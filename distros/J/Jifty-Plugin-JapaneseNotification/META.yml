@@ -1,0 +1,19 @@
+--- 
+abstract: Send emails from Jifty with Japanese character code
+author: 
+  - Tomohiro Hosaka, C<< <bokutin at bokut.in> >>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Jifty-Plugin-JapaneseNotification
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Encode: 2.11
+  Jifty: 0.71129
+version: 0.01

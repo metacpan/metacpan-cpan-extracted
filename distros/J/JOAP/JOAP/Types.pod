@@ -1,0 +1,185 @@
+# JOAP::Types - Documentation Package for JOAP Datatypes
+#
+# Copyright (c) 2003, Evan Prodromou <evan@prodromou.san-francisco.ca.us>
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+# tag: documentation-only package about data types in JOAP
+
+=pod
+
+=head1 NAME
+
+JOAP::Types - Documentation-only package about data types in JOAP
+
+=head1 SYNOPSIS
+
+    [N/A]
+
+=head1 ABSTRACT
+
+This documentation-only package discusses the JOAP datatypes and gives
+precise definitions of each datatype and how they are used.
+
+=head1 DESCRIPTION
+
+JOAP has a fairly specific set of data types that are used throughout
+the system. Rather than documenting the types everywhere they're used,
+this package gives more detail on each type.
+
+JOAP borrows its set of datatypes from XML-RPC, as XML-RPC is already
+used on the Jabber network for application development. Each datatype
+is defined by a name that is used in, for example, the metadata about
+attributes and methods.
+
+Each type is identified by a string value; these are translated into
+element tag names in XML format.
+
+The definition here is loose; see the full JOAP documenation for
+details. Although the types come from XML-RPC, the formats of each
+type are mapped to XML Schema datatypes, which are generally more
+permissive than XML-RPC.
+
+Note also that input for accessors and method parameters are generally
+marshalled from Perl values to the 'correct' JOAP value format before
+going on the wire, and back to Perl values when they're taken off the
+wire. So programmers will generally not have to worry if their values
+are formatted correctly; the values will automagically go through the
+JOAP pipe correctly.
+
+=head2 XML-RPC Types
+
+The types inherited from XML-RPC include the following. Note that
+there is an eclectic inventory style here; this is XML-RPC's fault,
+not JOAP's, and there's not much we can do about it.
+
+=over
+
+=item 'string'
+
+Any string value. No codeset conversion is done. There's no limit on
+the size of the string. Almost any Perl scalar value will work well in
+this data type.
+
+=item 'int'
+
+=item 'i4'
+
+This is a 32-bit signed integer value in decimal format. The two type
+names are synonymous.
+
+=item 'double'
+
+A signed 'double precision' floating-point number, in decimal notation
+('-120.4') or scientific notation ('-1.204e2').
+
+=item 'boolean'
+
+A boolean true/false value. The number '0' represents false, and '1'
+represents true.
+
+=item 'dateTime.iso8601'
+
+A string representation for a date/time combination in the gregorian
+calendar. The format is very specific, as follows:
+
+    YYYY-MM-DDTHH:MM:SS[.ffff]TZ
+
+Here, YYYY is the four-digit year (actually, the year can be greater
+than four digits, or negative). MM is the 2-digit month of the year,
+from '01' to '12'. DD is the day of the month, ranging from '01' to
+'31'. The 'T' is a literal character 'T' (assumably to specify
+'time'), and 'HH' is the hour, ranging from '00' to '23'. 'MM' is the
+minute part, from '00' to '59', and SS is the seconds, '00' to '59'.
+
+The 'ffff' part is optional, and represents the fractional part of the
+second. Any number of digits can be included.
+
+The TZ is the timezone; JOAP specifies that all datetime values will
+be in UTC, so this will always be the letter 'Z'.
+
+This type comes from XML Schema; the XML-RPC date format is slightly
+different.
+
+=item 'base64'
+
+This is a base64-encoded binary value (such as a binary file
+format). JOAP doesn't do any encoding for you, and support for this
+data type is spotty.
+
+=item 'array'
+
+This is a series of other values. It maps well to Perl arrays or
+lists.
+
+=item 'struct'
+
+A set of name-value pairs, where the values can be any kind of JOAP
+value.
+
+=back
+
+=head2 Object Types
+
+In addition to these types, JOAP defines an object-address
+datatype. If a type specification is a JOAP class address, like
+'Person@joap-server.example.net', the address of any instance of that
+class can be used as a value, like
+'Person@joap-server.example.net/Prodromou,Evan'.
+
+Moreover, the addresses of instances of classes that define
+'Person@joap-server.example.net' as one of their superclasses can also
+be used as values for the type. So
+'Vulcan@joap-server.example.net/Spock' can be used if
+'Vulcan@joap-server.example.net' defines
+'Person@joap-server.example.net' as one of its superclasses.
+
+Currently, the JOAP Perl package supports object types poorly.
+
+=head1 EXPORT
+
+None by default.
+
+=head1 SEE ALSO
+
+The JOAP specification lists the full definition of the datatypes with
+more detail.
+
+The L<JOAP> package has tools for marshalling Perl values to JOAP
+values and vice versa.
+
+=head1 AUTHOR
+
+Evan Prodromou E<lt>evan@prodromou.san-francisco.ca.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003, Evan Prodromou E<lt>evan@prodromou.san-francisco.ca.usE<gt>.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+=cut

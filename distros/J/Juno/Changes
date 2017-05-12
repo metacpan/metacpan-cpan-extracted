@@ -1,0 +1,49 @@
+Revision history for Perl extension Juno
+
+0.010   18.12.14
+        * Fix hanging on Windows if AnyEvent::Ping is not present.
+          (thanks, Alexandr Ciornii)
+        * Fix more hanging. (thanks, Graham Knop @haarg)
+
+0.009   10.02.13
+        * Added pure Ping test (thanks, BelGoat).
+        * Documentation overhaul.
+        * Avoid loading Class::MOP.
+        * Really really really don't depend on Moose.
+        * Reinstated finer-grained type constraints.
+        * Rewrote HTTP check test (thanks for the heads up, BelGoat).
+        * Shave some seconds off the testing.
+        * Code cleanup.
+        * More modern usage of MooseX::Role::Loggable.
+
+0.008   22.07.12
+        * Fixing lazy-yet-required attribute with subclassing that adds a
+          builder as well.
+
+0.007   22.07.12
+        * Convert to Moo.
+        * RawCommand's exit status was still checked even when we couldn't
+          deserialize it (or if it didn't exist). We return in case that
+          happens (on_fail and on_result will both still get called).
+
+0.006   18.07.12
+        * FPing.pm's analyze_ping_result returns the IP found.
+
+0.005   16.07.12
+        * Adding "after" timer attribute (Fayland Lam).
+        * Change "interval" timer attribute from Int to Num (Fayland Lam).
+
+0.004   15.07.12
+        * Add MooseX::Role::Loggable.
+
+0.003   12.07.12
+        * Fix interpolation in FPing's fping command.
+        * Add on_result support for TCP check.
+
+0.002   12.07.12
+        * Adding TCP (reported by Tal Fishler).
+        * Small fixes.
+
+0.001   22.04.12
+        * First release of Juno, a Perl general purpose checker.
+

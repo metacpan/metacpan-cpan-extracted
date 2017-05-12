@@ -1,0 +1,577 @@
+=encoding utf8
+
+=head1 NAME
+
+Jifty::Manual::Tutorial_zhtw - Jifty 從零開始
+
+=head1 DESCRIPTION
+
+這份教學文件將提供建構第一個 jifty 應用程式所需要的技巧。
+
+=cut
+
+=head1 如何做？
+
+=head2 需求
+
+這就是你需要安裝的。
+
+=head2 安裝 Jifty
+
+我們相當相信 DRY ( Don't Repeat Yourself ) 的原則，這是我們喜愛 Perl 與 CPAN 的一個很重要的原因。
+
+Jifty 使用了 CPAN 上許多令人驚奇的程式碼。他直接使用 60 多個來自 CPAN 的模組 。
+
+大部分的套件都是跨平台且只以 Perl 寫成的模組，且能在你可取得 Perl 的任何平台上良好運作。
+
+我們花了很長的一段時間讓您能夠不用花上一整天的時間下載函式庫以及所有相關的套件。 
+
+Jifty 的安裝程式能夠自動偵測您機器上尚未安裝的模組，並且直接下載並安裝他們。
+
+別擔心，Jifty 在更動之前提醒你。
+
+在大多數的系統上，你可以使用 Perl 所提供的 CPAN 模組來下載並且安裝 Jifty:
+
+  # perl -MCPAN -e"install Jifty"
+
+如果你下載了 Jifty 的 C<.tar.gz> 檔，您可以使用手動安裝:
+
+  # tar xzvf jifty-<version>.tgz
+  # cd jifty-<version>
+  # perl Makefile.PL
+  # make
+  # make test
+  # make install
+
+我們會想要知道如果單元測試沒有通過的原因，如果您遇到了這樣的問題。
+請加入我們的 C<jifty-devel@lists.jifty.org> 並回報相關的錯誤訊息。
+關於如何加入我們，請參見下方的 L<GETTING HELP> 
+
+=head2 設置框架
+
+一旦你完成了 Jifty 的安裝，便能開始構築你第一份 Jifty 應用程式。
+
+Jifty 將所有的事情設計的相當簡單使用，你只需要使用 Jifty 提供的 F<jifty> 命令列工具來啟動您的應用程式
+ ( 在您建構的應用程式裡的 F<bin/> 資料夾內 )
+
+請切換到一個乾淨的目錄底下來建立你的 Jifty 應用程式。 ( Jifty 會為您建立子資料夾 ).
+
+  # jifty app --name MyWeblog
+  Creating new application MyWeblog
+  Creating directory lib
+  Creating directory lib/MyWeblog
+  Creating directory bin
+  Creating directory etc
+  Creating directory doc
+  Creating directory log
+  Creating directory var
+  Creating directory var/mason
+  Creating directory share
+  Creating directory share/po
+  Creating directory share/web
+  Creating directory share/web/templates
+  Creating directory share/web/static
+  Creating directory lib/MyWeblog/Model
+  Creating directory lib/MyWeblog/Action
+  Creating directory t
+  Creating configuration file MyWeblog/etc/config.yml
+
+以下將逐一解說。
+
+=over
+
+=item bin
+
+在 F<bin/> 資料夾內的便是 F<jifty>, 是 Jifty 用來處理 Jifty 指令的程式 . 
+
+一些較重要的指令是 C<schema> , 這個指令用來設置或更新您的資料庫。
+又如指令 C<server> , 這個指令將啟動獨立的網頁伺服器。 .
+
+想知道其他 Jifty 提供的指令，可執行:
+
+    jifty help
+
+=item etc
+
+設定檔都放在 F<etc/> 內，如果你沒有這個檔案，Jifty 會為你自動產生一個設定檔。
+
+=item doc
+
+當你需要寫文件時，可以直接寫在 F<doc/> 內。
+
+=item log
+
+Jifty 使用 L<Log::Log4perl> 模組來紀錄所有訊息。預設會將訊息紀錄至 F<log>
+資料夾內的 F<server.log> 以及 F<error.log> 檔案。
+
+=item var
+
+Jifty 會將 Server 執行時的快取檔案存放在 var 資料夾。請不要去碰這個資料夾。
+
+=item share/web/po
+
+Jifty 支援國際化。 F<share/web/po/> 裡頭可以放你的本地化翻譯。
+("portable object templates") will go.
+
+=item share/web/templates
+
+Jifty 應用程式大多使用 L<Template::Declare> 模組來產生樣板。
+但我們也支援 L<HTML::Mason> 樣板引擎。
+
+你可將你的 Mason 樣板放入 F<share/web/templates/> 目錄內。
+此外， Jifty 內建的 I<skeleton> 會為你放在 F<share/web/templates/> 內。
+
+如此一來，預設的 Jifty 應用程式提供了一個最基本的功能，也可以馬上執行。
+
+不過， 當你需要建制更進階的應用程式時， 你仍需要自己客制化你的樣板，
+
+你可以由此找到 Jifty 設置的預設樣板位置:
+
+  perl -MJifty::Util -le 'print Jifty::Util->share_root'
+
+=item share/web/static
+
+你的網頁應用程式有些內容其實是不需要經過樣板引擎的。這些靜態檔案，
+都可以放在 F<share/web/static> 目錄內。
+
+當 Jifty 找不到相對應的樣板名稱時，將會由靜態檔案的路徑去搜尋正確的名稱。
+
+另外，Jifty 提供 CSS 樣式、Javascript 函式庫以及一隻小馬在此目錄裡頭。
+
+可看看 Jifty F<share/web/static> 目錄，或者在預設樣板引擎的目錄裡頭。
+
+=item lib/MyWeblog/Model
+
+你的應用程式裡頭，最重要的部份就是在 C<lib/MyWeblog/Model>。
+
+這裡放置的類別，定義了你應用程式的資料結構，以及他們如何與其他資料模型 ( Data
+Model ) 關聯。
+
+Jifty 會從你的資料模型類別 ( Model Class ) 的定義，來設置或升級你的資料庫 schema。
+
+完整的 Jifty 物件模型請參考 L<Jifty::Manual::ObjectModel>
+
+=item lib/MyWeblog/Action
+
+動作 ( Actions ) 是你資料模型類別 ( Model Class ) 的 API。
+
+你可以將他們想像程式 HTML 表單，但表單是自動產生的。
+
+Jifty 會在執行期間自動為你的資料模型 ( B<Models> ) 自動產生基本的資料庫動作 (
+C<CREATE> , C<READ> , C<UPDATE> , C<DELETE> ) B< 動作 ( Actions )>。
+
+=item t
+
+Jifty 可以為你提供一些基本的測試，如資料模型 (Model)
+的基本測試，不過沒辦法為你提供所有的測試。 然而，你可以你可在 F<t/>
+目錄底下撰寫更詳盡的測試。
+
+=back
+
+=head2 建置你的資料模型 (Data Model)
+
+如同我們教學應用程式被命名為 B<MyWeblog>
+，這裡的範例就是要示範如何建置一個簡單的 weblog 應用程式。
+
+未來的教學將會提供使用者驗證，回應、以及 RSS 與 ATOM Feeds。
+
+=head3 文章
+
+Weblogs 最主要的重點就是文章，所以我們第一個需要的資料模型為 C<Post> ，用來存放文章:
+
+  # cd MyWeblog
+  # jifty model --name Post
+  Writing file /tmp/MyWeblog/lib/MyWeblog/Model/Post.pm
+  Writing file /tmp/MyWeblog/t/00-model-Post.t
+
+太棒了！現在你有了 B<Post> 資料模型 ( 不過我們還沒有定義任何東西 )。
+
+以你最喜歡的編輯器，將 F<lib/MyWeblog/Model/Post.pm> 檔案打開。
+
+你會看見如下的東西:
+
+  use strict;
+  use warnings;
+  
+  package MyWeblog::Model::Post;
+  use Jifty::DBI::Schema;
+  
+  use MyWeblog::Record schema {
+  
+  };
+  
+  # Your model-specific methods go here.
+  
+  1;
+
+現在是該說明文章的模型類別 (model class) 了。
+
+從給我們的文章 C<body> 以及 C<title> 欄位開始吧。
+
+(在這份教學文件，我們計畫在未來提供更完整的解釋，
+以及加入文章類別 (C<category>) 以及 標籤 (C<tags>) 資料表的範例 )
+
+將你的游標放置在下面這行的下方
+
+  use MyWeblog::Record schema {
+
+新增這些行:
+
+  column title =>
+        type is 'text',
+        label is 'Title',
+        default is 'Untitled post';
+
+  column body => 
+        type is 'text',
+        label is 'Content',
+        render_as 'Textarea';
+
+接著存檔。
+
+=head2 啟動 Jifty 應用程式伺服
+
+現在你有了可以運作、簡易的應用程式。積著可以透過 C<jifty server> 啟動你的
+Jifty 應用程式了。
+
+現在你第一個看到的應該是 Jifty 提示你目前沒有資料庫，所以它會立刻將你建置一個。
+Jifty 會使用 SQLite 作為你預設的資料庫引擎。
+如果你想使用 PostgreSQL 或是 MySQL ，你需要新增一些設定在 F<etc/config.yml>。
+(請參見 L<Jifty::Config> 了解更多資訊)
+
+    # jifty server
+    WARN - Application schema has no version in the database.
+    WARN - Automatically creating your database.
+    INFO - Generating SQL for application MyWeblog...
+    INFO - Using MyWeblog::Model::Post, as it appears to be new.
+    INFO - Using Jifty::Model::Session, as it appears to be new.
+    INFO - Using Jifty::Model::Metadata, as it appears to be new.
+    INFO - Set up version 0.0.1, jifty version 0.81208
+    INFO - You can connect to your server at http://localhost:8888/
+
+除了最後一行之外，都是關於資料庫設置的訊息。
+而這些訊息只會在 Jifty 修改你的資料庫時才會顯示。
+
+最後一行告訴你可以到你的網頁瀏覽器打開瀏覽這個網址。
+到處看看已啟用 AJAX 的管理介面，還有線上文件瀏覽器以及一隻小馬。
+
+對有些平台而言，你可能需要輸入 "./bin/jifty server" 。
+
+=head2 建置你的使用者介面
+
+這個網頁管理介面提供讓你可以操作應用程式資料的功能。你可以建立、更新、刪除我們剛剛
+所建置的文章 (posts) 。
+
+是的，你可以建立、更新、刪除文章。然而，它還不算是一個 welog。
+
+=head3 張貼
+
+現在讓我們建置一個用來建立新文章的頁面吧。
+
+請使用文字編輯器開啟 F<lib/MyWeblog/View.pm> 檔案。
+讓它看起來像這樣:
+
+  package MyWeblog::View;
+  use strict;
+  use warnings;
+  use Jifty::View::Declare -base;
+  
+  template post => page { title => 'Post Entry' } content {
+      my $action = new_action(class => 'CreatePost');
+  
+      form {
+          render_action $action;
+
+          # 提交按鈕
+          form_submit(label => 'Post');
+      }
+  };
+  
+  1;
+
+=head3 瀏覽
+
+要取得 I<基本> 的文章列表或是有些複雜的 AJAX 的清單其實是相當容易的。
+這裡將會示範如何做這兩種清單。 你可以選擇最適合你的方式來實做。
+
+=head4 The quick and dirty way
+
+開啟你的 F<lib/MyWeblog/View.pm> 檔案，並且在 C<post> 以及 "1;"
+之間，新增以下這些程式:
+
+  template '/' => page {
+
+      # 取得所有文章資料
+      my $posts = MyWeblog::Model::PostCollection->new;
+      $posts->unlimit;
+  
+      # 將每則文章顯示於 <dl> HTML 標籤內。
+      dl {
+          while (my $post = $posts->next) {
+              dt { $post->title }
+              dd { $post->body  }
+          }
+      }
+  };
+
+現在你到 C<http://localhost:8888> ，你就可以看到你所有的文章了。
+
+=head4 酷但也比較複雜的方式
+
+這個 I<complex way> 會使用 Jifty 的進階功能之一:  頁面區塊 ( I<Page regions> )
+不論你是用現在高階網頁瀏覽器來使用 AJAX 或是使用低階瀏覽器如 C<lynx> 或 C<w3m> 
+來做一般的 GET 要求，這些區塊可以讓你的應用程式只單獨對你頁面中的小部份區塊獨立更新
+
+這種方式的下層其實是每個分開的區塊都需要存在在它所屬的樣板 (template) 內。
+然而就算不用區塊 (regions) 這也是一個相當不錯的設計練習。
+
+
+這個較複雜的方式初步與上頭介紹的簡單方式是一樣的。
+取代 F<lib/MyWeblog/View.pm> 內的 '/' 樣板（若你仍對其簡單性有些顧忌，那加上它吧）:
+
+  template '/' => page {
+      render_region(
+          name => 'myweblog-posts',
+          path => '/fragments/page_of_posts',
+      );
+  };
+
+如果你已經了解狀況，你大概已經猜到我們需要建立一個樣板叫做 
+C</fragments/page_of_posts>。 讓這個樣板填入以下程式:
+
+  template '/fragments/page_of_posts' => sub {
+      # 取得目前頁數的參數，預設是 1
+      my $page = get('page') || 1;
+      
+      # 取得所有文章
+      my $posts = MyWeblog::Model::PostCollection->new;
+      $posts->unlimit;
+      
+      # 讓設定目前頁數，並且每頁顯示三篇文章
+      $posts->set_page_info(
+          current_page => $page,
+          per_page     => 3,
+      );
+  
+      # 顯示我們在第幾頁上頭
+      if ($posts->pager->last_page > 1) {
+          p { "Page $page of " . $posts->pager->last_page }
+      }
+  
+      # 顯示目前頁面的文章
+      dl {
+          attr { class => 'list' };
+  
+          while (my $post = $posts->next) {
+              dt { $post->title }
+              dd { $post->body  }
+          }
+      };
+  
+      # 回前頁的連結， 當區塊重新被呼叫時，這裡的 'page' 參數會被設定新的數值
+      if ($posts->pager->previous_page) {
+          hyperlink(
+              label => 'Previous Page',
+              onclick => {
+                  args => {
+                      page => $posts->pager->previous_page,
+                  },
+              },
+          );
+      }
+  
+      # 下一頁的連結
+      if ($posts->pager->next_page) {
+          hyperlink(
+              label => 'Next Page',
+              onclick => {
+                  args => {
+                      page => $posts->pager->next_page,
+                  },
+              },
+          );
+      }
+  };
+
+現在重新啟動你的 Jifty 網頁伺服器。瀏覽 C</post> 並且建立三份以上的文章。
+回到首頁，並且玩玩看 C<Next Page> 以及 C<Previous Page> 的 AJAX 連結。
+
+關掉你瀏覽器的 Javascript 或者用 C<lynx> 來瀏覽， 
+並注意網頁上使用 AJAX 的區域已經自動退為一般的頁面內容
+
+所有都是免費並且自由的，感謝 Jifty!
+
+=head3 嘿，那些類別哪來的？ 
+
+你也許會想知道 C<MyWeblog::Model::PostCollection> ，因為沒有檔案叫做 
+F<PostCollection.pm>。 Jifty 使用 C<Jifty::ClassLoader> 來自動產生許多類別。
+當然，你也可以繼承這些自動產生的類別並給予新的定義。請參見 L<Jifty::ClassLoader> 。
+
+=head2 導覽列
+
+當然，要記住這些能夠取得文章頁面的 URL 是有點惱人的。
+要讓我們的導覽列選單能夠有一個 B<Post> 按鈕，你需要覆載原本預設的選單。
+
+我們將要為你的 Blog 設定新的分派器(dispatcher)。一個分派器負責將每個頁面需求的 URL
+對應到應該要做的事情。
+
+我們可以在 "繪製任何網頁樣板之前" 的分派規則內，設定更多的選單項目。
+
+打開一個新檔叫做 F<lib/MyWeblog/Dispatcher.pm> 並且將以下內容填入:
+
+  package MyWeblog::Dispatcher;
+  use strict;
+  use warnings;
+  use Jifty::Dispatcher -base;
+  
+  before '*' => run {
+      my $top = Jifty->web->navigation;
+      $top->child(Home => url => '/');
+      $top->child(Post => url => '/post', label => 'Post Article');
+  };
+  
+  1;
+
+關於更多關於選單系統的資訊，請參見 L<Jifty::Web::Menu>。
+
+=head2 使用自己的頁面類別 (此條目僅於中文文件新增)
+
+由於 Jifty 使用 Jifty::ClassLoader 來自動為你產生 MyWeblog::View::Page 
+因此為你套用的頁面、選單都是預設的。 如果你不喜歡 Jifty 為你建立預設的頁面以及選單
+你可以將 MyWeblog::View::Page 類別覆載 (override) 來客制化自己的頁面
+
+請建立 F<lib/MyWeblog/View/Page.pm> 檔案，並填入下列內容:
+
+    use strict;
+    use warnings;
+    package MyWeblog::View::Page;
+    use base 'Jifty::View::Declare::Page';   # 繼承 Jifty::View::Declare::Page
+    use Jifty::View::Declare::Helpers;
+
+    sub render_body {
+        my ($self, $body_code) = @_;
+        $self->render_header();
+        body {
+
+            # so that we don't show menu template here.
+
+            $self->render_pre_content_hook();
+            $body_code->();
+        };
+    }
+
+    sub render_page {
+        my $self = shift;
+        Carp::cluck $self unless $self->content_code;
+        div { 
+
+            # 可自訂每頁 Page 在產生主內容前要做什麼。
+            # page wrapper here
+
+            $self->content_code->(); 
+        };
+    }
+
+    sub render_footer {
+        my $self = shift;
+
+        # 可新增自己想要的樣板於每頁的註腳
+        # do what you want
+
+        $self->SUPER::render_footer;
+    }
+
+關於 MyWeblog::View::Page 所覆載 (override) 的各項函式名稱，請參考
+L<Jifty::View::Declare::Page> 類別的文件。
+
+=head2 就是這樣了！
+
+以上就是你初步以 Jifty 建置網頁應用程式需要了解的事情。
+我們致力於將 Jifty 做的更簡單易用，並且儘快將像這樣有點難的教學棄置。
+
+請加入我們在 C<jifty-devel> 的 mailing list 來討論你如何使用 Jifty 或者
+你覺得有哪些特別難用地方。
+
+=head1 更多的教學
+
+=over 4
+
+=item * 控制與管理你的資料模型
+
+L<Jifty::Manual::Models>
+
+=item * 讓 Jifty 做事 - 動作 (Action)
+
+L<Jifty::Manual::Actions>
+
+=item * 使用頁面區塊
+
+L<Jifty::Manual::PageRegions>
+
+=item * CSS 與 JS
+
+L<Jifty::Manual::UsingCSSandJS>,
+L<Jifty::Manual::JavaScript>
+
+=item * 網頁服務
+
+參見 L<Jifty::Manual::TutorialRest>
+
+=item * 內容接續 ( Continuations )
+
+L<Jifty::Manual::Continuations>
+
+=item * 存取控制以及安全性
+
+L<Jifty::Manual::AccessControl>
+
+=item * 佈署你的應用程式
+
+L<Jifty::Manual::Deploying>
+
+=item * 關於資料庫模型的升級
+
+L<Jifty::Manual::Upgrading>
+
+=item * 使用 Jifty 常見問題的解決方案
+
+L<Jifty::Manual::Cookbook>
+
+=back
+
+=head1 取得求助
+
+=head2 線上說明
+
+C<jifty> 的內建指令提供了協助訊息:
+
+  jifty help
+
+  jifty help <command>
+
+如果你啟用了管理者模式 ( 設定檔內的 C<AdminMode> 屬性為一 )
+那麼你可以在你的瀏覽器內點選 "線上文件" 連結，來瀏覽每個 Jifty 模組的文件內容。
+
+=head2 加入轉信清單
+
+C<jifty-devel@lists.jifty.org> 是我們討論如何建置 Jifty 的地方，以及任何相關問題的地方。
+
+要加入轉信清單，請寄信件至 C<jifty-devel-subscribe@lists.jifty.org>.
+
+=head2 瀏覽 Wiki
+
+我們有 wiki ! (事實上這個 wiki 正是使用 Jifty 做出的第一個網站)
+
+請參閱 L<http://jifty.org/>, 瀏覽或者貢獻。
+
+Wiki 系統是由 I<Wifty> 來建置的，程式碼可由 Jifty Subversion 儲存庫自由取用。
+
+=head1 錯誤回報
+
+請將 Jifty 程式錯誤 (Bugs) 回報至 C<jifty-devel@lists.jifty.org>。
+
+=head1 翻譯者
+
+林佑安 (c9s) ( C<cornelius.howl_at_gmail.com> ) L<http://oulixe.us/>
+
+=cut

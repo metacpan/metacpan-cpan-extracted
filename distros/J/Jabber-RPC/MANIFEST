@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+test.pl
+lib/Jabber/RPC.pm
+lib/Jabber/RPC/Server.pm
+lib/Jabber/RPC/Client.pm
+examples/server.pl
+examples/client.pl
+

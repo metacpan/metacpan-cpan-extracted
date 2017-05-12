@@ -1,0 +1,860 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@tcool.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. ($appname,$confirm_url)
+#: lib/Jifty/Plugin/Authentication/Password/Notification/ConfirmLostPassword.pm:38
+msgid ""
+"\n"
+"You're getting this message because you (or somebody claiming to be you)\n"
+"request to reset your password for %1.\n"
+"\n"
+"If you don't want to reset your password just ignore this message.\n"
+"\n"
+"To reset your password, click on the link below:\n"
+"\n"
+"%2\n"
+msgstr ""
+"\n"
+"%1 用のパスワードをリセットします。\n"
+"\n"
+"もしこのメールに心当たりがなく、パスワードをリセットする\n"
+"必要がない場合は無視してください。\n"
+"\n"
+"本当にリセットする場合は下のリンクをクリックしてください。\n"
+"\n"
+"%2\n"
+
+#. ($appname,$confirm_url)
+#: lib/Jifty/Plugin/Authentication/Password/Notification/ConfirmEmail.pm:41
+msgid ""
+"\n"
+"You're getting this message because you (or somebody claiming to be you)\n"
+"wants to use %1. \n"
+"\n"
+"We need to make sure that we got your email address right.  Click on the link below to get started:\n"
+"\n"
+"%2\n"
+msgstr ""
+"\n"
+"%1 へのご登録ありがとうございます。\n"
+"\n"
+"メールアドレスが正しいか確認させていただきます。下のリンクをクリックしてください。\n"
+"\n"
+"%2\n"
+
+#: lib/Jifty/Action/Record/Search.pm:172
+msgid "!=>< allowed"
+msgstr "! = > < は利用できません"
+
+#. ($appname,Jifty->config->framework('AdminEmail'))
+#: lib/Jifty/Notification.pm:108 lib/Jifty/Notification.pm:125
+msgid "%1 <%2>"
+msgstr "%1 <%2>"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:143
+msgid "%1 after"
+msgstr "%1 より後"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:146
+msgid "%1 before"
+msgstr "%1 より前"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:133
+msgid "%1 contains"
+msgstr "%1 を含む"
+
+#:
+msgid "%1 entries"
+msgstr "%1 件"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:166
+msgid "%1 greater or equal to"
+msgstr "%1 と同じかそれ以上"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:160
+msgid "%1 greater than"
+msgstr "%1 より大きい"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:121
+msgid "%1 is not"
+msgstr "%1 以外"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:136
+msgid "%1 lacks"
+msgstr "%1 を含まない"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:169
+msgid "%1 less or equal to"
+msgstr "%1 と同じかそれ以下"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:163
+msgid "%1 less than"
+msgstr "%1 より小さい"
+
+#:
+msgid "%1 line %2"
+msgstr "%1 %2行目"
+
+#. ($_->[3])
+#: lib/Jifty/Plugin/SQLQueries.pm:186
+msgid "%1 seconds"
+msgstr "%1 秒"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:149
+msgid "%1 since"
+msgstr "%1 と同じかそれ以降"
+
+#. ($label)
+#: lib/Jifty/Action/Record/Search.pm:152
+msgid "%1 until"
+msgstr "%1 と同じかそれ以前"
+
+#: lib/Jifty/Action/Record/Search.pm:81
+msgid "(any)"
+msgstr "（指定なし）"
+
+#: lib/Jifty/Plugin/AutoReference.pm:95
+msgid "- none -"
+msgstr "- なし -"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ConfirmEmail.pm:58
+msgid ". Your email address has now been confirmed."
+msgstr "メールアドレスの確認が完了しました。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/SendPasswordReminder.pm:96
+msgid "A link to reset your password has been sent to your email account."
+msgstr "お使いのメールアカウントにパスワードをリセットするリンクを送信しました。"
+
+#. ($appname)
+#: lib/Jifty/Notification.pm:110 lib/Jifty/Notification.pm:127
+msgid "A notification from %1!"
+msgstr "%1 からのお知らせです!"
+
+#:
+msgid "Actions"
+msgstr "操作"
+
+#: lib/Jifty/Plugin/AdminUI/Dispatcher.pm:34
+msgid "Administration"
+msgstr "管理"
+
+#: lib/Jifty/View/Declare/Page.pm:197
+msgid "Administration mode is enabled."
+msgstr "管理モードが有効になっています。"
+
+#: lib/Jifty/View/Declare/Page.pm:194
+msgid "Alert"
+msgstr "注意"
+
+#: lib/Jifty/Action/Record/Create.pm:105
+msgid "An error occurred.  Try again later"
+msgstr "エラーが発生しました。しばらく待ってから再度試してみてください"
+
+#: lib/Jifty/Action/Record/Search.pm:177
+msgid "Any field contains"
+msgstr "検索したい文字列"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:115
+msgid "Anyway, the software has logged this error."
+msgstr "エラーは記録しました。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Mixin/Model/User.pm:54
+msgid "Authentication token"
+msgstr "認証トークン"
+
+#:
+msgid "Back to the admin console"
+msgstr "管理画面に戻る"
+
+#:
+msgid "Back to the application"
+msgstr "アプリケーションに戻る"
+
+#: lib/Jifty/Plugin/SQLQueries.pm:175
+msgid "Bindings"
+msgstr "バインディング"
+
+#:
+msgid "Calendar"
+msgstr "カレンダー"
+
+#: lib/Jifty/View/Declare/CRUD.pm:447
+msgid "Cancel"
+msgstr "キャンセル"
+
+#:
+msgid "Children"
+msgstr "子"
+
+#:
+msgid "Close window"
+msgstr "閉じる"
+
+#:
+msgid "Confirm delete?"
+msgstr "本当に削除しますか?"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/SendAccountConfirmation.pm:94
+msgid "Confirmation resent."
+msgstr "確認メールを再送しました。"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:65
+msgid "Continue"
+msgstr "次"
+
+#: lib/Jifty/View/Declare/CRUD.pm:845
+msgid "Create"
+msgstr "作成"
+
+#. (ref($record),$msg)
+#: lib/Jifty/Action/Record/Create.pm:104
+msgid "Create of %1 failed: %2"
+msgstr "%1 の作成に失敗しました: %2"
+
+#: lib/Jifty/Action/Record/Create.pm:131
+msgid "Created"
+msgstr "作成しました"
+
+#:
+msgid "Database Administration"
+msgstr "データベース管理"
+
+#: lib/Jifty/View/Declare/CRUD.pm:608
+msgid "Default"
+msgstr "デフォルト"
+
+#: lib/Jifty/View/Declare/CRUD.pm:457
+msgid "Delete"
+msgstr "削除"
+
+#: lib/Jifty/Action/Record/Delete.pm:82
+msgid "Deleted"
+msgstr "削除しました"
+
+#: lib/Jifty/View/Declare/CRUD.pm:379
+msgid "Edit"
+msgstr "編集"
+
+#:
+msgid "Edit %1"
+msgstr "%1 を編集"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:53 lib/Jifty/Plugin/Authentication/Password/Action/SendPasswordReminder.pm:32
+msgid "Email"
+msgstr "メール"
+
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:53
+msgid "Email address"
+msgstr "メールアドレス"
+
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:55
+msgid "Email address confirmed?"
+msgstr "確認済?"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:182
+msgid "Fill in your address below, and we'll send out another confirmation email to you. "
+msgstr "メールアドレスをご記入ください。再度確認メールを送信します。"
+
+#:
+msgid "Foo cannot contain -, *, +, or ?."
+msgstr "-、*、+、?は利用できません。"
+
+#:
+msgid "Foo cannot contain uppercase letters."
+msgstr "大文字は利用できません。"
+
+#:
+msgid "Foo values are always in lowercase."
+msgstr "かならず小文字で記入してください。"
+
+#:
+msgid "For one reason or another, you got to a web page that caused a bit of an error. And then you got to our 'basic' error handler. Which means we haven't written a pretty, easy to understand error message for you just yet. The message we do have is :"
+msgstr "なんらかの理由でページにエラーが発生しました。現時点ではわかりやすい綺麗なエラーメッセージを表示できません。実際のエラーメッセージは次の通りです: "
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:27
+msgid "For one reason or another, you got to a web page that caused a bit of an error. And then you got to our 'basic' error handler. Which means we haven't written a pretty, easy to understand error message for you just yet. The message we do have is:"
+msgstr "なんらかの理由でページにエラーが発生しました。現時点ではわかりやすい綺麗なエラーメッセージを表示できません。実際のエラーメッセージは次の通りです: "
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:122
+msgid "Go back home..."
+msgstr "ホームページに戻る…"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:35
+msgid "Go for it!"
+msgstr "登録する!"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:69
+msgid "Hashed Password"
+msgstr "パスワードハッシュ"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:44
+msgid "Head on back home"
+msgstr "ホームページに戻る"
+
+#:
+msgid "Hello, %1!"
+msgstr "%1 さん、こんにちは!"
+
+#. (Jifty->web->current_user->user_object->facebook_name)
+#: lib/Jifty/Plugin/Authentication/Facebook/Action/LoginFacebookUser.pm:103
+msgid "Hi %1!"
+msgstr "%1 さん、こんにちは!"
+
+#. (DateTime::Locale->load($lang)->native_name)
+#: lib/Jifty/Plugin/I18N/Action/SetLang.pm:44
+msgid "Hi, we speak %1."
+msgstr "いまの言語は %1 です"
+
+#. ($cu->username)
+#: lib/Jifty/Plugin/SkeletonApp/View.pm:30
+msgid "Hiya, %1."
+msgstr "%1 さん、こんにちは"
+
+#: lib/Jifty/Plugin/SkeletonApp/Dispatcher.pm:31
+msgid "Home"
+msgstr "ホーム"
+
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:50
+msgid "How should I display your name to other users?"
+msgstr "ほかのユーザに公開する名前を決めてください。"
+
+#:
+msgid "I changed $field for you"
+msgstr "$fieldを変更しました"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:64
+msgid "I'm not sure how this happened."
+msgstr "原因は不明です。"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:59
+msgid "If the username provided conflicts with an existing username or contains invalid characters, you will have to give us a new one."
+msgstr "ユーザ名が既に登録されている場合、または利用できない文字が含まれている場合は新しいユーザ名を登録していただきます。"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:27
+msgid "If you have a Livejournal or other OpenID account, you don't even need to sign up. Just log in."
+msgstr "LivejournalなどのOpenIDアカウントをお持ちの場合は、サインアップは不要です。ログインしてください。"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:64
+msgid "Internal error"
+msgstr "内部エラー"
+
+#:
+msgid "Invalid OpenID URL.  Please check to make sure it is correct.  (@{[$csr->err]})"
+msgstr "OpenID URLが正しくありません。ご確認ください。(@{[$csr->err]})"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:122 lib/Jifty/Plugin/Authentication/Password/Action/SendAccountConfirmation.pm:75 lib/Jifty/Plugin/Authentication/Password/Action/SendPasswordReminder.pm:79
+msgid "It doesn't look like there's an account by that name."
+msgstr "そのようなアカウントは存在しないようです。"
+
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:108
+msgid "It looks like somebody else is using that address. Is there a chance you have another account?"
+msgstr "そのアドレスは既に使われているようです。別のアカウントをお持ちではありませんか?"
+
+#: lib/Jifty/Plugin/OpenID/Dispatcher.pm:45
+msgid "It looks like someone is already using that OpenID."
+msgstr "そのOpenIDは既に使われているようです。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:75
+msgid "It looks like you already have an account. Perhaps you want to <a href=\"/login\">log in</a> instead?"
+msgstr "既にアカウントをお持ちのようです。<a href=\"/login\">ログイン</a>してください。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:75
+msgid "It looks like you didn't enter the same password into both boxes. Give it another shot?"
+msgstr "パスワードが一致しません。もう一度入力してください。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/SendAccountConfirmation.pm:79
+msgid "It looks like you're already confirmed."
+msgstr "確認済みのようです。"
+
+#:
+msgid "Jifty Developer Documentation Online"
+msgstr "開発者向けオンラインドキュメント"
+
+#:
+msgid "Jifty Pod Online"
+msgstr "オンラインドキュメント"
+
+#: lib/Jifty/Plugin/I18N/Action/SetLang.pm:12
+msgid "Language"
+msgstr "言語"
+
+#: lib/Jifty/View/Declare/Page.pm:215
+msgid "Loading..."
+msgstr "読込み中…"
+
+#: lib/Jifty/Plugin/Authentication/Password/Dispatcher.pm:137 lib/Jifty/Plugin/Authentication/Password/View.pm:88
+msgid "Login"
+msgstr "ログイン"
+
+#: lib/Jifty/Plugin/Authentication/Facebook/View.pm:24
+msgid "Login to Facebook now to get started!"
+msgstr "Facebookを始めよう!"
+
+#: lib/Jifty/Plugin/Authentication/Facebook/View.pm:41
+msgid "Login to Facebook now to link it with your current account!"
+msgstr "お使いのアカウントをFacebookにリンクさせましょう!"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:82
+msgid "Login with a password"
+msgstr "パスワードでログイン"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:17
+msgid "Login with your OpenID"
+msgstr "OpenIDでログイン"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:57
+msgid "Login!"
+msgstr "ログイン!"
+
+#: lib/Jifty/Plugin/Authentication/Password/Dispatcher.pm:156
+msgid "Logout"
+msgstr "ログアウト"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:90
+msgid "Lost your password?"
+msgstr "パスワードをお忘れですか?"
+
+#:
+msgid "Mason error"
+msgstr "Mason エラー"
+
+#:
+msgid "Models"
+msgstr "モデル"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:115
+msgid "New password"
+msgstr "新しいパスワード"
+
+#: lib/Jifty/View/Declare/CRUD.pm:774
+msgid "Next Page"
+msgstr "次のページ"
+
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:49
+msgid "Nickname"
+msgstr "ニックネーム"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:79
+msgid "No account yet? It's quick and easy. "
+msgstr "登録はお済みですか?"
+
+#: lib/Jifty/Action/Record/Search.pm:178
+msgid "No field contains"
+msgstr "排除したい文字列"
+
+#:
+msgid "No items found"
+msgstr "見つかりませんでした"
+
+#: lib/Jifty/View/Declare/CRUD.pm:689
+msgid "No items found."
+msgstr "見つかりませんでした。"
+
+#: lib/Jifty/Web.pm:305
+msgid "No request to handle"
+msgstr "処理できるリクエストがありません"
+
+#: lib/Jifty/Plugin/UUID/Widget.pm:37
+msgid "No value yet"
+msgstr "値がありません"
+
+#:
+msgid "Online Documentation"
+msgstr "オンラインドキュメント"
+
+#: lib/Jifty/Plugin/OnlineDocs/Dispatcher.pm:26
+msgid "Online docs"
+msgstr "オンラインドキュメント"
+
+#: lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:27
+msgid "OpenID URL"
+msgstr "OpenID URL"
+
+#: lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:48
+msgid "OpenID verification failed.  It looks like you cancelled the OpenID verification request."
+msgstr "OpenIDの確認に失敗しました。確認をキャンセルされませんでしたか。"
+
+#: lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:57
+msgid "OpenID verification failed: "
+msgstr "OpenIDの確認に失敗しました: "
+
+#. ($page,$collection->pager->last_page)
+#: lib/Jifty/View/Declare/CRUD.pm:741
+msgid "Page %1 of %2"
+msgstr "%1 / %2 ページ"
+
+#:
+msgid "Page info"
+msgstr "ページ情報"
+
+#:
+msgid "Parent"
+msgstr "親"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:64 lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:32 lib/Jifty/Plugin/Authentication/Password/Mixin/Model/User.pm:60
+msgid "Password"
+msgstr "パスワード"
+
+#: lib/Jifty/Plugin/Authentication/Password/Mixin/Model/User.pm:136
+msgid "Passwords need to be at least six characters long"
+msgstr "パスワードは最低6文字以上にしてください"
+
+#: lib/Jifty/Action/Record/Delete.pm:61 lib/Jifty/Action/Record/Update.pm:182 lib/Jifty/Action/Record/Update.pm:195 lib/Jifty/Record.pm:508 lib/Jifty/Record.pm:567 lib/Jifty/Record.pm:70
+msgid "Permission denied"
+msgstr "権限がありません"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:66
+msgid "Please email us!"
+msgstr "メールをお送りください!"
+
+#: lib/Jifty/View/Declare/CRUD.pm:763
+msgid "Previous Page"
+msgstr "前のページ"
+
+#: lib/Jifty/View/Declare/CRUD.pm:460
+msgid "Really delete?"
+msgstr "本当に削除しますか?"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:65
+msgid "Really, really sorry."
+msgstr "本当に申し訳ないです。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:72
+msgid "Remember me?"
+msgstr "記憶しますか?"
+
+#:
+msgid "Rendered in %1s"
+msgstr "描画時間: %1秒"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:108 lib/Jifty/Plugin/Authentication/Password/View.pm:112
+msgid "Reset lost password"
+msgstr "パスワードをリセットする"
+
+#:
+msgid "Run the action"
+msgstr "実行"
+
+#:
+msgid "SQL Statements"
+msgstr "SQL文"
+
+#: lib/Jifty/View/Declare/CRUD.pm:438
+msgid "Save"
+msgstr "保存"
+
+#:
+msgid "Schema"
+msgstr "スキーマ"
+
+#: lib/Jifty/View/Declare/CRUD.pm:327
+msgid "Search"
+msgstr "検索"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:152
+msgid "Send"
+msgstr "送信"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:147
+msgid "Send a link to reset your password"
+msgstr "パスワードをリセットするURLを送信する"
+
+#:
+msgid "Send a password reminder"
+msgstr "通知メールを送信する"
+
+#: lib/Jifty/Plugin/Feedback/View.pm:21
+msgid "Send us feedback!"
+msgstr "ご意見ご感想をお寄せください!"
+
+#: lib/Jifty/Plugin/Authentication/Password/Dispatcher.pm:142 lib/Jifty/Plugin/Authentication/Password/View.pm:42 lib/Jifty/Plugin/Authentication/Password/View.pm:47
+msgid "Sign up"
+msgstr "サインアップ"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:80
+msgid "Sign up for an account!"
+msgstr "サインアップする"
+
+#. ($msg)
+#: lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:108
+msgid "Something bad happened and we couldn't create your account: %1"
+msgstr "問題が発生したためアカウントを作成できませんでした: %1"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:132
+msgid "Something went awry"
+msgstr "問題が発生しました"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:110
+msgid "Something's not quite right"
+msgstr "原因不明のエラーです"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:116
+msgid "Sorry about this."
+msgstr "申し訳ないです。"
+
+#: lib/Jifty/Plugin/Authentication/Facebook/Action/LoginFacebookUser.pm:62
+msgid "Sorry, something weird happened (we couldn't create a user for you).  Try again later."
+msgstr "問題が発生したため、ユーザの作成に失敗しました。お手数ですがあとでもう一度試してみてください。"
+
+#:
+msgid "Table of Contents"
+msgstr "目次"
+
+#. (Jifty->config->framework('ApplicationName'))
+#: lib/Jifty/Plugin/Feedback/View.pm:22
+msgid "Tell us what's good, what's bad, and what else you want %1 to do!"
+msgstr "%1へのご意見、ご感想、ご要望をお寄せください。"
+
+#. ($new_email)
+#: lib/Jifty/Plugin/User/Mixin/Model/User.pm:101
+msgid "That %1 doesn't look like an email address."
+msgstr "%1は正しいメールアドレスではないようです。"
+
+#: lib/Jifty/Action.pm:1063
+msgid "That doesn't look like a correct value"
+msgstr "値が不適切なようです"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/SendAccountConfirmation.pm:68 lib/Jifty/Plugin/Authentication/Password/Action/SendPasswordReminder.pm:72 lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:70
+msgid "That doesn't look like an email address."
+msgstr "正しいメールアドレスではないようです。"
+
+#: lib/Jifty/Action/Record.pm:362
+msgid "That doesn't look right, but I don't know why"
+msgstr "原因不明のエラーです"
+
+#:
+msgid "The OpenID '$openid' has been linked to your account."
+msgstr "OpenID '$openid'をお使いのアカウントにリンクさせました。"
+
+#: lib/Jifty/Action/Record.pm:220
+msgid "The passwords you typed didn't match each other"
+msgstr "パスワードが一致しません"
+
+#: lib/Jifty/Web.pm:426
+msgid "There was an error completing the request.  Please try again later."
+msgstr "リクエストの処理中にエラーが発生しました。あとでもう一度試してみてください。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:81
+msgid "There was an error setting your password."
+msgstr "パスワードの設定中にエラーが発生しました。"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:37
+msgid "There's a pretty good chance that error message doesn't mean anything to you, but we'd rather you have a little bit of information about what went wrong than nothing. We've logged this error, so we know we need to write something friendly explaining just what happened and how to fix it."
+msgstr "このエラーメッセージはみなさんにはあまり意味がないかもしれませんが、何もないよりは多少なりとも何が起こっているかお知らせした方が安心していただけると思っています。このエラーは記録しましたので、今度はわかりやすいメッセージを用意したり問題を解決できるようにいたします。"
+
+#:
+msgid "This console lets you manage the records in your Jifty database. Below, you should see a list of all your database tables. Feel free to go through and add, delete or modify records."
+msgstr "ここでは Jifty データベースのレコードを管理できます。下にデータベースの全テーブルが一覧されているはずですので、自由に表示・作成・削除・修正してください。"
+
+#:
+msgid "To disable this administrative console, add \"AdminMode: 0\" under the \"framework:\" settings in the config file (etc/config.yml)."
+msgstr "この管理画面を無効にするには、設定ファイル（etc/config.yml）の \"framework:\" の項目の下に \"AdminMode: 0\" を追加してください。"
+
+#: lib/Jifty/View/Declare/CRUD.pm:653
+msgid "Toggle search"
+msgstr "検索の切り替え"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:149
+msgid "Try again"
+msgstr "もう一度試してみてください"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:108
+msgid "Try again later. We're really, really sorry."
+msgstr "もう一度試してみてください。お手数をおかけして申し訳ないです。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:53
+msgid "Type that again?"
+msgstr "もう一度入力してください。"
+
+#: lib/Jifty/Action/Record/Update.pm:222
+msgid "Updated"
+msgstr "更新しました"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:44
+msgid "Username"
+msgstr "ユーザ名"
+
+#:
+msgid "Variables"
+msgstr "変数"
+
+#:
+msgid "W00t"
+msgstr "OK"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:53
+msgid "We need you to set a username or quickly check the one associated with your OpenID. Your username is what other people will see when you ask questions or make suggestions"
+msgstr "ユーザ名を設定するか、お使いのOpenIDに関連づけられたユーザ名をすぐに確認してください。このユーザ名は質問や提案をするときに表示されます"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:114
+msgid "We've sent a confirmation message to your email box."
+msgstr "お使いのメールボックスに確認のメールを送信しました。"
+
+#:
+msgid "Welcome %1 to the %2"
+msgstr "%1さん、%2へようこそ"
+
+#: lib/Jifty/Plugin/OpenID/Dispatcher.pm:66
+msgid "Welcome back, "
+msgstr "おかえりなさい"
+
+#. ($user->name)
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:258
+msgid "Welcome back, %1."
+msgstr "%1さん、おかえりなさい"
+
+#. ($appname)
+#: lib/Jifty/Plugin/Authentication/Password/Notification/ConfirmEmail.pm:40
+msgid "Welcome to %1!"
+msgstr "%1へようこそ!"
+
+#. (Jifty->config->framework('ApplicationName'),$u->name)
+#. (Jifty->config->framework('ApplicationName'),$record->name)
+#: lib/Jifty/Plugin/Authentication/Password/Action/ConfirmEmail.pm:57 lib/Jifty/Plugin/Authentication/Password/Action/Signup.pm:113
+msgid "Welcome to %1, %2."
+msgstr "%2さん、%1へようこそ"
+
+#:
+msgid "Welcome to your new Jifty application"
+msgstr "Jifty の新規アプリケーションへようこそ"
+
+#: lib/Jifty/Plugin/OpenID/Action/CreateOpenIDUser.pm:94
+msgid "Welcome, "
+msgstr "ようこそ"
+
+#: lib/Jifty/Plugin/OpenID/View.pm:42
+msgid "You already logged in."
+msgstr "ログイン済みです。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:63
+msgid "You don't exist."
+msgstr "そのようなユーザは存在しません。"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:114
+msgid "You got to a page that we don't think exists."
+msgstr "このページは存在しません。"
+
+#:
+msgid "You got to a page that we don't think exists.  Anyway, the software has logged this error. Sorry about this."
+msgstr "このページは存在しません。エラーとして記録しておきました。ご不便をお詫びいたします。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ConfirmEmail.pm:44
+msgid "You have already confirmed your account."
+msgstr "アカウントは確認済みです。"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:215
+msgid "You haven't confirmed your account yet."
+msgstr "アカウントの確認が済んでいません"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:148
+msgid "You lost your password. A link to reset it will be sent to the following email address:"
+msgstr "パスワードをリセットします。このメールアドレスに通知を送ります:"
+
+#:
+msgid "You lost your password. A reminder will be send to the following mail:"
+msgstr "このメールアドレスに通知を送ります:"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:199
+msgid "You may have mistyped your email or password. Give it another shot."
+msgstr "メールアドレスかパスワードが間違っているようです。もう一度入力してください。"
+
+#: lib/Jifty/Plugin/Authentication/Facebook/Action/LinkFacebookUser.pm:40
+msgid "You must be logged in to link your user to your Facebook account."
+msgstr "Facebookアカウントとリンクさせるにはログインする必要があります。"
+
+#: lib/Jifty/Action.pm:949
+msgid "You need to fill in this field"
+msgstr "必須項目です"
+
+#:
+msgid "You said you wanted a pony. (Source %1)"
+msgstr "こんなのが欲しかったんでしょう？（出典：%1）"
+
+#: lib/Jifty/Plugin/Authentication/Password/View.pm:96
+msgid "You're already logged in."
+msgstr "ログイン済みです。"
+
+#: lib/Jifty/Plugin/SkeletonApp/View.pm:33
+msgid "You're not currently signed in."
+msgstr "サインインしていません。"
+
+#. (Jifty->web->current_user->user_object->facebook_name)
+#: lib/Jifty/Plugin/Authentication/Facebook/Action/LinkFacebookUser.pm:72
+msgid "Your account has been successfully linked to your Facebook user %1!"
+msgstr "アカウントをFacebookのユーザ%1にリンクさせました!"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/Login.pm:73
+msgid "Your browser can remember your login for you"
+msgstr "お使いのブラウザはログインを記憶させることができます"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:87
+msgid "Your password has been reset.  Welcome back."
+msgstr "パスワードをリセットしました。おかえりなさい"
+
+#: lib/Jifty/Plugin/Authentication/Password/Mixin/Model/User.pm:63
+msgid "Your password should be at least six characters"
+msgstr "パスワードは最低6文字以上にしてください"
+
+#: lib/Jifty/View/Declare/CRUD.pm:556
+msgid "asc"
+msgstr "昇順"
+
+#: lib/Jifty/View/Declare/CRUD.pm:565
+msgid "desc"
+msgstr "降順"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/SendAccountConfirmation.pm:31
+msgid "email address"
+msgstr "メールアドレス"
+
+#: lib/Jifty/Plugin/ErrorTemplates/View.pm:46
+msgid "for now, and try to forget that we let you down."
+msgstr "。ご不便をおかけして申し訳ないです。"
+
+#: lib/Jifty/Action/Record.pm:459
+msgid "no value"
+msgstr "値がありません"
+
+#:
+msgid "text of the link"
+msgstr "リンクテキスト"
+
+#:
+msgid "text of the link that hides"
+msgstr "隠すリンクテキスト"
+
+#: lib/Jifty/Plugin/Authentication/Password/Action/ResetLostPassword.pm:37
+msgid "type your password again"
+msgstr "もう一度パスワードを入力してください"
+
+#:
+msgid "warning"
+msgstr "警告"
+
+#: lib/Jifty/Action/Record/Bulk.pm:114
+msgid "yatta"
+msgstr "OK!"

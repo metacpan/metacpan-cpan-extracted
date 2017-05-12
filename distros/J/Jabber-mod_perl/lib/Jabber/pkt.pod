@@ -1,0 +1,92 @@
+=pod
+
+=head1 NAME
+
+Jabber::pkt - Perl wrapper for Jabber pkt for management of XML nodes
+
+=head1 SYNOPSIS
+
+   Jabber::pkt is a helper class - you do not directly invoke it.  
+
+
+=head1 DESCRIPTION
+
+Jabber::pkt is a wrapper for the jabberd session manager (sm) packet object.
+It provides a framework to access characteristics of the packet such as the to and from addresses, the nad object, an dto construct new packets.
+
+=head1 METHODS
+
+=head2 error()
+
+Generate an error pkt, based on an existing pkt.
+
+ my $epkt = pkt->error($code, $message);
+
+=head2 to()
+
+get the packets 'to' address.
+
+ my $to = $pkt->to();
+
+=head2 from()
+
+get a packets 'from' address.
+
+ my $from = $pkt->from();
+
+=head2 type()
+
+get a packets 'type' eg. message, presence, or iq.
+
+ my $type = $pkt->type();
+
+=head2 nad()
+
+get a reference to a packets nad object
+
+ my $nad = $pkt->nad();
+
+=head2 tofrom()
+
+swap a packets to and from address, and return the object for convenience
+
+ $pkt = $pkt->tofrom();
+
+=head2 dup()
+
+Duplicate the packet
+
+ my $newpkt = $pkt->dup();
+
+=head2 create()
+
+Create a new packet in the context of the current session (session that
+the current packet is attached to).
+
+ my $newpkt = $pkt->create("<message|iq|presence>", $type, $to, $from);
+
+Once the packet skeleton has been created - access the nad ($newpkt->nad)
+and modify the XML fragment as necessary, before delivering the packet 
+with $newpkt->router().
+
+=head2 router()
+
+Send a packet on it's way
+
+ $pkt->router();
+
+
+=head2 free()
+
+Free a packet.
+
+ $pkt->free();
+
+=head2 id()
+
+Copy the current packets ID to another packet.
+
+ $pkt->id( $otherpkt );
+
+=cut
+

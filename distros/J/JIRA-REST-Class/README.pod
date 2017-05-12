@@ -1,0 +1,44 @@
+=pod
+
+=head1 JIRA-REST-Class
+
+An OO Class module dealing with JIRA issues and their data as objects.
+
+=head1 DESCRIPTION
+
+An OO Class module built atop L<JIRA::REST> for dealing with JIRA issues and
+their data as objects.
+
+This code is a work in progress, so it's bound to be incomplete.  I add methods
+to it as I discover I need them.  I have also coded for fields that might exist
+in my JIRA server's configuration but not in yours.  It is my I<intent>,
+however, to make things more generic as I go on so they will "just work" no
+matter how your server is configured.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<JIRA::REST>
+
+L<JIRA::REST::Class> uses C<JIRA::REST> to perform all its interaction with JIRA.
+
+=item * L<REST::Client>
+
+C<JIRA::REST> uses a C<REST::Client> object to perform its low-level
+interactions.
+
+=item * L<JIRA REST API Reference|https://docs.atlassian.com/jira/REST/latest/>
+
+Atlassian's official JIRA REST API Reference.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Packy Anderson
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

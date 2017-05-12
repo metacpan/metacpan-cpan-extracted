@@ -1,0 +1,916 @@
+[
+    {
+        "cases": [
+            {
+                "expression": "foo.*.baz",
+                "is_deeply": 1,
+                "result": [
+                    "val",
+                    "val",
+                    "val"
+                ]
+            },
+            {
+                "expression": "foo.bar.*",
+                "is_deeply": 1,
+                "result": [
+                    "val"
+                ]
+            },
+            {
+                "expression": "foo.*.notbaz",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "a",
+                        "b",
+                        "c"
+                    ],
+                    [
+                        "a",
+                        "b",
+                        "c"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo.*.notbaz[0]",
+                "is_deeply": 1,
+                "result": [
+                    "a",
+                    "a"
+                ]
+            },
+            {
+                "expression": "foo.*.notbaz[-1]",
+                "is_deeply": 1,
+                "result": [
+                    "c",
+                    "c"
+                ]
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": {
+                    "baz": "val"
+                },
+                "other": {
+                    "baz": "val"
+                },
+                "other2": {
+                    "baz": "val"
+                },
+                "other3": {
+                    "notbaz": [
+                        "a",
+                        "b",
+                        "c"
+                    ]
+                },
+                "other4": {
+                    "notbaz": [
+                        "a",
+                        "b",
+                        "c"
+                    ]
+                },
+                "other5": {
+                    "other": {
+                        "a": 1,
+                        "b": 1,
+                        "c": 1
+                    }
+                }
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo.*",
+                "is_deeply": 1,
+                "result": [
+                    {
+                        "second-1": "val"
+                    },
+                    {
+                        "second-1": "val"
+                    },
+                    {
+                        "second-1": "val"
+                    }
+                ]
+            },
+            {
+                "expression": "foo.*.*",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "val"
+                    ],
+                    [
+                        "val"
+                    ],
+                    [
+                        "val"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo.*.*.*",
+                "is_deeply": 1,
+                "result": [
+                    [],
+                    [],
+                    []
+                ]
+            },
+            {
+                "expression": "foo.*.*.*.*",
+                "is_deeply": 1,
+                "result": [
+                    [],
+                    [],
+                    []
+                ]
+            }
+        ],
+        "given": {
+            "foo": {
+                "first-1": {
+                    "second-1": "val"
+                },
+                "first-2": {
+                    "second-1": "val"
+                },
+                "first-3": {
+                    "second-1": "val"
+                }
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "*.bar",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "one"
+                ]
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": "one"
+            },
+            "nomatch": {
+                "notbar": "three"
+            },
+            "other": {
+                "bar": "one"
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "*",
+                "is_deeply": 1,
+                "result": [
+                    {
+                        "sub1": {
+                            "foo": "one"
+                        }
+                    },
+                    {
+                        "sub1": {
+                            "foo": "one"
+                        }
+                    }
+                ]
+            },
+            {
+                "expression": "*.sub1",
+                "is_deeply": 1,
+                "result": [
+                    {
+                        "foo": "one"
+                    },
+                    {
+                        "foo": "one"
+                    }
+                ]
+            },
+            {
+                "expression": "*.*",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        {
+                            "foo": "one"
+                        }
+                    ],
+                    [
+                        {
+                            "foo": "one"
+                        }
+                    ]
+                ]
+            },
+            {
+                "expression": "*.*.foo[]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "one"
+                ]
+            },
+            {
+                "expression": "*.sub1.foo",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "one"
+                ]
+            }
+        ],
+        "given": {
+            "top1": {
+                "sub1": {
+                    "foo": "one"
+                }
+            },
+            "top2": {
+                "sub1": {
+                    "foo": "one"
+                }
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*].bar",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            },
+            {
+                "expression": "foo[*].notbar",
+                "is_deeply": 1,
+                "result": [
+                    "four"
+                ]
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "bar": "one"
+                },
+                {
+                    "bar": "two"
+                },
+                {
+                    "bar": "three"
+                },
+                {
+                    "notbar": "four"
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "[*]",
+                "is_deeply": 1,
+                "result": [
+                    {
+                        "bar": "one"
+                    },
+                    {
+                        "bar": "two"
+                    },
+                    {
+                        "bar": "three"
+                    },
+                    {
+                        "notbar": "four"
+                    }
+                ]
+            },
+            {
+                "expression": "[*].bar",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            },
+            {
+                "expression": "[*].notbar",
+                "is_deeply": 1,
+                "result": [
+                    "four"
+                ]
+            }
+        ],
+        "given": [
+            {
+                "bar": "one"
+            },
+            {
+                "bar": "two"
+            },
+            {
+                "bar": "three"
+            },
+            {
+                "notbar": "four"
+            }
+        ]
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo.bar[*].baz",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "one",
+                        "two",
+                        "three"
+                    ],
+                    [
+                        "four",
+                        "five",
+                        "six"
+                    ],
+                    [
+                        "seven",
+                        "eight",
+                        "nine"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo.bar[*].baz[0]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "four",
+                    "seven"
+                ]
+            },
+            {
+                "expression": "foo.bar[*].baz[1]",
+                "is_deeply": 1,
+                "result": [
+                    "two",
+                    "five",
+                    "eight"
+                ]
+            },
+            {
+                "expression": "foo.bar[*].baz[2]",
+                "is_deeply": 1,
+                "result": [
+                    "three",
+                    "six",
+                    "nine"
+                ]
+            },
+            {
+                "expression": "foo.bar[*].baz[3]",
+                "is_deeply": 1,
+                "result": []
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": [
+                    {
+                        "baz": [
+                            "one",
+                            "two",
+                            "three"
+                        ]
+                    },
+                    {
+                        "baz": [
+                            "four",
+                            "five",
+                            "six"
+                        ]
+                    },
+                    {
+                        "baz": [
+                            "seven",
+                            "eight",
+                            "nine"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo.bar[*]",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "one",
+                        "two"
+                    ],
+                    [
+                        "three",
+                        "four"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo.bar[0]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "two"
+                ]
+            },
+            {
+                "expression": "foo.bar[0][0]",
+                "result": "one"
+            },
+            {
+                "expression": "foo.bar[0][0][0]",
+                "result": null
+            },
+            {
+                "expression": "foo.bar[0][0][0][0]",
+                "result": null
+            },
+            {
+                "expression": "foo[0][0]",
+                "result": null
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": [
+                    [
+                        "one",
+                        "two"
+                    ],
+                    [
+                        "three",
+                        "four"
+                    ]
+                ]
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*].bar[*].kind",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "basic",
+                        "intermediate"
+                    ],
+                    [
+                        "advanced",
+                        "expert"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo[*].bar[0].kind",
+                "is_deeply": 1,
+                "result": [
+                    "basic",
+                    "advanced"
+                ]
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "bar": [
+                        {
+                            "kind": "basic"
+                        },
+                        {
+                            "kind": "intermediate"
+                        }
+                    ]
+                },
+                {
+                    "bar": [
+                        {
+                            "kind": "advanced"
+                        },
+                        {
+                            "kind": "expert"
+                        }
+                    ]
+                },
+                {
+                    "bar": "string"
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*].bar.kind",
+                "is_deeply": 1,
+                "result": [
+                    "basic",
+                    "intermediate",
+                    "advanced",
+                    "expert"
+                ]
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "bar": {
+                        "kind": "basic"
+                    }
+                },
+                {
+                    "bar": {
+                        "kind": "intermediate"
+                    }
+                },
+                {
+                    "bar": {
+                        "kind": "advanced"
+                    }
+                },
+                {
+                    "bar": {
+                        "kind": "expert"
+                    }
+                },
+                {
+                    "bar": "string"
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*].bar[0]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "three",
+                    "five"
+                ]
+            },
+            {
+                "expression": "foo[*].bar[1]",
+                "is_deeply": 1,
+                "result": [
+                    "two",
+                    "four"
+                ]
+            },
+            {
+                "expression": "foo[*].bar[2]",
+                "is_deeply": 1,
+                "result": []
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "bar": [
+                        "one",
+                        "two"
+                    ]
+                },
+                {
+                    "bar": [
+                        "three",
+                        "four"
+                    ]
+                },
+                {
+                    "bar": [
+                        "five"
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*].bar[0]",
+                "is_deeply": 1,
+                "result": []
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "bar": []
+                },
+                {
+                    "bar": []
+                },
+                {
+                    "bar": []
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*][0]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "three",
+                    "five"
+                ]
+            },
+            {
+                "expression": "foo[*][1]",
+                "is_deeply": 1,
+                "result": [
+                    "two",
+                    "four"
+                ]
+            }
+        ],
+        "given": {
+            "foo": [
+                [
+                    "one",
+                    "two"
+                ],
+                [
+                    "three",
+                    "four"
+                ],
+                [
+                    "five"
+                ]
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo[*][0]",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "one",
+                        "two"
+                    ],
+                    [
+                        "five",
+                        "six"
+                    ],
+                    [
+                        "nine"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo[*][1]",
+                "is_deeply": 1,
+                "result": [
+                    [
+                        "three",
+                        "four"
+                    ],
+                    [
+                        "seven",
+                        "eight"
+                    ],
+                    [
+                        "ten"
+                    ]
+                ]
+            },
+            {
+                "expression": "foo[*][0][0]",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "five",
+                    "nine"
+                ]
+            },
+            {
+                "expression": "foo[*][1][0]",
+                "is_deeply": 1,
+                "result": [
+                    "three",
+                    "seven",
+                    "ten"
+                ]
+            },
+            {
+                "expression": "foo[*][0][1]",
+                "is_deeply": 1,
+                "result": [
+                    "two",
+                    "six"
+                ]
+            },
+            {
+                "expression": "foo[*][1][1]",
+                "is_deeply": 1,
+                "result": [
+                    "four",
+                    "eight"
+                ]
+            },
+            {
+                "expression": "foo[*][2]",
+                "is_deeply": 1,
+                "result": []
+            },
+            {
+                "expression": "foo[*][2][2]",
+                "is_deeply": 1,
+                "result": []
+            },
+            {
+                "expression": "bar[*]",
+                "result": null
+            },
+            {
+                "expression": "bar[*].baz[*]",
+                "result": null
+            }
+        ],
+        "given": {
+            "foo": [
+                [
+                    [
+                        "one",
+                        "two"
+                    ],
+                    [
+                        "three",
+                        "four"
+                    ]
+                ],
+                [
+                    [
+                        "five",
+                        "six"
+                    ],
+                    [
+                        "seven",
+                        "eight"
+                    ]
+                ],
+                [
+                    [
+                        "nine"
+                    ],
+                    [
+                        "ten"
+                    ]
+                ]
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "string[*]",
+                "result": null
+            },
+            {
+                "expression": "hash[*]",
+                "result": null
+            },
+            {
+                "expression": "number[*]",
+                "result": null
+            },
+            {
+                "expression": "nullvalue[*]",
+                "result": null
+            },
+            {
+                "expression": "string[*].foo",
+                "result": null
+            },
+            {
+                "expression": "hash[*].foo",
+                "result": null
+            },
+            {
+                "expression": "number[*].foo",
+                "result": null
+            },
+            {
+                "expression": "nullvalue[*].foo",
+                "result": null
+            },
+            {
+                "expression": "nullvalue[*].foo[*].bar",
+                "result": null
+            }
+        ],
+        "given": {
+            "hash": {
+                "bar": "baz",
+                "foo": "bar"
+            },
+            "nullvalue": null,
+            "number": 23,
+            "string": "string"
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "string.*",
+                "result": null
+            },
+            {
+                "expression": "hash.*",
+                "is_deeply": 1,
+                "result": [
+                    "val",
+                    "val"
+                ]
+            },
+            {
+                "expression": "number.*",
+                "result": null
+            },
+            {
+                "expression": "array.*",
+                "result": null
+            },
+            {
+                "expression": "nullvalue.*",
+                "result": null
+            }
+        ],
+        "given": {
+            "array": [
+                1,
+                2,
+                3
+            ],
+            "hash": {
+                "bar": "val",
+                "foo": "val"
+            },
+            "nullvalue": null,
+            "number": 23,
+            "string": "string"
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "*[0]",
+                "is_deeply": 1,
+                "result": [
+                    0,
+                    0
+                ]
+            }
+        ],
+        "given": {
+            "a": [
+                0,
+                1,
+                2
+            ],
+            "b": [
+                0,
+                1,
+                2
+            ]
+        }
+    }
+]

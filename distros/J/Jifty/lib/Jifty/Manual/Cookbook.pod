@@ -1,0 +1,620 @@
+=head1 NAME
+
+Jifty::Manual::Cookbook - Recipes for common tasks in Jifty
+
+=head1 DESCRIPTION
+
+This document aims to provide solutions to common questions of "How do
+I do I<x> with Jifty?" While the solutions here certainly aren't the
+only way to do things, they're generally the solutions the developers
+of Jifty use, and ones that work pretty well.
+
+=head1 HOW DO I ...
+
+=head2 Catching Action Result in Dispatcher
+
+To get action result in your dispatcher:
+
+    on '/=/your_action_name/'  => run {
+
+        my $result = Jifty->web->response->result( 'action-moniker' );
+
+
+    };
+
+=head2 Catching POST data in Dispatcher
+
+In your L<MyApp::Dispatcher>:
+
+    on POST '/=/catch' => run {
+        my $data = get('data');
+
+    };
+
+=head2 Upload file via Action parameter
+
+In your action schema:
+
+    use Jifty::Action schema {
+
+        param image =>
+            type is 'upload'
+            label is _('Upload a file');
+
+    };
+
+to catch the file , in your C<take_action> method:
+
+    sub take_action {
+        my $self = shift;
+
+        my $fh = $self->argument_value('image');
+        local $/;
+        my $file_content = <$fh>
+        close $fh;
+
+    }
+
+=head2 Use PostgreSQL instead of the default SQLite database.
+
+You need to modify your F<etc/config.yml> file.
+
+  Database:
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: twetter
+    Driver: SQLite
+
+Please change Driver "SQLite" to "Pg", and 
+make sure that you've installed L<DBD::Pg>.
+
+=head2 Create an LDAP autocomplete field
+
+You need an action in your application. Then run
+
+  jifty action --name LdapSearch
+
+in C<lib/myApp/Action/LdapSearch.pm> add the C<search> field
+
+  use Jifty::Action schema {
+    param search =>
+        autocompleter is \&ldap_search;
+  }
+
+we need L<Net::LDAP> and an accessor to our LDAP value.
+
+  use Net::LDAP;
+
+  __PACKAGE__->mk_accessors(qw(LDAP));
+
+and we can write our C<ldap_search> function. 
+Search need at least 3 characters and return an array of C<DisplayName (login)>
+
+  sub ldap_search {
+    my $self = shift;
+    my $search = shift;
+    my @res;
+    if (length $search > 2) {
+         if (! $self->LDAP() ) {
+            $self->LDAP( Net::LDAP->new('ldap.myorg.org');
+            $self->LDAP()->bind( );
+        }
+
+        $self->LDAP()->search(
+          base    => 'ou=people,dc=myorg,dc=org',
+          filter => '(cn='.$filter.')',
+          attrs   =>  ['uid','cn','givenname','displayname'],
+          sizelimit => 10
+          );
+
+        foreach my $entr ( $result->sorted('cn') ) {
+            push @res, $entr->get_value('displayname').' ('.$entr->get_value('uid').')';
+        }
+    }
+    return @res;
+  }
+
+=head2 Add Atom/RSS Feeds ?
+
+You could generate atom/rss feeds for virtually any model in your application.
+For instance, suppose there's a "Post" model (like a blog entry), you could use
+L<XML::Feed> to do this:
+
+    # In '/feed' template
+    <%args>
+    $type
+    </%args>
+    <%init>
+    use XML::Feed;
+    my $posts = MyApp::Model::PostCollection->new();
+    $posts->unlimit();
+
+    my $feed = XML::Feed->new( $type );
+    $feed->title( Jifty->config->framework('ApplicationName') . " Feed" );
+    $feed->link( Jifty->web->url );
+    $feed->description( $feed->title );
+
+    while( my $post = $posts->next ) {
+        my $feed_entry = XML::Feed::Entry->new($type);
+        $feed_entry->title($post->title);
+        $feed_entry->author($post->author->username);
+        $feed_entry->link( Jifty->web->url . "/posts/" . $post->id );
+        $feed_entry->issued( $post->created_on );
+        $feed_entry->summary( $post->body );
+        $feed->add_entry( $feed_entry );
+    }
+    </%init>
+    <% $feed->as_xml |n %>
+
+And add this in F<MyApp/Dispatcher.pm> to make URI look prettier:
+
+    # note the case of the feed types
+    on qr{^/feed/(Atom|RSS)}, run {
+        set type => $1;
+        show('/feed');
+    };
+
+And of course, you need to put these in your HTML header template
+(conventionally that's C</_elements/header>):
+
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="/feed/atom" />
+    <link rel="alternate" type="application/rss+xml" title="RSS" href="/feed/rss" />
+
+=head2 Use date or time objects with the database?
+
+On your columns, specify either
+
+    filters are 'Jifty::DBI::Filter::DateTime'
+
+for a timestamp (date and time), or
+
+    filters are 'Jifty::DBI::Filter::Date'
+
+for just a date. Jifty will then automatically translate to and from
+DateTime objects for you when you access the column on your
+model. Additionally, if you add:
+
+    filters are qw(Jifty::Filter::DateTime Jifty::DBI::Filter::Date)
+
+Jifty will inspect the model's
+L<current_user|Jifty::Manual::AccessControl> for a C<time_zone>
+method, and, if it exists, set the retrieved DateTime object's time
+zone appropriately. All dates are stored in UTC in the database, to
+ensure consistency.
+
+=head2 Emulate 'created_on' field like Rails ?
+
+In Rails, if you have a field named 'created_on', it's automatically
+set to the creation time of the record. How can I emulate this
+behaviour in Jifty ?
+
+The trick here is to use L<Scalar::Defer>. And declare your column
+like this:
+
+    column created_on =>
+        type is 'timestamp',
+        label is 'Created On',
+        default is defer { DateTime->now },
+        filters are 'Jifty::DBI::Filter::DateTime';
+
+This approach is not really accurate, if you render this field in a
+form, then the defer value is evaluated by the time of rendering,
+which might be way earlier then the creation of record. However, it is
+the easiest one.
+
+If you're using the newly recommended C<JIfty::DBI::Record schema {}>
+to declare your schema, you might find this trick not working at the moment.
+Please override model's C<before_create> method instead:
+
+    sub before_create {
+        my ($self, $attr) = @_;
+        $attr->{'created_on'} = DateTime->now;
+    };
+
+=head2 Emulate 'updated_on' ?
+
+If a lot of column could change, you can override C<_set> method:
+
+    sub _set {
+        my $self = shift;
+        my ($val, $msg) = $self->SUPER::_set(@_);
+
+        $self->SUPER::_set(column => 'changed_on', value => defer {DateTime->now});
+        $self->SUPER::_set(column => 'from', 
+            value => Jifty->web->request->remote_host. " / ". Jifty->web->current_user->user_object->name );
+
+        return ($val, $msg);
+    }
+
+=head2 Limit access to pages to logged-in users
+
+The best place to do this is probably in your application's
+L<Dispatcher|Jifty::Dispatcher>. If, for example, you wanted to limit
+access to C</secret> to logged-in users, you could write:
+
+    before qr'^/secret' => run {
+        unless(Jifty->web->current_user->id) {
+            Jifty->web->tangent(url => '/login');
+        }
+    };
+
+Then, in your login form component, you would write something like:
+
+    <% Jifty->web->return(to => '/', submit => $login_action) $>
+
+The combination of the C<tangent> and C<return> will cause the user to
+be returned to wherever they came from. See L<Jifty::Continuation> for
+more information.
+
+If you want model-level access control, Jifty provides a ready-built
+ACL system for its models; See L<Jifty::Manual::AccessControl> for
+details.
+
+Finally, you can also allow or deny specific actions in the
+dispatcher, to limit who is able to perform what actions -- see
+L<Jifty::API>.
+
+=head2 Run my Jifty app as FastCGI in Apache/Lighttpd ?
+
+Jifty provides a really simple way to run the application as a FastCGI
+server. The complete instructions and examples are in
+C<jifty help FastCGI> for both Apache servers and Lighttpd servers.
+(Please C<cd> to your app directory before running this command.)
+
+You'll have to install C<CGI::Fast> and C<FCGI> module for this.
+
+=head2 Take actions based on data in URLs
+
+You can add actions to the request based on data in URLs, or anything
+else, using
+L<Jifty::Request::add_action|Jifty::Request/add_action>. For example,
+suppose you wanted to make the path C</logout> log the user out, and
+redirect them to the home page. You could write:
+
+    before '/logout' => {
+        Jifty->web->request->add_action( class => 'Logout' );
+        Jifty->web->request->add_action( class     => 'Redirect',
+                                         arguments => { url => '/' });
+    };
+
+=head2 Pass HTML form input directly to components
+
+Sometimes you don't want to take an action based on input from HTML
+forms, but just want to change how the page is displayed, or do
+something similarly transient.
+
+C<Jifty::Action> is great, but it doesn't have to be the answer to
+everything. For cases like this, it's fine to use typical HTML C<<
+<input>s >>. Their values will be accessible as request arguments, so
+you can fetch them with C<get> in the dispatcher, and they will be
+passed as arguments to top-level Mason components that list them in
+C<< <%args> >>. And don't worry about namespace conflicts with Jifty's
+auto-generated argument fields -- Jifty prefixes all its C<name>s with
+C<J:> so there won't be a problem.
+
+=head2 Perform database migration
+
+Edit etc/config.yml and change Database->Version to a proper value
+(say, 0.0.2). Then run
+
+    jifty schema --setup
+
+Jifty would inspect the current database and perform proper actions.
+You could give a C<--print> option to see the actual SQL statements:
+
+    jifty schema --setup --print
+
+
+=head2 Use different table names than the ones Jifty automatically creates
+
+In YourApp::Record, define a C<_guess_table_name> sub that doesn't
+pluralise or pluralises differently.
+
+
+=head2 Perform ajax canonicalization on a given field ?
+
+Asking user to input something in a form is really common in a web
+app. For some certain form fields you want them to have a certain
+normalized/canonicalized form in the database, and you could do an ajax
+canonicalization in Jifty very easily. Let's say your User model needs a
+canonicalized C<username> field to make sure those names are in
+lowercase.  All you have to do is to define a method named
+C<canonicalize_username> in your Model class, like this:
+
+    package MyApp::Model::User;
+    use base qw(MyApp::Record);
+
+    sub canonicalize_username {
+        my $class = shift;
+        my $value = shift;
+        return lc($value);
+    }
+
+If the form is generated by a C<Jifty::Action::Record>-based action
+(all those autogenerated CRUD actions), then this is all you need to
+do. And that is probably 90% of cases.  C<Jifty::Action::Record>
+would check if there is a method named like C<canonicalize_fieldname>
+when it is rendering form fields. If found, related javascript code is
+generated. You do not have to modify any code in your view. Jifty does
+it for you.
+
+The ajax canonicalization happens when the input focus leaves that
+field. You would see the effect a bit later than the value in the
+field is changed.
+
+Of course, you can apply the same trick to your own Action classes.
+
+You can use the canonicalization to change data in other fields.  For
+example you might want to update the postcode field when the suburb
+field is changed.
+
+        $self->argument_value( other_field => "new value" )
+
+
+=head2 Use F<iepngfix.htc> to add PNG support in IE5.5+
+
+Jifty has included F<iepngfix.htc> by Angus Turnbull. The HTC file will
+automatically add PNG support to IMG elements and also supports any
+element with a "background-image" CSS property.
+
+If you want to use this fix, please include this one line in your CSS
+file, with tag names to which you want the script applied:
+
+    img, div { behavior: url(/static/js/iepngfix.htc) }
+
+Alternatively, you can specify that this will apply to all tags like so:
+
+    * { behavior: url(/static/js/iepngfix.htc) }
+
+Check details from Angus himself. ( http://www.twinhelix.com/ )
+
+=head2 Render model refers_to field as a select widget with meaningful display name
+
+See L<Jifty::Record> for C<brief_description> method.
+
+Sometimes you need to render a column which is using C<refers_to> to other
+model. but you want not to display unique id of the entries , but meaningful
+display name instead.
+
+    use Jifty::DBI::Schema;
+    use MyApp::Record schema {
+            column colors => 
+                refers_to MyApp::Model::Color;
+    };
+
+you can implement a C<name> method in ModelColor:
+
+    package MyApp::Model::Color;
+    use Jifty::DBI::Schema;
+
+    use MyApp::Record schema {
+
+    column color_name =>
+        type is 'varchar';
+
+    };
+
+    sub name {
+        my $self = shift;
+        return $self->color_name;
+    }
+
+so that, when you render an field which refers to MyApp::Model::Color , it will
+render a select widget with the mapping color names instead the unique id for you.
+
+=head2 Create mutually dependent models
+
+Sometimes you need two tables that both depend upon each other. That is, you have model A that needs to have a column pointing to Model B and a column in Model B pointing back to model A. The solution is very straight forward, just make sure you setup the base class I<before> you load dependent model and this will just work. For example:
+
+  package ModelA;
+  use base qw/ MyApp::Record /;
+
+  # Note that "use base..." comes first
+  use ModelB;
+
+  use Jifty::DBI::Schema;
+  use MyApp::Record schema {
+    column b_record => refers_to ModelB;
+  };
+
+  package ModelB;
+  use base qw/ MyApp::Record /;
+
+  # Note that "use base..." comes first
+  use ModelA;
+
+  use Jifty::DBI::Schema;
+  use MyApp::Record schema {
+    column a_record => refers_to ModelA;
+  };
+
+Everything should work as expected.
+
+=head2 Reuse Jifty models and actions outside of a Jifty app
+
+    use lib '/path/to/MyApp/lib';
+
+    use Jifty;
+    BEGIN { Jifty->new(no_request => 1); }
+
+    use MyApp::Model::Foo;
+    use MyApp::Action::FrobFoo;
+
+From there you can use the model and action to access your data and run your
+actions like you normally would.
+
+If you've actually installed your app into C<@INC>, you can skip the
+C<use lib> line.
+
+=head2 Send out dynamically created binary data
+
+In a C<Template::Declare> view, do something like this:
+    
+    template 'image' => sub {
+        # ...
+        # create dynamic $image, for example using Chart::Clicker
+
+        Jifty->web->response->content_type('image/png');
+        Jifty->web->out($image);
+    };
+
+=head2 Create a many-to-many relationship
+
+You need to create two one-to-many relationships with a linking table as you normally would in pure SQL. First, create your linking table by running:
+
+  bin/jifty model --name LinkTable
+
+Modify the newly created C<MyApp::Model::LinkTable> class to add new columns linking back to either side of the table:
+
+  use MyApp::Record schema {
+      column left_table =>
+          refers_to MyApp::Model::LeftTable;
+      column right_table =>
+          refers_to MyApp::Model::RightTable;
+  };
+
+Then create links to the linking table in C<MyApp::Model::LeftTable>:
+
+  use MyApp::Record schema {
+      # other columns...
+      
+      column right_things =>
+          refers_to MyApp::Model::LinkTableCollection by 'left_table';
+  };
+
+Then create links to the linking table in C<MyApp::Model::RightTable>:
+
+  use MyApp::Record schema {
+      # other columns...
+      
+      column left_things =>
+          refers_to MyApp::Model::LinkTableCollection by 'right_table';
+  };
+
+Now, add your records. To create a relationship between a row the two tables:
+
+  my $left = MyApp::Model::LeftTable->new;
+  $left->load(1);
+
+  my $right = MyApp::Model::RightTable->new;
+  $right->load(1);
+
+  my $link = MyApp::Model::LinkTable->new;
+  $link->create(
+      left_table  => $left,
+      right_table => $right,
+  );
+
+And to get all the "right things" from the left table, you need to make the extra hop in your loop:
+
+  my $links = $left->right_things;
+  while (my $link = $links->next) {
+      my $right = $link->right_table;
+  
+      # Do stuff with $right
+  }
+
+=for comment
+Document how to do this with Mason
+
+=head2 Show login box on an action submit
+
+In your application's dispatcher add the following:
+
+    before '*' => run {
+        # do nothing if user is logged in
+        return if Jifty->web->current_user->id;
+
+        # check all actions the request has. if at least one require login
+        # then save them in a continuation and redirect to the login page
+        tangent '/login' if
+            grep $_->can('require_login') && $_->require_login,
+            map $_->class, Jifty->web->request->actions;
+    };
+
+All you have to do now is to add C<sub require_login { return 1 }> into
+actions which need this functionality.
+
+Note that you can implement complex logic in the require_login method,
+but it's called as class method what set a lot of limitations. That
+would be really cool to have access to all data of the action in
+this method, so you are welcome to post a better solution.
+
+=head2 Append a new region based upon the result of the last action using AJAX
+
+In the Administration Interface, you can create new items. You enter the information and then the newly created item is appended to the end of the list immediately without reloading the page. You can use this recipe to do something like this, or to modify the page however you need based upon the result of any server-side action.
+
+Render your action fields as you normally would. The key to the process is in the submit button. Here's how the L<Jifty::View::Declare::CRUD> does this, as of this writing:
+
+  Jifty->web->form->submit(
+      label   => 'Create',
+      onclick => [
+          { submit       => $create },
+          { refresh_self => 1 },
+          {   element =>
+                  Jifty->web->current_region->parent->get_element(
+                  'div.list'),
+              append => $self->fragment_for('view'),
+              args   => {
+                  object_type => $object_type,
+                  id => { result_of => $create, name => 'id' },
+              },
+          },
+      ]
+  );
+
+This could is embedded in a call to C<outs()> for use with L<Template::Declare> templating, but you could just as easily wrap the line above in C<< <% %> >> for use with Mason templates. The keys is each item in the list past to C<onclick>:
+
+  { submit => $create },
+
+This tells Jifty submit the form elements related to the action referenced by C<$create> only. Any other actions in the same form will be ignored.
+
+  { refresh_self => 1 },
+
+This tells the browser to refresh the current region (which will be the one containing the current submit button), so that the form can be reused. You could also modify this behavior to delete the region, if you wrote:
+
+  { delete => Jifty->web->current_region },
+
+The most complicated part is the most important:
+
+  {   element =>
+          Jifty->web->current_region->parent->get_element(
+          'div.list'),
+      append => $self->fragment_for('view'),
+      args   => {
+          object_type => $object_type,
+          id => { result_of => $create, name => 'id' },
+      },
+  },
+
+=over
+
+=item element
+
+The C<element> parameter tells the browser where to insert the new item. By using C<< Jifty->web->current_region->parent->get_element('div.list') >>, the new code will be appended to the first C<div> tag found with a C<list> class within the parent region. This assumes that you have added such an element to the parent region. 
+
+You could look up an arbitrary region using C<< Jifty->web->get_region('fully-qualified-region-name') >> if you don't want to use the parent of the current region.
+
+=item append
+
+The C<append> argument gives the path to the URL of the item to insert. By using C<append>, you are telling Jifty to add your new code to the end of the element given in C<element>. If you want to add it to the beginning, you can use C<prepend> instead.
+
+=item args
+
+Last, but not least, you need to send arguments to the URL related to the action being performed. These can be anything you need for the your template to render the required code. In this example, two arguments are passed: C<object_type> and C<id>. In the case of C<object_type> a known value is passed. In the case of C<id>, the result of the action is passed, which is the key to the whole deal:
+
+  id => { result_of => $create, name => 'id' },
+
+This line tells Jifty that you want to set the "id" parameter sent to the URL given in C<append>, to the "id" set when C<$create> is executed. That is, after running the action, Jifty will contact the URL and effectively perform:
+
+  set id => $create->result->content('id');
+
+It's a lot more complicated than that in actuality, but Jifty takes care of all the nasty details.
+
+=back
+
+If you want to use a custom action other than the built-in create and want to pass something back other than the "id", you just need to set the result into the appropriate key on the C<content> method of the L<Jifty::Result>.
+
+For more details on how you can customize this further, see L<Jifty::Manual::PageRegions>, L<Jifty::Web::Form::Element>, L<Jifty::Result>, L<Jifty::Action>, L<Jifty::Web::PageRegion>, L<Jifty::Web>, and L<Jifty::Request::Mapper>.
+
+=cut

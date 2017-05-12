@@ -1,0 +1,89 @@
+NAME
+    JSAN::Librarian - JavaScript::Librarian adapter for a JSAN installation
+
+DESCRIPTION
+    JavaScript::Librarian works on the concept of "libraries" of JavaScript
+    files each of which may depend on other files to be loaded before them.
+
+    "JSAN::Librarian" provides a mechanism for detecting and indexing a
+    JavaScript::Librarian::Library object for a JSAN installation.
+
+METHODS
+  new $path, $index
+    The "new" constructor creates a new "JSAN::Librarian" object for a JSAN
+    installation library/prefix located at a local directory.
+
+    Because a JSAN installation library does not have a definitive method by
+    which its existance can be verified, at this time the only check
+    actually made is that the directory exists.
+
+    An optional second parameter can be provided, which will be taken to be
+    the location of the index file. Relative paths will be interpreted as
+    being relative to the root path passed as the first param.
+
+    Note: As long as the root path exists, a new "JSAN::Librarian" object
+    will be created whether index file exists or not.
+
+    Returns a new "JSAN::Librarian" object, or undef if the directory does
+    not exist.
+
+  root
+    The "root" accessor returns the root path of the installed JSAN library.
+
+  index_file
+    The "index_file" accessor returns the location of index file, as
+    provided to the constructor (or the default), which may be a path
+    relative to the root.
+
+  index_path
+    The "index_path" method returns the path to the index file, with
+    relative file locations converted to the full path relative to the root.
+
+  index_exists
+    The "index_exists" method checks to see if the index file exists.
+
+    Returns true if the index file exists, or false if not.
+
+  build_index $lib
+    The "build_index" method scans the library to find all perl-file
+    dependencies and builds them into an index object.
+
+    Returns a Config::Tiny object, or throws an exception on error.
+
+  make_index
+    The "make_index" static method scans the installed JSAN tree and creates
+    an index file (written from a Config::Tiny object) containing the
+    file-level dependency information.
+
+    Returns true on success, or throws an exception on error.
+
+  library
+    The "library" method creates and returns a JSAN::Librarian::Library for
+    the installed JSAN library.
+
+    If an index file exists, the pre-built index in the file will be used.
+
+    If there is no index file, the installed JSAN library will be scanned
+    and an index built in-memory as needed.
+
+    Returns a new JSAN::Librarian::Library, or throws an exception on error.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Librarian>
+
+    For other issues, contact the maintainer.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

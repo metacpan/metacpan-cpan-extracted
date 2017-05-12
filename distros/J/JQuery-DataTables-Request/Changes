@@ -1,0 +1,7 @@
+Revision history for JQuery::DataTables::Request
+
+0.109   2014-09-18 00:00:00 (EST)
+        - Corrected documentation in SYNOPSIS
+
+0.108   2014-09-13 00:00:00 (EST) 
+        - First version, released on an unsuspecting world.

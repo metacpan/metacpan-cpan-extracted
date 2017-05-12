@@ -1,0 +1,30 @@
+JDBC
+
+The JDBC module provides an interface to Java JDBC using Inline::Java.
+
+You'll need to install and test Inline::Java (>= 0.50) before you can use this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+The Derby database driver is bundled with the JDBC module in the drivers
+directory. The t/test_init.pl script is used by all the tests to add
+the full path to the drivers/db-derby-10.1.1.0.jar file into CLASSPATH for you.
+
+(Alternatively you can hack t/test_init.pl to refer to some other driver, but
+then it'll be much harder for people to help you if you run into problems.)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Tim Bunce
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Enjoy!

@@ -1,0 +1,74 @@
+--- 
+framework: 
+  AdminMode: 1
+  ApplicationClass: Simapp
+  ApplicationName: Simapp
+  ApplicationUUID: 62E656F2-7901-11DD-926E-C08783FE53EB
+  ConfigFileVersion: 4
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: simapp
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 1
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - 
+      LetMe: {}
+
+    - 
+      SkeletonApp: {}
+
+    - 
+      REST: {}
+
+    - 
+      Halo: {}
+
+    - 
+      ErrorTemplates: {}
+
+    - 
+      OnlineDocs: {}
+
+    - 
+      CompressedCSSandJS: {}
+
+    - 
+      AdminUI: {}
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 0
+  TemplateClass: Simapp::View
+  View: 
+    FallbackHandler: Jifty::View::Mason::Handler
+    Handlers: 
+      - Jifty::View::Static::Handler
+      - Jifty::View::Declare::Handler
+      - Jifty::View::Mason::Handler
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

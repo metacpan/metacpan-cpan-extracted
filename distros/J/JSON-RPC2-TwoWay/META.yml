@@ -1,0 +1,23 @@
+---
+abstract: 'Transport-independent bidirectional JSON-RPC 2.0'
+author:
+  - 'Wieger Opmeer <wiegerop@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-RPC2-TwoWay
+requires:
+  JSON::MaybeXS: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/a6502/JSON-RPC2-TwoWay/issues
+  homepage: https://github.com/a6502/JSON-RPC2-TwoWay
+  repository: https://github.com/a6502/JSON-RPC2-TwoWay.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.69'

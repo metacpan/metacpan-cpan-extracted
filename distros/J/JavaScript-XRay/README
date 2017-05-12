@@ -1,0 +1,315 @@
+NAME
+    JavaScript::XRay - See What JavaScript is Doing
+
+VERSION
+    Version 1.22
+
+SYNOPSIS
+     #!/usr/bin/perl
+     use strict;
+     use warnings;
+     use JavaScript::XRay;
+
+     # HTML page with a <head> and <body> tag and some javascript functions
+     my $html_page = do { local $/; <> };
+
+     # create a new instance
+     my $jsxray = JavaScript::XRay->new();
+
+     # to inline/filter external javascript files you'll need 'abs_uri'
+     # my $jsxray = JavaScript::XRay->new( 
+     #     abs_uri => $abs_url_or_local_file_path
+     # );
+
+     # use switches to change filtering behavior
+     # $jsxray->switches( only => 'onData' );
+
+     # use inlining to inline/filter external javascript files
+     # $jsxray->inline_methods( 'dir1', 'dir2', \&callback, 'HTTP_GET' );
+
+     # filter page
+     print $js_xray->filter($html_page);
+
+DESCRIPTION
+    JavaScript::XRay is an HTML source filter. It was developed as a tool to
+    help figure out and debug large JavaScript frameworks.
+
+    The main idea is that you hook it into your application framework and
+    give you the ability to 'flip a switch' an inject a JavaScript function
+    tracing console into your outgoing page.
+
+  Some of the things it does...
+    *   Injects an IFrame logging console
+
+        It finds the body tag in the document and injects the IFrame just
+        after it along with all the JavaScript to drive it. It also provides
+        you with a logging function with the same name as your alias
+        (defaults to jsxray)
+
+           jsxray("Hi there");
+
+    *   Scans HTML for JavaScript functions
+
+        For each function it finds it inserts a call to this method which
+        logs the function call along with the value of the function
+        arguments.
+
+            function sum ( x, y ) {
+
+        becomes
+
+            function sum ( x, y ) {
+                jsxray( "sum( " + x + ", " + y + " )" );
+
+        so now any call this function and its arguments will get logged to
+        the IFrame.
+
+    *   Switches to limit what you log
+
+        You can manually skip specific functions, choose to see only
+        functions you specify, or match functions matching a specified
+        string. ( see the switchs methods )
+
+    *   Provide execution counts
+
+        Provides a method to see how often your functions are being called.
+        This can be helpful to target which functions to refactor to
+        increase performance.
+
+    *   Inlines external JavaScript files
+
+        If external javascript files are referenced, they can be inlined so
+        they'll be filtered as well.
+
+    *   Command line script 'jsxray'
+
+        Use the command line script 'jsxray' to save and filter local HTML
+        files to see how things work. Think reverse engineering. :)
+
+    *   Save the log for later.
+
+        You can cut and paste the IFrame to a text file to analyze later by
+        hand or munge the results with perl. Extremely helpful in moments
+        when you have a lot of code executing and your just trying to get a
+        handle on what's happening.
+
+CONSTRUCTOR
+  JavaScript::XRay->new( %hash );
+    Create a new instance with the following arguments
+
+    *   alias
+
+        Think of this as a JavaScript namespace. All injeted JavaScript
+        functions and variables are prefixed with this alias to avoid
+        colliding with any code that currently exists on your page. It also
+        is the prefix used for all the switches to toggle things on and off.
+
+    *   switches
+
+        Hash reference containing switches to change filtering behavior.
+        Actually just dereferences the hash and passes it onto the
+        'switches' method.
+
+    *   abs_uri
+
+        Used to help find and filter external javascript files. It can be
+        the absolute URL of the requested file via a webserver or the path
+        of the file you're filtering from the command line.
+
+    *   iframe_height
+
+        The height of your logging IFrame, defaults to 200 pixels.
+
+    *   css_inline
+
+        Change the style of the logging IFrame via inline CSS.
+
+    *   css_external
+
+        Change the style of the logging IFrame via an external stylesheet.
+
+    *   verbose
+
+        Turn on verbose output (bool)
+
+METHODS
+  $jsxray->switches( %switches )
+    Switches control the behavior of which is going to be filtered and
+    provide the ability to uncomment debugging code on the fly.
+
+    *   all (bool)
+
+        Turn on filtering of all functions. This is the default behavior.
+
+            all => 1
+
+    *   none (bool)
+
+        Turn off filtering of functions. Helpful in combination with
+        uncomment switch.
+
+            none => 1
+
+    *   uncomment ( string1, string2, ... )
+
+        Uncomment lines prefix with these strings. Helpful with injecting
+        timing code, or more specific debugging code. You can deploy
+        commented logging code to production and turn it on when your turn
+        on filtering. Extremely helpful when diagnosing problems you can't
+        reproduce in your development environment.
+
+            uncomment => "DEBUG1,DEBUG3"
+            uncomment => [ qw( DEBUG1 DEBUG3 ) ]
+
+        will turn this...
+
+            //DEBUG1 jsxray("Hey this is debug1");
+            //DEBUG2 jsxray("Hey this is debug2");
+            //DEBUG3 jsxray("Hey this is debug3");
+
+        into this
+
+            jsxray("Hey this is debug1");
+            //DEBUG2 jsxray("Hey this is debug2");
+            jsxray("Hey this is debug3");
+
+    *   anon (bool)
+
+        Include filtering of anonymous functions.
+
+            anon => 1
+
+    *   no_exec_count ( bool )
+
+        Don't inject code that keeps track of how many times a function was
+        called.
+
+            no_exec_count => 1
+
+    *   only ( function1, function2, ... )
+
+        Only filter comma separated list of functions
+        (function1,function2,...)
+
+            only => "processData,writeToPage"
+            only => [ qw( processData writeToPage ) ]
+
+    *   skip ( function1, function2, ... )
+
+        Skip comma separated list of functions
+
+            skip => "formatNumber,onData"
+            skip => [ qw( formatNumber onData ) ]
+
+    *   match ( /^string/ )
+
+        Only filter functions that match string
+
+            match => 'string'           # will result in qr/^string/
+            match => qr/whatever/
+
+  $jsxray->inline_methods( @methods );
+    WARNING THIS FUNCTIONALITY IS EXPERIMENTAL AND THE INTERFACE MAY CHANGE
+
+    Take external javascript blocks (use src attribute) and get the
+    javascript, filter it, and inline the code. There are currently three
+    supported methods to do this.
+
+    *   HTTP_GET (default)
+
+        Special string that represents using LWP::Simple to attempt to fetch
+        external javascript. If the src attribute isn't absolute, then
+        you'll need to pass the 'abs_uri' in when you create your instance.
+
+    *   File Directory
+
+        Base file path to use with the src attribute to load the javascript
+        off disk. From a webserver, you'd probably include the web root and
+        from the commandline, you'd use the path of the file you're
+        filtering.
+
+    *   Code Reference
+
+        The arguments to the code reference are the src attribute from the
+        javascript attribute and the code block must return the coresponding
+        code.
+
+            $javascript_code = &$code_ref( $src_attr, $abs_uri );
+
+  $jsxray->filter( $html );
+    Pass HTML in, get modified HTML out.
+
+AUTHOR
+    Jeff Bisbee, "<jbisbee at cpan.org>"
+
+TODO
+    Some of the things that are still in the conceptional phase
+
+    *   Personal proxy
+
+        Include a personal proxy script with this module so you can filter
+        ANY webpage you go to.
+
+    *   Add a user interface to the console to control the switches
+
+        Add a form to the console that will allow you to see the values of
+        the switches and then resubmit the url to have the changes take
+        affect.
+
+    *   Add .toSource to objects when logging (or a switch to turn it on)
+
+BUGS
+    Please report any bugs or feature requests to "bug-JavaScript-xray at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-XRay>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc JavaScript::XRay
+
+    You can also look for information at:
+
+    *   JavaScript::XRay development mailing list
+
+        <http://groups.google.com/group/jsxray-dev>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/JavaScript-XRay>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/JavaScript-XRay>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=JavaScript-XRay>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/JavaScript-XRay>
+
+ACKNOWLEDGEMENTS
+    *   Senta Mcadoo
+
+        Providing the JavaScript DOM logging code in order to do the reverse
+        logging (solved the scrolling problem).
+
+    *   Ronnie Paskin
+
+        General hacking on the code, good feedback, and for being a sounding
+        board to work out issues.
+
+    *   Tony Fernandez
+
+        Giving me the green light to publish this on the CPAN.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Jeff Bisbee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

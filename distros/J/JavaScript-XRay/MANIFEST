@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+examples/jsxray
+lib/JavaScript/XRay.pm
+bin/jsxray
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

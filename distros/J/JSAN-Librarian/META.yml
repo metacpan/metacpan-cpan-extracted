@@ -1,0 +1,32 @@
+---
+abstract: 'JavaScript::Librarian adapter for a JSAN installation'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Remove: 1.40
+  Test::More: 0.47
+  URI: 1.33
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: JSAN::Librarian
+name: JSAN-Librarian
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Tiny: 2.00
+  File::Find::Rule: 0.20
+  File::Path: 1.06
+  File::Spec: 0.80
+  JSAN::Parse::FileDeps: 0.02
+  JavaScript::Librarian: 0.03
+  Params::Util: 0.21
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

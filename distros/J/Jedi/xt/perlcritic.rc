@@ -1,0 +1,16 @@
+severity        = 3
+verbose         = 6
+top             = 50
+theme           = pbp || core || bugs || security || maintenance
+criticism-fatal = 1
+color           = 1
+allow-unsafe    = 1
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo Moo::Role Jedi::App
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo Moo::Role Jedi::App
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+allow = _build_params _build_cookies _build_uploads _build__body _build__jedi_roads_cache _build__jedi_routes_cache _build_remote_address

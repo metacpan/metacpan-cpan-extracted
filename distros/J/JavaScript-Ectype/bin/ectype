@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use Pod::Usage;
+use Getopt::Long;
+use JavaScript::Ectype;
+GetOptions(
+    'input=s' => \( my $input ),
+    'path=s'  => \( my $path ),
+    'debug!'  => \( my $debug ),
+    'minify!' => \( my $minify ),
+);
+
+print JavaScript::Ectype->convert(
+    path => $path || $ENV{ECTYPE_JS_ROOT_PATH} || pod2usage( -verbose => 1 ),
+    debug => $debug || 0,
+    target => $input || pod2usage( -verbose => 1 ),
+    minify => $minify || 1
+);
+1;
+__END__
+
+=head1 NAME
+
+ectype - A command of JavaScript::Ectype preprocessor
+
+=head1 SYNOPSIS
+
+ectype -i hoge.js -p "/path/to/ectype/libraries/"
+
+Options:
+
+-i --input  target script from path
+
+-p --path   target libraries path
+
+-d --debug  is_debug mode or not
+
+-m --minify to use minify or not
+
+-h --help   help message
+
+
+=cut

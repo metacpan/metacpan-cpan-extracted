@@ -1,0 +1,37 @@
+---
+abstract: 'extract links from JSON via a schema'
+author:
+  - '<http://purl.org/NET/cpan-uri/person/tobyink>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: JSON::Hyper
+name: JSON-Hyper
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  JSON: 2.00
+  JSON::Path: 0
+  LWP::UserAgent: 0
+  URI: 1.30
+  URI::Escape: 0
+  perl: 5.8.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=JSON-Hyper
+  homepage: https://metacpan.org/release/JSON-Hyper
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-json-hyper
+version: 0.011

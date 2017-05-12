@@ -1,0 +1,26 @@
+---
+abstract: 'Jifty plugin to add a wiki toolbar to your textarea box'
+author:
+  - 'Yves Agostini, <yvesago@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-WikiToolbar
+no_index:
+  directory:
+    - share
+    - share
+    - inc
+    - t
+requires:
+  Jifty: 0.91117
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:yvesago/jifty-plugin-wikitoolbar.git
+version: 1.00

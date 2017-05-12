@@ -1,0 +1,75 @@
+libjifty-dbi-perl (0.48-1) unstable; urgency=low
+
+  * 0.48 
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Fri, 25 Jan 2008 11:02:45 +0100
+
+libjifty-dbi-perl (0.42-1) unstable; urgency=low
+
+  * 0.42 
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Tue, 21 Aug 2007 10:34:15 +0200
+
+libjifty-dbi-perl (0.41-1) unstable; urgency=low
+
+  * 0.41
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Wed,  2 May 2007 10:16:36 +0200
+
+libjifty-dbi-perl (0.40-1) unstable; urgency=low
+
+  *  0.40
+
+ -- Agostini yves <agostini@univ-metz.fr>  Sun, 15 Apr 2007 21:10:58 +0200
+
+libjifty-dbi-perl (0.39-1) unstable; urgency=low
+
+  * 0.39
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Fri,  9 Mar 2007 15:45:43 +0100
+
+libjifty-dbi-perl (0.34-1) unstable; urgency=low
+
+  * 0.34
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Mon, 29 Jan 2007 09:48:25 +0100
+
+libjifty-dbi-perl (0.32-1) unstable; urgency=low
+
+  * deprecated use of length
+  * deprecated use of column whitout schema
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Fri, 26 Jan 2007 14:47:37 +0100
+
+libjifty-dbi-perl (0.31-1) unstable; urgency=low
+
+  * - load, load_by_cols, load_from_hash and create are now optionally class methods.
+  - "length is 42" in schema declarations is deprecated; please write "max_length is 42" instead.
+  - Jifty::DBI::Collection - document the "LIKE" and "MATCHES" limit operators correctly.
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Fri, 26 Jan 2007 12:44:23 +0100
+
+libjifty-dbi-perl (0.30-1) unstable; urgency=low
+
+  * New cpan release
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Thu, 18 Jan 2007 08:54:39 +0100
+
+libjifty-dbi-perl (0.29-1) unstable; urgency=low
+
+  * Initial debianisation.
+
+ -- Bart Bunting <bart@debian.org>  Sat, 13 Jan 2007 14:20:12 +1000
+
+libjifty-dbi-perl (0.26-1) unstable; urgency=low
+
+  * New cpan release
+
+ -- AGOSTINI Yves <agostini@univ-metz.fr>  Wed, 24 Nov 2006 21:08:26 +0200
+
+libjifty-dbi-perl (0.24-1) unstable; urgency=low
+
+  * Initial debianisation.
+
+ -- Bart Bunting <bart@debian.org>  Mon, 21 Aug 2006 15:30:31 +1000
+

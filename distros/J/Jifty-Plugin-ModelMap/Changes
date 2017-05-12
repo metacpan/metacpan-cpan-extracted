@@ -1,0 +1,7 @@
+Revision history for Jifty-Plugin-ModelMap
+
+0.02    2008-01-07 07:25:25+0900
+	fix careless hardcoded line in t/test_app.t.
+
+0.01    2008-01-07 03:16:54+0900
+        First version, released on an unsuspecting world.

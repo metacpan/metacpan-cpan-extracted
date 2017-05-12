@@ -1,0 +1,22 @@
+---
+abstract: 'Manage your JavaScript dependencies'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-Dependency-Manager
+requires:
+  Moo: 0.009010
+  Sub::Quote: 0
+  Tie::IxHash: 1.22
+  autodie: 2.10
+resources:
+  repository: git://github.com/frioux/JavaScript-Dependency-Manager.git
+version: 0.001002

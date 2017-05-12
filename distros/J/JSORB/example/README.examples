@@ -1,0 +1,65 @@
+This document explains how to run the examples for JSORB.
+
+NOTE:
+Each example will compile a Javascript client library
+inside the given directory. It might be interesting to
+look at these if you want, the Javascript is pretty
+readable.
+
+-----------------------------------------------------------
+simple/
+-----------------------------------------------------------
+
+This is a very minimal test, you simply need to run the
+jsorb_server.pl file and then open index.html in your
+browser. Some browsers (Firefox) will not let this work
+due to security issues because the HTML is a file:// url
+and it is accessing a localhost server (odd but true).
+
+-----------------------------------------------------------
+forest_tree/
+-----------------------------------------------------------
+
+This is a simple example of a Forest::Tree instance
+which is served via AJAX. It is currently a very small
+tree, but obviously this technique could be easily
+used for very large trees that you want to load lazily.
+
+This example requires you to have the Forest module
+installed from CPAN
+
+To start the JSORB server you must do the following:
+
+  perl -I lib/ example/forest_tree/jsorb_server.pl
+
+This will start the server and correctly configure the
+document root, etc. Next you open up your web browser
+and point it at:
+
+  http://localhost:9999/example/forest_tree/index.html
+
+-----------------------------------------------------------
+kiokudb_navigator
+-----------------------------------------------------------
+
+This is a slightly more complex example of a tool that
+will navigate a KiokuDB database. It can handle recursive
+data structures and all sorts of other fun KiokuDB stuff.
+
+This example requires you to have the KiokuDB module
+installed from CPAN
+
+To start the JSORB server you must do the following:
+
+  perl -I lib/ example/kiokudb_navigator/jsorb_server.pl
+
+This will start the server and correctly configure the
+document root, etc. Next you open up your web browser
+and point it at:
+
+  http://localhost:9999/example/kiokudb_navigator/index.html
+
+
+-----------------------------------------------------------
+
+

@@ -1,0 +1,30 @@
+5/22/00
+* Make JavaServer into an Applet - I don't think this would be too hard to do.
+* Maybe figure out a more generic way to implement event handling.
+* Allow classes to reside on the front-end side of the world & be loaded
+	back when requested.
+* Was playing with allowing Perl to subclass Java classes but the implementation
+	was getting too hairy so need to rethink it.
+* Maybe use a multiplexed stream between client & JavaServer so I don't have to
+	use to separate ports.
+* Allow for other communication means between client & JavaServer - like
+	named pipes or UNIX domain socket for local communications & maybe
+	UDP &/or multicast.  That should not be too hard.
+* See what's going on w/Beans & maybe allow Beans to be written in Perl.
+* Allow for persistent object storage
+* Allow multiple clients to hook into same JavaServer to share objects
+	(rite now a new Thread is spawned for each connexion & they don't
+	talk to each other).
+* Maybe 'use overload' for equality check
+* Fix stupid bug that doesn't allow a Java string to be an integer.
+* Would be nice to make Java arrays tie'd Perl arrays.  Should't be very hard.
+6/1/00
+* Created primitive arrays!
+2/11/01
+* Am working on a C frontend - basically a glorified JNI.
+* Would be nice to get handles to objects created by yer Java program 
+	so the client side of JavaServer can play with them.
+3/9/01
+* DID 'use overload' for equality check!
+* DID tie Java arrays to Perl arrays!
+*	Cross 'em off!

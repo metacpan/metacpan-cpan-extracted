@@ -1,0 +1,207 @@
+=head1 NAME
+
+PerlSub - Encapsulate a perl CODE reference in JavaScript
+
+=head1 DESCRIPTION
+
+Perl subroutines that you pass to javascript will be wrapped into instances
+of C<PerlSub>.
+
+More generally, I<any> perl CODE reference that enters javascript land will
+become a C<PerlSub> instance.
+
+    ...
+    $ctx->bind_function(perl_rand => sub { rand });
+    $ctx->bind_function(add => sub {
+	my($a, $b) = @_;
+	return $a + $b;
+    });
+    ...
+    $ctx->eval(q{
+	val = add(10, 20);         // val now 30
+	say("10 + 20 = " + val);   // 'say' itself is defined in the
+	                           //  stock context
+	v1 = perl_rand();
+	v2 = perl_rand();
+	say(v1 + " + " + v2 + " = " + add(v1, v2));
+    });
+
+
+=head1 JAVASCRIPT INTERFACE
+
+When you send a subroutine from perl to javascript, you'll get an instance of
+C<PerlSub>. C<PerlSub>s behave pretty much like native javascript Functions.
+
+Like Function instances, instances of PerlSub are invoked with a parenthesized
+list of arguments.
+
+    var foo = perl_rand();  // invoke perl_rand, foo now random number
+    var bar = perl_rand;    // now 'bar' is another reference to perl_rand
+    var baz = bar();	    // invoke it, baz now a random number
+
+And as with any other object, you can manipulate properties and call methods of
+instances of C<PerlSub>.
+
+    perl_rand.attr = 'This is a function imported from perl';
+    add.toString();          // Please try this ;-)
+    add.toSource();	    // Or this!
+
+=head2 Instance methods
+
+C<PerlSub.prototype> implements methods analogous to C<Function.prototype>'s.
+
+=over 4
+
+=item call(thisArg, ARGLIST)
+
+Analogous to C<Function.prototype.call>.
+
+=item apply(thisArg, somerray)
+
+Analogous to C<Function.prototype.apply>.
+
+=item toSource( )
+
+Analogous to C<Function.protype.toSource>. Tries to uncompile and returns the
+perl code associated, depends on L<B::Deparse>.
+
+=item toString( )
+
+Returns the literal string C<"sub {\n\t[perl code]\n}">
+
+=back
+
+=head2 Instance properties
+
+=over 4
+
+=item name                                              B<string>
+
+Store the name on the original perl subroutine if named or the string
+"(anonymous)".
+
+=item prototype                                         B<object>
+
+Remember that any Function instance has a property C<prototype>, and PerlSub
+instances have one also.  Please read your javascript documentation for details.
+
+=item $wantarray                                        B<boolean>
+
+Determines the perl's context, C<false> -> 'scalar',  C<true> -> 'list', to use 
+when the subrotine is called. Defaults to C<true> I<!!>. See L</"Perl contexts">.
+
+=back
+
+=head2 Constructor
+
+You can construct new perl functions from inside javascript.
+
+=over 4
+
+=item new PerlSub(PERLCODE)
+
+    var padd = new PerlSub("\
+	my($a, $b) = @_;\
+	return $a +$b\
+    ");
+
+Returns a new instance of C<PerlSub>, that can be called in the normal way:
+
+    padd(5, 6); // 11
+
+I<PERLCODE>, a string, is the body of your new perl subroutine, it's passed
+verbatim to perl for compilation. Syntax errors will throw exceptions at
+construction time.
+
+=back
+
+If you ever pass to perl instances constructed by PerlSub you'll see normal
+CODE references indistinguishable from anonymous subs.
+
+=head1 Calling semantics
+
+When you invoke a C<PerlSub> from javascript, in most cases JSPL does the
+right thing. But there are differences in the way than javascript and perl
+behave respect to function calling that you should be aware of. Mainly when you
+export to javascript arbitrary perl functions or expose perl namespaces to
+javascript.
+
+Read this section for the gory details.
+
+=head2 Perl contexts
+
+In perl you call a subroutine in either scalar or list context. Perl determines
+this context automatically using the form of the expression in which the
+function is called. And perl lets your subroutine know which context is being
+used (via L<perlfunc/wantarray>). Some subroutines behave differently
+depending on which context they where called. In javascript this concept
+doesn't exists.
+
+To make the problem of calling perl subroutines from javascript even more
+interesting, perl subroutines can return list of values where javascript
+functions always return a single value.
+
+To solve the first problem, the context in which the perl subroutine call will
+be made is taken from the C<$wantarray> property of the instances of
+C<PerlSub>. C<$wantarray> defaults to C<true>, which is the correct value to
+use in the vast majority of the cases. We explain why and when to use a
+C<false> value below.
+
+For the return value of a C<PerlSub> call you will get either a single value or
+a C<PerlArray>.   You'll get a single value when C<$wantarray> is C<false> or
+when the list returned has a single element, otherwise you'll get a
+C<PerlArray>.
+
+You'll never receive arrays with a single element in them.  This behaviour may
+be unfortunate but it makes the rest of the cases much more simpler. Besides,
+you can check trivially for that condition as follows:
+
+    res = perl_sub_that_returns_a_list();
+    if(res instanceof PerlArray) {
+	 ...
+    } else {
+	...
+    }
+
+
+Having C<$wantarray> default to true is the best thing to do because, on one
+side, perl subroutines returning single values are not affected, and on the
+other side it's the correct value to use for subroutines returning lists.
+
+You'll need to set C<$wantarray> to C<false> when: you need to call a perl
+subroutine that uses B<wantarray> and/or you need to force 'scalar'
+context for the call.
+
+C<$wantarray> usage example:
+
+    // Asuming that 'perlfunc' is a PerlSub
+    
+    perlfunc.$wantarray = true;  // this is the default
+    listres = perlfunc(); // Called in 'list' context
+
+    perlfunc.$wantarray = false;
+    scalres = perlfunc(); // Called in 'scalar' context
+
+=head2 C<this>
+
+In javascript I<every call to a function is a method call> and a reference to
+the caller is visible inside the function as C<this>. The function author decides
+if behave as a method, using C<this> or as a simple function ignoring C<this>.
+
+In perl method calls use a syntax different from regular calls. A subroutine
+called as a method sees its caller in front of the other arguments.
+
+When the caller to a C<PerlSub> is either a C<PerlObject> or a C<Stash>, JSPL's
+engine will push it in the arguments. The call will use perl's method call
+semantics.
+
+In every other case, JSPL's engine assumes that you are creating or extending
+regular JavaScript objects with C<PerlSub>-based methods and you need a way to
+get the value of C<this> in a I<transparent> way. Thats the purpose of the
+magical variable L<JSPL/$This>.
+
+Perl code not aware of being called from JavaScript will see its arguments
+unmodified. Perl code that needs JavaScript's C<this> gets it in C<$JSPL::This>.
+And everyone is happy.
+
+=cut

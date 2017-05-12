@@ -1,0 +1,165 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8bb6e859f8779d6631d54dcee7bf6bfec42fac44 AUTHOR_PLEDGE
+SHA1 a22e35f8bd8fa345de7ffea06b4c9a927d8ec6ac CONTRIBUTORS
+SHA1 1ca4addcc14feb6af0615c586eab3bd12f785b0b Changes
+SHA1 47b516dc4faf4ffee9ffa615b97a3c6aa4328a32 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 b378979e77ecec517f116380d8af0198924f13bf MANIFEST
+SHA1 2c56fde458d1301211d1ce007477a5c4411901cc META.json
+SHA1 519bb5f8577092d94a147b333d39737ee1c62b37 META.yml
+SHA1 4f2d3ea4a676c7b45fb61f3884a86761403342e5 Makefile.PL
+SHA1 30e3785e498fe275588538bdca416536693cc1d6 cpanfile
+SHA1 ab04333b4d065a59f1d024592a157da36be22d6d doap.xml
+SHA1 f3b7082f24842967258e743378f859dc4e6aadf4 lib/JSON/Schema/AsType.pm
+SHA1 9dcb27cef953fb9cfbe47a8bbeaba95a132af8e8 lib/JSON/Schema/AsType/Draft3.pm
+SHA1 c47fae1d3e865de94672a530d9cc8aac52c7e03e lib/JSON/Schema/AsType/Draft3/Types.pm
+SHA1 8abee79fd70fa280c9b9d34ba49def5b96665c71 lib/JSON/Schema/AsType/Draft4.pm
+SHA1 62c892537edee0027ccccaae1b4a071de06aa200 lib/JSON/Schema/AsType/Draft4/Types.pm
+SHA1 41ff9c2515b95b03eb84bf7cba5c438ae5008fd5 lib/JSON/Schema/AsType/Draft6.pm
+SHA1 ba18cc304eafcbc90e2c1e16fbcc40fff83b1d5f lib/JSON/Schema/AsType/Draft6/Types.pm
+SHA1 92ec724df92de2410789f96c33d89798ac823c4b t/00-compile.t
+SHA1 a1e346bcfe44792c8a0dca21eda706fc656aca0b t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 dea3bb4d6c5023217c3b23d3cb1410ba106baf83 t/basic.t
+SHA1 01381f2786464cd5014c86e331f96bf984db2483 t/corpus/settlers.json
+SHA1 4d32969dd2de51cd078c4b39050cd25ab511ccfe t/draft3.t
+SHA1 9d090d71d1780bda7f3f6b15685e5213e6352199 t/draft4.t
+SHA1 4220348bdb3e7d0731418bc42c87c4c535fc524e t/draft6.t
+SHA1 6808b97edf6d2c189571af702b95916168ff7db8 t/json-schema-test-suite/LICENSE
+SHA1 29fbd8bc084f0861aed7cbb9c79577092d3a9a55 t/json-schema-test-suite/README.md
+SHA1 4d5a67ca63bf2a0f798029c9346a4f4513e28bbe t/json-schema-test-suite/bin/jsonschema_suite
+SHA1 540ac6c24e79c7aa63933cb3744b1dcaade95e5d t/json-schema-test-suite/index.js
+SHA1 1fe67252ed1f38f6db132758922c29cf16a200f9 t/json-schema-test-suite/package.json
+SHA1 8f6fb865eb29957c5bfb7421004b2e3167642f90 t/json-schema-test-suite/remotes/folder/folderInteger.json
+SHA1 8f6fb865eb29957c5bfb7421004b2e3167642f90 t/json-schema-test-suite/remotes/integer.json
+SHA1 1f615357a89bd0da92d950b0e41ebb03ece1ef19 t/json-schema-test-suite/remotes/name.json
+SHA1 37c96fe4e2078670eba4b9b8a7bd7dcad1fd6563 t/json-schema-test-suite/remotes/subSchemas.json
+SHA1 2ee8e87da159bbba225375f21e75f04cf94d71c0 t/json-schema-test-suite/test-schema.json
+SHA1 27d59858bfa22eabaa96f2ceb80c50e5f45edcdc t/json-schema-test-suite/tests/draft3/additionalItems.json
+SHA1 34478026a586b1ff8b96dbe54efdf7515099da7d t/json-schema-test-suite/tests/draft3/additionalProperties.json
+SHA1 17c051cc94a9fb40ad627b04a41d7dce9150e3b5 t/json-schema-test-suite/tests/draft3/default.json
+SHA1 b64e0240af6ccacfeee6359d31ad9eeb73061ab2 t/json-schema-test-suite/tests/draft3/dependencies.json
+SHA1 0338efb887db1499031a573dbd4bdf8e04381e44 t/json-schema-test-suite/tests/draft3/disallow.json
+SHA1 f93261c3b99ed5c49d6bbd0ba5622d6c5f62d614 t/json-schema-test-suite/tests/draft3/divisibleBy.json
+SHA1 00ef7a2317fb93d40ea8bfd17be00cef250abeea t/json-schema-test-suite/tests/draft3/enum.json
+SHA1 b74a86f27d00aa8b618e4a00770d0d23e95a0b57 t/json-schema-test-suite/tests/draft3/extends.json
+SHA1 873828cf8ad5d2701022650e99367cb0a89624b0 t/json-schema-test-suite/tests/draft3/items.json
+SHA1 580cdb7c89cd07b45f3fdadb2279bb13108b79b4 t/json-schema-test-suite/tests/draft3/maxItems.json
+SHA1 a7aff353343095ecb7e7213d041ba0e2885c8d28 t/json-schema-test-suite/tests/draft3/maxLength.json
+SHA1 c205edb4c5bd171c9e1f4955f5cc3b94ca78cb0c t/json-schema-test-suite/tests/draft3/maximum.json
+SHA1 176fedc074768c6ec5c7ceb979f23a6a4bd0be58 t/json-schema-test-suite/tests/draft3/minItems.json
+SHA1 f092e02fe6648fbd1972145941739a0951e7e548 t/json-schema-test-suite/tests/draft3/minLength.json
+SHA1 1a849968c80db05a9ad0a92481edd93dee567804 t/json-schema-test-suite/tests/draft3/minimum.json
+SHA1 32b70fb2c2156c979702eec5c18a86c1fe6d0bd7 t/json-schema-test-suite/tests/draft3/optional/bignum.json
+SHA1 6b70a47cc809a02326dd12ed2ed429dcaa82a163 t/json-schema-test-suite/tests/draft3/optional/format.json
+SHA1 489105099db925ea513fdf20050c6389b868f4c5 t/json-schema-test-suite/tests/draft3/optional/jsregex.json
+SHA1 dac50eb552aa8bb46fdc594283b6b8aea7fb626c t/json-schema-test-suite/tests/draft3/optional/zeroTerminatedFloats.json
+SHA1 30996b58748cb366e0eb54bc5252ba9a3d353e19 t/json-schema-test-suite/tests/draft3/pattern.json
+SHA1 e0080348b213f1d004af7d5c43c2f3f29375224b t/json-schema-test-suite/tests/draft3/patternProperties.json
+SHA1 1aacdf890a9b844c7275f6ad2f3acc2f9100219c t/json-schema-test-suite/tests/draft3/properties.json
+SHA1 0aece5442909b18d5cb12f9c3d91098afb73e70d t/json-schema-test-suite/tests/draft3/ref.json
+SHA1 ef0c43623cad9a3ceb7b407272062ca55c1c9c7e t/json-schema-test-suite/tests/draft3/refRemote.json
+SHA1 6cd95ad810f5ee5f90bc22c72ed2f4260b036ee3 t/json-schema-test-suite/tests/draft3/required.json
+SHA1 b771ba92e768bcf69d5f6a845821626bfb33be3c t/json-schema-test-suite/tests/draft3/type.json
+SHA1 8c9909ffd2abf8f625f81c18a43c789efa369e34 t/json-schema-test-suite/tests/draft3/uniqueItems.json
+SHA1 6ade68257f0292fd2234beed7e7a202ae8fe8f68 t/json-schema-test-suite/tests/draft4/additionalItems.json
+SHA1 34478026a586b1ff8b96dbe54efdf7515099da7d t/json-schema-test-suite/tests/draft4/additionalProperties.json
+SHA1 e98aea1d36d932870561f0c32c32fc5858f251f9 t/json-schema-test-suite/tests/draft4/allOf.json
+SHA1 8081feb305d328878b37a7cc3b296eb5544c239d t/json-schema-test-suite/tests/draft4/anyOf.json
+SHA1 17c051cc94a9fb40ad627b04a41d7dce9150e3b5 t/json-schema-test-suite/tests/draft4/default.json
+SHA1 0963ac4f014a0faf6ad37554c9af03f63dad9b02 t/json-schema-test-suite/tests/draft4/definitions.json
+SHA1 d239f1bb8cfffb7487335c73e02c6cda10d4ef5b t/json-schema-test-suite/tests/draft4/dependencies.json
+SHA1 4b96cc24245950f9fad0916113a5056d9f51c2e5 t/json-schema-test-suite/tests/draft4/enum.json
+SHA1 53307f30a557c789d21c355ab99550cbfdee1fe1 t/json-schema-test-suite/tests/draft4/items.json
+SHA1 580cdb7c89cd07b45f3fdadb2279bb13108b79b4 t/json-schema-test-suite/tests/draft4/maxItems.json
+SHA1 a7de803a65a643219a2fd9391f0e019b5dd23bcb t/json-schema-test-suite/tests/draft4/maxLength.json
+SHA1 1703d6ef976a74eae8ea6cd21c131853c6ca5f6c t/json-schema-test-suite/tests/draft4/maxProperties.json
+SHA1 ea2ed4c0faeee7ad6378796ae117a5935d77abec t/json-schema-test-suite/tests/draft4/maximum.json
+SHA1 176fedc074768c6ec5c7ceb979f23a6a4bd0be58 t/json-schema-test-suite/tests/draft4/minItems.json
+SHA1 f092e02fe6648fbd1972145941739a0951e7e548 t/json-schema-test-suite/tests/draft4/minLength.json
+SHA1 b61b2829899d8a5f6bbc8bde2b694b69bb35d38a t/json-schema-test-suite/tests/draft4/minProperties.json
+SHA1 02dbd7fd78b40b37361990c6ab890d5ef11b7096 t/json-schema-test-suite/tests/draft4/minimum.json
+SHA1 9e70c593b1cc3a3572a0d389b5b7a171bf292ddd t/json-schema-test-suite/tests/draft4/multipleOf.json
+SHA1 5b9567e8409e28b256f3704ca83447f0d0abb707 t/json-schema-test-suite/tests/draft4/not.json
+SHA1 6772cacb066e5458a7fca9a47cfee27b56110d6b t/json-schema-test-suite/tests/draft4/oneOf.json
+SHA1 32b70fb2c2156c979702eec5c18a86c1fe6d0bd7 t/json-schema-test-suite/tests/draft4/optional/bignum.json
+SHA1 5043b8d798d2504c2a7c7d04fd6057ad8cacfcc3 t/json-schema-test-suite/tests/draft4/optional/ecmascript-regex.json
+SHA1 d07d6f90942ffcd693936bd5bb8d451f21f0d3a2 t/json-schema-test-suite/tests/draft4/optional/format.json
+SHA1 dac50eb552aa8bb46fdc594283b6b8aea7fb626c t/json-schema-test-suite/tests/draft4/optional/zeroTerminatedFloats.json
+SHA1 30996b58748cb366e0eb54bc5252ba9a3d353e19 t/json-schema-test-suite/tests/draft4/pattern.json
+SHA1 e0080348b213f1d004af7d5c43c2f3f29375224b t/json-schema-test-suite/tests/draft4/patternProperties.json
+SHA1 1aacdf890a9b844c7275f6ad2f3acc2f9100219c t/json-schema-test-suite/tests/draft4/properties.json
+SHA1 551753cd1e7b7c5028557b8bd67bff85b6196ced t/json-schema-test-suite/tests/draft4/ref.json
+SHA1 9404865ab0aa82a64c2389a2272bf8b0875d0e42 t/json-schema-test-suite/tests/draft4/refRemote.json
+SHA1 44e882aa7967bce3b73988e7efa20c7e9b9087da t/json-schema-test-suite/tests/draft4/required.json
+SHA1 0938ece285eb0fa6560e1ab029aaf096f149ebcb t/json-schema-test-suite/tests/draft4/type.json
+SHA1 8c9909ffd2abf8f625f81c18a43c789efa369e34 t/json-schema-test-suite/tests/draft4/uniqueItems.json
+SHA1 6ade68257f0292fd2234beed7e7a202ae8fe8f68 t/json-schema-test-suite/tests/draft6/additionalItems.json
+SHA1 34478026a586b1ff8b96dbe54efdf7515099da7d t/json-schema-test-suite/tests/draft6/additionalProperties.json
+SHA1 1751b68470f6ebab723c56770a76075799dbecd3 t/json-schema-test-suite/tests/draft6/allOf.json
+SHA1 1730eaf04a18ac9712e3089e10e31e323529e680 t/json-schema-test-suite/tests/draft6/anyOf.json
+SHA1 33d830e549a64f86997b3577fa30da3871715401 t/json-schema-test-suite/tests/draft6/boolean_schema.json
+SHA1 7f83997f3e443489e3a438af6f46da984b97f6d4 t/json-schema-test-suite/tests/draft6/const.json
+SHA1 0101f9e39f70ed8e826f2d22ba4093163ba7aece t/json-schema-test-suite/tests/draft6/contains.json
+SHA1 17c051cc94a9fb40ad627b04a41d7dce9150e3b5 t/json-schema-test-suite/tests/draft6/default.json
+SHA1 0963ac4f014a0faf6ad37554c9af03f63dad9b02 t/json-schema-test-suite/tests/draft6/definitions.json
+SHA1 5252f40434778c0c11924d4fe0de78327b50eee8 t/json-schema-test-suite/tests/draft6/dependencies.json
+SHA1 4b96cc24245950f9fad0916113a5056d9f51c2e5 t/json-schema-test-suite/tests/draft6/enum.json
+SHA1 2c5e14450a7227d25834d5bc160e4e1c72164321 t/json-schema-test-suite/tests/draft6/exclusiveMaximum.json
+SHA1 ebd44046e0298b86c1330b28b716d1a3511e2c79 t/json-schema-test-suite/tests/draft6/exclusiveMinimum.json
+SHA1 15bab82edeac6fe0949229bf9e3caa0d9c2b5691 t/json-schema-test-suite/tests/draft6/items.json
+SHA1 580cdb7c89cd07b45f3fdadb2279bb13108b79b4 t/json-schema-test-suite/tests/draft6/maxItems.json
+SHA1 a7de803a65a643219a2fd9391f0e019b5dd23bcb t/json-schema-test-suite/tests/draft6/maxLength.json
+SHA1 1703d6ef976a74eae8ea6cd21c131853c6ca5f6c t/json-schema-test-suite/tests/draft6/maxProperties.json
+SHA1 9545f23e93bae3c81d26df9d29fecb5917d5a7b9 t/json-schema-test-suite/tests/draft6/maximum.json
+SHA1 176fedc074768c6ec5c7ceb979f23a6a4bd0be58 t/json-schema-test-suite/tests/draft6/minItems.json
+SHA1 f092e02fe6648fbd1972145941739a0951e7e548 t/json-schema-test-suite/tests/draft6/minLength.json
+SHA1 b61b2829899d8a5f6bbc8bde2b694b69bb35d38a t/json-schema-test-suite/tests/draft6/minProperties.json
+SHA1 ab98938e4f13170e20cd029f29edd76a1c39d607 t/json-schema-test-suite/tests/draft6/minimum.json
+SHA1 9e70c593b1cc3a3572a0d389b5b7a171bf292ddd t/json-schema-test-suite/tests/draft6/multipleOf.json
+SHA1 1b1f042e8210aa9a6b69420e4fd8ff4bba989890 t/json-schema-test-suite/tests/draft6/not.json
+SHA1 143f9e3535843c4fc9e72e551a2da5d5b67a575e t/json-schema-test-suite/tests/draft6/oneOf.json
+SHA1 2cb2aa6b9085d7c89bb70a1177b6bccc8fb15418 t/json-schema-test-suite/tests/draft6/optional/bignum.json
+SHA1 5043b8d798d2504c2a7c7d04fd6057ad8cacfcc3 t/json-schema-test-suite/tests/draft6/optional/ecmascript-regex.json
+SHA1 d07d6f90942ffcd693936bd5bb8d451f21f0d3a2 t/json-schema-test-suite/tests/draft6/optional/format.json
+SHA1 5abbe313c1f15e730f51142027e1cc790b12b431 t/json-schema-test-suite/tests/draft6/optional/zeroTerminatedFloats.json
+SHA1 30996b58748cb366e0eb54bc5252ba9a3d353e19 t/json-schema-test-suite/tests/draft6/pattern.json
+SHA1 a20e511d43a6640d2153c30dc3e4753633aa0740 t/json-schema-test-suite/tests/draft6/patternProperties.json
+SHA1 18999871f9d498ef86378e1fbe688629cf46276b t/json-schema-test-suite/tests/draft6/properties.json
+SHA1 4aa0c457fb19532cd7fd1a55e10a95c4f4af915e t/json-schema-test-suite/tests/draft6/propertyNames.json
+SHA1 6a95d6a8ad7a6d184c4bf14dae899b5b24b40b49 t/json-schema-test-suite/tests/draft6/ref.json
+SHA1 567534e265a39b16a4e9e11015e480996b4dbc07 t/json-schema-test-suite/tests/draft6/refRemote.json
+SHA1 152838d9f14fc4178f2e56c862bf2bc6314cc084 t/json-schema-test-suite/tests/draft6/required.json
+SHA1 0938ece285eb0fa6560e1ab029aaf096f149ebcb t/json-schema-test-suite/tests/draft6/type.json
+SHA1 8c9909ffd2abf8f625f81c18a43c789efa369e34 t/json-schema-test-suite/tests/draft6/uniqueItems.json
+SHA1 763f153d2d58dec98346ab6990baa5d5dffad78b t/json-schema-test-suite/tox.ini
+SHA1 818f330ce0d5b2f7186a1ae695c0cc603da2cd8d t/lib/TestUtils.pm
+SHA1 41b2d8c8559d8adac00d821d584b7fe26c57fae2 t/recurse.t
+SHA1 09adf28b4f755afd4ab990aff1c88ec1939db5a2 t/register_uris.t
+SHA1 d8bf1c87a8c6226aa63a4dec9823b8933d8fc247 t/schema-coerce.t
+SHA1 25765227e2ca72ac8a260dfff4ac4416fbd674bd t/spec-schema.t
+SHA1 280304d51e4a4ecf2ceb5c947f93d3dfcbb73049 t/string_number.t
+SHA1 8961b76ac10b08881f8ba839c47a1c45d7c1b949 t/types_draft3.t
+SHA1 13ce2c9ab3ea3958b41dc115e54576f545fe97e9 t/types_draft4.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlkH030ACgkQ34Hwf+GwC4y/1QCdFqvidJajWyU6T9ihHOT0oUqD
+WP8An20NtrJM9Ai16as+OZ9Fgw8bv9jB
+=pRR4
+-----END PGP SIGNATURE-----

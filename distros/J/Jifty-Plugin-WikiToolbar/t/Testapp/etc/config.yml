@@ -1,0 +1,53 @@
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: Testapp
+  ApplicationName: Testapp
+  ApplicationUUID: afb0181e-aa5b-443e-9070-9332f0bb1081
+  ConfigFileVersion: 4
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: testapp
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 0
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - CompressedCSSandJS: {}
+    - SkeletonApp: {}
+    - WikiToolbar: {}
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 0
+  TemplateClass: Testapp::View
+  View: 
+    Handlers: 
+      - Jifty::View::Static::Handler
+      - Jifty::View::Declare::Handler
+      - Jifty::View::Mason::Handler
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

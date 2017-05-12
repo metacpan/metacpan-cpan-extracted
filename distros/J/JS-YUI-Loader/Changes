@@ -1,0 +1,18 @@
+0.06 Wednesday May 28 15:10:29 PDT 2008: 
+ - Automatically include the default "sam" skin if an object is skinnable
+
+0.05 Saturday May 03 19:29:07 PDT 2008:
+ - Some documentation tweaks
+ - Changed JS::YUI::Loader::Source::YUIHost to ::Internet to be consistent with JS::jQuery::Loader
+
+0.04 Thursday May 01 21:06:48 PDT 2008:
+ - Moar documentation
+
+0.03 Tuesday April 29 11:57:55 PDT 2008:
+ - Ensure minimum version of 2.08 for JSON.pm
+
+0.02 Monday April 28 18:38:58 PDT 2008:
+ - Disable network testing by default in t/04-cache.t
+
+0.01 Monday April 28 18:34:38 PDT 2008:
+ - Initial release

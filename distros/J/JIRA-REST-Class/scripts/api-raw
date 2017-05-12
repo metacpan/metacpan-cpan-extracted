@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use lib $ENV{HOME}.'/git/JIRA-REST-Class/lib';
+use lib $ENV{HOME}.'/git/JIRA-REST/lib';
+use JIRA::REST::Class;
+use Data::Dumper::Concise;
+
+my $path = shift @ARGV;
+my $host = $ENV{APIHOST} // 'http://speedy:8080';
+my $user = $ENV{APIUSER} // 'packy';
+
+
+
+my $args = { url => $host };
+
+my $cmd = "GET $host$path";
+if ($user eq 'undef') {
+    $args->{anonymous} = 1;
+}
+else {
+    $args->{username} = $user;
+    $cmd .= "  (user $user)";
+}
+say $cmd;
+
+my $jira = JIRA::REST::Class->new($args);
+print 'headers = '.Dumper($jira->REST_CLIENT->{_headers});
+
+my $data = $jira->JIRA_REST->GET($path);
+print $jira->dump( $data );

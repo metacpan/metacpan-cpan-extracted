@@ -1,0 +1,83 @@
+=pod
+
+=head1 Name
+
+Test.Harness.Director - Run TAP standard JavaScript test scripts with statistics in Director
+
+=head1 Synopsis
+
+  Test.Harness.Director.runTests(
+      'async_html',
+      'bad_plan_html',
+      'buffer_html',
+      'builder_html'
+  );
+
+=head1 Description
+
+B<STOP!> If all you want to do is write a test script, consider using
+Test.Simple. Test.Harness is the module that reads the output from
+Test.Simple, Test.More and other modules based on Test.Builder. You don't need
+to know about Test.Harness to use those modules.
+
+Test.Harness.Director runs JavaScript tests in Director and expects to get the
+results from the C<TestResults> attribute of the Test.Builder object
+constructed by each test script. These results conform to a format called TAP,
+the Test Anything Protocol. It is defined in
+L<http://search.cpan.org/dist/Test-Harness/lib/Test/Harness/TAP.pod>. See
+L<Test.Harness> for details on the output.
+
+=head2 Class Methods
+
+  Test.Harness.Director.runTests('javascript_funtion_1', 'javascript_funtion_2');
+
+Constructs a new Test.Harness.Director object and calls its C<runTests()>
+instance method, passing all arguments along.
+
+=head2 Constructors
+
+  var harness = new Test.Harness.Director();
+
+Constructs a new Test.Harness.Director object.
+
+=head2 Instance Methods
+
+=over 4
+
+=item B<runTests>
+
+  harness.runTests('javascript_funtion_1', 'javascript_funtion_2');
+
+This method runs all the given test functions and divines whether they passed
+or failed based on the contents of the C<TestRusults> attribute of their
+global C<Test.Builder.Test> object. It prints out each individual test that
+failed along with a summary report and a how long it all took. When all tests
+have been run, a diagnostic message will be output. See L<Test.Harness> for
+details on the output.
+
+=head1 See Also
+
+To actually use this module, there is a a fair amount of Director scaffolding
+required. See L<http://www.gmccreight.com/TestSimple/> for additional
+downloads and documentation.
+
+L<Test.Harness>, the base class for this class.
+
+L<Test.Simple> and L<Test.More>, modules with which to write tests.
+
+=head1 Authors
+
+Gordon McCreight <gordon@mccrieght.com> and David Wheeler
+<david@kineticode.com>.
+
+=head1 Copyright
+
+Copyright 2005 by David Wheeler <david@kineticode.com>
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Perl Artistic License or the GNU GPL.
+
+See L<http://www.perl.com/perl/misc/Artistic.html> and
+L<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut

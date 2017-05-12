@@ -1,0 +1,11 @@
+Jifty-Plugin-Feedback changes
+
+0.05 Mon Feb 14 2011 14:20
+    Refactor the feedback notification into a proper Jifty notification class
+
+0.04 Wed Jan 26 2011 17:25
+    Updated for Plack
+
+0.03 Wed Nov 18 2009 19:53:31
+    Distribution fixes suggested by rafl
+

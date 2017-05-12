@@ -1,0 +1,1028 @@
+---
+javax.jcr.AccessDeniedException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.Credentials:
+  isa:
+   - java.io.Serializable
+  has_constructors: 0
+  methods:
+
+javax.jcr.ImportUUIDBehavior:
+  has_constructors: 0
+  static_fields:
+   - IMPORT_UUID_CREATE_NEW
+   - IMPORT_UUID_COLLISION_REMOVE_EXISTING
+   - IMPORT_UUID_COLLISION_REPLACE_EXISTING
+   - IMPORT_UUID_COLLISION_THROW
+  methods:
+
+javax.jcr.InvalidItemStateException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.InvalidSerializedDataException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.Item:
+  has_constructors: 0
+  methods:
+    instance:
+      isNode: boolean
+      save: void
+      isSame: boolean
+      isNew: boolean
+      remove: void
+      getAncestor: javax.jcr.Item
+      getName: java.lang.String
+      getParent: javax.jcr.Node
+      getPath: java.lang.String
+      getSession: javax.jcr.Session
+      isModified: boolean
+      accept: void
+      refresh: void
+      getDepth: int
+
+javax.jcr.ItemExistsException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.ItemNotFoundException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.ItemVisitor:
+  has_constructors: 0
+  methods:
+    instance:
+      visit: void
+
+javax.jcr.lock.Lock:
+  has_constructors: 0
+  methods:
+    instance:
+      isSessionScoped: boolean
+      isLive: boolean
+      getLockOwner: java.lang.String
+      getNode: javax.jcr.Node
+      getLockToken: java.lang.String
+      refresh: void
+      isDeep: boolean
+
+javax.jcr.lock.LockException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.LoginException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.MergeException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.NamespaceException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.NamespaceRegistry:
+  has_constructors: 0
+  methods:
+    instance:
+      unregisterNamespace: void
+      getPrefix: java.lang.String
+      getURIs: Array:java.lang.String
+      getURI: java.lang.String
+      registerNamespace: void
+      getPrefixes: Array:java.lang.String
+
+javax.jcr.Node:
+  isa:
+   - javax.jcr.Item
+  has_constructors: 0
+  methods:
+    instance:
+      hasProperties: boolean
+      getMixinNodeTypes: Array:javax.jcr.nodetype.NodeType
+      getAncestor: javax.jcr.Item
+      merge: javax.jcr.NodeIterator
+      setProperty: javax.jcr.Property
+      getProperty: javax.jcr.Property
+      getParent: javax.jcr.Node
+      accept: void
+      getUUID: java.lang.String
+      getDepth: int
+      cancelMerge: void
+      holdsLock: boolean
+      getProperties: javax.jcr.PropertyIterator
+      isNode: boolean
+      save: void
+      getIndex: int
+      isSame: boolean
+      getNode: javax.jcr.Node
+      hasNodes: boolean
+      isNew: boolean
+      orderBefore: void
+      checkout: void
+      doneMerge: void
+      isModified: boolean
+      refresh: void
+      checkin: javax.jcr.version.Version
+      getLock: javax.jcr.lock.Lock
+      getNodes: javax.jcr.NodeIterator
+      getDefinition: javax.jcr.nodetype.NodeDefinition
+      update: void
+      hasProperty: boolean
+      removeMixin: void
+      unlock: void
+      lock: javax.jcr.lock.Lock
+      restore: void
+      getSession: javax.jcr.Session
+      getReferences: javax.jcr.PropertyIterator
+      isLocked: boolean
+      restoreByLabel: void
+      getPrimaryNodeType: javax.jcr.nodetype.NodeType
+      isCheckedOut: boolean
+      canAddMixin: boolean
+      remove: void
+      getCorrespondingNodePath: java.lang.String
+      getName: java.lang.String
+      addMixin: void
+      getVersionHistory: javax.jcr.version.VersionHistory
+      getPath: java.lang.String
+      hasNode: boolean
+      getPrimaryItem: javax.jcr.Item
+      getBaseVersion: javax.jcr.version.Version
+      isNodeType: boolean
+      addNode: javax.jcr.Node
+
+javax.jcr.NodeIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      nextNode: javax.jcr.Node
+      remove: void
+      getPosition: long
+
+javax.jcr.nodetype.ConstraintViolationException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.nodetype.ItemDefinition:
+  has_constructors: 0
+  methods:
+    instance:
+      getName: java.lang.String
+      getDeclaringNodeType: javax.jcr.nodetype.NodeType
+      isProtected: boolean
+      isMandatory: boolean
+      getOnParentVersion: int
+      isAutoCreated: boolean
+
+javax.jcr.nodetype.NodeDefinition:
+  isa:
+   - javax.jcr.nodetype.ItemDefinition
+  has_constructors: 0
+  methods:
+    instance:
+      getName: java.lang.String
+      getDefaultPrimaryType: javax.jcr.nodetype.NodeType
+      getRequiredPrimaryTypes: Array:javax.jcr.nodetype.NodeType
+      getDeclaringNodeType: javax.jcr.nodetype.NodeType
+      isProtected: boolean
+      isMandatory: boolean
+      getOnParentVersion: int
+      isAutoCreated: boolean
+      allowsSameNameSiblings: boolean
+
+javax.jcr.nodetype.NodeType:
+  has_constructors: 0
+  methods:
+    instance:
+      getPropertyDefinitions: Array:javax.jcr.nodetype.PropertyDefinition
+      getDeclaredPropertyDefinitions: Array:javax.jcr.nodetype.PropertyDefinition
+      canSetProperty: boolean
+      canRemoveItem: boolean
+      getSupertypes: Array:javax.jcr.nodetype.NodeType
+      getName: java.lang.String
+      getDeclaredChildNodeDefinitions: Array:javax.jcr.nodetype.NodeDefinition
+      getPrimaryItemName: java.lang.String
+      isMixin: boolean
+      getChildNodeDefinitions: Array:javax.jcr.nodetype.NodeDefinition
+      canAddChildNode: boolean
+      getDeclaredSupertypes: Array:javax.jcr.nodetype.NodeType
+      isNodeType: boolean
+      hasOrderableChildNodes: boolean
+
+javax.jcr.nodetype.NodeTypeIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      nextNodeType: javax.jcr.nodetype.NodeType
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+
+javax.jcr.nodetype.NodeTypeManager:
+  has_constructors: 0
+  methods:
+    instance:
+      getAllNodeTypes: javax.jcr.nodetype.NodeTypeIterator
+      getNodeType: javax.jcr.nodetype.NodeType
+      getMixinNodeTypes: javax.jcr.nodetype.NodeTypeIterator
+      getPrimaryNodeTypes: javax.jcr.nodetype.NodeTypeIterator
+
+javax.jcr.nodetype.NoSuchNodeTypeException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.nodetype.PropertyDefinition:
+  isa:
+   - javax.jcr.nodetype.ItemDefinition
+  has_constructors: 0
+  methods:
+    instance:
+      getValueConstraints: Array:java.lang.String
+      getName: java.lang.String
+      getRequiredType: int
+      getDeclaringNodeType: javax.jcr.nodetype.NodeType
+      isMultiple: boolean
+      isProtected: boolean
+      isMandatory: boolean
+      getOnParentVersion: int
+      getDefaultValues: Array:javax.jcr.Value
+      isAutoCreated: boolean
+
+javax.jcr.NoSuchWorkspaceException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.observation.Event:
+  has_constructors: 0
+  static_fields:
+   - NODE_ADDED
+   - NODE_REMOVED
+   - PROPERTY_ADDED
+   - PROPERTY_REMOVED
+   - PROPERTY_CHANGED
+  methods:
+    instance:
+      getUserID: java.lang.String
+      getPath: java.lang.String
+      getType: int
+
+javax.jcr.observation.EventIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      nextEvent: javax.jcr.observation.Event
+      remove: void
+      getPosition: long
+
+javax.jcr.observation.EventListener:
+  has_constructors: 0
+  methods:
+    instance:
+      onEvent: void
+
+javax.jcr.observation.EventListenerIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      nextEventListener: javax.jcr.observation.EventListener
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+
+javax.jcr.observation.ObservationManager:
+  has_constructors: 0
+  methods:
+    instance:
+      getRegisteredEventListeners: javax.jcr.observation.EventListenerIterator
+      removeEventListener: void
+      addEventListener: void
+
+javax.jcr.PathNotFoundException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.Property:
+  isa:
+   - javax.jcr.Item
+  has_constructors: 0
+  methods:
+    instance:
+      getStream: java.io.InputStream
+      getValue: javax.jcr.Value
+      getDefinition: javax.jcr.nodetype.PropertyDefinition
+      getBoolean: boolean
+      getType: int
+      getValues: Array:javax.jcr.Value
+      getAncestor: javax.jcr.Item
+      setValue: void
+      getDate: java.util.Calendar
+      getParent: javax.jcr.Node
+      getDouble: double
+      getSession: javax.jcr.Session
+      accept: void
+      getDepth: int
+      getLong: long
+      isNode: boolean
+      getLengths: Array:long
+      save: void
+      isSame: boolean
+      getNode: javax.jcr.Node
+      isNew: boolean
+      remove: void
+      getLength: long
+      getName: java.lang.String
+      getPath: java.lang.String
+      getString: java.lang.String
+      isModified: boolean
+      refresh: void
+
+javax.jcr.PropertyIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      nextProperty: javax.jcr.Property
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+
+javax.jcr.PropertyType:
+  isa:
+   - java.lang.Object
+  has_constructors: 0
+  static_fields:
+   - STRING
+   - BINARY
+   - LONG
+   - DOUBLE
+   - DATE
+   - BOOLEAN
+   - NAME
+   - PATH
+   - REFERENCE
+   - UNDEFINED
+   - TYPENAME_STRING
+   - TYPENAME_BINARY
+   - TYPENAME_LONG
+   - TYPENAME_DOUBLE
+   - TYPENAME_DATE
+   - TYPENAME_BOOLEAN
+   - TYPENAME_NAME
+   - TYPENAME_PATH
+   - TYPENAME_REFERENCE
+   - TYPENAME_UNDEFINED
+  methods:
+    static:
+      valueFromName: int
+      nameFromValue: java.lang.String
+    instance:
+      toString: java.lang.String
+
+javax.jcr.query.InvalidQueryException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.query.Query:
+  has_constructors: 0
+  static_fields:
+   - XPATH
+   - SQL
+  methods:
+    instance:
+      getStatement: java.lang.String
+      execute: javax.jcr.query.QueryResult
+      getLanguage: java.lang.String
+      storeAsNode: javax.jcr.Node
+      getStoredQueryPath: java.lang.String
+
+javax.jcr.query.QueryManager:
+  has_constructors: 0
+  methods:
+    instance:
+      getQuery: javax.jcr.query.Query
+      getSupportedQueryLanguages: Array:java.lang.String
+      createQuery: javax.jcr.query.Query
+
+javax.jcr.query.QueryResult:
+  has_constructors: 0
+  methods:
+    instance:
+      getNodes: javax.jcr.NodeIterator
+      getColumnNames: Array:java.lang.String
+      getRows: javax.jcr.query.RowIterator
+
+javax.jcr.query.Row:
+  has_constructors: 0
+  methods:
+    instance:
+      getValue: javax.jcr.Value
+      getValues: Array:javax.jcr.Value
+
+javax.jcr.query.RowIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+      nextRow: javax.jcr.query.Row
+
+javax.jcr.RangeIterator:
+  isa:
+   - java.util.Iterator
+  has_constructors: 0
+  methods:
+    instance:
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+
+javax.jcr.ReferentialIntegrityException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.Repository:
+  has_constructors: 0
+  static_fields:
+   - SPEC_VERSION_DESC
+   - SPEC_NAME_DESC
+   - REP_VENDOR_DESC
+   - REP_VENDOR_URL_DESC
+   - REP_NAME_DESC
+   - REP_VERSION_DESC
+   - LEVEL_1_SUPPORTED
+   - LEVEL_2_SUPPORTED
+   - OPTION_TRANSACTIONS_SUPPORTED
+   - OPTION_VERSIONING_SUPPORTED
+   - OPTION_OBSERVATION_SUPPORTED
+   - OPTION_LOCKING_SUPPORTED
+   - OPTION_QUERY_SQL_SUPPORTED
+   - QUERY_XPATH_POS_INDEX
+   - QUERY_XPATH_DOC_ORDER
+  methods:
+    instance:
+      getDescriptor: java.lang.String
+      login: javax.jcr.Session
+      getDescriptorKeys: Array:java.lang.String
+
+javax.jcr.RepositoryException:
+  isa:
+   - java.lang.Exception
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.Session:
+  has_constructors: 0
+  methods:
+    instance:
+      addLockToken: void
+      getUserID: java.lang.String
+      getNamespaceURI: java.lang.String
+      checkPermission: void
+      exportDocumentView: void
+      isLive: boolean
+      getRepository: javax.jcr.Repository
+      getLockTokens: Array:java.lang.String
+      removeLockToken: void
+      getAttribute: java.lang.Object
+      itemExists: boolean
+      getItem: javax.jcr.Item
+      getNamespacePrefixes: Array:java.lang.String
+      setNamespacePrefix: void
+      impersonate: javax.jcr.Session
+      getValueFactory: javax.jcr.ValueFactory
+      getNamespacePrefix: java.lang.String
+      logout: void
+      move: void
+      importXML: void
+      getAttributeNames: Array:java.lang.String
+      getWorkspace: javax.jcr.Workspace
+      save: void
+      getImportContentHandler: org.xml.sax.ContentHandler
+      hasPendingChanges: boolean
+      getNodeByUUID: javax.jcr.Node
+      exportSystemView: void
+      getRootNode: javax.jcr.Node
+      refresh: void
+
+javax.jcr.SimpleCredentials:
+  isa:
+   - java.lang.Object
+   - javax.jcr.Credentials
+  has_constructors: 1
+  methods:
+    instance:
+      getAttributeNames: Array:java.lang.String
+      getUserID: java.lang.String
+      toString: java.lang.String
+      getPassword: Array:char
+      getAttribute: java.lang.Object
+      setAttribute: void
+      removeAttribute: void
+
+javax.jcr.UnsupportedRepositoryOperationException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.util.TraversingItemVisitor$Default:
+  isa:
+   - javax.jcr.util.TraversingItemVisitor
+  has_constructors: 1
+  methods:
+    instance:
+      toString: java.lang.String
+      visit: void
+
+javax.jcr.util.TraversingItemVisitor:
+  isa:
+   - java.lang.Object
+   - javax.jcr.ItemVisitor
+  has_constructors: 1
+  methods:
+    instance:
+      toString: java.lang.String
+      visit: void
+
+javax.jcr.Value:
+  has_constructors: 0
+  methods:
+    instance:
+      getLong: long
+      getDate: java.util.Calendar
+      getStream: java.io.InputStream
+      getString: java.lang.String
+      getDouble: double
+      getBoolean: boolean
+      getType: int
+
+javax.jcr.ValueFactory:
+  has_constructors: 0
+  methods:
+    instance:
+      createValue: javax.jcr.Value
+
+javax.jcr.ValueFormatException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.version.OnParentVersionAction:
+  isa:
+   - java.lang.Object
+  has_constructors: 0
+  static_fields:
+   - COPY
+   - VERSION
+   - INITIALIZE
+   - COMPUTE
+   - IGNORE
+   - ABORT
+   - ACTIONNAME_COPY
+   - ACTIONNAME_VERSION
+   - ACTIONNAME_INITIALIZE
+   - ACTIONNAME_COMPUTE
+   - ACTIONNAME_IGNORE
+   - ACTIONNAME_ABORT
+  methods:
+    static:
+      valueFromName: int
+      nameFromValue: java.lang.String
+    instance:
+      toString: java.lang.String
+
+javax.jcr.version.Version:
+  isa:
+   - javax.jcr.Node
+  has_constructors: 0
+  methods:
+    instance:
+      hasProperties: boolean
+      getMixinNodeTypes: Array:javax.jcr.nodetype.NodeType
+      getAncestor: javax.jcr.Item
+      getSuccessors: Array:javax.jcr.version.Version
+      merge: javax.jcr.NodeIterator
+      setProperty: javax.jcr.Property
+      getProperty: javax.jcr.Property
+      getParent: javax.jcr.Node
+      accept: void
+      getUUID: java.lang.String
+      getDepth: int
+      cancelMerge: void
+      holdsLock: boolean
+      getProperties: javax.jcr.PropertyIterator
+      isNode: boolean
+      save: void
+      getIndex: int
+      getPredecessors: Array:javax.jcr.version.Version
+      isSame: boolean
+      getNode: javax.jcr.Node
+      hasNodes: boolean
+      isNew: boolean
+      orderBefore: void
+      checkout: void
+      doneMerge: void
+      isModified: boolean
+      refresh: void
+      checkin: javax.jcr.version.Version
+      getLock: javax.jcr.lock.Lock
+      getNodes: javax.jcr.NodeIterator
+      getDefinition: javax.jcr.nodetype.NodeDefinition
+      update: void
+      hasProperty: boolean
+      getContainingHistory: javax.jcr.version.VersionHistory
+      removeMixin: void
+      unlock: void
+      lock: javax.jcr.lock.Lock
+      restore: void
+      getSession: javax.jcr.Session
+      getReferences: javax.jcr.PropertyIterator
+      isLocked: boolean
+      restoreByLabel: void
+      getCreated: java.util.Calendar
+      getPrimaryNodeType: javax.jcr.nodetype.NodeType
+      canAddMixin: boolean
+      isCheckedOut: boolean
+      remove: void
+      getCorrespondingNodePath: java.lang.String
+      getName: java.lang.String
+      addMixin: void
+      getVersionHistory: javax.jcr.version.VersionHistory
+      getPath: java.lang.String
+      hasNode: boolean
+      getPrimaryItem: javax.jcr.Item
+      getBaseVersion: javax.jcr.version.Version
+      isNodeType: boolean
+      addNode: javax.jcr.Node
+
+javax.jcr.version.VersionException:
+  isa:
+   - javax.jcr.RepositoryException
+  has_constructors: 1
+  methods:
+    instance:
+      getCause: java.lang.Throwable
+      toString: java.lang.String
+      initCause: java.lang.Throwable
+      fillInStackTrace: java.lang.Throwable
+      getLocalizedMessage: java.lang.String
+      setStackTrace: void
+      printStackTrace: void
+      getMessage: java.lang.String
+      getStackTrace: Array:java.lang.StackTraceElement
+
+javax.jcr.version.VersionHistory:
+  isa:
+   - javax.jcr.Node
+  has_constructors: 0
+  methods:
+    instance:
+      getAllVersions: javax.jcr.version.VersionIterator
+      hasProperties: boolean
+      getMixinNodeTypes: Array:javax.jcr.nodetype.NodeType
+      getAncestor: javax.jcr.Item
+      getRootVersion: javax.jcr.version.Version
+      merge: javax.jcr.NodeIterator
+      setProperty: javax.jcr.Property
+      getProperty: javax.jcr.Property
+      getVersionByLabel: javax.jcr.version.Version
+      getParent: javax.jcr.Node
+      removeVersionLabel: void
+      accept: void
+      getUUID: java.lang.String
+      getDepth: int
+      cancelMerge: void
+      holdsLock: boolean
+      getProperties: javax.jcr.PropertyIterator
+      isNode: boolean
+      save: void
+      getIndex: int
+      isSame: boolean
+      getNode: javax.jcr.Node
+      isNew: boolean
+      hasNodes: boolean
+      orderBefore: void
+      checkout: void
+      doneMerge: void
+      isModified: boolean
+      refresh: void
+      checkin: javax.jcr.version.Version
+      getLock: javax.jcr.lock.Lock
+      hasVersionLabel: boolean
+      getNodes: javax.jcr.NodeIterator
+      getDefinition: javax.jcr.nodetype.NodeDefinition
+      update: void
+      hasProperty: boolean
+      removeMixin: void
+      unlock: void
+      lock: javax.jcr.lock.Lock
+      restore: void
+      getSession: javax.jcr.Session
+      getReferences: javax.jcr.PropertyIterator
+      removeVersion: void
+      isLocked: boolean
+      restoreByLabel: void
+      getPrimaryNodeType: javax.jcr.nodetype.NodeType
+      addVersionLabel: void
+      getVersionLabels: Array:java.lang.String
+      canAddMixin: boolean
+      isCheckedOut: boolean
+      remove: void
+      getVersionableUUID: java.lang.String
+      getCorrespondingNodePath: java.lang.String
+      getName: java.lang.String
+      addMixin: void
+      getVersionHistory: javax.jcr.version.VersionHistory
+      getPath: java.lang.String
+      hasNode: boolean
+      getVersion: javax.jcr.version.Version
+      getPrimaryItem: javax.jcr.Item
+      getBaseVersion: javax.jcr.version.Version
+      isNodeType: boolean
+      addNode: javax.jcr.Node
+
+javax.jcr.version.VersionIterator:
+  isa:
+   - javax.jcr.RangeIterator
+  has_constructors: 0
+  methods:
+    instance:
+      nextVersion: javax.jcr.version.Version
+      hasNext: boolean
+      skip: void
+      getSize: long
+      next: java.lang.Object
+      remove: void
+      getPosition: long
+
+javax.jcr.Workspace:
+  has_constructors: 0
+  methods:
+    instance:
+      importXML: void
+      getNodeTypeManager: javax.jcr.nodetype.NodeTypeManager
+      getImportContentHandler: org.xml.sax.ContentHandler
+      getQueryManager: javax.jcr.query.QueryManager
+      copy: void
+      getObservationManager: javax.jcr.observation.ObservationManager
+      clone: void
+      getAccessibleWorkspaceNames: Array:java.lang.String
+      getName: java.lang.String
+      restore: void
+      getSession: javax.jcr.Session
+      getNamespaceRegistry: javax.jcr.NamespaceRegistry
+      move: void
+

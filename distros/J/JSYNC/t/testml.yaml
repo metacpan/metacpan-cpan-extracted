@@ -1,0 +1,5 @@
+testml: ../../jsync-tml
+local: testml
+lang: pm5
+bridge: t::Bridge
+template: template.tt

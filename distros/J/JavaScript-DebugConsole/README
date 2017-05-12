@@ -1,0 +1,38 @@
+JavaScript-DebugConsole version 0.01
+====================================
+
+This is version 0.01 of JavaScript::DebugConsole 
+
+This package generates JavaScript popups with custom text and typical web
+development useful informations.
+I packaged some my old and simple functions inside a Perl module (I was tired to
+do cut&paste each time :-) ) to generate the necessary JavaScript code in order
+to open a popup window with custom text and typical web development useful infos
+(like form params, environment variables, HTTP headers and so on).
+
+See perldoc JavaScript::DebugConsole for module documentation and use
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module doesn't requires other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Enrico Sorcinelli <enrico at sorcinelli.it>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

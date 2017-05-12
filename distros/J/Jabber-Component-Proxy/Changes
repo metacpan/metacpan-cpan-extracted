@@ -1,0 +1,8 @@
+Revision history for Perl extension Jabber::Component::Proxy.
+
+0.02  2002-04-01 dja
+  - Change the original packet type into 'error' too on deny (doh!)
+
+0.01  2001-12-12 dja
+	- original version
+

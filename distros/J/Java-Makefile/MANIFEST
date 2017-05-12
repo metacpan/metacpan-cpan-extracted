@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+lib/Java/Makefile.pm
+MANIFEST
+META.yml
+README.md
+lib/Java/com.codechild.jarinjarloader/JarRsrcLoader.java
+lib/Java/com.codechild.jarinjarloader/RsrcURLStreamHandler.java
+lib/Java/com.codechild.jarinjarloader/JIJConstants.java
+lib/Java/com.codechild.jarinjarloader/RsrcURLConnection.java
+lib/Java/com.codechild.jarinjarloader/RsrcURLStreamHandlerFactory.java
+META.json                                Module JSON meta-data (added by MakeMaker)

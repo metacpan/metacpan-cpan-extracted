@@ -1,0 +1,4 @@
+- Add support for {dependencies} schema attribute.
+- Test support for {additionalItems} and {patternProperties} attributes.
+- More test cases.
+- Documentation claims '$ref' not supported, but it is (via JSON::Hyper).

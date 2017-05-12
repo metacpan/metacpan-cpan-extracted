@@ -1,0 +1,272 @@
+Revision history for JIRA-Client.
+
+0.45      2016-12-11 10:52:46-02:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Fix a few spelling errors and remove the TODO file.
+
+0.44      2016-12-10 10:00:09-02:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Fix deprecation warning saying that JIRA's SOAP API was removed on JIRA
+    7 and not that it would be removed on JIRA 8.
+
+0.43      2015-02-01 22:33:09-02:00 America/Sao_Paulo
+
+  [Changes]
+
+  - Deprecate the distribution, because JIRA's SOAP API is already
+    deprecated and won't be available in future JIRA 8.0. Prospect users are
+    invited to try the JIRA::REST module instead.
+
+0.42      2014-08-09 17:47:44 America/Sao_Paulo
+
+  [Changes]
+
+  - Add deprecation warning and reference to JIRA::REST.
+
+0.41      2014-04-01 21:34:37 America/Sao_Paulo
+
+  [New features]
+
+  - New method filter_issues_unsorted.
+
+0.40      2012-08-02 08:21:52 America/Sao_Paulo
+
+  - Fix constructor URL munging by applying a patch from Slaven
+    Rezić. Thanks again!
+
+0.39      2012-07-31 09:25:36 America/Sao_Paulo
+
+  - Revert the constructor change of 0.38 because it broke
+    invokations when JIRA server's base URL had a path component.
+
+  - Implemented an alternative invokation style based on named
+    arguments passed via a hash-ref. This was suggested by Slaven
+    Rezić. Thanks!
+
+0.38      2012-07-13 19:50:24 America/Sao_Paulo
+
+  - The constructor now admits non-base URLs to non-standard WSDL
+    descriptors. This was suggested by Elena Bolshakova
+    <elena@cpan.org>. Thanks!
+
+  - Add examples/jira-filter.pl.
+
+  - Detects some weird connection errors.
+
+0.37      2012-05-01 18:48:03 America/Sao_Paulo
+
+  - Use Data::Util to make for cleaner code.
+
+0.36      2012-04-21 20:55:58 America/Sao_Paulo
+
+  - Moved from Google Code to GitHub.
+
+0.35      2012-04-12 13:14:13 America/Sao_Paulo
+
+  - Add method filter_issues.
+
+0.34    2012-02-22
+
+  - Distribution converted to use Dist::Zilla.
+    Online tests are now driven by a configuration file.
+
+0.33    2012-02-20
+
+  - Make create_issue correctly support sub-task issue types. This
+    was suggested by Stephen Marquard via
+    https://rt.cpan.org/Ticket/Display.html?id=75157.
+
+0.32    2011-12-05
+
+  - [rt72470] Fix create_issue and progress_workflow_action_safely parameter conversions.
+
+  - [rt72667] Pass project key to get_security_levels.
+
+0.31    2011-11-19
+
+  - Accept both names for JIRA fields that must be named one way
+    to be set and are named otherwise when read. This is due to
+    https://jira.atlassian.com/browse/JRA-12300 and was reported
+    by Dan Baber via
+    https://rt.cpan.org/Ticket/Display.html?id=72470.
+
+0.30    2011-09-26
+
+  - Cast duedate's field to a "date" SOAP::Data type. This is
+    required by JIRA 4.4.
+
+0.29    2011-09-13
+
+  - Support new methods in the JIRA 4.4 SOAP API.
+
+0.28  2011-05-09
+
+  - JIRA::Client->new passes extra arguments to the underlying
+    SOAP::Lite object. This was suggested by Nicholas J Humfrey
+    <njh AT cpan DOT org>.
+
+0.27  2011-03-05
+
+  - Properly casts RemoteProjectRole objects in several
+    methods. This was suggested by Philippe MARTIN.
+
+0.26  2010-12-21
+
+  - Implements some magic to make it easier to specify Cascading
+    field values in the create_issue and update_issue
+    methods. This was suggested by Keith Hackworth.
+
+0.25  2010-09-11
+
+  - Implements method get_statuses, courtesy of michael AT
+    riceclan.org.
+
+  - Fixes a problem in _convert_resolution, courtesy of KBeal AT
+    crosscountry-auto.com.
+
+  - Fixes a typo in examples/jiraclient.pl, courtesy of cosimo AT
+    cpan.org.
+
+0.24    2009-12-24
+
+  - Corrects one typo suggested by Andrey Belous and denies the
+    attachment of empty files, as suggested by Jon Connell.
+
+0.23    2009-12-12
+
+  - Corrects the SOAP serialization of arrays to enable the use of
+    the add*AttachmentsToIssue API methods. Thanks to Jon Connell
+    who reported the problem.
+
+  - Implements the methods attach_files_to_issue and
+    attach_strings_to_issue to make it easier to attach things.
+
+  - The method create_issue now accepts an optional Security Level
+    argument. Thanks to Lance Selvidge for the suggestion.
+
+0.22    2009-11-30
+
+  - Corrects a bug
+    [http://rt.cpan.org/Ticket/Display.html?id=52076] that
+    affected the methods progressWorkflowAction and updateIssue.
+
+0.21    2009-11-21
+
+  - Adds update_issue method.
+
+  - Adds lots of implicit conversions and document them better.
+
+  - Can set duedate field with a DateTime object.
+
+  - Adds a examples directory with a single example so far.
+
+  - Adds resolution conversion from names.
+
+0.20    2009-11-20
+
+  - Converts the 'duedate' field from the ISO format (YYYY-MM-DD)
+    into the JIRA required format (d/MMM/yy) in create_issue and
+    progress_workflow_action_safely. This is necessary because
+    while JIRA requires the later, it gives the former in
+    getIssue. Thanks to Andrey Belous for alerting me about this.
+
+  - Adds a perlcritic test and placates some of its criticisms.
+
+0.19    2009-11-06
+
+  - Updates the default conversions for the new JIRA 4.0 methods.
+    Thanks to Mário Moreira for alerting me about this.
+
+0.18    2009-10-24
+
+  - Adding kwalitee test. (See
+    http://cpants.perl.org/dist/overview/JIRA-Client)
+
+0.17  2009-10-18
+
+  - Implements the method get_issue_custom_field_values, to more
+    easily grok the custom field values from an issue.
+
+  - Refactors some code in a bunch of helper functions.
+
+  - Implements many more online tests. There are 39 now.
+
+  - Makes the POD tests disabled by default. They are meant to be
+    used by the author only.
+
+0.16  2009-10-04
+
+  - Implements the method get_favourite_filters, which caches the
+    user's favourite filters.
+
+  - Casts automatically filter names into filter id in the
+    arguments for getIssueCountForFilter, getIssuesFromFilter, and
+    getIssuesFromFilterWithLimit.
+
+  - These changes were inspired by Andrew Grangaard's example in
+    http://www.lowlevelmanager.com/2009/09/access-jira-api-from-perl-with.html.
+    Thanks!
+
+0.15  2009-09-28
+
+  - The method progress_workflow_action_safely hash argument now
+    accepts the same shortcuts as the create_issue argument does.
+
+  - Nate Murray and Jon Connell sent me bug reports and
+    suggestions. Thanks.
+
+0.14  2009-09-12
+
+  - Supporting versions of JIRA older than 3.14.4 in the method
+    next_issue.
+
+  - Added an optional argument to the method set_issue_iterator to
+    allow for the specification of the pre-fetching cache size.
+
+
+0.13  2009-08-04
+
+  - Make it easy to set custom fields in create_issue.
+
+0.12  2009-08-02
+
+  - Avoids spurious messages during destruction with a kludge.
+
+0.11    2009-07-13
+
+  - set_filter_iterator accepts filter ids or filter names.
+
+0.10    2009-07-11
+
+  - Implements methods create_issue and
+    progress_workflow_action_safelly using ideas from Jon Connel
+    <jon AT figsandfudge DOT com>.
+
+  - Makes it easier to call some methods by accepting simpler
+    arguments using an idea from BjÃ¸rn-Olav Strand <BOLAV AT cpan
+    DOT org>.
+
+  - Implements constructors for some helper objects.
+
+  - Implements online tests agains a JIRA server.
+
+0.05  2009-05-24
+
+  - Implement methods get_priorities, get_versions,
+    get_custom_fields, and set_custom_fields to maintain a cache
+    of this information.
+
+  - Eliminates the method custom_field_map, which is superseeded
+    by get/set_custom_fields.
+
+0.04  2009-05-05
+
+  - Implement coersions for structured arguments.
+
+0.03    2009-04-25
+
+  - First version, released on an unsuspecting world.

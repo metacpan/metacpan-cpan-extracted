@@ -1,0 +1,29 @@
+---
+abstract: 'Provides upload file and select url for Jifty'
+author:
+  - 'Yves Agostini, <yvesago@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Media
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  File::Basename: 0
+  File::Path: 0
+  Jifty: 0.91117
+  Text::Unaccent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:yvesago/jifty-plugin-media.git
+version: 0.01

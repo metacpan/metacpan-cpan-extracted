@@ -1,0 +1,29 @@
+JSON-RPC2-AnyEvent-Client version 0.1.0
+
+This module implement JSON RPC2 nonblocking client based on
+AnyEvent tcp transport implementation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+ JSON::XS
+ JSON::RPC2::Client
+ AnyEvent::Handle
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014, Serguei Okladnikov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

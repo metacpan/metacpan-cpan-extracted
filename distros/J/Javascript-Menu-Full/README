@@ -1,0 +1,32 @@
+NAME
+
+Javascript::Menu, packaged with dependencies - a module that builds Javascript + HTML menus.
+
+DESCRIPTION
+
+This module helps in creation of the Javascript, CSS and HTML required to produce a table-based menu. Special consideration has been given to i18n.
+
+This distribution packages the module along with its dependencies: NumberedTree and NumberedTree::DBTree.
+
+See the documentation for this module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+All supplied with the package.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Yosef Meller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

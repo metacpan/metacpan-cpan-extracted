@@ -1,0 +1,73 @@
+{
+   "abstract" : "handle JSON like {\"a\":1, \"a\":2}",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-MultiValueOrdered",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::MultiValueOrdered" : {
+         "file" : "lib/JSON/MultiValueOrdered.pm",
+         "version" : "0.005"
+      },
+      "JSON::Tiny::Subclassable" : {
+         "file" : "lib/JSON/Tiny/Subclassable.pm",
+         "version" : "0.005"
+      },
+      "Tie::Hash::MultiValueOrdered" : {
+         "file" : "lib/Tie/Hash/MultiValueOrdered.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/JSON-MultiValueOrdered/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=JSON-MultiValueOrdered"
+      },
+      "homepage" : "https://metacpan.org/release/JSON-MultiValueOrdered",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-json-multivalueordered.git",
+         "web" : "https://github.com/tobyink/p5-json-multivalueordered"
+      }
+   },
+   "version" : "0.005",
+   "x_contributors" : [
+      "David J. Oswald (DAVIDO) <davido@cpan.org>"
+   ]
+}

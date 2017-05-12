@@ -1,0 +1,20 @@
+Revision history for Perl extension JavaScript::Lite
+
+0.04  Wed 15 Jul 13:40:00 2009
+    - Fixed the "invoke()" method to work correctly with recent versions
+      of SpiderMonkey
+
+0.03  Wed 13 May 16:30:00 2009
+    - Allow the branch counter to be cleared
+
+0.02  Wed 13 May 15:53:00 2009
+    - Use more memory in unit tests; 20KB isnt enough for the new spidermonkey
+      to load it's standard classes.
+    - Added a "branch_callback" handler, mainly useful for aborting runaway
+      javascripts.
+
+0.01  Thu 19 Jun 17:35:00 2008
+	- Initial "release"... Very alpha... hacked together over
+      the course of YAPC::NA 2008.
+
+

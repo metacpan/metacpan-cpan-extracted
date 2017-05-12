@@ -1,0 +1,49 @@
+Revision history for Perl module Java::JVM::Classfile
+
+0.29 Thu Dec 27 21:26:47 CET 2007
+    - implement interfaces and fields with new features class and
+      test (patches by Vadim Beilin)
+
+0.19 Sun May 19 18:33:15 BST 2002
+	- new perl.t test which generates Perl code from the example
+          class files, runs them, and compares them with the expected
+          outcome
+        - more patches by Amit Guha: method to reads floats from the
+          IEEE format and 2-word operations ([dl]load, [dl]store) work
+          by simulating their effect on stacks i.e. loads are followed
+          by a push @stack, 0 and stores are preceded by a pop @stack.
+          Complicates the code but this is the only way to make it 
+          work in all cases.   
+
+0.18 Mon May 13 21:54:22 BST 2002
+	- new Ackermann example / tests
+	- Java::JVM::Classfile::Perl can now cope with ifne op and can
+	  send more than one parameter to a subroutine)
+	- added patches by Amit Guha to make ::Perl support multi-parameter
+          method calls and initial double / float / long functionality
+
+0.17 Tue Apr 16 16:25:43 GMT 2002
+	- support for int type
+	- support for sipush opcode
+	- new spin and fibo tests
+
+0.16 Sat Dec 15 15:57:06 GMT 2001
+	- added support for iinc, newarray opcodes
+	- new Java::JVM::Classfile::Perl which converts JVM
+	instructions to Perl code (with major limitations of course,
+	try ./class2perl.pl Bench.class). Can only pass in one argument to
+	subroutines at the moment, and probably need to write the
+	whole of the Java class libraries in Perl...
+
+0.15 Thu Oct 25 11:39:05 BST 2001
+	- much more robust bytecode parser which parses more bytecodes
+	and copes with branches and labels (new Bench.class and bench.t)
+	- support for LineNumberTable attribute (and docs & tests)
+
+0.14 Thu Oct 18 19:10:13 BST 2001
+	- added bytecode parser (see Code attribute)
+
+0.12 Mon Oct  8 12:22:43 BST 2001
+	- created and released first version
+
+

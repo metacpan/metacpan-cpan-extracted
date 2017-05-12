@@ -1,0 +1,147 @@
+<HTML>
+<HEAD>
+<TITLE>Win32API::Joystick</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<UL>
+
+		<LI><A HREF="#description">DESCRIPTION</A></LI>
+		<LI><A HREF="#requirments">REQUIRMENTS</A></LI>
+		<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+		<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+		<LI><A HREF="#explanation">EXPLANATION</A></LI>
+		<UL>
+
+			<UL>
+
+				<LI><A HREF="#attributes">ATTRIBUTES</A></LI>
+				<LI><A HREF="#getting position">GETTING POSITION</A></LI>
+			</UL>
+
+		</UL>
+
+		<LI><A HREF="#bugs">BUGS</A></LI>
+		<LI><A HREF="#todo">TODO</A></LI>
+		<LI><A HREF="#author">AUTHOR</A></LI>
+		<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H2><A NAME="description">DESCRIPTION</A></H2>
+<PRE>
+        Joystick allows input from game control devices.  Currently, Joystick has only been
+        developed for Win32API.</PRE>
+<P>
+<H2><A NAME="requirments">REQUIRMENTS</A></H2>
+<PRE>
+
+        To use Joystick you must have the Win32::API package installed.</PRE>
+<P>
+<H2><A NAME="synopsis">SYNOPSIS</A></H2>
+<PRE>
+        use Win32API::Joystick;
+</PRE>
+<PRE>
+
+        #returns number of POSSIBLE joystick devices in Windows
+        $number_of_joysticks = Joystick::joyGetNumDevs;</PRE>
+<PRE>
+
+        #create joystick object
+        $my_joystick = Joystick-&gt;new(0):        #joystick devices start at zero</PRE>
+<PRE>
+
+        #many attributes can be retrieved (see EXPLANATION).
+        print &quot;x axis max is $my_joystick-&gt;{XMAX}\n&quot;;</PRE>
+<PRE>
+
+        #returns position of x,y,z axes and button status
+        ($x, $y, $z, $button) =$my_joy-&gt;joyGetPos;</PRE>
+<P>
+<H2><A NAME="constructor">CONSTRUCTOR</A></H2>
+<PRE>
+        The constructor takes the device number of the game controller you wish to use, returns a
+        blessed reference if joystick is connected and working, and 0 if not. Device numbers for
+        windows joysticks start at 0. You can determine how many game controllers windows has
+        listed in the control panel by calling WinJoy::joyGetNumDevs.  This returns the number of
+        devices LISTED, not the number that are connected and working.  The constructor does not
+        throw an exception when the object cannot be created since often you may encounter
+        joysticks listed in windows that aren't there or don't work.</PRE>
+<P>
+<H2><A NAME="explanation">EXPLANATION</A></H2>
+<P>
+<H4><A NAME="attributes">ATTRIBUTES</A></H4>
+<PRE>
+        When the Joystick object is created, several attributes are extracted from the device's
+        configuration in windows.  They can be accessed this way:</PRE>
+<PRE>
+        $my_joystick_object-&gt;{ATTRIBUTE}</PRE>
+<PRE>
+        General information on joystick:
+        NUMBUTTONS MAXBUTTONS NUMAXES MAXAXES</PRE>
+<PRE>
+        x,y,z,r,u,and v axes minimum and maximum values:
+        XMIN XMAX YMIN YMAX ZMIN ZMAX RMIN RMAX UMIN UMAX VMIN VMAX</PRE>
+<PRE>
+        Axes center values (if the axes exists):
+        XCENT YCENT ZCENT RCENT UCENT VCENT
+</PRE>
+<PRE>
+
+        Windows driver information:
+        DRIVER REGKEY OEMVXD</PRE>
+<P>
+<H4><A NAME="getting position">GETTING POSITION</A></H4>
+<PRE>
+        The method joyGetPos returns four things.  The first three are x,y, and z positions. The
+        fourth is the button status.  The single number for the button status is a sum of values
+        for all the buttons that are being depressed.  This is how it is calculated:
+</PRE>
+<PRE>
+
+        button1 = 1
+        button2 = 2
+        button3 = 4
+        button4 = 8
+        button5 = 16
+        ...</PRE>
+<PRE>
+        So, if buttons 1 and 3 were being depressed at the same time, the button status would be
+        5.</PRE>
+<P>
+<H2><A NAME="bugs">BUGS</A></H2>
+<PRE>
+        The windows API call that returns the position of the joystick axes will only return
+        x, y, and z values.  In the case that you have a joystick that has more than x,y, and z
+        (r,u, and v) you will not be able to read those values. (There is an extended joystick
+      info that may be implimented in the future)</PRE>
+<P>
+<H2><A NAME="todo">TODO</A></H2>
+<PRE>
+        Create a Joystick module for use with Device under Unix/Linux.  Add capability to get
+      extended joystick info, such as POV positions, and axes on sticks with more than 3 axes.</PRE>
+<P>
+<H2><A NAME="author">AUTHOR</A></H2>
+<PRE>
+        Ben Lilley bdlilley@cpan.org</PRE>
+<P>
+<H2><A NAME="copyright">COPYRIGHT</A></H2>
+<PRE>
+        (C) Copyright 2000, Ben Lilley all rights reserverd
+        This module may freely distributed in accordance with the artistic license.</PRE>
+
+</BODY>
+
+</HTML>

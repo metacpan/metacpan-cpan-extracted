@@ -1,0 +1,14 @@
+The Jabber::RPC::HTTPgate is an experimental package that
+allows you to bridge traditional (HTTP-based) XML-RPC calls
+and Jabber-RPC calls. 
+
+With the Jabber::RPC::HTTPgate module you can set up a 
+gateway between HTTP-based and Jabber-based XML-RPC, so 
+a Jabber-RPC requester can make calls to an HTTP-based
+responder, and vice versa. 
+
+See the module documentation for more details. There are
+lots of examples in the distribution.
+
+http://www.pipetree.com/jabber/jrpc/httpgate/ is HTTPgate's 
+home.

@@ -1,0 +1,23 @@
+use warnings;
+use strict;
+use utf8;
+use FindBin '$Bin';
+use Test::More;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
+binmode STDOUT, ":encoding(utf8)";
+binmode STDERR, ":encoding(utf8)";
+use JSON::Create;
+my $jc = JSON::Create->new ();
+$jc->strict (1);
+$jc->fatal_errors (1);
+no utf8;
+my $input = 'かきくけこ';
+eval {
+    $jc->run ($input);
+};
+ok ($@, "Got error running in strict on non-utf8 data");
+like ($@, qr/Non-ASCII byte in non-utf8 string/, "Got correct diagnostic");
+done_testing ();

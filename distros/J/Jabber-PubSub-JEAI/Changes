@@ -1,0 +1,6 @@
+Revision history for Perl extension Jabber::PubSub::JEAI.
+
+0.01  Fri Jul 22 14:53:05 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Jabber::PubSub::JEAI
+

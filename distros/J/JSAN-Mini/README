@@ -1,0 +1,95 @@
+NAME
+    JSAN::Mini - Creates a minimal local mirror of JSAN for offline
+    installation
+
+SYNOPSIS
+      # Update your local minijsan using default settings
+      JSAN::Mini->update_mirror;
+      
+  # ... and for now that's about it :)
+
+DESCRIPTION
+    minijsan is an application which scans the JSAN index and ensures that
+    the release tarballs for all of the libraries in the index are stored in
+    the local mirror provided by JSAN::Transport.
+
+    This allows for the installation of JSAN packages without the need to
+    connect to the internet. For example, it can be very useful for
+    installing packaging while on international flights for example :)
+
+    "JSAN::Mini" provides the primary API for implementing the functionality
+    for minijsan, and also provides something that you can sub-class, and
+    thus add your own additional functionality.
+
+    If you're a normal user, or you are ot going to do anything weird, you
+    might want to look at minijsan instead.
+
+METHODS
+  update_mirror
+    The "update_mirror" static method creates and executes a new JSAN::Mini
+    object using the default params, normally pretty much Doing What You
+    Mean.
+
+  new value => 'param'
+    The "new" constructor creates a new minijsan process.
+
+    It takes as argument a set of key/value pairs controlling it.
+
+    verbose
+        The verbose flag controls the level of debugging output that the
+        object will produce.
+
+        When set to true, it causes process information to be printed to
+        "STDOUT". When set to false (the default) it prints nothing.
+
+    Returns a "JSAN::Mini" object.
+
+  added
+    Once the "JSAN::Mini" object has been "run", the "added" method returns
+    the number of new releases that were added to the local mirror.
+
+  run
+    The "run" method initiates the minicpan process to syncronize the files
+    in the local mirror with those on the remote mirror.
+
+    Returns the number of new files added to the minijsan mirror.
+
+  add_release $release
+    The "add_release" method is called when a release is to be added to the
+    local mirror.
+
+    The method is passed a JSAN::Index::Release object and, by default,
+    mirrors it from the remote repository.
+
+    This is the method that you would typically subclass to add additional
+    functionality to the module (where such functionality does not on
+    information contained) in other releases in the repository.
+
+  process_release $release
+    The optional "process_release" method can be defined by a "JSAN::Mini"
+    sub-class, and can be used as a place to implement extended
+    functionality, where this functionality requires that all new releases
+    by downloaded before processing starts.
+
+    The method is passed a JSAN::Index::Release object and simply shortcuts
+    by default.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Mini>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2005, 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

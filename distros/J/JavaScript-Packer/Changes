@@ -1,0 +1,155 @@
+Revision history for JavaScript-Packer
+
+2.03       2017-04-18
+    - Makefile.PL moved to ExtUtils::MakeMaker to fix no . in @INC (perl 5.25.11+)
+
+2.01        2016-06-22
+    - Fix refrence cycles in ->init method causing memory leaks (GH #1)
+
+2.00        2015-05-27
+    - New maintainer: LEEJO
+    - Merge PR from dod38fr (nevesenin/javascript-packer-perl:GH #8, nevesenin/javascript-packer-perl:GH #9)
+    - Fix "Redundant argument in sprintf" against perl 5.22
+    - Repoint issue tracker/repo at leejo's fork
+    - Add .travis.yml for CI goodness
+    - Add Changes test
+    - Add MYMETA.json to .gitignore
+
+1.006003    2012-03-02
+    - This release fixes issue #1.
+    - Added additional concat tests.
+    - Fixed bug in string concatenation. Thanks to Nigel Horne for reporting this issue.
+    - Tidied up.
+
+1.006002    2012-02-28
+    - This release fixes issue #2.
+    - Fixed bug in handling regular expressions when shrink is used. Thanks to Colin Kuskie for reporting this issue and writing tests.
+
+1.006001    2012-02-19
+    - Use gnutar to build distribution.
+
+1.006   2011-09-26
+    - Raised version number.
+
+1.005_001   2011-07-22
+    - Replaced some map with foreach.
+    - Some cleanups.
+    - Added concat test.
+
+1.004   2011-06-07
+    - Raised version number.
+
+1.003_003   2011-05-19
+    - Some minor changes.
+    - Added tests.
+
+1.003_002   2011-05-15
+    - Made comment option work in conjunction with all compression options. Suggested by Marc S. Brooks.
+
+1.003_001   2011-04-13
+    - Compression opts "minify" and "base62" are no longer supported.
+    - Added accessors.
+    - Added tests.
+    - Minor Bugfixes.
+    - Cleanup.
+
+1.002001    2011-03-01
+    - Changed requirements to Regexp::RegGrp 1.000001 due to "undefined submatches bug" in Regexp::RegGrp.
+
+1.002   2011-01-28
+    - Bugfix: Added missing testfile.
+
+1.001   2011-01-27
+    - Bugfix: Removed restore pattern.
+    - Added test.
+
+1.000   2011-01-17
+    - Changed versioning.
+    - Raised major version due to changes in versioning.
+    - Changed requirements to Regexp::RegGrp 1.000 due to changes in versioning.
+
+0.0601  2011-01-05
+    - Changed requirements to Regexp::RegGrp 0.04
+
+0.06    2010-12-03
+    - Raised version number.
+
+0.05_08 2010-10-05
+    - Removed the ridiculous missing semicolon fix.
+    - Changed required perl version to 5.8.9.
+
+0.05_07 2010-09-28
+    - Bugfix: Fixed Regexp.
+
+0.05_06 2010-09-28
+    - Bugfix: Fixed Regexp.
+
+0.05_05 2010-09-28
+    - Added handling for missing semicolons. THIS WILL BE REMOVED IN FUTURE VERSIONS.
+    - Added handling for functions as arguments.
+    - Added remove_copyright option.
+    - Added copyright comment option.
+    - Added tests.
+
+0.05_04 2010-09-22
+    - Added option to define compression level via comment.
+    - Added tests.
+
+0.05_03 2010-09-13
+    - Changed requirements to Regexp::RegGrp 0.0201.
+
+0.05_02 2010-09-07
+    - Moved regexp grouping stuff to Regexp::RegGrp.
+    - Switched to Module::Install.
+
+0.0402  2010-07-29
+    - Bugfix: Removed match variable from _process_minify()
+
+0.0401  2010-07-10
+    - Bugfix: Removed $& from module to increase speed.
+    Thanks to Graham Knop for suggestion
+    - Switched tabs to soft tabs
+
+0.04    2010-01-04
+    - Changed version number
+
+0.03_02 2009-10-21
+    - Added support for perl 5.8
+    - Changed requirements back to perl 5.8
+    - Bugfix in concat function
+    - Bugfix in shrink function
+
+0.03_01 2009-09-30
+    - Added object-oriented interface, examples in perldoc, support for
+    prototype.js' $super function
+    - Updated regular expressions based on the original regular
+    expressions in Dean Edwards' javascript libraries
+    - Adapted javascript parts to Dean Edwards' javascript libraries
+    - Replaced evals with subs
+    - The minify method returns a scalar if requested by context. Thanks
+    to Mary Shaw for suggestion
+    - Changed requirements to perl 5.10 to use named capture buffers in
+    regular expressions
+
+0.02    2009-04-10
+    - Changed version number
+
+0.01_02 2009-03-16
+    - Bugfix
+
+0.01_01 2009-03-15
+    - Changed compression level names
+    - Added compression level 'best'
+    - Updated some regular expressions
+    - Added some tests
+
+0.0102 2008-11-24
+    - Former changes didn't work. Undone these changes. I'm sorry
+    for that. This will not happen again.
+    - Changed requirements to perl 5.8.
+
+0.0101  2008-11-20
+    Replaced int() by sprintf() for perl 5.6
+
+0.01    2008-11-15
+    First version, released on an unsuspecting world.

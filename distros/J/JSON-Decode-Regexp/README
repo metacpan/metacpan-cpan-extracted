@@ -1,0 +1,45 @@
+SYNOPSIS
+
+     use JSON::Decode::Regexp qw(from_json);
+     my $data = from_json(q([1, true, "a", {"b":null}]));
+
+DESCRIPTION
+
+    This module is a packaging of Randal L. Schwartz' code (with some
+    modification) originally posted at:
+
+     http://perlmonks.org/?node_id=995856
+
+    The code is licensed "just like Perl".
+
+FUNCTIONS
+
+ from_json($str) => DATA
+
+    Decode JSON in $str. Dies on error.
+
+FAQ
+
+ How does this module compare to other JSON modules on CPAN?
+
+    As of version 0.04, performance-wise this module quite on par with
+    JSON::PP (faster on strings and longer arrays/objects, slower on
+    simpler JSON) and a bit slower than JSON::Tiny. And of course all three
+    are much slower than XS-based modules like JSON::XS.
+
+    JSON::Decode::Regexp does not yet support Unicode, and does not
+    pinpoint exact location on parse error.
+
+    In general, I don't see a point in using it in production (I recommend
+    instead JSON::XS or Cpanel::JSON::XS if you can use XS modules, or
+    JSON::Tiny if you must use pure Perl modules). But it is a cool hack
+    that demonstrates the power of Perl regular expressions and beautiful
+    code.
+
+SEE ALSO
+
+    Pure-perl modules: JSON::Tiny, JSON::PP, Pegex::JSON,
+    JSON::Decode::Marpa.
+
+    XS modules: JSON::XS, Cpanel::JSON::XS.
+

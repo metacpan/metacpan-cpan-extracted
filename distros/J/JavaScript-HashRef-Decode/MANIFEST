@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkd
+dist.ini
+lib/JavaScript/HashRef/Decode.pm
+t/001_simple_types.t
+t/002_interface.t
+t/099_issues.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

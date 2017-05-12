@@ -1,0 +1,24 @@
+---
+abstract: 'to build large JSON with temp files when memory limit, and compress optionaly.'
+author:
+  - 'Nick Kostyria <kni@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Builder
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: '0'
+  JSON::XS: '0'
+  MIME::Base64: '3.11'
+version: '0.04'

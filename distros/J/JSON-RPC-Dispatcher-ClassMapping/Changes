@@ -1,0 +1,11 @@
+Revision history for JSON-RPC-Dispatcher-ClassMapping
+
+0.03    Sun Apr  8 21:43:23 PHT 2012
+          - Require JSON::RPC::Dispatcher 0.0505
+
+0.02    Sun Apr  8 00:11:40 PHT 2012
+          -  Fixed Changes, POD, and README
+
+0.01    Wed Jan 25 15:54:11 PHT 2012
+          - First version, released on an unsuspecting world.
+

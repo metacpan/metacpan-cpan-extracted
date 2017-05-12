@@ -1,0 +1,30 @@
+---
+abstract: 'javascript object notation object notator'
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+build_requires:
+  Module::Build: 0.34
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSON-ON
+provides:
+  JSON::ON:
+    file: lib/JSON/ON.pm
+    version: v0.0.3
+requires:
+  Class::Accessor::Classy: 0
+  JSON: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-ON
+  homepage: http://enobacon.com/
+  license: http://dev.perl.org/licenses/
+  repository: git://git.scratchcomputing.com/JSON-ON.pm.git
+version: v0.0.3

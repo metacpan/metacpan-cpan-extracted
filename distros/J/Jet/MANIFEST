@@ -1,0 +1,13 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Jet.pm
+t/00-compile.t
+xt/release/distmeta.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t
+xt/release/portability.t

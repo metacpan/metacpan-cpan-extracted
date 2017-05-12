@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+test.pl
+lib/Jabber/Component/Proxy.pm
+examples/proxy.pl
+examples/access.xml
+examples/confproxy.xml

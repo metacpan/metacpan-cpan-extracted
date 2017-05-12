@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Akzhan Abdulin, C<< <akzhan.abdulin at gmail.com> >>'
+  - 'Akzhan Abdulin <akzhan.abdulin@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-Console
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON::XS: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=JavaScript-Console
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.01

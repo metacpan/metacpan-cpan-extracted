@@ -1,0 +1,80 @@
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: TestApp::Plugin::EmailErrors
+  ApplicationName: TestApp-Plugin-EmailErrors
+  ApplicationUUID: C2C3404E-03CE-11E0-8CAD-D61A07ABC711
+  ConfigFileVersion: 5
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: testapp_plugin_emailerrors
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 0
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - 
+      AdminUI: {}
+
+    - 
+      CompressedCSSandJS: {}
+
+    - 
+      ErrorTemplates: {}
+
+    - 
+      Halo: {}
+
+    - 
+      LetMe: {}
+
+    - 
+      OnlineDocs: {}
+
+    - 
+      REST: {}
+
+    - 
+      SkeletonApp: {}
+
+    -
+      EmailErrors:
+        to: errors@example.com
+        from: server@example.com
+        subject: Sound the alarm!
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 0
+  TemplateClass: TestApp::Plugin::EmailErrors::View
+  View: 
+    Handlers: 
+      - Jifty::View::Static::Handler
+      - Jifty::View::Declare::Handler
+      - Jifty::View::Mason::Handler
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    PSGIStatic: 1
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

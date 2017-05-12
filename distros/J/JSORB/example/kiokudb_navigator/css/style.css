@@ -1,0 +1,48 @@
+
+body {
+    font-family: sans-serif;
+    background : #DDDDDD;
+}
+
+#root {
+    padding-left : 0px;
+}
+
+ul {
+    list-style    : none;
+    border-top    : 1px solid #666666;
+    background    : #CCCCCC;
+}
+
+li {
+    border     : 1px solid #AAAAAA;
+    background : white;
+}
+
+.label {
+    float        : left;
+    width        : 150px;
+    padding-left : 2px;
+}
+
+.collection {
+    border-top    : 1px solid #CCCCCC;
+}
+
+.value a {
+    text-decoration : none;
+    color           : #336699;
+}
+
+.value {
+
+}
+
+.value ul {
+    clear : both;
+}
+
+.hidden {
+    display : none;
+}
+

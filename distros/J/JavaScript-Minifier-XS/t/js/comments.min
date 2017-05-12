@@ -1,0 +1,3 @@
+/* comments containing the word "copyright" are left in, though */
+// including line comments, with mixed case cOpYrIgHt
+var foo=3;var bar=4;var replaced_with_ws=foo+ +bar;var also_replaced=foo- -bar;var removed_outright=foo+-bar;var also_removed=foo-+bar;

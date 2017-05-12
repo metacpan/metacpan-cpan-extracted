@@ -1,0 +1,82 @@
+------------
+INTRODUCTION
+------------
+
+JavaScript.pm - Execute JavaScript from within Perl
+
+JavaScript.pm is an interface to the SpiderMonkey JS engine. It lets you execute JS code, 
+call JS functions, bind Perl classes to JS, import Perl functions to JS, precompile and exeute 
+scripts among many other things. It does conversion between Perl and JS datatypes.
+
+  use JavaScript;
+
+  my $rt = JavaScript::Runtime->new();
+  my $cx = $rt->create_context();
+
+  $cx->bind_function(write => sub { print @_; });
+
+  $cx->eval(q/
+    for (i = 99; i > 0; i--) {
+        write(i + " bottle(s) of beer on the wall, " + i + " bottle(s) of beer\n");
+        write("Take 1 down, pass it around, ");
+        if (i > 1) {
+            write((i - 1) + " bottle(s) of beer on the wall.");
+        }
+        else {
+            write("No more bottles of beer on the wall!");
+        }
+    }
+  /);
+
+------------
+INSTALLATION
+------------
+
+To install JavaScript.pm, make sure you have libjs installed. Otherwize, grab a recent one from ftp://ftp.mozilla.org/pub/js. The module requires 1.7 or later.
+
+Debian users can alternatively install the libmozjs-dev package by doing
+> apt-get install libmozjs0g-dev
+
+Makefile.PL will ask a number of questions regarding threading, utf8 and e4x support. Prompting for this can be disabled by 
+setting their respective environment variable to a true (1) or false value (2)
+
+    JS_THREADSAFE
+    Enables or disables threadsafe. If you're getting errors in make test later that looks something like "Assertion failure: (uint32)2 < JS_MIN(((obj)->map)->freeslot, ((obj)->map)->nslots), at jsapi.c:1969" you probablly have a libjs that's threadsafe.
+
+    JS_UTF8
+    Enable utf-8 support for strings. This requires a modern spidermonkey (1.7 or later).
+
+    JS_ENABLE_E4X
+    SpiderMonkey 1.6 and later has something called E4X which is XML for JavaScript. In JavaScript these are objects (very very cool) and by enabling this we'll be able to flatten them to strings for now.
+
+Where do look for headers and libraries can be specified using JS_LIB and JS_INC environment variables. They accept a colon (:) separated list.
+
+The Makefile.PL will try to build a small test to determine if the libraries and headers can be used as well as checking what 
+spidermonkey library is used. We require at least 1.7 but it *might* work on 1.6. If you don't want these test to be performed 
+set the environment variable JS_FORCE to a true value before running Makefile.PL.
+
+When ready invoke the following to build and install this module:
+
+> perl Makefile.PL
+> make
+> make test
+> make install
+
+-------
+SUPPORT
+-------
+
+= Mailing list at perl-javascript@perl.org, send an empty email to perl-javascript-subscribe@perl.org to subscribe.
+
+Please send questions/patches/docs/comments to "Claes Jakobsson", claesjac@cpan.org
+
+---------
+COPYRIGHT
+---------
+
+Copyright (c) 2001 - 2008, Claes Jakobsson C<< <claesjac@cpan.org> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See http://dev.perl.org/licenses/artistic.html
+
+

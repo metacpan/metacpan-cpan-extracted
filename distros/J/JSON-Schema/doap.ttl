@@ -1,0 +1,302 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/72303>, <http://purl.org/NET/cpan-uri/rt/ticket/76892>, <http://purl.org/NET/cpan-uri/rt/ticket/76944>, <http://purl.org/NET/cpan-uri/rt/ticket/80083>, <http://purl.org/NET/cpan-uri/rt/ticket/81736>, <http://purl.org/NET/cpan-uri/rt/ticket/81867>;
+	doap-deps:runtime-requirement [ doap-deps:on "autovivification 0"^^doap-deps:CpanId ], [
+		doap-deps:on "HTTP::Link::Parser 0.100"^^doap-deps:CpanId;
+	], [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ], [ doap-deps:on "JSON::Hyper 0"^^doap-deps:CpanId ], [ doap-deps:on "JSON::Path 0"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent 0"^^doap-deps:CpanId ], [ doap-deps:on "match::simple"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.94"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Schema>;
+	doap:category        [ rdfs:label "JSON"@en ], [ rdfs:label "Schema"@en ], [ rdfs:label "Validation"@en ];
+	doap:created         "2010-07-31"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/JSON-Schema>;
+	doap:homepage        <https://metacpan.org/release/JSON-Schema>;
+	doap:license         <http://dev.perl.org/licenses/>, <http://www.opensource.org/licenses/mit-license.php>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "JSON-Schema";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_00>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_01>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-010>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-011>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-012>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-013>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-014>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-015>, <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-016>;
+	doap:repository      [
+		a doap:SVNRepository;
+		doap:browse <http://goddamn.co.uk/svn-web/perlmods/browse/JSON-Schema/>;
+	];
+	doap:shortdesc       "validate JSON against a schema"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_00>
+	a                    doap:Version;
+	dc:issued            "2010-08-02"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.001_00.tar.gz>;
+	doap:revision        "0.001_00"^^xsd:string;
+	rdfs:comment         "Developer release"@en.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_01>
+	a                    doap:Version;
+	dc:issued            "2010-08-04"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support for maximumCanEqual and minimumCanEqual, which aren't included in the Javascript version."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support for divisibleBy."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "JSON::Schema now calls JSON::Hyper to expand $ref references by itself. This is more efficient as they can be expanded just-in-time, as needed, rather than speculatively."@en;
+			rdfs:comment "This is a more efficient way of doing things."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_00>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.001_01.tar.gz>;
+	doap:revision        "0.001_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-010>
+	a                    doap:Version;
+	dc:issued            "2011-09-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "additionalItems."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "required."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "exclusiveMaximum and exclusiveMinimum."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Split JSON::Schema::Helper and JSON::Schema::Null into separate files."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Numeric maxima."@en;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Arrays. (Thanks to Naveed Massjouni.)"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Improved test cases. (Thanks to Naveed Massjouni.)"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "uniqueItems."@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "patternProperties."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-001_01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-011>
+	a                    doap:Version;
+	dc:issued            "2011-11-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "patternProperties fix."@en;
+			doap-changeset:blame [ foaf:nick "LIEUTAR" ];
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "addError fix."@en;
+			doap-changeset:blame [ foaf:name "Markus Lauer" ];
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "format."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-010>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-012>
+	a                    doap:Version;
+	dc:issued            "2012-05-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fixes for 'additionalProperties' being false or non-existant."@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/76892>, <http://purl.org/NET/cpan-uri/rt/ticket/76944>;
+			doap-changeset:thanks [ foaf:name "Piotr Piatkowski" ], [ foaf:mbox <mailto:sdevoid@gmail.com> ];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-011>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-013>
+	a                    doap:Version;
+	dc:issued            "2012-10-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [ rdfs:label "Drop common::sense dependency." ], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for union types."@en;
+			doap-changeset:fixes <https://rt.cpan.org/Ticket/Display.html?id=80083>;
+			doap-changeset:thanks [ foaf:nick "DAVIDIAM" ];
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Patched 02integer.t."@en;
+			doap-changeset:thanks [ foaf:nick "DAVIDIAM" ];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-012>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-014>
+	a                    doap:Version;
+	dc:issued            "2012-12-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for string lengths."@en;
+			doap-changeset:fixes <https://rt.cpan.org/Ticket/Display.html?id=81736>;
+			doap-changeset:thanks [ foaf:mbox <mailto:jabbas@jabbas.eu> ];
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-013>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-015>
+	a                    doap:Version;
+	dc:issued            "2012-12-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "enum assumed that all enumerated values would be non-references; this assumption was incorrect. Reference values are now allowed in an enumeration."@en;
+			doap-changeset:fixes <https://rt.cpan.org/Ticket/Display.html?id=81867>;
+			doap-changeset:thanks [ foaf:mbox <mailto:gszpetkowski@gmail.com> ];
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document test suite."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-014>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Schema/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "JSON-Schema-0.016"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document the status of this module.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Stop using smartmatch.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Schema-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/72303>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Infinite loop when using \"patternProperties\".";
+	dc:created           "2011-11-09T05:29:37"^^xsd:dateTime;
+	dc:modified          "2011-11-26T10:48:58"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "72303"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=72303>;
+	doap-bugs:reporter   [ a foaf:Agent; foaf:mbox <mailto:LIEUTAR@cpan.org> ];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/76892>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Improper default value of additionalProperties";
+	dc:created           "2012-04-30T10:06:34"^^xsd:dateTime;
+	dc:modified          "2012-12-12T22:19:08"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "76892"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=76892>;
+	doap-bugs:reporter   [ a foaf:Agent; foaf:mbox <mailto:pp@idea7.pl> ];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/76944>
+	a                    doap-bugs:Issue;
+	rdfs:label           "AdditionalProperties not working";
+	dc:created           "2012-05-02T18:50:18"^^xsd:dateTime;
+	dc:modified          "2012-12-12T22:19:32"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "76944"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=76944>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:sdevoid@gmail.com>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/80083>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Union data type validation";
+	dc:created           "2012-10-09T22:21:51"^^xsd:dateTime;
+	dc:modified          "2012-10-11T22:39:43"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "80083"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=80083>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:DAVIDIAM@cpan.org>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/81736>
+	a                    doap-bugs:Issue;
+	rdfs:label           "JSON::Schema string length validation";
+	dc:created           "2012-12-06T08:35:57"^^xsd:dateTime;
+	dc:modified          "2012-12-13T12:56:24"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "81736"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=81736>;
+	doap-bugs:reporter   [ a foaf:Agent; foaf:mbox <mailto:jabbas@jabbas.eu> ];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/81867>
+	a                    doap-bugs:Issue;
+	rdfs:label           "Nested array in enum is compared by reference";
+	dc:created           "2012-12-10T16:38:09"^^xsd:dateTime;
+	dc:modified          "2012-12-15T14:37:26"^^xsd:dateTime;
+	doap-bugs:assignee   _:B1;
+	doap-bugs:id         "81867"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=81867>;
+	doap-bugs:reporter   [
+		a foaf:Agent;
+		foaf:mbox <mailto:gszpetkowski@gmail.com>;
+	];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+_:B1
+	a                    foaf:Agent;
+	foaf:nick            "TOBYINK".
+

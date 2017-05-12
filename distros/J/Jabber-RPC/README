@@ -1,0 +1,10 @@
+Jabber::RPC is an implementation of Jabber-RPC, XML-RPC
+encoded traffic over Jabber (as opposed to HTTP). Jabber-RPC
+See http://www.pipetree.com/jrpc/ for background information.
+
+The package contains two main modules: Jabber::RPC::Server
+and Jabber::RPC::Client, and have a similar feel to the 
+Frontier::RPC2 API. This package needs Frontier::RPC2.
+
+It's a young package, all comments, questions and so on to
+the author, please: dj.adams@pobox.com

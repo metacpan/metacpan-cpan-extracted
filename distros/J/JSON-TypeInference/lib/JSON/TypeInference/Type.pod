@@ -1,0 +1,52 @@
+=encoding utf-8
+
+=head1 NAME
+
+JSON::TypeInference::Type - Classes of JSON types
+
+=head1 DESCRIPTION
+
+The implementations of JSON::TypeInference::Type represent types of JSON values.
+
+They must implement some methods that described below.
+
+=head1 INTERFACE
+
+=head2 CLASS METHODS
+
+=over 4
+
+=item C<< accepts($data: Any) # => Bool >>
+
+Returns whether the given value is valid as the class.
+
+=item C<< name() # => Str >>
+
+Returns a name of type.
+
+=back
+
+=head2 INSTANCE METHODS
+
+=over 4
+
+=item C<< signature() # => Str >>
+
+Returns a signature of type.
+
+If the type has some type parameters, the signature contains type parameters that sorted by name.
+
+=back
+
+=head1 LICENSE
+
+Copyright (C) aereal.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+aereal E<lt>aereal@aereal.orgE<gt>
+
+=cut

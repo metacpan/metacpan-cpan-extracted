@@ -1,0 +1,71 @@
+NAME
+    Jifty::Plugin::Authentication::ModShibb - Shibboleth auth. plugin for
+    Jifty
+
+DESCRIPTION
+    This may be combined with the Jifty::Plugin::User plugin to provide user
+    authentication using Shibboleth web single sign-on. The Shibboleth
+    System is a standards based software package for web single sign-on
+    across or within organizational boundaries. It supports authorization
+    and attribute exchange using the OASIS SAML protocol.
+    Jifty::Plugin::Authentication::ModShibb requires a "shibd" service
+    provider which will set required attributes in environment variables.
+
+CONFIG
+     in etc/config.yml
+
+      Plugins: 
+        - Authentication::ModShibb:
+           mapping:                           # jifty column : shibboleth attribute
+             shibb_id: eppn
+             email: email
+             name: displayName
+           authz:  $ENV{'primary_affiliation'} eq 'employee' # shibboleth attribute : value
+
+    "shibb_id" is mandatory and must provide a distinct id for each user
+
+    "name" is highly recommended to display feedback for users
+
+    "email" is highly recommended if you mix shibboleth authentication and
+    other jifty authentication plugins
+
+    add in your User Model
+
+     use Jifty::Plugin::Authentication::ModShibb::Mixin::Model::User;
+
+    apache
+
+       <Location />
+        AuthType shibboleth
+        Require shibboleth
+       </Location>
+         
+  <Location /shibblogin>
+        ShibRequestSetting applicationId uads
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        require valid-user
+       </Location>
+
+    For debugging idp and sp config you can add an apache authentication on
+    "/shibb_test" location.
+
+METHODS
+  prereq_plugins
+    This plugin depends on the User plugin.
+
+  init
+    load config
+
+SEE ALSO
+    Jifty::Manual::AccessControl, Jifty::Plugin::User, Shibboleth::SP
+
+AUTHOR
+    Yves Agostini, <yvesago@cpan.org>
+
+LICENSE
+    Copyright 2010, Yves Agostini <yvesago@cpan.org>.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+

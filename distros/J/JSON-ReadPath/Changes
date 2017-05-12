@@ -1,0 +1,12 @@
+1 2014-04-23
+    First Version
+
+2 2014-04-29
+    Encode perl data into JSON String
+
+3.01 2016-01-12
+    - print out the json in full
+    - the --env set default to "payload"
+    - scripts will use the "exported payload" environment variable
+    - flat down levelized json with "print_variables --flat" argument
+    - use eval $(print_variables) to export all key-value into current session

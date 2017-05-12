@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00base.t
+t/01real.t
+t/02tt2.t
+lib/JavaScript/DebugConsole.pm
+META.yml                                 Module meta-data (added by MakeMaker)

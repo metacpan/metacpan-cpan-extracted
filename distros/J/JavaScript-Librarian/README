@@ -1,0 +1,36 @@
+NAME
+    JavaScript::Librarian - Load and use libraries of JavaScript packages
+
+DESCRIPTION
+    "JavaScript::Librarian" is a package for loading and using "libraries"
+    of JavaScript packages, managing dependencies between the files, and
+    generating fragments of HTML with the <script> tags to load them in the
+    correct order.
+
+STATUS
+    This is an early release, and while it implements the core object and
+    logic, this package does not yet come with any Library sub-classes
+    capable of loading the required metadata from anything.
+
+    This will be dealth with in a seperate package, or in a future version
+    of this one. For the moment consider it something you can use to build
+    your own modules. See the source code for more documentation.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-Librarian>
+
+    For other issues, contact the maintainer
+
+AUTHORS
+    Adam Kennedy <cpan@ali.as>, <http://ali.as/>
+
+COPYRIGHT
+    Copyright (c) 2005 Adam Kennedy. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

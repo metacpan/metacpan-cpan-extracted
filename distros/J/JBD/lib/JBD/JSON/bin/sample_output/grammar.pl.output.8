@@ -1,0 +1,2061 @@
+json_space->( ) <<<
+	[0] JsonSpace<#[\JsonSpace]>
+>>>
+json_escape_seq->(\") <<<
+	[0] JsonEscapeSeq<#[\JsonEscapeSeq]>
+>>>
+json_null_literal->(null) <<<
+	[0] JsonNull<null>
+>>>
+json_bool_literal->(true) <<<
+	[0] JsonBool<true>
+>>>
+json_bool_literal->(false) <<<
+	[0] JsonBool<false>
+>>>
+json_string_char->(chars) <<<
+	[0] JsonStringChar<chars>
+>>>
+star_string_char->(String chars?
+) <<<
+	[0] JsonStringChar<String>
+	[1] JsonSpace<#[\JsonSpace]>
+	[2] JsonStringChar<chars>
+	[3] JsonStringChar<?>
+	[4] JsonEscapeSeq<#[\JsonEscapeSeq]>
+>>>
+json_string->("This. Is
+a string?") <<<
+	[0] JsonString<"This. Is
+a string?">
+>>>
+json_member_list->("nada":null) <<<
+	[0] JsonString<"nada">
+	[1] JsonColon<:>
+	[2] JsonNull<null>
+>>>
+json_element_list->(true, false, null, 1, 2) <<<
+	[0] JsonBool<true>
+	[1] JsonComma<,>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonBool<false>
+	[4] JsonComma<,>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonNull<null>
+	[7] JsonComma<,>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonNum<1>
+	[10] JsonComma<,>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonNum<2>
+>>>
+json_array->([1, 2]) <<<
+	[0] JsonSquareBracket<[>
+	[1] JsonNum<1>
+	[2] JsonComma<,>
+	[3] JsonSpace<#[\JsonSpace]>
+	[4] JsonNum<2>
+	[5] JsonSquareBracket<]>
+>>>
+json_member_list->("one" : 1, "two": [1, 2]) <<<
+	[0] JsonString<"one">
+	[1] JsonSpace<#[\JsonSpace]>
+	[2] JsonColon<:>
+	[3] JsonSpace<#[\JsonSpace]>
+	[4] JsonNum<1>
+	[5] JsonComma<,>
+	[6] JsonSpace<#[\JsonSpace]>
+	[7] JsonString<"two">
+	[8] JsonColon<:>
+	[9] JsonSpace<#[\JsonSpace]>
+	[10] JsonSquareBracket<[>
+	[11] JsonNum<1>
+	[12] JsonComma<,>
+	[13] JsonSpace<#[\JsonSpace]>
+	[14] JsonNum<2>
+	[15] JsonSquareBracket<]>
+>>>
+json_object->({ "one": {"one_A": true} ,   "two": 2.0, "tre": 3.0E0 }) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonSpace<#[\JsonSpace]>
+	[2] JsonString<"one">
+	[3] JsonColon<:>
+	[4] JsonSpace<#[\JsonSpace]>
+	[5] JsonCurlyBrace<{>
+	[6] JsonString<"one_A">
+	[7] JsonColon<:>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonBool<true>
+	[10] JsonCurlyBrace<}>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonComma<,>
+	[13] JsonSpace<#[\JsonSpace]>
+	[14] JsonString<"two">
+	[15] JsonColon<:>
+	[16] JsonSpace<#[\JsonSpace]>
+	[17] JsonNum<2.0>
+	[18] JsonComma<,>
+	[19] JsonSpace<#[\JsonSpace]>
+	[20] JsonString<"tre">
+	[21] JsonColon<:>
+	[22] JsonSpace<#[\JsonSpace]>
+	[23] JsonNum<3.0E0>
+	[24] JsonSpace<#[\JsonSpace]>
+	[25] JsonCurlyBrace<}>
+>>>
+json_text->({
+    "red":"#f00",
+    "green":"#0f0",
+    "blue":"#00f",
+    "cyan":"#0ff",
+    "magenta":"#f0f",
+    "yellow":"#ff0",
+    "black":"#000"
+}
+) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"red">
+	[4] JsonColon<:>
+	[5] JsonString<"#f00">
+	[6] JsonComma<,>
+	[7] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonString<"green">
+	[10] JsonColon<:>
+	[11] JsonString<"#0f0">
+	[12] JsonComma<,>
+	[13] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[14] JsonSpace<#[\JsonSpace]>
+	[15] JsonString<"blue">
+	[16] JsonColon<:>
+	[17] JsonString<"#00f">
+	[18] JsonComma<,>
+	[19] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[20] JsonSpace<#[\JsonSpace]>
+	[21] JsonString<"cyan">
+	[22] JsonColon<:>
+	[23] JsonString<"#0ff">
+	[24] JsonComma<,>
+	[25] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[26] JsonSpace<#[\JsonSpace]>
+	[27] JsonString<"magenta">
+	[28] JsonColon<:>
+	[29] JsonString<"#f0f">
+	[30] JsonComma<,>
+	[31] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[32] JsonSpace<#[\JsonSpace]>
+	[33] JsonString<"yellow">
+	[34] JsonColon<:>
+	[35] JsonString<"#ff0">
+	[36] JsonComma<,>
+	[37] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[38] JsonSpace<#[\JsonSpace]>
+	[39] JsonString<"black">
+	[40] JsonColon<:>
+	[41] JsonString<"#000">
+	[42] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[43] JsonCurlyBrace<}>
+	[44] JsonEscapeSeq<#[\JsonEscapeSeq]>
+>>>
+json_text->({
+     "firstName": "John",
+     "lastName": "Smith",
+     "age": 25,
+     "address":
+     {
+         "streetAddress": "21 2nd Street",
+         "city": "New York",
+         "state": "NY",
+         "postalCode": "10021"
+     },
+     "phoneNumber":
+     [
+         {
+           "type": "home",
+           "number": "212 555-1234"
+         },
+         {
+           "type": "fax",
+           "number": "646 555-4567"
+         }
+     ]
+ }) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"firstName">
+	[4] JsonColon<:>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonString<"John">
+	[7] JsonComma<,>
+	[8] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[9] JsonSpace<#[\JsonSpace]>
+	[10] JsonString<"lastName">
+	[11] JsonColon<:>
+	[12] JsonSpace<#[\JsonSpace]>
+	[13] JsonString<"Smith">
+	[14] JsonComma<,>
+	[15] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[16] JsonSpace<#[\JsonSpace]>
+	[17] JsonString<"age">
+	[18] JsonColon<:>
+	[19] JsonSpace<#[\JsonSpace]>
+	[20] JsonNum<25>
+	[21] JsonComma<,>
+	[22] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[23] JsonSpace<#[\JsonSpace]>
+	[24] JsonString<"address">
+	[25] JsonColon<:>
+	[26] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[27] JsonSpace<#[\JsonSpace]>
+	[28] JsonCurlyBrace<{>
+	[29] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[30] JsonSpace<#[\JsonSpace]>
+	[31] JsonString<"streetAddress">
+	[32] JsonColon<:>
+	[33] JsonSpace<#[\JsonSpace]>
+	[34] JsonString<"21 2nd Street">
+	[35] JsonComma<,>
+	[36] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[37] JsonSpace<#[\JsonSpace]>
+	[38] JsonString<"city">
+	[39] JsonColon<:>
+	[40] JsonSpace<#[\JsonSpace]>
+	[41] JsonString<"New York">
+	[42] JsonComma<,>
+	[43] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[44] JsonSpace<#[\JsonSpace]>
+	[45] JsonString<"state">
+	[46] JsonColon<:>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonString<"NY">
+	[49] JsonComma<,>
+	[50] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[51] JsonSpace<#[\JsonSpace]>
+	[52] JsonString<"postalCode">
+	[53] JsonColon<:>
+	[54] JsonSpace<#[\JsonSpace]>
+	[55] JsonString<"10021">
+	[56] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[57] JsonSpace<#[\JsonSpace]>
+	[58] JsonCurlyBrace<}>
+	[59] JsonComma<,>
+	[60] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[61] JsonSpace<#[\JsonSpace]>
+	[62] JsonString<"phoneNumber">
+	[63] JsonColon<:>
+	[64] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[65] JsonSpace<#[\JsonSpace]>
+	[66] JsonSquareBracket<[>
+	[67] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[68] JsonSpace<#[\JsonSpace]>
+	[69] JsonCurlyBrace<{>
+	[70] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[71] JsonSpace<#[\JsonSpace]>
+	[72] JsonString<"type">
+	[73] JsonColon<:>
+	[74] JsonSpace<#[\JsonSpace]>
+	[75] JsonString<"home">
+	[76] JsonComma<,>
+	[77] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[78] JsonSpace<#[\JsonSpace]>
+	[79] JsonString<"number">
+	[80] JsonColon<:>
+	[81] JsonSpace<#[\JsonSpace]>
+	[82] JsonString<"212 555-1234">
+	[83] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[84] JsonSpace<#[\JsonSpace]>
+	[85] JsonCurlyBrace<}>
+	[86] JsonComma<,>
+	[87] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[88] JsonSpace<#[\JsonSpace]>
+	[89] JsonCurlyBrace<{>
+	[90] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[91] JsonSpace<#[\JsonSpace]>
+	[92] JsonString<"type">
+	[93] JsonColon<:>
+	[94] JsonSpace<#[\JsonSpace]>
+	[95] JsonString<"fax">
+	[96] JsonComma<,>
+	[97] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[98] JsonSpace<#[\JsonSpace]>
+	[99] JsonString<"number">
+	[100] JsonColon<:>
+	[101] JsonSpace<#[\JsonSpace]>
+	[102] JsonString<"646 555-4567">
+	[103] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[104] JsonSpace<#[\JsonSpace]>
+	[105] JsonCurlyBrace<}>
+	[106] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[107] JsonSpace<#[\JsonSpace]>
+	[108] JsonSquareBracket<]>
+	[109] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[110] JsonSpace<#[\JsonSpace]>
+	[111] JsonCurlyBrace<}>
+>>>
+json_text->({
+  "arrays" : [
+    [],
+    [],
+    []
+  ],
+  "objects" : {
+    "pair 0" : {},
+    "pair 1" : {},
+    "pair 2" : {}
+  }
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"arrays">
+	[4] JsonSpace<#[\JsonSpace]>
+	[5] JsonColon<:>
+	[6] JsonSpace<#[\JsonSpace]>
+	[7] JsonSquareBracket<[>
+	[8] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[9] JsonSpace<#[\JsonSpace]>
+	[10] JsonSquareBracket<[>
+	[11] JsonSquareBracket<]>
+	[12] JsonComma<,>
+	[13] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[14] JsonSpace<#[\JsonSpace]>
+	[15] JsonSquareBracket<[>
+	[16] JsonSquareBracket<]>
+	[17] JsonComma<,>
+	[18] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[19] JsonSpace<#[\JsonSpace]>
+	[20] JsonSquareBracket<[>
+	[21] JsonSquareBracket<]>
+	[22] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[23] JsonSpace<#[\JsonSpace]>
+	[24] JsonSquareBracket<]>
+	[25] JsonComma<,>
+	[26] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[27] JsonSpace<#[\JsonSpace]>
+	[28] JsonString<"objects">
+	[29] JsonSpace<#[\JsonSpace]>
+	[30] JsonColon<:>
+	[31] JsonSpace<#[\JsonSpace]>
+	[32] JsonCurlyBrace<{>
+	[33] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[34] JsonSpace<#[\JsonSpace]>
+	[35] JsonString<"pair 0">
+	[36] JsonSpace<#[\JsonSpace]>
+	[37] JsonColon<:>
+	[38] JsonSpace<#[\JsonSpace]>
+	[39] JsonCurlyBrace<{>
+	[40] JsonCurlyBrace<}>
+	[41] JsonComma<,>
+	[42] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[43] JsonSpace<#[\JsonSpace]>
+	[44] JsonString<"pair 1">
+	[45] JsonSpace<#[\JsonSpace]>
+	[46] JsonColon<:>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonCurlyBrace<{>
+	[49] JsonCurlyBrace<}>
+	[50] JsonComma<,>
+	[51] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[52] JsonSpace<#[\JsonSpace]>
+	[53] JsonString<"pair 2">
+	[54] JsonSpace<#[\JsonSpace]>
+	[55] JsonColon<:>
+	[56] JsonSpace<#[\JsonSpace]>
+	[57] JsonCurlyBrace<{>
+	[58] JsonCurlyBrace<}>
+	[59] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[60] JsonSpace<#[\JsonSpace]>
+	[61] JsonCurlyBrace<}>
+	[62] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[63] JsonCurlyBrace<}>
+>>>
+json_text->({
+   "data": [
+      {
+         "id": "X999_Y999",
+         "from": {
+            "name": "Tom Brady", "id": "X12"
+         },
+         "message": "Looking forward to 2010!",
+         "actions": [
+            {
+               "name": "Comment",
+               "link": "http://www.facebook.com/X999/posts/Y999"
+            },
+            {
+               "name": "Like",
+               "link": "http://www.facebook.com/X999/posts/Y999"
+            }
+         ],
+         "type": "status",
+         "created_time": "2010-08-02T21:27:44+0000",
+         "updated_time": "2010-08-02T21:27:44+0000"
+      },
+      {
+         "id": "X998_Y998",
+         "from": {
+            "name": "Peyton Manning", "id": "X18"
+         },
+         "message": "Where's my contract?",
+         "actions": [
+            {
+               "name": "Comment",
+               "link": "http://www.facebook.com/X998/posts/Y998"
+            },
+            {
+               "name": "Like",
+               "link": "http://www.facebook.com/X998/posts/Y998"
+            }
+         ],
+         "type": "status",
+         "created_time": "2010-08-02T21:27:44+0000",
+         "updated_time": "2010-08-02T21:27:44+0000"
+      }
+   ]
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"data">
+	[4] JsonColon<:>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonSquareBracket<[>
+	[7] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonCurlyBrace<{>
+	[10] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonString<"id">
+	[13] JsonColon<:>
+	[14] JsonSpace<#[\JsonSpace]>
+	[15] JsonString<"X999_Y999">
+	[16] JsonComma<,>
+	[17] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[18] JsonSpace<#[\JsonSpace]>
+	[19] JsonString<"from">
+	[20] JsonColon<:>
+	[21] JsonSpace<#[\JsonSpace]>
+	[22] JsonCurlyBrace<{>
+	[23] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[24] JsonSpace<#[\JsonSpace]>
+	[25] JsonString<"name">
+	[26] JsonColon<:>
+	[27] JsonSpace<#[\JsonSpace]>
+	[28] JsonString<"Tom Brady">
+	[29] JsonComma<,>
+	[30] JsonSpace<#[\JsonSpace]>
+	[31] JsonString<"id">
+	[32] JsonColon<:>
+	[33] JsonSpace<#[\JsonSpace]>
+	[34] JsonString<"X12">
+	[35] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[36] JsonSpace<#[\JsonSpace]>
+	[37] JsonCurlyBrace<}>
+	[38] JsonComma<,>
+	[39] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[40] JsonSpace<#[\JsonSpace]>
+	[41] JsonString<"message">
+	[42] JsonColon<:>
+	[43] JsonSpace<#[\JsonSpace]>
+	[44] JsonString<"Looking forward to 2010!">
+	[45] JsonComma<,>
+	[46] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonString<"actions">
+	[49] JsonColon<:>
+	[50] JsonSpace<#[\JsonSpace]>
+	[51] JsonSquareBracket<[>
+	[52] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[53] JsonSpace<#[\JsonSpace]>
+	[54] JsonCurlyBrace<{>
+	[55] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[56] JsonSpace<#[\JsonSpace]>
+	[57] JsonString<"name">
+	[58] JsonColon<:>
+	[59] JsonSpace<#[\JsonSpace]>
+	[60] JsonString<"Comment">
+	[61] JsonComma<,>
+	[62] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[63] JsonSpace<#[\JsonSpace]>
+	[64] JsonString<"link">
+	[65] JsonColon<:>
+	[66] JsonSpace<#[\JsonSpace]>
+	[67] JsonString<"http://www.facebook.com/X999/posts/Y999">
+	[68] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[69] JsonSpace<#[\JsonSpace]>
+	[70] JsonCurlyBrace<}>
+	[71] JsonComma<,>
+	[72] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[73] JsonSpace<#[\JsonSpace]>
+	[74] JsonCurlyBrace<{>
+	[75] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[76] JsonSpace<#[\JsonSpace]>
+	[77] JsonString<"name">
+	[78] JsonColon<:>
+	[79] JsonSpace<#[\JsonSpace]>
+	[80] JsonString<"Like">
+	[81] JsonComma<,>
+	[82] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[83] JsonSpace<#[\JsonSpace]>
+	[84] JsonString<"link">
+	[85] JsonColon<:>
+	[86] JsonSpace<#[\JsonSpace]>
+	[87] JsonString<"http://www.facebook.com/X999/posts/Y999">
+	[88] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[89] JsonSpace<#[\JsonSpace]>
+	[90] JsonCurlyBrace<}>
+	[91] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[92] JsonSpace<#[\JsonSpace]>
+	[93] JsonSquareBracket<]>
+	[94] JsonComma<,>
+	[95] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[96] JsonSpace<#[\JsonSpace]>
+	[97] JsonString<"type">
+	[98] JsonColon<:>
+	[99] JsonSpace<#[\JsonSpace]>
+	[100] JsonString<"status">
+	[101] JsonComma<,>
+	[102] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[103] JsonSpace<#[\JsonSpace]>
+	[104] JsonString<"created_time">
+	[105] JsonColon<:>
+	[106] JsonSpace<#[\JsonSpace]>
+	[107] JsonString<"2010-08-02T21:27:44+0000">
+	[108] JsonComma<,>
+	[109] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[110] JsonSpace<#[\JsonSpace]>
+	[111] JsonString<"updated_time">
+	[112] JsonColon<:>
+	[113] JsonSpace<#[\JsonSpace]>
+	[114] JsonString<"2010-08-02T21:27:44+0000">
+	[115] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[116] JsonSpace<#[\JsonSpace]>
+	[117] JsonCurlyBrace<}>
+	[118] JsonComma<,>
+	[119] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[120] JsonSpace<#[\JsonSpace]>
+	[121] JsonCurlyBrace<{>
+	[122] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[123] JsonSpace<#[\JsonSpace]>
+	[124] JsonString<"id">
+	[125] JsonColon<:>
+	[126] JsonSpace<#[\JsonSpace]>
+	[127] JsonString<"X998_Y998">
+	[128] JsonComma<,>
+	[129] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[130] JsonSpace<#[\JsonSpace]>
+	[131] JsonString<"from">
+	[132] JsonColon<:>
+	[133] JsonSpace<#[\JsonSpace]>
+	[134] JsonCurlyBrace<{>
+	[135] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[136] JsonSpace<#[\JsonSpace]>
+	[137] JsonString<"name">
+	[138] JsonColon<:>
+	[139] JsonSpace<#[\JsonSpace]>
+	[140] JsonString<"Peyton Manning">
+	[141] JsonComma<,>
+	[142] JsonSpace<#[\JsonSpace]>
+	[143] JsonString<"id">
+	[144] JsonColon<:>
+	[145] JsonSpace<#[\JsonSpace]>
+	[146] JsonString<"X18">
+	[147] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[148] JsonSpace<#[\JsonSpace]>
+	[149] JsonCurlyBrace<}>
+	[150] JsonComma<,>
+	[151] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[152] JsonSpace<#[\JsonSpace]>
+	[153] JsonString<"message">
+	[154] JsonColon<:>
+	[155] JsonSpace<#[\JsonSpace]>
+	[156] JsonString<"Where's my contract?">
+	[157] JsonComma<,>
+	[158] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[159] JsonSpace<#[\JsonSpace]>
+	[160] JsonString<"actions">
+	[161] JsonColon<:>
+	[162] JsonSpace<#[\JsonSpace]>
+	[163] JsonSquareBracket<[>
+	[164] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[165] JsonSpace<#[\JsonSpace]>
+	[166] JsonCurlyBrace<{>
+	[167] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[168] JsonSpace<#[\JsonSpace]>
+	[169] JsonString<"name">
+	[170] JsonColon<:>
+	[171] JsonSpace<#[\JsonSpace]>
+	[172] JsonString<"Comment">
+	[173] JsonComma<,>
+	[174] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[175] JsonSpace<#[\JsonSpace]>
+	[176] JsonString<"link">
+	[177] JsonColon<:>
+	[178] JsonSpace<#[\JsonSpace]>
+	[179] JsonString<"http://www.facebook.com/X998/posts/Y998">
+	[180] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[181] JsonSpace<#[\JsonSpace]>
+	[182] JsonCurlyBrace<}>
+	[183] JsonComma<,>
+	[184] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[185] JsonSpace<#[\JsonSpace]>
+	[186] JsonCurlyBrace<{>
+	[187] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[188] JsonSpace<#[\JsonSpace]>
+	[189] JsonString<"name">
+	[190] JsonColon<:>
+	[191] JsonSpace<#[\JsonSpace]>
+	[192] JsonString<"Like">
+	[193] JsonComma<,>
+	[194] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[195] JsonSpace<#[\JsonSpace]>
+	[196] JsonString<"link">
+	[197] JsonColon<:>
+	[198] JsonSpace<#[\JsonSpace]>
+	[199] JsonString<"http://www.facebook.com/X998/posts/Y998">
+	[200] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[201] JsonSpace<#[\JsonSpace]>
+	[202] JsonCurlyBrace<}>
+	[203] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[204] JsonSpace<#[\JsonSpace]>
+	[205] JsonSquareBracket<]>
+	[206] JsonComma<,>
+	[207] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[208] JsonSpace<#[\JsonSpace]>
+	[209] JsonString<"type">
+	[210] JsonColon<:>
+	[211] JsonSpace<#[\JsonSpace]>
+	[212] JsonString<"status">
+	[213] JsonComma<,>
+	[214] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[215] JsonSpace<#[\JsonSpace]>
+	[216] JsonString<"created_time">
+	[217] JsonColon<:>
+	[218] JsonSpace<#[\JsonSpace]>
+	[219] JsonString<"2010-08-02T21:27:44+0000">
+	[220] JsonComma<,>
+	[221] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[222] JsonSpace<#[\JsonSpace]>
+	[223] JsonString<"updated_time">
+	[224] JsonColon<:>
+	[225] JsonSpace<#[\JsonSpace]>
+	[226] JsonString<"2010-08-02T21:27:44+0000">
+	[227] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[228] JsonSpace<#[\JsonSpace]>
+	[229] JsonCurlyBrace<}>
+	[230] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[231] JsonSpace<#[\JsonSpace]>
+	[232] JsonSquareBracket<]>
+	[233] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[234] JsonCurlyBrace<}>
+>>>
+json_text->({
+    "title": "Talk On Travel Pool",
+    "link": "http://www.flickr.com/groups/talkontravel/pool/",
+    "description": "Travel and vacation photos from around the world.",
+    "modified": "2009-02-02T11:10:27Z",
+    "generator": "http://www.flickr.com/",
+    "items": [
+            {
+            "title": "View from the hotel",
+            "link": "http://www.flickr.com/photos/33112458@N08/3081564649/in/pool-998875@N22",
+            "media": {"m":"http://farm4.static.flickr.com/3037/3081564649_4a6569750c_m.jpg"},
+            "date_taken": "2008-12-04T04:43:03-08:00",
+            "description": "<p><a href=\"http://www.flickr.com/people/33112458@N08/\"> Talk On Travel<\/a> has added a photo to the pool:<\/p> <p><a href=\"http:// www.flickr.com/photos/33112458@N08/3081564649/\" title=\"View from the hotel\"> <img src=\"http://farm4.static.flickr.com/3037/3081564649_4a6569750c_m.jpg\" width=\"240\" height=\"180\" alt=\"View from the hotel\" /><\/a><\/p> ",
+            "published": "2008-12-04T12:43:03Z",
+            "author": "nobody@flickr.com (Talk On Travel)",
+            "author_id": "33112458@N08",
+            "tags": "spain dolphins tenerife canaries lagomera aqualand playadelasamericas junglepark losgigantos loscristines talkontravel"
+            }
+    ]
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"title">
+	[4] JsonColon<:>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonString<"Talk On Travel Pool">
+	[7] JsonComma<,>
+	[8] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[9] JsonSpace<#[\JsonSpace]>
+	[10] JsonString<"link">
+	[11] JsonColon<:>
+	[12] JsonSpace<#[\JsonSpace]>
+	[13] JsonString<"http://www.flickr.com/groups/talkontravel/pool/">
+	[14] JsonComma<,>
+	[15] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[16] JsonSpace<#[\JsonSpace]>
+	[17] JsonString<"description">
+	[18] JsonColon<:>
+	[19] JsonSpace<#[\JsonSpace]>
+	[20] JsonString<"Travel and vacation photos from around the world.">
+	[21] JsonComma<,>
+	[22] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[23] JsonSpace<#[\JsonSpace]>
+	[24] JsonString<"modified">
+	[25] JsonColon<:>
+	[26] JsonSpace<#[\JsonSpace]>
+	[27] JsonString<"2009-02-02T11:10:27Z">
+	[28] JsonComma<,>
+	[29] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[30] JsonSpace<#[\JsonSpace]>
+	[31] JsonString<"generator">
+	[32] JsonColon<:>
+	[33] JsonSpace<#[\JsonSpace]>
+	[34] JsonString<"http://www.flickr.com/">
+	[35] JsonComma<,>
+	[36] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[37] JsonSpace<#[\JsonSpace]>
+	[38] JsonString<"items">
+	[39] JsonColon<:>
+	[40] JsonSpace<#[\JsonSpace]>
+	[41] JsonSquareBracket<[>
+	[42] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[43] JsonSpace<#[\JsonSpace]>
+	[44] JsonCurlyBrace<{>
+	[45] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[46] JsonSpace<#[\JsonSpace]>
+	[47] JsonString<"title">
+	[48] JsonColon<:>
+	[49] JsonSpace<#[\JsonSpace]>
+	[50] JsonString<"View from the hotel">
+	[51] JsonComma<,>
+	[52] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[53] JsonSpace<#[\JsonSpace]>
+	[54] JsonString<"link">
+	[55] JsonColon<:>
+	[56] JsonSpace<#[\JsonSpace]>
+	[57] JsonString<"http://www.flickr.com/photos/33112458@N08/3081564649/in/pool-998875@N22">
+	[58] JsonComma<,>
+	[59] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[60] JsonSpace<#[\JsonSpace]>
+	[61] JsonString<"media">
+	[62] JsonColon<:>
+	[63] JsonSpace<#[\JsonSpace]>
+	[64] JsonCurlyBrace<{>
+	[65] JsonString<"m">
+	[66] JsonColon<:>
+	[67] JsonString<"http://farm4.static.flickr.com/3037/3081564649_4a6569750c_m.jpg">
+	[68] JsonCurlyBrace<}>
+	[69] JsonComma<,>
+	[70] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[71] JsonSpace<#[\JsonSpace]>
+	[72] JsonString<"date_taken">
+	[73] JsonColon<:>
+	[74] JsonSpace<#[\JsonSpace]>
+	[75] JsonString<"2008-12-04T04:43:03-08:00">
+	[76] JsonComma<,>
+	[77] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[78] JsonSpace<#[\JsonSpace]>
+	[79] JsonString<"description">
+	[80] JsonColon<:>
+	[81] JsonSpace<#[\JsonSpace]>
+	[82] JsonString<"<p><a href=\"http://www.flickr.com/people/33112458@N08/\"> Talk On Travel</a> has added a photo to the pool:</p> <p><a href=\"http:// www.flickr.com/photos/33112458@N08/3081564649/\" title=\"View from the hotel\"> <img src=\"http://farm4.static.flickr.com/3037/3081564649_4a6569750c_m.jpg\" width=\"240\" height=\"180\" alt=\"View from the hotel\" /></a></p> ">
+	[83] JsonComma<,>
+	[84] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[85] JsonSpace<#[\JsonSpace]>
+	[86] JsonString<"published">
+	[87] JsonColon<:>
+	[88] JsonSpace<#[\JsonSpace]>
+	[89] JsonString<"2008-12-04T12:43:03Z">
+	[90] JsonComma<,>
+	[91] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[92] JsonSpace<#[\JsonSpace]>
+	[93] JsonString<"author">
+	[94] JsonColon<:>
+	[95] JsonSpace<#[\JsonSpace]>
+	[96] JsonString<"nobody@flickr.com (Talk On Travel)">
+	[97] JsonComma<,>
+	[98] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[99] JsonSpace<#[\JsonSpace]>
+	[100] JsonString<"author_id">
+	[101] JsonColon<:>
+	[102] JsonSpace<#[\JsonSpace]>
+	[103] JsonString<"33112458@N08">
+	[104] JsonComma<,>
+	[105] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[106] JsonSpace<#[\JsonSpace]>
+	[107] JsonString<"tags">
+	[108] JsonColon<:>
+	[109] JsonSpace<#[\JsonSpace]>
+	[110] JsonString<"spain dolphins tenerife canaries lagomera aqualand playadelasamericas junglepark losgigantos loscristines talkontravel">
+	[111] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[112] JsonSpace<#[\JsonSpace]>
+	[113] JsonCurlyBrace<}>
+	[114] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[115] JsonSpace<#[\JsonSpace]>
+	[116] JsonSquareBracket<]>
+	[117] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[118] JsonCurlyBrace<}>
+>>>
+json_text->({
+    "ResultSet": {
+        "totalResultsAvailable": "1827221",
+        "totalResultsReturned": 2,
+        "firstResultPosition": 1,
+        "Result": [
+                   {
+                   "Title": "potato jpg",
+                   "Summary": "Kentang Si bungsu dari keluarga Solanum tuberosum L ini ternyata memiliki khasiat untuk mengurangi kerutan  jerawat  bintik hitam dan kemerahan pada kulit  Gunakan seminggu sekali sebagai",
+                   "Url": "http:\/\/www.mediaindonesia.com\/spaw\/uploads\/images\/potato.jpg",
+                   "ClickUrl": "http:\/\/www.mediaindonesia.com\/spaw\/uploads\/images\/potato.jpg",
+                   "RefererUrl": "http:\/\/www.mediaindonesia.com\/mediaperempuan\/index.php?ar_id=Nzkw",
+                   "FileSize": 22630,
+                   "FileFormat": "jpeg",
+                   "Height": "362",
+                   "Width": "532",
+                   "Thumbnail": {
+                   "Url": "http:\/\/thm-a01.yimg.com\/nimage\/557094559c18f16a",
+                   "Height": "98",
+                   "Width": "145"
+                   }
+                   },
+                   {
+                   "Title": "potato jpg",
+                   "Summary": "Introduction of puneri aloo This is a traditional potato preparation flavoured with curry leaves and peanuts and can be eaten on fasting day  Preparation time   10 min",
+                   "Url": "http:\/\/www.infovisual.info\/01\/photo\/potato.jpg",
+                   "ClickUrl": "http:\/\/www.infovisual.info\/01\/photo\/potato.jpg",
+                   "RefererUrl": "http:\/\/sundayfood.com\/puneri-aloo-indian-%20recipe",
+                   "FileSize": 119398,
+                   "FileFormat": "jpeg",
+                   "Height": "685",
+                   "Width": "1024",
+                   "Thumbnail": {
+                   "Url": "http:\/\/thm-a01.yimg.com\/nimage\/7fa23212efe84b64",
+                   "Height": "107",
+                   "Width": "160"
+                   }
+                   }
+                   ]
+    }
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"ResultSet">
+	[4] JsonColon<:>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonCurlyBrace<{>
+	[7] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonString<"totalResultsAvailable">
+	[10] JsonColon<:>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonString<"1827221">
+	[13] JsonComma<,>
+	[14] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[15] JsonSpace<#[\JsonSpace]>
+	[16] JsonString<"totalResultsReturned">
+	[17] JsonColon<:>
+	[18] JsonSpace<#[\JsonSpace]>
+	[19] JsonNum<2>
+	[20] JsonComma<,>
+	[21] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[22] JsonSpace<#[\JsonSpace]>
+	[23] JsonString<"firstResultPosition">
+	[24] JsonColon<:>
+	[25] JsonSpace<#[\JsonSpace]>
+	[26] JsonNum<1>
+	[27] JsonComma<,>
+	[28] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[29] JsonSpace<#[\JsonSpace]>
+	[30] JsonString<"Result">
+	[31] JsonColon<:>
+	[32] JsonSpace<#[\JsonSpace]>
+	[33] JsonSquareBracket<[>
+	[34] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[35] JsonSpace<#[\JsonSpace]>
+	[36] JsonCurlyBrace<{>
+	[37] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[38] JsonSpace<#[\JsonSpace]>
+	[39] JsonString<"Title">
+	[40] JsonColon<:>
+	[41] JsonSpace<#[\JsonSpace]>
+	[42] JsonString<"potato jpg">
+	[43] JsonComma<,>
+	[44] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[45] JsonSpace<#[\JsonSpace]>
+	[46] JsonString<"Summary">
+	[47] JsonColon<:>
+	[48] JsonSpace<#[\JsonSpace]>
+	[49] JsonString<"Kentang Si bungsu dari keluarga Solanum tuberosum L ini ternyata memiliki khasiat untuk mengurangi kerutan  jerawat  bintik hitam dan kemerahan pada kulit  Gunakan seminggu sekali sebagai">
+	[50] JsonComma<,>
+	[51] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[52] JsonSpace<#[\JsonSpace]>
+	[53] JsonString<"Url">
+	[54] JsonColon<:>
+	[55] JsonSpace<#[\JsonSpace]>
+	[56] JsonString<"http://www.mediaindonesia.com/spaw/uploads/images/potato.jpg">
+	[57] JsonComma<,>
+	[58] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[59] JsonSpace<#[\JsonSpace]>
+	[60] JsonString<"ClickUrl">
+	[61] JsonColon<:>
+	[62] JsonSpace<#[\JsonSpace]>
+	[63] JsonString<"http://www.mediaindonesia.com/spaw/uploads/images/potato.jpg">
+	[64] JsonComma<,>
+	[65] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[66] JsonSpace<#[\JsonSpace]>
+	[67] JsonString<"RefererUrl">
+	[68] JsonColon<:>
+	[69] JsonSpace<#[\JsonSpace]>
+	[70] JsonString<"http://www.mediaindonesia.com/mediaperempuan/index.php?ar_id=Nzkw">
+	[71] JsonComma<,>
+	[72] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[73] JsonSpace<#[\JsonSpace]>
+	[74] JsonString<"FileSize">
+	[75] JsonColon<:>
+	[76] JsonSpace<#[\JsonSpace]>
+	[77] JsonNum<22630>
+	[78] JsonComma<,>
+	[79] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[80] JsonSpace<#[\JsonSpace]>
+	[81] JsonString<"FileFormat">
+	[82] JsonColon<:>
+	[83] JsonSpace<#[\JsonSpace]>
+	[84] JsonString<"jpeg">
+	[85] JsonComma<,>
+	[86] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[87] JsonSpace<#[\JsonSpace]>
+	[88] JsonString<"Height">
+	[89] JsonColon<:>
+	[90] JsonSpace<#[\JsonSpace]>
+	[91] JsonString<"362">
+	[92] JsonComma<,>
+	[93] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[94] JsonSpace<#[\JsonSpace]>
+	[95] JsonString<"Width">
+	[96] JsonColon<:>
+	[97] JsonSpace<#[\JsonSpace]>
+	[98] JsonString<"532">
+	[99] JsonComma<,>
+	[100] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[101] JsonSpace<#[\JsonSpace]>
+	[102] JsonString<"Thumbnail">
+	[103] JsonColon<:>
+	[104] JsonSpace<#[\JsonSpace]>
+	[105] JsonCurlyBrace<{>
+	[106] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[107] JsonSpace<#[\JsonSpace]>
+	[108] JsonString<"Url">
+	[109] JsonColon<:>
+	[110] JsonSpace<#[\JsonSpace]>
+	[111] JsonString<"http://thm-a01.yimg.com/nimage/557094559c18f16a">
+	[112] JsonComma<,>
+	[113] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[114] JsonSpace<#[\JsonSpace]>
+	[115] JsonString<"Height">
+	[116] JsonColon<:>
+	[117] JsonSpace<#[\JsonSpace]>
+	[118] JsonString<"98">
+	[119] JsonComma<,>
+	[120] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[121] JsonSpace<#[\JsonSpace]>
+	[122] JsonString<"Width">
+	[123] JsonColon<:>
+	[124] JsonSpace<#[\JsonSpace]>
+	[125] JsonString<"145">
+	[126] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[127] JsonSpace<#[\JsonSpace]>
+	[128] JsonCurlyBrace<}>
+	[129] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[130] JsonSpace<#[\JsonSpace]>
+	[131] JsonCurlyBrace<}>
+	[132] JsonComma<,>
+	[133] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[134] JsonSpace<#[\JsonSpace]>
+	[135] JsonCurlyBrace<{>
+	[136] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[137] JsonSpace<#[\JsonSpace]>
+	[138] JsonString<"Title">
+	[139] JsonColon<:>
+	[140] JsonSpace<#[\JsonSpace]>
+	[141] JsonString<"potato jpg">
+	[142] JsonComma<,>
+	[143] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[144] JsonSpace<#[\JsonSpace]>
+	[145] JsonString<"Summary">
+	[146] JsonColon<:>
+	[147] JsonSpace<#[\JsonSpace]>
+	[148] JsonString<"Introduction of puneri aloo This is a traditional potato preparation flavoured with curry leaves and peanuts and can be eaten on fasting day  Preparation time   10 min">
+	[149] JsonComma<,>
+	[150] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[151] JsonSpace<#[\JsonSpace]>
+	[152] JsonString<"Url">
+	[153] JsonColon<:>
+	[154] JsonSpace<#[\JsonSpace]>
+	[155] JsonString<"http://www.infovisual.info/01/photo/potato.jpg">
+	[156] JsonComma<,>
+	[157] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[158] JsonSpace<#[\JsonSpace]>
+	[159] JsonString<"ClickUrl">
+	[160] JsonColon<:>
+	[161] JsonSpace<#[\JsonSpace]>
+	[162] JsonString<"http://www.infovisual.info/01/photo/potato.jpg">
+	[163] JsonComma<,>
+	[164] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[165] JsonSpace<#[\JsonSpace]>
+	[166] JsonString<"RefererUrl">
+	[167] JsonColon<:>
+	[168] JsonSpace<#[\JsonSpace]>
+	[169] JsonString<"http://sundayfood.com/puneri-aloo-indian-%20recipe">
+	[170] JsonComma<,>
+	[171] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[172] JsonSpace<#[\JsonSpace]>
+	[173] JsonString<"FileSize">
+	[174] JsonColon<:>
+	[175] JsonSpace<#[\JsonSpace]>
+	[176] JsonNum<119398>
+	[177] JsonComma<,>
+	[178] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[179] JsonSpace<#[\JsonSpace]>
+	[180] JsonString<"FileFormat">
+	[181] JsonColon<:>
+	[182] JsonSpace<#[\JsonSpace]>
+	[183] JsonString<"jpeg">
+	[184] JsonComma<,>
+	[185] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[186] JsonSpace<#[\JsonSpace]>
+	[187] JsonString<"Height">
+	[188] JsonColon<:>
+	[189] JsonSpace<#[\JsonSpace]>
+	[190] JsonString<"685">
+	[191] JsonComma<,>
+	[192] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[193] JsonSpace<#[\JsonSpace]>
+	[194] JsonString<"Width">
+	[195] JsonColon<:>
+	[196] JsonSpace<#[\JsonSpace]>
+	[197] JsonString<"1024">
+	[198] JsonComma<,>
+	[199] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[200] JsonSpace<#[\JsonSpace]>
+	[201] JsonString<"Thumbnail">
+	[202] JsonColon<:>
+	[203] JsonSpace<#[\JsonSpace]>
+	[204] JsonCurlyBrace<{>
+	[205] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[206] JsonSpace<#[\JsonSpace]>
+	[207] JsonString<"Url">
+	[208] JsonColon<:>
+	[209] JsonSpace<#[\JsonSpace]>
+	[210] JsonString<"http://thm-a01.yimg.com/nimage/7fa23212efe84b64">
+	[211] JsonComma<,>
+	[212] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[213] JsonSpace<#[\JsonSpace]>
+	[214] JsonString<"Height">
+	[215] JsonColon<:>
+	[216] JsonSpace<#[\JsonSpace]>
+	[217] JsonString<"107">
+	[218] JsonComma<,>
+	[219] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[220] JsonSpace<#[\JsonSpace]>
+	[221] JsonString<"Width">
+	[222] JsonColon<:>
+	[223] JsonSpace<#[\JsonSpace]>
+	[224] JsonString<"160">
+	[225] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[226] JsonSpace<#[\JsonSpace]>
+	[227] JsonCurlyBrace<}>
+	[228] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[229] JsonSpace<#[\JsonSpace]>
+	[230] JsonCurlyBrace<}>
+	[231] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[232] JsonSpace<#[\JsonSpace]>
+	[233] JsonSquareBracket<]>
+	[234] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[235] JsonSpace<#[\JsonSpace]>
+	[236] JsonCurlyBrace<}>
+	[237] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[238] JsonCurlyBrace<}>
+>>>
+json_text->({
+    "menu": {
+        "header": "xProgress SVG Viewer",
+        "items": [
+            {
+                "id": "Open"
+            },
+            {
+                "id": "OpenNew",
+                "label": "Open New"
+            },
+            null,
+            {
+                "id": "ZoomIn",
+                "label": "Zoom In"
+            },
+            {
+                "id": "ZoomOut",
+                "label": "Zoom Out"
+            },
+            {
+                "id": "OriginalView",
+                "label": "Original View"
+            },
+            null,
+            {
+                "id": "Quality"
+            },
+            {
+                "id": "Pause"
+            },
+            {
+                "id": "Mute"
+            },
+            null,
+            {
+                "id": "Find",
+                "label": "Find..."
+            },
+            {
+                "id": "FindAgain",
+                "label": "Find Again"
+            },
+            {
+                "id": "Copy"
+            },
+            {
+                "id": "CopyAgain",
+                "label": "Copy Again"
+            },
+            {
+                "id": "CopySVG",
+                "label": "Copy SVG"
+            },
+            {
+                "id": "ViewSVG",
+                "label": "View SVG"
+            },
+            {
+                "id": "ViewSource",
+                "label": "View Source"
+            },
+            {
+                "id": "SaveAs",
+                "label": "Save As"
+            },
+            null,
+            {
+                "id": "Help"
+            },
+            {
+                "id": "About",
+                "label": "About xProgress CVG Viewer..."
+            }
+        ]
+    }
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"menu">
+	[4] JsonColon<:>
+	[5] JsonSpace<#[\JsonSpace]>
+	[6] JsonCurlyBrace<{>
+	[7] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonString<"header">
+	[10] JsonColon<:>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonString<"xProgress SVG Viewer">
+	[13] JsonComma<,>
+	[14] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[15] JsonSpace<#[\JsonSpace]>
+	[16] JsonString<"items">
+	[17] JsonColon<:>
+	[18] JsonSpace<#[\JsonSpace]>
+	[19] JsonSquareBracket<[>
+	[20] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[21] JsonSpace<#[\JsonSpace]>
+	[22] JsonCurlyBrace<{>
+	[23] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[24] JsonSpace<#[\JsonSpace]>
+	[25] JsonString<"id">
+	[26] JsonColon<:>
+	[27] JsonSpace<#[\JsonSpace]>
+	[28] JsonString<"Open">
+	[29] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[30] JsonSpace<#[\JsonSpace]>
+	[31] JsonCurlyBrace<}>
+	[32] JsonComma<,>
+	[33] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[34] JsonSpace<#[\JsonSpace]>
+	[35] JsonCurlyBrace<{>
+	[36] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[37] JsonSpace<#[\JsonSpace]>
+	[38] JsonString<"id">
+	[39] JsonColon<:>
+	[40] JsonSpace<#[\JsonSpace]>
+	[41] JsonString<"OpenNew">
+	[42] JsonComma<,>
+	[43] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[44] JsonSpace<#[\JsonSpace]>
+	[45] JsonString<"label">
+	[46] JsonColon<:>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonString<"Open New">
+	[49] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[50] JsonSpace<#[\JsonSpace]>
+	[51] JsonCurlyBrace<}>
+	[52] JsonComma<,>
+	[53] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[54] JsonSpace<#[\JsonSpace]>
+	[55] JsonNull<null>
+	[56] JsonComma<,>
+	[57] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[58] JsonSpace<#[\JsonSpace]>
+	[59] JsonCurlyBrace<{>
+	[60] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[61] JsonSpace<#[\JsonSpace]>
+	[62] JsonString<"id">
+	[63] JsonColon<:>
+	[64] JsonSpace<#[\JsonSpace]>
+	[65] JsonString<"ZoomIn">
+	[66] JsonComma<,>
+	[67] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[68] JsonSpace<#[\JsonSpace]>
+	[69] JsonString<"label">
+	[70] JsonColon<:>
+	[71] JsonSpace<#[\JsonSpace]>
+	[72] JsonString<"Zoom In">
+	[73] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[74] JsonSpace<#[\JsonSpace]>
+	[75] JsonCurlyBrace<}>
+	[76] JsonComma<,>
+	[77] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[78] JsonSpace<#[\JsonSpace]>
+	[79] JsonCurlyBrace<{>
+	[80] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[81] JsonSpace<#[\JsonSpace]>
+	[82] JsonString<"id">
+	[83] JsonColon<:>
+	[84] JsonSpace<#[\JsonSpace]>
+	[85] JsonString<"ZoomOut">
+	[86] JsonComma<,>
+	[87] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[88] JsonSpace<#[\JsonSpace]>
+	[89] JsonString<"label">
+	[90] JsonColon<:>
+	[91] JsonSpace<#[\JsonSpace]>
+	[92] JsonString<"Zoom Out">
+	[93] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[94] JsonSpace<#[\JsonSpace]>
+	[95] JsonCurlyBrace<}>
+	[96] JsonComma<,>
+	[97] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[98] JsonSpace<#[\JsonSpace]>
+	[99] JsonCurlyBrace<{>
+	[100] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[101] JsonSpace<#[\JsonSpace]>
+	[102] JsonString<"id">
+	[103] JsonColon<:>
+	[104] JsonSpace<#[\JsonSpace]>
+	[105] JsonString<"OriginalView">
+	[106] JsonComma<,>
+	[107] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[108] JsonSpace<#[\JsonSpace]>
+	[109] JsonString<"label">
+	[110] JsonColon<:>
+	[111] JsonSpace<#[\JsonSpace]>
+	[112] JsonString<"Original View">
+	[113] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[114] JsonSpace<#[\JsonSpace]>
+	[115] JsonCurlyBrace<}>
+	[116] JsonComma<,>
+	[117] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[118] JsonSpace<#[\JsonSpace]>
+	[119] JsonNull<null>
+	[120] JsonComma<,>
+	[121] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[122] JsonSpace<#[\JsonSpace]>
+	[123] JsonCurlyBrace<{>
+	[124] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[125] JsonSpace<#[\JsonSpace]>
+	[126] JsonString<"id">
+	[127] JsonColon<:>
+	[128] JsonSpace<#[\JsonSpace]>
+	[129] JsonString<"Quality">
+	[130] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[131] JsonSpace<#[\JsonSpace]>
+	[132] JsonCurlyBrace<}>
+	[133] JsonComma<,>
+	[134] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[135] JsonSpace<#[\JsonSpace]>
+	[136] JsonCurlyBrace<{>
+	[137] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[138] JsonSpace<#[\JsonSpace]>
+	[139] JsonString<"id">
+	[140] JsonColon<:>
+	[141] JsonSpace<#[\JsonSpace]>
+	[142] JsonString<"Pause">
+	[143] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[144] JsonSpace<#[\JsonSpace]>
+	[145] JsonCurlyBrace<}>
+	[146] JsonComma<,>
+	[147] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[148] JsonSpace<#[\JsonSpace]>
+	[149] JsonCurlyBrace<{>
+	[150] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[151] JsonSpace<#[\JsonSpace]>
+	[152] JsonString<"id">
+	[153] JsonColon<:>
+	[154] JsonSpace<#[\JsonSpace]>
+	[155] JsonString<"Mute">
+	[156] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[157] JsonSpace<#[\JsonSpace]>
+	[158] JsonCurlyBrace<}>
+	[159] JsonComma<,>
+	[160] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[161] JsonSpace<#[\JsonSpace]>
+	[162] JsonNull<null>
+	[163] JsonComma<,>
+	[164] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[165] JsonSpace<#[\JsonSpace]>
+	[166] JsonCurlyBrace<{>
+	[167] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[168] JsonSpace<#[\JsonSpace]>
+	[169] JsonString<"id">
+	[170] JsonColon<:>
+	[171] JsonSpace<#[\JsonSpace]>
+	[172] JsonString<"Find">
+	[173] JsonComma<,>
+	[174] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[175] JsonSpace<#[\JsonSpace]>
+	[176] JsonString<"label">
+	[177] JsonColon<:>
+	[178] JsonSpace<#[\JsonSpace]>
+	[179] JsonString<"Find...">
+	[180] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[181] JsonSpace<#[\JsonSpace]>
+	[182] JsonCurlyBrace<}>
+	[183] JsonComma<,>
+	[184] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[185] JsonSpace<#[\JsonSpace]>
+	[186] JsonCurlyBrace<{>
+	[187] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[188] JsonSpace<#[\JsonSpace]>
+	[189] JsonString<"id">
+	[190] JsonColon<:>
+	[191] JsonSpace<#[\JsonSpace]>
+	[192] JsonString<"FindAgain">
+	[193] JsonComma<,>
+	[194] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[195] JsonSpace<#[\JsonSpace]>
+	[196] JsonString<"label">
+	[197] JsonColon<:>
+	[198] JsonSpace<#[\JsonSpace]>
+	[199] JsonString<"Find Again">
+	[200] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[201] JsonSpace<#[\JsonSpace]>
+	[202] JsonCurlyBrace<}>
+	[203] JsonComma<,>
+	[204] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[205] JsonSpace<#[\JsonSpace]>
+	[206] JsonCurlyBrace<{>
+	[207] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[208] JsonSpace<#[\JsonSpace]>
+	[209] JsonString<"id">
+	[210] JsonColon<:>
+	[211] JsonSpace<#[\JsonSpace]>
+	[212] JsonString<"Copy">
+	[213] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[214] JsonSpace<#[\JsonSpace]>
+	[215] JsonCurlyBrace<}>
+	[216] JsonComma<,>
+	[217] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[218] JsonSpace<#[\JsonSpace]>
+	[219] JsonCurlyBrace<{>
+	[220] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[221] JsonSpace<#[\JsonSpace]>
+	[222] JsonString<"id">
+	[223] JsonColon<:>
+	[224] JsonSpace<#[\JsonSpace]>
+	[225] JsonString<"CopyAgain">
+	[226] JsonComma<,>
+	[227] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[228] JsonSpace<#[\JsonSpace]>
+	[229] JsonString<"label">
+	[230] JsonColon<:>
+	[231] JsonSpace<#[\JsonSpace]>
+	[232] JsonString<"Copy Again">
+	[233] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[234] JsonSpace<#[\JsonSpace]>
+	[235] JsonCurlyBrace<}>
+	[236] JsonComma<,>
+	[237] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[238] JsonSpace<#[\JsonSpace]>
+	[239] JsonCurlyBrace<{>
+	[240] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[241] JsonSpace<#[\JsonSpace]>
+	[242] JsonString<"id">
+	[243] JsonColon<:>
+	[244] JsonSpace<#[\JsonSpace]>
+	[245] JsonString<"CopySVG">
+	[246] JsonComma<,>
+	[247] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[248] JsonSpace<#[\JsonSpace]>
+	[249] JsonString<"label">
+	[250] JsonColon<:>
+	[251] JsonSpace<#[\JsonSpace]>
+	[252] JsonString<"Copy SVG">
+	[253] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[254] JsonSpace<#[\JsonSpace]>
+	[255] JsonCurlyBrace<}>
+	[256] JsonComma<,>
+	[257] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[258] JsonSpace<#[\JsonSpace]>
+	[259] JsonCurlyBrace<{>
+	[260] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[261] JsonSpace<#[\JsonSpace]>
+	[262] JsonString<"id">
+	[263] JsonColon<:>
+	[264] JsonSpace<#[\JsonSpace]>
+	[265] JsonString<"ViewSVG">
+	[266] JsonComma<,>
+	[267] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[268] JsonSpace<#[\JsonSpace]>
+	[269] JsonString<"label">
+	[270] JsonColon<:>
+	[271] JsonSpace<#[\JsonSpace]>
+	[272] JsonString<"View SVG">
+	[273] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[274] JsonSpace<#[\JsonSpace]>
+	[275] JsonCurlyBrace<}>
+	[276] JsonComma<,>
+	[277] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[278] JsonSpace<#[\JsonSpace]>
+	[279] JsonCurlyBrace<{>
+	[280] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[281] JsonSpace<#[\JsonSpace]>
+	[282] JsonString<"id">
+	[283] JsonColon<:>
+	[284] JsonSpace<#[\JsonSpace]>
+	[285] JsonString<"ViewSource">
+	[286] JsonComma<,>
+	[287] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[288] JsonSpace<#[\JsonSpace]>
+	[289] JsonString<"label">
+	[290] JsonColon<:>
+	[291] JsonSpace<#[\JsonSpace]>
+	[292] JsonString<"View Source">
+	[293] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[294] JsonSpace<#[\JsonSpace]>
+	[295] JsonCurlyBrace<}>
+	[296] JsonComma<,>
+	[297] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[298] JsonSpace<#[\JsonSpace]>
+	[299] JsonCurlyBrace<{>
+	[300] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[301] JsonSpace<#[\JsonSpace]>
+	[302] JsonString<"id">
+	[303] JsonColon<:>
+	[304] JsonSpace<#[\JsonSpace]>
+	[305] JsonString<"SaveAs">
+	[306] JsonComma<,>
+	[307] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[308] JsonSpace<#[\JsonSpace]>
+	[309] JsonString<"label">
+	[310] JsonColon<:>
+	[311] JsonSpace<#[\JsonSpace]>
+	[312] JsonString<"Save As">
+	[313] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[314] JsonSpace<#[\JsonSpace]>
+	[315] JsonCurlyBrace<}>
+	[316] JsonComma<,>
+	[317] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[318] JsonSpace<#[\JsonSpace]>
+	[319] JsonNull<null>
+	[320] JsonComma<,>
+	[321] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[322] JsonSpace<#[\JsonSpace]>
+	[323] JsonCurlyBrace<{>
+	[324] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[325] JsonSpace<#[\JsonSpace]>
+	[326] JsonString<"id">
+	[327] JsonColon<:>
+	[328] JsonSpace<#[\JsonSpace]>
+	[329] JsonString<"Help">
+	[330] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[331] JsonSpace<#[\JsonSpace]>
+	[332] JsonCurlyBrace<}>
+	[333] JsonComma<,>
+	[334] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[335] JsonSpace<#[\JsonSpace]>
+	[336] JsonCurlyBrace<{>
+	[337] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[338] JsonSpace<#[\JsonSpace]>
+	[339] JsonString<"id">
+	[340] JsonColon<:>
+	[341] JsonSpace<#[\JsonSpace]>
+	[342] JsonString<"About">
+	[343] JsonComma<,>
+	[344] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[345] JsonSpace<#[\JsonSpace]>
+	[346] JsonString<"label">
+	[347] JsonColon<:>
+	[348] JsonSpace<#[\JsonSpace]>
+	[349] JsonString<"About xProgress CVG Viewer...">
+	[350] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[351] JsonSpace<#[\JsonSpace]>
+	[352] JsonCurlyBrace<}>
+	[353] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[354] JsonSpace<#[\JsonSpace]>
+	[355] JsonSquareBracket<]>
+	[356] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[357] JsonSpace<#[\JsonSpace]>
+	[358] JsonCurlyBrace<}>
+	[359] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[360] JsonCurlyBrace<}>
+>>>
+json_text->({
+        "name":"Product",
+        "properties":
+        {
+                "id":
+                {
+                        "type":"number",
+                        "description":"Product identifier",
+                        "required":true
+                },
+                "name":
+                {
+                        "description":"Name of the product",
+                        "type":"string",
+                        "required":true
+                },
+                "price":
+                {
+                        "type":"number",
+                        "minimum":0,
+                        "required":true
+                },
+                "tags":
+                {
+                        "type":"array",
+                        "items":
+                        {
+                                "type":"string"
+                        }
+                }
+        }
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[2] JsonSpace<#[\JsonSpace]>
+	[3] JsonString<"name">
+	[4] JsonColon<:>
+	[5] JsonString<"Product">
+	[6] JsonComma<,>
+	[7] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonString<"properties">
+	[10] JsonColon<:>
+	[11] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[12] JsonSpace<#[\JsonSpace]>
+	[13] JsonCurlyBrace<{>
+	[14] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[15] JsonSpace<#[\JsonSpace]>
+	[16] JsonString<"id">
+	[17] JsonColon<:>
+	[18] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[19] JsonSpace<#[\JsonSpace]>
+	[20] JsonCurlyBrace<{>
+	[21] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[22] JsonSpace<#[\JsonSpace]>
+	[23] JsonString<"type">
+	[24] JsonColon<:>
+	[25] JsonString<"number">
+	[26] JsonComma<,>
+	[27] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[28] JsonSpace<#[\JsonSpace]>
+	[29] JsonString<"description">
+	[30] JsonColon<:>
+	[31] JsonString<"Product identifier">
+	[32] JsonComma<,>
+	[33] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[34] JsonSpace<#[\JsonSpace]>
+	[35] JsonString<"required">
+	[36] JsonColon<:>
+	[37] JsonBool<true>
+	[38] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[39] JsonSpace<#[\JsonSpace]>
+	[40] JsonCurlyBrace<}>
+	[41] JsonComma<,>
+	[42] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[43] JsonSpace<#[\JsonSpace]>
+	[44] JsonString<"name">
+	[45] JsonColon<:>
+	[46] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonCurlyBrace<{>
+	[49] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[50] JsonSpace<#[\JsonSpace]>
+	[51] JsonString<"description">
+	[52] JsonColon<:>
+	[53] JsonString<"Name of the product">
+	[54] JsonComma<,>
+	[55] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[56] JsonSpace<#[\JsonSpace]>
+	[57] JsonString<"type">
+	[58] JsonColon<:>
+	[59] JsonString<"string">
+	[60] JsonComma<,>
+	[61] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[62] JsonSpace<#[\JsonSpace]>
+	[63] JsonString<"required">
+	[64] JsonColon<:>
+	[65] JsonBool<true>
+	[66] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[67] JsonSpace<#[\JsonSpace]>
+	[68] JsonCurlyBrace<}>
+	[69] JsonComma<,>
+	[70] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[71] JsonSpace<#[\JsonSpace]>
+	[72] JsonString<"price">
+	[73] JsonColon<:>
+	[74] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[75] JsonSpace<#[\JsonSpace]>
+	[76] JsonCurlyBrace<{>
+	[77] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[78] JsonSpace<#[\JsonSpace]>
+	[79] JsonString<"type">
+	[80] JsonColon<:>
+	[81] JsonString<"number">
+	[82] JsonComma<,>
+	[83] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[84] JsonSpace<#[\JsonSpace]>
+	[85] JsonString<"minimum">
+	[86] JsonColon<:>
+	[87] JsonNum<0>
+	[88] JsonComma<,>
+	[89] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[90] JsonSpace<#[\JsonSpace]>
+	[91] JsonString<"required">
+	[92] JsonColon<:>
+	[93] JsonBool<true>
+	[94] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[95] JsonSpace<#[\JsonSpace]>
+	[96] JsonCurlyBrace<}>
+	[97] JsonComma<,>
+	[98] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[99] JsonSpace<#[\JsonSpace]>
+	[100] JsonString<"tags">
+	[101] JsonColon<:>
+	[102] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[103] JsonSpace<#[\JsonSpace]>
+	[104] JsonCurlyBrace<{>
+	[105] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[106] JsonSpace<#[\JsonSpace]>
+	[107] JsonString<"type">
+	[108] JsonColon<:>
+	[109] JsonString<"array">
+	[110] JsonComma<,>
+	[111] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[112] JsonSpace<#[\JsonSpace]>
+	[113] JsonString<"items">
+	[114] JsonColon<:>
+	[115] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[116] JsonSpace<#[\JsonSpace]>
+	[117] JsonCurlyBrace<{>
+	[118] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[119] JsonSpace<#[\JsonSpace]>
+	[120] JsonString<"type">
+	[121] JsonColon<:>
+	[122] JsonString<"string">
+	[123] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[124] JsonSpace<#[\JsonSpace]>
+	[125] JsonCurlyBrace<}>
+	[126] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[127] JsonSpace<#[\JsonSpace]>
+	[128] JsonCurlyBrace<}>
+	[129] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[130] JsonSpace<#[\JsonSpace]>
+	[131] JsonCurlyBrace<}>
+	[132] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[133] JsonCurlyBrace<}>
+>>>
+json_text->(
+  { 
+	"name"
+		 : 
+			" 名 学校"
+        ,
+	"address": [
+       		 1 , "近义词"   
+	] 
+
+  }
+
+) <<<
+	[0] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[1] JsonSpace<#[\JsonSpace]>
+	[2] JsonCurlyBrace<{>
+	[3] JsonSpace<#[\JsonSpace]>
+	[4] JsonString<"name">
+	[5] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[6] JsonSpace<#[\JsonSpace]>
+	[7] JsonColon<:>
+	[8] JsonSpace<#[\JsonSpace]>
+	[9] JsonString<" 名 学校">
+	[10] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonComma<,>
+	[13] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[14] JsonSpace<#[\JsonSpace]>
+	[15] JsonString<"address">
+	[16] JsonColon<:>
+	[17] JsonSpace<#[\JsonSpace]>
+	[18] JsonSquareBracket<[>
+	[19] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[20] JsonSpace<#[\JsonSpace]>
+	[21] JsonNum<1>
+	[22] JsonSpace<#[\JsonSpace]>
+	[23] JsonComma<,>
+	[24] JsonSpace<#[\JsonSpace]>
+	[25] JsonString<"近义词">
+	[26] JsonSpace<#[\JsonSpace]>
+	[27] JsonSquareBracket<]>
+	[28] JsonSpace<#[\JsonSpace]>
+	[29] JsonCurlyBrace<}>
+	[30] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[31] JsonEscapeSeq<#[\JsonEscapeSeq]>
+>>>
+json_text->({"apiVersion":"2.0",
+ "data":{
+    "updated":"2010-01-07T19:58:42.949Z",
+    "totalItems":800,
+    "startIndex":1,
+    "itemsPerPage":1,
+    "items":[
+        {"id":"hYB0mn5zh2c",
+         "uploaded":"2007-06-05T22:07:03.000Z",
+         "updated":"2010-01-07T13:26:50.000Z",
+         "uploader":"GoogleDeveloperDay",
+         "category":"News",
+         "title":"Google Developers Day US - Maps API Introduction",
+         "description":"Google Maps API Introduction ...",
+         "tags":[
+            "GDD07","GDD07US","Maps"
+         ],
+         "thumbnail":{
+            "default":"http://i.ytimg.com/vi/hYB0mn5zh2c/default.jpg",
+            "hqDefault":"http://i.ytimg.com/vi/hYB0mn5zh2c/hqdefault.jpg"
+         },
+         "player":{
+            "default":"http://www.youtube.com/watch?v\u003dhYB0mn5zh2c"
+         },
+         "content":{
+            "1":"rtsp://v5.cache3.c.youtube.com/CiILENy.../0/0/0/video.3gp",
+            "5":"http://www.youtube.com/v/hYB0mn5zh2c?f...",
+            "6":"rtsp://v1.cache1.c.youtube.com/CiILENy.../0/0/0/video.3gp"
+         },
+         "duration":2840,
+         "aspectRatio":"widescreen",
+         "rating":4.63,
+         "ratingCount":68,
+         "viewCount":220101,
+         "favoriteCount":201,
+         "commentCount":22,
+         "status":{
+            "value":"restricted",
+            "reason":"limitedSyndication"
+         },
+         "accessControl":{
+            "syndicate":"allowed",
+            "commentVote":"allowed",
+            "rate":"allowed",
+            "list":"allowed",
+            "comment":"allowed",
+            "embed":"allowed",
+            "videoRespond":"moderated"
+         }
+        }
+    ]
+ }
+}) <<<
+	[0] JsonCurlyBrace<{>
+	[1] JsonString<"apiVersion">
+	[2] JsonColon<:>
+	[3] JsonString<"2.0">
+	[4] JsonComma<,>
+	[5] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[6] JsonSpace<#[\JsonSpace]>
+	[7] JsonString<"data">
+	[8] JsonColon<:>
+	[9] JsonCurlyBrace<{>
+	[10] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[11] JsonSpace<#[\JsonSpace]>
+	[12] JsonString<"updated">
+	[13] JsonColon<:>
+	[14] JsonString<"2010-01-07T19:58:42.949Z">
+	[15] JsonComma<,>
+	[16] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[17] JsonSpace<#[\JsonSpace]>
+	[18] JsonString<"totalItems">
+	[19] JsonColon<:>
+	[20] JsonNum<800>
+	[21] JsonComma<,>
+	[22] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[23] JsonSpace<#[\JsonSpace]>
+	[24] JsonString<"startIndex">
+	[25] JsonColon<:>
+	[26] JsonNum<1>
+	[27] JsonComma<,>
+	[28] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[29] JsonSpace<#[\JsonSpace]>
+	[30] JsonString<"itemsPerPage">
+	[31] JsonColon<:>
+	[32] JsonNum<1>
+	[33] JsonComma<,>
+	[34] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[35] JsonSpace<#[\JsonSpace]>
+	[36] JsonString<"items">
+	[37] JsonColon<:>
+	[38] JsonSquareBracket<[>
+	[39] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[40] JsonSpace<#[\JsonSpace]>
+	[41] JsonCurlyBrace<{>
+	[42] JsonString<"id">
+	[43] JsonColon<:>
+	[44] JsonString<"hYB0mn5zh2c">
+	[45] JsonComma<,>
+	[46] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[47] JsonSpace<#[\JsonSpace]>
+	[48] JsonString<"uploaded">
+	[49] JsonColon<:>
+	[50] JsonString<"2007-06-05T22:07:03.000Z">
+	[51] JsonComma<,>
+	[52] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[53] JsonSpace<#[\JsonSpace]>
+	[54] JsonString<"updated">
+	[55] JsonColon<:>
+	[56] JsonString<"2010-01-07T13:26:50.000Z">
+	[57] JsonComma<,>
+	[58] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[59] JsonSpace<#[\JsonSpace]>
+	[60] JsonString<"uploader">
+	[61] JsonColon<:>
+	[62] JsonString<"GoogleDeveloperDay">
+	[63] JsonComma<,>
+	[64] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[65] JsonSpace<#[\JsonSpace]>
+	[66] JsonString<"category">
+	[67] JsonColon<:>
+	[68] JsonString<"News">
+	[69] JsonComma<,>
+	[70] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[71] JsonSpace<#[\JsonSpace]>
+	[72] JsonString<"title">
+	[73] JsonColon<:>
+	[74] JsonString<"Google Developers Day US - Maps API Introduction">
+	[75] JsonComma<,>
+	[76] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[77] JsonSpace<#[\JsonSpace]>
+	[78] JsonString<"description">
+	[79] JsonColon<:>
+	[80] JsonString<"Google Maps API Introduction ...">
+	[81] JsonComma<,>
+	[82] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[83] JsonSpace<#[\JsonSpace]>
+	[84] JsonString<"tags">
+	[85] JsonColon<:>
+	[86] JsonSquareBracket<[>
+	[87] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[88] JsonSpace<#[\JsonSpace]>
+	[89] JsonString<"GDD07">
+	[90] JsonComma<,>
+	[91] JsonString<"GDD07US">
+	[92] JsonComma<,>
+	[93] JsonString<"Maps">
+	[94] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[95] JsonSpace<#[\JsonSpace]>
+	[96] JsonSquareBracket<]>
+	[97] JsonComma<,>
+	[98] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[99] JsonSpace<#[\JsonSpace]>
+	[100] JsonString<"thumbnail">
+	[101] JsonColon<:>
+	[102] JsonCurlyBrace<{>
+	[103] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[104] JsonSpace<#[\JsonSpace]>
+	[105] JsonString<"default">
+	[106] JsonColon<:>
+	[107] JsonString<"http://i.ytimg.com/vi/hYB0mn5zh2c/default.jpg">
+	[108] JsonComma<,>
+	[109] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[110] JsonSpace<#[\JsonSpace]>
+	[111] JsonString<"hqDefault">
+	[112] JsonColon<:>
+	[113] JsonString<"http://i.ytimg.com/vi/hYB0mn5zh2c/hqdefault.jpg">
+	[114] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[115] JsonSpace<#[\JsonSpace]>
+	[116] JsonCurlyBrace<}>
+	[117] JsonComma<,>
+	[118] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[119] JsonSpace<#[\JsonSpace]>
+	[120] JsonString<"player">
+	[121] JsonColon<:>
+	[122] JsonCurlyBrace<{>
+	[123] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[124] JsonSpace<#[\JsonSpace]>
+	[125] JsonString<"default">
+	[126] JsonColon<:>
+	[127] JsonString<"http://www.youtube.com/watch?vu003dhYB0mn5zh2c">
+	[128] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[129] JsonSpace<#[\JsonSpace]>
+	[130] JsonCurlyBrace<}>
+	[131] JsonComma<,>
+	[132] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[133] JsonSpace<#[\JsonSpace]>
+	[134] JsonString<"content">
+	[135] JsonColon<:>
+	[136] JsonCurlyBrace<{>
+	[137] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[138] JsonSpace<#[\JsonSpace]>
+	[139] JsonString<"1">
+	[140] JsonColon<:>
+	[141] JsonString<"rtsp://v5.cache3.c.youtube.com/CiILENy.../0/0/0/video.3gp">
+	[142] JsonComma<,>
+	[143] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[144] JsonSpace<#[\JsonSpace]>
+	[145] JsonString<"5">
+	[146] JsonColon<:>
+	[147] JsonString<"http://www.youtube.com/v/hYB0mn5zh2c?f...">
+	[148] JsonComma<,>
+	[149] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[150] JsonSpace<#[\JsonSpace]>
+	[151] JsonString<"6">
+	[152] JsonColon<:>
+	[153] JsonString<"rtsp://v1.cache1.c.youtube.com/CiILENy.../0/0/0/video.3gp">
+	[154] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[155] JsonSpace<#[\JsonSpace]>
+	[156] JsonCurlyBrace<}>
+	[157] JsonComma<,>
+	[158] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[159] JsonSpace<#[\JsonSpace]>
+	[160] JsonString<"duration">
+	[161] JsonColon<:>
+	[162] JsonNum<2840>
+	[163] JsonComma<,>
+	[164] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[165] JsonSpace<#[\JsonSpace]>
+	[166] JsonString<"aspectRatio">
+	[167] JsonColon<:>
+	[168] JsonString<"widescreen">
+	[169] JsonComma<,>
+	[170] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[171] JsonSpace<#[\JsonSpace]>
+	[172] JsonString<"rating">
+	[173] JsonColon<:>
+	[174] JsonNum<4.63>
+	[175] JsonComma<,>
+	[176] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[177] JsonSpace<#[\JsonSpace]>
+	[178] JsonString<"ratingCount">
+	[179] JsonColon<:>
+	[180] JsonNum<68>
+	[181] JsonComma<,>
+	[182] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[183] JsonSpace<#[\JsonSpace]>
+	[184] JsonString<"viewCount">
+	[185] JsonColon<:>
+	[186] JsonNum<220101>
+	[187] JsonComma<,>
+	[188] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[189] JsonSpace<#[\JsonSpace]>
+	[190] JsonString<"favoriteCount">
+	[191] JsonColon<:>
+	[192] JsonNum<201>
+	[193] JsonComma<,>
+	[194] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[195] JsonSpace<#[\JsonSpace]>
+	[196] JsonString<"commentCount">
+	[197] JsonColon<:>
+	[198] JsonNum<22>
+	[199] JsonComma<,>
+	[200] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[201] JsonSpace<#[\JsonSpace]>
+	[202] JsonString<"status">
+	[203] JsonColon<:>
+	[204] JsonCurlyBrace<{>
+	[205] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[206] JsonSpace<#[\JsonSpace]>
+	[207] JsonString<"value">
+	[208] JsonColon<:>
+	[209] JsonString<"restricted">
+	[210] JsonComma<,>
+	[211] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[212] JsonSpace<#[\JsonSpace]>
+	[213] JsonString<"reason">
+	[214] JsonColon<:>
+	[215] JsonString<"limitedSyndication">
+	[216] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[217] JsonSpace<#[\JsonSpace]>
+	[218] JsonCurlyBrace<}>
+	[219] JsonComma<,>
+	[220] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[221] JsonSpace<#[\JsonSpace]>
+	[222] JsonString<"accessControl">
+	[223] JsonColon<:>
+	[224] JsonCurlyBrace<{>
+	[225] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[226] JsonSpace<#[\JsonSpace]>
+	[227] JsonString<"syndicate">
+	[228] JsonColon<:>
+	[229] JsonString<"allowed">
+	[230] JsonComma<,>
+	[231] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[232] JsonSpace<#[\JsonSpace]>
+	[233] JsonString<"commentVote">
+	[234] JsonColon<:>
+	[235] JsonString<"allowed">
+	[236] JsonComma<,>
+	[237] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[238] JsonSpace<#[\JsonSpace]>
+	[239] JsonString<"rate">
+	[240] JsonColon<:>
+	[241] JsonString<"allowed">
+	[242] JsonComma<,>
+	[243] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[244] JsonSpace<#[\JsonSpace]>
+	[245] JsonString<"list">
+	[246] JsonColon<:>
+	[247] JsonString<"allowed">
+	[248] JsonComma<,>
+	[249] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[250] JsonSpace<#[\JsonSpace]>
+	[251] JsonString<"comment">
+	[252] JsonColon<:>
+	[253] JsonString<"allowed">
+	[254] JsonComma<,>
+	[255] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[256] JsonSpace<#[\JsonSpace]>
+	[257] JsonString<"embed">
+	[258] JsonColon<:>
+	[259] JsonString<"allowed">
+	[260] JsonComma<,>
+	[261] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[262] JsonSpace<#[\JsonSpace]>
+	[263] JsonString<"videoRespond">
+	[264] JsonColon<:>
+	[265] JsonString<"moderated">
+	[266] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[267] JsonSpace<#[\JsonSpace]>
+	[268] JsonCurlyBrace<}>
+	[269] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[270] JsonSpace<#[\JsonSpace]>
+	[271] JsonCurlyBrace<}>
+	[272] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[273] JsonSpace<#[\JsonSpace]>
+	[274] JsonSquareBracket<]>
+	[275] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[276] JsonSpace<#[\JsonSpace]>
+	[277] JsonCurlyBrace<}>
+	[278] JsonEscapeSeq<#[\JsonEscapeSeq]>
+	[279] JsonCurlyBrace<}>
+>>>

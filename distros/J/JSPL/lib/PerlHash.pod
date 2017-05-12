@@ -1,0 +1,121 @@
+=head1 NAME
+
+PerlHash - Encapsulate a perl HASH in JavaScript space
+
+Perl HASH references are seen in javascript as C<PerlHash> instances. 
+
+=head1 JAVASCRIPT INTERFACE
+
+When a perl HASH enters javascript you'll get an instance of C<PerlHash>.
+These objects will behave just like common javascript objects.
+
+For example, you can use them in C<for...in> or C<for each...in> javascript
+statements or access its properties with C<hash.foo> or C<hash['foo']>
+expressions.
+
+These objects have two important characteristics:
+
+=over 4
+
+=item *
+
+They are connected to their perl counterpart. Changes to this objects will be
+observable on the original perl HASH. If the hash has perl magic, for example
+if it is C<tied>, any access from javascript to the hash will invoke the
+associated magic in perl.
+
+For example you can expose the program arguments to javascript:
+
+    $ctx->bind_value(Env => \%ENV); 
+
+
+=item *
+
+Every perl HASH has a single javascript C<PerlHash> instance. No matter how the
+perl HASH enters javascript: passed as an argument to a javascript function,
+returned by a subroutine, binded from perl to a global object property, etc....
+No matter how many times the same perl HASH enters javascript. It will always
+get the I<same> (C<==> and C<===>-wise) C<PerlHash> instance.
+
+=back
+
+
+=head2 Constructor
+
+    phash = new PerlHash(...);
+
+You can create new perl HASHes in javascript.
+
+The arguments, if any, are taken as KEY/VALUE pairs to populate the HASH.
+
+    var ahash = new PerlHash('foo', 1, 'bar', 'hi');
+
+When those objects land in perl space they will be normal (without any "magic")
+perl HASHes, nobody can distinguish its origin.
+
+Common javascript objects will be seen in perl as HASHes too, but can be
+perl code that I<needs> a HASH without any magic.  To convert a javascript
+object to a PerlHash you can use something like:
+
+    function Object2PH(obj) {
+	// A simple "one level deep copy"
+	var ph = new PerlHash();
+	for(var key in obj) {
+	    ph[key] = obj[key];
+	}
+	return ph;
+    }
+
+    perl_func_that_need_a_real_hash_ref(
+	Object2PH( {foo: 1, bar: 'hi'} )
+    );
+
+=head2 Properties
+
+Every key in the associated perl HASH becomes an own property in the PerlHash.
+As you can expect, the value of the property is the value of that key in the
+perl HASH.
+
+When you add a new property, you are adding a new C<< key => value >> pair to the
+associated perl HASH.
+
+When you delete a property, you are deleting it from the perl HASH.
+
+=head2 Methods
+
+If the perl HASH has a subroutine reference stored in some key, it will be
+called if the corresponding property is used as a method call. Instances of
+C<PerlHash> originally don't have any methods by themselves. 
+
+C<PerlHash> instances inherit the following methods from C<PerlHash.prototype>:
+
+=over 4
+
+=item toSource ( )
+
+Returns a string that when evaluated recreated the PerlHash.
+
+    // Assuming 'ahash' is defined above
+    say(ahash.toSource()); // prints "new PerlHash('foo',1,'bar','hi')"
+
+=back
+
+As with all javascript objects you can change its constructor's prototype
+object (C<PerlHash.prototype>) to make changes to all C<PerlHash> instances.
+
+=head1 PERL INTERFACE
+
+=head2 PACKAGE VARIABLES
+
+=over 4
+
+=item $construct_blessed
+
+When you set the variable I<$JSPL::PerlHash::construct_blessed> to a TRUE value, you are
+turning on the Claes's JavaScript compatibility mode. This affects the behavior
+of the javascript C<PerlHash> constructor.
+
+This feature can be removed at any time. I strongly recommend against using it.
+Read "Migrating from JavaScript.txt" for the details.
+
+=back

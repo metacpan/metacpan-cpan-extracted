@@ -1,0 +1,8 @@
+# just some stuff ...
+
+index_title: Chicken JavaScript Template Library Testing
+import_libs:
+  - lib/jQuery.js
+  - ../lib/JS/Chicken.js
+  - lib/Test/Chicken.js  
+

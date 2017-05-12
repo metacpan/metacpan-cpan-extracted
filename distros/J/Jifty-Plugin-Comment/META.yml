@@ -1,0 +1,30 @@
+---
+abstract: 'Add comments to any record'
+author:
+  - 'Andrew Sterling Hanenkamp, C<< <hanenkamp@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Comment
+no_index:
+  directory:
+    - share
+    - share
+    - inc
+    - t
+requires:
+  CGI::Cookie: 0
+  HTML::Scrubber: 0
+  Jifty: 0.90409
+  MIME::Base64::URLSafe: 0
+  Regexp::Common: 0
+  Regexp::Common::Email::Address: 0
+  Regexp::Common::URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

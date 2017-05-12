@@ -1,0 +1,459 @@
+{
+  "id": "https://github.com/dnmfarrell/Settlers-Game-Notation/schema/message.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {
+    "tCode": {
+      "type": "string",
+      "enum": ["D", "F", "FO", "H", "M", "P", "S"]
+    },
+    "rNumber": {
+      "type": ["integer", "null"],
+      "minimum": 2,
+      "maximum": 12
+    },
+    "tile": {
+      "type": "array",
+      "minSize": 2,
+      "maxSize": 2,
+      "items": {
+        "type": "integer"
+      }
+    },
+    "intersection": {
+      "type": "array",
+      "minSize": 3,
+      "maxSize": 3,
+      "items": {
+        "$ref": "#/definitions/tile"
+      }
+    },
+    "path": {
+      "type": "array",
+      "minSize": 2,
+      "maxSize": 2,
+      "items": {
+        "$ref": "#/definitions/intersection"
+      }
+    },
+    "hCode": {
+      "type": "string",
+      "enum": ["HR", "HRB", "HRG", "HRL", "HRO", "HRW"]
+    },
+    "tiles": {
+      "type": "array",
+      "minSize": 37,
+      "items": {
+        "type": "object",
+        "allOf": [{
+          "$ref": "#/definitions/tile"
+        }, {
+          "$ref": "#/definitions/tile"
+        }, {
+          "$ref": "#/definitions/tile"
+        }]
+      }
+    },
+    "harbors": {
+      "type": "array",
+      "minSize": 8,
+      "items": {
+        "type": "object",
+        "allOf": [{
+          "$ref": "#/definitions/path"
+        }, {
+          "$ref": "#/definitions/hCode"
+        }]
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "player": {
+            "type": "string"
+          },
+          "B": {
+            "type": "integer"
+          },
+          "G": {
+            "type": "integer"
+          },
+          "L": {
+            "type": "integer"
+          },
+          "O": {
+            "type": "integer"
+          },
+          "W": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "cCode": {
+      "type": "string",
+      "enum": ["KN", "MO", "RB", "VP", "YP"]
+    },
+    "phase": {
+      "type": "string",
+      "enum": ["Setup", "Deployment", "Play", "End"]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "uuid": {
+      "type": "string"
+    },
+    "player": {
+      "type": "string"
+    },
+    "batch": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "event": { "type": "string" },
+      "value": { "type": "object" }
+    }
+  },
+  "required": ["uuid", "player", "event", "value"],
+  "oneOf": [{
+    "properties": {
+      "event": { "pattern": "^BC$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "intersection": {"$ref": "#/definitions/intersection" }
+        },
+        "required": ["intersection"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^BD$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "cCode": {"$ref": "#/definitions/cCode" }
+        },
+        "required": ["cCode"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^BR$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "path": {"$ref": "#/definitions/path" }
+        },
+        "required": ["path"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^BS$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "intersection": {"$ref": "#/definitions/intersection" }
+        },
+        "required": ["intersection"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^CH$" },
+      "value": {
+        "properties": {
+          "msg": {
+            "type": "string"
+          }
+        },
+        "required": ["msg"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^CR$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^DR$" },
+      "value": {
+        "properties": {
+          "result": {
+            "type": "integer",
+            "minimum": 2,
+            "maximum": 12
+          }
+        },
+        "required": ["result"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^GO$" },
+      "value": {}
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^LA$" },
+      "value": {
+        "properties": {
+          "strength": {
+            "type": "integer"
+          }
+        },
+        "required": ["strength"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^LR$" },
+      "value": {
+        "properties": {
+          "length": {
+            "type": "integer"
+          }
+        },
+        "required": ["length"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^MD$" },
+      "value": {
+        "$ref": "#/definitions/tiles",
+        "$ref": "#/definitions/harbors"
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^MO$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^PA$" },
+      "value": {
+        "properties": {
+          "player": {
+            "type": "string"
+          }
+        },
+        "required": ["player"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^PD$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "cCode": {"$ref": "#/definitions/cCode" }
+        },
+        "required": ["cCode"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^PE$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "phase": {"$ref": "#/definitions/phase" }
+        },
+        "required": ["phase"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^PS$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "phase": {"$ref": "#/definitions/phase" }
+        },
+        "required": ["phase"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RA$" },
+      "value": {}
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RD$" },
+      "value": {}
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RE$" },
+      "value": {
+        "properties": {
+          "round": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["round"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RS$" },
+      "value": {
+        "properties": {
+          "round": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "required": ["round"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RM$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "tile": {"$ref": "#/definitions/tile" }
+        },
+        "required": ["tile"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RP$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^RR$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TA$" },
+      "value": {
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "required": ["uuid"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TD$" },
+      "value": {
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "required": ["uuid"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TC$" },
+      "value": {
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        },
+        "required": ["uuid"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TB$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TO$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TE$" },
+      "value": {}
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TS$" },
+      "value": {}
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^TR$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" },
+          "uuid": { "type": "string" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }, {
+    "properties": {
+      "event": { "pattern": "^YP$" },
+      "value": {
+        "type": "object",
+        "properties": {
+          "resources": {"$ref": "#/definitions/resources" }
+        },
+        "required": ["resources"]
+      }
+    }
+  }]
+}

@@ -1,0 +1,31 @@
+utils/jaipo-notify-libnotify-test.pl
+bin/jaipo-jaiku.pl
+bin/jaipo
+bin/jaipo.pl
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-config.t
+t/00-load.t
+t/02-console.t
+AUTHORS
+MANIFEST
+Changes
+lib/Jaipo.pm
+lib/Jaipo/Service/Jaiku.pm
+lib/Jaipo/Service/Twitter.pm
+lib/Jaipo/Service/Plurk.pm
+lib/Jaipo/Config.pm
+lib/Jaipo/Filter.pm
+lib/Jaipo/Notify/MacGrowl.pm
+lib/Jaipo/Notify/LibNotify.pm
+lib/Jaipo/Service.pm
+lib/Jaipo/Notify.pm
+lib/Jaipo/Logger.pm
+lib/Jaipo/UI/Console.pm
+lib/Jaipo/UI.pm
+README
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

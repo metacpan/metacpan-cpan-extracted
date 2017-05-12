@@ -1,0 +1,31 @@
+gutil-JSON2-XS version 0.15.0
+===========================
+
+Thin wrapper around fast JSON::XS that makes each JSON fields as string, and Perl fields as bytes (utf8 octet)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014-2016 by cindy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

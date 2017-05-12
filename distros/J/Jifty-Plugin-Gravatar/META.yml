@@ -1,0 +1,22 @@
+---
+author: ~
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Gravatar
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Cache::File: 0
+  Gravatar::URL: 0
+  Jifty: 0.90220
+  LWP::Simple: 0
+version: 0.02

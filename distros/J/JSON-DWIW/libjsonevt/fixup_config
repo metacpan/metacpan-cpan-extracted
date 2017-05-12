@@ -1,0 +1,43 @@
+#!/bin/sh
+
+perl_run=$1
+
+if [ "x$perl_run" == "x" ]; then
+    for p in /usr/local/bin/perl /usr/bin/perl; do
+	if [ -e $p ]; then
+	    perl_run=$p
+	    break
+	fi
+    done
+fi
+
+if [ "x$perl_run" != "x" ]; then
+
+    echo "/* jsonevt_config.h.  Generated from config.h by fixup_config. */" > jsonevt_config.h
+
+    grep -v ' VERSION ' config.h | grep -v ' PACKAGE ' | \
+	$perl_run -p -e 's/(#define|#undef)\s+(HAVE_)/$1 JSONEVT_DEF_$2/g; s/(#define|#undef)\s+(STDC_HEADERS|TIME_WITH_SYS_TIME)/$1 JSONEVT_DEF_HAVE_$2/g; s/(#define|#undef)\s+(PACKAGE_.*)/$1 JSONEVT_$2/g;' >> jsonevt_config.h
+
+else
+
+    echo "/* jsonevt_config.h.  Generated from config.h by fixup_config. */" > jsonevt_config.h
+
+grep -v ' VERSION ' config.h | grep -v ' PACKAGE ' | 
+     sed '/\(#define\|#undef\) \(HAVE_\)/{ 
+         s//\1 JSONEVT_DEF_\2/ 
+     } 
+     /\(#define\|#undef\) \(STDC_HEADERS\|TIME_WITH_SYS_TIME\)/{ 
+         s//\1 JSONEVT_DEF_HAVE_\2/      
+     } 
+     /\(#define\|#undef\) \(PACKAGE_VERSION\)/{ 
+         s//\1 JSONEVT_VERSION/ 
+     }   
+     /\(#define\|#undef\) \(PACKAGE_.*\)/{ 
+         s//\1 JSONEVT_\2/ 
+     } 
+     ;' >> jsonevt_config.h 
+ 
+
+
+fi
+

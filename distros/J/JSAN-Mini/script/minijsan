@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+# This will be pretty boring till we get some options in here
+
+use 5.006;
+use strict;
+use JSAN::Mini;
+
+our $VERSION = '1.04';
+
+JSAN::Mini->update_mirror;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+minijsan - Create and maintain a minimal local mirror of the JSAN
+
+=head1 SYNOPSIS
+
+  > minijsan
+  Starting JSAN::Mini...
+  Loading JSAN::Index...
+  Mirroring /index.sqlite...done
+  Adding new releases...
+  Mirroring /dist/ADAMK/Display.Swap-0.01.tar.gz...done
+  Added new release.
+  Stopping JSAN::Mini...done
+  
+  >
+
+=head1 DESCRIPTION
+
+C<minijsan> is an application for creating a minimal local mirror of only
+the releases that might actually be needed to install the libraries in the
+JSAN index (rather than mirroring all files in JSAN).
+
+It currently implements only minimal functionality, and will only work
+with L<JSAN::Client> based systems (which the main jsan shell isn't yet),
+but does do what it is meant to.
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Mini>
+
+For other issues, contact the author.
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2005, 2009 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

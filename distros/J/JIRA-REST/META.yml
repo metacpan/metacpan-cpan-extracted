@@ -1,0 +1,38 @@
+---
+abstract: "Thin wrapper around JIRA's REST API"
+author:
+  - 'Gustavo L. de M. Chaves <gnustavo@cpan.org>'
+build_requires:
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JIRA-REST
+recommends:
+  HTTP::Status: '0'
+  Net::Netrc: '0'
+requires:
+  Carp: '0'
+  Config::Identity: '0.0019'
+  HTML::TreeBuilder: '0'
+  HTTP::Status: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  Net::Netrc: '0'
+  REST::Client: '0'
+  URI: '0'
+  URI::Escape: '0'
+  perl: 5.008_008
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: https://metacpan.org/module/JIRA::REST
+  repository: https://github.com/gnustavo/JIRA-REST.git
+version: '0.017'

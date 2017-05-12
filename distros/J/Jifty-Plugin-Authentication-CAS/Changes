@@ -1,0 +1,10 @@
+Revision history for Perl module Jifty::Plugin::Authentication::CAS
+
+1.00 Wed, 10 Jun 2009 11:46:12 +0200
+    - bump version number to avoid conflict with debian
+
+0.10 Tue, 09 Jun 2009 20:29:15 +0200
+    - mistake in test path
+
+0.9  Tue, 15 May 2009 10:09:50 +0200
+    - original version for CPAN

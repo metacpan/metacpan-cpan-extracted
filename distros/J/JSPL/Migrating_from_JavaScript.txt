@@ -1,0 +1,41 @@
+Migrating code written for JavaScript.pm to JSPL
+
+= Exception Handling
+
+JSPL and Jackobsson's JavaScript module differ on how they throw exceptions:
+
+In JavaScript, when an error occurred inside javascript code (and was not
+trapped by a C<try ... catch>), the operation returned C<undef> and C<$@> was
+set. But this can lead to unnoticed errors.
+
+In JSPL the handling of exceptions uses a more regular mechanism.
+Errors in both languages always throw exceptions. Period.
+
+As this is an incompatible change, if you have code that depends on the
+previous behaviour, you can revert to it by setting context's option
+C<RaiseExceptions> to a FALSE value. Please see L<JSPL::Context/RaiseEceptions>.
+
+
+= PerlArray and PerlHash classes
+
+JSPL's classes PerlArray and PerlHash have a class property: $construct_blessed.
+You can set it to a TRUE value to turn on the Claes's JavaScript compatibility
+mode.
+
+This affect the behavior of the javascript C<PerlArray> constructor because
+when the PerlArray instance constructed in this mode arrives to perl space
+it will be a C<JSPL::PerlArray> instance, not a very useful thing.
+
+If in some other place of your code you need to known if legacy support mode is
+active or modify it, you can:
+
+    if($JSPL::PerlArray::construct_blessed) {
+	# In legacy support mode
+	# Turns it off;
+	local $JSPL::PerlArray::construct_blessed = undef;
+	# Now you can call js code that creates perl arrays with out worry
+	...
+    }
+
+As this is an interim back compatibility feature, we strongly recommend you to
+port your code, and forget about instances of C<JSPL::PerlArray> in perl.

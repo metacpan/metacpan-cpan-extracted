@@ -1,0 +1,11 @@
+`JSON-Hyper`
+	version_from      m`JSON::Hyper`;
+	readme_from       m`JSON::Hyper`;
+	perl_version_from m`JSON::Hyper`;
+	test_requires     p`Test::More 0.61`;
+	requires          p`JSON 2.00`;
+	requires          p`JSON::Path`;
+	requires          p`LWP::UserAgent`;
+	requires          p`URI 1.30`;
+	requires          p`URI::Escape`;
+.

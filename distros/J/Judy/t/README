@@ -1,0 +1,7 @@
+Test organization:
+
+0*: sanity
+10: basic API
+20: peek/poke+searching
+30: extra API
+40: misc

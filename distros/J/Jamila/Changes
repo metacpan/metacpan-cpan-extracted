@@ -1,0 +1,14 @@
+Revision history for Perl extension Jamila.
+
+0.03  Fri Sep 25 12:00:00 2009
+	- Add : Sample of InfoPath(Jamila.xsn) with VB.NET
+	- Fix : Add LWP dependence in Makefile.PL 
+  
+0.02  Fri Jul 31 15:00:00 2009
+	- Fix : enable to return undef value from Jamila.pm
+	- Change : URI encoding function Jamila.js, Jamila.xls
+  
+0.01  Wed Jul 15 16:59:42 2009
+	- original version; created by h2xs 1.23 with options
+		-AX -n Jamila
+

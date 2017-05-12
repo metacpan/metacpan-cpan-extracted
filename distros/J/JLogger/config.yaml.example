@@ -1,0 +1,12 @@
+transport:
+    JLogger::Transport::AnyEvent:
+        host: logger.server.com
+        port: 5526
+        secret: secret
+storages:
+    - JLogger::Storage::Dumper
+filters:
+    - JLogger::Filter::FieldRegexp:
+        fields:
+            from: "^user@server.com"
+            to: "^user@server.com"

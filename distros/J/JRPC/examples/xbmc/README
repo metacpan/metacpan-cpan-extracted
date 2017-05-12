@@ -1,0 +1,20 @@
+# XBMC JSON-RPC
+
+Guides:
+
+- http://wiki.xbmc.org/?title=JSON-RPC_API
+
+Webserver / HTTP Control interface has to be separately enabled.
+
+Set Content-type to "application/json"
+
+http://wiki.xbmc.org/index.php?title=JSON-RPC_API/v6
+XBMC v12 (Frodo) and v13 (Gotham)
+
+Example for Interfacing
+
+Examples: http://wiki.xbmc.org/index.php?title=JSON-RPC_API/Examples
+
+With jrpc_client.pl
+./jrpc_client.pl --url http://odroid:10000/jsonrpc --parafile "VideoLibrary.GetMovies.json" --method "VideoLibrary.GetMovies"
+

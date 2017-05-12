@@ -1,0 +1,30 @@
+<html>
+<head>
+  <script type="text/javascript" src="./lib/JSAN.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+new JSAN("../lib").use("Test.Harness.Browser");
+new Test.Harness.Browser('./lib/JSAN.js').encoding('utf-8').runTests(
+    'async.js',
+    'bad_plan.js',
+    'buffer.js',
+    'builder.js',
+    'builder_death.js',
+    'circular_data.js',
+    'curr_test.js',
+    'details.js',
+    'diag.js',
+    'instance.js',
+    'jsan.js',
+    'harness.js',
+    'more.js',
+    'output.js',
+    'simple.html',
+    'simpler.html',
+    'simple.js',
+    'test_result.js'
+);
+</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+---
+abstract: 'jabber messages logger'
+author:
+  - 'Sergey Zasenko'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JLogger
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent::XMPP: 0
+  Class::Load: 0
+  DBI: 0
+  DBIx::Connector: 0
+  YAML: 0
+  perl: 5.8.1
+resources:
+  bugtracker: https://github.com/und3f/jlogger/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/und3f/jlogger
+version: 1.001

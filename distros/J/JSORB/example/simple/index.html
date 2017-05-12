@@ -1,0 +1,22 @@
+<html>
+<head>
+<script language="javascript" src="../js/jquery-1.2.6.js"></script>
+<script language="javascript" src="../js/json2.js"></script>
+<script language="javascript" src="../../lib/JS/JSORB.js"></script>
+<script language="javascript" src="MathSimple.js"></script>
+<script language="javascript">
+
+var math = new Math.Simple( 'http://localhost:9999/' );
+
+math.add( 2, 2, function (result) { alert(result) } );
+
+</script>
+</head>
+<body>
+<h1>JSORB Test</h1>
+<p>
+You may have security issues with this test since sometimes
+a file:// URL is not allowed to access a AJAX url.
+</p>
+</body>
+</html>

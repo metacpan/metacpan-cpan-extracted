@@ -1,0 +1,395 @@
+=head1 NAME
+
+JE::Types - JavaScript types and objects
+
+This is just documentation, not a module.
+
+=head1 DESCRIPTION
+
+The various JavaScript types and objects are represented by Perl
+classes in JE (which are listed below).  This document describes the basic 
+interface implemented by
+these classes.  Information specific to each class can be found on its own
+manual page.
+
+=head1 UPGRADING VALUES
+
+When a value is passed from Perl to JavaScript, it will be "upgraded" to a 
+Perl object
+representing a JavaScript value.  This is done by the C<upgrade> method of
+the global object.
+
+If the value to be upgraded is a blessed reference, and the class into
+which it is blessed has been bound using JE's C<bind_class> method, it is
+wrapped up in a proxy object that provides the methods JS needs.  A blessed
+reference whose class has not been bound will be
+left alone (we assume you know what you are doing). 
+Otherwise the
+conversion is as follows:
+
+  From            To
+  -------------------------
+  undef           undefined
+  array ref       Array
+  hash ref        Object
+  code ref        Function
+  '0'             number
+  other scalar    string
+
+B<WARNING:> The 'upgrading' of simple scalars (strings/numbers) and regexps
+is still 
+subject to change.
+
+B<To do:> Make &JE::upgrade detect whether a simple scalar is a string or 
+number.
+
+B<To do:> Convert Regexp objects to
+JE::Object::RegExp objects.
+
+=head1 WHICH CLASSES ARE WHICH
+
+Each built-in JavaScript class or primitive type is a Perl class 
+underneath. Here 
+is the complete list of object classes:
+
+  JavaScript   Perl
+  -----------------
+  Object          JE::Object
+  Function        JE::Object::Function
+  Array           JE::Object::Array
+  String          JE::Object::String
+  Boolean         JE::Object::Boolean
+  Number          JE::Object::Number
+  Date            JE::Object::Date
+  RegExp          JE::Object::RegExp
+  Error           JE::Object::Error
+  RangeError      JE::Object::Error::RangeError
+  ReferenceError  JE::Object::Error::ReferenceError
+  SyntaxError     JE::Object::Error::SyntaxError
+  TypeError       JE::Object::Error::TypeError
+  URIError        JE::Object::Error::URIError
+  
+And here are the primitive types:
+
+  string          JE::String
+  number          JE::Number
+  boolean         JE::Boolean
+  null            JE::Null
+  undefined       JE::Undefined
+
+And I might also mention a few special cases:
+
+  Global              JE
+  Math                JE::Object::Math
+  Arguments           JE::Object::Function::Arguments
+  Function scope      JE::Object::Function::Call
+  RegExp constructor  JE::Object::Function::RegExpConstructor
+
+The last three are for internal use. 
+  
+=head1 PUBLIC API
+
+=head2 Using JS Values as Scalars
+
+Every JS data type can be used as a string, boolean or number.  It works
+exactly as it does in JavaScript.  For example:
+
+  $num = $je->eval('42');
+  $num2 = $je->eval('NaN');
+  print $num2; # prints NaN
+  print 0+$num2; # prints nan or NaN, depending or your system
+                 # (or something really weird on Windows).
+
+  $zero_str = $je->eval("'0'");
+  print "true" if $zero_str; # prints 'true'
+  print "false" unless 0+$zero_str; # prints 'false'
+
+  $false = $je->eval('false');
+  print $false; # prints 'false'
+  print "false" unless $false; # also prints 'false'
+
+=head2 Property Access
+
+To access the property of a JS object,
+or of the
+JS environment itself (i.e., a global variable), just use it as a hash ref:
+
+  $je->{String};    # gives you the String constructor function
+  $je->{undefined}; # the undefined value
+  my $obj = $je->eval('var obj = new Object; return obj');
+  $obj->{foo} = 'bar';
+
+C<keys> will return a list of the object's enumerable properties, including
+those inherited from its prototype.  The following example prints
+S<'baz foo '>:
+
+  $obj = $je->eval('Object.prototype.foo="bar"; ({baz:43}) ');
+  print "$_ " for keys %$obj;
+
+C<exists> and C<delete> act upon properties of the object itself, ignoring
+those of
+its prototype, so C<< exists $obj->{foo} >> will return false.
+
+=head2 Calling Methods
+
+To call a method on an object or primitive data type, use the C<method>
+method:
+
+  my $number = $je->eval('42');
+  $number->method('toString', 16); # returns the number in hexadecimal
+
+=head2 Calling Functions
+
+Just use a function as though it were a coderef:
+
+  $je->{Array}->();
+
+If you need to specify the invocant ('this' value), use the C<call_with>
+method:
+
+  $je->{Number}{prototype}{toString}->call_with($je->eval('42'), 16);
+
+=head2 Just Getting a Simple Perl Scalar
+
+To convert one of the fancy objects returned by JE into a simple Perl
+value, use the C<value> method.
+
+  $number->value; # simple Perl scalar
+  $str->value;    # likewise
+  $obj->value;    # hash ref
+  $array->value;  # array ref
+
+Currently the C<value> method of objects and arrays is not recursive, but
+I plan to make it so later on.  The only way to get consistent behaviour
+between this and future versions is to pass C<< recursive => 0 >> as
+arguments.
+
+=head1 DATA TYPE API (in more detail)
+
+If you are going to write your own custom data types, proxy objects, or
+subclasses of JE's classes, you'll need to read
+this.  If not, you shouldn't need to, but you might like to anyway. :-)
+
+Be warned that some of the methods described here can be hard
+to use, and can easily result in code that's hard to debug, if misused.
+This applies to those that expect their arguments already to be objects
+compatible with the JE::Types interface.  If you are not sure that a value you have is such, run it through the global object's C<upgrade> method (or
+just use the L</PUBLIC API>, above).
+
+These are the methods that the JavaScript engine itself uses (as opposed
+to those provided for convenient access from the Perl side).  Each class 
+provides whichever of the following methods are applicable.  If
+an object does not support a particular method, a TypeError will be thrown
+when JavaScript code (indirectly) tries to call that method.  (For
+instance,
+C<'some_string'()> will attempt to call the C<call> method of JE::String,
+thus resulting in a TypeError).
+
+=over 4
+
+=item prop($name)
+
+=item prop($name, $new_value)
+
+Gets or sets a property.  Setting a property returns the new
+value.  The return value will be a Perl undef if the
+property does not exist.  See also L<JE::Object>, for the
+S<< C<prop({ ... })> >> usage.
+
+The new value is expected already to be an object compatible with the
+JE::Types interface.
+
+=item keys
+
+Returns a list of the names of enumerable properties.  This is a list of
+Perl strings, not JE::Strings.
+
+=item delete($name)
+
+Deletes the property named $name, if it is deletable.  If the property did 
+not exist or it was deletable, then
+true is returned.  If the property exists and could not be deleted, false
+is returned.
+
+L<JE::Object> will also take a second argument, that allows one to
+indicate whether an undeletable property should be deleted.  This is
+required by custom classes if the object in question is the global object.
+
+The return value is a Perl scalar, not a JE::Boolean.
+
+=item value
+
+This returns a value that is supposed to be useful in Perl.  The 
+C<< value >> method of a JE::Object::Array,
+for instance, produces an array ref.
+
+=item call(@args)
+
+Runs the code associated with the object if it is a function.
+The arguments are passed as-is, and are not upgraded.
+
+=item apply($obj, @args)
+
+Runs the code associated with the object if it is a function.  C<$obj> will
+be passed to the function as its invocant (its 'this' value).
+The arguments are passed, as-is, and are not upgraded.
+
+=item construct(@args)
+
+This is just like calling a function
+in JS with the C<new> keyword (which itself calls this method).  It calls 
+the constructor, if this 
+function has one (functions written in JS
+don't have this).  Otherwise, an empty object will be created and passed to 
+the 
+function as its invocant.  The return value of the function will be
+returned if it is an object.  Otherwise it will be discarded, and the
+object 
+originally passed to the function will be returned instead (possibly 
+modified).
+
+=begin comment
+
+NOTE: I need to copy parts of this to those classes that don't describe the
+C<new> method, before I go and delete it.
+
+=item I<Class>->new($global_obj, @args)
+
+The C<@args> are in the same order that they are passed to the constructor
+function in JavaScript (for objects, not primitives.  For primitive
+classes, 
+there should be only two
+arguments, the global object and the value).
+
+Some object classes also provide a hash ref syntax.  See each object
+class's
+respective man page.
+
+User-defined classes do not need to accept arguments in the same order as
+those that come with JE.  They can do whatever they like.
+
+=end comment
+
+=item exists($property_name)
+
+Returns a boolean indicating whether the property exists and is not
+inherited from a prototype.  Used by 
+C<Object.prototype.hasOwnProperty>.  (The C<in> operator checks to see 
+whether
+the return value of C<prop> is defined.)
+
+B<To do:> Implement this method in subclasses of JE::Object.
+
+=item is_readonly($property_name)
+
+Not supported by the primitive JE classes.  This returns a boolean 
+indicating whether a given property is readonly.  If
+it doesn't exist, then the C<is_readonly> method of the object's prototype
+is called with the same arguments.  If there is no prototype, false is 
+returned.
+This is used internally by JE::Object's C<prop> method.
+
+=item is_enum($property_name)
+
+Not supported (yet) by the primitive JE classes.  This returns a boolean 
+indicating whether a given property is enumerable.
+This is used by C<Object.prototype.propertyIsEnumerable>.
+
+=item typeof
+
+Returns a Perl string containing the type of the object.  Used
+by the JS C<typeof> operator.
+
+=item class
+
+This applies to object classes only (though it is going to change, so that
+primitives can pretend to be objects).  It returns 
+a 
+Perl string containing
+the type of object.  This is only used by the default JavaScript
+C<toString> method.  If you create your own object class without
+subclassing JE::Object,
+you should I<still> provide the C<class> method, so that this
+JS code will still work:
+
+  YourClass.prototype.toString = Object.prototype.toString;
+  (new YourClass).toString();
+
+=item id
+
+This returns a unique id for the object or primitive, used by 
+the JavaScript C<===>
+operator.  This id is unique as a I<string,> not as a number.
+
+The JE primitive classes provide a unique string beginning with the data
+type.  The JE::Object and its subclasses return the memory address of the
+object itself.  If you 
+subclass JE::Object, you should not have to
+implement this method, unless you have multiple objects that you would
+like JS to consider the same object.
+
+Note that the id 'num:nan' is treated specially.  It is never
+considered equal to itself.
+
+=item primitive
+
+Returns true or false.
+
+=item prototype
+
+=item prototype ( $obj )
+
+This applies to objects only, not to primitives.  This method returns the 
+prototype of the object, or undef if there is no prototype.  If C<$obj> is 
+specified,
+the prototype is set to that object first.  The C<prop> method uses this
+method, as does C<< JE::Object->new >>.
+
+=item to_primitive($preferred_type)
+
+=item to_boolean
+
+=item to_string
+
+=item to_number
+
+=item to_object
+
+These each perform the appropriate type conversion.  $preferred_type, which 
+is 
+optional, must be either 'string' or 'number'.
+
+Calling C<to_string> or C<to_number> on a object is not exactly the same as 
+calling
+C<to_primitive('string')> or C<to_primitive('number')>, because the
+argument to C<to_primitive> is merely a I<suggestion.>
+
+The last four methods in this list should not be overridden by subclasses
+of JE::Object.
+
+=item global
+
+Returns a reference to the global object.
+
+=item taint($taint_brush)
+
+This will only be called if it is implemented.  Of JE's types, only 
+primitive strings and numbers implement this.
+
+C<$taint_brush> will always be a tainted empty string.  If the
+object's internal value is not tainted, this method should return a tainted 
+clone 
+of
+the object.  Otherwise, it should return the object itself.
+
+=back
+
+=head1 SEE ALSO
+
+L<JE> and all the modules listed above under L</WHICH CLASSES ARE WHICH>.
+
+=cut
+
+
+
+

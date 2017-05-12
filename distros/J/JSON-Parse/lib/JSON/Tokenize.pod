@@ -1,0 +1,140 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Tokenize - tokenize a string containing JSON
+
+=head1 SYNOPSIS
+
+    
+    use JSON::Tokenize ':all';
+    my $input = '{"tuttie":["fruity", true, 100]}';
+    my $token = tokenize_json ($input);
+    print_tokens ($token, 0);
+    
+    sub print_tokens
+    {
+        my ($token, $depth) = @_;
+        while ($token) {
+            my $start = tokenize_start ($token);
+            my $end = tokenize_end ($token);
+            my $type = tokenize_type ($token);
+            print "   " x $depth;
+            my $value = substr ($input, $start, $end - $start);
+            print ">>$value<< has type $type\n";
+            my $child = tokenize_child ($token);
+            if ($child) {
+                print_tokens ($child, $depth+1);
+            }
+            my $next = tokenize_next ($token);
+            $token = $next;
+        }
+    }
+
+
+This outputs
+
+    >>{"tuttie":["fruity", true, 100]}<< has type object
+       >>"tuttie"<< has type string
+       >>:<< has type colon
+       >>["fruity", true, 100]<< has type array
+          >>"fruity"<< has type string
+          >>,<< has type comma
+          >>true<< has type literal
+          >>,<< has type comma
+          >>100<< has type number
+
+
+=head1 VERSION
+
+This documents version 0.49 of JSON::Tokenize corresponding to
+L<git commit 21138ec0efa9123392388027af87017af93009dc|https://github.com/benkasminbullock/JSON-Parse/commit/21138ec0efa9123392388027af87017af93009dc> released on Sat Nov 26 15:48:20 2016 +0900.
+
+
+
+=head1 DESCRIPTION
+
+This is a module for tokenizing a JSON string. It breaks the string
+into individual tokens without creating any Perl structures. Thus it
+can be used for tasks such as picking out or searching through parts
+of a large JSON structure without storing each part of the entire
+structure as individual Perl variables in memory.
+
+This module is an experimental part of L<JSON::Parse> and its
+interface is likely to change. The tokenizing functions are currently
+written in a very primitive way.
+
+=head1 FUNCTIONS
+
+=head2 tokenize_json
+
+    my $token = tokenize_json ($json);
+
+=head2 tokenize_next
+
+    my $next = tokenize_next ($token);
+
+Walk the tree of tokens.
+
+=head2 tokenize_child
+
+    my $child = tokenize_child ($child);
+
+Walk the tree of tokens.
+
+=head2 tokenize_start
+
+    my $start = tokenize_start ($token);
+
+Get the start of the token as a byte offset from the start of the
+string. Note this is a byte offset not a character offset.
+
+=head2 tokenize_end
+
+    my $end = tokenize_end ($token);
+
+Get the end of the token as a byte offset from the start of the
+string. Note this is a byte offset not a character offset.
+
+=head2 tokenize_type
+
+    my $type = tokenize_type ($token);
+
+Get the type of the token as a string. The possible return values are
+
+    "invalid",
+    "initial state",
+    "string",
+    "number",
+    "literal",
+    "object",
+    "array",
+    "unicode escape"
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

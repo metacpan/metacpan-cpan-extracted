@@ -1,0 +1,8 @@
+<&|/_elements/wrapper, title => 'Something went awry' &>
+
+<& _elements/error_text, error => $m->dhandler_arg &>
+
+</&>
+<%init>
+Jifty->log->error("Unhandled web error ". $m->dhandler_arg);
+</%init>

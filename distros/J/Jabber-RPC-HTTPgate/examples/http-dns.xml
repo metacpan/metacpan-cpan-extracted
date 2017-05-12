@@ -1,0 +1,8 @@
+  <!-- component instance definition for the http-dns component -->
+  <service id="http-dns">
+    <load><dnsrv>./dnsrv/dnsrv.so</dnsrv></load>
+    <dnsrv xmlns='jabber:config:dnsrv'>
+      <resend>http</resend>
+    </dnsrv>
+  </service>
+

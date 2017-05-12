@@ -1,0 +1,15 @@
+.change-field .field-name {
+    font-weight: bold;
+}
+
+.change-field .old-value, .change-field .new-value {
+    font-weight: bold;
+}
+
+.change-field .no-value {
+    font-style: italic;
+}
+
+.change-details {
+    padding-left: 2em;
+}

@@ -1,0 +1,45 @@
+JSON::PP::Comapt5005 -- independent JSON::PP5005
+=================
+
+JSON::PP was inculded in JSON distribution (CPAN module).
+It comes to be a perl core module in Perl 5.14.
+
+This distribution is for the preparation.
+
+    [STEPS]
+
+    * release this module as JSON::PPdev.
+
+    * release other PP::* modules as JSON::PP::Compat*.
+
+    * JSON distribution will inculde yet another JSON::PP modules.
+      They are JSNO::backportPP. So JSON.pm should work as it did at all!
+
+    * remove JSON::PP and JSON::PP::* modules from JSON distribution
+       and release it as developer version.
+
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    * release JSON distribution as stable version.
+
+    * rename JSON::PPdev into JSON::PP and release on CPAN.
+
+=================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+    Makamaka Hannyaharamitu, <makamaka[at]cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2005-2010 by Makamaka Hannyaharamitu
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

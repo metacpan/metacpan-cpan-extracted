@@ -1,0 +1,152 @@
+
+=encoding utf8
+
+=head1 NAME
+
+OpenIDAuthenticationGuide::zhtw - 為你的 Jifty 應用程式提供 OpenID 驗證
+
+=head1 DESCRIPTION
+
+為你的 Jifty 應用程式提供 OpenID 驗證
+
+=head1 USAGE
+
+=head2 Config
+
+請在 F<etc/config.yml> 設定檔內提供 C<OpenIDSecret>
+欄位設定驗證碼。另外你也可以提供 C<OpenIDUA> 來使用不同的代理器 (UserAgent)
+類別 (非必要)。OpenID Plugin 則會預設使用 L<LWPx::ParanoidAgent> .
+
+    --- 
+    application:
+        OpenIDSecret: 1234
+        OpenIDUA: LWP::UserAgent
+
+你也可以從命令列指定你所要使用的代理器 (UserAgent) 類別 ，用 C<OpenIDUserAgent>:
+
+    OpenIDUserAgent=LWP::UserAgent bin/jifty server
+
+如果你想用 L<LWPx::ParanoidAgent> 來作為你的 OpenID 代理器。
+那麼如果你需要提供你自己的 OpenID 伺服器作為驗證，請將你的伺服器位址加入至
+
+C<JIFTY_OPENID_WHITELIST_HOST> 這個環境變數內:
+
+    export JIFTY_OPENID_WHITELIST_HOST=123.123.123.123
+
+=head2 User Model
+
+第一步，你需要建立自己的 User 資料模型 ( Model ) 來存放使用者資料。
+
+然後你需要將 UserID 插件提供的使用者模型結合你的 User 資料模型，讓你的
+模型可以同時擁有 OpenID 插件所定義的欄位。
+請在你的模型檔案內加入
+
+    use Jifty::Plugin::OpenID::Mixin::Model::User
+
+此外 OpenID 插件會呼叫 UserModel 的 brief_description 函式來取得可閱讀的唯一值
+在使用 CurrentUser 物件時，會需要讓 brief_description 函式來取得有意義的使用者名稱
+
+所以你需要在 User 模型內實做 C<name> 函式。
+
+大致上看來會像這樣:
+
+    use TestApp::Record schema {
+
+        column email =>
+            type is 'varchar';
+
+    };
+    use Jifty::Plugin::OpenID::Mixin::Model::User;
+
+    sub name {
+        my $self = shift;
+        return $self->email;
+    }
+
+請參見 L<Jifty::Record> 所定義的 C<brief_description> 函式來了解更詳細的資訊。
+
+=head2 View
+
+OpenID 插件提供了 AuthenticateOpenID 的動作 (Action) 。所以你可以在你的樣板中
+來繪製 AuthenticationOpenID 提供的表單:
+
+    form {
+        my $openid = new_action( class   => 'AuthenticateOpenID',
+                                moniker => 'authenticateopenid' );
+        render_action( $openid );
+    };
+
+這個動作 (Action) 會繪製一個提供 OpenID 網址的欄位。
+然後，你接著也需要在表單內提供一個送出的按鈕:
+
+    form {
+        my $openid = new_action( class   => 'AuthenticateOpenID',
+                                moniker => 'authenticateopenid' );
+
+        # ....
+
+        render_action( $openid );
+        outs_raw(
+            Jifty->web->return(
+                to     => '/openid_verify_done',
+                label  => _("Login with OpenID"),
+                submit => $openid
+            ));
+    };
+
+在 C<to> 欄位，是用來讓已經確認身份的使用者確認之後導向的頁面。
+所以你需要實做一個 C</openid_verify_done> 的樣板:
+
+    template '/openid_verify_done' => page {
+        h1 { "Done" };
+    };
+
+打開你的 Jifty ，測試一下吧!
+
+=head1 AUTHOR
+
+林佑安 C<<cornelius.howl _at_ gmail.com>>  L<http://oulixe.us>
+
+=cut
+
+sub init {
+    my $self = shift;
+    my %opt = @_;
+    my $ua_class = $self->get_ua_class;
+    eval "require $ua_class";
+}
+
+sub get_ua_class {
+    return Jifty->config->app('OpenIDUA') 
+                || $ENV{OpenIDUserAgent} 
+                || 'LWPx::ParanoidAgent' ;
+}
+
+sub new_ua {
+    my $class = shift;
+    my $ua;
+    my $ua_class = $class->get_ua_class;
+    if( $ua_class eq 'LWPx::ParanoidAgent' ) {
+         $ua = LWPx::ParanoidAgent->new(
+                        whitelisted_hosts => [ $ENV{JIFTY_OPENID_WHITELIST_HOST} ]
+                     );
+    }
+    else {
+        $ua = $ua_class->new;
+    }
+    return $ua;
+}
+
+
+sub get_csr {
+    my $class = shift;
+    return Net::OpenID::Consumer->new(
+        ua              => $class->new_ua ,
+        cache           => Cache::FileCache->new,
+        args            => scalar Jifty->handler->cgi->Vars,
+        consumer_secret => Jifty->config->app('OpenIDSecret'),
+        @_,
+    );
+}
+
+1;

@@ -1,0 +1,19 @@
+1.00 2006-09-30
+        - This release has only build-time changes
+        - Incrementing to 1.00
+        - Minor changes to Makefile.PL and tests
+        - Updating to Module::Install 0.64
+
+0.04 2006-07-01
+	- Importing into collaborative repository
+	- Converting to Module::Install 0.63
+
+0.03 2005-07-26
+	- Adding support for JSAN.require
+
+0.02 2005-07-26
+	- Expanding original out to handle more functions, and return
+	  the deps as library names or file names.
+
+0.01 2005-07-22    
+	- Initial release.

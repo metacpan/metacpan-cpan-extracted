@@ -1,0 +1,26 @@
+<& header, title => $title &>
+<body>
+% Jifty::View->call_trigger('body_start');
+  <div id="headers">
+    <%Jifty->web->link( url => "/", label => _(Jifty->config->framework('ApplicationName')))%>
+    <h1 class="title"><% _($title) %></h1>
+  </div>
+  <& sidebar &>
+  <div id="content">
+    <a name="content"></a>
+% if (Jifty->admin_mode) {
+<div class="warning admin_mode">
+<%_('Alert')%>: <% Jifty->web->tangent( label => _('Administration mode is enabled.') , url => '/__jifty/admin/')%>
+</div>
+% }
+  <% Jifty->web->render_messages %>
+  <% $m->content |n%>
+  <& /_elements/keybindings &>
+  </div>
+  <div id="jifty-wait-message" style="display: none"><%_('Loading...')%></div>
+% Jifty::View->call_trigger('body_end');
+</body>
+</html>
+<%args>
+$title => ""
+</%args>

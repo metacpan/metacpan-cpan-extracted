@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e84131801f5ed1cf7ae6dd5d29fc77cf1fc3dc63 Build.PL
+SHA1 547ce2002708591cddc21b37d96037b4193bcaf7 CHANGES
+SHA1 6e0ef6fd898cfeca712579753b0a69161dbabde9 LICENSE
+SHA1 732beef372bd01d4fc010fda9e10621a0c421ac7 MANIFEST
+SHA1 bc3506b8cfb97eb1e6d9a61324be37a782598d0f META.json
+SHA1 2b83e9d7e864fd22e9ab5a39e33ea8676d99fc8d META.yml
+SHA1 4368a1d13b449840518012b82cc88ea54884579f README
+SHA1 cb3b99e4b3a855829f63a27674729cbe19da9b16 examples/json_decode.pl
+SHA1 db145eac7b93bc4ca36caf580f7f1ccf51940f00 examples/json_reformat.pl
+SHA1 a59efc4f6ea11435f9761a668f8f9444ba92f343 examples/json_sax.pl
+SHA1 689e23c5e34415640e66a3a6e17137b95c2974fe examples/json_tokenize.pl
+SHA1 a3501c0c0bfa2696f4f849d6016e2dd913a6d249 examples/small.json
+SHA1 6b5442346aa64fa1c6d133b3ce14f7cdc588ed34 lib/JSON/YAJL.pm
+SHA1 97e5fed5bff1d931653a45815acc814113849a34 lib/JSON/YAJL/Generator.pm
+SHA1 522f05d49b05f5d0edfe6d05c4d5ec9a37da461c lib/JSON/YAJL/Generator.xs
+SHA1 258ed0c4ae2f5473409fff06976f2c984ddeeb34 lib/JSON/YAJL/Parser.pm
+SHA1 6d948b421cb568338a52e1b740cb217f6d81c99b lib/JSON/YAJL/Parser.xs
+SHA1 fc2ccef7b2a9a8686652e554b1318a781263faad lib/JSON/YAJL/ppport.h
+SHA1 46a6c8e551cd17dfdc0c967300109ce7c6fa2218 t/both.t
+SHA1 43150e7d07ef3f0a060355da197db4d4ad14ac15 t/generator.t
+SHA1 3b7184aa771a692ce489fc7f284135e5264e900a t/parser.t
+SHA1 94773c84db3931a0874cad0c699d8e964122f56c t/pod.t
+SHA1 5cdaf60fe136ddcf5aef8115d285c5c2005bc072 typemap
+SHA1 9559f0c3a1f4259ff7df905f5ccdd54a1d478065 yajl/COPYING
+SHA1 74268a08dc05a997379359544778997358c39ba3 yajl/ChangeLog
+SHA1 86f2796c661e4a4a5b598b75a7cacc940d4cb9cc yajl/README
+SHA1 614e8d4cee9aaaea6e8bd7860aadff2af62b7e80 yajl/yajl.c
+SHA1 c9761da2e1578c556d1b38efa085d9d9ab42d5f1 yajl/yajl_alloc.c
+SHA1 7a6fc92cf6fa0d5a5312933fa9c38130552b5b55 yajl/yajl_alloc.h
+SHA1 9dda9ef9723d659507231473526166fdbcca8f0e yajl/yajl_buf.c
+SHA1 0164205fdf7ac8cc14aa45d691d0e27c0b965fd7 yajl/yajl_buf.h
+SHA1 d258f45f83a2512571ac6453e579be3f7c9bef7e yajl/yajl_bytestack.h
+SHA1 eb18b2ca34536035236b8b87cbaac8c19b411016 yajl/yajl_common.h
+SHA1 a21d053c9a925dd2b9f82c812de602036b6b1548 yajl/yajl_encode.c
+SHA1 b16406062974c82768ce3b4b012c669ce2145cc4 yajl/yajl_encode.h
+SHA1 d9bd1d67f1a463930c9692b03a21ca390f06c465 yajl/yajl_gen.c
+SHA1 68865b0e8b8ffd1bb8bcf064a551dd4790f081c8 yajl/yajl_gen.h
+SHA1 85319f704ecd1dc2c6f074f25cec82752645fc0b yajl/yajl_lex.c
+SHA1 4e87502d0e9bf5e28b65553d016233fb7fde3edf yajl/yajl_lex.h
+SHA1 92040c58189945149ac7325c3bbfa713181fc198 yajl/yajl_parse.h
+SHA1 49019ed19655d4d4f855b770a426239ebfd11901 yajl/yajl_parser.c
+SHA1 37d78af8b66271ae0f759f0c3468cac8cb4cd6ef yajl/yajl_parser.h
+SHA1 62a96d77d8377a01def5242a6736abd5366e7390 yajl/yajl_tree.c
+SHA1 fd1662de210ba720e5de7cdb444591cfb98a4536 yajl/yajl_tree.h
+SHA1 b7c5a9649fdd086d9e986459f2cee39986af7272 yajl/yajl_version.c
+SHA1 830f3e878c2316db56b9316d4ea5a023b147c8b1 yajl/yajl_version.h
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk47kIEACgkQnvdMljFk9hWajACgrAQWwrOtjgKKJXEjtlfmlLYK
+/TYAoMsWruOA0lBI3z5qmcjrLJB/BZ88
+=SmsZ
+-----END PGP SIGNATURE-----

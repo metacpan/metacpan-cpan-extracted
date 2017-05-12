@@ -1,0 +1,56 @@
+{
+   "abstract" : "javascript object notation object notator",
+   "author" : [
+      "Eric Wilhelm @ <ewilhelm at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.131490",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-ON",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Classy" : "0",
+            "JSON" : "0",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::ON" : {
+         "file" : "lib/JSON/ON.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-ON"
+      },
+      "homepage" : "http://enobacon.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://git.scratchcomputing.com/JSON-ON.pm.git"
+      }
+   },
+   "version" : "v0.0.3"
+}

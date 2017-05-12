@@ -1,0 +1,136 @@
+---
+abstract: 'A perl implementation of JSON Schema (draft-04) validator'
+author:
+  - 'zigorou <zigorou@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSV
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSV:
+    file: lib/JSV.pm
+    version: '0.08'
+  JSV::Context:
+    file: lib/JSV/Context.pm
+  JSV::Keyword:
+    file: lib/JSV/Keyword.pm
+  JSV::Keyword::Draft4::AllOf:
+    file: lib/JSV/Keyword/Draft4/AllOf.pm
+  JSV::Keyword::Draft4::AnyOf:
+    file: lib/JSV/Keyword/Draft4/AnyOf.pm
+  JSV::Keyword::Draft4::Dependencies:
+    file: lib/JSV/Keyword/Draft4/Dependencies.pm
+  JSV::Keyword::Draft4::Enum:
+    file: lib/JSV/Keyword/Draft4/Enum.pm
+  JSV::Keyword::Draft4::Format:
+    file: lib/JSV/Keyword/Draft4/Format.pm
+  JSV::Keyword::Draft4::Id:
+    file: lib/JSV/Keyword/Draft4/Id.pm
+  JSV::Keyword::Draft4::Items:
+    file: lib/JSV/Keyword/Draft4/Items.pm
+  JSV::Keyword::Draft4::MaxItems:
+    file: lib/JSV/Keyword/Draft4/MaxItems.pm
+  JSV::Keyword::Draft4::MaxLength:
+    file: lib/JSV/Keyword/Draft4/MaxLength.pm
+  JSV::Keyword::Draft4::MaxProperties:
+    file: lib/JSV/Keyword/Draft4/MaxProperties.pm
+  JSV::Keyword::Draft4::Maximum:
+    file: lib/JSV/Keyword/Draft4/Maximum.pm
+  JSV::Keyword::Draft4::MinItems:
+    file: lib/JSV/Keyword/Draft4/MinItems.pm
+  JSV::Keyword::Draft4::MinLength:
+    file: lib/JSV/Keyword/Draft4/MinLength.pm
+  JSV::Keyword::Draft4::MinProperties:
+    file: lib/JSV/Keyword/Draft4/MinProperties.pm
+  JSV::Keyword::Draft4::Minimum:
+    file: lib/JSV/Keyword/Draft4/Minimum.pm
+  JSV::Keyword::Draft4::MultipleOf:
+    file: lib/JSV/Keyword/Draft4/MultipleOf.pm
+  JSV::Keyword::Draft4::Not:
+    file: lib/JSV/Keyword/Draft4/Not.pm
+  JSV::Keyword::Draft4::OneOf:
+    file: lib/JSV/Keyword/Draft4/OneOf.pm
+  JSV::Keyword::Draft4::Pattern:
+    file: lib/JSV/Keyword/Draft4/Pattern.pm
+  JSV::Keyword::Draft4::Properties:
+    file: lib/JSV/Keyword/Draft4/Properties.pm
+  JSV::Keyword::Draft4::Ref:
+    file: lib/JSV/Keyword/Draft4/Ref.pm
+  JSV::Keyword::Draft4::Required:
+    file: lib/JSV/Keyword/Draft4/Required.pm
+  JSV::Keyword::Draft4::Type:
+    file: lib/JSV/Keyword/Draft4/Type.pm
+  JSV::Keyword::Draft4::UniqueItems:
+    file: lib/JSV/Keyword/Draft4/UniqueItems.pm
+  JSV::Reference:
+    file: lib/JSV/Reference.pm
+  JSV::Result:
+    file: lib/JSV/Result.pm
+  JSV::Util::Type:
+    file: lib/JSV/Util/Type.pm
+  JSV::Validator:
+    file: lib/JSV/Validator.pm
+    version: '0.08'
+  Test::JSV::Suite:
+    file: lib/Test/JSV/Suite.pm
+requires:
+  B: '0'
+  Carp: '0'
+  Class::Accessor::Lite: '0'
+  Clone: '0'
+  Data::Validate::Domain: '0'
+  Data::Validate::IP: '0'
+  Data::Validate::URI: '0'
+  Data::Walk: '0'
+  Email::Valid::Loose: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Hash::MultiValue: '0'
+  JSON: '0'
+  JSON::Pointer: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Module::Pluggable::Object: '0'
+  Scalar::Util: '0'
+  URI: '0'
+  URI::Split: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/zigorou/perl-JSV/issues
+  homepage: https://github.com/zigorou/perl-JSV
+  repository: git://github.com/zigorou/perl-JSV.git
+version: '0.08'
+x_contributors:
+  - 'Tomohiro Mitsumune <tomohiro.mitsumune@dena.com>'
+  - 'maedama <klemensplatz+githhub@gmail.com>'
+  - 'Sergiy Zuban <s.zuban@trackingsoft.com>'
+  - 'yokoe.naosuke <yokoe.naosuke@dena.jp>'
+  - 'tanaka-tatsuya <ta.ts.yt@gmail.com>'
+  - 'Naosuke Yokoe <ankerasoy@gmail.com>'
+  - 'Peter Valdemar Mørch <peter@morch.com>'
+  - 'Ichito Nagata <ichito.nagata@dena.com>'
+  - 'Yuuki Furuyama <addsict@gmail.com>'
+  - 'Yoshitaro Makise <yoshizow@turtlewalk.org>'
+  - 'ar-tama <arata.makoto@gmail.com>'

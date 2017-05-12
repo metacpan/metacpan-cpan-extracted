@@ -1,0 +1,13 @@
+% Jifty->web->response->content_type("text/x-json");
+<% Jifty::JSON::encode_json(\%results) |n%>
+
+<%INIT>
+my %results = Jifty->web->response->results;
+for (values %results) {
+    $_ = $_->as_hash;
+
+    # backwards compatibility :(
+    $_->{_content} = delete $_->{content};
+}
+</%INIT>
+

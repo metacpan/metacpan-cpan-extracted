@@ -1,0 +1,10 @@
+# This file is used to override the following defaults:
+
+index_title: JSORB Library Testing
+import_libs:
+  - ../example/js/jquery-1.2.6.js
+  - ../example/js/json2.js  
+  - ../lib/JS/JSORB.js
+  - lib/Test/JSORB.js  
+# template_include_path:
+#   - template

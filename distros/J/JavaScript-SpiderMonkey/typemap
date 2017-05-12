@@ -1,0 +1,17 @@
+######################################################################
+# Typemap for JavaScript::SpiderMonkey
+#
+# Revision:     $Revision: 1.1.1.1 $
+# Last Checkin: $Date: 2006/02/01 06:00:49 $
+# By:           $Author: mschilli $
+# Author:       Mike Schilli mschilli1@aol.com, 2002
+######################################################################
+JSRuntime      * T_PTRREF
+JSContext      * T_PTRREF
+JSClass        * T_PTRREF
+JSObject       * T_PTRREF
+JSNative         T_PTRREF
+JSPropertySpec * T_PTRREF
+JSFunctionSpec * T_PTRREF
+uintN            T_SV
+JSBool           T_SV

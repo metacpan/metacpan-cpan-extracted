@@ -1,0 +1,14 @@
+Revision history for JQuery
+
+1.00    First Release
+1.01    The cgi-bin files used an incorrect namespace
+1.02    Added alt to img in Treeview (HTML Validation)
+        In Tabs, escaped href
+        Remove empty styles (HTML Validation)
+        There was a problem with installation - TableSorter was checked but non-existant.
+        Added TableSorter.
+1.03    Fixed separator on menus
+1.04    Left a DEBUG message in Taconite which stopped it from working
+1.05    Changed jquery_heartbeat.js so that it uses a counter to ensure that IE does not cache
+        Add Module::Build dependency
+1.06    Added some missing files

@@ -1,0 +1,106 @@
+.crud-ui {
+}
+
+.crud-search {
+}
+
+.crud-pages {
+}
+
+.crud-paging {
+}
+
+.crud-table {
+    display: table;
+}
+
+.crud-column-headers {
+    display: table-header-group;
+}
+
+.crud-column-header, .crud-field {
+    display: table-cell;
+    padding-left: .2em;
+    padding-right: .2em;
+}
+
+.crud-list {
+    background: #FFFFFF;
+}
+
+/* this is the fallback for when you do not have css 3 */
+.crud-list div.odd {
+    background: #DDFFFF;
+}
+
+/* this is more robust as it permits adding/removing rows */
+/* XXX: it's not ready yet because there are intermittent script tags only
+ * in the original CRUD, not in region updates. argh */
+/*.crud-list > div:nth-child(odd) {
+    background: #DDFFFF;
+}*/
+
+.crud-list {
+    display: table-row-group;
+}
+
+.crud-create {
+}
+
+.crud-item {
+    display: table-row;
+}
+
+.field {
+    float: left;
+    margin: 0.15em 0.5em 0.15em 0.15em;
+    font-weight: bold;
+}
+
+.crud-sort-menu {
+    float: left;
+}
+
+.crud-column-header img {
+    vertical-align:middle;
+    border: 0;
+}
+
+.crud-column-headers a {
+    color: black;
+    float: left;
+    font-size: 0.8em;
+    height: 100%;
+    text-decoration: none;
+    font-family : sans-serif;
+}
+
+.crud-column-header ul {
+    list-style-type:none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #ccc;
+}
+
+.crud-column-header li {
+    float:left;
+}
+
+.paging-nav {
+    font-size: 0.8em;
+}
+
+.paging-nav a,
+.paging-nav a:active,
+.paging-nav a:hover,
+.paging-nav a:visited {
+    color: #0000FF;
+}
+
+.paging-nav .current {
+    font-weight: bold;
+}
+
+.paging-prev, .paging-next, .paging-all {
+    font-size: 0.8em;
+}

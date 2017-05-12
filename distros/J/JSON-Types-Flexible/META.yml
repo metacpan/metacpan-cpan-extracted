@@ -1,0 +1,44 @@
+---
+abstract: 'Yet another L<JSON::Types> module'
+author:
+  - 'Pine Mizune <pinemz@gmail.com>'
+build_requires:
+  JSON::XS: '3.02'
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Types-Flexible
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::Types::Flexible:
+    file: lib/JSON/Types/Flexible.pm
+    version: '0.03'
+requires:
+  JSON::Types: '0.05'
+  List::MoreUtils: '0'
+  Sub::Install: '0.928'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/pine/p5-JSON-Types-Flexible/issues
+  homepage: https://github.com/pine/p5-JSON-Types-Flexible
+  repository: git://github.com/pine/p5-JSON-Types-Flexible.git
+version: '0.03'
+x_authority: cpan:PINE
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

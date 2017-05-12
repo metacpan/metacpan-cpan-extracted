@@ -1,0 +1,52 @@
+{
+   "abstract" : "Job queue handling using PostgreSQL.",
+   "author" : [
+      "Kaare Rasmussen <kaare at cpan dot net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Job-Machine",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBD::Pg" : "3",
+            "DBI" : "0",
+            "Data::Serializer" : "0",
+            "Data::Serializer::Sereal" : "0",
+            "base" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/kaare/JobMachine.git",
+         "web" : "http://github.com/kaare/JobMachine"
+      }
+   },
+   "version" : "0.26"
+}
+

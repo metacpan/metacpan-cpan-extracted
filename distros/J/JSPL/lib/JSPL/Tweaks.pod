@@ -1,0 +1,30 @@
+=head1 NAME
+
+JSPL::Tweaks - "JavaScriptification" tweaks for Perl modules
+
+=head1 DESCRIPTION
+
+Although JSPL try to make easy to use perl code from JavaScript land,
+not every Perl API can be used from JavaScript without changes.
+
+Consider for example the perl's L<perlfunc/read>, it expects a SCALAR as
+its second argument to use as the buffer into which the characters will
+be read. Thats work because in perl a subroutine decide if its arguments
+are received by value or by reference.
+
+But in JavaScript all primitives are immutable and always passed by value.
+So perl's "read" function can't be used in its current form, it needs a
+specialized wrapper.
+
+When you use L<JSPL::Controller/install> to bind a perl module into JavaScript
+land, a "Tweaks file" will be searched, and evaluated if found.
+
+That file can overrides the default bindings of the module to adapt it to
+JavaScript semantics.
+
+For example, when you bind the "IO::Handle" module, JSPL engine will search
+for a file F<JSPL/Tweaks/IO/Handle.js> in every directory in C<@INC>. That file
+should returns an Object with the wrapper needed for the C<IO::Handle>'s "read"
+method.
+
+=cut

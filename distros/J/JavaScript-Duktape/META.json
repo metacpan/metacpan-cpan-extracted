@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl interface to Duktape embeddable javascript engine",
+   "author" : [
+      "Mamod Mehyar <mamod.mehyar@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-Duktape",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Fatal" : "0.014",
+            "Try::Tiny" : "0.24"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.63",
+            "Inline::MakeMaker" : "0.51"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Inline" : "0.80",
+            "Inline::C" : "0.75"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mamod/JavaScript-Duktape/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/mamod/JavaScript-Duktape.git"
+      }
+   },
+   "version" : "v2.1.3",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

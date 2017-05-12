@@ -1,0 +1,25 @@
+Revision history for Perl extension JSON::RPC::Simple.
+
+0.06  Thu Feb 6 2013
+    - Improved error and debug reporting (Scott Baker)
+ 
+0.05  Tue Mar 13 2012
+    - Added a sample PSGI handler which loads service based on URI and dispatches them
+    - Wrap the content_length check in an eval and fallback to other methods of getting that
+      header if it fails (Apache2::RequestReq fix)
+      
+0.04  Wed Dec 7 2011
+    - Support for calls via HTTP GET
+    - t/03-client.t now doesn't fail because of faulty URL
+    
+0.03  Fri Jun 3 2011
+    - Corrected faulty MANIFEST
+    
+0.02  Fri Jun 3 2011
+    - When dumping response don't add \n before and after actual data.
+    - Added jsonrpc-simple client util which is a really simple key/value JSON caller
+    
+0.01  Tue May  4 10:55:49 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n JSON::RPC::Simple -b 5.8.0
+

@@ -1,0 +1,5 @@
+development:
+  dir: "/etc/fixtures/development"
+
+test:
+  dir: "/etc/fixtures/test"

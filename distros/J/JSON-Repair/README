@@ -1,0 +1,96 @@
+       _ ____   ___  _   _         ____                  _      
+      | / ___| / _ \| \ | |  _ _  |  _ \ ___ _ __   __ _(_)_ __ 
+   _  | \___ \| | | |  \| | (_|_) | |_) / _ \ '_ \ / _` | | '__|
+  | |_| |___) | |_| | |\  |  _ _  |  _ <  __/ |_) | (_| | | |   
+   \___/|____/ \___/|_| \_| (_|_) |_| \_\___| .__/ \__,_|_|_|   
+                                            |_|                 
+
+
+This is the README for JSON::Repair version 0.06.
+
+JSON::Repair is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+JSON::Repair - reformat JSON to strict compliance
+
+Given some "relaxed" JSON text containing such things as trailing
+commas, comments, or strings containing tab characters or newlines,
+this module uses heuristics to convert these into strictly compliant
+JSON.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?JSON::Repair
+    * http://metacpan.org/release/JSON-Repair
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc JSON::Repair
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.14.1 or later.
+
+To install the module from CPAN, use
+
+    cpan JSON::Repair
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm JSON::Repair
+
+To install the module from the source file, JSON-Repair-0.06.tar.gz, follow
+this sequence of commands:
+
+    tar xfz JSON-Repair-0.06.tar.gz
+    cd JSON-Repair-0.06
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/json-repair/issues>,
+
+or if you want to alter the source code of JSON::Repair, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/json-repair>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Thu Mar  9 11:17:38 2017.
+
+-----------------------------------------------------------------------------

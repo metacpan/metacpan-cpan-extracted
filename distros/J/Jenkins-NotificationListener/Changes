@@ -1,0 +1,19 @@
+Revision history for Perl extension Jenkins::NotificationListener
+
+0.06    六  7/21 10:10:41 2012
+        - with_details flag
+
+0.05    六  5/26 12:12:08 2012
+        - Add to_hashref method
+
+0.04    六  5/26 11:19:31 2012
+        - Rename _api to api for Net::Jenkins 0.04
+
+0.03    六  5/26 11:05:27 2012
+        - Export parse_jenkins_notification function
+
+0.02    五  5/25 13:03:08 2012
+        - Update pod
+
+0.01    Thu May 24 01:22:12 2012
+        - original version

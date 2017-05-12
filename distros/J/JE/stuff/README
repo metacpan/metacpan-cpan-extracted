@@ -1,0 +1,9 @@
+The codedumper program parses the JS code passed to its STDIN (using
+the new experimental version),  calls  set_global(undef),  and  then
+dumps it, followed by a Deparse of the Perl code generated. It’s use-
+ful for debugging,  but you can use it for fun as well.  Try running
+this through it:
+
+a:for(;;)b:for(;;)c:do d:try{}finally{}while(true)
+
+You’ll need Data::Dump::Streamer installed, along with the DDS alias.

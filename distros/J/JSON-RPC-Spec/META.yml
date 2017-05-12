@@ -1,0 +1,55 @@
+---
+abstract: 'Yet another JSON-RPC 2.0 Implementation'
+author:
+  - 'nqounet <mail@nqou.net>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-RPC-Spec
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::RPC::Spec:
+    file: lib/JSON/RPC/Spec.pm
+    version: v1.0.6
+  JSON::RPC::Spec::Client:
+    file: lib/JSON/RPC/Spec/Client.pm
+  JSON::RPC::Spec::Common:
+    file: lib/JSON/RPC/Spec/Common.pm
+  JSON::RPC::Spec::Procedure:
+    file: lib/JSON/RPC/Spec/Procedure.pm
+recommends:
+  Cpanel::JSON::XS: '0'
+requires:
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Router::Simple: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+  version: '0'
+resources:
+  bugtracker: https://github.com/nqounet/p5-json-rpc-spec/issues
+  homepage: https://github.com/nqounet/p5-json-rpc-spec
+  repository: git://github.com/nqounet/p5-json-rpc-spec.git
+version: v1.0.6
+x_authority: cpan:NQOUNET
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

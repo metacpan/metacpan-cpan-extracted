@@ -1,0 +1,12 @@
+Stuff to test further:
+- on_before callback
+- all the callbacks (better checking)
+- FPing
+
+Document:
+- all the callback parameters
+
+Fixes:
+- FPing should use System::Command
+- FPing might just be a subclass of RawCommand?
+- SNMP should use hosts provided by the role.

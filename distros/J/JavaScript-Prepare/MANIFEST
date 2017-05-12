@@ -1,0 +1,17 @@
+bin/jsprepare
+lib/JavaScript/Prepare.pm
+Makefile.PL
+MANIFEST
+t/00.use.t
+t/01.instantiate.t
+t/10.minify.t
+t/20.strip_console.t
+t/50.directory.t
+t/60.control_file.t
+t/90.any.t
+t/control/create_namespace.js
+t/control/master.js
+t/control/namespace.js
+t/dir/00-before/namespace.js
+t/dir/create_namespace.js
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+name = "JSON-RPC-Lite"
+badges = ["travis"]
+authority="cpan:NQOUNET"
+
+module_maker="ModuleBuildTiny"

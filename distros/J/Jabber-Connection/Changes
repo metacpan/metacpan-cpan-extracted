@@ -1,0 +1,29 @@
+Revision history for Perl extension Jabber::Connection.
+
+0.04  2002-05-05
+  - Jabber::NodeFactory::Node : resolve memory leak due to parent-child
+    reflective pointers (uses Scalar::Util) (chris pile)
+  - Jabber::NodeFactory::Node : fix bug with missing parent
+    relationship built from insertTag($node) calls (me)
+
+0.03  2002-02-24
+  - Jabber::Connection : be more accurate with the to='' addressing
+    in the stream header (sean welsh)
+  - Jabber::NodeFactory : accumulate cdata for XML from string (rob norris)
+  - Jabber::Connection : modified _read() to work around problem
+    in BSD implementation of recv() (ralphm)
+  - Added component example and XML
+  - Added use strict to client example (!)
+
+0.02  2001-09-22
+  - Jabber::Connection : fixed spin when Jabber server shutdown
+  - Jabber::NodeFactory::Node : fixed getting of namespace qualified
+    unnamed tags in getTag()
+  - Jabber::NodeFactory::Node : allow insertion of Node objects
+    in insertTag() as well as raw tag names
+
+0.01  Wed Aug 22 21:26:55 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Jabber::Connection
+
+

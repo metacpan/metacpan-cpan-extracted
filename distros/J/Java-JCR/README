@@ -1,0 +1,67 @@
+Java::JCR
+---------
+
+"JCR" is a shorthand for Content Repository API for the Java Specification API.
+This is a hierarchical database API written for Java. 
+
+I'm in the process of writing a similar API for Perl (see Repository::Simple),
+but I'm getting a little impatient and wanted something usable right now.
+Therefore, I used Inline::Java and some custom scripting to build a direct API
+port from the JCR and added the tools necessary to create and use a Jackrabbit
+repository.
+
+If you have no idea what I'm talking about, I recommend the following
+resources:
+
+  http://www.jcp.org/en/jsr/detail?id=170
+  http://jackrabbit.apache.org/
+
+Installation
+------------
+
+Installation can be a bit tricky because this library depends upon Inline::Java,
+which didn't install without going through the process by hand. (I usually just
+let CPAN do all the work.) You must first install Inline::Java. 
+
+Then, you must install libwww-perl, as I use that to download the Jar files. I
+hope to remove this dependency in the future, but it's there for now.
+
+After installing both of those, you should be able to run:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+I generally try to make my build scripts as standard as possible. If you prefer
+using make, I have Module::Build distributing a makefile generator too:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Bugs/Comments
+-------------
+
+Your comments are welcome. You may email me at hanenkamp@cpan.org or post a bug
+to CPAN RT:
+
+  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Java-JCR
+
+Contributions are also welcome, of course. If you'd like to participate in the
+development of this tool, send me an email.
+
+Copyright/License
+-----------------
+
+Copyright 2006 Andrew Sterling Hanenkamp <hanenkamp@cpan.org>.  All 
+Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
+

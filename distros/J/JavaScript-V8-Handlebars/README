@@ -1,0 +1,98 @@
+NAME
+    JavaScript::V8::Handlebars - Compile and execute Handlebars templates
+    via the actual JS library
+
+SYNOPSIS
+            use JavaScript::V8::Handlebars
+
+            my $hbjs = JavaScript::V8::Handlebars->new;
+
+            print $hbjs->render_string( "Hello {{var}}", { var => "world" } );
+
+            my $template = $hbjs->compile_file( "template.hbs" );
+            print $template->({ var => "world" });
+
+METHODS
+    For now the majority of these methods work as described in
+    <http://handlebarsjs.com/>
+
+    $hbjs->new()
+    $hbjs->c()
+        Returns the internal JavaScript::V8 object, useful for executing
+        javascript code in the context of the module.
+
+    $hbjs->eval($javascript_string)
+        Wrapper function for "$hbjs-"c->eval> that checks for errors and
+        throws an exception.
+
+    $hbjs->add_to_context_file($javascript_filename)
+    $hbjs->add_to_context($javascript_string)
+        Shortcut for evaluating javascript intended to add global functions
+        and objects to the current environment.
+
+    $hbjs->precompile_file($template_filename)
+    $hbjs->precompile($template_string)
+        Takes a template and translates it into the javascript code suitable
+        for passing to the "template" method.
+
+    $hbjs->compile_file($template_filename)
+    $hbjs->compile($template_string)
+        Takes a template and returns a subref that takes a hashref
+        containing variables as an argument and returns the text of the
+        executed template.
+
+    $hbjs->registerHelper
+        TBD
+
+    $hbjs->template( $compiled_javascript_string | $compiled_perl_object )
+        Takes a precompiled template datastructure and returns a subref
+        ready to be executed.
+
+    $hbjs->render_string( $template_string, \%context_vars )
+        Wrapper method for compiling and then executing a template passed as
+        a string.
+
+    $hbjs->add_template_dir( $directory, [$extension] )
+    $hbjs->add_template_file( $filename, [$base_path] )
+    $hbjs->add_template( $name, $template_string )
+        Takes a template, compiles it and adds it to the internal store of
+        cached templates for "execute_template" to use.
+
+    $hbjs->execute_template( $name, \%context_vars )
+        Executes a cached template.
+
+    $hbjs->precompiled()
+        Returns a string of javascript consisting of all the templates in
+        the cache ready for execution by the browser.
+
+    $hbjs->safeString($string)
+        Whatever the original Handlebar function does.
+
+    $hbjs->escapeString ($string)
+        Whatever the original Handlebar function does.
+
+    $hbjs->registerPartial($string)
+        Whatever the original Handlebar function does.
+
+AUTHOR
+    Robert Grimes, "<rmzgrimes at gmail.com>"
+
+BUGS
+    Please report and bugs or feature requests through the interfaces at
+    <https://github.com/rmzg/JavaScript-V8-Handlebars>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+    perldoc JavaScript::V8::Handlebars
+
+LICENSE AND COPYRIGHT
+    Copyright 2015 Robert Grimes.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <https://github.com/rmzg/JavaScript-V8-Handlebars>,
+    <http://handlebarsjs.com/>
+

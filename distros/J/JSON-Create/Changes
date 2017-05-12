@@ -1,0 +1,94 @@
+0.22 2016-07-15
+* Handle strings with leading zeros which look like numbers.
+
+0.21 2016-06-28 06:59:06
+* Tests changed for Perl 5.25 regex changes.
+
+0.20 2016-01-23
+* Add a "strict" mode
+
+0.19 2015-12-31
+* Better documentation of Unicode handling.
+* Unicode upgrade applied for callback return values.
+* UTF-8 check applied for callback return values.
+
+0.18 2015-12-30
+* Better documentation of Unicode handling.
+* Add "downgrade_utf8" method (experimental).
+
+0.17 2015-12-29
+* Add handlers for NaN and infinity.
+* Documented how to remove values set by obj_handler or type_handler.
+
+0.16 2015-12-26
+* Change required version of JSON::Parse to 0.38.
+
+0.15 2015-12-24
+* Test repo is updated correctly.
+* Added response to dishonest review of module.
+
+0.14 2015-11-08
+* Returning the undefined value causes a halt of execution
+* Validates four byte UTF-8 correctly
+* Pure Perl module now fully compatible with XS module.
+
+0.13 2015-11-07
+* Add "obj_handler" method which hands all objects to the user
+* Load PP module if XSLoader fails
+
+0.12 2015-11-02
+* String processing improvements
+* Fix bug in JavaScript escaping
+* Fix bug in 4-byte UTF-8 strings
+* "replace_bad_utf8" method added.
+
+0.10 2015-11-02
+* Implement more complete Unicode support, including validation.
+* Dereference behaviour for objects changed.
+* Optional reference handling
+* "validate" method now warns rather than croaking.
+* Backtracing removed for user input errors.
+* Remove regexp and code reference handling in favour of general
+  ref_handler method.
+* Add "fatal_errors" method to change behaviour to/from dying on
+  error.
+
+0.09 2015-10-31
+* Deal better with references containing numerical and string values
+
+0.08 2015-10-30
+* Disable compatibility testing against Mojo::JSON.
+
+0.07 2015-10-29
+* More flexible formatting for floating point numbers
+* Experimental support for booleans
+* User option to escape / into \/.
+* User-generated JSON callbacks
+* Validation of user-generated JSON
+* Boolean round-trips with JSON::Parse 0.37
+
+0.06 2015-10-27
+* More tests and benchmarks for floating point
+* Fixes bug with ASCII control characters
+
+0.05 2015-10-26
+* Handling of NaN, negative and positive infinity via
+  stringification.
+* Removed dereferencing behaviour for objects.
+* Documentation clarifies some behaviours and performance.
+* Further performance wrangling for integers.
+
+0.04 2015-10-22
+* Performance increases for output of strings and integers
+* Partial Unicode handling added
+
+0.03 2015-10-21
+* JSON::Parse changed from prerequisite to test prerequisite .. and back
+* Handle magic and blessed types slightly better (work in progress)
+
+0.02 2015-10-20
+* Undefined values are now printed as "null"
+
+0.01 2015-10-18
+* Initial version released to CPAN
+

@@ -1,0 +1,23 @@
+<%args>
+$counter => 0
+</%args>
+<%init>
+my $request;
+
+$request = Jifty::Request->new( path => Jifty->web->request->path );
+$request->argument( counter => $counter + 1 );
+my $up = Jifty::Continuation->new( request => $request );
+
+$request = Jifty::Request->new( path => Jifty->web->request->path );
+$request->argument( counter => $counter - 1 );
+my $down = Jifty::Continuation->new( request => $request );
+</%init>
+
+<&| /_elements/wrapper, title => "Continuations counter demo" &>
+
+<h1> The counter is: <% $counter %></h1>
+
+<% Jifty->web->link(call => $down, label => '--') %>
+<% Jifty->web->link(call => $up, label => '++') %>
+
+</&>

@@ -1,0 +1,1765 @@
+
+
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Parse - Read JSON into a Perl variable
+
+=head1 SYNOPSIS
+
+    
+    use JSON::Parse 'parse_json';
+    my $json = '["golden", "fleece"]';
+    my $perl = parse_json ($json);
+    # Same effect as $perl = ['golden', 'fleece'];
+    
+
+
+Convert JSON into Perl.
+
+=head1 VERSION
+
+This documents version 0.49 of JSON::Parse corresponding to
+L<git commit 21138ec0efa9123392388027af87017af93009dc|https://github.com/benkasminbullock/JSON-Parse/commit/21138ec0efa9123392388027af87017af93009dc> released on Sat Nov 26 15:48:20 2016 +0900.
+
+
+
+=head1 DESCRIPTION
+
+A module for parsing JSON. (JSON means "JavaScript Object Notation"
+and it is specified in L</RFC 7159>.)
+
+JSON::Parse offers the function L</parse_json>, which takes a string
+containing JSON, and returns an equivalent Perl structure. It also
+offers validation of JSON via L</valid_json>, which returns true or
+false depending on whether the JSON is correct or not, and
+L</assert_valid_json>, which produces a descriptive fatal error if the
+JSON is invalid. A function L</json_file_to_perl> reads JSON from a
+file, and there is a safer version of L</parse_json> called
+L</parse_json_safe> which doesn't throw exceptions.
+
+For special cases of parsing, there are also methods L</new> and
+L</run>, which create a JSON parsing object and run it on text. See
+L</METHODS>.
+
+JSON::Parse accepts only UTF-8 as input. See L</UTF-8 only> and
+L</Handling of Unicode>.
+
+=head1 FUNCTIONS
+
+=head2 parse_json
+
+    use JSON::Parse 'parse_json';
+    my $perl = parse_json ('{"x":1, "y":2}');
+
+This function converts JSON into a Perl structure, either an array
+reference, a hash reference, or a scalar.
+
+If the first argument does not contain a complete valid JSON text, is
+the undefined value, an empty string, or a string containing only
+whitespace C<parse_json> throws a fatal error ("dies").
+
+If the argument contains valid JSON, the return value is either a hash
+reference, an array reference, or a scalar. If the input JSON text is
+a serialized object, a hash reference is returned:
+
+    
+    use JSON::Parse ':all';
+    my $perl = parse_json ('{"a":1, "b":2}');
+    print ref $perl, "\n";
+    
+
+
+produces output
+
+    HASH
+
+
+(This example is included as L<F<hash.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/hash.pl> in the distribution.)
+
+
+If the input JSON text is a serialized array, an array reference is
+returned:
+
+    
+    use JSON::Parse ':all';
+    my $perl = parse_json ('["a", "b", "c"]');
+    print ref $perl, "\n";
+    
+
+
+produces output
+
+    ARRAY
+
+
+(This example is included as L<F<array.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/array.pl> in the distribution.)
+
+
+Otherwise a Perl scalar is returned. 
+
+The behaviour of allowing a scalar was added in version 0.32 of this
+module. This brings it into line with the new specification for
+JSON. The behaviour of disallowing empty inputs was changed in version
+0.49. This makes it conform to the L</JSON Parsing Test Suite>.
+
+The function L</parse_json_safe> offers a version of this function
+with various safety features enabled.
+
+=head2 json_file_to_perl
+
+    use JSON::Parse 'json_file_to_perl';
+    my $p = json_file_to_perl ('filename');
+
+This is exactly the same as L</parse_json> except that it reads the
+JSON from the specified file rather than a scalar. The file must be in
+the UTF-8 encoding, and is opened as a character file using
+C<:encoding(UTF-8)> (see L<PerlIO::encoding> and L<perluniintro> for
+details). The output is marked as character strings.
+
+This is a convenience function written in Perl. You may prefer to read
+the file yourself using another module if you need faster performance.
+
+=head2 valid_json
+
+    use JSON::Parse 'valid_json';
+    if (valid_json ($json)) {
+        # do something
+    }
+
+C<valid_json> returns I<1> if its argument is valid JSON and I<0> if
+not. It runs several times faster than L</parse_json>. This gain in
+speed is obtained because it discards the input data after reading it,
+rather than storing it into Perl variables.
+
+This does not supply the actual errors which caused invalidity. Use
+L</assert_valid_json> to get error messages when the JSON is invalid.
+
+This cannot detect key collisions in the JSON since it does not store
+values. See L</Key collisions> for more on this module's handling of
+non-unique names in the JSON.
+
+=head2 assert_valid_json
+
+    
+    use JSON::Parse 'assert_valid_json';
+    eval {
+        assert_valid_json ('["xyz":"b"]');
+    };
+    if ($@) {
+        print "Your JSON was invalid: $@\n";
+    }
+    # Prints "Unexpected character ':' parsing array"
+
+
+produces output
+
+    Your JSON was invalid: JSON error at line 1, byte 7/11: Unexpected character ':' parsing array starting from byte 1: expecting whitespace: '\n', '\r', '\t', ' ' or comma: ',' or end of array: ']' at /usr/home/ben/projects/Json3/examples/assert.pl line 6.
+    
+
+
+(This example is included as L<F<assert.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/assert.pl> in the distribution.)
+
+
+This is the underlying function for L</valid_json>. It runs at the
+same speed, but it throws an error if the JSON is wrong, rather than
+returning 1 or 0. See L</DIAGNOSTICS> for the error format, which is
+identical to L</parse_json>.
+
+This cannot detect key collisions in the JSON since it does not store
+values. See L</Key collisions> for more on this module's handling of
+non-unique names in the JSON.
+
+The behaviour of disallowing empty inputs was changed in version
+0.49. This makes it conform to the L</JSON Parsing Test Suite>, and
+also makes it give identical results to L</valid_json>.
+
+=head2 parse_json_safe
+
+This is almost the same thing as L</parse_json>, but has the following
+differences:
+
+=over
+
+=item Does not throw exceptions
+
+If the JSON is invalid, a warning is printed and the undefined value
+is returned, as if calling L</parse_json> like this:
+
+    eval {
+        $out = parse_json ($json);
+    };
+    if ($@) {
+        carp $@;
+	$out = undef;
+    }
+
+=item Detects key collisions
+
+This switches on L</detect_collisions>, so that if the JSON contains
+non-unique names, a warning is printed and the undefined value is
+returned. See L</Key collisions> for an explanation of what a key
+collision is.
+
+=item Booleans are not read-only
+
+This switches on L</copy_literals> so that JSON true, false and null
+values are copied. These values can be modified, but they will not be
+converted back into C<true> and C<false> by L<JSON::Create>.
+
+=item Errors are reported by carp
+
+Parsing errors are reported by L<Carp/carp>, so the error line number
+refers to the caller's line.
+
+=back
+
+As the name implies, this is meant to be a "safety-first" version of
+L</parse_json>. This function does not pass all of the tests of the
+L</JSON Parsing Test Suite>, because it creates an error for duplicate
+keys in objects, which is legal JSON. See L<t/jpts.t> for details.
+
+This function was added in version 0.38.
+
+=head1 OLD INTERFACE
+
+The following alternative function names are accepted. These are the
+names used for the functions in old versions of this module. These
+names are not deprecated and will never be removed from the module.
+
+=head2 json_to_perl
+
+This is exactly the same function as L</parse_json>.
+
+=head2 validate_json
+
+This is exactly the same function as L</assert_valid_json>.
+
+=head1 Mapping from JSON to Perl
+
+JSON elements are mapped to Perl as follows:
+
+=head2 JSON numbers
+
+JSON numbers become Perl numbers, either integers or double-precision
+floating point numbers, or possibly strings containing the number if
+parsing of a number by the usual methods fails somehow.
+
+JSON does not allow leading zeros, like I<0123>, or leading plus
+signs, like I<+100>, in numbers, so these cause an L</Unexpected
+character> error. JSON also does not allow numbers of the form I<1.>,
+but it does allow things like I<0e0> or I<1E999999>. As far as
+possible these are accepted by JSON::Parse.
+
+=head2 JSON strings
+
+JSON strings become Perl strings. The JSON escape characters such as
+C<\t> for the tab character (see section 2.5 of L</RFC 7159>) are
+mapped to the equivalent ASCII character.
+
+=head3 Handling of Unicode
+
+Inputs must be in the UTF-8 format. See L</UTF-8 only>.
+
+If the input to L</parse_json> is marked as Unicode characters, the
+output strings will be marked as Unicode characters. If the input is
+not marked as Unicode characters, the output strings will not be
+marked as Unicode characters. Thus, 
+
+    
+    use JSON::Parse ':all';
+    # The scalar $sasori looks like Unicode to Perl
+    use utf8;
+    my $sasori = '["蠍"]';
+    my $p = parse_json ($sasori);
+    print utf8::is_utf8 ($p->[0]);
+    # Prints 1.
+    
+
+
+but
+
+    
+    use JSON::Parse ':all';
+    # The scalar $ebi does not look like Unicode to Perl
+    no utf8;
+    my $ebi = '["海老"]';
+    my $p = parse_json ($ebi);
+    print utf8::is_utf8 ($p->[0]);
+    # Prints nothing.
+    
+
+
+Escapes of the form \uXXXX (see page three of L</RFC 7159>) are mapped
+to ASCII if XXXX is less than 0x80, or to UTF-8 if XXXX is greater
+than or equal to 0x80.
+
+Strings containing \uXXXX escapes greater than 0x80 are also upgraded
+to character strings, regardless of whether the input is a character
+string or a byte string, thus regardless of whether Perl thinks the
+input string is Unicode, escapes like \u87f9 are converted into the
+equivalent UTF-8 bytes and the particular string in which they occur
+is marked as a character string:
+
+    
+    use JSON::Parse ':all';
+    no utf8;
+    # 蟹
+    my $kani = '["\u87f9"]';
+    my $p = parse_json ($kani);
+    print "It's marked as a character string" if utf8::is_utf8 ($p->[0]);
+    # Prints "It's marked as a character string" because it's upgraded
+    # regardless of the input string's flags.
+
+
+This is modelled on the behaviour of Perl's C<chr>:
+
+    
+    no utf8;
+    my $kani = '87f9';
+    print "hex is character string\n" if utf8::is_utf8 ($kani);
+    # prints nothing
+    $kani = chr (hex ($kani));
+    print "chr makes it a character string\n" if utf8::is_utf8 ($kani);
+    # prints "chr makes it a character string"
+
+
+Since every byte of input is validated as UTF-8 (see L</UTF-8 only>),
+this hopefully will not upgrade invalid strings.
+
+Surrogate pairs in the form C<\uD834\uDD1E> are also handled. If the
+second half of the surrogate pair is missing, an L</Unexpected
+character> or L</Unexpected end of input> error is thrown. If the
+second half of the surrogate pair is present but contains an
+impossible value, a L</Not surrogate pair> error is thrown.
+
+=head2 JSON arrays
+
+JSON arrays become Perl array references. The elements of the Perl
+array are in the same order as they appear in the JSON.
+
+Thus
+
+    my $p = parse_json ('["monday", "tuesday", "wednesday"]');
+
+has the same result as a Perl declaration of the form
+
+    my $p = [ 'monday', 'tuesday', 'wednesday' ];
+
+=head2 JSON objects
+
+JSON objects become Perl hashes. The members of the JSON object become
+key and value pairs in the Perl hash. The string part of each object
+member becomes the key of the Perl hash. The value part of each member
+is mapped to the value of the Perl hash.
+
+Thus
+
+    my $j = <<EOF;
+    {"monday":["blue", "black"],
+     "tuesday":["grey", "heart attack"],
+     "friday":"Gotta get down on Friday"}
+    EOF
+
+    my $p = parse_json ($j);
+
+has the same result as a Perl declaration of the form
+
+    my $p = {
+        monday => ['blue', 'black'],
+        tuesday => ['grey', 'heart attack'],
+        friday => 'Gotta get down on Friday',
+    };
+
+=head3 Key collisions
+
+A key collision is something like the following.
+
+    
+    use JSON::Parse qw/parse_json parse_json_safe/;
+    my $j = '{"a":1, "a":2}';
+    my $p = parse_json ($j);
+    print "Ambiguous key 'a' is ", $p->{a}, "\n";
+    my $q = parse_json_safe ($j);
+
+
+produces output
+
+    JSON::Parse::parse_json_safe: JSON error at line 1, byte 10/14: Name is not unique: "a" parsing object starting from byte 1  at /usr/home/ben/projects/Json3/examples/key-collision.pl line 8.
+    Ambiguous key 'a' is 2
+
+
+(This example is included as L<F<key-collision.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/key-collision.pl> in the distribution.)
+
+
+Here the key "a" could be either 1 or 2. As seen in the example,
+L</parse_json> overwrites the first value with the second
+value. L</parse_json_safe> halts and prints a warning. If you use
+L</new> you can switch key collision on and off with the
+L</detect_collisions> method.
+
+The rationale for L</parse_json> not to give warnings is that Perl
+doesn't give information about collisions when storing into hash
+values, and checking for collisions for every key will degrade
+performance for the sake of an unlikely occurrence.
+
+Note that the JSON specification says "The names within an object
+SHOULD be unique." (see L</RFC 7159>, page 5), although it's not a
+requirement.
+
+For performance, L</valid_json> and L</assert_valid_json> do not store
+hash keys, thus they cannot detect this variety of problem.
+
+=head2 Literals
+
+
+=head3 null
+
+L</parse_json> maps the JSON null literal to a readonly scalar
+C<$JSON::Parse::null> which evaluates to C<undef>. L</parse_json_safe>
+maps the JSON literal to the undefined value. If you use a parser
+created with L</new>, you can choose either of these behaviours with
+L</copy_literals>, or you can tell JSON::Parse to put your own value
+in place of nulls using the L</set_null> method.
+
+=head3 true
+
+L</parse_json> maps the JSON true literal to a readonly scalar which
+evaluates to C<1>. L</parse_json_safe> maps the JSON literal to the
+value 1. If you use a parser created with L</new>, you can choose
+either of these behaviours with L</copy_literals>, or you can tell
+JSON::Parse to put your own value in place of trues using the
+L</set_true> method.
+
+=head3 false
+
+L</parse_json> maps the JSON false literal to a readonly scalar which
+evaluates to the empty string, or to zero in a numeric context. (This
+behaviour changed from version 0.36 to 0.37. In versions up to 0.36,
+the false literal was mapped to a readonly scalar which evaluated to 0
+only.) L</parse_json_safe> maps the JSON literal to a similar scalar
+without the readonly constraints. If you use a parser created with
+L</new>, you can choose either of these behaviours with
+L</copy_literals>, or you can tell JSON::Parse to put your own value
+in place of falses using the L</set_false> method.
+
+=head3 Round trips and compatibility
+
+The Perl versions of literals produced by L</parse_json> will be
+converted back to JSON literals if you use
+L<JSON::Create/create_json>. However, JSON::Parse's literals are
+incompatible with the other CPAN JSON modules. For compatibility with
+other CPAN modules, create a JSON::Parse object with L</new>, and set
+JSON::Parse's literals with L</set_true>, L</set_false>, and
+L</set_null>.
+
+This example demonstrates round-trip compatibility using L<JSON::Tiny>
+version 0.54:
+
+    
+    use JSON::Tiny '0.54', qw(decode_json encode_json);
+    use JSON::Parse;
+    use JSON::Create;
+    my $cream = '{"clapton":true,"hendrix":false,"bruce":true,"fripp":false}';
+    my $jp = JSON::Parse->new ();
+    my $jc = JSON::Create->new ();
+    print "First do a round-trip of our modules:\n\n";
+    print $jc->run ($jp->run ($cream)), "\n\n";
+    print "Now do a round-trip of JSON::Tiny:\n\n";
+    print encode_json (decode_json ($cream)), "\n\n";
+    print "First, incompatible mode:\n\n";
+    print 'tiny(parse): ', encode_json ($jp->run ($cream)), "\n";
+    print 'create(tiny): ', $jc->run (decode_json ($cream)), "\n\n";
+    $jp->set_true (JSON::Tiny::true);
+    $jp->set_false (JSON::Tiny::false);
+    print "Compatibility with JSON::Parse:\n\n";
+    print 'tiny(parse):', encode_json ($jp->run ($cream)), "\n\n";
+    $jc->bool ('JSON::Tiny::_Bool');
+    print "Compatibility with JSON::Create:\n\n";
+    print 'create(tiny):', $jc->run (decode_json ($cream)), "\n\n";
+    print "JSON::Parse and JSON::Create are still compatible too:\n\n";
+    print $jc->run ($jp->run ($cream)), "\n";
+
+
+produces output
+
+    First do a round-trip of our modules:
+    
+    {"hendrix":false,"clapton":true,"fripp":false,"bruce":true}
+    
+    Now do a round-trip of JSON::Tiny:
+    
+    {"bruce":true,"clapton":true,"fripp":false,"hendrix":false}
+    
+    First, incompatible mode:
+    
+    tiny(parse): {"bruce":1,"clapton":1,"fripp":"","hendrix":""}
+    create(tiny): {"fripp":0,"bruce":1,"clapton":1,"hendrix":0}
+    
+    Compatibility with JSON::Parse:
+    
+    tiny(parse):{"bruce":true,"clapton":true,"fripp":false,"hendrix":false}
+    
+    Compatibility with JSON::Create:
+    
+    create(tiny):{"hendrix":false,"fripp":false,"bruce":true,"clapton":true}
+    
+    JSON::Parse and JSON::Create are still compatible too:
+    
+    {"fripp":false,"bruce":true,"clapton":true,"hendrix":false}
+
+
+(This example is included as L<F<json-tiny-round-trip-demo.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/json-tiny-round-trip-demo.pl> in the distribution.)
+
+
+Most of the other CPAN modules use similar methods to L<JSON::Tiny>,
+so the above example can easily be adapted. See also
+L<JSON::Create/Interoperability> for various examples.
+
+=head3 Modifying the values
+
+L</parse_json> maps all the literals to read-only values. Because of
+this, attempting to modifying the boolean values in the hash reference
+returned by L</parse_json> will cause "Modification of a read-only
+value attempted" errors:
+
+    my $in = '{"hocus":true,"pocus":false,"focus":null}';
+    my $p = json_parse ($in);
+    $p->{hocus} = 99;
+    # "Modification of a read-only value attempted" error occurs
+
+Since the hash values are read-only scalars, 
+C<< $p->{hocus} = 99 >> is like this:
+
+    undef = 99;
+
+If you need to modify the returned hash reference, then delete the
+value first:
+
+    my $in = '{"hocus":true,"pocus":false,"focus":null}';
+    my $p = json_parse ($in);
+    delete $p->{pocus};
+    $p->{pocus} = 99;
+    # OK
+
+Similarly with array references, delete the value before altering:
+
+    my $in = '[true,false,null]';
+    my $q = json_parse ($in);
+    delete $q->[1];
+    $q->[1] = 'magic';
+
+Note that the return values from parsing bare literals are not
+read-only scalars, so
+
+    my $true = JSON::Parse::json_parse ('true');
+    $true = 99;
+
+produces no error. This is because Perl copies the scalar.
+
+=head1 METHODS
+
+If you need to parse JSON and you are not satisfied with the parsing
+options offered by L</parse_json> and L</parse_json_safe>, you can
+create a JSON parsing object with L</new> and set various options on
+the object, then use it with L</run>. These options include the
+ability to copy JSON literals with L</copy_literals>, switch off fatal
+errors with L</warn_only>, detect key collisions in objects with
+L</detect_collisions>, and set the JSON literals to user defined
+values with the methods described under L</Methods for manipulating
+literals>.
+
+These methods only work on an object created with L</new>; they do not
+affect the behaviour of L</parse_json> or L</parse_json_safe>.
+
+=head2 new
+
+    my $jp = JSON::Parse->new ();
+
+Create a new JSON::Parse object.
+
+This method was added in version 0.38.
+
+=head2 run
+
+    my $out = $jp->run ($json);
+
+This does the same thing as L</parse_json>, except its behaviour can
+be modified using the methods below.
+
+This method was added in version 0.38.
+
+=head2 check
+
+    eval {
+        $jp->check ($json);
+    };
+
+This does the same thing as L</assert_valid_json>, except its
+behaviour can be modified using the methods below. Only the
+L</diagnostics_hash> method will actually affect this.
+
+This method was added in version 0.48, for the benefit of
+L<JSON::Repair>.
+
+=head2 copy_literals
+
+    $jp->copy_literals (1);
+
+With a true value, copy JSON literal values (C<null>, C<true>, and
+C<false>) into new Perl scalar values, and don't put read-only values
+into the output. 
+
+With a false value, use read-only scalars:
+
+    $jp->copy_literals (0);
+
+The C<copy_literals (1)> behaviour is the behaviour of
+L</parse_json_safe>. The C<copy_literals (0)> behaviour is the
+behaviour of L</parse_json>.
+
+If the user also sets user-defined literals with L</set_true>,
+L</set_false> and L</set_null>, that takes precedence over this.
+
+This method was added in version 0.38.
+
+=head2 warn_only
+
+    $jp->warn_only (1);
+
+Warn, don't die, on error. Failed parsing returns the undefined value,
+C<undef>, and prints a warning.
+
+This can be switched off again using any false value:
+
+    $jp->warn_only ('');
+
+This method was documented in version 0.38, but only implemented in
+version 0.41.
+
+=head2 detect_collisions
+
+    $jp->detect_collisions (1);
+
+This switches on a check for hash key collisions (non-unique names in
+JSON objects). If a collision is found, an error message L</Name is
+not unique> is printed, which also gives the non-unique name and the
+byte position where the start of the colliding string was found:
+
+    
+    use JSON::Parse;
+    my $jp = JSON::Parse->new ();
+    $jp->detect_collisions (1);
+    eval {
+        $jp->run ('{"animals":{"cat":"moggy","cat":"feline","cat":"neko"}}');
+    };
+    print "$@\n" if $@;
+
+
+produces output
+
+    JSON error at line 1, byte 28/55: Name is not unique: "cat" parsing object starting from byte 12 at /usr/home/ben/projects/Json3/blib/lib/JSON/Parse.pm line 103.
+    
+
+
+(This example is included as L<F<collide.pl>|https://api.metacpan.org/source/BKB/JSON-Parse-0.49/examples/collide.pl> in the distribution.)
+
+
+The C<detect_collisions (1)> behaviour is the behaviour of
+L</parse_json_safe>. The C<detect_collisions (0)> behaviour is the
+behaviour of L</parse_json>.
+
+This method was added in version 0.38.
+
+=head2 diagnostics_hash
+
+    $jp->diagnostics_hash (1);
+
+This changes diagnostics produced by errors from a simple string into
+a hash reference containing various fields. This is experimental and
+subject to change. This is incompatible with L</warn_only>.
+
+This replaces the previous experimental global variable
+C<$json_diagnostics>, which was removed from the module. The hash keys
+and values are identical to those provided in the object returned by
+C<$json_diagnostics>, with the addition of a key C<error as string>
+which returns the usual error.
+
+This requires Perl version 5.14 or later.
+
+This method was added in version 0.46.
+
+=head2 Methods for manipulating literals
+
+These methods alter what is written into the Perl structure when the
+parser sees a literal value, C<true>, C<false> or C<null> in the input
+JSON.
+
+This number of methods is unfortunately necessary, since it's possible
+that a user might want to set_false (undef) to set false values to
+turn into undefs.
+
+    $jp->set_false (undef);
+
+Thus, we cannot use a single function C<< $jp->false (undef) >> to
+cover both setting and deleting of values.
+
+These methods were added in version 0.38.
+
+
+
+
+
+=head3 set_true
+
+    $jp->set_true ("Yes, that is so true");
+
+Supply a scalar to be used in place of the JSON C<true> literal. 
+
+This example puts the string "Yes, that is so true" into the hash or
+array when we hit a "true" literal, rather than the default read-only
+scalar:
+
+    
+    use JSON::Parse;
+    my $json = '{"yes":true,"no":false}';
+    my $jp = JSON::Parse->new ();
+    $jp->set_true ('Yes, that is so true');
+    my $out = $jp->run ($json);
+    print $out->{yes}, "\n";
+    
+
+
+prints
+
+    Yes, that is so true
+
+
+
+To override the previous value, call it again with a new value. To
+delete the value and revert to the default behaviour, use
+L</delete_true>.
+
+
+
+If you give this a value which is not "true", as in Perl will
+evaluate it as a false in an if statement, it prints a warning
+L</User-defined value for JSON true evaluates as false>.
+You can switch this warning off with L</no_warn_literals>.
+
+
+
+This method was added in version 0.38.
+
+=head3 delete_true
+
+    $jp->delete_true ();
+
+Delete the user-defined true value. See L</set_true>. 
+
+This method is "safe" in that it has absolutely no effect if no
+user-defined value is in place. It does not return a value.
+
+This method was added in version 0.38.
+
+
+
+
+=head3 set_false
+
+    $jp->set_false (JSON::PP::Boolean::false);
+
+Supply a scalar to be used in place of the JSON C<false> literal. 
+
+In the above example, when we hit a "false" literal, we put
+C<JSON::PP::Boolean::false> in the output, similar to L<JSON::PP> and
+other CPAN modules like L<Mojo::JSON> or L<JSON::XS>.
+
+
+To override the previous value, call it again with a new value. To
+delete the value and revert to the default behaviour, use
+L</delete_false>.
+
+
+
+If you give this a value which is not "false", as in Perl will
+evaluate it as a false in an if statement, it prints a warning
+L</User-defined value for JSON false evaluates as true>.
+You can switch this warning off with L</no_warn_literals>.
+
+
+
+This method was added in version 0.38.
+
+=head3 delete_false
+
+    $jp->delete_false ();
+
+Delete the user-defined false value. See L</set_false>. 
+
+This method is "safe" in that it has absolutely no effect if no
+user-defined value is in place. It does not return a value.
+
+This method was added in version 0.38.
+
+
+
+
+=head3 set_null
+
+    $jp->set_null (0);
+
+Supply a scalar to be used in place of the JSON C<null> literal. 
+
+
+To override the previous value, call it again with a new value. To
+delete the value and revert to the default behaviour, use
+L</delete_null>.
+
+
+
+This method was added in version 0.38.
+
+=head3 delete_null
+
+    $jp->delete_null ();
+
+Delete the user-defined null value. See L</set_null>. 
+
+This method is "safe" in that it has absolutely no effect if no
+user-defined value is in place. It does not return a value.
+
+This method was added in version 0.38.
+
+
+
+=head3 no_warn_literals
+
+    $jp->no_warn_literals (1);
+
+Use a true value to switch off warnings about setting boolean values
+to contradictory things. For example if you want to set the JSON
+C<false> literal to turn into the string "false",
+
+    $jp->no_warn_literals (1);
+    $jp->set_false ("false");
+
+See also L</Contradictory values for "true" and "false">.
+
+This also switches off the warning L</User-defined value overrules
+copy_literals>.
+
+This method was added in version 0.38.
+
+=head1 RESTRICTIONS
+
+This module imposes the following restrictions on its input.
+
+=over
+
+=item JSON only
+
+JSON::Parse is a strict parser. It only accepts input which exactly
+meets the criteria of L</RFC 7159>. That means, for example,
+JSON::Parse does not accept single quotes (') instead of double quotes
+("), or numbers with leading zeros, like 0123. JSON::Parse does not
+accept control characters (0x00 - 0x1F) in strings, missing commas
+between array or hash elements like C<["a" "b"]>, or trailing commas
+like C<["a","b","c",]>. It also does not accept trailing
+non-whitespace, like the second "]" in C<["a"]]>.
+
+=item No incremental parsing
+
+JSON::Parse does not parse incrementally. It only parses fully-formed
+JSON strings which include all opening and closing brackets. This is
+an inherent part of the design of the module. Incremental parsing in
+the style of L<XML::Parser> would (obviously) require some kind of
+callback structure to deal with the elements of the partially digested
+structures, but JSON::Parse was never designed to do this; it merely
+converts what it sees into a Perl structure. Claims to offer
+incremental JSON parsing in other modules' documentation should be
+diligently verified.
+
+=item UTF-8 only
+
+Although JSON may come in various encodings of Unicode, JSON::Parse
+only parses the UTF-8 format. If input is in a different Unicode
+encoding than UTF-8, convert the input before handing it to this
+module. For example, for the UTF-16 format,
+
+    use Encode 'decode';
+    my $input_utf8 = decode ('UTF-16', $input);
+    my $perl = parse_json ($input_utf8);
+
+or, for a file, use C<:encoding> (see L<PerlIO::encoding> and
+L<perluniintro>):
+
+    open my $input, "<:encoding(UTF-16)", 'some-json-file'; 
+
+JSON::Parse does not determine the nature of the octet stream, as
+described in part 3 of L</RFC 7159>.
+
+This restriction to UTF-8 applies regardless of whether Perl thinks
+that the input string is a character string or a byte
+string. Non-UTF-8 input will cause an L</Unexpected character> error.
+
+=back
+
+=head1 DIAGNOSTICS
+
+L</valid_json> does not produce error messages. L</parse_json> and
+L</assert_valid_json> die on encountering invalid
+input. L</parse_json_safe> uses L<Carp/carp> to pass error messages as
+warnings.
+
+Error messages have the line number, and the byte number where
+appropriate, of the input which caused the problem. The line number is
+formed simply by counting the number of "\n" (linefeed, ASCII 0x0A)
+characters in the whitespace part of the JSON.
+
+In L</parse_json> and L</assert_valid_json>, parsing errors are fatal,
+so to continue after an error occurs, put the parsing into an C<eval>
+block:
+
+    my $p;                       
+    eval {                       
+        $p = parse_json ($j);  
+    };                           
+    if ($@) {                    
+        # handle error           
+    }
+
+The following error messages are produced:
+
+
+
+=head2 Unexpected character
+
+An unexpected character (byte) was encountered in the input. For
+example, when looking at the beginning of a string supposedly
+containing JSON, there are six possible characters, the four JSON
+whitespace characters plus "[" and "{". If the module encounters a
+plus sign, it will give an error like this:
+
+    assert_valid_json ('+');
+
+
+gives output
+
+    JSON error at line 1, byte 1/1: Unexpected character '+' parsing initial state: expecting whitespace: '\n', '\r', '\t', ' ' or start of string: '"' or digit: '0-9' or minus: '-' or start of an array or object: '{', '[' or start of literal: 't', 'f', 'n' 
+
+
+
+The message always includes a list of what characters are allowed.
+
+If there is some recognizable structure being parsed, the error
+message will include its starting point in the form "starting from
+byte n":
+
+    assert_valid_json ('{"this":"\a"}');
+
+
+gives output
+
+    JSON error at line 1, byte 11/13: Unexpected character 'a' parsing string starting from byte 9: expecting escape: '\', '/', '"', 'b', 'f', 'n', 'r', 't', 'u' 
+
+
+
+A feature of JSON is that parsing it requires only one byte to be
+examined at a time. Thus almost all parsing problems can be handled
+using the "Unexpected character" error type, including spelling errors
+in literals:
+
+    assert_valid_json ('[true,folse]');
+
+
+gives output
+
+    JSON error at line 1, byte 8/12: Unexpected character 'o' parsing literal starting from byte 7: expecting 'a' 
+
+
+
+and the missing second half of a surrogate pair:
+
+    assert_valid_json ('["\udc00? <-- should be a second half here"]');
+
+
+gives output
+
+    JSON error at line 1, byte 9/44: Unexpected character '?' parsing unicode escape starting from byte 3: expecting '\' 
+
+
+
+All kinds of errors can occur parsing numbers, for example a missing
+fraction,
+
+    assert_valid_json ('[1.e9]');
+
+
+gives output
+
+    JSON error at line 1, byte 4/6: Unexpected character 'e' parsing number starting from byte 2: expecting digit: '0-9' 
+
+
+
+and a leading zero,
+
+    assert_valid_json ('[0123]');
+
+
+gives output
+
+    JSON error at line 1, byte 3/6: Unexpected character '1' parsing number starting from byte 2: expecting whitespace: '\n', '\r', '\t', ' ' or comma: ',' or end of array: ']' or dot: '.' or exponential sign: 'e', 'E' 
+
+
+
+The error message is this complicated because all of the following are
+valid here: whitespace: C<[0 ]>; comma: C<[0,1]>, end of array:
+C<[0]>, dot: C<[0.1]>, or exponential: C<[0e0]>.
+
+These are all handled by this error.  Thus the error messages are a
+little confusing as diagnostics.
+
+Versions of this module prior to 0.29 gave more informative messages
+like "leading zero in number". (The messages weren't documented.) The
+reason to change over to the single message was because it makes the
+parsing code simpler, and because the testing code described in
+L</TESTING> makes use of the internals of this error to check that the
+error message produced actually do correspond to the invalid and valid
+bytes allowed by the parser, at the exact byte given.
+
+This is a bytewise error, thus for example if a miscoded UTF-8 appears
+in the input, an error message saying what bytes would be valid at
+that point will be printed.
+
+    
+    no utf8;
+    use JSON::Parse 'assert_valid_json';
+    
+    # Error in first byte:
+    
+    my $bad_utf8_1 = chr (hex ("81"));
+    eval { assert_valid_json ("[\"$bad_utf8_1\"]"); };
+    print "$@\n";
+    
+    # Error in third byte:
+    
+    my $bad_utf8_2 = chr (hex ('e2')) . chr (hex ('9C')) . 'b';
+    eval { assert_valid_json ("[\"$bad_utf8_2\"]"); };
+    print "$@\n";
+
+
+prints
+
+    JSON error at line 1, byte 3/5: Unexpected character 0x81 parsing string starting from byte 2: expecting printable ASCII or first byte of UTF-8: '\x20-\x7f', '\xC2-\xF4' at examples/bad-utf8.pl line 10.
+    
+    JSON error at line 1, byte 5/7: Unexpected character 'b' parsing string starting from byte 2: expecting bytes in range 80-bf: '\x80-\xbf' at examples/bad-utf8.pl line 16.
+    
+
+
+
+
+
+=head2 Unexpected end of input
+
+The end of the string was encountered before the end of whatever was
+being parsed was. For example, if a quote is missing from the end of
+the string, it will give an error like this:
+
+    assert_valid_json ('{"first":"Suzuki","second":"Murakami","third":"Asada}');
+
+
+gives output
+
+    JSON error at line 1: Unexpected end of input parsing string starting from byte 47 
+
+
+
+
+
+
+=head2 Not surrogate pair
+
+While parsing a string, a surrogate pair was encountered. While trying
+to turn this into UTF-8, the second half of the surrogate pair turned
+out to be an invalid value.
+
+    assert_valid_json ('["\uDC00\uABCD"]');
+
+
+gives output
+
+    JSON error at line 1: Not surrogate pair parsing unicode escape starting from byte 11 
+
+
+
+
+
+
+=head2 Empty input
+
+This error occurs for an input which is an empty (no length or
+whitespace only) or an undefined value.
+
+    assert_valid_json ('');
+
+
+gives output
+
+    JSON error: Empty input parsing initial state 
+
+
+
+Prior to version 0.49, this error was produced by
+L</assert_valid_json> only, but it is now also produced by
+L</parse_json>. See L</JSON Parsing Test Suite>.
+
+
+
+
+=head2 Name is not unique
+
+This error occurs when parsing JSON when the user has chosen
+L</detect_collisions>. For example an input like
+
+    my $p = JSON::Parse->new ();
+    $p->detect_collisions (1);
+    $p->run ('{"hocus":1,"pocus":2,"hocus":3}');
+
+
+gives output
+
+    JSON error at line 1, byte 23/31: Name is not unique: "hocus" parsing object starting from byte 1 at blib/lib/JSON/Parse.pm line 109.
+
+
+
+where the JSON object has two keys with the same name, C<hocus>. The
+terminology "name is not unique" is from the JSON specification.
+
+
+
+
+=head2 Contradictory values for "true" and "false"
+
+=head3 User-defined value for JSON false evaluates as true
+
+This happens if you set JSON false to map to a true value:
+
+    $jp->set_false (1);
+
+To switch off this warning, use L</no_warn_literals>.
+
+This warning was added in version 0.38.
+
+=head3 User-defined value for JSON true evaluates as false
+
+This happens if you set JSON true to map to a false value:
+
+    $jp->set_true (undef);
+
+To switch off this warning, use L</no_warn_literals>.
+
+This warning was added in version 0.38.
+
+=head2 User-defined value overrules copy_literals
+
+This warning is given if you set up literals with L</copy_literals>
+then you also set up your own true, false, or null values with
+L</set_true>, L</set_false>, or L</set_null>.
+
+This warning was added in version 0.38.
+
+=head1 PERFORMANCE
+
+On the author's computer, the module's speed of parsing is
+approximately the same as L<JSON::XS>, with small variations depending
+on the type of input. For validation, L</valid_json> is faster than
+any other module known to the author, and up to ten times faster than
+JSON::XS.
+
+Some special types of input, such as floating point numbers containing
+an exponential part, like "1e09", seem to be about two or three times
+faster to parse with this module than with L<JSON::XS>. In
+JSON::Parse, parsing of exponentials is done by the system's C<strtod>
+function, but JSON::XS contains its own parser for exponentials, so
+these results may be system-dependent. 
+
+At the moment the main place JSON::XS wins over JSON::Parse is in
+strings containing escape characters, where JSON::XS is about 10%
+faster on the module author's computer and compiler. As of version
+0.33, despite some progress in improving JSON::Parse, I haven't been
+able to fully work out the reason behind the better speed.
+
+There is some benchmarking code in the github repository under the
+directory "benchmarks" for those wishing to test these claims. The
+script L<F<benchmarks/bench>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/benchmarks/bench> is an adaptation of the similar
+script in the L<JSON::XS> distribution. The script L<F<benchmarks/pub-bench.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/benchmarks/pub-bench.pl> runs the benchmarks and prints them
+out as POD.
+
+The following benchmark tests used version 0.47 of JSON::Parse and
+version 3.03 of JSON::XS on Perl Version 18.2, compiled with Clang
+version 3.4.1 on FreeBSD 10.3. The files in the "benchmarks" directory
+of JSON::Parse. "short.json" and "long.json" are the benchmarks used
+by JSON::XS.
+
+=over
+
+=item short.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     | 776722.963 |  0.0000129 |
+    JSON::Parse   | 285326.803 |  0.0000350 |
+    JSON::XS      | 257319.264 |  0.0000389 |
+    --------------+------------+------------+
+
+
+=item long.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     |  13985.675 |  0.0007150 |
+    JSON::Parse   |   5128.138 |  0.0019500 |
+    JSON::XS      |   5919.977 |  0.0016892 |
+    --------------+------------+------------+
+
+
+=item words-array.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     | 285326.803 |  0.0000350 |
+    JSON::Parse   |  32589.775 |  0.0003068 |
+    JSON::XS      |  32263.877 |  0.0003099 |
+    --------------+------------+------------+
+
+
+=item exp.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     | 128266.177 |  0.0000780 |
+    JSON::Parse   |  52626.148 |  0.0001900 |
+    JSON::XS      |  19849.995 |  0.0005038 |
+    --------------+------------+------------+
+
+
+=item literals.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     | 313007.761 |  0.0000319 |
+    JSON::Parse   |  47180.022 |  0.0002120 |
+    JSON::XS      |  28826.832 |  0.0003469 |
+    --------------+------------+------------+
+
+
+=item cpantesters.json
+
+    Repetitions: 10 x 100 = 1000
+    --------------+------------+------------+
+    module        |      1/min |        min |
+    --------------|------------|------------|
+    JP::valid     |   1398.241 |  0.0071518 |
+    JSON::Parse   |    211.734 |  0.0472291 |
+    JSON::XS      |    215.100 |  0.0464900 |
+    --------------+------------+------------+
+
+
+
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item RFC 7159
+
+JSON is specified in L<RFC 7159 "The application/json Media Type for
+JavaScript Object Notation
+(JSON)"|http://www.ietf.org/rfc/rfc7159.txt>.
+
+=item json.org
+
+L<http://json.org> is the website for JSON, authored by Douglas
+Crockford.
+
+=item JSON::Create
+
+L<JSON::Create> is a companion module to JSON::Parse by the same
+author. As of version 0.08, I'm using it everywhere, but it should
+still be considered to be in a testing stage. Please feel free to try
+it out.
+
+=item JSON::Tokenize
+
+L<JSON::Tokenize> is part of the JSON::Parse distribution, a tokenizer
+which reduces a JSON string to tokens. This makes the JSON::Parse
+tokenizer available to people who want to write their own JSON
+parsers.
+
+=item JSON::Repair
+
+L<JSON::Repair> is an example module which demonstrates using
+JSON::Parse to apply some kinds of heuristics to repair "relaxed JSON"
+or otherwise broken JSON into compliant JSON.
+
+=back
+
+=head2 Other CPAN modules for parsing and producing JSON
+
+=over
+
+=item Reading and writing JSON
+
+=over
+
+=item L<JSON>
+
+This calls on either L<JSON::PP> or L<JSON::XS>.
+
+=item L<JSON::PP>
+
+This is part of the Perl core, installed when you install Perl. "PP"
+stands for "Pure Perl", which means it is in Perl-only without the XS
+(C-based) parsing. This is slower but may be necessary if you cannot
+install modules requiring a C compiler.
+
+=item L<JSON::XS>
+
+This is an all-purpose JSON module in XS, which means it requires a C
+compiler to install.
+
+=item L<Cpanel::JSON::XS>
+
+This is a fork of L<JSON::XS> related to a disagreement about how to
+report bugs. Please see the module for details.
+
+=item L<JSON::DWIW>
+
+"Does what I want" module.
+
+=item L<JSON::YAJL>
+
+Wraps a C library called yajl.
+
+=item L<JSON::Util>
+
+Relies on L<JSON::MaybeXS>.
+
+=item L<Pegex::JSON>
+
+Based on L<Pegex>.
+
+=item L<JSON::Syck>
+
+Takes advantage of a similarity between YAML (yet another markup
+language) and JSON to provide a JSON parser/producer using
+L<YAML::Syck>.
+
+=item L<Inline::JSON>
+
+Relies on L</JSON>.
+
+=item L<Glib::JSON>
+
+Uses the JSON library from Glib, a library of C functions for the
+Linux GNOME desktop project.
+
+=item L<Mojo::JSON>
+
+Part of the L<Mojolicious> standalone web framework, "pure Perl" JSON
+reader/writer. As of version 6.25 of Mojolicious, this actually
+depends on L</JSON::PP>.
+
+=item L<JSON::Tiny>
+
+This is a fork of L</Mojo::JSON>.
+
+=item L<File::JSON::Slurper>
+
+Slurp a JSON file into a data structure, and the reverse. It relies on
+L</JSON::MaybeXS>.
+
+=back
+
+=item Special-purpose modules
+
+=over
+
+=item L<JSON::MultiValueOrdered> and L<JSON::Tiny::Subclassable>
+
+C<JSON::MultiValueOrdered> is a special-purpose module for parsing
+JSON objects which have key collisions (something like
+C<{"a":1,"a":2}>) within objects.
+
+(JSON::Parse's handling of key collisions is discussed in L</Key
+collisions> in this document.)
+
+=item L<boolean>
+
+This module offers C<true> and C<false> literals similar to JSON.
+
+=item L<Devel::JSON>
+
+For one-liners.
+
+=item L<App::JSON::to>
+
+Convert JSON data to other formats.
+
+=item L<JSON::Color>
+
+This module generates JSON, colorized with ANSI escape sequences.
+
+=item L<Config::JSON>
+
+Configuration files in JSON
+
+=item L<JSON::String>
+
+Automatically change a JSON string when a data structure changes.
+
+=item L<JSON::Builder>
+
+Create JSON under memory limitations.
+
+=item L<JSON::Pointer>
+
+Extract parts of a JSON string.
+
+=item L<Inline::JSON>
+
+Include JSON in a Perl program.
+
+=item L<JSON::Path>
+
+Search nested hashref/arrayref structures using JSONPath.
+
+=back
+
+=item Test-related modules
+
+=over
+
+=item L<Test::JSON>
+
+This offers a way to compare two different JSON strings to see if they
+refer to the same object. As of version 0.11, it relies on
+L</JSON::Any>.
+
+=item L<Test::JSON::More>
+
+JSON Test Utility. As of version 0.02, it relies on L</JSON>.
+
+=item L<Test::Deep::JSON>
+
+Compare JSON with L<Test::Deep>. As of version 0.03, it relies on
+L</JSON>.
+
+=back
+
+=item Type-related modules
+
+These untangle numbers, strings, and booleans into JSON types.
+
+=over
+
+=item L<JSON::Types>
+
+=item L<JSON::TypeInference>
+
+=item L<JSON::Typist>
+
+=item L<JSON::Types::Flexible>
+
+=back
+
+=item Combination modules
+
+These modules rely on more than one back-end module.
+
+=over
+
+=item L<JSON::MaybeXS>
+
+A module which combines L</Cpanel::JSON::XS>, L</JSON::XS>, and
+L</JSON::PP>. The original L</JSON> combines L</JSON::XS> and
+L</JSON::PP>, so this prioritizes L</Cpanel::JSON::XS>.
+
+=item L<JSON::Any>
+
+This module combines L</JSON::DWIW>, L</JSON::XS> versions one and
+two, and L</JSON::Syck>.
+
+=item L<JSON::XS::VersionOneAndTwo>
+
+A "combination module" which supports two different interfaces of
+L</JSON::XS>. However, JSON::XS is now onto version 3.
+
+=item L<Mojo::JSON::MaybeXS>
+
+This pulls in L</JSON::MaybeXS> instead of L</Mojo::JSON>.
+
+=back
+
+=item JSON extensions
+
+These modules extend JSON with comments and other things.
+
+=over
+
+=item L<JSON::Relaxed>
+
+"An extension of JSON that allows for better human-readability".
+
+=item L<JSONY>
+
+"Relaxed JSON with a little bit of YAML"
+
+=item L<JSON::Diffable>
+
+"A relaxed and easy diffable JSON variant"
+
+=back
+
+=item Other modules
+
+=over
+
+=item L<JSON::XS::Sugar>
+
+=item L<JSON::ON>
+
+=item L<Eve::Json>
+
+=item L<JBD::JSON>
+
+=item L<JSON::JS>
+
+=item L<Silki::JSON>
+
+=item L<Haineko::JSON>
+
+=item L<App::JSON::Tools>
+
+=item L<JSON::XS::ByteString>
+
+=item L<JSON::Streaming::Reader> and L<JSON::Streaming::Writer>
+
+=item L<JSON::SL>
+
+=item L<JSON::Meth>
+
+=back
+
+=back
+
+=head1 SCRIPT
+
+A script "validjson" is supplied with the module. This runs
+L</assert_valid_json> on its inputs, so run it like this.
+
+     validjson *.json
+
+The default behaviour is to just do nothing if the input is valid. For
+invalid input it prints what the problem is:
+
+    validjson ids.go 
+    ids.go: JSON error at line 1, byte 1/7588: Unexpected character '/' parsing initial state: expecting whitespace: '\n', '\r', '\t', ' ' or start of string: '"' or digit: '0-9' or minus: '-' or start of an array or object: '{', '[' or start of literal: 't', 'f', 'n'.
+
+If you need confirmation, use its --verbose option:
+
+    validjson -v *.json
+
+    atoms.json is valid JSON.
+    ids.json is valid JSON.
+    kanjidic.json is valid JSON.
+    linedecomps.json is valid JSON.
+    radkfile-radicals.json is valid JSON.
+
+=head1 TEST RESULTS
+
+The CPAN testers results are at the usual place. 
+
+The ActiveState test results are at
+L<http://code.activestate.com/ppm/JSON-Parse/>.
+
+=head1 EXPORTS
+
+The module exports nothing by default. Functions L</parse_json>,
+L</parse_json_safe>, L</json_file_to_perl>, L</valid_json> and
+L</assert_valid_json>, as well as the old function names
+L</validate_json> and L</json_to_perl>, can be exported on request.
+
+All of the functions can be exported using the tag ':all':
+
+    use JSON::Parse ':all';
+
+=head1 TESTING
+
+=head2 Internal testing code
+
+The module incorporates extensive testing related to the production of
+error messages and validation of input. Some of the testing code is
+supplied with the module in the F</t/> subdirectory of the
+distribution.
+
+More extensive testing code is in the git repository. This is not
+supplied in the CPAN distribution. A script, L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/randomjson.pl>,
+generates a set number of bytes of random JSON and checks that the
+module's bytewise validation of input is correct. It does this by
+taking a valid fragment, then adding each possible byte from 0 to 255
+to see whether the module correctly identifies it as valid or invalid
+at that point, then randomly picking one of the valid bytes and adding
+it to the fragment and continuing the process until a complete valid
+JSON input is formed. The module has undergone about a billion
+repetitions of this test.
+
+This setup relies on a C file, L<F<json-random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/json-random-test.c>, which isn't in
+the CPAN distribution, and it also requires L<F<Json3.xs>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/Json3.xs> to be edited
+to make the macro C<TESTRANDOM> true (uncomment line 7 of the
+file). The testing code uses C setjmp/longjmp, so it's not guaranteed
+to work on all operating systems and is commented out for CPAN
+releases.
+
+A pure C version called L<F<random-test.c>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/random-test.c> also exists. This applies
+exactly the same tests, and requires no Perl at all.
+
+If you're interested in testing your own JSON parser, the outputs
+generated by L<F<randomjson.pl>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/randomjson.pl> are quite a good place to start. The
+default is to produce UTF-8 output, which looks pretty horrible since
+it tends to produce long strings of UTF-8 garbage. (This is because it
+chooses randomly from 256 bytes and the end-of-string marker C<"> has
+only a 1/256 chance of being chosen, so the strings tend to get long
+and messy). You can mess with the internals of JSON::Parse by setting
+MAXBYTE in F<json-common.c> to 0x80, recompiling (you can ignore the
+compiler warnings), and running F<randomjson.pl> again to get just
+ASCII random JSON things. This breaks the UTF-8 functionality of
+JSON::Parse, so please don't install that version.
+
+=head2 JSON Parsing Test Suite
+
+Version 0.48 passed all but two of the yes/no tests of the L<JSON
+Parsing Test Suite|https://github.com/nst/JSONTestSuite>. The first
+failure was that L</assert_valid_json> did not mark L<a completely
+empty
+file|https://github.com/nst/JSONTestSuite/blob/master/test_parsing/n_structure_no_data.json>
+as invalid JSON, and the second was that L</parse_json> did not mark
+L<a file containing a single space
+character|https://github.com/nst/JSONTestSuite/blob/master/test_parsing/n_single_space.json>
+as invalid json. The tests also revealed an inconsistency between
+L</assert_valid_json> and L</valid_json>, which was reporting the
+completely empty file as invalid. Running these tests also revealed
+several bugs in the script L<validjson|/SCRIPT>. All of these errors
+were amended in version 0.49.
+
+I attempted to include the JSON Parsing Test Suite tests in the
+module's tests, but some of the files (like 100,000 open arrays)
+actually L<cause crashes on some versions of Perl on some
+machines|http://fast-matrix.cpantesters.org/?dist=JSON-Parse%200.48_01>,
+so they're not really suitable for distribution. The tests are found,
+however, in the repository under L<F<xt/jpts.t>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/jpts.t> and the
+subdirectory L<F<xt/jpts>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/jpts>, so if you are interested in the
+results, please copy that and try it. There is also a test for the
+L<validjson|/SCRIPT> script as L<F<xt/validjson.t>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/xt/validjson.t> in the
+repository. These are author tests, so you may need to install extra
+modules to run them. These author tests are run automatically before
+any code is uploaded to CPAN.
+
+=head1 HISTORY
+
+See L<F<Changes>|https://github.com/benkasminbullock/JSON-Parse/blob/21138ec0efa9123392388027af87017af93009dc/Changes> in the distribution for a full list of changes.
+
+This module started out under the name L<JSON::Argo>. It was
+originally a way to escape from having to use the other JSON modules
+on CPAN.
+
+The reason it only parsed JSON was that when I started this I didn't
+know the Perl extension language XS very well, and I was not confident
+about making a JSON producer, so it only parsed JSON, which was the
+main job I needed to do. It originally used lex and yacc in the form
+of flex and bison, since discarded. I also found out that someone else
+had a JSON parser called Argo in Java, so to save confusion I dropped
+the name JSON::Argo and renamed this JSON::Parse, keeping the version
+numbers continuous.
+
+The module has since been completely rewritten, twice, mostly in an
+attempt to improve performance, after I found that JSON::XS was much
+faster than the original JSON::Parse. (The first rewrite of the module
+was not released to CPAN, this is the second one, which explains why
+some files have names like F<Json3.xs>). I also hoped to make something
+useful which wasn't in any existing CPAN module by offering the
+high-speed validator, L</valid_json>.
+
+I also rewrote the module due to some bugs I found, for example up to
+version 0.09 it was failing to accept whitespace after an object key
+string, so a JSON input of the form C<{ "x" : "y" }>, with whitespace
+between the C<"x"> and the colon, C<:>, would cause it to fail. That
+was one big reason I created the random testing regime described in
+L</TESTING> above. I believe that the module is now compliant with the
+JSON specification. 
+
+After starting JSON::Create, I realised that some edge case handling
+in JSON::Parse needed to be improved. This resulted in the addition of
+the hash collision and literal-overriding methods introduced
+in versions 0.37 and 0.38 of this module.
+
+Version 0.42 fixed a very serious bug where long strings could
+overflow an internal buffer, and could cause a segmentation fault.
+
+Version 0.48 removed an experimental feature called
+C<$json_diagnostics> which would produce errors in JSON, and replaced
+it with the current L</diagnostics_hash> method, for the benefit of
+L</JSON::Repair>.
+
+Version 0.49 brought the module into conformance with the L</JSON
+Parsing Test Suite>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Shlomi Fish (SHLOMIF) fixed some memory leaks in version
+0.40. kolmogorov42 (https://github.com/kolmogorov42) reported a very
+serious bug which led to version 0.42.
+
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2013-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

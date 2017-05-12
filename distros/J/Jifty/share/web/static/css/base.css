@@ -1,0 +1,97 @@
+body {
+}
+
+body.calpopup {
+}
+
+.error {
+    color: #a00000;
+}
+
+.warning {
+    color: #00a0a0;
+}
+
+.canonicalization_note {
+    color: #009966;
+}
+
+hr {
+    clear: both;
+} 
+
+.messages .message {
+    display: block;
+}
+
+div#messages,  div#errors {
+     background-color: rgb(240,234,183);
+     border: 1px solid rgb(230,224,173);
+     margin-top: 10px;
+     margin-bottom: 10px;
+     padding: 5px;
+     font-size: 1.2em;
+
+}
+
+div.spacer {
+    clear: both;
+}
+
+.next-page, .prev-page {
+    display: block;
+    float: left;
+    margin: 0.5em 0;
+    padding: 0.2em 0.5em 0.5em 0.5em;
+    border-top: 1px solid gray;
+}
+
+.next-page { padding-right: 1em; }
+.prev-page { padding-left: 1em; }
+
+div#jifty-wait-message {
+    background: #fff url(/static/images/css/spinner.gif) no-repeat scroll center center;
+    position:fixed;
+    top: 5px;
+    right: 5px;
+    height: 24px;
+    width: 24px;
+    padding: 5px;
+    text-indent: 10em;
+    z-index: 42;
+    border-radius: 15px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+}
+
+div#jifty-region, div#jifty-region-lazy {
+    display: inline;
+}
+
+
+
+div.warning {
+ position: absolute;
+ top: 0;
+ left: 50%;
+ right: 0;
+
+ background-color: red;
+ color: white;
+ padding: .5em;
+ border-bottom: 1px solid #000;
+}
+
+div.warning a {
+ color: white;
+
+}
+
+ul.menu {
+  display: block;
+
+}
+
+h1.title {
+  border-bottom: 1px solid black;
+}

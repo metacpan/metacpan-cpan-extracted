@@ -1,0 +1,99 @@
+[PARSED] json_null_literal->(null)
+	JsonStringChar<null>
+
+[PARSED] json_bool_literal->(true)
+	JsonStringChar<true>
+
+[PARSED] json_bool_literal->(false)
+	JsonStringChar<false>
+
+[PARSED] json_string_char->(chars)
+	JsonStringChar<chars>
+
+[PARSED] star_string_chars->(String chars?
+)
+	JsonStringChar<String>
+	JsonStringChar<chars>
+	JsonStringChar<?>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+
+[PARSED] json_string->("This. Is
+a string?")
+	Quote<">
+	JsonStringChar<This>
+	JsonStringChar<.>
+	JsonStringChar<Is>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	JsonStringChar<a>
+	JsonStringChar<string>
+	JsonStringChar<?>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	Quote<">
+
+[PARSED] json_member_list->("nada":null)
+	Quote<">
+	JsonStringChar<nada>
+	Quote<">
+	JsonStringChar<:>
+	JsonStringChar<null>
+
+[PARSED] json_value->(1)
+	Num<1>
+
+[PARSED] json_element_list->(1, 2)
+	Num<1>
+	JsonStringChar<,>
+	Num<2>
+
+[PARSED] json_array->([1, 2])
+	JsonStringChar<[>
+	Num<1>
+	JsonStringChar<,>
+	Num<2>
+	JsonStringChar<]>
+
+[PARSED] json_member_list->("one" : 1, "two": [1, 2])
+	Quote<">
+	JsonStringChar<one>
+	Quote<">
+	JsonStringChar<:>
+	Num<1>
+	JsonStringChar<,>
+	Quote<">
+	JsonStringChar<two>
+	Quote<">
+	JsonStringChar<:>
+	JsonStringChar<[>
+	Num<1>
+	JsonStringChar<,>
+	Num<2>
+	JsonStringChar<]>
+
+[PARSED] json_object->({ "one": {"one_A": 1} ,   "two": 2.0, "tre": 3.0E0 })
+	JsonStringChar<{>
+	Quote<">
+	JsonStringChar<one>
+	Quote<">
+	JsonStringChar<:>
+	JsonStringChar<{>
+	Quote<">
+	JsonStringChar<one_A>
+	Quote<">
+	JsonStringChar<:>
+	Num<1>
+	JsonStringChar<}>
+	JsonStringChar<,>
+	Quote<">
+	JsonStringChar<two>
+	Quote<">
+	JsonStringChar<:>
+	Num<2.0>
+	JsonStringChar<,>
+	Quote<">
+	JsonStringChar<tre>
+	Quote<">
+	JsonStringChar<:>
+	Num<3.0E0>
+	JsonStringChar<}>
+

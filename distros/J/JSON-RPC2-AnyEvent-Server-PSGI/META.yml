@@ -1,0 +1,45 @@
+---
+abstract: 'PSGI adapter for JSON::RPC2::AnyEvent::Server'
+author:
+  - 'Daisuke (yet another) Maki <maki.daisuke@gmail.com>'
+build_requires:
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Plack::Test::AnyEvent: 0
+  Test::Exception: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSON-RPC2-AnyEvent-Server-PSGI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::RPC2::AnyEvent::Server::PSGI:
+    file: lib/JSON/RPC2/AnyEvent/Server/PSGI.pm
+    version: 0.01
+requires:
+  JSON::RPC2::AnyEvent::Server: 0
+  Plack: 0
+  Try::Tiny: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI/issues
+  homepage: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI
+  repository: https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI
+version: 0.01

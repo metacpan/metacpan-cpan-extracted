@@ -1,0 +1,10 @@
+<access>
+  <allow>
+    <address>jabber.org</address>
+    <address>gnu.mine.nu</address>
+  </allow>
+  <deny>
+   <address>qmacro@jabber.org</address>
+   <address>test.jabber.org</address>
+  </deny>
+</access>

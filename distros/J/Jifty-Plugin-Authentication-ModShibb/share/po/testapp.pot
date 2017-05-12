@@ -1,0 +1,37 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../lib/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogout.pm:32
+msgid "For a full logout, you need to CLOSE your browser."
+msgstr ""
+
+#. (Jifty->web->current_user->user_object->name)
+#: ../../blib/lib/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:116 ../../debian/libjifty-plugin-authentication-modshibb-perl/usr/share/perl5/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:116 ../../lib/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:116
+msgid "Hi %1!"
+msgstr ""
+
+#: ../../blib/lib/Jifty/Plugin/Authentication/ModShibb/View.pm:13 ../../blib/lib/Jifty/Plugin/Authentication/ModShibb/View.pm:17 ../../debian/libjifty-plugin-authentication-modshibb-perl/usr/share/perl5/Jifty/Plugin/Authentication/ModShibb/View.pm:13 ../../debian/libjifty-plugin-authentication-modshibb-perl/usr/share/perl5/Jifty/Plugin/Authentication/ModShibb/View.pm:17 ../../lib/Jifty/Plugin/Authentication/ModShibb/View.pm:13 ../../lib/Jifty/Plugin/Authentication/ModShibb/View.pm:17
+msgid "Shibbolteh access denied"
+msgstr ""
+
+#: ../../blib/lib/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:81 ../../debian/libjifty-plugin-authentication-modshibb-perl/usr/share/perl5/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:81 ../../lib/Jifty/Plugin/Authentication/ModShibb/Action/ShibbLogin.pm:81
+msgid "Sorry, something weird happened (we couldn't create a user for you).  Try again later."
+msgstr ""
+
+#: ../../blib/lib/Jifty/Plugin/Authentication/ModShibb/View.pm:18 ../../debian/libjifty-plugin-authentication-modshibb-perl/usr/share/perl5/Jifty/Plugin/Authentication/ModShibb/View.pm:18 ../../lib/Jifty/Plugin/Authentication/ModShibb/View.pm:18
+msgid "Your Identity Provider don't provide a required attribute for this application."
+msgstr ""

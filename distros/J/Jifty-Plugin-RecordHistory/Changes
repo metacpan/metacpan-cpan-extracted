@@ -1,0 +1,22 @@
+0.08  2011-06-08
+    - Fix the delete_change option to work without a database error (trs)
+
+0.07  unreleased
+    - Support two ways of overriding the collection of Changes displayed (trs)
+
+0.06  2011-02-26
+    - Refactor change-update template so its components are reusable (Sartak)
+    - Bump Jifty dependency (Sartak)
+
+0.05  2011-02-24
+    - Refactor current_user_can to be simpler and more correct (Sartak)
+
+0.04  2011-02-18
+    - Allow control of cascaded_delete (Sartak)
+    - Allow control over current_user_can on Change and ChangeField by
+      implementing current_user_can_for_change in your record class (Sartak)
+    - Provide a way to create a delete_change for record delete (Sartak)
+
+0.03  2011-02-17
+    - Provide a brief description of the object being viewed in the page title (trs)
+    - Rename the record template to record_type (trs)

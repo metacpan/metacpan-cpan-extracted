@@ -1,0 +1,49 @@
+---
+abstract: 'Transport agnostic JSON RPC helper objects'
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+build_requires:
+  Data::Dumper: '0'
+  Encode: '0'
+  HTTP::Request: '0'
+  Module::Build: '0.3601'
+  Test::Exception: '0'
+  Test::More: '0'
+  utf8: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-RPC-Common
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  HTTP::Response: '0'
+  JSON: '2.11'
+  MIME::Base64: '0'
+  MRO::Compat: '0'
+  Moose: '0.48'
+  Moose::Role: '0'
+  MooseX::Types: '0'
+  MooseX::Types::Moose: '0'
+  Try::Tiny: '0'
+  URI::QueryParam: '0'
+  namespace::clean: '0.20'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dmcbride/json-rpc-common
+  repository: https://github.com/dmcbride/json-rpc-common.git
+version: '0.11'
+x_contributors:
+  - 'Darin McBride <dmcbride@cpan.org>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Kazuhiro Osawa <ko@yappo.ne.jp>'
+  - 'Makamaka <makamaka@donzoko.net>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Stevan Little <stevan@localhost.(none)>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

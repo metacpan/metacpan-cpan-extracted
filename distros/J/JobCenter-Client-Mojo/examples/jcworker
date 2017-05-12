@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use Mojo::Base -base;
+
+# see the comments in JobCenter::Client::Mojo
+# we need to do this before use-ing Mojo::IOLoop
+BEGIN {
+        $ENV{'MOJO_REACTOR'} = 'Mojo::Reactor::Poll';
+}
+use Mojo::IOLoop; # for the timer in do_square
+use Mojo::JSON qw(decode_json encode_json);
+
+# standard modules
+use Data::Dumper;
+
+# us
+use JobCenter::Client::Mojo;
+
+my %actions = (
+	# actionname => [ callback, async_flag ]
+	'radd' => [ \&do_add, 0 ],
+	'rsquare' => [ \&do_square, 1],
+	'rdiv' => [ \&do_div, 0],
+);
+
+exit main(@ARGV);
+
+sub main {
+	my $client = JobCenter::Client::Mojo->new(
+		who => 'theEmployee',
+		token => 'doesThings',
+		debug => 1,
+		json => 0,
+	);
+
+	die 'no client?' unless $client;
+
+	for my $actionname (sort keys %actions) {
+		my ($cb, $async) = @{$actions{$actionname}};
+		# fixme: check results?
+		my $err = $client->announce(
+			actionname => $actionname,
+			cb => $cb,
+			async => $async
+		);
+		die "could not announce $actionname: $err" if $err;
+	}
+
+	$client->work();
+
+	return  0;
+}
+
+sub do_add {
+	my ($job_id, $vars) = @_;
+	my $out = {};
+	$out->{counter} = $vars->{counter} + ($vars->{step} || 1);
+	return $out;
+}
+
+# example of a asynchronous worker
+sub do_square {
+	my ($job_id, $vars, $cb) = @_;
+	my $out = {};
+	$out->{square} = $vars->{root}**2;
+	my $tmr = Mojo::IOLoop->timer(3 => sub { $cb->($out) } );
+	return;
+}
+
+sub do_div {
+	my ($job_id, $vars) = @_;
+	my $out = {};
+	$out->{quotient} = $vars->{dividend} / $vars->{divisor};
+	return $out;
+}

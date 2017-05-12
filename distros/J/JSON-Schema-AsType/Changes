@@ -1,0 +1,68 @@
+Revision history for JSON-Schema-AsType
+
+0.4.2 2017-05-01
+  [ BUG FIXES ]
+    - add 'allow-nonref' for JSON serializing (GH#14, Ben Hutton)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 11 insertions(+), 10 deletions(-)
+
+0.4.1 2017-04-16
+  - now running on TravisCI
+  - set the minimal perl version to 5.14 (GH#13)
+  - change some types that had their `validation_explain` explode for perl
+    +5.22.
+
+  [ STATISTICS ]
+    - code churn: 7 files changed, 104 insertions(+), 9 deletions(-)
+
+0.4.0 2017-04-06
+  [ ENHANCEMENTS ]
+    - Fine-tune the behavior of strings-vs-numbers. Can be strict, JSON
+      Schema-style, or lax, like Perl. (lots of help from Ruslan Zakirov)
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 186 insertions(+), 48 deletions(-)
+
+0.3.0 2017-03-24
+  [ ENHANCEMENTS ]
+    - Code brought up to speed with the latest official draft04 tests.
+    - Draft3 and Draft4 types in JSON::Schema::AsType::Draft*::Types.
+    - Let the user decide if they want strict Strings or lax Strings.
+      (GH#12)
+    - Add support for Draft6.
+    - Add 'Schema' types.
+
+  [ STATISTICS ]
+    - code churn: 21 files changed, 1168 insertions(+), 343 deletions(-)
+
+0.2.0 2017-03-17
+  [ BUG FIXES ]
+    - Only giving a schema url resulted in an infinite recursion. (GH#8)
+
+  [ ENHANCEMENTS ]
+    - All keywords of Draft4 turned into types. (GH#1)
+
+  [ STATISTICS ]
+    - code churn: 78 files changed, 1285 insertions(+), 5306 deletions(-)
+
+0.1.0 2015-12-22
+  [ ENHANCEMENTS ]
+    - Add 'validate_*_schema' for validation of the schema agains its spec.
+      (GH#5)
+
+  [ STATISTICS ]
+    - code churn: 7 files changed, 86 insertions(+), 5 deletions(-)
+
+0.0.2 2015-12-09
+  - Minimum Path::Tiny version of 0.062 (for `visit()`)
+  - Set minimum Perl to be 5.10.0.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 22 insertions(+), 2 deletions(-)
+
+0.0.1 2015-12-06
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 74 files changed, 5230 insertions(+), 10 deletions(-)

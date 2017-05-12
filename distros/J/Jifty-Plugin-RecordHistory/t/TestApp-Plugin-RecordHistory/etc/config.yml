@@ -1,0 +1,58 @@
+# See perldoc Jifty::Config for more information about config files
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: TestApp::Plugin::RecordHistory
+  ApplicationName: TestApp-Plugin-RecordHistory
+  ApplicationUUID: D25CC0EA-33C9-11E0-887F-C54A534EF7F3
+  ConfigFileVersion: 5
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: testapp_plugin_recordhistory
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 0
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - CompressedCSSandJS: {}
+    - ErrorTemplates: {}
+    - LetMe: {}
+    - REST: {}
+    - SkeletonApp: {}
+    - RecordHistory: {}
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 0
+  TemplateClass: TestApp::Plugin::RecordHistory::View
+  View: 
+    Handlers: 
+      - Jifty::View::Static::Handler
+      - Jifty::View::Declare::Handler
+      - Jifty::View::Mason::Handler
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    PSGIStatic: 1
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

@@ -1,0 +1,69 @@
+
+Tokenized file: comments.js
+$VAR1 = [
+          bless( [
+                   'Comment',
+                   '/*
+* This is a multi-line comment.*/'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'LineTerminator',
+                   '
+
+'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'Comment',
+                   '// This is a single-line comment.'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'LineTerminator',
+                   '
+'
+                 ], 'JBD::Parser::Token' )
+        ];
+
+Tokenized file: digits.js
+$VAR1 = [
+          bless( [
+                   'DecimalIntegerLiteral',
+                   '314159'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'HexIntegerLiteral',
+                   '0xffff'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'SignedInteger',
+                   '-5'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'SignedInteger',
+                   '+83'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'ExponentPart',
+                   'e-2882'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' 
+'
+                 ], 'JBD::Parser::Token' )
+        ];

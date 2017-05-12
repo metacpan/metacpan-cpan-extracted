@@ -1,0 +1,25 @@
+<%init>
+# Note: the only point to this file is to set the content_type; the actual
+# behavior is accomplished inside the framework.  It will go away once we
+# have infrastructure for serving things of various content-types.
+Jifty->web->response->content_type('text/xml; charset=UTF-8');
+unless (Jifty->web->response->result('autocomplete')) {
+  print "<body />";
+  return;
+}
+my $ref =  Jifty->web->response->result('autocomplete')->content;
+my @options = @{$ref->{'completions'}||[]};
+</%init>
+<body>
+<ul>
+% foreach my $item ( @options) {
+%    if (!ref($item)) {
+<li><% $item %></li>
+%    } elsif (exists $item->{label}) {
+<li><span class="informal"><% $item->{label} %></span><span class="hidden_value"><% $item->{value} %></span></li>
+%    } else {
+<li><% $item->{value} %></li>
+%    }
+%}
+</ul>
+</body>

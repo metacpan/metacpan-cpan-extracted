@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: JavaScript-DataFormValidator
+version: 0.50
+author:
+  - Mark Stosberg <mark@summersault.com>
+abstract: |-
+  JavaScript form validation from a Perl Data::FormValidator profile
+license: perl
+build_requires:
+  Data::JavaScript::Anon: 0
+  Test::More: 0
+provides:
+  JavaScript::DataFormValidator:
+    file: lib/JavaScript/DataFormValidator.pm
+    version: 0.50
+generated_by: Module::Build version 0.2611

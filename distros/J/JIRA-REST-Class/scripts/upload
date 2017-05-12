@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+
+use Data::Dumper::Concise;
+use File::Basename;
+
+use lib dirname($0).'/../lib';
+use lib dirname($0).'/../t';
+use lib dirname($0).'/../t/lib';
+
+use JIRA::REST::Class;
+use MyTest;
+
+TestServer_setup();
+
+my $test = JIRA::REST::Class->new(TestServer_url(), 'username', 'password');
+my $results = $test->data_upload({
+    url  => "/data_upload",
+    name => "file.txt",
+    data => "An OO Class module built atop L<JIRA::REST> for "
+         .  "dealing with JIRA issues and their data as objects.",
+});
+
+TestServer_stop();
+
+

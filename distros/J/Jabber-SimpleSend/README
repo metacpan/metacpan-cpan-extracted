@@ -1,0 +1,17 @@
+
+README
+
+This is a very simple module that wraps Net::Jabber and allows you to
+send a Jabber message very easily. To use it you will need a
+registered JID and password - the normal one you use for your
+Jabber.org will be fine for testing.
+
+The most interesting thing is probably the test procedure, it basically
+emails a Jabber bot your hostname and localtime, waits 5 seconds and then
+downloads a webpage via LWP that the Jabber bot maintains and should of
+put your hostname and localtime on.
+
+If you don't want to give away your hostname, feel free to edit the
+$string variable in the test program.
+
+Greg.

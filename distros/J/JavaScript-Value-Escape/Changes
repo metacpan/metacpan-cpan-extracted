@@ -1,0 +1,28 @@
+Revision history for Perl extension JavaScript::Value::Escape
+
+0.07 2015-01-14T07:27:52Z
+
+        - Use %04x not %04d (Thanks anall and teancom)
+        - cleanup docs add a reference to a site about preventing XSS (Thanks teancom)
+        - migrate with minil
+
+0.06    Wed Jul 20 00:06:44 2011
+        - checking input text
+
+0.05    Wed May 18 15:54;42 2011
+        - no changes.
+        - skipping auto_includes in Makefile.PL
+
+0.04    Tue Nov 23 15:41:27 2010
+        - Improve docs (gfx)
+        - Add js() (alias to javascript_value_escape()) to @EXPORT_OK (gfx)
+
+0.03    Tue Nov 23 00:02:29 2010
+        - added '+' for escape
+
+0.02    Sat Nov 20 00:35:37 2010
+        - incopatible change.
+        - arguments must be flagged UTF8 string
+
+0.01    Sun Nov 14 00:53:33 2010
+        - original version

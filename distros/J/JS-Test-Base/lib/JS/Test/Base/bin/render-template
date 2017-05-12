@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Template;
+use YAML;
+use File::Find;
+use Cwd;
+
+my ($template_name, $test_file_name) = @ARGV;
+
+my $config = -f 'config.yaml'
+    ? YAML::LoadFile('config.yaml')
+    : {};
+$config->{index_title} ||= 'Testing ' . Cwd::cwd();
+$config->{template_include_path} ||= ['template/'];
+$config->{import_libs} ||= do {
+    my $libs = [];
+    File::Find::find(
+        { 
+            wanted => sub {
+                push @$libs, $File::Find::name
+                    if -f;
+            }, 
+            follow => 1 
+        },
+        'lib'
+    );
+    $libs;
+};
+
+my $t = Template->new({ INCLUDE_PATH => $config->{template_include_path}});
+
+my $data = {
+    %$config,
+    test_file => $test_file_name,
+    all_test_files => [ glob('*.t.html') ],
+};
+
+my $result;
+
+$t->process($template_name, $data, \$result)
+    or die $t->error;
+
+print STDOUT $result;

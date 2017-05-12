@@ -1,0 +1,7 @@
+Revision history for Perl extension JS-JSON
+
+0.02
+    - Added tests/ suite using JS-Test-Base --Ingy döt Net
+
+0.01
+    - repackaging JSON.js from json.org

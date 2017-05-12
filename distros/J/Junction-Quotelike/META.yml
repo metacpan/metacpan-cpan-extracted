@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Junction-Quotelike
+version:             0.01
+abstract:            quotelike junction operators
+license:             artistic
+author:              
+    - blackhat.blade <blade@dropfknuck.net>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Perl6::Junction:               1.4
+    PerlX::QuoteOperator:          0.01
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

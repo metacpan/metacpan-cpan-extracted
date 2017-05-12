@@ -1,0 +1,102 @@
+NAME
+       JSON::API - Module to interact with a JSON API
+
+SYNOPSIS
+         use JSON::API;
+         my $api = JSON::API->new("http://myapp.com/");
+         my $obj = { name => 'foo', type => 'bar' };
+         if ($api->put("/add/obj", $obj) {
+           print "Success!\n";
+         } else {
+           print $api->errstr . "\n";
+         }
+
+DESCRIPTION
+       This module wraps JSON and LWP::UserAgent to create a flexible utility for accessing APIs that accept/provide JSON data.
+
+       It supports all the options LWP supports, including authentication.
+
+METHODS
+   new
+       Creates a new JSON::API object for connecting to any API that accepts and provide JSON data.
+
+       Example:
+
+               my $api = JSON::API->new("https://myapp.com:8443/path/to/app",
+                       user => 'foo',
+                       pass => 'bar',
+                       realm => 'my_protected_site',
+                       agent => 'MySpecialBrowser/1.0',
+                       cookie_jar => '/tmp/cookie_jar',
+               );
+
+       Parameters:
+
+       base_url
+           The base URL to apply to all requests you send this api, for example:
+
+           https://myapp.com:8443/path/to/app
+
+       parameters
+           This is a hash of options that can be passed in to an LWP object.  Additionally, the user, pass, and realm may be provided to configure authentication for LWP. You must provide all three
+           parameters for authentication to work properly.
+
+           Specifying debug => 1 in the parameters hash will also enable debugging output within JSON::API.
+
+   get|post|put|del
+       Perform an HTTP action (GET|POST|PUT|DELETE) against the given API. All methods take the path to the API endpoint as the first parameter. The put() and post() methods also accept a second data
+       parameter, which should be a reference to be serialized into JSON for POST/PUTing to the endpoint.
+
+       If called in scalar context, returns the deserialized JSON content returned by the server. If no content was returned, returns an empty hashref. To check for errors, call errstr or was_success.
+
+       If called in list context, returns a two-value array. The first value will be the HTTP response code for the request. The second value will either be the deserialized JSON data. If no data is
+       returned, returns an empty hashref.
+
+   get
+       Performs an HTTP GET on the given path. path will be appended to the base_url provided when creating this object. If given a data object, this will be turned into querystring parameters, with URI
+       encoded values.
+
+         my $obj = $api->get('/objects/1');
+         # Automatically add + encode querystring params
+         my $obj = $api->get('/objects/1', { param => 'value' });
+
+   put
+       Performs an HTTP PUT on the given path, with the provided data. Like get, this will append path to the end of the base_url.
+
+         $api->put('/objects/', $obj);
+
+   post
+       Performs an HTTP POST on the given path, with the provided data. Like get, this will append path to the end of the base_url.
+
+         $api->post('/objects/', [$obj1, $obj2]);
+
+   del
+       Performs an HTTP DELETE on the given path. Like get, this will append path to the end of the base_url.
+
+         $api->del('/objects/first');
+
+   response
+        Returns the HTTP::Response object for the last response
+
+   header
+        Returns the list of header names or the value(s) of a specific header in the last response.
+
+   errstr
+       Returns the current error string for the last call.
+
+   was_success
+       Returns whether or not the last request was successful.
+
+   url
+       Returns the complete URL of a request, when given a path.
+
+REPOSITORY
+       <https://github.com/geofffranks/json-api>
+
+AUTHOR
+           Geoff Franks <gfranks@cpan.org>
+
+COPYRIGHT
+       Copyright 2014, Geoff Franks
+
+       This library is licensed under the GNU General Public License 3.0

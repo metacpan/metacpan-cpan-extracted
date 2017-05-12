@@ -1,0 +1,106 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:74
+msgid "Continue"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:35
+msgid "Go for it!"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:59
+msgid "If the username provided conflicts with an existing username or contains invalid characters, you will have to give us a new one."
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:72
+msgid "A link to confirm this email will be sent to receive later notifications."
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:27
+msgid "If you have a Livejournal or other OpenID account, you don't even need to sign up. Just log in."
+msgstr ""
+
+#. (@{[$csr->err]})
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:68
+msgid "Invalid OpenID URL.  Please check to make sure it is correct.  (%1)"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:45
+msgid "It looks like someone is already using that OpenID."
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID.pm:86
+msgid "Login with OpenID"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:17
+msgid "Login with your OpenID"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:27
+msgid "OpenID URL"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:29
+msgid "For example: you.livejournal.com"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:48
+msgid "OpenID verification failed.  It looks like you cancelled the OpenID verification request."
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:57
+msgid "OpenID verification failed: "
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:48
+msgid "Set your username"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:96
+msgid "Sign in with your Google Account"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:128
+msgid "Sign in with your MyOpenID Account"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:112
+msgid "Sign in with your Yahoo account"
+msgstr ""
+
+#. ($openid)
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:50
+msgid "The OpenID '%1' has been linked to your account."
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:53
+msgid "We need you to set a username or quickly check the one associated with your OpenID. Your username is what other people will see when you ask questions or make suggestions"
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:66
+msgid "Welcome back, "
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/CreateOpenIDUser.pm:94
+msgid "Welcome, "
+msgstr ""
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:42
+msgid "You already logged in."
+msgstr ""

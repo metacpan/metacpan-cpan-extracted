@@ -1,0 +1,325 @@
+=pod
+
+=head1 NAME
+
+JavaScript::Shell - Run Spidermonkey shell from Perl
+
+=head1 SYNOPSIS
+
+    use JavaScript::Shell;
+    use strict;
+    use warnings;
+    
+    my $js = JavaScript::Shell->new();
+    
+    ##create context
+    my $ctx = $js->createContext();
+    
+    $ctx->Set('str' => 'Hello');
+    
+    $ctx->Set('getName' => sub {
+        my $context = shift;
+        my $args    = shift;
+        my $firstname = $args->[0];
+        my $lastname  = $args->[1];
+        return $firstname . ' ' . $lastname;
+    });
+    
+    $ctx->eval(qq!
+        function message (){
+            var name = getName.apply(this,arguments);
+            var welcome_message = str;
+            return welcome_message + ' ' + name;
+        }
+    !);
+    
+    
+    my $val = $ctx->get('message' => 'Mamod', 'Mehyar')->value;
+    
+    print $val . "\n"; ## prints 'Hello Mamod Mehyar'
+    
+    $js->destroy();
+
+=head1 DESCRIPTION
+
+JavaScript::Shell will turn Spidermonkey shell to an interactive environment
+by connecting it to perl
+
+It will let you bind functions from perl and call them from javascript or
+create functions in javascript then call them from perl
+
+=head1 WHY
+
+While I was working on a project where I needed to connect perl with javascript
+I had a lot of problems with existing javascript modules, they were eaither hard
+to compile or out of date, and since I don't know C/C++ - creating my own
+perl / javascript binding wasn't an option, so I thought of this approach as an
+alternative.
+
+Even though this sounds crazy to do, to my surprise it worked as expected - at
+least in my usgae cases
+
+=head1 SPEED
+
+JavaScript::Shell connect spidermonkey with perl through IPC bridge using
+L<IPC::Open2> so execution speed will never be as fast as using C/C++
+bindings ported to perl directly
+
+There is another over head when translating data types to/from perl, since it
+converts perl data to JSON & javascript JSON to perl data back again.
+
+Saying that the over all speed is acceptable and you can take some steps to
+improve speed like
+
+=over 4
+
+=item L<JSON::XS>
+
+Make sure you have L<JSON::XS> installed - this is important, JavaScript::Shell
+uses JSON::Any to parse data and it will use any available JSON parser
+but if you have JSON::XS installed in your system it will use it by default as
+it's the fastest JSON parser available
+
+=item Data Transfer
+
+Try to transfer small data chunks between processes when possible, sending
+large data will be very slow
+
+=item Minimize calls
+
+Minimize number of calls to both ends, let each part do it's processing
+for eaxmple:
+
+    ##instead of
+    
+    $js->eval(qq!
+        function East (){}
+        function West (){}
+        function North (){}
+        function South (){}
+    !);
+    
+    $js->call('East');
+    $js->call('West');
+    $js->call('North');
+    $js->call('South');
+    
+    ##do this
+    
+    $js->eval(qq!
+        function all () {
+            
+            East();
+            West();
+            North();
+            South();
+            
+        }
+        
+        function East (){}
+        function west (){}
+        function North (){}
+        function South (){}
+        
+    !);
+    
+    $js->call('all');
+
+=back
+
+
+=head1 CONTEXT
+
+Once you intiate JavaScript::Shell you can create as many contexts
+as you want, each context will has it's own scope and will not overlap
+with other created contexts.
+
+    my $js = JavaScript::Shell->new();
+    my $ctx = $js->createContext();
+
+You can pass a hash ref with simple data to C<createContext> method as a
+sandbox object and will be copied to the context immediately
+
+    my $ctx->createContext({
+        Foo => 'Bar',
+        Foo2 => 'Bar2'
+    });
+
+=head1 FUNCTIONS
+
+=head2 new
+
+Initiates SpiderMonkey Shell
+
+=head2 createContext
+
+creates a new context
+
+=head2 run
+
+This will run javascript code in a blocking loop until you call jshell.endLoop()
+from your javascript code
+
+    $js->Set('Name' => 'XXX');
+    $js->eval(qq!
+        for (var i = 0; i < 100; i++){
+            
+        }
+        
+        jshell.endLoop();
+        
+    !);
+    
+    $js->run();
+    
+    ##will never reach this point unless we call
+    ## jshell.endLoop(); in javascript code as above
+    
+
+=head2 Set
+
+Sets/Defines javascript variables, objects and functions from perl
+    
+    ## set variable 'str' with Hello vales
+    $ctx->Set('str' => 'Hello');
+    
+    ## set 'arr' Array Object [1,2,3,4]
+    $ctx->Set('arr' => [1,2,3,4]);
+    
+    ## set Associated Array Object
+    $ctx->Set('obj' => {
+        str1 => 'something',
+        str2 => 'something ..'
+    });
+    
+    ## set 'test' function
+    ## caller will pass 2 arguments
+    ## 1- context object
+    ## 2- array ref of all passed arguments
+    $ctx->Set('test' => sub {
+        my $context = shift;
+        my $args = shift;
+        
+        return $args->[0] . ' ' . $args->[1];
+    });
+    
+    ## javascript object creation style
+    
+    $ctx->Set('obj' => {});
+    
+    #then
+    $ctx->Set('obj.name' => 'XXX');
+    $ctx->Set('obj.get' => sub { });
+    ...
+
+=head2 get
+
+get values from javascript code, returns a C<JavaScript::Shell::Value> Object
+    
+    my $ret = $ctx->get('str');
+    print $ret->value; ## Hello
+    
+    ## remember to call value to get the returned string/object
+    
+get method will search your context for a matched variable/object/function and
+return it's value, if the name was detected for a function in will run this
+function first and then returns it's return value
+    
+    $ctx->get('obj.name')->value; ## XXX
+    
+    ##you can pass variables when trying to get a function
+    $ctx->get('test' => 'Hi','Bye')->value; ## Hi Bye
+    
+    ##get an evaled script values
+    
+    $ctx->get('eval' => qq!
+        var n = 2;
+        var x = 3;
+        n+x;
+    !)->value;  #--> 5
+    
+    
+=head2 call
+
+Calling javascript functions from perl, same as C<get> but doesn't return any
+value
+
+    $ctx->call('test');
+
+=head2 eval
+
+eval javascript code
+
+    $ctx->eval(qq!
+        
+        //javascript code
+        var n = 10;
+        for(var i = 0; i<100; i++){
+            n += 10;
+        }
+        ...
+    !);
+    
+=head2 onError
+
+set error handler method, this method accepts a code ref only. When an error
+raised from javascript this code ref will be called with 2 arguments
+
+=over 4
+
+=item * JavaScript::Shell instance
+
+=item * error object - Hash ref
+
+=back
+
+Error Hash has the folloing keys
+
+=over 4
+
+=item * B<message>  I<error message>
+
+=item * B<type>     I<javascript error type: Error, TypeError, ReferenceError ..>
+
+=item * B<file>     I<file name wich raised this error>
+
+=item * B<line>     I<line number>
+
+=item * B<stack>    I<string of the full stack trace>
+
+=back
+
+Setting error hnadler example
+
+    my $js = JavaScript::Shell->new();
+    $js->onError(sub{
+        my $self = shift;
+        my $error = shift;
+        print STDERR $error->{message} . ' at ' . $error->{line}
+        exit(0);
+    });
+
+=head2 destroy
+
+Destroy javascript shell / clear context
+
+    my $js = JavaScript::Shell->new();
+    my $ctx->createContext();
+    
+    ##clear context;
+    $ctx->destroy();
+    
+    ##close spidermonkey shell
+    $js->destroy();
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 COPYRIGHTS
+
+Copyright (C) 2013 by Mamod A. Mehyar <mamod.mehyar@gmail.com>
+
+=cut

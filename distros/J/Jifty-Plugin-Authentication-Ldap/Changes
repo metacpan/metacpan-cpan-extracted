@@ -1,0 +1,14 @@
+Revision history for Perl module Jifty::Plugin::Authentication::Ldap
+
+1.01 Wed, 15 Sep 2010 12:36:08 +0200
+    - Active Directory style binding (ssinyagin)
+    - hooks login (ssinyagin)
+
+1.00 Wed, 10 Jun 2009 11:49:12 +0200
+    - bump version number to avoid conflict with debian
+
+0.10 Tue, 09 Jun 2009 20:39:53 +0200
+    - mistake in test path
+
+0.9  Tue, 15 May 2009 10:10:50 +0200
+    - original version for CPAN

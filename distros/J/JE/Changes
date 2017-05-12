@@ -1,0 +1,1039 @@
+Revision history for JE
+
+0.066   26 October, 2014
+        Bug fix:  Math.pow  tries harder to give correct results  for
+        Math.pow(-Infinity, whatever)  on platforms where the underly-
+        ing mathematics libraries give results  different  from  what
+        ECMAScript specifies (i.e., some Windows compilers).
+
+0.065   12 October, 2014
+        Enhancement:  Regexp stringification (and RegExp.source)  now
+        escape backslashes so that  new RegExp('/')  stringified is a
+        valid regexp literal.
+        Tests:  Two badly-written tests added to  t/15.09-dates.t  in
+        0.063 that were supposedly fixed in the previous release have
+        now actually been fixed.  (We’ll see. :-)
+
+0.064   5 October, 2014
+        Enhancement: ‘new Date()’ now uses Time::HiRes to get the cur-
+        rent time to the nearest millisecond.
+        Tests:  Two badly-written tests added to  t/15.09-dates.t  in
+        the previous release have been fixed.
+
+0.063   28 September, 2014
+        Bug fix: Date edge cases were not handled correctly; specific-
+        ally negative years and months out of range.  Also,  due to a
+        caching problem,  creation of dates with negative years could
+        cause creation of dates in  the  far  future  to  give  incor-
+        rect results.
+
+0.062   17 August, 2014
+        Bug fixes:
+        • Object literals (aka object constructors) now allow a trail-
+          ing comma, as in ‘{foo: 123,}’ (RT #83661).
+        • Regular expression literals now allow unescaped slashes  in
+          character classes (i.e., /[^/]/) (RT #83661).
+
+0.061   10 August, 2014
+        Fixed to work with Perl 5.20.
+
+0.060   21 October, 2012
+        Incompatible change:  We now require  perl  5.8.4  or  higher,
+        instead of  pretending  that  5.8.3  is  supported.  (It  was
+        already broken enough to spew out warnings.)
+        Bug fixes:
+        •  An escaped surrogate in a regular expression  now  matches
+           that surrogate, instead of trying to match a backslash fol-
+           lowed by a literal ‘x{d800}’ or similar.
+        • ‘... ? this : ...’  no longer confuses the run-time  engine,
+           resulting in an error (RT #79855).
+        •  The run-time  engine  now  suppresses  recursion  warnings,
+           which legitimate JavaScript code could trigger.
+
+0.059   18 March, 2012
+        New feature:  JE now provides TO_JSON methods to allow serial-
+        isation  with  JSON.pm  (when  the  latter’s  convert_blessed
+        option is enabled). Thanks to Toby Inkster for the suggestion
+        (RT #75369).
+        t/15.09-dates.t  no longer fails  on  the  29th  of  February
+        (RT #75402).
+
+0.058   1 January, 2012
+        Bug fix: Remove some debugging code inadvertently included in
+        the previous release. It was spewing out warnings.
+
+0.057   1 January, 2012
+        Bug fix:  The JE::Destroyer  class introduced in the previous
+        release was still leaking quite a few objects. Hopefully this
+        has now been fixed.
+        New feature:  The JE::Object::Function constructor now allows
+        Perl functions to request the global object in their lists of
+        arguments.
+
+0.056   4 December, 2011
+        New feature:  An experimental JE::Destroyer class, which,  if
+        loaded before any JE  objects are created,  will track all of
+        them, allowing JE::Destroyer::destroy($je) to destroy all cir-
+        cular references.
+
+0.055   13 January, 2011
+        Some pod fixes from Damyan Ivanov  (RT #64015).  (Thank you.)
+        One bug fix:  ‘throw new Error’ and ‘$@ = bless[],'JE::Scope'’
+        will no longer cause a  crash  when  *@  has  been  localised.
+
+0.054   30 January, 2011
+        Bug fix: JE::Object::Errors thrown from within store handlers
+        now propagate instead of turning into ‘Cannot assign to a non-
+        lvalue’ message.  (Thanks to Chia-liang Kao for fixing this.)
+
+0.053   12 December, 2010
+        Bug fixes:
+        • The regular expression module was relying on a bug in  perl
+          that is fixed in 5.13.8.
+        • The  match  and  search  methods of  strings  now  work  if
+          no regular expressions have  been  used  yet.  (A  ‘require’
+          was missing.)
+
+0.052   5 December, 2010
+        Bug fix:  The return value of JE::LValue->can can now be used
+        and will delegate properly to the referent.
+        Test fix:  t/parse08-regexps.t  has been fixed to  work  with
+        the new (?^u:...)  stringification of internally-UTF8 regular
+        expressions in perl 5.13.8.
+
+0.051   10 October, 2010
+        Bug fix:  On DragonFly BSD,  exp(Infinity) and exp(-Infinity)
+        now correctly return Infinity and 0, respectively, instead of
+        NaN (I hope).
+
+0.050   3 October, 2010
+        • Fix t/parse08-regexps.t to work with the new (?^...) syntax
+          in perl 5.13.5.
+        • constant::lexical is no longer required.
+
+0.049   20 June, 2010
+        Bug fix: String.prototype.indexOf no longer dies if the start-
+        ing position is greater than the length  of  the  string  and
+        perl was built with -DDEBUGGING. Thanks to Jurgen Weigert for
+        reporting this (RT #58371).
+
+0.048   13 June, 2010
+        Incompatible change: for-in loops now treat undefined/null on
+        the rhs as {}, instead of dying.  This brings JE into conform-
+        ity with JScript, Nitro, SpiderMonkey, Opera and ECMAScript 5.
+        (So it is no  longer  in  conformity  with  ECMAScript 3  and
+        ExtendScript in this regard.)
+        New features:
+        • Octal numeric literals
+        • Proper nummification of JE::Undefined in Perl land (as nan)
+        • Number.MIN_VALUE and .MAX_VALUE have been added.  Their val-
+          ues are determined by Data::Float.
+        Bug fixes:
+        • Converting an array to a string no longer causes  an  error
+          when the array contains a function.
+        • Array.prototype.slice  used to ignore its arguments and sim-
+          ply return a copy of the array.
+        • Number.prototype.toString used to ignore its arguments.
+        • Left-associative infix operators (except for ‘||’, ‘&&’ and
+         ‘,’)  were executing the RHS before converting the LHS  into
+          an rvalue breaking code like  ‘while(expr != (expr = ...))’.
+        • A dot in a character class  (/[.]/)  is now a literal , not
+          a metachar.
+        Optimisation:  parseFloat  now  cheats  if  its  argument  is
+        already a number. It just returns it.
+
+0.047   6 June, 2010
+        Bug fixes:
+        • "\0" is no longer parsed as the empty string.
+        • Octal escapes beginning with 4-7 are now recognised.
+
+0.046   16 May, 2010
+        Incompatible change:  The long-deprecated JE::Object::new_con-
+        structor method has been deleted.
+        New features:  The RegExp  constructor now has the  lastMatch
+        ($&), lastParen ($+), leftContext ($`), rightContext ($') and
+        $1 to $9 properties.
+        Bug fixes:
+        • RegExp.prototype.exec  now reads  lastIndex  correctly when
+          global  is true:  It used to treat negative  numbers  as  0,
+          Infinity as  the  string  length  minus  one,  and  numbers
+          greater than the string length as the string length  itself.
+          Objects as the value of lastIndex  would produce unpredicta-
+          ble results,  usually just a failed match (because a memory
+          address was used as the index).
+        • The Error  constructor’s  length  property and those of its
+          subclasses are now 1, not 0.
+        • The Error  constructor no longer adds a message property to
+          an error object if no message was provided. This means that
+          a string like  ‘Unknown error’  is inherited from the proto-
+          type. The message used to be an empty string.
+        • Error  subclasses now have their  internal  class  property
+          (used by Object.prototype.toString)  set to  Error,  rather
+          than  RangeError,  etc.  (I must have  misread  the  spec.)
+        • The overload methods of  JE::LValue  objects  (returned  by
+          code like  $je->eval("a.b"))  no longer produce warnings if
+          the caller has warnings disabled. (E.g.,
+            no warnings; if($je->eval('a.b') eq $squit){...}
+          no longer warns if $squit is undef.)
+        • Suppress  ‘use of goto  ...  is deprecated’  warnings  that
+          appear in perl 5.12.
+        • Updated to work with perl  5.13.1’s  improved  $@  handling.
+
+0.045   28 March, 2010
+        Bug fix:  RegExp(re)  used to clone  the  regular  expression
+        object passed to it, instead of simply returning it.
+        Test fixes:
+        • Some badly-written date tests were failing consistently  in
+          some time zones.
+        • A couple of toPrecision  tests are now skipped, as they are
+          too unreliable and system-dependent.
+
+0.044   14 March, 2010
+        Bug fix:  Math.pow(0,-even)  has been fixed to work  on  some
+        Linux systems.
+
+0.043   14 March, 2010
+        New features:
+        • New date methods  (Date  is  now  complete):  setUTCSeconds,
+          setUTCMinutes, setUTCHours,  setUTCDate,  setUTCMonth,  set-
+          FullYear and setUTCFullYear
+        • Regular expressions can now  be  called  as  functions  (RT
+          #55405).
+        Bug fixes:
+        • toFixed no longer ignores its arguments.
+        • toFixed and  toExponential now round away from zero a value
+          that is half  way  between  the  two  values  it  could  be
+          rounded to.
+        • toExponential  used always to assume that it was passed a 0
+          as its only argument.
+        • Various fixes for toPrecision:
+          • It no longer dies with non-zero numbers between 0  and  1
+            or negative numbers when passed an argument.
+          • It no longer leaves an extra  trailing  zero  when  using
+            exponential notation.
+          • It  now  always  includes  a  decimal  point  in  exponen-
+            tial notation.
+        • Math.sqrt(-Infinity) now returns NaN, not Infinity.
+        • setMinutes no longer identifies itself as setHours  when it
+          dies  (‘setHours cannot be called on an object of type...’).
+        • I must have been half asleep when I re-read  the  spec  for
+          character classes in July last year.  I’ve now reverted the
+          change to /[]/, so it is once more equivalent to /(?!)/, in
+          accordance with the spec (which 0.022 wasn’t).
+        • Math.atan2 with two infinite arguments now works on Windows.
+        • Math.pow(NaN,0) now works on Windows.
+
+0.042   8 November, 2009
+        New feature:  We extend ECMAScript by treating hyphens in reg-
+        exp character classes that are  adjacent  to  \d,  \s  or  \w
+        always as literal hyphens and  no  longer  as  syntax  errors
+        (RT #51123).
+        Bug fixes:
+        • JE::Number’s id  method has been fixed such  that  ===  and
+          isNaN  now recognise positive  NaN  as  NaN  on Windows (RT
+          #51036).
+        • Parsing long strings no longer causes  perl  5.8  to  crash
+          on  Windows  (see  http://www.nntp.perl.org/group/perl.cpan
+         .testers/2009/11/msg5881496.html).  I fixed this by  reïncor-
+          porating part of Kevin Cameron’s code  (RT #49607)  that  I
+          had simplified to make it faster.
+
+0.041   1 November, 2009
+        Bug fix:  The unwrap option to  bind_class  now unwraps array-
+        like objects and custom wrappers (RT #50473).
+
+0.040   25 October, 2009
+        Bug fixes:
+        • Same as  last  time,  but  for  strings:  Calling  a_string
+         .valueOf() no longer dies.
+        • Array literals no longer store  lvalues.  This  means  that
+         ‘a = [nonexistent_var]; a[0]+""’ now dies on the first state-
+          ment, not the second; and ‘s='string'; [s][0].valueOf()’ no
+          longer chokes.
+        • Number.prototype.toPrecision  actually works instead of  be-
+          having like toString.
+
+0.039   18 October, 2009
+        Bug fix:  Calling some_number.valueOf() no longer dies.  (val-
+        ueOf  now knows how to handle plain numbers as  well  as  num-
+        ber objects.)
+
+0.038   9 October, 2009
+        Incompatible change:
+        • When a JavaScript function is called as a coderef, the unde-
+          fined value is now returned as a Perl  undef,  instead of a
+          JE::Undefined object.
+        New features:
+        • New date methods:  setDate, setHours, setMinutes,  setMonth
+          and setSeconds
+        • Function objects now have a call_with method.
+
+0.037   17 September, 2009
+        Bug fixes:
+        • Numification of strings  containing  initial  Unicode  para-
+          graph or line separators has been fixed to work with  blead
+          (perl 5.11.0-to-be).
+        • The parser has been fixed to  recognise  Unicode  paragraph
+          and line separators as whitespace in blead.
+        • Proxy objects for array-  or  hash-like  Perl  objects  now
+          implement the ‘exists’ method, so that hash elements can be
+          referenced via JE::Scope’s find_var method.  This makes the
+          following work if there is a form named theForm:
+            with(document) theForm.submit()
+
+0.036   13 September, 2009
+        New feature:
+        • Escaped line breaks in strings are now ignored  (RT #49607)
+         (Kevin Cameron).
+        Bug fix:
+        • Very long strings no longer cause  syntax  errors  in  perl
+          5.10.x and SEGVs in perl 5.8.x (RT #49607)  (Kevin Cameron).
+
+0.035   27 August, 2009
+        Bug fix:  Made the new HTML-comment-ignoring feature actually
+        work properly :-).  Specifically, <!-- to the end of the line
+        is  now  ignored  in  cases where  a  <  operator  can  occur.
+
+0.034   25 August, 2009
+        New feature:  an ECMAScript-violating HTML  mode that ignores
+        HTML comment delimiters (or, more precisely, treats them like
+        //  [except that -->  has to be preceded by nothing but white-
+        space on the same line]).
+        Bug fixes:
+        • Date  functions no longer  produce  warnings  in  bleadperl
+          (5.11.0-to-be) when handling NaN values.
+        • delete new String().length used to return true, even though
+          it did not  delete  the  property.  Now  it  returns  false.
+        • Number() with no args (and no ‘new’ keyword) used to return
+          a number object containing 0 instead of just the  number  0.
+        • The Math.SQRT2 property didn’t exist and Math.SQRT1_2  held
+          the square root of two. (Oops!)
+        • *All*  the  Math  functions used to return  number  objects
+          instead of plain numbers.  I must have been asleep  when  I
+          wrote those.
+
+0.033   First day of summer, 2009
+        bind_class  no longer replaces an existing constructor of the
+        same name as the class being bound  if  the  constructor  arg
+        is omitted.
+
+0.032   April Fools’ Day, 2009
+        Bug fixes:
+        • If a subclass overrides the global object’s ‘prop’, it
+          no longer stops  escape  functions  from  working  (RT
+          #43582 again).
+        • escape and unescape now work without arguments.
+
+0.031   3 March, 2009
+        New Features:
+        • setYear
+        • Octal escapes within strings
+        • Functions now have an ‘arguments’ property  (in addition to
+          the ‘arguments’ variable inside the function)  (RT  #43582).
+        Bug fixes:
+        • Probably  broken  by  0.029:  A  bind_class  array  class’s
+          object’s length property was a simple scalar,  which caused
+          various parts of JE’s internals to hiccough.
+        • slice no longer works like shift (!)
+        • ++ (in Perl) now works on JE::Numbers.
+
+0.030   17 October, 2008
+        Some minor optimisations.
+        Incompatible changes:
+        • When a JavaScript method that is written in Perl  is called
+          on a primitive type, the primitive value itself, and not an
+          object derived from it, is passed to the method.
+        • JE::LValue’s set method now returns its argument instead of
+          the lvalue object itself.
+        • JE::Scope’s  find_var  method no longer takes a second argu-
+          ment. Use $scope->find_var($name)->set($val) instead.
+        New features:
+        • The global object now has ‘true’ and  ‘false’  methods that
+          return the corresponding JE::Boolean objects.
+        • It also has a  prototype_for  method that is used to  store
+          prototypes for  JS  built-in classes  (resulting  in  a  1%
+          speed-up :-).
+        • JE::Code’s set_global method
+        • An experimental version of the run-time engine,  which will
+          eventually replace the current one.
+        Bug fixes:
+        • 0.029 broke bind_class-style error objects thrown from Perl.
+          They were not being passed through ‘upgrade’.
+        • The parser used  to  treat  identifiers  representing  null,
+          this,  true  or  false  this with Unicode  escape sequences
+          (\uXXXX) as keywords instead of identifiers.
+        • 0.025  was supposed  to  make  generic  Perl  errors  propa-
+          gated through JavaScript into  Error  objects,  rather than
+          TypeErrors.  It only actually worked for errors  outside  a
+          try{} block.  Within a try{},  they were still turned  into
+          TypeErrors.  This has now been fixed.  Also, various operat-
+          ors/functions were producing Errors  instead of  TypeErrors
+          starting with that version. These have been fixed:
+          • Calling ‘new’ on a non-object (new 'foo')
+          • Trying to convert to a primitive  an  object  that  can’t
+            be converted
+          • Calling Function.prototype.toString on a non-func-
+            tion object
+          • Calling a function’s JS apply  method with an invalid sec-
+            ond argument
+          • Calling a  Date  object’s built-in method  on  an  object
+            that’s not a date
+          • Calling RegExp.prototype.toString on something other
+            than a regexp
+        • JE::Object::String’s  is_readonly  property used to  return
+          true if the property name was the length of whatever  value
+          happened to be in  $_,  instead of returning true  for  the
+         ‘length’ property.
+        • The prefix ++ and -- operators used to return lvalues. This
+          would cause ‘delete ++a’ to delete the variable, whereas it
+          shouldn’t.
+
+0.029   1 October, 2008
+        Optimisations:
+        • The previous release’s memory optimisation  tickled  a  soft
+          spot in String.prototype.replace, which caused that function
+          to run pathologically more  slowly  than  before.  This  has
+          been fixed.
+        • Some more optimisations have been  made  (the  incompatible
+          change in particular), such that, at least for some scripts,
+          it runs 20% faster than 0.027.
+        Incompatible change:
+        • As threatened, the prop method of all data types and the
+          call and apply methods of functions no  longer  ‘upgrade’
+          their arguments.  Either run the arguments through  JE’s
+          upgrade  method or use the  ‘Public API’  documented  in
+          JE::Types.
+        New feature:
+        • JE::Object::String’s value16 method
+        Bug fixes:
+        • Array.prototype.push, .reverse, .sort, .shift, .slice and
+         .unshift  no longer die when called on an object without a
+          length property.
+        • Array.prototype.push also no longer returns a string when
+          the return value > 0.
+        • Array.prototype.push and .pop no longer set the length prop-
+          erty to a string (as opposed to a number)  when called on a
+          non-array object.
+        • JE::Object::String’s value method used to return the value
+          of the  ‘value’  property  (if it existed)  instead of the
+          string object’s internal value.
+        • Array.prototype.reverse.length is now 0, not 1.
+        • Perl string comparisons on  JE’s data types no  longer  get
+          the logic backwards when the object is the right-hand  argu-
+          ment. (0.028 also made this bug apparent in JavaScript with
+          Array.prototype.sort() and the < and > operators,  *if* the
+          string on the right hand side was retrieved from  a  for-in
+          iterator and the object iterated  over  was  created  using
+          {...}  syntax  and  the  property  name  was  a  number  or
+          quoted string.)
+
+0.028   29 September, 2008
+        New feature:
+        • max_ops: This lets you limit the number of operations that
+          can occur before a script is terminated.
+        Optimisations:
+        • Stringification  (in JavaScript)  now runs up to 5% faster.
+          Thanks to Christian Forster for doing the benchmarking and
+          finding the bottleneck.
+        • Memory usage may go down as much as 10%, depending on what
+          you are doing  (the more strings you use,  the greater the
+          effect). (The memory leaks are still there, though.)
+        Bug fixes:
+        • Fixed Array.prototype.splice when used on non-array objects
+          such that the  length  property is always an integer  after-
+          wards.  (This used to work only on systems  with  a  32-bit
+          integer and only when the length was a fraction.)
+        • Array.length is now 1, not 0.
+        • Array.prototype.join and .pop no longer die when their
+         ‘this’ values have no length property.
+        • Object.prototype.toLocaleString  now  calls  the  toString
+          method on the object instead of  calling  Object.prototype
+         .toString. Y’know, the spec is really unclear on this point.
+        • Boolean() now simply returns false, instead of a Boo-
+          lean object.
+        • Array.prototype.concat now actually works instead of dying.
+        • Array.prototype.pop now rounds down the length property when
+          it is a fraction.
+
+0.027   24 September, 2008
+        Two bug fixes:
+        • Array.prototype.splice now actually works. It used to mangle
+          the array in strange ways.  It also used to die when  called
+          on an object with no length property.
+        • Constructors created by bind_class now pass all their argu-
+          ments to the underlying Perl methods.  Thanks to Christian
+          Forster for finding this bug. 
+        Internals:
+        • Various parts of JE were breaking  JE::String’s  encapsula-
+          tion. Now they have been changed to use the value16 method,
+          so that JE::String’s internals can be changed.
+
+0.026   21 September, 2008
+        One bug fix: Array.protoype.sort used to die with a custom
+        sort routine.  Thanks to Christian Forster  for  reporting
+        this (#39462).
+
+0.025   15 September, 2008
+        Incompatible change:
+        • \cX escapes used always to match chr(ord(X) % 32),  so \c`,
+          for instance, would match a null character. Non-alphabetic
+          characters after the c  are actually syntax errors in ECMA-
+          Script,  so there’s no reason we can’t follow Perl’s behav-
+          iour here, which is what we do now.
+        • Errors thrown in Perl and propagated through JavaScript now
+          become plain Error objects, rather than TypeErrors.
+        Bug fixes:
+        • new Number no longer warns.
+        • Function.prototype.apply no longer dies when the second
+          argument is null.
+        • Function.prototype.length is no longer enumerable.
+        • String.prototype.slice now actually works.  It used to  die
+          with more than one arg, and return an empty string and omit
+          warnings otherwise.
+        • String.prototype.substring no longer dies when both args are
+          greater than the string’s length.
+        • /)/ throws a SyntaxError instead of a nonsensical TypeError
+          (when parsed by JS’s  eval  or  RegExp  functions;  a plain
+          Perl string when parsed by JE’s  eval).  I  think  I  broke
+          this in 0.022.
+        • Embedded Perl code constructs  in  regular  expressions  now
+          throw SyntaxErrors instead of TypeErrors or Perl strings, as
+          in pre-0.022.
+        • Back-references in regular expression that refer  to  cap-
+          tures that did  not  participate  in  the  match,  as  in
+          /(?:a|(x))\1/.exec("ab"), now match the null string (ECMA-
+          Script-style),  instead of failing (the way Perl does it).
+        • Back-references that are >= 10 and refer to captures that
+          occur later in the pattern are now  null  string  matches
+          (ECMAScript-style), instead of octal escapes (Perl-style).
+
+0.024   29 July, 2008
+        Changed the dependency on constant::private
+        to constant::lexical, since that module has
+        been renamed.
+        Bug fixes:
+        • String.length is now 1, not 0.
+        • String.prototype.charAt and .charCodeAt no longer warn
+          and behave incorrectly  when  passed  something  other
+          than a number.
+        • String.prototype.match and .search no longer die when passed
+          null or undefined.
+        • The index property of arrays returned by String.prototype
+         .match and RegExp.prototype.exec  is now a number,  and no
+          longer a string.
+        • Fixed an obscure bug in the date module’s daylight saving
+          adjustment which  would  sometimes  use  the  wrong  year.
+        • str.indexOf('', num), where num > str.length,  no longer
+          returns num in perl 5.10.0, but str.length, as it should.
+
+0.023   25 July, 2008
+        No functional changes. constant::private is now declared as a
+        dependency in  Makefile.PL.  I forgot  to  add  this  to  the
+        last release.
+
+0.022   24 July, 2008
+        New features:
+        • RegExp.prototype.test and RegExp.prototype.toString have
+          been added, so the RegExp class is complete.
+        • Date.prototype’s setTime, setMilliseconds and
+          setUTCMilliseconds methods has been added.
+        • [] in a regular expression used to be an always-fail asser-
+          tion.  This is no longer the case.  Now it follows  Perl’s
+          behaviour  (the  ]  is interpreted as a literal  character
+          within the class). I originally misread the spec.  This is
+          actually a syntax error in ECMAScript.
+        • Added an ‘unwrap’ option to bind_class, that makes it behave
+          more sensibly in the author’s opinion.  This may become  the
+          default in a future release.
+        • Tainted code can now be run safely, and can no longer
+          untaint its own data.
+        Bug fixes:
+        • String.prototype.replace
+          • used to be a no-op when the second arg was a string (now
+            it actually works); and
+          • it used to die when either arg was null or undefined.
+        • Quantified capturing parentheses in regular expressions now
+          produce undefined if they do not participate in  the  match
+          the last time the quantified subpattern matches.  This used
+          to follow  perl’s  behaviour,  which is  inconsistent  (try
+          matching "abb" against /((a)?b)+/  and  /((a+)?b)+/  to see
+          what I mean). (Backreferences within a pattern still follow
+          perl’s behaviour.)
+        • Capturing parentheses within a negative lookahead assertion
+          now produce undefined.  It used to be that a  pattern  like
+          (?!(a)(?!))  would return  'a'  for the first capture  (the
+          way perl does it).  (Back-references within a pattern still
+          follow perl’s behaviour.)
+        • String.prototype.split
+          • used to return an array extended with undefined values
+            when the limit was greater than the number of elements
+            that the returned array should have had;
+          • used to put an empty string at the  end  of  its  returned
+            array if the separator was the empty string  or  a  regexp
+            that could match the empty string (null matches at the end
+            of the string are not supposed to count); and
+          • used to die when passed undefined or null as its
+            first argument.
+        • Fixed a bug that caused a Function object that was  a  Perl
+          subroutine underneath to die on returning if it happened to
+          call ‘warn’ with no arguments. (Actually, I worked around a
+          perl 5.8.8 bug.)
+        • Quantified zero-width assertions in regular expressions
+          with no maximum (i.e.,  quantified with * + {num,})  no
+          longer warn.
+        • String.fromCharCode now actually works,  instead of return-
+          ing a string of null characters equal in length to the num-
+          ber of args.
+	• A String object’s length property (as opposed to that of a
+          string) used to be a Perl scalar,  which caused JE’s inter-
+          nals to hiccough on it.
+        • Functions now stringify properly. Thanks to Alex Robinson
+          for drawing my attention to it.
+
+0.021   8 February, 2008
+        Due to a silly mistake made at the last  minute,  the  newly-
+        added Date class did not work at all in the previous release.
+        Now this has been repaired,  the  Date  constructor can  now
+        parse strings, Date.parse and Date.UTC have been added,  and
+        all the methods have been added, except for the set* methods.
+
+0.020   23 December, 2007
+        Additions/changes:
+        • The Date object has been added, though it is far from com-
+          plete.  Only the Date object itself  (which does not  yet
+          parse strings)  and the prototype’s getTime,  getYear and
+          toGMTString methods have been added.
+        • The escape and unescape functions have been added.
+        • String.prototype.substr has been added.
+        • JE::String now has a value16 method that returns the inter-
+          nal UTF-16 version of the string.
+        • JE::String also has now a ‘class’ method, that returns
+         ‘String.’  This is intended primarily for internal  use.
+        • If JE::Object::Function->new is called with no_proto => 1,
+          the resulting function will now die when called as a  con-
+          structor. This fixes an inconsistency with the spec.  for 
+          all such built-in functions.
+        • A string passed to  JE::Object’s  prop  method’s  autoload
+          parameter is now evaluated in the package that called prop.
+        Fixed bugs:
+        • parseInt  has now been fixed to match the spec.  It used to
+          return a string,  unless the return value was  0.  It  also
+          used to behave unpredictably when  the  radix  was  out  of
+          range,  instead of simply returning NaN.  It used always to
+          return a positive number for radices other than  2,  8,  10
+          and 16. And it used not to allow capital letters in numbers.
+        • parseFloat used to produce 0 when fed a number  preceded  by
+         \v or non-ASCII whitespace. It would emit warnings, too. This
+          has been fixed.
+        • isNaN and isFinite have now been fixed, so they return a boo-
+          lean, rather than a string.
+        • String.prototype.lastIndexOf now works.
+        • The length property of functions is now a number,
+          not a string.
+        • parseInt, isNan, isFinite, decodeURI, decodeURIComponent,
+          encodeURI and encodeURIComponent used to die when called
+          with no args.
+        • isFinite’s logic was flawed and probably would have failed
+          on Windows and OpenBSD.  (I still don’t  know  whether  it
+          works, or whether it even failed before; it just has a far
+          greater chance of being portable now.)
+        • decodeURI and decodeURIComponent used to die when passed an
+          encoded UTF-8 sequence for a character outside the BMP.
+        • decodeURI(Component) used to die when the input contained an
+          unpaired surrogate.
+        • decodeURI(Component) used not to die when fed encoded utf8
+          characters > 0x10ffff.
+        • decodeURI(Component)  used simply to  return  undefined
+          (instead of throwing an error) if the URI contained mal-
+          formed UTF-8 escape sequences.
+        • decodeURI(Component) used to die if a UTF-8 escape sequence
+          resulted in a surrogate, contrary to the spec.
+        • encodeURI  used to encode any strings contained in  $,  and
+          would produce “Use of uninitialized value” warnings if that
+          var were undef, or return undefined if that variable caused
+          a regexp syntax error when it was interpolated.
+        • encodeURI used erroneously to encode $ and ,
+        • encodeURI and encodeURIComponent used to throw TypeErrors,
+          rather than URIErrors,  when  stumbling  across  unpaired
+          surrogates.
+        • encodeURI(Component) used to use lc hex digits
+          instead of uc.
+        • Many methods and functions throughout the code could  die
+          when passed data containing a surrogate. This is fixed by
+         ‘no warnings 'utf8'’, believe it or not.
+        • isPrototypeOf used always to return false.
+        • Object.length and  Function.length  used to be strings,  but
+          are now numbers. They also used to be enumerable, but are no
+          longer so.
+        • hasOwnProperty and propertyIsEnumerable used to emit warn-
+          ings and behave incorrectly when called with no arguments.
+        • hasOwnProperty used to semi-autovivify the property, such
+          that propertyIsEnumerable would find it,  as would for-in,
+          but the ‘in’ op would not.
+        • JE::LValue->can no longer dies instead of returning false
+          when called as a class method.
+        • The Function constructor now propagates syntax errors,
+          instead of creating functions that do nothing.
+        • JE’s parse and compile methods used to die when there was a
+          regexp syntax error within a regexp literal or an invalid
+          regexp modifier.
+
+0.019  23 November, 2007
+          One bug fix:  Methods and subroutines passed to  bind_class
+          that are expected to return something were sometimes called
+          in  list  context.  Now  they  are  always  called  in  sca-
+          lar context.
+
+0.018   5 November, 2007
+        - bind_class now binds hash- or array-like classes.
+        - For methods, properties, and primitivisation, bind_class
+          supports type-casting/filters  (specify method names  as
+         'foo:String', where 'String' is a JS function to feed the
+          result of foo through).
+        - Properties registered with bind_class can now be inherited
+          by subclasses that are also registered with bind_class, as
+          long as  'isa =>'  is given a  class  name  (not a   proto-
+          type object).
+        - If you don't specify  'to_primitive'  et al.  when you call
+          bind_class, JE will now check to see whether the object has
+          string/number/boolean overloading, and will use that. If it
+          doesn't,  it continues to do the default JS thing  (use the
+          valueOf and toString methods).
+
+0.017   9 September, 2007
+        Another alpha release, featuring just bug fixes:
+        - Fixed a bug with the length property of strings being a Perl
+          scalar instead of a JE::Number.
+        - Fixed a bug that was causing line numbers in parse error
+          messages to be counted from 1 even when another starting
+          line number was given.
+        -'continue' and 'break' statements now no longer clobber the
+          return value of the previous statement, so
+          eval('do{3; continue} while(0)') now returns 3, in accord-
+          ance with the spec.
+        - In a variable initialiser such as var a = b, the value is
+          now correctly extracted from b and put inside a. Before, a
+          reference to b would be put in a, such that
+         'var a=non_existent_var; do_something_with(a)' would throw an
+          error on the second statement, not the first.
+        - Fixed a problem with 'continue OUTER' statements in nested
+          loops calling the loop condition on the inner loop first.
+          E.g., in the following snippet:
+            var x = 0, y = 0
+            OUTER: while(++x < 2) while(++y < 2) continue;
+          The 'continue' would make '++y < 2' get evaluated, and then
+         '++x < 2'; whereas only the latter should be evaluated. This
+          problem was affecting do, while and for(;;) loops.
+        - for(;;) loops now work when there is nothing before the
+          first semicolon.
+        - RegExp.prototype.exec now actually works (not fully tested)
+          instead of always dying.
+        - switch(non_existent_var) now dies as it should.
+        - In a try-catch-finally statement, return, break and contin-
+          ue statements and errors within the catch block no  longer
+          prevent the final block from running.
+
+0.016   22 July, 2007
+        New feature:
+        - Added support for filenames and line numbers in
+          error messages.
+        Bug fix:
+        - Added a workaround for a perl 5.8.x bug (#24254) that was
+          causing errors thrown from  expressions  within  argument
+          lists to trigger an  "Attempt to  free  unreferenced  sca-
+          lar" warning.
+
+0.015   10 June, 2007
+        - JS properties can now be bound to Perl subroutines that
+          store/fetch the value (see JE::Types).
+        - Class bindings now support binding of properties, as well
+          as methods.
+        - The constructor_name argument to bind_class is gone, since
+          it was confusing.
+        - bind_class now will understand 'package' to be the same as
+         'name' if only the latter is provided.
+        - bind_class now creates a constructor  whether  or  not  the
+         'constructor' argument is passed. If it is not, the construc-
+          tor that it makes will throw an error when invoked.
+        - JE::Scope's get_var method has been renamed to find_var,
+          since the name 'get_var' has the wrong implications.
+
+0.014   30 May, 2007
+        Features and API changes:
+        - Binding of Perl classes to JE with the new bind_class method
+        - JE::Parser's delete_statement method now takes mul-
+          tiple args.
+        Bug fixes:
+        - JS's eval function now uses the same parser if called from
+          code that was parsed with a custom parser.
+        - JE::Object's prop({...}) method used to infer  'dontenum =>
+          0' even if the property already existed.  Now it leaves the
+          enumerability of existing properties alone if 'dontenum' is
+          not specified explicitly.
+        - Fixed a problem with bus errors resulting from  'autoload'
+          handlers executing JS code when called from a tie handler
+        - The & ^ | operators now work correctly when the second oper-
+          and is outside the signed 32-bit range.
+
+0.013   20 May, 2007
+        Features and API changes:
+        - JavaScript properties can now be autoloaded.
+        - &JE::Scope::var has been renamed to &JE::Scope::get_var,
+          since it was too easily confused with JavaScript's 'var'
+          keyword, which does something different.
+        - Started work on parser customisation
+        Bug fixes:
+        - '==' and '!=' were not correctly determining which type of
+           comparison to do  when  the  two  operands  were  of  dif-
+           ferent types.
+        -  throw now requires an expression, as it always should
+           have done.
+
+0.012   13 May, 2007
+        Yes, another alpha release.
+        - JE::Object::Array's array dereference handler now returns a
+          tied array.
+        - JE::Object::Array's 'value' method now returns a copy of the
+          object's internal array, instead of the array itself.
+        - Functions created with new_function are now enumerable, just
+          like 'alert', et al. in web browsers.
+        Bug fixes:
+        - Fixed the JE::Object's tie handlers so that  autovivification
+          now works, and delete behaves the way it usually does in Perl.
+        - When $obj->prop({ ... }) creates a new property and dontenum
+          is not given, the property is now enumerable.
+        - Corrected Array.prototype.unshift so that it resets the
+          array's length.
+        - JE::Object::Function's 'apply' method now upgrades the argu-
+          ments to the function if the function is  written  in  Perl
+          (version 0.011 only half-fixed the problem)
+
+0.011   10 May, 2007
+        Oh no! Another alpha release!
+        - JE::Object::Function's 'apply' method now upgrades the argu-
+          ments to the function
+        - JE::Object's %{} overloading now returns a tied hash that
+          can be used to modify the object  (untested and  still  a
+          bit buggy).
+
+0.010   9 May, 2007
+        Added three features:
+        - &{} overloading for JE::Object::Function
+        - numeric overloading for JE::Object
+        - 'exists' method for JE::Object and JE::Object::Array
+        One bug fix:
+        - JE::Object::Array's is_enum now correctly returns false for
+          the length property
+
+0.009   8 May, 2007
+        Yet another alpha release. Here are the usual lists:
+        New features/API changes:
+        - Added numeric overloading to JE::Null.
+        - Added compile as an alias for parse.
+        - Added the 'exists' and 'class' methods to JE::Number
+        Fixes:
+        - JE::LValue's overloading was very buggy with anything other
+          than  simple  conversion.  I've  fixed  it  and  written  a
+          test script.
+        - Corrected the bitshift operators such that numbers > 31 for
+          the right operand now have % 32 applied, and are no  longer
+          simply treated as 31.
+        - Corrected JE::Null->to_boolean so it returns a JE::Boolean,
+          not a JE::String.
+        - Stopped surrogate escape sequences in string literals from
+          producing warnings.
+        - Corrected JE::Number's stringification overloading to match
+          the stringification in JavaScript  (for NaN  and  Infinity)
+        - A JE::Number that has a value of NaN now boolifies in  Perl
+          as false, as in JavaScript.
+        - Fixed the constructors for the various subclasses of Error,
+          so that they no longer throw TypeErrors when called  ('new
+          TypeError'  would actually cause the whole script to  die)
+        - Corrected 'instanceof'  so it throws an error if its right
+          operand is an object but not a function
+        - Corrected the  'prototype'  properties of the various sub-
+          classes of Error such that they now actually inherit from
+          Error.prototype instead of directly from Object.prototype.
+        - Fixed the << operator so it now works correctly on
+          64-bit machines
+
+0.008   22 April, 2007
+        New features and API changes in this release:
+        - Added JE::LValue's can method
+        - new_function has been moved from JE to JE::Object, to make
+          it more versatile
+        - new_method has been written as a method of JE::Object
+        - Changed the interface of JE::Code's 'execute' method, so that
+          the third arg has three possible values  for  indicating  the
+          type of code, and is no longer a boolean
+        - Changed the delete method of JS values to support a second
+          arg (see JE::Types)
+        - Renamed the 'props' method to 'keys'
+        - Renamed JE::compile to JE::parse
+        - Added the 'exists' and 'class' methods to JE::Boolean
+        - Added numification overloading to JE::Boolean
+        Bug fixes:
+        - Fixed the ~ operator so it works on 64-bit platforms
+        - Changed most calls to 'UNIVERSAL::isa($thing, UNIVERSAL)' to
+         'defined Scalar::Util::blessed $thing', since the former also 
+          works with strings containing package names  (and  does  not
+          necessarily tell whether something is blessed). This bug was
+          causing strange errors.
+        - Fixed a bug that was making errors thrown by JS  functions
+          called from within JavaScript cause lots of warnings and a
+          nonsensical ReferenceError.
+        - String.prototype.substring now works instead of
+          always dying.
+        - function and var declarations now work in else blocks and
+          labelled statements
+        - continue <label> now works within a labelled switch or iter-
+          ation statement
+        - JS functions now return undefined when there is no  explicit
+         'return'  statement.  Before,  the return value of  the  last
+          statement that returned one was being  used,  as  with  JS's
+         'eval' function (oops!). This required changing the interface
+          of JE::Code slightly.
+        - function declarations now clobber attributes of
+          existing vars
+        - Code run by JS's eval now inherits the scope chain from the
+          caller (before, it was getting its own,  just like the body
+          of a JS function)
+        - var declarations no longer make existing vars undeletable
+        - JE::Scope::new_var now looks for the first  object  in  the
+          scope chain that is a call object (it used to use the first
+          object, whatever it was)
+        - Calling an lvalue that has a call (activation) object as its
+          base object now works instead of just dying.
+        - arguments.length is now a number, not a string
+        - arguments objects are no longer given extra properties  cor-
+          responding to the function's parameters if there aren't that
+          many args.
+        - Functions written in Perl that return  an  empty  list  now
+          return 'undefined' to JS, instead of producing lots of warn-
+          ings and dying.  In fact, they are called in scalar context
+          now, rather than list context.
+        - Fixed array literals so that elided elements do not exist.
+          (Before, they would exist, but still be undefined.)
+        - Fixed the bug that was causing isNaN to fail on OpenBSD.
+        - Corrected the comma, assignment, conditional (? :), || and
+          && operators so they no longer return lvalues.
+        - Function.prototype.apply now puts its error in $@ when it
+          dies. It used to leave $@ empty. It no longer dies when
+          called with just one argument.
+        - Fixed Array.prototype.toString and Array.prototype.
+          toLocaleString such that they produce a sensible error mes-
+          sage when invoked upon an object other than an array, rather
+          than the nonsensical 'Can't locate object method "prop" via
+          package "Object is not an Array"'
+        - String.prototype.split now actually works.
+        - JE::Code::parse now  stringifies  its  input,  avoiding  the
+          potential problem of pos() being unreliable on a stringified
+          object,  and solving the problem with  $obj =~ /(...)/  man-
+          gling $1 in perl 5.8.5.
+
+0.007   April Fool's Day, 2007
+	Alpha release. New features/fixes:
+        - Added the RegExp constructor and RegExp.prototype.exec
+        - Added the rest of the string methods
+        - Added the Boolean, Number and ReferenceError classes
+        - Added the Math object
+        - Fixed 'return' without an argument, so it returns undefined,
+          rather than a null Perl string  (which  was  causing  weird
+          errors elsewhere).
+        - 'break' called from within a labelled statement was produc-
+          ing warnings (fixed)
+        - 'throw' without an argument now throws undefined, rather
+          than 'Died at /usr/local/lib/perl5/5.8.8/JE/Code.pm
+          line 387'
+        - 'continue' now works with a do-while loop
+        - instanceof now works instead of just dying
+        - Assigning to a writeable property used  to  overwrite  the 
+          dontenum attribute and make the property enumerable (fixed)
+        - Fixed lvalues such that 'null.var = val' no longer creates a
+          global property.  'null.var'  in void context now  throws  a
+          TypeError.
+        - Fixed the null and undefined classes, so they don't try to
+          rebless the same scalar as each other.
+        - Fixed the boolean class's to_string method, so it no longer
+          gives 'true' for false and 'false' for true (!).
+
+0.006   29 March, 2007
+        Alpha release.
+        - Added TypeError and RangeError classes
+        - Finished the Function and Array classes (except for
+          Function.prototype.toString)
+        - JE::String now has an exportable 'surrogify' function
+        - Added some methods (toString, valueOf, charAt, charCodeAt,
+          concat, indexOf, lastIndexOf,  localeCompare)  to  String
+          objects, and added the String constructor to the
+          global object
+        - Found and fixed quite a few bugs in the parser:
+          o || && were parsing as | |  and & &
+          o Hexadecimal literals would cause syntax errors
+          o The parser would create a garbage tree when certain infix
+            ops were followed by compound expressions that could  con-
+            tain the same op (i.e., [], {}, () and function literals).
+            (I fell into the 'sub foo { /regex(.*)/; foo(); print $1}'
+            trap.)
+          o Bracketed subscripts did not allow whitespace before the
+            closing bracket
+          o "a++\nb++"  without a semicolon between the two statements
+            was causing a syntax error because -- and ++ were gobbling
+            up trailing whitespace.
+          o <<= and >>= and >>>= were causing syntax errors
+          o for loops with variable declarations in the header
+            weren't parsing
+          o continue/throw/break/return were not parsing correctly
+            when followed by a line break
+          o 'with' was parsing as 'while' (!)
+          o switch and try blocks weren't parsing correctly
+
+0.005   5 March, 2007
+        Alpha release. Changes and additions:
+        - The parser has been rewritten completely with recursive sub-
+          routines.  It is now faster than before,  and doesn't cause
+          bus errors.
+        - The Error and SyntaxError classes now actually work. Before
+          I just threw them together without even testing them.
+        - The Object constructor is now according to spec.
+	- URI-handling functions and the URIError class
+        - Added the rest of Object.prototype's properties
+
+0.004   19 February, 2007
+        Alpha release. New features and bug fixes in this
+        release include:
+        - Support for all JavaScript statements, not just expression
+          statements
+        - JE::String now provides a desurrogify function.
+        - JE::upgrade now supports coderefs and makes '0' into a num-
+          ber, as the docs say it does.
+        - The JE::new_function method has been added.
+        - Overloading for JE::LValue objects
+        - JE::Object::props now returns the names of the object's pro-
+          totype's properties as well as the object's own
+        - Error and SyntaxError classes
+        - Function literals and declarations
+        - '==' in JS now does string comparison if at least one oper-
+          and is a string  (it used to determine that it  should  do
+          string  comparison  and  then  do  numeric  equals  anyway,
+          because I typed '==' by mistake instead of 'eq'!)
+
+0.003   14 February, 2007
+        Alpha release. All JavaScript operators are now supported. JS
+        numbers now use Perl's nan and inf.  A few bugs in the object
+        classes have been fixed.  A bug preventing the  expansion  of
+        backslash escapes in string literals has been fixed.
+
+0.002   7 February, 2007
+        Still a pre-alpha version with almost no features and lots of
+        bugs. A lot of work has been done on the object classes.  The
+        parser is half-written,  but the code that actually  executes
+        the parse tree is far from complete.  The only really noticea-
+        ble new features are that array and object literals and  iden-
+        tifiers are now parsed and interpreted.
+
+0.001   24 January, 2007
+        Pre-alpha version,  with almost no features and lots of  bugs.
+        The man pages describe many features that have not been imple-
+        mented, so it's all just talk.
+

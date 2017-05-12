@@ -1,0 +1,87 @@
+{
+   "abstract" : "Library for creating and accessing dynamic arrays",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Judy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Config" : "0",
+            "DynaLoader" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Module::Build" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Judy" : "0.26",
+            "Config" : "0",
+            "DynaLoader" : "0",
+            "Sub::Exporter" : "0",
+            "constant" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Judy" : {
+         "file" : "lib/Judy.pm",
+         "version" : "0.41"
+      },
+      "Judy::1" : {
+         "file" : "lib/Judy/1.pm",
+         "version" : 0
+      },
+      "Judy::HS" : {
+         "file" : "lib/Judy/HS.pm",
+         "version" : 0
+      },
+      "Judy::L" : {
+         "file" : "lib/Judy/L.pm",
+         "version" : 0
+      },
+      "Judy::Mem" : {
+         "file" : "lib/Judy/Mem.pm",
+         "version" : 0
+      },
+      "Judy::SL" : {
+         "file" : "lib/Judy/SL.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.41"
+}

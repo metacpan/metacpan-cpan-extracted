@@ -1,0 +1,310 @@
+# JOAP::NetJabber.pm - Documentation-only package about using Net::Jabber JOAP objects
+#
+# Copyright (c) 2003, Evan Prodromou evan@prodromou.san-francisco.ca.us.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+# tag: documentation-only package about using Net::Jabber JOAP objects
+
+__END__
+
+=head1 NAME
+
+JOAP::NetJabber - Documentation-only package about using Net::Jabber JOAP objects
+
+=head1 SYNOPSIS
+
+   use Net::Jabber qw(Client);
+   use JOAP;
+
+   my $iq = new Net::Jabber::IQ;
+   my $read = $iq->NewQuery($JOAP::NS, 'read');
+
+   $read->SetName('gar');
+
+=head1 ABSTRACT
+
+The JOAP Perl package leverages off the excellent Jabber Perl library
+Net::Jabber. This documentation-only package describes how JOAP uses
+Net::Jabber, and how to do low-level JOAP stuff with Net::Jabber. It's
+probably only of interest to people hacking on this library itself or
+people extending -- nay, overextending -- this library.
+
+=head1 DESCRIPTION
+
+First off, nothing in this document is crucial to anyone using the
+JOAP Perl libraries. Don't get confused or querulous about what's in
+here. It requires some deep knowledge of the Net::Jabber libraries and
+the Jabber protocol itself, as well as of the JOAP protocol.
+
+Users of the JOAP library only have to use Net::Jabber for one thing:
+to set up the connection for JOAP proxies. See L<JOAP::Proxy> for more
+information.
+
+The JOAP library uses -- or, really, abuses -- the Net::Jabber
+library. Net::Jabber allows external libraries to map autoloaded
+methods to a particular XML namespace. We use that to add methods to
+Jabber-level objects in the JOAP namespace, so we don't go insane
+trying to fiddle with all the details.
+
+=head2 Building JOAP IQs
+
+Each JOAP object is a Net::Jabber::Query. The base queries -- JOAP
+verbs, children of an L<Net::Jabber::IQ> -- are all in the
+C<$JOAP::NS> namespace. This may change, so I'm not writing it out all
+over the place here. The stuff that is children of the base queries --
+attributes, timestamps, etc. -- are in munged-up internal sub-parts of
+the C<$JOAP::NS>. See L<Net::Jabber::Namespaces> for why this is
+needed.
+
+JOAP IQs have queries with tagnames like 'read', 'edit', 'add',
+etc. Most namespaces use the tagname 'query', though, so it's a little
+difficult to get around the Net::Jabber default. The mechanism
+I've found to work is this:
+
+   # create an IQ
+   my $iq = new Net::Jabber::IQ;
+   # add a new query in the JOAP namespace with the given query tagname
+   my $read = $iq->NewQuery($JOAP::NS, 'read');
+
+Also note that IQ's C<Reply()> method leaves in all the children of a
+query, which you probably don't want to do. L<JOAP::Server::Object>
+defines a C<reply()> method that works better.
+
+=head2 Autoload Methods
+
+The methods created are too numerous to go into here. Instead, I
+borrow a page from the Net::Jabber handbook and merely give tables of
+functions that can be used to manipulate JOAP objects. See
+L<Net::Jabber::Query> for an explanation of the format of these tables.
+
+Note also that at this level there's no automagic coercion of
+datatypes; parameters to these methods should be in exactly the right
+format to go on the wire.
+
+=head3 read requests
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  array    GetName()         SetName()         DefinedName()
+  master   GetRead()         SetRead()
+
+=head3 read responses
+
+See L</attributes> for more info on contents of attributes.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  children GetAttribute()    AddAttribute()    DefinedAttribute()
+  string   GetTimestamp()    SetTimestamp()    DefinedTimestamp()
+  master   GetRead()         SetRead()
+
+Timestamps must be date/time values in ISO 8601 format; see
+<JOAP::Types> for details.
+
+=head3 edit requests
+
+See L</attributes> for more info on contents of attributes.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  children GetAttribute()    AddAttribute()    DefinedAttribute()
+  master   GetEdit()         SetEdit()
+
+=head3 edit responses
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetNewAddress()   SetNewAddress()   DefinedNewAddress()
+  master   GetEdit()         SetEdit()
+
+The new address must be a valid JOAP address; see <JOAP::Addresses>
+for details.
+
+=head3 add requests
+
+See L</attributes> for more info on contents of attributes.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  children GetAttribute()    AddAttribute()    DefinedAttribute()
+  master   GetAdd()          SetAdd()
+
+=head3 add responses
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetNewAddress()   SetNewAddress()   DefinedNewAddress()
+  master   GetAdd()          SetAdd()
+
+=head3 delete requests
+
+Delete requests don't have much in them.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  master   GetDelete()       SetDelete()
+
+=head3 delete responses
+
+Delete responses don't have much in them, either.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  master   GetDelete()       SetDelete()
+
+=head3 search requests
+
+See L</attributes> for more info on contents of attributes.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  children GetAttribute()    AddAttribute()    DefinedAttribute()
+  master   GetSearch()       SetSearch()
+
+=head3 search responses
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  array    GetItem()         SetItem()         DefinedItem()
+  master   GetSearch()       SetSearch()
+
+=head3 describe requests
+
+Describe requests are pretty empty.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  master   GetDescribe()     SetDescribe()
+
+=head3 describe responses
+
+See L</attribute descriptions> for more info about the content of
+attribute descriptions.
+
+See L</method descriptions> for more info about the content of method
+descriptions.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  array    GetDesc()         SetDesc()         DefinedDesc()
+  array    GetClass()        SetClass()        DefinedClass()
+  array    GetSuperclass()   SetSuperclass()   DefinedSuperclass()
+  children GetAttributeDescription()
+                             AddAttributeDescription()
+                                               DefinedAttributeDescription()
+  children GetMethodDescription()
+                             AddMethodDescription()
+                                               DefinedMethodDescription()
+  string   GetTimestamp()    SetTimestamp()    DefinedTimestamp()
+  master   GetDescribe()     SetDescribe()
+
+Both classes and superclasses must be valid JOAP class addresses; see
+L<JOAP::Addresses> for details.
+
+=head3 attributes
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetName()         SetName()         DefinedName()
+  string   GetValue()        SetValue()        DefinedValue()
+  master   GetAttribute()    SetAttribute()
+
+The value of an attribute is identical to a jabber:iq:rpc value
+object; see L<Net::Jabber::Query> for details on the interface.
+
+=head3 attribute descriptions
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetName()         SetName()         DefinedName()
+  string   GetType()         SetType()         DefinedType()
+  array    GetDesc()         SetDesc()         DefinedDesc()
+  string   GetRequired()     SetRequired()     DefinedRequired()
+  string   GetWritable()    SetWritable()    DefinedWritable()
+  string   GetAllocation()   SetAllocation()   DefinedAllocation()
+  master   GetAttributeDescription()
+                             SetAttributeDescription()
+
+=head3 method descriptions
+
+See L</params> for further info on the params object.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetName()         SetName()         DefinedName()
+  string   GetReturnType()   SetReturnType()   DefinedReturnType()
+  array    GetDesc()         SetDesc()         DefinedDesc()
+  string   GetAllocation()   SetAllocation()   DefinedAllocation()
+  master   GetMethodDescription()
+                             SetMethodDescription()
+
+=head3 params
+
+This is just a nested container; See L</param> for further info on the
+param object.
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  array    GetParams()                         SetParams()
+  object                     AddParam()
+
+=head3 param
+
+  Type     Get               Set               Defined
+  =======  ================  ================  ==================
+  string   GetName()         SetName()         DefinedName()
+  string   GetType()         SetType()         DefinedType()
+  array    GetDesc()         SetDesc()         DefinedDesc()
+  master   GetParam()        SetParam()
+
+=head1 EXPORT
+
+[N/A]
+
+=head1 SEE ALSO
+
+The L<JOAP> documentation has general information about the library as
+well as bug-reporting and other contact addresses.
+
+L<Net::Jabber> and friends describe how to do Jabber
+programming. L<Net::Jabber::Namespaces> describes the mechanism JOAP
+uses to insinuate itself into the Net::Jabber world.
+
+L<Net::Jabber::Query> defines how to build XML-RPC queries.
+
+=head1 AUTHOR
+
+Evan Prodromou, E<lt>evan@prodromou.san-francisco.ca.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003, Evan Prodromou E<lt>evan@prodromou.san-francisco.ca.usE<gt>.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+=cut

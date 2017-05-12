@@ -1,0 +1,51 @@
+{
+   "abstract" : "Beautify Javascript (beautifier for javascript)",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-Beautifier",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Getopt::Long" : "0",
+            "IO::File" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "Code::TidyAll::Plugin::JSBeautifier" : {
+         "file" : "lib/Code/TidyAll/Plugin/JSBeautifier.pm",
+         "version" : "0.18"
+      },
+      "JavaScript::Beautifier" : {
+         "file" : "lib/JavaScript/Beautifier.pm",
+         "version" : "0.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/fayland/perl-javascript-beautifier/tree/master"
+      }
+   },
+   "version" : "0.20"
+}

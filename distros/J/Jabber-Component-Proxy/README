@@ -1,0 +1,7 @@
+Jabber::Component::Proxy is an experimental proxy for
+Jabber components to allow an administrator to control
+who has access to a(n otherwise) public service such as
+a conference or JUD component.
+
+It's a young package, all comments, questions and so on to
+the author, please: dj.adams@pobox.com

@@ -1,0 +1,192 @@
+0.49 2016-11-26
+
+* Behaviour for undefined, whitespace-only inputs was altered
+* JSON Parsing Test Suite compliance
+
+0.48 2016-11-20
+
+* Add "check" method for the benefit of JSON::Repair
+
+0.47 2016-11-16
+
+* Bug fixes for Perl 12 and earlier regarding diagnostics_hash method
+
+0.46 2016-11-16
+
+* Remove experimental feature $json_diagnostics
+* Add diagnostics_hash method as a replacement for $json_diagnostics
+* Better warnings for parse_json_safe
+* Add the examples directory files to the CPAN distribution
+* Documentation rewrites
+
+0.45 2016-11-15
+
+* Remove non-functioning JSON::Whitespace module from CPAN distribution
+
+0.44 2016-11-13
+
+* Add a primitive interface to JSON::Tokenize
+* Document the JSON::Tokenize interface
+
+0.43 2016-11-05
+
+* Remove validjson dependence on Path::Tiny.
+* Produce better outputs from validjson script
+
+0.42 2016-08-22
+
+* Long string copying bug fixed.
+
+0.41 2016-06-14
+
+* Implement "warn_only"
+* Documentation clarifications
+
+0.40 2016-05-22
+
+* Compilation warning, possible memory leaks (SHLOMIF)
+
+0.39 2015-11-18
+
+* Fix for 64 bit
+* Changed error message documentation to machine-readable
+
+0.38 2015-10-30
+
+* Add object interface for more flexible parsing.
+* Add "parse_json_safe" with no exceptions and hash collision detection.
+* Add choice to copy literals.
+* Better documentation of changes and examples
+
+0.37 2015-10-29
+
+* Remove $JSON::Parse::true and false, use &PL_sv_yes and &PL_sv_no instead.
+
+0.36 2015-10-24
+
+* Document and install "validjson" script.
+* Document the "$JSON::Parse::json_diagnostics" global variable.
+
+0.35 2015-10-19
+
+* Minor documentation changes
+
+0.34 2015-10-19
+
+* Document key collisions
+* Extend SEE ALSO section on other JSON modules on CPAN.
+
+0.33 2015-10-09
+
+* Memory leak plug
+* Small speed improvements
+* Minor bug about commas after bare values
+* Documentation rewritten to clarify changes in 0.32 and testing.
+
+0.32 2015-07-29
+
+* Update to accept bare values, per RFC 7159.
+
+0.31 2014-12-07
+
+* Make sure to cast to STRLEN in newSVpv(n) calls.
+* Remove reference to deleted Google Group from documentation.
+
+0.30 2014-03-23
+
+* Prototypes removed from functions
+* Documentation rewrites
+* Changes to compile on Darwin OS
+* Use "assert_valid_json" in DIAGNOSTICS section of pod.
+
+0.29 2013-12-25
+
+* UTF-8 validation in strings
+* Number, object, array parsing improvements
+* Fewer error messages & documented (see DIAGNOSTICS in pod)
+* Testing done with random input to root out problems (see TESTING in pod)
+
+0.28 2013-12-12
+
+* Change function name from "validate_json" to "assert_valid_json"
+  (old name is still accepted).
+* More tests
+* Style of error messages changed for "end of input" errors.
+* More error checking for invalid \u escapes.
+
+0.27 2013-12-11
+
+* More thorough checking of input for format errors (missing commas etc.)
+* Check for bytes 0x00 - 0x1F in strings and throw error if present
+* Don't upgrade \u0000 - \u0080 to character strings
+* Documentation rewrites
+
+0.26 2013-12-10
+
+* Remove core file from distribution.
+
+0.25 2013-12-10
+
+* Fix bug where missing commas were not detected.
+* Now parses \uXXXX constructions.
+* "valid_json" now back to being a fast validator.
+* Add new "validate_json", a fast, exception throwing validator.
+* Surrogate pairs now handled (tentative)
+* Upgrade \uXXXX to character string.
+
+0.24 2013-11-27
+
+* Update "Changes" to conform to CPAN::Changes::Spec
+
+0.23 2013-09-15
+
+0.22 2013-08-26
+
+* Typos and minor details in documentation.
+* Changes to compile on Microsoft C compiler.
+
+0.21 2013-08-07
+
+* Changes documented.
+
+0.20 2013-08-06
+
+* From-scratch rewrite of module.
+
+0.19 2013-03-15
+
+0.18 2013-03-12
+
+0.17 2013-03-10
+
+0.16 2013-03-08
+
+0.15 2013-03-08
+
+0.14 2012-06-12
+
+0.13 2012-06-12
+
+0.12 2012-06-12
+
+0.11 2012-04-13
+
+0.10 2012-03-17
+
+0.09 2012-03-16
+
+0.07 2011-06-09
+
+0.06 2011-06-02
+
+0.05 2011-05-31
+
+* Changed name from JSON::Argo to JSON::Parse
+
+0.04 2011-05-29
+
+0.03 2011-05-25
+
+0.02 2011-05-25
+
+0.01 2011-05-23

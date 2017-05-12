@@ -1,0 +1,6 @@
+You should install the JSAN shell from CPAN using the CPAN shell. This
+will aid in the building of required Perl module dependencies. The list
+of dependencies is quite long so please be patient.
+
+  shell> perl -MCPAN -e'install "JSAN"'
+

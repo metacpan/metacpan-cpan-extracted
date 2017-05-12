@@ -1,0 +1,31 @@
+Revision history for JSON-CPAN-Meta
+
+7.001     2011-03-15
+
+          note that these tools are on their way to the ash heap
+
+          fix packaging error; META.json amusingly contained YAML
+
+7.000     2009-05-18
+          correct a bug in EUMM plugin to add META.json to the manifest
+          minor documentation tweaks
+
+6.000     2009-05-17
+          we now output META.json files instead of META.yml files
+
+5.000     2009-03-21
+          minor packaging tweak
+
+4.000     2009-03-21
+          improve the Module::Install plugin to behave more sensibly
+            (Ash Berlin)
+
+3.000     2009-03-09
+          make the Module::Install plugin take the credit/blame for generated_by
+          implement a Module::Build helper
+
+2.000     2009-03-09
+          implement a Module::Install plugin
+
+1.000     2009-03-04
+          first release

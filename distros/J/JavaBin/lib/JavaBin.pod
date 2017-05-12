@@ -1,0 +1,118 @@
+=encoding UTF-8
+
+=head1 NAME
+
+JavaBin - Apache Solr JavaBin (de)serializer
+
+=for html
+<a href="https://travis-ci.org/JRaspass/JavaBin">
+    <img src="https://api.travis-ci.org/JRaspass/JavaBin.svg">
+</a>
+<a href="https://coveralls.io/r/JRaspass/JavaBin">
+    <img src="https://img.shields.io/coveralls/JRaspass/JavaBin.svg">
+</a>
+
+=head1 SYNOPSIS
+
+ use JavaBin;
+
+ my $javabin = to_javabin { foo => 'bar' };
+
+ my $href = from_javabin $javabin;
+
+=head1 DESCRIPTION
+
+JavaBin is a compact binary format used by L<Apache Solr|http://lucene.apache.org/solr>.
+
+For more information on this format see the L<Solr Wiki|http://wiki.apache.org/solr/javabin>.
+
+This package provides a serializer and deserializer for this format.
+
+B<WARNING>: The API of this module is unstable and may change without warning (any change will be appropriately documented in the changelog).
+
+=head1 FUNCTIONS
+
+=head2 from_javabin
+
+ my $result = from_javabin $javabin;
+
+Accepts one argument, a binary string containing the JavaBin.
+
+Returns a scalar representation of the data, be that undef, number, string, or reference.
+
+This function does no error checking, hand it invalid JavaBin and it will probably die.
+
+=head2 to_javabin
+
+ my $javabin = to_javabin $data;
+
+Accepts one argument, a Perl scalar, be that undef, number, string, or reference.
+
+Returns a Perl string containing the binary JavaBin.
+
+This function does no error checking, hand it invalid JavaBin and it will probably die.
+
+=head1 MAPPING
+
+This section describes how JavaBin maps Perl values to JavaBin values and vice versa. These mappings are designed to "do the right thing" in most circumstances automatically, preserving round-tripping characteristics (what you put in comes out as something equivalent).
+
+Runtime errors are avoided with a preference to encoding more exoctic Perl values (think regular expressions, tied values, etc.) to a JavaBin null.
+
+=head2 JavaBin -> Perl
+
+=head3 null
+
+A JavaBin null becomes undef in Perl.
+
+=head3 true, false
+
+JavaBin booleans become L<JavaBin::Bool> objects in Perl which overload to behave like literal C<1> and C<0> respectively.
+
+=head3 byte, short, int, long
+
+JavaBin integers are returned as scalars (with IV set), with the requirement of a 64bit Perl for longs.
+
+=head3 float, double
+
+JavaBin floating point values are returned as scalars (with NV set).
+
+=head3 String
+
+JavaBin Strings are returned as Perl strings with the UTF-8 flag on.
+
+=head3 Date
+
+A JavaBin Date is returned as a string in ISO 8601 format. This will likely change to be a L<JavaBin::Date> object in future to facilitate round-tripping.
+
+=head3 Enum
+
+A JavaBin enum is returned as a L<JavaBin::Enum> object.
+
+=head3 array
+
+A JavaBin array is returned as a Perl array.
+
+=head3 Iterator
+
+A JavaBin Iterator is flattened into a Perl array. This will likely change to be a L<JavaBin::Iterator> object in future to facilitate round-tripping.
+
+=head3 Map, NamedList, SimpleOrderedMap
+
+A JavaBin Map, NamedList, or SimpleOrderedMap is returned as a Perl hash. This is technically wrong all three allow repeating keys but Perl does not, and SimpleOrderedMap, as the name implies, has an order but Perl does not.
+
+This will need to change in the future.
+
+=head2 Perl -> JavaBin
+
+TODO
+
+=head1 INSPIRATION
+
+This package was inspired by the L<Ruby JavaBin library|https://github.com/kennyj/java_bin>.
+Both that library and the Java JavaBin library proved very helpful in understanding JavaBin.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright © 2013–2014 by James Raspass
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

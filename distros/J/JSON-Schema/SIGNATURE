@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 b9752afe5fbc35c6a14c43128673d38e8541221c COPYRIGHT
+SHA1 0b4fcba3f8af05ae16e81bf2b9eea82100fa398a CREDITS
+SHA1 5c4911c1a63083b2080e9f64c3f33343f05b3024 Changes
+SHA1 82e026808b694db76d9c927e080ab145c796bea8 INSTALL
+SHA1 18d6d2837c678763cc562d047a61645194be2047 MANIFEST
+SHA1 bd6664577ea3da021e90896b7e193cc1c9350956 META.json
+SHA1 07074a855200d8a0c8440048b46984f74627dd26 META.yml
+SHA1 43237be80fb649d3dc5a47d1ad4c417d950f99e7 Makefile.PL
+SHA1 8160253b9087ce9ae3546e064fa2a83209cce307 README
+SHA1 012811977113a1e01ced79167ce882ba26f059a0 TODO
+SHA1 a5de2c8c851512e8eb2fd5df84bf4f86aaebcd44 dist.ini
+SHA1 7a999736e759d86c6722f8661aead31fd7a3a3ba doap.ttl
+SHA1 24d5f9c94feb0402d44ff401fe07f80eb9016f1f examples/validation.pl
+SHA1 32ed0ae6f02d842ddce5af41e5110d383d4305dd lib/JSON/Schema.pm
+SHA1 4a042b9324a4b8acf942ffe5059e777499146727 lib/JSON/Schema/Error.pm
+SHA1 dced3cb8a3d978b8876fb5d3156460a8940e545a lib/JSON/Schema/Examples.pod
+SHA1 6eff9fe0abbf468f8b94da8931a742a41bba02eb lib/JSON/Schema/Helper.pm
+SHA1 579b2ed68e593f7818252e134fd2c2aa2662c637 lib/JSON/Schema/Null.pm
+SHA1 955279507e4acde3af2501e120133a09119b8f7a lib/JSON/Schema/Result.pm
+SHA1 3cf3ccdc69233c95ec9f31700652a3835f57030b t/01basic.t
+SHA1 a58d6978aa3be2713c14ac2b3f0dbcb5092ad131 t/02integer.t
+SHA1 f7a16845d44b238169df99a30b925c389bf75729 t/03required.t
+SHA1 9ef186068e0b8decb0c6736703d6f89e62701e3f t/04format.t
+SHA1 621003dc2a20f554bf41c3287a72f47c636129ac t/05union.t
+SHA1 0b208837c1715a1494c8975f30cf8e42611f39a0 t/06lengths.t
+SHA1 def20d16d52f2f3e3cdcab85b6736a6b4cba9600 t/07enum.t
+SHA1 15e9473f8a88ed0fad7b7e96598d1508acd117ab t/rt-76892.t
+SHA1 071dbb2ab4f439a422378c3a56bf63b6c4991477 t/rt-76944.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQRoykACgkQzr+BKGoqfTmhUACeL/228/KJutktKBRYJSUjdCX2
+RG8An2KgWjnNfCDVD4LUlME8Sdl5eIVc
+=57e+
+-----END PGP SIGNATURE-----

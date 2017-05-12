@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                JSON-RPC-Server-FastCGI
+version:             0.03
+abstract:            A FastCGI version of JSON::RPC::Server
+license:             ~
+author:              
+    - Faiz Kazi <faiz@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    CGI::Fast:                     0
+    FCGI:                          0
+    HTML::HeadParser:              0
+    HTTP::Request:                 0
+    JSON::RPC::Server::CGI:        0.92
+    Test::More:                    0
+    URI:                           0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

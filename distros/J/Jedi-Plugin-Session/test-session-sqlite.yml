@@ -1,0 +1,9 @@
+Jedi:
+  Roads:
+    t::lib::session_sqlite: /
+t::lib::session_sqlite:
+  session:
+    expiration: 3 seconds
+    sqlite:
+      path: /tmp/test_session_sqlite
+

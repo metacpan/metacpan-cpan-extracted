@@ -1,0 +1,9 @@
+/* Autocomplete */
+
+.ac_value {
+    font-style: italic;
+    text-align: right;
+    color: #AAA;
+    font-size: .9em;
+}
+

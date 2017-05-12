@@ -1,0 +1,84 @@
+---
+abstract: 'generates Type::Tiny types out of JSON schemas'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0.062'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Schema-AsType
+provides:
+  JSON::Schema::AsType:
+    file: lib/JSON/Schema/AsType.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft3:
+    file: lib/JSON/Schema/AsType/Draft3.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft3::Types:
+    file: lib/JSON/Schema/AsType/Draft3/Types.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft4:
+    file: lib/JSON/Schema/AsType/Draft4.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft4::Types:
+    file: lib/JSON/Schema/AsType/Draft4/Types.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft6:
+    file: lib/JSON/Schema/AsType/Draft6.pm
+    version: v0.4.2
+  JSON::Schema::AsType::Draft6::Types:
+    file: lib/JSON/Schema/AsType/Draft6/Types.pm
+    version: v0.4.2
+requires:
+  Class::Load: '0'
+  Clone: '0'
+  JSON: '0'
+  LWP::Simple: '0'
+  List::AllUtils: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::ClassAttribute: '0'
+  MooseX::MungeHas: '0'
+  Path::Tiny: '0.062'
+  Scalar::Util: '0'
+  Type::Library: '0'
+  Type::Tiny: '0'
+  Type::Tiny::Class: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  URI: '0'
+  perl: v5.14.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/JSON-Schema-AsType/issues
+  homepage: https://github.com/yanick/JSON-Schema-AsType
+  repository: https://github.com/yanick/JSON-Schema-AsType.git
+version: 0.4.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Ben Hutton <relequestual@gmail.com>'
+  - 'Daniel Perrett <dp13@sanger.ac.uk>'
+  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'

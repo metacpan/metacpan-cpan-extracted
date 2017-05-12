@@ -1,0 +1,50 @@
+Fri Dec 20 16:30:31 GMT 2002
+0.04 - added in the pod documentation for Jabber::NADs and Jabber::pkt.
+     - added in missing XS files NADs.xs and pkt.xs
+     - rejigged the perl Makefile.PL process to cope with either the jabberd2
+       checked out of cvs or the release candidates such as 
+       http://files.jabberstudio.org/jabberd2/jabberd-2.0.0-a3.tar.gz
+
+Sun Dec 22 12:57:03 GMT 2002
+0.05 - added various functions to Jabber::NADs for getting element and attribute
+       values, and for finding children elements, and the list of attributes
+       of a given node (element)
+     
+Thu Jul  7 09:35:38 BST 2005
+0.06 - applied patches supplied by Christopher Zorn to make the build work for j2.0s8
+     - fixed an old bug with build where make was picking up Perls config.h instead
+       of jabberd2s
+     - for the moment - I have removed jadperl from the build, and concentrated on
+       mod_perl for sm - my thinking is that there are so many Perl implementations
+       for building components and clients that I should focus on the core
+
+Wed Jul 27 08:39:21 BST 2005
+0.07 - applied patches supplied by Christopher Zorn for problem wih dup() in pkt
+       where it doesnt handle blank from and tos
+
+Tue Dec 13 07:06:39 GMT 2005
+0.08 - add two new methods for adding to CDATA of a given element - append_cdata_head(),
+       and append_cdata_tail() on Jabber::NAD.
+
+Wed Dec 21 10:16:35 GMT 2005
+0.10 - Added nad_replace_cdata_head(), and nad_replace_cdata_tail().  These complement the nad_append_cdata* methods.
+     - added support for nearly all the module chain events - support list is now:
+    * sess-start
+    * sess-end
+    * in-sess
+    * out-sess
+    * in-router
+    * out-router
+    * pkt-sm
+    * pkt-user
+    * pkt-router
+  Refer to the sample modules in the examples subdirectory, and the sm.xml file for the config.
+
+Fri Dec 30 15:30:38 GMT 2005
+0.15 - Corrected problem with $nad->find_scoped_namespace() where an empty prefix was not 
+       recognised.
+		 - Fixed $nad->elem() so that it now correctly finds an element given the context of a 
+		   namespace.
+		 - Added $pkt->create() - this enables the creation of a new packet in the context of the 
+		   current packets session.
+		 Refer to the examples/MyStamp.pm for a good overview of packet handling and creation.

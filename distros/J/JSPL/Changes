@@ -1,0 +1,74 @@
+1.07  2012-01-16
+    * Add 'mozjs185' package-config file support, seen in Ubuntu 11 
+      - Thanks to Christiaan Kras for his report and help with testing.
+    * Add support for XulRunner 9, that reintroduces visible JSScript and JS::Value
+    * Fix for perls compiled without 64bit support, broken in 1.05
+
+1.06  2011-10-12
+    * Fix support for SM < 1.8.0 broken in 1.05
+    * Add support for new SM 1.8.5 (post July 2011) with missing JS_HasArrayLength
+      seen in xulrunner >= 7
+      - Thanks to Simone for the report.
+    * Add JSPL->does_support_anonfunfix for detect SM's support of recently removed
+      JSOPTION_ANONFUNFIX and fix t/14-roundtrip-function.t that broke.
+
+1.05  2011-07-29
+    * Add support for _released_ SM 1.8.5 (js185-1.0.0 official tar ball)
+    * Include some workarounds for possible floating point types mismatch.
+
+1.04  2011-05-09
+    * Fix tests for newer perls
+    * Fix constant handling in SM::ByteCode
+    * Protect 'new PerlSub' with check_privileges
+    * Add a CommonJS oriented runtime
+    
+1.03  2010-06-25
+    * Big rename JSP -> JSPL, to avoid clash with "JavaServer Pages".
+      Its hurts but as sooner as easy.
+
+1.02  2010-06-24
+    * Separate documentation for JS programmers.
+    * Export some SM constants to perl land.
+    * Add SM::Opcode and SM::ByteCode for more robust bytecode handling.
+    * Work around for a broken pkg-config in freebsd
+    * Made set_branch_handler availability testable
+    * Add CTX::Timeout
+
+1.01  2010-06-14
+    * JSP::Stash->allow_from_js now returns the previous state
+    * A pair of tests in t/29-exceptions.t relaxed to cope with 5.13.1
+    * Add couple of low level functions for inspect Script's prologue, needed for
+      JavaScript::Inline
+    * Makefile.PL will try hard to find a SpiderMonkey.
+    * Remove duplicated code
+    * Fix some problems with perl 5.8
+    * Fix Win32 build
+
+1.00  2010-06-07
+
+     This is a fork from Claes Jakobsson's perl JavaScript module.
+     Although almost every area was revamped, we try hard to be fully backward
+     compatible, but you should read the documentation.
+
+     The following are the most visible changes:
+
+    - All that you cat expect to be passed by reference between both
+      interpreters are now not "converted" but passed encapsulated in
+      specialized classes and are "alive".
+    - All Perl classes are exportable to JavaScript. Think (mouth-watering):
+
+	var DBI = Sys.require('DBI');
+	var handler = DBI.connect(...);
+
+    - New "questions free" building mechanism.
+    - Builds against SpiderMonkey 1.7.0 up to (unreleased) 1.8.5 as found in
+      Gecko 1.9.3.
+    - Improved exception handling.
+    - Perl can access and manipulate JavaScript's 'this'.
+    - Full support for utf8 even when SpiderMonkey wasn't compiled with support
+      for it.
+    - The code is modularized, some subsystems are only loaded on demand.
+    - A command line 'jspl' JavaScript shell included for standalone apps execution.
+    - Much bigger test battery. Grown from 311 to over 900 tests. 
+    - Revised and extender documentation.
+    - Many bugs fixed.

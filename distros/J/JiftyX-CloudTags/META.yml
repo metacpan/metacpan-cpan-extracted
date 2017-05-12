@@ -1,0 +1,22 @@
+---
+abstract: ~
+author:
+  - 'Cornelius <cornelius.howl@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.80'
+license: GPL
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JiftyX-CloudTags
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Jifty: 0
+  JiftyX::ModelHelpers: 0
+  Mouse: 0
+version: 0.01

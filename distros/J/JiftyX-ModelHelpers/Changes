@@ -1,0 +1,13 @@
+0.23:
+- fix tests, so they can be actually running -- c9s++
+
+0.22:
+- Improve M() function to accept parameters for model constructors.
+- M() can also take a sole id value now: M(Book, 42)
+- auto-generated helpers now works exactly the same as M()
+
+0.20:
+- Add M() function exported by default
+
+2008-09-08T21:13:46+0800
+0.01 - Initial release

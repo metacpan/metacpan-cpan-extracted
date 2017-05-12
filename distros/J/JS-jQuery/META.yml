@@ -1,0 +1,21 @@
+---
+abstract: 'The Write Less, Do More JavaScript Library'
+author:
+  - 'Ingy döt Net <ingy@cpan.org> is the packager of JS-jQuery.'
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license:
+  - mit
+  - gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: JS-jQuery
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JS: 0.17
+  perl: 5.6.1
+version: 1.2.6.001

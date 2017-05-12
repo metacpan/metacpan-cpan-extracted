@@ -1,0 +1,80 @@
+{
+   "abstract" : "PSGI adapter for JSON::RPC2::AnyEvent::Server",
+   "author" : [
+      "Daisuke (yet another) Maki <maki.daisuke@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-RPC2-AnyEvent-Server-PSGI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::RPC2::AnyEvent::Server" : "0",
+            "Plack" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Plack::Test::AnyEvent" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::RPC2::AnyEvent::Server::PSGI" : {
+         "file" : "lib/JSON/RPC2/AnyEvent/Server/PSGI.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI/issues"
+      },
+      "homepage" : "https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI",
+      "repository" : {
+         "url" : "https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI",
+         "web" : "https://github.com/Maki-Daisuke/p5-JSON-RPC2-AnyEvent-Server-PSGI"
+      }
+   },
+   "version" : "0.01"
+}

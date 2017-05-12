@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+
+use Modern::Perl;
+
+use Getopt::Long            qw( :config bundling );
+use JavaScript::Prepare;
+use Pod::Usage;
+use POSIX           qw( mkfifo );
+
+use constant PIPE_MODE => '0444';   # mode r--r--r--
+use constant OPTIONS   => qw(
+     help|h
+     pipe|p=s
+    strip|s
+);
+
+
+my %option = get_options_or_exit();
+my $jsprep = JavaScript::Prepare->new( strip => $option{'strip'} );
+
+if ( $option{'pipe'} ) {
+    run_pipe( @ARGV );
+}
+
+print $jsprep->process( @ARGV );
+exit;
+
+
+
+sub run_pipe {
+    my @args = @_;
+    
+    my $pipe_file = $option{'pipe'};
+    
+    # clean up the pipe on exit
+    $SIG{'INT'} = sub {
+        unlink $pipe_file;
+        exit 0;
+    };
+    
+    while (1) {
+        unless ( -p $pipe_file ) {
+            unlink $pipe_file;
+            mkfifo( $pipe_file, PIPE_MODE )
+                or die "Cannot make ${pipe_file}: $!";
+        }
+        
+        open( my $pipe, '>', $pipe_file )
+            or die "Cannot write ${pipe_file}: $!";
+        
+        print {$pipe} $jsprep->process( @args );
+        
+        close $pipe;
+        select undef, undef, undef, 0.1;
+        
+        utime undef, undef, $pipe_file;
+    }
+}
+
+
+
+
+sub get_options_or_exit {
+    my %getopts = @_;
+    
+    my $known = GetOptions( \%getopts, OPTIONS );
+    
+    pod2usage()
+        if ! $known || $getopts{'help'};
+    
+    return %getopts;
+}
+
+__END__
+
+=head1 NAME
+
+B<jsprepare> - prepare JavaScript files for deployment
+
+=head1 SYNOPSIS
+
+B<jsprepare> -h
+B<jsprepare> [-p|--pipe] <file|dir> [...]
+

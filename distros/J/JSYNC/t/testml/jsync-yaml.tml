@@ -1,0 +1,83 @@
+%PointMarker +++
+
+=== Plain mapping
++++ jsync
+{"one":"two","three":"four"}
++++ yaml
+---
+one: two
+three: four
+
+=== Duplicate Map Reference
++++ jsync
+[{"&":"1","x":"y"},"*1","*1"]
++++ yaml
+---
+- &1
+  x: y
+- *1
+- *1
+
+=== Nulls
++++ jsync
+[null,{"x":null}]
++++ yaml
+---
+- ~
+- x: ~
+
+=== Recursive Reference
++++ jsync
+{"&":"1","x":"*1"}
++++ yaml
+--- &1
+x: *1
+
+=== Typed Mapping
++++ jsync
+{"!":"!perl/hash:Foo","x":"y"}
++++ yaml
+--- !!perl/hash:Foo
+x: y
+
+=== Typed Sequence
++++ jsync
+["!!perl/array:Foo","x","y"]
++++ yaml
+--- !!perl/array:Foo
+- x
+- y
+
+=== Schwern's Escaping Test
++++ jsync
+{".!":"not a type","..!":"not an escaped type","foo":"42"}
++++ yaml
+---
+'!': not a type
+.!: not an escaped type
+foo: '42'
+
+=== Globs
++++ perl
+package main;
+no strict;
+$foo = 'O HAI';
+*foo;
++++ jsync
+{"!":"!perl/glob:","NAME":"foo","PACKAGE":"main","SCALAR":"O HAI"}
+
+=== Dump Options
++++ perl_run
+JSYNC::dump(
+    ['hello', 42, { goodbye => 43 }],
+    {pretty => 1}
+)
++++ jsync
+[
+   "hello",
+   "42",
+   {
+      "goodbye" : "43"
+   }
+]
+

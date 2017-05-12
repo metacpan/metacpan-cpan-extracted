@@ -1,0 +1,223 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "JSON 2.00"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "LV"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Path>;
+	doap:created         "2010-07-28"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/JSON-Path>;
+	doap:homepage        <https://metacpan.org/release/JSON-Path>;
+	doap:license         <http://www.opensource.org/licenses/mit-license.php>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "JSON-Path";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_00>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_01>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-100>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-101>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-200>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-201>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-202>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-203>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-204>, <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-205>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-json-path>;
+	];
+	doap:shortdesc       "search nested hashref/arrayref structures using JSONPath".
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_00>
+	a                    doap:Version;
+	rdfs:label           "Ported from PHP."@en;
+	dc:issued            "2010-07-28"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.080_00.tar.gz>;
+	doap:revision        "0.080_00"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_01>
+	a                    doap:Version;
+	dc:issued            "2010-07-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix license metadata in distribution."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_00>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.080_01.tar.gz>;
+	doap:revision        "0.080_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-100>
+	a                    doap:Version;
+	dc:issued            "2010-08-25"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Support for JSON::JOM."@en;
+		], [ rdfs:label "Minor documentation improvements."@en ];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-080_01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-101>
+	a                    doap:Version;
+	dc:issued            "2011-09-29"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix retrieval of zeroth array element."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Add more test cases."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-100>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-200>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.200"^^xsd:string;
+	dc:issued            "2012-09-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Switch from Error.pm exceptions to Carp::croak.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Drop dependency on common::sense.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Modernize.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.200.tar.gz>;
+	doap:revision        "0.200"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-201>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.201"^^xsd:string;
+	dc:issued            "2012-09-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Remove remaining `use Error` in test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.201.tar.gz>;
+	doap:revision        "0.201"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-202>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.202"^^xsd:string;
+	dc:issued            "2012-10-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "`value` method.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`map` method.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`get` and `set` methods.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "`jpath`, `jpath1` and `jpath_map` functions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.202.tar.gz>;
+	doap:revision        "0.202"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-203>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.203"^^xsd:string;
+	dc:issued            "2012-10-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor corrections to pod.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.203.tar.gz>;
+	doap:revision        "0.203"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-204>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.204"^^xsd:string;
+	dc:issued            "2013-02-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Add documentation to test suite.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Corrections to lvalue documentation.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix `set` method which was broken in some circumstances.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/83249>;
+			doap-changeset:thanks [
+				a foaf:Person;
+				foaf:name "Mitsuhiro Nakamura";
+			];
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.204.tar.gz>;
+	doap:revision        "0.204"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-Path/v_0-205>
+	a                    doap:Version;
+	dc:identifier        "JSON-Path-0.205"^^xsd:string;
+	dc:issued            "2013-11-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Dist::Inkt.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use LV instead of lvalue.pm.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Exporter::Tiny instead of Sub::Exporter.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix problem using JSON::Path with Devel::ptkdb.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/89393>;
+			doap-changeset:thanks [
+				a foaf:Person;
+				foaf:name "Henri-Damien Laurent";
+			];
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-Path-0.205.tar.gz>;
+	doap:revision        "0.205"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/83249>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "83249"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=83249>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/89393>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "89393"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=89393>.
+

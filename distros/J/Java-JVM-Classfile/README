@@ -1,0 +1,243 @@
+NAME
+    Java::JVM::Classfile - Parse JVM Classfiles
+
+SYNOPSIS
+      use Java::JVM::Classfile;
+
+      my $c = Java::JVM::Classfile->new("HelloWorld.class");
+      print "Class: " . $c->class . "\n";
+      print "Methods: " . scalar(@{$c->methods}) . "\n";
+
+DESCRIPTION
+    The Java Virtual Machine (JVM) is an abstract machine which processes
+    JVM classfiles. Such classfiles contain, broadly speaking,
+    representations of the Java methods and member fields forming the
+    definition of a single class, information to support the exception
+    mechanism and a system for representing additional class attributes. The
+    JVM itself exists primarily to load and link classfiles into the running
+    machine on demand (performed by the Class Loader), represent those
+    classes internally by means of a number of runtime data structures and
+    facilitate execution (a role shared between the Execution Engine (which
+    is responsible for execution of JVM instructions) and the Native Method
+    Interface which allows a Java program to execute non-Java code,
+    generally ANSI C/C++.
+
+    This Perl module reveals the information in a highly-compressed JVM
+    classfile by representing the information as a series of objects. It is
+    hoped that this module will eventually lead to a JVM implementation in
+    Perl (or Parrot), or possibly a way-ahead-of-time (WAT) to Perl (or
+    Parrot) compiler for Java.
+
+    It is important to remember that the Java classfile is
+    highly-compressed. Classfiles are intended to be as small as possible as
+    they are often sent across the network. This may explain the slightly
+    odd object tree. One of the most important things to consider is the
+    idea of a constant pool. All constants (constant strings, method names
+    and signatures etc.) are clustered in the constant pool at the start of
+    the classfile, and sprinkled throughout the file are references to the
+    constant pool. The module attempts to hide this optimisation as much as
+    possible from the user, however.
+
+    It is probably important to at least have briefly read "The JavaTM
+    Virtual Machine Specification", http://java.sun.com/docs/books/vmspec/
+
+METHODS
+  new
+
+    This is the constructor, it takes the filename of the classfile to parse
+    and returns an object:
+
+      my $c = Java::JVM::Classfile->new("HelloWorld.class");
+
+  magic
+
+    This method returns the magic number for the classfile. All valid
+    classfiles should have the magic number 0xCAFEBABE:
+
+      my $magic = $c->magic;
+
+  version
+
+    This method returns the version of the classfile. The version consists
+    of a major number and a minor number. For example, "45.3" has major
+    number 45 and minor number 3:
+
+      my $version = $c->version;
+
+  class
+
+    This method returns the name of the class that this classfile
+    corresponds to:
+
+      my $class = $c->class;
+
+  superclass
+
+    This method returns the name of the superclass of the class that this
+    classfile corresponds to:
+
+      my $superclass = $c->superclass;
+
+  constant_pool
+
+    This method returns the constant pool entries as an array reference.
+    Each entry is an object. Currently undocumented.
+
+      my $constant_pool = $c->constant_pool;
+
+  access_flags
+
+    This method returns the access flags for the class as an array
+    reference. Possible flags are:
+
+    abstract
+        Declared abstract; may not be instantiated
+
+    final
+        Declared final; no subclasses allowed
+
+    interface
+        Is an interface, not a class
+
+    public
+        Declared public; may be accessed from outside its package
+
+    super
+        Treat superclass methods specially when invoked by the invokespecial
+        instruction
+
+      print "Flags: " . join(", ", @{$c->access_flags}) . "\n";
+
+  interfaces
+
+    This method returns an array reference of the interfaces defined in the
+    classfile. Currently unimplemented:
+
+      my $interfaces = $c->interfaces;
+
+  fields
+
+    This method returns an array reference of the fields defined in the
+    classfile. Currently unimplemented:
+
+      my $fields = $c->fields;
+
+  methods
+
+    This method returns an array reference of the methods defined in the
+    classfile:
+
+      my $methods = $c->methods;
+
+    Each Java method is represented by an object which has the following
+    methods: name, descriptor, access_flags and attributes. name and
+    descriptor return the method name and descriptor. Possible access flags
+    are:
+
+    abstract
+        Declared abstract; no implementation is provided
+
+    final
+        Declared final; may not be overridden
+
+    native
+        Declared native; implemented in a language other than Java
+
+    private
+        Declared private; accessible only within the defining class
+
+    protected
+        Declared protected; may be accessed within subclasses
+
+    public
+        Declared public; may be accessed from outside its package
+
+    static
+        Declared static
+
+    strict
+        Declared strictfp; floating-point mode is FP-strict
+
+    synchronized
+        Declared synchronized; invocation is wrapped in a monitor lock
+
+    Various attributes are possible, the most common being the Code
+    attribute, where the value holds information about the Java bytecode for
+    the method:
+
+      foreach my $method (@{$c->methods}) {
+        print "  " . $method->name . " " . $method->descriptor;
+        print "\n    ";
+        print "is " . join(", ", @{$method->access_flags});
+        print "\n    ";
+        print "has attributes: ";
+        foreach my $att (@{$method->attributes}) {
+          my $name = $att->name;
+          my $value = $att->value;
+          if ($att->name eq 'Code') {
+            print "      $name: ";
+            print "stack(" . $value->max_stack . ")";
+            print ", locals(" . $value->max_locals . ")\n";
+            foreach my $instruction (@{$value->code}) {
+              print $instruction->label . ':' if defined $instruction->label;
+              print "\t" . $instruction->op . "\t" . (join ", ", @{$instruction->args}) . "\n";
+            }
+            print "\n";
+            foreach my $att2 (@{$value->attributes}) {
+              my $name2 = $att2->name;
+              my $value2 = $att2->value;
+              if ($name2 eq 'LineNumberTable') {
+                print "\tLineNumberTable (offset, line)\n";
+                print "\t" . $_->offset . ", " . $_->line . "\n" foreach (@$value2);
+              } else {
+                print "!\t$name2 = $value2\n";
+              }
+            }
+          } else {
+            print "!\t$name $value\n";
+          }
+        }
+        print "\n";
+      }
+
+    Note that in the case of the Code attribute, the value contains an
+    object which has three main methods: max_stack (the maximum depth of
+    stack needed by the method), max_locals (the number of local variables
+    used by the method), code (returns an arrayref of instruction objects
+    which have op, args and label methods), and attributes. One attribute
+    that Code can have is the LineNumberTable attributes, which has an
+    arrayref of objects as a value. These have offset and line methods,
+    representing a link between bytecode offset and sourcecode line.
+
+  attributes
+
+    This method returns an array reference of the attributes defined in the
+    classfile. Attributes are common in many places in the classfile - here
+    in particular we have the classfile attributes.
+
+      my $attributes = $c->attributes;
+
+    Attributes are represented by an object that has name and value methods:
+
+      foreach my $attribute (@{$c->attributes}) {
+        print "  " . $attribute->name . " = " . $attribute->value . "\n";
+      }
+
+    Possible attributes include the SourceFile attribute, the value of which
+    is the source file that was compiled into this classfile.
+
+BUGS
+    A number of classfile features are not currently supported. This will be
+    fixed real soon now.
+
+    Not enough test programs.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2001, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

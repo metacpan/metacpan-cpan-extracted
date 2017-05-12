@@ -1,0 +1,23 @@
+---
+abstract: 'Object-oriented higher-level DBI interface for select into arrays, placeholders, sequences, etc.'
+author:
+  - 'Jim Turner <turnerjw784@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JDBIx
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+  perl: '5.006'
+version: '1.02'

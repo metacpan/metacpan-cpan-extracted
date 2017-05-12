@@ -1,0 +1,8 @@
+Revision history for JIP-Conf
+
+0.02    2015-06-04
+        Fixed unescaped left brace in regex.
+
+0.01    2015-04-19
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,19 @@
+Revision history for Perl extension JavaScript-Mochikit
+
+0.04  Fri Jul 21 19:37:34 2006
+    - use strict
+    - DATA handles closed
+
+0.03  Thr Feb 05 23:47 2006
+    - Internal cleanup
+    - Own class that represents a Javascript-Module
+    - Dependencies added
+    - is_required function added
+    - Testcases added
+
+0.02  Thr Feb 04 03:37 2006
+    - Funktions to require/load/get (Javascript-)Modules
+    - Javascript-Code packages added.
+
+0.01  Thr Feb 02 19:06 2006
+    - Namespace reserved

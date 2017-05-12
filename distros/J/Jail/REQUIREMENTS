@@ -1,0 +1,212 @@
+IRIX-6.x
+STL http://www.sgi.com/Technology/STL/download.html
+
+Your 'versions' output should contain:
+
+I  ifl_dev              09/26/97  Image Format Library Development Environment,
+                                  1.1.1
+I  ifl_dev.man          09/26/97  Image Format Documents
+I  ifl_dev.man.c        09/26/97  Image Format C Man Pages
+I  ifl_dev.man.c++      09/26/97  Image Format C++ Man Pages
+I  ifl_dev.man.relnotes 09/26/97  Image Format Release Notes
+I  ifl_dev.sw           09/26/97  Image Format Software
+I  ifl_dev.sw.c         09/26/97  Image Format C API
+I  ifl_dev.sw.c++       09/26/97  Image Format C++ API
+I  ifl_dev.sw.gifts     09/26/97  Image Format Gifts Source
+
+I  ifl_eoe              09/26/97  Image Format Library Execution Only
+                                  Environment, 1.1.1
+I  ifl_eoe.man          09/26/97  Image Format Execution Environment Documents
+I  ifl_eoe.man.ifl      09/26/97  Image Format EOE Man Pages
+I  ifl_eoe.man.relnotes 09/26/97  Image Format EOE Release notes
+I  ifl_eoe.sw           09/26/97  Image Format Executable Software
+I  ifl_eoe.sw.c         09/26/97  Image Format Shared C Library
+I  ifl_eoe.sw.c++       09/26/97  Image Format Shared C++ Library
+I  ifl_eoe.sw.ifl1_0    09/26/97  Image Format Library 1.0 DSOs
+
+I  il_dev               09/26/97  ImageVision Library, 3.1.1
+I  il_dev.books         09/26/97  ImageVision Development Books
+I  il_dev.books.ProgGuide  09/26/97  ImageVision Programmer's Guide
+I  il_dev.man           09/26/97  ImageVision Documents
+I  il_dev.man.c         09/26/97  ImageVision C Man Pages
+I  il_dev.man.c++       09/26/97  ImageVision C++ Man Pages
+I  il_dev.man.relnotes  09/26/97  ImageVision Release Notes
+I  il_dev.sw            09/26/97  ImageVision Software
+I  il_dev.sw.c          09/26/97  ImageVision C API
+I  il_dev.sw.c++        09/26/97  ImageVision C++ API
+I  il_dev.sw.gifts      09/26/97  ImageVision Gifts Source
+I  il_dev.sw.il2_5      09/26/97  ImageVision 2.5 Headers, Libraries
+I  il_dev.sw.monitor    09/26/97  ImageVision Monitor Tool
+I  il_dev.sw.vk         09/26/97  ImageVision ViewKit API
+I  il_eoe               09/26/97  ImageVision Library Execution Only
+                                  Environment, 3.1.1
+I  il_eoe.man           09/26/97  ImageVision Execution Environment Documents
+I  il_eoe.man.il        09/26/97  ImageVision EOE Man Pages
+I  il_eoe.man.relnotes  09/26/97  ImageVision EOE Release notes
+I  il_eoe.sw            09/26/97  ImageVision Executable Software
+I  il_eoe.sw.c          09/26/97  ImageVision Shared C Library
+I  il_eoe.sw.c++        09/26/97  ImageVision Shared C++ Library
+I  il_eoe.sw.il2_5      09/26/97  ImageVision Library 2.5 DSOs
+I  il_eoe.sw.il3_0      09/26/97  ImageVision Library 3.0 DSOs
+I  il_eoe.sw.vk         09/26/97  ImageVision Shared Viewkit Support Library
+               
+I  il_eoe               09/26/97  ImageVision Library Execution Only
+                                  Environment, 2.5.1
+I  il_eoe.sw            09/26/97  ImageVision Executable Software
+I  il_eoe.sw.il2_2      09/26/97  ImageVision Library 2.2 DSOs
+I  il_eoe.sw32          09/26/97  ImageVision Executable Software (n32)
+I  il_eoe.sw32.fit      09/26/97  ImageVision FIT Image File Support (n32)
+I  il_eoe.sw32.jfif     09/26/97  ImageVision JFIF (JPEG) Image File Support
+                                  (n32)
+I  il_eoe.sw32.photocd  09/26/97  ImageVision PhotoCD Image File Support (n32)
+I  il_eoe.sw32.sgi      09/26/97  ImageVision SGI Image File Support (n32)
+I  il_eoe.sw32.tiff     09/26/97  ImageVision TIFF Image File Support (n32)
+
+I  c++_dev              10/15/97  C++, 7.1 on irix 6.2
+I  c++_dev.books        10/15/97  C++ IRIS InSight Books
+I  c++_dev.books.C++LangSysOverview  10/15/97  C++ Language System Overview
+I  c++_dev.books.C++Lang_System_Lib  10/15/97  C++ Language System Library
+I  c++_dev.books.C++Product_Ref  10/15/97  C++ Language System Product
+                                  Reference Manual
+I  c++_dev.books.C++_PG 10/15/97  C++ Programming Guide
+I  c++_dev.books.STL_PG 10/15/97  Standard Template Library Programmer's Guide
+I  c++_dev.hdr          10/15/97  C++ Headers
+I  c++_dev.hdr.lib      10/15/97  C++ Library Headers
+I  c++_dev.hdr.librw    10/15/97  C++ Rogue Wave Tools.h++ Library Headers
+I  c++_dev.man          10/15/97  C++ Manual Pages
+I  c++_dev.man.c++      10/15/97  C++ Compiler Man Pages
+I  c++_dev.man.librw    10/15/97  C++ Rogue Wave Tools.h++ Man Pages
+I  c++_dev.man.relnotes 10/15/97  C++ Release Notes
+I  c++_dev.sw           10/15/97  C++ Software
+I  c++_dev.sw.c++       10/15/97  C++ Compiler
+I  c++_dev.sw.lib       10/15/97  C++ Libraries
+I  c++_dev.sw.librw     10/15/97  C++ Rogue Wave Tools.h++ Library
+I  c++_dev.sw.v6_c++    10/15/97  C++ Compiler Version 6
+I  c++_dev.sw64         10/15/97  C++ Software
+I  c++_dev.sw64.librw   10/15/97  C++ Rogue Wave Tools.h++ Library 64bit
+               
+I  c++_eoe              09/26/97  Standard Execution Environment (C++, 6.2)
+I  c++_eoe.man          03/07/97  Standard Execution Manual Pages
+I  c++_eoe.man.relnotes 03/07/97  Standard Execution Libraries Release Notes
+I  c++_eoe.sw           03/07/97  Standard Execution Software
+I  c++_eoe.sw.lib       03/07/97  Standard Execution Libraries
+I  c++_eoe.sw32         09/26/97  Standard Execution Software (N32bit)
+I  c++_eoe.sw32.lib     09/26/97  Standard Execution Libraries (N32)
+I  c_dev                09/26/97  C, 7.1 on irix 6.2
+I  c_dev.books          09/26/97  C IRIS InSight Books
+I  c_dev.books.CLanguageRef  09/26/97  C Language Reference Manual
+I  c_dev.hdr            09/26/97  C Headers
+I  c_dev.hdr.lib        09/26/97  C Library Headers
+I  c_dev.man            09/26/97  C Manual Pages
+I  c_dev.man.c          09/26/97  C Compiler Man Pages
+I  c_dev.man.copt       09/26/97  C Copt Man Pages
+I  c_dev.man.relnotes   09/26/97  C Release Notes
+I  c_dev.man.util       09/26/97  C Utility Man Pages
+I  c_dev.src            09/26/97  C Optional Sources
+I  c_dev.src.acpp       09/26/97  C acpp Source
+I  c_dev.src.customalloc  09/26/97  C customalloc Source
+I  c_dev.sw             09/26/97  C Software
+I  c_dev.sw.c           09/26/97  C Compiler
+I  c_dev.sw.copt        09/26/97  C Scalar Optimizer
+I  c_dev.sw.lib         09/26/97  C Libraries
+I  c_dev.sw.util        09/26/97  C Utilities
+I  c_dev.sw.v6_c        09/26/97  C Compiler Version 6
+I  c_dev.sw.v6_copt     09/26/97  C Scalar Optimizer Version 6
+               
+I  c_eoe                07/30/97  Standard Execution Environment (C, 6.2)
+I  c_eoe.man            03/07/97  Standard Execution Manual Pages
+I  c_eoe.man.relnotes   03/07/97  Standard Execution Libraries Release Notes
+I  c_eoe.sw             03/07/97  Standard Execution Software
+I  c_eoe.sw.lib         03/07/97  Standard Execution Libraries
+I  c_eoe.sw32           07/30/97  Standard Execution Software (N32bit)
+I  c_eoe.sw32.lib       07/30/97  Standard Execution Libraries (N32)
+I  compiler_dev         09/26/97  Base Compiler Development Environment, 7.1 on
+                                  irix 6.2
+I  compiler_dev.books   09/26/97  Base Compiler Books
+I  compiler_dev.books.MProAsLg_PG  09/26/97  MIPSpro Assembly Language
+                                  Programming Guide
+I  compiler_dev.books.MProCplrDbx_TG  09/26/97  MIPSpro Compiling, Debugging
+                                  and Performance Tuning Guide
+I  compiler_dev.books.MProPort_TG  09/26/97  MIPSpro Porting and Transition
+                                  Guide
+I  compiler_dev.books.MPro_n32_ABI  09/26/97  MIPSpro N32 ABI Handbook
+I  compiler_dev.man     09/26/97  Base Compiler Manual Pages
+I  compiler_dev.man.base  09/26/97  Base Compiler Components Man Pages
+I  compiler_dev.man.dbx 09/26/97  Base Compiler dbx Man Page
+I  compiler_dev.man.ld  09/26/97  Base Compiler Loader Man Pages
+I  compiler_dev.man.lib 09/26/97  Base Compiler Programmers Man Pages
+I  compiler_dev.man.relnotes  09/26/97  Base Compiler Release Notes
+I  compiler_dev.man.util  09/26/97  Base Compiler Utility Man Pages
+I  compiler_dev.sw      09/26/97  Base Compiler Software
+I  compiler_dev.sw.abi  09/26/97  Base Compiler ABI Compiler
+I  compiler_dev.sw.base 09/26/97  Base Compiler Components
+I  compiler_dev.sw.dbx  09/26/97  Base Compiler dbx Debugger
+I  compiler_dev.sw.ld   09/26/97  Base Compiler Loader
+I  compiler_dev.sw.lib  09/26/97  Base Compiler Libraries
+I  compiler_dev.sw.util 09/26/97  Base Compiler Utilities
+I  compiler_dev.sw.v6_base  09/26/97  Base Compiler Components Version 6
+I  compiler_dev.sw.v6_ld  09/26/97  Base Compiler Loader Version 6
+               
+I  compiler_eoe         09/26/97  IRIX Standard Execution Environment, (Base
+                                  Compiler, 7.1 on irix 6.2)
+I  compiler_eoe.hdr     09/26/97  Base Compiler Headers
+I  compiler_eoe.hdr.lib 09/26/97  Base Compiler Headers
+I  compiler_eoe.man     09/26/97  IRIX Standard Execution Environment Man Pages
+I  compiler_eoe.man.dso 09/26/97  IRIX DSO Man Pages
+I  compiler_eoe.man.relnotes  09/26/97  Standard Execution Libraries Release
+                                  Notes
+I  compiler_eoe.man.unix  09/26/97  IRIX Standard Man Pages
+I  compiler_eoe.sw      09/26/97  IRIX Standard Execution Environment Software
+I  compiler_eoe.sw.cpp  09/26/97  Source Code Preprocessor
+I  compiler_eoe.sw.lboot  09/26/97  Kernel lboot Software
+I  compiler_eoe.sw.lib  09/26/97  Base Execution Libraries
+I  compiler_eoe.sw.unix 09/26/97  IRIX Execution Environment
+I  compiler_eoe.sw32    09/26/97  IRIX Standard Execution Environment Software
+                                  (N32)
+I  compiler_eoe.sw32.lib  09/26/97  Base Execution Libraries (N32)
+I  compiler_eoe.sw32.unix  09/26/97  IRIX Execution Environment (N32)
+I  dmedia_dev           09/26/97  IRIS Digital Media Development Environment,
+                                  6.2
+I  dmedia_dev.books     09/26/97  Digital Media Programming Guide
+I  dmedia_dev.books.DMediaDev_PG  09/26/97  Digital Media Programming Guide
+I  dmedia_dev.man       09/26/97  IRIS Digital Media Development Documentation
+I  dmedia_dev.man.cosmo 09/26/97  Cosmo Man Page
+I  dmedia_dev.man.lib   09/26/97  Digital Media Development Man Pages
+I  dmedia_dev.man.relnotes  09/26/97  Digital Media Developer Release Notes
+I  dmedia_dev.src       09/26/97  IRIS Digital Media Example Source
+I  dmedia_dev.src.examples  09/26/97  Digital Media Programming Examples
+I  dmedia_dev.src.tools 09/26/97  Digital Media Tools Source Code
+I  dmedia_dev.sw        09/26/97  IRIS Digital Media Development Software
+I  dmedia_dev.sw.cosmo  09/26/97  Cosmo Development Software
+I  dmedia_dev.sw.galileo  09/26/97  Video Library Header for Galileo Video
+I  dmedia_dev.sw.lib    09/26/97  Digital Media Libraries
+I  dmedia_dev.sw.sirius 09/26/97  Video Library Header for Sirius Video
+I  dmedia_dev.sw.vino   09/26/97  Video Library Header for Indy Video-In
+I  dmedia_dev.sw32      09/26/97  IRIS Digital Media N32 Development Software
+I  dmedia_dev.sw32.lib  09/26/97  Digital Media N32bit Libraries
+               
+I  dmedia_eoe           09/26/97  IRIS Digital Media Execution Environment, 6.2
+I  dmedia_eoe.books     03/07/97  Media Control Panels Help/User's Guide
+I  dmedia_eoe.books.MediaCtls_UG  03/07/97  Media Control Panels User's Guide,
+                                  Help and Book
+I  dmedia_eoe.books.MediaTls_UG  03/07/97  Media Tools User's Guide, Help and
+                                  Book
+I  dmedia_eoe.data      03/07/97  IRIS Digital Media EOE Data Files
+I  dmedia_eoe.data.movies  03/07/97  Sample Movie Files
+I  dmedia_eoe.data.soundscheme  03/07/97  SoundScheme Data Files
+I  dmedia_eoe.man       03/07/97  IRIS Digital Media Documentation
+I  dmedia_eoe.man.midi  03/07/97  MIDI Man Pages
+I  dmedia_eoe.man.relnotes  03/07/97  Digital Media End-User Release Notes
+I  dmedia_eoe.man.soundscheme  03/07/97  SoundScheme Manual Pages
+I  dmedia_eoe.man.tools 03/07/97  Manual Pages for Digital Media Tools
+I  dmedia_eoe.sw        03/07/97  IRIS Digital Media Software
+I  dmedia_eoe.sw.audio  03/07/97  Base Audio Software
+I  dmedia_eoe.sw.common 03/07/97  Digital Media Streams Software
+I  dmedia_eoe.sw.filetype  03/07/97  Digital Media Desktop Rules
+I  dmedia_eoe.sw.lib    03/07/97  Digital Media Execution Libraries
+I  dmedia_eoe.sw.midi   03/07/97  Base MIDI Software
+I  dmedia_eoe.sw.soundscheme  03/07/97  SoundScheme Sound Server
+I  dmedia_eoe.sw.tools  03/07/97  Digital Media Tools
+I  dmedia_eoe.sw.video  03/07/97  Base Video Software
+I  dmedia_eoe.sw32      09/26/97  IRIS Digital Media N32 Software
+I  dmedia_eoe.sw32.lib  09/26/97  Digital Media N32 Execution Libraries

@@ -1,0 +1,91 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "Yusuke Watase <ywatase@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JQuery-DataTables-Heavy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Hash::Merge" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "SQL::Abstract::Limit" : "0",
+            "perl" : "5.008005",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0.09",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "JQuery::DataTables::Heavy" : {
+         "file" : "lib/JQuery/DataTables/Heavy.pm",
+         "version" : "0.04"
+      },
+      "JQuery::DataTables::Heavy::Base" : {
+         "file" : "lib/JQuery/DataTables/Heavy/Base.pm"
+      },
+      "JQuery::DataTables::Heavy::DBI" : {
+         "file" : "lib/JQuery/DataTables/Heavy/DBI.pm"
+      },
+      "JQuery::DataTables::Heavy::DBIC" : {
+         "file" : "lib/JQuery/DataTables/Heavy/DBIC.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ywatase/JQuery-DataTables-Heavy/issues"
+      },
+      "homepage" : "https://github.com/ywatase/JQuery-DataTables-Heavy",
+      "repository" : {
+         "url" : "git://github.com/ywatase/JQuery-DataTables-Heavy.git",
+         "web" : "https://github.com/ywatase/JQuery-DataTables-Heavy"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Yusuke Watase <ywatase+github@gmail.com>"
+   ]
+}

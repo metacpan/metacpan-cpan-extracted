@@ -1,0 +1,21 @@
+---
+abstract: 'Facebook authentication plugin for Jifty'
+author:
+  - 'Alex Vandiver'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Authentication-Facebook
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Jifty: 0
+  WWW::Facebook::API: 0.3.6
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.9

@@ -1,0 +1,10 @@
+Revision history for Perl extension JSON-RPC2-AnyEvent
+
+0.02 2013-10-20T13:37:16Z
+
+    - Fixed t/03_tcp_server.t for Cygwin
+
+0.01 2013-10-18T06:25:23Z
+
+    - original version
+

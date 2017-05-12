@@ -1,0 +1,7 @@
+# This file is used to override the following defaults:
+
+# index_title: A Sample Test.Base Testing Setup
+# import_libs:
+#   - lib/Test/Sample.js
+# template_include_path:
+#   - template

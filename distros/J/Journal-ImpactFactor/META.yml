@@ -1,0 +1,29 @@
+---
+abstract: 'A list of updated scientiffic journal impact factor.'
+author:
+  - 'Felipe da Veiga Leprevost <leprevost@cpan.org>'
+build_requires:
+  Moose: '0'
+  Storable: '0'
+  Test::More: '0'
+  namespace::autoclean: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Journal-ImpactFactor
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Journal-ImpactFactor
+  homepage: https://github.com/Leprevost/Journal-ImpactFactor
+  repository: https://github.com/Leprevost/Journal-ImpactFactor.git
+version: '0.04'

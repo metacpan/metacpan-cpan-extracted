@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+author/testdata.pl
+cpanfile
+lib/JKML.pm
+minil.toml
+t/00_compile.t
+t/01_decode.t
+t/02_encode.t
+t/data.json
+META.yml
+MANIFEST

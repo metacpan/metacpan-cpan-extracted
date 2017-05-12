@@ -1,0 +1,6 @@
+JSON::YAJL::Generator  T_PTROBJ
+JSON::YAJL::Parser     T_PTROBJ
+long int               T_LONG
+unsigned int*          T_UV
+const unsigned char ** T_PV
+const char *           T_PV

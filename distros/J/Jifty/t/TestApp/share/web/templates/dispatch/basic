@@ -1,0 +1,4 @@
+<&| /_elements/wrapper, title => "Test of dispatch" &>
+  Basic test.
+<% Jifty::YAML::Dump(\%ARGS) %>
+</&>

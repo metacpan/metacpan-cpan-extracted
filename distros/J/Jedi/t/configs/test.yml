@@ -1,0 +1,14 @@
+Jedi:
+  Roads:
+    t::lib::configs::myConfigRoot: /
+    t::lib::configs::myConfigAdmin: /admin
+Plack:
+  server: Starman
+  env: production
+Starman:
+  workers: 2
+  port: 9999
+t::lib::configs::myConfigRoot:
+  text: root ok
+t::lib::configs::myConfigAdmin:
+  text: admin ok

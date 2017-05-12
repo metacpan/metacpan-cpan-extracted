@@ -1,0 +1,153 @@
+<html>
+<head>
+<script language="javascript" src="../tests/lib/jQuery.js"></script>
+<script language="javascript" src="../lib/JS/Chicken.js"></script>
+<script language="javascript">
+
+/********************** Some Objects ***************************/
+
+function User (name) {
+    this._name = name;
+}
+User.prototype.name = function () { return this._name }
+
+function Product (id, name) {
+    this._id = id;
+    this.name = name;
+}
+Product.prototype.get_id = function () { return this._id }
+
+/********************** Paramters ***************************/
+
+var params = {
+    '#logo'           : new Chicken.Callback (function (t, selector) {
+        t.find(selector).attr({
+            'src'   : 'http://iinteractive.com/images/logo.gif',
+            'style' : 'padding: 10px;',
+        });
+    }),
+    '.username'       : new Chicken.MethodThunk (new User ('Stevan'), "name"),
+    '#user_quotation' : 'JQuery Rocks',
+    '.copyright'      : new Chicken.Thunk (
+        function () { return "Copyright (c) " + (new Date ()).getFullYear() }
+    ),
+    '#products'       : new Chicken.Collection ({
+        row_selector  : '.row',
+        values        : [
+            new Product (10, 'Foo'),
+            new Product (11, 'Bar'),
+            new Product (12, 'Baz'),
+        ],
+        transformer   : function (val) {
+            return {
+                '.id'   : val.get_id(),
+                '.name' : new Chicken.PropertyThunk (val, 'name'),
+            }
+        }
+    }),
+    '#dogs'          : new Chicken.Collection ({
+        row_selector : '.table_row',
+        values       : [
+            { '.sound' : "Bark" },
+            { '.sound' : "Woof" },
+        ]
+    }),
+    '#cats'          : new Chicken.Hierarchy ({
+        list_selector : '.list',
+        item_selector : '.item',
+        values       : {
+            node     : { '.name' : "Twinkles"  },
+            children : [
+                { node : { '.name' : "Shnuckums" } },
+                { 
+                    node     : { '.name' : "Bilbo" },
+                    children : [
+                        { 
+                            node     : { '.name' : "Dweezil" },
+                            children : [
+                                { node : { '.name' : "Tabby" } },                      
+                            ]
+                        },
+                        { node : { '.name' : "Abraxas"    } },                                                
+                    ]
+                },
+            ]
+        }
+    }),
+    '#rooms'          : new Chicken.Hierarchy ({
+        list_selector : '.list',
+        item_selector : '.item',
+        values       : {
+            node     : { 'place' : "Ceiling"  },
+            children : [
+                { node : { 'place' : "Basement" } },
+                { 
+                    node     : { 'place' : "Garage" },
+                    children : [
+                        { node : { 'place' : "Root Cellar" } },
+                        { 
+                            node     : { 'place' : "Kitchen" },
+                            children : [
+                                { node : { 'place' : "Under The Stairs" } },                      
+                            ]
+                        },
+                        { node : { 'place' : "Bathroom" } },                                                
+                    ]
+                },
+            ]
+        },
+        transformer : function (node) {
+            return {
+                '.name' : node['place']
+            }
+        }
+    }),    
+};
+
+$(document).ready(function () {
+    $('body').process_template(params);
+});
+
+</script>
+</head>
+<body>
+<img id="logo" src="http://l.yimg.com/a/i/ww/beta/y3.gif" border="1" />
+<hr/>
+<div class="username">Foo</div>
+<hr/>
+<p id="user_quotation">Text goes here</p>
+<div id="products" style="border: 1px solid grey; width: 250px">
+    <div class="row" style="border: 1px solid red; padding: 2px; margin: 2px;">
+        <span class="id">ID</span>
+        <span class="name">NAME</span>
+    </div>
+</div>
+<br/>
+<table id="dogs" border="1">
+    <thead>
+        <th>Hello</th>
+    </thead>
+    <tbody>
+        <tr class="table_row">
+            <td>My dog says <span class="sound">NAME</span></td>
+        </tr>
+    </tbody>
+</table>
+<hr/>
+<div id="cats">
+    <ul class="list">
+        <li class="item">My cat is named <span class="name">NAME</span></li>
+    </ul>
+</div>
+<hr/>
+<div id="rooms">
+    <div class="list" style="padding-left: 10px">
+        <div class="item" style="padding-left: 10px">My room is <span class="name">NAME</span></div>
+    </div>
+</div>
+<hr/>
+<div class="username">Foo</div>
+<hr/>
+<div class="copyright">Copyleft</div>
+</body>
+</html>

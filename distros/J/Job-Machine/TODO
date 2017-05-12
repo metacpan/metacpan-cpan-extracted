@@ -1,0 +1,53 @@
+TODO
+
+0.15
+- Defect: result only accepts structure (array/hash-ref)
+  Make it accept scalar and undef.
+- accessor for task data
+
+0.1x
+- DB select_all instead of select_first for revive_tasks etc
+- Client send parameters
+  class_id is the queue name
+  grouping some kind of coaleshing value (for some kind of get_next method in process)
+  title ??
+  parameters could be json, is that in Pg 9.0?
+  run_after default to now, but possible to set somehow
+  remove_after possible to set. If not set, make it modified +30 days when completed or failed
+
+Rough priority.
+
+0.20
+- Payload
+  Pg 9.0
+  client methods check and receive, worker method result
+  Includes the result_id. fetch result using that id
+  The payload of the result notification .
+- Pg
+  How do you instruct "listen" to never return (no timeout)?
+  Does 9.0 have a native JSON type? (Parameters, result)
+
+0.30
+- More fine grained Worker status methods (perhaps)
+  finished,failed,failure (total), declined (or wait)
+- Clean up parameter passing
+- tests, incl database, test for installed pg
+- tasks/jobs with expiration (defaulting to never)
+- locked flag / next try datetime
+- Wait until datetime (run_after)
+- Housekeeping section (upon loop timeout)
+  - remove dead tasks
+  - Find and recycle locked tasks (left by dead processes etc)
+  - config option (or similar) to determine if chores can be processed in a loop
+- Logging
+  - To stderr or syslog? If syslog (or log4perl), DB carp -> log
+  - When a task is transferred to process
+  - When do_chores does chores, removing old tasks, failing tasks
+
+0.40
+- Task dependency / task bundling
+- Scoreboard / status monitoring
+- Job Administration
+- Schedule table, ideas
+  - cron-like?
+  - or perhaps DateTime recurring thingie

@@ -1,0 +1,211 @@
+######################################################################
+    JavaScript::SpiderMonkey 0.17
+######################################################################
+
+NAME
+    JavaScript::SpiderMonkey - Perl interface to the JavaScript Engine
+
+SYNOPSIS
+        use JavaScript::SpiderMonkey;
+
+        my $js = JavaScript::SpiderMonkey->new();
+
+        $js->init();  # Initialize Runtime/Context
+
+                      # Define a perl callback for a new JavaScript function
+        $js->function_set("print_to_perl", sub { print "@_\n"; });
+
+                      # Create a new (nested) object and a property
+        $js->property_by_path("document.location.href");
+
+                      # Execute some code
+        my $rc = $js->eval(q!
+            document.location.href = append("http://", "www.aol.com");
+
+            print_to_perl("URL is ", document.location.href);
+
+            function append(first, second) {
+                 return first + second;
+            }
+        !);
+
+            # Get the value of a property set in JS
+        my $url = $js->property_get("document.location.href");
+
+        $js->destroy();
+
+INSTALL
+    JavaScript::SpiderMonkey requires Mozilla's readily compiled
+    SpiderMonkey 1.5 distribution or better. Please check "SpiderMonkey
+    Installation".
+
+DESCRIPTION
+    JavaScript::SpiderMonkey is a Perl Interface to the SpiderMonkey
+    JavaScript Engine. It is different from Claes Jacobsson's
+    "JavaScript.pm" in that it offers two different levels of access:
+
+    [1] A 1:1 mapping of the SpiderMonkey API to Perl
+
+    [2] A more Perl-like API
+
+    This document describes [2], for [1], please check "SpiderMonkey.xs".
+
+  new()
+    "$js = JavaScript::SpiderMonkey->new()" creates a new object to work
+    with. To initialize the JS runtime, call "$js->init()" afterwards.
+
+  $js->destroy()
+    "$js->destroy()" destroys the current runtime and frees up all memory.
+
+  $js->init()
+    "$js->init()" initializes the SpiderMonkey engine by creating a context,
+    default classes and objects and adding an error reporter.
+
+  $js->array_by_path($name)
+    Creates an object of type *Array* in the JS runtime:
+
+        $js->array_by_path("document.form");
+
+    will first create an object with the name "document" (unless it exists
+    already) and then define a property named "form" to it, which is an
+    object of type *Array*. Therefore, in the JS code, you're going to be
+    able define things like
+
+        document.form[0] = "value";
+
+  $js->function_set($name, $funcref, [$obj])
+    Binds a Perl function provided as a coderef ($funcref) to a newly
+    created JS function named $name in JS land. It's a real function
+    (therefore bound to the global object) if $obj is omitted. However, if
+    $obj is ref to a JS object (retrieved via "$js->object_by_path($path)"
+    or the like), the function will be a *method* of the specified object.
+
+        $js->function_set("write", sub { print @_ });
+            # write("hello"); // In JS land
+
+        $obj = $j->object_by_path("navigator");
+        $js->function_set("write", sub { print @_ }, $obj);
+            # navigator.write("hello"); // In JS land
+
+  $js->array_set_element($obj, $idx, $val)
+    Sets the element of the array $obj at index position $idx to the value
+    $val. $obj is a reference to an object of type array (retrieved via
+    "$js->object_by_path($path)" or the like).
+
+  $js->array_set_element_as_object($obj, $idx, $elobj)
+    Sets the element of the array $obj at index position $idx to the object
+    $elobj (both $obj and $elobj have been retrieved via
+    "$js->object_by_path($path)" or the like).
+
+  $js->array_get_element($obj, $idx)
+    Gets the value of of the element at index $idx of the object of type
+    Array $obj.
+
+  $js->property_by_path($path, $value, [$getter], [$setter])
+    Sets the specified property of an object in $path to the value $value.
+    $path is the full name of the property, including the object(s) in JS
+    land it belongs to:
+
+        $js-E<gt>property_by_path("document.location.href", "abc");
+
+    This first creates the object "document" (if it doesn't exist already),
+    then the object "document.location", then attaches the property "href"
+    to it and sets it to "abc".
+
+    $getter and $setter are coderefs that will be called by the JavaScript
+    engine when the respective property's value is requested or set:
+
+        sub getter {
+            my($property_path, $value) = @_;
+            print "$property_path has value $value\n";
+        }
+
+        sub setter {
+            my($property_path, $value) = @_;
+            print "$property_path set to value $value\n";
+        }
+
+        $js-E<gt>property_by_path("document.location.href", "abc",
+                                  \&getter, \&setter);
+
+    If you leave out $getter and $setter, there's going to be no callbacks
+    triggerd while the properity is set or queried. If you just want to
+    specify a $setter, but no $getter, set the $getter to "undef".
+
+  $js->object_by_path($path, [$newobj])
+    Get a pointer to an object with the path specified. Create it if it's
+    not there yet. If $newobj is provided, the ref is used to bind the
+    existing object to the name in $path.
+
+  $js->property_get($path)
+    Fetch the property specified by the $path.
+
+        my $val = $js->property_get("document.location.href");
+
+  $js->eval($code)
+    Runs the specified piece of <$code> in the JS engine. Afterwards,
+    property values of objects previously defined will be available via
+    "$j->property_get($path)" and the like.
+
+        my $rc = $js->eval("write('hello');");
+
+    The method returns 1 on success or else if there was an error in JS
+    land. In case of an error, the JS error text will be available in $@.
+
+SpiderMonkey Installation
+    First, get the latest SpiderMonkey distribution from mozilla.org:
+    http://www.mozilla.org/js/spidermonkey shows which releases are
+    available. "js-1.5-rc3a.tar.gz" has been proven to work.
+
+    Untar it at the same directory level as you just untarred the
+    "JavaScript::SpiderMonkey" distribution you're currently reading. So, if
+    you're currently in "/my/path/JavaScript-SpiderMonkey-v.vv", do this:
+
+        cp js-1.5-rc3a.tar.gz /my/path
+        cd /my/path
+        tar zxfv js-1.5-rc3a.tar.gz
+
+    Then, compile the SpiderMonkey distribution, if you're on Linux, just
+    use:
+
+        cd js/src
+        make -f Makefile.ref
+
+    It's important that the js and JavaScript-SpiderMonkey-v.vv directories
+    are at the same level:
+
+        [/my/path]$ ls
+        JavaScript-SpiderMonkey-v.vv
+        js
+        js-1.5-rc3a.tar.gz
+        [/my/path]$
+
+    (Note that you *can* untar the SpiderMonkey distribution elsewhere, but,
+    if so, then you need to edit the setting of $JSLIBPATH in Makefile.PL).
+
+    Next, you need to copy the shared library file thus constructed (e.g.,
+    libjs.so or js32.dll) to an appropriate directory on your library path.
+    On Windows, this can also be the directory where the perl executable
+    lives. On Unix, this has been shown to work without copying, but this
+    way you need to keep the compiled binary in the "js" build directory
+    forever. Copying "js/src/Your_OS_DBG.OBJ/libjs.so" to "/usr/local/lib"
+    and making sure that "/usr/local/lib" is in your "LD_LIBRARY_PATH" seems
+    to be safest bet.
+
+    Now, build JavaScript::SpiderMonkey in the standard way:
+
+        cd JavaScript-SpiderMonkey-v.vv
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+AUTHOR
+    Mike Schilli, <m@perlmeister.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2002 by Mike Schilli
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

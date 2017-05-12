@@ -1,0 +1,7 @@
+{arch}
+Makefile
+.arch-ids
+t/.arch-ids
+,,*
+\+\+*
+

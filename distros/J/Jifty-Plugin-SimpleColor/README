@@ -1,0 +1,46 @@
+NAME
+    Jifty::Plugin::SimpleColor - Provides simple jQuery color picker for
+    Jifty
+
+SYNOPSIS
+    In your model class schema description, add the following:
+
+       column color1 => is SimpleColor;
+
+    In your jifty config.yml under the framework section:
+
+        Plugins:
+          - SimpleColor: {}
+
+    or
+
+        Plugins:
+          - SimpleColor:
+              defaultColors:
+                 - F00
+                 - 00FF00
+                 - 00F
+                 - FFF
+                 - 000
+
+    you can add colors in each model class schema description with
+
+      sub Jifty::Plugin::SimpleColor::Widget::addColors { return "['900', '090', '009', 'ccc']"; }
+
+  init
+    load config values, javascript and css
+
+AUTHOR
+    Yves Agostini, <yvesago@cpan.org>
+
+LICENSE
+    Copyright 2010, Yves Agostini.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+
+    Embeded jquery.colorPicker.js Copyright (c) 2008 Lakshan Perera
+    (www.laktek.com)
+
+    Licensed under the MIT licenses
+

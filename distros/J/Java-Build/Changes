@@ -1,0 +1,66 @@
+Revision history for Perl extension Java::Build.
+
+0.05  Mon Oct  6 12:48:04 CDT 2003
+        - Changed Tasks::jar so it accepts an undef manifest.
+        - Cleaned t/02javac.t to remove the old compile filed test
+        - Removed Java::Build::JVM::_dump_errors in favor of inlining its
+          action.
+        - Adjusted documentation and error message relating to tools.jar.
+          During installation, this jar must be in the classpath.  Otherwise
+          the tests will not work.
+        - Corrected bug in GenericBuild::GO which did not allow callers
+          to request the first step in the targets list.  (I will write
+          50 times on the chalkboard: 0 is false.)
+        - Renamed build.script to build.driver in the demo.  This is on my
+          list of politically correct name changes 'script' is pajorative.
+        - Corrected Tasks::copy_file so that directories with spaces are
+          properly quoted.
+
+0.04  Mon Sep 15 08:54:30 CDT 2003
+        - Corrected small problems with the demo build so it will actually
+          run on other people's machines.  (It used to depend on absolute
+          paths, I made them relative.)
+        - Added Test::More to the PREREQ_PM list in Makefile.PL.
+        - Cleaned GenericBuild test file.
+        - Improved GenericBuild error when GO receives a target that isn't
+          in its list.
+        - Corrected GenericBuild so it doesn't die when the BUILD_SUCCESS
+          file is initially missing.
+        - Corrected GenericBuild so GO no longer does an extra step when
+          user requests two targets, the later of which is currently
+          in BUILD_SUCCESS.
+        - Changed Tasks::read_prop_file so it uses a bare return if it
+          can't read the file.  It used to kill the program.  That lead
+          to odd log entries when Tasks::update_prop_file was asked to
+          update an absent file.
+        - Made it a fatal error to supply a BASE_DIR argument to
+          Tasks::build_file_list which is not an existing directory.
+        - Added optional INCLUDE_PATTERNS parameter to
+          Tasks::make_jar_classpath.  Now callers can control which files
+          end up in the list.  In particular, they can have both .jar and .zip.
+
+0.03  Tue Sep  2 08:05:33 CDT 2003
+        - Added Java::Build::GenericBuild to be the top level controller of
+          builds.
+        - Added a demo directory to the distrubution to show how builds might
+          be built.
+        - Changed Java::Build::JVM so that compile error are fatal.
+          All calls to its compile method should be eval'ed to trap errors.
+        - Changed jar and jarsigner Tasks so they only log when their
+          underlying call returns something.
+        - Changed jar and jarsigner so they call croak when their underlying
+          command fails.
+        - Corrected jar so it doesn't stay in the base directory of the jar
+          contents when it dies.  This is important for callers who are
+          trapping fatal errors with eval.
+
+0.02  Wed Aug 27 09:32:16 CDT 2003
+        - Modified Java compiling code so that errors from javac are not
+          dumped directly onto standard out.  Now when compile returns false,
+          the caller should call dump_errors on the compiling object to
+          retrieve the errors.
+
+0.01  Fri Jul 25 08:16:01 2003
+	- original version; created by h2xs 1.22 with options
+		-AXn Java::Build
+

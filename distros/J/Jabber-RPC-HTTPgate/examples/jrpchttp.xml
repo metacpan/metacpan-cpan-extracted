@@ -1,0 +1,10 @@
+  <!-- component instance definition for the HTTPgate gateway -->
+  <!-- the httpgate.pl program connects via this definition -->
+  <service id='jrpchttp.localhost'>
+    <accept>
+      <ip>127.0.0.1</ip>
+      <secret>secret</secret>
+      <port>5700</port>
+    </accept>
+  </service>
+

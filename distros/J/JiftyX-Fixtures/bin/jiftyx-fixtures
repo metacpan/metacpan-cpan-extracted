@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+use Jifty;
+use Jifty::Util;
+use JiftyX::Fixtures;
+use Cwd;
+
+BEGIN { 
+  die "Current directory is not Jifty application root\n" unless cwd() eq Jifty::Util->app_root;
+  $ARGV[0] ||= "help";
+  JiftyX::Fixtures->new->run;
+}
+

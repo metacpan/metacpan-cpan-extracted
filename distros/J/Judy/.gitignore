@@ -1,0 +1,38 @@
+Judy-*
+
+# WTF, why does CPANTS write this file?
+Debian_CPANTS.txt
+
+t/MAGIC/typemap
+
+# Releases
+Judy-HS-*
+
+# Compilation artifacts
+*.bs
+*.c
+*.o
+_Inline
+
+# Module::Build
+Build
+_build
+
+# EU::MM
+blib
+pm_to_blib
+Makefile
+Makefile.old
+
+# Emacs
+.#*
+*#
+*~
+
+# Distribution artifacts
+MANIFEST.bak
+META.yml
+MYMETA.yml
+
+# bin/release
+Changes.bak

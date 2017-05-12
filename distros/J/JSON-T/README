@@ -1,0 +1,168 @@
+NAME
+    JSON::T - transform JSON using JsonT
+
+SYNOPSIS
+     my $jsont = slurp('foo/bar.js');
+     my $input = slurp('foo/quux.json');
+     my $JSONT = JSON::T->new($jsont);
+     print $JSONT->transform($input);
+
+DESCRIPTION
+    This module implements JsonT, a language for transforming JSON-like
+    structures, analogous to XSLT in the XML world.
+
+    JsonT is described at <http://goessner.net/articles/jsont/>. JsonT is a
+    profile of Javascript; so JsonT needs a Javascript engine to actually
+    work. This module provides the engine-neutral stuff, while JSON::T::JE and
+    JSON::T::SpiderMonkey provide the necessary glue to hook it up to a couple
+    of Javascript engines.
+
+    JSON::T::JE uses the pure Perl Javascript implementation JE.
+
+    JSON::T::SpiderMonkey uses JavaScript::SpiderMonkey which in turn is
+    backed by Mozilla's libjs C library.
+
+    This module tries to provide a similar API to XML::Saxon::XSLT2.
+
+  Constructor
+    `new($code, $name)`
+        Constructs a new JSON::T transformation. $code is the JsonT Javascript
+        code. As a JsonT file can contain multiple (potentially unrelated)
+        transformations, the name of the particular transformation you want to
+        use should also be provided. If $name is omitted, then the name
+        "_main" is assumed.
+
+        If you wish to use a particular Javascript implementation, you can
+        use, for example:
+
+          JSON::T::SpiderMonkey->new($code, $name)
+
+        Otherwise
+
+          JSON::T->new($code, $name)
+
+        will try to pick a working implementation for you.
+
+  Methods
+    `parameters(param1=>$arg1, param2=>$arg2, ...)`
+        Sets global variables available to the Javascript code. All arguments
+        are treated as strings.
+
+    `transform($input)`
+        Run the transformation. The input may be a JSON string, a
+        JSON::JOM::Node or a native Perl nested arrayref/hashref structure, in
+        which case it will be stringified using the JSON module's to_json
+        function. The output (return value) will be a string.
+
+    `transform_structure($input)`
+        Like `transform`, but attempts to parse the output as a JSON string
+        and return a native Perl arrayref/hashref structure. This method will
+        fail if the output is not a JSON string.
+
+    `DOES($role)`
+        Like UNIVERSAL's DOES method, but returns true for:
+
+          JSON::T->DOES('XML::Saxon::XSLT2')
+
+        as an aid for polymorphism.
+
+    The following methods also exist for compatibility with XML::Saxon::XSLT2,
+    but are mostly useless:
+
+    `transform_document`
+    `messages`
+    `media_type`
+    `version`
+    `doctype_system`
+    `doctype_public`
+    `encoding`
+
+  Javascript Execution Environment
+    JSON::T is a profile of Javascript, so is evaluated in an execution
+    environment. As this is not a browser environment, many global objects
+    familiar to browser Javascript developers are not available. (For example,
+    `window`, `document`, `navigator`, etc.)
+
+    A single global object called "JSON" is provided with methods `stringify`
+    and `parse` compatible with the well-known json2.js library
+    (<http://www.JSON.org/json2.js>), and a method `transform(obj,jsont)` that
+    provides a Javascript JsonT implementation.
+
+    A function `print_to_perl` is provided which prints to Perl's STDOUT
+    stream.
+
+SUBCLASSING
+    Two subclasses are provided: JSON::T::JE and JSON::T::SpiderMonkey, but if
+    you need to hook JSON::T up to another Javascript engine, it is relatively
+    simple. Just create a Perl class which is a subclass of JSON::T. This
+    subclass must implement two required methods and should implement one
+    optional method.
+
+    `init`
+        Will be passed a newly created object (let's call it $self). It is
+        expected to initialise a Javascript execution context for $self, and
+        define two Javascript functions: `return_to_perl` (which acts as a
+        shim to `$self->_accept_return_value()`) and `print_to_perl` (which
+        acts as a shim to `print`). It must then call `SUPER::init`.
+
+    `engine_eval`
+        Will be passed an object ($self) and a Javascript string. Must
+        evaluate the string in the object's Javascript execution context.
+
+    `parameters`
+        This one is optional to implement it. If you don't implement it, then
+        users will get a warning message if they try to call `parameters` on
+        your subclass.
+
+        Will be passed an object ($self) and a hash of parameters, using the
+        following format:
+
+          (
+            name1  => 'value1',
+            name2  => [ type2 => 'value2' ],
+            name3  => [ type3 => 'value3', hint => 'hint value' ],
+          )
+
+        This should have the effect of setting:
+
+          var name1 = 'value1';
+          var name2 = 'value2';
+          var name3 = 'value3';
+
+        in the object's Javascript execution context. Parameter types and
+        additional hints may be used to set the correct types in Javascript.
+
+    You are unlikely to need to do anything else when subclassing.
+
+    If you wish `JSON::T->new` to know about your subclass, then push its name
+    onto @JSON::T::Implementations.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    Specification: <http://goessner.net/articles/jsont/>.
+
+    Related modules: JSON, JSON::Path, JSON::GRDDL, JSON::Hyper, JSON::Schema.
+
+    JOM version: JSON::JOM, JSON::JOM::Plugins::JsonT.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+    This module is embeds Stefan Goessner's Javascript implementation of JsonT
+    (version 0.9) to do the heavy lifting.
+
+COPYRIGHT AND LICENCE
+    Copyright 2006 Stefan Goessner.
+
+    Copyright 2008-2011, 2013-2014 Toby Inkster.
+
+    Licensed under the Lesser GPL:
+    <http://creativecommons.org/licenses/LGPL/2.1/>.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,60 @@
+Revision history for Perl extension Java::Javap.
+
+0.11 Sept 5th 2010
+    - Now includes constant values in the generated perl6 (Phil Crow)
+
+0.09 July 27th 2010
+    - Greatly improved code (declaration) generation.
+    - Includes a working (but very minimal) example DBDI driver for PostgreSQL.
+    - Includes a working perl6 script to use the DBDI driver.
+    - Defaults to compiling the .pm6 into adjacent .pir files for performance.
+
+0.08 July 20th 2010
+    - Added very experimental DBDI files
+    - Fixed references to old Std generator
+
+0.07 July 19th 2010
+    - Assorted code generation improvements.
+
+0.06 July 10th 2010
+    - Renamed command to java2perl6api.
+    - Renamed distro to Java-2Perl6API.
+    - Only generate roles, not classes.
+    - Added set_types and add_types options.
+    - --recurse --nest --check is now the default.
+    - Assorted bug fixes.
+    - Now handles constructors, constants, and implements (does)
+
+0.05 July 2nd 2010
+    - Simplified grammar for arg_lists and similar constructs, removed
+      middle production which was not needed.
+    - Added mkjdbc.pl script that runs java2perl6 on the JDBC classes
+      and then runs perl6 on each to validate them.
+    - Repository moved to http://github.com/timbunce/java2perl6
+
+0.04 Wed Jul 25 16:47:30 CDT 2007
+    - Improved the grammar so java.net.URL can be recursively parsed without
+      error.  This included:
+        allow $ as a legal character in identifier names
+        allowing constants to have array type
+        allowing transient, native, and synchronized in various places.
+    - Corrected error in recursion.
+
+0.03 Sat Jul 21 08:29:53 CDT 2007
+    - Added support for recurse flag at the command line.  It now tries
+      to process any types it encounters but doesn't recognize.
+    - Improved the grammar to account for more variety.  It's still incomplete.
+      Bug reports welcome.
+    - Added a lot of POD and expanded the README.
+
+0.02 Wed Jul 18 17:41:38 CDT 2007
+    - Completed initial work on class generation (constructors are missing).
+    - Guarded tests so they don't run if you don't have javap in your path.
+    - Fixed bug in qualified names, now there is a dot separated java
+      name and a double colon separated perl name.
+    - Made java2perl6 usable.  Only recursive work remains.
+
+0.01  Tue May 15 17:51:40 2007
+	- original version; created by h2xs 1.23 with options
+		-Xn Java::Javap
+

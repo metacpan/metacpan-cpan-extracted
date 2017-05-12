@@ -1,0 +1,1 @@
+function initScript(){var c=parseXML("config.xml").getElementsByTagName("config");var e=parseXML('konfig.xml').getElementsByTagName('konfig');var b='conf.xml';var a='conf';var d=parseXML(b).getElementsByTagName(a)}

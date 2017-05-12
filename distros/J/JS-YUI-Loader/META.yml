@@ -1,0 +1,31 @@
+---
+abstract: 'Load (and cache) the Yahoo YUI framework'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.710'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: JS-YUI-Loader
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Algorithm::Dependency: 0
+  Carp::Clan::Share: 0
+  File::Copy: 0
+  HTML::Declare: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Path::Abstract: 0
+  Path::Class: 0
+  Scalar::Util: 0
+  URI: 0
+version: 0.02

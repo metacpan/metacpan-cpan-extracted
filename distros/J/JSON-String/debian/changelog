@@ -1,0 +1,5 @@
+libjson-string-perl (0.1.0-1) unstable; urgency=low
+
+  * Initial Release
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 27 Mar 2015 11:06:00 -0500

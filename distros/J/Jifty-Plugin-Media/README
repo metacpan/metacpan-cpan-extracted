@@ -1,0 +1,90 @@
+NAME
+    Jifty::Plugin::Media - Provides upload file and select url for Jifty
+
+DESCRIPTION
+    Jifty::Plugin::Media is a Jifty plugin to allow managing static files,
+    upload create directory, delete and select url for any media file for
+    your application.
+
+SYNOPSIS
+    In your Model class schema description, add the following:
+
+       column color1 => is Media;
+
+    In your jifty config.yml under the framework section:
+
+       Plugins:
+           - Media:
+              default_root: files
+
+    "default_root" will be added to "Your_app_root/share/web/static/" path
+    Your web process need to have write rights in this directory.
+
+    In your Dispatcher manage allowed uploaders :
+
+      use strict;
+      use warnings;
+      package TestApp::Dispatcher;
+      use Jifty::Dispatcher -base;
+      before '*' => run {
+        Jifty->api->allow('Jifty::Plugin::Media::Action::ManageFile')
+            if Jifty->web-current_user->is_supersuser;
+        };
+      before '/media_*' => run {
+        tangent '/access_denied'
+            if ( ! Jifty->web-current_user->is_superuser );
+      };
+      1;
+
+    In your View you can access to a manager page '/media_manage_page' or a
+    fragment '/media_manage' usable in a popout link:
+
+      hyperlink (label => 'Manage files',
+                   onclick => { popout => '/media_manage' });
+
+    you can open a repository on load with "mediadir" argument
+
+       hyperlink (label => 'Manage files',
+                     onclick => {
+                         popout => '/media_manage',
+                         args => { mediadir => '/images/'}
+                         });
+
+    or you can change default_root to a sub directory with "rootdir"
+    argument
+
+       hyperlink (label => 'Manage files',
+                     onclick => {
+                         popout => '/media_manage',
+                         args => { rootdir => '/images/'}
+                         });
+
+  init
+    load config values, javascript and css
+
+  read_dir
+  file_info
+  conv2ascii
+     convert accent character to ascii
+
+  clean_dir_name
+    convert dir name in ascii
+
+  clean_file_name
+    convert file name in ascii
+
+AUTHOR
+    Yves Agostini, <yvesago@cpan.org>
+
+LICENSE
+    Copyright 2010, Yves Agostini.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+
+    Embeded "jqueryFileTree.js" is based on jQuery File Tree from
+    http://abeautifulsite.net/2008/03/jquery-file-tree/
+
+    Which is dual-licensed under the GNU General Public License and the MIT
+    License and is copyright 2008 A Beautiful Site, LLC.
+

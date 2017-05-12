@@ -1,0 +1,79 @@
+Revision history for JMAP-Tester
+
+0.014     2017-04-18 10:22:11-04:00 America/New_York
+        - add update_client_session and configure_from_client_session;
+          These methods should make it easier to bootstrap your tester from a
+          running server.
+
+0.013     2017-03-31 18:25:11-05:00 America/Chicago
+        - assert_successful_set and assert_single_successful_set
+        - $set_sentence->assert_no_errors now returns $set_sentence on okay
+
+0.012     2017-03-24 19:12:50-04:00 America/New_York
+        - JWT access tokens for authenticated GET now supported
+        - logout should be more reliable
+        - renamed auth_struct to client_session
+
+0.011     2017-02-23 11:34:22-08:00 America/Los_Angeles
+        - add ->sentence_named to Response and Paragraph
+        - add ->sentences and ->paragraphs to Response
+        - add ->assert_named to Sentence
+        - add ->assert_n_sentences to Response and Paragraph
+        - Sentence::Set is now a subclass of Sentence
+
+0.010     2017-02-15 08:00:29-05:00 America/New_York
+        - methods like "paragraph" and "sentence" now issue aborts when the
+          index is out of range
+        - Results now have ->assert_successful, which returns the Result or
+          aborts
+        - There's now a ->logout method on tester that attempts to log out
+        - the Authorization header is now set only on specific requests, not on
+          every request made by the tester's user agent
+        - simple authentication has been fixed; it was totally broken in the
+          last release
+
+0.009     2017-01-28 13:54:00-05:00 America/New_York
+        - an abort is now issued on bogus paragraphs and non-contiguous use of
+          a client id; we can roll this back in the future if someone has a
+          need… but why would you?
+        - Set sentences now have an assert_no_errors method that throws a
+          error-dumping abort if any part of the setFoos method did not succeed
+        - paragraphs now have a client_id method
+        - $set->VERB_errors now always returns an empty hashref if there are
+          errors, even if the server returned nothing or null
+
+0.008     2017-01-01 12:00:12-05:00 America/New_York
+        - update minimum required JSON::Typist
+
+0.007     2016-12-28 12:21:52-05:00 America/New_York
+        - there's a logging system, which will be documented when more done
+        - improved support for ->download
+        - simple_auth should now, uh, work
+        - some internal exceptions now throw JMAP::Tester::Abort errors,
+          for use with Test::Abortable
+        - "Set" sentences now understand new-style Object values for "updated"
+          and provide transparent access to both new- and old-style updated
+
+0.006     2016-12-01 10:49:03+11:00 Australia/Melbourne
+        - support for upload and download
+        - jmap_uri is now api_uri
+        - logging in via simple auth now uploads uris when possible
+
+0.005     2016-10-27 19:12:19-04:00 America/New_York
+        - default_arguments have been added so you don't need to remember to
+          put an accountId in every single method call
+
+0.004     2016-09-26 14:05:14-04:00 America/New_York
+        - include http_response on all request results
+
+0.003     2016-09-02 11:09:48-04:00 America/New_York
+        - fix a decoding bug for non-ASCII in successful JMAP response handling
+        - http_response is now available on successful responses
+
+0.002     2016-08-22 10:51:35-04:00 America/New_York
+        - $paragraph->sentence($n) added
+        - $res->single_sentence($name) added
+        - response, paragraph, and sentence get ->as_stripped_X methods
+
+0.001     2016-05-31 11:24:33-04:00 America/New_York
+        - first release to CPAN, at Alfie's urging

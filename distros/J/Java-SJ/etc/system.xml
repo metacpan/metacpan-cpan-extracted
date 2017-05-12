@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<sj>
+	<debug level="3"/>
+
+	<!-- define a default name to use for applications -->
+	<name>DEFAULT_NAME</name>
+	
+	<!-- define a default class to run -->
+	<class>uk.co.src.sj.DefaultApplicationClass</class>
+	
+	<!-- sets config variables -->
+	<var name="dir.base" value="/home/wiggly/src/src-java/BASE"/>
+	<var name="dir.pid" value="${dir.base}/var/run"/>
+	<var name="dir.log" value="${dir.base}/var/log/sj"/>
+	<var name="dir.tmp" value="/tmp"/>
+	<var name="dir.lib" value="${dir.base}/lib/sj"/>
+	<var name="dir.script" value="${dir.base}/var/sj/script"/>
+
+	<pid dir="${dir.pid}" file="${app.name}.pid"/>	
+
+	<!-- sets -Dname=value options -->
+	<property name="org.omg.ORBSingleton" value="jacorb.ORB"/>
+
+	<!-- sets environment values -->
+	<environment name="TZ" value="BST"/>
+
+	<!-- specify bootclasspath in full -->
+	<bootclasspath>
+		<dir path="/home/wiggly/lib/java"/>
+		<jar name="jacorb"/>
+		<jar name="log4j" version="1.4.0"/>
+		<jar file="/home/wiggly/lib/java/vcb.jar"/>
+	</bootclasspath>
+	
+	<!-- specify dirs/libs to prepend to bootclasspath -->	
+	<prepend_bootclasspath>
+	</prepend_bootclasspath>
+
+	<!-- specify dirs/libs to append to bootcalsspath -->	
+	<append_bootclasspath>
+	</append_bootclasspath>
+
+	<!-- specifiy dirs/libs to add to classpath -->
+	<classpath>		
+	</classpath>
+
+	<vm name="ibm2" vendor="IBM" version="1.3.1" home="/usr/local/IBMJava-1.3.1" language="2.0" default="true">
+		<param name="" value="" sep=""/>
+		<environment name="" value=""/>		
+	</vm>
+
+	<vm name="" vendor="" version="" language="">
+		<param name="" value="" sep=""/>
+		<environment name="" value=""/>		
+	</vm>
+	
+</sj>

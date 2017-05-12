@@ -1,0 +1,54 @@
+{
+    "version": "0.44",
+    "name": "JSON-DWIW",
+    "abstract": "JSON converter that does what I want",
+    "author": [ "Don Owens <don@regexguy.com>" ],
+    "release_status": "stable",
+    "keywords": [ "json" ],
+    "dynamic_config": false,
+    "generated_by": "Don Owens <don@regexguy.com>",
+    "license": [ "artistic_1" ],
+
+    "prereqs": {
+	"runtime": {
+	    "requires": {
+		"perl": "5.006"
+	    },
+	    "recommends": {
+		"Math::BigInt": "0",
+		"Math::BigFloat": "0"
+	    }
+	},
+	"test": {
+	    "requires": {
+		"Test::More": "0"
+	    }
+	}
+    },
+
+    "provides": {
+	"JSON::DWIW": {
+	    "file": "lib/JSON/DWIW.pm"
+	},
+	"JSON::DWIW::Boolean": {
+	    "file": "lib/JSON/DWIW/Boolean.pm"
+	},
+	"JSON::DWIW::Changes": {
+	    "file": "lib/JSON/DWIW/Changes.pm"
+	}
+    },
+
+    "resources": {
+	"license": [ "http://dev.perl.org/licenses/artistic.html" ],
+	"bugtracker": {
+	    "web": "https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-DWIW",
+	}
+    },
+
+    "meta-spec" : {
+	"version": "2",
+	"url": 'http://search.cpan.org/perldoc?CPAN::Meta::Spec'
+    }
+
+
+}

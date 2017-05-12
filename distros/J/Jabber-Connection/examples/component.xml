@@ -1,0 +1,8 @@
+<service id='comp'>
+  <host>comp.localhost</host>
+  <accept>
+    <ip>localhost</ip>
+    <port>9999</port>
+    <secret>secret</secret>
+  </accept>
+</service>

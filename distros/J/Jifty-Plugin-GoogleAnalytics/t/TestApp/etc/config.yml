@@ -1,0 +1,79 @@
+--- 
+framework: 
+  AdminMode: 1
+  ApplicationClass: TestApp
+  ApplicationName: TestApp
+  ApplicationUUID: D6E3D090-BC62-11DC-BF89-15601638B6C5
+  ConfigFileVersion: 2
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: testapp
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 1
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - GoogleAnalytics: 
+        javascript: |
+          <script type="text/javascript">
+              var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+              document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+              var pageTracker = _gat._getTracker("UA-2035411-3");
+              pageTracker._initData();
+              pageTracker._trackPageview();
+          </script>
+    - 
+      LetMe: {}
+
+    - 
+      SkeletonApp: {}
+
+    - 
+      REST: {}
+
+    - 
+      Halo: {}
+
+    - 
+      ErrorTemplates: {}
+
+    - 
+      OnlineDocs: {}
+
+    - 
+      CompressedCSSandJS: {}
+
+    - 
+      AdminUI: {}
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 0
+  TemplateClass: TestApp::View
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

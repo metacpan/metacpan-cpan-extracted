@@ -1,0 +1,153 @@
+{
+   "abstract" : "JSON RPC 2.0 Server Implementation",
+   "author" : [
+      "Daisuke Maki"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-RPC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Plack::Request" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "0"
+         },
+         "requires" : {
+            "CGI" : "0",
+            "Class::Accessor::Lite" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Plack" : "0",
+            "Router::Simple" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::RPC" : {
+         "file" : "lib/JSON/RPC.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Constants" : {
+         "file" : "lib/JSON/RPC/Constants.pm"
+      },
+      "JSON::RPC::Dispatch" : {
+         "file" : "lib/JSON/RPC/Dispatch.pm"
+      },
+      "JSON::RPC::Legacy" : {
+         "file" : "lib/JSON/RPC/Legacy.pm"
+      },
+      "JSON::RPC::Legacy::Client" : {
+         "file" : "lib/JSON/RPC/Legacy/Client.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::Procedure" : {
+         "file" : "lib/JSON/RPC/Legacy/Procedure.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::ReturnObject" : {
+         "file" : "lib/JSON/RPC/Legacy/Client.pm",
+         "version" : "0"
+      },
+      "JSON::RPC::Legacy::Server" : {
+         "file" : "lib/JSON/RPC/Legacy/Server.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::Server::Apache" : {
+         "file" : "lib/JSON/RPC/Legacy/Server/Apache2.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::Server::Apache2" : {
+         "file" : "lib/JSON/RPC/Legacy/Server/Apache2.pm"
+      },
+      "JSON::RPC::Legacy::Server::CGI" : {
+         "file" : "lib/JSON/RPC/Legacy/Server/CGI.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::Server::Daemon" : {
+         "file" : "lib/JSON/RPC/Legacy/Server/Daemon.pm",
+         "version" : "1.06"
+      },
+      "JSON::RPC::Legacy::Server::system" : {
+         "file" : "lib/JSON/RPC/Legacy/Server.pm"
+      },
+      "JSON::RPC::Legacy::ServiceObject" : {
+         "file" : "lib/JSON/RPC/Legacy/Client.pm"
+      },
+      "JSON::RPC::Parser" : {
+         "file" : "lib/JSON/RPC/Parser.pm"
+      },
+      "JSON::RPC::Procedure" : {
+         "file" : "lib/JSON/RPC/Procedure.pm"
+      },
+      "JSON::RPC::Test" : {
+         "file" : "lib/JSON/RPC/Test.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "ssh://git@github.com/lestrrat/JSON-RPC/issues"
+      },
+      "homepage" : "ssh://git@github.com/lestrrat/JSON-RPC",
+      "repository" : {
+         "url" : "ssh://git@github.com/lestrrat/JSON-RPC.git",
+         "web" : "ssh://git@github.com/lestrrat/JSON-RPC"
+      }
+   },
+   "version" : "1.06",
+   "x_contributors" : [
+      "Yoshimitsu Torii <yoshimitsu.torii@gmail.com>",
+      "Stanislav Lechev [AngelFire] <af@0xAF.org>",
+      "Kazuhiro Shibuya <stevenlabs@gmail.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "ThePeePs <patrick@thepeeps.net>",
+      "Kirill Bogdanov <Sco76@hackerdom.ru>",
+      "ar_tama <makoto.arata@dena.com>",
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

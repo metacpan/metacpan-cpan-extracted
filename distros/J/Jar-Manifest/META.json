@@ -1,0 +1,60 @@
+{
+   "abstract" : "Read and Write Java Jar Manifests",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "java",
+      "jar",
+      "manifest"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Jar-Manifest",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Text::Wrap" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Jar::Manifest" : {
+         "file" : "lib/Jar/Manifest.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-jar-manifest/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-jar-manifest",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-jar-manifest.git"
+      }
+   },
+   "version" : "v1.0.1"
+}

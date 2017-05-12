@@ -1,0 +1,9 @@
+Revision history for Jorge
+
+0.04    updated docs
+0.03    added Jorge::Extended to keep backwards compatibility with old
+        Jorge based apps.
+0.02    Fixed failed tests.
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,79 @@
+1.008  2015-04-08 10:25:27 GMT
+    * Bug #485 : Remove MinimumPerl (Celogeek San)
+
+1.007  2014-11-11 06:40:07 GMT
+    * Feature #460 : Add url to Jedi Request (Celogeek San)
+	fix base_url: host contain the server port, we don't need to take SERVER_PORT
+
+1.006  2014-11-09 16:57:07 GMT
+    * Feature #460 : Add url to Jedi Request (Celogeek San)
+	add also base_url
+
+1.005  2014-11-09 15:45:56 GMT
+    * Feature #460 : Add url to Jedi Request (Celogeek San)
+    * Feature #459 : Add host_ip to Jedi (Celogeek San)
+    * Feature #458 : handle ipv6 and ipv4 properly (Celogeek San)
+    * Bug #457 : Create remote_address_str (Celogeek San)
+    * Bug #456 : Fix private range of ips (Celogeek San)
+
+1.004  2014-03-29 17:56:11 GMT
+    * Feature #421 : Add jedi_base_route method, useful for template (Celogeek San)
+
+1.003  2014-01-07 21:54:11 GMT
+    * Bug #398 : pod: mysterious with a y (Celogeek San)
+
+1.002  2013-12-23 21:41:33 GMT
+    * Feature #389 : Add IP of the caller (remote_address) (Celogeek San)
+	Fix perlcritic
+
+1.001  2013-12-23 21:39:01 GMT
+    * Feature #389 : Add IP of the caller (remote_address) (Celogeek San)
+
+1.000  2013-12-21 14:36:50 GMT
+    * Feature #385 : Rewrite pod for Jedi Core (Celogeek San)
+    * Feature #355 : Clear the useless app conf, everything should use the share dir (Celogeek San)
+    * Feature #356: Create a jedi launcher (Celogeek San)
+
+0.14  2013-08-28 18:14:30 GMT
+    * Bug #305 : Fix pod: Jedi::Apps => Jedi::App (Celogeek San)
+
+0.13  2013-08-17 13:49:28 GMT
+    * Bug #298 : cache should include REQUEST_METHOD (Celogeek San)
+
+0.12  2013-08-17 12:32:25 GMT
+    * Bug #297 : the request HEAD / GET should be handle properly (Celogeek San)
+
+0.11  2013-08-16 15:00:40 GMT
+    * Bug #295 : Fix config root detection for windows env (Celogeek San)
+
+0.10  2013-08-03 16:25:26 GMT
+    * Feature #287 : use EndOfScope to import the role for jedi app (Celogeek San)
+
+0.09  2013-08-02 08:56:00 GMT
+    * Bug #283 : add missing deps on yaml, and fix directory matches on win (Celogeek San)
+
+0.08  2013-08-01 14:21:04 GMT
+    * Feature #282 : add jedi_root to the app (Celogeek San)
+
+0.07  2013-07-31 21:12:23 GMT
+    * Bug #279 : dont use findbin with plack (Celogeek San)
+
+0.06  2013-07-31 20:36:56 GMT
+    * Feature #272 : create config attribute into jedi app (Celogeek San)
+
+0.05  2013-07-31 18:32:44 GMT
+    * Feature #276 : add cache for path resolution (Celogeek San)
+
+0.04  2013-07-31 13:00:16 GMT
+    * Feature #271 : add scheme, port, host into the request (Celogeek San)
+
+0.03  2013-07-31 11:10:47 GMT
+    * Bug #270 : add missing deps (Celogeek San)
+
+0.02  2013-07-30 22:34:00 GMT
+    * Feature #268 : Add env into request (Celogeek San)
+
+0.01  2013-07-30 22:09:46 GMT
+
+    * Feature #266 : First release
+

@@ -1,0 +1,34 @@
+JQuery::Mobile is a Perl interface to jQuery Mobile. It generates HTML markups, such as navbars, forms, and listviews, that are compatible with jQuery Mobile.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc JQuery::Mobile
+
+You can also look for information at:
+
+    Github
+        http://github.com/dannyglue/JQuery-Mobile
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/JQuery-Mobile
+
+    Search CPAN
+        http://search.cpan.org/dist/JQuery-Mobile
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 Xufeng (Danny) Liang
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

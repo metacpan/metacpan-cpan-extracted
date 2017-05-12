@@ -1,0 +1,21 @@
+NAME
+    Jifty::Plugin::Userpic - Provides user pictures for Jifty
+
+SYNOPSIS
+    In your model class schema description, add the following:
+
+        column image => is Userpic;
+
+DESCRIPTION
+    This plugin provides user pictures, or any image field associated with a
+    record.
+
+AUTHOR
+    Alex Vandiver
+
+LICENSE
+    Copyright 2005-2009 Best Practical Solutions, LLC.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+

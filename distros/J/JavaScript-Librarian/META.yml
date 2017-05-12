@@ -1,0 +1,19 @@
+abstract: Load and use libraries of JavaScript packages
+author: Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+build_requires: 
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: JavaScript-Librarian
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Algorithm::Dependency: 1.02
+  Clone: 0.13
+  File::Spec: 0.82
+  Params::Coerce: 0.06
+  URI: 1.33
+version: 1.00

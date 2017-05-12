@@ -1,0 +1,29 @@
+---
+abstract: 'application lock/mutex based on files'
+author:
+  - 'Vladimir Zhavoronkov <flyweight@yandex.ru>'
+build_requires:
+  English: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JIP-LockFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  English: '0'
+  Fcntl: '0'
+  IO::File: '0'
+  JIP::ClassField: '0.03'
+  perl: '5.006'
+version: '0.05'

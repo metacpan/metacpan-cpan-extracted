@@ -1,0 +1,1 @@
+eval(function(p,a,c,k,e,r){e=String;if('0'.replace(0,e)==0){while(c--)r[e(c)]=k[c];k=[function(e){return r[e]||e}];e=function(){return'[024-9]'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('5(c){0 a=\'2 9\';0 e=3;8(a);0 d=1;//@a\n0 b=c;/*@4 0 d=1;@*/4 0 6=$7()};',[],10,'var||blah||abcd|function|f|H|alert|blubb'.split('|'),0,{}))

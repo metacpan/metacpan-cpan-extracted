@@ -1,0 +1,30 @@
+bin/jrpc_client.pl
+Changes
+examples/filesearch.json
+examples/filesearch.pl
+examples/LongSearch.pm
+examples/qmp.conf
+examples/qmp.pm
+examples/say.json
+examples/SimpleMath.pm
+examples/simpleserver.pl
+examples/SoundIt.pm
+examples/xbmc/README
+examples/xbmc/VideoLibrary.GetMovies.json
+JRPC.pm
+JRPC/Apache2.pm
+JRPC/CGI.pm
+JRPC/Client.pm
+JRPC/Nginx.pm
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/01load_ap.t
+t/02testserv.t
+t/20test_mp.t
+t/21pod.t
+t/test_add.json
+t/test_mult.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

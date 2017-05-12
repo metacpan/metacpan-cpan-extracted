@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib 'lib';
+use Getopt::Long;
+use JSTAPd::Server;
+use Path::Class;
+use Pod::Usage;
+
+# From 'prove': Allow cuddling the paths with the -ignore_case
+@ARGV = map { /^(-I)(.+)/ ? ($1,$2) : $_ } @ARGV;
+
+my @includes;
+my $dir = 'jt';
+my $port = 1978;
+my $host = '127.0.0.1';
+my $new = '';
+
+Getopt::Long::Configure("no_ignore_case", "pass_through");
+GetOptions(
+    "new|n=s"      => \$new,
+    "d|dir=s"      => \$dir,
+    "port=s"       => \$port,
+    "host=s"       => \$host,
+    'I=s@'         => \@includes,
+    "h|help",      => \my $help,
+);
+
+pod2usage(0) if $help;
+lib->import(@includes) if @includes;
+
+if ($new) {
+    my $d = Path::Class::Dir->new($new);
+    die "$d is exists." if -f $d || -d $d;
+    print "create $d\n";
+    $d->mkpath;
+
+    my $f = $d->file('index');
+    print "create $f\n";
+    my $fh = $f->openw;
+    print $fh <<'END';
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>index</title>
+$HEAD
+    </head>
+    <body id="body">
+$BODY
+    </body>
+</html>
+END
+
+    $f = $d->file('conf.pl');
+    print "create $f\n";
+    $fh = $f->openw;
+    print $fh <<'END';
+# JSTAPd config
+my $config = {
+    jstapd_prefix => '____jstapd',
+    apiurl        => qr{^/(?!____jstapd(?:__api))},
+#    apiurl        => qr{^/(?!____jstapd(?:__api)|jslib/)},
+};
+#$config->{urlmap} = [
+#    { qr!^/jslib/! => '../jslib/' },
+#];
+
+# browser auto open
+# for run_once mode (prove -vl foo.t or prove -vlr jstap/)
+# this example for Mac OS X
+# $config->{auto_open_command} = 'open -g -a Safari %s';
+# or $ENV{JSTAP_AUTO_OPEN_COMMAND} = 'open -g -a Safari %s';
+
+$config;
+END
+
+    $f = $d->file('01_base.t');
+    print "create $f\n";
+    $fh = $f->openw;
+    print $fh <<'END';
+use JSTAPd::Suite;
+sub tests { 6 }
+
+sub include {
+#    (
+#        'your-under-controll-scriptfile.js',
+#    );
+}
+
+sub include_ex {
+#    (
+#        'your-not-under-controll-scriptfile.js',
+#    );
+}
+END
+
+    $f = $d->file('01_base.js');
+    print "create $f\n";
+    $fh = $f->openw;
+    print $fh <<'END';
+ok(1, 'ok 1');
+ok(!0, 'ok 0');
+is('test', 'test', 'is');
+isnt('test', 'dev', 'isnt');
+like('test', new RegExp('es'), 'like');
+is(tap$('test').innerHTML, 'DATA', 'getElementById');
+END
+
+    $f = $d->file('01_base.html');
+    print "create $f\n";
+    $fh = $f->openw;
+    print $fh <<'END';
+<div id='test'>DATA</div>
+END
+
+    exit;
+}
+
+pod2usage(0) unless -d $dir;
+JSTAPd::Server->new( dir => $dir, port => $port, host => $host )->run;
+
+__END__
+
+=head1 NAME
+
+jstapd - 
+
+=head1 SYNOPSIS
+
+  # start server
+  jstapd -d testdir
+    --host 0.0.0.0  - listen address
+    --port 1978     - listen port
+
+  # create new test
+  jstapd -n foo/bar/dirname
+

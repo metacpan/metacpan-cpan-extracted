@@ -1,0 +1,271 @@
+# JOAP::Descriptors - Documentation-only package about JOAP descriptors
+#
+# Copyright (c) 2003, Evan Prodromou evan@prodromou.san-francisco.ca.us.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+# tag: documentation-only package about JOAP descriptors
+
+=head1 NAME
+
+JOAP::Descriptors - Documentation-only package about JOAP descriptors
+
+=head1 SYNOPSIS
+
+    package MyPerson;
+    use JOAP::Server::Class;
+    use base qw(JOAP::Server::Class);
+
+    # other stuff here
+
+    MyPerson->Attributes (
+    {
+	given_name => {
+	    type => 'string',
+	    required => 1,
+	    desc => 'Given name of the person.'
+	},
+
+	age => {
+	    type => 'i4',
+	    writable => 0,
+	    desc => 'Age in years (rounded down) of person at current time',
+	},
+
+	species => {
+	    type => 'string',
+	    writable => 0,
+	    allocation => 'class',
+	    desc => 'species of people'
+	},
+
+	population => {
+	    type => 'i4',
+	    writable => 1,
+	    allocation => 'class',
+	    desc => 'total population of people'
+	}
+    });
+
+    MyPerson->Methods (
+    {
+	walk => {
+	    returnType => 'boolean',
+	    params => [
+		{
+  		      name => 'steps',
+		      type => 'i4',
+		      desc => 'how many steps forward to walk, fault if less than zero'
+		}
+	    ],
+	    desc => 'Walk forward \'steps\' steps'},
+
+	get_family => {
+	    allocation => 'class',
+	    returnType => 'array',
+	    params => [
+		{
+  		      name => 'family_name',
+		      type => 'string',
+		      desc => 'family name to look for'
+		}
+	    ],
+	    desc => 'Returns people in a given family'}
+    });
+
+
+=head1 ABSTRACT
+
+This documentation-only package describes the format and use of the
+descriptor data structures used to define JOAP attributes and methods.
+
+=head1 DESCRIPTION
+
+The JOAP server and proxy classes all use data structures called
+B<descriptors> to describe attributes and methods. This document
+defines the data structures, so I don't have to define them over and
+over and over again.
+
+=head2 Attribute Descriptors
+
+Each attribute descriptor is a reference to a hashtable containing the
+following fields.
+
+=over
+
+=item type
+
+A string value containing the name of the datatype for the
+attribute. See L<JOAP::Types> for details about the allowed values in
+this field.
+
+Leaving out this field is a bad idea.
+
+=item required
+
+1 if this is a required attribute, and 0 if it's not required. If
+unspecified, defaults to 0.
+
+=item writable
+
+1 if this attribute can be written to, and 0 if not. Default is 1.
+
+=item allocation
+
+'class' if this is a class attribute, and 'instance' if this is an
+instance attribute. For object servers, this is kind of a moot point,
+so it should probably be unspecified.
+
+Default is 'instance'.
+
+=item desc
+
+A human-readable description of the purpose and usage of the
+attribute. Although JOAP allows multiple descriptions for an attribute
+(for i18n reasons), this library doesn't. This is a bug that should be
+fixed in future versions.
+
+=back
+
+Note that the name of the attribute is not in the descriptor. As shown
+in the synopsis, names are provided as the key in the attribute
+descriptor hashtables.
+
+Attribute names can only contain characters in the range [a-zA-Z0-9_],
+and the first character must be an understore or an alphabetic
+character.
+
+=head2 Method Descriptors
+
+Each method descriptor is a reference to a hashtable containing the
+following fields.
+
+=over
+
+=item returnType
+
+A string value containing the datatype of the return value of this
+method. See L<JOAP::Types> for more information on the range of
+datatypes afforded by JOAP.
+
+By default, the returnType is 'array'.
+
+=item allocation
+
+'class' if this is a class method, and 'instance' if this is an
+instance method. The default is 'instance'.
+
+For object servers, the allocation of a method is a moot point, and
+it's best to leave it unspecified.
+
+=item params
+
+A reference to an array of parameter descriptors. See L</Parameter
+Descriptors> below for more information on the format of these
+descriptors.
+
+The parameter descriptors must be ordered in the array in the order
+that the parameters are required by the method. There is no provision
+for optional parameters or parameter lists. Each and every parameter
+in the list must be present, in order, for a method call.
+
+=item desc
+
+A human-readable description of the purpose and usage of the
+method. JOAP allows multiple values for this field; this library does
+not. This will probably be corrected in future versions.
+
+Note that each parameter also has its own description.
+
+=back
+
+As with attribute descriptors, method descriptors don't contain the
+name of the method. This is defined at a higher level, in the map of
+names to descriptors, as above in the SYNOPSIS.
+
+Method names can only contain characters in the range [a-zA-Z0-9_],
+and the first character must be an understore or an alphabetic
+character.
+
+=head2 Parameter Descriptors
+
+For methods, there's further descriptors for each parameter of the
+method. These descriptors are also references to hashtables with the
+following fields:
+
+=over
+
+=item name
+
+A string containing the name of the parameter. Parameter names can
+only contain characters in the range [a-zA-Z0-9_], and the first
+character must be an underscore or an alphabetic character.
+
+=item type
+
+A string with the JOAP datatype for this parameter. See L<JOAP::Types>
+for more information about the range of values for JOAP datatypes.
+
+=item desc
+
+A human-readable description of the purpose and use of the
+parameter. Again, JOAP allows multiple values here, but this library
+only allows a single string. This will probably be fixed in the future.
+
+=back
+
+=head1 EXPORT
+
+N/A
+
+=head1 BUGS
+
+The fields in descriptors are generally not validated, causing bad
+typo errors.
+
+=head1 SEE ALSO
+
+See L<JOAP> for more information about JOAP and contact info for the
+author.
+
+See L<JOAP::Types> for more information about JOAP datatypes.
+
+Attribute and method descriptors are used all over the place in JOAP;
+see L<JOAP::Server::Object>, L<JOAP::Proxy>, and
+L<JOAP::Proxy::Package> for examples.
+
+=head1 AUTHOR
+
+Evan Prodromou, E<lt>evan@prodromou.san-francisco.ca.usE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2003, Evan Prodromou E<lt>evan@prodromou.san-francisco.ca.usE<gt>.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+
+=cut

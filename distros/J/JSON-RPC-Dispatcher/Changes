@@ -1,0 +1,70 @@
+0.0508 2016-01-21
+ - Last image didn't seem to include setting $VERSION.
+ - Expand accepted method names (PR #1)
+
+0.0507 2016-01-21
+ - Remove bytes usage.
+ - Dist::Zilla updates
+ - Allow user to override how requests are logged (passwords)
+
+0.0506 2012-10-25
+ - Added a new test to show how to decode UTF before passing it across the procedure.
+
+0.0505 2010-08-22
+ - Something happened between Moose 1.08 and 1.10 that caused JRD::Procedure to always throw an error. This has been corrected in this release.
+
+0.0504 2010-08-16
+ - Fixed a UTF-8 decoding problem. Thanks to Henry Tang for documenting the bug and suggesting a fix.
+
+0.0503 2010-07-06
+ - Fixed an infinite parse error problem. Thanks to Rob Hoelz for the patch.
+
+0.0502 2010-07-01
+ - Fixed "method not found" bug introduced in 0.0500.
+
+0.0501 2010-06-30
+ - Encoding JSON as UTF-8 per the JSON-RPC protocol specification, and for Plack Middleware compliance. Thanks to Peter Makholm for pointing this out.
+
+0.0500 2010-06-24
+ - Moved bug tracking to github.
+ - Messages that process correctly, but return an error response rather than a result response now log as "error" rather than "info". All other errors are still logged as "fatal".
+ - Added more documentation about what is logged.
+ - Restructured request params handling.
+ - Added with_plack_request registration option.
+ - Updated register_rpc_method_names() to support registration options.
+
+0.0402 2010-04-18
+ - Fixed an uninitialized warning.
+ - Some types of fatal errors weren't being logged.
+ - JSON RPC 2.0 has been ratified
+
+0.0401 2010-03-04
+ - Fixed a crash bug with some types of fatal errors.
+
+0.0400 2010-03-03
+ - Added exception handling for when procs don't throw exceptions, but also don't return valid content.
+ - Eliminated Sub::Name dependency.
+ - Now requires Plack 0.9913.
+ - Merged miyagawa's patch for updated Plack.
+ - Added logging support via Log::Any; now requires Log::Any.
+
+0.0300 2009-12-28
+ - Got rid of the notion of "advanced" methods in favor of a cleaner way to throw errors.
+ - Now throws errors by dieing with an array ref of [code, msg, data].
+ - Procedures are now passed their data as a list not refs.
+
+0.0200 2009-12-24
+ - Added JSON::RPC::Dispatcher::App to make it easy to create sub-classable apps.
+ - Added required module Sub::Name.
+ - Added error() helper method to JSON::RPC::Dispatcher::Procedure.
+
+0.0101 2009-12-19
+ - Params now set error if they aren't a hash or array as specified in the spec.
+ - We now send the Content-Length header with the response per the spec.
+ - Notification responses are removed from batch requests, and if only a notification is sent the HTTP response is 204 No Content per the spec.
+ - Removed extraneous result/error nodes per spec.
+ - Fixed bulk requests.
+ - Added author tests which put the whole system through it's paces.
+
+0.0100 2009-12-19
+ - Initial public release.

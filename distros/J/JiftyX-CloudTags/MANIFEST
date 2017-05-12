@@ -1,0 +1,14 @@
+Changes
+lib/JiftyX/CloudTags.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/TestApp/bin/jifty
+t/TestApp/etc/config.yml
+t/TestApp/lib/TestApp/Model/LabelPost.pm
+t/TestApp/lib/TestApp/Model/Labels.pm
+t/TestApp/lib/TestApp/Model/Posts.pm
+t/TestApp/t/00-model-LabelPost.t
+t/TestApp/t/00-model-Labels.t
+t/TestApp/t/00-model-Posts.t

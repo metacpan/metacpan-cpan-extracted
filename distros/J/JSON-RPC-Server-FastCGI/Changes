@@ -1,0 +1,14 @@
+Revision history for JSON-RPC-Server-FastCGI
+
+0.03    Sub Mar 02 13:35:00 2008
+          - Fixing module dependency checks
+
+0.02    Mon Feb 25 03:15:00 2008
+          - First release as a separate module on CPAN.
+            JSON::RPC::Server::FastCGI was initially
+            part of the JSON::RPC distribution, but now has it's
+            own package.
+          - Tested against JSON::RPC 0.95
+
+0.01    Sun Jun 24 12:50:00 2007
+          - First version; tested against JSON::RPC 0.01

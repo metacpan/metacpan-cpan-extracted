@@ -1,0 +1,61 @@
+---
+abstract: 'A Perl implementation of JSON Pointer (RFC6901)'
+author:
+  - 'Toru Yamaguchi <zigorou at cpan.org>'
+build_requires:
+  Test::Exception: '0.31'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Pointer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::Pointer:
+    file: lib/JSON/Pointer.pm
+    version: '0.07'
+  JSON::Pointer::Context:
+    file: lib/JSON/Pointer/Context.pm
+    version: '0.07'
+  JSON::Pointer::Exception:
+    file: lib/JSON/Pointer/Exception.pm
+    version: '0.07'
+  JSON::Pointer::Syntax:
+    file: lib/JSON/Pointer/Syntax.pm
+    version: '0.07'
+requires:
+  B: '0'
+  Carp: '1.20'
+  Class::Accessor::Lite: '0.05'
+  Clone: '0.36'
+  Exporter: '0'
+  JSON: '2.53'
+  URI::Escape: '3.31'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zigorou/perl-json-pointer/issues
+  homepage: https://github.com/zigorou/perl-json-pointer
+  repository: git://github.com/zigorou/perl-json-pointer.git
+version: '0.07'
+x_contributors:
+  - 'aoneko <aoneko.ether@gmail.com>'
+  - 'Kensaku Araga <ken39arg@gmail.com>'
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+  - 'Toru Yamaguchi <zigorou@cpan.org>'

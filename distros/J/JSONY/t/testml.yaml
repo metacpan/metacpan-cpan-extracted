@@ -1,0 +1,15 @@
+source_testml_dir: ../../jsony-tml
+local_testml_dir: ./testml
+test_file_prefix: testml-
+test_file_template: |
+  use lib (-e 't' ? 't' : 'test'), 'inc';
+  use TestML;
+  use TestMLBridge;
+
+  TestML->new(
+      testml => '[% file %]',
+      bridge => 'TestMLBridge',
+  )->run;
+exclude_testml_files:
+- comments.tml
+- edge.tml

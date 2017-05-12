@@ -1,0 +1,10 @@
+  <!-- component instance definition for the Jabber-RPC component responder  -->
+  <!-- jrpc-responder-component.pl connects via this definition -->
+  <service id='jrpc.localhost'>
+    <accept>
+      <ip>127.0.0.1</ip>
+      <secret>secret</secret>
+      <port>5702</port>
+    </accept>
+  </service>
+

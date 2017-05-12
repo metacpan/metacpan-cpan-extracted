@@ -1,0 +1,209 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Jifty::Manual::AccessControl_zhtw - 使用 Jifty 預設的 ACL 系統
+
+=head1 DESCRIPTION
+
+以 Jifty 為基礎的應用程式都有存取權限控制 (ACL) 系統。這個系統能夠透過呼叫
+C<current_user_can> 函式來在建立、讀取、更新、刪除等動作之前自動驗證
+L<Jifty::Record> 物件的存取權限控制 ( ACL )。
+
+在任何狀況，傳遞給 CRUD 程序的參數都會以額外的參數傳遞給 C<current_user> 函式。
+
+在 C<create()> 函式，如果 C<current_user_can('create')> 回傳 false
+則拒絕此項操作。
+
+在 C<_value()> 或 C<I<somefieldname>> 函式， 如果 C<current_user_can('read')>
+回傳 false 則操作會被拒絕。
+
+在 C<_set()> 或 C<I<set_somefieldname>> 函式，如果 C<current_user_can('read')>
+回傳 false 則操作會被拒絕。
+
+在 C<delete()> 函式，如果 C<current_user_can('read')>
+回傳 false 則操作會被拒絕。
+
+系統預設的行為會讓 C<current_user_can> 回傳 1。
+
+當你想檢查 ACLs 時，你需要在你的 C<Jifty::Record> 內覆載 C<current_user_can()> 函式。
+
+It's likely that at some point, you'll decide you want to ask other
+questions on certain types of operations.  Say, you only want to let
+administrators update the C<paid_account> field. In that case, you'd override
+C<check_update_rights()> to look for the C<admin> right rather than the 
+C<update> right, if the C<FIELD> is C<paid_account>.
+
+=head1 透過插件來啟用權限控制 ( ENABLING ACCESS CONTROL USING THE USER PLUGIN )
+
+要無痛啟用 AccessControl 子系統，可以使用 User 插件來搭配一個驗證插件，
+如 C<Authentication::Password> 插件。我們可以在 F<etc/config.yml> 來將這件事設定完成:
+
+    Plugins:
+      - Authentication::Password: {}
+
+然後，建立你的 C<App::Model::User> 類別，讓它覆載 C<Jifty::Plugin::User::Mixin::Model::User> 
+以及驗證插件的 C<Jifty::Plugin::Authentication::Password::Mixin::Model::User>
+舉例來說:
+
+    use strict;
+    use warnings;
+
+    package App::Model::User;
+
+    use Jifty::DBI::Schema;
+
+    use App::Record schema {
+    };
+
+    use Jifty::Plugin::User::Mixin::Model::User;
+    use Jifty::Plugin::Authentication::Password::Mixin::Model::User;
+
+    # Your model-specific methods go here.
+
+    1;
+
+下一步，使用 F<jifty> 執行檔，來建立你資料庫內的資料表。如:
+
+    $ bin/jifty schema --setup
+
+=head2 延展資料模型
+
+管理 C<User> 紀錄的資料模型並不限定於插件的定義。
+
+它可以被延展，並可被定義其他額外的欄位。
+每個欄位都會被新增到插件的欄位之中。
+
+只需要簡單的在資料模型綱要 ( schema ) 的定義區塊中新增一些欄位定義:
+
+    use Jifty::DBI::Schema;
+    use App::Record schema {
+        column 'extra_column_name';
+
+        column 'mygroup' =>
+               valid_values are qw/admin moderator user/,
+               default is 'user';
+
+        # more columns if necessary
+    };
+
+關於定義資料模型綱要的完整語法，可於
+L<Jifty::Manual::Models> 或 L<Jifty::DBI::Schema> 內參閱更詳細的資料。
+
+如果你需要管理系統管理者群組，你需要保護這個群組欄位只能讓超級使用者
+(superuser) 來改變。
+
+接著，你需要覆載 C<App::Model::User> 中的 C<current_user_can> 函式:
+
+    sub current_user_can {
+        my $self = shift;
+        my $type = shift;
+        my %args = (@_);
+
+        return 0 
+            if ( $type eq 'update'
+                and !$self->current_user->is_superuser
+                and $args{'column'} eq 'mygroup' ); 
+
+
+        return 1;
+    }
+
+在你的 C<App::CurrentUser> 類別中，定義 C<_init> 函式
+讓你有機會新增更多資料到你的 C<CurrentUser> 物件。
+
+這則函式會在插件的 C<_init> 函式完畢之後自動被呼叫。
+
+    package App::CurrentUser;
+
+    use strict;
+    use warnings;
+
+    use base qw(Jifty::CurrentUser);
+
+    __PACKAGE__->mk_accessors(qw(group));
+
+    sub _init {
+        my $self = shift;
+        my %args = (@_);
+
+        if (keys %args) {
+            $self->user_object(App::Model::User->new(current_user => $self));
+            $self->user_object->load_by_cols(%args);
+
+            if ( $self->user_object->mygroup eq 'admin') {
+                $self->is_superuser(1);
+            };
+
+            $self->group($self->user_object->mygroup);
+        };
+        $self->SUPER::_init(%args);
+    };
+
+透過你所定義的 C<App::CurrentUser> , 在 admin 群組內的使用者都將是超級使用者 (superuser) 
+並且你可以在你的應用程式內使用 C<< Jifty->web->current_user->group >>。
+
+=head2 C<Authentication::Password> 插件所定義的樣板
+
+C<Authentication::Password> 插件已經定義了許多可使用的樣板，來避免做重複的事情，
+
+=over 4
+
+=item F</login>
+
+提供了登入表單的樣板。並且有註冊 (signup) 的選項。
+
+在成功登入之後，便會導向到接續的頁面。若是沒有定義，則會導向到 F</> 。
+
+=item F</logout>
+
+讓目前使用者登出
+
+=item F</signup>
+
+讓使用者註冊。 系統預設會確認信件寄給使用者。
+
+=item F</passwordreminder>
+
+在輸入他或她的電子郵件地址之後，使用者會收到一封包含重設密碼連結的信件
+於 F</let/reset_lost_password> 重設密碼。
+
+=item F</let/confirm_email>
+
+會在使用者點選確認信件連結之後被呼叫。並且確認使用者。
+
+=item F</let/reset_lost_password>
+
+重設密碼。
+此樣板允許使用者重新設定密碼。
+
+=back
+
+=head2 Doing checks at other places in your code
+
+如果你需要檢查更多關於資料模型為基礎的資料操作，那麼你需要自己撰寫
+細節的程式碼。 C<< Jifty->web->current_user >> 提供了
+C<App::CurrentUser> 物件以取得目前的使用者，此物件包含了一些相當好用的函式:
+
+=over 4
+
+=item C<username>
+
+傳回目前使用者的名稱，如果沒有登入，則傳回 C<undef>
+
+=item C<id>
+
+傳回目前使用者的 ID ，若沒有登入，則傳回 C<undef>
+
+=back
+
+=head1 SEE ALSO
+
+L<Jifty::CurrentUser>, L<Jifty::Record>, L<Jifty::RightsFrom>, L<Jifty::Plugin::Authentication::Ldap>, L<Jifty::Plugin::Authentication::CAS> 
+
+=head1 翻譯者
+
+林佑安 (c9s) ( C<cornelius.howl_at_gmail.com> ) L<http://oulixe.us/>
+
+=cut

@@ -1,0 +1,7 @@
+  <service id='confproxy.qmacro.dyndns.org'>
+    <accept>
+      <ip>localhost</ip>
+      <port>8888</port>
+      <secret>secret</secret>
+    </accept>
+  </service>

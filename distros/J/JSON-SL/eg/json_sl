@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use JSON::SL qw(decode_json);
+use Data::Dumper;
+use File::Slurp;
+
+print STDERR "Using version ${JSON::SL::VERSION}\n";
+
+my $buf = read_file($ARGV[0]);
+
+print Dumper decode_json($buf);

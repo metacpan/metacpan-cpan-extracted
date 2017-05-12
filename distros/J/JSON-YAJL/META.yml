@@ -1,0 +1,32 @@
+---
+abstract: 'An interface to the YAJL JSON parsing and generation library'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSON-YAJL
+provides:
+  JSON::YAJL:
+    file: lib/JSON/YAJL.pm
+    version: 0.10
+  JSON::YAJL::Generator:
+    file: lib/JSON/YAJL/Generator.pm
+    version: 0.10
+  JSON::YAJL::Parser:
+    file: lib/JSON/YAJL/Parser.pm
+    version: 0.10
+requires:
+  Test::Exception: 0
+  Test::More: 0
+resources:
+  homepage: http://search.cpan.org/dist/JSON-YAJL/
+  license: http://dev.perl.org/licenses/
+version: 0.10

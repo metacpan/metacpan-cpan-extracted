@@ -1,0 +1,75 @@
+SYNOPSIS
+
+     use JSON::Color qw(encode_json);
+     say encode_json([1, "two", {three => 4}]);
+
+DESCRIPTION
+
+    This module generates JSON, colorized with ANSI escape sequences.
+
+    To change the color, see the %theme in the source code. In theory you
+    can also modify it to colorize using HTML.
+
+FUNCTIONS
+
+ encode_json($data, \%opts) => STR
+
+    Encode to JSON. Will die on error (e.g. when encountering
+    non-encodeable data like Regexp or file handle).
+
+    Known options:
+
+      * pretty => BOOL (default: 0)
+
+      Pretty-print.
+
+      * linum => BOOL (default: 0)
+
+      Show line number.
+
+      * sort_by => CODE
+
+      If specified, then sorting of hash keys will be done using this sort
+      subroutine. This is similar to the sort_by option in the JSON module.
+      Note that code is executed in JSON::Color namespace, example:
+
+       # reverse sort
+       encode_json(..., {sort_by => sub { $JSON::Color::b cmp $JSON::Color::a }});
+
+      Another example, using Sort::ByExample:
+
+       use Sort::ByExample cmp => {-as => 'by_eg', example => [qw/foo bar baz/]};
+       encode_json(..., {sort_by => sub { by_eg($JSON::Color::a, $JSON::Color::b) }});
+
+FAQ
+
+ What about loading?
+
+    Use JSON.
+
+ How to handle non-encodeable data?
+
+    Use Data::Clean::JSON.
+
+ Why do numbers become strings?
+
+    Example:
+
+     % perl -MJSON::Color=encode_json -E'say encode_json([1, "1"])'
+     ["1","1"]
+
+    To detect whether a scalar is a number (e.g. differentiate between "1"
+    and 1), the XS module Scalar::Util::LooksLikeNumber is used. This is
+    set as an optional prerequisite, so you'll need to install it
+    separately. After the prerequisite is installed:
+
+     % perl -MJSON::Color=encode_json -E'say encode_json([1, "1"])'
+     [1,"1"]
+
+SEE ALSO
+
+    To colorize with HTML, you can try Syntax::Highlight::JSON.
+
+    Syntax::SourceHighlight can also colorize JSON/JavaScript to HTML or
+    ANSI escape. It requires the GNU Source-highlight library.
+

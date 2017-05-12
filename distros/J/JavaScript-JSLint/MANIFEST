@@ -1,0 +1,10 @@
+bin/jslint
+Build.PL
+Changes
+lib/JavaScript/JSLint.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/JavaScript-JSLint.t
+META.json

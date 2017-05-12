@@ -1,0 +1,130 @@
+Revision history for JavaScript-XRay
+
+1.22   6/29/2008
+        - perlcritic updates
+            - fixed Use character classes for literal metachars instead of escapes
+            - fixed "local" variable not initialized
+            - bin/jsxray passes all my perl critic tests
+        - update README from pod
+
+1.21    6/28/2008
+        - fixed t/pod.t and t/pod_coverage.t to require instead of
+          use to see if they were present. (fixed CPANT errors)
+        - perlcritic updates
+            - added IFRAME_DEFAULT_HEIGHT constant of 200
+            - removed trailing whitespace
+            - fixed regexps with /x modifier to use {} instead fo //
+            - fixed useless interpolation of strings - changed "" to ''
+        - added use strict/use warnings to 00-load.t
+        - added use strict/use warnings to 01-basic.t
+        - moved repository to git - thanks rjbs
+
+1.2     11/5/2006
+        - Added Senta McAdoo's dynamic form to update functions
+        - Updated Makefile.PL to include LICENSE for CPANTS
+        - added examples directory with the jsxray command line
+
+1.1     7/3/2006
+        - Fixed inline code and added tests to cover all cases.  I just 
+          needed to use URI->abs_uri
+        - New mailing list for JavaScript::XRay development
+          jsxray-dev@googlegroups.com
+          http://groups.google.com/group/jsxray-dev
+        - Added reference to the new mailing list in the pod
+
+1.02    6/26/2006
+        - Fixed jsxray inline methods to try fetching if absolute url first.
+
+1.01    6/26/2006
+        - Fixed regression bug (fixed syntax on 3 arg open)
+
+1.0     6/26/2006
+        - Just wanted to make sure folks got the latest version for YAPC
+
+0.99_5  6/24/2006
+        - Used 'perlcritic' to start to apply PBP to the source.
+            - moved all pod into the __END__ block
+            - fixed regexes to add the m prefix and x suffix to most
+            - changed all open statements to use the 3 argument open 
+
+0.99_4  6/22/2006
+        - Don't insert newlines when adding javascript code.
+
+0.99_3  6/23/2006
+        - Fixed broken code in jsxray.  Method call should have been 
+          'inline_methods' and not 'set_inline_methods'
+        - Fix documentation of jsxay to change switch 'filter' to 'match'
+
+0.99_2  6/23/2006
+        - Added EXED_FILES => [ 'bin/jsxray' ] to the Makefile.PL to install
+          jsxray.
+        - Fix documentation of jsxay to change switch 'filter' to 'match'
+
+0.99_1  6/22/2006
+        - Wanted to get this code out there before I write more tests.
+        - Renamed the 'filter' switch to 'match'
+        - Cleaned up the whole switches setting interface to make things a 
+          bit more clear.
+        - Fixed a bug where javascript was attempting to log before the DOM 
+          was ready (couldn't find the logging IFrame yet).  Setup a queue
+          to log messages until IFrame was found.
+        - Streamlined the documentation.
+        - New 'abs_uri' attribute to aid in inlining relative src javascript
+          files.
+        - Now handles both both relative and absolute URI (http and files)
+          to inline external javascript
+        - New command line script 'jsxray' to filter HTML on your local 
+          disk (ie save a page and filter it to see how it works)
+        - New verbose attribute so you can see whats going on.
+        - Additional required modules
+            - URI
+            - Pod::Usage
+            - Getopt::Long
+            - File::Spec::Functions
+            - File::Basename
+
+0.97    6/15/2006
+        - Major restructuring of the code
+            - Refactored sub 'filter' into smaller functions
+            - use a regex to find functions instead of spliting lines
+            - Now looks for script blocks with 'src' attributes and will
+              only inline fully qualified ones with now (via LWP::Simple)
+              <script type="JavaScript" src="http://www.jbisbee.com/test.js">
+        - New depedancy on LWP::Simple
+        - New "INLINING EXTERNAL JAVASCRIPT" pod section
+        - Few more documentation tweaks
+
+0.96    6/7/2006
+        - Fix spelling of Acknowledgements
+        - Now have 100% test coverage
+        - Include use Carp (had croak call without use Carp qw(croak)
+        - Included Carp as a required module
+
+0.95    6/5/2006
+        - Bunch fixed typos and spelling errors fixed.
+        - Forgot to update the MANIFEST with the filename of
+          the new test file so its in there this time
+        
+0.94    6/5/2006
+        - Bunch of documentation cleanups
+          - Fix synopsis rendering with perldoc -t and regenerate README
+          - Fix internal see L</"Switches"> links
+          - Clarify uncomment switch with after example
+          - Cleanup Switches section
+        - First basic tests... It's a start :)
+
+0.93    6/4/2006
+        - Add a catalyst switch example in the synopsis
+        - warning about leaving it wide open in a production environment.
+        - method documentation cleanup.
+
+0.92    6/4/2006
+        - Fix Synopsis example so it actually does something (and won't
+          throw an error)
+
+0.91    6/4/2006
+        - Few documentation tweaks, remove "Your" from the description
+
+0.9     6/4/2006
+        - First version, released on an unsuspecting world.
+

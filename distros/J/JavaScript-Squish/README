@@ -1,0 +1,96 @@
+JavaScript-Squish
+=================
+
+This module provides methods to compact javascript source down to just
+what is needed. It can remove all comments, put everything on one line
+(semi-)safely, and remove extra whitespace.
+
+Any one of the various compacting techniques can be applied individually,
+or with in any group.
+
+It also provides a means by which to extract all text literals or
+comments in separate arrays in the order they appear.
+
+Since JavaScript eats up bandwidth, this can be very helpful, and you
+can then be free to properly comment your JavaScript without fear of
+burning up too much bandwidth.
+
+SYNOPSIS
+    use JavaScript::Squish;
+    my $compacted = JavaScript::Squish->squish(
+                        $javascript,
+                        remove_comments_exceptions => qr/copyright/i )
+                        or die $JavaScript::Squish::err_msg;
+
+   # OR, to just do a few steps #
+
+    my $c = JavaScript::Squish->new();
+    $c->data( $javascript );
+    $c->remove_comments(exceptions => qr/copyright/i );
+    $c->replace_white_space();
+    $c->remove_blank_lines();
+    my $new = $c->data();
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+BUGS
+
+There are a few bugs, which may rear their head in some minor situations.
+
+Statements not terminated by semi-colon.
+   These should be ok now - leaving a note here because this hasn't
+   been thoroughly tested (I don't have any javascript to test with
+   that meets this criteria).
+
+   This would affect statements like the following:
+
+       i = 5.4
+       j = 42
+
+   This used to become "i=5.4 j=42", and would generate an error along
+   the lines of "expected ';' before statement".
+
+   The linebreak should be retained now. Please let me know if you see
+   otherwise.
+
+Ambiguous operator precidence
+   Operator precidence may get screwed up in ambiguous statements. Eg.
+   "x = y + ++b;" will be compacted into "x=y+++b;", which means some-
+   thing different.
+
+SEE ALSO
+
+Latest releases, bugzilla, cvs repository, etc:
+    https://developer.berlios.de/projects/jscompactor/
+
+Simlar projects:
+    http://crockford.com/javascript/jsmin
+    http://search.cpan.org/%7Epmichaux/JavaScript-Minifier/lib/JavaScript/Minifier.pm
+    http://dojotoolkit.org/docs/shrinksafe
+    http://dean.edwards.name/packer/
+
+
+AUTHOR
+
+Joshua I. Miller <jmiller@puriifeddata.net>
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2005 by CallTech Communications, Inc.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8.3 or, at
+your option, any later version of Perl 5 you may have available.
+
+
+

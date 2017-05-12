@@ -1,0 +1,37 @@
+Changes
+INSTALL
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+SpiderMonkey.pm
+SpiderMonkey.xs
+SpiderMonkey.h
+t/000readme.t
+t/001properties.t
+t/002functions.t
+t/003properties.t
+t/004setget.t
+t/005error.t
+t/006objmeth.t
+t/007funcret.t
+t/00array.t
+t/01doc-href.t
+t/02nav-appv.t
+t/03doc-write.t
+t/04loop.t
+t/05form.t
+t/06form2.t
+t/07func.t
+t/08func2.t
+t/09meth.t
+t/10elobj.t
+t/11intret.t
+t/12dblret.t
+t/13strret.t
+t/init.pl
+t/error.t
+typemap
+util/download.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

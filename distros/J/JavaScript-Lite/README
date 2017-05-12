@@ -1,0 +1,53 @@
+JavaScript::Lite
+================
+
+JavaScript::Lite is a bare-bones interface to the SpiderMonkey
+ECMAscript engine. It aims to provide as little functionality (and
+therefore as little overhead) as is neccessary to connect perl with
+ECMAscript. Efficiency is the goal here; the intended environments
+are places where you are going to be calling from perl into
+ECMAscript thousands (or millions) of times in succession.
+
+Please note that this is an alpha release. I intend to keep the
+API more-or-less stable, but there may be quirks, and new features
+will be added in future releases (so long as they do not slow the
+existing features down!).
+
+INSTALLATION
+============
+
+JavaScript::Lite doesn't try very hard to compile properly.
+It looks for your SpiderMonkey API as either "libjs" or
+"libmozjs", and adds "/usr/include/mozjs" to your C compiler's
+include path. If you have both "libjs" and "libmozjs" on your
+system, it will try to link against both of them, which is
+probably not what you want.
+
+Ohhh yeah... alpha software. Gotta love it.
+
+As people write in to complain (or hopefully with patches), we'll
+get all the edge cases sorted out and things should compile everywhere.
+Maybe if I'm lucky some CPAN testers will have SpiderMonkey installed
+on their build systems.
+
+Under debian or ubuntu, you can get the neccessary libraries and
+headers installed with the following command (run as root):
+
+  aptitude install libmozjs-dev
+
+For redhat/centos, I had to scour the net for the appropriate
+RPMs. Search for "mozjs" or "spidermonkey", depending on which
+of the dozens of redhat flavours you are running.
+
+COPYRIGHT AND LICENSE
+=====================
+
+Copyright (C) 2008 by Tyler MacDonald <japh@crackerjack.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+This module needs the "SpiderMonkey" ECMAscript implementation to
+function, so you'll probably have to accept the mozilla license as well.
+

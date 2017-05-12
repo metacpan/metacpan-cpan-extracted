@@ -1,0 +1,106 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:74
+msgid "Continue"
+msgstr "Continuer"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:35
+msgid "Go for it!"
+msgstr "Essayer ces valeurs !"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:59
+msgid "If the username provided conflicts with an existing username or contains invalid characters, you will have to give us a new one."
+msgstr "Si le nom d'utilisateur est déjà utilisé ou contient des caractères non autorisés, vous devez en définir un autre."
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:27
+msgid "If you have a Livejournal or other OpenID account, you don't even need to sign up. Just log in."
+msgstr "Si vous avez un compte OpenID, vous n'avez pas besoin de créer un compte. Vous pouvez directement vous connecter."
+
+#. (@{[$csr->err]})
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:68
+msgid "Invalid OpenID URL.  Please check to make sure it is correct.  (%1)"
+msgstr "URL OpenID incorrecte. Merci de la vérifier.  (%1)"
+
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:45
+msgid "It looks like someone is already using that OpenID."
+msgstr "Cet identifiant OpenID est déjà utilisé par un utilisateur."
+
+#: ../../lib/Jifty/Plugin/OpenID.pm:86
+msgid "Login with OpenID"
+msgstr "Identification OpenID"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:17
+msgid "Login with your OpenID"
+msgstr "Se connecter avec votre OpenID"
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:27
+msgid "OpenID URL"
+msgstr "URL OpenID"
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/AuthenticateOpenID.pm:29
+msgid "For example: you.livejournal.com"
+msgstr "Par exemple: you.livejournal.com"
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:48
+msgid "OpenID verification failed.  It looks like you cancelled the OpenID verification request."
+msgstr "La vérification OpenID a échouée. Vous avez peut-être annulé la demande de vérification."
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:72
+msgid "A link to confirm this email will be sent to receive later notifications."
+msgstr "Un message pour confirmer cet email vous sera envoyé."
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/VerifyOpenID.pm:57
+msgid "OpenID verification failed: "
+msgstr "Vérification OpenId échouée: "
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:48
+msgid "Set your username"
+msgstr "Définissez votre nom d'utilisateurs"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:96
+msgid "Sign in with your Google Account"
+msgstr "Se connecter avec un compte Google"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:128
+msgid "Sign in with your MyOpenID Account"
+msgstr "Se connecter avec un compte MyOpenID"
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:112
+msgid "Sign in with your Yahoo account"
+msgstr "Se connecter avec un compte Yahoo"
+
+#. ($openid)
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:50
+msgid "The OpenID '%1' has been linked to your account."
+msgstr "L'identifiant OpenID '%1' a été attaché à votre compte."
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:53
+msgid "We need you to set a username or quickly check the one associated with your OpenID. Your username is what other people will see when you ask questions or make suggestions"
+msgstr "Vous devez définir ou vérifier le nom d'utilisateur associé à votre IOpenID. C'est ce nom d'utilisateur qui apparaîtra lorsque vous publierez des informations."
+
+#: ../../lib/Jifty/Plugin/OpenID/Dispatcher.pm:66
+msgid "Welcome back, "
+msgstr "Re-bonjour, "
+
+#: ../../lib/Jifty/Plugin/OpenID/Action/CreateOpenIDUser.pm:94
+msgid "Welcome, "
+msgstr "Bienvenue, "
+
+#: ../../lib/Jifty/Plugin/OpenID/View.pm:42
+msgid "You already logged in."
+msgstr "Vous êtes déjà connecté."

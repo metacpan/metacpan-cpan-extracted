@@ -1,0 +1,57 @@
+[
+    {
+        "cases": [
+            {
+                "expression": "foo[].\"\u2713\"",
+                "is_deeply": 1,
+                "result": [
+                    "\u2713",
+                    "\u2717"
+                ]
+            }
+        ],
+        "given": {
+            "foo": [
+                {
+                    "\u2713": "\u2713"
+                },
+                {
+                    "\u2713": "\u2717"
+                }
+            ]
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "\"\u262f\"",
+                "result": true
+            }
+        ],
+        "given": {
+            "\u262f": true
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "\"\u266a\u266b\u2022*\u00a8*\u2022.\u00b8\u00b8\u2764\u00b8\u00b8.\u2022*\u00a8*\u2022\u266b\u266a\"",
+                "result": true
+            }
+        ],
+        "given": {
+            "\u266a\u266b\u2022*\u00a8*\u2022.\u00b8\u00b8\u2764\u00b8\u00b8.\u2022*\u00a8*\u2022\u266b\u266a": true
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "\"\u2603\"",
+                "result": true
+            }
+        ],
+        "given": {
+            "\u2603": true
+        }
+    }
+]

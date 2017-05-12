@@ -1,0 +1,252 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Term::ReadLine();
+use Getopt::Long();
+use JSPL;
+our $VERSION = '0.91';
+
+my $Options = {
+    rt => 'stock',
+};
+
+sub evalmode {
+    my $ctx = shift;
+    my $stash = undef; #$ctx->get_controller->get_package('main');
+    my $histfile = "$ENV{HOME}/.jspl_history";
+    my $printer = $ctx->eval('Object.prototype.toString');
+
+    my $term = Term::ReadLine->new('jspl');
+    my $hist = $term->ReadLine eq 'Term::ReadLine::Gnu';
+    if($hist) {
+	$term->{MinLength} = 0; # Turns autohistory off
+	$term->ReadHistory($histfile);
+	$term->ornaments(0);
+    } else {
+	warn "Install Term::ReadLine::Gnu for command line editing and history\n";
+    }
+
+    EVLOOP: while(1) {
+	my $line = $term->readline('JSC: ');
+	last EVLOOP unless defined $line;
+	while($line =~ /\\$/) {
+	    chop $line; $line .=  $term->readline('JSC> ');
+	}
+	next EVLOOP unless $line =~ /\S/;
+	$term->add_history($line) if $hist;
+	my $res = eval { $ctx->jsc_eval($stash, $line, "eval") };
+	if($@) {
+	    warn "ERR: $@\n";
+	    next;
+	}
+	if(ref($res) eq 'QUIT') { last EVLOOP; }
+	if(ref($res) eq 'CMD') { $res = eval $$res; }
+	$res = '(undef)' unless defined $res;
+	print STDERR "\nRP: $res\nRJS: ",$ctx->jsc_call($res,$printer,[]),"\n";
+    }
+    if($hist) {
+	$term->WriteHistory($histfile) or warn "Can't write history: $!\n";
+    }
+    warn "\nGood bye...\n";
+}
+
+sub usage {
+    print STDERR <<EOF;
+
+jspl - A JavaScript interpreter with perl powers v$VERSION
+© 2009-2010 Salvador Ortiz
+
+usage:
+    jspl [--shell] [--help] [<file>]
+
+    --shell      Use interactive JS shell
+    --help	 show this text 
+EOF
+    exit shift;
+}
+
+$My::Attached::_allow_js_export = 1;
+
+Getopt::Long::GetOptions(
+    $Options,
+    'shell',
+    'help|?',
+    'rt=s',
+) or usage(1);
+usage(0) if $Options->{help};
+
+my $ctx = JSPL->stock_context($Options->{rt});
+$ctx->bind_all(
+    quit => sub { bless {}, 'QUIT' },
+    version => "JSPL version $VERSION",
+    'attach' => sub {
+	JSPL->check_privileges;
+	for(@_) {
+	    eval "package My::Attached;\nuse $_;";
+	    die $@ if $@;
+	}
+    },
+    'Attached' => $ctx->get_controller->add('My::Attached')->{Proxy},
+#    'package' => sub {
+#	defined $_[0]
+#	    ? bless \(q|$stash=$ctx->get_controller->get_package('| . "$_[0]')")
+#	    : bless \(q|$stash=undef|) ,
+#	'CMD'
+#    },
+);
+
+$ctx->{Restricted} = 0;
+
+if($Options->{shell} || !@ARGV) {
+    evalmode($ctx);
+} else {
+    require IO::File;
+    my $prgname = shift @ARGV;
+    my $bang = '';
+    my $fh = IO::File->new($prgname) or die "Can't open $prgname\n";
+    my $c = $fh->getc;
+    if($c eq '#') {
+	$bang = $fh->getline;
+    } else {
+	$fh->ungetc(ord($c));
+    }
+    my $plug = JSPL::Runtime->_getplug;
+    $plug->{main}->($ctx, $prgname, $bang) if $plug->{main};
+    eval { $ctx->eval($fh, $prgname) } or die $@,"\n";
+}
+$ctx = undef;
+
+__END__
+
+=head1 Name
+
+jspl - JavaScript interpreter with perl powers
+
+=head1 Synopsis
+
+An example say more than a thousands words:
+
+=over 4
+
+ #!/usr/bin/jspl
+ // Load some modules
+ require('Gtk2', 'Gtk2');
+ install('Gtk2.Window', 'Gtk2::Window');
+ install('Gtk2.Button', 'Gtk2::Button');
+
+ Gtk2.init();
+
+ var window = new Gtk2.Window('toplevel');
+ var button = new Gtk2.Button('Quit');
+
+ button.signal_connect('clicked', function() { Gtk2.main_quit() });
+ window.add(button);
+ window.show_all();
+
+ Gtk2.main();
+ say('Thats all folks!');
+
+=back
+
+=head1 Description
+
+This provides a SpiderMonkey based javascript shell extended by perl, thanks to
+L<JSPL> perl module.
+
+=head1 Usage
+
+    $jspl [--shell] [--help] [<file>]
+
+B<jspl> can be used either in interactive or script execution modes. The script to
+be executed can be passed on the command line as I<file> above or B<jspl> can be used
+in the she-bang line of your script.
+
+    #!/usr/bin/jspl
+    <Lot of javascript code>
+    
+=head2 Options
+
+You can use any of the following
+
+=over 4
+
+=item --shell 
+
+Start an interactive JS shell
+
+=item --help
+
+Print usage help
+
+=item <file>
+
+Optional. Run a script from the given B<file>.
+
+=back
+
+If not I<file> given, its starts in interactive mode.
+
+=head1 JavaScript extensions
+
+Your script should be written in javascript syntax and has available all features of
+the SpiderMonkey engine, see L<https://developer.mozilla.org/en/Core_JavaScript_1.5_Reference>
+
+Also B<jspl> provides all the services documented in L<JSPL::Runtime::Stock>
+plus the following:
+
+=over 4
+
+=item Argv                                                 B<PerlArray>
+
+Array of arguments passed to your script on the command line. Available only in
+non interactive mode.
+
+This array is an alias to perl's B<@ARGV>.
+
+=item quit ()                                              B<PerlSub>
+
+Exit from the interactive shell
+
+=item PrgName                                              B<string>
+
+String with the name of the file running, available only in non interactive mode.
+
+=item version                                              B<string>
+
+This is a string describing the shell version. It has the form  "JSPL version
+<version>".
+
+=back
+
+=head1 Author
+
+Salvador Ortiz <sortiz@cpan.org>
+
+=head1 License and copyright
+
+Copyright (c) 2008 - 2010, Salvador Ortiz <sortiz@cpan.org>
+
+=head1 Disclaimer of warranty
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR
+THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING. THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO
+THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE
+PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR
+CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL
+ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE
+THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO
+LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR
+THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+
+=cut

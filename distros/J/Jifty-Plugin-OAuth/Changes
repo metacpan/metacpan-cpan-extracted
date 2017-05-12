@@ -1,0 +1,17 @@
+0.04 Wed Nov 18 20:00:49 2009
+    * Update for test_warnings on new Jifty
+    * /oauth/authorized? should run _after_ app "before" rules
+    * Don't use the consumer's mech to fetch server warnings
+    * Doc fixes
+    * Distribution fixes
+
+0.03 Tue Aug 12 04:39:47 2008
+    * Fail earlier when an unauthenticated user accesses /oauth/authorize
+    * Many doc fixes
+
+0.02 Tue Apr 08 17:21:48 2008
+    * separated from the core Jifty distribution
+
+0.01 primordial soup era
+    * life begins in the core Jifty distribution
+

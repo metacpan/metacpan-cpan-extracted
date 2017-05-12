@@ -1,0 +1,30 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^JSON-Create-[0-9\.]+/$
+^JSON-Create-[0-9\.]+\.tar\.gz$
+^Create.(?:c|o|bs)$
+# Round-trip script, not in CPAN distro for the time being.
+^rt\.pl$
+# Template for the POD
+^lib/JSON/Create\.pod\.tmpl$
+^timesheet$
+^unicode\.o$
+^makeitfile$
+# Example file outputs
+^examples/.*-out\.txt$
+# Benchmark output
+^bench/bench\.output
+# Author build file
+^make-pod\.pl$
+# Timekeeping file
+^timesheet\.txt$
+# Benchmarks
+^bench\..*$
+# Author tests can be downloaded from github.
+^xt/.*$

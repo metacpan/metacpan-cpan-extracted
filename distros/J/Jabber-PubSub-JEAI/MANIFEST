@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Jabber-PubSub-JEAI.t
+lib/Jabber/PubSub/JEAI.pm
+META.yml                                 Module meta-data (added by MakeMaker)

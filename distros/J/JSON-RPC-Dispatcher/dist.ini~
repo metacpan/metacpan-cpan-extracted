@@ -1,0 +1,35 @@
+name    = JSON-RPC-Dispatcher
+version = 0.0507
+author  = JT Smith <RIZEN@cpan.org>
+license = Perl_5
+copyright_holder = Plain Black Corporation
+copyright_year = 2010
+
+[@Filter]
+-bundle = @Classic
+-remove = PodCoverageTests
+
+[MetaJSON]
+[@Git]
+
+[Meta::Contributors]
+contributor = Darin McBride <dmcbride@cpan.org>
+
+
+[MetaResources]
+bugtracker.web    = http://github.com/plainblack/JSON-RPC-Dispatcher/issues
+repository.url    = git://github.com/plainblack/JSON-RPC-Dispatcher.git 
+repository.web    = http://github.com/plainblack/JSON-RPC-Dispatcher
+repository.type   = git
+
+[Prereqs]
+Plack = 0.9913
+Moose = 0.93
+JSON = 2.16
+Test::More = 0
+Log::Any = 0.11
+
+[MetaNoIndex]
+folder = author.t
+folder = eg
+

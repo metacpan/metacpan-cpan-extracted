@@ -1,0 +1,96 @@
+
+table {
+	margin: auto;
+	border: 1px solid #eee;
+	background-color: #FFF;
+	text-align: left;
+}
+
+th {
+	background-color: #e9e9da;
+}
+td {
+	
+	padding:5px;
+}	
+
+.headerSimple {
+		background: 
+			#e9e9da
+			url('/images/green_arrows.gif')
+			no-repeat
+			center left;
+		color: #333;
+		padding: 5px;
+		padding-left: 25px;
+		text-align: left;
+		cursor: pointer;	
+}
+
+.headerSimpleSortUp {
+	background:
+		#e9e900 
+		url('/images/green_descending.gif')		
+		no-repeat
+		center left;
+}
+
+.headerSimpleSortDown {
+	background:
+		#e9e900 
+		url('/images/green_ascending.gif')
+		no-repeat
+		center left;
+}
+
+.even {  
+  background-color: lightblue;
+}
+
+.odd {  
+  background-color: lightgrey;
+}
+
+.highlight { 
+  color: grey;
+}
+
+.header {
+	background-image: url(/images/header-bg.png);
+	background-repeat: no-repeat;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #000;
+	border-top: 1px solid #FFF;
+	padding-left: 30px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	height: auto;
+        cursor: pointer;	
+}
+
+.headerSortUp {
+	background-image: url(/images/header-asc.png);
+	background-repeat: no-repeat;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #000;
+	border-top: 1px solid #FFF;
+	padding-left: 30px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	height: auto;
+        cursor: pointer;	
+}
+.headerSortDown {
+	background-image: url(/images/header-desc.png);
+	background-repeat: no-repeat;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #000;
+	border-top: 1px solid #FFF;
+	padding-left: 30px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	height: auto;
+        cursor: pointer;	
+}
+
+

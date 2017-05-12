@@ -1,0 +1,51 @@
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: TestApp::Plugin::AppPluginHasModels
+  ApplicationName: TestApp-Plugin-AppPluginHasModels
+  ApplicationUUID: 646FD662-32DD-11DC-AD79-2A0157C3B83B
+  ConfigFileVersion: 5
+  Database: 
+    CheckSchema: 1
+    Database: testapp_plugin_apppluginhasmodels
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    RecordUUIDs: active
+    User: ''
+    Version: 0.0.1
+  DevelMode: 0
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    - AdminUI: {}
+    - CompressedCSSandJS: {}
+    - ErrorTemplates: {}
+    - Halo: {}
+    - LetMe: {}
+    - OnlineDocs: {}
+    - REST: {}
+    - SkeletonApp: {}
+    - TestApp::Plugin::AppPluginHasModels::Plugin::MyAppPlugin: {}
+
+  SkipAccessControl: 0
+  TemplateClass: TestApp::Plugin::AppPluginHasModels::View
+  Web: 
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

@@ -1,0 +1,302 @@
+
+=head1 NAME
+
+Jifty::Manual::PageRegions - Using page regions
+
+=head1 DESCRIPTION
+
+Page regions are a way of doing the new trend of automatic in-page
+replacement with JavaScript -- while at the same time providing the
+same user experience for non-JavaScript enabled browsers.  Sections
+are chunked into nestable "page regions", which can be refreshed
+independently.
+
+=head1 USING PAGE REGIONS
+
+=head2 Constructing Page Regions
+
+From inside any template, a region may get constructed via something like
+this:
+
+    <% Jifty->web->region( name     => 'regionname',
+                           path     => '/path/of/component',
+                           defaults => { argname => 'some value', ... },
+                         ) %>
+
+This call will pass all arguments to the C<new> constructor of
+L<Jifty::Web::PageRegion>. The most often used parameters are:
+
+=over
+
+=item name
+
+The mandatory region's name given here is used to embed the region's
+content into a C<< <div> >> tag which is marked with a fully qualified
+name for that region. The qualified name represents the nesting
+structure of regions inside a page and is automatically built inside.
+The qualified name for a given L<Jifty::Web::PageRegion> object can
+be obtained by calling C<< Jifty->web->qualified_region >>.
+
+=item path (optional)
+
+If a path is given, the component's rendered result under this path is
+embedded inside the region. If no path is given, C</__jifty/empty>
+will be used resulting in an empty region inside.
+
+=item defaults (optional)
+
+Every argument given here (as a hash-ref) will be transported to the
+component that displays the region inside. The values are accessible
+by building a C<< <%args> >> block in the component (Mason template)
+specifying the arguments.
+
+=back
+
+=head2 Using Page Regions
+
+Given a template with regions, any region can influence itself or any
+other region it knows about. Doing this is typically done with
+JavaScript handlers like C<onclick>. The examples below will
+demonstrate some typical scenarios:
+
+    %# replace this region with some other component
+    <% Jifty->web->link( label   => 'click me',
+                         onclick => {
+                             replace_with => '/new/path/component',
+                             args         => { argname => 'some value' },
+                                    },
+                       ) %>
+
+    %# insert a new region in front of a given region
+    %# use an HTML-entity as the link-text and a CSS class
+    <% Jifty->web->link( label        => '%#9997;',
+                         escape_label => 0,
+                         class        => 'blue_button',
+                         onclick => {
+                             region  => 'regionname',
+                             prepend => '/new/path/component',
+                             args    => { argname => 'some value' },
+                                    },
+                       ) %>
+
+    %# insert a new region after a given CSS selector inside $region
+    <% Jifty->web->link( label   => 'add something',
+                         onclick => {
+                             element => $region->parent->get_element('div.list'),
+                             append  => '/new/path/component',
+                             args    => { argname => 'some value' },
+                                    },
+                       ) %>
+
+    %# a button to replace the current region with empty content
+    <% Jifty->web->link( label   => 'clear',
+                         onclick => {
+                             refresh_self => 1,
+                             toggle       => 1,
+                                    },
+                         as_button => 1,
+                       ) %>
+
+    %# a button to delete some region with JavaScript confirmation alert
+    <% Jifty->web->link( label   => 'delete',
+                         onclick => {
+                             delete  => 'regionname',
+                             confirm => 'really delete this?',
+                                    },
+                         as_button => 1,
+                       ) %>
+
+    %# refresh the parent region which holds the current one
+    <% $search->button(
+        label   => 'Search!',
+        onclick => {
+            submit  => $search_action,
+            refresh => Jifty->web->current_region->parent,
+            args    => { page => 1 }
+                   }
+      ) %>
+
+=head1 GORY DETAILS
+
+There is a bit of complication involved in making sure that the
+server-side Perl implementation of page regions, and, more importantly,
+how they preserve state, interacts with the client-side JavaScript
+implementation.  What follows is an attempt to describe the process.
+
+Regions, when they are created, have a default path and a default set
+of arguments.  These are "defaults" because they can be overridden by
+the browser -- this is what enables the browser to say "...and that
+region has this other path, in reality."  The same is true for
+arguments; for example, a paging widget could have a default C<page>
+argument of 1, but could be actually being rendered with a C<page> of
+2.
+
+These overrides are kept track of using state variables.  When a
+region is entered, it peers at the current state variables, and
+overrides the default path and arguments before rendering the region.
+
+When a L<Jifty::Web::Form::Clickable> object with an C<onclick> is
+L<generated|Jifty::Web::Form::Clickable/generate>, it examines the
+C<onclick> and determines how to emulate it without JavaScript.  It
+determines which actions need to be run, as well as how to manipulate
+the future state variables to change the display of the appropriate
+regions.  It encodes all of this in the button or link; since the
+JavaScript usually returns false, the fallback mode is never seen by
+the browser.
+
+When a region is output, it is output with a tiny "region wrapper",
+which serves two purposes: to inform the JavaScript of the existence
+of the page region and its default path and variables, and to create a
+unique C<< <div> >> for the fragment to reside in.  The browser reads
+the JavaScript and creates, on the client-side, a model of the nested
+PageRegions.  This allows the JavaScript to model the state variable
+changes correctly.
+
+When the JavaScript C<Update> function is called, it is passed a list of
+fragments that needs to be updated, as well as a list of actions that
+need to be run.  As it does so, it builds up an up-to-date list of
+state variables, to more closely imitate the state of a non-javascript
+enabled client.  It constructs a JSON request based on that
+information, and passes it off to the XML web-service endpoint on the
+server.
+
+When the request comes back, it parses the XML.  For each fragment
+that was requested, it finds the correct bit of the response, and
+replaces the content of the DOM with the response.  As it does so, it
+re-updates the client-side view of the fragments with the server's
+information -- this is particularly key for dealing with parameters
+which were mapped by the request mapper.  Finally, it displays
+any messages and errors from actions.
+
+=head2 EXAMPLES
+
+
+=head3 Hidden information that shows after click on a link
+
+It's often required to hide some extra information, a list of objects
+or something else under a link. User clicks on the link and the
+information you're hiding shows up instead of the link. Regions could
+help you to do this task very easy.
+
+First of all you'll need a region's component F<templates/additional_info>:
+
+    <%args>
+    $collapsed => 1
+    ... some other arguments required to show correct info ...
+    </%args>
+    % if ( $collapsed ) {
+    <% Jifty->web->link(
+        label   => _('text of the link'),
+        onclick => {
+            refresh_self => 1,
+            args         => { %ARGS, collapsed => 0 },
+        },
+    ) %>
+    % } else {
+    .... here we show our additional info ...
+    % }
+
+In this component we have one argument C<$collapsed> that controls either
+we show link or information. By default we prefer hidden state and in this
+case we show only the link with an C<onclick> action that refreshes the
+current region, however value of the argument is overridden.
+
+You can add any arguments you want to this component that may be required
+to show the additional information, for example an id of some object, but
+you should remember to use this arguments during links generation.
+
+Next thing you should do is to add a region to some page:
+
+    ... and region:
+    <% Jifty->web->region(
+        name => 'block_name',
+        path => '/additional_info',
+        defaults => { ... some args required to show the info ... },
+    ) %>
+    ... other information on the page
+
+That's all. Things should just work.
+
+Smarty ones should mention that the link disappears after click, but may
+be you want show/hide functionality. This is very easy task when we know how
+to use links generation. In the component's else branch add:
+
+    % } else {
+    <% Jifty->web->link(
+        label   => _('text of the link that hides'),
+        onclick => {
+            refresh_self => 1,
+            args         => { %ARGS, collapsed => 1 },
+        },
+    ) %>
+    .... here we show our additional info ...
+    % }
+
+Wow! Works again. Enjoy.
+
+=head3 Page Region in Template::Declare
+
+    use Jifty::View::Declare -base;
+    use Jifty::View::Declare::Helpers;
+
+    template '/replaced' => sub {
+        my $data = get('region_data');   # get "data to pass"
+        h1 { 'Replaced!' };
+    };
+
+    template '/' => page {
+        my $region = Jifty::Web::PageRegion->new(
+                    name => "region-to-replace",
+                    path => "/__jifty/empty",
+        );
+
+        div { { class is 'region-div' };
+            $region->render;
+        }:
+
+        hyperlink(
+            label => "Replace",
+            onclick => {
+                region => $region,
+                replace_with => '/replaced',
+                arguments => {
+                    region_data => "data to pass"
+                }
+            }
+        );
+    };
+
+=head3 Page Region in Javascript 
+
+Assume that you have region named "latest-posts", then the full-qualified name
+is C<__page-latest-posts>. Or if you have a Jifty::Web::PageRegion object , you can retrieve
+the full-qualified name via C<qualified_name> method.
+
+to use JavaScript to replace a region, you could write the follow JavaScript in your code:
+
+    Jifty.update({
+        fragments: [ {
+            region: '__page-latest-posts',
+            args: {},
+            path: '/latest_expends',
+            mode: 'Replace'
+        } ]
+    });
+
+the C<fragments> attribute must contains an array of hashes,  which may have:
+
+C<region> is the name of the region to update
+
+C<args> is a hash of arguments to override
+
+C<path> is the path of the fragment (if this is a new fragment)
+
+C<element> is the CSS selector of the element to update, if 'region' isn't supplied
+
+C<mode> is one of 'Replace', 'Top', 'Bottom', 'Before', or 'After'
+
+C<effect> is the name of an effect
+
+See L<Jifty::Manual::JavaScript> in more detail.
+
+=cut

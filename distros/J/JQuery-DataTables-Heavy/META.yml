@@ -1,0 +1,51 @@
+---
+abstract: "It's new $module"
+author:
+  - 'Yusuke Watase <ywatase@gmail.com>'
+build_requires:
+  Test::Mock::Guard: '0.09'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JQuery-DataTables-Heavy
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JQuery::DataTables::Heavy:
+    file: lib/JQuery/DataTables/Heavy.pm
+    version: '0.04'
+  JQuery::DataTables::Heavy::Base:
+    file: lib/JQuery/DataTables/Heavy/Base.pm
+  JQuery::DataTables::Heavy::DBI:
+    file: lib/JQuery/DataTables/Heavy/DBI.pm
+  JQuery::DataTables::Heavy::DBIC:
+    file: lib/JQuery/DataTables/Heavy/DBIC.pm
+requires:
+  Class::Load: '0'
+  Hash::Merge: '0'
+  Moo: '0'
+  MooX::Types::MooseLike: '0'
+  SQL::Abstract::Limit: '0'
+  perl: '5.008005'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/ywatase/JQuery-DataTables-Heavy/issues
+  homepage: https://github.com/ywatase/JQuery-DataTables-Heavy
+  repository: git://github.com/ywatase/JQuery-DataTables-Heavy.git
+version: '0.04'
+x_contributors:
+  - 'Yusuke Watase <ywatase+github@gmail.com>'

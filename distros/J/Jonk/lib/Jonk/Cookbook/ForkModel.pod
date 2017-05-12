@@ -1,0 +1,44 @@
+=head1 NAME
+
+Jonk::Cookbook::ForkModel - with Parallel::Prefork.
+
+=head1 USAGE
+
+prefork worker script:
+
+    #! perl
+    use strict;
+    use warnings;
+    use Parallel::Prefork;
+    use DBI;
+    use Jonk::Worker;
+    use Your::Worker;
+
+    my $pm = Parallel::Prefork->new({
+        max_workers       => 10,
+        trap_signals      => {
+            TERM => 'TERM',
+            HUP  => 'TERM',
+        },
+    });
+
+    while ($pm->signal_received ne 'TERM') {
+        $pm->start and next;
+
+        my $dbh = DBI->connect('dbi:mysql:test','user','pass');
+        my $jonk = Jonk::Worker->new($dbh => {functions => [qw/worker_key/]});
+
+        while (1) {
+            if (my $job = $jonk->dequeue) {
+                Your::Worker->work($job);
+            } else {
+                sleep(3); # wait for 3 sec.
+            }
+        }
+
+        $pm->finish;
+    }
+
+    $pm->wait_all_children();
+
+=cut

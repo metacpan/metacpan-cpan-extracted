@@ -1,0 +1,28 @@
+---
+abstract: 'Provides OpenID authentication for your jifty app'
+author:
+  - 'Alex Vandiver, Cornelius  <cornelius.howl {at} gmail.com >, Yves Agostini'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-OpenID
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Cache::FileCache: 0
+  Jifty: 0
+  LWPx::ParanoidAgent: 0
+  Net::OpenID::Consumer: 1.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.02

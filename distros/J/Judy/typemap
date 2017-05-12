@@ -1,0 +1,153 @@
+TYPEMAP
+Pvoid_t T_PVOID
+PWord_t T_WORD_PTR
+UWord_t T_UWORD
+IWord_t T_IWORD
+Str T_STR
+
+INPUT
+T_STR
+    ($var.ptr) = SvPV($arg,($var.length));
+    if ( SvUTF8($arg) ) {
+        /* TODO: handle warning properly if there's an embedded null
+           in the input string. Right now, ordinary %s interpolation
+           will halt. */
+        warn(\"Dropping UTF8 flag for '%s'\",
+             $var.ptr);
+    }
+
+T_PVOID
+
+    /* It should never, ever happen that I get pointers that could
+       suffer truncation because Judy always allocates everything and
+       that's at the native size instead of perl's long long. */
+
+    $var = (Pvoid_t)(SvOK($arg) ? (Word_t)SvUV($arg) : 0);
+
+T_WORD_PTR
+    /* It should never, ever happen that I get pointers that could
+       suffer truncation because Judy always allocates everything and
+       that's at the native size instead of perl's long long. */
+
+    $var = INT2PTR($type,SvUV($arg));
+
+T_IWORD
+    /* Accept:
+       - IV that fits in (long int).
+       - IV that requires more bits that fit in (long int). Truncate
+         it to LONG_MAX. Throw a warning.
+       - UV that fits in (long int) without using the sign bit.
+       - UV that fits in (long int) using the sign bit. Truncate it to
+         LONG_MAX and throw a warning.
+       - UV that doesn't fit in (long int). Truncate it to LONG_MAX
+         and throw a warning.
+       - Cast everything else to IV or NV and apply the above rules.
+     */
+
+    if ( SvUOK($arg) ) {
+        if ( SvUV($arg) > LONG_MAX ) {
+            $var = LONG_MAX;
+            warn(\"Truncating %\"UVuf\" to %ld because your number is larger than fits in a signed integer\",
+                 SvUV($arg), LONG_MAX);
+        }
+        else {
+            $var = (long int)SvIV($arg);
+        }
+    }
+    else {
+    if (LONGSIZE == IVSIZE) {
+        assert( LONG_MIN <= SvIV($arg) && SvIV($arg) <= LONG_MAX );
+        $var = SvIV($arg);
+    } else {
+        if ( SvIV($arg) > LONG_MAX ) {
+            $var = LONG_MAX;
+            warn(\"Truncating %\"IVdf\" to %ld because your number is larger than fits in a signed integer\",
+                 SvIV($arg), LONG_MAX);
+        }
+        else if ( SvIV($arg) < LONG_MIN ) {
+            $var = LONG_MIN;
+            warn(\"Truncating %\"IVdf\" to %ld because your number is smaller than fits in a signed integer\",
+                 SvIV($arg), LONG_MIN);
+        }
+        else {
+            $var = SvIV($arg);
+        }
+    }
+    }
+
+
+T_UWORD
+    /* Accept:
+       - IV that's -1.
+       - IV that's negative, coerce to 0 and warn.
+       - IV/UV that fits in (unsigned long int)
+       - IV/UV that requires more bits than fit in (unsigned long
+         int). Truncate it and throw a warning.
+       - Cast everything else to UV and apply the above rules
+     */
+    if ( SvIOK($arg) && SvIV($arg) < 0 ) {
+        if ( SvIV($arg) == -1 ) {
+            $var = -1;
+        }
+        else {
+            $var = 0;
+            warn(\"Coercing %\"IVdf\" to 0. Can't use negative values as keys.\",
+                 SvIV($arg));
+        }
+    }
+    else {
+        if (LONGSIZE == UVSIZE) {
+            $var = SvUV($arg);
+        }
+        else {
+            if (SvUV($arg) > ULONG_MAX) {
+                $var = LONG_MAX;
+                warn(\"Truncating %\"UVuf\" to %lu because your number is larger than fits in an unsigned integer\",
+                SvUV($arg), ULONG_MAX);
+            }
+            else {
+                $var = SvUV($arg);
+            }
+        }
+    }
+
+OUTPUT
+T_STR
+    SvUPGRADE($arg,SVt_PV);
+    sv_setpvn(
+        $arg,
+        $var.ptr,
+        $var.length ? $var.length : strlen( $var.ptr )
+    );
+
+T_PVOID
+    SvUPGRADE($arg,SVt_IV);
+    if ( (unsigned long int)$var > LONG_MAX ) {
+        sv_setuv($arg,PTR2UV($var));
+    }
+    else {
+        sv_setiv($arg,PTR2IV($var));
+    }
+
+T_IWORD
+    SvUPGRADE($arg,SVt_IV);
+    sv_setiv($arg, (signed long int)$var);
+
+T_UWORD
+    SvUPGRADE($arg,SVt_IV);
+    if ( $var > LONG_MAX ) {
+        sv_setuv($arg,PTR2UV($var));
+    }
+    else {
+        sv_setiv($arg,PTR2IV($var));
+    }
+    
+
+T_WORD_PTR
+    SvUPGRADE($arg,SVt_IV);
+    if ( (unsigned long int)$var > LONG_MAX ) {
+        sv_setuv($arg,PTR2UV($var));
+    }
+    else {
+        sv_setiv($arg,PTR2IV($var));
+    }

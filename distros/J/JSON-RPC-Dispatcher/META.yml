@@ -1,0 +1,30 @@
+---
+abstract: 'A JSON-RPC 2.0 server.'
+author:
+  - 'JT Smith <RIZEN@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-RPC-Dispatcher
+no_index:
+  directory:
+    - author.t
+    - eg
+requires:
+  JSON: '2.16'
+  Log::Any: '0.11'
+  Moose: '0.93'
+  Plack: '0.9913'
+  Test::More: '0'
+resources:
+  bugtracker: http://github.com/plainblack/JSON-RPC-Dispatcher/issues
+  repository: git://github.com/plainblack/JSON-RPC-Dispatcher.git
+version: '0.0508'
+x_contributors:
+  - 'Darin McBride <dmcbride@cpan.org>'

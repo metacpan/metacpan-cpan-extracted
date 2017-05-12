@@ -1,0 +1,55 @@
+---
+abstract: 'Asynchronous event-driven checking mechanism'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Adam Balali <adamba@cpan.org>'
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.28
+  Test::Fatal: 0
+  Test::Fork: 0
+  Test::More: 0.94
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build: 0.28
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Juno
+no_index:
+  file:
+    - README.pod
+requires:
+  AnyEvent: 0
+  AnyEvent::HTTP: 0
+  AnyEvent::Ping: 0
+  AnyEvent::Socket: 0
+  AnyEvent::Util: 0
+  Carp: 0
+  Class::Load: 0
+  JSON: 0
+  List::Util: 0
+  Moo: 1.000001
+  Moo::Role: 0
+  MooX::Types::MooseLike: 0
+  MooseX::Role::Loggable: 0.008
+  PerlX::Maybe: 0
+  Safe::Isa: 0
+  Sub::Quote: 0
+  System::Command: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  namespace::sweep: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/xsawyerx/juno/issues
+  repository: http://github.com/xsawyerx/juno
+version: 0.010

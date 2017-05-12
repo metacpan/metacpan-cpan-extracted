@@ -1,0 +1,25 @@
+`JSON-Hyper 0.001_00 cpan:TOBYINK`
+	issued     2010-08-02 ;
+	label      "Developer release".
+
+`JSON-Hyper 0.001_01 cpan:TOBYINK`
+	issued     2010-08-04 ;
+	changeset [
+		item   "process_includes is no longer recursive by default."^^Change;
+	].
+
+`JSON-Hyper 0.010 cpan:TOBYINK`
+	issued     2011-09-29 ;
+	changeset [
+		item   "Support targetSchema attribute."^^Update;
+		item   "Support schema attribute."^^Update;
+		item   "href attributes with multiple substitutions are now supported."^^Bugfix;
+	].
+
+`JSON-Hyper 0.011 cpan:TOBYINK`
+	issued     2012-10-12 ;
+	changeset [
+		item   "find_links now returns blessed objects."^^Change;
+		item   "General updatedness."^^Update;
+	].
+

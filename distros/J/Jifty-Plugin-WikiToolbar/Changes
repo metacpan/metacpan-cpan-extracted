@@ -1,0 +1,13 @@
+Revision history for Perl module Jifty::Plugin::WikiToolbar
+
+1.00 Sun, 17 Jan 2010 12:08:52 +0100
+    - add WikiToolbar type, this is shorter than render_as
+    - use JQuery instead of Behaviour in js
+    - fix multi toolbar on one page
+
+0.9  Tue, 05 May 2009 16:36:50 +0200
+    - allow to override rows and cols size
+
+0.01 Sat, 14 Jun 2008 10:48:03 +0200
+    - original version for CPAN
+

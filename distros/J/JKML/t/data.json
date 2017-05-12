@@ -1,0 +1,53 @@
+[
+   "{\n}\n",
+   {},
+   "[r'hogehoge']\n",
+   [
+      "hogehoge"
+   ],
+   "[\n    r'hogehoge',\n    r'h\\uh' # a\n]\n",
+   [
+      "hogehoge",
+      "h\\uh"
+   ],
+   "r'hogehoge'\n",
+   "hogehoge",
+   "base64(\"aG9nZQ==\")\n",
+   "hoge",
+   "[\n    r\"1\", r\"1\",\n]\n",
+   [
+      1,
+      1
+   ],
+   "{\n    b => 2,\n\n}\n",
+   {
+      "b" : 2
+   },
+   "<<-HERE\nI'm here\nHERE\n",
+   "I'm here",
+   "{\n    foo => <<-HERE,\n    I'm here\n    HERE\n}\n",
+   {
+      "foo" : "I'm here"
+   },
+   "  <<-HERE\n  x\n  y\n  HERE\n",
+   "x\ny",
+   "true\n",
+   true,
+   "[null]\n",
+   [
+      null
+   ],
+   "\"hoge'fuga\"\n",
+   "hoge'fuga",
+   "'hoge\"fuga'\n",
+   "hoge\"fuga",
+   "[<<-EOS, true]\nhoge\nEOS\n",
+   [
+      "hoge",
+      true
+   ],
+   "{f => <<-EOS}\nhoge\nEOS\n",
+   {
+      "f" : "hoge"
+   }
+]

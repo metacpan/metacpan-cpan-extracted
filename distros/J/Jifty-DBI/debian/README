@@ -1,0 +1,15 @@
+This directory contains Debian packaging files for Jifty::DBI.
+
+It is currently at a very early stage of development and is hardly
+tested.
+
+I have Built it under Ubuntu Dapper with two perl modules from Edgy.
+Another two modules were built from cpan using dh-make-perl.
+
+A more complete list of instructions will follow and I'll probably
+host a apt repository until such time as sufficient packages exist in
+mainstream Debian or Ubuntu to install without any other packages
+being required.
+
+Bart Bunting
+ 

@@ -1,0 +1,14 @@
+0.05  2014-01-05 12:55:45 GMT
+    * Feature #397 : Replace CHI by a faster cache provider for Jedi Plugin Session (Celogeek San)
+
+0.04  2013-12-25 18:05:07 GMT
+    * Feature #393 : Add SQLite for Jedi Plugin Session (Celogeek San)
+
+0.03  2013-12-25 14:31:31 GMT
+    * Feature #392 : Add configurable prefix for jedi session with the redis backend (Celogeek San)
+
+0.02  2013-12-24 23:13:28 GMT
+    * Feature #391 : Create Redis backend for Jedi::Plugin::Session (Celogeek San)
+
+0.01  2013-12-24 17:25:16 GMT
+    * Feature #390 : Create Jedi Session Plugin

@@ -1,0 +1,28 @@
+---
+abstract: 'a module to quickly build JSON/JSONP web services'
+author:
+  - 'Anselmo Canfora <acanfora@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSONP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: '0'
+  Digest::SHA: '0'
+  JSON: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  Want: '0'
+  perl: '5.01'
+version: '1.61'

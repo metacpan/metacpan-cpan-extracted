@@ -1,0 +1,46 @@
+---
+abstract: 'JSON Merge Patch implementation'
+author:
+  - 'Taishi Hiraga <sojiro@cpan.org>'
+build_requires:
+  Test::JSON: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-MergePatch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::MergePatch:
+    file: lib/JSON/MergePatch.pm
+    version: '0.04'
+requires:
+  Exporter: '0'
+  JSON::MaybeXS: '0'
+  List::MoreUtils: '0'
+  Test::Deep: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/sojiro14/JSON-MergePatch/issues
+  homepage: https://github.com/sojiro14/JSON-MergePatch
+  repository: git://github.com/sojiro14/JSON-MergePatch.git
+version: '0.04'
+x_contributors:
+  - 'taishi-hiraga <taishi.hiraga@dena.com>'
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+  - 'Taishi Hiraga <sojiro14@users.noreply.github.com>'

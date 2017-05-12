@@ -1,0 +1,19 @@
+====
+TODO
+====
+
+We plan the following road-map for JSPL 1.x, in no particular order:
+
+- Test building in more platforms.
+- API to move Objects between contexts
+- Extend security model
+- Write a small tutorial for javascript users about using CPAN modules.
+- Write more examples
+- Complete documentation.
+- Testing, testing and Testing.
+
+====
+BUGS
+====
+
+- None ;-)

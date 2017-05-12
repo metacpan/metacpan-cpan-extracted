@@ -1,0 +1,47 @@
+---
+version: 0.16
+date:    Thu Aug 28 00:43:35 PDT 2008
+changes:
+- Add section_delim config option.
+- Added 'eval' filter.
+
+---
+version: 0.15
+date:    Thu Aug 28 00:21:25 PDT 2008
+changes:
+- Update sample Makefile to be more portable
+- Add in Socialtext refactorings from the last couple years
+- Added newSubclass() method to vastly simplify subclassing Test.Base
+
+---
+version: 0.14
+date:    Mon Aug 18 22:26:46 PDT 2008
+changes:
+- Make available as JS-Test-Base
+- Completely refactored layout
+- Pull dependencies using JS
+- Remove dependency on the external Sub_class module
+
+---
+version: 0.13
+date:    Mon Mar  6 18:35:43 PST 2006
+changes:
+- Depend on the external Sub_class module
+
+---
+version: 0.12
+date:    Sun Mar  5 18:33:40 PST 2006
+changes:
+- Created a sample installation for easy user setup
+
+---
+version: 0.11
+date:    Wed Mar  1 01:37:21 PST 2006
+changes:
+- Recent changes ported from Jemplate versions of modules.
+
+---
+version: 0.10
+date:    Sun Feb 26 21:23:02 PST 2006
+changes:
+- Maiden voyage

@@ -1,0 +1,35 @@
+---
+abstract: unknown
+author:
+  - 'Lee Johnson <leejo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Most: '0.31'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Schema-ToJSON
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cpanel::JSON::XS: '3.0213'
+  DateTime: '0'
+  Hash::Merge: '0'
+  JSON::Validator: '0.96'
+  Mojolicious: '7.15'
+  String::Random: '0.29'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Humanstate/json-schema-tojson/issues
+  homepage: https://metacpan.org/module/JSON::Schame::ToJSON
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Humanstate/json-schema-tojson
+version: '0.10'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

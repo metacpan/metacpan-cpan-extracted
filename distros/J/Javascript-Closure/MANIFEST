@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-constants-import.t
+t/02-closure.appspot.com-connection.t
+t/03-output_format.t
+lib/Javascript/Closure.pm
+META.yml                                 Module meta-data (added by MakeMaker)

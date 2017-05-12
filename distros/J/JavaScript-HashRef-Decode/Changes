@@ -1,0 +1,27 @@
+v.133120 - 2013-11-08
+    Properly parse negative decimals
+
+v.130240 - 2013-01-24
+    Add improved backslash decoding and support all backslash sequences
+    Faster string parsing, support \u notation
+    Support more decimal and hex number syntaxes
+    Requires perl 5.10.0
+
+v.130220 - 2013-01-22
+    Die properly on invalid input (#1 on github)
+    Add link to ECMAScript spec
+
+v.130160 - 2013-01-16
+    Fix test failure on 5.8.9 (defined-or)
+
+v.130142 - 2013-01-14
+    Add support for true, false, null
+    hashref keys can be single- and double- quoted strings
+    Renamed key_value to tuple
+    Added description
+
+v.130141 - 2013-01-14
+    Fixed POD
+
+v.130140 - 2013-01-14
+    Initial release

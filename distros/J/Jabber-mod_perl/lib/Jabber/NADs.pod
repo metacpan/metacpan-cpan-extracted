@@ -1,0 +1,224 @@
+=pod
+
+=head1 NAME
+
+Jabber::NADs - Perl wrapper for Jabber NADs for management of XML nodes
+
+=head1 SYNOPSIS
+
+  use Jabber::NADs;
+  my $nc = Jabber::NADs::nadCache();
+  my $nad = Jabber::NADs::newNAD( $nc );
+
+=head1 DESCRIPTION
+
+Jabber::NADs is a wrapper for the nad_t struct based object representing an XML packet 
+fragment in the jabberd2 sm ( session manager ).
+The API is almost identical to that of the nad API of the utils library, and as such 
+the utils documentation can be refered to.
+
+=head1 METHODS
+
+=head2 cache_new()
+
+A static method to create a new NAD cache - you really shouldn't call this yourself - it
+is for testing purposes.  jabberd2 controls the creation of nad_cache so there is no need 
+for the user to do this.
+
+ my $nc = Jabber::NADs::cache_new();
+
+=head2 cache_free()
+
+A static method to free a NAD cache - this is controled by jabberd2, so no need to call this -
+this is for testing purposes only.
+
+ Jabber::NADs::cache_free( $nc );
+
+=head2 nad_new()
+
+A static method to create a new NAD.
+
+ my $n = Jabber::NADs::nad_new( $nc );
+
+=head2 free()
+
+A method to free a NAD
+
+ $nad->free();
+
+=head2 copy()
+
+A method to copy a NAD
+
+ my $ncopy = $nad->copy( );
+
+=head2 append_elem()
+
+A method to append an element to a NAD
+
+ $n->nad_append_element( $ns, $name, $depth );
+
+=head2 insert_elem()
+
+A method to insert an element into a NAD
+
+ $n->insert_elem( $startelem, $ns, $name, $cdata );
+
+=head2 find_elem()
+
+A method to find an element in a NAD
+
+ $n->find_elem( $startelem, $ns, $name, $depth );
+
+=head2 append_cdata()
+
+A method to append CDATA to a NAD.
+
+ $n->append_cdata( $cdata, $len, $depth );
+
+=head2 append_cdata_head()
+
+A method to append CDATA to the cdata before the first child element.
+
+ $n->append_cdata_head( $elem, $cdata );
+
+=head2 append_cdata_tail()
+
+A method to append CDATA to the cdata after the child elements of THIS element.
+
+ $n->append_cdata_head( $elem, $cdata );
+
+=head2 replace_cdata_head()
+
+A method to replace the CDATA before the first child element of the nominated element.
+
+ $n->replace_cdata_head( $elem, $cdata );
+
+=head2 replace_cdata_tail()
+
+A method to replace the CDATA after the child elements of THIS element.
+
+ $n->replace_cdata_head( $elem, $cdata );
+
+=head2 add_namespace()
+
+A method to add a namespace to a NAD
+returns an integer representing the namespace.
+
+ $n->add_namespace( $name );
+
+=head2 find_namespace()
+
+A method to find a namespace within a NAD starting at a specific element.
+returns an integer representing the namespace.
+
+ $n->find_namespace( $elem, $uri, $prefix );
+
+=head2 find_scoped_namespace()
+
+A method to find a namespace within a NAD - returns an integer representing the namespace.
+
+ $n->find_scoped_namespace( $uri, $prefix );
+
+=head2 findAttr()
+
+A method to find the attributes of a NAD.  Value is optional.
+returns an integer representing the position of the attribute.
+
+ $n->findAttr( $startelem, $name, $value );
+
+=head2 getAttr()
+
+A method to find the attributes of a NAD.  Value is optional.
+returns an integer representing the position of the attribute.
+
+ $n->getAttr( $attr );
+
+=head2 setAttr()
+
+A method to set the value of attributes of a NAD.
+
+ $n->setAttr( $startelem, $name, $value );
+
+=head2 appendAttr()
+
+A method to append  attributes to an element of a NAD.
+
+ $n->appendAttr( $name, $value );
+
+=head2 print()
+
+A method to print a NAD (serialise the xml)
+
+ $n->print( $depth );
+
+=head2 find_children()
+
+return an array of the index numbers of child elements of the 
+given nad element
+
+ $n->find_children( $element_number );
+
+=head2 attrs()
+
+return an array of the index numbers of attributes of the 
+given nad element
+
+ $n->attrs( $element_number );
+
+=head2 nad_attr_name()
+
+Get the name of a given attribute
+
+ $n->nad_attr_name( $attr_number );
+
+=head2 nad_attr_val()
+
+Get the value of a given attribute
+
+ $n->nad_attr_val( $attr_number );
+
+=head2 nad_elem_name()
+
+Get the name of a given element
+
+ $n->nad_elem_name( $elem_number );
+
+=head2 nad_cdata()
+
+Get the cdata of a given element
+
+ $n->nad_cdata( $elem_number );
+
+=head2 nad_uri()
+
+Get the name of a given uri (namespace)
+
+ $n->nad_uri( $uri_number );
+
+=head2 nad_uri_prefix()
+
+Get the name of a given uri (namespace) prefix
+
+ $n->nad_uri_prefix( $uri_number );
+
+
+=head1 VERSION
+
+very new
+
+=head1 AUTHOR
+
+Piers Harding
+
+=head1 SEE ALSO
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002, Piers Harding. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+=cut
+

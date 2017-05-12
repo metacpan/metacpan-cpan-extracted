@@ -1,0 +1,17 @@
+0.06 Nov 4 2011
+    * Add get_project, get_project_versions and get_version
+
+0.05 Oct 29 2011
+    * Fix instantiation when debug isn't set (Matthew Horsfall)
+
+0.04 Sep 14 2011
+    * Really fix username and password to use the one supplied.
+
+0.03 Sep 11 2011
+    * Fix username and password to use the on supplied.
+
+0.02 Sep 11 2011
+    * POD improvements
+
+0.1 Sept 10 2011
+    * First release

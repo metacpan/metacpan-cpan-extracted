@@ -1,0 +1,34 @@
+NAME
+    JLogger - jabber messages logger
+
+DESCRIPTION
+    JLogger is a highly customizable jabber transport for logging messages
+    passed over jabber server. It has different kind of filters and
+    possibilities to save captured messages.
+
+SERVER CONFIGURATION
+  ejabberd
+    Edit ejabberd.cfg and add this line to the 'modules' section:
+
+        {mod_service_log, [{loggers, ["jlogger.jabber.myserver.com"]}]},
+
+    Add this to 'listen' section to make ejabberd listen for JLogger
+    connections:
+
+        {5526, ejabberd_service, [
+            {ip, {127, 0, 0, 1}},
+            {access, all}, 
+            {hosts,
+                ["jlogger.jabber.myserver.com"], 
+                [{password, "secret"}]}
+            ]},
+
+AUTHOR
+    Sergey Zasenko
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011, Sergey Zasenko.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl 5.10.
+

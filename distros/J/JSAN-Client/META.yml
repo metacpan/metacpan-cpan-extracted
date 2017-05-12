@@ -1,0 +1,46 @@
+---
+abstract: 'JSAN Client 2.0 (migrated from Class::DBI to ORLite)'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.40
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: JSAN::Client
+name: JSAN-Client
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Algorithm::Dependency: 1.106
+  Archive::Tar: 1.30
+  Archive::Zip: 1.18
+  Config::Tiny: 2.12
+  DBD::SQLite: 1.25
+  DBI: 1.607
+  Digest::MD5: 2.33
+  File::HomeDir: 0.69
+  File::Path: 1.06
+  File::Spec: 0.80
+  LWP::Online: 0.03
+  LWP::Simple: 1.41
+  Params::Util: 1.00
+  Scalar::Util: 1.11
+  URI::ToDisk: 1.08
+  YAML: 0.60
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/JSAN-Client
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/JSAN-Client
+version: 0.29

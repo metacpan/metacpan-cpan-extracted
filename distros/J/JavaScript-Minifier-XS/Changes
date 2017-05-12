@@ -1,0 +1,68 @@
+Revision history for Perl extension JavaScript::Minifier::XS.
+
+0.11        Tue Jan 27 16:50 PST 2015
+    - RT #58416; don't segfault when trying to minify non-javascript
+
+0.10        Mon Jan 26 22:46 PST 2015
+    - RT #64948; allow builds on older versions of Perl.
+      Thanks to Michael Robinton and Ruslan Zakirov.
+    - Lowered minimum Perl version to v5.6.0, as detected by
+      Perl::MinimumVersion.
+    - RT #51008; allow for minification of JS code that returns regexps from
+      functions.
+      Thanks to James Barton, Robert Krimen, and Randy Stauner.
+    - Added "xt/test-compile.t" to test minification against a wider range of
+      JS.  While not a 100% guarantee that the JS still works, it does provide
+      a wider range of JS to test against.
+
+0.09        Tue Nov  2 22:12 PDT 2010
+    - Bump required Perl version to 5.8.8; oldest release w/Newxz() available.
+
+0.08        Wed Jul 21 21:23 PDT 2010
+    - use Newxz/Safefree for memory management, instead of malloc/free.  Thanks
+      to Kenichi Ishigaki for his patch to CSS-Minifier-XS that prompted this.
+
+0.07        Fri Apr 23 23:44 PDT 2010
+    - switch to Git
+
+0.06        Thu Aug  6, 22:08 PDT 2009
+    - fix invalid "L<text|scheme:...>" POD sequences
+
+0.05        Wed Jul 16, 23:35 PDT 2008
+    - don't segfault w/older Perls if we minify right down to nothing.
+      (similar behaviour as described for CSS::Minifier::XS in RT #36557)
+
+0.04        Wed May 28, 21:58 PDT 2008
+    - rebuild packages; wrong version number in META.yml
+
+0.03        Wed May 28, 14:46 PDT 2008
+    - fix minification when a regexp follows a comment that ends with something
+      that looks like code; was treating it as division instead of as a literal
+    - properly clear end of internally allocated buffers
+    - added some debugging output, which could be enabled at compile-time
+
+0.02        Tue May  6 00:16 PDT 2008
+    - rebuild packages; EU::MM borked my META.yml
+
+0.01        Mon May  5 15:11 PDT 2008
+    - fix minification of "division of an array subscript".  Thanks to Ingy and
+      Dan at Socialtext for the JS!
+    - first NON-devel release
+
+0.01_05     Sat Oct 20 22:48 PDT 2007
+    - don't use "strcasestr()"; not available on Solaris
+
+0.01_04     Wed Oct 17 15:56 PDT 2007
+    - fix t/02-minify.t, so it doesn't try to "use_ok()" before issuing a test
+      plan
+
+0.01_03     Tue Oct 16 19:47 PDT 2007
+    - don't use "strndup()"; not available on all systems
+    - we require Perl 5.006; update Build.PL and XS.pm to denote this
+
+0.01_02     Tue Oct 16 12:22 PDT 2007
+    - relocate the XS file so that its picked up properly by EU::MM when
+      running "perl Makefile.PL" to do a build.
+
+0.01_01     Mon Oct 15 22:11 PDT 2007
+    - initial public version

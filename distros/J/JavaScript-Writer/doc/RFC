@@ -1,0 +1,4 @@
+* Use B::Deparse so "$js" isn't even required ?
+* Generate browser-depedent js code with one perl code.
+  * for addEventListener / attachEvent thing
+

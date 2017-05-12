@@ -1,0 +1,100 @@
+JSON-Schema
+===========
+
+Created:      2010-07-31
+Home page:    <https://metacpan.org/release/JSON-Schema>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Schema>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.016	2014-09-11
+
+ [ Documentation ]
+ - Document the status of this module.
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+ [ Other ]
+ - Updated: Stop using smartmatch.
+
+0.015	2012-12-15
+
+ [ Bug Fixes ]
+ - enum assumed that all enumerated values would be non-references; this
+   assumption was incorrect. Reference values are now allowed in an
+   enumeration.
+   mailto:gszpetkowski@gmail.com++
+
+ [ Documentation ]
+ - Document test suite.
+
+0.014	2012-12-12
+
+ [ Bug Fixes ]
+ - Fix for string lengths.
+   mailto:jabbas@jabbas.eu++
+
+0.013	2012-10-11
+
+ [ Bug Fixes ]
+ - Fix for union types.
+   DAVIDIAM++
+ - Patched 02integer.t.
+   DAVIDIAM++
+
+ [ Other ]
+ - Drop common::sense dependency.
+
+0.012	2012-05-06
+
+ [ Bug Fixes ]
+ - Fixes for 'additionalProperties' being false or non-existant.
+   Fixes RT#76944.
+   Fixes RT#76892.
+   mailto:sdevoid@gmail.com++
+   Piotr Piatkowski++
+   <https://rt.cpan.org/Ticket/Display.html?id=76944>
+   <https://rt.cpan.org/Ticket/Display.html?id=76892>
+
+0.011	2011-11-11
+
+ [ Bug Fixes ]
+ - addError fix.
+   Markus Lauer++
+ - patternProperties fix.
+   LIEUTAR++
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Added: format.
+ - Updated: use 5.010
+
+0.010	2011-09-27
+
+ [ Bug Fixes ]
+ - Arrays. (Thanks to Naveed Massjouni.)
+ - Numeric maxima.
+
+ [ Packaging ]
+ - Improved test cases. (Thanks to Naveed Massjouni.)
+ - Split JSON::Schema::Helper and JSON::Schema::Null into separate files.
+
+ [ Other ]
+ - Added: additionalItems.
+ - Added: exclusiveMaximum and exclusiveMinimum.
+ - Added: patternProperties.
+ - Added: required.
+ - Added: uniqueItems.
+
+0.001_01	2010-08-04
+
+ - Added: JSON::Schema now calls JSON::Hyper to expand $ref references by
+   itself. This is more efficient as they can be expanded just-in-time, as
+   needed, rather than speculatively.
+ - Added: Support for divisibleBy.
+ - Added: Support for maximumCanEqual and minimumCanEqual, which aren't
+   included in the Javascript version.
+
+0.001_00	2010-08-02

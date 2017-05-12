@@ -1,0 +1,4 @@
+0.000002 - 2014-12-10
+    - moved from JSON to JSON::MaybeXS
+
+0.000001 - 2012-08-30

@@ -1,0 +1,27 @@
+---
+abstract: 'track all changes made to a record class'
+author:
+  - 'Shawn M Moore C<< <sartak@bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-RecordHistory
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Jifty: 1.10214
+  Jifty::DBI: 0.66
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

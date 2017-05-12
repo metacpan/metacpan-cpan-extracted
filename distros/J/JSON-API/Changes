@@ -1,0 +1,24 @@
+Revision history for Perl module JSON::API
+
+1.1.0 Sun Oct 23 11:36:00 2016
+    - Added support for customizing and retrieving reqest/response headers
+    - Added support for accessing the raw HTTP response object after issuing
+      a request
+    - Converted to licensing to the Perl license itself
+
+1.0.8 Mon Feb 16 14:26:00 2015
+    - Fixed Build.PL's license attribute, allowing META.* file creation
+
+1.0.7 Wed Jan 28 23:23:23 2015
+    - Added query parameter support for get()
+
+1.0.6 Mon Jan 26 19:45:00 2015
+    - Fixed testing issues on other versions of JSON
+
+1.0.5 Mon Jan 26 09:50:00 2015
+    - Initial public release
+
+0.01 Tue Nov 13 21:37:28 2012
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

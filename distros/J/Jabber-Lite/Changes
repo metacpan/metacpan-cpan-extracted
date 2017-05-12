@@ -1,0 +1,55 @@
+
+0.8 2007/01 - Bruce Campbell
+	- And thats how my brother became a BMW.
+
+		* Eric Hacker found a problem which lead to the 'use' lines
+		  within the 'eval's being changed to 'require'.
+		* Marc Pelzer caught a bad (new) usage of send where a working
+		  syswrite had been in place, breaking SSL in 0.7
+		* <stream:stream> always wants a 'to'.  
+
+0.7 2006/09 - Bruce Campbell
+	- If we all spoke the same language, where would we get our women from?
+
+		* Shifted Jabber::LiteImpl to Jabber::Lite::Impl after realised
+		  that CPAN counts it as another namespace.
+
+0.6 2006/09 - Bruce Campbell
+	- This may sting a little.
+
+		* Fixed a circular dependency that was stopping perl garbage
+		  collection from working.
+		* Reduced overhead in some core routines, resulting in a
+		  faster parser.
+
+0.5 2006/06 - Bruce Campbell
+	- Thats no moon...
+
+		* CPAN this time for real.  (Deathstars do respond to mallets)
+		* Tweaks for yet more corner cases.
+
+0.4 2006/04 - Bruce Campbell
+	- Earth?  Earth-with-nuclear-weapons-Earth?  Friend!
+
+		* Intended Initial CPAN Release
+		* Resolution of SRV Records.
+
+0.3 2006/02 - Bruce Campbell
+	- I'd talk to the hand, but I have a clear above-the-belt chat policy.
+
+		* Reworking to avoid blocking wherever possible.
+		* Tidy up of debug calls and other cruft.
+		* Addition of various RFC goodness.
+
+0.2 2006/01 - Bruce Campbell
+	- Theres something about all those legs that sends shivers down my spine
+
+		* Hopeful extermination of parsing bugs.
+		* SASL authentication as client.
+		* Simple authentication as component.
+
+0.1 2005/12 - Bruce Campbell
+	- Upside-Down Ms Jane!
+
+		* Basic sketch of the XML Parser code
+		* Simple (blocking) connection and authentication.

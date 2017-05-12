@@ -1,0 +1,21 @@
+Changes
+LICENSE
+demo/demo.c
+libpatricia/copyright
+libpatricia/credits.txt
+libpatricia/Makefile.PL
+libpatricia/patricia.c
+libpatricia/patricia.h
+libpatricia/MYMETA.json
+libpatricia/MYMETA.yml
+Makefile.PL
+MANIFEST			This list of files
+lib/JCM/Net/Patricia.pm
+Patricia.xs
+README
+t/01everything.t
+t/02climb.t
+t/03matching_prefix.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

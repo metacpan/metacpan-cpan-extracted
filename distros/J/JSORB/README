@@ -1,0 +1,58 @@
+JSORB version 0.04
+===========================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moose
+    MooseX::AttributeHelpers
+    MooseX::Traits
+    MooseX::Params::Validate
+
+    Try::Tiny
+    Set::Object
+    JSON::RPC::Common
+    Path::Router
+
+    Buffer::Transactional
+    MooseX::Types::Path::Class
+
+    Class::Inspector
+    File::Copy
+
+    HTTP::Server::Simple
+    HTTP::Request
+    HTTP::Response
+
+    Text::SimpleTable
+
+And optionally
+
+    Catalyst
+
+for the JSORB.js client library
+
+    JS
+    JS::JSON
+    JS::jQuery
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

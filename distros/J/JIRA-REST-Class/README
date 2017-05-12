@@ -1,0 +1,410 @@
+NAME
+    JIRA::REST::Class - An OO Class module built atop JIRA::REST for dealing
+    with JIRA issues and their data as objects.
+
+VERSION
+    version 0.10
+
+SYNOPSIS
+      use JIRA::REST::Class;
+
+      my $jira = JIRA::REST::Class->new({
+          url             => 'https://jira.example.net',
+          username        => 'myuser',
+          password        => 'mypass',
+          SSL_verify_none => 1, # if your server uses self-signed SSL certs
+      });
+
+      # get issue by key
+      my ($issue) = $jira->issues( 'MYPROJ-101' );
+
+      # get multiple issues by key
+      my @issues = $jira->issues( 'MYPROJ-101', 'MYPROJ-102', 'MYPROJ-103' );
+
+      # get multiple issues through search
+      my @issues =
+          $jira->issues({ jql => q/project = "MYPROJ" and status = "open" / });
+
+      # get an iterator for a search
+      my $search =
+          $jira->iterator({ jql => q/project = "MYPROJ" and status = "open" / });
+
+      if ( $search->issue_count ) {
+          printf "Found %d open issues in MYPROJ:\n", $search->issue_count;
+          while ( my $issue = $search->next ) {
+              printf "  Issue %s is open\n", $issue->key;
+          }
+      }
+      else {
+          print "No open issues in MYPROJ.\n";
+      }
+
+DESCRIPTION
+    An OO Class module built atop JIRA::REST for dealing with JIRA issues
+    and their data as objects.
+
+    This code is a work in progress, so it's bound to be incomplete. I add
+    methods to it as I discover I need them. I have also coded for fields
+    that might exist in my JIRA server's configuration but not in yours. It
+    is my *intent*, however, to make things more generic as I go on so they
+    will "just work" no matter how your server is configured.
+
+    I'm actively working with the author of JIRA::REST (thanks gnustavo!) to
+    keep the arguments for "JIRA::REST::Class->new" exactly the same as
+    "JIRA::REST->new", so I'm just duplicating the documentation for
+    JIRA::REST->new:
+
+CONSTRUCTOR
+  new *HASHREF*
+  new *URL*, *USERNAME*, *PASSWORD*, *REST_CLIENT_CONFIG*, *ANONYMOUS*, *PROXY*, *SSL_VERIFY_NONE*
+    The constructor can take its arguments from a single hash reference or
+    from a list of positional parameters. The first form is preferred
+    because it lets you specify only the arguments you need. The second form
+    forces you to pass undefined values if you need to pass a specific value
+    to an argument further to the right.
+
+    The arguments are described below with the names which must be used as
+    the hash keys:
+
+    *   url
+
+        A string or a URI object denoting the base URL of the JIRA server.
+        This is a required argument.
+
+        The REST methods described below all accept as a first argument the
+        endpoint's path of the specific API method to call. In general you
+        can pass the complete path, beginning with the prefix denoting the
+        particular API to use ("/rest/api/VERSION", "/rest/servicedeskapi",
+        or "/rest/agile/VERSION"). However, to make it easier to invoke
+        JIRA's Core API if you pass a path not starting with "/rest/" it
+        will be prefixed with "/rest/api/latest" or with this URL's path if
+        it has one. This way you can choose a specific version of the JIRA
+        Core API to use instead of the latest one. For example:
+
+            my $jira = JIRA::REST::Class->new({
+                url => 'https://jira.example.net/rest/api/1',
+            });
+
+    *   username
+
+    *   password
+
+        The username and password of a JIRA user to use for authentication.
+
+        If anonymous is false then, if either username or password isn't
+        defined the module looks them up in either the ".netrc" file or via
+        Config::Identity (which allows "gpg" encrypted credentials).
+
+        Config::Identity will look for ~/.jira-identity or ~/.jira. You can
+        change the filename stub from "jira" to a custom stub with the
+        "JIRA_REST_IDENTITY" environment variable.
+
+    *   rest_client_config
+
+        A JIRA::REST object uses a REST::Client object to make the REST
+        invocations. This optional argument must be a hash reference that
+        can be fed to the REST::Client constructor. Note that the "url"
+        argument overwrites any value associated with the "host" key in this
+        hash.
+
+        As an extension, the hash reference also accepts one additional
+        argument called proxy that is an extension to the REST::Client
+        configuration and will be removed from the hash before passing it on
+        to the REST::Client constructor. However, this argument is
+        deprecated since v0.017 and you should avoid it. Instead, use the
+        following argument instead.
+
+    *   proxy
+
+        To use a network proxy set this argument to the string or URI object
+        describing the fully qualified URL (including port) to your network
+        proxy.
+
+    *   ssl_verify_none
+
+        Sets the "SSL_verify_mode" and "verify_hostname ssl" options on the
+        underlying REST::Client's user agent to 0, thus disabling them. This
+        allows access to JIRA servers that have self-signed certificates
+        that don't pass LWP::UserAgent's verification methods.
+
+    *   anonymous
+
+        Tells the module that you want to connect to the specified JIRA
+        server with no username or password. This way you can access public
+        JIRA servers without needing to authenticate.
+
+METHODS
+  issues QUERY
+  issues KEY [, KEY...]
+    The "issues" method can be called two ways: either by providing a list
+    of issue keys, or by proving a single hash reference which describes a
+    JIRA query in the same format used by JIRA::REST (essentially, "jql =>
+    "JQL query string"").
+
+    The return value is an array of JIRA::REST::Class::Issue objects.
+
+  query QUERY
+    The "query" method takes a single parameter: a hash reference which
+    describes a JIRA query in the same format used by JIRA::REST
+    (essentially, "jql => "JQL query string"").
+
+    The return value is a single JIRA::REST::Class::Query object.
+
+  iterator QUERY
+    The "query" method takes a single parameter: a hash reference which
+    describes a JIRA query in the same format used by JIRA::REST
+    (essentially, "jql => "JQL query string""). It accepts an additional
+    field, however: "restart_if_lt_total". If this field is set to a true
+    value, the iterator will keep track of the number of results fetched
+    and, if when the results run out this number doesn't match the number of
+    results predicted by the query, it will restart the query. This is
+    particularly useful if you are transforming a number of issues through
+    an iterator, and the transformation causes the issues to no longer match
+    the query.
+
+    The return value is a single JIRA::REST::Class::Iterator object. The
+    issues returned by the query can be obtained in serial by repeatedly
+    calling next on this object, which returns a series of
+    JIRA::REST::Class::Issue objects.
+
+  maxResults
+    A getter/setter method that allows setting a global default for the
+    maxResults pagination parameter for JIRA's REST API
+    <https://docs.atlassian.com/jira/REST/latest/#pagination>. This
+    determines the *maximum* number of results returned by the issues and
+    query methods; and the initial number of results fetched by the iterator
+    (when next exhausts that initial cache of results it will automatically
+    make subsequent calls to the REST API to fetch more results).
+
+    Defaults to 50.
+
+      say $jira->maxResults; # returns 50
+
+      $jira->maxResults(10); # only return 10 results at a time
+
+  issue_types
+    Returns a list of defined issue types (as JIRA::REST::Class::Issue::Type
+    objects) for this server.
+
+  projects
+    Returns a list of projects (as JIRA::REST::Class::Project objects) for
+    this server.
+
+  project PROJECT_ID || PROJECT_KEY || PROJECT_NAME
+    Returns a JIRA::REST::Class::Project object for the project specified.
+    Returns undef if the project doesn't exist.
+
+  SSL_verify_none
+    Sets to false the SSL options "SSL_verify_mode" and "verify_hostname" on
+    the LWP::UserAgent object that is used by REST::Client (which, in turn,
+    is used by JIRA::REST, which is used by this module).
+
+  name_for_user
+    When passed a scalar that could be a JIRA::REST::Class::User object,
+    returns the name of the user if it is a "JIRA::REST::Class::User"
+    object, or the unmodified scalar if it is not.
+
+  key_for_issue
+    When passed a scalar that could be a JIRA::REST::Class::Issue object,
+    returns the key of the issue if it is a "JIRA::REST::Class::Issue"
+    object, or the unmodified scalar if it is not.
+
+  find_link_name_and_direction
+    When passed two scalars, one that could be a
+    JIRA::REST::Class::Issue::LinkType object and another that is a
+    direction (inward/outward), returns the name of the link type and
+    direction if it is a "JIRA::REST::Class::Issue::LinkType" object, or
+    attempts to determine the link type and direction from the provided
+    scalars.
+
+  dump
+    Returns a stringified representation of the object's data generated
+    somewhat by Data::Dumper::Concise, but not descending into any objects
+    that might be part of that data. If it finds objects in the data, it
+    will attempt to represent them in some abbreviated fashion which may not
+    display all the data in the object. For instance, if the object has a
+    "JIRA::REST::Class::Issue" object in it for an issue with the key
+    'JRC-1', the object would be represented as the string
+    'JIRA::REST::Class::Issue->key(JRC-1)'. The goal is to provide a gist of
+    what the contents of the object are without exhaustively dumping
+    EVERYTHING. I use it a lot for figuring out what's in the results I'm
+    getting back from the JIRA API.
+
+READ-ONLY ACCESSORS
+  args
+    An accessor that returns a copy of the arguments passed to the
+    constructor. Useful for passing around to utility objects.
+
+  url
+    An accessor that returns the "url" parameter passed to this object's
+    constructor.
+
+  username
+    An accessor that returns the username used to connect to the JIRA
+    server, even if the username was read from a ".netrc" or
+    Config::Identity file.
+
+  password
+    An accessor that returns the password used to connect to the JIRA
+    server, even if the password was read from a ".netrc" or
+    Config::Identity file.
+
+  rest_client_config
+    An accessor that returns the "rest_client_config" parameter passed to
+    this object's constructor.
+
+  anonymous
+    An accessor that returns the "anonymous" parameter passed to this
+    object's constructor.
+
+  proxy
+    An accessor that returns the "proxy" parameter passed to this object's
+    constructor.
+
+INTERNAL METHODS
+  get
+    A wrapper for "JIRA::REST"'s GET method.
+
+  post
+    Wrapper around "JIRA::REST"'s POST method.
+
+  put
+    Wrapper around "JIRA::REST"'s PUT method.
+
+  delete
+    Wrapper around "JIRA::REST"'s DELETE method.
+
+  data_upload
+    Similar to JIRA::REST->attach_files, but entirely from memory and only
+    attaches one file at a time. Returns the HTTP::Response object from the
+    post request. Takes the following named parameters:
+
+    + url
+        The relative URL to POST to. This will have the hostname and REST
+        version information prepended to it, so all you need to provide is
+        something like "/issue/"*issueIdOrKey*"/attachments". I'm allowing
+        the URL to be specified in case I later discover something this can
+        be used for besides attaching files to issues.
+
+    + name
+        The name that is specified for this file attachment.
+
+    + data
+        The actual data to be uploaded. If a reference is provided, it will
+        be dereferenced before posting the data.
+
+    I guess that makes it only a *little* like "JIRA::REST->attach_files"...
+
+  rest_api_url_base
+    Returns the base URL for this JIRA server's REST API. For example, if
+    your JIRA server is at "http://jira.example.com", this would return
+    "http://jira.example.com/rest/api/latest".
+
+  strip_protocol_and_host
+    A method to take the provided URL and strip the protocol and host from
+    it. For example, if the URL "http://jira.example.com/rest/api/latest"
+    was passed to this method, "/rest/api/latest" would be returned.
+
+  jira
+    Returns a JIRA::REST::Class object with credentials for the last JIRA
+    user.
+
+  factory
+    An accessor for the JIRA::REST::Class::Factory.
+
+  JIRA_REST
+    An accessor that returns the JIRA::REST object being used.
+
+  REST_CLIENT
+    An accessor that returns the REST::Client object inside the JIRA::REST
+    object being used.
+
+  JSON
+    An accessor that returns the JSON object inside the JIRA::REST object
+    being used.
+
+  make_object
+    A pass-through method that calls
+    JIRA::REST::Class::Factory::make_object().
+
+  make_date
+    A pass-through method that calls
+    JIRA::REST::Class::Factory::make_date().
+
+  class_for
+    A pass-through method that calls
+    JIRA::REST::Class::Factory::get_factory_class().
+
+  obj_isa
+    When passed a scalar that *could* be an object and a class string,
+    returns whether the scalar is, in fact, an object of that class. Looks
+    up the actual class using "class_for()", which calls
+    JIRA::REST::Class::Factory::get_factory_class().
+
+  cosmetic_copy *THING*
+    A utility function to produce a "cosmetic" copy of a thing: it clones
+    the data structure, but if anything in the structure (other than the
+    structure itself) is a blessed object, it replaces it with a
+    stringification of that object that probably doesn't contain all the
+    data in the object. For instance, if the object has a
+    "JIRA::REST::Class::Issue" object in it for an issue with the key
+    'JRC-1', the object would be represented as the string
+    'JIRA::REST::Class::Issue->key(JRC-1)'. The goal is to provide a gist of
+    what the contents of the object are without exhaustively dumping
+    EVERYTHING.
+
+RELATED CLASSES
+    * JIRA::REST::Class::Factory
+
+    * JIRA::REST::Class::Issue
+
+    * JIRA::REST::Class::Issue::Type
+
+    * JIRA::REST::Class::Iterator
+
+    * JIRA::REST::Class::Mixins
+
+    * JIRA::REST::Class::Project
+
+    * JIRA::REST::Class::Query
+
+SEE ALSO
+    *   JIRA::REST
+
+        "JIRA::REST::Class" uses "JIRA::REST" to perform all its interaction
+        with JIRA.
+
+    *   REST::Client
+
+        "JIRA::REST" uses a "REST::Client" object to perform its low-level
+        interactions.
+
+    *   JIRA REST API Reference
+        <https://docs.atlassian.com/jira/REST/latest/>
+
+        Atlassian's official JIRA REST API Reference.
+
+REPOSITORY
+    <https://github.com/packy/JIRA-REST-Class>
+
+CREDITS
+    Gustavo Leite de Mendonça Chaves <https://metacpan.org/author/GNUSTAVO>
+    <gnustavo@cpan.org>
+        Many thanks to Gustavo for JIRA::REST, which is what I started
+        working with when I first wanted to automate my interactions with
+        JIRA in the summer of 2016, and without which I would have had a LOT
+        of work to do.
+
+AUTHOR
+    Packy Anderson <packy@cpan.org>
+
+CONTRIBUTOR
+    Alexey Melezhik <melezhik@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by Packy Anderson.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

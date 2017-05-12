@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+lib/JSON/Streaming/Writer.pm
+lib/JSON/Streaming/Writer/TestUtil.pm
+t/00-use.t
+t/01-simple.t
+t/03-normal.t
+META.yml                                 Module meta-data (added by MakeMaker)

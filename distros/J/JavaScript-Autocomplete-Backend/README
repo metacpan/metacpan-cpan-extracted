@@ -1,0 +1,26 @@
+JavaScript::Autocomplete::Backend version 0.10
+==============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None besides Perl.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2004 Ivan Tubert-Brohman <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+Icons in the html/ directory by tigert; they were taken from 
+http://tigert.gimp.org/gnome/gnome-stock/ . Available under the GPL.
+

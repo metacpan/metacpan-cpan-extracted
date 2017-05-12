@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+lib/JiftyX/ModelHelpers.pm
+t/Simapp/Makefile.PL
+t/Simapp/bin/jifty
+t/Simapp/etc/config.yml
+t/Simapp/lib/Simapp/Model/Book.pm
+t/Simapp/t/00-model-Book.t
+t/Simapp/t/helpers.t
+t/Simapp/t/m-helper.t
+

@@ -1,0 +1,13 @@
+Revision history for Jasmine-Spy
+
+1.02 Thu May 12 2016
+
+- Fixed a bug with spying on multiple methods on the same invocant.
+
+1.01 Fri Apr 01 2016
+
+- Added docs for the Quantifier methods.
+
+1.0 Fri Apr 01 2016
+
+0.9 Fri Mar 25 2016

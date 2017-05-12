@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use AnyEvent;
+use FindBin '$Bin';
+
+use JLogger;
+use JLogger::Config;
+
+$0 = 'jlogger';
+
+my $cv = AnyEvent->condvar;
+
+my $config_file = '/etc/jlogger.yaml';
+if (@ARGV > 0) {
+    $config_file = $ARGV[0];
+}
+
+my $config = JLogger::Config->new->load_file($config_file);
+
+my $logger = JLogger->new(%$config);
+
+my $w;
+$logger->on_disconnect(
+    sub {
+        my $logger = shift;
+
+        warn "Server has gone away...\n";
+
+        $w = AnyEvent->timer(
+            after => $config->{reconnect_interval} || 15,
+            cb => sub {
+                $logger->connect;
+            }
+        );
+    }
+);
+
+$logger->connect;
+
+$cv->recv;

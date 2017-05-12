@@ -1,0 +1,8 @@
+Jar::Signer - Ease the process of creating a signed Jar file.
+
+To install the module:
+
+    perl Makefile.PL;
+    make;
+    make test;
+    make install;

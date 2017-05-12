@@ -1,0 +1,74 @@
+Extended Testing of the JOAP Perl Package
+=========================================
+
+tag: extended testing documentation
+
+JOAP is inherently is communications software, and you're not going to
+get the most interesting tests to work unless there's a server running
+to test against. Of course, if you're not a developer, you probably
+shouldn't really care.
+
+There's a program in the examples/ directory called 'myserver.pl'. You
+can start that sucker up, and it will act as a Jabber component to
+provide a sample server and sample class to test against. The usage
+is:
+
+   perl examples/myserver.pl --hostname [host] --port [port] --name [name] --secret [secret]
+
+Here, [host] is the name of the server, like 'localhost', that will
+allow you to act as a component, [port] is the port it's listening on,
+like '7009', [name] is the name of the component, like
+'joap.localhost', according to the Jabber server, and [secret] is the
+s00per sekrit password that the component uses to connect to the
+Jabber server.
+
+You probably are going to need to run a local Jabber server to finish
+this up. You can get the jabberd distribution here:
+
+        http://jabberd.jabberstudio.org/
+
+Then, download, build it, and install it. You can add the following
+stanza, or something close to it, to your /etc/jabber/jabber.xml file
+(or wherever your jabberd config file lives):
+
+      <service id="joap.localhost">
+	<accept>
+	  <ip/>
+	  <port>7010</port>
+	  <secret>IheartJOAP</secret>
+	</accept>
+      </service>      
+   
+Now, restart your local Jabber server, and run the
+examples/myserver.pl script with the args set to values in your jabber.xml stanza.
+It _should_ start up and spew out all kinds of weird-looking XML data.
+
+OK, so, now that the example server is running, you can run a full
+test suite by setting the following environment variables:
+
+      PROXYTEST_MYSERVER : where the myserver.pl script attached to, like 'joap.localhost'
+      PROXYTEST_USER : Jabber user account to use to connect to the JOAP server
+      PROXYTEST_SERVER : Jabber server to log in to
+      PROXYTEST_PASSWORD : password for the user account
+
+You should probably use a junk user account for this, since unless you
+check the sourcecode of the library and tests carefully, there's no
+way for you to know that I'm not collecting passwords in some secret
+bucket to take over the world. Mwahahaha!
+
+You can set them on the command line like this:
+
+      make test PROXYTEST_MYSERVER=... PROXYTEST_USER=... PROXYTEST_SERVER=... PROXYTEST_PASSWORD=... 
+
+If for some reason your Jabber server doesn't allow you to connect to
+the default Jabber port 5222, then you should also set the following env var:
+
+      PROXYTEST_PORT : port to connect to on login server
+
+Finally, if you're doing evil things and the default Jabber resource
+ID that the test suite uses doesn't suit you, well, you can also set this:
+
+      PROXYTEST_RESOURCE : Jabber resource to connect as
+
+I will probably in the future set up a publicly available JOAP server,
+but for now you're going to have to run your own and test against it.

@@ -1,0 +1,15 @@
+NAME
+    Foo.Bar - A Foo Bar JavaScript Module
+
+SYNOPSIS
+        ln -s `js-cpan Foo.Bar` Foo.Bar.js
+
+DESCRIPTION
+    A sample JavaScript module for CPAN.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2008-2014. Ingy döt Net.
+

@@ -1,0 +1,109 @@
+Java/Build version 0.03
+=====================
+
+In my shop, we grew tired of using Ant for builds.  We wanted to script,
+and as the O'Reilly book on the subject points out at length, Ant is not
+a scripting language.  We wanted variables, loops, conditionals, and
+subroutines, to name a few things.  Eventually we decided to move to a
+Perl based build system.  This is the result of that work.
+
+Ant provides one essential feature:
+
+    It uses only one JVM
+
+In our builds, this issue is only important for compiling.  All of the
+other tasks are uncommon enough that starting a new JVM for each one is
+not prohibitively expensive.  (It is possible to add to Java::Build::JVM to
+use its JVM for additional tasks, but we haven't needed to yet.)
+
+By using Java::Build::JVM, you get one JVM which you can keep using
+for compilation throughout your script.
+
+Java::Build::Tasks provides some useful helper functions.  None of them
+are essential, but they seem to make our scripts easier to write and more
+consistent.  The tasks currently include: jar, signjar, read_prop_file,
+update_prop_file, build_file_list, and what_needs_compiling (the later uses
+time stamps to decide which class files are missing or stale).  There
+are more tasks, see perldoc for Java::Build::Tasks.
+
+INSTALLATION
+
+To install this module:
+
+You MUST include Sun's tools.jar in your classpath environment variable
+to use Java::Build::JVM.  Do this before you start the following steps.
+
+Once that is in place, type:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+EXAMPLE
+
+There is a demo subdirectory of the distribution directory.  Go there and
+look in the README for an example of how we use all the pieces of this
+package to allow flexibility and build code reuse.
+
+The Dreaded Inline Directories
+
+During perl Makefile.PL, you will be asked where you want Inline to keep
+its compiled Java program.  The only program it uses is called
+PerlJavac.class which accesses the javac API.  Inline keeps this in
+a special directory.  You have options regarding the location of
+that directory which are only briefly explained by Makefile.PL.  Here
+are the details.
+
+Do you mind small _Inline directories on your disk? [n]
+
+If you answer no, each directory from which scripts using Java::Build::JVM 
+are started will have a _Inline subdirectory created.  This leads to
+clutter, but only if you start such scripts from several places.
+(If users have .Inline directories in their home directory, Inline uses it.)
+
+If you answer yes, you will be asked:
+
+Where should I put my compiled Inline class? [/etc/Inline]
+
+Since you have indicated that you are unwilling to have one or more _Inline
+directories on your disk, you must name a place to put the compiled code.
+This directory will be used for ALL Java::Build::JVM programs, including
+those in the test suite for this module.
+
+If the directory you named does not exist, you will be asked:
+
+Should I create this directory? [y]
+
+Keep in mind that the directory must exist, or Inline will revert
+to its old habit of creating _Inline directories as needed.  So, letting
+Makefile.PL make the directory is good, unless you didn't have proper
+permissions and umask when you ran perl Makefile.PL.
+
+If at any point you want to remove _Inline directories, feel free to do
+so.  They will be recreated when and only when they are needed.  This
+means you could later decide to centrally locate the PerlJava.class code.
+To do so, simply make a directory for it (and its friends).  Then change
+the DIRECTORY entry in the 'use Inline' statement in Java::Build::JVM.
+Of course, this must be a directory which exists and is readable by
+all users and writable by someone.  That someone should run a script
+which relies on Java::Build::JVM once to populate the directory.  That
+script can be as simple as:
+
+    #!/usr/bin/perl
+    use Java::Build::JVM;
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Inline
+  Inline::Java
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Phil Crow, philcrow2000@yahoo.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.8.0 itself. 
+

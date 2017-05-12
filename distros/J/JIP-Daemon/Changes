@@ -1,0 +1,15 @@
+Revision history for JIP-Daemon
+
+0.03    2015-06-24
+        Added on_fork_callback attribute.
+        Sub::Util::set_subname() for all callback functions.
+        Improved tests.
+
+0.02    2015-06-20
+        Renamed detached attribute to is_detached.
+        Fixed parameter order for POSIX::kill.
+        Improved tests.
+        More reference docs.
+
+0.01    2015-06-12
+        First version, released on an unsuspecting world.

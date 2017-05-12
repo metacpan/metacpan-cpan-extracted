@@ -1,0 +1,26 @@
+---
+abstract: 'Check JavaScript code for problems'
+author:
+  - 'Steve Webster <cpan (at) statichtml.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112621'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-JSLint
+provides:
+  JavaScript::JSLint:
+    file: lib/JavaScript/JSLint.pm
+    version: 0.07
+requires:
+  File::Basename: 0
+  Getopt::Long: 0
+  JSON: 0
+  JavaScript: 0
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: 0.07

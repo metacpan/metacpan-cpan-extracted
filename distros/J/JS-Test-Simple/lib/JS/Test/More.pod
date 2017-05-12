@@ -1,0 +1,742 @@
+=head1 Name
+
+Test.More - A framework for writing test scripts
+
+=head1 Synopsis
+
+  <pre id="test">
+    <script type="text/javascript">
+      plan({ tests: numTests });
+      // or
+      plan({ noPlan: true });
+      // or
+      plan({ skipAll: reason });
+
+=begin _unimplemented
+
+      loadOK( 'someclass.js' );
+
+=end _unimplemented
+
+      // Various ways to say "ok"
+      ok(got == expected, testDescription);
+
+      is(got, expected,   testDescription);
+      isnt(got, expected, testDescription);
+
+      // Rather than document.write("# here's what went wrong\n")
+      diag("here's what went wrong");
+
+      like(got, /expected/, testDescription);
+      unlike(got, 'expected', testDescription);
+
+      cmpOK(got, '==', expected, testDescription);
+
+      isDeeply(complexStructure1, complexStructure2, testDescription);
+
+      if (!haveSomeFeature) skip(why, howMany);
+      else {
+          ok( foo(),       testDescription );
+          is( foo(42), 23, testDescription );
+      }
+
+      TODO: {
+          todo(why, howMany);
+          ok( foo(),       testDescription );
+          is( foo(42), 23, testDescription );
+      };
+
+      canOK(module, method);
+      isaOK(object, class);
+
+      pass(testDescription);
+      fail(testDescription);
+
+      isSet(gotArray, expectedArray, testDescription);
+    </script>
+  </pre>
+
+=head1 Description
+
+B<STOP!> If you're just getting started writing tests, have a look at
+L<Test.Simple|Test.Simple> first. This is a drop in replacement for Test.Simple
+that you can switch to once you get the hang of basic testing.
+
+The purpose of this module is to provide a wide range of testing utilities.
+Various ways to say "ok" with better diagnostics, facilities to skip tests,
+test future features and compare complicated data structures. While you can do
+almost anything with a simple C<ok()> function, it doesn't provide good
+diagnostic output.
+
+=head2 I love it when a plan comes together
+
+Before anything else, you need a an HTML element in which to run the tests,
+and you need a testing plan. The HTML element must have the ID "test" so that,
+when all test finish running, Test.More can check everything over and possibly
+output a test status message in the event that something has gone wrong.
+
+A testing plan declares how many tests your script is going to run to protect
+against premature failure. The preferred way to create a testing plan is to
+use the C<plan()> function:
+
+  plan({ tests: numTests });
+
+There are rare cases when you will not know beforehand how many tests your
+script is going to run. In this case, you can declare that you have no plan.
+(Try to avoid using this as it weakens your test.)
+
+  plan({ noPlan: true });
+
+In some cases, you'll want to completely skip an entire testing script.
+
+  plan({ skipAll: reason });
+
+Your script will declare a skip with the reason why you skipped and exit
+immediately with a zero (success).
+
+You can also calculate the number of tests:
+
+  plan({ tests: someArray.length });
+
+or to decide between running the tests at all:
+
+  if (!window.XMLHttpRequest) {
+      plan({ skipAall:  'Test irrelevant in IE' });
+  } else {
+      plan({ tests: 42 });
+  }
+
+=head2 Test Descriptions
+
+By convention, each test is assigned a number in order. This is largely done
+automatically. However, it's often very useful to assign a description to each
+test. Which would you rather see:
+
+  ok 4
+  not ok 5
+  ok 6
+
+or
+
+  ok 4 - basic multi-variable
+  not ok 5 - simple exponential
+  ok 6 - force == mass * acceleration
+
+The latter gives you some idea of what failed. It also makes it easier to find
+the test in your script: simply search for "simple exponential".
+
+All test functions take a description argument. It's optional, but highly
+suggested that you use it.
+
+=head2 I'm ok, you're not ok.
+
+The basic purpose of this library is to print out either "ok #" or "not
+ok #" depending on whether a given test succeeded or failed. Everything
+else is just gravy.
+
+All of the following functions print "ok" or "not ok" depending on if the test
+succeeded or failed. They all also return true or false, respectively.
+
+=over
+
+=item B<ok>
+
+  ok(got == expected, testDescription);
+
+This function simply evaluates any expression (C<got == expected> is just a
+simple example) and uses its value to determine whether the test succeeded or
+failed. A true expression passes, a false one fails. Very simple.
+
+For example:
+
+    ok( exp{9} == 81,   'simple exponential' );
+    ok( p.tests == 4,   'saw tests' );
+    ok( items.length,  'items populated');
+
+(Mnemonic:  "This is ok.")
+
+C<testDescription> is a very short description of the test to be printed out.
+It makes it very easy to find a test in your script when it fails and gives
+others an idea of your intentions. C<testDescription> is optional, but we
+B<very> strongly encourage its use.
+
+Should an ok() fail, it will produce some diagnostics:
+
+    not ok 18 - sufficient mucus
+    #     Failed test 18 (foo.t at line 42)
+
+This is actually the same as Test.Simple's ok() function.
+
+=item B<is>
+
+=item B<isnt>
+
+  is  ( got, expected, testDescription );
+  isnt( got, expected, testDescription );
+
+Similar to ok(), is() and isnt() compare the stringified value of their two
+arguments and use the result of that to determine if the test succeeded or
+failed. So these:
+
+    // Is the ultimate answer 42?
+    is( ultimateAnswer(), 42, "Meaning of Life" );
+
+    // foo isn't empty
+    isnt( foo, '',            "Got some foo" );
+
+are similar to these:
+
+    ok( ultimateAnswer() == 42, "Meaning of Life" );
+    ok( foo != '',              "Got some foo" );
+
+(Mnemonic: "This is that." "This isn't that.")
+
+So why use these functions? They produce better diagnostics on failure than
+does ok(). ok() cannot know what you are testing for (beyond the name), but
+is() and isnt() know what the test was and why it failed. For example this
+test:
+
+    var foo = 'waffle', bar = 'yarblokos';
+    is( foo, bar,   'Is foo the same as bar?' );
+
+Will produce something like this:
+
+    not ok 17 - Is foo the same as bar?
+    #     Failed test (foo.t at line 139)
+    #          got: 'waffle'
+    #     expected: 'yarblokos'
+
+So you can figure out what went wrong without rerunning the test.
+
+You are encouraged to use is() and isnt() over ok() where possible, however do
+not be tempted to use them to find out if something is C<true> or C<false>!
+
+  // XXX BAD!
+  is( isFinite(brooklyn['trees']), true, 'Brooklyn has finite trees');
+
+This example fails to check for whether C<isFinite(brooklyn['trees'])> is
+true, it checks if it returns C<true>. Very different. Similar caveats exist
+for C<false> and 0. In these cases, use ok().
+
+  is( isFinite(brooklyn['trees']), 'Brooklyn has finite trees');
+
+=item B<like>
+
+  like( got, /expected/, testDescription );
+
+Similar to ok(), like() matches this against the regex C</expected/>.
+
+So this:
+
+    like(got, /expected/, 'got is expected');
+
+is similar to:
+
+    ok( /expected/.test(got), 'got is expected');
+
+(Mnemonic "This is like that".)
+
+The second argument is a regular expression. It may be given as a literal
+regex object (i.e. C<//> or C<new RegExp()>) or as a string that looks like a
+regex:
+
+    like(got, 'expected', 'got is expected');
+
+If <got> is not a string, the test will fail.
+
+    like([], /expected/, 'this will fail');
+
+The advantages of like() over ok() are similar to that of is() and isnt().
+Better diagnostics on failure.
+
+=item B<unlike>
+
+  unlike( this, /that/, testDescription );
+
+Works exactly as like(), only it checks if this B<does not> match the
+given pattern.
+
+=item B<cmpOK>
+
+  cmpOK( got, op, expected, testDescription );
+
+Halfway between ok() and is() lies cmpOK(). This function allows you to
+compare two arguments using any binary JavaScript operator, plus a few
+Perl-style binary operators for string comparisons:
+
+    // ok( got.toString() == expected.toString() );
+    cmpOK( got, 'eq', expected, 'got eq expected' );
+
+    // ok( got == expected );
+    cmpOK( got, '==', expected, 'got == expected' );
+
+    // ok( got && expected );
+    cmpOK( got, '&&', expected, 'got && expected' );
+    // ...etc...
+
+The advantage of cmpOK() over ok() is when the test fails you'll know what
+this and that were:
+
+    not ok 1
+    #     Failed test (foo.html at line 12)
+    #     '23'
+    #         &&
+    #     undef
+
+It's also useful in those cases where you are comparing numbers and is()'s use
+of string comparison will interfere:
+
+    cmpOK( bigHairyNumber, '==', anotherBigHairyNumber );
+
+The added perl operators are:
+
+=over
+
+=item eq
+
+String equivalence.
+
+=item ne
+
+String non-equivalence.
+
+=item lt
+
+String less than.
+
+=item gt
+
+String greater than.
+
+=item le
+
+String less than or equal to.
+
+=item ge
+
+String greater than or equal to.
+
+=back
+
+=item B<canOK>
+
+  canOK(class,  method, method, method...);
+  canOK(object,  method, method, method...);
+
+Checks to make sure the class or object can do the defined methods.
+
+    canOK('Foo', 'foo', 'bar', 'whatever');
+
+Handy for quickly testing an interface.
+
+No matter how many methods you check, a single canOK() call counts as one
+test. If you desire otherwise, use:
+
+    for (var meth in ['foo', 'bar', 'whatever']) {
+        canOK('Foo', meth);
+    }
+
+B<Note:> Instances of classes defined by assigning anonymous objects to the
+C<prototype> attribute of the constructor will not work properly in the
+C<canOK()> function.
+
+  My.Class = function () {};
+  My.Class.prototype = {
+      foo: function () { return 'foo' },
+      bar: function () { return 'bar' }
+  };
+
+  var my = new My.Class();
+  canOK(my, 'foo'); // Fail
+
+This is because the anonymous object assigned to the prototype is constructed
+by the base C<Object> class, not by the C<My.Class()> construtor. The
+workaround is to call C<canOK()> with the class name, instead:
+
+  canOK('My.Class', 'foo'); // Pass
+
+This is not an issue for prototypes that are simply assigned to:
+
+  My.Class = function () {};
+  My.Class.prototype.foo = function () { return 'foo' };
+  My.Class.prototype.bar = function () { return 'bar' };
+
+  var my = new My.Class();
+  canOK(my, 'foo'); // Pass
+
+=item B<isaOK>
+
+  isaOK(object, class, objectName);
+
+Checks to see if the given C<object> is a C<class>. Also checks to make sure
+the object was defined in the first place. Handy for this sort of thing:
+
+    var obj = new SomeClass();
+    isaOK( obj, 'SomeClass' );
+
+where you'd otherwise have to write
+
+    var obj = new SomeClass();
+    ok( defined obj && SomeClass.constructor.prototype.isPrototypeOf(obj));
+
+to safeguard against your test script blowing up.
+
+It works on core classes, too:
+
+    isaOK( [], 'Array' );
+
+The diagnostics of this test normally just refer to 'the object'. If you'd
+like them to be more specific, you can supply an objectName (for example
+'Test customer').
+
+Note that inheritance is detected only for versions of JavaScript that support
+the isPrototypeOf() method. Earlier versions of JavaScript will only detect an
+exact match for class membership.
+
+=item B<pass>
+
+=item B<fail>
+
+  pass(testDescription);
+  fail(testDescription);
+
+Sometimes you just want to say that the tests have passed. Usually the case is
+you've got some complicated condition that is difficult to wedge into an ok().
+In this case, you can simply use pass() (to declare the test ok) or fail (for
+not ok). They are synonyms for ok(1) and ok(0).
+
+Use these functions very, very, very sparingly.
+
+=back
+
+=head2 Diagnostics
+
+If you pick the right test function, you'll usually get a good idea of what
+went wrong when it fails. But sometimes it doesn't work out that way. So here
+we have ways for you to write your own diagnostic messages.
+
+=over
+
+=item B<diag>
+
+  diag(message);
+  diag(message, message2, message3, ...);
+
+Prints a diagnostic message that is guaranteed not to interfere with test
+output. All of the arguments to diag() will simply be concatinated together.
+
+Handy for this sort of thing:
+
+    ok( users['foo']), "There's a foo user" )
+      || diag("Since there's no foo, check that /etc/bar is set up right");
+
+which would produce:
+
+    not ok 42 - There's a foo user
+    #     Failed test (foo.html at line 52)
+    # Since there's no foo, check that /etc/bar is set up right.
+
+All diag()s can be made silent by passing the "noDiag" option to the plan()
+function: C<plan({ tests: 1, noDiag: true });>. This is useful if you have
+diagnostics for personal testing but then wish to make them silent for release
+without commenting out each individual statement.
+
+=back
+
+=begin _unimplemented
+
+=head2 Script tests
+
+You usually want to test if the JavaScript file you're testing loads ok,
+rather than just vomiting if its load fails. For such purposes we have
+C<loadOK()>.
+
+=over
+
+=item B<loadOK>
+
+   loadOK(file);
+
+This function simply loads the given JavaScript files and tests to make sure
+the load happened ok.
+
+=back
+
+=end _unimplemented
+
+=head2 Conditional tests
+
+Sometimes running a test under certain conditions will cause the test script
+to die. A certain function or method might not be implemented (such as
+C<window.XMLHttpRequest()> in Internet Explorer), some resource isn't
+available (like a net connection) or a JavaScript class isn't available. In
+these cases it's necessary to skip tests, or declare that they are supposed to
+fail but will work in the future (a todo test).
+
+For more details on the mechanics of skip and todo tests see L<Test.Harness>.
+
+The way Test.More skips tests is with a named block. Basically, a block of
+tests that can be skipped over or made todo. It's best if I just show you...
+
+=over
+
+=item B<skip>
+
+  if (condition) skip(why, howMany);
+  else {
+      // ...normal testing code goes here...
+  }
+
+This example demonstrates how to skip a series of tests, C<howMany> tests to
+skip, C<why> and under what C<condition> to skip them. An example is the
+easiest way to illustrate:
+
+  if (!window.XMLHttpRequest) skip("No XMLHttpRequest in your browser.", 1);
+  else {
+      isaOK(new XMLHttpRequest(), 'XMLHttpRequest');
+  }
+
+If the user's browser doesn't support C<window.XMLHttpRequest()>, we skip the
+test by calling C<skip()>. Test.More will output special C<ok>s that
+Test.Harness interprets as skipped, but passing, tests. If the browser does
+support C<window.XMLHttpRequest()>, then obviously the tests will be run as
+normal.
+
+It's important that C<howMany> accurately reflects the number of tests to skip
+so the number of tests run will match up with your plan. If your plan is
+"noPlan", C<howMany> is optional and will default to 1.
+
+Don't skip failing tests because there's a bug in your program, or for which
+you have not yet written code. For that you use todo(). Read on.
+
+=item B<todo>
+
+    TODO: {
+        todo(why, howMany);
+        // ...normal testing code goes here...
+    }
+
+Declares a series of tests that you expect to fail and why. Perhaps it's
+because you haven't fixed a bug or haven't finished a new feature:
+
+    TODO: {
+        todo("URIGeller not finished", 2);
+
+        var card = "Eight of clubs";
+        is( URIGeller.yourCard(), card, 'Is THIS your card?' );
+
+        var spoon;
+        URIGeller.bendSpoon();
+        is( spoon, 'bent',    "Spoon bending, that's original" );
+    }
+
+With todo(), C<howMany> specifies how many tests are expected to fail.
+Test.More will run the tests normally, but print out special flags indicating
+they are "todo" tests. Test.Harness will interpret these failures as ok.
+Should any todo test pass, Test.Harness will report it as an unexpected
+success. You then know the thing you had todo is done and can remove the call
+to todo().
+
+The nice part about todo tests, as opposed to simply commenting out a block of
+tests, is that they're like a programmatic todo list. You know how much work
+is left to be done, you're aware of what bugs there are, and you'll know
+immediately when they're fixed.
+
+It's a good idea to label a block that contains your TODO tests so that
+they're easy to find. Once a todo test starts succeeding, simply move it
+outside the and decrement the C<howMany> argument to C<todo()>. When the block
+is empty, delete it.
+
+=item B<todoSkip>
+
+  if (condition) todoSkip(why, howMany);
+  else {
+      // ...normal testing code...
+  }
+
+With todo tests, it's best to have the tests actually run. That way you'll
+know when they start passing. But sometimes this isn't possible. Often a
+failing test will cause the whole program to die or hang. In such extreme
+cases you have no choice but to skip over the broken tests entirely.
+
+The syntax and behavior of todoSkip() is similar to that of C<skip()> except
+the tests will be marked as failing but todo. Test.Harness will interpret them
+as passing.
+
+=item When do I use skip() vs. todo()?
+
+B<If it's something the user might not be able to do>, use skip(). This
+includes optional classes that aren't loaded, running in a browser that
+doesn't have some feature, or maybe running on a platform without an Internet
+connection.
+
+B<If it's something the programmer hasn't yet done>, use todo(). This feature
+is for any code you haven't written yet, or bugs you have yet to fix, but when
+want to test them, anyway (always a good idea).
+
+=item B<skipRest>
+
+  if (condition) skipRest(why);
+  // ...normal testing code
+
+Sometimes you may have structured your tests so that you expect them all work
+up to a certain point, but perhaps not beyond that point. Use skipRest() at
+that point to skip all of the rest of the tests in the test file. This is
+effectively a shortcut for C<skip(why, howMany)>, but you don't have to count
+how many tests to skip to get to the end of the test file.
+
+=back
+
+=head2 Comparison functions
+
+Not everything is a simple equality check or regular expression comparison.
+There are times you need to see if two arrays are equivalent, for instance.
+For these instances, Test.More provides a handful of useful functions.
+
+=over
+
+=item B<isDeeply>
+
+  isDeeply( got, expected, testDescription );
+
+Similar to is(), except that if C<got> and C<expected> are arrays or objects,
+it does a deep comparison, walking each data structure to see if they are
+equivalent. If the two structures are different, isDeeply() will output
+diagnostics identifying where they start differing.
+
+=begin comment
+
+Removed these functions since they're not reall test functions. Use isDeeply()
+instead.
+
+=item B<eqArray>
+
+  eqArray(got, expected);
+
+Checks if two arrays are equivalent. This is a deep check, so multi-level
+structures are handled correctly. eqArray() supports numeric arrays and
+associative arrays, but not objects.
+
+=item B<eqAssoc>
+
+  eqAssoc(got, expected);
+
+Determines if the two associative arrays contain the same keys and values.
+This is a deep check. eqAssoc() supports both associative arrays and objects.
+
+=item B<eqHash>
+
+  eqHash(got, expected);
+
+This function is an alias for eqArray() thrown as a sop to Perl programmers.
+
+=end comment
+
+=item B<isSet>
+
+  isSet(gotArray, expectedArray, testDescription);
+
+This function tests that two arrays have the same values, but unlike in
+isDeeply(), the order of the elements is B<not> important. Only values are
+compared, not the keys (so it makes no difference whether you pass in a
+numeric array or an associative array). Note that this is a deep check, but
+the irrelevance of order only applies to the top level.
+
+In the event of test failure, the diagnostic output will, as usual, indicate
+where the two sets differ. However, since the arrays are sorted, the values
+may not be in the same order (that is, with the same array indices) as they
+appeared in the arrays passed to isSet().
+
+B<NOTE:> By historical accident, this is not a true set comparison. While the
+order of elements does not matter, duplicate elements do matter.
+
+=back
+
+=head2 Extending and Embedding Test.More
+
+Sometimes the Test.More interface isn't quite enough. Fortunately, Test.More is
+built on top of Test.Builder, which provides a single, unified back end for any
+test library to use. This means two test libraries that both use Test.Builder
+B<can be used together in the same program>.
+
+If you simply want to do a little tweaking of how the tests behave, you can
+access the underlying Test.Builder object like so:
+
+=over
+
+=item B<builder>
+
+    var testBuilder = Test.More.builder();
+
+Returns the Test.Builder object underlying Test.More for you to play with.
+
+=item B<beginAsync>
+
+=item B<endAsync>
+
+  var timeout = 3000;
+  var asyncID = beginAsync(timeout);
+  window.setTimeout(
+      function () {
+          Test.ok(true, "Pass after 2 seconds");
+          endAsync(asyncID);
+      }, timeout - 1000
+  );
+
+Sometimes you may need to run tests in an asynchronous process. Such processes
+can be started using C<window.setTimeout()> or C<window.setInterval()> in a
+browser, or by making an XMLHttpRequest call. In such cases, the tests might
+normally run I<after> the test script has completed, and thus the summary
+message at the end of the test script will be incorrect--and the test results
+will appear after the summary.
+
+To get around this problem, use beginAsync() to prevent the test script from
+finishing until you pass the ID returned by beginAsync() to endAsync(). If
+you've called beginAsync() with the optional timout argument, then the test
+will finish if endAsync() has not been called with the appropriate ID before
+the timeout has elapsed. The timeout can be specified in milliseconds.
+
+=back
+
+=head1 See Also
+
+=over
+
+=item L<Test.Simple>
+
+If all of these test functions confuse you and you just want to write some
+simple tests. You can upgrade to Test.More later (it's forward compatible).
+
+=begin _unimplemented
+
+XXX Test.Harness has yet to be written.
+
+L<Test.Harness> for details on how your test results are interpreted by Perl.
+
+=end _unimplemented
+
+=item L<http://www.edwardh.com/jsunit/>
+
+JSUnit: elaborate xUnit-style testing framework.
+
+=back
+
+=head1 Authors
+
+Michael G Schwern <schwern@pobox.com> with much inspiration from Joshua
+Pritikin's Test module and lots of help from Barrie Slaymaker, Tony Bowden,
+blackstar.co.uk, chromatic, Fergal Daly and the perl-qa gang. JavaScript
+implementation by David Wheeler <david@kineticode.com>.
+
+=head1 Copyright
+
+Copyright 2001, 2002, 2004 by Michael G Schwern <schwern@pobox.com>, 2005 by
+David Wheeler.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Perl Artistic License or the GNU GPL.
+
+See L<http://www.perl.com/perl/misc/Artistic.html> and
+L<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut

@@ -1,0 +1,10 @@
+%TestML 0.1.0
+
+# Make sure these strings do not parse as JSONY.
+*jsony.jsony_load.Catch.OK
+
+=== Comma in bareword
+--- jsony: { url: http://foo.com,2012 }
+
+=== Unmatched [
+--- jsony: foo[bar

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Apache Solr JavaBin (de)serializer",
+   "author" : [
+      "James Raspass <jraspass@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaBin",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JavaBin" : {
+         "file" : "lib/JavaBin.pm",
+         "version" : "0.9"
+      },
+      "JavaBin::Bool" : {
+         "file" : "lib/JavaBin.pm"
+      },
+      "JavaBin::Enum" : {
+         "file" : "lib/JavaBin.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JRaspass/JavaBin/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/JavaBin",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/JRaspass/JavaBin.git",
+         "web" : "https://github.com/JRaspass/JavaBin"
+      }
+   },
+   "version" : "0.9"
+}
+

@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+test.pl
+lib/Jabber/RPC/HTTPgate.pm
+examples/http-dns.xml
+examples/httpgate.pl
+examples/http.xml
+examples/jrpchttp.xml
+examples/jrpc-requester.pl
+examples/jrpc-responder-client.pl
+examples/jrpc-responder-component.pl
+examples/jrpc.xml
+examples/README
+examples/states-client.pl
+examples/states-daemon.pl

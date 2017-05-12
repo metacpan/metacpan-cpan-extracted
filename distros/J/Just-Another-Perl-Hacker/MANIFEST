@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Just-Another-Perl-Hacker.t
+lib/Just/Another/Perl/Hacker.pm
+META.yml                                 Module meta-data (added by MakeMaker)

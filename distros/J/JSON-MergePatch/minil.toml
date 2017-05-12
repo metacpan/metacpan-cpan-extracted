@@ -1,0 +1,4 @@
+name = "JSON-MergePatch"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

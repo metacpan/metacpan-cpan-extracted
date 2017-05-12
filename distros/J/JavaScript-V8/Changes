@@ -1,0 +1,39 @@
+Revision history for Perl extension JavaScript::V8
+
+0.07  Fri 28 Dec 11:52:52 GMT 2012
+    - Add support for naming the top level object
+    - Add a mini REPL as an example
+    - Add support for setting V8 flags (Nick Johnston)
+    - Fixes for Perl 5.8 (Nick Johnston)
+    - Many improvements for object conversion (Igor Zaytsev)
+
+0.06  Tue 29 Mar 2011 21:26:00 BST
+    - Support for returning functions from JavaScript (Paul Driver)
+    - Included Devel::CheckLib upgraded (Paul Driver)
+    - Fixes for NUL and Latin-1 values in eval
+
+0.05  Sat 12 Mar 2011 15:40:20 GMT
+    - API change: Always return array and hash references (previously the API
+      was broken, returning raw AV and HVes, resulting in "Bizarre copy of XXX"
+      errors if you didn't make the return value into a reference yourself).
+    - Support return of nested data structures from JavaScript functions
+      (Stéphane Puybareau).
+
+0.04  Sat 19 Feb 2011 16:08:46 GMT
+    - RT #65875: Better compile exception handling (Rémy Chibois)
+
+0.03  Tue 15 Feb 2011 21:00:12 GMT
+    - eval can now handle arrays and objects as return values (Steve Webster)
+    - RT #65348: Perl 5.8 support and ability to trap syntax errors (Nick
+      Johnston)
+    - RT #65534: bind_function CODEREF pointer on 64bit systems (Rémy)
+
+0.02  Wed Dec 30 13:52:43 2009 +0100
+    - add support for simple exception handling
+    - fix some memory leaks 
+        - added t/refcnt.t
+    - add missing test
+        - t/error.t
+
+0.01  Mon Dec 21 14:02:23 2009 +0100
+    - original version

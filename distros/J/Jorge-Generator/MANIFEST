@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/jorge-generate
+lib/Jorge/Generator.pm
+lib/Jorge/Generator/Controller.pm
+lib/Jorge/Generator/Model.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

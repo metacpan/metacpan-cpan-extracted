@@ -1,0 +1,49 @@
+Revision history for Perl extension JSORB
+
+0.04 Wed. Jan. 13, 2010
+    + JSORB::Client::Compiler
+      - base role for client compilers
+
+    + JSORB::Client::Compiler::Javascript
+      - concreate class to compile javascript
+        clients based on a JSORB interface
+        - added tests
+
+    - JSORB::Types
+      - removed the ScalarRef type (we can't
+        really support it).
+        - clarified types in the docs
+
+    - JS::JSORB
+      - added support for finding, slurping
+        and copying the JSORB.js file
+        - added details in the docs
+
+0.03 Thurs. Sept. 10, 2009
+    - added Try::Tiny dependency and
+      converted all exception handling
+      to use it.
+
+    * JSORB::Server::Simple
+      - removed HTTP::Engine dependency
+        and converted to regular just
+        HTTP::Server::Simple
+
+0.02 Sat. July 18, 2009
+    * Catalyst::Action::JSORB
+      Catalyst::Action::JSORB::WithInvocant
+      - better error messages
+
+    * JSORB::Dispatcher::Path
+      - no longer stringifies exceptions by default
+
+    * JSORB::Core::Element
+      - fixed is_weak_ref mis-spelling
+
+    * example/
+      - cleaning up and updating the examples and
+        including a README to explain how to run
+        them
+
+0.01 Fri. Feb. 27, 2009
+    - First release to an unsuspecting world!

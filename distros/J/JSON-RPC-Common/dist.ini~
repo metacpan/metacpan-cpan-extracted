@@ -1,0 +1,35 @@
+name = JSON-RPC-Common
+author = Yuval Kogman <nothingmuch@woobling.org>
+license = Perl_5
+copyright_holder = Yuval Kogman and others
+
+[@Git]
+tag_format = JSON-RPC-Common-%v
+
+[Git::NextVersion]
+version_regexp = ^JSON-RPC-Common-(.+)$
+
+
+[@Basic]
+[PkgVersion]
+[PodWeaver]
+[PodSyntaxTests]
+[ModuleBuild]
+[DualBuilders]
+[MetaJSON]
+
+[NextRelease]
+format = %-7v %{yyy-MM-dd}d
+
+[AutoPrereqs]
+skip = CGI::Expand
+
+[Prereqs]
+JSON                 = 2.11
+Moose                = 0.48
+namespace::clean     = 0.20
+
+[Prereqs / TestRequires]
+Test::Exception = 0
+
+[GithubMeta]

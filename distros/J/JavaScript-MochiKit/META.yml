@@ -1,0 +1,62 @@
+---
+name: JavaScript-MochiKit
+version: 0.04
+author:
+  - 'Sascha Kiefer, C<esskar@cpan.org>'
+abstract: JavaScript::MochiKit makes Perl suck less
+license: perl
+requires:
+  Class::Accessor::Chained::Fast: 0
+provides:
+  JavaScript::MochiKit:
+    file: lib/JavaScript/MochiKit.pm
+    version: 0.04
+  JavaScript::MochiKit::Accessor:
+    file: lib/JavaScript/MochiKit/Accessor.pm
+  JavaScript::MochiKit::Async:
+    file: lib/JavaScript/MochiKit/Async.pm
+  JavaScript::MochiKit::Base:
+    file: lib/JavaScript/MochiKit/Base.pm
+  JavaScript::MochiKit::Color:
+    file: lib/JavaScript/MochiKit/Color.pm
+  JavaScript::MochiKit::Core:
+    file: lib/JavaScript/MochiKit/Core.pm
+  JavaScript::MochiKit::DOM:
+    file: lib/JavaScript/MochiKit/DOM.pm
+  JavaScript::MochiKit::DateTime:
+    file: lib/JavaScript/MochiKit/DateTime.pm
+  JavaScript::MochiKit::Format:
+    file: lib/JavaScript/MochiKit/Format.pm
+  JavaScript::MochiKit::Iter:
+    file: lib/JavaScript/MochiKit/Iter.pm
+  JavaScript::MochiKit::JS::Async:
+    file: lib/JavaScript/MochiKit/JS/Async.pm
+  JavaScript::MochiKit::JS::Base:
+    file: lib/JavaScript/MochiKit/JS/Base.pm
+  JavaScript::MochiKit::JS::Color:
+    file: lib/JavaScript/MochiKit/JS/Color.pm
+  JavaScript::MochiKit::JS::Core:
+    file: lib/JavaScript/MochiKit/JS/Core.pm
+  JavaScript::MochiKit::JS::DOM:
+    file: lib/JavaScript/MochiKit/JS/DOM.pm
+  JavaScript::MochiKit::JS::DateTime:
+    file: lib/JavaScript/MochiKit/JS/DateTime.pm
+  JavaScript::MochiKit::JS::Format:
+    file: lib/JavaScript/MochiKit/JS/Format.pm
+  JavaScript::MochiKit::JS::Iter:
+    file: lib/JavaScript/MochiKit/JS/Iter.pm
+  JavaScript::MochiKit::JS::Logging:
+    file: lib/JavaScript/MochiKit/JS/Logging.pm
+  JavaScript::MochiKit::JS::LoggingPane:
+    file: lib/JavaScript/MochiKit/JS/LoggingPane.pm
+  JavaScript::MochiKit::JS::Visual:
+    file: lib/JavaScript/MochiKit/JS/Visual.pm
+  JavaScript::MochiKit::Logging:
+    file: lib/JavaScript/MochiKit/Logging.pm
+  JavaScript::MochiKit::LoggingPane:
+    file: lib/JavaScript/MochiKit/LoggingPane.pm
+  JavaScript::MochiKit::Module:
+    file: lib/JavaScript/MochiKit/Module.pm
+  JavaScript::MochiKit::Visual:
+    file: lib/JavaScript/MochiKit/Visual.pm
+generated_by: Module::Build version 0.2611

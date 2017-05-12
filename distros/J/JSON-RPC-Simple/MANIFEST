@@ -1,0 +1,15 @@
+bin/jsonrpc-simple
+Changes
+eg/MyService.pm
+eg/json-rpc-simple.psgi
+lib/JSON/RPC/Simple.pm
+lib/JSON/RPC/Simple/Client.pm
+lib/JSON/RPC/Simple/Dispatcher.pm
+Makefile.PL
+MANIFEST
+README
+t/01-load.t
+t/02-dispatcher.t
+t/03-client.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

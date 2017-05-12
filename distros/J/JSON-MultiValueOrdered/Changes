@@ -1,0 +1,32 @@
+JSON-MultiValueOrdered
+======================
+
+Created:      2012-11-08
+Home page:    <https://metacpan.org/release/JSON-MultiValueOrdered>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=JSON-MultiValueOrdered>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.005	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.004	2013-05-14
+
+ - Changed heuristics for number detection to better line up with user
+   expectations.
+
+0.003	2013-02-27
+
+ [ Documentation ]
+ - Document test suite.
+
+ [ Other ]
+ - Added: Implement 'j' function as supported by JSON::Tiny.
+
+0.002	2012-11-11	Perl 5.8 compatibility release
+
+ - Avoid defined-or operator.
+ - Require UNIVERSAL::DOES on Perl 5.8.
+
+0.001	2012-11-08	Initial release

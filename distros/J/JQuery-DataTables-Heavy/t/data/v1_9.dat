@@ -1,0 +1,75 @@
+{   param => {
+        sEcho          => q{4},
+        iColumns       => q{5},
+        iDisplayStart  => q{75},
+        iDisplayLength => q{25},
+        mDataProp_0    => q{},
+        sSearch_0      => q{},
+        bRegex_0       => q{false},
+        bSearchable_0  => q{false},
+        bSortable_0    => q{false},
+        mDataProp_1    => q{hoge},
+        sSearch_1      => q{},
+        bRegex_1       => q{false},
+        bSearchable_1  => q{true},
+        bSortable_1    => q{true},
+        mDataProp_2    => q{foo.bar},
+        sSearch_2      => q{cond2},
+        bRegex_2       => q{true},
+        bSearchable_2  => q{true},
+        bSortable_2    => q{true},
+        mDataProp_3    => q{fuga.a},
+        sSearch_3      => q{},
+        bRegex_3       => q{false},
+        bSearchable_3  => q{true},
+        bSortable_3    => q{true},
+        mDataProp_4    => q{fuga.b.c},
+        sSearch_4      => q{cond4},
+        bRegex_4       => q{false},
+        bSearchable_4  => q{true},
+        bSortable_4    => q{false},
+        bRegex         => q{false},
+        iSortCol_0     => q{1},
+        sSortDir_0     => q{desc},
+        iSortingCols   => q{1},
+        '_'            => q{1408438218844},
+    },
+
+    methods => {
+        _create_output => {
+            args => [ [], 37, 23 ],
+            res => {
+                sEcho                => 4,
+                iTotalRecords        => 37,
+                iTotalDisplayRecords => 23,
+                aaData               => [],
+            },
+        },
+        order_clause => { res => [ { '-desc' => 'hoge' } ] },
+        where_clause => {
+            res => +{
+                -and => [
+                    { 'foo.bar' => { -regexp => 'cond2' } },
+                    { 'b.c'     => { -like   => '%cond4%' } },
+                ],
+            },
+        },
+        limit      => { res => 25 },
+        offset     => { res => 75 },
+        fields     => { res => [ '', 'hoge', 'foo.bar', 'fuga.a', 'fuga.b.c' ] },
+        table_cols => { res => [ '', 'hoge', 'foo.bar', 'fuga.a', 'b.c' ] },
+        table_data_default => {
+            res => {
+                hoge => undef,
+                foo  => { bar => undef },
+                fuga => {
+                    a => undef,
+                    b => { c => undef },
+                },
+            }
+        },
+        where_fields => { res => [ 'foo.bar', 'fuga.b.c' ], },
+    },
+};
+
+# vim:set ft=perl:

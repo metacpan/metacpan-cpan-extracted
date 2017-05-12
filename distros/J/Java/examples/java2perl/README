@@ -1,0 +1,11 @@
+Examples in this directory demonstrate how your Java classes can evalutate perl expressions.
+
+The expressions need to evaluate to a true value - check out SelfRunning.java
+where some subroutine perl code is first eval'ed into the package SelfRunning,
+note there's a '1' on the end there to force it to eval to true.
+
+Also the whole thing just returns Strings - no fancy object stuff like
+from Perl to Java
+
+ALL OF THIS STUFF IS VERY EXPERIMENTAL!!!
+LET ME KNOW IF YOU COME UP WITH ANY GOOD APPLICATIONS OF THIS FEATURE!

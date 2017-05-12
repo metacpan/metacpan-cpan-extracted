@@ -1,0 +1,18 @@
+1.001  2014-03-29 19:07:03 GMT
+    * Bug #422 : Use jedi_base_route instead of PATH_INFO to find file (Celogeek San)
+
+1.000  2013-12-21 15:39:13 GMT
+    * Feature #386 : Rewrite pod for Jedi Plugin Template (Celogeek San)
+    * Feature #358 : Use the share app config inside the template plugin (Celogeek San)
+
+0.04  2013-08-22 18:22:06 GMT
+    * Bug #302 : Fix pod for Jedi::Plugin::Template (Celogeek San)
+
+0.03  2013-08-03 16:39:40 GMT
+    * Feature #288 : Improve usage of the plugin template using endofscope (Celogeek San)
+
+0.02  2013-08-02 10:58:47 GMT
+    * Feature #284 : Plugin Template : activate cache and gzip for public file on deman (Celogeek San)
+
+0.01  2013-08-02 09:37:16 GMT
+    * Feature #273 : create template attribute into jedi app (Celogeek San)

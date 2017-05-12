@@ -1,0 +1,13 @@
+Source: libjson-string-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7), libsub-exporter-perl, libjson-perl, libtest-exception-perl
+Build-Depends-Indep: perl
+Maintainer: Anthony Brummett <brummett@cpan.org>
+Homepage: http://search.cpan.org/dist/Devel-Chitin/
+Vcs-Git: git://github.com/amb43790/Devel-Chitin.git
+
+Package: libjson-string-perl
+Architecture: all
+Depends: perl, libsub-exporter-perl, libjson-perl
+Description: Automatically change a JSON string when a data structure changes

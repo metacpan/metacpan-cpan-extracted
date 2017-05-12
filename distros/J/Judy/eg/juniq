@@ -1,0 +1,9 @@
+#!perl
+use strict;
+use warnings;
+use Judy::HS qw( Duplicates );
+
+my $judy;
+while ( <> ) {
+    print if ! Duplicates( $judy, $_ );
+}

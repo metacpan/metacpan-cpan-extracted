@@ -1,0 +1,19 @@
+TYPEMAP
+p2j	T_PTROBJ
+jclass	T_PTROBJ
+jmethodID	T_PTROBJ
+jstring 	T_PTROBJ
+jobjectArray	T_PTROBJ
+jobject		T_PTROBJ
+jfieldID	T_PTROBJ
+jsize		T_IV
+jint		T_IV
+jboolean	T_IV
+jbyte		T_IV
+jchar		T_CHAR
+jshort		T_SHORT
+jlong		T_LONG
+jfloat		T_FLOAT
+jdouble		T_DOUBLE
+_jvalueArray	T_PTROBJ
+

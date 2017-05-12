@@ -1,0 +1,25 @@
+TYPEMAP
+
+JavaScript::Context         T_PTROBJ
+JavaScript::PerlArray       T_PTROBJ
+JavaScript::PerlClass       T_PTROBJ
+JavaScript::PerlFunction    T_PTROBJ
+JavaScript::PerlHash        T_PTROBJ
+JavaScript::PerlSub         T_PTROBJ
+JSFunction *                T_PTROBJ
+jsval                       jsval
+PJS_Runtime *               T_PTRREF
+PJS_Script *                T_PTRREF
+PJS_TrapHandler *           T_PTRREF
+
+OUTPUT
+
+jsval
+    {
+        SV *orz = sv_newmortal();
+        /* Convert js value to perl */
+        JSVALToSV(PJS_GetJSContext(cx), NULL, $var, &orz);
+        sv_setsv($arg, orz);
+        JS_GC(PJS_GetJSContext(cx));
+    }
+            

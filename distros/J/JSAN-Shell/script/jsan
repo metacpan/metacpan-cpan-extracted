@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+use JSAN::Shell ();
+
+our $VERSION = '2.03';
+    $VERSION = eval $VERSION;
+
+$|  = 1;
+
+# Launch the shell
+JSAN::Shell->new->run;
+
+exit(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+jsan - The JavaScript Archive Network (JSAN) Shell
+
+=head1 SYNOPSIS
+
+  adam@red:~$ jsan
+  
+  jsan shell -- JSAN exploration and library installation (v2.03)
+             -- Copyright 2005 - 2010 Adam Kennedy.
+             -- Type 'help' for a summary of available commands.
+  
+  jsan> help
+  
+     ------------------------------------------------------------
+   | Display Information                                          |
+   | ------------------------------------------------------------ |
+   | command     | argument      | description                    |
+   | ------------------------------------------------------------ |
+   | a,author    | WORD          | about an author                |
+   | d,dist      | WORD          | about a distribution           |
+   | l,library   | WORD          | about a library                |
+   | f,find      | SUBSTRING     | all matches from above         |
+   | ------------------------------------------------------------ |
+   | Download, Test, Install...                                   |
+   | ------------------------------------------------------------ |
+   | get         |               | download                       |
+   | install     | WORD          | install (implies get)          |
+   | readme      | WORD          | display the README file        |
+   | ------------------------------------------------------------ |
+   | Other                                                        |
+   | ------------------------------------------------------------ |
+   | h,help,?    |               | display this menu              |
+   | h,help,?    | COMMAND       | command details                |
+   | conf get    | OPTION        | get a config option            |
+   | conf set    | OPTION, VALUE | set a config option            |
+   | quit,q,exit |               | quit the jsan shell            |
+     ------------------------------------------------------------
+  
+  jsan> author adamk
+  
+  Author ID = adamk
+      Name:    Adam Kennedy
+      Email:   jsan@ali.as
+      Website: http://ali.as/
+  
+  jsan> dist JSAN
+  
+  Distribution   = JSAN
+  Latest Release = /dist/c/cw/cwest/JSAN-0.10.tar.gz
+      Version:  0.10
+      Created:  Tue Jul 26 17:26:35 2005
+      Author:   cwest
+          Name:    Casey West
+          Email:   casey@geeknest.com
+          Website:
+      Library:  JSAN  0.10
+  
+  jsan> library Test.Simple
+  
+  Library          = Test.Simple
+      Version: 0.20
+  In Distribution  = Test.Simple
+  Latest Release   = /dist/t/th/theory/Test.Simple-0.20.tar.gz
+      Version:  0.20
+      Created:  Thu Aug 18 04:09:19 2005
+      Author:   theory
+          Name:    David Wheeler
+          Email:   david@justatheory.com
+          Website: http://www.justatheory.com/
+      Library:  Test.Builder           0.20
+      Library:  Test.Harness           0.20
+      Library:  Test.Harness.Browser   0.20
+      Library:  Test.Harness.Director  0.20
+      Library:  Test.More              0.20
+      Library:  Test.Simple            0.20
+  
+  jsan> find cwest
+  
+    Author:        cwest      ("Casey West" <casey@geeknest.com>)
+    Release:       /dist/c/cw/cwest/Digest.MD5-0.01.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.01.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.02.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.03.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.04.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.05.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.06.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.07.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.08.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.09.tar.gz
+    Release:       /dist/c/cw/cwest/JSAN-0.10.tar.gz
+    Found 12 matching objects in the index
+  
+  jsan> exit
+  
+  K TNX BYE!!!
+  
+  adam@red:~$
+
+=head1 DESCRIPTION
+
+C<jsan> is a rewrite of the JavaScript Archive Network shell. Once
+completed it will replace the current shell L<jsan>. For now it is being
+released with the "2" so people can test it out and make suggestions.
+
+=head2 How To Use This
+
+The synopsis above pretty much covers everything that has been implemented
+at the present time, with the "help" content what is planned to be added
+before it is completed.
+
+Please note at this time the C<jsan> script will B<only> use the default
+L<http://opanjsan.org> site, and does not work with mirrors. (only because
+I haven't gotten around to it yet).
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<jsan>, L<JSAN::Shell>, L<JSAN::Client>, L<http://openjsan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2005 - 2007 Adam Kennedy.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

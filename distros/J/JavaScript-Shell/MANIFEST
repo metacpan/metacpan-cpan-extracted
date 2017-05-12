@@ -1,0 +1,19 @@
+Changes
+lib/JavaScript/Shell.pm
+lib/JavaScript/Shell/builtin.js
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.pod
+t/buffer.t
+t/context.t
+t/error.t
+t/functions.t
+t/get.t
+t/JavaScript-Shell.t
+t/objects.t
+t/print.pl
+t/print.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,685 @@
+NAME
+    Java - Perl extension for accessing a JVM remotely or locally
+
+SYNOPSIS
+      use Java;
+      $java = new Java;
+      $frame = $java->create_object("java.awt.Frame","Frame's Title");
+      $frame->setSize(400,400);
+      $frame->show();
+      $java->do_event($frame,"addWindowListener",\&event_handler);
+  
+      $array = $java->create_array("java.lang.String",5);
+      // Set array element 3 to "Java is lame"
+      $array->[3] = "Java is lame";
+      $element_value = $array->[3]->get_value();
+
+      $button = $java->create_object("java.awt.Button","Push Me");
+      // Listen for 'Action' events from $button object
+      $java->do_event($button,"addActionListener",\&event_handler);
+
+      // Loop & wait mode
+      while(1)
+      {
+           my $continue = $java->go;
+           last if (!defined $continue);
+      }
+
+      // Got an event!
+      sub event_handler
+      {
+            my($object_that_caused_event,$event_object) = @_;
+            if ($object_that_caused_event->same($button))
+            {
+                    // From $button!
+                    print "You pushed my button!!\n";
+            }
+      }
+
+DESCRIPTION
+    This module allows you to talk to a JVM on a local or remote machine.
+    You can create objects, call functions, access fields, deal with arrays,
+    get events & all the nonsense you can do in Java - from Perl!
+
+Starting a JVM server
+    First you must run 'JavaServer' on the machine to which you will make
+    connections. Simply do a 'java JavaServer' to start the server. By
+    default it will start listening on port 2000. Make sure the
+    'JavaServer.jar' is in your classpath - also make sure the Swing stuff
+    (JFC if you prefer) is in your classpath as well if you want to use
+    Swing stuff (note this does not apply to JVM 1.2+).
+
+Creating the root Java object
+    You connect to a remote (or local) JVM when you create a new Java
+    instance. The new call accepts a hash with the following keys:
+
+            host => hostname of remote machine to connect to
+                            default is 'localhost'
+            port => port the JVM is listening on (JavaServer)
+                            default is 2000
+            event_port => port that the remote JVM will send events to
+                            default is 2001.  If you specify '-1' for this
+                            value then the event service will be turned off -
+                            if you're not doing any GUI work this might be
+                            a good idea as the second event port will NOT
+                            get used/opened saving some system resources.
+            authfile => The path to a file whose first line is used as a 
+                            shared 'secret' which will be passed to 
+                            JavaServer.  To use this feature you must start 
+                            JavaServer with the '--authfile=<filename>' 
+                            command-line option.
+                            If the secret words match access will be granted
+                            to this client.  By default there is no shared
+                            secret.  See the 'Authorization' section below.
+            use_old_style_arrays => tell Java.pm to use 'old-style' arrays
+                            which you should NOT be using unless you need
+                            backwards compatibility with 3.x Java.pm & 
+                            earlier.  By default all arrays returned by 
+                            JavaServer are 'tied' to the JavaArray class for 
+                            easier perl-like manipulation.  See the 'Arrays' 
+                            section futher down for more info.
+
+    For example:
+
+            $java = new Java(host => "java.zzo.com", event_port => 4032);
+
+            # No events!
+            $java2 = new Java(port => 8032, event_port => -1);
+
+    You can have any number of java 'environments' in a Perl program.
+
+    Also if you 'use strict' you must do a 'no struct 'subs'' 'cuz all Java
+    method calls are AUTOLOAD'ed - sorry.
+
+Creating java primitives
+    The Java.pm module will treat all integers encountered in parameter
+    lists as integer and strings as java Strings. All other primitive types
+    must be suffixed with an identifier so Java.pm knows what primitive Java
+    type to convert it to - for instance boolean types are tagged like:
+    "true:b" or "false:b"
+
+    Here's a complete list of supported Java primitives:
+
+            Perl String Value  -> (converted to) -> Java Primitive
+            -----------------                       --------------
+            2344                                    int
+            "23:short"                              short
+            "23:byte"                               byte
+            "a:char"                                char
+            "23445:long"                            long
+            "3.42:float"                            float
+            "3.14159:double"                        double
+            "true:b" or "false:b"                   boolean
+            "Anything else"                         String
+                    or
+            "Anything else:string"                  String
+
+    So... if you need to use an integer as a String say "343:string".
+
+Localization and String encoding
+    Quick note on String encodings, you can specify that your strings are
+    encoded in a specific format using the ":string_<ENCODING>" syntax like:
+
+            my $label = $java->create_object("java.awt.Label","Label:string_UTF8");
+
+    This specifies that this String uses Unicode encoding. See
+    http://www.javasoft.com/products/jdk/1.1/docs/guide/intl/encoding.doc.ht
+    ml for the complete list of valid Java String encodings.
+
+Creating java objects
+    Once you've connected to a JVM via the 'new Java' call you can start
+    creating Java objects. This is accomplished via the 'create_object'
+    function. The first argument must be the 'fully-qualified'/'full path'
+    of the Java object you want to create - like 'java.lang.String' or
+    'java.awt.Frame'. The remaining arguments are passed to that object's
+    constructor.
+
+    For example:
+
+            my $frame = $java->create_object("java.awt.Frame","Frame Title");
+            my $dialog = $java->create_object("java.awt.Dialog",$frame,
+                            "Dialog Title","true:b");
+
+    Note the use of "true:b" in the constructor to tell Java.pm that that
+    value should be a 'true' Java boolean value.
+
+    In these cases a 'java.awt.Frame' takes a String as the lone parameter,
+    whereas a 'java.awt.Dialog' takes a Frame, a String, and a boolean value
+    in its constructor.
+
+Calling java methods
+    You can make both static and instantiated method calls on java objects.
+    The parameter lists work exactly like constructor parameter lists - if
+    you want to pass a java primitive anything other than integers or
+    Strings need to be tagged accordingly. All function calls that return
+    something return a java object - so even if the java function returns an
+    'int' it is returned to perl as a 'java.lang.Integer'. To get the value
+    of that Integer you must use the 'get_value' function. The syntax is
+    exactly what you'd expect (I hope!).
+
+    For example:
+
+            $frame->setSize(200, 500);
+            $frame->show();  # (or $frame->show)
+
+    Note functions that don't take any parameters don't need the
+    parentheses! Alternatively you can use the 'call' function to make
+    method calls:
+
+            $frame->call('setSize', 500, 500);
+            $frame->call('show');
+
+    But that's no fun!
+
+    To call static functions the syntax is slightly different.
+
+    For example:
+
+    To call the static method 'forName' in the object 'java.lang.Class' it
+    looks like this:
+
+            my $class = $java->java_lang_Class("forName", "Test");
+
+    Note you use the '$java' object returned from the call to 'new Java' to
+    access static methods - the static object must be fully-qualified
+    separated by '_'s instead of '.'s WHEN USED AS A FUNCTION NAME (as
+    opposed to the method below when it's used as a string - in the below
+    case DO NOT replace '.'s with '_'s)! And finally the first parameter is
+    the name of the static function followed by any parameters to it.
+
+    If your static class is NOT in a package you MUST use the 'static_call'
+    function like:
+
+            my $return_value = $java->static_call("MyStaticClass","<function_name>",@params);
+
+    Even if your class is in a package you can use the 'static_call'
+    function (Note when using the 'static_call' function your fully
+    qualified class name is separated by '.' NOT '_'s as in the example
+    above):
+
+        my $class = $java->static_call("java.lang.Class", "forName", "Test");
+            IS EXACTLY EQUIVALENT TO
+            my $class = $java->java_lang_Class("forName", "Test");
+
+    Note the use of '.'s in the first case and '_'s in the second case. Also
+    the returned value '$class' in an OBJECT NOT a string. To 'stringify' it
+    use the 'get_value' function as described below. Here's a sneak peek:
+
+        print "This java.lang.Class object's name is ", $class->get_value, "\n";
+
+Getting and Setting java object fields
+    You can get and set individual fields in java objects (static or
+    instantiated) using the 'get_field' and 'set_field' methods. All
+    'get_field' calls return java objects just like calling java functions.
+    You must use the 'get_value' function to 'unwrap' primitive types to
+    their actual values.
+
+    For example:
+
+    Get a static field
+
+            my $win_act = $java->get_field("java.awt.event.WindowEvent",
+                                                    "WINDOW_ACTIVATED");
+
+    Note the first parameter must be the fully qualified java object name
+    and the second parameter is the static field.
+
+    Get an instantiated field
+
+            my $obj = $java->create_object("java.my.Object");
+            my $field = $obj->get_field("my_field");
+
+    Similarly to set a field another parameter is added to the 'set_field'
+    call with the object that the specified field is to be set to:
+
+    Set a static field
+
+            $java->set_field("java.static.Object","field_name",$obj);
+
+    Set an instantiated field
+
+            $obj->set_field("integer_field_name",400);
+
+Getting values
+    To 'unwrap' java primitives (including Strings) you need to call the
+    'get_value' function. This will stringify any object given to it -
+    typcially this is only useful for 'unwrapping' java primitives and
+    Strings. Note for all other object the 'toString()' method is called.
+
+    For example:
+
+            my $string1 = $java->create_object("java.lang.String","Mark");
+            my $string2 = $java->create_object("java.lang.String","Jim");
+
+            if ($string1 eq $string2)
+            {
+                    # WRONG!!!  
+                    # $string1 & $string2 are objects!
+            }
+
+            if ($string1->get_value eq $string2->get_value)
+            {
+                    # RIGHT!!!
+                    # now you're comparing actual strings...
+            }
+
+Arrays - new style!
+    Arrays are created with the 'create_array' function call. It needs a
+    fully-qualified java object or primitive name and a dimension.
+
+            If you specified 'use_tied_arrays' in your constructor to Java.pm
+            (& I think you should unless you have to perserve backwards 
+            compatibility...) all Java array references will be 'tied' to the
+            JavaArray class allowing a more intuitive interface to your array.
+
+            All array references will be _references_ to these objects.  
+            Here's how it looks (compare with 'old style' below):
+
+            # This will create a String array with 100 elements
+        #       (this is the same)
+            my $array  = $java->create_array("java.lang.String",100);
+
+        # Now it gets interesting!
+            # Don't forget on primitive arrays to use the ':' notation!
+            $array->[22] = "Mark rules the free world";
+
+            # Get element #99
+            my $element_99 = $array->[99];
+
+    To get the length or size of an array do what you'd expect (I hope!)
+
+    For example:
+
+            my $length = scalar (@$array);
+            my $size = $#{@array};
+
+            (remember you get an arrayref there sonny...)
+
+    To pass as a function parameter just pass it in as normal:
+
+            my $list = $java->java_util_Arrays("asList",$array);
+
+Arrays - old style
+    Arrays are created with the 'create_array' function call. It needs a
+    fully-qualified java object or primitive name and a dimension.
+
+    For example:
+
+            # This will create a char array with 100 elements
+            my $char_array  = $java->create_array("char",100);
+
+            # This will create a String array with 5 elements
+            my $string_array = $java->create_array("java.lang.String",5);
+                
+    Array elements are get and set using the 'get_field' and 'set_field'
+    function calls.
+
+    For example:
+
+            # Set element #22 to 'B'
+            # Don't forget on primitive arrays to use the ':' notation!
+            $char_array->set_field(22,"B:char");
+
+            # Set element #3 to 'Mark Rox'
+            $string_array->set_field(3,"Mark Rox");
+
+            # Get element #99
+            my $element_99 = $char_array->get_field(99);
+
+            # Get element #4
+            my $element_4 = $string_array->get_field(4);
+
+            # Don't forget to get the actual string value you gotta call
+            #       'get_value'!
+            my $char_value = $char_element_99->get_value;
+            my $string_value = $string_element_4->get_value;
+
+    To get the length of an array use the get_length function.
+
+    For example:
+
+            my $length = $string_array->get_length;
+
+    Note this will return an actual integer! You do not need to call
+    'get_value' on 'get_length's return value!
+
+Passing & receiving the 'null' value
+    To pass a 'null' in a function parameter list or to set a field or array
+    index, used Perl's 'undef'. So:
+
+            $object->function($param1, undef, $param2);
+
+    Will pass 'null' as the second parameter to that function. Similarly to
+    set a field or array index to null:
+
+            $object->set_field("fieldname",undef);  # Set field to null
+            $array->[4] = undef;    # Set array value to null
+
+    Of course if the field or array type is a primimtive type you will get a
+    NullPointerException - Java doesn't seem to like that!
+
+    If a function returns null or a field or array index is equal to null,
+    you will recieve 'undef' back. Note this is indistinguishable (sp??)
+    from a function with a 'void' return value. So:
+
+            my $retval = $object->function($param1,$param2,undef,"Another param");
+            print "It returned NULL\n" if (!$retval);
+
+    Similarly:
+
+            my $f_value = $object->get_field("someField");
+            print "someField is NULL\n" if (!$f_value);
+
+            my $a_value = $array->[38];
+            print "Array index 38 is NULL\n" if (!$a_value);
+
+    If someone can think of a good reason why the null return value should
+    not be undef or should be different than what a void function returns
+    I'd like to hear about it!
+
+Exceptions
+    Currently Java.pm will 'croak' when an Exception is encountered in
+    JavaServer. So the way to deal with them is to enclose your Java
+    expression that might throw an exception in an 'eval' block & then check
+    the $@ variable to see if an Exception was indeed thrown. You then need
+    to parse the $@ variable to see exactly what Exception was thrown.
+    Currently the format of the $@ string is:
+
+            ERROR: java.lang.Exception: some.java.Exception: <more info> at $0 line XX
+
+    Note the '<more info>' part is the result of the getMessage() function
+    of that Exception. Everything after that is the stuff put in there by
+    croak; the filename & line number of your Perl program.
+
+  get_exception
+    The actual Exception object that was thrown is available via the
+    'get_exception' function call.
+
+  get_stack_trace
+    There is also a convenience function 'get_stack_trace' which will return
+    the Stack Trace as an array of lines from the most recent Exception
+    thrown. To see how this is done 'Read The Code Luke' in Java.pm -
+    basically it just gets the most recent Exception & creates an
+    appropriate PrintWriter into which it has Java dump the Stack Trace &
+    then it just returns the String-ifized version of it - something you can
+    easily (albiet messily) do yourself.
+
+
+    So here's what an Exception handler can look like:
+
+            my $I;
+            eval
+            {
+                    $I = $java->java_lang_Integer("parseInt","$some_string:string");
+            };
+            if ($@)
+            {
+                    # An exception was thrown!!
+                    $@ =~ s/^ERROR: //;     # Gets rid of 'ERROR: '
+                    $@ =~ s/at $0.*$//;     # Gets rid of 'croak' generated stuff
+
+                    # Print just the Java stuff
+                    print "$@\n";
+
+                    # This is the actual NumberFormatException object
+                    my $exception_object = $java->get_exception;
+
+                    # There's also this new convenience routines to give
+                    #       the Stack Trace as an array of lines
+                    # This returns the Stack Trace from the most recent
+                    #       Exception thrown 
+                    my @stack_trace = $java->get_stack_trace;
+
+                    local($") = "\n";
+                    print "Stack Trace:\n@st\n";
+
+            }
+
+    So in this example if the scalar $some_string did NOT contain a parsable
+    integer - say 'dd' - the printed error message would be:
+
+            java.lang.Exception: java.lang.NumberFormatException: dd 
+
+            Stack Trace:
+            java.lang.Exception: java.lang.NumberFormatException: dd
+                    at Dealer.callFunction(Dealer.java:856)
+                    at Dealer.parse(Dealer.java:526)
+                    at Dealer.run(Dealer.java:425)
+
+    You can most likely ignore all of the 'Dealer' stack frames as that is
+    internal to JavaServer. Of course dumping Stack Traces should only be
+    used while you're debugging anyways!
+
+Comparing Java objects
+    The '==' operator is now overloaded to provide this functionality!
+    Woohoo! So you can now say stuff like:
+
+            if ($object1 == $object2)
+            {
+                    #They're the same!
+            }
+            else
+            {
+                    #Not!
+            }
+
+    Here's the old (other) way of doing the exact same thing:
+
+    You can see if two references to java objects actually point to the same
+    object by using the 'same' function like:
+
+            if ($object1->same($object2))
+            {
+                    # They're the same!
+            }
+            else
+            {
+                    # Nope, not the same
+            }
+
+    You'll see why this is useful in the next section 'Events'.
+
+Events
+    Events are passed from the remote JVM to Perl5 via a separate event
+    port. To enable events on an object use the 'do_event' function. Your
+    callback function will receive the object that caused the event as its
+    first parameter and the event object itself as the second parameter.
+    Here's where ya wanna use the 'same' function (or the new overloaded
+    '==' operator) to see what object caused this event if you set up
+    multiple objects to call the same event function.
+
+    For example:
+
+            my $frame = $java->create_object("java.awt.Frame","Title");
+            $java->do_event($frame,"addWindowListener",\&event_handler);
+            my $button = $java->create_object("java.awt.Button","Push Me");
+            $java->do_event($button,"addActionListener",\&event_handler);
+
+    To stop listening for events do:
+
+            $java->do_event($frame,"removeWindowListener");
+
+    Where: - $frame is the object for which you'd like to receive events -
+    "addWindowListener" specifies the types of events you want to listen for
+    - \&event_handler is your event callback routing that will handle these
+    events
+
+    You will keep receiving events you registered for until you make a
+    "remove" call or your Java object goes away (out of scope, you destroy
+    it, whatever).
+
+    Note the second parameter MUST be of the form:
+
+            "<add | remove><Event Type>Listener"
+
+    Default <Event Types> are:
+
+            Component
+            Container
+            Focus
+            Key
+            Mouse
+            MouseMotion
+            Window
+            Action
+            Item
+            Adjustment
+            Text
+
+    Swing <Event Types> are:
+
+            Ancestor
+            Caret
+            CellEditor
+            Change
+            Hyperlink
+            InternalFrame
+            ListData
+            ListSelection
+            MenuDragMouse
+            MenuKey
+            Menu
+            PopupMenu
+            TreeExpansion
+            TreeSelection
+            TreeWillExpand
+
+    And within most of these <Event Types> there are a number of specific
+    events. Check out the Java event docs if you don't know what I'm talking
+    about...
+
+    Here's what an event handler looks like:
+
+            sub event_handler
+            {
+                    my($object,$event) = @_;
+                    if ($object->same($frame))      # Old sytle
+                            OR
+                    if ($object == $frame)          # New style!
+                    {
+                            # Event caused by our frame object!
+        
+                            # This will get this event's ID value
+                            my $event_id = $event->getID->get_value;
+
+                            # Get value for a WINDOW_CLOSING event
+                            my $closing_id = $java->get_field("java.awt.event.WindowEvent","WINDOW_CLOSING")->get_value;
+
+                            if ($event_id == $closing_id)
+                            {
+                                    # Close our frame @ user request
+                                    $object->dispose;
+                            }
+                    }
+                    if ($object->same($button))     # old style
+                            OR
+                    if ($object == $button)         # new style!
+                    {
+                            print "You Pushed My Button!\n";
+                    }
+            }
+
+    Note return values from event handlers are ignored by Java.pm BUT are
+    returned from the Event Loop as you'll see in a bit.
+
+    Note also how I had to call 'get_value' to get the actualy integer
+    values of the 'getID' function return value and the field value of
+    WINDOW_CLOSING.
+
+Event Loops
+    Once you've set up your event handlers you must start the event loop to
+    begin getting events - there are two ways to do this.
+
+            1. Have Java.pm handle the event loop 
+            2. Roll your own.
+
+    Java.pm's event loop will block until an events happens - typically this
+    is what you want but sometimes you might want more control, so I've
+    decided to be nice this _one_ time & let you roll your own too.
+
+    Here's how Java.pm's event loop works for ya:
+
+            #
+            # Set up a bunch of events...
+            #
+
+            while(1)
+            {
+                    my $cont = $java->go;
+                    last if (!defined $cont);
+            }
+
+    Note this works similarly to Tk's event loop. Your program will now just
+    sit & respond to events via your event handlers. Also note that
+    Java.pm's event loop only handles ONE event & then returns - the return
+    value is whatever your event handler returned OR undef if there was an
+    error (like you lost yer connexion to the JVM).
+
+    Here's how you can create yer own Event Loop:
+
+    You ask Java.pm for a FileHandle that represents the incoming event
+    stream. You can then select on this FileHandle or do whatever else you
+    want - remember this is a READ ONLY FileHandle so writing to it ain't
+    going to do anything. Once you get a 'line' from this FileHandle you can
+    (and probably should) call 'decipher_event' & the event will be
+    dispatched to your event handler appropriately - the return value being
+    the return value of your event handler. This can look something like
+    this:
+
+            ## Roll my own event loop
+
+            # Get event FileHandle
+            my $event_file_handle = $java->get_event_FH;
+
+            # Set up my select loop
+            my $READBITS = 0;
+            vec($READBITS,$event_file_handle->fileno,1) = 1;
+
+            # Suck in lines forever & dispatch events
+            while(1)
+            {
+                    my $nf = select(my $rb = $READBITS,undef,undef,undef);
+                    if ($nf)
+                    {
+                            my $event_line = <$event_file_handle>;
+                            $java->decipher_event($event_line);
+                    }
+            }
+
+    Note this example is EXACTLY what Java.pm's 'go' function does - if you
+    roll yer own Event Loop you prolly want to do something more interesting
+    than this!
+
+    The upshot is you'll probably just want to use the 'go' function but if
+    you've got some other FileHandles going on & you don't want to block on
+    just this one you can (and should) use the 'roll your own' method.
+
+Authorization
+    Using the 'authfile' key when creating the root Java object specifies a
+    file whose first line is taken to be a password to be passed to the
+    remote JavaServer to authenticate the connexion. JavaServer must be
+    started with the '--authfile=<filename>' command-line option and the
+    first line of that file must match to be granted access. Note this is a
+    _very_ basic form of authorization - to maximize it you should restrict
+    the file permissions as much as possible (i.e. 0600). Thanks to Achim
+    Settelmeier for the initial implementation!
+
+EXPORT
+    None by default.
+
+AUTHOR
+    Mark Ethan Trostler, mark@zzo.com
+
+SEE ALSO
+    perl(1). http://www.javasoft.com/. Any sorta Java documentation you can
+    get yer hands on! http://www.zzo.com/Java/getit.html
+
+COPYRIGHT
+    Copyright (c) 2000-2003 Mark Ethan Trostler
+
+    All Rights Reserved. This module is free software. It may be used,
+    redistributed and/or modified under the terms of the Perl Artistic
+    License.
+
+    (see http://www.perl.com/perl/misc/Artistic.html)
+

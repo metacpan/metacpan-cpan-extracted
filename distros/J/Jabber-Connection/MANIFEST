@@ -1,0 +1,11 @@
+Changes
+README
+lib/Jabber/Connection.pm
+lib/Jabber/NodeFactory.pm
+lib/Jabber/NS.pm
+MANIFEST
+Makefile.PL
+test.pl
+examples/client.pl
+examples/component.pl
+examples/component.xml

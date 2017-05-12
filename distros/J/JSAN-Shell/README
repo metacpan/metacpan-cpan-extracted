@@ -1,0 +1,43 @@
+NAME
+    JSAN::Shell - JavaScript Archive Network Client Shell
+
+DESCRIPTION
+    "JSAN::Shell" provides command handling and dispatch for the jsan user
+    application. It interprates these commands and provides the appropriate
+    instructions to the JSAN::Client and JSAN::Transport APIs to download
+    and install JSAN modules.
+
+  Why Do A New Shell?
+    The JavaScript Archive Network, like its predecessor CPAN, is a large
+    system with quite a number of different parts.
+
+    In an effort to have a usable repository up, running and usable as
+    quickly as possible, some systems (such as the original JSAN shell) were
+    built with the understanding that they would be replaced by lighter,
+    more scalable and more comprehensive (but much slower to write)
+    replacements eventually.
+
+    "JSAN::Shell" represents the rewrite of the end-user JSAN shell
+    component, with JSAN::Client providing the seperate and more general
+    programmatic client interface.
+
+METHODS
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Shell>
+
+    For other issues, contact the author.
+
+AUTHORS
+    Adam Kennedy <adam@ali.as>
+
+SEE ALSO
+    jsan, JSAN::Client, <http://openjsan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2010 Adam Kennedy.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

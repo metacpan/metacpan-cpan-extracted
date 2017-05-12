@@ -1,0 +1,23 @@
+# JRPC
+
+This is package JRPC - meant for Creating JSON-RPC Services that focus on app logic, not worrying about the details of JSON-RPC Processing.
+
+# Installation
+
+Installation is based on the standard CPAN Module install flow with following st
+eps (after download of package):
+
+  tar zxvf StoredHash-NN.tar.gz
+  cd  StoredHash-NN
+  perl Makefile.PL
+  make
+  make test
+  make install
+  
+# Prerequisites
+
+- JSON::XS - Parser ans serializer for JSON-RPC Messages
+- LWP - The great libwww for Perl
+- HTTP::Server::Simple - library for embedding HTTPD in Perl applications.
+
+See Makefile.PL for hints on debian packages to fullfill the dependencies.

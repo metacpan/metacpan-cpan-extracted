@@ -1,0 +1,49 @@
+=head1 NAME
+
+PerlScalar - Encapsulate Perl SCALAR references in JavaScript
+
+=head1 DESCRIPTION
+
+The ability to take references to stuff in perl is a basic language feature
+used by many perl modules. As such, it's important to be able to pass to
+javascript references to perl scalars and to create in javascript references to
+scalars.
+
+=head1 JAVASCRIPT INTERFACE
+
+Any I<unblessed> SCALAR reference that you pass from perl to javascrip will be
+wrapped as an instance of C<PerlScalar>, Blessed ones will be normally a L<PerlObject>.
+
+=head2 Contructor
+
+You can construct from javascript new SCALAR references.
+
+=over 4
+
+=item new PerlScalar(somevalue)
+
+    var ref = new PerlScalar(mystr);
+
+Creates a perl scalar with a copy of I<somevalue> and returns a new reference to it.
+If you pass this object to perl land it will be undistinguishable from a normal
+reference. C<somevalue> can be any javascript primitive value.
+
+=back
+
+=head2 Instance methods
+
+=over 4
+
+=item valueOf
+
+    var value = ref.valueOf();
+
+Retrive the value from the reference, the returned value will be a javascript primitive.
+
+=item toString
+
+Returns the perl stringification for the reference. (Subject to change soon).
+
+=back
+
+=cut

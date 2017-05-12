@@ -1,0 +1,75 @@
+NAME
+    JSON::RPC::Simple - Simple JSON-RPC client and dispatcher (WD 1.1 subset
+    only currently)
+
+SYNOPSIS
+    As client
+
+      use JSON::RPC::Simple;
+      
+  my $client = JSON::RPC::Simple->connect("https://www.example.com/API/", {
+        timeout => 600,
+      });
+      my $r = $client->echo({ param1 => "value" });
+
+    As server:
+
+      package MyApp::API;
+      
+  use base qw(JSON::RPC::Simple);
+
+      sub new { return bless {}, shift };
+      
+  sub echo : JSONRpcMethod(Arg1, Arg2, Arg3) {
+        my ($self, $request, $args) = @_;
+      }
+          
+  package MyApp::Handler;
+      
+  my $dispatcher = JSON::RPC::Simple->dispatch_to({
+        "/API" => MyApp::API->new(),
+        "/OtherAPI" => "MyApp::OtherAPI",
+      });
+      
+  sub handle {
+        my $request = shift; # Assume a HTTP::Request
+        my $response = $dispatcher->handle($request->uri->path, $request);
+        return $response; # Assume a HTTP::Response
+      }
+
+DESCRIPTION
+    This module is a very simple JSON-RPC 1.1 WD implementation that only
+    supports a subset of the specification.
+
+    It supports
+
+    HTTP POST only
+    Named and positonal arguments
+    Error objects
+
+USAGE
+  As a client
+    This module provides a class method for creating a client that works as
+    a shortcut to "JSON::RPC::Simple::Client->new(...)".
+
+    connect(URL)
+    connect(URL, \%OPTIONS)
+        Returns a new client for the given *URL* with the optional
+        *%OPTIONS*.
+
+        See "options" in JSON::RPC::Simple::Client for what options it
+        accepts.
+
+AUTHOR
+    Claes Jakobsson, <claesjac@cpan.org>
+
+THANKS & CONTRIBUTORS
+	Scott Baker
+	
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010-2011 by Claes Jakobsson and Glue Finance AB
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

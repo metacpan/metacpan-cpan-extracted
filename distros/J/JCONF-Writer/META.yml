@@ -1,0 +1,24 @@
+---
+abstract: 'Create JCONF configuration from perl code'
+author:
+  - 'Oleg G <oleg@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.52
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JCONF-Writer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  parent: 0
+resources:
+  repository: https://github.com/olegwtf/p5-JCONF-Writer
+version: 0.03

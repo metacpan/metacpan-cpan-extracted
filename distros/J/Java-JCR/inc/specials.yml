@@ -1,0 +1,88 @@
+javax.jcr.Node:
+  set_property: |-
+    sub set_property {
+        my $self = shift;
+        my ($name, $value) = @_;
+
+        my @args;
+        if (Java::JCR::Calendar::_perl_date_has_conversion($value)) {
+            @args = ($name, Java::JCR::Calendar::_perl_date_to_java_calendar($value));
+        }
+
+        else {
+            @args = Java::JCR::Base::_process_args(@_);
+        }
+
+        my $result = eval { $self->{obj}->setProperty(@args) };
+        if ($@) { my $e = Java::JCR::Exception->new($@); croak $e }
+
+        return Java::JCR::Base::_process_return($result, 'javax.jcr.Property', 'Java::JCR::Property');
+    }
+
+javax.jcr.Property:
+  get_date: |-
+    sub get_date {
+        my ($self, $class) = @_;
+
+        my $result = $self->{obj}->getDate();
+
+        return Java::JCR::Calendar::_java_calendar_to_perl_date($result, $class);
+    }
+
+javax.jcr.Session:
+  import_xml: |-
+    sub import_xml {
+        my $self = shift;
+        my $path = shift;
+        my $handle = shift;
+        my $behavior = shift;
+
+        my $input_stream = Java::JCR::JavaUtils::input_stream($handle);
+
+        $self->{obj}->importXML($path, $input_stream, $behavior);
+    }
+ 
+javax.jcr.SimpleCredentials: 
+  new: |-
+    sub new {
+        my $class = shift;
+        my $user = shift;
+        my $password = shift;
+
+        my $charArray = Java::JCR::PerlUtils->charArray($password);
+        
+        return bless {
+            obj => Java::JCR::javax::jcr::SimpleCredentials->new($user, $charArray),
+        }, $class;
+    }
+
+javax.jcr.Value:
+  get_date: |-
+    sub get_date {
+        my ($self, $class) = @_;
+
+        my $result = $self->{obj}->getDate();
+
+        return Java::JCR::Calendar::_java_calendar_to_perl_date($result, $class);
+    }
+
+javax.jcr.ValueFactory:
+  create_value: |-
+    sub create_value {
+        my $self = shift;
+        my ($value) = @_;
+
+        my @args;
+        if (Java::JCR::Calendar::_perl_date_has_conversion($value)) {
+            @args = (Java::JCR::Calendar::_perl_date_to_java_calendar($value));
+        }
+
+        else {
+            @args = Java::JCR::Base::_process_args(@_);
+        }
+
+        my $result = eval { $self->{obj}->createValue(@args) };
+        if ($@) { my $e = Java::JCR::Exception->new($@); croak $e }
+
+        return Java::JCR::Base::_process_return($result, 'javax.jcr.Value', 'Java::JCR::Value');
+    }

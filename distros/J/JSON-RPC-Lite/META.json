@@ -1,0 +1,76 @@
+{
+   "abstract" : "Simple Syntax JSON RPC 2.0 Server Implementation",
+   "author" : [
+      "nqounet <mail@nqou.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-RPC-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::RPC::Spec" : "0",
+            "Plack" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Message" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::RPC::Lite" : {
+         "file" : "lib/JSON/RPC/Lite.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nqounet/p5-json-rpc-lite/issues"
+      },
+      "homepage" : "https://github.com/nqounet/p5-json-rpc-lite",
+      "repository" : {
+         "url" : "https://github.com/nqounet/p5-json-rpc-lite.git",
+         "web" : "https://github.com/nqounet/p5-json-rpc-lite"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_authority" : "cpan:NQOUNET"
+}

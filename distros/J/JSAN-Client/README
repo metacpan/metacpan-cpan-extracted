@@ -1,0 +1,122 @@
+NAME
+    JSAN::Client - JSAN Client 2.0 (migrated from Class::DBI to ORLite)
+
+SYNOPSIS
+      # Create the client object
+      my $client = JSAN::Client->new(
+          prefix  => '/usr/local/js',
+          verbose => 1,
+      );
+      
+  # Install by library name
+      $client->install_library('Display.Swap');
+      
+  # Install by distribution name
+      $client->install_distribution('DOM.Trigger');
+
+DESCRIPTION
+    The "JSAN::Client" API intended to provide the highest-possible level
+    abstraction for the process of installing JSAN distributions.
+
+    However this class is still intended for developers, and won't do things
+    like auto-detect your "JSAN_PREFIX" and so on.
+
+    For more DWIM type functionality aimed at users, see the JSAN::Shell
+    class, or even more preferably the jsan installer application.
+
+METHODS
+  new param => 'value', ...
+    The "new" constructor takes a set of key/value params and creates a new
+    JSAN installation client, who's purpose is to install JSAN distributions
+    to a specific location on the local disk.
+
+    Please note that although you can create multiple "JSAN::Client" objects
+    for multiple install paths, all clients will share the common
+    JSAN::Index and JSAN::Transport layers, which means both that
+    distribution packages will be cached across all the clients, and that
+    they must install from the same remote JSAN repository.
+
+    The constructor takes the following parameters
+
+    prefix
+        The "prefix" params should be the location on the local disk that
+        the JSAN libraries contained in the distribution should be installed
+        to.
+
+    verbose
+        The "verbose" (current not implemented) enables verbose mode for the
+        client.
+
+        In verbose mode, the client will write a number of procedural and
+        diagnostic messages to "STDOUT" as it processes the installation
+        requests.
+
+    Returns a new "JSAN::Client" object, or dies on error.
+
+  prefix
+    The "prefix" accessor returns the installation prefix path for the
+    client.
+
+  verbose
+    The "verbose" accessor returns the boolean flag indicating whether the
+    client is running in verbose mode. If called with argument - modifies
+    the current 'verbose' value.
+
+  build
+    The "build" accessor returns the boolean flag indicating whether the
+    client is running in build-time mode.
+
+  install_library $name
+    The "install_library" method takes the name of a JSAN library and
+    installs the most recent release of the distribution that the library is
+    contained in as indicated in the JSAN index.
+
+    Any dependencies required for the library will also be installed as
+    needed.
+
+    Please note the difference between a JSAN "library" and a JSAN
+    "distribution". There are often many libraries contained in a single
+    distribution.
+
+    Returns true if the library was installed, false if the library is
+    already up to date and did not need to be installed, or dies on error.
+
+  install_distribution $name
+    The "install_distribution" method takes the name of a JSAN distribution
+    and installs the most recent release of that distribution.
+
+    Any dependencies required for the distribution will also be installed as
+    needed.
+
+    Please note the difference between a JSAN "library" and a JSAN
+    "distribution". There are often many libraries contained in a single
+    distribution.
+
+    Returns true if the distribution was installed, false if the
+    distribution is already up to date and did not need to be installed, or
+    dies on error.
+
+TO DO
+    - Add the testing dependency algorithm variant
+
+    - Add support for JSON META.yml files
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Client>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

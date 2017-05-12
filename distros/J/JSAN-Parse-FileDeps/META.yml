@@ -1,0 +1,16 @@
+abstract: Parse file-level dependencies from JSAN modules
+author: Completed and maintained by Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+build_requires: 
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: JSAN-Parse-FileDeps
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  File::Spec: 0.80
+  perl: 5.005
+version: 1.00

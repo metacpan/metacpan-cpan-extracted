@@ -1,0 +1,22 @@
+---
+abstract: 'Calculate the MD5 digest of a CGI form field'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Javascript-MD5
+provides:
+  Javascript::MD5:
+    file: lib/Javascript/MD5.pm
+    version: 1.10
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.10

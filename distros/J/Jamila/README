@@ -1,0 +1,44 @@
+Jamila version 0.01
+===================
+
+Jamila is yet another RPC using JSON and HTTP(CGI).
+Jamila stands for JSON Approach to Make Integration Linking Applications.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  utf8
+  CGI
+  JSON
+
+SAMPLE
+
+This distribution has sample HTML + JavaScript and perl script.
+
+- 1. Get prototype.js from http://prototypejs.org/download,
+     modifty prototype.js URL in jamila.html.
+- 2. Put jamila.html and Jamila.js into a htdocs directory.
+- 3. Put testJamila.pl into a cgi-bin directory. And set to run that script.
+- 4. Run perl function from jamila.html
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by KAWAI,Takanori
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,43 @@
+This is a message from Ingy to Stevan describing how to set up tests for
+a JS-Foo CPAN module.
+
+Follow these steps:
+
+    > sudo cpan JS::Test::Base
+    > cd JS-Foo/trunk/
+    > mkdir tests
+    > cd tests
+    > cp `js-cpan Test/Base/Makefile` .
+    > cp `js-cpan Test/Base/config.yaml` .
+    > vim config.yaml       # Change index_title (and optionally import_libs)
+    > mkdir -p lib/Test
+    > vim lib/Test/JSON.js  # Make a subclass of Test.Base for testing JSON.js
+    > mkdir t
+    > vim t/basics.t.js     # See t/basics.t.js
+    > # make as many tests as you want
+    > make all
+
+NOTE: I did everything for you here except:
+
+    > sudo cpan JS::Test::Base
+    > make all
+
+Now you should be able to point your browser at
+JS-JSON/trunk/tests/index.html and run the TAP suite in your browser.
+Try different browsers.
+
+When you upload your module to CPAN, people can run the tests like this:
+
+    http://search.cpan.org/src/STEVAN/JS-JSON-0.01/tests/index.html
+
+See this example:
+
+    http://search.cpan.org/src/INGY/JS-Test-Base-0.16/tests/index.html
+
+When everything looks good:
+
+    > make clean all
+    > cd ..
+    > perl Makefile.PL; make manifest; make dist; cpan-upload ...
+
+Enjoy

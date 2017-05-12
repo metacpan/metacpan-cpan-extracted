@@ -1,0 +1,175 @@
+Revision history for Perl extension Java.
+
+1.0  Fri Apr 28 16:36:29 2000
+	- original version; created by h2xs 1.20 with options
+		-X -n Java -v 1.0
+1.1  
+	 - Allow creation of primitive Java array types
+	 - Allow Strings to be created using encodings for Localization
+		w/':string_<ENCODING>' syntax
+	 - Allow integers to be strings w/':string' syntax
+1.12
+	- Refined string encoding stuff
+1.13
+	- Added 'static_call' function to make static method calls on
+		classes NOT in packages.
+1.14
+	- Just setsockopt SO_REUSEADDR on Java.pm event_server port
+2.0
+	8/23/00
+	- Now using ctrl-A to separate parameter lists so we can accept
+		commas or any other printable character in strings.
+		THIS CHANGE MEANS NEITHER JAVASERVER NOR JAVA.PM ARE
+			COMPATIBLE WITH ANY 1.X RELEASE!!
+		(hence the bump up of the major version number!)
+
+Java stuff got updated to 2.1 - Perl stuff still at 2.0
+        1/24/01
+        - Included Andreas Leue's code to statically start and stop
+                JavaServer from within an already-running Java app
+                Check out 'test_test.pl' in the Perl examples directory
+                so see what this looks like on the Perl side.  Pretty
+                much the same!
+                On the Java side you can now use 'JavaServer.start()',
+                or 'JavaServer.start(int port)' to specify a port other
+                than 2000 to programmatically start JavaServer & you
+                similarly use 'JavaServer.stop()' to stop the madness
+                when you've had enough fun.
+                Like:
+
+                public class MyApp
+                {
+                        public static void main(String args[])
+                        {
+                                // Allow JavaServer to 'hook' into
+                                //      your running program
+                                JavaServer.start();
+
+
+                                // Do whatever yer program does
+
+                                // Done
+                                JavaServer.stop();
+                        }
+                }
+        - Fixed stupid bug about the MANIFEST file looking for Java.jar
+                when it's really called JavaServer.jar
+
+Perl stuff up to 2.1 - Java stuff the same
+	2/22/01
+	- Fixed bug in 'static_call' so it now uses PARAMETER_SEPARATOR
+		(thanks to David Roth)
+	- Fixed bugs in java_server_install.pl to correctly reference 
+		'JavaServer.jar' & not 'Java.jar'
+		(thanks to Slavan Rezic & David Roth)
+Perl stuff up to 2.2 - Java stuff the same
+	3/9/01
+	- Overloaded '==' to be the same as the 'same' function.
+		So instead of having to do:
+			if ($obj1.same($obj2))
+		You can now do:
+			if ($obj1 == $obj2)
+		Check out the perldoc.
+	- Added JavaArray tied interface for Java arrays!
+		See 'perldoc Java' for all the glorious details!
+		It's very cool!  See 'array.pl' in 'examples' directory
+		for example usage.
+	- Some other random bug fixes for the install stuff
+
+Both Perl & Java stuff moved up to 3.0
+	3/21/01
+	- Moved up major version numbers because the JavaServer protocol
+		has changed & is incompatible with previous versions.
+		It was changed to handle multi-line sending.  Now all commands
+		sent & received must be terminated by a Control-A beginning
+		a line by itself (akin to SMTP and the '.' to end DATA).
+	- So now you can say something like:
+		my $str = $java->create_object("java.lang.String","multi\nline\string);
+		As well as correctly fetch the value using 'get_value'.
+	- Should ONLY effect multi-line String processing BUT since the
+		protocol itself has changed yer gonna need 3.x versions so
+		they can understand each other.
+Perl stuff up to 3.1 Java stuff the same
+	5/16/01
+	- AUTOLOAD function now correctly recognizes if it's dealing with
+		a static or instantiated method call - THEREFORE you can now
+		call instantiated functions with '_'s in their names.
+	- Also threw in some reorg of how functions get called to isolate
+		the code.
+....	- License change for Perl code to Perl's Artistic License (was GPL)
+....	- License change for Java code to LGPL 2.1 (was GPL)
+
+6/29/01 Perl 3.2 Java 3.1
+	- Now can handle 'null' values for parameter lists & return values
+		-Perl stuff use 'undef' to pass in a null value
+			null values will be returned as 0 (zero)
+			So you say: $object->function($param1,undef,$parm3);
+				to pass null as the 2nd parameter
+			Or: $array->[4] = undef;
+			perldoc Java.pm for more info
+		-Java stuff - a protocol addition of NULL_TOKEN
+			To pass a 'null' to JavaServer use NULL_TOKEN as 
+			defined in Dealer.java (curently '___NULL___') & 'NUL'
+			value now correctly returned for null values
+			(same thing as functions that return void)
+
+7/10/01 
+Perl & Java both to 4.0
+Date: 994752000
+4.0	Authorization additions - now a shared secret between server &
+		client can exist to allow the server to authorize
+		remote clients.  Hopefully this will open the door to
+		further security enhancements.
+	Event port usage can now be turned off by specifying an event_port
+		of '-1'
+	Callback objects can be created & used to allow Java to call Perl 
+		See the Java2Perl.java classfile and the java2perl directory
+		under 'examples' & Java.pm's perldoc
+	Thanks to Achim Settelmeier for the Auth & Callback Stuff! Good Job!
+	Added support for getting the last Exception object & a convenience
+		method for dumping its stack trace into a perl array via
+		the 'get_exception' and 'get_stack_trace' methods.  See the
+		perldoc.  Before all you could get was just the String-ified
+		message ('getMessage()') of the Exception.
+
+Perl 4.1
+Date: 996440427 Sun Jul 29 14:00:27 2001
+File: perl/Java.pm
+  2001/07/20 22:39:44
+    Allow blank lines for callbacks
+File: perl/Java.pm
+  2001/07/17 15:50:25
+    Made sure exceptions are stored in the 'java' object & not the
+    instantiated object.  added some convenience functions for this too
+File: perl/Java.pm
+  2001/07/13 14:59:51
+    Put eval'ed callbacks in package main by default like it should have been
+    in the first place
+File: perl/Java.pm
+  2001/07/10 18:47:36
+    Changed '\r' to more portable '\015'
+Date: 996702730 Wed Aug  1 14:52:10 2001
+Date: 1007147938 Fri Nov 30 11:18:58 2001
+
+Perl 4.2
+	fixed Java.pm to work with Windows 2k
+
+1/19/04
+Java 5.0
+	put Java stuff into 'com.zzo.javaserver' package
+Java 4.6
+	fix test script
+
+
+2/25/04
+Java 5.1
+	- added logging framework/better logging
+	- easier to run JavaServer either in standalone mode or integrated
+	    into another app
+	- Shutdownable interface to kill of threads
+	- fixed to get protected/private fields/functions
+Perl 4.7
+	- updated examples to use lib '..' & use com.zzo.javaserver package
+	    when instantiated Test classes
+	- add 'destroy' method for hand destroying objects
+

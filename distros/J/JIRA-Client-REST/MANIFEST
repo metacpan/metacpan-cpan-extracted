@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/JIRA/Client/REST.pm
+t/issue.t
+t/project.t
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/version.t

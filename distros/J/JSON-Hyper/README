@@ -1,0 +1,136 @@
+NAME
+    JSON::Hyper - extract links from JSON via a schema
+
+SYNOPSIS
+     my $hyper = JSON::Hyper->new($hyperschema);
+     my $json  = from_json( ... );
+     my @links = $hyper->find_links($json->[1]->{some}->{object});
+     foreach my $link (@links)
+     {
+       printf("<%s> (%s)", $link->{href}, $link->{rel});
+     }
+
+DESCRIPTION
+    The JSON Hyper Schema proposal defines hypertext navigation through data
+    structures represented by JSON.
+
+  Constructor
+    "new($hyperschema)"
+        Given a JSON (or equivalent Perl nested hashref/arrayref structure)
+        Hyper Schema, returns a Perl object capable of interpreting that
+        schema.
+
+        If the schema is omitted, defaults to the JSON Referencing hyper
+        schema (described at <http://json-schema.org/json-ref>)
+
+  Methods
+    "schema"
+        Returns the original schema as a hashref/arrayref structure.
+
+    "ua"
+        Get/set the LWP::UserAgent instance used to retrieve things.
+
+    "find_links($object, $base)"
+        Given a JSON object (or equivalent Perl nested hashref/arrayref
+        structure) and optionally a base URL for interpreting relative URI
+        references, returns a list of links found on object node. Does not
+        operate recursively.
+
+        Each link is a JSON::Hyper::Link object.
+
+    "get($uri)"
+        Performs an HTTP request for the given URI and returns a list of
+        Perl nested hashref/arrayref structures corresponding to the JSON
+        response. The URI may contain a fragment identifier, which will be
+        interpreted according to the schema's fragment resolution method.
+        Fragment resolution methods supported include:
+
+        *       slash-delimited (default)
+
+        *       dot-delimited
+
+        *       jsonpath
+
+        For example, assuming the hyper schema specifies slash-delimited
+        fragments, the following:
+
+         my $hyper    = JSON::Hyper->new($hyperschema);
+         my ($result) = $hyper->get('http://example.com/data.json#foo/bar/0');
+
+        Is roughly equivalent to:
+
+         use JSON;
+         use LWP::UserAgent;
+         my $ua       = LWP::UserAgent->new;
+         my $response = $ua->get('http://example.com/data.json');
+         my $object   = from_json($response->decoded_content);
+         my $result   = $object->{foo}{bar}[0];
+
+        Note, if called multiple times on the same URL will return not just
+        equivalent objects, but the same object.
+
+        So, why does this method return a list of results instead of just a
+        single result? In most cases, there will be either 0 or 1 items on
+        the list; however, JSONPath allows a path to match multiple nodes,
+        so there will occasionally be more than one result. (In scalar
+        context, this method just returns the first result anyway.)
+
+    "resolve_fragment($object, $fragment)"
+        Used by "get" to resolve the fragment part of a URL against an
+        object.
+
+    "process_includes($object, $base, $recurse)"
+        Given an JSON object (or equivalent Perl nested hashref/arrayref
+        structure) and optional base URL, crawls the object finding
+        rel="full" links, dereferences them using "get" and replaces the
+        appropriate nodes with the retrieved content. $recurse is a boolean.
+
+        This has the effect of rel="full" behaving like inclusion does in
+        various programming languages.
+
+        This modifies the given object rather than creating a new object.
+
+  Utilities
+    "JSON::Hyper::json_ref()"
+        Returns the JSON referencing hyperschema as a hashref.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    JSON::Hyper::Link.
+
+    Related modules: JSON::T, JSON::Path, JSON::GRDDL, JSON::Schema.
+
+    <http://tools.ietf.org/html/draft-zyp-json-schema>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2010-2012 Toby Inkster.
+
+    This module is tri-licensed. It is available under the X11 (a.k.a. MIT)
+    licence; you can also redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+  a.k.a. "The MIT Licence"
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+

@@ -1,0 +1,61 @@
+
+N A Rantor <wiggly@wiggly.org>
+
+June 2003
+
+------------------------------------------
+
+Like most Lazy perl programmers I use MakeMaker, so try:
+
+bash$ perl Makefile.PL
+bash$ make
+bash$ make test
+bash$ make install
+
+And if you have trouble then e-mail me. (p.s. Don't worry, there aren't any
+tests yet)
+
+------------------------------------------
+
+This is the first cut of a Perl based java runner package system.
+
+The system is comprised of a set of modules and scripts in Perl that accept
+configurations described in XML regarding the system configuration and
+application configuration.
+
+These scripts are used to create scripts for controlling java programs.
+
+These scripts are meant ot be easy to read and create by humans and should
+allow scripts to be minimal. This means that default values hould be used
+wherever possible and the user should not have to specify values to
+correctly run a program.
+
+Additionally it should also be the case that the system configuration script
+can fall-back to rational defaults in the abscence of a completely defined
+configuration file
+
+---------------------------------------
+
+sj.pl
+
+A simple wrapper script that uses SRC/Java.pm to run an XML based script
+
+SRC/Java.pm
+
+A set of subroutines that provide all the functionality of running scripts,
+viewing running process details, stopping processes, restarting processes
+etc.
+
+SRC/Java/Config.pm
+
+Deals with the parsing of XML configuration files and creating internal Perl
+structures that can be used to create commands to run.
+
+-----------------------------------------
+
+Configuration
+
+The sj system relies on configuration information at the system level and at
+the application/script level. Please have a look at Java::SJ::Config for
+more information.
+

@@ -1,0 +1,28 @@
+---
+abstract: 'create javascript concatenations'
+author:
+  - 'Lee Aylward, C<< <leedo at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-Sprockets
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0
+  File::Which: 0
+  IPC::Open3: 0
+  List::MoreUtils: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.02

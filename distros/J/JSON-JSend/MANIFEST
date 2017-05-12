@@ -1,0 +1,8 @@
+Changes             Revision history
+MANIFEST			This list of files
+README              Version and installation instructions
+lib/JSON/JSend.pm   The module implementation
+t/JSON-JSend.t      The module test suite
+Makefile.PL         The make file
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

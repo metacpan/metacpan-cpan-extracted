@@ -1,0 +1,44 @@
+{
+   "abstract" : "Check JavaScript code for problems",
+   "author" : [
+      "Steve Webster <cpan (at) statichtml.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-JSLint",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : 0,
+            "Getopt::Long" : 0,
+            "JSON" : 0,
+            "JavaScript" : 0
+         }
+      }
+   },
+   "provides" : {
+      "JavaScript::JSLint" : {
+         "file" : "lib/JavaScript/JSLint.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "0.07"
+}

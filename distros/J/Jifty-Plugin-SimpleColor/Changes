@@ -1,0 +1,9 @@
+Revision history for Perl module Jifty::Plugin::SimpleColor
+
+0.20 Fri, 03 Dec 2010 08:54:02 +0100
+    - increase z-index css
+    - better element_id escape for jquery
+    - add missing default colors
+
+0.10 Tue, 05 Jan 2010 10:01:56 +0100
+    - original version for CPAN

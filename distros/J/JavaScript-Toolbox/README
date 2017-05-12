@@ -1,0 +1,10 @@
+JavaScript::Toolbox - Collection of JavaScript Tools.
+
+You install the modules by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please report any bugs/suggestions to <peiry@cpan.org>

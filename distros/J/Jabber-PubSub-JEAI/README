@@ -1,0 +1,55 @@
+Jabber-PubSub-JEAI version 0.03
+===============================
+
+PERL interfaces to Erlang's J-EAI server 1.0
+
+ABOUT J-EAI
+
+J-EAI (http://www.erlang.org/) is an Enterprise Integration Platform. The acronym stands for Jabber-based 
+Enterprise Application Integration. J-EAI is the first EAI built above free standard-based EAI solution:
+
+	. XMPP is a standard XML protocol for data exchange between client and server. It is highly
+	  extensible and fits perfectly the EAI domain.
+
+	. Jabber is an instant messaging platform build upon the XMPP protocol that as proven the
+	  scalability and the robustness of the XMPP protocol.
+	  Jabber is becoming an instant messaging standard and J-EAI is getting huge benefits from the
+	  Jabber dynamic and expension. Many tools are already available for Jabber (Clients, servers,
+	  libraries, plugins, extensions, dedicated transports, ...) and J-EAI can take advantage of 
+	  the wealth of existing code in the XMPP area.
+	  
+Also, relying on the Jabber/XMPP implementation gives you two main features :
+
+	. Message queueing: When a client is offline, message are queued and can be retrieved later. No
+	  messages are lost.                                                                              
+
+	. Presence and status of connected application is handled. This is an unprecedented EAI feature
+	  allowing application to take decision based on presence or status change of other applications. 
+	  The use of XMPP for developing an integration platform turns J-EAI into the most open, dynamic  
+	  and fast growing integration platform.  
+
+INSTALLATION                                   
+                                               
+To install this module type the following:     
+                                                      
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Net::Jabber
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Kai Li
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

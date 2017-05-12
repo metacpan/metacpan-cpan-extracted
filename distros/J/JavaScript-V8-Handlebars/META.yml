@@ -1,0 +1,27 @@
+---
+abstract: 'Compile and execute Handlebars templates via the actual JS library'
+author:
+  - 'Robert Grimes <rmzgrimes@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-V8-Handlebars
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::ShareDir: '0'
+  File::Slurp: '0'
+  JavaScript::V8: '0'
+  perl: '5.010001'
+resources:
+  repository: git://github.com/rmzg/JavaScript-V8-Handlebars.git
+version: '0.06'

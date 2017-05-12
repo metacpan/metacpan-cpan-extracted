@@ -1,0 +1,23 @@
+lib/JS/SourceMap.pm
+lib/JS/SourceMap/Decoder.pm
+lib/JS/SourceMap/Index.pm
+lib/JS/SourceMap/Token.pm
+Makefile.PL
+LICENSE
+MANIFEST
+README.md
+t/000-basic.t
+t/001-integration.t
+t/002-objects.t
+t/fixtures/coolstuff.js
+t/fixtures/coolstuff.min.js
+t/fixtures/coolstuff.min.map
+t/fixtures/jquery.js
+t/fixtures/jquery.min.js
+t/fixtures/jquery.min.map
+t/fixtures/unicode.js
+t/fixtures/unicode.min.js
+t/fixtures/unicode.min.map
+t/lib.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,4 @@
+{
+  "sort": {"order": "ascending", "method": "title", "ignorearticle": true},
+  "limits" : {"start":0, "end": 100}
+}

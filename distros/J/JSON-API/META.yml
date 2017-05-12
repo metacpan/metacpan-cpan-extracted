@@ -1,0 +1,35 @@
+---
+abstract: 'Module to interact with a JSON API'
+author:
+  - 'Geoff Franks <geoff.franks@gmail.com>'
+build_requires:
+  IO::Capture: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Test::Fake::HTTPD: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-API
+provides:
+  JSON::API:
+    file: lib/JSON/API.pm
+    version: v1.1.0
+requires:
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI::Encode: '0'
+resources:
+  bugtracker: https://github.com/geofffranks/json-api/issues
+  homepage: https://github.com/geofffranks/json-api
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/geofffranks/json-api.git
+version: v1.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

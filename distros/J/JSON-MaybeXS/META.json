@@ -1,0 +1,76 @@
+{
+   "abstract" : "Use L<Cpanel::JSON::XS> with a fallback to L<JSON::XS> and L<JSON::PP>",
+   "author" : [
+      "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "json",
+      "serializer",
+      "serialiser",
+      "data"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "JSON-MaybeXS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.27",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "2.3310"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "JSON::PP" : "2.27300",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-JSON-MaybeXS@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-MaybeXS"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/p5sagit/JSON-MaybeXS.git",
+         "web" : "https://github.com/p5sagit/JSON-MaybeXS"
+      }
+   },
+   "version" : "1.003009",
+   "x_contributors" : [
+      "Clinton Gormley <develop@traveljury.com>",
+      "Graham Knop <haarg@haarg.org>",
+      "John SJ Anderson <genehack@genehack.org>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Kieren Diment <diment@gmail.com>",
+      "Matt S Trout <mst@shadowcat.co.uk>"
+   ],
+   "x_serialization_backend" : "JSON::MaybeXS version 1.003008"
+}

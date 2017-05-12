@@ -1,0 +1,698 @@
+==================================================
+Changes from 2013-10-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.002 at 2014-10-26 03:49:51 +0000
+------------------------------------------
+
+  Change: c031ccf9aaf85a9d842b9b97885a7d60a8c6752f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-25 23:49:48 +0000
+
+    Add exception class
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 0d63bd90c35577b41306e16b25144c2ebae0dd00
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 22:57:05 +0000
+
+    v2.001_1 
+
+  Change: 0a5a8babad47fd5e36173c9d1c2fe53dc469256b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-24 22:56:35 +0000
+
+    add type checks to query charmstore, use moose
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 3048fad444f2a383134c5114f19d2e9267bb1d0f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 20:56:44 +0000
+
+    fix request call for service_set_yaml
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 2.0 at 2014-10-15 00:53:01 +0000
+----------------------------------------
+
+  Change: 674c1c3234518fe7ee99f5df83b9951e4d4fa628
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 20:53:01 +0000
+
+    v2.0 
+
+  Change: 903b6f876f35575c79ff95fa124c6713af120536
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 20:51:41 +0000
+
+    Add parameters constraints
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.9 at 2014-10-14 18:11:48 +0000
+----------------------------------------
+
+  Change: 15164780e0ff197f4d71d60c59f8a8fff97a1d82
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 14:11:48 +0000
+
+    v1.9 
+
+  Change: eeb0a4e0e50863a7a2c2ab82a9daa54718407272
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-14 14:11:15 +0000
+
+    2 new api calls, provisioning_script and retry_provisioning 
+
+  Change: 0ba868dfa7b65e23bc3d83ce58217d455820b625
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 23:24:24 +0000
+
+    set perl version
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.8 at 2014-10-14 01:42:55 +0000
+----------------------------------------
+
+  Change: 6697b4c79f4745894fe3b5d49ce591fbd179d2ea
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 21:42:55 +0000
+
+    v1.8 
+
+  Change: 5d44ecf2df898179061472e5ba243727d2445a28
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 21:41:58 +0000
+
+    use Function::Parameters
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.7 at 2014-10-13 15:23:09 +0000
+----------------------------------------
+
+  Change: c5bdc127cec966f32ee119f73deb58d9c4f59b6d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 11:23:09 +0000
+
+    v1.7 
+
+  Change: 32d4a32601552f9f8dcc2ef4410fdbc763a15d12
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 11:17:25 +0000
+
+    cleanup machines, services, and units after tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 379dd5309e47e1b48e6af1992c9b81451312909f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-13 11:10:18 +0000
+
+    add new api commands run and run_on_all_machines
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 5831690e9aaaac3810386c1b02d9ff63cd728e58
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 21:11:44 +0000
+
+    update method documentation for environment_unset
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.6 at 2014-10-13 01:06:16 +0000
+----------------------------------------
+
+  Change: 3b172a9319f7a53b3e1814deec080e8c7ce822a8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 21:06:16 +0000
+
+    v1.6 
+
+  Change: e2886734fd42d13fc328d4ef3ff994bb5724e277
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 21:03:57 +0000
+
+    extend deploy tests
+
+    * tests for relations * fix missing true return in Util :\ * fix
+    deploy issues found with unittests * add .travis.yml for CI mainly
+    useful for charmstore tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 4e91c7a1d8f2f5fef38b528b90e0fee4c1ca855f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 19:45:46 +0000
+
+    fix add_machine validator
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: cbc4f38f320199cc5774978b89b56fa370c4e5b5
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 19:23:32 +0000
+
+    bump ver
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 1e185f9025df5331b9c5e85d85df33e2bd7532b6
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 19:13:58 +0000
+
+    v1.5.1 
+
+  Change: 0db17765dcdeabd5612f21228d92d229483bdb48
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 19:13:12 +0000
+
+    validate more params
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: d4ec54b66df34221837df8858fe569543c427718
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 16:23:11 +0000
+
+    Add check for charm series format in deploy
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.5 at 2014-10-12 19:26:23 +0000
+----------------------------------------
+
+  Change: e84a0ed8a6b6f171f160f0af8156fa6735bb5a86
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 15:26:23 +0000
+
+    v1.5 
+
+  Change: 8608a50655f15532afdfbb7ea555096b39e88f92
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 15:26:04 +0000
+
+    more method documentation
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 4faf31a687f3be704711edec6f8cdfdea816cb9a
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 14:51:24 +0000
+
+    work on param validators
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 7c96899ba70504c91b149b9e73c3b5d4a1f64e62
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 14:47:48 +0000
+
+    update method documentation
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: b7a8a66f2eaed8da1fc79889796d79c3730a7f7f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 14:47:14 +0000
+
+    Add top level manual pod
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: fa4a6157e219cee0b54063ea83e2687da9ffa0c7
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 14:34:40 +0000
+
+    Export charmstore helpers into a utility class
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.4 at 2014-10-12 17:47:34 +0000
+----------------------------------------
+
+  Change: d3d7609a0bf47d465d0f8a61bf6298c4f6307763
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 13:47:34 +0000
+
+    v1.4 
+
+  Change: 99a682d4f8b41fbd2becaa73456e1af844077428
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 13:47:10 +0000
+
+    fix deploy api call
+
+    add deploy tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: bca235ab2cb0f86e96514049ebf130e72cac109f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-12 11:55:34 +0000
+
+    update build
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: f095a53ecf8cd9ed67a5b085bef5566fa9413b5d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 22:39:52 +0000
+
+    remove old example script
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.3 at 2014-10-12 02:29:10 +0000
+----------------------------------------
+
+  Change: 530f44248468cdb40e7756555033e133a83600d9
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 22:29:10 +0000
+
+    v1.3 
+
+  Change: 5fa54969d3394427cb0c819a94f2fdc915403607
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 22:28:31 +0000
+
+    extend environment tests
+
+    fix some add_machine errors found during testing
+
+    start machine deploy tests
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.2 at 2014-10-11 21:33:05 +0000
+----------------------------------------
+
+  Change: eb0a092f5708279960e6f2bd75182c0901c23de3
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 17:33:05 +0000
+
+    v1.2 
+
+  Change: 5ef6812dbf6ce686faeccc4decfbde6bb970ad9f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 17:32:21 +0000
+
+    cleanup rpc code
+
+    update example script
+
+    update tests to make use of newer rpc code
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 59c10eff1203b0b5facea752cd06aed7b8deeead
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 16:24:44 +0000
+
+    Update quickstart document
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: dd4c483a4e9d50d2b177eacff034fe6060a285a7
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 16:19:53 +0000
+
+    add seealso pod weaver plugin
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.1 at 2014-10-11 20:08:59 +0000
+----------------------------------------
+
+  Change: 1b116070507246b2fb57d84e82941c85e4679110
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 16:08:59 +0000
+
+    v1.1 
+
+  Change: 67fcb2558f821ee84e02925a2c120abd6515e6a9
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-11 16:08:39 +0000
+
+    extend tests
+
+    more api updates
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 1.0 at 2014-10-11 03:11:47 +0000
+----------------------------------------
+
+  Change: 955d4b660b210abdc73066e608a6f3743e1e54c4
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-10 23:11:47 +0000
+
+    v1.0 
+
+  Change: 1049ac5d9f668293e2ab23a19ab368da19d6ac07
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-10 23:10:13 +0000
+
+    Updates
+
+    - More support for blocking/nonblocking routines - More tests -
+    query_cs helper for querying charmstore
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.9 at 2014-10-11 00:38:42 +0000
+----------------------------------------
+
+  Change: 22269aedfb647a10ec4a7bc8ac6c0c9d39944c2c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-10 20:38:42 +0000
+
+    v0.9 
+
+  Change: 120caa37480b0744962f6d2dee0807006a471afa
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-10 20:38:32 +0000
+
+    handle optional callback
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.8 at 2014-10-09 13:49:52 +0000
+----------------------------------------
+
+  Change: 29349b7c0149dfdb748b607a8da4f5001434ffe2
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 09:49:52 +0000
+
+    v0.8 
+
+  Change: 48e7d2bc8d1bc136794879cf485e30a834239d0d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 09:49:39 +0000
+
+    fix method load
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.7 at 2014-10-09 04:37:46 +0000
+----------------------------------------
+
+  Change: 4db27c7323959499c6f564d3d068d51f72501b03
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 00:37:46 +0000
+
+    v0.7 
+
+  Change: 29ba97028ce080e0fac59192a61cfb0aad783563
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 00:37:30 +0000
+
+    Update API to work with latest Juju 1.20.x series
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.6 at 2014-10-09 04:10:47 +0000
+----------------------------------------
+
+  Change: 7d1a06f94ec443af0aa45f61ffe818d7122867ac
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 00:10:47 +0000
+
+    v0.6 
+
+  Change: a51c0b7e59845791b99e88f86da6ec35b0af5fcd
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-10-09 00:10:37 +0000
+
+    update dist
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8d2f7a2c9a3cbd43366968ded05f6c3bd2d6151c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-09-07 13:09:34 +0000
+
+    fix eg
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.5 at 2014-04-22 17:03:35 +0000
+----------------------------------------
+
+  Change: 454f13c5ed3a7a98f85c96cdd4e029ce62fa9d78
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-04-22 13:03:35 +0000
+
+    v0.5 
+
+  Change: 58083363a72ccbbd61e57cfc099f20ee96c9bd42
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-04-22 13:03:17 +0000
+
+    prep for release
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 7ca15e0eeea99b4db5ea25d12ba71677fbeb3060
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-03-12 18:07:57 +0000
+
+    eg/envinfo.pl
+
+    - Support env variable
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: e1c26d4be11441ceababed1264fce86d625cd999
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-21 23:30:08 +0000
+
+    fix namespace clean
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 76adfae98f4c2b6e03e067ad563b96650b4eea67
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-16 23:26:23 +0000
+
+    clean up example
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: f8cefd5aa8a74f6bf1ec59f876a3dec3315cee6c
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-15 19:10:25 +0000
+
+    fix bareword error
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8000eecc33d3839b4be3cf05cf8bccca8ab71c47
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-15 18:59:52 +0000
+
+    update environment api docs
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.4 at 2014-02-15 23:47:00 +0000
+----------------------------------------
+
+  Change: 15dd7faa09cd0a00ffe42f692aef92500a89a0e9
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-15 18:47:00 +0000
+
+    v0.4
+
+    - Use MIT license
+
+    - Add more api calls 
+
+  Change: 1bc48d77a4c4a6f6810257a8d02b47d1033a7475
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-15 18:46:42 +0000
+
+    change license to MIT; add more api calls
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.3 at 2014-02-14 22:16:08 +0000
+----------------------------------------
+
+  Change: 44d7c48ae6bd20c43c645786994c4bf4d42680fe
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-14 17:16:08 +0000
+
+    v0.3
+
+    - Adding API calls
+
+    - Finished non-blocking code 
+
+  Change: bdfc388c297264a675a84a279f36893f16d7eec4
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-14 17:16:02 +0000
+
+    pre
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: bbf8e74af8c6478bf185b2601a204d821fd97c5d
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-14 17:12:07 +0000
+
+    Fix events, start adding api calls
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.2 at 2014-02-14 05:03:26 +0000
+----------------------------------------
+
+  Change: 9c249f553944060eda7b1361297c993ff3e100d6
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-14 00:03:26 +0000
+
+    v0.2 
+
+  Change: b8a60e6bb865e0afbdf3ccffc79e7fc73bceef99
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-14 00:02:33 +0000
+
+    more websocket work
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 394ad83c0b7735b3b9202583a46db8c4d1372617
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-13 23:38:49 +0000
+
+    update examples, clean up event code
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 1cd20a7a687dc8a714a6c90ce0bfe658215a9fe7
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-13 19:06:14 +0000
+
+    update eg
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 7b5dd7e0b7386fa3c921b1cdab797838642bdf0f
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-12 17:22:49 +0000
+
+    websockets.....:(((((
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 644ef83f8ec1aea9fefc4689413191cc6eb51574
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-11 21:28:04 +0000
+
+    websockets make my head hurt
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8f8468402931a3c861134264b0cc36f351063b6a
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-11 19:56:11 +0000
+
+    more work on connection
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 342776568615c9ad12cd774c4c9ea6db96e458e2
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-11 15:41:46 +0000
+
+    start connection code
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 06b268b74fa8166e6ae1e95ac97b5e2efd428888
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-08 22:43:23 +0000
+
+    what spec does juju use for websockets????
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 8b140d22e788b6d5eb883f0090c8bfc945c4c1fc
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 18:16:02 +0000
+
+    More work on environment and RPC
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 056f3607af3eff49708669bcc55ef13d9d5ed2e8
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 17:58:05 +0000
+
+    Add RPC, Environment classes
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: 4518b232413d0f959ceabd87674fd5398018b75b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 17:23:41 +0000
+
+    start manual
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+----------------------------------------
+version 0.1 at 2014-02-07 18:49:46 +0000
+----------------------------------------
+
+  Change: c7df68d9b166612bb0327a4fac6034361c98c466
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 13:49:46 +0000
+
+    v0.1 
+
+  Change: 12b583daf348a254f7fbde408f01e358678fa46b
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 13:49:30 +0000
+
+    add build files
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+  Change: c0e0775638b3ddccd5968a439d9748fa9ff41f57
+  Author: Adam Stokes <adam.stokes@ubuntu.com>
+  Date : 2014-02-07 13:42:01 +0000
+
+    init
+
+    Signed-off-by: Adam Stokes <adam.stokes@ubuntu.com> 
+
+================
+End of releases.
+================

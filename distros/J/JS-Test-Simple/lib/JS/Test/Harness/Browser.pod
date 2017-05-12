@@ -1,0 +1,202 @@
+=pod
+
+=head1 Name
+
+Test.Harness.Browser - Run TAP standard JavaScript test scripts with statistics in a Browser
+
+=head1 Synopsis
+
+  <html>
+  <head>
+    <script type="text/javascript" src="JSAN.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      new JSAN("../lib").use("Test.Harness.Browser");
+      new Test.Harness.Browser('JSAN.js').runTests(
+          'async.js',
+          'bad_plan.html',
+          'buffer.js',
+          'builder.html'
+      );
+    </script>
+  </body>
+  </html>
+
+or non-JSAN approach (JavaScript test files will not work without JSAN)
+
+  <html>
+  <head>
+    <script type="text/javascript" src="Test/Harness.js"></script>
+    <script type="text/javascript" src="Test/Harness/Browser.js"></script>
+  </head>
+  <body>
+    <script type="text/javascript">
+      Test.Harness.Browser.runTests(
+          'async.html',
+          'bad_plan.html',
+          'buffer.html',
+          'builder.html'
+      );
+    </script>
+  </body>
+  </html>
+
+=head1 Description
+
+B<STOP!> If all you want to do is write a test script, consider using
+Test.Simple. Test.Harness is the module that reads the output from
+Test.Simple, Test.More and other modules based on Test.Builder. You don't need
+to know about Test.Harness to use those modules.
+
+Test.Harness.Browser runs JavaScript tests in a browser and expects to get the
+results from the C<TestResults> attribute of the Test.Builder object
+constructed by each test script. These results conform to a format called TAP,
+the Test Anything Protocol. It is defined in
+L<http://search.cpan.org/dist/Test-Harness/lib/Test/Harness/TAP.pod>. See
+L<Test.Harness> for details on the output.
+
+=head2 Class Methods
+
+  Test.Harness.Browser.runTests('testone.js', 'testtwo.html');
+
+Constructs a new Test.Harness.Browser object and calls its C<runTests()>
+instance method, passing all arguments along.
+
+=head2 Constructors
+
+  var harness = new Test.Harness.Browser('script.js', 'another.js');
+
+Constructs a new Test.Harness.Browser object. If your tests will be pure JavaScript
+files (that is, ending in F<.js>, pass in a list of dependency scripts to be
+loaded before each script. A particularly handy one to load is F<JSAN.js>
+(L<http://www.openjsan.org/go?l=JSAN>). This library will allow you to
+dymamically load whatever other libraries you need from each test script, like
+so:
+
+  var jsan = new JSAN('../lib');
+  jsan.use('Test.More');
+  jsan.use('HTTP.Query');
+  plan({tests: 1});
+  var q = new HTTP.Query;
+  isaOK(q, HTTP.Query);
+
+In fact, this is the approach that Test.Simple's own tests take. Check 'em
+out!
+
+=head2 Instance Methods
+
+=over 4
+
+=item B<runTests>
+
+  harness.runTests('testone.js', 'testtwo.html');
+
+This method runs all the given test files and divines whether they passed or
+failed based on the contents of the C<TestResults> attribute of their global
+C<Test.Builder.Test> object. It prints out each individual test that failed
+along with a summary report and a how long it all took. When all tests have
+been run, a diagnostic message will be output. See L<Test.Harness> for details
+on the output.
+
+For F<.js> files, be sure to pass to the Test.Harness.Browser constructor a
+list of required scripts to be loaded before the test is loaded and executed.
+
+=back
+
+=head2 GET Options
+
+An HTML file that uses Test.Harness.Browser will automatically process the
+C<GET> its arguments, and these can be used to affect the behavior of the
+harness.
+
+=over
+
+=item B<verbose>
+
+  index.html?verbose=1
+
+Set the C<verbose> option to a true value to have all of the output of all of
+the tests in the harness output to the browser window. By default, only
+failing tests display their output.
+
+=item B<file>
+
+  index.html?file=foo.html;file=bar.html
+
+Set the C<file> option to override the list of files passed to runTest().
+This option may be specified multiple times, and each file specified will be
+passed to runTest().
+
+=back
+
+=head1 Bugs
+
+Safari (and maybe KHTML?) has a number of bugs that affect how
+Test.Harness.Browser works. The most obvious is that it cannot run tests on a
+local disk. The harness I<only> works in Safari if the tests are served by a
+Web server. The WebKit team is aware of the issue; expect it to be fixed in a
+future version.
+
+Other Safari bugs I reported while writing this module:
+
+=over
+
+=item iFrame Doesn't seem to Respect a local "file://" src
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3593>
+
+=item Function.toString() Doesn't Stringify Constructors as Attributes
+
+Some tests are skipped in F<tests/create.html>, F<tests/harness.html>,
+and F<tests/more.html> to work around this bug.
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3537>
+
+=item WebKit JavaScript Does not Properly Support Circular References
+
+One test is skipped in F<tests/circular_data.html> to work around this bug.
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3539>
+
+=item iFrames Appear to be Cached
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3580>
+
+=item iFrames set to display:none are Missing from frames array
+
+So the iframe used to run tests isn't hidden in Safari. Instead, it is set to
+"height: 0; widht: 0".
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3581>
+
+=item Add Support for the watch() method of Object
+
+This would just be nice to have, so that we wouldn't have to set timeouts to
+check for test completion.
+
+L<http://bugs.webkit.org/show_bug.cgi?id=3659>
+
+=back
+
+=head1 See Also
+
+L<Test.Harness>, the base class for this class.
+
+L<Test.Simple> and L<Test.More>, modules with which to write tests.
+
+=head1 Authors
+
+David Wheeler <david@kineticode.com>.
+
+=head1 Copyright
+
+Copyright 2005 by David Wheeler <david@kineticode.com>
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Perl Artistic License or the GNU GPL.
+
+See L<http://www.perl.com/perl/misc/Artistic.html> and
+L<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut

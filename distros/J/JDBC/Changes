@@ -1,0 +1,8 @@
+Revision history for JDBC
+
+0.01    5th October 2005
+        First version released on an unsuspecting world.
+
+0.02    19th January 2014
+        Fix a long-standing failure due to changes in @ISA caching introduced in perl 5.10.0.
+

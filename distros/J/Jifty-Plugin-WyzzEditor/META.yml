@@ -1,0 +1,17 @@
+abstract: Simple WYSIWYG online editor for Jifty textarea
+author: Yves Agostini, <yvesago@cpan.org>
+build_requires: 
+  ExtUtils::MakeMaker: 6.11
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: Jifty-Plugin-WyzzEditor
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Jifty: 0.70416
+tests: t/*.t
+version: 0.01

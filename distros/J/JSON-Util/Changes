@@ -1,0 +1,20 @@
+Revision history for JSON-Util
+
+0.06    3 Sep 2015
+    - swapping JSON::MaybeXS in for JSON::XS (thanks to John SJ Anderson)
+
+0.05    16 Mar 2010
+    - build_requires fix
+
+0.04     4 Mar 2009
+    - allow file locking and atomic (see IO::Any)
+
+0.03    13 Oct 2009
+    - fixed test to pass with JSON::XS 2.26 (indent now adds a final newline)
+
+0.02    10 Sep 2009
+    - croak decode error
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

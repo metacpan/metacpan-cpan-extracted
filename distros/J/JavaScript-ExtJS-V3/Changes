@@ -1,0 +1,9 @@
+Revision history for JavaScript::ExtJS::V3
+
+3.4.11 2014-06-01
+    - Fixed sub redefined warning (changed use to require for Path::Class)
+      (note that this is still the same version of ExtJS, which *is* actually
+      v3.4.11, so the version number is still accurate and tied to ExtJS)
+
+3.4.1 2013-06-25
+    - Initial release

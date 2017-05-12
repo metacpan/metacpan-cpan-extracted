@@ -1,0 +1,220 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-recommendation [ doap-deps:on "Cpanel::JSON::XS"^^doap-deps:CpanId ], [ doap-deps:on "JE"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010000"^^doap-deps:CpanId ], [ doap-deps:on "Module::Runtime"^^doap-deps:CpanId ];
+	doap-deps:runtime-suggestion [
+		doap-deps:on "JavaScript::SpiderMonkey"^^doap-deps:CpanId;
+	], [ doap-deps:on "JSON::PP"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-T>;
+	doap:category        [ rdfs:label "JSON" ], [ rdfs:label "Transform" ], [ rdfs:label "JsonT" ], [ rdfs:label "ECMAScript" ], [ rdfs:label "JavaScript" ];
+	doap:created         "2010-07-29"^^xsd:date;
+	doap:developer       [
+		a foaf:Person;
+		foaf:homepage <http://goessner.net/>;
+		foaf:name "Stefan Goessner";
+	], <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:documenter      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/JSON-T>;
+	doap:homepage        <https://metacpan.org/release/JSON-T>;
+	doap:license         <http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "JSON-T";
+	doap:programming-language "Javascript", "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_00>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_01>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_02>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_03>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_04>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-100>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-101>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-102>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-103>, <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-104>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-json-t>;
+	];
+	doap:shortdesc       "transform JSON using JsonT"@en;
+	doap:tester          <http://purl.org/NET/cpan-uri/person/tobyink>.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_00>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "JSON-T-0.090_00"^^xsd:string;
+	dc:issued            "2010-07-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.090_00.tar.gz>;
+	doap:revision        "0.090_00"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "JSON-T-0.090_01"^^xsd:string;
+	dc:issued            "2010-07-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Non-JSON-string input for transform method was not being correctly converted to JSON."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_00>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.090_01.tar.gz>;
+	doap:revision        "0.090_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_02>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "JSON-T-0.090_02"^^xsd:string;
+	dc:issued            "2010-08-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Switched from JavaScript::SpiderMonkey to JE - SpiderMonkey version is retained for those that want it."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_01>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.090_02.tar.gz>;
+	doap:revision        "0.090_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_03>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "JSON-T-0.090_03"^^xsd:string;
+	dc:issued            "2010-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Additional debugging info added to tests."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_02>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.090_03.tar.gz>;
+	doap:revision        "0.090_03"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_04>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "JSON-T-0.090_04"^^xsd:string;
+	dc:issued            "2010-08-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Force stringification of return value of transform method. Pesky JE::String values!"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_03>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.090_04.tar.gz>;
+	doap:revision        "0.090_04"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-100>
+	a                    doap:Version;
+	dc:identifier        "JSON-T-0.100"^^xsd:string;
+	dc:issued            "2010-09-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Accept JSON::JOM as input to transformations."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-090_04>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.100.tar.gz>;
+	doap:revision        "0.100"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-101>
+	a                    doap:Version;
+	dc:identifier        "JSON-T-0.101"^^xsd:string;
+	dc:issued            "2011-12-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Separate out the JE-specific stuff into JSON::T::JE."@en;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Create a clear division between the implementation-specific and more generic parts of the code. Document how to make implementation subclasses."@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		], [
+			rdfs:label "Constructor uses Class::Load to load a suitable subclass."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use Object::AUTHORITY"@en;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Provide a DOES method."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-100>;
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.101.tar.gz>;
+	doap:revision        "0.101"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-102>
+	a                    doap:Version;
+	dc:identifier        "JSON-T-0.102"^^xsd:string;
+	dc:issued            "2013-03-20"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "no common::sense";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.102.tar.gz>;
+	doap:revision        "0.102"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-103>
+	a                    doap:Version;
+	dc:identifier        "JSON-T-0.103"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.103.tar.gz>;
+	doap:revision        "0.103"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-T/v_0-104>
+	a                    doap:Version;
+	dc:identifier        "JSON-T-0.104"^^xsd:string;
+	dc:issued            "2014-09-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Drop dependency on Object::AUTHORITY.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use dynamic config so that if JavaScript::SpiderMonkey is installed, JE is not a dependency.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use dynamic config to depend on Cpanel::JSON::XS or JSON::PP, rather than JSON.pm.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Module::Runtime instead of Class::Load.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Lots of tidying up.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Assign to @ISA instead of using base.pm.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Copyright 2014.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Update example; no longer use JSON::JOM which I withdrew from CPAN.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-T-0.104.tar.gz>;
+	doap:revision        "0.104"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

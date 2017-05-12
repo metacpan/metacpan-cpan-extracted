@@ -1,0 +1,13 @@
+# -*- mode: org -*- (yes, it looks best in emacs)
+
+* Use Alien::V8 in the build process if we can't find V8 via Devel::CheckLib
+  Mostly so we get the benefit of cpantesters testing JavaScript::V8
+  for us, but also make it so that people don't have to install V8
+  manually...
+* Lots of tests
+* Look at JavaScript::V8x::TestMoreish on CPAN
+  It might be interesting to investigate (and also check the recent changes haven't broken it...)
+* re::engine::V8
+  Okay, slightly out there, but V8's irregexp is fast and I've already
+  written re::engine::RE2, so it seems like I should complete the
+  set...

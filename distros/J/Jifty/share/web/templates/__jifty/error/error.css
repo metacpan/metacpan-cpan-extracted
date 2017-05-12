@@ -1,0 +1,13 @@
+h1 {
+    color: red;
+}
+
+<%init>
+Jifty->web->response->content_type("text/css");
+</%init>
+<%doc>
+
+This exists as fallback CSS, in case the Jifty application's CSS is causing
+the error.
+
+</%doc>

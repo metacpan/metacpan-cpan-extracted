@@ -1,0 +1,28 @@
+---
+abstract: 'Simple JSON-RPC client and dispatcher (WD 1.1 subset only currently)'
+author:
+  - 'Claes Jakobsson <claesjac@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSON-RPC-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request: 0
+  HTTP::Response: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  URI::Escape: 1.31
+version: 0.06

@@ -1,0 +1,184 @@
+commit 36fe72a6cdf9dd23da39030617b403202f370369
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 6 16:11:56 2015 -0700
+
+    Update embeddded jsonsl
+
+commit b12c325c8d2427f7816c5f956e8fa181c51d865d
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Jul 6 16:11:07 2015 -0700
+
+    Version bump: 1.0.6
+
+commit f88d28651aed9f31bd16c895d9f51bc06cec8f5a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 24 12:35:14 2015 -0500
+
+    Release 1.0.5
+
+commit f20c381f72051b179ea1ea310f4c184b12f4a4c3
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 24 12:51:09 2015 -0500
+
+    RT-102273: Don't crash on undef
+
+commit c25904231e7a4fd9d6abbc70a2ddf35beca5bddd
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 24 10:20:03 2015 -0800
+
+    Embed jsonsl source code in library
+
+commit 125ff23a3397420817799ca517c17447a23fd1bc
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Feb 24 10:16:30 2015 -0800
+
+    Bump to 1.0.4
+
+commit b243a7aed99aa5a507bd8a9a7f2915c7ce400ac1
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Dec 21 21:55:39 2014 -0800
+
+    Use stock version of jsonsl
+    
+    I accidentally used by development tree.
+
+commit 40158ca94f6ec87635c91101214d03c00b5f495e
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Dec 21 07:50:08 2014 -0800
+
+    Release version 1.0.3
+
+commit 6cabb3c4fbcde64a379f4a84ea17dca88a39be3d
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Nov 30 11:08:08 2014 -0800
+
+    Add simple 'json_sl' script (like 'json_pp', 'json_xs', etc.)
+
+commit ecef06059a38c95025eea2eb0216b9fb94f1c0ce
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Nov 30 11:06:20 2014 -0800
+
+    Add .gitignore
+
+commit b6b1bbcc32d71de4fe0ba4af9d87a7f3f96ebe29
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Nov 30 11:01:57 2014 -0800
+
+    RT #100564: Mark HV as containing UTF8 keys when necessary
+    
+    https://rt.cpan.org/Ticket/Display.html?id=100564
+
+commit 3e33df65c1c64479f41906ce809a3fd7ffa07c24
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jul 22 11:14:16 2014 -0700
+
+    Bump to version 1.0.2
+
+commit 20a3362268b09ab4ff0784400530cf198d898b55
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Jul 22 11:12:44 2014 -0700
+
+    Explicitly set state objects to NOMATCH if they don't match
+    
+    Since the state object potentially contains older state data from a
+    previous parse, we might erroneously think the object is a match. Don't
+    do this!
+
+commit 8795e8fa085b6efbbcb0ba9a0fd7f081e80eea40
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Apr 5 12:47:35 2013 -0700
+
+    v1.0.1
+
+commit 72712d665e0b669c124030c69211721cf2230085
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Apr 5 12:44:10 2013 -0700
+
+    Allow callback to attain the root object
+
+commit 454a1e5dc3c33249a8b8b2511854adfce847806f
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Dec 14 15:53:54 2012 -0800
+
+    Update MANIFEST to include new tests
+
+commit ae4d2e59e381fcda7473236fcc19b86396b47756
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Dec 14 15:50:54 2012 -0800
+
+    Tagged for 1.0 release
+
+commit ce76731db39ff24e0c40764e6d6ece03ab194270
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Dec 14 15:49:01 2012 -0800
+
+    Add test for issue #2
+
+commit c551b540545bec5e47a7fbde8d2ee79fdd11edfb
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Dec 14 08:03:00 2012 -0800
+
+    JSON-SL[2]: Allow modifiable JSON-null values
+
+commit 07b47fc13b3f729bab3e3f291438696f50f6e62d
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Sep 19 09:53:38 2012 -0700
+
+    Prepare for 0.08
+
+commit 55e83030f2e636c3e2304cac2cd7b595e0685486
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Sep 18 10:14:51 2012 -0700
+
+    Fix segfault on multiple streams..
+
+commit f7ee3f33f2cc4cf3f6f654707ef451628ef83c79
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Mon Sep 17 11:31:29 2012 -0700
+
+    Fix memory leak for array elements
+
+commit 8df1d893a7f5dd51c87aa6852660abde47101a0a
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Apr 8 15:49:40 2012 -0700
+
+    Fixed numeric code (allow -0 to be accepted). Bump version
+
+commit ee3f8a2fee00bee3a179a76585c9a562db3764e3
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Sun Apr 8 01:38:01 2012 -0700
+
+    Added some tuba tests.
+    
+    Initialize hashrefs to &PL_sv_undef rather than &PL_sv_placeholder.
+    Also fixed numeric handling..q
+
+commit 3454ad8ec2fcdc4c66920f638a8b11ba87fcbdb4
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Apr 6 16:37:53 2012 -0700
+
+    submodule again?
+
+commit 87f4838c5f5952c0a10fb93149922ed95393ada5
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Apr 6 16:29:03 2012 -0700
+
+    submodule test
+
+commit 1a2501d66bd76c7e6b664c03f89690ced9d07d40
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Fri Apr 6 04:56:13 2012 -0700
+
+    Tuba tuba tuba. also fixed compiler warnings and some more docs
+
+commit 288c839fdb9e9b2a215460eb66468789a92c00bc
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Wed Apr 4 02:13:14 2012 -0700
+
+    Work on tuba, object_drip
+
+commit 36b5369f5ded427a913227e655b8ae4b6fee5577
+Author: Mark Nunberg <mnunberg@haskalah.org>
+Date:   Tue Apr 3 02:20:58 2012 -0700
+
+    initial commit

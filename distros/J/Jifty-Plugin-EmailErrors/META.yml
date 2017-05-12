@@ -1,0 +1,26 @@
+---
+abstract: 'Emails all 500 pages to an arbitrary email address'
+author:
+  - 'Alex Vandiver C<alexmv@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Jifty::Plugin::EmailErrors
+name: Jifty-Plugin-EmailErrors
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Jifty: 1.00506
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

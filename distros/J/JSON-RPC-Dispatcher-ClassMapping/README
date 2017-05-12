@@ -1,0 +1,51 @@
+NAME
+    JSON::RPC::Dispatcher::ClassMapping - Expose all public methods of
+    classes as RPC methods
+
+SYNOPSIS
+      # in app.psgi
+      use JSON::RPC::Dispatcher::ClassMapping;
+
+      my $server = JSON::RPC::Dispatcher::ClassMapping->new(
+          dispatch => { 
+              Foo   => 'My::Module', 
+              Bar   => 'My::Another::Module', 
+          },
+      );
+
+      $server->to_app;
+
+DESCRIPTION
+    This module is a wrapper for JSON::RPC::Dispatcher and provides an easy
+    way to expose all public methods of classes as JSON-RPC methods. It
+    treats methods with a leading underscore as private methods.
+
+ATTRIBUTES
+    *dispatch*
+        This is a hashref that maps "package names" in RPC method requests
+        to actual Perl module names (in a format like "My::Module::Name").
+        For example, let's say that you have a "dispatch" that looks like
+        this:
+
+         {
+             'Util'     => 'Foo::Service::Util',
+             'Calendar' => 'Bar::Baz'
+         }
+
+        So then, calling the method "Util.get" will call
+        "Foo::Service::Util->get". Calling "Calendar.create" will call
+        "Bar::Baz->create". You don't have to pre-load the Perl modules,
+        JSON::RPC::Dispatcher::ClassMapping will load them for you.
+
+AUTHOR
+    Sherwin Daganato <sherwin@daganato.com>
+
+    Based on the dispatcher of RPC::Any::Server by Max Kanat-Alexander.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    RPC::Any::Server SOAP::Server
+

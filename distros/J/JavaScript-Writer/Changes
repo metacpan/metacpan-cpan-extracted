@@ -1,0 +1,70 @@
+Revision history for JavaScript-Writer
+
+0.3.1
+- Fix those tests broken by Test::More 0.96. Need to explicitly stringify overloaded objects.
+
+0.3.0
+- Introduce JE.pm in testing to verify the generated javascript code are 
+  correct in syntax.
+- var() method now can turn a CODEref inside an array or hash into function().
+- When writting a hash with var() method, the output of keys are sorted.
+- Require self 0.32.
+
+0.2.0
+- Scalar references now generates barewords in jsvascripts:
+
+    js->alert(\ "foo")
+
+  Now generates
+
+    alert(foo)
+
+- append() method now distinguished whether it's been called from
+  inside JavaScript::Writer or not. This avoids function
+  name conflictions. Specifically for jQuery(e).append().
+
+- end() method that asserts the end of call chain is removed.
+  This is a burden rather then a helper.
+
+0.1.0
+- Introduce a new wave of js writter with the spiffy "js" function.
+- Add "let" method that let you do multiple variable assignment.
+- No v-string in "use" for no warning in perl 5.10
+
+0.0.8
+- Add as_html() method
+- Let new() be an instance method too.
+- Extends the use of "var" method so it can tie a javascript variable with a
+  perl variable.
+
+0.0.7
+- Add if...elsif...else
+- As an experiment, write a basic Perl6 version under lib6, corresponding
+  tests are under t6/. It require pugs to run them. Try run-t6.sh.
+
+0.0.6
+- Add a 'while' writter.
+
+0.0.5
+- Add a var declartion writer, which supports simple values (scalar,
+  array, hash), as well as function assignments.
+
+0.0.4
+- Add function name and arguments to function writer.
+
+0.0.3
+- Fix messy POD :(
+
+0.0.2  Tue Aug 28 00:17:13 CST 2007
+- Featured "call chain", let it be joyful like jquery.
+- overload "<<" and stringify as syntatic sugar
+- use AUTOLOAD to call functions like perl
+- Directly use JSON::Syck instead.
+- Add an "object" method that let you call function
+  on objects other then "window"
+- Add a "function" method that let you write function
+  definition with perl sub.
+
+0.0.1  Sun Aug 19 20:59:58 2007
+       Initial release.
+

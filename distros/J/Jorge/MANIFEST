@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Jorge.pm
+lib/Jorge/Config.pm
+lib/Jorge/DB.pm
+lib/Jorge/DBEntity.pm
+lib/Jorge/ObjectCollection.pm
+lib/Jorge/Extended.pm
+lib/Jorge/Plugin/Md5.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,153 @@
+=pod
+
+=head1 Name
+
+Test.Harness - Run TAP standard JavaScript test scripts with statistics
+
+=head1 Synopsis
+
+  Test.Harness.runTests('foo.js', bar.js');
+
+=head1 Description
+
+B<STOP!> If all you want to do is write a test script, consider using
+Test.Simple. Test.Harness is the module that reads the output from
+Test.Simple, Test.More and other modules based on Test.Builder. You don't need
+to know about Test.Harness to use those modules.
+
+B<STOP AGAIN!> Test.Harness is an abstract base class. See
+L<Test.Harness.Browser> for a concrete subclass offering a browser-based
+harness.
+
+Test.Harness runs tests and expects to get the results from the C<TestResults>
+attribute of the Test.Builder object.  These results conform to a format
+called TAP, the Test Anything Protocol. It is defined in
+L<http://search.cpan.org/dist/Test-Harness/lib/Test/Harness/TAP.pod>.
+
+=head2 Failure
+
+When tests fail, analyze the summary report:
+
+  base.html..............ok
+  nonumbers.js...........ok
+  ok.js..................ok
+  test-harness.js........ok
+  waterloo.html..........dubious
+  DIED. FAILED tests 1, 3, 5, 7, 9, 11, 13, 15, 17, 19
+          Failed 10/20 tests, 50.00% okay
+  Failed Test   Total Fail  Failed  List of Failed
+  -------------------------------------------------------------
+  waterloo.html    20   10  50.00%  1 3 5 7 9 11 13 15 17 19
+  Failed 1/5 test scripts, 80.00% okay. 10/44 subtests failed, 77.27% okay.
+
+Everything passed but F<waterloo.html>. It failed 10 of 20 tests.
+
+The columns in the summary report mean:
+
+=over 4
+
+=item B<Failed Test>
+
+The test file which failed.
+
+=item B<Total>
+
+Total number of tests expected to run.
+
+=item B<Fail>
+
+Number that failed, either from "not ok" or because they never ran.
+
+=item B<Failed>
+
+Percentage of the total tests that failed.
+
+=item B<List of Failed>
+
+A list of the tests that failed.  Successive failures may be abbreviated
+(ie. 15-20 to indicate that tests 15, 16, 17, 18, 19 and 20 failed).
+
+=back
+
+=head2 Class Methods
+
+  Test.Harness.runTests('testone.js', 'testtwo.js');
+
+Constructs a new Test.Harness object and calls its C<runTests()> instance
+method, passing all arguments along.
+
+=head2 Constructors
+
+  var harness = new Test.Harness();
+
+Constructs a new Test.Harness object.
+
+=head2 Instance Methods
+
+=over 4
+
+=item B<runTests>
+
+  harness.runTests('testone.js', 'testtwo.js');
+
+This method runs all the given test files and divines whether they passed or
+failed based on the contents of the C<TestRusults> attribute of their global
+C<Test.Builder.Test> object.  It prints out each individual test that failed
+along with a summary report and a how long it all took. When all tests have
+been run, a diagnostic message will be output.
+
+=item B<encoding>
+
+  var encoding = harness.encoding();
+  harness = harness.encoding(encoding);
+
+Gets or sets the encoding to use for the test scripts. Returns the harness
+object when setting the encoding. The encoding is C<null> by default, and
+therefore unset.
+
+=back
+
+=head1 Diagnostics
+
+=over 4
+
+=item C<All tests successful.\nFiles=%d,  Tests=%d, %s>
+
+If all tests are successful some statistics about the performance are output.
+
+=item C<FAILED tests %s\n\tFailed %d/%d tests, %.2f%% okay.>
+
+For any single script that has failing subtests statistics like the above are
+printed.
+
+=item C<Failed 1 test, %.2f%% okay. %s>
+
+=item C<Failed %d/%d tests, %.2f%% okay. %s>
+
+If not all tests were successful, the script dies with one of the above
+messages.
+
+=back
+
+=head1 See Also
+
+L<Test.Simple> and L<Test.More>, modules with which to write tests.
+
+=head1 Authors
+
+David Wheeler <david@kineticode.com>, based on the original Test::Harness
+included with Perl.
+
+=head1 Copyright
+
+Copyright 2005 by David Wheeler <david@kineticode.com>
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Perl Artistic License or the GNU GPL.
+
+See L<http://www.perl.com/perl/misc/Artistic.html> and
+L<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut
+
+

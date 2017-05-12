@@ -1,0 +1,120 @@
+package Juju::Manual::Quickstart;
+$Juju::Manual::Quickstart::VERSION = '2.002';
+# ABSTRACT: Getting started with Juju
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Juju::Manual::Quickstart - Getting started with Juju
+
+=head1 VERSION
+
+version 2.002
+
+=head1 INSTALL
+
+Installation is handled through cpanm and you can point directly to
+the github repository:
+
+    cpanm git@github.com:battlemidget/p5-juju.git
+
+Or install from cpan
+
+    cpanm Juju
+
+=head1 INTRO
+
+The library exposes juju rpc interface via a secure
+websocket. The credentials required are found in your
+B<~/.juju/environments/'env'.jenv>. If that directory/file does not
+exist you'll want to make sure you've bootstrapped first:
+
+    juju bootstrap --upload-tools
+
+See more information on the workings of juju at
+L<http://juju.ubuntu.com>
+
+=head1 USING
+
+To get started initialize the Juju class:
+
+    use Juju;
+
+    # Open connection over the websocket protocol
+    my $juju = Juju->new(endpoint => 'wss://192.168.122.16:17070',
+                         password => '8fdsaf0fda');
+    $juju->login;
+    $juju->status(
+      sub {
+        my $status = shift;
+        print $status->{UUID};
+      }
+    );
+
+    # Close the connection
+    $juju->close;
+
+The password is found in the B<~/.juju/environments/'env'.jenv> under
+C<password>.
+
+There is a B<port (17070)> for accessing the machine resources. To see what state
+servers are available to you run:
+
+    $ juju api-endpoints
+
+=head1 AUTHOR
+
+Adam Stokes <adamjs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Adam Stokes.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<Juju|Juju>
+
+=back
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+=cut

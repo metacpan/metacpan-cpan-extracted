@@ -1,0 +1,23 @@
+---
+abstract: 'A relaxed and easy diffable JSON variant'
+author:
+  - 'Robert Sedlacek <r.sedlacek@shadowcat.co.uk>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-Diffable
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::MaybeXS: '0'
+  strictures: '1'
+version: '0.000002'

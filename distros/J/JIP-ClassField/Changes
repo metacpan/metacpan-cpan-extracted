@@ -1,0 +1,21 @@
+Revision history for JIP-ClassFiels
+
+0.05    2016-03-06
+        Added support for multiple attributes in a single declaration.
+        Default rules for attributes.
+
+0.04    2015-07-08
+        Added cleanup_namespace method.
+
+0.03    2015-05-26
+        Fixed default_value handling bugs.
+        Default value should be a constant or callback.
+        More tests.
+        Improved documentation.
+
+0.02    2015-05-24
+        attr() support default parameter value.
+
+0.01    2015-05-17
+        First version, released on an unsuspecting world.
+

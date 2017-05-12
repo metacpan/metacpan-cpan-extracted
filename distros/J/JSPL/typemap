@@ -1,0 +1,29 @@
+TYPEMAP
+
+JSPL::Context      T_PTROBJ
+JSPL::PerlClass    T_PTROBJ
+JSPL::RawObj       T_PTROBJ
+JSPL::RawRT        T_PTROBJ
+JSPL::TrapHandler  T_PTROBJ
+JSPL::SM::Opcode   T_PTROBJ
+JSObject*         T_PTRREF
+jsval             T_jsval
+
+
+INPUT
+T_PTROBJ
+	if (SvROK($arg) && sv_derived_from($arg, \"${ntype}\")) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type,tmp);
+	}
+	else
+	    Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+		       ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+		       \"$var\", \"$ntype\")
+
+OUTPUT
+T_jsval
+	if(!PJS_ReflectJS2Perl(aTHX_ cx, $var, &$arg, 1) &&
+	   PJS_report_exception(aTHX_ pcx))
+	    XSRETURN_UNDEF;
+	sv_2mortal($arg);

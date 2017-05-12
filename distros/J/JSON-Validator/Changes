@@ -1,0 +1,207 @@
+Revision history for perl distribution JSON-Validator
+
+0.97 2017-03-21T23:31:27+0100
+ - Require a newer version of Test::More to build
+
+0.96 2017-03-06T20:53:35+0100
+ - Fix JSON::Validator::load_and_validate_schema()
+ - Add handling of header/formData/query as array #38
+ - Allow alternative date-time separator #49
+ - Improved recursion tracking #52
+ - More tests in t/acceptance.t are ok #52
+ - Avoid loading the same file multiple times #54
+ - Swagger2 is deprecated
+
+0.95 2017-03-02T22:22:10+0100
+ - Add support for format "password"
+ - Add load_and_validate_schema() to JSON::Validator #51
+ - Started deprecating load_and_validate_spec()
+
+0.94 2017-02-13T09:33:20+0100
+ - Fix t/issue-27-yaml-syck-false.t
+ - Removed Carp::Always #47
+
+0.93 2017-02-13T01:04:54+0100
+ - Fix coercing YAML booleans in input specification jhthorsen/mojolicious-plugin-openapi#24
+ - Replace JSON_VALIDATOR_CACHE_DIR with JSON_VALIDATOR_CACHE_PATH
+ - Remove deprecated cache_dir attribute
+
+0.92 2017-01-18T11:54:03+0000
+ - Fix infinite recursion when resolving self referencing data structures
+
+0.91 2017-01-10T23:02:36+0100
+ - Mojo::Util::slurp is DEPRECATED in favor of Mojo::File::slurp
+
+0.90 2016-12-11T11:38:38+0100
+ - Add support for validating Dancer2 requset/responses #34
+ - Fix invalidating integer/number path part with letters #37
+
+0.89 2016-11-05T01:36:52+0100
+ - Fix multipleOf:0.01, closes #35
+
+0.88 2016-11-04T23:18:26+0100
+ - Fix number coercion #32
+   Contributor: @melhesedek
+ - Add JSON::Validator::OpenAPI->load_and_validate_spec()
+
+0.87 2016-10-20T22:59:45+0200
+ - Fix validating data when boolean.pm is loaded
+
+0.86 2016-10-06T18:36:36+0200
+ - Documented bundled resources
+
+0.85 2016-09-26T22:30:21+0200
+ - Fix handling of collectionFormat where no input is defined
+
+0.84 2016-08-19T19:11:51+0200
+ - Removed support for passing $json_path to validate()
+ - Fix guessing type of objects that has TO_JSON()
+
+0.83 2016-08-16T19:37:04+0200
+ - Fix handling of true/false in schema, when loaded with YAML::Syck #27
+ - Add EXPERIMENTAL support for passing $json_path to validate()
+
+0.82 2016-08-09T12:45:05+0200
+ - Fix finding all $ref occurances jhthorsen/swagger2#95
+
+0.81 2016-08-08T10:03:43+0200
+ - Add support for multiple cache dir search paths
+ - Deperecated cache_dir()
+ - Fix recurring requests with same path part jhthorsen/swagger2#93
+ - Fix "Use of uninitialized value $schema_type..." warnings
+
+0.80 2016-08-03T19:12:40+0200
+ - Fix parsing recursive schema
+
+0.79 2016-07-28T21:14:47+0200
+ - Reverted improved allOf, anyOf and oneOf error messages
+
+0.78 2016-07-28T20:51:31+0200
+ - Fix recursive dependencies #23
+ - Add EXPERIMENTAL resolver attribute
+ - Improved allOf, anyOf and oneOf error messages
+
+0.77 2016-07-26T15:03:13+0200
+ - Avoid duplicate error messages with enum #22
+ - Fix "false" must be false and not true in OpenAPI
+
+0.76 2016-07-25T14:49:27+0200
+ - Will write default values into Mojolicious::Controller
+
+0.75 2016-07-02T14:44:31+0200
+ - Fix uploads must not be slurped
+ - Fix reporting error on missing response status definition
+ - Add warnings on invalid (Perl) regexes
+
+0.74 2016-06-22T19:26:14+0200
+ - Fix length($data) need be defined in 5.10
+
+0.73 2016-06-22T19:12:10+0200
+ - Add http://git.io/vcKD4 error schema to cache
+ - Add JSON schema for JSONPatch files
+ - Updated Swagger2 spec to https://github.com/OAI/OpenAPI-Specification/blob/19fed9f0f812ccebe0fc45313fea75bb6656de1c/schemas/v2.0/schema.json
+
+0.72 2016-06-10T19:22:52-0700
+ - Fix default cache_dir() path
+ - JSON::Validator is no longer EXPERIMENTAL
+ - Move Swagger2::SchemaValidator into JSON::Validator::OpenAPI
+
+0.71 2016-06-07T15:29:35-0500
+ - Fix setting schema() inside validate()
+
+0.70 2016-05-31T13:38:04+0200
+ - Fix allowing "id" as property name in objects
+
+0.69 2016-05-26T19:36:53+0200
+ - Fix failing anyOf logic in t/swagger-validate-response-object.t
+
+0.68 2016-05-25T17:35:26+0100
+ - Remove _merge_error to clarify anyOf errors #15
+
+0.67 2016-04-11T13:49:55+0200
+ - Add JSON::Validator::Error class
+
+0.66 2016-02-09T18:32:57+0100
+ - Fix validating recursive datastructures
+
+0.65 2016-01-07T15:31:37+0100
+ - Fix t/swagger-validate-response-object.t require Swagger2 0.66 #14
+
+0.64 2015-12-18T16:03:09+0800
+ - Fix treating JSON::PP::Boolean objects as boolean #13
+   Contributor: Krasimir Berov
+ - Allow hash reference as arguments to coerce #13
+   Contributor: Krasimir Berov
+
+0.63 2015-11-28T08:17:59+0100
+ - Fix skip test in t/booleans.t
+
+0.62 2015-11-27T12:13:08+0100
+ - Remove support for YAML.pm #jhthorsen/swagger2#50
+ - Remove support for YAML::Tiny #jhthorsen/swagger2#50
+
+0.61 2015-11-11T21:01:13+0100
+ - Fix use of TO_JSON() on objects inside arrays #12
+
+0.60 2015-11-09T14:35:56+0000
+ - Can use TO_JSON() when validating perl objects
+
+0.59 2015-10-14T17:19:53+0200
+ - Move "collectionFormat" support to Swagger2
+
+0.58 2015-10-13T14:47:25+0200
+ - Fix string "0" is not detected as boolean
+
+0.57 2015-10-11T13:20:45+0200
+ - Trust guesswork if input data is undefined
+
+0.56 2015-09-30T11:43:49+0200
+ - Can read YAML::XS booleans automatically #8
+ - Change coerce() into a method. #8
+ - Remove EXPERIMENTAL coerce attribute #8
+ - Remove EXPERIMENTAL JSON_VALIDATOR_COERCE_VALUES and SWAGGER_COERCE_VALUES #8
+
+0.55 2015-09-29T19:01:05+0200
+ - Fix "required" cannot be a boolean on properties
+ - Improved documentation of error object
+ - Change anyOf/allOf/oneOf error message
+
+0.54 2015-09-27T13:33:02+0200
+ - Add support for $ref to relative path #3 #4 #5
+ - Removed Swagger specific type "file"
+ - Removed Swagger specific formats: "byte", "date", "double", "float", "int32" and "int64".
+
+0.53 2015-09-13T10:52:16+0200
+ - Fix properties, patternProperties, additionalProperties interaction - patternProperty invalidates property
+ - Fix validation for a keyword and instance SHOULD succeed when keywords does not match primitive type
+ - Fix allOf with base schema - mismatch base schema
+ - Fix checking for a boolean "required"
+
+0.52 2015-09-05T13:52:39+0200
+ - Add guessing of schema type, based on other attributes
+ - More strict on what is validated as "boolean"
+ - Fix additionalItems are allowed by default
+ - Fix additionalProperties allows a schema which should validate
+ - Fix validating "enum"
+ - Fix validating "array" against "additionalItems"
+ - Fix bugs after running
+   https://github.com/Relequestual/Test-JSON-Schema-Acceptance to validate
+
+0.51 2015-08-24T16:19:06+0200
+ - Fix "$ref" pointing to a file on disk #1
+
+0.50 2015-08-23T15:07:08+0200
+ - Fix missing namespace when registering new document
+ - Made cache_dir() public
+ - Bundled spec for json-schema and swagger
+
+0.49 2015-08-23T00:51:08+0200
+ - Fix loading schema from files
+
+0.48 2015-08-22T21:23:55+0200
+ - Merged core functionality from Swagger2 and Swagger2::SchemaValidator
+   into this module, JSON::Validator
+   See https://metacpan.org/source/JHTHORSEN/Swagger2-0.47/Changes for
+   previous Changes (<=0.47)
+ - Fix coercing collectionFormat strings into integers and numbers
+ - Add support for reading schemas from __DATA__ section

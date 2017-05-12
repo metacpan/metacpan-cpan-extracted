@@ -1,0 +1,21 @@
+Changes
+lib/JSON/MaybeXS.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/cpanel.t
+t/legacy.t
+t/lib/is_bool.pm
+t/new.t
+t/none.t
+t/pp.t
+t/preload_cpanel.t
+t/preload_xs.t
+t/xs.t
+xt/json_pm.t
+xt/json_pm_legacy.t
+xt/json_pp_legacy.t
+xt/json_xs_legacy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

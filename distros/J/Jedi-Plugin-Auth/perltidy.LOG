@@ -1,0 +1,13 @@
+perltidy version 20130922 log file on a darwin system, OLD_PERL_VERSION=5.018001
+Configuration and command line parameters for this run:
+-html -pre
+To find error messages search for 'WARNING' with your editor
+Line 1 implies starting-indentation-level = 1
+WARNING: 
+Partial match to quote modifier [msixpodualgc] at word: 'lib'
+Please put a space between quote modifiers and trailing keywords.
+guessing that / after auth starts a division (no end to pattern found on the line)
+Suggest including 'use warnings;'
+Suggest including 'use strict;'
+Suggest using upper case characters in label(s)
+  defined at line(s): (2)(3)(4)

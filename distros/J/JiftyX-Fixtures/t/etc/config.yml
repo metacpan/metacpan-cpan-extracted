@@ -1,0 +1,62 @@
+--- 
+framework: 
+  AdminMode: 0
+  ApplicationClass: JiftyTest
+  ApplicationName: JiftyTest
+  ApplicationUUID: 91D4EA3E-2683-11DE-884A-C14A77938ECA
+  ConfigFileVersion: 4
+  Database: 
+    AutoUpgrade: 1
+    CheckSchema: 1
+    Database: jiftytest
+    Driver: SQLite
+    Host: localhost
+    Password: ''
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+    User: ''
+    Version: 0.0.1
+  DevelMode: 1
+  L10N: 
+    PoDir: share/po
+  LogLevel: INFO
+  Mailer: Sendmail
+  MailerArgs: []
+
+  Plugins: 
+    # - AdminUI: {}
+    # - OnlineDocs: {}
+    # - Halo: {}
+    # - SkeletonApp: {}
+    # - ErrorTemplates: {}
+    - LetMe: {}
+    - User: {}
+    - Authentication::Password: 
+        login_by: account
+    - CompressedCSSandJS: {}
+    - REST: {}
+
+  PubSub: 
+    Backend: Memcached
+    Enable: ~
+  SkipAccessControl: 1
+  TemplateClass: JiftyTest::View
+  View: 
+    Handlers: 
+      - Jifty::View::Static::Handler
+      - Jifty::View::Declare::Handler
+      - Jifty::View::Mason::Handler
+  Web: 
+    SessionCookieName: JIFTY_STD_$PORT    # Jifty::Web::Session
+    BaseURL: http://localhost
+    DataDir: var/mason
+    Globals: []
+
+    MasonConfig: 
+      autoflush: 0
+      default_escape_flags: h
+      error_format: text
+      error_mode: fatal
+    Port: 8888
+    ServeStaticFiles: 1
+    StaticRoot: share/web/static
+    TemplateRoot: share/web/templates

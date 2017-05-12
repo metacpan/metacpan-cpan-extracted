@@ -1,0 +1,6 @@
+Revision history for Perl extension JomonTest.
+
+0.01  Fri Sep  7 10:11:18 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.10.1 -n JomonTest
+

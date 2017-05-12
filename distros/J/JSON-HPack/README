@@ -1,0 +1,3 @@
+JSON::HPack - JSON Homogeneous Collections Compressor
+
+This is perl implementation of https://github.com/WebReflection/JSONH

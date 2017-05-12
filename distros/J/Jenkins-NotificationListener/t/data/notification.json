@@ -1,0 +1,14 @@
+{
+    "name": "jruby-git",
+    "url": "job/jruby-git",
+    "build":{
+        "number": 4259,
+        "phase": "STARTED",
+        "status": "FAILED",
+        "url": "/job/jruby-git/4259",
+        "full_url": "http://ci.jruby.org/job/jruby-git/4259",
+        "parameters":{
+            "branch":"master"
+        }
+    }
+}

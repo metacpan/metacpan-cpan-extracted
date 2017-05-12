@@ -1,0 +1,76 @@
+<%init>
+Jifty->web->response->content_type('text/xml; charset=UTF-8');
+
+my $output = "";
+use XML::Writer;
+my $writer = XML::Writer->new( OUTPUT => \$output );
+$writer->xmlDecl( "UTF-8", "yes" );
+$writer->startTag("validation");
+for my $ra ( Jifty->web->request->actions ) {
+    my $action = Jifty->web->new_action_from_request($ra);
+    unless ($action ){
+        warn "Couldn't turn $ra into an action";
+        next;
+        
+    }
+    $writer->startTag( "validationaction", id => $action->register_name );
+    for my $arg ( $action->argument_names ) {
+        if ( not $action->arguments->{$arg}->{ajax_validates} ) {
+            $writer->emptyTag( "ignored", id => $action->error_div_id($arg) );
+            $writer->emptyTag( "ignored", id => $action->warning_div_id($arg) );
+        } elsif ( (not defined $action->argument_value($arg)
+                  or length $action->argument_value($arg) == 0)
+                      and not $action->result->ajax_force_validate($arg)
+              ) {
+            $writer->emptyTag( "blank", id => $action->error_div_id($arg) );
+            $writer->emptyTag( "blank", id => $action->warning_div_id($arg) );
+        } elsif ( $action->result->field_error($arg) ) {
+            $writer->dataElement(
+                "error",
+                $action->result->field_error($arg),
+                id => $action->error_div_id($arg)
+            );
+            $writer->emptyTag( "ok", id => $action->warning_div_id($arg) );
+        } elsif ( $action->result->field_warning($arg) ) {
+            $writer->dataElement(
+                "warning",
+                $action->result->field_warning($arg),
+                id => $action->warning_div_id($arg)
+            );
+            $writer->emptyTag( "ok", id => $action->error_div_id($arg) );
+        } else {
+            $writer->emptyTag( "ok", id => $action->error_div_id($arg) );
+            $writer->emptyTag( "ok", id => $action->warning_div_id($arg) );
+        }
+    }
+    $writer->endTag();
+    $writer->startTag( "canonicalizeaction", id => $action->register_name );
+    for my $arg ( $action->argument_names ) {
+        if (($ra->arguments->{$arg} || "") eq ($action->argument_value($arg) || "")) {
+            # if the value doesn't change, it can be ignored.
+            # canonicalizers can change other parts of the action, so we want to send all changes
+            $writer->emptyTag( "ignored", name => $action->form_field_name($arg) );
+        } elsif ( not defined $action->argument_value($arg)
+            or length $action->argument_value($arg) == 0 ) {
+            $writer->emptyTag( "blank", name => $action->form_field_name($arg) );
+        } else {
+            $writer->dataElement(
+                "update",
+                $action->argument_value($arg),
+                name => $action->form_field_name($arg)
+            );
+        }
+        if ( $action->result->field_canonicalization_note($arg) ) {
+            $writer->dataElement(
+                "canonicalization_note",
+                $action->result->field_canonicalization_note($arg),
+                id => $action->canonicalization_note_div_id($arg)
+            );
+        }
+    }
+    $writer->endTag();
+}
+$writer->endTag();
+$m->out($output);
+$m->abort();
+</%init>

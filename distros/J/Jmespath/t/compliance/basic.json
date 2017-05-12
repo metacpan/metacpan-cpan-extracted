@@ -1,0 +1,146 @@
+[
+    {
+        "cases": [
+            {
+                "expression": "foo",
+                "is_deeply": 1,
+                "result": {
+                    "bar": {
+                        "baz": "correct"
+                    }
+                }
+            },
+            {
+                "expression": "foo.bar",
+                "is_deeply": 1,
+                "result": {
+                    "baz": "correct"
+                }
+            },
+            {
+                "expression": "foo.bar.baz",
+                "result": "correct"
+            },
+            {
+                "expression": "foo\n.\nbar\n.baz",
+                "result": "correct"
+            },
+            {
+                "expression": "foo.bar.baz.bad",
+                "result": null
+            },
+            {
+                "expression": "foo.bar.bad",
+                "result": null
+            },
+            {
+                "expression": "foo.bad",
+                "result": null
+            },
+            {
+                "expression": "bad",
+                "result": null
+            },
+            {
+                "expression": "bad.morebad.morebad",
+                "result": null
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": {
+                    "baz": "correct"
+                }
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo",
+                "is_deeply": 1,
+                "result": {
+                    "bar": [
+                        "one",
+                        "two",
+                        "three"
+                    ]
+                }
+            },
+            {
+                "expression": "foo.bar",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            }
+        ],
+        "given": {
+            "foo": {
+                "bar": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            }
+        }
+    },
+    {
+        "cases": [
+            {
+                "expression": "one",
+                "result": null
+            },
+            {
+                "expression": "two",
+                "result": null
+            },
+            {
+                "expression": "three",
+                "result": null
+            },
+            {
+                "expression": "one.two",
+                "result": null
+            }
+        ],
+        "given": [
+            "one",
+            "two",
+            "three"
+        ]
+    },
+    {
+        "cases": [
+            {
+                "expression": "foo.\"1\"",
+                "is_deeply": 1,
+                "result": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            },
+            {
+                "expression": "foo.\"1\"[0]",
+                "result": "one"
+            },
+            {
+                "expression": "foo.\"-1\"",
+                "result": "bar"
+            }
+        ],
+        "given": {
+            "foo": {
+                "-1": "bar",
+                "1": [
+                    "one",
+                    "two",
+                    "three"
+                ]
+            }
+        }
+    }
+]

@@ -1,0 +1,101 @@
+# NAME
+
+JIRA::Client::REST - JIRA REST Client
+
+# VERSION
+
+version 0.06
+
+# SYNOPSIS
+
+    use JIRA::Client::REST;
+
+    my $client = JIRA::Client::REST->new(
+        username => 'username',
+        password => 'password',
+        url => 'http://jira.mycompany.com',
+    );
+    my $issue = $client->get_issue('TICKET-12');
+    print $issue->{fields}->{priority}->{value}->{name}."\n";
+
+# DESCRIPTION
+
+JIRA::Client::REST is a wrapper for the [JIRA REST API](http://docs.atlassian.com/jira/REST/latest/).
+It is a thin wrapper, returning decoded version of the JSON without any munging
+or mangling.
+
+# HEADS UP
+
+This module is under development and some of the REST API hasn't been implemented
+yet.
+
+# ATTRIBUTES
+
+## password
+
+Set/Get the password to use when connecting to JIRA.
+
+## url
+
+Set/Get the URL for the JIRA instance.
+
+## username
+
+Set/Get the username to use when connecting to JIRA.
+
+# METHODS
+
+## get_issue($id, $expand)
+
+Get the issue with the supplied id.  Returns a HashRef of data.
+
+## get_issue_transitions($id, $expand)
+
+Get the transitions possible for this issue by the current user.
+
+## get_issue_votes($id, $expand)
+
+Get voters on the issue.
+
+## get_issue_watchers($id, $expand)
+
+Get watchers on the issue.
+
+## get_project($key)
+
+Get the project for the specifed key.
+
+## get_project_versions($key)
+
+Get the versions for the project with the specified key.
+
+## get_version($id)
+
+Get the version with the specified id.
+
+## unvote_for_issue($id)
+
+Remove your vote from an issue.
+
+## unwatch_issue($id, $username)
+
+Remove a watcher from an issue.
+
+## vote_for_issue($id)
+
+Cast your vote in favor of an issue.
+
+## watch_issue($id, $username)
+
+Watch an issue. (Or have someone else watch it.)
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

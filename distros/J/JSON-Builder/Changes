@@ -1,0 +1,12 @@
+Revision history for JSON::Builder.
+
+0.04  2015-04-15
+	- encode_sub
+	- fh_plain
+	- only tempfile; unlink
+
+0.03  2014-05-20
+	- fix for empty lists and objects
+
+0.02  2014-03-07
+	- version with MIME::Base64

@@ -1,0 +1,21 @@
+=head1 NAME
+
+Foo.Bar - A Foo Bar JavaScript Module
+
+=head1 SYNOPSIS
+
+    ln -s `js-cpan Foo.Bar` Foo.Bar.js
+
+=head1 DESCRIPTION
+
+A sample JavaScript module for CPAN.
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright 2008-2014. Ingy döt Net.
+
+=cut

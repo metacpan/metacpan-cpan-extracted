@@ -1,0 +1,87 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "Carp 1.00"^^doap-deps:CpanId ], [ doap-deps:on "JSON"^^doap-deps:CpanId ], [ doap-deps:on "JSON::T"^^doap-deps:CpanId ], [ doap-deps:on "LWP::UserAgent"^^doap-deps:CpanId ], [ doap-deps:on "Object::AUTHORITY"^^doap-deps:CpanId ], [ doap-deps:on "RDF::Trine 0.112"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=JSON-GRDDL>;
+	doap:category        [ rdfs:label "JSON"@en ], [ rdfs:label "GRDDL"@en ], [ rdfs:label "jsonGRDDL"@en ], [ rdfs:label "JsonT"@en ], [ rdfs:label "transform"@en ], [ rdfs:label "RDF"@en ], [ rdfs:label "Semantic Web"@en ];
+	doap:created         "2010-07-30"^^xsd:date;
+	doap:developer       <http://tobyinkster.co.uk/#i>;
+	doap:documenter      <http://tobyinkster.co.uk/#i>;
+	doap:download-page   <https://metacpan.org/release/JSON-GRDDL>;
+	doap:homepage        <https://metacpan.org/release/JSON-GRDDL>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://tobyinkster.co.uk/#i>;
+	doap:name            "JSON-GRDDL";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-001>, <http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-001_00>, <http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-002>;
+	doap:repository      [
+		a doap:SVNRepository;
+		doap:browse <http://goddamn.co.uk/svn-web/perlmods/browse/JSON-GRDDL/>;
+	];
+	doap:shortdesc       "transform JSON to RDF"@en;
+	doap:tester          <http://tobyinkster.co.uk/#i>.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Stable release"@en;
+	dc:issued            "2011-12-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "use 5.010"@en;
+		], [
+			a doap-changeset:Update;
+			rdfs:label "use Object::AUTHORITY"@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Module::Package::RDF"@en;
+		], [
+			rdfs:label "Add a randomised aspect to blank node labels."@en;
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Improve test suite."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-001_00>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-GRDDL-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-001_00>
+	a                    doap:Version;
+	dc:issued            "2010-08-01"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-GRDDL-0.001_00.tar.gz>;
+	doap:revision        "0.001_00"^^xsd:string;
+	rdfs:comment         "Forked from Swignition."@en.
+
+<http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "JSON-GRDDL-0.002"^^xsd:string;
+	dc:issued            "2014-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/JSON-GRDDL-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://tobyinkster.co.uk/#i>
+	a                    foaf:Person;
+	foaf:homepage        <http://tobyinkster.co.uk/>;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:page            <https://metacpan.org/author/TOBYINK>;
+	owl:sameAs           <http://purl.org/NET/cpan-uri/person/tobyink>.
+

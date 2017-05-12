@@ -1,0 +1,11 @@
+Revision history for JSON-Schema-Shorthand
+
+0.0.2 2016-09-18
+  [ BUG FIXES ]
+    - Needs Perl >= 5.20.0 (GH#1)
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 15 insertions(+)
+
+0.0.1 2016-09-14
+  - First version, unleashed on an unsuspecting world.

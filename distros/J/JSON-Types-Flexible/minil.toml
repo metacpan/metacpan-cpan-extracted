@@ -1,0 +1,9 @@
+name = "JSON-Types-Flexible"
+badges = ["travis", "codecov"]
+authority="cpan:PINE"
+license="mit"
+
+module_maker="ModuleBuildTiny"
+
+[Metadata]
+x_static_install = 1

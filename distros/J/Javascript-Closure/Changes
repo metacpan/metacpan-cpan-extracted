@@ -1,0 +1,55 @@
+Revision history for Perl extension Javascript::Closure.
+
+0.07  2010/08/21
+
+MODIFICATION
+      - worldwritable changes.
+
+0.06  2010/08/21
+
+MODIFICATION
+      - the tar contained unnecessary files making make fails.
+
+0.05  2010/07/15
+
+mostly documentation based update.no new features per se.
+
+MODIFICATION
+      - Makefile.PL setting of the requirement was wrong it seems.
+
+ADDITION:
+      - none
+
+UPDATE
+	  - doc layout errors/info here and there updated
+
+
+0.04  2010/07/14
+
+MODIFICATION
+	  - check parameter value
+      - does not query twice for strings and urls now
+      - check that the url exists and carp if not
+
+ADDITION:
+      - added timeout setting via package variable TIMEOUT
+      - added warning_level option
+
+UPDATE:
+      - updated the doc
+      - updated the test suite
+
+
+0.03  2010/07/13
+	  - updated the input parameter to accept multiple urls or strings. 
+      - updated the output_format to accept multiple format.
+      - updated the doc accordingly
+      - updated the test suite
+
+0.02  2010/07/13
+	  - the packaging was wrong. 
+      - updated the proper version	
+
+0.01  Tue Jul 13 10:56:56 2010
+	- First version, released on an unsuspecting world.
+

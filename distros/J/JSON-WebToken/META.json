@@ -1,0 +1,104 @@
+{
+   "abstract" : "JSON Web Token (JWT) implementation",
+   "author" : [
+      "xaicron <xaicron@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-WebToken",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "Exporter" : "0",
+            "JSON" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Mock::Guard" : "0.07",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0.06"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::WebToken" : {
+         "file" : "lib/JSON/WebToken.pm",
+         "version" : "0.10"
+      },
+      "JSON::WebToken::Constants" : {
+         "file" : "lib/JSON/WebToken/Constants.pm"
+      },
+      "JSON::WebToken::Crypt" : {
+         "file" : "lib/JSON/WebToken/Crypt.pm"
+      },
+      "JSON::WebToken::Crypt::HMAC" : {
+         "file" : "lib/JSON/WebToken/Crypt/HMAC.pm"
+      },
+      "JSON::WebToken::Crypt::RSA" : {
+         "file" : "lib/JSON/WebToken/Crypt/RSA.pm"
+      },
+      "JSON::WebToken::Exception" : {
+         "file" : "lib/JSON/WebToken/Exception.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-JSON-WebToken/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-JSON-WebToken",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-JSON-WebToken.git",
+         "web" : "https://github.com/xaicron/p5-JSON-WebToken"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:XAICRON",
+   "x_contributors" : [
+      "Masaki Sawamura <sawamura.masaki@dena.jp>",
+      "Ryo <ritou.06@gmail.com>",
+      "yokoe.naosuke <yokoe.naosuke@dena.jp>",
+      "maedama <maedama85@gmail.com>",
+      "xaicron <xaicron@gmail.com>"
+   ]
+}

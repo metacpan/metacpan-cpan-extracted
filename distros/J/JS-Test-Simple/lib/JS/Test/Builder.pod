@@ -1,0 +1,740 @@
+=pod
+
+=head1 Name
+
+Test.Builder - Back end for building test libraries
+
+=head1 Synopsis
+
+  var Test = new Test.Builder();
+
+  function ok (test, description) {
+      Test.ok(test, description);
+  }
+
+=head1 Description
+
+Test.Builder provides the buildings block upon which to write test libraries
+like Test.Simple and Test.More I<that can work together>. All tests are
+expected to use a plan and to be run in an HTML element with its "id"
+attribute set to "test". See L<Test.Simple|Test.Simple> and
+L<Test.More|Test.More> for details. Users of this class, however, are expected
+to be folks who want to write test functions that interoperate with
+Test.Simple and Test.More.
+
+=head2 Constants
+
+=over
+
+=item B<Test.PLATFORM>
+
+This constant contains a string that defines the platform in which the tests
+are currently running. Possible values are:
+
+=over
+
+=item browser
+
+A Web browser.
+
+=item director
+
+Adobe Director.
+
+=item wsh
+
+Windows Scripting Host.
+
+=back
+
+=back
+
+=head2 Construction
+
+=over
+
+=item B<Test.Builder>
+
+  var Test = new Test.Builder();
+
+Returns a new Test.Builder object. Since you generally only run one test per
+program, there should be B<one and only one> Test.Builder object. So, in
+general, you should call Test.Builder.instance() to get at the singleton
+object used for all tests. Only use C<new Test.Builder()> if you need to
+create a new Test.Builder object to, for example, test a Test.Builder-based
+test library.
+
+=item B<instance>
+
+  var Test = Test.Builder.instance();
+
+Returns a Test.Builder object representing the current state of the test.  No
+matter how many times you call C<Test.Builder.instance()>, you'll get the same
+object. (This is called a singleton).
+
+=item B<reset>
+
+  Test.reset();
+
+Reinitializes the Test.Builder singleton to its original state. Mostly useful
+for tests run in persistent environments where the same test might be run
+multiple times in the same process.
+
+=begin private
+
+=item B<die>
+
+  Test.Builder.die(msg);
+
+This class method kills the tests with the error message. Implemented with the
+C<throw> keyword currently supported only by JavaScript 1.5. This is subject
+to change.
+
+=item B<warn>
+
+  Test.Builder.warn(msg);
+
+This class method outputs a warning message. Currently implemented with the
+C<alert()> method of the global (window) object. This is subject to change.
+
+=end private
+
+=back
+
+=head2 Setting up tests
+
+These methods are for setting up tests and declaring how many there are. You
+usually only want to call one of these methods.
+
+=over
+
+=item B<plan>
+
+  Test.plan({ noPlan:  true     });
+  Test.plan({ skipAll: reason   });
+  Test.plan({ tests:   numTests });
+
+A convenient way to set up your tests. Call this method and Test.Builder will
+print the appropriate headers and take the appropriate actions.
+
+If you call plan(), don't call any of the other test setup methods.
+
+=item B<expectedTests>
+
+    var max = Test.expectedTests();
+    Test.expectedTests(max);
+
+Gets/sets the number of tests we expect this test to run and prints out the
+appropriate headers.
+
+=item B<noPlan>
+
+  Test.noPlan();
+
+Declares that this test will run an indeterminate number tests.
+
+=item B<hasPlan>
+
+  var plan = Test.hasPlan();
+
+Find out whether a plan has been defined. C<plan> is either C<null> (no plan
+has been set) "noPlan" (indeterminate number of tests) or an integer (the
+number of expected tests).
+
+=item B<skipAll>
+
+  Test.skipAll();
+  Test.skipAll(reason);
+
+Skips all the tests in the test file, using the given C<reason>.
+
+=back
+
+=head2 Running tests
+
+These methods actually run the tests. The C<description> argument is always
+optional.
+
+=over
+
+=item B<ok>
+
+  Test.ok(test, description);
+
+Your basic test. Pass if test is true, fail if test is false. Returns a boolean
+indicating passage or failure.
+
+=item B<isEq>
+
+  Test.isEq(got, expect, description);
+
+Tests to see whether C<got> is equivalent to C<expect>.
+
+=item B<isNum>
+
+  Test.isNum(got, expect, description);
+
+Tests to see whether the numeric form of C<got> is equivalent to the
+numeric form of C<expect> as converted by Number().
+
+=item B<isntEq>
+
+  Test.isntEq(got, dontExpect, description);
+
+The opposite of C<isEq()>. Tests to see whether C<got> is I<not> equivalent to
+C<dontExpect>.
+
+=item B<isntNum>
+
+  Test.isntNum(got, dontExpect, description);
+
+The opposite of C<isNum()>. Tests to see whether the numeric form of C<got> is
+I<not> equivalent to the numeric form of C<dontExpect> as converted by
+Number().
+
+=item B<like>
+
+  Test.like(got, /regex/, description);
+  Test.like(got, 'regex', description);
+
+Tests to see whether C<got> matches the regular expression in C<regex>. If a
+string is passed for the C<regex> argument, it will be converted to a regular
+expression object for testing. If <got> is not a string, the test will fail.
+
+=item B<unlike>
+
+  Test.unlike(got, /regex/, description);
+  Test.unlike(got, 'regex', description);
+
+The opposite of C<unlike()>. Tests to see whether C<got> I<does not match> the
+regular expression in C<regex>. If a string is passed for the C<regex>
+argument, it will be converted to a regular expression object for testing.  If
+<got> is not a string, the test will pass.
+
+=begin private
+
+=item B<_regexOK>
+
+  Test._regexOK(val, /regex/, cmp, description);
+  Test._regexOK(val, 'regex', cmp, description);
+
+This method is used by C<like()> and C<unlike()> to perform the actual regular
+expression test.
+
+=item B<_diagLike>
+
+  Test._diagLike(val, /regex/, cmp);
+
+This method is used by C<_regexOK()> to output diagnostics when a test fails.
+
+=end private
+
+=item B<cmpOK>
+
+  Test.cmpOK(got, op, expect, description);
+
+Performs a comparison of two values, C<got> and C<expect>. Specify any binary
+comparison operator as a string via the C<op> argument. In addition to the
+usual JavaScript operators, cmpOK() also supports the Perl-style string
+comparison operators:
+
+=over
+
+=item C<eq> - String equal
+
+=item C<ne> - String not equal
+
+=item C<lt> - String less than
+
+=item C<gt> - String greater than
+
+=item C<le> - String less than or equal
+
+=item C<ge> - String greater than or equal
+
+=back
+
+=begin private
+
+=item B<_cmpDiag>
+
+  Test._cmpDiag(got, op, expect);
+
+Outputs a diagnostic message when a C<cmpOK()> string comparison test fails.
+
+=item B<_isDiag>
+
+  Test._isDiag(got, op, expect);
+
+Outputs a diagnostic message when a C<cmpOK()> numeric comparison test fails.
+
+=end private
+
+=item B<BAILOUT>
+
+    Test.BAILOUT(reason);
+
+Indicates to the Test.Harness that things are going so badly all testing should
+terminate. This includes running any additional test files.
+
+=item B<skip>
+
+    Test.skip();
+    Test.skip(why);
+
+Skips the current test, reporting C<why>.
+
+=item B<todoSkip>
+
+  Test.todoSkip();
+  Test.todoSkip(why);
+
+Like C<skip()>, only it will declare the test as failing and TODO.
+
+=item B<skipRest>
+
+  Test.skipRest();
+  Test.skipRest(reason);
+
+Like C<skip()>, only it skips all the rest of the tests you plan to run and
+terminates the test.
+
+If you're running under "noPlan", it skips once and terminates the test.
+
+=back
+
+=head2 Test style
+
+=over
+
+=item B<useNumbers>
+
+    Test.useNumbers(onOrOff);
+
+Whether or not the test should output numbers. That is, this if true:
+
+  ok 1
+  ok 2
+  ok 3
+
+or this if false
+
+  ok
+  ok
+  ok
+
+Most useful when you can't depend on the test output order. Test.Harness will
+accept either, but avoid mixing the two styles. Defaults to C<true>.
+
+=item B<noHeader>
+
+    Test.noHeader(noHeader);
+
+If set to C<true>, no "1..N" header will be printed.
+
+=item B<noEnding>
+
+    Test.noEnding(noEnding);
+
+Normally, Test.Builder does some extra diagnostics when the test ends. It also
+changes the exit code as described below. If this is C<true>, none of that
+will be done.
+
+=back
+
+=head2 Output
+
+Controlling where the test output goes. It's ok for your test to change where
+C<document.write> points to; Test.Builder's default output settings will not be
+affected.
+
+=over
+
+=item B<diag>
+
+    Test.diag(msg);
+    Test.diag(msg, msg2, msg3);
+
+Prints out all of its arguments. All arguments are simply appended together
+for output.
+
+Normally, it uses the failureOutput() handle, but if this is for a TODO test,
+the todoOutput() handle is used.
+
+Output will be indented and marked with a "#" so as not to interfere with test
+output. A newline will be put on the end if there isn't one already.
+
+We encourage using this method rather than outputting diagnostics directly.
+
+Returns false. Why? Because C<diag()> is often used in conjunction with a
+failing test (C<ok() || diag()>) it "passes through" the failure.
+
+    return ok(...) || diag(...);
+
+=begin private
+
+=item B<_print>
+
+  Test.Builder._print(msg);
+  Test.Builder._print(msg, msg2, msg3);
+  Test._print(msg);
+  Test._print(msg, msg2, msg3);
+
+This private class method prints out its message arguments. Currently, it just
+sends it to C<document.write()>. May be called as a class method or an
+instance method.
+
+=item B<_printDiag>
+
+    Test._printDiag(msg);
+
+Like C<_print()>, but prints to the current diagnostic file handle.
+
+=end private
+
+=back
+
+=head2 Output
+
+These methods specify where test output and diagnostics will be sent. By
+default, in a browser they all default to appending to the element with the
+"test" ID or, failing that, to using C<document.write()>. In Adobe Director,
+they use C<trace()> for their output, and in Windows Scripting Host, they use
+C<WScript.StdOut.writeline()>. If you wish to specify other functions that
+lack the C<apply()> method, you'll need to supply them instead as custom
+anonymous functions that take a single argument (multiple arguments will be
+concatenated before being passed to the output function):
+
+  Test.output(function (msg) { foo(msg) });
+
+=over
+
+=item B<output>
+
+    Test.output(function);
+
+Function to call with normal "ok/not ok" test output.
+
+=item B<failureOutput>
+
+    Test.failureOutput(function);
+
+Function to call with diagnostic output on test failures and diag.
+
+=item B<todoOutput>
+
+    Test.todoOutput(function);
+
+Function to call with diagnostic about todo test failures and diag.
+
+=item B<warnOutput>
+
+    Test.warnOutput(function);
+
+Function to call with warnings.
+
+=item B<endOutput>
+
+    Test.endOutput(function);
+
+Function to which to pass any end messages (such as "Looks like you planed 8
+tests but ran 2 extra").
+
+=back
+
+=head2 Test Status and Info
+
+=over
+
+=item B<currentTest>
+
+    var currTest = Test.currentTest();
+    Test.currentTest(num);
+
+Gets/sets the current test number we're on. You usually shouldn't have to set
+this property.
+
+If set forward, the details of the missing tests are filled in as "unknown".
+if set backward, the details of the intervening tests are deleted. You can
+erase history if you really want to.
+
+=item B<summary>
+
+    my @tests = Test.summary();
+
+A simple summary of the tests so far returned as an array or boolean values,
+C<true> for pass, C<false> for fail. This is a logical pass/fail, so todos are
+passes.
+
+Of course, test #1 is tests[0], etc...
+
+=item B<details>
+
+    my @tests = Test.details();
+
+Like summary(), but with a lot more detail.
+
+  tests[testNum - 1] = {
+      ok:        is the test considered a pass?
+      actual_ok: did it literally say 'ok'?
+      desc:      description of the test (if any)
+      type:      type of test (if any, see below).
+      reason:    reason for the above (if any)
+  };
+
+=over
+
+=item *
+
+"ok" is true if Test.Harness will consider the test to be a pass.
+
+=item *
+
+"actual_ok" is a reflection of whether or not the test literally printed "ok"
+or "not ok". This is for examining the result of "todo" tests.
+
+=item *
+
+"description is the description of the test.
+
+=item *
+
+"type" indicates if it was a special test. Normal tests have a type of "".
+Type can be one of the following:
+
+=over
+
+=item skip        see skip()
+
+=item todo        see todo()
+
+=item todo_skip   see todoSkip()
+
+=item unknown     see below
+
+=back
+
+=back
+
+Sometimes the Test.Builder test counter is incremented without it printing any
+test output, for example, when C<currentTest()> is changed. In these cases,
+Test.Builder doesn't know the result of the test, so it's type is "unknown". The
+details for these tests are filled in. They are considered ok, but the name
+and actual_ok is left C<null>.
+
+For example "not ok 23 - hole count # TODO insufficient donuts" would
+result in this structure:
+
+  tests[22] = {          // 23 - 1, since arrays start from 0.
+      ok:        1,      // logically, the test passed since it's todo
+      actual_ok: 0,      // in absolute terms, it failed
+      desc:      'hole count',
+      type:      'todo',
+      reason:    'insufficient donuts'
+  };
+
+=item B<todo>
+
+    TODO: {
+        Test.todo(why, howMany);
+        ...normal testing code goes here...
+    }
+
+Declares a series of tests that you expect to fail and why. Perhaps it's
+because you haven't fixed a bug or haven't finished a new feature. The next
+C<howMany> tests will be expected to fail and thus marked as "TODO" tests.
+
+=item B<caller>
+
+    var package = Test.caller();
+    my(pack, file, line) = Test.caller();
+    my(pack, file, line) = Test.caller(height);
+
+Like the normal caller(), except it reports according to your level().
+
+=back
+
+=begin private
+
+=over
+
+=item B<_sanityCheck>
+
+  Test._sanityCheck();
+
+Runs a bunch of end of test sanity checks to make sure reality came through
+ok. If anything is wrong it will die with a fairly friendly error message.
+
+=item B<_whoa>
+
+  _whoa(check, description);
+
+A sanity check, similar to C<assert()>. If the check is true, something has
+gone horribly wrong. It will die with the given description and a note to
+contact the author.
+
+=item B<_endOutput>
+
+  var output_fn = Test._endOutput();
+
+This method is called by the _ending() method to get a function to which to
+send ending output. It first tries to get it from endOutput(), then tries to
+get an element with the ID "test", and falls back on C<document.write> if all
+else fails. The function found will be assigned to endOutput().
+
+=item B<_ieWrite>
+
+  Test._ieWrite(message, message2, ...);
+
+This method handles the default output to C<document.write> for Internet
+Explorer, since it lacks an C<apply()> method on C<document.write>. It is
+assigned to output(), todoOutput(), and failureOutput() by default, and to
+endOutput() if no element with the ID "test" can be found.
+
+=item B<_notifyHarness()>
+
+  Test._notifyHarness();
+
+This method is called by C<_ending()> to notify any Test.Harness classes that
+the test has finished.
+
+=item B<_ending>
+
+  Test._ending();
+
+This method is called by the C<window.onload> handler installed by
+Test.Builder.  It checks the test run and outputs any necessary ending
+messages, such as "It looks like you planed 8 tests but ran 2 extra."
+
+=item B<typeOf>
+
+  var type = Test.typeOf(object);
+
+Returns the class of the object passed to it. For user-created classes, it
+uses a hack that examines the stringified value of an object's constructor
+method to get the class name.
+
+=item B<isUndef>
+
+  Test.isUndef(got, expected, description);
+
+Tests to see that two values are both undefined (or C<null>, which is
+equivalent). Pass if both values are undefined, fail if one or both is
+defined. Returns a boolean indicating passage or failure.
+
+=end private
+
+=item B<beginAsync>
+
+=item B<endAsync>
+
+  var timeout = 3000;
+  var asyncID = Test.beginAsync(timeout);
+  window.setTimeout(
+      function () {
+          Test.ok(true, "Pass after 2 seconds");
+          Test.endAsync(asyncID);
+      }, timeout - 1000
+  );
+
+Sometimes you may need to run tests in an asynchronous process. Such processes
+can be started using C<window.setTimeout()> or C<window.setInterval()> in a
+browser, or by making an XMLHttpRequest call. In such cases, the tests might
+normally run I<after> the test script has completed, and thus the summary
+message at the end of the test script will be incorrect--and the test results
+will appear after the summary.
+
+To get around this problem, tell the Test.Builder object that you're running
+asyncronous tests by calling beginAsync(). The test script will not finish
+until you pass the ID returned by beginAsync() to endAsync(). If you've called
+beginAsync() with the optional timout argument, then the test will finish if
+endAsync() has not been called with the appropriate ID before the timeout has
+elapsed. The timeout can be specified in milliseconds.
+
+=item B<exporter>
+
+  if (typeof JSAN != 'undefined') new JSAN().use('Test.Builder');
+  else {
+      if (typeof Test == 'undefined' || typeof Test.Builder == 'undefined')
+          throw new Error(
+              "You must load either JSAN or Test.Builder "
+              + "before loading Test.Simple"
+          );
+  }
+
+  Test.Simple = {};
+  Test.Simple.EXPORT      = ['plan', 'ok'];
+  Test.Simple.EXPORT_TAGS = { ':all': Test.Simple.EXPORT };
+  Test.Simple.VERSION     = '0.29';
+
+  // .... Declare exportable functions, then export them.
+
+  if (typeof JSAN == 'undefined') Test.Builder.exporter(Test.Simple);
+
+This method is used by Test.More and Test.Simple to export functions into the
+global namespace. It is only used if JSAN (L<http://www.openjsan.org/>) is not
+available. Other test modules built with Test.Builder should also use this
+method to export functions. An optional second argument specifies the name
+space in which to export the functionls. If it is not defined, it defaults to
+the C<window> object in browsers and the C<_global> object in Director.
+
+=back
+
+=head1 Examples
+
+CPAN can provide the best examples. Test.Simple and Test.More both use
+Test.Builder.
+
+=head1 See Also
+
+=over
+
+=item Test.Simple
+
+Simple testing with a single testing function, ok(). Built with Test.Builder.
+
+=item Test.More
+
+Offers a panoply of test functions for your testing pleasure. Also built with
+Test.Builder.
+
+=item L<http://www.edwardh.com/jsunit/>
+
+JSUnit: elaborate xUnit-style testing framework. Completely unrelated to
+Test.Builder.
+
+=back
+
+=head1 ToDo
+
+=over
+
+=item *
+
+Finish porting tests from Test::Simple.
+
+=item *
+
+Properly catch native exceptions, such as for syntax errors (is this even
+possible?).
+
+=back
+
+=head1 Authors
+
+Original Perl code by chromatic and maintained by Michael G Schwern
+<schwern@pobox.com>. Ported to JavaScript by David Wheeler
+<david@kineticode.com>.
+
+=head1 Copyright
+
+Copyright 2002, 2004 by chromatic <chromatic@wgz.org> and Michael G Schwern
+<schwern@pobox.com>, 2005 by David Wheeler <david@kineticode.com>.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the Perl Artistic License or the GNU GPL.
+
+See L<http://www.perl.com/perl/misc/Artistic.html> and
+L<http://www.gnu.org/copyleft/gpl.html>.
+
+=cut

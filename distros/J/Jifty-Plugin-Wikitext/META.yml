@@ -1,0 +1,25 @@
+---
+abstract: 'Wikitext field renderer'
+author:
+  - 'Best Practical Solutions'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Wikitext
+no_index:
+  directory:
+    - inc
+requires:
+  HTML::Scrubber: 0
+  Jifty: 0.90422
+  Text::WikiFormat: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

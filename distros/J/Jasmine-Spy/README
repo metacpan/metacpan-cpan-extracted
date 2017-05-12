@@ -1,0 +1,144 @@
+NAME
+
+    Jasmine::Spy
+
+VERSION
+
+    version 1.02
+
+SYNOPSIS
+
+            use Test::Spec;
+            use Jasmine::Spy qw(spyOn stopSpying expectSpy);
+    
+            describe "FooClass" => sub {
+                    before each => sub {
+                            spyOn("BarClass", "bazMethod")->andReturn("Bop");
+                            spyOn("BarClass", "bam")->andCallThrough;
+                    };
+                    it "calls BarClass" => sub {
+                            FooClass->doTheThing();
+                            expectSpy("BarClass", "bazMethod")->toHaveBeenCalled();
+                    };
+                    it "calls BarClass->bat method with 'bam'" => sub {
+                            FooClass->doTheThing();
+                            expectSpy("BarClass", "bat")->toHaveBeenCalledWith('bam')
+                    };
+                    after each => sub {
+                            stopSpying("BarClass");
+                    };
+            };
+
+Methods
+
+    Nothing is exported by default, but they cann all be pulled in with the
+    :all tag
+
+ Base Class Methods
+
+    spyOn($invocant, $method)
+
+      This is the setup method to begin spying. $invocant may be either an
+      object instance or the name of a class. Spying on a Class will
+      automatically spy on all instances of the class, even those created
+      before setting up the spy. Spyng on an instance only effects that
+      instance, not the class or other instances of that class.
+
+      A "spy" object is returned from this call which will allow
+      introspection and testing of calls. However there is no need to catch
+      this, as other convience methods provide a better way of performing
+      the same introspection later.
+
+    stopSpying($invocant)
+
+      Use this call to stop spying and restore original functionality to
+      the object or class.
+
+    expectSpy($invocant, $method)
+
+      Use this to retrieve the "spy" object created by spyOn. It also sets
+      the spy object to introspect of the provided $method. There is only
+      one spy object created for each distinct $invocant beign spied on,
+      even if multiple methods are being watched. This is why expectSpy is
+      the recomended way to start introspection on a spied method.
+
+    getCalls($invocant, $method)
+
+      This will fetch an array of array's containing the arguments passed
+      each time the $method was called. This is a tied array ref which also
+      provides convience methods first and mostRecent.
+
+ Spy object methods
+
+    toHaveBeenCalled
+
+      Test that the spied method has been called atleast once.
+
+    notToHaveBeenCalled
+
+      Test that the spied method was never called.
+
+    toHaveBeenCalledWith($matchers)
+
+      Expects that the spied method has been called with arguments matching
+      $matchers atleast once. This is done with deep comparison via
+      Test::Deep.
+
+    notToHaveBeenCalledWith($matchers)
+
+      Inverse of toHaveBeenCalledWith.
+
+    andReturn($value)
+
+      Sets the spied method to return the supplied value. Usually this
+      would be called directly on the return from spyOn.
+
+      For example:
+
+              spyOn($foo, 'bar')->andReturn('baz')
+
+    andCallThrough
+
+      Sets the spied method to call through to the original method,
+      recording arguments passed along the way.
+
+    andCallFake(sub {})
+
+      Sets the spied method to invoke the supplied code reference in place
+      of the original method. It does also record the arguments along the
+      way.
+
+ Qunatifiers
+
+    Quantifiers may be called on the return of either toHaveBeenCalled or
+    toHaveBeenCalledWith to stipulate how many times the method should have
+    been called.
+
+    once()
+
+      The method was called exactly one time
+
+    atleast(X)
+
+      Method was called atleast X times
+
+    atMost(X)
+
+      Method was not called more than X times
+
+    exactly(X)
+
+      Method was called exactly X times.
+
+TODO
+
+    Convience Method for andThrow
+
+      Having put some thought into this, I haven't come up with a clean
+      robust way to handle it. In the end, I think you are better off using
+      andCallFake to throw an exception if you need to test that.
+
+See also
+
+    Test::Spec, Test::Deep
+

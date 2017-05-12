@@ -1,0 +1,52 @@
+<html>
+<head>
+<script language="javascript" src="../js/jquery-1.2.6.js"></script>
+<script language="javascript" src="../js/json2.js"></script>
+<script language="javascript" src="../../lib/JS/JSORB.js"></script>
+<script language="javascript" src="ForestTree.js"></script>
+<script language="javascript">
+
+function draw_node (c) {
+    return '<li id="node_'
+         + c.uid
+         + '"><a href="javascript:load_subtree('
+         + c.uid
+         + ')">'
+         + c.node
+         + '</a><ul id="children_'
+         + c.uid
+         + '"></ul></li>';
+}
+
+var forest = new Forest.Tree ('http://localhost:9999/');
+
+$(document).ready(function () {
+   forest.get_root_tree(function (t) {
+       var out = '';
+       $.each(t.children, function (i, c) { out += draw_node(c) });
+       $('#tree').html(out);
+   });
+})
+
+function load_subtree (uid, node) {
+    if ($('#children_' + uid).html()) {
+        $('#children_' + uid).toggle();
+    }
+    else {
+        forest.get_tree_at(uid, function (t) {
+            var out = '';
+            $.each(t.children, function (i, c) { out += draw_node(c) });
+            $('#children_' + uid).html(out);
+        });
+    }
+}
+
+</script>
+</head>
+<body>
+<h1>JSORB Tree Test</h1>
+<hr/>
+<ul id="tree">
+</ul>
+</body>
+</html>

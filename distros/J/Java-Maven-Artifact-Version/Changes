@@ -1,0 +1,9 @@
+Revision history for Java-Maven-Artifact-Version
+
+1.000001    2014-11-11 17:08:26+01:00
+            Maven 3.2.3 compatibility approved.
+            mv MIN_PERL_VERSION to 5.008008
+
+1.00        2014-07-14 17:00:00+02:00
+            First version, released.
+

@@ -1,0 +1,15 @@
+^\.git
+^Makefile$
+^blib/
+^MakeMaker-\d
+\.tar\.gz
+^JSON-Tiny-[\d._]+/
+~$
+\.old$
+^#.*#$
+^\.#
+\.gz$
+^MYMETA
+pm_to_blib
+cover
+^JSON-Tiny$

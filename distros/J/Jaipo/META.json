@@ -1,0 +1,61 @@
+{
+   "abstract" : "Micro-blogging Client",
+   "author" : [
+      "BlueT - Matthew Lien - 練喆明 <BlueT@BlueT.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Jaipo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cache" : "0",
+            "Class::Accessor::Fast" : "0",
+            "Data::Dumper::Simple" : "0",
+            "Desktop::Notify" : "0",
+            "Hash::Merge" : "0",
+            "Net::Twitter" : "0",
+            "Number::RecordLocator" : "0",
+            "Term::ReadLine" : "0",
+            "Test::More" : "0",
+            "Text::Table" : "0",
+            "YAML::Syck" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Jaipo"
+      },
+      "repository" : {
+         "url" : "https://github.com/BlueT/jaipo"
+      }
+   },
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

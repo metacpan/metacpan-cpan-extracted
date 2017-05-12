@@ -1,0 +1,20 @@
+
+0.03	Sat Aug  9 20:18:44 BST 2008
+
+	Removed failing tests properly this time.
+
+	n.b. CPAN tester emails sent to HiveMinder is truly a great way to pester you
+	to do something.
+
+	I'll have another look at this soon and check it really does still work and go
+	through any patches outstanding.
+
+0.02	Sat Aug 19 05:41:09 BST 2006
+
+	Removed failing test (i'm not supplying the cgi it called to at the moment).
+	Updated email address.
+	Added licensing details.
+	Added this file.
+
+
+

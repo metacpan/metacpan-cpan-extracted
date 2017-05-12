@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Java-JVM-Classfile
+version:             0.20
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.38
+distribution_type:   module
+requires:     
+    Class::Struct:                 0
+    Test::Simple:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

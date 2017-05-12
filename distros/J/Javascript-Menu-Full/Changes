@@ -1,0 +1,10 @@
+Revision history for Perl extension Javascript::Menu.
+
+2.00  Fri Oct 31 2003
+	- Now contains version 2.00 of Javascript::Menu, and the new deps.
+
+2.01  Wed Apr 7 2004
+	- Contains version 2.01 of Javascript::Menu, which added support for IE5. 
+
+2.02  Sat Oct 8 2005 
+	- Version 2.02 of Javascript::Menu, menu timing is no longer hard-coded.

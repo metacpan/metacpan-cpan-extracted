@@ -1,0 +1,27 @@
+This is Perl module JiftyX::Markapl.
+
+INSTALLATION
+
+JiftyX::Markapl installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan JiftyX::Markapl
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+JiftyX::Markapl documentation is available as in POD. So you can do:
+
+    % perldoc JiftyX::Markapl
+
+to read the documentation online with your favorite pager.
+
+Kang-min Liu

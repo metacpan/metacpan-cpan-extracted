@@ -1,0 +1,25 @@
+---
+abstract: 'Shibboleth auth. plugin for Jifty'
+author:
+  - 'Yves Agostini, <yvesago@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Authentication-ModShibb
+no_index:
+  directory:
+    - share
+    - share
+    - inc
+    - t
+requires:
+  Jifty: 0.91117
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git@github.com:yvesago/jifty-plugin-authentication-modshibb.git
+version: 0.03

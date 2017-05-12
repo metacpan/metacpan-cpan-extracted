@@ -1,0 +1,9 @@
+lib/Jifty/Plugin/YouTube.pm
+lib/Jifty/Plugin/YouTube/Dispatcher.pm
+lib/Jifty/Plugin/YouTube/View.pm
+lib/Jifty/Plugin/YouTube/Widget.pm
+t/00-load.t
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml

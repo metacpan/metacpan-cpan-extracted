@@ -1,0 +1,74 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: JSON-Path
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/JSON-Path
+
+Files: Changes
+ META.json
+ META.yml
+ dist.ini
+ doap.ttl
+Copyright: Copyright 2013 Toby Inkster.
+License: Expat
+
+Files: CONTRIBUTING
+ INSTALL
+ LICENSE
+ examples/eg1.pl
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: t/03shortcuts.t
+ t/04map.t
+Copyright: Copyright 2012-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+ t/06lvalue.t
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: README
+ lib/JSON/Path.pm
+Copyright: Copyright 2007 Stefan Goessner.
+ Copyright 2010-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/02zeroth.t
+Copyright: Copyright 2011-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: Copyright 2010-2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/05set.t
+Copyright: Copyright 2013 Mitsuhiro Nakamura.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Expat
+ This software is Copyright (c) 2013 by Toby Inkster.
+ 
+ This is free software, licensed under:
+ 
+   The MIT (X11) License
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

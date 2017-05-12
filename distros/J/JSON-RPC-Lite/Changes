@@ -1,0 +1,18 @@
+Revision history for Perl extension JSON-RPC-Lite
+
+v1.0.0 2014-08-26T15:42:46Z
+
+    - fix missing_build_prereqs
+
+0.03 2014-08-13T23:19:13Z
+
+    - fix test
+
+0.02 2014-08-13T17:44:52Z
+
+    - from JSON::RPC::Dispatch::Lite to JSON::RPC::Spec
+
+0.01 2014-08-08T23:43:20Z
+
+    - original version
+

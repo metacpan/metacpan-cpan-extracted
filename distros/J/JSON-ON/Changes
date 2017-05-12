@@ -1,0 +1,18 @@
+Revision history for JSON-ON
+
+v0.0.3 2013-06-26
+
+  * declare JSON dependency in metadata too!
+
+v0.0.2 2013-06-26
+
+  * declare dependencies in metadata
+
+v0.0.1 2013-06-03
+
+  * first public release
+
+See the source code repository for more detail.
+  git://git.scratchcomputing.com/JSON-ON.pm.git
+
+vim:ts=2:sw=2:et:sta

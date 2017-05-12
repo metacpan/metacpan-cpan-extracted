@@ -1,0 +1,23 @@
+Changes
+MANIFEST
+Makefile.PL
+README.md
+README.pod
+emulators/cpanfile
+emulators/generic.pl
+lib/JSON/Schema/ToJSON.pm
+t/001_compiles_pod.t
+t/003_changes.t
+t/005_simple.t
+t/006_array.t
+t/007_object.t
+t/008_ref.t
+t/010_combining_schema.t
+t/020_round_trip.t
+t/021_example_key.t
+t/030_json_schema.t
+t/040_string_format.t
+t/050_complex.t
+t/060_recursion.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

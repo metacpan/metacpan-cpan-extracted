@@ -1,0 +1,273 @@
+Revision history for JavaScript class Test.Simple.
+
+0.29
+      - As in Test::Builder 0.81_01, changed the message for extra tests run
+        to show the number of tests run rather than the number extra to avoid
+        the user having to do mental math. --theory
+      - Fixed the test summary to be a `<pre>` tag instead of a `<div>` with a
+        style attribute to make the output match. --jbisbee
+      - Fixed Test.Builder so that it no longer wraps errors in a `<span>` tag
+        now that we're appending to a text node (They don't don't get turned
+        DOM elements). --jbisbee
+
+      - Fixed bug with `canOK()`. It only checked objects prototype and not
+        the object itself. This means that if you had this code
+
+            function TestObject() { this.myMethod = function() {}; }
+            TestObject.prototype.protoMethod = function() {};
+
+            var testObject = new TestObject();
+            canOK( testObject, 'myMethod', 'protoMethod' );
+
+        then `canOK()` in its previous form would not find `myMethod`. It now
+        actually checks to see if you pass in instantiated objects.a --jbisbee
+      - Fixed a bug when testing a DOM element's `scrollTop` attribute within
+        a browser harness IFRAME that is 0X0 "display: none". We now Default
+        all harness `iframe`s to be both hidden and 1x1 pixels. Yes, there may
+        be a little square in some browsers that don't properly hide the
+        iframe, but at least tests that work outside the harness will now also
+        work within it --jbisbee
+      - Documented how to use `Test.Harness.Browser` without JSAN. --jbisbee
+      - Fix a summary bug in `Test.Builder` -- it wasn't reporting failures!
+        failed any tests, it wasn't reporting them! Thanks to Jeff Platter for
+        finding and fixing this issue. --jbisbee
+      - Moved source code to GitHub. Clone it from
+        git://github.com/theory/js-test-simple.git!
+      - Got `Test.Harness.Browser` working on Firefox again. Thanks to Nikolas
+        Coukouma for pointing me at the solution.
+
+0.28  2008-08-27T23:27:57
+      - Fix line breaks in new harness output in IE. --ingy
+
+0.27  2008-08-19T14:09:33
+      - Update documentation to reflect that the `<pre>` is no longer
+        required. --ingy
+      - Allow '-' in linked harness file names. --ingy
+
+0.26  2008-08-14T15:07:57
+      - Changed "got/expected" to "have/want", following Schwern's lead
+        with Test::Builder 2.
+      - Make test names be links to individual test urls. --ingy
+
+0.25  2008-07-08T14:07:03
+      - Tweaked the MANIFEST.SKIP to not MANIFEST the MANIFEST.SKIP.
+
+0.24  2008-07-03T00:59:14
+      - Reorganized properly for CPAN by Ingy döt Net.
+
+0.23  2008-06-19T00:00:00
+      - Fixed Test.Browser to work with Konqueror. Patch from Cory Bennett.
+      - Fixed a bunch of syntax errors, typos, and out-and-out broken bits,
+        thanks to a run of jslint by Cory Bennett.
+      - Eliminated Unicode characters from the code, as suggested by jslint.
+        Of course, JavaScript is supposed to be a UTF-8 language, but who
+        knows really, so it's best to be safe and let the implementation
+        work with ASCII. Tests can of course still be written using Unicode.
+      - Fixed a bug in `canOK` where a lack of arguments caused a `diag`
+        output to be missing a class name. Caught by Cory Bennet and jslint.
+      - Changed the name of the `output` variable in `Director.js` to
+        `toOutput`, since `output` is apparently a builtin in Directory.
+        Reported by Cory Bennett.
+      - Ported to CPAN by Ingy döt Net. Initial CPAN release.
+
+0.22  2008-04-02T03:19:48
+      - Added note to the documentation of "canOK()" explaining why it doesn't
+        work for objects based on prototypes created from anonymous classes.
+      - Fixed CSS typo for failure output. Thanks to Kevin Frost for the spot!
+      - When testing in a browser, Test::Builder now searches for an element
+        with the ID "test_output" or one with the ID "test" to which to send
+        the TAP output. If it doesn't exist, it creates a <pre> element with
+        the id "test_output" and sends all output there. This makes it much
+        easiser to harness test output, e.g., with Selenium, and it's easier
+        to write tests in .html files without having to put in any kind of
+        exta div at all. Suggested by Luke Closs.
+      - Switched from "isPrototypeOf" to "instanceof" in "isaOK". It seems to
+        work even in Safari. Patch from Marvin Humphrey.
+      - Refactored test results into a separate class, rather than using an
+        anonymous object. Mavin Humphrey.
+      - Added support for JavaScript command-line interpreters. Patch from
+        Thomas Yandell.
+
+0.21  2005-08-29T17:16:33
+      - Moved source code to JSAN Subversion repository. Check it out at
+        https://svn.openjsan.org:81/users/theory/Test.Simple/!
+      - Fixed Test.Harness.Browser to work with both .html and .js files in
+        IE 6 SP 2.
+
+0.20  2005-08-17T16:27:13
+      - Fixed verbose test output to be complete in the harness in Safari and
+        IE.
+      - Fixed plan() so that it doesn't die if the object is passed with an
+        unknown attribute. This can happen when JS code has altered
+        Object.prototype. Reported by Rob Kinyon.
+      - Fixed some errors in the POD documentation.
+      - Updated JSAN to 0.10.
+      - Added documentation for Test.Harness.Director, complements of
+        Gordon McCreight.
+      - Fixed line endings in Konqueror and Opera and any other browser
+        other than MSIE that supports document.all. Reported by Rob Kinyon.
+      - Added support to Test.Harness.Browser for .js test files in addition
+        to .html test files. Thanks to Pawel Chmielowski for helping me to
+        overcome the final obstacles to actually getting this feature to work.
+      - Added missing variable declarations. Patch from Pawel Chmielowski.
+      - More portable fetching of the "body" element in Test.Builder.
+        Based on patch from Pawel Chmielowski.
+      - Added an "encoding" attribute to Test.Harness. This is largely to
+        support pure JS tests, so that the browser harness can set up the
+        proper encoding for the "script" elements it creates.
+      - Added support for Opera, with thanks to Pawel Chmielowski.
+      - Fixed the output from skipAll in the test harness.
+      - Fixed display of summary of failed tests after all tests have been run
+        by the browser harness. They are now displayed in a nicely formatted
+        table without a "NaN" stuck where it doesn't belong.
+      - COMPATIBILITY CHANGE: The browser harness now outputs failure
+        information bold-faced and red. This required changing the "output"
+        argument to the outputResults() method to an object with two methods,
+        pass() and fail(). Anyone using Test.Harness.outputResults() will want
+        to make any changes accordingly.
+      - COMPATIBILITY CHANGE: new Test.Builder() now always returns a new
+        Test.Builder object instead of a singleton. If you want the singleton,
+        call Test.Builder.instance(). Test.Builder.create() has been
+        deprecated and will be removed in a future release. This is different
+        from how Perl's Test::Builder works, but is more JavaScript-like and
+        sensible, so we felt it was best to break things early on rather than
+        later. Suggested by Bob Ippolito.
+      - Added beginAsync() and endAsync() functions to Test.More. Suggested by
+        Bob Ippolito.
+
+0.11  2005-07-06T02:51:16
+      - The browser harness now works more reliably in IE and Safari.
+      - Fixed syntax errors in tests/harness.html that IE and Safari care
+        about.
+      - Various tweaks for Director compatibility from Gordon McCreight.
+      - Removed debugging output from Test.More.canOK().
+      - Fixed default output so that it doesn't re-open a closed browser
+        document when there is a "test" element.
+      - Added experimental Test.Harness.Director, complements of Gordon
+        McCreight. This harness is subject to change.
+      - Added Test.PLATFORM, containing a string defining the platform.  At
+        the moment, the only platforms listed are "browser" or "director".
+      - Added support for Casey West's JSAN (http://www.openjsan.org). All
+        releases of Test.Simple will be on OpenJSAN from now on.
+      - The iframe in the browser harness is no longer visible in IE. Thanks
+        to Marshall Roch for the patch.
+      - Noted addition of Test.Harness and Test.Harness.Browser in the README.
+
+0.10  2005-06-24T04:30:24
+      - Changed the signature of functions passed to output() and friends to
+        accept a single argument rather than a list of arguments. This allows
+        custom functions to be much simpler.
+      - Added support for Macromedia Director. Patch from Gordon McCreight.
+      - Backwards Incompatibility change: moved all "modules" into Test
+        "namespace" by using an object for the Test namespace and assigning
+        the Build() constructor to it. See http://xrl.us/fy4h for a
+        description of this approach.
+      - Fixed the typeOf() class method in Test.Builder to just return the
+        value returned by the "typeof" operator if the class constructor is an
+        anonymous function.
+      - Changed "for (var in in someArray)" to 
+        "for (var i = 0; i < someArray.length; i++)" for iterating through
+        arrays, since the former method will break if someone has changed the
+        prototype for arrays. Thanks to Bob Ippolito for the spot!
+      - The default output in browsers is now to append to an element with the
+        ID "test" or, failing that, to use "document.write". The use of the
+        "test" element allows output to continue to be written to the browser
+        window even after the document has been closed. Reported by Adam
+        Kennedy.
+      - Changed the default endOutput() method to be the same as the other
+        outputs.
+      - Backwards incompatibility change: Changed semantics of plan() so that
+        it takes an object for an argument.  This allows multiple commands to
+        be passed, where the object attribute keys are the command and their
+        values are the arguments.
+      - Backwards incompatibility change: Changed the "no_plan", "skip_all",
+        and "no_diag" (in Test.More only) options to plan() to their studlyCap
+        alternatives, "noPlan", "skipAll", and "noDiag". This makes them
+        consistent with JavaScript attribute naming convention.
+      - Added beginAsync() and endAsync() methods to Test.Builder to allow
+        users to put off the ending of a script until after asynchronous tests
+        have been run. Suggested by Adam Kennedy.
+      - Backwards incompatibility change: Changed the signature for the
+        output() method and friends to take only a single anonymous function
+        as its argument. If you still need to call a method, pass an anonymous
+        function that calls it appropriately.
+      - Changed handling of line-endings to be browser-specific. That is, if
+        the current environment is Internet Explorer, we use \r for line
+        endings.  Otherwise we use \n. Although IE properly interprets \n as a
+        line ending when it's passed to "document.write()", it doesn't when
+        passed to a DOM text node. No idea why not.
+      - Added a browser harness. Now you can run all of your tests in a single
+        browser window and get a summary at the end, including a list of
+        failed tests and the time spent running the tests.
+      - Fixed calls to warn() in Test.More.
+      - Output to the browser now causes the window to scroll when the length
+        of the output is greater than the height of the window.
+      - Backwards incompatibility change: Changed all instances of "Ok" to
+        "OK". So this means that the new Test.More function names are
+        "canOK()", "isaOK()", and "cmpOK()". Sorry 'bout that, won't happen
+        again.
+      - Ported to Safari (though there are issues--see the "Bugs" section
+        of the Test.Harness.Browser docs for details).
+
+0.03  2005-04-29T18:03:18
+      - Removed trailing commas from 3 arrays, since IE6/Win doesn't like
+        them. And now everything works in IE. Thanks to Marshall Roch for
+        tracking down and nailing this problem.
+      - isNum() and isntNum() in TestBuilder.js now properly convert values
+        to numbers using the global Number() function.
+      - CurrentTest is now properly initialized to 0 when creating a new
+        TestBuilder object.
+      - Values passed to like() and unlike() that are not strings now
+        always fail to match the regular expression.
+      - plan() now outputs better error messages.
+      - isDeeply() now works better with circular and repeating references.
+      - diag() is now smarter about converting objects to strings before
+        outputting them.
+      - Changed isEq() and isntEq() to use simple equivalence checks (== and
+        !=, respectively) instead of stringified comparisons, as the
+        equivalence checks are more generally useful. Use
+        "cmpOk(got, 'eq', expect)" to explicitly compare stringified
+    versions of values.
+      - TestBuilder.create() now properly returns a new TestBuilder object
+        instead of the singleton.
+      - The useNumbers(), noHeader(), and noEnding() accessors will now
+        properly assign a non-null value passed to them.
+      - The arrays returned from summary() and details() now have the
+        appropriate structures.
+      - diag() now always properly adds a "#" character after newlines.
+      - Added output(), failureOutput(), todoOutput(), warnOutput(), and
+        endOutput() to TestBuilder to set up function reference to which to
+        send output for various purposes. The first three each default to
+        document.write, while warnOutput() defaults to window.alert and
+        endOutput() defaults to the appendData function of a text element
+        inside an element with the ID "test" or, failing that, window.write.
+      - todo() and todoSkip() now properly add "#" after all newlines in their
+        messages.
+      - Fixed line ending escapes in diagnostics to be platform-independent.
+        Bug reported by Marshall Roch.
+      - Ported about a third of the tests from Test::Simple (which is how I
+        caught most of the above issues). The remaining test from Test::Simple
+        will be ported for the next release.
+      - Removed all stack trace information from diagnostics, since there's no
+        way to get file names and line numbers in JavaScript, and outtputting
+        an empty file name and "line 0" was rather useless.
+
+0.02  2005-04-12T21:00:07
+      - Removed eqArray() and eqAssoc() functions from TestMore per suggestion
+        from Michael Schwern. The problem is that these are not test
+        functions, and so are inconsistent with the way the rest of the
+        functions work. isDeeply() is the function that users really want.
+      - Changed eqSet() to isSet() and made it into a real test function.
+      - Implemented skip(), todoSkip(), and todo(). These are a bit different
+        than the Perl originals originals so read the docs!
+      - Implemented skipAll() and BAILOUT() using exceptions and an exception
+        handler installed in "window.onerror".
+      - The final message of a test file now properly outputs in the proper
+        place. Tests must be run inside an element its "id" attribute set to
+        "test", such as '<pre id="test">'. The window.onload handler will find
+        it and append the final test information.
+      - Implemented skipRest() in TestBuilder and TestMore. This method is
+        stubbed out the Perl original, but not yet implemented there!
+
+0.01  2005-04-07T18:17:18
+      - Initial public release (alpha).

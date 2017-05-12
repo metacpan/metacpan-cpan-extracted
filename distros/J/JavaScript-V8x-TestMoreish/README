@@ -1,0 +1,97 @@
+NAME
+    JavaScript::V8x::TestMoreish - Run and test JavaScript code in Perl
+    using Test::More and v8
+
+VERSION
+    Version 0.013
+
+SYNOPSIS
+        use Test::More
+
+        plan qw/no_plan/
+
+        is( 1, 1 )
+
+        use JavaScript::V8x::TestMoreish
+
+        test_js( <<'_END_' )
+        diag( "Hello, World." );
+        areEqual( 1, 1 );
+        areEqual( 1, 2 );
+        like( "Hello, World.", /o, World/ )
+            like( "Hello, World.", /Alice/ )
+        _END_
+
+DESCRIPTION
+    JavaScript::V8x::TestMoreish uses the Google V8 JavaScript engine (via
+    JavaScript::V8) to execute JavaScript code on demand in Perl. In
+    addition, the customized context binds some functions that expose parts
+    of Test::More to facillate testing.
+
+    An installation of "libv8" (for JavaScript::V8) is required.
+
+    You can interleave regular Test::More tests and JavaScript tests as
+    usual.
+
+JavaScript USAGE
+  diag( $message )
+        "Print" $message as Test::More does with diag
+
+  areEqual( $got, $expected, $name )
+        $got == $expected
+
+  like( $got, $match, $name )
+        isValue( $got ) && isString( $got ) && $got.match( $match )
+
+USAGE
+  test_js( $js )
+    Evaluate $js in a Test::More-ish context (see JavaScript USAGE for
+    available functionality)
+
+SEE ALSO
+    JavaScript::V8
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-javascript-v8x-test
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-V8x-TestMorei
+    sh>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc JavaScript::V8x::TestMoreish
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=JavaScript-V8x-TestMoreish
+        >
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/JavaScript-V8x-TestMoreish>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/JavaScript-V8x-TestMoreish>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/JavaScript-V8x-TestMoreish/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2010 Robert Krimen.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+
+#BOOTSTRAP-BEGIN
+# This section of code will be replaced by lots of inline Perl modules
+# to make the standalone jemplate script.
+use lib 'lib';
+use Jemplate;
+#BOOTSTRAP-END
+
+Jemplate->main(@ARGV);
+
+__END__
+
+=encoding UTF-8
+
+=head1 Usage:
+
+    jemplate --runtime [runtime-opt]
+
+    jemplate --compile [compile-opt] template-list
+
+    jemplate --runtime [runtime-opt] --compile [compile-opt] template-list
+
+    jemplate --list template-list
+
+Where C<--runtime> and C<runtime-opt> can include:
+
+    --runtime           Equivalent to --ajax=ilinsky --json=json2
+    --runtime=standard
+
+    --runtime=lite      Same as --ajax=none --json=none
+    --runtime=jquery    Same as --ajax=jquery --json=none
+    --runtime=yui       Same as --ajax=yui --json=yui
+    --runtime=legacy    Same as --ajax=gregory --json=json2
+
+    --json              By itself, equivalent to --json=json2
+    --json=json2        Include http://www.json.org/json2.js for parsing/stringifying
+    --json=yui          Use YUI: YAHOO.lang.JSON (requires external YUI)
+    --json=none         Doesn't provide any JSON functionality except a warning
+    
+    --ajax              By itself, equivalent to --ajax=xhr
+    --ajax=jquery       Use jQuery for Ajax get and post (requires external jQuery)
+    --ajax=yui          Use YUI: yui/connection/connection.js (requires external YUI)
+    --ajax=xhr          Use XMLHttpRequest (will automatically use --xhr=ilinsky if --xhr is not set)
+    --ajax=none         Doesn't provide any Ajax functionality except a warning
+
+    --xhr               By itself, equivalent to --xhr=ilinsky
+    --xhr=ilinsky       Include http://code.google.com/p/xmlhttprequest/
+    --xhr=gregory       Include http://www.scss.com.au/family/andrew/webdesign/xmlhttprequest/
+
+    --xxx               Include XXX and JJJ helper functions
+
+    --compact           Use the YUICompressor compacted version of the runtime
+
+Where C<compile-opt> can include:
+
+    --start-tag
+    --end-tag
+    --pre-chomp
+    --post-chomp
+    --trim
+    --any-case
+    --eval
+    --noeval
+    -s, --source
+    --exclude
+
+    See below for more information
+    
+=head2 Example:
+
+Write the Jemplate runtime code into Jemplate.js, then
+compile all the template files in the templates/ directory and put
+the output in my-jemplate.js.
+
+    jemplate --runtime > Jemplate.js
+    jemplate --compile templates/* > my-jemplate.js
+
+Do the same thing, but put the output into one file.
+
+    jemplate --runtime > my-jemplate.js
+    jemplate --compile templates/* >> my-jemplate.js
+
+=head2 template-list:
+
+The template-list is the list of template files that will be compiled.
+If something in the list is a file, then the template name will be just
+the file name. If it is a directory, then all the files under that
+directory will be found, and the relative paths to those files will be
+the template name.
+
+So 'template/foo/bar.tt2' will be named 'bar.tt2', but 'template/' will
+find a template named 'foo/bar.tt2'.
+
+It is important to know what Jemplate thinks the template name will be
+when you are writing templates or code that refers to other templates.
+Use the --list option to check this.
+
+=head1 Commands:
+
+    -r, --runtime
+        This flag tells Jemplate to print the Jemplate JavaScript
+        runtime code to STDOUT. You should redirect this output into
+        a .js file.
+
+    -c, --compile
+        The --compile flag tells Jemplate to actually compile templates.
+        The output is written to STDOUT.
+
+    -l, --list
+        Just print (STDOUT) the template names that Jemplate would use
+        from the template-list.
+
+=head1 Template Toolkit Compile Options:
+
+Jemplate allows you to specify the following Template Toolkit compile
+time options. Full descriptions of these options are available at
+L<http://www.template-toolkit.org/docs/plain/Manual/Config.html>.
+
+These options may either be set as JEMPLATE_* environment variables or as
+command line switches.
+
+    --start-tag (JEMPLATE_START_TAG)
+        Specify the starting template delimiter to use. Default is '[%'.
+
+    --end-tag (JEMPLATE_END_TAG)
+        Specify the ending template delimiter to use. Default is '%]'.
+
+    --pre-chomp (JEMPLATE_PRE_CHOMP)
+        Chomp leading whitespace automatically. Default is off.
+
+    --post-chomp (JEMPLATE_POST_CHOMP)
+        Chomp trailing whitespace automatically. Default is off.
+
+    --trim (JEMPLATE_TRIM)
+        Trim leading and trailing whitespace. Default is off.
+
+    --any-case (JEMPLATE_ANYCASE)
+        Allow lower or mixed case for template directives. Default is off.
+
+    --eval (--noeval) (JEMPLATE_EVAL_JAVASCRIPT)
+        Allow the execution of raw JavaScript. Default is on.
+        Use --noeval to disallow it.
+
+=head1 Jemplate Options:
+
+These compile time options are specific to Jemplate.
+
+    -s, --source
+        Include the original template source code as a JavaScript
+        comment next to each compiled template.
+
+    --exclude
+        Exclude any file matching the given regular expression.
+
+=cut

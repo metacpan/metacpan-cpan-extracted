@@ -1,0 +1,83 @@
+{
+   "abstract" : "JSON Merge Patch implementation",
+   "author" : [
+      "Taishi Hiraga <sojiro@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-MergePatch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Deep" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::JSON" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::MergePatch" : {
+         "file" : "lib/JSON/MergePatch.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sojiro14/JSON-MergePatch/issues"
+      },
+      "homepage" : "https://github.com/sojiro14/JSON-MergePatch",
+      "repository" : {
+         "url" : "git://github.com/sojiro14/JSON-MergePatch.git",
+         "web" : "https://github.com/sojiro14/JSON-MergePatch"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "taishi-hiraga <taishi.hiraga@dena.com>",
+      "Ivan Bessarabov <ivan@bessarabov.ru>",
+      "Taishi Hiraga <sojiro14@users.noreply.github.com>"
+   ]
+}

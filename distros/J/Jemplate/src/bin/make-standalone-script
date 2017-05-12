@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/../../lib", "$Bin/../lib";
+use Template;
+use IO::All;
+
+{
+    my $script = io(shift)->all;
+    $script =~ s{^#!/usr/bin/perl$}{#!/usr/bin/env perl}m;
+
+    $script =~ /(.*\n#BOOTSTRAP-BEGIN\n).*\n(#BOOTSTRAP-END\n.*)/s
+        or die;
+
+    print $1 . guts() . $2;
+}
+
+sub guts {
+    my $output = '';
+    for (qw(
+        Number::Compare
+        Text::Glob
+        File::Find::Rule
+        Template::Constants
+        Template::Base
+        Template::Config
+        Template::Document
+        Template::Exception
+        Template::Service
+        Template::Provider
+        Template
+        Template::Grammar
+        Template::Directive
+        Template::Parser
+        Jemplate::Directive
+        Jemplate::Grammar
+        Jemplate::Parser
+        Jemplate::Runtime
+        Jemplate::Runtime::Compact
+        Jemplate
+    )) {
+        $output .= get_module($_);
+    }
+    return disable_libs() . $output;
+}
+
+sub disable_libs {
+    return <<'...';
+# This is the standalone Jemplate compiler.
+#
+# All you need is this program and the program called `perl`. You don't need
+# to install any Perl modules.
+#
+# If you downloaded this program from the internet, don't forget to put it in
+# your path and make sure it is executable. Like this:
+#
+#     mv jemplate /usr/local/bin/
+#     chmod +x /usr/local/bin/jemplate
+#
+# Try this command to make sure it works:
+#
+#     jemplate --help
+
+use Config;
+BEGIN {
+    @INC = (
+        $Config::Config{archlib},
+        $Config::Config{privlib},
+    );
+}
+use strict;
+use warnings;
+
+...
+}
+
+sub get_module {
+    my $module = shift;
+    eval "require $module; 1" or die "$module not found";
+    $module =~ s{::}{/}g;
+    $module .= '.pm';
+    my $content = io($INC{$module})->all;
+    # Get rid of DATA section
+    $content =~ s/^__(END|DATA)__.*//sm;
+    # Remove POD
+    $content =~ s/^=\w+.*?(\n=cut\n|\z)//msg;
+    # Remove comments
+    $content =~ s/^#.*\n//gm;
+
+    # Return the concatenation of prerequisite modules
+    return
+        "#\n# Inline include of $module\n#\n" .
+        "BEGIN { \$INC{'$module'} = 'dummy/$module'; }\n" .
+        "BEGIN {\n" .
+        "#line 0 \"$module\"\n" .
+        $content .
+        "\n}\n" .
+        "";
+}

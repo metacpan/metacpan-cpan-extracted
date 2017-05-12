@@ -1,0 +1,5 @@
+Revision history for Perl extension JSON::PP::Compat5005.
+
+1.10  Sun Nov 28 02:02:49 2010
+	- split away JSON distribution.
+

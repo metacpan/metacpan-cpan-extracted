@@ -1,0 +1,32 @@
+---
+abstract: "Mocking library for perl inspired by Jasmine's spies"
+author:
+  - 'Dave Mueller <dave@perljedi.com>'
+build_requires:
+  Test::Spec: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jasmine-Spy
+requires:
+  Class::MOP: '0'
+  Exporter: '0'
+  Test::Builder::Module: '0'
+  Test::Deep: '0'
+  Tie::Array: '0'
+  Want: '0'
+  base: '0'
+  perl: v5.14.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/perljedi/ADD-URL-HERE
+  repository: https://github.com/perljedi/perl-jasmine-spy.git
+version: '1.02'

@@ -1,0 +1,77 @@
+==================================================
+Changes from 1740-11-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2014-09-11 19:57:53 +0000
+------------------------------------------
+
+  Change: 607531dc7093f045548201c4fdd8eba5e683dad9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-09-11 21:57:41 +0000
+
+    Updated faulty test, added warning, new travisyml 
+
+  Change: 8fb01727187fa1510f9bb4f45b59a340c98587c5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-09 04:26:53 +0000
+
+    Removed Path::Tiny towards Path::Class to be fatpackable 
+
+  Change: 39e14270662f8592820c2df40cb15ff5ea9baaae
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 01:34:58 +0000
+
+    Added parameter to enable features of the JSON object 
+
+  Change: 2b300f81266dad9bab0100f9b9c4646ffb8ef4a2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:42:53 +0000
+
+    More evil test to assure deep stuff is handled fine 
+
+  Change: 25b2ed46a0dfae3d9fc63dbaef05e250a3670a5e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:16:08 +0000
+
+    Yeah i need to fix my plugin 
+
+  Change: c705fbeca5c116d9b330d2932a3e7f7dfcb5e358
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:10:49 +0000
+
+    Added .travis.yml 
+
+  Change: ad2710efe7cdf4934c6a1ed0b10cca4e7877b32c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:09:49 +0000
+
+    Typo fixed in doc 
+
+  Change: 619cb91c9227ee364bceeaed36fbf1d81e8e8e17
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:08:33 +0000
+
+    Aehm, never used that... 
+
+  Change: abe81c52319be5dbbe4c1628b7f766e5d8611517
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-07 00:07:35 +0000
+
+    More documentation 
+
+  Change: 3a461900b5d30040d19f0627528fc3f85e093a90
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-06 23:59:21 +0000
+
+    First working implementation 
+
+  Change: c6b49c909846a8b390d699021fa117295b8d4509
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-06 21:36:24 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

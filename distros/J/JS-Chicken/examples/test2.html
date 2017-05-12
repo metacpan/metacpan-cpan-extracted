@@ -1,0 +1,118 @@
+<html>
+<head>
+<style type="text/css">
+
+BODY {
+    font-family : Arial;
+}
+
+fieldset {
+    font-size   : 1.2em;
+    color       : #336699;
+    background  : #DDDDDD;
+    width       : 500px;
+}
+
+legend {
+    border         : 1px solid grey;
+    background     : white;
+    padding-left   : 10px;
+    padding-right  : 10px;
+    cursor         : pointer;
+    cursor         : hand;    
+}
+
+fieldset input { 
+    font-size   : .95em;
+    color       : #336699;
+    background  : #DDDDDD;
+    border      : 0px;
+    padding     : 0px;
+    margin      : 0px;    
+}
+
+legend input { 
+    font-size   : .95em;
+    color       : #336699;
+    background  : white;
+    border      : 0px;  
+    padding     : 0px;
+    margin      : 0px;    
+}
+
+
+button {
+    font-size      : 0.7em;
+    color          : #99CCFF;
+    background     : #336699;
+    padding-left   : 5px;
+    padding-right  : 5px;
+    padding-top    : 3px;
+    padding-bottom : 3px;
+    border         : 2px solid #6699CC;
+}
+
+
+</style>
+<script language="javascript" src="../tests/lib/jQuery.js"></script>
+<script language="javascript" src="../lib/JS/Chicken.js"></script>
+<script language="javascript">
+
+var editable = function () {
+    var self = $(this);
+    self.unbind('click');
+    var orig = self.html();
+    self.html( 
+        $('<input type="text" />')
+            .attr({
+                size : orig.length
+            })
+            .val(orig)
+            .blur(function () {
+                self.html( $(this).val() );
+                self.click(editable);
+            })
+            .keypress(function () {
+                //console.log($(this).val().length);
+                $(this).attr({ size : $(this).val().length })
+            }) 
+    );
+    $('input', self).focus();
+};
+
+$(document).ready(function () {
+
+    var collection = new Chicken.Collection ({
+        row_selector : '.item'
+    });
+
+    collection.initialize( $('body'), '#list' );
+
+    $('button.append').click(function () {
+        collection.append_values(
+            [ { '.value' : "..." } ]
+        );
+        var values = $('#list .value');
+        values.unbind().click(editable).eq(values.length - 1).click();
+    });
+
+    $('legend').click(editable);
+
+});
+
+</script>
+</head>
+<body>
+
+<fieldset>
+    <legend>New Table</legend>
+
+    <ul id="list">
+        <li class="item"><span class="value">New Value</span></li>
+    </ul>
+
+    <button class="append">Add New Value</button>
+</fieldset>
+
+</body>
+</html>

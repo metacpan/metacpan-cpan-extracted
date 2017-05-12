@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+#
+# http://daringfireball.net/2007/03/javascript_bookmarklet_builder
+
+# NEED NO SRC SWITCH! Will ARGV[0] do it?
+
+use strict;
+use warnings;
+use open IO => ":utf8",    # UTF8 by default
+  ":std";                  # Apply to STDIN/STDOUT/STDERR
+use JavaScript::Bookmarklet qw(make_bookmarklet);
+
+my $src = do { local $/; <> };
+my $bookmarklet = make_bookmarklet($src);
+print $bookmarklet;
+eval {
+    system("/bin/echo -n '$bookmarklet' | /usr/bin/pbcopy")
+      ;                    # put bookmarklet on clipboard.
+};
+warn "Bookmarklet code not be placed in your clipboard: $@" if $@;
+
+__END__
+
+=head1 NAME
+
+make-bookmarklet - a command-line script that transforms
+human-readable JavaScript code into bookmarklet form.
+
+=head1 DESCRIPTION
+
+This script will attempt to copy the bookmarklet code to
+your desktop clipboard using pbcopy if possible. A warning
+will be issued if it cannot regardless of the availablity of
+pbcopy, the bookmarklet code will be output.
+
+=head1 USAGE
+
+ make-bookmarklet < example.js
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-Bookmarklet>
+
+For other issues, contact the author.
+
+=head1 AUTHOR
+
+Timothy Appnel <tima@cpan.org>
+
+=head1 SEE ALSO
+
+http://daringfireball.net/2007/03/javascript_bookmarklet_builder, 
+L<make-bookmarklet>
+
+=head1 COPYRIGHT AND LICENCE
+
+The software is released under the Artistic License. The
+terms of the Artistic License are described at
+http://www.perl.com/language/misc/Artistic.html. Except
+where otherwise noted, JavaScript::Bookmarklet is Copyright
+2008, Timothy Appnel, tima@cpan.org. All rights reserved.

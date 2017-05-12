@@ -1,0 +1,161 @@
+<html>
+
+<head>
+<title>Chained Selects</title>
+<meta name="keywords" content="dhtml, javascript, menu, select, selection, list, select list, selection list, dropdown, drop-down">
+
+<link rel=stylesheet href="cs.css" type="text/css">
+
+<script language="javascript" src="chainedselects.js"></script>
+<script language="javascript" src="sample.js"></script>
+<script language="javascript">
+function checkList(list, order, instance) {
+  alert("List Group Instance Order: "+instance+"\nSelect List Order: "+order+"\nOption Value: "+list.value);
+}
+</script>
+</head>
+
+<body onload="initListGroup('vehicles', document.forms[0].make, document.forms[0].type, document.forms[0].model, 'cs'); initListGroup('vehicles', document.forms[0].make2, document.forms[0].type2, document.forms[0].model2, 'cs2'); initListGroup('vehicles', document.forms[0].make3, document.forms[0].type3, document.forms[0].model3, 'cs3', checkList);">
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" width="90%"><tr><td>
+<p align="center" class="title">Chained Selects</p>
+<p align="center" class="copyright">Copyright 2004&nbsp;&nbsp;&nbsp;&nbsp;Xin Yang</p>
+
+<form>
+<table align="center">
+<tr><td colspan="4">Select a vehicle:&nbsp;</td></tr>
+<tr>
+<td><select name="make"></select></td>
+<td><select name="type"></select></td>
+<td><select name="model"></select></td>
+<td><input type="button" value="Reset" onclick="resetListGroup('vehicles',1)"></td>
+</tr>
+</table>
+
+<p>Chained Selects lets you "chain" multiple form select lists together so that the selection in a "parent" list can tailor the options available in a "child" list.
+<p>Chained Selects supports unlimited number of form select lists in a "chain", as well as unlimited number of "chains" in a page. Click [ <a href="cs.zip">here</a> ] to download Chained Selects.</p>
+<p>To implement Chained Selects, you will need to:</p>
+<ol>
+<li>define the structure of your select options, which would be referred to as a list group</li>
+<li>include the Chained Selects function script (chainedselects.js) in the page</li>
+<li>embed the definitions of list groups in the page, or include it if put in a JS file</li>
+<li>set up the form select lists as usual (or just set up some empty select lists)</li>
+<li>bind the form select lists to a list group when the page is loaded</li>
+</ol>
+
+<br><p>A list group is like a folder tree. Imagine that you want to "chain" three select lists and you would prepare options for them. It's just like mapping a three-level folder tree to three select lists, the folders/items at top-level will populate the first select list, and when a top-level folder is selected, its sub-folders/sub-items will populate the second select list, and same goes for the third select list.</p>
+<p>To define a list group, Chained Selects introduces the following function calls:</p>
+<ul>
+<li>addListGroup("list-group-name", "first-list-name")</li>
+<p>The "first-list-name" is like the root of the folder tree, and the "list-group-name" will be referred to later when we are to bind form select lists to this list group.</p>
+
+<li>addList("first-list-name", "option text", "option value", "sub-list-name", default-selected)</li>
+<p>This is like adding a top-level folder to the folder tree. This option will populate the first select list binded to the list group.</p>
+<p>The "default-selected" parameter can be ignored. If supplied, it can be any value (1 would be handy).</p>
+
+<li>addOption("first-list-name", "option text", "option value", default-selected)</li>
+<p>This is like adding a top-level item to the folder tree. This option will populate the first select list binded to the list group.</p>
+<p>The "default-selected" parameter can be ignored. If supplied, it can be any value.</p>
+</ul>
+
+<p>The "addList()" and "addOption()" will be re-used to define options for the second select list and the rest of select lists:</p>
+<ul>
+<li>addList("sub-list-name", "option text", "option value", "nested-sub-list-name", default-selected)</li>
+<li>addOption("sub-list-name", "option text", "option value", default-selected)</li>
+</ul>
+
+<br><p>As you might notice, the first parameter in "addList()" and "addOption()" calls refer to some "list-name"s, the "addList()" calls also have a fourth parameter for the name of a nested sub-list. These names should be unique.</p>
+<p>We could specify many default options in a list (identified by a "list-name"). If such a list is mapping to a single-choice form select list, only the last default option will be taken. If the list is mapping to a multiple-choice form select list, all the default options will be selected.</p>
+<p>When you finish the definition of a list group, you can define another with the "addListGroup()" call again, followed by a bunch of "addList()" calls and "addOption()" calls.</p>
+
+<br><p>Once you have a list group, you can bind form select lists to it and populate the select lists with options defined in the list group. To do so, you can have:</p>
+<ul>
+<li>&lt;body onload="initListGroup('list-group-name', select-list-1, select-list-2, ..., 'cookie_name')"&gt;</li>
+</ul><br>
+
+<p>The 'cookie_name' parameter is optional, if provided, will be used as the name prefix of the cookies to store the last selections and resume them for re-visits within the same browser session.</p>
+<p>If you implement a list group into more than one page with the same 'cookie_name' parameter, those pages can share the last selections within the same browser session. If different 'cookie_name' parameters are used, each page will be able to have its own copy of last selections.</p>
+<p>If you have more than one list group in a single page, you should have different 'cookie_name' parameters for each list group.</li>
+<p>If you want to re-use a list group for different sets of select lists in a single page, you can do so like this:</p>
+<ul>
+<li>&lt;body onload="initListGroup('MyList', select-list-1, select-list-2, 'cookie-A'); initListGroup('MyList', select-list-3, select-list-4, 'cookie-B')"&gt;</li>
+</ul><br>
+
+<p>Following is an example of mapping a list group to some multiple-choice select lists, the same list group for the select lists at page top is re-used here:</p>
+<table>
+<tr><td colspan="3">Select some vehicles:</td></tr>
+<tr>
+<td><select multiple size="12" name="make2"></select></td>
+<td><select multiple size="12" name="type2"></select></td>
+<td><select multiple size="12" name="model2"></select></td>
+</tr>
+<tr><td colspan="3"><input type="button" value="Reset" onclick="resetListGroup('vehicles',2)"></td></tr>
+</table><br>
+
+<p>Sometimes you might want to do something when an option is picked from the list, to do so, you will need to define a JS callback function and pass the name of the function to the initListGroup() call, for example:</p>
+<pre>
+&lt;head&gt;
+...
+&lt;script language="javascript"&gt;
+function <b>checkList</b>(list, order, instance) {
+  alert("List Group Instance Order: " + instance + "\nSelect List Order: " + order + "\nOption Value: " + list.value);
+}
+&lt;/script&gt;
+&lt;/head&gt;
+
+&lt;body onload="initListGroup('MyList', select-list-1, select-list-2, 'cookie_name', <b>checkList</b>)"&gt;
+ ...
+</pre>
+<p>The function would be given three parameters: the select list object from which the option is just picked, the order of the select list in the initListGroup() call, and the instance number of the list group. Once such a function is set up, it will be called each time after an option is picked from a list and the sub-lists (if any) are refreshed.</p>
+<p>Here we re-use the vehicles list group again (the instance order will be 3 as this is the third instance of the same vehicles list group) and simply alert the option just picked:</p>
+<table>
+<tr><td colspan="3">Select a vehicle:&nbsp;</td></tr>
+<tr>
+<td><select name="make3"></select></td>
+<td><select name="type3"></select></td>
+<td><select name="model3"></select></td>
+</tr>
+</table>
+</form><br>
+
+<p>The callback function can be set up for many purposes. For example, in a frameset case we can put the select lists in the top frame and load a page in the bottom frame when an option is picked. To do so, we can code the callback function this way:</p>
+<pre>
+function loadPage(list, order, instance) {
+  if (list.value!="") {
+    parent.bottom_frame.location=list.value;
+  }
+}
+...
+&lt;body onload="initListGroup('MyList', select-list-1, select-list-2, 'cookie_name', loadPage)"&gt;
+</pre><br>
+
+<p>Usually the number of select lists should be equal to the number of maximum nested levels in a list group. For a selection that doesn't have sub-options for its "child" select list, its "child" select list and all the "grand-child" select lists will be emptied.</p>
+<p>When a select list is emptied, you can choose to just leave it there, to disable it or to hide it.</p>
+<p>To disable empty lists, you can embed the following line before the include line of the function script:</p>
+<ul>
+<li>var disable_empty_list=true;</li>
+<p>a disabled list will be enabled when there are some options to pupolate it.</p>
+</ul>
+<br><p>To hide empty lists, you can embed the following line before the include line of the function script:</p>
+<ul>
+<li>var hide_empty_list=true;</li>
+<p>a hidden list will become visible when there are some options to pupolate it.</p>
+</ul>
+
+<p>&nbsp;</p>
+<p># Update History:</p>
+<ul>
+<li>fixed a bug that a disabled sub-list didn't get enabled again ... 2004-10-14.</li>
+<li>added support of multiple selection ... 2004-08-31.</li>
+<li>added the option to set up a callback function ... 2004-08-26.</li>
+<li>added the ability to re-use a list group ... 2004-08-23.</li>
+<li>fixed a bug in sub-list sharing ... 2004-08-13.</li>
+<li>added the "cookie_name" parameter ... 2004-07-17.</li>
+<li>added the "default-selected" parameter ... 2004-06-18.</li>
+<li>first release ... 2004-04-28.</li>
+</ul>
+<p>&nbsp;</p>
+</td></tr></table>
+</body>
+
+</html>

@@ -1,0 +1,32 @@
+---
+abstract: 'represents a DataTables server-side request'
+author:
+  - 'Mike Wisener <xmikew_cpan_org>'
+build_requires:
+  Exporter: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JQuery-DataTables-Request
+no_index:
+  package:
+    - TestData
+requires:
+  Carp: '0'
+  Class::Accessor: '0'
+  base: '0'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/xmikew/p5-JQuery-DataTables-Request/issues
+  homepage: https://github.com/xmikew/p5-JQuery-DataTables-Request
+  repository: https://github.com/xmikew/p5-JQuery-DataTables-Request.git
+version: '0.109'

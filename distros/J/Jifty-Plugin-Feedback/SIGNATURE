@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4d42bb46a797e87879fd0a7c954023fd5689985d Changes
+SHA1 13b4c1cbe82355ed097fee3303910ec3f444b61e MANIFEST
+SHA1 26d541f249e378a62a162e2e763f7b957f99badb META.yml
+SHA1 fa35eb97b3166515676cfd80f20bd2ce9df0938a Makefile.PL
+SHA1 20c73697e1713638140c719d8eaa19a275ed43a5 inc/Module/AutoInstall.pm
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 ca13d9875e1249f6e84f7070be8152c34837955e inc/Module/Install/AutoInstall.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b501b0df59a5cd235cca473889f82c3d3429f39e inc/Module/Install/Include.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 815f0254201b5cc7e83747280a3df9a4a492e723 lib/Jifty/Plugin/Feedback.pm
+SHA1 5dd5b38ca905d2d81ea075383104aec13fda0b8e lib/Jifty/Plugin/Feedback/Action/SendFeedback.pm
+SHA1 669cccd68ef4a11c1c11808f85c705472c636a6e lib/Jifty/Plugin/Feedback/Notification.pm
+SHA1 fffa8fbf71e431075b4974fc93dbd574e4f6d6c6 lib/Jifty/Plugin/Feedback/View.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNWYNnHdv9ZfNcOAcRAlYdAJsFJicFLVMTmmIaRbZ59nbG0HeK3ACfc5K8
+IxC+Qg1RsuBIlQrRejuXNNs=
+=YFN/
+-----END PGP SIGNATURE-----

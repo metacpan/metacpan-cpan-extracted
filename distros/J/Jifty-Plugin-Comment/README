@@ -1,0 +1,141 @@
+NAME
+    Jifty::Plugin::Comment - Add comments to any record
+
+SYNOPSIS
+    Setup the config.yml
+
+      Plugins:
+        - Comment:
+
+          # Set this if you want spam checking by Net::Akismet
+          Akismet:
+            Key: 1234567890a
+            Url: http://example.com
+
+          # Set this if you want to customize the HTML scrubbing of comments
+          Scrubber:
+            message: "Comments may only contain <strong>, <em>, and <a> tags."
+            allow:
+              - strong
+              - em
+              - a
+            default:
+              - 0
+              - 
+                '*': 0
+                href: !!perl/regexp:
+                  REGEXP: '^(?!(?:java)?script)'
+                  MODIFIERS: i
+
+    Setup a model that has comments:
+
+      package App::Model::Fooble;
+
+      use Jifty::DBI::Schema;
+      use App::Record schema {
+          column scribble => type is 'text';
+          column wobble => type is 'int';
+      };
+
+      use Jifty::Plugin::Comment::Mixin::Model::Commented;
+
+      sub allow_owner_update_delete {
+          my $self = shift;
+          my ($right, %args) = @_;
+
+          if ($right eq 'create') {
+              return 'allow' ;#if $self->current_user->id;
+          }
+
+          if ($right eq 'update' || $right eq 'delete') {
+              return 'allow' if $self->current_user->id;
+          }
+
+          if ($right eq 'read') {
+              return 'allow';
+          }
+
+          return 'deny';
+      };
+
+      App::Model::FoobleComment->add_trigger( name => 'before_access', callback => \&allow_owner_update_delete);
+      App::Model::Comment->add_trigger( name => 'before_access', callback => \&allow_owner_update_delete);
+
+    Setup a view for creating, viewing, and managing the comments:
+
+      # assuming $fooble here isa App::Action::UpdateFooble object
+      template 'fooble/view' => page {
+          my $fooble = get 'fooble';
+
+          render_action $fooble, undef, { render_mode => 'read' };
+
+          render_region
+              name     => 'fooble-comments',
+              path     => '__comment/list_and_add',
+              defaults => { 
+                  comment_upon  => $fooble->record->for_commenting,
+                  initial_title => 'Re: '.substr($fooble->scribble, 0, 20).'...',
+              },
+              ;
+      };
+
+DESCRIPTION
+    This plugin allows you to attach comments to any model. You do this
+    using the three steps listed in the synopsis. For variations on these
+    steps, see the other classes that handle the individual parts.
+
+COMMENTED RECORDS
+    To set up a commented model, you will need to do the following:
+
+    1 Add ths plugin to your project by modifying your config.yml.
+    1 Add the Jifty::Plugin::Comment::Mixin::Model::Commented mixin to the
+    model or models that you want to have comments attached to. See that
+    class for details on how it works. You may also want to examine
+    Jifty::Plugin::Comment::Model::Comment on how to customize that class
+    for your application.
+    1 Create a view that appends a comment editor to your edit form (or on a
+    separate page or wherever you feel like comments work best in your
+    application). You should be able to use these views from either
+    Template::Declare or HTML::Mason templates. See
+    Jifty::Plugin::Comment::View for additional details on what views are
+    available.
+
+METHODS
+  init
+    Called during initialization. This will setup the Net::Akismet object if
+    it is configured and available.
+
+  akismet
+    This returns an instance of Net::Akismet that is used to check to see if
+    a new comment posted contains spam. No such checking is performed if
+    this returns "undef", which indicates that "Net::Akismet" is
+    unavailable, wasn't configured, or there was an error configuring it
+    (e.g., the Akismet server was unavailable during Jifty startup).
+
+  scrubber
+    This returns an instance of HTML::Scrubber that is used to clean up HTML
+    submitted in comments.
+
+TO DO
+    Right now the module depends directly upon HTML::Scrubber to do the work
+    of cleaning up the text. You might want to use something else to do
+    this. It also provides no mechanism for customizing any other aspect of
+    the formatting. For example, your application might want to use
+    Markdown, or BBCode, or just turn line breaks in the BR-tags, or
+    anything else to format the comment text.
+
+    In the future, I'd like to consider something like Text::Pipe or a
+    similar API to allow these formats to be customized more easily.
+
+SEE ALSO
+    Net::Akismet, HTML::Scrubber
+
+AUTHOR
+    Andrew Sterling Hanenkamp, "<hanenkamp@cpan.org>"
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 Boomer Consulting, Inc. All Rights Reserved.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+

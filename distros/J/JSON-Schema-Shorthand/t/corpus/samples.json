@@ -1,0 +1,14 @@
+[
+["string",{"type":"string"},"type as string"],
+[{"object":{"foo":"string"}},{"type":"object","properties":{"foo":{"type":"string"}}},"object property"],
+["#foo",{"$ref":"#foo"},"expands #ref"],
+[{"object":{"foo":{}}},{"type":"object","properties":{"foo":{}}},"expands objects"],
+[{"array":["number"]},{"type":"array","items":[{"type":"number"}]},"expands array"],
+[{"array":"number"},{"type":"array","items":{"type":"number"}},"expands array"],
+[{"properties":{"foo":{"required":true}}},{"required":["foo"],"properties":{"foo":{}}},"expands required"],
+[{"allOf":["number"]},{"allOf":[{"type":"number"}]},""],
+[{"anyOf":["number"]},{"anyOf":[{"type":"number"}]},""],
+[{"oneOf":["number"]},{"oneOf":[{"type":"number"}]},""],
+[{"definitions":{"foo":"object"}},{"definitions":{"foo":{"type":"object"}}},"expands definitions"],
+[{"not":"object"},{"not":{"type":"object"}},"expands not"]
+]

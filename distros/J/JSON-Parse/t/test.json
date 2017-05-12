@@ -1,0 +1,106 @@
+{
+   "pod" : "NAME Algorithm::NGram SYNPOSIS use Algorithm::NGram; my $ng = Algorithm::NGram->new(ngram_width => 3); # use trigrams # feed in text $ng->add_text($text1); # analyze $text1 $ng->add_text($text2); # analyze $text2 # feed in arbitrary sequence of tokens $ng->add_start_token; $ng->add_tokens(qw/token1 token2 token3/); $ng->add_end_token; my $output = $ng->generate_text; DESCRIPTION This is a module for analyzing token sequences with n-grams. You can use it to parse a block of text, or feed in your own tokens. It can generate new sequences of tokens from what has been fed in. EXPORT None. METHODS new Create a new n-gram analyzer instance. Options: ngram_width This is the \"window size\" of how many tokens the analyzer will keep track of. A ngram_width of two will make a bigram, a ngram_width of three will make a trigram, etc... ngram_width Returns token window size (e.g. the \"n\" in n-gram) token_table Returns n-gram table add_text Splits a block of text up by whitespace and processes each word as a token. Automatically calls \"add_start_token()\" at the beginning of the text and \"add_end_token()\" at the end. add_tokens Adds an arbitrary list of tokens. add_start_token Adds the \"start token.\" This is useful because you often will want to mark the beginnings and ends of a token sequence so that when generating your output the generator will know what tokens start a sequence and when to end. add_end_token Adds the \"end token.\" See \"add_start_token()\". analyze Generates an n-gram frequency table. Returns a hashref of *N => tokens => count*, where N is the number of tokens (will be from 2 to ngram_width). You will not normally need to call this unless you want to get the n-gram frequency table. generate_text After feeding in text tokens, this will return a new block of text based on whatever text was added. generate Generates a new sequence of tokens based on whatever tokens have previously been fed in. next_tok Given a list of tokens, will pick a possible token to come next. token_lookup Returns a hashref of the counts of tokens that follow a sequence of tokens. token_key Serializes a sequence of tokens for use as a key into the n-gram table. You will not normally need to call this. serialize Returns the tokens and n-gram (if one has been generated) in a string deserialize($string) Deserializes a string and returns an \"Algorithm::NGram\" instance SEE ALSO Text::Ngram, Text::Ngrams AUTHOR Mischa Spiegelmock, <mspiegelmock@gmail.com> COPYRIGHT AND LICENSE Copyright 2007 by Mischa Spiegelmock This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself. ",
+   "date" : "2011-09-23T05:08:06",
+   "status" : "latest",
+   "author" : "REVMISCHA",
+   "directory" : false,
+   "maturity" : "released",
+   "indexed" : true,
+   "documentation" : "Algorithm::NGram",
+   "id" : "rEbfZ9plgUX_e6ySf4u3d5ZGrhE",
+   "module" : [
+      {
+         "indexed" : true,
+         "authorized" : true,
+         "version" : "0.9",
+         "name" : "Algorithm::NGram",
+         "version_numified" : 0.9
+      }
+   ],
+   "authorized" : true,
+   "pod_lines" : [
+      [
+         19,
+         51
+      ],
+      [
+         92,
+         5
+      ],
+      [
+         98,
+         5
+      ],
+      [
+         104,
+         7
+      ],
+      [
+         130,
+         5
+      ],
+      [
+         143,
+         8
+      ],
+      [
+         157,
+         5
+      ],
+      [
+         168,
+         8
+      ],
+      [
+         211,
+         6
+      ],
+      [
+         225,
+         6
+      ],
+      [
+         256,
+         5
+      ],
+      [
+         283,
+         5
+      ],
+      [
+         301,
+         6
+      ],
+      [
+         313,
+         5
+      ],
+      [
+         331,
+         5
+      ],
+      [
+         363,
+         18
+      ]
+   ],
+   "version" : "0.9",
+   "binary" : false,
+   "name" : "NGram.pm",
+   "version_numified" : 0.9,
+   "path" : "lib/Algorithm/NGram.pm",
+   "release" : "Algorithm-NGram-0.9",
+   "description" : "This is a module for analyzing token sequences with n-grams. You can use it to parse a block of text, or feed in your own tokens. It can generate new sequences of tokens from what has been fed in.",
+   "distribution" : "Algorithm-NGram",
+   "stat" : {
+      "uid" : 500,
+      "mtime" : 1316754239,
+      "mode" : 33188,
+      "size" : 7715,
+      "gid" : 500
+   },
+   "level" : 2,
+   "sloc" : 143,
+   "slop" : 94,
+   "mime" : "text/x-script.perl-module"
+}

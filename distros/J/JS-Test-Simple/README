@@ -1,0 +1,11 @@
+This is the README file for Test.Simple, basic utilities for writing tests, by
+Michael G Schwern <schwern@pobox.com> as ported to JavaScript by David Wheeler
+<david@kineticode.com>.
+
+This package also contains Test.Harness and Test.Harness.Browser. You can use
+the latter module to run all of your Test.Simple and Test.More tests in a
+single browser window, similar to how Perl's Test::Harness allows all tests in
+a package to be run with a single shell command.
+
+Please consult the documentation for how to start writing tests for your
+JavaScript code.

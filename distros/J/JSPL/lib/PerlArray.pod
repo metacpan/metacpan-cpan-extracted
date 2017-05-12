@@ -1,0 +1,205 @@
+=head1 NAME
+
+PerlArray - Encapsulate a Perl ARRAY in JavaScript space
+
+Any ARRAY reference that you pass from perl to javascript will be automatically
+wrapped as an instance of C<PerlArray>.
+
+=head1 JAVASCRIPT INTERFACE
+
+Any perl ARRAY is exposed in javascript space as an instance of C<PerlArray>.
+Them behave like native javascript Arrays and implements all methods documented
+for native ones.
+
+When perl ARRAY enters javascript space for the first time a C<PerlArray>
+wrapper will be created, multiple visits of the same ARRAY will use the same
+wrapper, i.e the same instance of a C<PerlArray>.
+
+The wrapper holds a reference to the ARRAY, this means that if you modify it,
+the changes are visible from perl side (if you hold a reference there). If the
+array has perl magic, for example if its C<tied>, any access from javascript to
+the array will invoke the associated magic in perl.
+
+For example you can expose the program arguments to javascript:
+
+    $ctx->bind_value(Argv => \@ARGV); 
+
+PerlArray instances inherit from C<PerlArray.prototype>. As with all javascript
+objects you can change its constructor prototype object to make changes to all
+PerlArray instances.
+
+As every object in javascript, C<PerlArray> instances inherits, via its
+prototype chain, all the methods and properties from Object. You can even set
+non-numeric properties in them, but those changes will not be normally visible
+from perl space.
+
+=head2 Constructor
+
+    var array = new PerlArray(...);
+
+You can create new perl ARRAYs from javascript.
+
+The arguments are use to initialize the array.
+
+    var parray = new PerlArray(3, 4, 'foo', someval);
+
+When those objects land in perl space they will be normal perl ARRAYs, i.e.
+with out any "magic".
+
+=head2 Properties
+
+Instances of PerlArray can be accessed as a normal arrays using integer
+indexes.  If a negative index is used it is relative to the tail.
+
+=over 4
+
+=item length
+
+  parray.length;        // Get the length of parray
+  parray.length = fill; // Change the length of parray
+
+C<length> is the actual number of items in the array.
+
+You can set this property to modify the length of the array, similar to Perl's
+C<$#array = $fill>. Remember: C<length> is the number of elements while
+C<$#array> is the index to the last one.
+
+When the array is extended the new elements will be C<undefined> (C<undef> in
+Perl).  When the array is truncated, the excess elements are freed.
+
+Setting C<parray.length = 0;> effectively clears the array.
+
+=back
+
+=head2 Methods
+
+All the methods documented for instances of Array are implemented for instances
+of PerlArray, please check your javascript documentation.
+
+The more common are:
+
+=over 4
+
+=item push(arg1, ...)
+
+Pushes the arguments onto the array.
+
+=item unshift(arg1, ...)
+
+Unshifts (i.e. inserts at the beginning) the arguments into the array.
+
+=item pop( )
+
+Returns the top element.
+
+=item shift( )
+
+Returns the bottom element.
+
+=item join( )
+
+=item join(I<joinexp>)
+
+Returns a string with all the array elements, converted to strings if necessary,
+concatenated with C<joinexp>, by default C<','> if none provided.
+
+=item slice( )
+
+=item slice(I<begin>)
+
+=item slice(I<begin>, I<end>)
+
+Returns a new I<one level deep> copy of the array, from C<begin> to C<end>.  If
+C<begin> isn't provided defaults to 0, if C<end> isn't provided defaults to the
+index of the last element.
+
+Note that the array isn't changed in any way. A new Array is created and
+returned.
+
+=item reverse( )
+
+Reverse the array I<in place>. The reversed array is returned
+
+=item sort( )
+
+=item sort( I<sorter> )
+
+This will sort the array I<in place>. In the first form, without an argument,
+the sort will be in lexicographical order.
+
+In the second form, C<sorter> is a function used to perform the comparations of
+the array elements. If supplied, the array elements are sorted according to the
+return value of the compare function. If C<a> and C<b> are two elements being
+compared, then:
+
+=over 4
+
+=item * 
+If C<sorter(a, b)> is less than 0, sort C<a> to a lower index than C<b>.
+
+=item * 
+If C<sorter(a, b)> returns 0, leave C<a> and C<b> unchanged with respect to each
+other, but sorted with respect to all different elements.
+
+=item * 
+If C<sorter(a, b)> is greater than 0, sort C<b> to a lower index than C<a>.
+
+=item * 
+C<sorter(a, b)> must always returns the same value when given a specific pair
+of elements a and b as its two arguments. If inconsistent results are returned
+then the sort order is undefined.
+
+=back
+
+The sorted array is returned.
+
+=item toString( )
+
+Joins the array and returns one string containing each array element separated
+by commas.
+
+Javascript calls the toString method automatically when a PerlArray is to be
+represented as a text value or when a PerlArray is referred to in a string
+concatenation.
+
+=item indexOf(I<searchElement>)
+
+=item indexOf(I<searchElement>, I<fromIndex>)
+
+Returns the first index at which a given C<searchElement> element can be found
+in the array, or -1 if it is not present. The search starts at C<fromIndex>,
+if provided or from the beginning if not.
+
+=item lastIndexOf(I<searchElement>)
+
+=item lastIndexOf(I<searchElement>, I<fromIndex>)
+
+Returns the last index at which a given element can be found in the array, or
+-1 if it is not present. The array is searched backwards, starting at
+C<fromIndex> if provided or from the end if not.
+
+=item toSource ( )
+
+Returns a string that when evaluated recreated the PerlArray.
+    
+    // Asumes 'parray' as defined above
+    say(parray.toSource()); // "new PerlArray(3,4,'foo',someval)"
+
+=back
+
+=head1 PERL INTERFACE
+
+=head2 PACKAGE VARIABLES
+
+=over 4
+
+=item $construct_blessed
+
+When you set the variable I<$JSPL::PerlArray::construct_blessed> to a TRUE value, you are
+turning on the Claes's JavaScript compatibility mode. This affects the behavior
+of the javascript C<PerlHash> constructor.
+
+This feature can be removed at any time. I strongly recommend against using it.
+Read "Migrating from JavaScript.txt" for the details.
+
+=cut

@@ -1,0 +1,16 @@
+/*
+Tabs - hide tabs before initialization to avoid flash of content (not required).
+
+This style sheet should be added via JavaScript for graceful degradation!
+
+Recommended usage (place this in the head before other style sheets are included):
+<script type="text/javascript">//<![CDATA[
+    $('head').append('<link rel="stylesheet" href="tabs_js.css" media="projection, screen" />');
+//]]></script>
+
+Omit CDATA if using HTML instead of XHTML.
+
+*/
+.tabs-container {
+    display: none;
+}

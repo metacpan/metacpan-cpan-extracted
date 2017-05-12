@@ -1,0 +1,30 @@
+---
+abstract: 'A charting API for Jifty'
+author:
+  - 'Andrew Sterling Hanenkamp C<< <andrew.hanenkamp@boomer.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.11
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-Chart
+no_index:
+  directory:
+    - share
+    - share
+    - inc
+    - t
+recommends:
+  Chart::Base: 0
+  GD: 0
+  GD::Graph: 0
+  Image::Info: 0
+  XML::Simple: 0
+requires:
+  Jifty: 0.90409
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

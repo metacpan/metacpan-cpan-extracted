@@ -1,0 +1,15 @@
+severity        = 3
+verbose         = 6
+top             = 50
+theme           = pbp || core || bugs || security || maintenance
+criticism-fatal = 1
+color           = 1
+allow-unsafe    = 1
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moo::Role
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo::Role
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+allow = _jedi_dispatch_public_files _build__jedi_template_views

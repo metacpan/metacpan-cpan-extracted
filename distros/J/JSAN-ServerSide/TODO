@@ -1,0 +1,3 @@
+- Allow for multiple file-system directories
+- Provide a "never reparse" mode for optimization
+- Path for JSAN.js to just do exporting, not fetching

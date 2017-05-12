@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+OpcodeCounting.xs
+README
+t/01-basic.t
+t/pod-coverage.t
+t/pod.t
+lib/JavaScript/Runtime/OpcodeCounting.pm
+lib/JavaScript/Error/OpcodeLimitExceeded.pm
+META.yml                                 Module meta-data (added by MakeMaker)

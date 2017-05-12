@@ -1,0 +1,41 @@
+Things that need doing - volunteers most welcome!
+
+* High Priority
+
+Add --prefix=S that'll prefix all generated classes/types with S.
+Thats needed because the output of java2perl6api is dependent not only
+on the input java class but only on the specific type mapping used.
+Different projects may want to use different type mapings for the
+same java class. --prefix=S provides a way to avoid clashes.
+
+Embed actual values of class constants in class/interface definitions.
+For example:
+    public static final int CONCUR_READ_ONLY;
+Probably best done by extending the parser to parse the extra details
+in the "javap -v" output.
+
+* Medium Priority
+
+Someone with reasonable knowledge of perl6 and java should sanity check the
+type mappings etc. and document the issues/tradeoffs.
+
+handle enums like "public final class java.sql.RowIdLifetime extends java.lang.Enum{"
+by generating perl6 enums
+
+Determine class hierarchy of exceptions and replicate in perl6.
+
+* General polishing:
+
+Move most of the code from bin/java2perl6api into new Java::2Perl6API module.
+
+Only add comments to types that have non-default mappings.
+(Add method to TypeCast to ask if type has a default mapping)
+
+Improve test coverage.
+
+Move multi-line strings used for comparison tests out from the test script
+into separate text files. Then if a test fails write the new output to a
+different file (same name, extra extension). That way when the code
+generation is changed the tests can be sync'd just by renaming the new file
+over the old one. (This approach has worked well for the NYTProf tests.)
+

@@ -1,0 +1,96 @@
+NAME
+    Jifty::Plugin::Chart - A charting API for Jifty
+
+SYNOPSIS
+    In your config.yml:
+
+      Plugins:
+        - Chart: {}
+
+    In your Mason templates:
+
+      <% Jifty->web->chart(
+          type   => 'Bar',
+          width  => 400,
+          height => 300,
+          data   => [
+              [ '2004', '2005', '2006', '2007' ], # labels
+              [ 14,     15,     17,     22     ], # first data set
+              [ 22,     25,     20,     21     ], # second data set
+          ],
+      ) %>
+
+DESCRIPTION
+    CAUTION: This plugin is experimental. The API *will* change.
+
+    This plugin provides a charting API that can be used by Jifty
+    applications to build data visualizations without regard to the
+    underlying rendering mechanism.
+
+    As of this writing, the API is a barely veiled interface over Chart.
+    However, I intend to expand the interface to apply to something like
+    Maani's XML/SWF Charts or Imprise Javascript charts or even something
+    like OpenLaszlo (or something Open Source and Perl if I can find or
+    build such a thing in time).
+
+INTERFACE
+    By adding this method to the plugin configuration for your Jifty
+    application, you will cause Jifty::Web to inherit a new method, "chart",
+    which is the cornerstone of this API.
+
+    This method is described in Jifty::Plugin::Chart::Web and an example is
+    shown in the "SYNOPSIS" above.
+
+CONFIGURATION
+    Here is an example configuration for config.yml:
+
+      Plugins:
+        - Chart:
+            DefaultRenderer: PlotKit
+            PreloadRenderers:
+             - XMLSWF
+             - SimpleBars
+             - App::Renderer::Custom
+
+    The available options are:
+
+    DefaultRenderer
+        This is the name of the class to use as the default renderer.
+        Jifty::Plugin::Chart::Renderer::Chart is the current default, but
+        that could change in the future. It's recommended that you set this
+        to your preference.
+
+    PreloadRenderers
+        This is a list of other render classes to load during
+        initialization. If they are not loaded during initialization some
+        renderers may not work correctly the first time they are run because
+        they are not able to inform Jifty of the CSS or JS files they need
+        before that part of the page is already rendered. If you use the
+        "renderer" option of "chart" in Jifty::Plugin::Chart::Web, then you
+        should make sure any value you use is set here in the configuration
+        to make sure it works properly.
+
+METHODS
+  init
+    Adds the "chart" in Jifty::Plugin::Chart::Web method to Jifty::Web.
+
+  init_renderer
+      my $renderer = $chart_plugin->init_renderer($renderer_class)
+
+    This is a helper method that is used by the API to initialize the
+    renderer class. This is handled automatically so you probably shouldn't
+    use this.
+
+SEE ALSO
+    Jifty::Plugin, Jifty::Web, Jifty::Plugin::Chart::Renderer,
+    Jifty::Plugin::Chart::Renderer::Chart, Jifty::Plugin::Chart::View
+
+AUTHOR
+    Andrew Sterling Hanenkamp "<andrew.hanenkamp@boomer.com>"
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 Boomer Consulting, Inc.
+
+    This is free software and may be modified and redistributed under the
+    same terms as Perl itself.
+

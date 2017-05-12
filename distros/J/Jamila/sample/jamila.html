@@ -1,0 +1,48 @@
+<html>
+<head>
+<META HTTP-EQUIV="Content-type" CONTENT="text/html; charset=UTF-8">
+<title>Jamila Test(JSON Approach to Make Integration with Linking Applications)</title>
+<script type="text/javascript" src="http://prototypejs.org/assets/2008/9/29/prototype-1.6.0.3.js"> </script>  
+<script type="text/javascript" src='Jamila.js'    ></script>
+
+<SCRIPT LANGUAGE="JavaScript">
+var oLocal = {
+  echo:          function (sPrm) { return "LOCAL CALL:" + sPrm;},
+  getServerTime: function () { return 'TIME NOW';},
+  arraySample: function () { return ['A', 'B', 'C'];},
+  hashSample: function () { return {first:'A', second:'B', third:'C'};}
+};
+var oJmL  = new Jamila(
+                     oLocal,
+                     null, null,
+                     function(sMsg) { alert("ERROR:" + sMsg);});
+var oJmR  = new Jamila(
+                     '/cgi-bin/jamila/testJamila.pl',
+                     null, null,
+                     function(sMsg) { alert("ERROR:" + sMsg);});
+
+function getJm(oBtn)
+{
+  return (oBtn.form.rdoUrl[0].checked)? oJmL : oJmR;
+}
+</SCRIPT>
+</head>
+<body>
+TEST FORM Jamila
+<form>
+<input type="radio" name="rdoUrl" value="local" checked>local 
+<input type="radio" name="rdoUrl" value="remote">remote<br>
+<input type="text" name="txtPrm" value="TEST FOR Jamila">
+<input type="button" value="echo text" 
+  onClick="var oJm = getJm(this); alert(oJm.call('echo', txtPrm.value));">
+<input type="button" value="Get Time"
+  onClick="var oJm = getJm(this); alert(oJm.call('getServerTime'));" ><BR>
+<input type="button" value="Array" 
+  onClick="var oJm = getJm(this); var aRes = oJm.call('arraySample'); var sMsg = ''; 
+           for(var i=0; i < aRes.length; i++) sMsg +=aRes[i] + '\n'; alert(sMsg);">
+<input type="button" value="Hash" 
+  onClick="var oJm = getJm(this); var aRes = oJm.call('hashSample'); var sMsg = ''; 
+           for(var sKey in aRes) sMsg +=sKey + ':' + aRes[sKey] + '\n'; alert(sMsg);">
+</form>
+</body>
+</html>

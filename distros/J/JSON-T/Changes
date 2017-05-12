@@ -1,0 +1,77 @@
+JSON-T
+======
+
+Created:      2010-07-29
+Home page:    <https://metacpan.org/release/JSON-T>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=JSON-T>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.104	2014-09-15
+
+ [ Documentation ]
+ - Copyright 2014.
+ - Update example; no longer use JSON::JOM which I withdrew from CPAN.
+
+ [ Packaging ]
+ - Use dynamic config so that if JavaScript::SpiderMonkey is installed, JE
+   is not a dependency.
+ - Use dynamic config to depend on Cpanel::JSON::XS or JSON::PP, rather
+   than JSON.pm.
+
+ [ Other ]
+ - Assign to @ISA instead of using base.pm.
+ - Lots of tidying up.
+ - Updated: Drop dependency on Object::AUTHORITY.
+ - Use Module::Runtime instead of Class::Load.
+
+0.103	2014-09-11
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.102	2013-03-20
+
+ - Updated: no common::sense
+
+0.101	2011-12-05
+
+ [ Documentation ]
+ - Create a clear division between the implementation-specific and more
+   generic parts of the code. Document how to make implementation
+   subclasses.
+
+ [ Packaging ]
+ - Module::Package::RDF
+
+ [ Other ]
+ - Added: Provide a DOES method.
+ - Constructor uses Class::Load to load a suitable subclass.
+ - Separate out the JE-specific stuff into JSON::T::JE.
+ - Updated: use 5.010
+ - Updated: use Object::AUTHORITY
+
+0.100	2010-09-02
+
+ - Accept JSON::JOM as input to transformations.
+
+0.090_04	2010-08-15
+
+ - Force stringification of return value of transform method. Pesky
+   JE::String values!
+
+0.090_03	2010-08-10
+
+ - Additional debugging info added to tests.
+
+0.090_02	2010-08-02
+
+ - Switched from JavaScript::SpiderMonkey to JE - SpiderMonkey version is
+   retained for those that want it.
+
+0.090_01	2010-07-30
+
+ [ Bug Fixes ]
+ - Non-JSON-string input for transform method was not being correctly
+   converted to JSON.
+
+0.090_00	2010-07-30

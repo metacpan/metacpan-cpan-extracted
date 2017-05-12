@@ -1,0 +1,8 @@
+Revision history for Perl module Jifty::Plugin::Comment
+
+1.00 Fri, 26 Jun 2009 08:52:55 +0200
+    - add missing dep from Action/CreateComment.pm in Makefile.PL
+    - add dep on Jifty 0.90409 to use Jifty::Test::Dist
+
+0.9  Wed, 10 Jun 2009 09:33:32 +0200
+    - original version for CPAN

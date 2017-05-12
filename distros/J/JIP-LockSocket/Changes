@@ -1,0 +1,10 @@
+Revision history for JIP-LockSocket
+
+0.02    2015-05-17
+        get_port() is now port().
+        get_addr() is now addr().
+        JIP::ClassField for getters/setters.
+
+0.01    2015-04-29
+        First version, released on an unsuspecting world.
+

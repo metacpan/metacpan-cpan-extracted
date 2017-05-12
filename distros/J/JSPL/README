@@ -1,0 +1,169 @@
+------------
+INTRODUCTION
+------------
+
+JSPL.pm is a bridge between Mozilla's SpiderMonkey JavaScript engine and the
+Perl engine.
+
+JSPL allows you to export perl functions, classes and even entire perl namespaces
+to javascript, then compile and execute javascript code and call javascript
+functions.
+
+You can pass any variable or value between both interpreters and JSPL does
+automatic reflexion between perl and javascript datatypes.
+
+You can start using all this by writing JavaScript code and running it with the
+included "jspl" shell:
+
+    #!/usr/bin/jspl
+
+    // This JavaScript code uses perl's features in a transparent way
+
+    say('Hello World!');
+    say('Are you ' + Sys.Env['USER'] + '?');
+
+    if(Sys.Argv.length) say('My argv: ' + Sys.Argv.toString());
+
+
+Or execute JavaScript code from perl:
+
+    use JSPL;
+
+    my $ctx = JSPL->stock_context;
+
+    $ctx->eval(q|
+       for (i = 99; i > 0; i--) {
+	 say(i + " bottle(s) of beer on the wall, " + i + " bottle(s) of beer");
+	 say("Take 1 down, pass it around, ");
+	 if (i > 1) {
+	   say((i - 1) + " bottle(s) of beer on the wall.");
+	 }
+	 else {
+	   say("No more bottles of beer on the wall!");
+	 }
+       }
+    |);
+
+
+Even use installed CPAN modules directly from JavaScript:
+
+    #!/usr/bin/jspl
+    require('Gtk2', 'Gtk2');
+    install('Gtk2.Window', 'Gtk2::Window');
+    install('Gtk2.Button', 'Gtk2::Button');
+
+    Gtk2.init();
+
+    var window = new Gtk2.Window('toplevel');
+    var button = new Gtk2.Button('Quit');
+
+    button.signal_connect('clicked', function() { Gtk2.main_quit() });
+    window.add(button);
+    window.show_all();
+
+    Gtk2.main();
+    say('Thats all folks!');
+
+
+------------
+INSTALLATION
+------------
+
+Prerequisites
+-------------
+
+To compile and install JSPL, make sure you have SpiderMonkey's headers
+and libraries installed. See <https://developer.mozilla.org/en/SpiderMonkey>
+
+Currently this module support SpiderMonkey versions 1.7.0 to 1.8.5
+
+Note that for SpiderMonkey after version 1.8.0, you require a C++ compiler.
+
+If you have build your own SpiderMonkey from sources but not installed it,
+set the environment variable 'JS_SRC' to the path of your build directory,
+normally one below SM's 'js/src' directory, and skip to "Building" below.
+But be aware that using JS_SRC imply that you want to use a SM _static_ build.
+
+Otherwise the simplest way to get SM's headers an libraries is to install a
+recent copy of the XULRunner SDK (aka Gecko SDK) or a packaged SpiderMonkey for
+your distribution.
+
+* Linux
+
+Most Linux distributions provide the XULRunner SDK: in Fedora it is provided in
+the package 'xulrunner-devel', in Debian in 'xulrunner-dev', Ubuntu distributes
+it in parts, you need 'libmozjs-dev' or 'libmoz185-dev'.  Some linux distributions
+ship a 'js-devel' package that can be used too.
+
+All those should include a pkg-config's file that Makefile.PL will use to get
+the required compilation parameters, but different distributions use different names.
+
+An easy way to known if you has one of them installed is to execute:
+
+  $ pkg-config --list-all | grep js
+
+Makefile.PL will automatically search for some known pkg-config's files, but you can
+select which one to use.
+
+* Windows
+
+Grab a copy of XULRunner SDK from <https://developer.mozilla.org/en/Gecko_SDK>,
+unzip it and include its "bin" directory in front of the PATH environment variable.
+
+For example, if you unzip it at e:\xulrunner-sdk, you should setup your path
+with:
+
+  C:\> set PATH=e:\xulrunner-sdk\bin:%PATH%
+
+That way Makefile.PL can find all the required files.
+
+We use VS 6.0+ for all testing.
+
+* MacOS
+
+Untested, some hacking may be required.
+
+* Other Unixes
+
+All should work as long as Makefile.PL finds a 'pkg-config' file for your
+installed SM.
+
+Building
+--------
+
+To build and install this module, do the following:
+
+> perl Makefile.PL
+> make
+> make test
+> make install
+
+In linux, you can pass the name of the pkg-config module that you want to use as
+a single argument to Makefile.PL, for example:
+
+> perl Makefile mozilla-js2
+
+In Windows, substitute "make" with "nmake".
+
+-------
+SUPPORT
+-------
+
+Please submit any questions, bug reports, comments, feature requests, etc.,
+to Salvador Ortiz <sortiz@cpan.org>.
+
+I'm also subscribed to the perl-javascript@perl.org mailing list that is a proper
+place to discuss this module.
+
+---------
+COPYRIGHT
+---------
+
+Copyright (c) 2009 - 2012, Salvador Ortiz <sortiz@cpan.org>.
+All rights reserved.
+
+Some code adapted from JavaScript module
+Copyright (c) 2001 - 2008, Claes Jakobsson <claesjac@cpan.org>.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See http://dev.perl.org/licenses/artistic.html

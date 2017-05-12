@@ -1,0 +1,140 @@
+NAME
+    JSON::Schema - validate JSON against a schema
+
+SYNOPSIS
+     my $validator = JSON::Schema->new($schema, %options);
+     my $json      = from_json( ... );
+     my $result    = $validator->validate($json);
+ 
+     if ($result)
+     {
+       print "Valid!\n";
+     }
+     else
+     {
+       print "Errors\n";
+       print " - $_\n" foreach $result->errors;
+     }
+
+STATUS
+    This module offers good support for JSON Schema as described by draft
+    specifications circa 2012.
+
+    However, since then the JSON Schema draft specifications have changed
+    significantly. It is planned for this module to be updated to support the
+    changes, however this work will not be undertaken until the JSON Schema
+    specifications become more stable. (Being published as an IETF RFC will be
+    seen as sufficient stability.)
+
+DESCRIPTION
+  Constructors
+    `JSON::Schema->new($schema, %options)`
+        Given a JSON (or equivalent Perl nested hashref/arrayref structure)
+        Schema, returns a Perl object capable of checking objects against that
+        schema.
+
+        Note that some schemas contain '$ref' properties which act as
+        inclusions; this module does not expand those, but the JSON::Hyper
+        module can.
+
+        The only option currently supported is 'format' which takes a hashref
+        of formats (section 5.23 of the current JSON Schema draft) such that
+        the keys are the names of the formats, and the values are regular
+        expressions or callback functions. %JSON::Schema::FORMATS provides a
+        library of useful format checkers, but by default no format checkers
+        are used.
+
+         my $s = JSON::Schema->new($schema,
+                                   format => \%JSON::Schema::FORMATS);
+
+    `JSON::Schema->detect($url)`
+        Given the URL for a JSON instance (or an HTTP::Response object)
+        returns a list of schemas (as JSON::Schema objects) that the JSON
+        instance claims to conform to, detected from the HTTP response
+        headers.
+
+  Methods
+    `validate($object)`
+        Validates the object against the schema and returns a
+        JSON::Schema::Result.
+
+    `schema`
+        Returns the original schema as a hashref/arrayref structure.
+
+    `format`
+        Returns the hashref of format checkers.
+
+    `ua`
+        Returns the LWP::UserAgent that this schema object has used or would
+        use to retrieve content from the web.
+
+  Perl Specifics
+    Perl uses weak typing. This module largely gives JSON instances the
+    benefit of the doubt. For example, if something looks like a number (e.g.
+    a string which only includes the digits 0 to 9) then it will validate
+    against schemas that require a number.
+
+    The module extends JSON Schema's native set of types ('string', 'number',
+    'integer', 'boolean', 'array', 'object', 'null', 'any') with any Perl
+    package name. i.e. the following is valid:
+
+      my $validator = JSON::Schema->new({
+        properties => { 
+          'time' => { type => ['DateTime','string'] },
+        },
+      });
+      my $object = {
+        'time' => DateTime->now;
+      };
+      my $result = $schema->validate($object);
+
+    This extension makes JSON::Schema useful not just for validating JSON
+    structures, but acyclic Perl structures generally.
+
+    Acyclic. Yes, acyclic. You don't want an infinite loop.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    JSON::Schema::Result, JSON::Schema::Error, JSON::Schema::Helper,
+    JSON::Schema::Null, JSON::Schema::Examples.
+
+    Related modules: JSON::T, JSON::Path, JSON::GRDDL, JSON::Hyper.
+
+    <http://tools.ietf.org/html/draft-zyp-json-schema>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+    This is largely a port of Kris Zyp's Javascript JSON Schema validator
+    <http://code.google.com/p/jsonschema/>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2007-2009 Kris Zyp.
+
+    Copyright 2010-2012 Toby Inkster.
+
+    This module is tri-licensed. It is available under the X11 (a.k.a. MIT)
+    licence; you can also redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+  a.k.a. "The MIT Licence"
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
+    and/or sell copies of the Software, and to permit persons to whom the
+    Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+

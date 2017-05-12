@@ -1,0 +1,13 @@
+{
+  "title": "Example Schema",
+  "type": "object",
+  "required": ["firstName", "lastName"],
+  "properties": {
+      "firstName": { "type": "string" },
+      "lastName": { "type": "string" },
+      "age": { "$ref": "#/definitions/age" }
+  },
+  "definitions": {
+    "age": { "type": "integer", "minimum": 0, "description": "Age in years" }
+  }
+}

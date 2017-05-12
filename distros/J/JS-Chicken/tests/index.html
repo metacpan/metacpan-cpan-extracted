@@ -1,0 +1,22 @@
+<html>
+<head>
+    <title>Chicken JavaScript Template Library Testing</title>
+    <script type="text/javascript" src="lib/Test/Harness.js"></script>
+    <script type="text/javascript" src="lib/Test/Harness/Browser.js"></script>
+</head>
+<body>
+<script type="text/javascript">
+    var t = new Test.Harness.Browser();
+    
+    t.runTests(
+        "001_basic.t.html",
+        "002_thunks.t.html",
+        "003_collection.t.html",
+        "004_hierarchy.t.html",
+        "005_deep_selectors.t.html",
+        "006_error_handling.t.html",
+        "007_adding_to_collection.t.html"
+    );
+</script>
+</body>
+</html>

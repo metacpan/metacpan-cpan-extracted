@@ -1,0 +1,39 @@
+
+LOG_DIR=logs
+
+# enable profiler
+PERL5DB:='use Devel::NYTProf'
+NYTPROF:=start=begin:file=nytprof.out
+PERL5LIB:="lib:t/lib:t/*/lib:local/lib/perl5:$${PERL5LIB}"
+PERL_TEST_HARNET_DUMP_TAP:=$(LOG_DIR)
+TEST_VERBOSE:=1
+SHELL=/bin/bash
+
+all: clean prepare build tests coverage nytprof
+
+clean:
+	if [[ -e Makefile ]] ; then make -k realclean ; fi
+	rm -vf nytprof.out Makefile Makefile.old blib *.tar.gz
+	cover -delete
+	rm -rf local
+
+prepare:
+	mkdir -p $(LOG_DIR)
+	perl -V
+
+build:
+	perl Makefile.PL && make
+	cpanm -f --local-lib=local --installdeps .
+
+tests: build
+	HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,inc prove -Ilocal/lib/perl5 -lv --formatter TAP::Formatter::JUnit t \
+						2>&1 > $(LOG_DIR)/tests.xml
+
+coverage:
+	cover -report clover
+	cover
+
+nytprof:
+	NYTPROF=start=begin:file=nytprof.out; 
+	perl -Ilocal/lib/perl5 -Ilib -d:NYTProf t/*.t 
+	nytprofhtml

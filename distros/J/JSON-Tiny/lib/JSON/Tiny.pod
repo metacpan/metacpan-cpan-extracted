@@ -1,0 +1,248 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+JSON::Tiny - Minimalistic JSON. No dependencies.
+
+=head1 SYNOPSIS
+
+  use JSON::Tiny qw(decode_json encode_json);
+
+  my $bytes = encode_json {foo => [1, 2], bar => 'hello!', baz => \1};
+  my $hash  = decode_json $bytes;
+
+=head1 DESCRIPTION
+
+L<JSON::Tiny> is a minimalistic standalone adaptation of L<Mojo::JSON>, from
+the L<Mojolicious> framework. It is a single-source-file module with under 300
+lines of code and core-only dependencies.
+
+Features include transparent Unicode support, speed, small memory footprint,
+and a minimal code base ideal for bundling or inlining. Along with
+L<Mojo::JSON>, it is among the fastest pure-Perl implementations of
+L<RFC 7159|http://tools.ietf.org/html/rfc7159>.
+
+L<JSON::Tiny> supports normal Perl data types like scalar, array reference,
+hash reference, and will try to call the L<TO_JSON> method on blessed
+references, or stringify them if it doesn't exist.
+
+Differentiating between strings and numbers in Perl is hard; depending on how
+it has been used, a scalar can be both at the same time. The string value has a
+higher precedence unless both representations are equivalent.
+
+  [1, -2, 3]     -> [1, -2, 3]
+  {"foo": "bar"} -> {foo => 'bar'}
+
+Literal names will be translated to and from L<JSON::Tiny> constants or a
+similar native Perl value.
+
+  true  -> JSON::Tiny->true
+  false -> JSON::Tiny->false
+  null  -> undef
+
+Scalar references will be used to generate Booleans, based on if their values
+are true or false.
+
+  \1 => true
+  \0 => false
+
+The two Unicode whitespace characters C<u2028> and C<u2029> will always be
+escaped to make JSONP easier, and the character C</> to prevent XSS attacks.
+
+=head1 FUNCTIONS
+
+L<JSON::Tiny> implements the following functions, which can be imported
+individually.
+
+=head2 decode_json
+
+  my $value = decode_json $bytes;
+
+Decode JSON to Perl value and die if decoding fails.
+
+=head2 encode_json
+
+  my $bytes = encode_json {foo => 'bar'};
+
+Encode Perl value to JSON.
+
+=head2 false
+
+  my $false = false;
+
+False value, used because Perl has no equivalent.
+
+=head2 from_json
+
+  my $value = from_json $chars;
+
+Decode JSON text that is not C<UTF-8> encoded to Perl value and die if
+decoding fails.
+
+=head2 j
+
+  my $bytes = j [1, 2, 3];
+  my $bytes = j {foo => 'bar'};
+  my $value = j $bytes;
+
+Encode Perl data structure (which may only be an array reference or hash
+reference) or decode JSON. An C<undef> return value indicates a bare C<null>.
+Dies if decoding fails.
+
+=head2 to_json
+
+  my $chars = to_json {i => '♥ Perl'};
+
+Encode Perl value to JSON text without C<UTF-8> encoding it.
+
+=head2 true
+
+  my $true = true;
+
+True value, used because Perl has no native equivalent.
+
+=head3 More on Booleans
+
+A reference to a scalar (even if blessed) is encoded as a Boolean value unless
+it has a TO_JSON method.
+
+  my $json = $j->encode( { b => \1, a => \0 } ); # {"b":true,"a":false}
+
+Boolean false and true values returned when JSON is decoded are
+JSON::Tiny::_Bool objects with overloaded stringification.
+
+B<Advanced option>: Users requiring a plain old literal C<0> or C<1>, may set
+C<$JSON::Tiny::FALSE = 0;> and C<$JSON::Tiny::TRUE = 1;>. Any value, including
+blessed references will work. This must be set prior to calling a JSON decoding
+function. Use C<local> to limit scope.
+
+=head1 Tiny
+
+JSON::Tiny compared with JSON::PP from the L<JSON> distribution:
+
+=over 4
+
+=item * L<JSON::PP> is configurable, but more complex. L<JSON::Tiny> offers
+sane defaults, and no configuration.
+
+=item * Download and install with C<cpanm>: L<JSON::PP>, 5.2 seconds.
+L<JSON::Tiny>, 1.9 seconds.
+
+=item * Minimal Dependencies: Both L<JSON::PP> and L<JSON::Tiny> only use core
+dependencies. JSON::Tiny requires Perl 5.8.4, while L<JSON::PP> requires 5.6.
+
+=item * Simple Design: L<JSON> has 2254 lines of code, six modules and five
+files. Distribution: 85KB. 
+
+L<JSON::Tiny> has under 300 lines of code; an embeddable single-file module.
+Distribution: 18KB.
+
+=item * L<JSON::PP> has 42 functions and methods. L<JSON::Tiny> has seven.
+
+=item * Performance:
+
+             Rate   JSON_PP JSON_Tiny
+  JSON_PP   304/s        --      -52%
+  JSON_Tiny 636/s      109%        --
+
+L<JSON> uses L<JSON::XS> if it's available, in which case L<JSON> wins.
+See C<examples/json_bench.pl> for benchmark code.
+
+JSON::Tiny's lightweight design reduces its startup time compared to the
+L<JSON> module. This may benefit frequently run applications like CGI.
+
+=item * Light Memory Needs: Memory usage was tested with
+L<http://valgrind.org/valgrind> and L<Devel::MemoryTrace::Light> by running
+C<examples/json_pp.pl> and C<examples/json_tiny.pl>.
+
+             valgrind  Devel::MemoryTrace::Light
+  JSON::PP   5.1MB     3.7MB
+  JSON::Tiny 4.5MB     2.6MB
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+No configuration.
+
+=head1 DEPENDENCIES
+
+Perl 5.8.4 or newer. B<Perl 5.10+ is recommended due to bugs in Perl 5.8's
+regular expression engine.>
+
+=head1 INCOMPATIBILITIES
+
+Incompatible with L<Exporter> versions older than 5.59 (ie, predating Perl
+5.8.4).
+
+=head1 AUTHOR
+
+David Oswald, C<< <davido at cpan.org> >>
+
+Code and tests adapted from L<Mojo::JSON>.
+
+=head1 SUPPORT
+
+Direct support requests to the author. Direct bug reports to CPAN's Request
+Tracker (RT).
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc JSON::Tiny
+
+You may look for additional information at:
+
+=over 4
+
+=item * Github: Development is hosted on Github at:
+
+L<http://www.github.com/daoswald/JSON-Tiny>
+
+=item * RT: CPAN's request tracker (bug reports)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-Tiny>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/JSON-Tiny>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/JSON-Tiny>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/JSON-Tiny/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+L<Mojolicious> team for its lightweight JSON implementation. This module was
+adapted from L<Mojo::JSON> because it is robust, minimal, and well tested.
+Mojo::JSON's tests were also adapted to a dependency-free design.
+
+Christian Hansen, whos L<GitHub Gist|https://gist.github.com/chansen/810296>
+formed the basis for L<Mojo::JSON>, and subsequently JSON::Tiny.
+
+Randal Schwartz showed his pure-regexp JSON parser
+(L<PerlMonks|http://perlmonks.org/?node_id=995856>) to Los Angeles Perl Mongers
+(09/2012). He wasn't involved in JSON::Tiny, but exploring alternatives to his
+solution led to this project.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012-2014 David Oswald.
+
+This program is free software, you can redistribute it and/or modify it under
+the terms of the Artistic License version 2.0.
+
+See L<http://www.perlfoundation.org/artistic_license_2_0> for more information.
+
+=head1 SEE ALSO
+
+L<Mojo::JSON>, L<JSON>, L<RFC7159|http://tools.ietf.org/html/rfc7159>.
+
+=cut

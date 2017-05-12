@@ -1,0 +1,32 @@
+---
+abstract: 'A JavaScript Preprocessor designed for large scale javascript development'
+author:
+  - 'Daichi Hiroki <hirokidaichi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-Ectype
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  File::Slurp: 0
+  JSON: 0
+  JavaScript::Minifier: 0
+  List::Util: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

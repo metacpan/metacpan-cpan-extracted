@@ -1,0 +1,88 @@
+{
+   "abstract" : "transform JSON using JsonT",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "ECMAScript",
+      "JSON",
+      "JavaScript",
+      "JsonT",
+      "Transform"
+   ],
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-T",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Cpanel::JSON::XS" : "0",
+            "JE" : "0"
+         },
+         "requires" : {
+            "Module::Runtime" : "0",
+            "perl" : "5.010000"
+         },
+         "suggests" : {
+            "JSON::PP" : "0",
+            "JavaScript::SpiderMonkey" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::T" : {
+         "file" : "lib/JSON/T.pm",
+         "version" : "0.104"
+      },
+      "JSON::T::JE" : {
+         "file" : "lib/JSON/T/JE.pm",
+         "version" : "0.104"
+      },
+      "JSON::T::SpiderMonkey" : {
+         "file" : "lib/JSON/T/SpiderMonkey.pm",
+         "version" : "0.104"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=JSON-T"
+      },
+      "homepage" : "https://metacpan.org/release/JSON-T",
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-json-t.git",
+         "web" : "https://github.com/tobyink/p5-json-t"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/JSON-T/project"
+   },
+   "version" : "0.104",
+   "x_contributors" : [
+      "Stefan Goessner"
+   ]
+}

@@ -1,0 +1,22 @@
+2005-07-19    0.07
+
+  - Fixed the source directory indexing problems.
+
+2005-07-15    0.06
+
+  - Fixed a completely broken build system (Adam Kennedy).
+
+2005-07-12    0.03
+
+  - Fixed tests.
+  - Added doc entry to library table.
+  - Added meta class handler.
+  - Added dependency following.
+
+2005-07-11    0.02
+
+  - Changed indexer namespace to JSAN::Indexer.
+
+2005-07-11    0.01
+
+  - Initial release.

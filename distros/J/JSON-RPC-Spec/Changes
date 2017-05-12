@@ -1,0 +1,63 @@
+Revision history for Perl extension JSON-RPC-Spec
+
+v1.0.6 2016-06-26T09:31:10Z
+
+    commit c0c8a2140412d40fac17d4409489f84e88ca91cc
+    Author: nqounet <mail@nqou.net>
+    Date:   Sun Jun 26 02:26:09 2016 -0700
+
+        fix regex syntax(master)
+
+        http://www.cpantesters.org/cpan/report/b7ae725c-3abc-11e6-9180-881149b3ac32
+
+v1.0.5 2015-11-15T15:07:31Z
+
+    commit 494dff7e668a0be085367d5e452b39661283a33d
+    Author: nqounet <mail@nqou.net>
+    Date:   Sun Nov 15 22:58:04 2015 +0900
+
+        add undeclared dependency(master)
+
+    commit 38591da6a8b9b96d66769578eb2c8885e930945e
+    Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+    Date:   Thu Nov 12 15:20:01 2015 +0000
+
+        - Made SEE ALSO link clickable.
+
+v1.0.4 2015-11-12T01:03:04Z
+
+    - add extra args into parse to register method.
+
+v1.0.3 2015-03-01T19:22:10Z
+
+    - change default value to code refs
+
+v1.0.2 2015-02-06T16:13:43Z
+
+    - change default value from `.callback` to `_callback`
+    - add tests
+    - add daiku perltidy
+
+v1.0.1 2014-09-13T13:46:31Z
+
+    - add code `no Moo;`
+
+v1.0.0 2014-08-26T12:50:12Z
+
+    - from Class::Accessor::Lite to Moo
+    - add method `compose`
+
+0.03 2014-08-17T14:33:56Z
+
+    - from JSON::XS to JSON::MaybeXS
+    - add new options
+    - add method `parse_without_encode`
+
+0.02 2014-08-14T09:08:26Z
+
+    - add param matched hash (via Router::Simple)
+    - enable debug mode
+
+0.01 2014-08-13T14:28:56Z
+
+    - original version

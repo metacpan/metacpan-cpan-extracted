@@ -1,0 +1,28 @@
+---
+abstract: 'JavaScript Templating with Template Toolkit'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jemplate
+no_index:
+  directory:
+    - examples
+recommends:
+  JavaScript::V8x::TestMoreish: '0'
+requires:
+  File::Find::Rule: '0.33'
+  Template: '2.25'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/jemplate/issues
+  homepage: https://github.com/ingydotnet/jemplate
+  repository: https://github.com/ingydotnet/jemplate.git
+version: '0.30'

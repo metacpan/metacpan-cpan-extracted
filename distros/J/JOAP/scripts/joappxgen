@@ -1,0 +1,491 @@
+#!/usr/bin/perl -w
+
+# Copyright (C) 2003, Evan Prodromou <evan@prodromou.san-francisco.ca.us>.
+
+# This file is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This file is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with GNU Emacs; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+# tag: proxy class generator
+
+use strict;
+use warnings;
+use Net::Jabber qw(Client);
+use Error qw(:try);
+use JOAP::Proxy::Server;
+use JOAP::Proxy::Class;
+use JOAP::Proxy::Error;
+use File::Spec;
+use File::Path;
+use IO::File;
+use Getopt::Long;
+use Text::Wrap;
+
+# version
+
+my $VERSION = $JOAP::VERSION;
+
+# These are config options
+
+our $jid = undef;
+our $port = 5222;
+our $password = undef;
+our $resource = 'joappxgen';
+our $directory = '.';
+our $verbose = undef;
+
+sub usage;
+sub jabber_con;
+sub generate_server_code;
+sub generate_class_code;
+
+sub usage {
+    print <<"END_OF_USAGE";
+joappxgen.pl [options] REMOTE PACKAGE
+Generate JOAP proxy code for JOAP server REMOTE in Perl package PACKAGE
+Example: joappxgen.pl payroll.example.com Payroll
+
+Available options are:
+
+  --jid=JID            Jabber ID to connect with (ex: 'JRandom\@example.com')
+  --port=PORT          Port to connect to local server (default: $port)
+  --password=PASS      Password to use to connect
+  --resource=RSRC      Resource to use to connect (default: '$resource')
+  --directory=DIR      Directory for output files (default: '$directory')
+  --config-file=FILE   Config file to use (default: ~/.joapperlrc)
+  --help               Output this message and exit
+  --version            Output version information and exit
+  --verbose            Verbose output
+
+END_OF_USAGE
+    version();
+}
+
+sub version {
+print <<"END_OF_VERSION";
+joappxgen.pl $VERSION, Copyright (C) 2003 Evan Prodromou <evan\@prodromou.san-francisco.ca.us>
+
+This is free software; see the source for copying conditions. There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+END_OF_VERSION
+}
+
+sub main {
+
+    my $help = undef;
+    my $version = undef;
+    my $config_file = File::Spec->catfile($ENV{HOME}, ".joapperlrc");
+
+    GetOptions("jid=s", \$jid,
+               "port=i", \$port,
+               "password=s", \$password,
+               "resource=s", \$resource,
+               "directory=s", \$directory,
+               "help", \$help,
+               "version", \$version,
+               "verbose", \$verbose,
+               "config-file=s", \$config_file);
+
+    if ($version) {
+        version;
+        exit(0);
+    }
+
+    if ($help) {
+        usage;
+        exit(0);
+    }
+
+    unless (my $return = do $config_file) {
+        warn "Couldn't parse $config_file: $@.\n" if $@;
+        warn "Couldn't do $config_file: $!.\n" unless defined $return;
+        warn "Couldn't run $config_file.\n" unless $return;
+    }
+
+    my $remote = $ARGV[0];
+    my $package = $ARGV[1];
+
+    if (!$jid || !$port || !$password || !$resource || !$remote || !$directory || !$package) {
+        usage;
+        exit(1);
+    }
+
+    my $con = jabber_con($jid, $port, $password, $resource);
+
+    unless ($con) {
+        die("Couldn't connect as $jid (port $port)\n");
+    }
+
+    JOAP::Proxy->Connection($con);
+
+    try {
+
+        print "Getting info for server $remote\n" if $verbose;
+
+        my $server = JOAP::Proxy::Server->get($remote);
+
+        generate_server_code($server, $directory, $package);
+
+    } catch JOAP::Proxy::Error with {
+        my $err = shift;
+        die("JOAP error " . $err->value . ": " . $err->text . "\n");
+    };
+
+    $con->Disconnect();
+}
+
+sub jabber_con {
+
+    my $jid = shift;
+    my $port = shift;
+    my $password = shift;
+    my $resource = shift;
+
+    my $jidobj = new Net::Jabber::JID($jid);
+
+    my $user = $jidobj->GetUserID;
+    my $server = $jidobj->GetServer;
+
+    unless ($user && $server) {
+        return undef;
+    }
+
+    my $con = new Net::Jabber::Client;
+
+    my $status = $con->Connect(hostname => $server,
+                               port => $port);
+
+    unless (defined($status)) {
+        return undef;
+    }
+
+    my @result = $con->AuthSend(username => $user,
+                                password => $password,
+                                resource => $resource);
+
+    unless ($result[0] eq 'ok') {
+        $con->Disconnect;
+        return undef;
+    }
+
+    $con->RosterGet;
+    $con->PresenceSend(priority => 0);
+
+    return $con;
+}
+
+sub generate_server_code {
+
+    my $server = shift;
+    my $outdir = shift;
+    my $package = shift;
+    my %classes;
+
+    foreach my $classname (@{$server->classes}) {
+
+        print "Getting info for class $classname\n" if $verbose;
+
+        my $class = JOAP::Proxy::Class->get($classname);
+
+        my $base = basename($classname);
+
+        my $class_pkg = pkg_name($package, $base);
+
+        print "Putting class $classname in package $class_pkg\n" if $verbose;
+
+        generate_class_code($class, $outdir, $class_pkg);
+
+        $classes{$base} = $class_pkg;
+    }
+
+    my $file = output_file($outdir, $package);
+
+    file_prolog($file, $package, 'Server');
+
+    common_metadata($file, $package, $server);
+    classes($file, $package, $server);
+
+    method_decl($file, $package, $server->methods);
+    attrs_decl($file, $package, $server->attributes);
+
+    server_methods($file, $package, $server);
+
+    file_epilog($file, $package);
+
+    $file->close;
+};
+
+sub generate_class_code {
+
+    my $class = shift;
+    my $outdir = shift;
+    my $package = shift;
+
+    my $file = output_file($outdir, $package);
+
+    file_prolog($file, $package, 'Class');
+    common_metadata($file, $package, $class);
+    superclasses($file, $package, $class);
+    method_decl($file, $package, $class->methods);
+    attrs_decl($file, $package, $class->attributes);
+    class_methods($file, $package, $class);
+    file_epilog($file, $package);
+
+    $file->close;
+}
+
+sub superclasses {
+    my $file = shift;
+    my $package = shift;
+    my $obj = shift;
+
+    $file->print($package, "->Superclasses([qw(", @{$obj->superclasses}, ")]);\n\n");
+}
+
+sub classes {
+
+    my $file = shift;
+    my $package = shift;
+    my $server = shift;
+
+    $file->print($package, "->Classes([qw(", @{$server->classes}, ")]);\n\n");
+}
+
+sub common_metadata {
+
+    my $file = shift;
+    my $package = shift;
+    my $obj = shift;
+
+    $file->print($package, "->Address('", $obj->address, "');\n\n");
+    $file->print($package, "->Timestamp('", $obj->timestamp, "');\n\n");
+    $file->print($package, "->Description(<<'END_OF_DESCRIPTION');\n");
+    $file->print(wrap('', '', $obj->description));
+    $file->print("END_OF_DESCRIPTION\n\n");
+}
+
+sub class_methods {
+
+    my $file = shift;
+    my $package = shift;
+    my $obj = shift;
+
+    my $meths = $obj->methods;
+    my $attrs = $obj->attributes;
+
+    my @class_methods = grep {$meths->{$_}->{allocation} eq 'class'} keys %$meths;
+    my @instance_methods = grep {$meths->{$_}->{allocation} ne 'class'} keys %$meths;
+    my @class_attrs = grep {$attrs->{$_}->{allocation} eq 'class'} keys %$attrs;
+    my @instance_attrs = grep {$attrs->{$_}->{allocation} ne 'class'} keys %$attrs;
+
+    if (@class_attrs) {
+        $file->print("# class attribute accessors\n\n");
+        foreach my $name (@class_attrs) {
+            $file->print("*$name = $package->class_accessor('$name');\n");
+        }
+        $file->print("\n");
+    }
+
+    if (@class_methods) {
+        $file->print("# class methods\n\n");
+        foreach my $name (@class_methods) {
+            $file->print("*$name = $package->class_method('$name');\n");
+        }
+        $file->print("\n");
+    }
+
+    if (@instance_attrs) {
+        $file->print("# instance attribute accessors\n\n");
+        foreach my $name (@instance_attrs) {
+            $file->print("*$name = $package->instance_accessor('$name');\n");
+        }
+        $file->print("\n");
+    }
+
+    if (@instance_methods) {
+        $file->print("# instance methods\n\n");
+        foreach my $name (@instance_methods) {
+            $file->print("*$name = $package->instance_method('$name');\n");
+        }
+        $file->print("\n");
+    }
+}
+
+sub server_methods {
+
+    my $file = shift;
+    my $package = shift;
+    my $obj = shift;
+
+    my $meths = $obj->methods;
+    my $attrs = $obj->attributes;
+
+    $file->print("\n# server methods\n\n");
+
+    while (my ($name, $desc) = each %$meths) {
+        $file->print("*$name = $package->method('$name');\n");
+    }
+
+    $file->print("\n# server attribute accessors\n\n");
+
+    while (my ($name, $desc) = each %$attrs) {
+        $file->print("*$name = $package->accessor('$name');\n");
+    }
+}
+
+sub pkg_name {
+
+    my $package = shift;
+    my $base = shift;
+
+    return $package . "::" . $base;
+}
+
+sub basename {
+    my $classname = shift;
+    my $jid = new Net::Jabber::JID($classname);
+
+    return $jid->GetUserID;
+}
+
+sub output_file {
+
+    my $outdir = shift;
+    my $package = shift;
+
+    my @dirparts = split(/::/, $package);
+    my $base = pop @dirparts;
+
+    my $dir = File::Spec->catfile($outdir, @dirparts);
+
+    unless (-d $dir) {
+        if (-f $dir) {
+            warn "Whomping existing file $dir\n";
+            unlink $dir;
+        }
+        mkpath($dir);
+    }
+
+    my $filename = File::Spec->catfile($dir, $base) . ".pm"; # XXX: assumes .pm
+
+    print "Opening output file $filename for package $package\n" if $verbose;
+
+    return IO::File->new("> $filename");
+}
+
+sub method_decl {
+
+    my $file = shift;
+    my $package = shift;
+    my $meths = shift;
+
+    $file->print($package, "->Methods({");
+
+    while (my ($name, $desc) = each %$meths) {
+        my $desc_wrap = wrap('','', $desc->{desc});
+        $file->print(<<"END_OF_METHOD_PROLOG");
+
+    $name =>
+    {
+        desc => <<'END_OF_DESC',
+$desc_wrap
+END_OF_DESC
+        returnType => '$desc->{returnType}',
+        allocation => '$desc->{allocation}',
+        params => [
+END_OF_METHOD_PROLOG
+        foreach my $paramdesc (@{$desc->{params}}) {
+            my $pdescwrap = wrap('','', $paramdesc->{desc});
+            $file->print(<<"END_OF_METHOD_PARAM");
+            {
+              name => '$paramdesc->{name}',
+              type => '$paramdesc->{type}',
+              desc => <<'END_OF_PARAM_DESC'
+$pdescwrap
+END_OF_PARAM_DESC
+            },
+END_OF_METHOD_PARAM
+        }
+        $file->print(<<"END_OF_METHOD_EPILOG");
+        ]
+    },
+END_OF_METHOD_EPILOG
+    }
+    $file->print("});\n");
+}
+
+sub attrs_decl {
+
+    my $file = shift;
+    my $package = shift;
+    my $attrs = shift;
+
+    $file->print($package, "->Attributes({");
+
+    while (my ($name, $desc) = each %$attrs) {
+        my $desc_wrap = wrap('','', $desc->{desc});
+        $file->print(<<"END_OF_ATTRIBUTE");
+
+    $name =>
+    {
+        desc => <<'END_OF_DESC',
+$desc_wrap
+END_OF_DESC
+        type => '$desc->{type}',
+        allocation => '$desc->{allocation}',
+        required => $desc->{required},
+        writeable => $desc->{writeable}
+    },
+END_OF_ATTRIBUTE
+    }
+    $file->print("});\n");
+}
+
+sub file_prolog {
+
+    my $file = shift;
+    my $package = shift;
+    my $type = shift;
+    my $ts = localtime;
+
+    print $file <<"END_OF_PROLOG";
+# Do not edit! Autogenerated file! All will perish!
+#
+# created by joappxgen.pl $VERSION at $ts
+#
+# More template stuff to go here soon
+
+package $package;
+
+use 5.008;
+use strict;
+use warnings;
+
+use JOAP::Proxy::Package::$type;
+use base qw(JOAP::Proxy::Package::$type);
+
+END_OF_PROLOG
+}
+
+sub file_epilog {
+
+    my $file = shift;
+    my $package = shift;
+
+    $file->print("1;\n");
+
+}
+
+
+&main();

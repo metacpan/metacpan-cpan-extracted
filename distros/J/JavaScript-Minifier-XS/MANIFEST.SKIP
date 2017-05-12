@@ -1,0 +1,10 @@
+Build
+_build
+.git/
+.gitignore
+\..*\.swp
+.prove
+.travis.yml
+blib/
+^MYMETA\.yml$
+^MYMETA\.json$

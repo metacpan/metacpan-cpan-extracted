@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-load.t
+t/02-swellsquish.t
+lib/JavaScript/Swell.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+bin/example.pl

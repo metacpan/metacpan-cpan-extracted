@@ -1,0 +1,17 @@
+1. I expected an Ajax response, but nothing happens. 
+
+   The possibilities are boundless, but let's have a look and see how
+   to find out what the problem is and how to debug it.
+
+
+   a) The program needs 
+       use JQuery::Taconite ;
+   b) my $taconite = new JQuery::Taconite(addToJQuery => $jquery) ; 
+   c) the remoteProgram must exist
+   d) if using CGI::Application, the runmode must exist
+   e) if using CGI::Application, ensure that only one header is sent, not two
+   f) ensure that the reply header is text/xml
+   g) ensure that the reply is valid xml - NOW CHECK AGAIN - VALID XML
+   h) set the debug flag on Taconite to 1 to see the results in Firebug
+   h) read http://www.malsup.com/jquery/taconite/#debugging
+   

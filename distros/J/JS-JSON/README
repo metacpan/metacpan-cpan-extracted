@@ -1,0 +1,23 @@
+JS::JSON version 0.01
+===========================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    JS
+
+This Javascript is Public Domain, as is this repackaging of it.
+
+NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.

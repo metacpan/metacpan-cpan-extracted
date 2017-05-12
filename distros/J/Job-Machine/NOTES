@@ -1,0 +1,4 @@
+Making a queue safe:
+http://johtopg.blogspot.com/2010/12/queues-in-sql.html
+Job::Machine doesn't use advisory locks; it is designed frpm the assumption
+that the worker does a lot of non-task work.

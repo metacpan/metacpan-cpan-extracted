@@ -1,0 +1,8 @@
+.swp
+.swo
+local
+bin/zaton
+Vagrantfile
+.zaton-run
+.vagrant
+JSON-ReadPath-.*

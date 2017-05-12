@@ -1,0 +1,51 @@
+---
+abstract: 'transform JSON to RDF'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640'
+keywords:
+  - GRDDL
+  - JSON
+  - JsonT
+  - RDF
+  - 'Semantic Web'
+  - jsonGRDDL
+  - transform
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-GRDDL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  JSON::GRDDL:
+    file: lib/JSON/GRDDL.pm
+    version: '0.002'
+requires:
+  Carp: '1.00'
+  JSON: '0'
+  JSON::T: '0'
+  LWP::UserAgent: '0'
+  Object::AUTHORITY: '0'
+  RDF::Trine: '0.112'
+  Scalar::Util: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/JSON-GRDDL/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=JSON-GRDDL
+  homepage: https://metacpan.org/release/JSON-GRDDL
+  license: http://dev.perl.org/licenses/
+  repository: http://goddamn.co.uk/svn-web/perlmods/browse/JSON-GRDDL/
+version: '0.002'

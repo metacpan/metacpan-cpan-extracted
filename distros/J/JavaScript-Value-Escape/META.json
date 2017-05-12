@@ -1,0 +1,78 @@
+{
+   "abstract" : "Avoid XSS with JavaScript value interpolation",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-Value-Escape",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "JavaScript::Value::Escape" : {
+         "file" : "lib/JavaScript/Value/Escape.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/JavaScript-Value-Escape/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/JavaScript-Value-Escape",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/JavaScript-Value-Escape.git",
+         "web" : "https://github.com/kazeburo/JavaScript-Value-Escape"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Fuji, Goro <gfuji@cpan.org>",
+      "Andrea Nall <anall@andreanall.com>",
+      "David Bishop <david@gnuconsulting.com>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

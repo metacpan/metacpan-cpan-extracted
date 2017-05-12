@@ -1,0 +1,13 @@
+lib/JSON/Streaming/Reader.pm
+lib/JSON/Streaming/Reader/TestUtil.pm
+lib/JSON/Streaming/Reader/EventWrapper.pm
+t/03-callbackapi.t
+t/02-errors.t
+t/00-use.t
+t/01-basics.t
+t/04-eventapi.t
+t/05-slurp.t
+t/06-underrun.t
+Makefile.PL
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

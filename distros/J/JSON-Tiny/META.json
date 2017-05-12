@@ -1,0 +1,61 @@
+{
+   "abstract" : "Minimalistic JSON. No dependencies.",
+   "author" : [
+      "David Oswald <davido[at]cpan[dot]org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008000"
+         },
+         "suggests" : {
+            "JSON::PP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::Tiny" : {
+         "file" : "lib/JSON/Tiny.pm",
+         "version" : "0.56"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/daoswald/JSON-Tiny.git",
+         "web" : "https://github.com/daoswald/JSON-Tiny"
+      }
+   },
+   "version" : "0.56",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

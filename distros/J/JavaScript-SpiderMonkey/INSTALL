@@ -1,0 +1,34 @@
+
+How to install JavaScript::SpiderMonkey
+
+Get the latest SpiderMonkey distribution from mozilla.org:
+http://www.mozilla.org/js/spidermonkey shows which releases are available.
+http://ftp.mozilla.org/pub/js/js-1.5-rc3a.tar.gz has been proven to work.
+
+Untar it at the same directory level as the distribution of the
+JavaScript::SpiderMonkey perl module distribution whichs README
+you're currently reading:
+
+cd ..
+tar zxfv js-1.5-rc3a.tar.gz
+
+It's important that the js and JavaScript-SpiderMonkey-v.vv directories
+are at the same level:
+
+$ls
+JavaScript-SpiderMonkey-1.00  
+js
+js-1.5-rc3a.tar.gz
+
+Alternatively, specify the location of the library on the command line
+to Makefile.PL using the --js_lib_dir and --js_lib_name options:
+
+perl Makefile.PL --js_lib_dir /path/to/library/ --js_lib_name js
+
+Next, build JavaScript::SpiderMonkey in the standard way:
+
+cd JavaScript-SpiderMonkey-1.00
+perl Makefile.PL
+gmake
+gmake test
+gmake install

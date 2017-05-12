@@ -1,0 +1,17 @@
+
+Jabber::Lite is a Jabber connection and XML stanza processing library
+implemented entirely in perl.  Originally written to act as a Jabber
+client on old, non-upgradable perl versions, it has grown into a more 
+generic library.  From the DESCRIPTION in perldoc:
+
+       Whats in the box?  Jabber::Lite is able to connect to a
+       Jabber server, read from the socket, and supply XML
+       objects to the application as the application reads them.
+       Its function calls are mostly compatible with Jab-
+       ber::NodeFactory and Jabber::Connection.  Surprisingly, it
+       can also function as a stand-alone XML parser (which was
+       not the author's original intent, but hey, it works).
+
+       Whats not in the box?  Any requirement for a recent perl
+       version, UTF-8 support, as well as a fully XML-compliant
+       Parser.

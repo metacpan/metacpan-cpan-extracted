@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               JE
+version:            0.066
+abstract:           Pure-Perl ECMAScript (JavaScript) Engine
+author:
+    - Father Chrysostomos <sprout @ cpan . org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:          1.01
+    constant:      1.03
+    Date::Parse:   0
+    Encode:        2.08
+    Exporter:      5.57
+    List::Util:    0
+    POSIX:         0
+    re:            0.02
+    Scalar::Util:  1.14
+    strict:        0
+    Test::More:    0
+    Time::Local:   0
+    Time::Zone:    0
+    utf8:          0
+    warnings:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

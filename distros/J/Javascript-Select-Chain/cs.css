@@ -1,0 +1,13 @@
+body {background-color:#ffffff; color:#000000;}
+p, td, ul, ol, li, input, select, option {font-size:12pt; color:#000000; font-weight:normal; font-family:sans-serif,verdana,helvetica;}
+pre {font-size:11pt; color:#003366; background-color:#cccccc; font-family:sans-serif,verdana,helvetica; border:1px solid #003366; padding:12pt; margin:12pt;}
+
+.title {font-size:14pt; color:#000000; font-family:sans-serif,verdana,helvetica;}
+.copyright {font-size:10pt; color:#000000; font-family:sans-serif,verdana,helvetica;}
+
+a {text-decoration:none}
+a:link {color:#336699}
+a:visited {color:#336699}
+a:active {color:#6699cc}
+
+select { width:220px; }

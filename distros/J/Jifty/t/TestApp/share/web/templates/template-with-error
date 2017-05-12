@@ -1,0 +1,5 @@
+<&|/_elements/wrapper, title => 'Jifty Test Application' &>
+Before error
+% Jifty->web->non_existent_method;
+After error
+</&>

@@ -1,0 +1,61 @@
+---
+name: JQuery
+version: 1.06
+author:
+  - 'Peter Gordon <peter@pg-consultants.com>'
+abstract: A javascript interface, based on jQuery, giving simple access to Ajax and other feature from CGI
+license: perl
+requires:
+  CGI::Application: 1.0
+  CGI::Carp: 1.0
+  CGI::Util: 1.0
+  CSS: 1.0
+  HTML::Table: 1.0
+  IO::String: 1.0
+  Module::Build: 0.28
+  XML::Writer: 0.6
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  JQuery:
+    file: lib/JQuery.pm
+    version: 1.00
+  JQuery::Accordion:
+    file: lib/JQuery/Accordion.pm
+    version: 1.00
+  JQuery::CSS:
+    file: lib/JQuery/CSS.pm
+    version: 1.00
+  JQuery::ClickMenu:
+    file: lib/JQuery/ClickMenu.pm
+    version: 1.00
+  JQuery::Demo:
+    file: lib/JQuery/Demo.pm
+    version: 1.01
+  JQuery::Form:
+    file: lib/JQuery/Form.pm
+    version: 1.00
+  JQuery::Heartbeat:
+    file: lib/JQuery/Heartbeat.pm
+    version: 1.00
+  JQuery::Splitter:
+    file: lib/JQuery/Splitter.pm
+    version: 1.00
+  JQuery::TableSorter:
+    file: lib/JQuery/TableSorter.pm
+    version: 1.00
+  JQuery::Tabs:
+    file: lib/JQuery/Tabs.pm
+    version: 1.00
+  JQuery::Taconite:
+    file: lib/JQuery/Taconite.pm
+    version: 1.00
+  JQuery::Treeview:
+    file: lib/JQuery/Treeview.pm
+    version: 1.01
+resources:
+  license: http://dev.perl.org/licenses/

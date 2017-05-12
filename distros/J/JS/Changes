@@ -1,0 +1,62 @@
+0.29 Sat Aug 16 16:42:32 PDT 2014
+ - Change testdir to t
+
+0.28 Sat Aug 16 14:01:06 PDT 2014
+ - Remove =travis section
+
+0.27 Sat Aug 16 11:24:07 PDT 2014
+ - Meta 0.0.2
+
+0.26 Sat Aug 16 02:13:40 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.25 Fri Aug 15 15:57:36 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.24 Fri Aug  8 12:38:00 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.23 Sun Aug  3 23:04:02 PDT 2014
+ - Fix example Copyrights
+
+0.22 Wed Jul 30 15:46:27 PDT 2014
+ - Fix Meta and add Contributing
+ - Switch IRC to
+
+0.21 Sat Jun 28 11:30:10 PDT 2014
+ - Apply PR
+
+0.20 Wed Jun 25 20:54:23 PDT 2014
+ - Fix tests to use 'inc'
+
+0.19 Wed Jun 25 08:51:42 PDT 2014
+ - Switch to Zilla-Dist
+
+0.18 Tue Feb 28 20:22:28 PST 2012
+ - Rebuild to run with 5.15.8
+
+0.17 Wed Aug 27 23:14:48 PDT 2008
+ - Fixed a weird bug Stevan found with JS-JSON
+
+0.16 Tue Aug 19 23:34:54 PDT 2008
+ - Forgot to add new test file to MANIFEST in 0.15
+
+0.15 Tue Aug 19 23:34:54 PDT 2008
+ - Allow random files to be installed as well.
+
+0.14 Tue Mar 11 21:20:57 EET 2008
+ - Better SYNOPSIS in doc.
+ - Improved example module.
+
+0.12 Tue Mar 11 02:50:09 EET 2008
+ - Add tests.
+ - Add wildcarding.
+
+0.11 Sat Feb 16 15:23:27 PST 2008
+ - Move examples/Foo-Bar to examples/JS-Foo-Bar
+ - Fix doc errors
+
+0.10 Sat Feb 16 15:23:27 PST 2008
+ - Maiden voyage.
+

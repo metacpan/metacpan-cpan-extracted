@@ -1,0 +1,104 @@
+%grammar jsony
+%version 0.0.1
+
+jsony:
+  | seq
+  | map
+  | top_seq
+  | top_map
+  | list
+
+node:
+  | map
+  | seq
+  | scalar
+
+map:
+  /- '{' -/
+  pair*
+  /- '}' -/
+
+pair:
+  string
+  /- ':'? -/
+  node
+  /- ','? -/
+
+seq:
+  /- LSQUARE -/
+  node* %% /- ','? -/
+  /- RSQUARE -/
+
+top_seq: top_seq_entry+
+
+top_seq_entry:
+  /- '-' SPACE+ /
+  (
+    node* %% / (: SPACE* ',' SPACE* EOL - | SPACE+ ) /
+    ( comment | EOL )
+  )
+
+top_map:
+    (string /- ':' -/ node -)+
+
+list: node* %% /- ','? -/
+
+scalar:
+  | double
+  | single
+  | bare
+
+string: scalar
+
+# Interpretation of http://www.json.org/
+double: /
+  DOUBLE
+    (
+      (:
+        BACK (:     # Backslash escapes
+          [
+            DOUBLE  # Double Quote
+            BACK    # Back Slash
+            SLASH   # Foreward Slash
+            'b'     # Back Space
+            'f'     # Form Feed
+            'n'     # New Line
+            'r'     # Carriage Return
+            't'     # Horizontal Tab
+          ]
+        |
+          'u' HEX{4}  # Unicode octet pair
+        )
+      |
+        [^ DOUBLE CONTROLS ]  # Anything else
+      )*
+    )
+  DOUBLE
+/
+
+# TODO: Support '' as escape for single quote
+single: /
+  SINGLE
+  ([^ SINGLE ]*)
+  SINGLE
+/
+
+bare: /( [^ excludes ]* [^ excludes COLON ] )/
+
+excludes: /
+  WS
+  LCURLY RCURLY
+  LSQUARE RSQUARE
+  SINGLE DOUBLE
+  COMMA
+/
+
+ws: /(: WS | comment )/
+
+comment: /(:
+  HASH SPACE ANY* |
+  HASH |
+  SPACE*
+) (: EOL | EOS )/
+
+# vim: sw=2:

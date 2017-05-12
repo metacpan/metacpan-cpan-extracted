@@ -1,0 +1,68 @@
+NAME
+    JSAN::Parse::FileDeps - Parse file-level dependencies from JSAN modules
+
+DESCRIPTION
+    As in Perl, two types of dependencies exist in JSAN. Distribution-level
+    install-time dependencies, and run-time file-level dependencies.
+
+    Because JSAN modules aren't explicitly required to provide the
+    file-level dependencies, this package was created to provide a single
+    common module by which to determine what these dependencies are, so that
+    all processes at all stages of the JSAN module lifecycle will have a
+    common understanding of the dependencies that a file has, and provide
+    certainty for the module developer.
+
+METHODS
+  library_deps $file
+    The "library_deps" method finds a list of all the libary dependencies
+    for a given file, where a library is specified in the form "Foo.Bar"
+    (using the pseudo-namespaces common to JSAN).
+
+    Returns a list of libraries, or throws an exception on error.
+
+  file_deps $file
+    The "library_deps" method finds a list of all the file dependencies for
+    a given file, where a file is specified in the form "Foo/Bar.js" (that
+    is, relative to the root of the lib path for the modules).
+
+    The list is identical to, and is calculated from, the list of libraries
+    returned by "library_deps".
+
+    Returns a list of local filesytem relative paths, or throws an exception
+    on error.
+
+  find_deps_js $file
+    The "find_deps_js" method is used to extract the header content from a
+    file, to be searched for dependencies, and potentially written to a
+    "module_deps.js" file.
+
+    Returns the content as a list of lines, or throws an exception on error.
+
+  make_deps_js $file
+    The "make_deps_js" method takes a JSAN module filename in the form
+    "foo/bar.js" and extracts the dependency header, writing it to
+    "foo/bar_deps.js".
+
+    Returns true on success, or throws an exception on error.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSAN-Parse-FileDeps>
+
+    For other issues, contact the maintainer
+
+AUTHORS
+    Completed and maintained by Adam Kennedy <cpan@ali.as>, <http://ali.as/>
+
+    Original written by Rob Kinyon <rob.kinyon@iinteractive.com>
+
+COPYRIGHT
+    Copyright 2005, 2006 Rob Kinyon and Adam Kennedy. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,20 @@
+Revision history for Perl extension JavaScript::Librarian
+
+1.00 Mon  4 Sep 2006
+	- Moving from old CVS to new SVN repository
+	- Upgrading to Module::Install 0.64
+	- Cleaning up test scripts a bit
+
+0.04 Tue Jul 26 2005
+	- use Algorithm::Dependency::Ordered, not the base one
+	- Add missing ->resolver accessor
+
+0.03 Tue Jul 26 2005
+	- Fixed a small validation bug
+
+0.02 Fri Jul 13 2005
+	- Updating to use Params::Coerce instead of Param::Coerce
+
+0.01 Sun Apr  2 2005
+	- original version
+	- Doesn't contain any usable ::Library classes yet

@@ -1,0 +1,505 @@
+Revision history for Judy
+
+0.41
+
+Bug fixes:
+
+    * ExtUtils::ParseXS circa 3.16 no longer handles CPP directives in typemap
+      files. The typemap file now uses plain C instead of any CPP directives
+      for conditional compilation.
+
+0.40
+
+Bug fixes:
+
+    * Require Alien::Judy-0.26 because it's had a lot of work done
+      lately to properly load libJudy.so.1, especially on non-Linux
+      platforms.
+
+0.39
+
+Bug fixes:
+
+    * Normalize loading path to remove cycles
+      - Judy::Mem (forgot this one in 0.38)
+
+0.38
+
+Bug fixes:
+
+    * Normalize loading path to remove cycles
+      - Judy::1
+      - Judy::L
+      - Judy::SL
+      - Judy::HS
+
+0.37
+
+Bug fixes:
+
+    * Inform build meta data that Judy requires Alien::Judy-0.18+
+
+fcae9139a7fd29a3feb712b9a9bbeaa2648c5c8b Require Alien::Judy in distro meta-data as well as functionally at runtime
+
+0.36
+
+Bug fixes:
+
+    * Let Alien::Judy-0.18 load libJudy and remove Judy's attempt to load libJudy
+    * Update -I and -L during build for all Module::Build actions
+
+90dc5ed3954df3c89404fbf518eac9637d4df082 Finish loading all mixin behaviors into Judy before loading Judy::1, Judy::L, Judy::SL, or Judy::HS
+ae0f4cb0d02ce1b8508d875a49f57d92a17a71d1 Set $Judy::LOADING while compiling Judy.pm
+e1096320a51057737a77345a45297366913d4813 Load Sub::Exporter at runtime for code that reads linearly
+9ee85b39a8a0ee3a4b599dbb798c714c3ddca393 Defer loading libJudy to Alien::Judy
+dd1bbd744762ea3f8c25b17e06db2c74c7cb41f4 Remove our() in favor of vars.pm for 5.005 friendliness
+7b3249f8906a4f305e53e23737b29b1650b113d8 Remove a BEGIN so I can focus on straightforward execution
+a870d637374bb8144411993be8b1e8f09514f018 Remove -e checks for libJudy.so until I fully consume all the many possible libJudy names by reading DynaLoader more carefully
+f2ede9b5907d3f15f8dd4c80316e5b2cea404a98 Builder updates -I and -L paths for all Module::Build actions
+
+
+0.35
+
+Same as 0.34. Looks like a commit screw-up
+
+0.34
+
+Bug fixes:
+
+   * Re-write -I and -L at build-time because Build.PL-time often
+     doesn't have the right paths yet
+
+6d0bc8394ad8b9cd808c24d9fa79b297cf0a099f Re-do finding of Judy.h
+35772d2c643092b92480d18a296f771faf2a2c48 Oops, removed t/00-load.t
+02b07c1223ea6854ebb0d03d86dc1a7528afe0b3 Untabify
+0a7c72ee9d641ef98b68fa178343e0167271dccd Uniquify INC and LIB dirs
+aab84ac62a8f2f4a70436092f9c2df0ef68acc3f Add Alien::Judy to configure_requires and build_requires
+92ab57310f5bcb35207a1c2b9a4483386412dde2 Remove useless test
+
+0.34
+
+Bug fixes:
+
+    * Look in any(@INC)/Alien/Judy for -I and -L
+
+dcea55fedbab56001ad3c69983cbca55cfdc1b64 Retain prior value for @DynaLoader::dl_library_path
+02a7198316299c13fd33a3f27d525bc2eae21f32 Alien-Judy-0.16
+43fd1ebdf0262829e9e15aba64ec84db9c54426e Update Alien::Judy 0.15
+
+0.33 
+
+Bug fixes:
+
+    * Look in Alien-Judy's blib/arch/Alien/Judy for -I and -L
+
+570b45344c95969b1edc41627819a137ae0a04c8 Look in Alien-Judy's blib/arch/Alien/Judy for -I and -L
+19549418fe4e41bba46ba2e293e445739a5becfd Require Alien::Judy 0.15
+bdc754e221ad69adfa9499b895d8792c0ae6c711 Merge remote branch 'github/master'
+
+0.32
+
+Bug fixes:
+
+    * Force loading of libJudy from $sitearch/Alien/Judy when necessary
+    * ExtUtils::ParseXS no longer warns about uninitialized variables in $lastline
+    * Switched to Module::Build because ExtUtils::MakeMaker was
+      filtering out necessary -L/path/to/libJudy and -lJudy
+      parameters.
+
+b3eee2df43df9c9386ac2a370af4ff410068e03f Re-rendered README
+ac8bf36e698b26f4b35ff384b2a03413877e0681 Cleaning
+883639c9a75316b71fde3e7712538b4576fda145 Drop Inline::C as a dependency
+b3dc328b52c80c48fc68923840aa649e951c06fd Cleaning
+b938bde19fb62ca52fcccc621cbaedad1fe00c86 Cleaning
+134d8ce58e64fc805e01fe40ddf4869a1571e4db Manually pre-load libJudy when it can't be otherwise found
+4fc0633c3c8ff7b70044f41694450420f7acaa74 Use an IV when possible
+d8033eb4c42b9036a265cec1d793eb6281ef7842 Remove mutually exclusive condition
+9c5a1673b3238d65a155399afce9bf7087d407d7 Remove extra \\ in warning
+ff98e851af0c2125691259349eaf7407e5d0346a Switch from ExtUtils::MakeMaker to Module::Build because EU::MM pre-filtered LIBS preventing successful installation
+a047e1770b03ed081a679a59c6e6c1d5e0a61725 My::Paths was still involved, pre-removing the target directory for Alien::Judy's Judy.h
+634c95b15ed529fc456d27047f9d4de1daa461b6 Debian might not have a useable perldoc
+ 
+0.31
+
+Bug fixes:
+
+    * Removing My::Paths and relying solely on Alien::Judy to find Judy.h
+
+e5764ee14b7714fbe9bc2f2a8b6e5d5345cba8b7 My::Paths was still involved, pre-removing the target directory for Alien::Judy's Judy.h
+
+0.30 - Tue Jun 8 10:08:06 2010 -0700
+
+Bug fixes:
+
+    * Updating Alien::Judy
+
+b4fc6caf67e2e7b81cf6eb966f130d97a9acdf73 Update Alien::Judy-0.13
+
+0.29 - Tue Jun 8 10:07:20 2010 -0700
+
+Bug fixes:
+
+    * Updating Alien::Judy
+
+db7b9a8f5a082ae19b2a0d6d1e8bc4d888985313 Import Alien::Judy-0.12 so Judy.h can be found
+
+0.28 - Sat Jun 5 16:44:26 2010 -0700
+
+API Changes:
+
+    * Update truncation/coersion warnings
+    * Warn when dropping UTF8 on strings
+
+Bug fixes:
+
+    * Updating Alien::Judy
+
+7bdbcb71aaa17d0b164659ae85988dbba35e09a3 Update inc_dirs and lib_dirs functions from Alien::Judy
+a81de24c220c877d1cc3680c5d41fee00e8a2ca1 Updating documentation
+1666301f6daf9185552dbd0b5faed0251967b821 Updating documentation
+da1afee359ec5f741c41ccf42d04315597521d17 Update truncation/coersion warnings
+e7353195d744a34ec90ca6130140113605766085 Warn when dropping UTF8 on strings
+
+0.27 - Sat May 22 15:10:36 2010 -0700
+
+Bug fixes:
+
+    * Unsigned fields truncate to ULONG_MAX, not LONG_MAX. It's the
+      difference between whether the most significant bit is used.
+    * Fixed the usage of the API to allow the previously published -1
+      key value to be used as-is.
+
+ce7b9947ed7253e1bc2a265b930280feadeefe64 Allow -1 in unsigned fields because both libJudy and this Judy advertise -1 as a valid key
+c978e4d8da2e3a185ed67bac020ffbe23cdc166b Unsigned things get truncated to ULONG_MAX, not LONG_MAX
+
+0.26 - Fri May 21 15:04:02 2010 -0700
+
+Bug fixes:
+
+    * Fetching negative values are now actually negative
+
+8b87e30896942623287a0dbeba12ec51bbcf8ed3 typemap for IWord_t preserves sign bit
+04ee666dbcb6c130e27bf638dff95b514962a12e Judy::HS should be careful to cast return values to retain sign bit
+8bb118004db7ffd55dff7c7e7d9caec120882738 Judy::HS::Duplicates is unsigned
+d5a159d49299ff9afe1ff650765f0d91c666ad9a Judy::SL should be careful to cast return values to retain sign bit
+f0af5147edbe7c786d3ff17a0a79164aebc5f551 Judy::L should be careful to cast return values to retain sign bit
+01636c899ac712308b4561fc907162d89b6165c0 Judy::1 returns a bunch of unsigned ints
+0127a21239d574e3883d08fd0a08e19628749a40 Simplify Judy::HS::MemUsed
+4141ec47723c717dce3cda19f72c640060fc3a6c Silence type cast warning
+
+0.25 - Fri May 21 14:49:07 2010 -0700
+
+Bug fixes:
+
+    * All value-returning functions should return the value as a
+      signed integer. That is, if you store a -1 into a Judy::HS, you
+      should get back a -1 and regardless of whether you're using
+      Perl's -Duse64bitint on a 32-bit machine.
+    * Silenced a gcc warning about Judy::HS::MemUsed
+
+8b87e30896942623287a0dbeba12ec51bbcf8ed3 typemap for IWord_t preserves sign bit
+04ee666dbcb6c130e27bf638dff95b514962a12e Judy::HS should be careful to cast return values to retain sign bit
+8bb118004db7ffd55dff7c7e7d9caec120882738 Judy::HS::Duplicates is unsigned
+d5a159d49299ff9afe1ff650765f0d91c666ad9a Judy::SL should be careful to cast return values to retain sign bit
+f0af5147edbe7c786d3ff17a0a79164aebc5f551 Judy::L should be careful to cast return values to retain sign bit
+01636c899ac712308b4561fc907162d89b6165c0 Judy::1 returns a bunch of unsigned ints
+0127a21239d574e3883d08fd0a08e19628749a40 Simplify Judy::HS::MemUsed
+4141ec47723c717dce3cda19f72c640060fc3a6c Silence type cast warning
+
+0.25 - Fri May 21 13:12:46 2010 -0700
+
+Bug fixes:
+
+   * Include stub of Alien::Judy in inc/ for Makefile.PL's uses
+
+0.24 - Fri May 21 11:08:11 PDT 2010
+
+Bug fixes:
+
+   * Updated tests for the new typemap. Judy-0.23 fails.
+
+3808b2eb963dd6fdb343b6d91d5957a2fbe8f13d Oops, fix typemap tests for IWord_t and UWord_t
+
+0.23
+
+API changes:
+
+    * Judy::L::Set, Judy::SL::Set, Judy::HS::Duplicates, Judy::HS::Set
+      now consume their value as signed integers.
+
+    * Judy::L::Get, Judy::L::First, Judy::L::Next, Judy::L::Last,
+      Judy::L::Prev, Judy::SL::Get, Judy::SL::First, Judy::SL::Next,
+      Judy::SL::Last, Judy::SL::Prev, Judy::HS::Get all now return
+      their values as signed integers.
+
+    * 32-bit CPU users with -Duse64bitint now may receive truncation
+      warnings if the perl values being used can't be accomodated by
+      Judy.
+
+    * Added Judy::HS::MemUsed using private implementation.
+
+Bug fixes:
+
+    * The previous typemap was likely leaking memory
+    * The Judy::HS manual had some copy-paste errors from Judy::SL.
+
+e2445556d1ba7027fdcb961575941bd7113e5340 Judy::L::{Get,First,Next,Last,Prev}, Judy::SL::{Get,First,Next,Last,Prev}, Judy::HS::Get all now return signed integers instead
+0dbed9cf331a134363eaae473ed4b9d44f9cd5e7 typemap upgrades target and supposedly doesn't allocate another SV
+82348a159189364b6277abad7545b56f7cf77537 Remove default Word_t and store/fetch signed integers to be more perly
+52bb7559343867aa665d3ef02fc5a1b62b14a5a4 Output typemap for UWord_t ought to be using UVs
+499063d1e1048bb163b1fee0008a3f52b54302a0 All usage of unsigned Word_t ought to use UWord_t now instead
+64100e6b40f811264d29dfdfa49757b021d2b58e Add test description
+424e5a04d5fa5c15ebf653291db66186c47791e8 Adding coersion for negative numbers in unsigned type to 0
+4e606588ed7a0345b5b5ec51b06d66d910b8a710 Reimplement Word_t
+ce5b5479a42cfda2df5a5ddb9510ce49461f123d Remove Word_t* in favor of PWord_t
+5e3e1c7bd39a3fd5d7a0f0a630b5e502c0d0771f Whitespace
+0a8c47de880f0d2ffec01a65199339a89b6abad9 Mortalize all returns
+8d505819f8b12ea9be3f459612bf19f8c918d005 Add Pod documentation for Judy::HS::MemUsed
+48c85304592c1c224cb7889d2dd51d40790b6958 Improve comments
+89a24c0580b0774aac98ca9d8abe467ae554ccca Add TODO notes
+104b0300e2d6fd697dd188a4eca13cc8e6e0b096 Add Judy::HS::MemUsed
+d298ecc4628ab63d2cec88775ec58f884606a72e Remove buffer overflows by adding guard statements
+67b1c232fb8302eb47057e7f4154b01f0147d195 Judy::SL exception on a too-long key now reports the actual limitation
+9b784d8e003ad67269fcdcb7a7777ad9facf3582 Unify Word_t* to PWord_t
+f03de2274b464537a07e541010d85e5ec9abd54e Judy::1 prefers to use IV instead of UV
+58653a8790027fe8d243ba356276d1ddf7cdd2f4 Judy::Mem::Poke() now consumes SV* and extracts SvIV
+bd9be61e86cb29539640b051e2e7afd673d33511 Judy::Mem::Poke() now consumes SV* and extracts SvIV
+3c4c11287549ee3503513c21da1b4ed9d3ee95c3 Fix some typos in the Judy::HS manual
+
+
+0.22 - Wed May 12 09:24:39 2010 -0700
+
+Bug fixes:
+
+    * The warning when truncating a (Word_t) to (UV) accidentally
+      itself truncated the value so in my usage, it reported that it
+      was truncating -1 to -1.
+
+36933cb97e83840a931fcd39c00b2198c50efbdf Better comments
+7ea873165a1d628d836e52326010b9ebc1b6684f More accurate truncation warning
+
+0.21 - Wed May 12 09:23:52 2010 -0700
+
+Bug fixes:
+
+    * Use Alien::Judy's path ability to find Judy.h and
+      libJudy.so. Prior versions would often fail to build because
+      libJudy wasn't installed and Alien::Judy's build couldn't be
+      found.
+
+b2acef43ad6a8b9ea7cbc40bfcb00fc2098f1544 Use Alien::Judy's path ability to find Judy.h and libJudy.so
+d24e27a9652bfc1f3ce0cfc6863fd02e91ef9b96 chmod +x Makefile.PL
+
+0.20 - Fri Mar 26 11:24:00 2010
+
+Releasing a new version purely to deal with some PAUSE.cpan.org issue
+
+0.19 - Fri Mar 26  7:52:00 2010
+
+18f75f7cfdc0e866061a054687910e68d7b2141a Clean up types for debugger statements
+39c24a4296829573374395621ef07dd1712e5191 Minor reformatting
+bbd73c6272c897a78092d0cbb304f770c157138a Remove some less useful comments
+1f7b4e6fa2d37e20e2c9ca65cc1b95dd6f7fed64 Use PWord_t_, not Word_t*
+
+0.18 - Thu Mar 25 13:42:00 2010
+
+Bug fixes:
+
+    * The char* allocated by String2Ptr now have a trailing null. I
+      noticed that a common strcpy() of my allocated strings pulled in
+      random garbage because apparently all my initial work had just
+      accidentally worked right.
+
+      Without this bug fix, this can be worked around by appending
+      your own null:
+
+          my $ptr = Judy::Mem::String2Ptr( "hello world\0" )
+
+0bc65322391f5a402c7fe523badd9582e51c3405 Add a terminating null to String2Ptr allocated strings
+07d1f01575e7e1273c7aca53b618f59d5a35dec9 Remove unused variable from String2Ptr
+
+0.17 - Wed Mar 24 23:28:00 2010
+
+1e07c856ab39017fedb133590c664eaf0b5490bf Adjust tests to accomodate extra FETCH requests on behalf of perl-5.8.7
+
+0.16 - Wed Mar 24 23:10:00 2010
+
+f1a58a728fde2fe568f0d63411fe28af42a8aef7 Use Test::Deep to work-around perl-5.8.7 which would FETCH *many* times against a tied value and would break t/41typemap.t for no good reason
+
+0.15 - Wed Mar 24 21:55:00 2010
+
+322dbba36177b6892511bacf2a93f8c48ab7b773 Inline::C accepts a *string* in TYPEMAP, not array
+
+0.14 - Wed Mar 24 16:25:00 2010
+
+Bug fixes:
+
+* The functions Judy::SL::Get and ::Set were clobbering the
+  contents of the index keys. These variables weren't supposed to
+  be writable.
+
+  These functions should not be used prior to this release.
+
+* The functions Judy::1::Free, ::NextEmpty, ::LastEmpty, ::PrevEmpty
+  all accidentally used the wrong functions for JudyL arrays instead
+  of Judy1 arrays. It seems like a copy/paste error.
+
+  These functions should not be used prior to this release.
+
+* My Judy API normally writes the object's pointer to a in/out
+  variable. There was a potential memory leak if your original object
+  pointer was undef instead of 0. The newly allocated value is now
+  mortalized.
+
+  This can be worked around by initializing the Judy object. Do:
+
+      my $judy = 0;
+      Set( $judy, ... )
+
+   Instead of:
+
+      my $judy;
+      Set( $judy, ... )
+
+* The commit 0f5f24c appears to fix something about lifting undef
+  values to real values. I don't recall the substance of what happened
+  incorrectly without this.
+
+33a86ab42895c22b42f0e04b9b97c0b2f9e04258 Adding tied and object interfaces
+8a99855d8da7a2e53fac283caa51f93231205984 Expand tabs
+8aca5f37ae1e09b753db35d3d0ff0c345e815789 Add comments
+c743f6269187baf969841dbb6d0d68e7099efac1 Add debugging interface
+e17d8ff7e849c04b36fa53d4bd2a274246671471 Everyone wants debugging symbols
+34f79959ba649f879c818f479666947d2043d827 Be clearer about writing a null char to strings requiring null termination
+54f31540268b8eb7966da7a8034a113ca13c0019 Cast Index to char* Judy::SL::(First,Next,Last,Prev)
+728fae7e2e3094b00342564196dd6257099d7000 Judy::SL::Get was setting the key's C value by accident
+9df3be3646b7bb261011d7d8a1b9723095fb1048 Judy::SL::Set was setting the key's C value by accident
+ae661a371f86457ae62b9cffe720a654b7be8947 Judy::1:: Free, NextEmpty, LastEmpty, PrevEmpty used completely wrong APIs
+f8263552fbb84dd5372f6be1c1145e4fc6654403 Lowercase deadbeef
+51b10fac28e49e82d93c894e73b143d01841044c Mortalize the output when creating a judy pointer
+4e0245d2a81a1e695ed370c750a7c9c1a259b318 Word_t* -> PWord_t for conciseness
+8a92184856b014cd043653c34960d40f554368b9 t/41typemap.t has 23 tests
+0f5f24c85568fa781ad05145caff12f2454d6609 Instantiate target SVs before calling sv_set{iv,pvn}
+
+0.13 - Sun Apr  5 14:28:00 2009
+
+Bug fixes:
+
+* The functions Judy::SL::First, ::Next, ::Last, ::Prev were
+  clobbering the contents of the index keys. These variables weren't
+  supposed to be writable.
+
+  These functions should not be used prior to this release.
+
+897dc7a7b3f7b0c83bc8d56461e8ced83b0f0b13 Removed (char*) typecast from Index - wasn't needed
+96e01701727ffcc93525525e5f8146a66992ae68 Removed accidental Safefree from Judy::SL::Last
+bfd975011f2b2b444369edb3783deff75a516ec3 Judy::SL::Next copies Index like I thought I committed previously
+39494e19dcb530d09400773e09f37642d414bfd9 added blank space between packages in XS to make it easier to scan
+163a8281f4f580d6b20b249bcddce85c51a221b1 add PWord_t type for more conciseness
+1cabdcb08efb4f4e7b50635bfdb8a6aac4e6654c Judy::SL First, Next, Last, Pref don't clobber SvPV now
+
+0.12 - Sun Jan  4 02:06:00 2009
+
+50d6c6ac4862d77e53d4791ada9a3fba1ca76bb4 Updating documentation
+bb13e254151eccd773168771b310463ce50060be Use perl's croak() on error instead of Judy's fprintf(stderr,..);exit(1).
+2d77ac9de985ab64b210b4fa9b06602b255671c5 More careful checking for data truncation
+
+0.11 - Sat Jan  3 19:22:00 2009
+
+Bug fixes:
+
+* Handles "set" magic. Previously, if something being written to were
+  tied, the right thing wouldn't happen.
+
+5d26deb1395bea994f7a8157634e5b6ed53328e7 Adding several files
+0bede2d8ad33c03e5e29a3496b45c95f48978819 Ignore _Inline
+2272efcf967c5eba430a31f381280b296fb0b834 Remove const-c.inc, const-xs.inc harder
+ff9139907fc84a76844210930bbc37d9f502c9bc Allow Str.length=0 for easy use of null terminated strings
+241532e026a6496dc209fb256c2b7fa2c4e1d4b0 Removing const-{c,xs}.inc
+8b4ed49a13382c553d7d6cae3bbc091dc1ecd293 Adding Inline::C
+01a5464fd759fe4aae61413ced8d3da5de619fde Introduce typedef Str for uniform SV*->((char*),STRLEN) capture Silence warning, casting from (char*) to (uint8_t*) and
+ae3d809744caf37986d2ef164834c25a388350a3 Use PUSHp to get SV-set magic
+a28db4ae8179dc3ecfd540ad997b8dec2227e8ec Silence warning, casting from (char*) to (uint8_t*) and (const uint8_t*)
+07caf7318a41389fff5c7096865ed4b5125e1650 Starter test
+7497b8d674b4004a11c21b058f10fa86ee2aeeb0 Dox
+f08a2639b73f37d4c2c6814485267d370abf6135 Rename t/40l.t to t/40trunc.t
+93e82fc25e593e705abec167b685fae273b36500 syntax
+31f1eaba97aef0ec4efecae1a1c186113dda6168 Don' invoke set magic twice
+87f96b8fd57bd690bf732de925d73d48afad3477 Allow utf8 perl strings Refactored a smidge of XS so string handling is now strictly in the typemap Typemap handles SET
+
+0.10 - Sat Dec 26 15:06:00 2008
+
+0061f4e2792a48f3bb1ea83e98ca54beafcf2e2b Require Alien::Judy 0.06
+
+0.09 - Sat Dec 26 12:59:00 2008
+        API changes:
+            Moved PJERR and JLAP_INVALID from Judy::Mem to Judy
+            Removed PeekI, PokeI, PeekU, PokeU using IV and UV
+            Added Peek and Poke using Word_t
+        
+        Moved XS from Judy::HS to Judy.
+        Added Judy.pm, Judy.pod
+        Release script checks a -Duse64bitint perl.
+        Added notes to XS
+        DEADBEEF is sized to UVSIZE
+        Switched from PPCODE-style XS to CODE/OUTPUT-style XS to use implicit TARG.
+        Added typedefs for Pvoid_t, Word_t*, Word_t
+        Throw warning when UV/IV integers discard data when being truncated
+        for storage into native sized Word_t.
+        Require at least Alien-Judy 0.05
+        Removed const-c.inc, const-xs.inc from the dist since they're generated
+        Stop assigning 0 to $judy objects in example code - undef suffices
+        Moved PJERR and JLAP_INVALID to Judy from Judy::Mem
+        Judy::1, Judy::L, Judy::SL, Judy::HS all load Judy
+        Judy loads all of Judy::1, Judy::L, Judy::S, Judy::HS
+        Added test t/40l.t which checks for data loss on machines with
+            -Duse64bitint that don't have 64-bit words.
+
+0.08 - Tue Dec 22 00:07:00 2008
+        Add -L and -I build parameters to find Alien::Judy
+        Adding docs
+
+0.07 - Sun Dec 21 09:46:00 2008
+        Added Judy::1 and Judy::L
+        Changed API. Renamed search functions to be in line with the C library
+            SearchForward -> First
+            ContinueForward -> Next
+            SearchBackward -> Last
+            ContinueBackward -> Prev
+        Removed vestigial PeekPoke from tests
+        Added constants PJERR, PJLAP_INVALID
+
+0.06 - Sat Dec 20 01:20:00 2008
+        Depends on Alien::Judy to auto-install Judy
+
+0.05 - Fri Dec 19 00:35:34 2008
+	Added Judy::Mem
+        Added t/20sl.t
+        Renamed t/10basic.t to t/10hs.t
+
+        Removed PeekPoke dependency. Re-implemented in Judy::Mem.
+        Stop using sv_2pvbyte, use SvPVbyte instead.
+        Using ppport.h at its own recommendation. Possibly incompatible with 5.6.1. See comment in HS.xs
+
+        Changed C comment syntax from // to /**/
+        Fixed README, now it autogenerates from README.pod
+        Git ignores Judy-*
+        Cleaned MANIFEST
+
+0.04 - Fri Dec 20 12:02:00 2008
+        Added Judy::SL
+        Fixed documentation in Judy::HS
+
+0.03 - Thu Dec 19 02:00:00 2008
+        Rewrote API
+
+0.02 - Thu Dec 18 00:05:27 2008
+        Rewrote API
+        Moving pod to a separate file, minimally rewriting docs for new API
+        Rendered pod to README
+        Removed boilerplate from Changes
+        Author tests skipped unless AUTHOR_TEST
+
+0.01 - Wed Dec 17 13:31:03 2008
+	Initial upload.
+	Provided "raw" HS macros, some tests failing

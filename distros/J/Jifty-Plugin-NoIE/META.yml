@@ -1,0 +1,15 @@
+---
+author: ~
+distribution_type: module
+generated_by: 'Module::Install version 0.80'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-NoIE
+no_index:
+  directory:
+    - inc
+requires:
+  Jifty: 0.90220
+version: 0.01

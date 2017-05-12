@@ -1,0 +1,17 @@
+Revision history for Jaipo
+
+0.23	2017/02/21
+	fixed test fail and cleanup messages
+
+0.22	2017/02/13
+	update docs, use MakeMaker, Twitter works again.
+
+0.21	09 Apr 11 04/11/2009
+		Fix some bugs.
+
+0.2     09 Apr 10 04/10/2009
+        Add auto-update mode.  and support desktop::notify for linux and
+        mac::growl for Mac OS.
+
+0.01    09 Feb 03 02/03/2009
+        First version, released on an unsuspecting world.

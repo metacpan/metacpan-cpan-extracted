@@ -1,0 +1,18 @@
+Revision history for Perl module Jifty::Plugin::OpenID
+
+1.02 Mon, 18 Jan 2010 10:07:19 +0100
+    - missing install_share in Makefile.PL
+    - make TestApp tests
+    - fix pod spelling, thx to Jonathan Yu from debian packaging group
+
+1.01 Mon, 11 Jan 2010 10:59:19 +0100
+    - add Attribute Exchange management
+    - bump Net::OpenID::Consumer dep
+
+1.00 Wed, 10 Jun 2009 11:55:15 +0200
+    - bump version number to avoid conflict with debian
+    - add minimal load test
+    - temporary suspend tests with Test::OpenID::Server
+
+0.10 Tue, 09 Jun 2009 22:28:10 +0200
+    - original version for CPAN

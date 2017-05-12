@@ -1,0 +1,40 @@
+NAME
+    JSON::Diffable - A relaxed and easy diffable JSON variant
+
+SYNOPSIS
+        use JSON::Diffable qw( encode_json decode_json );
+
+        $json = encode_json $data;
+        $data = decode_json $json;
+
+DESCRIPTION
+    This module allows to create a JSON variant that is suitable for easy
+    diffing. This means:
+
+    *   Commas after each hash or array element.
+
+    *   Consistent indentation
+
+    *   One line per entry
+
+    The data can be read again by a relaxed JSON parser or the exported
+    "decode_json" function.
+
+EXPORTS
+  encode_json
+        my $json = encode_json($data);
+
+    Turns a Perl data structure into diffable JSON.
+
+  decode_json
+        my $data = decode_json($json);
+
+    Turns relaxed JSON into a Perl data structure.
+
+AUTHOR
+     Robert Sedlacek <r.sedlacek@shadowcat.co.uk>
+
+SPONSORED
+    The development of this module was sponsored by
+    <http://socialflow.com/>.
+

@@ -1,0 +1,386 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Spec;
+use Data::Dumper;
+
+use Java::Javap;
+use Java::Javap::Grammar;
+use Java::Javap::Generator;
+use Java::Javap::TypeCast;
+
+my %java_class_info;
+
+my $type_caster = Java::Javap::TypeCast->new();
+
+
+GetOptions(
+    'javapopts=s' => \(my $opt_javapopts = ''),
+    'genwith=s'   => \(my $opt_genwith = 'Perl6'),
+    'genopts=s'   => \my $opt_genopts,
+    'outdir=s'    => \(my $opt_outdir = '.'),
+    'nest!'       => \(my $opt_nest = 1),
+    'recurse!'    => \(my $opt_recurse = 1),
+    'compile!'    => \(my $opt_compile = 1),
+    'set_types=s'  => sub {
+        $type_caster->set_type_casts({});
+        $type_caster->add_type_casts_from_file( $_[1] );
+    },
+    'add_types=s'  => sub {
+        $type_caster->add_type_casts_from_file( $_[1] );
+    },
+    'trace=i'     => \(my $opt_trace = 1),
+    'help!'       => \&help,
+) or exit 1;
+
+my @classes = @ARGV
+    or die "usage: $0 [options] class [ class ... ]\nUse $0 --help for help\n";
+
+if ($opt_compile) {
+    # XXX fix to be portable to windows
+    my $perl6_ver = qx{perl6 --version 2>&1};
+    if ($perl6_ver) {
+        $perl6_ver = $1 if $perl6_ver =~ m/(Rakudo Perl.*)/; # tidy
+        print "perl6: $perl6_ver\n";
+    }
+    else {
+        warn "perl6 not available so --compile disabled\n";
+        $opt_compile = 0;
+    }
+}
+
+$| = 1 if $opt_trace;
+$::RD_WARN  = 1;
+$::RD_TRACE = 1 if $opt_trace >= 10;
+
+my $parser = Java::Javap::Grammar->new();
+my $jenny  = Java::Javap::Generator->get_generator(
+    $opt_genwith,
+    trace_level => $opt_trace,
+    split(/\s+/, $opt_genopts||''),
+);
+
+my %check_status;
+
+foreach my $class ( @classes ) {
+    load_java_class_info( $class, $opt_recurse );
+}
+
+for my $class (sort keys %java_class_info) {
+    my $info = $java_class_info{$class};
+    # ignore clases just vivified for referred_to_by_classes
+    next unless $info->{tree};
+
+    # include the decompiled java for reference
+    my @epilogue = ("=begin pod\n");
+    if (my $refs = $info->{referred_to_by_classes}) {
+        push @epilogue, "=head1 Referenced By\n";
+        push @epilogue, "  $_" for sort @$refs;
+        push @epilogue, "\n(Among the set of classes processed at the same time.)\n";
+    }
+    if (my @decomp_norm = split /\n/, $info->{decomp_norm}) {
+        push @epilogue, "=head1 Java\n";
+        push @epilogue, "  $_" for @decomp_norm;
+        push @epilogue, "\n";
+    }
+    push @epilogue, "=end pod\n";
+
+    my $file_name = generate_output_file( {
+        class_file  => $class,
+        ast         => $info->{tree},
+        javap_command => $info->{javap_command},
+        type_caster => $type_caster,
+        epilogue    => join("\n", '', @epilogue),
+    });
+    $info->{output_filename} = $file_name;
+    warn "wrote $file_name - $info->{kind} $class\n" if $opt_trace && $file_name;
+    if ($opt_trace >= 2) {
+        warn "\t uses @{ $info->{refers_to_classes} }\n"
+            if @{ $info->{refers_to_classes} };
+        warn "\t used by @{ $info->{referred_to_by_classes} }\n"
+            if @{ $info->{referred_to_by_classes} || [] };
+    }
+}
+
+for my $info (
+    # compile deepest first as a slight optimization
+    sort { ($b->{depth}||0) <=> ($a->{depth}||0) } values %java_class_info
+) {
+    next unless $opt_compile;
+    my $class = $info->{java_class_name};
+
+    my $file_name = $info->{output_filename}
+        or next;
+
+    warn "compiling $file_name - $info->{kind} $class\n" if $opt_trace;
+
+    (my $pirfile = $file_name) =~ s/\.pm6$/.pir/;
+    my @perl6cmd = ("perl6", "--target=PIR", "--output=$pirfile", $file_name);
+    local $ENV{PERL6LIB} = join(":",grep { $_ } $opt_outdir,$ENV{PERL6LIB});
+    warn "\t @perl6cmd\n" if $opt_trace >= 2;
+    $check_status{$file_name} = (system(@perl6cmd) == 0);
+}
+
+if (%check_status) {
+    my $passed = 0;
+    for my $file_name (sort keys %check_status) {
+        my $ok = $check_status{$file_name};
+        ++$passed if $ok;
+        printf "%7s: %s\n", ($ok ? "ok" : "FAILED"), $file_name
+            if !$ok or $opt_trace >= 2;
+    }
+    printf "%d ok, %d failed.\n", $passed, keys(%check_status)-$passed
+        if keys %check_status > 1;
+}
+
+exit 0;
+
+
+sub load_java_class_info {
+    my ($class, $recurse) = @_;
+
+    return undef if $java_class_info{$class}->{decomp_norm};
+
+    my @javapopts = split / /, $opt_javapopts; # XXX hack
+    my $javap_command = "javap @javapopts $class";
+
+    warn sprintf "loading %s%s%s\n",
+            $recurse ? (". " x ($recurse-1)) : "",
+            $class, " @javapopts"
+        if $opt_trace;
+
+    my $decomp_norm = Java::Javap->javap($class, \@javapopts);
+    warn $decomp_norm if $opt_trace >= 3;
+    my $decomp_verb = Java::Javap->javap($class, [ @javapopts, '-verbose' ]);
+    warn $decomp_verb if $opt_trace >= 9;
+
+    my $tree   = $parser->comp_unit( $decomp_verb )
+        or die "Error parsing output of '$javap_command'\n";
+
+    # tell them which types are used by this class
+    my $referenced_classes = Java::Javap->get_included_types( $tree, $type_caster );
+
+    $java_class_info{$class} = {
+        %{ $java_class_info{$class} || {} },
+        java_class_name => $class,
+        javap_command => $javap_command,
+        decomp_norm => $decomp_norm,
+        decomp_verb => $decomp_verb,
+        tree => $tree,
+        refers_to_classes => $referenced_classes,
+        kind => $tree->{class_or_interface},
+        depth => $recurse,
+    };
+
+    warn "$class: ".Dumper($java_class_info{$class}) if $opt_trace >= 9;
+
+    push @{$java_class_info{$_}->{referred_to_by_classes}}, $class
+        for @$referenced_classes;
+
+    if ($recurse) {
+        for my $ref_class (sort @$referenced_classes) {
+            if ($ref_class =~ m/\$/) {
+                warn "$ref_class: skipped private class\n"
+                    if $opt_trace >= 2;
+                next;
+            }
+            load_java_class_info( $ref_class, $recurse+1 );
+        }
+    }
+
+    return $referenced_classes;
+}
+
+
+
+sub generate_output_file {
+    my $params      = shift;
+    my $epilogue = delete $params->{epilogue};
+
+    my $output = $jenny->generate( $params );
+        
+    $output .= $epilogue if $epilogue;
+
+    my $file_name;
+    if ( $opt_outdir eq 'STDOUT' ) {
+        print $output; 
+    }   
+    else { # put it in a directory
+        my $class = $params->{class_file};
+        $file_name = output_filename_for_class($class, 1);
+        open my $API_MODULE, '>', $file_name
+            or die "Couldn't write to $file_name: $!\n";
+        print $API_MODULE $output;
+        close $API_MODULE or die "Error writing $file_name: $!\n";
+    }
+    
+    return $file_name;
+}       
+
+
+sub output_filename_for_class {
+    my ($class, $mkdir) = @_;
+
+    my @subdirs    = split /\./, $class;
+    my $class_name = pop @subdirs;
+
+    my $module_dir = $opt_outdir;
+    mkdir $module_dir or -d $module_dir
+        or die "Can't mkdir $module_dir: $!\n";
+    if ( $opt_nest ) {
+        foreach my $subdir ( @subdirs ) {
+            $module_dir = File::Spec->catdir( $module_dir, $subdir );
+            mkdir $module_dir or -d $module_dir
+                or die "Can't mkdir $module_dir: $!\n";
+        }
+    }
+    return File::Spec->catfile( $module_dir, "$class_name.pm6" );
+}
+
+
+sub help {
+    print <<'EO_Help';
+java2perl6api [options] class_file [class_file...]
+
+where options are:
+
+ --help          this message
+ --outdir=D      root directory for output files (default '.')
+ --nonest        don't place output files in nested directories
+ --nocompile     don't compile the generated modules into .pir files
+ --norecurse     don't recurse into types used by this class
+ --set_types=S   replace typemapings with those in file S
+ --add_types=S   add/override typemapings with those in file S
+ --javapopts=S   a string of command line flags for javap, example:
+                    -j '-classpath /some/path'
+ --genwith=S     the name of a Java::Javap::Generator:: module
+                    which will make the output, defaults to Perl6
+ --genopts=S     strings to pass to your --genwith constructor
+ --trace=N       defines the trace level (integer value), where:
+                    0 means silence, no trace,
+                    1 is the default minimum trace messages,
+                    >= 9 for full trace
+
+EO_Help
+    exit;
+}
+
+__END__
+
+=head1 NAME
+
+java2perl6api - a Java to Perl 6 API translator
+
+=head1 SYNOPSIS
+
+ java2perl6api [options] class_file [...]
+
+ --help          this message
+ --outdir=D      root directory for output files (default '.')
+ --nonest        don't place output files in nested directories
+ --nocompile     don't compile the generated modules into .pir files
+ --norecurse     don't recurse into types used by this class
+ --set_types=S   replace typemapings with those in file S
+ --add_types=S   add/override typemapings with those in file S
+ --javapopts=S   a string of command line flags for javap, example:
+                    -j '-classpath /some/path'
+ --genwith=S     the name of a Java::Javap::Generator:: module
+                    which will make the output, defaults to Perl6
+ --genopts=S     strings to pass to your --genwith constructor
+ --trace=N       defines the trace level (integer value), where:
+                    0 means silence, no trace,
+                    1 is the default minimum trace messages,
+                    >= 9 for full trace
+
+=head1 DESCRIPTION
+
+This script is the driver for the C<Java::Javap> module which reads compiled
+Java files, parses them into a tree, and generates output in Perl 6.
+
+=head1 EXAMPLES
+
+To get a single Perl module in the java/sql subdirectory of the current
+directory with an API translation of java.sql.Connection:
+
+    java2perl6api java.sql.Connection
+
+To get a single Perl module in the current directory with an API for
+com.example.YourModule whose class file is in /usr/lib/yourjavas:
+
+    java2perl6api --javapopts '-classpath /usr/lib/yourjavas' com.example.YourModule
+
+To put the output from the previous example into the /usr/local/javaapis
+directory:
+
+    java2perl6api --javapopts '-classpath /usr/lib/yourjavas' \
+        --outdir /usr/local/javaapis com.example.YourModule
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Prints a short help message (the same as the L<SYNOPSIS> above).
+
+=item --javapopts=S
+
+This option takes a single value, you need to quote it.  That value
+is passed directly to C<javap>.  C<-classpath /some/path> is the most
+common value.  Be aware that C<Java::Javap> parses the output of
+C<javap> with a grammar, so some C<javap> flags will cause fatal errors.
+
+=item --outdir=S
+
+Sets the root directory for output files. Default '.' (current directory).
+
+=item --nonest
+
+By default output files are written into a directory tree (rooted at --outdir)
+based on the namespace of the Java package. 
+
+Use the --nonest to write all files into the root output directory.
+
+=item --norecurse
+
+Disable the default behaviour of recursively processing any classes referenced
+by the specified class.
+
+=item --nocompile
+
+Disable compiling the generated Perl 6 .pm6 file into a .pir file.
+(Generating a .pir file takes time but significantly speeds up any future use
+of the module.)
+
+=item --trace N
+
+Integer value. Assign zero to it (--trace=0) to silence all messages from
+the script. 1 is the minimum trace level. An integer >= 9 will emit full
+trace messages.
+
+=item --genwith S
+
+Specify the Java::Javap::Generator::* class to use to generate the output files.
+Defaults to Perl6 (i.e. C<Java::Javap::Generator::Perl6>) which generates Perl
+6 roles in C<.pm6> files.
+
+=back
+
+=head1 AUTHOR
+
+Phil Crow E<lt>crow.phil@gmail.comE<gt> wrote the original verion,
+further devalopment by Tim Bunce and others since.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2007, Phil Crow
+Copyright (c) 2010, Tim Bunce
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+vim: ts=8:sw=4:et

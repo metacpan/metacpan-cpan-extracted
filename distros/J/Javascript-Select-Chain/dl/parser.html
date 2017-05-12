@@ -1,0 +1,70 @@
+<html>
+<head>
+<title>Chained Selects Parser</title>
+<link rel=stylesheet href="cs.css" type="text/css">
+<script language="javascript" src="parser.js"></script>
+</head>
+
+<body>
+
+<form>
+<p>List Group Name:
+<input type="text" name="listgroup" value="demo">
+<input type="button" onclick="parseGroup()" value="Parse">
+<input type="button" onclick="showGroup()" value="Show"></p>
+<p><textarea name="content" cols="70" rows="10"></textarea></p>
+</form>
+
+<table><tr valign="top">
+<td style="border:1px solid #000000; padding:6px; font-family:verdana; white-space:nowrap;">
+
+<!-- the following UL is all you need to modify -->
+
+<ul id="CS">
+<li>A,A-Value
+	<ul>
+	<li>1
+	<li>2, ,1
+		<ul>
+		<li>a
+		<li>b
+		<li>c,,1
+		<li>d
+		</ul>
+	<li>3
+	<li>4
+	</ul>
+<li>B,B-Value,1
+<li>C, ,
+<li>D
+</ul>
+
+<!-- # # # -->
+
+</td>
+<td width="20">&nbsp;</td>
+<td style="border:1px solid #000000; padding:6px;">
+<pre style="font-family:verdana;">
+# edit this page and compose the lists into the UL/LI layout on the left side
+# the top list is mapping to the outest UL, which has an ID of "CS"
+# each option is mapping to a LI element
+# if an option has sub-list, the sub-list is mapping to a nested UL
+# the content of a LI element could be:
+  - text ... &lt;option value="text"&gt;text&lt;/option&gt;
+  - text, , ... &lt;option value=""&gt;text&lt;/option&gt;
+  - text,value ... &lt;option value="value"&gt;text&lt;/option&gt;
+  - text,value,1 ... &lt;option value="value" selected&gt;text&lt;/option&gt;
+  - text,,1 ... &lt;option value="text" selected&gt;text&lt;/option&gt;
+  - text, ,1 ... &lt;option value="" selected&gt;text&lt;/option&gt;
+# the separator (,) is defined in the parser.js and can be changed
+
+# once you have the UL/LI layout representing the structure of your lists
+# fill in the name of the list group and click the [ Parse ] button
+# then save the output as the list group content
+# or you can click the [ Show ] button to preview the lists
+</pre>
+</td>
+</tr></table>
+
+</body>
+</html>

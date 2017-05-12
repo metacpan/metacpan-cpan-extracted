@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+changes
+dist.ini
+lib/JSON/Schema/Fit.pm
+t/get_adjusted.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

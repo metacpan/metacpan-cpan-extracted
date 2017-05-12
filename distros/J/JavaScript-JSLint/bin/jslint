@@ -1,0 +1,319 @@
+#!/usr/bin/perl -w
+# @(#) $Id$
+
+use strict;
+use warnings;
+
+use File::Basename;
+use Getopt::Long;
+use JavaScript::JSLint qw( jslint jslint_options );
+
+my $me = basename $0;
+
+sub slurp {
+    my ( $file ) = @_;
+    return do { local $/; <STDIN> } if $file eq '-';
+
+    open my $fh, '<', $file or die "$me: open($file): $!\n";
+    my $contents = do { local $/; <$fh> };
+    close $fh;
+    return $contents;
+}
+
+sub lint_file {
+    my ( $file, %opts ) = @_;
+    my $src = slurp( $file );
+    my @errors = jslint( $src, %opts );
+    if ( @errors ) {
+        foreach ( @errors ) {
+            print join( ':',
+                $file,
+                $_->{ line },
+                $_->{ character },
+                $_->{ reason } ),
+              "\n";
+        }
+    }
+    return scalar @errors;
+}
+
+my %all_options = jslint_options(1);
+
+sub usage {
+    my $msg = "usage: $me [--options] [file.js ...]\n";
+    foreach my $key ( sort keys %all_options ) {
+        if ( $all_options{$key}->{type} eq 'bool' ) {
+            $msg .= sprintf( "  --%-18s \t%s\n", $key, $all_options{ $key }->{desc} )
+        } elsif ( $all_options{$key}->{type} eq 'int' ) {
+            $msg .= sprintf( "  --%-18s \t%s\n", $key . ' NUM', $all_options{ $key }->{desc} )
+        } elsif ( $all_options{$key}->{type} eq 'list' ) {
+            $msg .= sprintf( "  --%-18s \t%s\n", $key . ' VAL', $all_options{ $key }->{desc} )
+        } elsif ( $all_options{$key}->{type} eq 'hash' ) {
+            $msg .= sprintf( "  --%-18s \t%s\n", $key . ' NAME=VAL', $all_options{ $key }->{desc} );
+        }
+    }
+    die $msg;
+}
+
+sub version {
+    print "$me $JavaScript::JSLint::VERSION\n";
+    exit 0;
+}
+
+my %opts;
+GetOptions( \%opts, 
+    'help', 
+    'version', 
+    map { 
+        ( $all_options{$_}->{type} eq 'bool' && "$_!"   ) ||
+        ( $all_options{$_}->{type} eq 'int'  && "$_=i"  ) ||
+        ( $all_options{$_}->{type} eq 'list' && "$_=s@" ) ||
+        ( $all_options{$_}->{type} eq 'hash' && "$_=s%" );
+    } sort keys %all_options 
+) or usage();
+usage()   if $opts{ help };
+version() if $opts{ version };
+
+# Normalize predef option values to 1 or 0 for the perl module
+if ( $opts{predef} ) {
+    foreach my $key ( keys %{$opts{predef}} ) {
+        my $value = $opts{predef}->{$key};
+        $opts{predef}->{$key} = ($value =~ /^(1|y|yes|true)$/i) ? 1 : 0;
+    }
+}
+
+# Read STDIN unless args present.
+@ARGV = ( '-' ) unless @ARGV;
+
+my @error_files = grep { lint_file( $_, %opts ) } @ARGV;
+exit( @error_files > 0 ? 1 : 0 );
+
+__END__
+
+=head1 NAME
+
+jslint - Check a file for JavaScript errors
+
+=head1 SYNOPSIS
+
+  jslint [--options] [file.js]
+
+=head1 DESCRIPTION
+
+B<jslint> will check a file (or stdin) for JavaScript errors.  All
+errors are printed on stdout and include:
+
+=over 4
+
+=item the filename
+
+=item the line number
+
+=item the column number
+
+=item the error
+
+=back
+
+B<NB>: You can also pass in HTML files and any JavaScript found inside
+will be checked instead.
+
+=head2 OPTIONS
+
+All options are disabled by default.
+
+=over 4
+
+=item --adsafe
+
+ADsafe rules should be enforced
+
+=item --bitwise
+
+bitwise operators should be allowed
+
+=item --browser
+
+standard browser globals should be predefined
+
+=item --confusion
+
+types can be used inconsistently
+
+=item --continue
+
+if the continuation statement should be tolerated
+
+=item --debug
+
+debugger statements should be allowed
+
+=item --devel
+
+logging should be allowed (console, alert, etc.)
+
+=item --eqeq
+
+C<==> should be allowed
+
+=item --es5
+
+ES5 syntax should be allowed
+
+=item --evil
+
+eval should be allowed
+
+=item --forin
+
+C<for in> statements need not filter
+
+=item --fragment
+
+HTML fragments should be allowed
+
+=item --indent NUM
+
+the indentation factor
+
+=item --maxerr NUM
+
+the maximum number of errors to allow
+
+=item --maxlen NUM
+
+the maximum length of a source line
+
+=item --newcap
+
+constructor names capitalization is ignored
+
+=item --node
+
+Node.js globals should be predefined
+
+=item --nomen
+
+names may have dangling C<_>
+
+=item --on
+
+HTML event handlers should be allowed
+
+=item --passfail
+
+the scan should stop on first error
+
+=item --plusplus
+
+increment/decrement should be allowed
+
+=item --properties
+
+all property names must be declared with C</*properties*/>
+
+=item --predef VAR=VAL
+
+predefine a variable named VAR. The VAL indicates whether the variable can be
+overwritten within the script. Given a value of '1', 'y', 'yes' or 'true',
+jslint will not complain if that variable is assigned to within the files being
+linted. Any other VAL value will result in assignments to that variable
+yeilding a jslint error.
+
+=item --regexp
+
+C<.> and C<[^...]> should be allowed in regexp literals
+
+=item --rhino
+
+Rhino environment globals should be predefined
+
+=item --undef
+
+variables can be declared out of order
+
+=item --unparam
+
+unused parameters should be tolerated
+
+=item --safe
+
+use of some browser features should be restricted
+
+=item --sloppy
+
+the \'use strict\'; pragma is optional
+
+=item --sub
+
+all forms of subscript notation are tolerated
+
+=item --vars
+
+multiple C<var> statements per function should be allowed
+
+=item --white
+
+sloppy whitespace is tolerated
+
+=item --widget
+
+Yahoo Widgets globals should be predefined
+
+=item --windows
+
+MS Windows-specific globals should be predefined
+
+
+=back
+
+=head1 SEE ALSO
+
+L<JavaScript::JSLint>
+
+=head1 AUTHOR
+
+Dominic Mitchell E<lt>cpan (at) happygiraffe.netE<gt>
+
+Steve Webster E<lt>cpan (at) statichtml.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 by Dominic Mitchell
+
+Portions copyright (C) 2011 by Steve Webster
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+=over 4
+
+=item 1.
+
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+
+=item 2.
+
+Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+=back
+
+THIS SOFTWARE IS PROVIDED BY AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL AUTHOR OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+
+JSLint is originally Copyright (C) 2002 Douglas Crockford.
+
+=cut

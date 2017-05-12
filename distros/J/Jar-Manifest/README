@@ -1,0 +1,129 @@
+
+
+NAME
+
+
+Jar::Manifest - Read and Write Java Jar Manifests
+
+
+
+SYNOPSIS
+
+
+    use Jar::Manifest qw(Dump Load);
+
+    # Read a Manifest
+    my $manifest_str = <<"MANIFEST";
+    Manifest-Version: 1.0
+    Created-By: 1.5.0_11-b03 (Sun Microsystems Inc.)
+    Built-By: JAPH
+
+    Name: org/myapp/foo/
+    Implementation-Title: Test Java JAR
+    Implementation-Version: 1.9
+    Implementation-Vendor: JAPH
+
+    MANIFEST
+
+    my $manifest = Load($manifest_str);
+    printf( "Jar built by -> %s\n", $manifest->{main}->{'Built-By'} );
+    printf(
+        "Name: %s\nVersion: %s\n",
+        $_->{Name}, $_->{'Implementation-Version'}
+        )
+        for @{ $manifest->{entries} };
+
+    # Write a manifest
+    my $manifest = {
+
+        # Main attributes
+        main => {
+            'Manifest-Version' => '1.0',
+            'Created-By'       => '1.5.0_11-b03 (Sun Microsystems Inc.)',
+            'Built-By'         => 'JAPH',
+        },
+
+        # Entries
+        entries => [
+            {
+                'Name'                   => 'org/myapp/foo/',
+                'Implementation-Title'   => 'Test Java JAR',
+                'Implementation-Version' => '1.9',
+                'Implementation-Vendor'  => 'JAPH',
+            }
+        ],
+    };
+    my $manifest_string = Dump($manifest);
+
+
+
+DESCRIPTION
+
+
+Jar::Manifest provides a perl interface to read and write Manifest files
+found within Java archives - typically META-INF/MANIFEST.MF within a
+.jar file.
+
+The Jar Manifest specification can be found here
+http://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html#JAR_Manifest
+
+
+
+METHODS
+
+
+-   Load($string)
+
+        use Jar::Manifest qw(Load);
+        use Data::Dumper;
+
+        my $manifest = Load($string);
+        print Dumper $manifest;
+
+    Read the manifest contents in $string. Returns a _hash-reference_
+    containing two keys. The _main_ key is another hash-reference to the
+    main attributes and corresponding values. The _entries_ key is an
+    array-ref of hashes containing per-entry attributes and the
+    corresponding values
+
+-   Dump($manifest)
+
+        print Dump($manifest);
+
+    Turns the $manifest data structure into a string that can be printed
+    to a MANIFEST.MF file. The $manifest structure is expected to be in
+    the same format as the Load() output.
+
+
+
+DEPENDENCIES
+
+
+Encode
+
+Text::Wrap
+
+
+
+BUGS AND LIMITATIONS
+
+
+Please report any bugs or feature requests at
+https://github.com/mithun/perl-jar-manifest/issues
+
+
+
+AUTHOR
+
+
+Mithun Ayachit mithun@cpan.org
+
+
+
+LICENSE AND COPYRIGHT
+
+
+Copyright (c) 2014, Mithun Ayachit. All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See perlartistic.

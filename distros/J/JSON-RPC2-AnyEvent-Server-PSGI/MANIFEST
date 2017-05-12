@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/JSON/RPC2/AnyEvent/Server/PSGI.pm
+minil.toml
+t/00_compile.t
+t/01_get.t
+t/02_post_urlencoded.t
+t/03_post_json.t
+t/04_notification.t
+META.yml
+MANIFEST

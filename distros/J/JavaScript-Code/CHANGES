@@ -1,0 +1,42 @@
+Revision history for Perl extension JavaScript-Code
+
+0.07  08.11.2006 23:29
+    - POD fixed
+
+0.07  Fri Jul 14 02:43 2006
+    - POD fixed
+
+0.06  Fri Jul 07 20:22 2006
+    - module dependency fixed
+
+0.05  Fri Feb 20 18:14 2006
+    - Boolean expressions
+    - Exports for Arithmetic expressions
+    - Conditions: if, if else, else
+    - Functions and Functions Result
+    - Variable/Function names are checked against JS nameing conventions
+    - Namespace for build-in functions like return, ...
+
+0.04  Fri Feb 10 02:04 2006
+    - Cleanup
+    - Array implemented
+    - JavaScript::Code::Block::add can now handle more than one element
+    - JavaScript::Code::Block::declared is undef by default (was 0), see doc
+    - JavaScript::Code::Block::add_variable
+
+0.03  Wed Feb 08 01:26 2006
+    - Arithmetic expressions +, -, *, /
+    - Declared and undelared variables
+    - Scopeing
+    - Cloneing of elements and values
+    - Comparing of variables (not fully)
+
+0.02  Mon Feb 06 18:25 2006
+    - Strings are no inclosed in " instead of '
+    - Documentation added
+    - Block Element implemented
+    - Code is now a Block
+    - Indenting added
+
+0.01  Mon Feb 06 04:02 2006
+    - Prove of concept

@@ -1,0 +1,15 @@
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`JSON-Hyper`
+	:shortdesc      "extract links from JSON via a schema"@en ;
+	:programming-language  "Perl" ;
+	:homepage       <https://metacpan.org/release/JSON-Hyper> ;
+	:download-page  <https://metacpan.org/release/JSON-Hyper> ;
+	:bug-database   <http://rt.cpan.org/Dist/Display.html?Queue=JSON-Hyper> ;
+	:repository     [ a :HgRepository ; :browse <https://bitbucket.org/tobyink/p5-json-hyper> ] ;
+	:maintainer     cpan:TOBYINK ;
+	:developer      cpan:TOBYINK ;
+	:documenter     cpan:TOBYINK ;
+	:tester         cpan:TOBYINK ;
+	:created        "2010-08-01"^^xsd:date ;
+	:license        <http://dev.perl.org/licenses/> , <http://opensource.org/licenses/mit-license.php>.

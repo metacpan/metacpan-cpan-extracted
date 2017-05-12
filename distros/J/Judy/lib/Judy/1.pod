@@ -1,0 +1,208 @@
+=head1 NAME
+
+Judy::1 - Efficient integer to bit map
+
+=head1 SYNOPSIS
+
+  use Judy::1 qw( Set Get Unset Count MemUsed First );
+
+  my $judy;
+  print Set( $judy, 123456 )
+      ? "ok - bit successfully set at 123456\n"
+      : "not ok - bit already set at 123456\n";
+
+  print Get( $judy, 654321 )
+      ? "not ok - set bit at 654321\n"
+      : "ok - bit not set at 654321\n";
+
+  my ( $count ) = Count( $judy, 0, -1 );
+  print "$count bits set in Judy::1 array\n";
+
+  my ( $key ) = First( $judy, 0 );
+  if ( defined $key ) {
+      print "ok - first bit set is at $key\n";
+  }
+  else {
+      print "not ok - no bits set in array\n";
+  }
+
+  printf "$count Keys used %d bytes of memory\n", MemUsed( $judy );
+
+  print Unset( $judy, 123456 )
+      ? "ok - bit successfully unset at 123456\n"
+      : "not ok - bit was not unset at 123456\n";
+
+
+
+=head1 EXPORT
+
+All functions are exportable by L<Sub::Exporter>.
+
+
+
+=head1 DESCRIPTION
+
+Judy::1 is the equivalent of a bit array or bit map. A bit is
+addressed by an C<$Key>. The array may be sparse, and the C<$Key> may
+be any native integer. If a key is present, it represents a set
+bit. If a key is absent, it represents an unset bit.
+
+Nothing special is required to allocate a Judy::1 array. Just start using it.
+
+  my $judy;
+  if ( Get( $judy, 10 ) ) {
+      ...
+  }
+
+Memory to support the array is allocated as bits are set, and released
+as bits are unset. If the Judy::1 pointer (C<$Judy>) is 0 or undef,
+all bits are unset (and the Judy::1 array requires no memory).
+
+As with an ordinary array, a Judy::1 array contains no duplicate keys.
+
+
+
+
+=head1 DATA TYPES
+
+=head2 $Judy - Judy::1 array
+
+=head2 $Key - integer
+
+=head2 bool - boolean
+
+=head2 count - integer
+
+
+
+=head1 BASIC FUNCTIONS
+
+=head2 bool = Set( $Judy, $Key )
+
+Insert/set C<$Key>'s bit in the Judy::1 array C<$Judy>. Return true if
+the bit was previously unset, false otherwise.
+
+=head2 bool = Unset( $Judy, $Key )
+
+Unset C<$Key>'s bit in the Judy::1 array C<$Judy>; that is, remove
+C<$Key> from the Judy::1 array. Return true if the bit was previously
+set, false otherwise.
+
+=head2 bool = Delete( $Judy, $Key )
+
+Alias for C<Unset()>.
+
+=head2 bool = Test( $Judy, $Key )
+
+Test if C<$Key>'s bit is set in the Judy::1 array C<$Judy>. Return
+true if the bit is set, false otherwise.
+
+=head2 bool = Get( $Judy, $Key )
+
+Alias for C<Test()>.
+
+=head2 count = Count( $Judy, $Key1, $Key2 )
+
+Count the number of set bits between C<$Key1> and C<$Key2>
+(inclusive). To count all set bits in a Judy::1 bit array, use:
+
+    $count = Count( $judy, 0, -1 );
+
+Note: The -1 promotes to the maximum integer, that is, all ones.
+
+=head2 $Key = Nth( $Judy, $Nth )
+
+Locate the c<$Nth> key that is present in the Judy::1 array C<$Judy>
+(C<$Nth = 1> returns the first key present). To refer to the last
+key in a fully populated array (all keys present, which is rare),
+use C<$Nth = 0>.
+
+Returns nothing if there is not an nth key.
+
+=head2 bytes = Free( $Judy )
+
+Free the entire Judy::1 array C<$Judy> (much faster than using a
+Next(), Unset() loop). Returns the number of bytes freed. C<$Judy> is
+set to 0.
+
+=head2 bytes = MemUsed( $Judy )
+
+Returns the number of bytes of memory currently in use by Judy::1
+array C<$Judy>. This is a very fast routine, and may be used after a
+Set() or Unset() call with little performance impact.
+
+
+
+=head1 Search Functions
+
+The Judy::1 search functions allow you to search for set or unset bits
+in the array. You may search inclusively or exclusively, in either
+forward or reverse directions.
+
+=head2 $Key = First( $Judy, $Key )
+
+Search (inclusive) for the first set C<$Key> that is equal to or
+greater than the passed C<$Key>. (Start with C<$Key> = 0 to find the
+first key in the array.) First() is typically used to begin a
+sorted-order scan of the keys present in a Judy::1 array.
+
+=head2 $Key = Next( $Judy, $Key )
+
+Search (exclusive) for the next key present that is greater than the
+passed C<$Key>. Next() is typically used to continue a sorted-order
+scan of the keys present in a Judy::1 array, or to locate a
+"neighbor" of a given key.
+
+=head2 $Key = Last( $Judy, $Key )
+
+Search (inclusive) for the last key present that is equal to or less
+than the passed C<$Key>. (Start with C<$Key> = -1, that is, all ones,
+to find the last key in the array.) Last() is typically used to begin
+a reverse-sorted-order scan of the keys present in a Judy::1 array.
+
+=head2 $Key = Prev( $Judy, $Key )
+
+Search (exclusive) for the previous key present that is less than the
+passed C<$Key>. Prev() is typically used to continue a
+reverse-sorted-order scan of the keys present in a Judy::1 array, or
+to locate a "neighbor" of a given key.
+
+=head2 $Key = FirstEmpty( $Judy, $Key )
+
+Search (inclusive) for the first absent key that is equal to or
+greater than the passed C<$Key>. (Start with C<$Key> = 0 to find the
+first key absent in the array.)
+
+=head2 $Key = NextEmpty( $Judy, $Key )
+
+Search (exclusive) for the next absent key that is greater than the
+passed C<$Key>.
+
+=head2 $Key = LastEmpty( $Judy, $Key )
+
+Search (inclusive) for the last absent key that is equal to or less
+than the passed C<$Key>. (Start with C<$Key> = -1 to find the last key
+absent in the array.)
+
+=head2 $Key = PrevEmpty( $Judy, $Key )
+
+Search (exclusive) for the previous absent key that is less than the
+passed C<$Key>.
+
+
+
+=head1 MULTIDIMENSIONAL Judy::L
+
+See L<Judy>.
+
+
+
+=head1 ERRORS & WARNINGS
+
+See L<Judy>.
+
+
+
+=head1 AUTHOR
+
+See L<Judy>.

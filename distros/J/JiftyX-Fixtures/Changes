@@ -1,0 +1,29 @@
+Revision history for Perl extension JiftyX::Fixtures.
+
+- 0.07
+  + add Script::Clean
+  + fix Script::Scaffold to create dir for respective mode
+
+- 0.06
+  + refactor Scaffold.pm and Load.pm
+  + purge Script::Base
+  + add mechanism about help_msg, before_run
+
+- 0.05
+  + Script::Scaffold work
+  + default subcommand as "help" when running script
+  + default subcommand as "load" when calling JiftyX::Fixtures->new->run
+
+- 0.04
+  + add Script::Help
+  + more doc
+
+- 0.03
+  + suport dropping MySQL database (all MySQL, SQLite now)
+  + new script architecture based on App::CLI
+
+- 0.02
+  + rewrite some tests
+
+- 0.01
+  + Load fixtures from prepared YAML file and drop existed database

@@ -1,0 +1,37 @@
+bps_util.js
+    focusElementById removed
+    custom onload hook code removed
+    buttonToLink, updateParentField, createCalendarLink, createDateTimeLink moved to Jifty.Utils
+
+removing JSAN usage wherever I can
+removing JSAN core and now-unused libraries
+
+formatDate not used in the last 3 years
+
+
+=== What's left?
+
+grep 'XXX TODO JS'
+
+use DatePicker from jQuery UI instead of YUI
+    removes YUI calendar
+    most (all?) of our calendar handler JS
+
+Jifty.Utils has a bunch of methods probably redundant with those in jQuery, but
+we need to check compat with what uses them
+
+update libraries
+    jQuery
+    iAutocompleter (and iUtil)
+
+jQuery 1.4
+    http://jquery14.com/day-01/jquery-14#backwards
+    we can replace css_browser_selector and our own browser stuff with jQuery.browser now
+
+
+=== Unused (but still useful??)
+
+DUBIOUS - rico.js - not even the full library, just corner rounding, and
+                    hacked ones at that
+
+UNCLEAR - jsTrace.js

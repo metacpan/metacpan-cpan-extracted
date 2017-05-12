@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib '/Users/jbisbee/src/JavaScript-XRay/lib';
+use JavaScript::XRay;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+use File::Spec::Functions qw(rel2abs splitpath);
+use File::Basename qw(fileparse);
+
+our $VERSION = '0.03';
+my ( $verbose, $alias, $iframe_height, $css_external );
+my ( $all, $none, $anon, @skip, @only, @uncomment, $no_exec_count, $match );
+
+# Stick any default switches at the beginning, so they can be overridden
+# by the command line switches.
+unshift @ARGV, split( " ", $ENV{JSXRAY_SWITCHES} )
+    if defined $ENV{JSXRAY_SWITCHES};
+
+Getopt::Long::Configure("no_ignore_case");
+GetOptions(
+    'alias=s'         => \$alias,
+    'iframe-height=s' => \$iframe_height,
+    'css-external=s'  => \$css_external,
+    'h|help|?'        => sub { pod2usage( { -verbose => 1 } ); exit },
+    'H|man'           => sub { pod2usage( { -verbose => 2 } ); exit },
+    'v|verbose'       => \$verbose,
+    'V|version'       => sub { print_version(); exit; },
+    'all'             => \$all,
+    'none'            => \$none,
+    'anon'            => \$anon,
+    'skip=s@'         => \@skip,
+    'only=s@'         => \@only,
+    'uncomment=s@'    => \@uncomment,
+    'no-exec-count'   => \$no_exec_count,
+    'match=s'         => \$match,
+) or exit 1;
+
+for my $file ( @ARGV ) {
+    open my $fh, '<', $file or die "can't open $file: $!";
+    my $html = do { local $/; <$fh> };
+    close $fh;
+
+    my $abs_uri = rel2abs($file);
+    my $jsxray = JavaScript::XRay->new(
+        abs_uri       => $abs_uri,
+        alias         => $alias,
+        iframe_height => $iframe_height,
+        css_external  => $css_external,
+        verbose       => $verbose,
+    );
+
+    $jsxray->switches(
+        all           => $all,
+        none          => $none,
+        anon          => $anon,
+        skip          => \@skip,
+        only          => \@only,
+        uncomment     => \@uncomment,
+        no_exec_count => $no_exec_count,
+        match         => $match,
+    );
+
+    my $dir = (splitpath($abs_uri))[1];
+    $jsxray->inline_methods("HTTP_GET", $dir);
+
+    # build new filename
+    my ($name,$path) = fileparse($abs_uri); 
+    if ($name =~ /\./) {
+        my @parts = split(/\./,$name);
+        $parts[-2] .= '-xrayed';
+        $name = join( '.', @parts );
+    }
+    else {
+        $name .= '-xrayed';
+    }
+
+    my $new_file = $path . $name;
+    open( my $output, '>', $new_file )
+        || die "Can't open file $new_file: $!";
+    print $output $jsxray->filter($html);
+    close $output;
+    print $new_file . "\n";
+}
+
+sub print_version {
+    printf( "jsxray v%s, using JavaScript::XRay v%s and Perl v%vd\n",
+        $VERSION, $JavaScript::XRay::VERSION, $^V );
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+jsxray -- A command-line tool for filtering HTML with JavaScript::XRay
+
+=head1 SYNOPSIS
+
+jsxray [options] [files/directories]
+
+Options:
+
+    -h, --help       Display this help
+    -H, --man        Longer manpage for jsxray
+    -v, --verbose    Verbose output
+    -V, --version    Display version info
+
+    --alias          Alias used by JS::XRay to prefix all injected code
+    --iframe-height  Height in pixels of logging iframe (default: 200)
+    --css-external   Location of external CSS
+
+    --all            Filter all functions (default)
+    --none           Turn off filtering of functions
+    --anon           Turn on logging of anonymous functions
+    --only           Limit filtering to only these functions
+    --skip           Skip filtering of these functions
+    --uncomment      Uncomment these 
+    --no-exec-count  Don't keep track of execution counts
+    --match          Filter functions that match string
+
+Default options may be set by specifying the JSXRAY_SWITCHES environment 
+variable.
+
+=head1 OVERVIEW
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 --alias
+
+Alias used by JS::XRay to prefix all injected code
+
+=head2 --iframe-height
+
+Height in pixels of logging iframe (default: 200)
+
+=head2 --css-external
+
+Location of external CSS
+
+=head2 --all
+
+Filter all functions (default)
+
+=head2 --none
+
+Turn off filtering of functions
+
+=head2 --anon
+
+Turn on logging of anonymous functions
+
+=head2 --only
+
+Limit filtering to only these functions
+
+=head2 --skip
+
+Skip filtering of these functions
+
+=head2 --uncomment
+
+Uncomment these 
+
+=head2 --no-exec-count
+
+Don't keep track of execution counts
+
+=head2 --match
+
+Filter functions that match string
+
+=head2 -v, --verbose
+
+Verbose output
+
+=head2 -V, --version
+
+Display version info
+
+=head2 -h, --help
+
+Display short usage help
+
+=head2 -H, --man
+
+Manpage for jsxray
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-JavaScript-xray at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-XRay>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc JavaScript::XRay
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/JavaScript-XRay>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/JavaScript-XRay>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=JavaScript-XRay>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/JavaScript-XRay>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Andy Lester for 'prove', which I refernced to write my first 
+command line script for CPAN
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Jeff Bisbee, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

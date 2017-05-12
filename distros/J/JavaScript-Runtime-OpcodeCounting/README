@@ -1,0 +1,35 @@
+JavaScript-Runtime-OpcodeCounting
+=================================
+
+This module provides an extended JavaScript::Runtime class that keeps track on how many opcodes 
+are executed by the runtime. It can also be set to abort execution when N number of opcodes have
+been executed by setting an upper limit.
+
+Currently both the counter and the limit are implemented as U32 values. If lots, and I mean *lots*, 
+of opcodes are executed without resetting the counter it will eventually overflow.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  JavaScript (1.02 or later)
+  Test::More
+  Test::Warn
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007, Claes Jakobsson <claesjac@cpan.org>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See "perldoc perlartistic".
+
+

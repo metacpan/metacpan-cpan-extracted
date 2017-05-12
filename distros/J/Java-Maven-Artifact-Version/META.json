@@ -1,0 +1,58 @@
+{
+   "abstract" : "a perl module for comparing Artifact versions exactly like Maven does.",
+   "author" : [
+      "Thomas Cazali <pandragon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Java-Maven-Artifact-Version",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "pandragon@cpan.org",
+         "web" : "https://github.com/apendragon/Java-Maven-Artifact-Version/issues"
+      },
+      "homepage" : "https://github.com/apendragon/Java-Maven-Artifact-Version/wiki",
+      "license" : [
+         "https://github.com/apendragon/Java-Maven-Artifact-Version/blob/master/LICENSE"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/apendragon/Java-Maven-Artifact-Version.git",
+         "web" : "https://github.com/apendragon/Java-Maven-Artifact-Version.git"
+      }
+   },
+   "version" : "1.000001"
+}

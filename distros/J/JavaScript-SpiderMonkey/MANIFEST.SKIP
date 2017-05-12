@@ -1,0 +1,11 @@
+blib
+^Makefile$
+^Makefile.old$
+CVS
+.cvsignore
+docs
+MANIFEST.bak
+adm/release
+^SpiderMonkey.bs$
+^SpiderMonkey.c$
+^SpiderMonkey.o$

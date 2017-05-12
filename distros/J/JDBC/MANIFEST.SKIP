@@ -1,0 +1,16 @@
+^Build$
+\B\.svn\b
+^Makefile$
+~$
+\.old$
+\.bak$
+^blib/
+^tmp/
+^old/
+^_build/
+^_Inline/
+^derbydb/
+^derby\.log
+\.tar\.gz$
+^JDBC-*
+^cover_db

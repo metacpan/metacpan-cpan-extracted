@@ -1,0 +1,8 @@
+Changes
+lib/JSON/PP/Compat5005.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/000_load.t
+t/900_pod.t

@@ -1,0 +1,29 @@
+---
+abstract: 'secure API authorization'
+author:
+  - 'Shawn M Moore C<< <sartak@bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Jifty-Plugin-OAuth
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Crypt::OpenSSL::RSA: 0
+  Digest::HMAC_SHA1: 0
+requires:
+  Jifty: 0.80408
+  Net::OAuth::Request: 0.05
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

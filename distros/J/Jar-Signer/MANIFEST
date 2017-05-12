@@ -1,0 +1,7 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+jarsigner.pl
+lib/Jar/Signer.pm
+test.pl

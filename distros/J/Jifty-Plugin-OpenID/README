@@ -1,0 +1,125 @@
+NAME
+    Jifty::Plugin::OpenID - Provides OpenID authentication for your jifty
+    app
+
+DESCRIPTION
+    Provides OpenID authentication for your app
+
+USAGE
+  Config
+    please provide "OpenIDSecret" in your etc/config.yml , the "OpenIDUA" is
+    optional , OpenID Plugin will use LWPx::ParanoidAgent by default.
+
+        --- 
+        application:
+            OpenIDSecret: 1234
+            OpenIDUA: LWP::UserAgent
+
+    or you can set "OpenIDUserAgent" environment var in command-line:
+
+        OpenIDUserAgent=LWP::UserAgent bin/jifty server
+
+    if you are using LWPx::ParanoidAgent as your openid agent. you will need
+    to provide "JIFTY_OPENID_WHITELIST_HOST" for your own OpenID server.
+
+        export JIFTY_OPENID_WHITELIST_HOST=123.123.123.123
+
+  User Model
+    Create your user model , and let it uses
+    Jifty::Plugin::OpenID::Mixin::Model::User to mixin "openid" column. and
+    a "name" method.
+
+        use TestApp::Record schema {
+
+            column email =>
+                type is 'varchar';
+
+        };
+        use Jifty::Plugin::OpenID::Mixin::Model::User;
+
+        sub name {
+            my $self = shift;
+            return $self->email;
+        }
+
+    Note: you might need to declare a "name" method. because the OpenID
+    CreateOpenIDUser action and SkeletonApp needs current_user->username to
+    show welcome message and success message , which calls
+    "brief_description" method. See Jifty::Record for "brief_description"
+    method.
+
+  View
+    OpenID plugin provides AuthenticateOpenID Action. so that you can render
+    an AuthenticateOpenID in your template:
+
+        form {
+            my $openid = new_action( class   => 'AuthenticateOpenID',
+                                    moniker => 'authenticateopenid' );
+            render_action( $openid );
+        };
+
+    this action renders a form which provides openid url field. and you will
+    need to provide a submit button in your form.
+
+        form {
+            my $openid = new_action( class   => 'AuthenticateOpenID',
+                                    moniker => 'authenticateopenid' );
+
+            # ....
+
+            render_action( $openid );
+            outs_raw(
+                Jifty->web->return(
+                    to     => '/openid_verify_done',
+                    label  => _("Login with OpenID"),
+                    submit => $openid
+                ));
+        };
+
+    the "to" field is for verified user to redirect to. so that you will
+    need to implement a template called "/openid_verify_done":
+
+        template '/openid_verify_done' => page {
+            h1 { "Done" };
+        };
+
+  Attribute Exchange
+    You can retrieve information from remote profile on authentication
+    server with OpenID Attribute Exchange service extension.
+
+    Set in your config.yml
+
+        - OpenID:
+           ax_param: openid.ns.ax=http://openid.net/srv/ax/1.0&openid.ax.mode=fetch_request&openid.ax.type.email=http://axschema.org/contact/email&openid.ax.type.firstname=http://axschema.org/namePerson/first&openid.ax.type.lastname=http://axschema.org/namePerson/last&openid.ax.required=firstname,lastname,email
+           ax_values: value.email,value.firstname,value.lastname
+           ax_mapping: "{ 'email': 'value.email', 'name': 'value.firstname value.lastname' }"
+
+    this parameters are usuable for all OpenID endpoints supporting
+    Attribute Exchange extension. They can be overriden in your application.
+    Watch and/or override "openid/wayf" template from
+    Jifty::Plugin::OpenID::View.
+
+    Or you can use in your view "show('openid/wayf','/url_return_to');".
+
+   ax_param
+    is the url send to authentication server. It defines namespace, mode,
+    attributes types and requested attributes.
+
+    hints : MyOpenID use schema.openid.net schemas instead of axschema.org,
+    Google provides lastname and firstname, Yahoo only fullname
+
+   ax_values
+    keys of attributes values read from authentication server response.
+
+   ax_mapping
+    mapping of recieve values with your application fields in json format.
+
+AUTHORS
+    Alex Vandiver, Cornelius <cornelius.howl {at} gmail.com >, Yves Agostini
+
+LICENSE
+    Copyright 2005-2010 Best Practical Solutions, LLC.
+
+    This program is free software and may be modified and distributed under
+    the same terms as Perl itself.
+

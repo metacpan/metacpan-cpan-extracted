@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use JSON::RPC::Simple;
+use Data::Dumper;
+
+my $debug = 0;
+
+# If the first arg is -d (for debug)
+# We should really use something like GetOpt::Long but we'll switch to that
+# when this script evolves into a more complex being
+if (defined $ARGV[0] && $ARGV[0] eq "-d") {
+    shift; # remove -d so checks below works
+    $debug = 1;
+}
+
+if (@ARGV < 2) {
+    print "Usage: jsonrpc-simple <URL> <method> [<arg1> <value1>] ...\n";
+    exit -1;
+}
+
+if (@ARGV & 1) {
+    print "Odd number of keys and values.. can't continue\n";
+    exit -1;
+}
+
+my $url = shift;
+my $client = JSON::RPC::Simple->connect($url, { 
+    debug => $debug 
+});
+
+my $method = shift;
+print Dumper($client->$method({@ARGV}));

@@ -1,0 +1,33 @@
+---
+abstract: 'Read and Write Java Jar Manifests'
+author:
+  - 'Mithun Ayachit <mithun@cpan.org>'
+build_requires:
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - java
+  - jar
+  - manifest
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Jar-Manifest
+provides:
+  Jar::Manifest:
+    file: lib/Jar/Manifest.pm
+    version: v1.0.1
+requires:
+  Encode: '0'
+  Text::Wrap: '0'
+resources:
+  bugtracker: https://github.com/mithun/perl-jar-manifest/issues
+  homepage: https://github.com/mithun/perl-jar-manifest
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mithun/perl-jar-manifest.git
+version: v1.0.1

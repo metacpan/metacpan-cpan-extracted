@@ -1,0 +1,85 @@
+0.25 Tue Jan 27 10:10:57 PST 2015
+ - Update packaging
+
+0.24 Sat Aug 16 14:02:38 PDT 2014
+ - Remove =travis section
+
+0.23 Sat Aug 16 11:25:12 PDT 2014
+ - Meta 0.0.2
+
+0.22 Sat Aug 16 02:15:47 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.21 Fri Aug 15 21:20:35 PDT 2014
+ - Remove t/use_ok.t
+
+0.20 Fri Aug 15 15:58:29 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.19 Tue Aug  5 09:50:00 PDT 2014
+ - Add badges to doc
+
+0.18 Sun Aug  3 23:09:58 PDT 2014
+ - Remove (c) from Copyright
+ - Meta and doc fixes.
+ - Fix Meta and add Contributing
+
+0.17 Mon Jun 16 15:34:45 PDT 2014
+ - Use manual VERSION
+
+0.16 Sun Jun 15 13:13:48 PDT 2014
+ - Switch to Zilla::Dist
+
+0.15 Sun Jan 13 22:31:32 PST 2013
+ - Refactor to make more portable to Ruby and JS and Python.
+
+0.14 Thu Aug 30 00:35:36 PDT 2012
+ - Use new TestML
+
+0.13 Wed Sep 21 23:15:16 CEST 2011
+ - Switch to Module::Package
+ - Released from Liz++&Wendy++'s master bathroom.
+
+0.12 Thu Sep 23 14:30:49 PDT 2010
+ - Use common JSYNC TestML test suite
+   http://github.com/ingydotnet/jsync-tml
+ - Update Makefile.PL
+
+0.11 Thu Sep  9 20:50:12 PDT 2010
+ - TestML changes
+
+0.10 Sat Aug 14 18:11:15 PDT 2010
+ - Use new Gloom
+
+0.09 Tue Aug 10 02:03:12 PDT 2010
+ - New TestML bundles Pegex.
+
+0.08 Tue Aug  3 18:29:56 PDT 2010
+ - TestML::Bridge no longer exists. Removed it from tests.
+
+0.07 Sun Jun 27 23:39:39 PDT 2010
+ - Unescape keys on load. Schwern++
+
+0.06 Tue Jun 22 13:18:35 PDT 2010
+ - Switch from Test::Base to TestML
+ - Thanks to Tommy++ and Chip++ at YAPC Acmeism Hackathon
+
+0.05 Tue Jun 22 08:38:32 PDT 2010
+ - Add pretty printing
+
+0.04 Mon Jun 21 22:04:36 PDT 2010
+ - Add glob dumping support
+
+0.03 Sat Jun 19 15:13:31 PDT 2010
+ - Dump and load recursive references
+ - Dump and load typed mappings and sequences
+ - Escaping of special keys and values
+
+0.02 Sat Jun 19 12:20:48 PDT 2010
+ - Add dump and load support for multiple references
+ - Support null without warnings
+
+0.01 Fri Jun 18 12:01:58 PDT 2010
+ - Initial version.
+

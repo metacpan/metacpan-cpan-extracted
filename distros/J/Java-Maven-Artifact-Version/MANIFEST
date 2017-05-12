@@ -1,0 +1,20 @@
+Changes
+lib/Java/Maven/Artifact/Version.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-normalization.t
+t/02-qualifiers-comparison.t
+t/03-integeritems-comparison.t
+t/04-stringitems-comparison.t
+t/05-listitems-comparison.t
+t/06-parameterized-depth-comparison.t
+t/boilerplate.t
+t/manifest.t
+t/meta.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

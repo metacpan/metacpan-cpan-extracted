@@ -1,0 +1,146 @@
+=head1 NAME
+
+Judy::HS - Efficiet string to integer map
+
+=head1 SYNOPSIS
+
+Removing duplicates from a list using sugar
+
+  use Judy::HS qw( Duplicates Free );
+
+  my $judy;
+  for (qw( d d c a d b c b a b a c )) {
+    print "$_\n" if ! Duplicates( $judy, $_ );
+  }
+  printf "Freed %d bytes\n", Free( $judy );
+
+Remove duplicates with less sugar
+
+  use Judy::HS qw( Set Get Free );
+
+  my $judy;
+  for (qw( d d c a d b c b a b a c )) {
+      my ( undef, $value ) = Get( $judy, $_ );
+      if ( ! $value ) {
+          Set( $judy, $_, 1 );
+          print "$_\n";
+      }
+  }
+  printf "Freed %d bytes\n", Free( $judy );
+
+
+
+=head1 DESCRIPTION
+
+Judy::HS is an equivalent to a hash of integers. The keys are all
+strings, the values are integers. JudyHS is a hybrid using the best
+capabilities of hashing and Judy methods. JudyHS does not have a poor
+performance case where knowledge of the hash algorithm can be used to
+degrade the performance.
+
+Since JudyHS is based on a hash method, Keys are not stored in any
+particular order. Therefore the C<First()>, C<Next()>, C<Prev()> and
+C<Last()> neighbor search functions are not practical.  To enumerate a
+Judy::HS object, see L<http://perlmonks.org/?node_id=733140>. This is
+not supported but it works.
+
+The hallmark of JudyHS is speed with scalability, but memory
+efficiency is excelleny. The speed is very competitive with the best
+hashing methods. The memory efficiency is similar to a linked list of
+the same Keys and Values. JudyHS is designed to scale from 0 to
+billions of Keys.
+
+Nothing special is required to allocate a Judy::HS array. Just start using it.
+
+    my $judy;
+    if ( Get( $judy, 'omg' ) ) {
+        Set( $judy, 'zomg', 42 );
+        ...
+    }
+
+As with an ordinary array, there are no duplicate keys in a Judy::HS
+array.
+
+
+
+=head1 DATA TYPES
+
+=head2 $Judy - Judy::HS array
+
+=head2 $Key - a string with no null characters
+
+=head2 $Value - integer
+
+=head2 $PValue - pointer to integer
+
+
+
+=head1 BASIC FUNCTIONS
+
+=head2 $PValue = Set( $Judy, $Key, $Value )
+
+Insert/set a C<$Key> and C<$Value> into C<$Judy>.
+
+Returns C<$PValue> pointing to the stored C<$Value>. Your program can
+use this pointer to modify the stored C<$Value> until the next
+C<Set()>, C<Delete()>, C<Free()>. Example:
+
+  use Judy::Mem qw( Peek );
+  use Judy::HS qw( Set );
+
+  $pvalue = Set( $judy, "al\0ha", 42 );
+  printf "al\\0ha=%d\n", Peek( $pvalue );
+
+Note: C<Set()> and Delete can reorganize the JudyHS array. Therefore,
+pointers returned from previous JudyHS calls become invalid and must
+be re-acquired (using Get()).
+
+=head2 bool = Delete( $Judy, $Key )
+
+Delete the specified C<$Key>/C<$Value> pair from Judy::HS. Returns
+true if the element was removed, false otherwise.
+
+=head2 ( $PValue, $Value ) = Get( $Judy, $Key )
+
+Get C<$Key>'s C<$Value>. If C<$Key> exists in C<$Judy>, return
+C<$PValue> pointing to C<$Key>'s C<$Value> and C<$Value> in a
+list. Return nothing if C<$Key> isn't present.
+
+
+
+=head1 SEARCH FUNCTIONS
+
+There are no search functions and no endorsed methods for enumerating
+the contents of Judy::HS. It's possible though. See
+L<http://perlmonks.org/?node_id=733140>.
+
+
+
+=head1 UTILITY FUNCTIONS
+
+=head2 bytes = Free( $Judy )
+
+Frees an entire Judy::HS array. C<$Judy> is set to 0.
+
+=head2 bytes = MemUsed( $Judy )
+
+Returns the size of a Judy::HS array. This implementation is not
+supplied by libJudy.
+
+
+
+=head1 MULTIDIMENSIONAL Judy::HS
+
+See L<Judy>.
+
+
+
+=head1 ERRORS & WARNINGS
+
+See L<Judy>.
+
+
+
+=head1 AUTHOR
+
+See L<Judy>.

@@ -1,0 +1,100 @@
+NAME
+
+    JSONY - Relaxed JSON with a little bit of YAML
+
+VERSION
+
+    This document describes JSONY version 0.1.17.
+
+SYNOPSIS
+
+        use JSONY;
+    
+        my $data = JSONY->new->load($jsony_string);
+
+DESCRIPTION
+
+    JSONY is a data language that is simlar to JSON, just more chill. All
+    valid JSON is also valid JSONY (and represents the same thing when
+    loaded), but JSONY lets you omit a lot of the syntax that makes JSON a
+    pain to write.
+
+API
+
+    JSONY has one instance method: load. You pass it a JSONY string and it
+    returns the loaded Perl data object.
+
+JSONY SYNTAX
+
+    Here is some examples of JSONY followed by equivalent JSON:
+
+    Words don't need quotes. A list of things is an array:
+
+        foo bar baz
+    
+        [ "foo", "bar", "baz" ]
+
+    Strings with spaces can use single or double quotes:
+
+        'foo bar'      # <= This is (a comment indicating) a string
+        # More commenting
+        "baz  boom "
+    
+        [ "foo bar ", "baz  boom " ]
+
+    Top level hashes can be ':' separated pairs or use curlies. Sub hashes
+    require curlies.
+
+        foo: { bar baz }
+        num: -1.2e3
+    
+        { "foo": { "bar": "baz" }, "num": -1.2e3 }
+
+    Top level arrays can use '- ' at the start of lines. Those arrays go
+    the end of line. Lines can be continued using a trailing comma. Sub
+    arrays require square brackets.
+
+        - array of 4 scalars
+        - array with [ sub
+          array { of
+          things }]
+        - array of 7 things on,
+          two lines
+    
+        [
+          [ "array", "of", 4, "scalars" ],
+          [ "array", "with", [ "sub", "array", { "of": "things" } ] ],
+          [ "array", "of", 7, "things", "on", "two", "lines" ]
+        ]
+
+    NOTE: You may want to look at the tests (especially t/load.t) to see
+    the full abilities of JSONY.
+
+STATUS
+
+    JSONY has been in use for well over a year. It seems to working well.
+
+    Development people are working on this in #jsony and #pegex in
+    irc.freenode.net. Please drop by.
+
+    JSONY.pm is a very simple Pegex-based parser. You can see the quite
+    tiny JSONY grammar here:
+    http://github.com/ingydotnet/jsony-pgx/blob/master/jsony.pgx
+
+    http://jsony.org coming soon.
+
+AUTHORS
+
+      * Ingy döt Net (ingy) <ingy@cpan.org>
+
+      * Matt S. Trout (mst) <mst@shadowcat.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2012-2017. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

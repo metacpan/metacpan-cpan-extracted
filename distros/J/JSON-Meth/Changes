@@ -1,0 +1,24 @@
+Revision history for JSON-Meth
+
+1.001007  2015-11-28
+        - Fix test failures due to newer Cpanel::JSON::XS version
+             stringifying objects
+
+1.001006  2015-08-29
+        - Avoid hardcoding package name, for subclassing
+
+1.001005  2015-08-10
+        - Handle undefs correctly
+
+1.001004  2015-04-11
+        - Added $json optional export variable
+
+1.001003  2015-04-10
+        - Implemented proper handling of objects
+
+1.001002  2015-04-09
+        - Added magic to $j, so we can pull results of encode/decode
+          right out of it
+
+1.001001  2015-04-09
+        - First version, released on the unsuspecting world

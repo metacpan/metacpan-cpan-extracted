@@ -1,0 +1,60 @@
+{
+   "abstract" : "Mocking library for perl inspired by Jasmine's spies",
+   "author" : [
+      "Dave Mueller <dave@perljedi.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Jasmine-Spy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::MOP" : "0",
+            "Exporter" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::Deep" : "0",
+            "Tie::Array" : "0",
+            "Want" : "0",
+            "base" : "0",
+            "perl" : "v5.14.0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Spec" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/perljedi/ADD-URL-HERE",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perljedi/perl-jasmine-spy.git",
+         "web" : "https://github.com/perljedi/perl-jasmine-spy"
+      }
+   },
+   "version" : "1.02"
+}
+

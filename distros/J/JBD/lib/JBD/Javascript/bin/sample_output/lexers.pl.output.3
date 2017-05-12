@@ -1,0 +1,114 @@
+
+Tokenized file: comments.js
+$VAR1 = [
+          bless( [
+                   'Comment',
+                   '/*
+* This is a multi-line comment.*/'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'LineTerminator',
+                   '
+
+'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'Comment',
+                   '// This is a single-line comment.'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'LineTerminator',
+                   '
+'
+                 ], 'JBD::Parser::Token' )
+        ];
+
+Tokenized file: digits.js
+$VAR1 = [
+          bless( [
+                   'DecimalLiteral',
+                   '10.0E+3'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'DecimalLiteral',
+                   '8383.373e-28'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'DecimalIntegerLiteral',
+                   '314159'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'HexIntegerLiteral',
+                   '0xffff'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'SignedInteger',
+                   '-5'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'SignedInteger',
+                   '+83'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'ExponentPart',
+                   'e-2882'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' 
+'
+                 ], 'JBD::Parser::Token' )
+        ];
+
+Tokenized file: boolean_and_null.js
+$VAR1 = [
+          bless( [
+                   'BooleanLiteral',
+                   'true'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'BooleanLiteral',
+                   'false'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   ' '
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'NullLiteral',
+                   'null'
+                 ], 'JBD::Parser::Token' ),
+          bless( [
+                   'WhiteSpace',
+                   '
+'
+                 ], 'JBD::Parser::Token' )
+        ];

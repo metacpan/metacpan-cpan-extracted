@@ -1,0 +1,25 @@
+tag: stuff that needs to be TODOne
+
+- ensure identity of proxy objects by caching them
+- add per-attribute validators on server side
+- add check for edit timestamp in server
++ update README file
++ POD documentation for JOAP
++ POD documentation for JOAP::NetJabber
++ POD documentation for JOAP::Types
++ POD documentation for JOAP::Descriptors
++ POD documentation for JOAP::Addresses
++ POD documentation for JOAP::Server
++ POD documentation for JOAP::Server::Object
++ POD documentation for JOAP::Server::Class
++ POD documentation for JOAP::Proxy
++ POD documentation for JOAP::Proxy::Error
++ POD documentation for JOAP::Proxy::Class
++ POD documentation for JOAP::Proxy::Server
++ POD documentation for JOAP::Proxy::Instance
++ POD documentation for JOAP::Proxy::Package
++ POD documentation for JOAP::Proxy::Package::Class
++ POD documentation for JOAP::Proxy::Package::Server
++ tool to pre-cook proxy classes
++ actually do logging in server
+- allow multiple descriptions based on language

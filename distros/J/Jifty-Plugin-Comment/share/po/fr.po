@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Yves Agostini <agostini@univ-metz.fr>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2009-06-10 08:39:17+0200\n"
+"PO-Revision-Date: 2009-06-10 08:39:17+0200\n"
+"Last-Translator: Yves Agostini <agostini@univ-metz.fr>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/Notification/CommentNeedsModeration.pm:73
+#. ($url,         $self->parent->title,        $comment->title,         $from,         $comment->created_on->strftime('%A, %B %d, %Y @ %H:%M%P')
+msgid ""
+"\n"
+"The following comment has not been published. If you would like to publish it, please visit the link below and click on the \"publish\" link. If it has been marked as spam and should not have been you should also click on the \"mark as ham\" link.\n"
+"\n"
+"View Comment: %1\n"
+"\n"
+"On Post: %2\n"
+"Subject: %3\n"
+"From: %4\n"
+"Date: %5\n"
+"\n"
+"%6\n"
+msgstr ""
+"\n"
+"Le commentaire suivant n'a pas encore été publié. Si vous voulez le publier, consultez le lien ci-dessous et cliquez sur le lien \"publier\". S'il a été marqué par erreur comme spam, cliquez sur le lien \"marquer comme han\".\n"
+"\n"
+"Commentaire: %1\n"
+"\n"
+"Sur le billet: %2\n"
+"Sujet: %3\n"
+"De: %4\n"
+"Date: %5\n"
+"\n"
+"%6\n"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/Notification/CommentPublished.pm:71
+#. ($url,        $self->parent->title,        $comment->title,         $from,         $comment->created_on->strftime('%A, %B %d, %Y @ %H:%M%P')
+msgid ""
+"\n"
+"View Comment: %1\n"
+"\n"
+"On Post: %2\n"
+"Subject: %3\n"
+"From: %4\n"
+"Date: %5\n"
+"\n"
+"%6\n"
+msgstr ""
+"\n"
+"Commentaire: %1\n"
+"\n"
+"Sur le billet: %2\n"
+"Sujet: %3\n"
+"De: %4\n"
+"Date: %5\n"
+"\n"
+"%6\n"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:165
+msgid "Add a comment"
+msgstr "Ajouter un commentaire"
+
+#: plugins/Comment/t/TestApp-Plugin-Comments/lib/TestApp/Plugin/Comments/View.pm:22
+#. ($blog->author)
+msgid "By %1"
+msgstr "Par %1"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:138 plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:197
+#. ($poster,                     $created_on->strftime('%A, %B %d, %Y @ %H:%M%P')
+#. ($poster,                             $created_on->strftime('%A, %B %d, %Y @ %H:%M%P')
+msgid "By %1 %2"
+msgstr "Par %1 %2"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:304
+msgid "No one has made a comment yet."
+msgstr "Aucun commentaire pour l'instant"
+
+#: plugins/Comment/t/TestApp-Plugin-Comments/lib/TestApp/Plugin/Comments/View.pm:13
+msgid "Post"
+msgstr "Poster"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:221
+msgid "Preview"
+msgstr "Aperçu"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:236
+msgid "Submit"
+msgstr "Soumettre"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/Action/CreateComment.pm:268
+msgid "Your comment has been added. If it does not immediately appear, it may have been flagged for moderation and should appear shortly."
+msgstr "Votre commentaire a été ajouté. S'il n'apparaît pas immédiatement, c'est qu'il est en attente de modération et sera bientôt publié."
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/Notification/CommentNeedsModeration.pm:67
+#. ($appname, $comment->title)
+msgid "[%1] Moderate comment: %2"
+msgstr "[%1] Commentaire modéré : %2"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/Notification/CommentPublished.pm:65
+#. ($appname, $comment->title)
+msgid "[%1] New comment: %2"
+msgstr "[%1] Nouveau commentaire : %2"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:87
+#. ($status)
+msgid "mark as %1"
+msgstr "marquer comme %1"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:100
+msgid "publish"
+msgstr "publier"
+
+#: plugins/Comment/lib/Jifty/Plugin/Comment/View.pm:100
+msgid "unpublish"
+msgstr "ne pas publier"

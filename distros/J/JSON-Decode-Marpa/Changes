@@ -1,0 +1,14 @@
+Revision history for JSON-Decode-Marpa
+
+0.02    2014-08-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - Typo/grammar fixes.
+
+        - Include benchmark code.
+
+
+0.01    2014-08-27 (PERLANCAR)
+
+        - First release.

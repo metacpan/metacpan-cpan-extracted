@@ -1,0 +1,80 @@
+Revision history for JSON-MaybeXS
+
+1.003009 - 2017-02-27
+ - fix tests to no longer rely on . being in @INC (RT#120404)
+
+1.003008 - 2016-10-03
+ - added an INSTALLATION section to documentation, to clarify the use of
+   dynamic prerequisites in Makefile.PL
+ - minimize prereqs listed in META.json to avoid giving the appearance of XS
+   prerequisites, and confusing static inspection tools such as metacpan.org.
+
+1.003007 - 2016-09-11
+ - no changes since 1.003006_001
+
+1.003006_001 - 2016-06-28
+ - bump prereq on JSON::PP, to ensure we get the fix for parsing utf8-encoded
+   values (in JSON::PP 2.27300)
+ - we now always upgrade JSON::XS if it is installed and below version 3.0,
+   due to changes in handling booleans
+ - remove test dependency on Test::Without::Module (RT#115394)
+
+1.003005 - 2015-03-22
+ - fix x_contributors metadata that was killing metacpan (see
+   https://github.com/CPAN-API/cpan-api/issues/401)
+
+1.003004 - 2015-03-14
+ - caveat added to documentation about type checking the object returned by
+   new() (John SJ Anderson, RT#102733)
+
+1.003003 - 2014-12-06
+ - ensure an old Cpanel::JSON::XS is upgraded if it is too old, as it will
+   always be used in preference to JSON::XS
+ - avoid "JSON::XS::Boolean::* redefined" warnings caused by an old JSON::XS
+   loaded at the same time as a newer Cpanel::JSON::XS
+
+1.003002 - 2014-11-16
+ - correctly fix boolean interoperability with older Cpanel::JSON::MaybeXS
+
+1.003001 - 2014-11-13
+ - fix boolean interoperability with older Cpanel::JSON::MaybeXS
+
+1.003_000 - 2014-10-30
+ - add :legacy tag to support legacy apps
+
+1.002006 - 2014-10-22
+ - add some additional test diagnostics, to help find bad version combinations
+   of JSON backends
+
+1.002005 - 2014-10-12
+ - fix "can I haz XS?" logic precedence in Makefile.PL
+ - added the ':all' export tag
+ - removed dependency on Safe::Isa
+ - repository moved to git://git.shadowcat.co.uk/p5sagit/JSON-MaybeXS.git
+
+1.002004 - 2014-10-11
+ - support use of PUREPERL_ONLY in Makefile.PL to avoid adding an XS
+   dependency
+ - new is_bool() interface
+
+1.002003 - 2014-10-07
+ - document how to use booleans
+
+1.002002 - 2014-04-23
+ - more metadata fiddling, to remove the Cpanel::JSON::XS dependency visible
+   to static analyzers (the prequisites at install time remain unchanged)
+
+1.002001 - 2014-04-23
+ - fix installation on older perls with an older ExtUtils::MakeMaker
+   (RT#94964)
+
+1.002000 - 2014-04-22
+ - Now also supports JSON::XS, when available: Cpanel::JSON::XS will only be
+   installed when there is no XS backend already installed; Cpanel::JSON::XS
+   will be used over JSON::XS when both are installed.
+
+1.001000 - 2013-12-11
+  - Add a constructor for people who want to forget how silly the JSON API is
+
+1.000000 - 2013-05-22
+  - Released on an unsuspecting world.

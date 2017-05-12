@@ -1,0 +1,5 @@
+^t/TestApp/testapp$
+^Makefile$
+.swp$
+.old$
+.bak$

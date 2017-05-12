@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use strict; use warnings;
+
+use MyBuild;
+require 'build.config';
+
+my $project = MyBuild->new(make_project_hash());
+
+$project->targets([ qw( init compile make_jars ) ]);
+
+$project->GO(@ARGV);

@@ -1,0 +1,67 @@
+---
+abstract: 'Inferencing JSON types from given Perl values'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires:
+  Devel::Cover: '0'
+  Devel::Cover::Report::Coveralls: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-TypeInference
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  JSON::TypeInference:
+    file: lib/JSON/TypeInference.pm
+    version: v1.0.2
+  JSON::TypeInference::Type::Array:
+    file: lib/JSON/TypeInference/Type/Array.pm
+  JSON::TypeInference::Type::Atom:
+    file: lib/JSON/TypeInference/Type/Atom.pm
+  JSON::TypeInference::Type::Boolean:
+    file: lib/JSON/TypeInference/Type/Boolean.pm
+  JSON::TypeInference::Type::Maybe:
+    file: lib/JSON/TypeInference/Type/Maybe.pm
+  JSON::TypeInference::Type::Null:
+    file: lib/JSON/TypeInference/Type/Null.pm
+  JSON::TypeInference::Type::Number:
+    file: lib/JSON/TypeInference/Type/Number.pm
+  JSON::TypeInference::Type::Object:
+    file: lib/JSON/TypeInference/Type/Object.pm
+  JSON::TypeInference::Type::String:
+    file: lib/JSON/TypeInference/Type/String.pm
+  JSON::TypeInference::Type::Union:
+    file: lib/JSON/TypeInference/Type/Union.pm
+  JSON::TypeInference::Type::Unknown:
+    file: lib/JSON/TypeInference/Type/Unknown.pm
+requires:
+  List::Util: '1.33'
+  List::UtilsBy: '0'
+  Scalar::Util: '0'
+  Types::Serialiser: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/aereal/JSON-TypeInference/issues
+  homepage: https://github.com/aereal/JSON-TypeInference
+  repository: git://github.com/aereal/JSON-TypeInference.git
+version: 1.0.2
+x_authority: cpan:AEREAL
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

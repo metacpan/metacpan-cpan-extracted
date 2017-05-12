@@ -1,0 +1,15 @@
+---
+abstract: 'JSON::Relaxed -- An extension of JSON that allows for better human-readability.'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: JSON-Relaxed
+provides:
+    JSON::Relaxed:
+        file: lib/JSON/Relaxed.pm
+        version: 0.05
+requires:
+    Test::Most: 0.34
+    perl: 5.003
+version: 0.05

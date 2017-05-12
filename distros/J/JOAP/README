@@ -1,0 +1,128 @@
+JOAP version 0.01
+=================
+
+tag: main README
+
+This module provides a Perl implementation of the Jabber Object Access
+Protocol, or JOAP. JOAP a language-independent distributed object
+protocol that lets developers expose object methods, attributes, and
+inheritance hierarchies over the Jabber network. Of course, once
+they're exposed, other folks can use them.
+
+The Perl package, JOAP.pm and friends, provides a number of
+JOAP-related features. It allows you (with a bit of work) to put your
+Perl objects on the Jabber network so that other programmers can
+access them from remote locations. And it lets you (if you're not the
+guy who's putting objects on the Jabber network) use other people's
+objects in a really transparent and easy way (I think).
+
+The definition of JOAP is here:
+
+        http://www.jabber.org/jeps/jep-0075.html
+
+I should note that this is an early and experimental implementation of
+the JOAP protocol. And the definition itself is still in flux. But as
+of this writing this software is useable for development and
+exploration, and I think if you're interested and give it a shot you
+can do really cool things with it.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Note that this is communications software, and you're not going to get
+the most interesting tests to work unless there's a server running to
+test against. See the file TESTING in this package for more info on
+how to do complete tests. At the very least, it will give you a clue
+about how to deploy JOAP objects.
+
+DEPENDENCIES
+
+This module depends on a lot of other modules, which, like, go figure.
+
+   Net::Jabber - 1.28
+
+        This is the main Perl library for creating Jabber software. It
+        roX0rs.
+
+   Class::Data::Inheritable - 0.02
+
+        This is used a lot for managing classes.
+
+   Symbol - 1.04
+        
+        Used for autoloaded class accessors, to stuff the class
+        attributes into packages.
+
+   Error - 0.15
+
+        Used a lot for doing exception-style exits.
+
+   Test::More - 0.45
+
+        This is what the entire test system uses.
+
+I used perl 5.8.0 to develop this software, and except for Net::Jabber
+and Class::Data::Inheritable these were all just built right in and
+stuff.
+
+CONTACT INFO
+
+There's a Web page for this project on JabberStudio, which you can find here:
+
+        http://joap-perl.jabberstudio.org/
+
+You can file bug reports with the cool bug reporting facility here:
+
+        http://www.jabberstudio.org/projects/joap-perl/bugs/
+
+...and make feature requests here:
+
+        http://www.jabberstudio.org/projects/joap-perl/features/
+
+There's a mailing list which you can sign up for here:
+
+        http://www.jabberstudio.org/cgi-bin/mailman/listinfo/joap-perl-dev/
+
+Messages should be sent to joap-perl-dev@jabberstudio.org.
+
+There's a Jabber conference for the project here:
+
+        joap-perl@conference.jabberstudio.org
+
+I can personally be contacted at evan@prodromou.san-francisco.ca.us by
+email, and at EvanProdromou@jabber.org by Jabber.
+
+More information on Jabber itself can be found here:
+
+        http://www.jabber.org/
+
+The definition of the Jabber Object Access Protocol is here:
+
+        http://www.jabber.org/jeps/jep-0075.html
+
+This implementation conforms to version 0.3 of the protocol.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Evan Prodromou <evan@prodromou.san-francisco.ca.us>
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
+

@@ -1,0 +1,237 @@
+# Source grammar for Java class parser.
+#
+# AFTER EDITING THIS FILE YOU MUST UPDATE THE PARSER BY RUNNING:
+#   cd lib/Java/Javap && perl -MParse::RecDescent - javap.grammar Java::Javap::Grammar
+#
+# http://java.sun.com/docs/books/jls/third_edition/html/syntax.html
+# http://www.cmis.brighton.ac.uk/staff/rnb/bosware/javaSyntax/Java1_6GrammarCorrected.html
+# http://www.cmis.brighton.ac.uk/staff/rnb/bosware/javaSyntax/rulesLinked.html
+
+{
+    my %methods;
+    my $constructors;
+}
+
+comp_unit : comp_stmt(?)
+    comp_unit_decl '{' body '}'
+{
+    my $retval = $item{ comp_unit_decl };
+    # Match of subrule X(?) always generates an array
+    my $comp_stmt = $item{ q{comp_stmt(?)} }->[0];
+    $retval->{ compiled_from } = "${comp_stmt}.java";
+    $retval->{ contents      } = $item{ body };
+    $retval->{ methods       } = { %methods };  %methods = ();
+    $retval->{ constructors  } = $constructors; $constructors = 0;
+    $retval;
+}
+          | <error>
+
+comp_stmt : 'Compiled from "' NAME '.java"' { $item{NAME} }
+
+comp_unit_decl : ACCESS class_qualifier(s?)
+                 CLASS_OR_INTERFACE qualified_name
+                 extends_clause(?)
+                 implements_clause(?)
+                 verbose_class_details(?)
+{
+    my $perl_qualified_name = $item{ qualified_name };
+    $perl_qualified_name    =~ s/\./::/g;
+    {
+        access              => $item{ ACCESS                 },
+        qualifiers          => $item{ 'class_qualifier(s?)'  },
+        class_or_interface  => $item{ CLASS_OR_INTERFACE     },
+        implements          => $item{ 'implements_clause(?)' }[0],
+        parent              => $item{ 'extends_clause(?)'    }[0],
+        java_qualified_name => $item{ qualified_name         },
+        perl_qualified_name => $perl_qualified_name,
+    }
+}
+
+verbose_class_details : /[^{]*/
+
+class_qualifier   : 'final'    { 'final'  }
+                  | 'abstract' { 'status' }
+
+extends_clause    : 'extends' qualified_name { $item{ qualified_name } }
+implements_clause : 'implements' comma_list  { $item{ comma_list } }
+
+body : body_element(s?) { $item[1] }
+
+body_element : constant { $item[1] }
+             | static_block { $item[1] }
+             | method   { $item[1] }
+             | variable { $item[1] }
+
+static_block : 'static' '{' '}' ';'
+    verbose_method_detail(s?) {
+        { body_element => 'static_block' }
+}
+
+constant : ACCESS 'static' constant_modifier(s?) arg NAME ';'
+           verbose_constant_details(?) {
+    my $type = $item{ arg }[0];
+    my $value = $item{ 'verbose_constant_details(?)' }[0];
+    # remove trailing 'd' from double constants
+    $value =~ s/d$// if $type->{name} eq 'double';
+    # remove trailing 'l' from long constants
+    $value =~ s/l$// if $type->{name} eq 'long';
+    #warn "constant( $item{ NAME } ) @{[ %$type ]}: '$value'";
+    {
+        body_element => 'constant',
+        access       => $item{ ACCESS },
+        modifiers    => $item{ 'constant_modifier(s?)' },
+        type         => $type,
+        name         => $item{ NAME },
+        value        => $value,
+    }
+}
+         | 'static' 'transient' arg NAME ';' {
+    {
+        body_element => 'transient_constant',
+        type         => $item{ arg }[0],
+        name         => $item{ NAME },
+    }
+}
+
+verbose_constant_details : 'Constant' 'value:' arg constant_value {
+    $item{ constant_value }
+}
+
+constant_value : /[^\n]*/
+
+constant_modifier : 'final' | 'transient' | 'volatile'
+
+method : ACCESS method_qualifier(s?)
+         arg NAME '(' arg_list(?) ')'
+         throws_clause(?) ';'
+         verbose_method_detail(s?) {
+             $methods{ $item[4] }++;
+             {
+                 body_element => 'method',
+                 access       => $item[1],
+                 attrs        => $item[2],
+                 type         => $item[3][0],
+                 name         => $item[4],
+                 args         => $item{ 'arg_list(?)' }[0] || [],
+                 throws       => $item{ 'throws_clause(?)' }[0] || [],
+             }
+         }
+       | ACCESS /(native)?/ qualified_name '(' arg_list(?) ')'
+         throws_clause(?) ';'
+         verbose_method_detail(s?) {
+             $constructors++;
+             $methods{ 'new' }++;
+             {
+                 body_element => 'constructor',
+                 access       => $item[1],
+                 native       => ( $item[2] eq 'native' ) ? 'native' : '',
+                 args         => $item{ 'arg_list(?)' }[0] || [],
+                 throws       => $item{ 'throws_clause(?)' }[0] || [],
+                 # add name and type so constructor data is like a method
+                 name         => 'new',
+                 type         => {
+                    array_depth => 0,
+                    array_text => '',
+                    name => $item[3],
+                 },
+             }
+         }
+
+verbose_method_detail : verbose_method_code
+                      | verbose_line_number_table
+                      | verbose_method_deprecated
+                      | verbose_exceptions
+                      | verbose_signature
+                      | verbose_annotations
+
+verbose_method_code       : 'Code:' /Stack.*=\d+/ byte_code_line(s?)
+# Using "byte_code_line : /\d+:[^\n]*/" doesn't handle multi-line opcodes
+# like tableswitch in java.sql.Date. Also skips "Exception table:"
+byte_code_line : /(?!LineNumberTable)[^\n]*/
+
+verbose_line_number_table : 'LineNumberTable:' number_table_line(s?)
+number_table_line : /line \d+:[^\n]*/
+
+verbose_method_deprecated : 'Deprecated:' 'true'
+verbose_exceptions        : 'Exceptions:' throws_clause
+
+verbose_signature         : /Signature: .*/ signature_line(s)
+signature_line : /\d\d\s+[A-F0-9 ]+/
+
+verbose_annotations       : /RuntimeVisibleAnnotations: .*/ annotations_line(s)
+annotations_line : /[A-F0-9][A-F0-9]/
+
+
+method_qualifier : 'abstract'     { 'abstract'     }
+                 | 'native'       { 'native'       }
+                 | 'static'       { 'static'       }
+                 | 'synchronized' { 'synchronized' }
+                 | 'final'        { 'final'        }
+
+throws_clause  : 'throws' comma_list { $item{comma_list} }
+
+variable : ACCESS var_modifier(s?) arg NAME ';' {
+    {
+        body_element => 'variable',
+        access       => $item{ ACCESS },
+        name         => $item{ NAME },
+        type         => $item{ arg }[0],
+    }
+}
+
+var_modifier : 'volatile' | 'final' | 'transient'
+
+qualified_name : NAME '.' qualified_name
+                 { "$item{NAME}.$item{qualified_name}" }
+               | NAME { $item[1] }
+
+comma_list : qualified_name ',' comma_list    {
+                my @names = ( $item[1] );
+                if ( ref( $item[3] ) eq 'ARRAY' ) {
+                    push @names, @{ $item[3] };
+                }
+                else {
+                    push @names, $item[3];
+                }
+                \@names;
+             }
+           | qualified_name {
+                [ $item[1] ]
+            }
+
+arg_list : arg ',' arg_list { [ @{ $item[1] }, @{ $item[3] } ] }
+         | arg              { $item[1] }
+
+arg : qualified_name array_depth {
+    my $array_text = '';
+    foreach my $i ( 1 .. $item[2] ) {
+        $array_text .= 'Array of ';
+    }
+    [
+        {
+            name        => $item[1],
+            array_depth => $item[2],
+            array_text  => $array_text,
+        }
+    ]
+}
+
+array_depth : ARRAY_LEVEL(s?) {
+                my $depth = scalar @{ $item[1] };
+                $depth;
+              }
+
+ARRAY_LEVEL : '[]' { 1 }
+
+NAME : /^([\w\d\$]+)/ { $1 }
+
+ACCESS : 'public'    { $item[1] }
+       | 'protected' { $item[1] }
+       | 'private'   { $item[1] }
+       |             { '' }
+
+CLASS_OR_INTERFACE : 'class'     { $item[1] }
+                   | 'interface' { $item[1] }
+
+comment : '/*' /[^*]*/ '*/' {}
+        |

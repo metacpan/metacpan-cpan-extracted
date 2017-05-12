@@ -1,0 +1,159 @@
+.halo {
+    border-color: #ffd700;
+    border-style: solid;
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.halo-header {
+    display: none;
+    border-bottom: 1px solid #ffd700;
+    background: #fff;
+    margin: 3px;
+}
+
+.halo-rendermode {
+    float: right;
+}
+
+.halo-source {
+    font-family: monospace;
+}
+
+.halo-argument {
+    position: absolute;
+    left: 200px;
+    border: 1px solid black;
+    background: #ccc;
+    padding: 1em;
+    padding-top: 0;
+    width: 300px;
+    height: 500px;
+    overflow: auto;
+}
+
+.halo_actions {
+    position: fixed;
+    border: 1px solid black;
+    background: #ccc;
+}
+
+.halo_actions h1 {
+    color: #fff;
+    background-color: #600;
+    border-bottom: 1px solid black;
+    padding: 0.25em;
+    margin: 0;
+    cursor: pointer;
+    font-size: 120%;
+}
+
+.halo_actions h1 a { 
+    color: #fff;
+}
+
+.halo_actions .resize {
+    border: 5px solid #ccc;
+    border-bottom-color: #000;
+    border-right-color: #666;
+    border-left-color: #aaa;
+    cursor: pointer;
+    color: #ccc;
+    display: block;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+.halo_actions .section {
+    color: #ccc;
+    background-color: #300;
+    border-top: 1px solid black;
+    margin-top: 0.5em;
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.halo_actions .section a {
+    text-align: center;
+    color: #ccc;
+}
+
+.halo_actions .body {
+    font-size: 110%;
+    margin:0;
+    padding:0 1em;
+}
+
+.halo_actions .body ul {
+    margin:0;
+    padding:0;
+    margin-left: 1em;
+}
+
+.halo_actions .body .path {
+    font-family: monospace;
+    font-size: 120%;
+    text-align: center;
+}
+
+.halo_actions .body .time {
+    font-style: italic;
+    text-align: center;
+}
+
+.halo_actions .body .fixed {
+    font-family: monospace;
+}
+
+.halo_button {
+    color: yellow;
+    position: absolute;
+    z-index: 9999;
+    font-size:2em;
+}
+
+#render_info_tree {
+    position: fixed;
+    background: white;
+    border: 1px solid yellow;
+    right: 1em;
+    bottom: 1em;
+    border: 2px solid #fc0;
+    padding: 1em;
+}
+
+#render_info_tree ul {
+    list-style: none;
+    padding-left: 1em;
+}
+
+#render_info {
+    position: fixed;
+    right:.5em;
+    bottom:0;
+}
+
+a.inline_edit {
+
+    display: block;
+    width: 0;
+    padding-left: 22px;
+    min-height: 20px;
+
+    background: no-repeat left center;
+    background: url(/static/images/silk/pencil.png) no-repeat 0 0;
+}
+
+a.inline_create {
+
+    display: block;
+    width: 0;
+    padding-left: 22px;
+    min-height: 20px;
+
+    background: no-repeat left center;
+    background: url(/static/images/silk/pencil_add.png) no-repeat 0 0;
+}
+

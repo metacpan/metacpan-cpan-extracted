@@ -1,0 +1,12 @@
+  <!-- component instance definition for the http component -->
+  <service id="http">
+    <load><http>./http/http.so</http></load>
+    <http xmlns="jabber:config:http">
+      <listen port="5281">
+        <map to="jrpchttp.localhost"/>
+      </listen>
+      <timeout>60</timeout>
+      <dnsrv>http-dns</dnsrv>
+    </http>
+  </service>
+

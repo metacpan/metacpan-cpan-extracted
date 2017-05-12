@@ -1,0 +1,153 @@
+Revision history for perl module JIRA-REST. -*- text -*-
+
+0.017     2017-01-06 15:47:28-02:00 America/Sao_Paulo
+
+  [Fixes]
+
+  - Fix attach_file() method which was broken on v0.016.
+
+0.016     2016-12-26 22:48:03-02:00 America/Sao_Paulo (TRIAL RELEASE)
+
+  [New features]
+
+  - Add support for all JIRA REST API's: JIRA Core, JIRA ServiceDesk, and
+    JIRA Software.
+
+  - Add a new-style of parameter passing for the constructor, via a hash
+    reference.
+
+  - Add support for anonymous REST interaction with JIRA.
+
+  - Add support for a new REST::Client configration extension to turn off
+    SSL verification.
+
+  [Fix]
+
+  - Add missing META.json file to the distribution.
+
+  [Enhancement]
+
+  - Add a few tests against jira.atlassian.com that can be performed
+    anonymously during release.
+
+  [Deprecation]
+
+  - The 'proxy' key to the REST::Client hash is deprecated in favor of the
+    new homonymous constructor parameter.
+
+0.015     2016-12-02 14:08:34-02:00 America/Sao_Paulo
+
+  [Fix]
+
+  - [RT#119092] v0.014 introduced an error making the constructor reject
+    URLs ending in slash.
+
+0.014     2016-11-23 07:27:52-02:00 America/Sao_Paulo
+
+  [New feature]
+
+  - JIRA::REST now supports the JIRA Software REST API and the JIRA Service
+    Desk REST API in addition to the JIRA Core REST API with a minimal
+    change. How cool is that!?
+
+    Many thanks Evan Brown for such a nice idea.
+
+  [Changes]
+
+  - Downgrade Perl version requirement from 5.10 to 5.8.8 to enable use on
+    older Perls.
+
+0.013     2016-11-22 16:01:45-02:00 America/Sao_Paulo
+
+  [New feature]
+
+  - Add support for getting username and password from Config::Identity,
+    which supports gpg encrypted credentials.
+
+0.012     2016-01-15 22:16:02-02:00 America/Sao_Paulo
+
+  [Fix]
+
+  - Remove dependency on Data::Util.
+
+0.011     2015-05-21 19:10:57-03:00 America/Sao_Paulo
+
+  [New feature]
+
+  - Add support for connecting to JIRA via a HTTP proxy.
+
+  [Fix]
+
+  - Recognize and output JIRA errors produced in XML format.
+
+0.010     2014-11-08 12:54:50 America/Sao_Paulo
+
+  [New features]
+
+  - Add utility method 'attach_files'.
+
+  [Changes]
+
+  - Prints any textual error message, not just of types text/plain and
+    text/html.
+
+0.009     2014-09-09 20:32:15 America/Sao_Paulo
+
+  [Fixes]
+
+  - Fix the set_search_iterator/next_issue pair of methods.
+
+  [Changes]
+
+  - The iterators now use JIRA's own default (which is 50) when the
+    'maxResults' argument isn't set. Previously our default was set to 256.
+
+0.008     2014-09-06 19:14:06 America/Sao_Paulo
+
+  [Changes]
+
+  - Show every detail in JIRA error messages. Some of which weren't being
+    shown before. (Thanks to Michael Kröll for the tip.)
+
+0.006     2014-08-16 20:50:07 America/Sao_Paulo
+
+  [Changes]
+
+  - Suppress script line numbers from error messages.
+
+  - Released on #cpanday.
+
+0.005     2014-08-07 20:25:14 America/Sao_Paulo
+
+  [Changes]
+
+  - New utility methods 'set_search_iterator' and 'next_issue' make it
+    easier to iterate through large sets of issues without having to deal
+    with "pagination".
+
+  - Error messages are not presented in a consistent format. JIRA errors are
+    parsed and presented in a legible way.
+
+0.004     2013-12-14 14:54:06 America/Sao_Paulo
+
+  [Fixes]
+
+  - [RT-91368] Some resource responses contain no content but specify
+    a Content-Type. Those were being considered errors. Now they
+    simply return undef.
+
+  - When a resource response contains a content but doesn't specify a
+    Content-Type it's an error. Previously it was returning undef.
+
+0.003     2013-09-03 17:32:02 America/Sao_Paulo
+  [Fixes]
+  - Fix code in documentation.
+
+0.002     2013-05-31 14:50:44 America/Sao_Paulo
+
+  [Fixes]
+  - Fix URL mangling in new.
+
+0.001     2013-05-31 08:52:14 America/Sao_Paulo
+
+

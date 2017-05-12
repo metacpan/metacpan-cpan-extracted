@@ -1,0 +1,104 @@
+=head1 NAME
+
+JSON::Schema::Examples - examples of JSON::Schema
+
+=head1 EXAMPLES
+
+=head2 Validate some JSON contact info against nested schemas.
+
+The card schema at L<http://json-schema.org/card> is tricky as it contains
+references to other schemas which need to be followed. But JSON::Schema
+handles it with ease...
+
+ use JSON qw[to_json];
+ use JSON::Schema;
+ use LWP::Simple qw[get];
+ 
+ # Here's some data...
+ my $contact = to_json({
+   fn        => 'Toby Inkster',
+   nickname  => 'TOBYINK',
+   email     => { value => 'tobyink@cpan.org' },
+   adr       => { countryName => 'England', region => 'East Sussex' },
+ });
+ 
+ # Now we create our JSON Schema validator:
+ my $card_schema = get('http://json-schema.org/card'); 
+ my $validator = JSON::Schema->new($card_schema);
+ 
+ # Validate:
+ my $valid = $validator->validate($contact);
+ if ($valid)
+ {
+   print "Yay!\n";
+   exit;
+ }
+ 
+ # But it's not valid...
+ foreach my $e ($valid->errors)
+ {
+   print "Naughty! $e\n";
+ }
+
+=head2 Validate a native Perl structure.
+
+JSON::Schema has uses beyond JSON!
+
+ use JSON:Schema;
+ use DateTime;
+ 
+ my $datetime_new_schema = {
+   type => 'object', # i.e. a hashref
+   properties => {
+     year       => { type=>'number', minimum=>0, maximum=>9999 },
+     month      => { type=>'number', minimum=>1, maximum=>12 },
+     day        => { type=>'number', minimum=>1, maximum=>31 },
+     hour       => { type=>'number', minimum=>0, maximum=>23 },
+     minute     => { type=>'number', minimum=>0, maximum=>59 },
+     second     => { type=>'number', minimum=>0, maximum=>61 },
+     nanosecond => { type=>'number', minimum=>0, maximum=>999999999 },
+     locale     => { type=>['DateTime::Locale','string'] },
+     time_zone  => { type=>['DateTime::TimeZone', 'string'] },
+     formatter  => { type=>'any' },
+   }
+ };
+ my $validator = JSON::Schema->new($datetime_new_schema);
+ 
+ my %params = get_user_input();
+ my $valid  = $validator->validate(\%params);
+ if ($valid)
+ {
+   my $dt = DateTime->new(%params);
+   
+   # do something interesting here with $dt...
+ }
+ else
+ {
+   die join("\n", "Invalid DateTime paramaters", $valid->errors);
+ }
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright 2010-2012 Toby Inkster.
+
+=head2 GNU Free Documentation Licence, Version 1.3
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+L<http://www.gnu.org/copyleft/fdl.html>.
+
+=head2 Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales
+
+This work is licenced under the Creative Commons Attribution-ShareAlike
+2.0 UK: England & Wales License. To view a copy of this licence, visit
+L<http://creativecommons.org/licenses/by-sa/2.0/uk/> or send a letter to
+Creative Commons, 171 Second Street, Suite 300, San Francisco, California 94105, USA.
+
+=cut

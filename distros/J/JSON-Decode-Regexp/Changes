@@ -1,0 +1,73 @@
+Revision history for JSON-Decode-Regexp
+
+0.09    2016-11-04 (PERLANCAR)
+
+	- Grok hex and octal escape in string.
+
+	- [security] Do not use Perl's eval() to avoid arbitrary code
+	  execution via perl quoting, e.g. this JSON '"@{[1+1]}"' (reported
+	  by Андрей Шедько/ayshedko).
+
+
+0.08    2016-03-31 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Remove Devel::NYTProf output which got included by mistake
+          [RT#113476].
+
+
+0.07    2016-03-24 (PERLANCAR)
+
+	- [Optimization] Don't repeatedly recompile main regex pattern.
+
+
+0.06    2016-03-18 (PERLANCAR)
+
+        - Add some error messages so parsing failure does not just return with
+          'No match' but shows more detailed error messages and input position.
+          This unfortunately slows down parsing a bit (~30% for short and simple
+          input, but for more complex input & longer hash/array the overall
+          overhead becomes smaller e.g. < 1% because the bottleneck is no longer
+          the parsing but the data structure building.
+
+
+0.05    2016-02-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak description and FAQ item (note about performance as of
+	  0.04), mention some other JSON modules.
+
+
+0.04    2016-02-18 (PERLANCAR)
+
+	- [Optimization] reuse previous array/hash when building
+	  array/object, this results in several times of speed increase
+	  when parsing longer arrays/objects.
+
+	- [Optimization] Move embedded code for object/array after '{'/'['
+	  to avoid repeated execution.
+
+	- [Optimization] We don't need to eval number, just use 0 + $^N.
+
+	- Remove code that checks for duplicate key when specifying object
+	  (JSON allows it).
+
+	- Add JSON::Decode::RegexpDebug (not included in build, see the git repo
+          directly). UPDATE: removed in 0.06.
+
+
+0.03    2013-10-26 (SHARYANTO)
+
+        - Minor tweak to regex: allow more whitespaces.
+
+
+0.02    2013-10-19 (SHARYANTO)
+
+        - Minor tweak to regex: allow whitespaces between ":".
+
+
+0.01    2013-10-19 (SHARYANTO)
+
+        - First release.

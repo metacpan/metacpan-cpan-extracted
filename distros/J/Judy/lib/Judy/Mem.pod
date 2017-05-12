@@ -1,0 +1,69 @@
+=head1 NAME
+
+Judy::Mem - Useful functions for interacting with memory
+
+
+
+=head1 DATA TYPES
+
+=head2 $Ptr - pointer
+
+=head2 $String - perl string
+
+=head2 $Length - integer
+
+
+
+=head1 FUNCTIONS
+
+=head2 $Ptr = String2Ptr( $String )
+
+Copies C<$String> into a new C string. The allocated string will be
+large enough to hold your perl string regardless of whether it uses
+multi-byte characters, or has null characters.
+
+You'll need to be careful to free this copy later when you're done
+with it.
+
+=head2 $String = Ptr2String( $Ptr )
+
+Dereferences C<$Ptr> and copies it into a new perl string. Doesn't do
+anything about Unicode, multibyte encoding, or null characters. In
+fact, if you have nulls in your data, your copied string will be
+truncated. Use the other function C<Ptr2String2> which allows you to
+pass in the byte length.
+
+=head2 $String = Ptr2String2( $Ptr, $Length )
+
+Dereferences C<$Ptr> and copies it into a new perl string. Doesn't do
+anything about Unicode, multibyte encoding. See the L<Encode> and
+L<utf8> about flipping the Perl utf8 bits.
+
+=head2 Free( $Ptr )
+
+Frees a pointer. You should be using this function on any pointer you
+previously allocated with String2Ptr or String2Ptr2.
+
+=head2 $Int = Peek( $Ptr )
+
+Reads an integer out of memory. This is equivalent to:
+
+  (Word_t)*ptr
+
+=head2 Poke( $Ptr, $Int )
+
+Writes an integer to memory. This is equivalent to to C code:
+
+  *ptr = (Word_t)val;
+
+
+
+=head1 ERRORS & WARNINGS
+
+See L<Judy>.
+
+
+
+=head1 AUTHOR
+
+See L<Judy>.

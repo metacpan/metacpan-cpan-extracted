@@ -1,0 +1,62 @@
+{
+   "abstract" : "fast, minimal, UTF-8-only serialization of data to JSON",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-Create",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::Parse" : "0.38",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/json-create/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benkasminbullock/json-create.git",
+         "web" : "https://github.com/benkasminbullock/json-create"
+      }
+   },
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,15 @@
+Revision history for Perl extension JavaScript::DebugConsole.
+
+0.01  Sat May  1 23:43:12 2004
+	- original version; created by h2xs 1.23 with options
+		-X -A -n JavaScript::DebugConsole
+		
+0.01_03 
+	- Added CGI form table print
+	
+0.01  Mon Jul 26 18:00:00 2004
+	- First CPAN public release
+	- Added t/02tt2.t test
+	- Updated docs 
+
+

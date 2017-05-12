@@ -1,0 +1,47 @@
+Revision history for Perl extension JavaScript::Minifier.
+
+1.14 2015-04-23
+    - Fixed error in SYNOPSIS
+
+1.13  2015-03-19
+    [Changes by vti]
+    - Fixed Issue #4 (Error in the docs)
+    - Updated Synopsis to use modern code
+
+1.12  2014-10-04
+    - Fixed Issue #3 (warnings for empty files)
+
+1.11  2014-01-30
+    - Added my dzil author plugin bundle and fixed up some packaging issues
+
+1.10  2014-01-22
+    - Added missing test prereqs
+    - Fixed up wrong year in the latest versions in the change log
+
+1.09  2014-01-22
+    - Made some changes to dzil plugins and added git repos for this module
+
+1.08  2014-01-19
+    - Fixed RT#76800 (preserve "\n" at the end of file)
+
+1.07  2014-01-19
+    - Fixed license issue (RT#92298)
+    - Converted to Dist::Zilla for packaging
+
+1.06  2014-01-18
+    - Zoffix Znet took over maintenance
+    - Applied user-submitted bug patches
+    - Modified the build system
+    - Added pod and kwalitee tests
+    - Added examples/minify.pl
+    - Fixed RT#85899 (superfluous perl 5.8 requirement)
+    - Fixed RT#91292 and RT#91291 (optimizations)
+
+1.05 2014-01-18
+    - This and previous 'Changes' are lost
+
+0.01  2007-05-19
+    - original version; created by h2xs 1.23 with options
+        -X -n JavaScript::Minifier
+
+

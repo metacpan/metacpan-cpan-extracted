@@ -1,0 +1,92 @@
+NAME
+    JSON::Util - easy and portable encode/decode of JSON
+
+SYNOPSIS
+        use JSON::Util;
+        $data = JSON::Util->decode('{"bar": "foo"}');
+        $data = JSON::Util->decode('some.json');
+        JSON::Util->encode({ 'foo' => 'bar' }, 'someother.json');
+
+        $data = JSON::Util->decode(['..', 'folder', some.json]);
+        JSON::Util->encode([123,321], ['..', 'folder', someother.json]);
+
+        print JSON::Util->encode([987,789]), "\n";
+        print JSON::Util->encode({987 => 789}), "\n";
+
+        my $json = JSON::Util->new(pretty => 0, convert_blessed => 1);
+        print $json->encode([ $object, $object2 ]);
+
+        # with file locking
+        $data = JSON::Util->decode(['..', 'folder', some.json], { 'LOCK_SH' => 1 });
+        $data = JSON::Util->decode(['..', 'folder', some.json], { 'LOCK_SH' => 1, LOCK_NB => 1 });
+        JSON::Util->encode([123,321], ['..', 'folder', someother.json], { 'LOCK_EX' => 1 });
+        JSON::Util->encode([123,321], ['..', 'folder', someother.json], { 'LOCK_EX' => 1, LOCK_NB => 1 });
+
+DESCRIPTION
+METHODS
+  new()
+    Object constructor. Needed only when the default_json configuration
+    needs to be changed. Any key/value passed as parameter will be called on
+    `<JSON::MaybeXS-'new()>> as `<$json-'$key($value)>>.
+
+  default_json
+    Returns `<JSON::MaybeXS-'new()>> with:
+
+            'utf8'            => 1,
+            'pretty'          => 1,
+            'convert_blessed' => 1,
+
+  json
+    Returns current JSON::MaybeXS object.
+
+  decode($what, [$opt])
+    Return ref with decoded `$what'. See IO::Any for `$where' and `$opt'
+    description.
+
+  encode($data, [$where], [$opt])
+    Returns encoded `$data'. If `$where' is passed then the result is
+    written there. See IO::Any for `$where' and `$opt' description.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-json-util at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JSON-Util. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc JSON::Util
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=JSON-Util
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/JSON-Util
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/JSON-Util
+
+    * Search CPAN
+        http://search.cpan.org/dist/JSON-Util
+
+ACKNOWLEDGEMENTS
+    The following people have contributed to the Sys::Path by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advises, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        John SJ Anderson
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

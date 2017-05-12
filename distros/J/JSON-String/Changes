@@ -1,0 +1,5 @@
+0.2.0     2015-02-04 14:18:49-06:00 America/Chicago
+    * Change tests to pass reliably on CPAN testers
+
+27 Jan 2015 - v0.1.0
+    * Initial Release

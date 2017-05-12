@@ -1,0 +1,8 @@
+# This file is used to override the following defaults:
+
+index_title: JS::JSON JavaScript Testing
+import_libs:
+  - ../lib/JS/JSON.js
+  - lib/Test/JSON.js
+# template_include_path:
+#   - template

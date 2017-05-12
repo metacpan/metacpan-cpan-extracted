@@ -1,0 +1,50 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Jifty::Manual::Logging - Using and controlling Jifty's logging system
+
+=head1 Intro
+
+Jifty uses the Log4perl module for logging messages, so you can define your own
+log4perl config for logging.
+
+You can define different behaviour for different log levels. For example,
+you can send mail to administrator when error occurred, or add color to
+warning messages that are logged to the terminal.
+
+=head1 Config from config.yml
+
+Various log level config can be set from F<etc/config.yml> or F<etc/site_config.yml>.
+
+=head1 Example
+
+    # vim:filetype=conf:et:
+    log4perl.rootLogger = INFO , Screen
+    log4perl.logger.MyApp.MailNotifier = WARN, Mailer
+
+    log4perl.appender.LOG1 = Log::Log4perl::Appender::File
+    log4perl.appender.LOG1.filename  = apache_fastcgi/logs/
+    log4perl.appender.LOG1.mode      = append
+    log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
+
+    log4perl.appender.Mailer         = Log::Dispatch::Email::MailSend
+    log4perl.appender.Mailer.to      = admin@blah.com
+    log4perl.appender.Mailer.subject = !!ERROR!!
+    log4perl.appender.Mailer.layout  = SimpleLayout
+
+    log4perl.filter.Filter1 = sub { /Plugin/ }
+    log4perl.filter.FilterRule       = Log::Log4perl::Filter::Boolean
+    log4perl.filter.FilterRule.logic = Filter1
+    log4perl.appender.LOG1.Filter    = FilterRule
+
+    log4perl.appender.ScreenColor  = Log::Log4perl::Appender::ScreenColoredLevels
+    log4perl.appender.ScreenColor.layout = SimpleLayout
+
+    log4perl.appender.Screen   = Log::Log4perl::Appender::Screen
+    log4perl.appender.Screen.layout = SimpleLayout
+
+=cut

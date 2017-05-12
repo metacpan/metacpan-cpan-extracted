@@ -1,0 +1,26 @@
+---
+abstract: 'JobCenter JSON-RPC 2.0 Api client using Mojo.'
+author:
+  - 'Wieger Opmeer <wiegerop@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JobCenter-Client-Mojo
+requires:
+  JSON::MaybeXS: '0'
+  JSON::RPC2::TwoWay: '0'
+  MojoX::NetstringStream: '0.04'
+  Mojolicious: '6.00'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/a6502/JobCenter-Client-Mojo/issues
+  homepage: https://github.com/a6502/JobCenter-Client-Mojo
+  repository: https://github.com/a6502/JobCenter-Client-Mojo.git
+version: '0.19'
+x_serialization_backend: 'YAML::Tiny version 1.70'

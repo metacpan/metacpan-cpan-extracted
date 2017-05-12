@@ -1,0 +1,86 @@
+<%args>
+$collection
+$page => 1
+$argument => 'page'
+$hide_single_page => 1
+$allow_all => 0
+</%args>
+<%init>
+return if $collection->count == 0;
+
+$page ||= 1;
+my $last = $collection->pager->last_page;
+my $prev = $collection->pager->previous_page;
+my $next = $collection->pager->next_page;
+
+return if $last == 1 && $hide_single_page;
+
+</%init>
+
+<div class="paging-nav">
+Page <span class="paging-numbers">
+
+% my $last_num = 0;
+% foreach my $goto_page (1 ..  $last) {
+% # only show page numbers that are: 1, (within 3 of the current page), last
+% next if (($goto_page > 1) && ($goto_page < $last) && (abs($goto_page-$page) > 2));
+% if ( ($goto_page - $last_num) > 1) {
+&hellip;
+% }
+<span class="paging-number <%$goto_page == $page ? 'current' : ''%>">
+    <% Jifty->web->link(
+        label => $goto_page,
+        onclick => {
+            args => {
+                $argument => $goto_page,
+            },
+        },
+    ) %>
+</span>
+% $last_num = $goto_page;
+% }
+
+% if ($prev) {
+<span class="paging-prev">
+    <% Jifty->web->link(
+        label => "Back",
+        class => "prev",
+        onclick => {
+            args => {
+                $argument => $prev,
+            },
+        },
+    ) %>
+</span>
+% }
+
+% if ($next) {
+<span class="paging-next">
+    <% Jifty->web->link(
+        label => "Next",
+        class => "next",
+        onclick => {
+            args => {
+                $argument => $next,
+            },
+        },
+    ) %>
+</span>
+% }
+
+% if ($allow_all && $last > 1) {
+<span class="paging-all">
+    <% Jifty->web->link(
+        label => "All",
+        class => "all",
+        onclick => {
+            args => {
+                $argument => 'all',
+            },
+        },
+    ) %>
+</span>
+% }
+
+</span>
+</div>

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/JavaScript/Dependency/Manager.pm
+t/basic.t
+t/js-lib/A.js
+t/js-lib/B.js
+t/js-lib/C.js
+t/js-lib/ext/ext-all-debug.js
+t/js-lib/ext/ext-all.js
+t/js-lib/ext/ext-core.js
+t/release-pod-syntax.t

@@ -1,0 +1,86 @@
+Revision history for Job-Machine
+
+0.26    2015-09-05 12:30:03 Europe/Copenhagen
+ - Only get name from the class when fetching tasks
+
+0.25    2015-08-01 12:15:47 Europe/Copenhagen
+ - Upgrade the chores to be a package variable, so new chores can be added from the outside,
+   using the add_chores method
+
+0.24    2015-07-30 07:59:10 Europe/Copenhagen
+ - Maintenance fix
+
+0.23    2015-07-29 10:34:19 Europe/Copenhagen
+ - Add some methods for administration and change the way some (hopefully) internal methods works
+ - If the result is a hashref, look for the mime_type
+
+0.22    2015-04-06 20:25:08 Europe/Copenhagen
+
+0.21    2015-03-24 03:33:30 Europe/Copenhagen
+ - Fix a bug of expecting a specific name (domm)
+
+0.20    2015-03-22 06:03:49 Europe/Copenhagen
+ - Use Data::Serializer -  and Data::Serializer::Sereal as default
+ - Don't try to disconnect from a database that's been handed down
+
+0.19    2014-07-09 13:38:13 Europe/Copenhagen
+ - Require DBD::Pg >= 3.0.0. Solves a nasty utf-8 bug.
+ - Small but nasty bug in the UPDATE statement fetching the next job
+
+0.18    2011-06-21 08:51:04 Europe/Copenhagen
+ - Allow scalars in data (experimental)
+ - Use JSON instead of JSON::XS. Less typing...
+ - Using pg_notify means we need at least PostgreSQL 9.0
+ - Significant update to examples/test.pl and better documentation(Mark Stosberg)
+ - En/decode in a more secure way
+ - Try to detect utf8 errors (thanks, Casper Warming)
+ - Skip tests if version number < 9.0
+
+0.17    2011-03-04 08:04:30 Europe/Copenhagen
+ - Use pg_notify instead of NOTIFY for safer handling
+ - Add new worker method, error_result to save the result of a failing task.
+ - Add new fulltask view, combining task, class and result tables
+ - Documentation enhancements
+
+0.16    2011-01-14 10:06:46 Europe/Copenhagen
+ - Add multiqueue support for workers. This means that a worker can now listen
+   to many queues.
+ - Clean up DB handling
+ - Full DBI commit now supported
+
+0.15    2010-12-19 20:53:02 Europe/Copenhagen
+ - Guarantee that fetch task for updating returns one task, and that task is
+   locked for this worker
+ - Documentation update
+
+0.14    2010-12-03 09:45:17 Europe/Copenhagen
+ - Begin using Dist::Zilla
+
+0.13 2010-8-21
+ - Wrote housekeeping functionality, revive_tasks, fail_tasks, remove_tasks
+ - Added select_all to DB
+ - Added subclassable remove_after method to Worker
+ - Bumped version number a bit to reflect the ready state of the module
+ - Added examples/ directory
+
+0.012 2010-8-2
+ - Reshuffled the test to handle missing createdb
+
+0.011 2010-8-1
+ - Added Test::Class as a requirement
+
+0.010 2010-7-31
+ - Ripped out Net::Stomp and put in PostgreSQL's notify/listen construct
+ - instead.
+ - Added a sql file to create jobmachine schema and tables.
+ - Added Test::Class tests
+
+0.003 2009-10-13
+  - Remove unnecessary reply hash key
+
+0.002 2009-10-12
+  - Makefile.PL for CPAN compatibility
+
+0.001 2009-10-09
+  - original version
+  

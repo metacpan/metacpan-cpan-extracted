@@ -1,0 +1,13 @@
+Revision history for Perl extension JSON-Types-Flexible
+
+0.03 2017-04-01T11:08:00Z
+    - enable static install
+
+0.02 2016-11-04T04:40:18Z
+
+    - not limit the version of List::MoreUtils
+
+0.01 2016-11-03T11:38:47Z
+
+    - original version
+

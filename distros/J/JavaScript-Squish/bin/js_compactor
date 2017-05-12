@@ -1,0 +1,325 @@
+#!/usr/bin/perl
+
+# NOTE: this thing needs documented, badly :-)
+# and cleaned up. Rolling it out as is cause we're in a hurry.
+# The code, however, does the job (the lib is the important part anyway).
+
+use strict;
+use JavaScript::Squish;
+use Getopt::Long;
+use File::Basename();
+
+my $DEBUG = 0;
+
+
+&Main();
+
+sub Main
+{
+    my $opts = &load_options();
+
+    die "Unable to read file [$$opts{src}]\n".&usage() unless -r $$opts{'src'};
+
+    my $outfile = $$opts{'dest'};
+    if ($outfile)
+    {
+        if (-e $outfile && $$opts{'force'}) {
+            print STDERR "WARNING: output file [$outfile] exists. Overwritting in 2 seconds.\n";
+            sleep 2;
+        } elsif (-e $outfile) {
+            die "Output file [$outfile] already exists.\nSpecify --force or remove the file prior to running.\n";
+        }
+        open(OUT, "> $outfile") or die "Unable to open output file [$outfile]\n";
+    } else {
+        *OUT = *STDOUT;
+    }
+
+    print STDERR "Reading in file...\n" if $DEBUG;
+    die "Unable to read file [$$opts{src}]\n".&usage() unless open(IN,"< $$opts{'src'}");
+
+    # slurp in the input
+    my $data;
+    { local($/); $data = <IN>; }
+    close IN;
+
+    my $js = JavaScript::Squish->new();
+    $js->data($data);
+    $js->determine_line_ending();
+
+    if ($$opts{'remove_comments'})
+    {
+        if (@{$$opts{'comment_exception'}}) {
+            $js->remove_comments(exceptions => $$opts{'comment_exception'});
+        } else {
+            $js->remove_comments();
+        }
+    }
+
+    $js->extract_strings_and_comments();
+
+    $js->replace_white_space() if $$opts{'replace_white_space'};
+    $js->remove_blank_lines()  if $$opts{'remove_blank_lines'};
+    $js->combine_concats()     if $$opts{'combine_concats'};
+    $js->join_all()            if $$opts{'join_all'};
+    $js->replace_extra_whitespace() if $$opts{'replace_extra_whitespace'};
+
+    $js->restore_literal_strings();
+    $js->restore_comments();
+
+    $js->replace_final_eol();
+
+    print OUT $js->data;
+
+    close OUT if $outfile;
+}
+
+sub usage
+{
+    my $prog_name = File::Basename::basename($0);
+    return "Usage $prog_name
+    [--src=<source file>]
+    [--dest=<destination file>]
+
+    [--opt]  (do max squishing)
+
+    [--comment_exception=<copyright>] (may specified multiple times)
+    [--remove_comments]             (can negate with --no_...)
+    [--replace_white_space]         (can negate with --no_...)
+    [--remove_blank_lines]          (can negate with --no_...)
+    [--combine_concats]             (can negate with --no_...)
+    [--join_all]                    (can negate with --no_...)
+    [--replace_extra_whitespace]    (can negate with --no_...)
+
+    [--force]   (force overwrite of destination files)
+
+    [--help]
+\n";
+}
+
+sub load_options
+{
+    my %opts;
+    $opts{'comment_exception'} = [];
+    GetOptions(
+        "src=s"                 => \$opts{'src'},
+        "destination=s"         => \$opts{'dest'},
+        "optimal"               => \$opts{'optimal'},
+        "help"                  => \$opts{'help'},
+        "force"                 => \$opts{'force'},
+        "comment_exception=s"   => $opts{'comment_exception'},
+
+        "remove_comments"       => \$opts{'remove_comments'},
+        "replace_white_space"   => \$opts{'replace_white_space'},
+        "remove_blank_lines"    => \$opts{'remove_blank_lines'},
+        "combine_concats"       => \$opts{'combine_concats'},
+        "join_all"              => \$opts{'join_all'},
+        "replace_extra_whitespace"  => \$opts{'replace_extra_whitespace'},
+
+        "no_remove_comments"        => \$opts{'no_remove_comments'},
+        "no_replace_white_space"    => \$opts{'no_replace_white_space'},
+        "no_remove_blank_lines"     => \$opts{'no_remove_blank_lines'},
+        "no_combine_concats"        => \$opts{'no_combine_concats'},
+        "no_join_all"               => \$opts{'no_join_all'},
+        "no_replace_extra_whitespace"   => \$opts{'no_replace_extra_whitespace'},
+        ) or die &usage();
+
+    if ($opts{'help'})
+    {
+        print &usage();
+        exit(1);
+    }
+    if (! $opts{'src'})
+    {
+        print "Required option [src] not specified.\n\n";
+        print &usage();
+        exit(1);
+    }
+
+    my @bool_options = qw(remove_comments replace_white_space remove_blank_lines combine_concats join_all replace_extra_whitespace);
+
+    # if none of the options were requested, assume default of --opt
+    my $something_checked;
+    foreach my $option (@bool_options) {
+        $something_checked++ if $opts{$option};
+    }
+
+    # apply default optimal settings if specified
+    # (or if nothing was checked).
+    if ($opts{'optimal'} || (!$something_checked) )
+    {
+        $opts{'remove_comments'} = 1;
+        $opts{'replace_white_space'} = 1;
+        $opts{'remove_blank_lines'} = 1;
+        $opts{'combine_concats'} = 1;
+        $opts{'join_all'} = 1;
+        $opts{'replace_extra_whitespace'} = 1;
+    }
+
+    # apply any negatives requested
+    foreach my $neg (@bool_options)
+    {
+        if ($opts{'no_'.$neg})
+        {
+            $opts{$neg} = 0;
+        }
+    }
+
+    # handle comment exceptions
+    for (my $i=0; $i<@{$opts{'comment_exception'}}; $i++)
+    {
+        my $item = $opts{'comment_exception'}->[$i];
+        $opts{'comment_exception'}->[$i] = qr/$item/i;
+    }
+
+    return \%opts;
+}
+
+=head1 NAME
+
+js_compactor - Command line utility to reduce JavaScript code to as few characters as possible.
+
+=head1 USAGE
+
+ js_compactor -src=source_file [OPTIONS]
+
+=head1 SYNOPSIS
+
+js_compactor
+[--src=source_file]
+[--dest=destination_file]
+[--opt]
+[--comment_exception=text]
+[--remove_comments]
+[--replace_white_space]
+[--remove_blank_lines]
+[--combine_concats]
+[--join_all]
+[--replace_extra_whitespace]
+[--no_remove_comments]
+[--no_replace_white_space]
+[--no_remove_blank_lines]
+[--no_combine_concats]
+[--no_join_all]
+[--no_replace_extra_whitespace]
+[--force]
+[--help]
+
+=head1 DESCRIPTION
+
+The "--src" option is required.
+
+Default usage is as though you specified "--opt", for optimal settings. Setting any of the specific settings will override the default "--opt" behavior, and rules will be applied one by one. You may also specify "--opt" and then disable specific features with a "--no_option_name" style option.
+
+=over
+
+=item B<--src=filename>
+
+The source javascript filename. (REQUIRED)
+
+=item B<--dest=filename>
+
+The destination file. Defaults to output to STDOUT.
+
+=item B<--force>
+
+Force overwriting of output file if it exists.
+
+=item B<--opt>
+
+Same as B<--remove_comments --replace_white_space --remove_blank_lines --combine_concats --join_all --replace_extra_whitespace>
+
+=item B<--comment_exception=text_to_match>
+
+Comments matching the provided text will NOT be removed. The primary purpose for this is to retain copyright notices. Eg.
+
+    js_compactor --comment_exception=copyright -src=somefile
+
+This option may be specified multiple times. Any comment matching any of the provided strings will then be retained.
+
+It uses a case insenstive regexp for the match. This option has no effect if --no_remove_comments is specified.
+
+=item B<--remove_comments> | B<--no_remove_comments>
+
+Remove all comments from the source.
+
+=item B<--replace_white_space> | B<--no_replace_white_space>
+
+Per each line:
+
+=over
+
+=item * Removes all begining of line whitespace.
+
+=item * Removes all end of line whitespace.
+
+=item * Combined all series of whitespace into one space character (eg.  s/\s+/ /g)
+
+=back
+
+Comments and string literals (if still embeded) are untouched.
+
+=item B<--remove_blank_lines> | B<--no_remove_blank_lines>
+
+Blank lines in code are removed.
+
+=item B<--combine_concats> | B<--no_combine_concats>
+
+Removes any string literal concatenations. Eg.
+
+    "bob and " +   "sam " + someVar;
+
+Becomes:
+
+    "bob and sam " + someVar
+
+=item B<--join_all> | B<--no_join_all>
+
+Put everything on one line (retained comments may still contain new lines).
+
+=item B<--replace_extra_whitespace> | B<--no_replace_extra_whitespace>
+
+This removes any excess whitespace. Eg.
+
+    if (someVar = "foo") {
+
+Becomes:
+
+    if(someVar="foo"){
+
+=back
+
+=head1 EXAMPLES
+
+The normal use is probably just for one off squishings:
+
+    js_compactor --src=input_file > new_file.js
+
+If you're squishing something with a copyright, it is recommended that you retain that copyright:
+
+    js_compactor --comment_exception=copyright --src=input_file > new_file.js
+
+If you want the code to still be somewhat readable, it is often helpful to retain all the line breaks:
+
+    js_compactor --opt --no_join_all --comment_exception=copyright --src=input_file > new_file.js
+
+=head1 SEE ALSO
+
+L<JavaScript::Squish>
+
+=head1 BUGS
+
+Please refer to http://developer.berlios.de/projects/jscompactor/ to report bugs.
+
+=head1 AUTHOR
+
+Joshua I. Miller <jmiller@puriifeddata.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005 by CallTech Communications, Inc.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.8.3 or, at
+your option, any later version of Perl 5 you may have available.
+
+=cut

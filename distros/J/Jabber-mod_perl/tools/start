@@ -1,0 +1,26 @@
+#!/bin/sh
+# given that jabberd has been installed into $JHOME/jabberd
+#  use this script to start the server
+#  note that you do not need to install Jabber::mod_perl - the Perl
+# library path is correctly set by pointing JMOD_PERL to the unpacked
+# distribution directory
+JHOME=/home/jabber
+JABBERD=$JHOME/jabberd
+JMOD_PERL=$JHOME/mod_perl
+export PERL5LIB=$JMOD_PERL/blib/arch:$JMOD_PERL/blib/lib:$JMOD_PERL/examples
+rm -f core
+echo > $JABBERD/router.log 
+echo > $JABBERD/resolver.log
+echo > $JABBERD/sm.log 
+echo > $JABBERD/c2s.log
+echo > $JABBERD/jp.log
+
+#rm -rf /home/jabber/jabberd/var/*
+
+$JABBERD/bin/router -D > $JABBERD/router.log 2>&1 &
+sleep 1
+$JABBERD/bin/resolver -D > $JABBERD/resolver.log 2>&1 &
+$JABBERD/bin/sm -D > $JABBERD/sm.log 2>&1 &
+$JABBERD/bin/c2s -D > $JABBERD/c2s.log 2>&1 &
+$JABBERD/bin/jadperl -D > $JABBERD/jp.log 2>&1 &
+

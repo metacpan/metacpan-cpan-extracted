@@ -1,0 +1,46 @@
+=head1 NAME
+
+Jonk::Cookbook::ErrorHandling - error handling enqueue and dequeue
+
+=head1 USAGE
+
+enqueue script:
+
+    #! perl
+    use strict;
+    use warnings;
+    use DBI;
+    use Jonk::Client;
+    
+    my $dbh = DBI->connect('dbi:mysql:test','user','pass');
+    my $jonk = Jonk::Client->new($dbh);
+    my $job_id = $jonk->enqueue('worker_key','job_data_here');
+    if ($jonk->errstr) {
+        die $jonk->errstr;
+    }
+
+worker script:
+
+    #! perl
+    use strict;
+    use warnings;
+    use DBI;
+    use Jonk::Worker;
+    use Your::Worker;
+    
+    my $dbh = DBI->connect('dbi:mysql:test','user','pass');
+    my $jonk = Jonk::Worker->new($dbh => {functions => [qw/worker_key/]});
+    
+    while (1) {
+        my $job = $jonk->dequeue;
+        if ($jonk->errstr) {
+            die $jonk->errstr;
+        }
+        if ($job) {
+            Your::Worker->work($job);
+        } else {
+            sleep(3); # wait for 3 sec.
+        }
+    }
+
+=cut

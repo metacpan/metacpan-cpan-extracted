@@ -1,0 +1,440 @@
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+JSON::Repair - reformat JSON to strict compliance
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use JSON::Repair 'repair_json';
+    my $bad_json = <<EOF;
+    {'very bad':0123,
+     "
+    naughty":'json',
+    value: 00000.00001,
+    }
+    // garbage
+    EOF
+    print repair_json ($bad_json);
+
+
+produces output
+
+    {"very bad":123,
+     "\nnaughty":"json",
+    "value": 0.00001
+    }
+
+
+(This example is included as L<F<synopsis.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/synopsis.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents version 0.06 of JSON::Repair corresponding to
+git commit L<6492fc9c24ac090897fc2946ca7e602e051a6199|https://github.com/benkasminbullock/json-repair/commit/6492fc9c24ac090897fc2946ca7e602e051a6199> released on Thu Mar 9 11:16:54 2017 +0900.
+
+=head1 DESCRIPTION
+
+Given some "relaxed" JSON text containing such things as trailing
+commas, comments, or strings containing tab characters or newlines,
+this module uses heuristics to convert these into strictly compliant
+JSON.
+
+=head1 FUNCTIONS
+
+=head2 repair_json
+
+    my $repaired = repair_json ($json, %options);
+
+This alters its input in various ways to make it compliant with the
+JSON specification, or prints an error message if C<$json> cannot be
+repaired, and returns the undefined value.
+
+=head3 Repairs applied
+
+=over
+
+=item Strip trailing commas
+
+    
+    use JSON::Repair ':all';
+    print repair_json (q/{"answer":["bob dylan",42,],}/), "\n";
+    
+    
+
+
+produces output
+
+    {"answer":["bob dylan",42]}
+
+
+(This example is included as L<F<trailing-commas.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/trailing-commas.pl> in the distribution.)
+
+
+=item Change single quotes to double quotes in keys
+
+    
+    use JSON::Repair ':all';
+    print repair_json ("{'answer':42}"), "\n";
+    
+    
+
+
+produces output
+
+    {"answer":42}
+
+
+(This example is included as L<F<single-quotes.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/single-quotes.pl> in the distribution.)
+
+
+=item Add missing object-end, string-end and array-end markers
+
+    
+    use JSON::Repair ':all';
+    my $r = repair_json ('{"stuff":["good');
+    print "$r\n";
+
+
+produces output
+
+    {"stuff":["good"]}
+
+
+(This example is included as L<F<missing-ends.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/missing-ends.pl> in the distribution.)
+
+
+=item Add quotes to unquoted keys
+
+    
+    use JSON::Repair ':all';
+    print repair_json ("{how many roads must a man walk down:42}",
+                       verbose => undef), "\n";
+    
+
+
+produces output
+
+    {"how many roads must a man walk down":42}
+
+
+(This example is included as L<F<unquoted-keys.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/unquoted-keys.pl> in the distribution.)
+
+
+=item Add missing commas to objects and arrays
+
+The module can add missing commas between the end of object or array
+values.
+
+    
+    use JSON::Repair ':all';
+    print repair_json (q![1 2 3 4 {"six":7 "eight":9}]!), "\n";
+    
+
+
+produces output
+
+    [1, 2, 3, 4, {"six":7, "eight":9}]
+
+
+(This example is included as L<F<missing-commas.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/missing-commas.pl> in the distribution.)
+
+
+=item Remove comments
+
+The module removes C and C++ comments and hash comments (Perl-style
+comments) from JSON.
+
+This example uses the example from the synopsis of L<JSON::Relaxed>:
+
+    
+    use JSON::Repair ':all';
+    my $rjson = <<'(RAW)';
+    /* Javascript-like comments are allowed */
+    {
+      // single or double quotes allowed
+      a : 'Larry',
+      b : "Curly",
+       
+      // nested structures allowed like in JSON
+      c: [
+         {a:1, b:2},
+      ],
+       
+      // like Perl, trailing commas are allowed
+      d: "more stuff",
+    }
+    (RAW)
+    print repair_json ($rjson, verbose => undef);
+
+
+produces output
+
+    
+    {
+        "a ": "Larry",
+      "b ": "Curly",
+       
+        "c": [
+         {"a":1, "b":2}
+      ],
+       
+        "d": "more stuff"
+    }
+
+
+(This example is included as L<F<comments.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/comments.pl> in the distribution.)
+
+
+This example demonstrates removing hash comments:
+
+    
+    use JSON::Repair 'repair_json';
+    print repair_json (<<'EOF');
+    {
+      # specify rate in requests/second
+      rate: 1000
+    }
+    EOF
+
+
+produces output
+
+    {
+        "rate": 1000
+    }
+
+
+(This example is included as L<F<hash-comments.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/hash-comments.pl> in the distribution.)
+
+
+The facility to remove hash comments was added in version 0.02 of the
+module. It currently uses L</C::Tokenize> for the C/C++ comment
+regexes.
+
+=item Sort out broken numbers
+
+JSON does not allow various kinds of numbers, such as decimals without
+a leading zero, like .123, decimals with an exponent but without a
+fraction, like 1.e9, or integers with a leading zero. JSON::Repair
+adds or removes digits to make them parseable.
+
+    
+    use JSON::Repair ':all';
+    print repair_json ('[.123,0123,1.e9]');
+
+
+produces output
+
+    [0.123,123,1.0e9]
+
+(This example is included as L<F<numbers.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/numbers.pl> in the distribution.)
+
+
+JSON::Repair strips leading zeros like 0123 without converting the
+result to octal (base 8). It doesn't attempt to repair hexadecimal
+(base 16) numbers.
+
+The facility to reinterpret numbers was added in version 0.02 of the
+module.
+
+=item Convert unprintable and whitespace characters to escapes in strings
+
+Strings containing unprintable ASCII characters and some kinds of
+whitespace are not allowed in JSON. This converts them into valid
+escapes.
+
+    
+    use JSON::Repair 'repair_json';
+    my $badstring = '"' . chr (9) . chr (0) . "\n" . '"';
+    print repair_json ($badstring), "\n";
+
+
+produces output
+
+    "\t\u0000\n"
+
+
+(This example is included as L<F<strings.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/strings.pl> in the distribution.)
+
+
+This was added in version 0.04 of the module.
+
+=item Empty inputs are converted into the empty string
+
+Completely empty inputs are converted into C<"">.
+
+=back
+
+=head3 Options
+
+Valid options are
+
+=over
+
+=item verbose
+
+    my $okjson = repair_json ($json, verbose => 1);
+
+Give a true value to make the module print messages about the
+operations applied. This facility is largely for debugging the module
+itself. The messages may be poorly formatted and opaque, and are not
+guaranteed to be the same in future versions of the module.
+
+Here is the output of the synopsis run with the C<verbose> option:
+
+    
+    use utf8;
+    use JSON::Repair 'repair_json';
+    my $bad_json = <<EOF;
+    {'very bad':0123,
+    # comment
+     "
+    naughty":'json',
+    value: 00000.00001,
+    }
+    garbage
+    EOF
+    print repair_json ($bad_json, verbose => 1);
+
+
+produces output
+
+    Unexpected character ''' at byte 2.
+    Changing single to double quote.
+    Unexpected character '1' at byte 14.
+    Leading zero in number?
+    Unexpected character '#' at byte 18.
+    Hash comments in object or array?
+    Deleting comment ' comment'.
+    Unexpected character '
+    ' at byte 20.
+    Changing 10 into \n.
+    Unexpected character ''' at byte 31.
+    Changing single to double quote.
+    Unexpected character 'v' at byte 39.
+    Unquoted key or value in object?
+    Adding quotes to key 'value'
+    Unexpected character '0' at byte 49.
+    Leading zero in number?
+    Unexpected character '}' at byte 57.
+    Removing a trailing comma.
+    Unexpected character 'g' at byte 58.
+    Trailing garbage 'garbage
+    '?
+    {"very bad":123,
+     "\nnaughty":"json",
+    "value": 0.00001
+    }
+
+
+(This example is included as L<F<synopsis-verbose.pl>|https://api.metacpan.org/source/BKB/JSON-Repair-0.06/examples/synopsis-verbose.pl> in the distribution.)
+
+
+=back
+
+=head1 EXPORTS
+
+L</repair_json> is exported on demand. The tag ":all" exports all functions.
+
+    use JSON::Repair ':all';
+
+=head1 DEPENDENCIES
+
+=over
+
+=item JSON::Parse
+
+This module relies on L<JSON::Parse/diagnostics_hash> to find the
+errors in the input. Most of the work of JSON::Repair is actually done
+by JSON::Parse's diagnostics, and then JSON::Repair applies a few
+heuristic rules to guess what might have caused the error, modify the
+input, and re-parse it repeatedly until either the input is compliant,
+or none of the rules can be applied to it.
+
+=item C::Tokenize
+
+This module uses the regular expression for C comments from L<C::Tokenize>.
+
+=item Carp
+
+L<Carp> is used to report errors.
+
+=item Perl 5.14
+
+Unfortunately L<JSON::Parse/diagnostics_hash> is only available for
+Perl 5.14 or later, because it relies on L<perlapi/croak_sv>, which
+was introduced in Perl 5.14. I'm not sure if there is a way to get the
+same behaviour with earlier versions of Perl.
+
+=back
+
+=head1 SCRIPT
+
+A script F<repairjson> is installed with the module which runs
+L</repair_json> on the files given as arguments:
+
+    repairjson file1.json file2.json
+
+The output is the repaired JSON.
+
+The script was added in version 0.02 of the module.
+
+=head1 SEE ALSO
+
+See the section L<JSON::Parse/SEE ALSO> for a comprehensive list of
+JSON modules on CPAN and more information about JSON itself.
+
+=head2 JSON-like formats
+
+It's very likely that a non-compliant JSON format cannot be handled by
+this module, because the changes that need to be made to put one
+variety of JSON-like format into strict JSON are incompatible with the
+changes that need to be made to fix another. For example, it is
+impossible to correctly convert the L</HJSON> format or the L</YAML>
+format into compliant JSON without breaking other parts of the
+module. Thus, no comprehensive solution is possible.
+
+Since it is unfeasible to meaningfully convert every possible list of
+bytes into compliant JSON, JSON::Repair should be regarded as an
+example which demonstrates the use of the diagnostics provided by the
+L</JSON::Parse> module to repair broken JSON inputs, rather than a
+general solution.
+
+=over
+
+=item HJSON
+
+See L<http://hjson.org>. This format cannot be converted to strictly
+compliant JSON by this module.
+
+=item YAML
+
+See L<http://yaml.org>. This format cannot be converted to strictly
+compliant JSON by this module.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

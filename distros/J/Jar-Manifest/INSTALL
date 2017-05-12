@@ -1,0 +1,32 @@
+Installing Jar-Manifest
+Mithun Ayachit
+
+
+
+DISTRIBUTION PAGE
+
+
+The latest and all previous releases for Jar-Manifest can be downloaded
+from https://metacpan.org/release/Jar-Manifest
+
+
+
+INSTALL USING cpanm
+
+
+Jar-Manifest can be installed with cpanm using the following command
+
+    cpanm .
+
+
+
+INSTALL USING Module::Build
+
+
+Jar-Manifest can be installed with Module::Build using the following
+commands
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install

@@ -1,0 +1,30 @@
+%PointMarker +++
+
+=== Plain mapping
++++ jsync
+{"one":"two","three":"four"}
+
+=== Duplicate Map Reference
++++ jsync
+[{"&":"1","x":"y"},"*1","*1"]
+
+=== Nulls
++++ jsync
+[null,{"x":null}]
+
+=== Recursive Reference
++++ jsync
+{"&":"1","x":"*1"}
+
+=== Typed Mapping
++++ jsync
+{"!":"!perl/hash:Foo","x":"y"}
+
+=== Typed Sequence
++++ jsync
+["!!perl/array:Foo","x","y"]
+
+=== Schwern's Escaping Test
++++ jsync
+{".!":"not a type","..!":"not an escaped type","foo":"42"}
+

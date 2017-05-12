@@ -1,0 +1,50 @@
+[
+    {
+        "cases": [
+            {
+                "expression": "\"foo.bar\"",
+                "result": "dot"
+            },
+            {
+                "expression": "\"foo bar\"",
+                "result": "space"
+            },
+            {
+                "expression": "\"foo\\nbar\"",
+                "result": "newline"
+            },
+            {
+                "expression": "\"foo\\\"bar\"",
+                "result": "doublequote"
+            },
+            {
+                "expression": "\"c:\\\\\\\\windows\\\\path\"",
+                "result": "windows"
+            },
+            {
+                "expression": "\"/unix/path\"",
+                "result": "unix"
+            },
+            {
+                "expression": "\"\\\"\\\"\\\"\"",
+                "result": "threequotes"
+            },
+            {
+                "expression": "\"bar\".\"baz\"",
+                "result": "qux"
+            }
+        ],
+        "given": {
+            "\"\"\"": "threequotes",
+            "/unix/path": "unix",
+            "bar": {
+                "baz": "qux"
+            },
+            "c:\\\\windows\\path": "windows",
+            "foo\nbar": "newline",
+            "foo bar": "space",
+            "foo\"bar": "doublequote",
+            "foo.bar": "dot"
+        }
+    }
+]

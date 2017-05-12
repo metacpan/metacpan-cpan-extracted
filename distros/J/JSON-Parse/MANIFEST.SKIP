@@ -1,0 +1,54 @@
+build\.pl
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Json3-[0-9.]/$
+^Json3-[0-9.]\.tar\.gz$
+^Json3.(?:c|o|bs)$
+^peek\.pl$
+^test-empty-string\.pl$
+^xt/.*
+^lib/JSON/Parse\.pod\.tmpl$
+^run\.pl$
+^Parse\.bs$
+# Can download from github if needed.
+benchmarks
+# Spurious build guff
+^makeitfile$
+# Corefiles, a.out sometimes get into the distribution.
+^.*\.core$
+^a\.out$
+# There aren't any files I plan to distribute with these file types.
+^[^/]*\.pl$
+^[^/]*\.txt$
+# Don't put the "torture test" code into the CPAN distribution. It
+# contains bad stuff like "setjmp" which is incompatible with many
+# people's operating systems. People who want this kind of stuff can
+# get it from the repository.
+^Json3-random-test\.c$
+^(?:json-)?random-test\.c$
+^random-test$
+^randomjson\.pl$
+# Don't add the UTF-8 test code to the repo:
+^utf8test/.*$
+# Makefile for C random stuff
+^randmakefile$
+# Not necessary or useful for CPAN
+^FILES$
+# Design document directory, no use to put on CPAN.
+^doc/.*$
+#
+^examples/.*-out\.txt$
+# Experimental unfinished module should not go to CPAN
+^lib/JSON/Whitespace\.pm$
+# Template for POD
+^lib/JSON/Tokenize\.pod\.tmpl$
+# Obsolete files
+^obsolete/.*$
+# Local variables:
+# comment-start: "#" 
+# End:

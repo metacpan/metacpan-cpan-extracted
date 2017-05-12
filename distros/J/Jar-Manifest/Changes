@@ -1,0 +1,53 @@
+Version History for Jar-Manifest
+Mithun Ayachit
+
+
+
+0.4.1
+
+
+-   No functional changes. Use semver and move bugtracker to
+    github-issues
+
+
+
+0.04
+
+
+    - Added the following additional constraints:
+        - Manifest-Version is required
+        - Manifest-Version must be first, and in exactly that case
+        - Attribute names cannot be repeated within a section
+    - Dumped strings will contain 2 new lines appended at EOF
+
+
+
+0.031
+
+
+    - Minor POD updates
+
+
+
+0.03
+
+
+    - Account for EOL characters
+    - Clean up helper functions
+    - A _named_ entry is saved only if the section begins with "Name: "
+
+
+
+0.02
+
+
+    - Fixed dependencies
+
+
+
+0.01
+
+
+    - Initial Release
+
+------------------------------------------------------------------------

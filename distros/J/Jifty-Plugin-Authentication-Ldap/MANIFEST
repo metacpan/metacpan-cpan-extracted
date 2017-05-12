@@ -1,0 +1,26 @@
+.gitignore
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Jifty/Plugin/Authentication/Ldap.pm
+lib/Jifty/Plugin/Authentication/Ldap/Action/LDAPLogin.pm
+lib/Jifty/Plugin/Authentication/Ldap/Action/LDAPLogout.pm
+lib/Jifty/Plugin/Authentication/Ldap/Dispatcher.pm
+lib/Jifty/Plugin/Authentication/Ldap/Mixin/Model/User.pm
+lib/Jifty/Plugin/Authentication/Ldap/View.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+share/po/jifty_plugin_authentication_ldap.pot
+t/00-load.t

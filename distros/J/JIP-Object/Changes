@@ -1,0 +1,12 @@
+Revision history for JIP-Object
+
+0.03    2016-05-02
+        Added support for multiple attributes in a single declaration.
+        More tests.
+
+0.02    2015-07-26
+        Fixed filename in MANIFEST.
+
+0.01    2015-07-10
+        First version, released on an unsuspecting world.
+

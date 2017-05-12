@@ -1,0 +1,22 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use lib 'lib';
+#use ExtUtils::testlib;
+use JSON::Repair 'repair_json';
+for my $file (@ARGV) {
+#    print "$file\n";
+    my $text;
+    open my $in, "<", $file or die $!;
+    while (<$in>) {
+	$text .= $_;
+    }
+    close $in or die $!;
+#    print "$text\n";
+    my $out = repair_json ($text);
+    print "$out\n";
+}
+
+# Local variables:
+# mode: perl
+# End:

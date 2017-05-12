@@ -1,0 +1,26 @@
+
+
+++$ENV{YES_I_WANT_JE_TO_OPTIMISE};
+use lib 'lib';
+use DDS;
+use JE;
+
+$c = new JE->parse(join '', <>) or die;
+$c->set_global(undef);
+new DDS->Ignore("JE",1)->Data($c)->Out;
+Dump eval "sub{$c->{psrc}}"||$@
+
+
+
+
+
+
+
+
+
+
+
+
+__END__
+
+YES_I_WANT_JE_TO_OPTIMISE=1 perl -MJE -Ilib -MDDS -le '$c = new JE->parse(q| switch(0){ case 1: case 2: var t } |); $c->set_global(undef); Dump $c; Dump eval "sub{$c->{psrc}}"||$@'

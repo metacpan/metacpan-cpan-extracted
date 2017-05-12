@@ -1,0 +1,27 @@
+---
+abstract: 'Automatically change a JSON string when a data structure changes'
+author:
+  - 'Anthony Brummett <brummett@cpan.org>'
+build_requires:
+  JSON::PP: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-String
+requires:
+  Carp: '0'
+  JSON: '0'
+  Sub::Exporter: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/brummett/JSON-String.git
+version: 0.2.0

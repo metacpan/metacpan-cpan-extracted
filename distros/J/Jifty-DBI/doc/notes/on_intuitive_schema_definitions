@@ -1,0 +1,526 @@
+# so, what we have here is a conversion of the test suite.
+# I'm not 100% on the syntax, but I want to get it basically working.
+
+# the first thing I need to figure out is how the hell to get these functions
+# exported into Sample::Address and Sample::Employee.
+# use base does an @INC frob and a require.
+# it does _not_ do a 'use', which means we never call 'import';
+
+
+
+package Sample::Address;
+
+# stinks of ingy, but:
+use Jifty::DBI::Record '-base';
+
+# *laugh*
+
+I want better syntax than that. hm.
+
+
+But is the general concept ok?
+
+# maybe. I almost wonder whether we want a separate class for this. 
+Jifty::DBI::Record->import(), actually ;
+
+
+
+# or could be:
+Jifty::DBI::Record->inherit; # or something (that means it has to be loaded already)
+# Well, sure, import would just work.
+# that's just evil.  maybe right too.
+
+UNIVERSAL::import.
+
+It works sort of like UNIVERSAL::require.
+
+then you could have
+
+import Jifty::DBI::Record::SchemaFunctions# or something
+
+#not sure I like that, though.
+# would you want to have that *and* the use base though?
+# no.
+
+
+# if you're not trying to subclass, then I don't see what's wrong
+# with 
+
+use Jifty::DBI::Record ':schemafunctions';
+# which is standard Exporter.pm (@EXPORT_TAGS or whatever)
+
+*nod*
+
+#it feels a bit unclean. especially given what we're tyring to do.
+#
+
+# Yeah, I don't really like having the stuff pollute the namespace either.
+# if prototypes worked with methods I wouldn't even mind having to do
+
+$x = Jifty::DBI::SchemaBuilder->new;
+$x->define_blablalb
+$x->bla bla
+# (ok, maybe I'm being influenced by ruby again :) )
+# (take a peek at the XML::Builder thing I checked into the SyncML tree sometime
+# for a simiarl  issue)
+
+# not convinced ruby influence is bad..
+
+
+# I sort of want to be able to take __PACKAGE__ and make an alias to it
+
+# CLASS-> or something
+
+# you just don't like the word __PACKAGE__ basically?
+
+# let me illustrate.
+
+# that's kind of the Class::DBI syntax, right?
+
+# yeah. and it pollutes everything.
+
+# and it doesn't let you *not* use () or magic sub{}s either :(
+
+# just look at that code. I see __PACKAGE__ and some lowercase stuff near it.
+# not "oh look, I have 3 fields"
+
+
+# yup.
+
+# *evil*
+
+our db_table 'addresses';
+our field name => { has_type 'varchar'; has_default 'frank' };
+
+
+# (by the way, i'm pretty sure we don't get to do the sub-at-t-end thing
+#  either... I tried lots of hacky ways to get it working and failed.)
+
+# yeah, I think we're going to end up having a pseudo-sub that's really a hash behind the scenes 
+
+
+# uh, ok, sothe ; has to become , probably.
+
+# probably. 
+
+# worrying about htat bridge later
+
+
+# *nod*.  So is it ok if db_table, field, etc end up in your model's namespace?
+
+# I think so.
+
+# I'd love to have that not true, but I'm not seeing it
+
+
+# Well, you probably could... no this is too wrong to imagine.
+
+# yes?
+
+
+{
+    my $s = Jifty::DBI::SG->import_functions;
+    
+    db_table bla bla bla;
+    field bla;
+    field bar;
+} # $s.DESTROY gets called and unimports db_table/field/...
+
+# actually you might not even need the { } for that as long as nothing
+# else in the file ever refers to it.
+
+
+
+my $schema = Jifty::DBI::RecordSchema->new;
+$schema->for_class(__PACKAGE__); #just riffing
+
+$schema->field name => { has_type 'varchar'; has_default 'Frank'}
+
+#It's not quite metaprogramming enough or something.
+
+I really like the barewords
+
+
+# I'm not sure you saw what I meant -- you don't need the method calls
+
+my $s = Jifty::DBI::RecordSchema->new;
+
+field name => bla;
+
+__ENDOFFILEHERE__  (it does work, I just tested it).  evil though.
+
+# yeah, you're using a destroy hack.
+
+# I'm not sure we need to worry about clearing out the namespace.
+
+# not sure we don't.
+
+# but it feels wrong to have it _stop_ working once the code is running.
+
+# well, it's wronger to modify the schema later :)
+
+# but anyway, what are you blocking on?
+# just how to get the functions exported?
+
+                                                             vvvvv?
+# I was blocking on whether to import the functions from the superclass,
+# as it somehow feels dirty.
+
+# oh. whether those functions belonged in Jifty::DBI::Record
+# or whether the schema was another object. but having played with that a bit
+# I think it results in more code and more disconnected code.
+
+
+# I think I agree that the record and the schema should be the same object.
+# but the "easy declaration macros" could come from somewhere else.  maybe
+# that doesn't make sense.
+
+# don't forget that after all this fancy sytnax is set up we will still
+# need a way to declare schemas programmatically probably.
+
+# it's my expectation that the default sub schema will just read a datastructure that the fancy syntax populates
+
+# cool, that's what i was thinking too. (easiest way to implement too)
+
+# I was planning on lowercasing your hash keys. that make sense?
+
+
+# sounds good.  i had no good reason for them to be in any particular case.
+# (it did kind of help make the difference between schema and form_fields
+# keys obvious, but that was just a lucky coincidence, not necessarily an
+# important feature.)
+
+# less "abusing" and more "never actually defined".
+
+# I've been finding a tiny impedance mismatch with how we do that anyway.
+# we're abusing 'type'
+
+
+# we're using it in two overlapping but incompatible ways ;)
+
+# what do you mean?  i haven't poked at that in a while.
+# my belief is that the type that you declare in a schema should be a relatively
+# high-level description (not worrying about say "time vs timestamp vs datetime"
+# say)
+
+# the issue that comes up is "password"
+
+# generally, string fields are all rendered the same way.
+
+# hmm. how do we do that?
+
+# Have a look. I declared a subtype. it's not nice.
+
+
+# my feeling is that passwords should be a string in the schema but a password
+# in a form_fields, probably. 
+
+# no, the schema needs to know not to give you a password accessor.
+
+
+ oh, good point.  then password should be
+# its own SG type :)
+
+# possibly. anyway.
+
+# so. we're back to the import. Let's find a good syntax :)
+
+# i mean, the standard perl way to say "import a bunch of functions" is
+use Jifty::DBI::Record ':schema';
+
+#and I read that and don't know what it does.
+
+# No, _I_, have a sense of "oh it imports some functions"
+
+# you've never seen that before? huh.  
+
+# but it doesn't read cleanly. it's a relatively unused perl semantic that I 
+# don't like.
+
+# it may not be clean but it's perl
+
+# lots of things are perl. that doesn't make them right.
+
+
+# fortunately, if you can come up with anything to put into this blank:
+                        vvvvv
+use Jifty::DBI::Record       ;
+
+# we can make it work.  (including leaving it blank)
+
+# i feel like any statement other than a "use" or an explicit "import"
+# bringing functions into my namespace is unexpected and scary.  (even
+# if it's better english grammar or something :) )
+
+*nod* So, I _don't_ expect either a use or an import to mess with my inheritance chain.
+
+
+# except for use base, right.
+
+# sorry, yes. I don't expect another module.
+
+# well, i mean, there's always
+
+use base 'Jifty::DBI::Record'; # set up inheritance
+Jifty::DBI::Record->im_gonna_be_describing sym;
+
+# it should not be two statements.
+
+# this is what I've been trying to figure out.
+
+
+# yeah, but i think your constraints that you've said are contradictory
+# (1) should not be two statements
+# (2) only 'use base' should change inheritance
+
+# not what I think I said. "regular 'use' statements shouldn't mess with inheritance'
+# *nod*
+
+# (3) only use or something more explicit should export
+
+Anyway. 
+
+# (ok, admittedly *I* said 3 :) but i think you agreed)
+
+# I'm not strong on 3.
+
+I wonder if I can force Jifty::DBI::Record to export into the current package's namespace when used, if and only if it's a subclass.
+
+
+When you say "when used" do you literally mean "when *use*d" or just "when you start calling functions in it" ?
+
+I guess you could make that work with
+
+BEGIN { @ISA = 'Jifty::DBI::Record' }
+use Jifty::DBI::Record; # but this sucks!
+
+use base qw/Jifty::DBI::Record/;
+
+__PACKAGE__->schema_version (0.0001) # or some other method that 
+# does two thing evilly.
+
+
+
+# but you already told me that 'use base' doesn't call import.
+# ah, that could work.  (i could believe it being __PACKAGE__->db_table)
+
+# except I want to be able to intuit that from classname
+
+# unless it's explicit.
+
+# will base let me pass anything in? time to hit source
+
+# i'm hitting it, and basically no.  in fact once the base class
+# has been required once in your program's execution, all that
+# future use base calls is going to do is a push @package::ISA, $base_class;
+
+# we could tie @ISA
+
+#I'm kidding
+
+# we could replace base::import to do interesting things for classes that
+# match /^Jifty/  (it would be invisible too. and wrong.)
+
+# no, that's an ingy trick.
+
+# nah, i think ingy just makes you not use base.  i think ours is more wrong :)
+
+#He actually replaces base:: on the fly
+
+# he showed me.
+
+# uch. never mind then.
+
+# we could just do another use statement
+
+
+# let me type, dude ;)
+
+# i still kind of feel like what you want is "i want perl to act like
+# not perl, but without any evil hacks" which seems tough.
+
+# yes.it's hard. possibly impossible. but if we can make it go, we win.
+
+
+
+# I don't mind two use statements.  especially since we might be having
+# some records that don't use the special syntax
+use base qw/Jifty::DBI::Record/;
+use Jifty::DBI::Recordblablabla;
+
+
+
+
+or even:
+
+use base /Jifty::DBI::Record/;
+
+Jifty::DBI::Record->define_schema();
+
+Jifty::DBI::Record->columns_from_code(); # instead of ->columns_from_db();
+# but maybe a better name for it.
+
+# 
+
+# yeah, that's good. I'd like that.
+
+# that seems the least insane so far.
+# but what do we call the method?
+
+# schema is perhaps a poor choice of word.
+
+Jifty::DBI::Record->
+
+# i don't like columns, since we're defining foreign keys etc in the schema
+
+# but you see why it makes me twitch?
+
+# i do like the _from_code vs _from_db, since then you can also have
+# _from_hash etc etc
+
+*nod* Let's see how it plays:
+
+# I really, really want to be able to define my own subroutine like structures
+
+# well... :
+
+# Class and instance method
+
+
+use base 'Jifty::DBI::Record';
+Jifty::DBI::Record->___from_code();
+
+db_table 'addresses';
+
+# legal! # AUTOLOAD? yup. # not sure that's ok. # also, not intuitive, i think.
+             # and "code that is really a hash but looks like code" is?
+            # at least the code that looks like code isn't embedding the column name in a sub call. 
+            # i just don't like it.
+            # and I don't actually want it to be a hash.
+            # I just haven't figured out a better way yet.
+            # *nod*
+field {
+    called 'name'; # ? 
+    
+        # don't really like that, mostly because it's again hard to skim for.
+        # are you just trying to get the {} block first?
+        
+        # basically.
+        # *nod*
+        # I want infix subs
+        
+        
+        # well, you're not going to get it, without "sub " or source filters
+        # (or switching languages :) )
+  
+  
+        # "we'll see"
+        # part of this is to see how far I can get. since I know what "feel" 
+        # i want.
+  
+        # well, there's one bit of hope for getting infix subs actually
+        # or, well, not really.  you can get infix subs but you need to
+        # but some weord there.  by which point that word might as well
+        # be "sub".  OK, what you just wrote will work. (if you like it)
+        # (well, except for needing a stupid semicolon on the end :( )
+     
+        # It's not my favorite.
+        
+        # but yeah, falls into the "works" category"
+           # and 
+           has_type 'string'
+        # is definitely better than
+           type => 'string'
+        # in your book?
+
+       # how would you do: 
+        
+            refers_to_many RT::Tickets by 'owner';
+
+    
+       # hmm. i thought about this before.  we can do like simon and
+           refers_to_many "RT::Tickets by owner";
+        # but I don't really like that.  parsing is lame.
+
+        # yeah, that's not ok.
+        # see also "a pub has beers on taps"
+
+        # I'm *pretty* sure that we can't get the line you've written to compile.
+        #  *maybe* by putting stuff into package 'by', but that's awful.
+        unless it's
+        RT::Tickets->refers_to_many(by(owner));
+        so you need to do
+        sub by; i guess
+    
+        # pretty sure you gave me something similar.
+        
+    
+        # oh no, autrijus gave me the one line I needed.
+        
+        # don't forget that RT::Tickets is a class/package.
+        
+        # shit! it actually works!!!
+        # yeahi think i did but i didn't believe in it :)
+        # although the code is running in the wrong place. but you
+        # can figure out the right class using caller.
+    
+        # the idea is that it just returns a key, val pair. so it doesn't matter.
+    
+        # well, right, but refers_to_many is being called in RT::Tickets
+        # instead of in the current package.  but that's ok.
+        
+        23:46 <obra> I've got a bad perl5 idea for you. Robert claims it's impossible
+23:47 <obra> I'm trying to make the syntax "refers_to_many 'BTDT::Model::Tasks' by 'owner';" valid perl5 syntax.
+23:47 <obra> I think I want "reverse overload" to make it go. But yeah. not possible.
+23:47 <obra> We think
+Day changed to 07 Aug 2005
+03:57 <autrijus> well, that may be true but you don't want that.
+03:57 <autrijus> refers_to_many BTDT::Model::Tasks by 'owner'
+03:57 <autrijus> is more readable and easily implemented.
+03:58 <autrijus> sub by ($) { by => @_ }
+03:58 <autrijus> done!
+03:58 <autrijus> stop thinking classes as strings :)
+
+ 
+ 
+ 
+  # so, now we're just still on the 
+        
+        field foo => sub {}; issue
+        # let's see what the hash syntax looks like with my weird keys. 
+    
+       
+# actually i think i may need to go.
+# i'll leave this open for a bit if you want to type, but save it?
+ 
+ # I'm going to switch back to vim, where I can code. But I'll check in these notes.
+ 
+ # ok. later.
+ 
+ field email => sub {
+ 
+    has_type 'varchar';
+    has_default 'Frank';
+};
+
+
+field phone => {
+    has_type 'varchar';
+};
+
+field employee_id => {
+    refers_to_a Sample::Employee;
+}
+
+package Sample::Employee;
+
+use base qw/Jifty::DBI::Record/;
+
+__PACKAGE__->db_table 'employees';
+
+__PACKAGE__->field name => has_type 'varchar';
+
+__PACKAGE__->field dexterity =>  { has_type 'integer'};
+
+1;
+

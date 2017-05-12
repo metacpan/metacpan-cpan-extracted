@@ -1,0 +1,23 @@
+=head1 NAME
+
+JSTAPd::Manual - JSTAPd Manual
+
+=head1 TABLE OF CONTENTS
+
+=over 4
+
+=item L<JSTAPd::Manual::Intro|JSTAPd::Manaual::Intro>
+
+Introduction to JSTAPd.
+
+=item L<JSTAPd::Manual::API|JSTAPd::Manaual::API>
+
+Contains JSTAPd API reference.
+
+=item L<JSTAPd::Tutorial::JA|JSTAPd::Tutorial::JA>
+
+Japanese tutorial.
+
+=back
+
+=cut

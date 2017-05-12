@@ -1,0 +1,69 @@
+Java::JCR Revision History
+
+0.07    2006-07-30 22:48    Andrew Sterling Hanenkamp
+
+    * [rt.cpan.org #20758] FIXED: Static methods work correctly now.
+    * [rt.cpan.org #20767] FIXED: Changed calendar routines so that they use the
+      HOUR_OF_DAY constant rather than HOUR so that dates work correctly.
+    * Added t/09-jackrabbit-timezone.t to better test time zone handling and
+      reveal [rt.cpan.org #20767].
+    * Added t/10-property-type.t to test constants and such and to identify
+      [rt.cpan.org #20758].
+
+0.06    2006-06-25 14:52    Andrew Sterling Hanenkamp
+
+    * Added register_node_types() to Java::JCR::Jackrabbit to allow for very
+      simple node type registration.
+    * Added t/08-jackrabbit-nodetypes.t and t/nodetypes.cnd to test the new node
+      type registration functionality.
+    * Updated a few of the Jackrabbit tests to make sure they call logout() on
+      the session when finished to make sure the repository gets shutdown
+      properly.
+
+0.05    2006-06-17 21:21    Andrew Sterling Hanenkamp
+
+    * Added the Java::JCR::Calendar class for handling Java-to-Perl and
+    * Perl-to-Java date conversions.
+    * Added built-in support for DateTime and Class::Date classes when using any
+    * JCR method that returns a date or takes a date as an argument.
+    * Added support for allowing the end-user to add custom conversions to use
+    * other date classes instead of just those built-in.
+    * Added t/07-jackrabbit-calendar.t t test the new date support.
+
+0.04    2006-06-16 20:19    Andrew Sterling Hanenkamp
+
+    * Added the Java::JCR::Exception class for handling exceptions.
+    * Updated inc/package-generator.pl to use the new exception class.
+    * Added t/06-jackrabbit-exception.t to test the new exception class.
+    * Altered inc/package-generator.pl so that it does not generate any class
+      ending with "Exception".
+    * All classes ending with "Exception" (other than Java::JCR::Exception) have
+      been removed.
+
+0.03    2006-06-12 20:31    Andrew Sterling Hanenkamp
+
+    * Fixed a bug in inc/package-generator.pl that resulted in the new array
+      handling code not being included when necessary.
+    * Added unit tests to find this bug and to cover the most common tasks.
+    * Added use strict and use warnings to the examples.
+    * Added a test for errors in the POD.
+    * Added POD to Java::JCR::Jackrabbit.
+
+0.02    2006-06-12 07:36    Andrew Sterling Hanenkamp
+
+    * Switched Jar files to slf4j-jdk14-1.0.1.jar from slf4j-log4j12-1.0.jar and
+      dropped log4j.
+    * Updated inc/package-generator.pl to handle the case when methods return
+      arrays.
+    * Updated inc/package-generator.pl to include $VERSION variables in the
+      generated files.
+    * Regenerated the packages using inc/package-generator.pl.
+    * Updated Java::JCR::Base to handle methods that return arrays.
+    * Added documentation to Java::JCR::Base.
+
+0.01    2006-06-07 18:39    Andrew Sterling Hanenkamp
+
+    * Original version; created by ExtUtils::ModuleMaker 0.47
+    * Generated the initial code and improved until it was capable of loading a
+      Jackrabbit repository and able to run the first three "hop" examples from
+      http://jackrabbit.apache.org/

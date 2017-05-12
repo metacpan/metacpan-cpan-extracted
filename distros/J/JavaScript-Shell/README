@@ -1,0 +1,33 @@
+JavaScript-Test version 0.01
+============================
+
+Run Spidermonkey shell from Perl
+
+JavaScript::Shell will turn Spidermonkey shell to an interactive environment
+by connecting it to perl
+
+It will let you bind functions from perl and call them from javascript or
+create functions in javascript then call them from perl
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  JASON::XS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Mamod A. Mehyar
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.2 or,
+at your option, any later version of Perl 5 you may have available.

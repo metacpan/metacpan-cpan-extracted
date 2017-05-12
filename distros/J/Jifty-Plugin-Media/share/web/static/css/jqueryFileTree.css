@@ -1,0 +1,157 @@
+/*
+ J:P:Media menu
+ */
+.media-manage .upload input .button {
+    background: url(/static/css/FTimages/add.png) left top no-repeat;
+}
+
+.media-manage .view {
+    border: 0;
+    width: 16px;
+    height: 16px;
+    background: url(/static/css/FTimages/eye.png) center top no-repeat;
+    text-indent: -1000em;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+.media-manage .preview {
+	font-family: Verdana, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+    background: #ddd;
+}
+
+.media-manage .preview a {
+	font-family: Verdana, sans-serif;
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+}
+
+.media-manage .preview img {
+    float: left;
+    height: 50px;
+    width: 50px;
+    padding-left: 0.5em;
+    padding-right: 2em;
+}
+
+.media-manage .add-folder {
+    border: 0;
+    width: 16px;
+    height: 16px;
+    background: url(/static/css/FTimages/folder_add.png) center top no-repeat;
+    text-indent: -1000em;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+.media-manage .delete {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 16px;
+    height: 16px;
+    background: url(/static/css/FTimages/delete.png) center top no-repeat;
+    text-indent: -1000em;
+    cursor: pointer; /* hand-shaped cursor */
+    cursor: hand; /* for IE 5.x */
+}
+
+/* 
+ vim update for jifty
+ :%s/images\//\/static\/css\/FTimages\//g
+ */
+UL.jqueryFileTree {
+	font-family: Verdana, sans-serif;
+	font-size: 11px;
+	line-height: 18px;
+	padding: 0px;
+	margin: 0px;
+}
+
+UL.jqueryFileTree LI {
+	list-style: none;
+	padding: 0px;
+	padding-left: 20px;
+	margin: 0px;
+	white-space: nowrap;
+}
+
+UL.jqueryFileTree A {
+	color: #333;
+	text-decoration: none;
+	display: block;
+	padding: 0px 2px;
+}
+
+UL.jqueryFileTree A:hover {
+	background: #BDF;
+}
+
+/* Core Styles */
+.jqueryFileTree LI.directory { background: url(/static/css/FTimages/directory.png) left top no-repeat; }
+.jqueryFileTree LI.expanded { background: url(/static/css/FTimages/folder_open.png) left top no-repeat; }
+.jqueryFileTree LI.file { background: url(/static/css/FTimages/file.png) left top no-repeat; }
+.jqueryFileTree LI.wait { background: url(/static/css/FTimages/spinner.gif) left top no-repeat; }
+/* File Extensions*/
+.jqueryFileTree LI.ext_3gp { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_afp { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_afpa { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_asp { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_aspx { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_avi { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_bat { background: url(/static/css/FTimages/application.png) left top no-repeat; }
+.jqueryFileTree LI.ext_bmp { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_c { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_cfm { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_cgi { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_com { background: url(/static/css/FTimages/application.png) left top no-repeat; }
+.jqueryFileTree LI.ext_cpp { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_css { background: url(/static/css/FTimages/css.png) left top no-repeat; }
+.jqueryFileTree LI.ext_doc { background: url(/static/css/FTimages/doc.png) left top no-repeat; }
+.jqueryFileTree LI.ext_exe { background: url(/static/css/FTimages/application.png) left top no-repeat; }
+.jqueryFileTree LI.ext_gif { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_fla { background: url(/static/css/FTimages/flash.png) left top no-repeat; }
+.jqueryFileTree LI.ext_h { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_htm { background: url(/static/css/FTimages/html.png) left top no-repeat; }
+.jqueryFileTree LI.ext_html { background: url(/static/css/FTimages/html.png) left top no-repeat; }
+.jqueryFileTree LI.ext_jar { background: url(/static/css/FTimages/java.png) left top no-repeat; }
+.jqueryFileTree LI.ext_jpg { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_jpeg { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_js { background: url(/static/css/FTimages/script.png) left top no-repeat; }
+.jqueryFileTree LI.ext_lasso { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_log { background: url(/static/css/FTimages/txt.png) left top no-repeat; }
+.jqueryFileTree LI.ext_m4p { background: url(/static/css/FTimages/music.png) left top no-repeat; }
+.jqueryFileTree LI.ext_mov { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_mp3 { background: url(/static/css/FTimages/music.png) left top no-repeat; }
+.jqueryFileTree LI.ext_mp4 { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_mpg { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_mpeg { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_ogg { background: url(/static/css/FTimages/music.png) left top no-repeat; }
+.jqueryFileTree LI.ext_pcx { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_pdf { background: url(/static/css/FTimages/pdf.png) left top no-repeat; }
+.jqueryFileTree LI.ext_php { background: url(/static/css/FTimages/php.png) left top no-repeat; }
+.jqueryFileTree LI.ext_png { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_ppt { background: url(/static/css/FTimages/ppt.png) left top no-repeat; }
+.jqueryFileTree LI.ext_psd { background: url(/static/css/FTimages/psd.png) left top no-repeat; }
+.jqueryFileTree LI.ext_pl { background: url(/static/css/FTimages/script.png) left top no-repeat; }
+.jqueryFileTree LI.ext_py { background: url(/static/css/FTimages/script.png) left top no-repeat; }
+.jqueryFileTree LI.ext_rb { background: url(/static/css/FTimages/ruby.png) left top no-repeat; }
+.jqueryFileTree LI.ext_rbx { background: url(/static/css/FTimages/ruby.png) left top no-repeat; }
+.jqueryFileTree LI.ext_rhtml { background: url(/static/css/FTimages/ruby.png) left top no-repeat; }
+.jqueryFileTree LI.ext_rpm { background: url(/static/css/FTimages/linux.png) left top no-repeat; }
+.jqueryFileTree LI.ext_ruby { background: url(/static/css/FTimages/ruby.png) left top no-repeat; }
+.jqueryFileTree LI.ext_sql { background: url(/static/css/FTimages/db.png) left top no-repeat; }
+.jqueryFileTree LI.ext_swf { background: url(/static/css/FTimages/flash.png) left top no-repeat; }
+.jqueryFileTree LI.ext_tif { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_tiff { background: url(/static/css/FTimages/picture.png) left top no-repeat; }
+.jqueryFileTree LI.ext_txt { background: url(/static/css/FTimages/txt.png) left top no-repeat; }
+.jqueryFileTree LI.ext_vb { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_wav { background: url(/static/css/FTimages/music.png) left top no-repeat; }
+.jqueryFileTree LI.ext_wmv { background: url(/static/css/FTimages/film.png) left top no-repeat; }
+.jqueryFileTree LI.ext_xls { background: url(/static/css/FTimages/xls.png) left top no-repeat; }
+.jqueryFileTree LI.ext_xml { background: url(/static/css/FTimages/code.png) left top no-repeat; }
+.jqueryFileTree LI.ext_zip { background: url(/static/css/FTimages/zip.png) left top no-repeat; }

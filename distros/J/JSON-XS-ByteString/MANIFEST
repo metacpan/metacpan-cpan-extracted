@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+ByteString.xs
+t/JSON-XS-ByteString.t
+lib/JSON/XS/ByteString.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+encode_gen.h
+META.json                                Module JSON meta-data (added by MakeMaker)

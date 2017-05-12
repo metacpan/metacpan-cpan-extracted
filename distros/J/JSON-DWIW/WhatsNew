@@ -1,0 +1,173 @@
+
+See JSON::DWIW::Changes for newer changes.
+
+
+Version 0.38 (Fri 2009-09-18)
+   * Fixed rt.cpan.org #49773 (missing semicolon)
+
+Version 0.37 (Wed 2009-09-16)
+   * Fixed bug with creating Math::BigFloat objects when parsing
+
+Version 0.36 (Sat 2009-08-22)
+   * Added ascii, bare_solidus, and minimal_escaping options.
+   * Began to use Test::More for some of the unit tests
+
+Version 0.35
+   * Apparent fix for [rt.cpan.org #47344].
+
+Version 0.34
+   * Fixed another memory leak, this time while inserting into a hash
+
+Version 0.33
+   * Fixed memory leak -- the stack was getting allocated in
+     init_cbs(), but never deallocated.
+
+Version 0.32
+   * Fixed segfault on Solaris 10 (on Sparc) when compiled with Sun
+     Studio.  It was a 64-bit versus 32-bit bug on my part, but
+     apparently GCC catches this and does the right thing.
+
+Version 0.30
+   * Added _GNU_SOURCE define to pull in asprintf on some platforms
+
+Version 0.29
+    * Fixed another segfault problem on 64-bit Linux (in vset_error).
+
+Version 0.28
+    * Fixed segfault problem on 64-bit Linux (rt.cpan.org #40879)
+    * Fixed test problem on Solaris (rt.cpan.org #41129)
+
+Version 0.27
+    * Documented the is_valid_utf8() method
+    * Added the upgrade_to_utf8() method
+    * Added shell-style comment support to the from_json() method
+    * Documented comment support
+
+Version 0.26
+    * Fixed number parsing bug (rt.cpan.org #37541)
+    * Documented utility functions
+
+Version 0.25
+    * Fixed mmap failure on Linux
+    * Fixed (hopefully) another compilation problem on Solaris (rt.cpan.org #35040)
+
+Version 0.24 Tue 2008-04-14
+    * Fixed compilation problem on Solaris (rt.cpan.org #35040)
+    * Some code cleanup
+    * Implemented utf-8 encoding/decoding from scratch when used by
+      deserialize().  Previously used Perl's implementation.
+    * Implemented utf-16 and utf-32 encoding and decoding, although it
+      is not used yet.
+
+Version 0.23
+    * Fixed illegal memory access and warnings from glibc (rt.cpan.org #33121)
+    * Now accept \xHH escape as in Javascript (rt.cpan.org #34285)
+    * Accept $ in bare keys (rt.cpan.org #34320).  This should probably be
+      expanded to take identifiers as defined in the ECMAScript spec
+    * Added vertical tab (\v) to the list of recognized escape
+      sequences when parsing -- this is in the ECMAScript spec
+
+Version 0.21
+    * Fix compile problem where I left a custom OPTIMIZE entry in
+      Makefile.PL when testing
+
+Version 0.20
+    * Added deserialize() function and documented it
+    * Added deserialize_file() function, but left it undocumented and
+      skip its tests
+
+Version 0.19
+    * Added fix for compiling on hpux
+
+Version 0.18
+    * Fixed compilation problem on Windows by removing calls to bzero()
+
+Version 0.17
+    * Fixed bug where unnecessary header files were being included,
+      breaking the build on Windows
+
+Version 0.16
+    * Added get_stats() method
+    * Added get_error_string() method
+    * Added get_error_data() method
+
+Version 0.15
+    * Added from_json_file() method
+    * Added to_json_file() method
+    * Fixed bug where, in Perl version >= 5.8, hash keys with
+      multibyte utf-8 chars were not handled correctly
+    * Changed error messages to include the module name and version,
+      fixed error messages that did not specify where the error
+      occurred, and added line number, character offset, and character
+      column to parse error messages.
+
+Version 0.14
+    * Fixed problem with escaping '\' when decoding
+    * Made some optimizations
+    * Now recognize more whitespace characters
+      The full list of whitespace characters recognized is:
+          case 0x20:   /* space */
+          case 0x09:   /* tab */
+          case 0x0b:   /* vertical tab */
+          case 0x0c:   /* form feed */
+          case 0x0d:   /* carriage return */
+          case 0x00a0: /* NSBP - non-breaking space */
+          case 0x200b: /* ZWSP - zero width space */
+          case 0x2029: /* PS - paragraph separator */
+          case 0x2060: /* WJ - word joiner */
+          case 0x0a:   /* newline */
+          case 0x0085: /* NEL - next line */
+          case 0x2028: /* LS - line separator */
+
+
+Version 0.13
+    * Fixed problem where array elements may be missing when the
+      "pretty" option is turned on
+
+Version 0.12
+    * Fixed assertion failure in perl 5.8.5 when finding a tied scalar
+      in a hash value
+
+Version 0.11
+    * Changed the way null gets converted to undef when converting
+      from JSON.  Instead of returning &PL_sv_undef, it now gets
+      returned as a new, unitialized SV.  This keeps Data::Dumper from
+      outputing undef as an alias to another undef value in the data
+      structure.
+
+Version 0.10
+    * Add methods true() and false() to return objects that will get
+      encoded as true and false, respectively, when converting to
+      JSON.
+
+Version 0.09
+    * Fixed the bad_char_policy option -- it was being ignored
+
+Version 0.08
+    * Fixed problem encoding scalars that have been used as both
+      strings and numbers (types SVt_PVN, SVt_PVIV)
+
+Version 0.07
+    * Fixed more problems with Math::BigInt and Math::BigFloat objects
+
+Version 0.06
+    * Fixed problems with tests using Math::BigInt and Math::BigFloat objects
+
+Version 0.05
+    * Bad utf-8 sequences now cause an error unless you pass an option
+      indicating otherwise
+    * Added options for how to react to bad utf8 data
+    * Added option to throw an exception on error
+    * Added option to pretty-print output
+    * Fixed some compilation problems on Windows
+
+Version 0.04
+    * Fixed bug where empty strings got encoded incorrectly
+
+Version 0.03
+    * Fixed bug where parsing an empty array would sometimes cause an error
+
+Version 0.02
+    * Speed optimizations
+    * Fixed a memory leak
+    * Added support for spurious commas in hashes and arrays

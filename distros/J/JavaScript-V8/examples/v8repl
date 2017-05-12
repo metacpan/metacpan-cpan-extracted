@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use strict;
+use Data::Dump qw(pp);
+use JavaScript::V8;
+use Term::ANSIColor qw(colored);
+use Term::ReadLine; # Much better if Term::ReadLine::Gnu is installed
+
+my $js = JavaScript::V8::Context->new;
+$js->name_global("global");
+$js->bind(print => sub { print "@_\n" });
+
+my $rl = Term::ReadLine->new($0);
+
+if($rl->isa("Term::ReadLine::Gnu")) {
+  my $attribs = $rl->Attribs;
+  my @list;
+  $attribs->{completion_entry_function} = sub {
+    my($complete_prefix, $count) = @_;
+
+    if($count == 0) {
+      (my $object = "global.$complete_prefix") =~ s/\.([^.]*)$//;
+      my $object_prefix = $1;
+      my $prefix = "";
+      if($complete_prefix =~ s/\.([^.]+)$/./) {
+        $prefix = $complete_prefix;
+      }
+      my $h = $js->eval($object);
+      if(ref $h eq 'HASH') {
+        @list = sort map $prefix . $_, grep /^\Q$object_prefix\E/, keys %$h;
+      } else {
+        @list = ();
+      }
+    }
+
+    $list[$count];
+  };
+}
+
+while (1) {
+  my $line = $rl->readline('> ');
+  exit unless defined $line;
+  my $ret = $js->eval($line);
+  if($@) {
+    print STDERR colored(['red'], $@);
+  } else {
+    pp $ret;
+  }
+}

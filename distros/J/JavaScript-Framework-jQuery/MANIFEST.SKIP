@@ -1,0 +1,15 @@
+^edit*
+Debian_CPANTS.txt
+\.releaserc
+\.git/
+\.svn/
+blib
+pm_to_blib
+MANIFEST.bak
+MANIFEST.SKIP~
+cover_db
+Makefile$
+Makefile.old$
+tar.gz$
+\.tmp$
+\.html$

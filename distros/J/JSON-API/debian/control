@@ -1,0 +1,14 @@
+Source: libjson-api-perl
+Maintainer: Geoff Franks <geoff.franks@gmail.com>
+Section: perl
+Priority: optional
+Build-Depends: libjson-perl, debhelper (>= 8), libtest-fake-httpd-perl, libio-capture-perl, libwww-perl, libtest-pod-coverage-perl, liburi-encode-perl, perl, perl-modules
+Standards-Version: 3.9.3
+
+Depends: perl, libjson-perl, liburi-encode-perl, libwww-perl
+Description: Module to interact with a JSON API
+Package: libjson-api-perl
+Architecture: all
+
+#Version: 1.0.2-23
+#Installed-Size: 51

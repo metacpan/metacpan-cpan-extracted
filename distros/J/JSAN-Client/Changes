@@ -1,0 +1,106 @@
+Revision history for Perl extension JSAN-Client
+
+0.29 Wed Jun 23 2010
+    - Fixed bug, when archive, created with Archive::Tar,
+      couldn't be extracted correctly
+
+0.28 Wed  9 Jun 2010
+    - Adding support for .tgz files
+
+0.27 Tue  1 Jun 2010
+    - Fixed bug, when content of binary files could 
+      been corrupted during installation
+
+0.26 Wed 27 Jan 2010
+    - Implemented static files handling 
+      (css, images, any arbitrary resources in general)
+
+0.25 Fri  8 Jan 2010
+    - Adding missing DBD::SQLite dependency
+
+0.24 Mon 14 Dec 2009
+    - Adding missing DBI dependency
+
+0.23 Wed 28 Oct 2009
+    - Various structural tidying
+
+0.22 Tue 29 Sep 2009
+    - Removed redundant JSAN::URI class
+
+0.21 Sat 26 Sep 2009
+    - Updated to ORLite::Mirror 1.17 with prune support
+    - Use prune support in the tests to avoid accidentally creating
+      files in the user's directory with root permissions when they install
+      with sudo.
+    - Parameters to JSAN::Client are passed through to JSAN::Index, and
+      thusly to ORLite::Mirror et al.
+
+0.20 Thu 24 Sep 2009
+    - Updated to Module::Install::DSL 0.91
+    - Migrating from Class::DBI to ORLite
+    - Inline all the generated table code to do non-standard things
+    - Tabs to spaces (alas)
+    - Cleaning up various stuff for a new public release
+
+0.17 Wed 16 Apr 2008
+    - Incremental release to upgrade Module::Install and tests
+    - Fixing a dependency bug
+
+0.16 Mon 22 Jan 2007
+    - Updating dependencies and copyright
+
+0.15 Mon 22 Jan 2007
+    - Add support for per-mirror hashed subdirs in the cache
+      (This should ensure we don't accidentally merge
+       caches from different dates)
+
+0.14 Sun  1 Oct 2006
+    - Ported from HTML::Location to URI::ToDisk
+    - Some minor cleanups
+    - Updated to Module::Install 0.64
+
+0.13 Sat Jul  1 2006
+    - Casey turned on mirror.conf
+    - Turned off URI skipping
+
+0.12 Fri Jun 30 2006
+    - Cleaning up inpreparation for a new round of releases
+    - Upgrading to Module::Install 0.63
+
+0.11 Sun Jan 29 2006
+    - Fix to handle a change in the Class::DBI API (grrr)
+    - Upgraded to Module::Install 0.55
+
+0.09 Sat Aug 27 2005
+    - Got sick of having all the index in one big file
+    - Refactored the main bits out into their own files
+
+0.08 Thu Aug 25 2005
+    - Added support for build-time dependency traversal instead of install-time traversal
+    - Reoranised the way we specify the install type to make things more flexible
+
+0.07 Thu Aug 25 2005
+    - Fixing bug in newline localisation which was accidentally adding <br> tags
+    - Catch the use of odd params and die appropriately
+
+0.06 Sun Aug 21 2005
+    - Completed first working version of JSAN::Client
+    - JSAN::Client->new( prefix => $path )->install_library('Display.Swap') works! :)
+
+0.05 Sat Aug 20 2005
+    - Added a ton of utlity methods
+    - Integrated Algorithm::Dependency
+    - Completed dist/release/library dependency functionality
+
+0.04 Fri Aug 19 2005
+    - Completed the bulk of JSAN::Index, except for extracting from Zip files
+    - Made JSAN::Transport create a database handle that is sane with Class::DBI
+    - Completed some basic ->extract_... methods
+    - Completed main unit testing for JSAN::Index
+
+0.03  missing
+
+0.02  missing
+
+0.01  Thu Aug 18 2005
+    - original version

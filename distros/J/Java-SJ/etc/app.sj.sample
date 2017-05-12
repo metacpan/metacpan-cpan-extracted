@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<sj>
+	<name>sleeper</name>
+	<class>uk.co.src.sleeper</class>
+	<classpath>
+		<dir path="/home/wiggly/src/src-java/java"/>
+		<jar file="/home/wiggly/lib/java/commons-cli-1.0.jar"/>
+	</classpath>
+</sj>

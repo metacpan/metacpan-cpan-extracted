@@ -1,0 +1,109 @@
+NAME
+    JSON::GRDDL - transform JSON to RDF
+
+SYNOPSIS
+     # Low-Level Interface
+     #
+     my $grddl = JSON::GRDDL->new;
+     my @transformations = $grddl->discover($jsondoc, $baseuri);
+     foreach my $trans (@transformations)
+     {
+       my $model = $grddl->transform_by_uri($jsondoc, $baseuri, $trans);
+       # $model is an RDF::Trine::Model
+     }
+
+     # High-Level Interface
+     #
+     my $grddl = JSON::GRDDL->new;
+     my $model = $grddl->data($jsondoc, $baseuri);
+     # $model is an RDF::Trine::Model
+
+DESCRIPTION
+    This module implements jsonGRDDL, a port of GRDDL concepts from XML to
+    JSON.
+
+    jsonGRDDL is described at <http://buzzword.org.uk/2008/jsonGRDDL/spec>.
+
+    This module attempts to provide a similar API to XML::GRDDL but differs in
+    some respects.
+
+  Constructor
+    `JSON::GRDDL->new`
+        The constructor accepts no parameters and returns a JSON::GRDDL
+        object.
+
+  Methods
+    `$grddl->ua`
+    `$grddl->ua($ua)`
+        Get/set an LWP::UserAgent object for HTTP requests.
+
+    `$grddl->data($json, $base, %options)`
+        This is usually what you want to call. It's a high-level method that
+        does everything for you and returns the RDF you wanted. $json is the
+        raw JSON source of the document, or an equivalent Perl
+        hashref/arrayref structure. $base is the base URI for resolving
+        relative references.
+
+        Returns an RDF::Trine::Model.
+
+    `$grddl->discover($json, $base, %options)`
+        You only need to call this method if you're doing something unusual.
+
+        Processes the JSON document to discover the transformation associated
+        with it. $json is the raw JSON source of the document, or an
+        equivalent Perl hashref/arrayref structure. $base is the base URI for
+        resolving relative references.
+
+        Returns a list of URLs as strings.
+
+    `$grddl->transform_by_uri($json, $base, $transformation, %options)`
+        You only need to call this method if you're doing something unusual.
+
+        Transforms a JSON document into RDF using a JsonT transformation,
+        specified by URI. $json is the raw JSON source of the document, or an
+        equivalent Perl hashref/arrayref structure. $base is the base URI for
+        resolving relative references. $transformation is the URI for the
+        JsonT transformation.
+
+        Returns an RDF::Trine::Model.
+
+    `$grddl->transform_by_jsont($json, $base, $code, $name, %options)`
+        You only need to call this method if you're doing something unusual.
+
+        Transforms a JSON document into RDF using a JsonT transformation,
+        specified as a Javascript code, variable name pair. $json is the raw
+        JSON source of the document, or an equivalent Perl hashref/arrayref
+        structure. $base is the base URI for resolving relative references.
+        $code and $name must be suitable for passing to the `new` constructor
+        from the JSON::T package.
+
+        Returns an RDF::Trine::Model.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org/>.
+
+SEE ALSO
+    Specification: <http://buzzword.org.uk/2008/jsonGRDDL/spec>.
+
+    Related modules: JSON, JSON::T, JSON::Path, JSON::Hyper, JSON::Schema,
+    XML::GRDDL.
+
+    <http://www.perlrdf.org/>.
+
+    This module is derived from Swignition
+    <http://buzzword.org.uk/swignition/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    Copyright 2008-2011 Toby Inkster.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

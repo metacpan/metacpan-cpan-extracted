@@ -1,0 +1,18 @@
+Revision history for Perl extension JSAN-Librarian
+
+0.03 Thu  3 Jul 2008
+	- Updating to Module::Install 0.77
+	- Updating bundled author files
+	- Apply FFR change to stat half as often
+	- Removed dependency on base.pm
+	- Added Params::Util for more robust param checking
+
+0.02 Tue 26 Jul 2005
+	- Added JSAN::Librarian::Library and JSAN::Librarian::Book
+	- Added missing Changes
+	- Caught a bunch of errors in JavaScript::Librarian now we can test it
+	- Tested that the whole thing works
+
+0.01 Tue 26 Jul 2005
+	- original version
+	- Doesn't contain any usable ::Library classes yet

@@ -1,0 +1,326 @@
+{
+   "abstract" : "Web App Framework",
+   "author" : [
+      "celogeek <me@celogeek.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Jedi",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0",
+            "CGI::Cookie::XS" : "0",
+            "CGI::Deurl::XS" : "0",
+            "CHI" : "0",
+            "Carp" : "0",
+            "Config::Any" : "0",
+            "HTTP::Body" : "0",
+            "Import::Into" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "1.003001",
+            "Moo::Role" : "0",
+            "MooX::Options" : "4.012",
+            "Net::IP::XS" : "0",
+            "Plack::Runner" : "0",
+            "Sys::HostIP" : "0",
+            "YAML::XS" : "0",
+            "autobox" : "0",
+            "feature" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON" : "0",
+            "Path::Class" : "0",
+            "Plack::Test" : "0",
+            "Scalar::Util" : "0",
+            "Slurp" : "0",
+            "Test::More" : "0.94",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/celogeek/perl-jedi/issues"
+      },
+      "homepage" : "https://tasks.celogeek.com/projects/perl-modules-jedi",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/celogeek/perl-jedi.git",
+         "web" : "https://github.com/celogeek/perl-jedi"
+      }
+   },
+   "version" : "1.008",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.012002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@GRS/@Filter/GatherDir",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@GRS/@Filter/PruneCruft",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@GRS/@Filter/ManifestSkip",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@GRS/@Filter/MetaYAML",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@GRS/@Filter/License",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@GRS/@Filter/Readme",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@GRS/@Filter/ExtraTests",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@GRS/@Filter/ExecDir",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@GRS/@Filter/ShareDir",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@GRS/@Filter/Manifest",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@GRS/@Filter/TestRelease",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@GRS/@Filter/ConfirmRelease",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "name" : "@GRS/ModuleBuild",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions",
+            "name" : "@GRS/ReportVersions",
+            "version" : "1.110730"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@GRS/OurPkgVersion",
+            "version" : "0.005001"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prepender",
+            "name" : "@GRS/Prepender",
+            "version" : "1.112280"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@GRS/AutoPrereqs",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@GRS/Prereqs",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : "0",
+                  "fail_on_warning" : "author",
+                  "fake_home" : "0",
+                  "filename" : "t/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : "0",
+                  "phase" : "test",
+                  "script_finder" : [
+                     ":ExecFiles"
+                  ],
+                  "skips" : []
+               }
+            },
+            "name" : "@GRS/Test::Compile",
+            "version" : "2.051"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::UnusedVars",
+            "name" : "@GRS/Test::UnusedVars",
+            "version" : "2.000007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneFiles",
+            "name" : "@GRS/PruneFiles",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeMarkdownFromPod",
+            "name" : "@GRS/ReadmeMarkdownFromPod",
+            "version" : "0.141140"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@GRS/MetaJSON",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@GRS/MetaConfig",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugin" : "@GRS",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ]
+               }
+            },
+            "name" : "@GRS/PodWeaver",
+            "version" : "3.102000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PerlTidy",
+            "name" : "@GRS/PerlTidy",
+            "version" : "0.21"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@GRS/Test::Perl::Critic",
+            "version" : "3.000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
+            "name" : "@GRS/Test::Kwalitee::Extra",
+            "version" : "v0.2.1"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "5.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "5.008"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "5.008"
+      }
+   }
+}
+

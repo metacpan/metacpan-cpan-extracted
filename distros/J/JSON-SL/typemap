@@ -1,0 +1,23 @@
+TYPEMAP
+
+PLJSONSL *	T_PLJSONSL
+PLTUBA*		T_PLTUBA
+
+INPUT
+T_PLJSONSL
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvIOK(SvRV($arg)))) {
+	die(\"Not a valid JSON::SL object\");
+	}
+
+	$var = NUM2PTR(PLJSONSL *, SvIV(SvRV($arg)));
+
+T_PLTUBA
+	if (! (SvROK($arg) && SvOBJECT(SvRV($arg)) && SvTYPE(SvRV($arg)) >= SVt_PVHV)) {
+	die(\"Not a valid JSON::SL::Tuba object\");
+	}
+    $var = (PLTUBA*)hv_fetchs((HV*)SvRV($arg), PLTUBA_HKEY_NAME, 0);
+    if ($var == NULL || (SvIOK(*(SV**)$var) == 0 && SvREFCNT($arg))) {
+        die(\"Did you mangle my hash?!\");
+    }
+    $var = NUM2PTR(PLTUBA *, SvIV(*(SV**)$var));
+

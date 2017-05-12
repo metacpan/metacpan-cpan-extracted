@@ -1,0 +1,7 @@
+<%init>
+my $title = "Jifty::Plugin::GoogleAnalytics test (dispatcher)";
+</%init>
+
+<&| /_elements/wrapper, title => $title &>
+<% $title %>
+</&>

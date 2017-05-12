@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                JSON-XS-VersionOneAndTwo
+version:             0.31
+abstract:            ~
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    JSON::XS:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

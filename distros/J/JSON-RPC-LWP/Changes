@@ -1,0 +1,41 @@
+0.007     2016-01-24
+
+  - Removed the 'id_generator' functionality
+  - Deprecate id_generator and previous_id attributes
+  - Delay creating 'ua' and 'marshal' objects
+  - Changed agent attribute from 'Maybe[Str]' to 'Str'
+
+0.006     2011-04-08
+
+  - The agent attribute will now be more appropriate for sub-classing modules
+  - Allow user to reset the id_generator to the original
+  - Require namespace::clean v0.20
+  - Flattened all tests ( no subtests )
+
+0.005     2011-03-04
+
+  - Took over control of agent attribute from ua
+    Now it sets ->ua->agent and ->marshal->user_agent
+  - Added id_generator attribute
+    Now it's possible to control the id's that get used in the call method
+  - Removed count attribute
+
+0.004     2011-03-02
+
+  - Improved checking for version attribute
+  - Allow setting of inherited attributes, in constructor
+
+0.003     2011-03-01
+
+  - Force use of a newer URI module
+    Tests failed when using URI v1.54 or earlier
+
+0.002     2011-02-28
+
+  - Hopefully fixed minor error in test file t/load.t
+  - Added notify method to JSON::RPC::LWP
+  - Removed complicated -key => param interface to call method
+
+0.001     2011-02-25
+
+  - Initial release

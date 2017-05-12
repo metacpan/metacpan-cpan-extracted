@@ -1,0 +1,192 @@
+Revision history for Perl extension JavaScript.
+
+1.16  2010-02-20
+	- Fixed a bunch of memory leaks (Scott++ for reporting them)
+	- Added some missing private docs for jsc_set_pending_exception
+	
+1.15  2010-01-04
+	- It's now possible to set a pending exception in the context from Perl space (Scott McWhirter)
+	- can now set JS_LIB_NAME in environment prior to running perl Makefile.PL 
+	  so that different library name can be specified (James)
+	- binding a value explicitly unsets $@ after it tests to see if something has been bound. (James)
+	
+1.14  2009-12-01
+	- No functional changes, just a re-dist. (Damn you OS X for preserving resource forks when I don't want it...)
+	
+1.13  2009-11-30
+	- Fixes compilation issues agains SM from MacPorts. [rt.cpan.org #48702] (Dominic Mitchell)
+	- Fixes compilation issues on Win32 (Apachez)
+	- Don't try to reinit UTF8 cstrings if already done as that'll assert libjs
+	- Don't consume the elements of arrays when converting to JS. [rt.cpan.org #46356] (Sergey Zhuravlev)
+	- Added support for Generators (James Duncan)
+	
+1.12  2009-04-04
+	- Guard against stack corruption (Salvador Ortiz Garcia)
+	- 64-bit build issues (Salvador Ortiz Garcia)
+	- Updated Makefile.PL to use new META_* instead of EXTRA_META for repo.
+	- Update UTF8 stuff to work with SM 1.8 (James Duncan)
+	- Added a native PerlSub type that encapsulates Perl subs.
+	- Converts SM regexps to Perl regexps (James Duncan)
+	- Added 'apply' method to bound Perl subs (James Duncan)
+    - JavaScript::Context is now a PJS_Context * (T_PTROBJ) and not a hash
+    - JavaScript::Error now has a stacktrace method that returns the JS stacktrace.
+    
+1.11  2008-08-23
+    - Added get_options, has_options and toggle_options so one can enable stuff like strict mode and JIT compilation
+      if the underlying SpiderMonkey supports it (TraceMonkey ftw!).
+      
+1.10  2008-08-11
+    - Warn user that JS_THREADSAFE is not what's recommended.
+    - Added a native PerlHash type that encapsulates a Perl hash reference in JavaScript.
+    - Added a native PerlArray type that encapsulates a Perl array reference in JavaScript.
+    - Changed the linked list that stores bound classes to a pair of HVs storing JavaScript::PerlClass objects instead
+      which are basically just PJS_Class* instances.
+    - Changed the linked list that stores bound functions to an HV storing JavaScript::PerlFunction objects instead
+      which are basically just PJS_Function* instances.
+    - Fixed a couple of problems that cause contexts no to be destroyed when supposed to
+    - Added resources section to META.yml with pointer to repository
+    - Improved the test suite a bit by naming tests
+    
+1.09  2008-08-03
+    - It's now possible to set and get the version of JS our context is dealing with since in
+      some cases such as using 'let' and 'yield' we actually have to specify that we want
+      1.7 features.
+    - Fix a bunch of small pod issues. [rt.cpan.org #30333]
+    - Fix Changes (this file) to use ISO 8601 dates
+    
+1.08  2008-05-08
+    - Fixes Makefile.PL issues which made it fail on various platforms when trying to compile test app.
+    - Added option to skip building of test app. Set environment variable JS_FORCE to a true value.
+    
+1.07  2008-05-06
+    - Makefile.PL should abort with exit code 0 if conditions are not met instead of exit code 1.
+    - Don't increase refcount for object originating from Perl (James Duncan).
+    - Make bind_value croak if trying to rebind an already existing property.
+    - bind_value (object|function) will now throw an error if the target already exists. [rt.cpan.org #35572]
+    - Added unbind_value to remove objects, functions and value from the context. [rt.cpan.org #35572]
+    - Fix longtime memory leak caused by decreasing refcount on RV instead of on the 
+      SV the RV references. [rt.cpan.org #35571]
+    
+1.06  2008-04-18
+    - Objects returned when creating constructor for bound classes should not increment
+      refcount because this causes the objects to never be freed (James Duncan)
+    - Docs stated argument constructor could be omitted in bind_class which wasn't the case and 
+      so now it can and a default constructor will be created.
+      
+1.05  2008-04-01
+    - Drop support for error handlers
+    - This module now requires SpiderMonkey 1.7 or later.
+    - Makefile.PL now compiles a small test to see if libs and headers can be found
+    - Makefile.PL now discovers install locations on CentOS5 (Gavin Carr)
+    - Drop support for Perl 5.6.x and earlier because we need some API symbols not available there 
+      and they don't support unicode properly either. [rt.cpan.org #31114]
+      
+1.04  2007-11-17
+    - Skip exception tests on engines less than 1.7 since these seem to be broken.
+    - Free memory allocated by JS_smprintf when converting from utf8 strings (spotted by Ash Berlin)
+    - Don't call js_ValueToXMLString but instead call JS method "toXMLString" on the object [rt.cpan.org #26411]
+    - Convert 64bit Perl ints to JSDouble if they are too big to fit in JS ints [rt.cpan.org #26474] (Niko Tyni)
+    - Add more include paths when building on debian [rt.cpan.org #26411] (Niko Tyni)
+    - Fix typo in exceptions.c that didn't get global object correctly [rt.cpan.org #26411] (Niko Tyni)
+    - Use JS_ExecuteScript instead of js_Execute [rt.cpan.org #26411] (Niko Tyni)
+    - Allow keys/properties to be unicode (Fotango)
+    - Object construction can now throw exceptions and it'll propagate to JS space [rt.cpan.org #26215]
+    - Handle recursive structures better (Fotango)
+    - Specify $(O_FILES) instead as a list of .o files as Writefile(OBJECT => ...)
+    - Use JS_CallFunction instead of js_InternalCall so we can link aginst libjs build with hidden internals [rt.cpan.org #26411]
+    - Remove support for custom stacksize since it's not what we thought it was (Fotango)
+    - Add tests for exceptions (Fotango)
+    - Split up giant .XS file into smaller pieces
+    - Added CREDITS to MANIFEST so it's bundled with the distribution
+    
+1.03  2007-02-21
+    - Honor value of JS_ENABLE_E4X
+    - Improved README
+    - Added CREDITS
+    - Remove unused variables to silence some cc warnings
+    - Remove ; from #include directive that can cause compilation warning (Fotango)
+    - Skip t/24-c-level-interrupt-handler.t if Inline::C is not installed (Fotango)
+    - Added module Test::JavaScript::More that's like Test::More but for JavaScript (Fotango)
+    - Added support extending JavaScript::Runtime. This obsoletes "(void *) ext" field in PJS_Runtime and PJS_Context.
+    - Added support for multple interrupt handlers. One at perl level and unlimited at C level.
+    - A report->linebuf that's NULL should be undefined and not an empty string (Fotango)
+    - Use SvPVutf8 macro instead of accessing via sv_2svutf8 (Fotango)
+    - Added JavaScript->supports(@features) to check feature support such as e4x, ut8, threading.
+    - Added does_support_utf8, does_support_threading and does_support_e4x. But really one should
+      be using the method above.
+    - Bridge E4X objects into perl space as strings (Fotango)
+    - Allow building with debug symbols (set JS_DEBUG to a true value) (Fotango)
+    - Allow setting JS_THREADSAFE and JS_UTF8 to true/false to avoid the prompts (Fotango)
+
+1.02  2007-02-17
+    - Makefile.PL now generates a JavaScript_Env.h that sets correct defines and includes correct headers
+    - Structs, macros etc are now in a JavaScript.h
+    - Header files and typemap is now installed with module
+    - Added ext field (void *) to PJS_Runtime and PJS_Context that can be used custom stuff
+            
+1.01  2007-02-12
+    - Added support for detecting DarwinPorts [rt.cpan.org #14910]
+    - Added missing test for converting JavaScript booleans -> Perl
+    - Integrated patch that fixes compilation problems on Debian (Toru Yamaguchi, Daniel Burke)
+    - Cleaned up TODO
+
+1.00  2006-09-04
+    - Release of 1.00
+
+1.00_02  2006-08-19
+    - Incorporated patch to support new SpiderMokey installation-scheme in Debian [rt.cpan.org #18152]
+    - Passing ERRSV to SVToJSVAL doesn't seem to be safe so we'll pass a copy instead (Tom Insam)
+    - Cleaning up some internal function names
+
+1.00_01  2006-07-11
+    - Fixed invocation of methods on objects
+    - Added support for "static" methods of classes, i.e. "Test.foo(...)" should now work
+    - Added support for "static" properties of classes, i.e. "Test.bar = 10"; should now work
+    - get_engine_version now returns a list in list context with (engine, version and date of build)
+    - You can now attach a custom interrupt handler to a runtime for tracing stuff
+    - Added more tests
+    - Integrated fixes by Fotango (pathes by Chia-liang Kao, Tom Insam, James Duncan)
+        - Support for UTF8 in scripts if SpiderMonkey can handle it
+        - bind_value in JavaScript::Context
+        - Encapsulate returned JavaScript functions as JavaScript::Function objects
+        - Better exception handling
+        - Unitialized line variable in jss_compile
+        - Make sure JavaScript::Context->can also handles undefined values
+        - Lots or more tests
+        - And lots more
+
+0.55  2005-06-30
+    - Fixed error handling (patch by G. Allen Morris III)
+
+0.54  2005-06-29
+    - Make Makefile.PL play happy games with Gentoo (patch by sungo)
+
+0.53  2005-03-18
+    - Added JS_THREADSAFE define, which fixed bug on perl 5.8.5
+      thread-multi linux
+    - added tests for debian spidermonkey libs (debian users can
+      now do "apt-get install libsmjs-dev" and compile the module)
+    - Added JS_PROP_ACCESSOR
+    - Added conversion of boolean values from JS to Perl
+    - moved JS_THREADSAFE to Makefile.PL and made code handle handle
+      both cases (though it appears to be mandatory to get the code
+      to run on perl 5.8.6 threaded and unthreaded)
+    - Fixed a couple of alloc()s
+    
+0.52  2001-08-11
+    - Added can method to JavaScript::Context
+    - Removed the need of passing the JSClass name to bind_object
+    - Fixed issues with package
+    - Fixed return from call
+    - Brought docs up to sync with implementation
+
+0.51  2001-07-26
+    - Changed new_context to create_context to match documentation
+    - Changed create_context to not try and take named arguments
+
+0.5   2001-06-25
+    - First public release
+    
+0.01  2001-03-19
+    - original version; created by h2xs 1.21 with options
+        -f -n JavaScript

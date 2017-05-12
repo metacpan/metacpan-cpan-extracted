@@ -1,0 +1,109 @@
+Revision history for Perl extension JavaScript::SpiderMonkey.
+
+0.21 (23/10/2011)
+    (tb) Added support for CentOS 5 / 64-bit
+    (tb) Added support for MacPorts (RT #44068)
+
+0.20 (29/05/2010)
+    (tb) Applied Ben Bullock's patch which fixes the following:
+           1. JS_Init is deprecated and to be replaced by JS_NewRuntime (RT #48852)
+           2. line number bug in error messages (RT #57572)
+           3. Newline bug in error messages (RT #57617)
+           4. Null pointer bug in error messages.
+           5. spelling mistakes and grammatical errors in documentation
+         and which adds Makefile.PL options to specify the location of the
+         SpiderMonkey libraries. It also removes an unncessary dependency on
+         Log::Log4Perl which is only used in debug mode.
+
+0.19 (05/09/2007)
+    (tb) Allocate correct amount of memory for scripts that contain UTF-8
+         characters with internal UTF-8 flag on. 
+
+0.18 (08/06/2007)
+    (tb) Added protection against infinite loops
+    (tb) Added support for JS_THREADSAFE
+
+0.17 (27/07/2006)
+    (tb) Made sure eval function doesn't produce warnings when script
+         variable is uninitialized.
+         [was supposed to be part of 0.16 but is actually part of 0.17]
+    (tb) Added support for E4X
+
+0.16 (13/06/2006)
+    (tb) Added patch initially proposed by marc [at] igneousconsulting.com
+         and subsequently modified by Agent Zhang that allows mapped perl
+         functions to return varied datatypes back to JavaScript
+
+0.15 (28/02/2006)
+    (tb) Rewrote Makefile.PL to work on more platforms
+
+0.14 (12/02/2006)
+    (tb) Removed remaining debug info
+
+0.13 (05/02/2006)
+    (tb) Removed debug info
+    (tb) Made sure Makefile.PL finds libjs if installed in /usr/lib or 
+         /usr/local/lib
+
+0.12 (12/03/2005)
+    (ms) Makefile.PL prerequisite changed from undef to '0'.
+    (ms) Thomas Busch added a check to Makefile.PL to find an already
+         installed JS lib.
+
+0.11 (08/22/2004)
+      * (ms) Added Log::Log4perl dependency in Makefile.PL as suggested
+             by an anonymous posting on rt.cpan.org.
+      * (ms) Added #define for MSC compiler as suggested in
+             https://rt.cpan.org/Ticket/Display.html?id=6984
+      * (ms) Roger Crew <crew@cs.stanford.edu> provided patches for
+             a clean Win32 compile plus README text on installing the dll/so.
+
+0.10  06/20/2004
+      * Nikita Savin <nikita@savin.go2serve.net> provided a patch to 
+        set $@ instead of printing to STDERR in case of a JS error.
+      * Added patch by Chris Blaise <cblaise@esoft.com>:
+          - Different objects can have the same named function. If no
+            object is specified on function_set, it's global.
+      * Log4perl in for debugging
+      * Chris Blaise submitted a patch to have a perl callback return
+        an object to JS. Applied with modifications, longer term we need
+        a solution on how the perl callback tells the JS wrapper what's coming
+        back: A JS string, an object or an integer.
+
+0.09  02/20/2004
+      * Max Maischein added Win32 installation steps in Makefile.PL
+
+0.08  09/19/2002
+      * Doc bug fixed, reported by Yoz Grahame.
+
+0.07  09/14/2002
+      * Release mgmt changed
+
+0.06  07/10/2002
+      * Made M*PL smarter to detect the JS target platform
+
+0.05  06/23/2002
+      * Added installation instructions to README.
+
+0.04  06/23/2002
+      * Added test case for just setter or just getter
+      * Added documentation
+      * Updated todo list
+
+0.03  06/23/2002 
+      * Added setters and getters for properties
+
+0.02  01/20/2002
+      * Fixed properties (get/set)
+
+0.01  01/03/2002
+      * Where it all began.
+
+TODO: 
+      * setters/getters for arrays
+      * Get rid of GLOBAL and the limitation to one instance
+      * getter/setter called every time, callback settings checked
+        at perl level only
+      * Make fixed constants in init() configurable (1000000)
+      * Allow for different contexts
+      * Rethink function names (by_path, function_set etc.)

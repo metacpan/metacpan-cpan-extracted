@@ -1,0 +1,21 @@
+---
+abstract: 'Read JSON path and output string'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JSON-ReadPath
+requires:
+  Getopt::Long: '0'
+  JSON::XS: '0'
+  Mouse: '0'
+  Template: '0'
+version: '3.01'

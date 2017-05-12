@@ -1,0 +1,56 @@
+Revision history for Perl module JSON::YAJL:
+
+0.10 Thu Aug  4 08:37:47 BST 2011
+     - work aroud the fact that win32 mingw/gcc doesn't have sprintf_s
+     - move dSP to top of callback_call to compile under Microsoft Visual
+       Studio 10.0
+
+0.09 Wed Jul  6 14:06:49 BST 2011
+     - don't test inf and nan under MirOS BSD
+     - work around not finding isinf under Solaris
+     - work around missing sprintf_s under Windows
+
+0.08 Mon Jun 27 14:34:14 BST 2011
+     - update to YAJL 2.0.3
+
+0.07 Mon Apr 18 20:09:36 CEST 2011
+     - link to YAJL website, as pointed out by Olivier Mengué
+     - add homepage, repository and bugtracker distribution metadata
+     - add LICENSE file
+     - add a SAX builder example
+     - add a tokenising example
+     - add a tokenising, parsing with Marpa example
+     - improved documentation
+     - clearer tests
+
+0.06 Sat Apr 16 19:22:54 CEST 2011
+     - fix minor documentation typo
+     - don't test inf and nan under MSWin32
+     - add an interface to the parser
+     - take advantage of typemaps and declarations to minimize
+       XS code
+
+0.05 Thu Apr 14 10:26:20 CEST 2011
+     - use aTHX_ when Perl_croak-ing to work on threaded Perls
+     - only test inf and nan on Perl 5.8.8 and later
+
+0.04 Wed Apr 13 17:09:21 CEST 2011
+     - use 4 instead of 1.23 for testing doubles, as we can't test
+       it in a cross-platform way
+     - work around not finding isinf under Solaris
+     - add const char * to the typemap to support Perl 5.6
+     - throw exceptions upon YAJL error states
+
+0.03 Tue Apr 12 09:56:35 CEST 2011
+     - define NEED_newSVpvn_flags and NEED_sv_2pv_flags, as suggested
+       by ppport.h (this should fix compilation problems with older
+       Perls)
+     - do not ship a Makefile.PL
+     - do not include stdint.h as we do not need it
+
+0.02 Mon Apr 11 15:39:18 CEST 2011
+     - include ppport.h as we use newSVpvn_utf8 (which only came
+       in with 5.011000), as pointed out by Andreas J. König
+
+0.01 Mon Apr 11 11:46:04 CEST 2011
+     - initial release

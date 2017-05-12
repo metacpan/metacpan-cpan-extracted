@@ -1,0 +1,139 @@
+JE, version 0.066
+
+JE is a pure-Perl ECMAScript (JavaScript) engine. Here are some of its
+advantages:
+
+    - Easy to install (no C compiler necessary)
+    - Compatible with Data::Dump::Streamer, so the runtime environment
+      can be serialised
+    - The parser can be extended/customised to support extra (or
+      fewer) language features (not yet complete)
+    - All JavaScript datatypes can be manipulated directly from Perl
+      (they all have overloaded operators)
+
+Here are its main weakness:
+    - It's slow (well, what did you expect?).
+    - It uses lots of memory.
+    - It leaks memory (to be fixed).
+
+This is still an alpha release, but it fully implements ECMAScript v3,
+except for a few seldom-used features like -0.
+
+If  you have the time and the interest,  please experiment  with  this
+module (or maybe even lend a hand :-). If you have any ideas as to how
+the API could be improved or reworked, please e-mail me.
+
+
+RECENT CHANGES
+
+Unfortunately,  I made the mistake of making the previous release  ver-
+sion 0.54 instead of 0.054. I have reset the version on CPAN, so 0.055
+is the current version,  but if anyone has already  upgrade  to  0.054,
+future upgrades will not work from  the  CPAN  shell  without  ‘force’.
+Hopefully two weeks was short enough an interval.  If this causes prob-
+lems for anyone, please let me know and I will increase the version to
+.541 or something similar.
+
+0.066
+-----
+Bug fix:  Math.pow  tries harder to  give  correct  results  for  Math
+.pow(-Infinity, whatever)  on platforms where the  underlying  mathema-
+tics libraries give results different from what  ECMAScript  specifies
+(i.e., some Windows compilers).
+
+0.065
+-----
+Enhancement:  Regexp  stringification (and  RegExp.source) now escape
+backslashes so  that  new RegExp('/')  stringified  is  a  valid  reg-
+exp literal.
+Tests: Two badly-written tests added to t/15.09-dates.t in 0.063 that
+were supposedly fixed in the previous release have now actually  been
+fixed.  (We’ll see. :-)
+
+0.064
+-----
+Enhancement:  ‘new Date()’  now uses  Time::HiRes  to get the current
+time to the nearest millisecond.
+Tests:  Two badly-written tests added to t/15.09-dates.t in the previ-
+ous release have been fixed.
+
+
+TO DO
+
+- Make the parser extensible/customisable
+- Add more helpful error messages
+- Determine some logical way of dealing with locale settings (for
+  String.prototype.localeCompare, et al.)
+- Finish writing tests
+- Deal with circular references
+- Finish making built-in JS properties load lazily
+- Finish optimising JS compiled code by turning it into Perl code
+- Other optimisations
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install JE"
+
+    [sudo] cpan
+    cpan> install JE
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+PREREQUISITES
+
+This module requires perl 5.8.4 or higher and the following modules:
+• Scalar::Util version 1.14 or later
+• The TimeDate distribution (more precisely, Time::Zone, Date::Format
+  and Date::Parse)
+• Encode 2.08 or later
+
+For perl versions earlier than 5.9.4 it also requires
+Tie::RefHash::Weak.
+
+Later it will probably require Unicode::Collate.
+
+There is a slight incompatibility with perl version 5.8.3. If you try
+to create a regular expression with invalid modifiers, you will get a
+warning as well as a SyntaxError. This causes one of the test scripts
+(parse08-regexps.t) to fail.
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with the 
+perldoc command.
+
+    perldoc JE
+
+Or try using man (it's faster, in my experience):
+
+    man JE
+
+
+ACKNOWLEDGEMENTS
+
+Thanks to Max Maischein, Kevin Cameron, Chia-liang Kao and Damyan Iva-
+nov for their contributions,
+
+to Andy Armstrong, Yair Lenga, Alex Robinson, Christian Forster, Imre
+Rad, Craig MacKenna and Toby Inkster for their suggestions,
+
+and to the CPAN Testers for their helpful reports.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-14 Father Chrysostomos
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as perl.

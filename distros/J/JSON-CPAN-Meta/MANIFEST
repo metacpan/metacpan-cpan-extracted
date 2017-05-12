@@ -1,0 +1,11 @@
+Changes
+lib/ExtUtils/MakeMaker/JSONMETA.pm
+lib/JSON/CPAN/Meta.pm
+lib/Module/Build/JSONMETA.pm
+lib/Module/Install/JSONMETA.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/compile.t
+META.json                                Module meta-data (added by MakeMaker)

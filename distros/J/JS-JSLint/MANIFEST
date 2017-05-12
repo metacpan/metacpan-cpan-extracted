@@ -1,0 +1,14 @@
+Build.PL
+Changes
+INSTALL
+lib/JS/JSLint.js
+lib/JS/JSLint.pm
+LICENSE
+MANIFEST			This list of files
+t/00-load.t
+xt/author/kwalitee.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+README
+META.yml
+META.json

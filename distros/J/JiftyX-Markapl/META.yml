@@ -1,0 +1,28 @@
+---
+abstract: 'A Jifty extension to let you use Markapl for templating'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JiftyX-Markapl
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Jifty: 0.9
+  Markapl: 0.09
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.03

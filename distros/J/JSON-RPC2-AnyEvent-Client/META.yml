@@ -1,0 +1,32 @@
+---
+abstract: 'Nonblocking JSON RPC2 client with method mapping.'
+author:
+  - 'Serguei Okladnikov < oklas@cpan.org >, Serguei Okladnikov <oklaspec@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  JSON::RPC2::AnyEvent: 0
+  JSON::RPC2::AnyEvent::Server: 0
+  JSON::RPC2::AnyEvent::Server::Handle: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JSON::RPC2::AnyEvent::Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: 0
+  AnyEvent::Handle: 0
+  JSON::RPC2::Client: 0
+  JSON::XS: 0
+  perl: 5.008005
+  version: 0
+version: 0.01

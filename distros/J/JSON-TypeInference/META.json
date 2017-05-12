@@ -1,0 +1,119 @@
+{
+   "abstract" : "Inferencing JSON types from given Perl values",
+   "author" : [
+      "aereal <aereal@aereal.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JSON-TypeInference",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.33",
+            "List::UtilsBy" : "0",
+            "Scalar::Util" : "0",
+            "Types::Serialiser" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Coveralls" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "JSON::TypeInference" : {
+         "file" : "lib/JSON/TypeInference.pm",
+         "version" : "v1.0.2"
+      },
+      "JSON::TypeInference::Type::Array" : {
+         "file" : "lib/JSON/TypeInference/Type/Array.pm"
+      },
+      "JSON::TypeInference::Type::Atom" : {
+         "file" : "lib/JSON/TypeInference/Type/Atom.pm"
+      },
+      "JSON::TypeInference::Type::Boolean" : {
+         "file" : "lib/JSON/TypeInference/Type/Boolean.pm"
+      },
+      "JSON::TypeInference::Type::Maybe" : {
+         "file" : "lib/JSON/TypeInference/Type/Maybe.pm"
+      },
+      "JSON::TypeInference::Type::Null" : {
+         "file" : "lib/JSON/TypeInference/Type/Null.pm"
+      },
+      "JSON::TypeInference::Type::Number" : {
+         "file" : "lib/JSON/TypeInference/Type/Number.pm"
+      },
+      "JSON::TypeInference::Type::Object" : {
+         "file" : "lib/JSON/TypeInference/Type/Object.pm"
+      },
+      "JSON::TypeInference::Type::String" : {
+         "file" : "lib/JSON/TypeInference/Type/String.pm"
+      },
+      "JSON::TypeInference::Type::Union" : {
+         "file" : "lib/JSON/TypeInference/Type/Union.pm"
+      },
+      "JSON::TypeInference::Type::Unknown" : {
+         "file" : "lib/JSON/TypeInference/Type/Unknown.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aereal/JSON-TypeInference/issues"
+      },
+      "homepage" : "https://github.com/aereal/JSON-TypeInference",
+      "repository" : {
+         "url" : "git://github.com/aereal/JSON-TypeInference.git",
+         "web" : "https://github.com/aereal/JSON-TypeInference"
+      }
+   },
+   "version" : "1.0.2",
+   "x_authority" : "cpan:AEREAL",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ]
+}

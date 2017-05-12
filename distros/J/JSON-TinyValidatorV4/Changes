@@ -1,0 +1,10 @@
+Revision history for Perl module JSON::TinyValidatorV4
+
+0.003 2015-04-25
+    - bump min perl version to 5.010
+
+0.002 2015-04-25
+    - pod tweaks, link to guthub
+
+0.001 2015-04-25
+    - Initial release

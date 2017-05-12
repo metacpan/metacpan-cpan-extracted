@@ -1,0 +1,20 @@
+Build.PL
+Changes
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/substvars
+json-api.spec
+lib/JSON/API.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/000_pod.t
+t/001_load.t
+t/core.t
+t/requests.t
+META.yml
+META.json

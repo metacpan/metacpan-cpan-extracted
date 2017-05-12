@@ -1,0 +1,104 @@
+Welcome to the Frightening World of Java/Perl interoperability!
+ 
+See 'Changes' files for the latest & greatest!
+
+See below for instructions on how to install on a Windows box running
+ActiveState Perl.
+
+1/19/04
+The Java portion has been bumped up to 5.x only because the java classes
+now reside in the com.zzo.javaserver package.  So to start the server
+you should now:
+% java -cp /path/to/JavaServer.jar com.zzo.javaserver.JavaServer
+This does NOT effect the perl stuff at all.
+The perl stuff got a minor bump 'cuz the test script should work now...
+However previous 4.x Perl versions are compatible with the new 5.x JavaServer.jar
+
+
+Once again a major version change meaning the 4.x is NOT backwards
+compatibile with previous JavaServer versions.  The 4.x stuff gives
+you very basic authorization, ability to turn off the event_port if
+you're not doing GUI work, and 'callbacks' that allow your Java classes
+to make Perl calls.  Also in 4.x 'use_tied_arrays' is now the default,
+to use 'old-style' array handling you have to say 'use_old_style_arrays=>1'
+in your constructor - which you really should not be using anymore!
+Again check out the 'Changes' file and the perldoc and a new examples
+directory called 'java2perl' for some callback examples.
+WARNING:  the callback infrastructure is EXPERIMENTAL - use at your
+own risk & let me know how it goes.  
+Big Thanks to Achim Settelmeier for the Callback & Authorization stuff -
+keep that twisted mind working!
+
+DON'T FORGET - If you recompile any Java classes that JavaServer is using
+you MUST STOP AND RESTART JavaServer so it will pick up your changes!!
+
+Good Idea Department:
+If you stick all of your Java classes you use with JavaServer into one
+directory the startup script for JavaServer will be much simpler since
+you won't have to fiddle with the CLASSPATH all the time since all of your
+stuff will be in one spot - always.
+
+Version 3.x of JavaServer & Java.pm are NOT backwards compatible!!!
+You MUST use a 3.x version of JavaServer with a 3.x version of Java.pm
+& same for 2.x and 1.x versions!
+
+Check out the 'Changes' file for new stuff in the 3.0 version of the
+Java code bundled with Java-3.0 - basically a protocol change to allow
+for multi-lined Strings.
+
+There are two parts to this:
+1. The 'Backend' - which is contained in 'JavaServer.jar'.  The backend must be
+running for the 'Frontend' (part #2) to work.  Run 'install_java_server.pl'
+to get this part going.  The 'main' Java class is called 'JavaServer' so
+you end up running the thing as 'java -classpath <classpath> JavaServer'
+JavaServer listens on a port for incoming connexions from Frontends - you
+can alter the default port of 2000 by specifying it on the command line like:
+java -classpath <classpath> JavaServer 8000
+Will start the server listening on port 8000.  You would then need to tell
+the Java Perl module to connect to port 8000 instead of the default like:
+my $java = new Java(port => 8000);
+More on this below.
+2. The 'Frontend' - which is the Perl module 'Java.pm' which you install
+as any other Perl module.
+
+First be sure to run 'install_java_server.pl' to get your JavaServer environment
+set up and happy.
+Make sure 'JavaServer' is up and running before you try to run any tests!
+
+Basically you just need to add 'JavaServer.jar' to your classpath on the 'java'
+command line (which unfortunately forces you to also add in classes.zip
+manually).  Run the 'install_java_server.pl' and it will create a shell
+or batch file for you (most likely) - or at least tell you what you need to
+to.
+
+Please see the javadoc on Java for LOTS more information.
+
+JavaServer Tested On Matrix:
+
+	JVM	1.1.8		1.2
+Platorm
+-------
+NetBSD		Yep		<Not available>
+Solaris		Yep		Yep
+Windows '98	Yep		Yep
+Linux		Yep		Yep
+
+In theory - according to 'Write Once Run Anywhere' that is! - JavaServer should run no problem under any 1.1+ JVM.  It doesn't really do anything too fancy.
+The 'SwingEventListener' does need Swing to be loaded (or accessible) to the
+JVM to use Swing events & of course Swing classes.
+You can run JavaServer just fine if Swing isn't available - it'll automatically
+detect that Swing isn't available and use 'EventListener' rather than 
+'SwingEventListener'.  That gets ya all the plain old AWT events.
+'SwingEventListener' subclasses 'EventListener' & just adds all them bizzare
+Swing events.
+
+A great place to look is the 'test.pl' script and in the 'examples' directory.
+
+ACTIVESTATE USERS
+Thanks to John Z. for this info:
+1. to install under activeperl, users needs to download nmake15. and use 
+the nmake instead of make on the usual perl install. location of 
+nmake15.exe is under ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+instrtuction on how its used with activestate modules is 
+www.activestate.com/Products/ActivePerl/docs/faq/ActivePerl-faq2.html
+

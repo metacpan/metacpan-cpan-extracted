@@ -1,0 +1,84 @@
+This directory contains a little Java project and the Java::Build tools
+needed to build it.  The build process is overkill in this case, but
+it shows you the pieces.  If your life is like mine, your projects are
+much more "interesting" than this one.
+
+To try out the application type:
+export CLASSPATH=$CLASSPATH:/path/suns/tools.jar
+perl Makefile.PL
+make
+make test
+cd demo
+./build.driver
+java -cp screen:common/common.jar com.example.screen.Main screen.txt char
+
+The rest of this file describes in some detail the files in this directory.
+
+build.config
+This file describes the subprojects in the project.  These descriptors
+are exhibited in a list of hash references in the order they should be built.
+You can see by reading the file that there are two projects: common and
+screen (see below).  The PROJECT_DIR is none other than this dir.
+BUILD_SUCCESS can be any writable file, it will be overwritten with build
+status (namely the name of the last successful build step).  If your
+project needs custom build steps, include the code here.  In that case it
+might be better to inherit from MyBuild so that overriding methods won't
+result in warnings.
+
+build.driver
+This is the driver of the build (that means you run it to do a build).
+It uses MyBuild (see below) and requires build.config (see above).
+This file exists to specify the order of the steps in a build which
+are listed in the call to targets.  It also makes a MyBuild object (which
+is just the config hash blessed into MyBuild).  Finally, it calls GO with
+whatever you specify on the command line.  The things you specify are
+steps named in the call to targets.
+
+common
+This is directory where the common code lives.  The common code is under
+com/example/common.  It includes two layout managers and a special JLabel.
+Feel free to have a peek at the code.
+
+common/common.jar
+This file will only appear when you build successfully.  It contains
+all the class files under the common directory.
+
+demo.log
+After you run at least one build, this file will show the steps in
+the build.  It's not very good, it's not timestamped for example.  Feel
+free to use a better logging scheme.
+
+_Inline
+You don't need to worry about this directory.  It is here, because I used
+Inline::Java to gain access to a single JVM for compiling.  You can
+remove it at any time, Inline::Java will replace it when you run build.driver
+again.  (If you supplied a directory for Inline to use during Makefile.PL,
+it will be used instead.)
+
+MyBuild.pm
+This is where the steps in the build are implemented.  The key is the set
+of subroutines whose names match the steps in the targets call in
+build.driver.  It also makes sure that the required elements are in
+the hash at construction time.  It could provide defaults, by including
+different coderefs in the @attrs array.  Instead, each coderef kills
+the driver with a nasty message.
+
+The constructor has the three key steps of a custom build driver:
+    1. set the ATTRIBUTES key in the project hash
+    2. call Java::Build::GenericBuild::process_attrs on the hash
+       (it actually enforces the attributes, by calling the coderef
+       for any missing key)
+    3. blesses the object and returns it to the caller
+
+README
+This file.
+
+screen
+Home of the screen application code.  It's actually in
+screen/com/example/screen/Main.java.  This application displays text
+fields on the screen using the common code for its label component and
+layout.
+
+screen.txt
+A little file for use in testing the application.
+

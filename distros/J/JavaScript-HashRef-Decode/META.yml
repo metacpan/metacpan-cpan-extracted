@@ -1,0 +1,25 @@
+---
+abstract: "JavaScript \"simple object\" (hashref) decoder"
+author:
+  - 'Marco Fontani'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: JavaScript-HashRef-Decode
+requires:
+  Exporter: 0
+  Parse::RecDescent: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/mfontani/JavaScript-HashRef-Decode/issues
+  repository: git://github.com/mfontani/JavaScript-HashRef-Decode.git
+version: 0.133120

@@ -1,0 +1,102 @@
+[PARSED] json_null_literal->(null)
+	JsonNull<null>
+
+[PARSED] json_bool_literal->(true)
+	JsonBool<true>
+
+[PARSED] json_bool_literal->(false)
+	JsonBool<false>
+
+[PARSED] json_string_char->(chars)
+	JsonStringChar<chars>
+
+[PARSED] star_string_chars->(String chars?
+)
+	JsonStringChar<String>
+	JsonStringChar<chars>
+	JsonStringChar<?>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+
+[PARSED] json_string->("This. Is
+a string?")
+	JsonQuote<">
+	JsonStringChar<This>
+	JsonStringChar<.>
+	JsonStringChar<Is>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	JsonStringChar<a>
+	JsonStringChar<string>
+	JsonStringChar<?>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	JsonEscapeSeq<#[\JsonEscapeSeq]>
+	JsonQuote<">
+
+[PARSED] json_member_list->("nada":null)
+	JsonQuote<">
+	JsonStringChar<nada>
+	JsonQuote<">
+	JsonColon<:>
+	JsonNull<null>
+
+[PARSED] json_element_list->(true, false, null, 1, 2)
+	JsonBool<true>
+	JsonComma<,>
+	JsonBool<false>
+	JsonComma<,>
+	JsonNull<null>
+	JsonComma<,>
+	JsonNum<1>
+	JsonComma<,>
+	JsonNum<2>
+
+[PARSED] json_array->([1, 2])
+	JsonSquareBracket<[>
+	JsonNum<1>
+	JsonComma<,>
+	JsonNum<2>
+	JsonSquareBracket<]>
+
+[PARSED] json_member_list->("one" : 1, "two": [1, 2])
+	JsonQuote<">
+	JsonStringChar<one>
+	JsonQuote<">
+	JsonColon<:>
+	JsonNum<1>
+	JsonComma<,>
+	JsonQuote<">
+	JsonStringChar<two>
+	JsonQuote<">
+	JsonColon<:>
+	JsonSquareBracket<[>
+	JsonNum<1>
+	JsonComma<,>
+	JsonNum<2>
+	JsonSquareBracket<]>
+
+[PARSED] json_object->({ "one": {"one_A": true} ,   "two": 2.0, "tre": 3.0E0 })
+	JsonCurlyBrace<{>
+	JsonQuote<">
+	JsonStringChar<one>
+	JsonQuote<">
+	JsonColon<:>
+	JsonCurlyBrace<{>
+	JsonQuote<">
+	JsonStringChar<one_A>
+	JsonQuote<">
+	JsonColon<:>
+	JsonBool<true>
+	JsonCurlyBrace<}>
+	JsonComma<,>
+	JsonQuote<">
+	JsonStringChar<two>
+	JsonQuote<">
+	JsonColon<:>
+	JsonNum<2.0>
+	JsonComma<,>
+	JsonQuote<">
+	JsonStringChar<tre>
+	JsonQuote<">
+	JsonColon<:>
+	JsonNum<3.0E0>
+	JsonCurlyBrace<}>
+

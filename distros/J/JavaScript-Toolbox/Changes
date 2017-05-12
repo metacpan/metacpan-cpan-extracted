@@ -1,0 +1,6 @@
+Revision history for Perl extension JavaScript::Toolbox.
+
+0.01  Thu May 16 19:17:56 2002
+	- original version; created by h2xs 1.20 with options
+		-X -n JavaScript::Toolbox
+

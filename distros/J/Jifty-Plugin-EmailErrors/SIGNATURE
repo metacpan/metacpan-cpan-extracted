@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 643c3e028f4b92865f37fee873257869864596c6 Changes
+SHA1 fa63d053947efc0e4d796a0d4dadf341463ed3ac MANIFEST
+SHA1 450376ccc1d8a46782ac96f6f3fdd7e54551e60b META.yml
+SHA1 b2d8d6bb4a0722179f1b9621f839f3e6695e798b Makefile.PL
+SHA1 ff2699ef47b63f7a185f53ffc96bcdc9d05799ec doc/site_config.yml
+SHA1 20c73697e1713638140c719d8eaa19a275ed43a5 inc/Module/AutoInstall.pm
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 ca13d9875e1249f6e84f7070be8152c34837955e inc/Module/Install/AutoInstall.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b501b0df59a5cd235cca473889f82c3d3429f39e inc/Module/Install/Include.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 825f66e950d998e0eff073a5af373c90695badcd lib/Jifty/Plugin/EmailErrors.pm
+SHA1 9d2855b0e2f34584e42c9dc491467db75223a1c6 lib/Jifty/Plugin/EmailErrors/Dispatcher.pm
+SHA1 301362a93c2087a98d5630a0a1f726250c55e706 lib/Jifty/Plugin/EmailErrors/Notification/EmailError.pm
+SHA1 9f91e0edc9de347ece004a225372a9ff330f4c17 t/TestApp-Plugin-EmailErrors/Makefile.PL
+SHA1 1b49e20e2e611f2f3df4e3e468787bb4215185ff t/TestApp-Plugin-EmailErrors/app.psgi
+SHA1 2cbdb35e9070ce00e65df0e997e14e2206d35662 t/TestApp-Plugin-EmailErrors/bin/jifty
+SHA1 c4883e3b6d5d7ae1f3ed46a286f1da14cda176a5 t/TestApp-Plugin-EmailErrors/etc/config.yml
+SHA1 c4d0ae61ced98e386dd27dacecdfcd9b4470feef t/TestApp-Plugin-EmailErrors/share/web/templates/dereference-error.html
+SHA1 3aa6cd38f21fdad8b3abc4142ae8d65f803150bb t/TestApp-Plugin-EmailErrors/t/001-mason.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAk0G4VgACgkQsxfQtHhyRPpupQCfUgyhCgyvPEOJd0Ln28vRJK30
+aE8An2Ym+7OTRzKrahUT4AiOCqdYEtxy
+=wKbs
+-----END PGP SIGNATURE-----

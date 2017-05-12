@@ -1,0 +1,4 @@
+5/22/00
+	* Nothing too bizarre to report - the ServerSocket example won't work
+	right if I don't check for errors after each readLine - think it 
+	mite just be a 'flush'ing problem.

@@ -1,0 +1,65 @@
+Revision history for Perl extension JSON::XS::ByteString.
+
+1.0.5 2017.4.26
+    Avoid "</" by "<\/" in the generated JSON strings.
+
+1.0.4 2017.4.26
+    Deal with escaped slash when decoding.
+
+1.0.3 2017.4.25
+    A missing file.
+
+1.0.2 2017.4.24
+    Avoid warnings on clang
+
+1.0.1 2017.4.24
+    Edit documentation
+
+1.0.0 2017.4.24
+    Reimplement. Remove the dependency to JSON::XS.
+
+0.15.3 2016.4.14
+    Fix floating-point values bug on some perl version.
+
+0.15.2 2016.3.25
+    true -> TURE
+    false -> FALSE
+
+0.15.1 2016.3.24
+    Restore origin bug fix
+
+0.15.0 2016.3.24
+    Deal with blessed references
+
+0.14.0 2014.9.12
+    Add numeric semantics [EXPERIMENTAL]
+
+0.13.5 2014.8.27
+    To fit JSON::XS' stricter acceptable codepoint
+
+0.13.4 2014.8.27
+    Fix malform UTF8 octet shadow buffer's wrong end position.
+
+0.13.3 2014.8.13
+    To compatible with Perl 5.8.5
+
+0.13.2 2014.8.12
+    Use older form of version string, to compatible with Perl 5.8
+
+0.13.1 2014.8.1
+    Add some syntax additions that makes clang happier...
+
+0.13.0 2014.8.1
+    Deal with malform UTF8 octet (except in hash key)
+
+0.12.0 2014.7.9
+    Deal with UTF8/wide char hash key
+
+0.11.0 2014.7.9
+    Detect Perl undef more correctly
+
+0.10.0 2014.7.5
+    Preserve Perl undef <-> JSON null
+
+0.9.0  2014.5.23
+    The first release ^_^

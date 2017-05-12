@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use lib "lib";
+use JSON::ReadPath;
+use Getopt::Long qw( GetOptions );
+
+my %args = ();
+
+GetOptions(
+    "file=s"   => \$args{file},
+    "string=s" => \$args{string},
+    "env=s"    => \$args{env},
+    "flat"     => \$args{flat},
+);
+
+my $file   = $args{file};
+my $string = $args{string};
+my $env    = $args{env} || "payload";
+
+$string ||= $ENV{$env};
+
+my $reader = JSON::ReadPath->new(
+    ( $file   ? ( file   => $file )   : () ),
+    ( $string ? ( string => $string ) : () ),
+);
+
+my %data_points = %{ $reader->config };
+
+if ( $args{flat} ) {
+    %data_points = $reader->flat_list( \%data_points );
+}
+
+foreach my $key ( sort keys %data_points ) {
+    my $value = $data_points{$key};
+    print "export $key="
+      . ( defined($value) ? quotemeta( $data_points{$key} ) : qq{} ) . ";\n";
+}

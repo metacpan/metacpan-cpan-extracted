@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               JiftyX-ModelHelpers
+version:            0.23
+abstract:           Make it simpler to fetch records in Jifty.
+author:
+    - Kang\-min\ Liu\ \<gugod\@gugod\.org\>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Exporter:  5.62
+    Jifty:     0.80408
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

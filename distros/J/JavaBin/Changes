@@ -1,0 +1,39 @@
+0.9 2014-06-22
+    - Add <stdint.h> to appease Strawberry Perl GCC.
+
+0.8 2014-04-21
+    - The output buffer is now grown as needed.
+
+0.7 2014-03-21
+    - Avoid punctuation in test data filenames, fixes Windows.
+    - Bump minimum Perl version to 5.18, this keeps the code sane.
+    - Croak on insufficient length.
+    - Croak on invalid JavaBin version. Only accept version 2.
+    - Fix loss of precision with floats on -Duselongdouble perls.
+    - Implement the from_javabin function.
+    - Improved docs on mapping.
+    - Provide example benchmarks of alternatives.
+    - Support EnumFieldValue.
+
+0.6 2013-11-12
+    - Fix test failures by avoiding using UTF-8 filenames.
+
+0.5 2013-11-12
+    - Fix compilation on threaded perls.
+    - Fix POD typo.
+
+0.4 2013-11-10
+    - Add millisecond precision to dates.
+    - Clarify to which Perl data types the Java ones are mapped.
+    - Re-implement in XS, now using EU::MM.
+    - Require Test::More 0.96 to have subtest() with implicit done_testing().
+
+0.3 2013-07-15
+    - Work around 32bit issues in tests, again.
+
+0.2 2013-07-09
+    - Revert to Module::Build as some testers lack Module::Build::Tiny.
+    - Work around 32bit issues in tests, document limitation.
+
+0.1 2013-07-07
+    - Initial release.

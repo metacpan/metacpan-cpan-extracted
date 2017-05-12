@@ -1,0 +1,11 @@
+---
+framework:
+  ConfigFileVersion: 5
+  Database:
+    RecordBaseClass: Jifty::DBI::Record::Cachable
+  Plugins:
+    - CompressedCSSandJS: {}
+    - SkeletonApp: {}
+    - Compat: {}
+    - Deflater: {}
+    - Halo: {}

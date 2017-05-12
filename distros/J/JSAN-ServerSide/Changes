@@ -1,0 +1,38 @@
+0.06  2008-11-07
+
+- Test changes only. Fixed dependencies.t so it passes on Win32.
+
+
+0.05  2007-07-04
+
+* Changed caching of dependencies so that it is done in individual
+  objects, rather than in the class. This makes it easier to force
+  reparsing for dependencies, because now you can simply make a new
+  object, which effectively flushes the cache.
+
+
+0.04  2007-03-04
+
+- Added a new method, files(), to support creating a single combined
+  Javascript file on the server side.
+
+
+0.03  2006-10-2005
+
+- Added missing prereqs to Build.PL - Params::Validate and
+  JSAN::Parse::FileDeps.  Reported by Stephen Adkins.
+
+- Switched from HTML::Location to URI::ToDisk (same module, new name).
+
+
+0.02  2005-08-27
+
+- Constructor now requires both a js_dir and uri_prefix parameter.
+
+- Use HTML::Location under the hood for path generation.
+
+
+0.01  2005-08-27
+
+- Initial release
+

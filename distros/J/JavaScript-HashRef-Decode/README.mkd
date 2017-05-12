@@ -1,0 +1,33 @@
+JavaScript::HashRef::Decode
+===========================
+
+This module allows you to decode a JavaScript "simple object" (a hashref)
+into a Perl hashref structure.
+
+It supports strings, numbers, hashrefs, and arrayrefs.
+
+Hashrefs values can contain either of the above, and so do arrayrefs values.
+
+Examples
+--------
+
+
+    use JavaScript::HashRef::Decode qw<decode_js>;
+    use Data::Dumper::Concise;
+    my $js   = q!{ foo: "bar", baz: { quux: 123 } }!;
+    my $href = decode_js($js);
+    print Dumper $href;
+    {
+        baz => {
+            quux => 123
+        },
+        foo => "bar"
+    }
+
+Copyright
+---------
+
+This software is copyright (c) 2013 by Situation Publishing.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,30 @@
+Revision history for Perl module JSON::Repair
+
+0.06 2017-03-09
+
+- Extend the documentation
+
+0.05 2017-03-08
+
+- Delete trailing garbage after a valid input
+
+0.04 2016-11-26
+
+- Escape unprintable and whitespace characters in strings
+- Escape double quotes found within single quotes
+- Turn empty input into an empty string
+
+0.03 2016-11-23
+
+- Documentation
+
+0.02 2016-11-20
+
+- Remove hash comments like # this
+- Fix numbers as well
+- Use new "check" method of JSON::Parse
+
+0.01 2016-11-20
+
+- Initial version
+

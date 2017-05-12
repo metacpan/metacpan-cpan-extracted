@@ -1,0 +1,173 @@
+---
+name: Java-JCR
+version: 0.08
+author:
+  - 'Andrew Sterling Hanenkamp, E<lt>hanenkamp@cpan.orgE<gt>'
+abstract: Use JSR 170 (JCR) repositories from Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Inline::Java: 0.21
+  LWP::UserAgent: 0
+provides:
+  Java::JCR:
+    file: lib/Java/JCR.pm
+    version: 0.08
+  Java::JCR::Base:
+    file: lib/Java/JCR/Base.pm
+    version: 0.02
+  Java::JCR::Calendar:
+    file: lib/Java/JCR/Calendar.pm
+    version: 0.05
+  Java::JCR::Credentials:
+    file: lib/Java/JCR/Credentials.pm
+    version: 0.07
+  Java::JCR::Exception:
+    file: lib/Java/JCR/Exception.pm
+    version: 0.04
+  Java::JCR::ImportUUIDBehavior:
+    file: lib/Java/JCR/ImportUUIDBehavior.pm
+    version: 0.07
+  Java::JCR::Item:
+    file: lib/Java/JCR/Item.pm
+    version: 0.07
+  Java::JCR::ItemVisitor:
+    file: lib/Java/JCR/ItemVisitor.pm
+    version: 0.07
+  Java::JCR::Jackrabbit:
+    file: lib/Java/JCR/Jackrabbit.pm
+    version: 0.06
+  Java::JCR::JavaUtils:
+    file: lib/Java/JCR/JavaUtils.pm
+    version: 0.07
+  Java::JCR::Lock:
+    file: lib/Java/JCR/Lock.pm
+    version: 0.01
+  Java::JCR::Lock::Lock:
+    file: lib/Java/JCR/Lock/Lock.pm
+    version: 0.07
+  Java::JCR::NamespaceRegistry:
+    file: lib/Java/JCR/NamespaceRegistry.pm
+    version: 0.07
+  Java::JCR::Node:
+    file: lib/Java/JCR/Node.pm
+    version: 0.07
+  Java::JCR::NodeIterator:
+    file: lib/Java/JCR/NodeIterator.pm
+    version: 0.07
+  Java::JCR::Nodetype:
+    file: lib/Java/JCR/Nodetype.pm
+    version: 0.01
+  Java::JCR::Nodetype::ItemDefinition:
+    file: lib/Java/JCR/Nodetype/ItemDefinition.pm
+    version: 0.07
+  Java::JCR::Nodetype::NodeDefinition:
+    file: lib/Java/JCR/Nodetype/NodeDefinition.pm
+    version: 0.07
+  Java::JCR::Nodetype::NodeType:
+    file: lib/Java/JCR/Nodetype/NodeType.pm
+    version: 0.07
+  Java::JCR::Nodetype::NodeTypeIterator:
+    file: lib/Java/JCR/Nodetype/NodeTypeIterator.pm
+    version: 0.07
+  Java::JCR::Nodetype::NodeTypeManager:
+    file: lib/Java/JCR/Nodetype/NodeTypeManager.pm
+    version: 0.07
+  Java::JCR::Nodetype::PropertyDefinition:
+    file: lib/Java/JCR/Nodetype/PropertyDefinition.pm
+    version: 0.07
+  Java::JCR::Observation:
+    file: lib/Java/JCR/Observation.pm
+    version: 0.01
+  Java::JCR::Observation::Event:
+    file: lib/Java/JCR/Observation/Event.pm
+    version: 0.07
+  Java::JCR::Observation::EventIterator:
+    file: lib/Java/JCR/Observation/EventIterator.pm
+    version: 0.07
+  Java::JCR::Observation::EventListener:
+    file: lib/Java/JCR/Observation/EventListener.pm
+    version: 0.07
+  Java::JCR::Observation::EventListenerIterator:
+    file: lib/Java/JCR/Observation/EventListenerIterator.pm
+    version: 0.07
+  Java::JCR::Observation::ObservationManager:
+    file: lib/Java/JCR/Observation/ObservationManager.pm
+    version: 0.07
+  Java::JCR::Property:
+    file: lib/Java/JCR/Property.pm
+    version: 0.07
+  Java::JCR::PropertyIterator:
+    file: lib/Java/JCR/PropertyIterator.pm
+    version: 0.07
+  Java::JCR::PropertyType:
+    file: lib/Java/JCR/PropertyType.pm
+    version: 0.07
+  Java::JCR::Query:
+    file: lib/Java/JCR/Query.pm
+    version: 0.01
+  Java::JCR::Query::Query:
+    file: lib/Java/JCR/Query/Query.pm
+    version: 0.07
+  Java::JCR::Query::QueryManager:
+    file: lib/Java/JCR/Query/QueryManager.pm
+    version: 0.07
+  Java::JCR::Query::QueryResult:
+    file: lib/Java/JCR/Query/QueryResult.pm
+    version: 0.07
+  Java::JCR::Query::Row:
+    file: lib/Java/JCR/Query/Row.pm
+    version: 0.07
+  Java::JCR::Query::RowIterator:
+    file: lib/Java/JCR/Query/RowIterator.pm
+    version: 0.07
+  Java::JCR::RangeIterator:
+    file: lib/Java/JCR/RangeIterator.pm
+    version: 0.07
+  Java::JCR::Repository:
+    file: lib/Java/JCR/Repository.pm
+    version: 0.07
+  Java::JCR::Session:
+    file: lib/Java/JCR/Session.pm
+    version: 0.07
+  Java::JCR::SimpleCredentials:
+    file: lib/Java/JCR/SimpleCredentials.pm
+    version: 0.07
+  Java::JCR::Util:
+    file: lib/Java/JCR/Util.pm
+    version: 0.01
+  Java::JCR::Util::TraversingItemVisitor:
+    file: lib/Java/JCR/Util/TraversingItemVisitor.pm
+    version: 0.07
+  Java::JCR::Util::TraversingItemVisitor::Default:
+    file: lib/Java/JCR/Util/TraversingItemVisitor/Default.pm
+    version: 0.07
+  Java::JCR::Value:
+    file: lib/Java/JCR/Value.pm
+    version: 0.07
+  Java::JCR::ValueFactory:
+    file: lib/Java/JCR/ValueFactory.pm
+    version: 0.07
+  Java::JCR::Version:
+    file: lib/Java/JCR/Version.pm
+    version: 0.01
+  Java::JCR::Version::OnParentVersionAction:
+    file: lib/Java/JCR/Version/OnParentVersionAction.pm
+    version: 0.07
+  Java::JCR::Version::Version:
+    file: lib/Java/JCR/Version/Version.pm
+    version: 0.07
+  Java::JCR::Version::VersionHistory:
+    file: lib/Java/JCR/Version/VersionHistory.pm
+    version: 0.07
+  Java::JCR::Version::VersionIterator:
+    file: lib/Java/JCR/Version/VersionIterator.pm
+    version: 0.07
+  Java::JCR::Workspace:
+    file: lib/Java/JCR/Workspace.pm
+    version: 0.07
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

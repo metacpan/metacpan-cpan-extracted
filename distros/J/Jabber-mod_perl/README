@@ -1,0 +1,124 @@
+
+Jabber::mod_perl
+
+-- mod_perl for jabberd (2) --
+
+Copyright (c) 2003, Piers Harding. All Rights Reserved.
+This module is free software. It may be used, redistributed
+and/or modified under the same terms as Perl itself.
+
+
+Jabber::mod_perl is an embedded interpreter in the session manager of jabberd2 (sm daemon).
+This allows the user to insert arbitrary perl code (in the form of loaded modules) in to the
+processing chain of the session manager, in a similar fashion to mod_perl for Apache.
+
+Because the XML processing of j2 is all based on NADs (Not A DOM), then you need to deal with their peculiarity, and API.  For details of this have a look at the jabberd2 documentation at http://jabberd.jabberstudio.org/2/docs/, and the POD documentation included in this distribution for Jabber::NAD.
+
+First of all you need to get hold of the jabberd2 source code, as this needs to 
+be patched to include mod_perl.c in the build.
+
+Also check that you have:
+ - Cyrus SASL 2
+     ftp://ftp.andrew.cmu.edu/pub/cyrus-mail/
+ - OpenSSL (0.9.6e or higher)
+     http://www.openssl.org/news/
+ - Berkeley DB 4.1
+     http://www.sleepycat.com/download.html
+ - autoconf 2.50+
+     http://www.gnu.org/software/autoconf/autoconf.html
+ - automake 1.4+
+     http://www.gnu.org/software/automake/automake.html
+ - libtool 1.4+
+     http://www.gnu.org/software/automake/automake.html
+
+Get a source code release candidate for the jabberd2 from:
+  http://www.jabberstudio.org/projects/jabberd2/project/view.php
+and unpack it - something like this: tar -xzvf Jabber-mod_perl-0.03.tar.gz
+
+OR: 
+
+You can get the latest jabberd2 source code by checking it out of cvs on jabberstudio.org like this:
+
+cvs -d :pserver:anonymous@jabberstudio.org:/home/cvs co jabberd2
+
+( remember to login to cvs first like this: cvs -d :pserver:anonymous@jabberstudio.org:/home/cvs login )
+
+this will give you a directory jabberd2 in the directory that you are currently sitting in.
+After this you should unpack this distribution next to it giving you two adjacent directories -
+./jabberd-2.x.x-ax ( or ./jabberd2 from cvs ) and ./Jabber-mod_perl-x.xx
+
+
+Change into the Jabber-mod_perl-x.xx directory and then do the -
+
+perl Makefile.PL
+make 
+make test
+make install <- do not do this if you want to test things first - see below
+
+Dance.
+
+perl Makefile.PL will prompt you for the location of jabberd2 (if the above went according to plan
+then the default should suffice ), and then you will be asked for configuration parameters to be
+passed to ./configure for the build of jabberd2.
+
+IMPORTANT NOTE:
+perl Makefile.PL will do the the entire configure and build for jabberd2 so don't forget to run make
+for Jabber::mod_perl.  It also changes the configuration files inorder to facilitate the build of jadperl,
+including copying source files to the correct locations.
+
+
+Once you have built Jabber::mod_perl - this should have compiled jabberd2 for you successfully.  You still
+need to change to the jabberd2 directory (cd ../jabberd2 ), and make install here to install the server.
+When the server is installed change to the server config directory (cd $PREFIX/etc/jabberd) and amend the 
+sm.xml config file to activate mod_perl - eg:
+
+ ......
+    <!-- pkt-sm receives packets from the router that are addressed directly to the sm host (no user) -->
+    <chain id='pkt-sm'>
+      <module>iq-last</module>      <!-- return the server uptime -->
+      <module>iq-time</module>      <!-- return the current server time -->
+      <module>iq-version</module>   <!-- return the server name and version -->
+      <module>echo</module>         <!-- echo messages sent to /echo -->
+      <module arg='Some::Handler1 MyEcho'>mod_perl</module>     <!-- mod_perl handler activated here -->
+    </chain>
+.....
+  </modules>
+
+Another example:
+    <chain id='in-sess'>
+		...
+      <module>presence</module>         <!-- process and distribute presence updates -->
+      <module arg='MyStamp'>mod_perl</module>     <!-- mod_perl handler activated here -->
+      <module>deliver</module>          <!-- deliver packets with full jids directly -->
+		...
+    </chain>
+
+The above examples correspond to the Perl packages found in examples/* in this distribution.
+
+
+Testing/Making it all run
+=========================
+
+The above handler modules are located in the examples directory of this distribution.
+When running the session manager - you must make sure the Perl can find any module
+that it is attempting to load.  I typically do this by setting the PERL5LIB 
+environment variable to include the appropriate paths - eg:
+
+export PERL5LIB=path/to/mod_perl/examples
+/path/to/jabberd/bin/sm -D > /path/to/jabberd/sm.log 2>&1 &
+
+Or something similar.
+
+look at the two scripts in the tools/ directory (start and stop) as an example
+of how to control this with a little less pain :-).
+
+Make sure that you watch the sm.log file, as this will alert you to any problems regarding loading 
+modules etc.
+
+
+for more details:
+
+perldoc Jabber::mod_perl
+
+Piers Harding - piers@cpan.org
+

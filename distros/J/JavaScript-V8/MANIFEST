@@ -1,0 +1,40 @@
+Changes
+examples/v8repl
+inc/Devel/CheckLib.pm
+JavaScript-V8-Context.xsp
+lib/JavaScript/V8.pm
+lib/JavaScript/V8/Context.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+perlobject.map
+ppport.h
+README
+t/01load.t
+t/basic.t
+t/bind_function.t
+t/bind_object.t
+t/circular.t
+t/error.t
+t/eval_array.t
+t/eval_object.t
+t/interrupt.t
+t/jsobj.t
+t/mem.pl
+t/plobj.t
+t/refcnt.t
+t/syntax_error.t
+t/types.t
+t/zzmem_plojb1.t
+t/zzmem_plojb2.t
+t/zzmem_sub.t
+TODO
+typemap
+typemap.xsp
+V8Context.cpp
+V8Context.h
+WithV8Context.xs
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

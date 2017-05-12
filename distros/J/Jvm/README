@@ -1,0 +1,37 @@
+# Ident = $Id: README,v 1.6 2001/04/28 05:20:26 yw Exp $
+
+Jvm - Java Virtual Machine Extension Version 0.9.1
+
+This is a Perl 5 extension to Java Virtual Machine. Document is in 
+Jvm.pm, run 'perldoc Jvm.pm' to read it.
+
+Current version is just an alpha version, and it only supports Sun 
+JDK1.3 beta right now.
+
+Before you install the module on your box, please run 'make test' 
+to perform a comprehensive test. The 'test.pl' has some examples, 
+which can be used as demos on how to manipulate Java Jvm.
+
+I just tested the package on my personal computer, I will try to
+make the package support as more different environment as possible.
+So, if you have any trouble with this package, please feel free
+let me know.
+ 
+ 
+PREQUIREMENT:
+------------
+Sun JDK1.3 beta or above
+Perl 5.005 or above
+
+
+Testing Enviornment:
+------------------
+Sun JDK1.3 beta
+Linux 2.2 or above
+Perl 5.005 or above
+
+Ye, Wei  <w_e_i_y_e@yahoo.com>
+San Jose, California
+
+Apr 27, 2000
+

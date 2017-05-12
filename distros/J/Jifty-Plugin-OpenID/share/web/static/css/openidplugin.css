@@ -1,0 +1,11 @@
+
+.argument-openid label {
+  background: #FFFFFF url('/static/oidimg/openid-icon-small.gif') no-repeat scroll 0pt 50%;
+  padding-left: 18px;
+}
+
+
+.openidwayf img {
+  vertical-align:middle;
+}
+

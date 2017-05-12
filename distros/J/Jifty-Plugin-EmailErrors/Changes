@@ -1,0 +1,5 @@
+Revision history for Perl module Jifty::Plugin::EmailErrors
+
+0.02  2010-12-13
+    - fix test regex to support 5.8.x
+    - distribution fixes

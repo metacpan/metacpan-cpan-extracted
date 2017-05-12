@@ -1,0 +1,46 @@
+Revision history for Perl extension Javascript::SHA1.
+
+1.07  Sun Feb 21 12:55:28 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.06  Wed Feb 10 14:02:11 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.05  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.04  Thu Oct 23 18:11:00 2008
+	- Remove ^M chars from source, including within the Javascript
+
+1.03  Sat Aug 04 13:52:00 2007
+	- Extend method javascript() to take a second parameter, which is the
+		number of the CGI form within the HTML page. The allows the module to
+		operate on an HTML page containing more than one CGI form.
+		The default value is 0, which is the first form, and perhaps the only form,
+		on the page. So, no need to upgrade if you only have one form per page
+	- Update the docs to describe this new parameter
+	- Note: Original patch kindly supplied by Thomas Goik
+	
+1.02  Fri Oct 21 14:27:00 2005
+	- No code changes (ouside new() ), so no need to upgrade
+	- Simplify code in new() to no longer check if caller is an object
+		as per the new standard on such matters. Personally, I don't care :-)
+	- Add more things to MANIFEST.SKIP
+	- Regenerate META.yml with Module::Build V 0.2611 to correct a faulty
+		META.yml output by V 0.24 which falsely said 'provides: {}',
+		which in turn stopped the PAUSE indexer from finding the SHA1.pm file,
+		which in turn meant this module was omitted from the master index:
+		ftp://pause.perl.org/pub/PAUSE/modules/01modules.index.html
+
+1.01  Tue Jul 20 20:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Add t/pod.t to test all PODs
+
+1.00  Fri Mar  05 10:23:29 2004
+	- Original version
+	- The Javascript is Paul Johnston's version, from his web site:
+		http://pajhome.org.uk/crypt/md5
+	- There are 3 functions, str2hex_sha1(), str2b64_sha1() and str2str_sha1(), to return various versions
+		of the digest

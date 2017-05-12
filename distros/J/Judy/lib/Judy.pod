@@ -1,0 +1,308 @@
+=head1 NAME
+
+Judy - Library for creating and accessing dynamic arrays 
+
+=head1 DESCRIPTION
+
+The Judy family of functions supports fully dynamic arrays. These
+arrays may be indexed by a 32- or 64-bit word (depending on processor
+word size) (L<Judy::1>, L<Judy::L>), a null terminated string
+(L<Judy::SL>), or an ordinary perl string (L<Judy::HS>).
+
+Judy arrays are both speed- and memory-efficient, with no tuning or
+configuration required, across a wide range of key set types
+(sequential, periodic, clustered, random). Judy's speed and memory
+usage are typically better than other data storage models such as
+skiplists, linked lists, binary, ternary, b-trees, or even hashing,
+and improves with very large data sets.
+
+The memory used by a Judy array is nearly proportional to the
+population (number of elements).
+
+Since an initial (empty) Judy array is represented by a null pointer,
+it is possible to construct an array of Judy arrays. In other words, a
+Judy array's Values can be pointers to other Judy arrays. This makes
+it very simple to construct an array with an arbitrary number of
+dimensions or Index sizes.
+
+The libJudy author believes JudyHS is a good replacement for a hashing
+method when resizing the hash table is done during population
+growth. A correctly tuned hash method with a static hash table size
+and population is unbeatable for speed. However, L<Judy::HS> will
+perform better than a hashing method with smaller and larger
+populations than the optimum hash table size. JudyHS does not have a
+degenerate performance case where knowledge of the hash algorithm can
+be exploited. (I.E. JudyHS does not use a linked list to handle hash
+collisions, it uses a tree of JudyL arrays and a virtual hash table
+size of 4 billion).
+
+=head1 SYNOPSIS
+
+=over
+
+=item L<Judy::1>:
+
+This can be thought of as a bit vector. For a comparison between
+L<Judy::1> and L<perlfunc/vec>, take a look at
+L<http://perlmonks.org/?node_id=732843>.
+
+    # Turn the 43rd bit on. A bit like:
+    #
+    #   vec( $str, 42, 1 ) = 1
+    #
+    Judy::1::Set(
+        $judy_1,
+        42
+    );
+
+=item L<Judy::L>
+
+Maps an integer to another integer. This is sort of like a very
+compact perl hash where the only allowed keys and values are
+integers.
+
+    # A bit like:
+    #
+    #   $array[ 42 ] = 9000
+    #
+    Judy::L::Set(
+        $judy_l,
+        42,
+        9000
+    );
+
+=item L<Judy::SL>
+
+Maps null terminated strings to integers.
+
+    # A bit like:
+    #
+    #   $hash{world} = 9000
+    #
+    Judy::SL::Set(
+        $judy_sl,
+        'world',
+        9000
+    );
+
+=item L<Judy::HS>
+
+Maps perl strings to integers.
+
+    # A bit like:
+    #
+    #   $hash{world} = 9000
+    #
+    Judy::HS::Set(
+        $judy_sl,
+        'world',
+        9000
+    );
+
+=back
+
+=head1 Multi-dimensional L<Judy::L>/L<Judy::SL>/L<Judy::HS> Arrays
+
+Storing a pointer to another L<Judy::L> array in a L<Judy::L> array's
+Value is a simple way to support dynamic multi-dimensional L<Judy::L>
+arrays. These arrays (or trees) built using L<Judy::L> arrays are very
+fast and memory efficient. (In fact, that is how JudySL and JudyHS are
+implemented). An arbitrary number of dimensions can be realized this
+way. To terminate the number of dimensions (or tree), the Value
+pointer is marked to NOT point to another Judy array. A
+C<Judy::JLAP_INVALID> flag is used in the least significant bit(s) of
+the pointer. After the flag C<Judy::JLAP_INVALID> is removed, it is
+used as a pointer to the users data.
+
+Note: The current version of Judy.h changed this flag from 0x4 to 0x1
+to allow for a malloc() that does not deliver memory on an 8 byte
+aligned boundry (such as old v algrind).
+
+The following example code segment can be used to dive into a
+multi-dimensional L<Judy::L> using an API similar to Tye McQueen's
+L<Data::Diver>. This makes a L<Judy::HS> object and looks past the
+public API as an example of a multi-dimensional Judy::* structure.
+
+    # For kicks, allocate a Judy::HS object and look inside it a
+    # little bit.
+    use Judy::HS;
+    Judy::HS::Set( my ($judy), 'abcd', 42 );
+    Dive( $judy, 4 );
+
+    use Judy;
+    use Judy::L;
+    sub Dive {
+        my ( $judy, @walk ) = @_;
+        
+        my ( $pvalue, $value );
+        for my $key ( @walk ) {
+            return if ! $judy;
+            
+            # Advance to next dimension.
+            ( $pvalue, $value ) = Judy::L::Get( $judy, $key );
+            
+            # Check if pointer to user buffer
+            last if $value & Judy::JLAP_INVALID;
+            
+            $judy = $value;
+        }
+        
+        if ( $value & JLAP_INVALID ) {
+            # Remove our flag.
+            $value &= ~ Judy::JLAP_INVALID;
+            
+            # Return the value.
+            printf "User object pointer is 0x%x at 0x%x\n", $value, $pvalue;
+        }
+        else {
+            warn sprintf "Judy::* object pointer is 0x%x at 0x%x\n", $value, $pvalue;
+        }
+        return ( $pvalue, $value );
+    }
+
+Note: This works because malloc() guarantees to return a pointer with
+the least bit(s) == 0x0. You must remove JLAP_INVALID before using the
+pointer.
+
+=head1 CONSTANTS
+
+=over
+
+=item JLAP_INVALID
+
+=item PJERR
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<http://judy.sourceforge.net> - the C library home page
+
+=item L<Judy::1>  - maps an integer to a bit
+
+=item L<Judy::L>  - maps an integer to an integer/pointer
+
+=item L<Judy::SL> - maps a null terminated string to an integer/pointer
+
+=item L<Judy::HS> - maps a string to an integer/pointer
+
+=item A 10 MINUTE TECHNICAL DESCRIPTION may be found at
+L<http://judy.sourceforge.net/downloads/10minutes.htm>
+
+=item A 3 HOUR TECHNICAL DESCRIPTION (out of date and a bit corny) may
+be found at L<http://judy.sourceforge.net/application/shop_interm.pdf>
+
+=back
+
+=head1 FILES
+
+Locations of interest include:
+http://sourceforge.net/projects/judy -- project downloads
+file:/usr/share/doc/Judy/ -- for HTML version of man pages.
+/usr/share/doc/Judy/demo/ -- demonstration program source files.
+
+The author attempted to write interesting application notes using
+advanced features of Judy. They may be found at
+"http://judy.sourceforge.net/application/ (Some may be out of date).
+
+=head1 ERRORS & WARNINGS
+
+=over
+
+=item File '%s', line %d: %s(), JU_ERRNO_* == %d, ID == %d
+
+See the header file Judy.h from the Judy C source library. You already
+have a local copy of this to have been able to build this perl
+library.
+
+=item Sorry, can't use keys longer than %d for now. This is a bug.
+
+=item Coercing %d to 0. Can't use negative values as keys.
+
+=item Truncating %d to %d because your number is larger than fits in a signed integer
+
+=item Truncating %d to %u because your number is larger than fits in an unsigned integer
+
+=item Truncating %d to %d because your number is smaller than fits in a signed integer
+
+=item Dropping UTF8 flag for '%s'
+
+=back
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-Judy-HS at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Judy-HS>.  I will be
+notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc Judy
+
+You can also look for information at:
+
+=over
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Judy>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Judy>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Judy>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Judy/>
+
+=back
+
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Doug Baskins, totally.
+
+Michael Schwern for writing Alien::SVN which made this possible.
+
+Tye McQueen for inspiring the minimal API.
+
+Yitzchak Scott-Thoennes for reminding me that perl's magic requires
+extra care and attention.
+
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 Josh Jore, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+
+=head1 SOURCE AVAILABILITY
+
+This source is in Github: L<git://github.com/jbenjore/judy-hs.git>
+
+
+
+=head1 AUTHOR
+
+Judy was invented by Doug Baskins (dougbaskins .AT, yahoo.com) and
+implemented by Hewlett-Packard. (Note: Judy is named for the
+inventor's sister, after discarding many proposed names.)
+
+The perl wrapper was written by Josh Jore

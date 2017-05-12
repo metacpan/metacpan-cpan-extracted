@@ -1,0 +1,30 @@
+Revision history for JavaScript-Dumper
+
+0.011   2009/03/24
+        fixed warning
+
+0.01    2009/03/09
+        00 got unquoted
+
+0.008   2008/08/27
+        forgot manifest, doh
+
+0.007   2008/08/16
+        Fixed warnings, again
+
+0.006   2008/08/18
+        Fixed unicode problem.
+
+0.005   2008/08/17
+        Fixed stringified numbers printed with quotes
+
+0.004   2008/08/16
+        Fixed warnings
+
+0.002   2008/02/01
+        Fixed problems with JSON::PP due to interface changes
+        added tests 
+
+0.001   Date/time
+        First version, released on an unsuspecting world.
+

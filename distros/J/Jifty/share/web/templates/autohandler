@@ -1,0 +1,11 @@
+<%init>
+# XXX FIXME See Jifty::View::Mason::Handler for the source of this puke.
+use vars qw/ $jifty_internal_request /;
+if (!$jifty_internal_request && $m->base_comp->path =~ m|/_elements/|) {
+    # Requesting an internal component by hand -- naughty
+    $m->redirect('/__jifty/error/requested_private_component');
+}
+$m->comp('/_elements/nav');
+$m->call_next();
+return;
+</%init>

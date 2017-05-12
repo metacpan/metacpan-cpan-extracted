@@ -1,0 +1,13 @@
+Source: libjifty-dbi-perl
+Section: perl
+Priority: optional
+Maintainer: Yves Agostini <agostini@univ-metz.fr>
+
+Package: libjifty-dbi-perl
+Section: perl
+Architecture: all
+Depends: ${perl:Depends}, libcache-simple-timedexpiry-perl (>> 0.21), libclass-accessor-perl, libclass-data-inheritable-perl, libclass-trigger-perl (>> 0.12), libclass-returnvalue-perl (>> 0.40), libclone-perl, libdbi-perl, libdbix-dbschema-perl (>> 0.33), libdata-page-perl, libdatetime-perl (>> 0.34), libdatetime-format-iso8601-perl, libdatetime-format-strptime-perl, libexporter-lite-perl, libhash-merge-perl, liblingua-en-inflect-perl, libobject-declare-perl (>> 0.22), libuniversal-require-perl (>> 0.11), libscalar-defer-perl (>> 0.10), libversion-perl, perl-modules (>> 0.52), libdbd-sqlite3-perl, libyaml-syck-perl, libtime-duration-perl, libtime-duration-parse-perl
+Recommends: libcache-memcached-perl
+Description: Jifty DBI
+ Jifty DBI
+

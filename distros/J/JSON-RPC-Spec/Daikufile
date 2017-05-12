@@ -1,0 +1,58 @@
+use lib 'lib';
+use Path::Tiny qw(path);
+use Capture::Tiny qw(capture_stdout);
+use App::scan_prereqs_cpanfile;
+
+desc 'install perl modules';
+task install => sub {
+    sh q(cpanm --with-recommends --with-develop --with-all-features --installdeps .);
+};
+
+desc 'test coverage';
+task coverage => sub {
+    sh q{perl Build.pl};
+    sh q{./Build build};
+    sh q{cover -test};
+    sh q{open cover_db/coverage.html};
+};
+
+desc 'Perl::Tidy';
+task perltidy => sub {
+    for my $dir ('examples', 'lib', 't') {
+        my $iter = path($dir)->iterator({recurse => 1});
+        while (my $path = $iter->()) {
+            next if $path->is_dir;
+            next unless $path->stringify =~ m/\.(t|p[lm])\z/;
+            sh qq{perltidy $path};
+        }
+    }
+};
+
+desc 'remove *.bak';
+task clean => sub {
+    for my $dir ('examples', 'lib', 't') {
+        my $iter = path($dir)->iterator({recurse => 1});
+        while (my $path = $iter->()) {
+            next if $path->is_dir;
+            $path->remove if $path->stringify =~ m/\.bak\z/;
+        }
+    }
+};
+
+desc 'NYTProf';
+task profile => sub {
+    sh q{PERL5OPT=-d:NYTProf perl -Ilib t/02_specification.t};
+    sh q{nytprofhtml --open};
+};
+
+namespace generate => sub {
+    desc 'generate cpanfile';
+    task cpanfile => sub {
+        my $stdout = capture_stdout sub {
+            sh q(scan-prereqs-cpanfile --ignore=public,templates,var);
+        };
+        path('cpanfile')->spew($stdout);
+    };
+};
+
+task default => sub { sh q{daiku -T} };

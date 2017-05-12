@@ -1,0 +1,22 @@
+Changes
+examples/comments.pl
+examples/hash-comments.pl
+examples/missing-commas.pl
+examples/missing-ends.pl
+examples/numbers.pl
+examples/single-quotes.pl
+examples/strings.pl
+examples/synopsis-verbose.pl
+examples/synopsis.pl
+examples/trailing-commas.pl
+examples/unquoted-keys.pl
+lib/JSON/Repair.pm
+lib/JSON/Repair.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+script/repairjson
+t/json-repair.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

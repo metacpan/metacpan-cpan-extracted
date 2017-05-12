@@ -1,0 +1,26 @@
+Changes
+doc/site_config.yml
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Jifty/Plugin/EmailErrors.pm
+lib/Jifty/Plugin/EmailErrors/Dispatcher.pm
+lib/Jifty/Plugin/EmailErrors/Notification/EmailError.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+SIGNATURE
+t/TestApp-Plugin-EmailErrors/app.psgi
+t/TestApp-Plugin-EmailErrors/bin/jifty
+t/TestApp-Plugin-EmailErrors/etc/config.yml
+t/TestApp-Plugin-EmailErrors/Makefile.PL
+t/TestApp-Plugin-EmailErrors/share/web/templates/dereference-error.html
+t/TestApp-Plugin-EmailErrors/t/001-mason.t

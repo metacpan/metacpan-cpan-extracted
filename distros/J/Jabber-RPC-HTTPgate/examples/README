@@ -1,0 +1,61 @@
+Ok, here's what to do to get this test/demo working.
+
+Jabber users
+------------
+You'll need two Jabber user IDs on your server:
+
+client@localhost  - for use in jrpc-requester.pl
+jrpc@localhost    - for use in jrpc-responder-client.pl
+
+Component instance definitions
+------------------------------
+Add the contents of each of the .xml files to your jabber.xml
+server configuration (make sure the names/ports don't clash 
+with other existing names and ports. You will need to download
+and install the http component if you haven't got it already.
+
+The 'server' scripts
+--------------------
+There are a lot of scripts. Start each of the following in 
+separate windows:
+
+states-daemon.pl              the HTTP responder
+httpgate.pl                   the HTTPgate gateway
+jrpc-responder-client.pl      the Jabber-RPC responder client
+jrpc-responder-component.pl   the Jabber-RPC responder component
+
+[states-daemon.pl and states-client.pl are modified versions of two
+of the scripts in the examples/ directory of the Frontier::RPC2 
+library.]
+
+The 'client' scripts
+--------------------
+Now we're ready to run the client scripts. There are two:
+
+states-client.pl              the HTTP requester
+jrpc-requester.pl             the Jabber-RPC requester
+
+states-client.pl makes three calls:
+
+- getStateName:    to the HTTP responder (states-daemon.pl)
+- getStateList:    to the component-based Jabber-RPC responder
+                   (jrpc-responder-component.pl)
+- getStateStruct:  to the client-based Jabber-RPC responder
+                   (jrpc-responder-client.pl)
+
+
+jrpc-requester.pl also makes three calls:
+
+- getStateName:    to the component-based Jabber-RPC responder
+                   (jrpc-responder-component.pl)
+- getStateList:    to the client-based Jabber-RPC responder
+                   (jrpc-responder-client.pl)
+- getStateStruct:  to the HTTP-based responder (states-daemon.pl)
+
+
+There is debug output so you can see what's going on.
+
+The two scripts states-client.pl and states-daemon.pl are
+adapted versions of two of the example scripts that come
+with Ken Macleod's Frontier::RPC2 module.
+

@@ -1,0 +1,1153 @@
+Revision history for Perl extension Jifty::DBI.
+
+0.78 2015-04-30
+    * Make t/99-pod-spelling.t pass
+    * Updated packaging
+
+0.77 2013-12-01
+    * Fix for perl 5.19.4 parsing of @{ foo { ... } }
+    * Fix signature
+
+0.76 2013-06-17
+    * Provide source repository info in metadata
+    * Default Cached::Memcached dependency off on Windows due to known build problems
+
+    Thanks to Alexandr Ciornii for both.
+
+0.75 2013-01-29
+- Bug fixes:
+    * backport a sort order fix for Pg handles from Searchbuilder
+    * Work around Pg's sub-second formatting and DateTime::Parser::ISO8601
+    * Don't attempt to filter, eq-check, validate, or otherwise munge functions
+
+- Tests:
+    * Fix failures on 5.17.6, reported as [rt.cpan.org #82978]
+    * Update test to account for the ported bug fix in f9439a0
+
+- Cleanup:
+    * remove a useless wrapper function
+
+- Documentation:
+    * SPROUT points out that the second fix in 0.73 is actually a run-time
+      error, of course
+
+0.74 2012-01-25
+- Documentation:
+    * Re-release of 0.73, now with a proper changelog
+
+0.73 2012-01-25
+- Fixes:
+    * Allow prefetching of only a subset of the other table's columns (Alex Vandiver)
+    * Avoid a run-time failure on blead caused by incorrect precedence (Thomas Sibley)
+
+0.72 2011-10-17
+- Fixes:
+    * Handle DBH connection errors, retry the query (Luke Closs)
+
+- Documentation:
+    * Mention old_value in after_* hooks (Thomas Sibley)
+
+0.71 2011-06-17
+- Fixes:
+    * Ensure canonicalization and validation triggers are properly found
+      (Thomas Sibley)
+
+0.70 2011-06-15
+- Fixes:
+    * Respect manual column sort_orders (Thomas Sibley)
+    * Produce more useful error messages during schema upgrades (Thomas Sibley)
+
+- Documentation:
+    * Clarify what value after_set_* hooks receive (Thomas Sibley)
+
+0.69 2011-05-17
+- Fixes:
+    * Remove some instances of qw() as parentheses deprecated in 5.14 (sunnavy)
+
+0.68 2011-04-14
+- Security:
+    * Prevent SQL injection in column names, operators, order and group by
+      (Alex Vandiver)
+    * Fix distinct_query to catch injection and correctly rewrite to
+      function => '' (Alex Vandiver)
+    * Prevent SQL injection via IS
+
+- Fixes:
+    * There is no need to check $args{column} around our LIKE adjustments
+      (Alex Vandiver)
+    * Slightly unify nigh-identical codepaths between Pg and Oracle
+      (Alex Vandiver)
+
+0.67 2011-02-28
+- Features:
+    * Make ->distinct_column_values use ->simple_query, thus going through our
+      SQL logging infrastructure (Alex Vandiver)
+
+- Fixes:
+    * Set raw_values in load_by_hash so the __raw_value method works when the
+      record is loaded by a collection (Thomas Sibley)
+
+- Tests:
+    * Author tests for no tabs (Shawn M Moore)
+
+0.66 2011-02-14
+- Features:
+    * Provide a sane way to wrap a function around an aliased column in order_by
+    * Pass old_value to triggers on column update
+
+- Fixes:
+    * Respect the 'by' attribute for refers_to columns in create and set
+    * Use the right FK when using a record object in load_by_cols or
+      limit [rt.cpan.org #64779]
+    * Don't encode fields when attempting to limit with IS
+    * Fix since/till by refactoring columns to use an updated all_columns
+
+- Installation:
+    * Only run these URI filter tests if we have URI [rt.cpan.org #65047]
+
+0.64 Wed Dec  8 15:21:17 EST 2010
+- Installation:
+    * Minor distribution fixes
+
+0.63 Wed Dec  8 15:14:17 EST 2010
+- Features:
+    * distinct_column_values method, docs and tests
+
+- Fixes:
+    * Warn about load(arg => value)
+    * Include column_name in the value passed to reader warning
+    * It is a rare but possible case that 0 is a valid id
+    * Ensure encode_base64 doesn't choke on utf8
+
+0.62 Thu May 20 13:58:53 EST 2010
+- Features:
+    * Computed columns let you have the Jifty-DBI scaffolding but without
+      touching the database
+    * Column->is_boolean
+
+- Fixes:
+    * Don't attempt to store undef values in memcached
+    * Avoid undef warnings
+
+0.61 Mon Jan  4 13:04:20 EST 2010
+- Installation:
+    * Minor distribution fixes
+
+0.60 Mon Jan  4 13:02:17 EST 2010
+- Features:
+    * Allow passing of extra parameters to canonicalizers
+    * Add an attribute which controls placeholder use for load_by_cols
+
+- Fixes:
+    * Don't add LOWER() on <= or >= operators, only = and !=
+    * Better case sensitivity tests
+    * Expose quote_value() on Jifty::DBI::Handle
+    * When generating COUT, don't add a DISTINCT unless needed
+    * Fix t/12prefetch.t's assumptions on row ordering
+
+0.59 Wed Nov 18 20:12:57 EST 2009
+- Features:
+    * Support a special value of "all" in set_page_info
+
+- Fixes:
+    * Make "default is ''" propagate correctly to ALTER and CREATE TABLE
+      statements
+
+- Installation:
+    * Our Module::Install was hilariously out of date
+
+0.58 Tue Jul 14 03:21:21 EST 2009
+- Possible incompatibilities:
+    * Modules which use Jifty::DBI::Schema will have strict and warnings
+      automatically applied to them.
+
+- Features:
+    * Jifty::DBI::Handle now has methods for supported_drivers,
+      available_drivers, and is_available_driver.
+
+- Fixes:
+    * Remove unused _limit_clause method
+    * Various error message improvements
+    * Use ->new_item instead of ->record_class->new since it was a performance
+        hit in Jifty
+    * Avoid cals to ->new_item where possible
+
+- Documentation:
+    * Document connect's quirky return value
+
+0.57 Tue May 19 08:02:03 EDT 2009
+- Major bugfixes:
+    * Use eval {} in Jifty::DBI::Handle's DESTROY block when manipulating DBI
+        Alterations to the DBI object in the DESTROY block must be wrapped in
+        an eval {}, as object destruction order is not guaranteed during
+        global destruction, and this interacts poorly with DBI's tie'd object.
+    * During DESTROY, don't explicitly disconnect a dbh set InactiveDestroy
+        The InactiveDestroy flag on DBI objects prevent them from being
+        implicitly disconnected when they go out of scope -- for example, in
+        the case where a process has forked, and two processes hold the socket
+        open.
+        However, it does not prevent them from being _explicitly_
+        disconnected, as we were doing in Jifty::DBI::Handle's DESTROY method.
+        This caused InactiveDestroy to never kick in, causing either a shared
+        socket, or two closed handles after a fork.  We prevent this by having
+        Jifty::DBI::Handle respect InactiveDestroy in its DESTROY method.
+    * Do not use Scalar::Defer defaults for columns' defaults in the db
+
+- New features:
+    * Add a display_length attribute on columns
+    * add schema manipulation tables: rename_column and rename_table
+    * If a column's default is a record, call its id method
+
+- Fixes:
+    * Improve SQL error message and avoid its duplication
+    * Pull the input_ and output_filters out of the instance hash
+
+- Tests:
+    * Added a unit test for the SaltHash filter
+    * use drop_table_if_exists in tests
+    * add drop_table_if_exists in t/utils.t
+    * unconditionaly drop tables for testing
+    * test rename_table
+    * add tests for rename_column
+    * SaltHash test does not need an is_deeply()
+    * Don't explicitly disconnect the handle, DESTROY handles it better
+    * Test for warnings instead of letting them leak into the test output
+
+
+0.53 Wed Mar 25 15:27:03 EDT 2009
+- Major bugfixes:
+   * On rollback, flush the record cache.  This fixes a bug when SQLite
+     reuses primary keys after rollback, and thus the record cache is
+     wrong.
+   * Apply filters to "default is ..." values, so "is boolean, default is
+     0" works on postgres, for instance
+   * $self->_new_collection_args is passed to the ->new constructor of a
+     collection, not its ->new_item method
+
+- Performance fixes:
+   * Don't call accessor twice when we have values around
+   * Don't create temporary variables we don't need around, just return
+   * Optimize for the case when there are no output filters
+   * Play with self/class only when passed argument is not a reference
+   * In _do_search, separate prefetch and non-prefetch paths; the latter
+     is a much tighter loop
+   * Refactor first pass over results in prefetch path
+   * Move a ->new_item call where we only need it
+   * Jifty::DBI::Handle::SQLite - LOWER() in SQLite is expensive; it's
+     easier just put COLLATE NOCASE on the column side.  Bump DBD::SQLite
+     to 1.14 which gives us COLLATE NOCASE.
+   * Cache on record table, not record class so subclasses also get
+     cached correctly.  If the data in the underlying table changes,
+     regardless of the class you're using, you want to load the new data.
+   * Refactor _qualified_record_columns
+   * call ->table for defaulting only when we actually want defaulting
+   * Selay some method calls when possible in limit
+   * Minor refactoring of _get_alias
+   * grep before looping to loop over fewer values in load_from_hash
+   * Cache load attempts in new_item in a local static cache
+   * Cache filter class load attempts in _apply_filters
+   * Save some slow Class::Accessor calls in Jifty::DBI::Filter
+   * Stick aliases into COLUMNS as well, for faster lookup
+   * Provide a faster load_from_hash for when we're being called from
+     do_search
+
+- Datetime fixes:
+   * _formatter is *inheritable* class data.  If it happens to get set by
+     the DateTime filter before getting set by one of its subclasses (the
+     Date and Time filters), than it is stuck on the DateTime _formatter
+     setting because the subclasses don't override it.  There are a
+     couple solutions, the simplest being to check the value of _strptime
+     and update/override _formatter if it is different, which is what
+     I've done here.  (This may not be the most optimized solution.)
+   * Require Time::Duration::Parse 0.06 to win us decimal durations like
+     1.5h
+   * Fix a broken regex that just happened to work because we only fed it
+     correct data
+   * Add date_only method in date and datetime filters
+   * For date-only timestamps, set hour, minute, and second to zero
+   * Include the datetime string we're trying to decode in parse failure
+     cluck
+   * Use DateTime's strptime since we don't want additional logic
+
+- Documentation fixes:
+   * Minor POD improvement for debian lintian in Jifty::DBI::Column
+   * Adding an example of open_paren/close_paren and limit subclause.
+   * Added documentation for "IS" on limit().
+   * Additional docs for load_by_cols
+   * Update record_class' docs
+
+- Minor bugfixes:
+   * Perltidy, primarily for indentation fixes
+   * Update copyright year to 2009
+   * collections can now clear_order_by
+   * requires('perl' => '5.8.3') confuses M:I. the "correct" incantation
+     is perl_version('5.8.3')
+   * Add the ability to unload columns and prefetched values
+   * Use $args{'collection'}->limit instead of
+     $self->Jifty::DBI::Collection::limit so we don't break
+   * We accept IN or = as operators for array ref. values, so match
+     against that (and do it case insensitively to boot)
+   * Allow validators to get extra arguments
+   * Storable with non-bytea is OK if we base64
+   * add double naming schema for record references, using name, name_by
+   * fixed situation with 'column X_not_id refers_to M by "not_id"'
+   * Aliases should be virtual
+   * When we have group_by, the first column may not be enough to
+     distinctify the rows.  But since they're grouped, they're all
+     distinct by definition.
+   * turn _handle _is_limited rows_per_page into accessors
+   * Clean out fetched when we load_from_hash
+   * Pass arguments database_Version to the super method
+   * Don't chomp Collection or s if prev character is ':', die instead,
+     it can happen for annon collections based either on JDBI::Collection
+     or J::Collection
+   * No need to setup the pager, its constructor does that for us;
+     actually it's really questionable that we need to setup pager when
+     there is no paging by default
+   * Don't optimize left joins on mysql 5.0 and newer, may be other DBs
+     can drop this too
+   * $caller->COLUMNS should not contain virtual methods from plugins
+   * Add "raw value" internal values
+   * Plugin import must not call ->columns which causes incorrect
+     caching.
+
+
+
+0.49 Mon Apr 07 22:16:48 EST 2008
+- Major changes:
+   * "is boolean" support for cross-database booleans
+   * New filters: Duration, URI
+   * column attribute encode_select for filtering columns on load_by_cols, etc
+   * <$collection> and @$collection support
+   * Protected and private fields, for Jifty's automatic action introspection
+   * ping/reconnect on error
+   * Memory leak, unnecessary query, and transaction fixes
+
+- All changes:
+   * call _init_hander for all columns
+   * Revert paging fix which isn't quite ready yet
+   * Note that booleans render as checkboxes
+   * Fixes for NULL boolean columns
+   * Booleans get canonicalizers, so perl-level gets canonical values, not just
+     the DB.
+   * Canonicalization fixes
+   * Catch some expected warnings with (new dependency on) Test::Warn
+   * Get rid of an unbalanced vim-fold
+   * Jifty::DBI::Filter::URI
+   * Rename decode_select to encode_on_select
+   * Fix final test failure: toggle pg_bool_tf before making the query
+   * encode and decode were swapped :|
+   * Some test fixes. DBD::Pg has a damn "DWIM" option for booleans that caused
+     failures
+   * Move the alias and column handling in ->limit up sooner so we have a
+     column object as soon as possible
+   * Apply filters on default values for attributes
+   * Rename encode_select to decode_select (I always get the two confused)
+   * Force undefined boolean attributes to be false, for sanity reasons
+   * Add a new column attribute, encode_select. This will apply filters on
+     load_by_cols and limit. Have Boolean use encode_select.
+   * Complain if the encoded/decoded value doesn't return one of _is_true or
+     _is_false.
+   * Add "is boolean" support for not-braindead booleans.
+   * Have filters receive the database handle
+   * fixing our lower() behaviour on non-text columns when we were being stupid
+   * better passing in the class of a joined table when using ->new_alias
+   * defaulting to a not-null string
+   * Quiet down defaults for an annoying regex match in current DBIx::DBSChema
+   * Return self, not true, in boolean context
+   * Fix collections in bool context
+   * Pass all data to logging hook so they can do more interesting things with
+     them immediately
+   * micro-optimization of _filters which is called quite often
+   * Add <$collection> and @$collection syntax sugar that simply calls
+     $collection->next and $collection->items_array_ref behind the scenes.
+   * Tiny POD tweak so t/pod-coverage.t passes.
+   * Jifty::DBI::Handle - When "begin_transaction", "commit" and "rollback"
+     did not succeed, the internal $TRANSDEPTH should be left unchanged.
+     (Otherwise, a failed ->commit will cause future transactions to never
+     really take place.)
+   * Add a documentation meta-attribute, for Jifty
+   * Debian packaging for 0.48
+   * Bump for added properties
+   * Protected and private fields, for Jifty's automatic action introspection
+   * Added the ping/reconnect on error as suggested by Jesse.
+   * Fix typo
+   * Upgrade dep to 0.05 now that the hh:mm(:ss) parsing code is in it
+   * Better error checking
+   * No need to duplicate order_by's logic, just call thrash explicitly and
+     call add_order_by
+   * Add Collection->add_order_by, which refines ordering, instead of thrashing
+     it
+   * Get rid of reference to deprecated method
+   * Don't try to encode/decode empty values
+   * Handle hh:mm(:ss)? within other duration strings so that "1d 2:30" works
+   * More tests for the duration filter (to test different input formats and
+     check the raw DB value)
+   * Fix version
+   * Handle hh:mm:ss in the duration filter as input and output a more concise
+     format
+   * dd missing dependancies with Class::Trigger in debian packaging for use of
+     alone package libjifty-dbi-perl
+   * Add optional dependencies on Time::Duration(::Parse) in Makefile.PL
+   * Add a duration filter which uses Time::Duration and Time::Duration::Parse.
+     Stores durations as seconds in the database and converts them to English
+     strings for output.
+   * Revert mistaken change
+   * UNIVERSAL::require has a memory leak, fixed by 0.11
+   * Allow starts_with and ends_with in addition to STARTSWITH and ENDSWITH
+   * We were leaking the collection on set_page_info. Yuck! We need some way to
+     find these Scalar::Defer leaks
+   * Be more careful about initializing values we're using
+   * Fix a mismerge in 4642
+   * By not reaching inside the pager object, we save on some useless forced
+     SQL queries
+   * Be a bit cleverer about not always doing a count before doing a select
+     (The previous behaviour was pathalogical)
+
+
+
+0.48 Thu Nov 29 16:28:11 EST 2007
+   * User and password values are excluded from the DSN in a more proper fashion
+   * Setting a default for RECORD_MIXINS and altering the mk_classdata() decls
+     to avoid any confusion with the mk_accessors() interface.
+   * Eliminated the ?: at the end of import() since RECORD_MIXINS is now [] by
+     default.
+   * Let users run arbitrary code during SQL statement logging
+   * Exclude user and passowrd from the DSN so it doesn't show up in the
+     terminal
+   * use YAML () -> require YAML to suppress error when YAML is not installed
+     (but ::Syck is installed)
+   * Fix reverse joins.  Broken in multiple ways.
+   * added 'escape' option (undef by default) to Collection->limit, to allow "
+   * where column like 'something including wildcard(\\%)' ESCAPE '\\'" kind of
+     stuff, mainly for SQLite which doesn't seem to be able to escape wildcards
+     without ESCAPE
+   * changed escape character in the t/01searches.t from backslashes to at mar
+   * k, which is cleaner and kind to postgres; added pod
+   * typo fix in docs
+   * mysql doesn't handle bare varchar's
+   * TODO a test that needs us to force mysql to be case sensitive
+   * expand the escape documentation
+   * manifest skip pm_to_blib, add new test file to manifest
+   * Update Changes
+
+
+
+0.47 Fri Nov 16 15:23:28 EST 2007
+   or, "The chmrr fixfest"
+
+   * Note for posterity why we can't apply acl checks to refers_to columns
+   * The formatter can't be decided at compile time, because subclasses
+     may override the format.  Hence, make it once and cache it.
+   * r4425 actually changed the way that undef foreign objects were
+     treated; revert to the old behavior, but make it easier to achieve
+     the new (aka Jifty's) behavior.
+   * Only create the parser and formatter for DateTime objects once, as
+     they are slow to create.
+   * When looking up the column object in a limit, try to find the right
+     class in the aliases.  This only currently works if you specified
+     the model class as the 'table2' in the join, instead of its table
+     name.
+   * Can now call ->record_class as a class method
+   * Force chained auto-joins to be marked distinct
+   * Alias columns now count as virtual
+   * some tests for referencing.
+   * Factor out ->_new_record_args and ->_new_collection_args on both
+     Record and Collection; makes for easier subclassing in Jifty
+   * (re-)wrapped POD
+   * Remove broken ->_normal_join
+   * $collection->prefetch is now smarter, stealing code from future
+     tisql branch
+   * $collection->_preload_columns becomes ->query_columns, to have a
+     better name
+   * $collection->{aliases} rolled into ->{joins}, to also not lie
+   * $collection->{leftjoins} becomes ->{joins}, to not lie
+   * Standardize on "prefetch" not "preload"
+   * Fix preload for records
+   * Don't grovel theough columns to find possible joins, just look at
+     the joins
+   * derived collections can't be relimited
+   * add derived => 1 for prefetched collections
+   * Remove Jifty::DBI::Collection->preload_columns, which was old and
+     unused 
+   * '$sb' -> '$collection' because we aren't SearchBuilder anymore
+   * perltidy
+   * Get rid of a spurious warning
+   * Whoops, turned off the wrong warning
+   * POD coverage
+
+
+
+0.46 Wed Nov  7 12:24:08 EST 2007
+ - POD Coverage nit
+ - Fix for a stray tempfiles bug reported by ANDK
+
+
+
+0.45
+Add a warning for mandatory+till until we fix it
+
+Fix the mandatory/inactive tests
+
+We don't need to check that a column is mandatory if it's not active
+
+Add failing tests for mandatory columns that aren't active, they shouldn't have the not null constraint
+
+Bump to 0.45 because of the JDBI::Filter::DateTime functionality fixes
+
+Improve the decode doc, which was mostly just a copy of encode
+More needless warnings gone
+
+Better error message when trying to use load_by_cols on a column that doesn't exist
+Two fixes for timezones:
+
+    Coerce input and output to be UTC (or Floating, if JDBI::Filter::Date)
+    I think we were depending on DT:F:Strptime being saner than it is
+
+    Use set_time_zone, not time_zone which is only a getter
+    defined is not what you check to see if there is a hash entry. this will stop bogus extra sql calls that slowed down your app
+
+Allow the specification of functions as 'column' on sql search criteria.
+
+When we fail to load a related model class for a good reason, actually die, rather than burying the error
+
+mysql doesn't handle bare varchar's
+
+TODO a test that needs us to force mysql to be case sensitive
+
+typo fix in docs
+
+We can have 0-valued columns, again
+
+New column attribute: is case_sensitive
+
+Make load_by_cols respect column case sensitivity.
+
+NOTE this is a behaviour change as columns are by default
+case-insensitive, and the call was doing a case sensitive
+search, which is different from Collection searching.
+
+To make Jifty::DBI load_by_cols work in the old behaviour:
+
+Use $rec->load_by_cols( name => { value => 'foobar',
+case_sensitive => 0,
+operator => '=' });
+
+unreadable and immutable are now in attributes.
+
+Refactor Jifty::DBI::Column to split attributes into two groups.
+Actual column-related (in jifty::dbi layer) ones, such as type,
+remains as accesssors.  The rest goes into the attributes hash.
+This allows us to declare higher level meta data without having to
+change Jifty::DBI::Column in the future.
+
+Note that if you are accessing the column object's ->{label} directly
+this will now fail.  Use ->label instead.
+
+*Test updates for case issues 
+
+* Add support for non-lowercase column names
+
+Make sure limit() does not modify arrays passed in to the "value" parameter.
+
+* Allow is_distinct when joining collections, hinting the
+resulting collection is still distinct.
+
+* If table2 is given as a Jifty::DBI::Collection object,
+detect if the join is still distinct.
+
+Added documentation for using @EXPORT with mixins.
+
+Fix the call to the after_set trigger.
+
+Added a new accessor, RECORD_MIXINS, for tracking which mixins have been attached to a model.
+
+Adding basic documentation for before_set and after_set triggers.
+
+Adding before_set and after_set triggers and tests for them.
+
+Moved Jifty::DBI to use Class::Trigger instead of its own fork of Class::Trigger.
+
+Added tests and debugged register_triggers_for_column on record plugins.
+
+Improvements to the trigger documentation for after_create and before_create.
+
+Fix the documentation of the after_create trigger to match the actual behavior (and only that, this time).
+
+Removed register_triggers_late() in favor of register_triggers_for_column(), which is nearly the same thing but with clearer semantics.
+
+Updated documentation to discuss the register_triggers_late() method.
+0.43 Fri Aug 24 00:13:20 EDT 2007
+
+
+----------------------------------------------------------------------
+r66529 (orig r3939):  audreyt | 2007-08-22 12:38:23 -0400
+
+* Jifty::DBI::Filter::DateTime: The _time_zone setting was not
+  honoured by ->decode, because the code had a no-op $dt->time_zone($tz)
+  where it should've been $dt->set_time_zone($tz).
+----------------------------------------------------------------------
+r66518 (orig r3928):  falcone | 2007-08-21 19:09:22 -0400
+
+ r23979@ketch:  falcone | 2007-08-21 18:00:57 -0400
+ * tell Pg to be case sensitive on IN clauses and handle the arrayref
+   structure used by IN
+
+----------------------------------------------------------------------
+r66517 (orig r3927):  falcone | 2007-08-21 19:08:59 -0400
+
+ r23978@ketch:  falcone | 2007-08-21 18:00:27 -0400
+ * we don't need to TODO this MySQL test because the case matches exactly
+   and returns values
+
+----------------------------------------------------------------------
+r66197 (orig r3926):  yves | 2007-08-21 10:49:01 -0400
+
+debian packaging
+
+----------------------------------------------------------------------
+r66169 (orig r3923):  efunneko | 2007-08-20 16:57:43 -0400
+
+Added support for the IN operator within limits.  This should be accompanied by an array ref of values to be compared against.  It also allows an array ref to be passed with the '=' operator to accomplish the same thing
+----------------------------------------------------------------------
+r66164 (orig r3918):  sterling | 2007-08-20 15:56:18 -0400
+
+Fixing the name of the branch.
+----------------------------------------------------------------------
+r66163 (orig r3917):  sterling | 2007-08-20 15:54:42 -0400
+
+Creating a new branch to develop improvements on indexes and relationships.
+----------------------------------------------------------------------
+r66157 (orig r3911):  trs | 2007-08-16 15:59:16 -0400
+
+ r26169@zot:  tom | 2007-08-16 15:58:56 -0400
+ Backup r3908 for now since it breaks existing code
+
+----------------------------------------------------------------------
+r66154 (orig r3908):  sterling | 2007-08-16 10:02:48 -0400
+
+ r8684@dynpc145:  andrew | 2007-08-16 08:55:32 -0500
+ Added support for virtual record columns.
+
+----------------------------------------------------------------------
+r66153 (orig r3907):  sterling | 2007-08-16 10:02:26 -0400
+
+ r8682@dynpc145:  andrew | 2007-08-15 11:17:32 -0500
+ Added more code comments, minor perl tidy, and removed a redundant call to set the column type.
+
+----------------------------------------------------------------------
+r65006 (orig r3743):  falcone | 2007-07-31 16:26:13 -0400
+
+ r23202@ketch:  falcone | 2007-07-31 16:25:03 -0400
+ * we have code that uses Jifty::Collection::implicit_clauses
+   and expects that where clause to still show up on an unlimit.
+   This is wrong, but we need to sort out the "right" thing to do.
+
+----------------------------------------------------------------------
+r64931 (orig r3741):  jesse | 2007-07-30 20:27:30 -0400
+
+ r64930@pinglin:  jesse | 2007-07-30 20:27:14 -0400
+ * Removed this. not time yet
+
+----------------------------------------------------------------------
+r64929 (orig r3740):  jesse | 2007-07-30 19:55:14 -0400
+
+ r64923@pinglin:  jesse | 2007-07-30 19:54:31 -0400
+  * first stab at a UUID filter
+
+----------------------------------------------------------------------
+r64902 (orig r3729):  jesse | 2007-07-28 20:27:31 -0400
+
+ r64901@pinglin:  jesse | 2007-07-28 18:29:15 -0500
+ * Added a find_all_rows method which works like 'unlimit' without the side effect of calling _clean_slate and zapping other metadata. 
+ * Clarified unlimit's somewhat brutal nature.
+ 
+     - Thanks to Mikko Lipasti
+
+----------------------------------------------------------------------
+r60774 (orig r3694):  sartak | 2007-07-16 12:49:13 -0400
+
+Fix 'uninitialized value' warnings
+----------------------------------------------------------------------
+r60655 (orig r3692):  jesse | 2007-07-14 00:06:17 -0400
+
+ r60634@pinglin:  jesse | 2007-07-13 20:14:44 -0400
+ * Additional  bulletproofing to stop jifty from trying to insert a bogus date into the database.
+
+----------------------------------------------------------------------
+r60350 (orig r3644):  trs | 2007-07-10 01:32:48 -0400
+
+ r25085@zot:  tom | 2007-07-10 01:32:08 -0400
+ Fix type for Pg
+
+
+0.41 Mon Apr 16 16:16:12 EDT 2007
+ * Fixed a broken dependency. Thanks to SAPER
+
+0.40 Sun Apr 15 11:19:45 EDT 2007
+
+ * Added sample code to POD for 'before_create' and 'after_create' to make it easier for users to implement by copy and pasting. -evdb
+ 
+ * Better non-lower()ing of non-string types on search. -jesse
+ 
+ * Fix up and add POD so that POD coverage tests pass -trs
+ 
+ * Kill unused JiftyRecord filter -trs
+ 
+ * Fixed documentation coverage for Jifty::DBI::Handle::Informix. -sterling
+ 
+ * Commented out incomplete apply_limits method in the Sybase handle. -sterling
+ 
+ * Fixed documentation coverage in Jifty::DBI::Record::Cachable. -sterling
+ 
+ * Fixed documentation coverage for Jifty::DBI::Record::Memcached. -sterling
+ 
+ * Added pod-coverage.t to encourage better documentation. Added documentation to Jifty::DBI::Record::Plugin. -sterling
+ 
+ * Added better handling of schema versioning -sterling
+ 
+ * Added _init_methods_for_columns to explicitly handle accessor/mutator creation for all columns attached to a record -sterling
+ 
+ * Applications employing JDBI can specify schema_version() in a sub-class of record to add better handling of "since" and "till" in both schema and code generation -sterling
+ 
+ * Modified columns() on records to only return active columns -sterling
+ 
+ * Added all_columns() to retrieve all columns on a record, even inactive ones -sterling
+ 
+ * Added the active() method to columns to test to see if a column is active for the current schema version -sterling
+ 
+ * Jifty::DBI now requires on Scalar::Defer 0.10. -audreyt
+ 
+ * Jifty::DBI::Schema - Don't rescind &defer and &lazy after the schema{...} block and talks about how to use it. -sterling
+ 
+ * debian changes -yves
+ 
+ * export of defer in Jifty::DB::Schema kills symbols for other use (thx audreyt) -yves
+ 
+ * Make load_by_cols work when a given value is undef by turning the query into IS NULL. -clkao
+ 
+ * Completely finish porting Jifty::DBI::Schema to use Object::Declare.  clkao, audreyt
+ 
+ Visible differences are: 
+   
+     - "refers App::Class" is now an alias for "refers_to App::Class".
+ 
+     - In refers/refers_to it is no longer neccessary to load App::Class
+       beforehand; therefore circular references can now be expressed.
+ 
+     - "length is 30" is now invalid; a compile-time exception will be
+       raised that tells the user to use "maxlength is 40" instead.
+ 
+0.39_9999 Fri Jan 26 21:30:48 CST 2007
+
+- Removed unneccessary use of Devel::SimpleTrace.
+
+0.39_999 Fri Jan 26 21:30:48 CST 2007
+
+- Improved error message for "length is 42":
+
+ Due to an incompatible API change, the "length" field in
+ Jifty::DBI columns has been renamed to "max_length":
+ 
+     column foo =>
+         length is 10;       # NOT VALID 
+
+ Please write this instead:
+ 
+     column foo =>
+         max_length is 10    # VALID
+
+- Calling 'column' within a schema class is an error:
+ 
+    package TestApp::Address::Schema;
+    column address => ...;        # NOT VALID
+
+  Please write this instead:
+
+    package TestApp::Address;
+    use Jifty::DBI::Schema;
+    use Jifty::DBI::Record schema {
+        column address => ...;    # VALID
+    };
+
+
+0.39_99 Fri Jan 26 19:57:48 CST 2007
+
+- INCOMPATIBLE API CHANGE: "length is 42" must be written as "max_length is 42" instead.
+- Switch to Object::Declare for schema declaration, fixing many annoyances such as the inability for two modules to refer to each other in their columns.
+- "refers Foo::Bar", a new alias to "refers_to Foo::Bar".
+
+0.34 Sun Jan 28 21:28:00 CST 2007
+
+- Added a method to the schema generator to output the SQL for a single column
+
+0.32 Fri Jan 26 20:51:12 CST 2007
+
+- Improved deprecation warning for "length is 42":
+
+ Due to an incompatible API change, the "length" field in
+ Jifty::DBI columns has been renamed to "max_length":
+ 
+     column foo =>
+         length is 10;       # NOT VALID 
+
+ Please write this instead:
+ 
+     column foo =>
+         max_length is 10    # VALID
+
+- Calling 'column' within a schema class is deprecated:
+ 
+    package TestApp::Address::Schema;
+    column address => ...;        # NOT VALID
+
+  Please write this instead:
+
+    package TestApp::Address;
+    use Jifty::DBI::Schema;
+    use Jifty::DBI::Record schema {
+        column address => ...;    # VALID
+    };
+
+0.31 Fri Jan 26 19:52:08 CST 2007
+
+- load, load_by_cols, load_from_hash and create are now optionally class methods.
+- "length is 42" in schema declarations is deprecated; please write "max_length is 42" instead.
+- Jifty::DBI::Collection - document the "LIKE" and "MATCHES" limit operators correctly.
+
+0.30 Wed Jan 17 15:29:44 EST 2007
+
+- update version dependency on DateTime to 0.34
+- fixed a "use of uninitialized value" warning in the tests.  [t/01records.t]
+- Make sure we don't go looking for the validate_COLUMN sub everytime for columns without validators (thanks to Alex for pointing that out)
+- Fix bug where validator_COLUMN subs weren't getting set as validators (thanks to Audrey for help)
+-  Test that the declarative syntax automagically sets validators as it should (these fail at the moment, though a fix should be forthcoming)
+- fixed the "order_by" bug in sub distinct_query.  [Jifty::DBI::Handle::Pg]
+- added unit tests for the Handle::Pg patch.  [t/14handle-pg.t]
+- fixed the desc string in the last test.  [t/13collection.t]
+- made _order_clause more flexible by dealing with empty aliases [lib/Jifty/DBI/Collection.pm]
+- added one test for it.  [t/13collection.t]
+- added t/13collection.t to test methods in Jifty::DBI::Collection.
+- Jifty::DBI::Handle::ODBC - Bring in the missing build_dsn method from
+  DBIx::SearchBuilder such that this backend can work again.
+  Requested by: agentzh++
+- Jifty::DBI::Column - Recognize "is autocompleted".
+- Jifty::DBI::Collection - The "function" argument to the "column" method
+  was broken when passed with trailing "?" characters.
+- Also clean up the documentation about ->distinct_required.
+- Jifty::DBI::Collection - Document the long-undocumented ->column method.
+- Jifty::DBI::Handle::ODBC - Doc fixup and author name fixup.
+- Jifty::DBI::Schema - Add "is autocompleted".
+- Jifty::DBI::Schema - Backport "order is 3" as alias of "sort_order is 3"
+  from Jifty::Param land.
+- Make "valid are ..." an alias for "valid_values are ..." for real.
+-  add 'is indexed' syntax to the declaritive schema generator
+- remove sort, it causes CREATE INDEX to run before CREATE TABLE
+- add sqlite sql so that these tests run without needing postgres configured
+- reorganize the code so its easier to add more databases later, and uses util.pl more
+- Jifty::DBI::Collection - More CORE::join() to avoid warnings.
+- Jifty::DBI::Collection: Pass through the arguments to L</new> to  L<clean_slate> and on to L<implicit_clauses>
+- import Carp::croak so the error message in apply works
+
+
+0.28, 0.29 Thu Nov 23 22:11:37 EST 2006
+
+* The last upload didn't take
+
+0.27 Thu Nov 23 22:06:09 EST 2006
+
+* Initial implementation of prefetching for related records and collections
+
+
+0.26 Mon Nov 13 11:11:31 EST 2006
+
+Usability
+
+ * avoid a warning in Jifty::DBI::Schema when our user is executing
+   a .pm file. When that is the case, caller(1) is not defined. --gaal
+ * Small error string change to suggest looking for missing use lines in models where refer_to is used --bartb
+
+Core code
+
+ * fixed sort_order setting in Jifty::DBI::Schema  --wolfgang
+ * Don't use main.*, ever. --clkao
+ * Jifty::DBI::Schema - Backport "valid are qw(...)" and "render as '...'"
+   support from Jifty::Param::Schema as aliases to "valid_values are" and
+   "render_as".  --audreyt
+ * added as_hash to Jifty::DBI::Record --jesse
+ * @ISA => use base --schwern
+ * Use DBIx::DBScehma::Column and ::Table rather than trust that DBIx::DBScehma
+   will load them. --schwern
+
+Installation
+
+ * Bump DateTime dependency, as older versions didn't provide the API 
+   we're using. (0.22 is known bad) --jesse (Thanks to Matt Trout)
+
+Testing
+
+ * make sure to skip 04memcached.t if you don't have Cache::Memcached --ishigaki
+ * Tests updated to not have $sth in scope when we $dbh->disconnect
+
+
+Doc
+ * demonstrate the valid_values alternate syntax that allows display and value to be separate 
+ * Document columns and column --schwern
+ * Minor changes to pod --evdb
+
+
+
+
+0.25 Tue Sep 12 23:52:45 BST 2006
+
+ * cleaned up DSN generation. 
+ * Allowed arbitrary parameter specification in DSNs
+ * Corrected the method name "DSN" to "dsn" throughout.
+ * ( If a user tries to load a record by columns that happen ot be foriegn keys, and values that are objects, do the right thing
+ * Propery cache DBI::Record entries when aliased.
+ * Fewer accessor calls.
+ * Only apply filters if we have values fetched.
+ * make passing a J:D:Collection as a value DTRT
+ * Jifty::DBI::Schema - s/die/croak/ to aid debugging.
+ * Refactor Jifty::DBI::Filter::Date to be a subclass of ::Filter::DateTime.
+ * New ::Filter::Time filter for time of day. ('time' sql type).
+ * Update to Module::Install 0.64 to fix auto_install() when Makefile.PL is
+   run from the command line and CPANPLUS is not installed.
+ * The number of fixed tests in t/10schema.t for Jifty::DBI was wrong.
+ * documented limit a bit more
+ 
+ * JDBI::Filter::Date clones dates before setting timezone, so that we
+   don't alter the object we're passed.
+ * Spelling fixes.
+ * Remove the @ISA-mocking code from Jifty::DBI::Schema, so that
+ 
+     use MyApp::Record schema {
+         ...;
+     }
+ 
+   can work even if MyApp::Record overrides Jifty::Record's column
+   building methods.  We do that by arranging the schema callback
+   to run after the @ISA chain is set up.
+ 
+ * Jifty::DBI::Schema - defer initialization for columns created via the
+  schema{} wrapper, so that users can continue to define column names
+  that overlaps with the helper functions, such as "label" and "type".
+ * attempt to test "label" and "type" column definitions.
+   however, as I don't have Pg, I cannot run this test; help welcome.
+ 
+ * cleaned up case sensitivity code
+ * fixed SQLite docs
+ * abstract out checking whether it's possible to make a clause case 
+    insensitive so that subclasses of Handle can use those tests
+ * doc'd Filter::DateTime special behavior when the column type is 'date'
+ * Adding a filter to salt and hash passwords
+ * Adding an after_set hook to Jifty::DBI::Record
+ * Jifty::DBI::Schema: Lift the restriction to use another ::Schema
+   package on the record model class; you can now directly write:
+ 
+     package Wifty::Model::Page;
+     use Jifty::DBI::Schema;
+ 
+     schema {
+     # ... your columns here ...
+     };
+ 
+   because &schema will unregister all symbols exported by Jifty::DBI::Schema
+   after it runs the column initialization code.  Backward compatibility is
+   preserved -- as long as you don't name your record model "Schema"...
+ 
+ * update the testmodels.pl to use new schema decl syntax
+ * Lift the call of schema to BEGIN time:
+ 
+ * fixed handling of case sensitivity and numeric columns so opertions 
+   like '>' do numeric instead of lexical comparisons
+ * Allow collection SELECTs to have preload_columns defined.
+ * Case insensitive searches should be, euh, case insensitive in Pg
+ * Mark case-sensitive tests as TODO for MySQL
+ * drop ::Cachable::new as it does nothing
+ * add cache tests: columns names are case insensetive so we should
+   generate cache key insenstive too
+ ::Cachable::_gen_record_cache_key
+  * hash key couldn't be undefined, but '' and 0 are different keys
+  * values undef, 0 and '' are different, use '__undef' only when it's
+    really undef
+  * apply the same logic when $value is hash reference
+  * use lower case for key part
+  
+ ::Cachable::load_from_cache
+  * don't generate PK cache key, we do that in subcequent _store call
+ 
+ ::Cachable::__set
+  * don't create local arguments hash, just pass @_ throught
+ 
+ ::Cachable::__delete
+  * don't eat arguments, may be somebody wants to subclass
+    and pass arguments to delete.
+ 
+ ::Cachable::_fetch 
+  * fetch again only when we found something in cache with
+    keys' aliases
+ ::Cachable::_primary_record_cache_key
+  * avoid check for $self->id definess as if it's undef then
+    record couldn't have pk cache key
+  * use $self->primary_keys to get columns of the PK and its
+    values, as result we get support for compound PKs here
+ 
+  * Mark undef PK loading as TODO
+
+  * Only mark the one failing test under mysql as TODO
+ 
+  * make Collection smart about guessing table names
+ 
+  * removed a lie from create() pod
+  * Make _open_paren and _close_paren into public methods open_paren and close_paren
+
+0.24 Tue Aug  8 23:33:34 EDT 2006
+ * artificial version increment
+
+0.23 Thu Jun 15 14:12:20 CEST 2006
+ * Add tests for case sensitivity in limits
+ * Caching for columns and readable/writable attributes. Only gains us 2% performance. But hey. 2% free
+ * Added DateTime::Format::Strptime to requires
+ * Do fewer ->COLUMNS calls from ->column, and do fewer ->column calls from
+->value.
+ * Make Jifty::DBI::Record::_init() expect a hash like Jifty::Record does
+ * Fixes 'is_distinct' failure when used in Jifty
+ * Use Class::Accessor::Fast.
+ * Remove Carp::cluck, as it  hates END and vice versa.
+ * Integrate today's hack for dumping callers for sql queries in question.
+ * Add tests for case sensitivity in limits
+ * Integrate today's hack for dumping callers for sql queries in question.
+ * Enforce mandatory things at a Jifty::DBI layer
+ * Cleanup 'distinct' column check and tests
+ * Tests for column constraints 'mandatory' and 'distinct'
+ * Implement support for 'distinct' column checks
+ * Perltidy
+ * Set validator on the column to validate_whatever (even if it's just
+   the autogenerated one)
+ * Update Module::Install to 0.21+ to prevent make loop; also
+   avoid the use of "our" in VERSION strings for compat with
+   older MMs. (Ditto with the previous commit)
+ * Oracle fixes from Mark Gardner
+ * Jifty::DBI::Filter::Storable - Do not die when the storable image is somehow
+   corrupt; instead, simply return undef.
+ * upgrade inc/ trees to 0.62+ to reflect the version::vpp fix.
+ * Jifty::DBI::Collection - minor POD style and typo fix.
+ * add_record now works on empty collections
+ * removed a debug warning from alex
+ * Enforce "default is ''" on columns
+ * Document the use and behavior of refers_to
+ * Cache::Memcached was being tested whether or not it was installed. Thanks to Matt Trout
+ * Fixed Pod typo
+ * Doc fixes relating to filters
+ * lib/Jifty/DBI/Record.pm - removed incorrect '=for' directive
+ * lib/Jifty/DBI/SchemaGenerator.pm - removed incorrect '=for' directive
+ * t/01-version_checks.t - test for CPAN VERSION parsing hang-ups
+ * lib/Jifty/DBI/Record.pm - added Class::ReturnValue's to disallowed accessors
+ * lib/Jifty/DBI/Record.pm - do not try to set_<foo>() a collection
+ * t/11schema_records.t - added tests for trying to set a collection
+ * t/10schema.t - silence undef warning
+ * lib/Jifty/DBI/Record.pm - catch attempts to set a refers_to
+ * lib/Jifty/DBI/SchemaGenerator.pm - crediting myself per Jesse's suggestion :-O (ewilhelm)
+ * lib/Jifty/DBI/SchemaGenerator.pm - pod edits:
+   Redid synopsis with real example -- 
+    maybe somewhat incorrect WRT Model::Schema, but it does work.
+   Stripped boilerplate sections.
+   Clarified add_model $model requirement.
+   Cleanup odd =for public... pod bits.
+   Spelling fix.
+ * lib/Jifty/DBI/Handle.pm - documentation fixes/cleanup
+ * created an api to allow distinct toggling
+
+
+0.21 Wed May  3 14:14:41 EDT 2006
+
+* We no longer do a count when setting up a collection's pager object by default
+* order_by now returns the current orders
+* added a "do_search" method to force a search, say before a count
+* Added a filter for Dates, lib/Jifty/DBI/Filter/Date.pm
+* Switched Jifty::DBI::Record to autocreate methods on object load rather than
+  use AUTOLOAD.
+
+0.20 Fri Apr 21 10:23:14 EDT 2006
+
+* Documentation updates and misc bugfixes from Eric Wilhelm
+* Performance optimization for the "standard case" of __value
+* Postgres sequence parsing fix from Daniel Tabuenca
+
+0.19 Sun Apr  2 18:59:53 JST 2006
+
+* Columns now have a "sort_order" attribute. This way when auto-rendering
+  forms, we can render them by "order defined" rather than just alphabetically.
+    - idea by Tatsuhiko Miyagawa
+
+0.18 Fri Mar 31 22:15:59 JST 2006
+
+* Test fixes to remove databases after testing. This fixes
+  Win32 test failures. -- Kenichi Ishigaki
+
+* Added "filters" method to records, which adds both 
+  input_filters and output_filters.
+
+0.17 Sun Mar  5 00:41:41 PST 2006
+
+* Memcached correctness fixes
+
+0.16 Sat Mar  4 18:02:44 PST 2006
+
+* Memcached installation fixes
+
+0.15
+
+
+* Added support for Memcached
+* Updated record docs to show hooks
+
+0.09 Thu Dec 29 07:56:30 EST 2005
+
+* Fixed dependency on Class::Data::Inheritable
+
+* Audrey Tang added "smarter" schema declaration processing to get us warnings on bogus usage.
+
+0.08 Sun Dec 25 14:34:12 EST 2005
+
+* Added a missing prereq: Exporter::Lite. Thanks to sri
+
+0.06 Fri Dec 23 15:44:17 EST 2005
+
+* Added more tests for mysql and Pg now that DBSchema supports them. Tests want more love
+
+0.05_03
+
+Forward-ported features from DBIx::SearchBuilder:
+  1.37_01 Thu Dec  8 15:56:50 EST 2005
+  * Switched Postgres sequence lookups to use CURRVAL, rather than OIDs
+  
+  1.36 Fri Dec  2 18:04:21 EST 2005
+  
+  * Change to how we resolve virtual columns to deal with a  
+    "no such attribute" bug in RT
+  
+  1.35 Wed Nov  2 22:36:02 EST 2005
+  * Doc fixes and OrderBy cleanup from ruslan
+  
+  1.34 Wed Nov  2 22:26:15 EST 2005
+  
+  * Clone support from Ruslan
+  
+
+
+0.05_02
+
+* Added support for "virtual" columns
+* Added support for named references between tables
+
+    column owner =>
+        refers_to MyApp::User by 'email';
+
+
+* not_null deprecated in favor of mandatory
+
+0.05_01 Tue Nov  8 16:29:02 EST 2005
+
+* Initial release

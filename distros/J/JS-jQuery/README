@@ -1,0 +1,23 @@
+NAME
+    JS-jQuery - The Write Less, Do More JavaScript Library
+
+SYNOPSIS
+        http://jquery.com
+
+DESCRIPTION
+    JS-jQuery is simply the latest version of jQuery on CPAN.
+
+    See JS for information on how to locate this module after you've
+    installed it.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org> is the packager of JS-jQuery.
+
+    John Resig is the author of jQuery.
+
+COPYRIGHT
+    Copyright (c) 2008. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as jQuery itself.
+

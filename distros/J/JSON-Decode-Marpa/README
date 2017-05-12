@@ -1,0 +1,77 @@
+NAME
+    JSON::Decode::Marpa - JSON parser using Marpa
+
+VERSION
+    This document describes version 0.02 of JSON::Decode::Marpa (from Perl
+    distribution JSON-Decode-Marpa), released on 2014-08-27.
+
+SYNOPSIS
+     use JSON::Decode::Marpa qw(from_json);
+     my $data = from_json(q([1, true, "a", {"b":null}]));
+
+DESCRIPTION
+    This module is based on MarpaX::Demo::JSONParser (using "json.2.bnf"),
+    but offers a more convenient interface for JSON decoding. I packaged
+    this for casual benchmarking against Pegex::JSON and
+    JSON::Decode::Regexp.
+
+    The result on my computer: Pegex::JSON and JSON::Decode::Marpa are
+    roughly the same speed (but Pegex has a much smaller startup overhead
+    than Marpa). JSON::Decode::Regexp is about an order of magnitude faster
+    than this module, and JSON::XS is about *three orders of magnitude*
+    faster. So that's that.
+
+    This is the benchmark code used:
+
+     use 5.010;
+     use strict;
+     use warnings;
+
+     use Benchmark qw(timethese);
+     use JSON::Decode::Marpa ();
+     use JSON::Decode::Regexp ();
+     use JSON::XS ();
+     use Pegex::JSON;
+
+     my $json = q([1,"abc\ndef",-2.3,null,[],[1,2,3],{},{"a":1,"b":2}]);
+     my $pgx  = Pegex::JSON->new;
+
+     timethese -0.5, {
+         pegex  => sub { $pgx->load($json) },
+         regexp => sub { JSON::Decode::Regexp::from_json($json) },
+         marpa  => sub { JSON::Decode::Marpa::from_json($json) },
+         xs     => sub { JSON::XS::decode_json($json) },
+     };
+
+FUNCTIONS
+  from_json($str) => DATA
+    Decode JSON in $str. Dies on error.
+
+FAQ
+SEE ALSO
+    JSON, JSON::PP, JSON::XS, JSON::Tiny, JSON::Decode::Regexp, Pegex::JSON.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/JSON-Decode-Marpa>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-JSON-Decode-Marpa>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=JSON-Decode-Marpa>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

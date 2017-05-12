@@ -1,0 +1,22 @@
+#!perl
+use warnings;
+use strict;
+use utf8;
+
+my $cmd = shift;
+if( $cmd eq 'console' ) {
+  use Jaipo::UI::Console;
+  my $jc = Jaipo::UI::Console->new;
+  $jc->init;
+  $jc->run;
+} 
+
+else {
+  print <<HELP
+
+  Usage:
+  
+  perl -Ilib bin/jaipo console
+
+HELP
+}

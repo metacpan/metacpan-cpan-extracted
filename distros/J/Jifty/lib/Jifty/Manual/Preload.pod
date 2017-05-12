@@ -1,0 +1,211 @@
+=head1 NAME
+
+Jifty::Manual::Preload - One Path to a Snappy UI
+
+=head1 DESCRIPTION
+
+Preloading lets you optimistically load regions before they are to be
+displayed. This improves user experience because preloaded updates are
+effectively instant; the user does not wait for an HTTP request/response cycle.
+The request/response cycle still happens, but it happens behind the scenes
+while the user is reading the current page, filling out a form, etc.
+
+=head1 WARNING
+
+Preloading is applicable only if your use case fulfills a specific set of
+constraints.
+
+The region you are preloading must I<not> depend greatly on the actions
+submitted by the current page. For example, you cannot sanely preload a region
+which includes the content of a textarea that the user is typing in the current
+page. When the preload occurs, the user probably has not even begun to type
+into the textarea yet.
+
+On the other hand, the click of a button may be preloadable depending on what
+the button does. We use a nice tactic in Changelogger
+(L<http://changelogger.bestpractical.com>) to preload vote buttons. We need to
+know which change to display to the user next, which is a nontrivial amount of
+database work. When rendering a button, we begin a transaction, submit a fake
+vote action, choose the next change, then rollback the transaction. This turns
+out to be a fairly simple way to figure out what to display next for
+preloading.
+
+A region that is preloaded should not cause gratuitous side effects. It should
+never construct and submit actions on its own, mutate records, or anything else
+of that sort. Basically, the region should expect to be generated
+unconditionally. It can of course display a form, since that itself does not
+have side effects. It can also cause side effects that are rolled back, such as
+the example in the previous paragraph.
+
+Preloading should also be agnostic of real-world time. If you preload a region
+that contains a timestamp, then that timestamp may be stale by the time the
+region is actually shown. Similarly for displaying duration. For example, at
+the end of Hiveminder's task review, we tell you exactly how long you spent in
+the review. This final report update cannot be preloaded because the user may
+spend ten minutes on the last task, which would not be reported if we preloaded
+that update.
+
+Preloading can cause additional server load. Instead of a single request
+containing action submission and region updates, preloading sends a request
+containing action submission, then a request for each region update handler.
+The overhead of each request is probably nontrivial. However, the cost of
+preloading is probably worth it to improve user experience.
+
+Finally, preloading is pretty new. It has not been battle tested. There may be
+serious race conditions that result in inconsistencies that confound your
+users. There may be data loss. It may interact strangely with other Jifty
+features. These things would be very difficult to debug.
+
+Good luck!
+
+=head1 USAGE
+
+To mark a form handler as preloadable, use the C<< preload => 'cache_key' >>
+option:
+
+    form_submit(
+        onclick => {
+            submit       => $vote,
+            preload      => 'vote',
+            refresh_self => 1,
+            arguments    => {
+                change => $next_change->id,
+            },
+        },
+    );
+
+This marks the onclick handler as preloadable. When this button is I<rendered>,
+the user's web browser will request this region immediately. When this button
+is I<clicked>, the user's web browser will instantly refresh the region without
+having to send an AJAX request and wait for the response.
+
+The value of C<preload> is a cache key. This lets you reuse the same cache for
+preloaded regions. For example, if you're going to display ten vote buttons,
+then ordinarily you would make ten preload requests. However, if you give all
+of the buttons the C<vote> cache key, only one preload request will be made.
+Obviously this means that the specific button being clicked should not matter.
+If you have a "undo vote" button which sends you backwards, you would not want
+to preload that with the same cache key as regular votes, since a different
+form would be displayed. In fact, you probably do not want to preload it all,
+since it's presumably a rare occurrence.
+
+You may also pass a value of C<1> for the C<preload> key. This tells Jifty to
+generate a unique key for this preload so that you don't have to.
+
+Note that the C<$vote> action is submitted well after the next region has been
+preloaded!
+
+=head1 GORY DETAILS
+
+=head2 Basis
+
+Preloading hijacks Jifty's ordinary AJAX update mechanism. When a preloadable
+element is rendered, we include a bit of additional javascript which
+immediately calls C<Jifty.preload>. Thus the preload request is initiated
+around the time the page is rendered. Since the request is nonblocking, it
+should not noticeably affect the user experience.
+
+When the user agent receives the response to the preload request, it is cached.
+Finally, when the user activates the handler that was preloaded, we run the
+cached response through the C<onSuccess> update routine. This ends up being
+very fast since the user does not have to wait for request and response
+overhead, or the server processing time.
+
+This is a slight simplification. In reality, a few forces make this process
+more complicated.
+
+=head2 Many requests for a preload key
+
+Suppose your form has many buttons which perform the same kind of region
+update. They all replace this vote form with the next vote form. It does not
+matter which specific button the user clicks, they're all going to preload the
+same vote form. Thus, it is desirable to make only one preload request for all
+of these buttons, instead of one preload request for each button.
+
+When we initiate a preload request, we check to see if there is already a
+pending preload request for the given preload cache key. If so, we bail out.
+This way, only one request is made.
+
+In the future, we may also bail out if a response exists for the preload key in
+the cache. We do not do this yet because of cache staleness concerns.
+
+=head2 Activating handler before its request cycle finishes
+
+If a user is quick, they may click a preloadable button during, or even before,
+that region's preload request/response cycle. The simple way to handle this
+would be to ignore that the handler has preloading and just continue with the
+usual update cycle, sending a fresh HTTP hit.
+
+We can do better though. Since we know we already sent the preload request, we
+instead of just wait for its response instead of initiating a new request. We
+then mark that preload key as "wanted". This means that upon response, it will
+be immediately processed instead of waiting for its handler to be activated
+again.
+
+=head2 Actions
+
+Actions complicate the whole workflow. Ordinarily, we strip out action
+submission from region preload requests, since preloaded regions are supposed
+to be side-effect free. Rendering the button does I<not> imply that the button
+will always be clicked, so preloading the onclick's region does not submit the
+action. Instead, the action is submitted when the onclick handler is activated
+by the user.
+
+Given a page that has a button which preloads a refresh_self region update and
+submits an action, the following sequence of events happens.
+
+=over 4
+
+=item The page is loaded
+
+This renders a button which fires off...
+
+=item The refresh_self preload request cycle occurs
+
+This puts the unprocessed region into a cache for later use.
+
+=item Time passes
+
+=item The user clicks the button
+
+Now a number of things occur pretty quickly.
+
+=item A nonblocking AJAX request for the action submission occurs
+
+This takes no noticeable time so the later region replacement still feels
+instantaneous.
+
+=item Preloading is temporarily halted
+
+=item The region replacement occurs
+
+Ordinarily, this would render the button again, which includes some javascript
+to preload the next replace_self. However, preload submission is blocked until
+the action's response arrives. This is to make sure the action has been run
+before the next region is rendered, otherwise things could get too
+inconsistent. We block preloading because the action submission request and the
+preload request are not guaranteed to happen in order since they are separate
+connections. They could be routed differently.
+
+In the future, we may do something similar to Nagle's algorithm where all such
+pieces end up in the same request.
+
+While preloading is blocked, all preload requests go into a queue. When
+preloading becomes unblocked, all of the delayed preload requests will be
+executed.
+
+=item The action response arrives
+
+=item We display the action results
+
+This could take the form of jGrowl updates or what have you, so the user still
+receives feedback about the actions they submitted.
+
+=item Preloading is unblocked
+
+=item Delayed preload requests are executed
+
+=back
+
+=cut
+

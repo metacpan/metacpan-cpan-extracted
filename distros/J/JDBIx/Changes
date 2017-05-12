@@ -1,0 +1,8 @@
+Revision history for JDBIx
+
+1.00    Date/time
+        First version, released on an unsuspecting world.
+1.01    2015/01/25
+        Fix text harness failure, small cleanups to docs.
+1.02    2015/01/27
+        Fix Makefile.PL to require DBI.

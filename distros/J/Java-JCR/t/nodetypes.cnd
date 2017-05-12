@@ -1,0 +1,5 @@
+<nt   = 'http://www.jcp.org/jcr/nt/1.0'>
+<test = 'http://search.cpan.org/dist/Java-JCR/test'>
+
+[test:unstructured]
+> nt:unstructured

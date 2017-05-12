@@ -1,0 +1,45 @@
+Revision history for Jenkins-API
+
+0.12      2017-04-09 20:04:10+01:00 Europe/London
+
+        Converted to Dzil to fix issue #18.
+
+0.11    2015-01-23
+        Added new method 'general_call' for arbitrary api calls.
+
+0.10    2015-01-16
+        Added new get_job_details method.
+        [David Horner]
+
+0.09    2015-01-15
+        Added new view_status method.
+        Improved documentation of authentication
+
+0.08    2014-12-25
+        Convert to Moo (Arthur Axel 'fREW' Schmidt)
+
+0.07    2014-12-24
+        Changed build calls to use POST method rather than GET as newer Jenkins 
+        appear to require that now.  Older versions also appear to work with POST
+        so this should not be an incompatible change.
+
+0.06    2014-06-13
+        Make _client lazy and preload modules
+        [Piers Cawley]
+
+0.05    2014-04-22
+        Added support for Basic Authentication (now a common option for Jenkins)
+        [Alex Kulbiy]
+
+0.04    2013-09-10
+        Minor Makefile clean up courtesy of David Steinbrunner
+
+0.03    2013-02-15
+        Added support for builds with parameters (Nick Hu)
+
+0.02    2013-01-19
+        First CPAN release.
+
+0.01    2012-04-12
+        First version, released on an unsuspecting world.
+

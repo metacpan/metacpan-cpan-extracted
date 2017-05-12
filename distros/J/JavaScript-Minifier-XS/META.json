@@ -1,0 +1,47 @@
+{
+   "abstract" : "XS based JavaScript minifier",
+   "author" : [
+      "Graham TerMarsch (cpan@howlingfrog.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "JavaScript-Minifier-XS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "JavaScript::Minifier::XS" : {
+         "file" : "lib/JavaScript/Minifier/XS.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.11"
+}

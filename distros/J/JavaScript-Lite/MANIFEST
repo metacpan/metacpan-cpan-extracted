@@ -1,0 +1,10 @@
+Changes
+lib/JavaScript/Lite.pm
+Lite.xs
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+t/JavaScript-Lite.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

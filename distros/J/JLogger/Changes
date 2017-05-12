@@ -1,0 +1,7 @@
+This file documents the revision history for Perl extension JLogger
+
+1.001  19.09.2011 00:00:00
+         - use DBIx::Connector for database connection
+
+1.000  09.09.2011 00:00:00
+         - first release

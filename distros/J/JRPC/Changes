@@ -1,0 +1,7 @@
+# 0.60
+- Initial release
+
+# 0.61
+- Fix a testing side bug of JRPC::Apache2 creating a deep dependency chain to number of Apache2::* modules,
+which are not a strict dependency by Makefile.PL. Strip JRPC::Apache2 from basic module loading test.
+Add (extremely simple) 01load_ap.t that is able to skip JRPC::Apache2 loading when Apache2::* modules are not found.

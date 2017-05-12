@@ -1,0 +1,98 @@
+NAME
+    JavaScript::DataFormValidator - JavaScript form validation from a Perl
+    Data::FormValidator profile
+
+SYNOPSIS
+    This module helps with setting up a JavaScript validation for a form
+    using Data.FormValidator, a JavaScript port of Data::FormValidator. A
+    key feature of this system is that it allows you to use the *exact same*
+    validation profile for both Perl and JavaScript validation.
+
+    You should read the docs for the JavaScript implementation for some
+    limitations: http://www.openjsan.org/doc/u/un/unrtst/Data/FormValidator/
+
+    Here's an example with HTML::Template syntax:
+
+      <script type="text/javascript" src="../JSAN/Data/FormValidator.js"></script>
+
+      <!-- tmpl_var dfv_profile -->
+
+      <form action="/foo"  <tmpl_var js_dfv_onsubmit > >
+      <!-- ... ->
+      </form>
+
+    And then back in your perl code...
+
+     use JavaScript::DataFormValidator;
+     my $t = HTML::Template->new_file('foo.html');  
+     $t->param(
+        dfv_profile => js_dfv_profile( 'my_form' => {
+                required => [qw/email first_name/],
+                optional => 'last_name',
+                constraints => {
+                    email => 'email',
+                }
+        }),
+        js_dfv_onsubmit => js_dfv_onsubmit('my_form');
+     );     
+
+  REQUIREMENTS
+    The Data.FormValidator JavaScript file must be copied to your server so
+    that you can call it. Download the latest version from here:
+    http://www.openjsan.org/doc/u/un/unrtst/Data/FormValidator/
+
+  js_dfv_profile( $profile_name => \%profile_hash );
+    $dfv_profile_in_js = js_dfv_profile( $profile_name => \%profile_hash );
+
+    Takes a named Data::FormValidator profile in Perl, and returns a
+    representation of it in JavaScript, for use with the Data.FormValidator
+    JavaScript module.
+
+  STATUS
+    Hopefully, it's done. It's very simple code.
+
+    However, the API may break and change in the first weeks after the the
+    release as I get feedback. I'll plan to at least make a new release to
+    remove this notice once things seem stable.
+
+  js_dfv_onsubmit($profile_name);
+     $onsubmit_code = js_dfv_onsubmit($profile_name);
+
+    Returns the Javascript snippet to put in your <form> tag to call the
+    basic "check_and_report()" JavaScript validation function.
+
+FUTURE DEVELOPMENT
+    This module is mostly released as a demonstration of how to integrate
+    with the Data.FormValidator JavaScript project. For anything more
+    complicated, it will probably be easier to use this source code as
+    starting point for a custom solution.
+
+
+AUTHOR
+    Mark Stosberg, "<mark at summersault.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-cgi-application-plugin-javascript-formvalidator at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=JavaScript-DataFormValid
+    ator>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    * CPAN Page
+        <http://search.cpan.org/dist/JavaScript-DataFormValidator>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=JavaScript-DataFormValidat
+        or>
+
+ACKNOWLEDGEMENTS
+    This uses Data::JavaScript::Anon for the heavy lifting.
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Mark Stosberg, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

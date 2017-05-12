@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/JSAN/ServerSide.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/class-to.t
+t/dependencies.t
+t/pod-coverage.t
+t/pod.t
+TODO
+SIGNATURE    Added here by Module::Build

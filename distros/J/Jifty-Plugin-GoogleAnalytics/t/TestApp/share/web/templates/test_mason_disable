@@ -1,0 +1,9 @@
+<%init>
+Jifty->web->request->argument(use_google_analytics=>0);
+
+my $title = "Jifty::Plugin::GoogleAnalytics test (mason)";
+</%init>
+
+<&| /_elements/wrapper, title => $title &>
+<% $title %>
+</&>

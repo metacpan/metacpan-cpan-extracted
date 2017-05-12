@@ -1,0 +1,63 @@
+名前
+    Jcode::CP932 - CP932準拠によるJcode
+
+概要
+     use Jcode::CP932;
+     # 推奨（Jcode.pmとの互換を考えて）
+     jcode( $str )->utf8;
+
+     # 古式ゆかしく
+     Jcode::CP932::convert($str, $ocode, $icode, "z");
+     # もしくはオブジェクト指向で！
+     print Jcode::CP932->new($str)->h2z->tr($from, $to)->utf8;
+
+説明
+    Jcode::CP932はCP932によるUnicodeマッピングを用いたJcode代替物です。
+    sjisはCP932の、eucやjisはCP51932およびCP50221のマッピングを利用しています。
+
+    特に説明のない点はJcodeと同様の動作になります。
+
+正規化
+    JIS系で変換したUTF-8文字とCP932系で変換したUTF-8での不整合を解消するために、エンコード変換時に正規化処理を行なうことができます
+    。 標準では一部記号をJIS系のものからCP932系に変換しています。
+
+追加メソッド
+    オリジナルのJcodeに対して、以下のメソッドを追加しています。
+
+    （これらは主にUnicode::Japaneseを参考にしました）
+
+  get
+    Jcode内部に保存しているUTF-8文字列を取得します。
+
+    utf8メソッドではUTF-8文字列をバイナリに変換しますが、getメソッドではutf8フラグが付いた文字列になります。
+
+  ひらがなカタカナ変換 (hira2kata kata2hira)
+    hira2kataメソッドは、文字列に含まれているひらがなを全てカタカナに変換します。
+
+    kata2hiraメソッドは、文字列に含まれているカタカナを全てひらがなに変換します。
+
+  ASCII文字列の全角半角変換
+    z2h_asciiメソッドは、文字列に含まれている半角ASCIIを全角ASCIIに変換します。
+    z2h_allメソッドは、文字列に含まれる半角のASCIIおよびカタカナを全角に変換します。
+
+    h2z_asciiメソッドは、文字列に含まれている全角ASCIIを半角ASCIIに変換します。
+    z2h_allメソッドは、文字列に含まれる全角のASCIIおよびカタカナを半角に変換します。
+
+謝辞
+    Jcode.pmの小飼弾氏と、Encode::EUCJPMSの成瀬ゆい氏、Unicode::Japaneseの山科氷魚氏に。
+
+    また、レガシーエンコディングの件では森山将之氏にお世話になりました。
+
+参考
+    Jcode
+
+    Encode::EUCJPMS
+
+    Unicode::Japanese
+
+著作権
+    Copyright 2006-2009 ASAKURA Takuji
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

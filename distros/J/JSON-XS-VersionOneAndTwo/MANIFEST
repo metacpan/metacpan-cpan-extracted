@@ -1,0 +1,11 @@
+benchmarks/json_xs_1.pl
+benchmarks/json_xs_2.pl
+benchmarks/versiononeandtwo.pl
+CHANGES
+lib/JSON/XS/VersionOneAndTwo.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/pod.t
+t/simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

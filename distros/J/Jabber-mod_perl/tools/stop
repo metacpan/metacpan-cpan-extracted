@@ -1,0 +1,23 @@
+#!/bin/sh
+PROCS="jadperl resolver sm c2s router"
+
+for i in $PROCS
+do
+  PID=`ps axf | grep $i | grep -v grep | grep -v vim | grep -v smbd | grep -v tail | awk '{print $1}'`
+  if [ -n "$PID" ]; then
+    killall $i
+  fi
+done
+
+sleep 3
+
+for i in $PROCS
+do
+  echo "checking $i ..."
+  PID=`ps axf | grep $i | grep -v grep | grep -v vim | grep -v smbd | grep -v tail | awk '{print $1}'`
+  if [ -n "$PID" ]; then
+    echo "killing $i"
+    killall -9 $i
+  fi
+done
+
