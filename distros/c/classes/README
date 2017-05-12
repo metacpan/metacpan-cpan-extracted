@@ -1,0 +1,80 @@
+$Id: README 137 2006-09-14 13:43:21Z rmuhle $
+
+NAME
+    classes - conventional Perl 5 classes
+
+VERSION
+    Version 0.940
+
+SUMMARY
+
+    A simple, stable, fast, and flexible way to use Perl 5 classes.
+    If you look at no other Perl OO module look at this one, really. If
+    you have done OO in Perl you will find this comfortably familiar. If
+    not you may save yourself time and pain learning the classes
+    pragma first or as you learn Perl OO--many have already.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+    * perldoc classes
+        Syntax reference
+
+    * perldoc classesoop
+
+        Introductory primer of concepts, ideas and terms from object
+        oriented programming without any particular implementation
+        specifics in mind
+
+    * perldoc classestut
+
+        [PENDING]
+
+        List of included tutorials aimed at taking a beginning Perl
+        programmer from the basics to advanced techniques of object
+        oriented programming with 'classes'.
+
+    * perldoc classescb
+
+        [PENDING]
+
+        Cookbook collection of specific tasks and examples with
+        lots of useable code.
+
+    * perldoc classesfaq
+
+        Questions and answers about support, design decisions,
+        justification, motivation, and other hype.
+
+    * SourceForge 'perl5class' Project Site
+        <http://sourceforge.net/projects/perl5class>
+
+        Please submit any bugs or feature requests to this site.
+
+    * perl5class-usage mailing list
+        <http://lists.sourceforge.net/lists/listinfo/perl5class-usage>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/classes>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/classes>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/classes>
+
+
+COPYRIGHT AND LICENSE
+    Copyright 2005, 2006 Robert S. Muhlestein (rob at muhlestein.net)
+    All rights reserved. This module is free software; you can
+    redistribute it and/or modify it under the same terms as Perl
+    itself. [See perlartistic.]
+

@@ -1,0 +1,17 @@
+.project
+Build.PL
+lib/UnifdefPlus.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+script/unifdef+.pl
+t/test1.c
+t/test1.c.expectedout
+t/test1.c.out
+t/test2.mak
+t/test2.mak.expectedout
+t/test2.mak.out
+test.pl
+unifdefplusman.txt
+META.yml
+META.json

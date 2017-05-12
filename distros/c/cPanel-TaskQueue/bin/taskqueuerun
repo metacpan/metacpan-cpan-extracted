@@ -1,0 +1,246 @@
+#!/usr/bin/perl
+
+# cpanel - ProgPath.pl                            Copyright(c) 2010 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+
+use strict;
+use warnings;
+
+use cPanel::TaskQueue                ();
+use cPanel::TaskQueue::Scheduler     ();
+use cPanel::TaskQueue::PluginManager ();
+use Getopt::Long;
+
+main() unless caller;
+
+sub main {
+    my $queue_dir  = '.';
+    my $qname      = 'main';
+    my $sname;
+    my $plugindirs = [];
+    my $namespaces = [];
+    my $plugins    = [];
+    my $logfile;
+
+    handle_config_file( 'taskqueue.cfg' );
+
+    GetOptions(
+        'dir=s',        \$queue_dir,
+        'qname=s',      \$qname,
+        'sname=s',      \$sname,
+        'plugindir=s@', \$plugindirs,
+        'namespace=s@', \$namespaces,
+        'plugin=s@',    \$plugins,
+        'logfile=s',    \$logfile,     # keep config file compatible between tools.
+    );
+
+    $namespaces = [ 'cPanel::TaskProcessors', ] unless @{$namespaces};
+    die "Missing plugin directories.\n" unless @{$plugindirs};
+    unshift @INC, @{$plugindirs} if @{$plugindirs};
+    $sname = $qname unless defined $sname;
+
+    load_plugins( $plugindirs, $namespaces, $plugins );
+
+    my $queue = cPanel::TaskQueue->new({
+        name => $qname,
+        state_dir => $queue_dir,
+        max_running => 1,
+    });
+    my $sched = cPanel::TaskQueue::Scheduler->new({
+        name => $qname,
+        state_dir => $queue_dir,
+    });
+
+    eval {
+        my $cnt = $sched->process_ready_tasks( $queue );
+        print "$cnt scheduled tasks moved to queue.\n" if $cnt;
+        if ( $queue->has_work_to_do() ) {
+            $queue->process_next_task();
+            print "Activated a queued task.\n";
+        }
+        else {
+            print "No work to do at this time.\n";
+        }
+        1;
+    } or do {
+        die "Exception detected: $@";
+    };
+
+    exit 0;
+}
+
+sub load_plugins {
+    my ($plugindirs, $namespaces, $plugins) = @_;
+    if ( @{$plugins} ) {
+        foreach my $modname ( @{$plugins} ) {
+            cPanel::TaskQueue::PluginManager::load_plugin_by_name( $modname );
+        }
+    }
+    else {
+        cPanel::TaskQueue::PluginManager::load_all_plugins(
+            directories => $plugindirs,
+            namespaces  => $namespaces,
+        );
+    }
+}
+
+sub handle_config_file {
+    my ($config) = @_;
+    if ( $ARGV[0] =~ /^\@(.*)$/ ) {
+        $config = $1;
+        shift @ARGV;
+    }
+    unshift @ARGV, config_file( $config ) if -e $config;
+}
+
+sub config_file {
+    my ($file) = @_;
+    open my $fh, '<', $file or die "Unable to open config file '$file': $!";
+    local $/;
+    my $cfg = <$fh>;
+    close $fh;
+    $cfg =~ s/#.*\n/\n/g;
+    return split( ' ', $cfg );
+}
+
+__END__
+
+=head1 NAME
+
+taskqueued - Simple program for processing a C<cPanel::TaskQueue>.
+
+=head1 SYNOPSIS
+
+    taskqueuerun
+
+In order to make use of the C<cPanel::TaskQueue>, you need some way to process
+the tasks in the queue. Although this process is not very difficult, there are
+a few subtleties to getting the processing correct.
+
+The C<taskqueuerun> program performs one processing step on a configured
+C<cPanel::TaskQueue>. This can be used to I<single-step> through queue-processing.
+It could also be driven by something like cron to process a TaskQueue without
+the need for a separate processing daemon.
+
+=head1 DESCRIPTION
+
+Although the C<taskqueuerun> program is not a production-quality queue processing
+program, it does provides an example of every step needed to do correct handling
+of the C<cPanel::TaskQueue>. For production operation, you would probably want to
+add some logging at a minimum.
+
+Each execution of the C<taskqueuerun> program checks the C<cPanel::TaskQueue::Scheduler>
+object, queueing any tasks that are ready to be queued. It then executes the first
+task on the queue if any tasks are allowed to execute. Then the program exits, without
+any more processing.
+
+=head1 CONFIGURATION
+
+The C<taskqueuerun> program is configured through command line options or a
+configuration file. If the first parameter to the program starts with an C<@>,
+the rest of the argument is treated as a configuration file name. If no
+configuration is passed on the command line, the program defaults to reading
+C<taskqueue.cfg> in the current directory.
+
+The configuration file just contains the command line options, one per line.
+Blank lines are ignored. Everything after the C<#> character is treated as
+a comment and discarded.
+
+The command line options that configure the program are
+
+=over 4
+
+=item --dir={queuedir}
+
+This required parameter specifies a directory in which we can find the
+C<TaskQueue>'s state files. The files to be accessed should be readable by the
+current user for the program to work.
+
+=item --qname={queue name}
+
+This optional parameter specifies the name associated with the C<TaskQueue>
+object. It is used to create the name of the C<TaskQueue> state file. If not
+supplied, a default value of C<main> is used.
+
+=item --sname={scheduler name}
+
+This optional parameter specifies the name associated with the
+C<TaskQueue::Scheduler> object. It is used to create the name of the
+C<TaskQueue::Scheduler> state file. If not supplied, the specified queue name
+is used.
+
+=item --plugindir={directory}
+
+This required parameter may be specified multiple times to specify one or more
+directories to search for plugins. This directory name should not contain the
+namespace.
+
+For example, if we are looking for the plugin C<TaskProcessor::NewCommands> in
+the namespace C<TaskProcessor>, and the plugin file is located at
+C</usr/local/lib/taskplugins/TaskProcessor/NewCommands.pm>. The plugindir
+would be C</usr/local/lib/taskplugins> and the namespace would be C<TaskProcessor>.
+
+These directories are also added to the Perl include directory list to allow
+loading any plugins we find.
+
+=item --namespace={ns}
+
+This optional parameter may be supplied multiple times to specify namespaces to
+search for plugins. If none are supplied, the default C<cPanel::TaskProcessors>
+is used.
+
+=item --plugin={modulename}
+
+This optional parameter may be specified multiple times to specify the particular
+plugins to load. If this parameter is supplied, the plugin directories are not
+searched for plugins. Instead, only the specified plugins are loaded.
+
+=item --logfile={filename}
+
+This parameter is not actually used. But it is supported so that the
+configuration of all of the tools is consistent.
+
+=back
+
+=head1 DEPENDENCIES
+
+This script depends on the L<cPanel::TaskQueue> module.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No outstanding bugs.
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2010, cPanel, Inc. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

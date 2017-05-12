@@ -1,0 +1,74 @@
+\section{System components}
+\label{comp}
+All executables take a mandatory switch \verb+--jobname+ which is used
+to identify the particular crawl job you want as well as the
+job-specific configuration directory.
+
+Briefly {\tt combineINIT} is used to initialize SQL database and the
+job specific configuration directory. {\tt combineCtrl} controls a Combine crawling job (start, stop, etc.) as well as printing some statistics. {\tt combineExport} exports records in various XML formats and 
+{\tt combineUtil} provides various utility operations on the Combine database.
+
+\hyperref{Detailed dependency information}{Detailed dependency 
+information (section }{)}{moddep} can be found in the 'Gory
+details' section.
+
+In \hyperref{appendix}{appendix (}{)}{manpages} you'll find all
+the man-pages collected.
+
+\subsection{combineINIT}
+Creates a MySQL database, database tables and initializes it. If the database exists it is dropped and recreated. A job-specific configuration directory is created in {\tt /etc/combine/} and populated with a default configuration file.
+
+If a topic definition filename is given, focused crawling using this topic defintion is enabled per default. Otherwise focused crawling is disabled, and Combine works as a general crawler.
+
+\subsection{combineCtrl}
+
+Implements various control functionality to administer a crawling job, like starting and stopping crawlers, injecting URLs into the crawl queue, scheduling newly found links for crawling, controlling scheduling, etc.
+This is the preferred way of controling a crawl job.
+
+\subsection{combineUtil}
+Implements a number of utilities both for extracting information:
+\begin{itemize}
+\item Global statistics about the database
+
+\item matched terms from topic definition
+
+\item topic classes assigned to documents
+\end{itemize}
+and for database maintenance:
+\begin{itemize}
+\item sanity check and restoration
+\item deleting records specified by either Web-server, URL path, MD5 checksum, or internal record identifier
+
+\item server alias detection and managing
+\end{itemize}
+
+\subsection{combineExport}
+Export of structured records is done according to one of three profiles: {\tt alvis},
+{\tt dc}, or {\tt combine}. {\tt alvis} and {\tt combine} are
+very similar XML formats where {\tt combine} is more compact with
+less redundancy and
+{\tt alvis} contains some more information.
+{\tt dc} is XML-encoded Dublin Core data.
+
+The {\tt alvis} profile format is defined by the  \htmladdnormallinkfoot{Alvis Enriched Document XML Schema}{http://www.miketaylor.org.uk/tmp/alvis/d3.1/enriched-document.xsd}.
+
+For flexibility a switch \verb+--xsltscript+ adds the possibility
+to filter the output using a XSLT script. The script is fed
+a record according to the {\tt combine} profile and the result
+is exported.
+
+Switches \verb+--pipehost+ and \verb+--pipeport+ makes combineExport send it's output directly to an
+\htmladdnormallinkfoot{Alvis}{http://www.alvis.info} pipeline reader instead
+of printing on stdout. This together with the switch \verb+--incremental+, which just exports changes since the last invocation,
+provides an easy way of keeping an external system like Alvis or a \htmladdnormallinkfoot{Zebra}{http://www.indexdata.dk/zebra/}
+ database updated.
+
+\subsection{Internal executables and Library modules}
+{\tt combine} is the main crawling machine in the Combine system and 
+{\tt combineRun} starts, monitors and restarts {\tt combine} crawling processes.
+
+%\subsubsection{combine}
+%\subsubsection{combineRun}
+\subsubsection{Library}
+
+Main, crawler-specific, library components are collected in the {\tt Combine::} Perl name-space.

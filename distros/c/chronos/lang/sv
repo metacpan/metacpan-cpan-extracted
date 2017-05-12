@@ -1,0 +1,196 @@
+# $Id: sv,v 1.2 2002/08/30 14:00:58 nomis80 Exp $
+#
+# Copyright (C) 2002  Frank Hoffsummer <frank.hoffsummer@svt.se>
+#
+# Den här filen är en del av Chronos.
+#
+# Chronos är en gratisprodukt; du kan sprida den vidare
+# och/eller modifiera den enligt de föreskrifter som gäller enligt
+# GNU General Public License publicerade av
+# the Free Software Foundation; antingen version 2 av Licensen, eller
+# (efter eget val) någon av de senare versionerna.
+#
+# Chronos disturberas i förhoppningen att den kan var användbar, men utan några
+# garantier, se the GNU General Public License för mer detaljer
+#
+# Du bör ha erhållit en kopia av GNU General Public License tillsammans
+# med Foobar; om inte, skriv till the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Månad
+week=Vecka
+Day=Dag
+today=Idag
+myagenda=Min agenda
+status_UNCONFIRMED=EJ BEKRÄFTAD
+status_CONFIRMED=BEKRÄFTAD
+status_CANCELED=AVBRUTEN
+eventname=Namn på händelse:
+eventstart=Börjar:
+eventend=Slutar:
+eventdescription=Beskrivning:
+eventrecur=Återkommande:
+eventnotrecur=Ej återkommande
+eventrecurweek=Den här dagen varje vecka
+eventrecurmonth=Den här dagen varje månad
+eventrecuryear=Den här dagen varje år
+eventrecurend=Slutar återkomma:
+eventparticipants=Deltagare:
+eventconfirm=Be om bekräftelse:
+eventsave=Spara
+errorstartdate=Startdatumet är inte giltigt.
+errorstarttime=Starttiden är inte giltig.
+errorenddate=Slutdatumet är inte giltigt.
+errorendtime=Sluttiden är inte giltig.
+errorrecurenddate=Slutdatum för återkommande är inte giltigt.
+errorrecurendtime=Sluttiden för återkommande är inte giltigt.
+errorendbeforestart=Sluttiden ligger före starttiden.
+errorrecurendbeforestart=Sluttiden för återkommande ligger för starttiden.
+errorrecurendbeforeend=Sluttiden för återkommande ligger före sluttiden.
+errormissingname=Händelsen saknar namn.
+reminder=Påminnelse:
+remind_me=Påminn mig via email %1 %2 innan händelsen börjar.
+min=minut(er)
+hour=timme(ar)
+day=dag(ar)
+error=Fel
+weeknum=Vecka %1 År %2
+weeknum2=Vecka %1 År %2
+eventdel=Ta bort
+initiator=Initiativtagare till händelsen
+cancel=Avbryt
+confirm=Bekräfta
+confirm_subject=Kallelse
+confirm_body=<<EOF
+Detta är ett automatgenererat meddelande, svara därför inte avsändaren genom "svara/reply"-funktionen.
+
+
+%%INITIATOR%% vill att du ska delta den %%DATE%%.
+Händelse: %%NAME%%
+Beskrivning: %%DESCRIPTION%%
+
+Var snäll och bekräfta ditt deltagande genom att gå till:
+%%CONFIRMURL%%
+
+--
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+errornotauthorized=Du har inte rättighet att utföra denna uppgift.
+tasklist=Uppgiftslista
+tasktitle=Titel:
+tasknotes=Anteckningar:
+taskpriority=Prioritet:
+newtask=Lägg till en uppgift
+options=Valmöjligheter
+userprefs=Användarinställningar
+lang=Språk:
+agendatype=Typ av agenda:
+publicrw=Tillgänglig för att läsa och skriva
+publicr=Endast tillgänglig för att läsa
+private=Privat
+indivpriv=Rättigheter:
+nopriv=Inga rättigheter
+r=Läsa
+rw=Läsa/Skriva
+email=e-postadress:
+name=Namn:
+password=Lösenord:
+create_db_intro=<<EOF
+Det här scriptet skapar MySQL databasen och tabellerna som är nödvändiga för
+Chronos.
+
+EOF
+create_db_pass=Administratörslösenord (root´s password) för MySQL:
+create_db_dbname=Chronos' databasnamn: [chronos]
+create_db_exists=Den här databasen finns redan, vill du ta bort den?
+create_db_deleted=Databasen %s är borttagen
+create_db_created=Databasen %s är skapad
+create_db_tablecreated=Tabellen %s är skapad
+create_db_user=Användarnamn för att ansluta till databasen: [chronos]
+create_db_dbpass=Lösenord: [random]
+create_db_grant=Du har nu rättigheter till %s i %s.*
+create_db_added=Information är tillagd till /etc/chronos.conf
+create_db_success=Installationen av Chronos lyckades
+chronosadmin_usage=<<EOF
+Användning:
+    %s [-u användarnamn] [-p [lösenord]] [--autodel] [--new-user]
+    [--new-users-batch[=FILE]] [--del-user=username] [database[@host]]
+
+Options:
+    -u användarnamn
+        Användarnamnet som används för att ansluta till databasen
+    -p lösenord
+        Lösenordet som används för att ansluta till databasen
+    --autodel
+        Fråga inte efter bekräftelse när en existerande användare
+        ska tas bort. Användbart för batch-filer.
+
+        Do not ask for confirmation when deleting an existing user. Useful for
+        batch files.
+    --new-user
+    	Skapa en ny användare i interaktiv inställning
+        Create a new user in interactive mode.
+    --new-users-batch[=FILE]
+        Skapa användare från en fil (eller STDIN som default) som på varje
+        rad innehåller
+        	användarnamn, lösenord, epost, rättigheter
+
+        Create users from a file (or STDIN by default) containing, on each line:
+            username,password,email,access
+    --del-user=användarnamn
+        Ta bort en användare
+    --show-holidays
+    	Det här kommandot skriver ut de ledigheter som finns tillgängliga
+    	i ditt system. Du kan i efterhand lägga till en rad i chronos.conf
+    	som ser ut så här:
+            HOLIDAYS=US  # United States
+EOF
+chronosadmin_exists=Användaren %s finns redan, vill du ta bort den?
+chronosadmin_created=Användare %s skapad
+chronosadmin_deleted=Användaren %s är borttagen
+chronosadmin_confirm=Bekräftelse:
+chronosadmin_pass=Lösenord
+chronosadmin_p=MySQL lösenord
+chronosadmin_username=Användarnamn (max 16 tecken)
+chronosadmin_email=Epostadress
+chronosadmin_lang=Lösenord
+chronosadmin_realname=Riktigt namn
+chronosadmin_connectok=Anslut till MySQL databasen
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Påminnelse
+
+Detta är ett automatgenererat meddelande, svara därför inte avsändaren genom
+"svara/reply"-funktionen.
+
+Jag vill påminna dig om att följande händelse snart kommer att börja:
+
+Namn:   %%NAME%%
+Börjar: %%START%%
+Slutar: %%END%%
+Beskrivning:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+apacheuser=Användare Apache körs som
+en=Engelska
+fr=Franska
+it=Italienska
+de=Tyska
+no=Norska
+po=Portugisiska
+sv=Svenska
+attachments=Bifogade filer:
+new_attachment=Bifoga ny fil:
+participants_to_add=Lägg till deltagare:
+remove_part=Ta bort
+notime=Ingen tid
+errornotitle=Den här uppgiften saknar titel.
+remindd_forking=Forking...
+remindd_forkerror=Couldn't fork: %s
+remindd_setsiderror=Kan inte påbörja en ny session: %s
+remindd_usage=Användning: %s [-D] [-f <config file>]

@@ -1,0 +1,110 @@
+Revision history for Circle-FE-Term
+
+0.170850 2017/03/27 18:38:29
+        [CHANGES]
+         * Pay attention to the "transient" class hint on static widgets
+         * Updates for more matrix event types
+
+0.170740 2017/03/16 16:05:00
+        [CHANGES]
+         * Support conditional if/then/else formatting in theme templates
+         * Added theme templates for (some) matrix events
+
+        [BUGFIXES]
+         * Workaround for Tickit's SvIV text render bug - RT120630
+
+0.163540 2016/12/20 20:08:47
+        [CHANGES]
+         * Updates for Tickit 0.58:
+            + Use $win->bind_event
+            + Use event info named field accessors
+         * Add theme fields for WATCH-related IRC events
+
+0.160390 2016/02/09 23:50:37
+        [CHANGES]
+         * Use Tickit 0.55 to avoid some of the ugly gutwrenching into Tickit
+           internals previously used to implement the ESC- keypress prefixing
+
+0.153000  2015/10/28 21:19:59
+        [CHANGES]
+         * Updated for later Tickit versions
+         * Updated for Tangence 0.21 / Net::Async::Tangence 0.13
+
+0.140961  2014/04/07 20:29:54
+        [BUGFIXES]
+         * Provide an 'orientation' method for Tickit::Widget::Tabbed::Ribbon
+         * Various other updates for recent Tickit changes (Tickit::Style)
+
+0.140960  2014/04/07 16:37:22
+        [CHANGES]
+         * Updated for Tickit 0.44:
+            + Use key/mouse event structure instead of positional arguments
+
+0.140500  2014/02/20 15:08:24
+        [CHANGES]
+         * Lazy loading of Scroller content as user scrolls upwards, rather
+           than eagerly at startup
+         * Updated for Tickit 0.42
+
+0.132840  2013/10/12 22:32:37
+        [CHANGES]
+         * Quiet the experimental::smartmatch warnings
+         * Updated to use Tickit::Widget 0.35's ->render_to_rb and not the
+           now-deprecated ->render
+
+0.132180 CHANGES:
+         * Fix Entry widget's Tab complete logic for Tickit 0.37
+
+0.131670 CHANGES:
+         * Theme templates for new IRC events
+         * Display a 'pending' counter display until BE confirms sent commands
+
+0.131340 CHANGES:
+         * Updated for Tickit 0.32:
+            + Widget attributes from Tickit::Style
+            + Fix for new Tickit::on_key handling logic
+         * Allow an initials-only ribbon mode
+         * Bugfix for tab-complete logic when possibilities include prefixes
+           of each other
+
+0.130560 CHANGES:
+         * Bugfix for datestamp display when backfilling
+         * Use new circle-be's irc.mode $moder argument
+         * Updated for Tangence 0.18
+
+0.130290 CHANGES:
+         * Fetch window backfill in the background, from the bottom upwards.
+         * Set terminal window title to window item name
+         * Bugfix to tab-complete
+
+0.123420 CHANGES:
+         * Handle tab-completion hints from BE
+         * Handle window raise requests
+
+0.123380 CHANGES:
+         * Handle slow Alt+letter or separately typed Escape letter
+           combinations by some currently-hacky logic around the on_key
+           handler and an on-screen indicator.
+         * Display a scrolling indicator showing the number of lines scrolled
+           and whether more content has been added since scrolling.
+
+0.122910 CHANGES:
+         * Handle mouse input on activity ribbon
+         * Futher bugfixes to ribbon label compression logic
+         * Configurable label format - name_and_number, or just number
+
+0.122820 CHANGES:
+         * Switched to date-based version numbering scheme
+             http://rjbs.manxome.org/rubric/entry/1749
+
+         * Connect NaTangence before starting Tickit, in case ssh wants to
+           interact
+         * Declare dependency on other Tickit::Widget:: classes
+         * Attempt to dynamically compress activity ribbon labels, so it fits
+           on smaller screens
+         * Removed erroneous 'use Error' line that ought not have been
+           released
+         * Added --help
+
+0.01    First version, released on an unsuspecting world.
+

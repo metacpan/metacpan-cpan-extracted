@@ -1,0 +1,18 @@
+Changes
+check/check.pm
+check/Makefile.PL
+config/config.pm
+config/Makefile.PL
+ctflags.pm
+long/long.pm
+long/Makefile.PL
+Makefile.PL
+MANIFEST
+memory/memory.pm
+memory/Makefile.PL
+parse/parse.pm
+parse/Makefile.PL
+README
+scripts/benchmark.pl
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

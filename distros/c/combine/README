@@ -1,0 +1,43 @@
+$Id: README 258 2008-09-03 08:29:42Z anders $
+
+ Combine is highly configurable web focused crawler completely written in Perl
+
+Please see documentation (DocMain.pdf) in the doc
+subdirectory or go directly to the Web-site
+http://combine.it.lth.se/
+
+
+The following command sequence will install Combine:
+  (you might have run 'make test' and 'make install' as root)
+
+perl Makefile.PL
+make
+make test
+make install
+mkdir /etc/combine
+cp conf/* /etc/combine/
+mkdir /var/run/combine
+
+
+INSTALLATION TEST
+Harvest 1 URL by doing:
+
+sudo combineINIT --jobname aatest --topic /etc/combine/Topic_carnivor.txt 
+combine --jobname aatest --harvest http://combine.it.lth.se/CombineTests/InstallationTest.html
+combineExport --jobname aatest --profile dc
+
+and verify that the output, except for dates and order, looks like
+
+<?xml version="1.0" encoding="UTF-8"?>
+<documentCollection xmlns="http://alvis.info/enriched/" version="1.1">
+  <dc:identifier>http://combine.it.lth.se/CombineTests/InstallationTest.html</dc:identifier>
+  <dc:date>2006-05-19 11:57:03</dc:date>
+  <dc:type>text/html</dc:type>
+  <dc:title>Installation test for Combine</dc:title>
+  <dc:format>text/html</dc:format>
+  <dc:format>text/html; charset=iso-8859-1</dc:format>
+  <dc:subject>Carnivorous plants, Drosera, Nepenthes</dc:subject>
+
+</documentCollection>
+
+

@@ -1,0 +1,63 @@
+# The database type. Note that Chronos has not been tested with anything other
+# than MySQL. Possible values: read about DBI
+# Default: mysql
+#DB_TYPE=mysql
+
+# The database host
+# Default: localhost
+#DB_HOST=localhost
+
+# The database server port
+# Default: 3306
+#DB_PORT=3306
+
+# The database name
+# Default: chronos
+#DB_NAME=chronos
+
+# The user that will be used for connecting to the database
+# Default: chronos
+#DB_USER=chronos
+
+# The password that will be used for connecting to the database
+# Default: none
+#DB_PASS=secret
+
+# The holiday profile that will be used. By default holidays are not used. Use
+# chronosadmin --show-holidays to know what profiles are available.
+#HOLIDAYS=CA-QC
+
+# Path to sendmail (/usr/sbin/sendmail by default)
+#SENDMAIL=/usr/sbin/sendmail
+
+# Path to stylesheet relative to DocumentRoot
+# Default: /chronos_static/chronos.css
+#STYLESHEET=/chronos_static/chronos.css
+
+# Date formats. Everything should be locale-aware.
+# String gets passed to POSIX::strftime(). See strftime(3). %(long) is
+# interpolated with Date::Calc::Date_to_Text_Long() and %(short) is interpolated
+# with Date::Calc::Date_to_Text().
+# Defaults:
+#DAY_DATE_FORMAT=%k:%M
+#DAY_MULTIDAY_DATE_FORMAT=%(long) %k:%M
+#DAY_NOTIME_DATE_FORMAT=
+#DAY_MULTIDAY_NOTIME_DATE_FORMAT=%(long)
+#MONTH_DATE_FORMAT=%k:%M
+#MONTH_MULTIDAY_DATE_FORMAT=%F %k:%M
+#MONTH_NOTIME_DATE_FORMAT=
+#MONTH_MULTIDAY_NOTIME_DATE_FORMAT=%F
+#WEEK_DATE_FORMAT=%k:%M
+#WEEK_MULTIDAY_DATE_FORMAT=%F %k:%M
+#WEEK_NOTIME_DATE_FORMAT=
+#WEEK_MULTIDAY_NOTIME_DATE_FORMAT=%F
+#MINIMONTH_DATE_FORMAT=%(long)
+#HEADER_DATE_FORMAT=%(long) %k:%M
+#DAYVIEW_DATE_FORMAT=%(long)
+#
+# Alternative example (this prints "It is now Mon Jan 02")
+#HEADER_DATE_FORMAT=It is now %a %b %g
+
+# Default action (ie. what to do when logging in)
+# Default: showday
+#DEFAULT_ACTION=showday

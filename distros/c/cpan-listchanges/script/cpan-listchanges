@@ -1,0 +1,47 @@
+#!perl
+use strict;
+use App::cpanlistchanges;
+
+my $app = App::cpanlistchanges->new;
+$app->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+cpan-listchanges - List changes for CPAN modules
+
+=head1 SYNOPSIS
+
+  # See what's changed in Plack between your local and the latest on CPAN
+  cpan-listchanges Plack
+
+  # See what's changed for URI between 1.56 and 1.58 (Use @ and ..)
+  cpan-listchanges URI@1.56..1.58
+
+  # See what's changed for Plack 0.9965 and CPAN current (Use HEAD for the latest)
+  cpan-listchanges Plack@0.9965..HEAD
+
+  # See the whole changelog for Catalyst::Runtime
+  cpan-listchanges --all Catalyst::Runtime
+
+  # See what's changed for modules that require upgrades
+  cpan-listchanges `cpan-outdated -p`
+
+=head1 OPTIONS
+
+=over 4
+
+=item -a, --all
+
+Displays the whole content of Changes, without version comparison.
+    
+=back
+
+=head1 SEE ALSO
+
+L<App::cpanminus> L<App::cpanoutdated>
+
+=cut
+
+

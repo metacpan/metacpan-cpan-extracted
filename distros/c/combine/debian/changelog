@@ -1,0 +1,371 @@
+combine (4.005) lucid; urgency=low
+
+  * Fixes to run under Ubuntu 10.10
+  * Fixed bug due to changed handling of autoinc in MySQL
+  * Updated tests
+  * Fixed bug in make clean in the doc directory
+
+ -- Anders Ardo <anders@nike>  Fri, 27 May 2011 09:52:29 +0200
+
+combine (4.004) karmic; urgency=low
+
+  * Fixed bug in RobotRules.pm - nows accepts and handles gzipped content
+  * Changes to fix things under Ubuntu 9.10
+  * Fixed bugs with character set encoding in Solr.pm
+  * Fixed bug in decoding text retrieved from MySQL in XWI2XML.pm
+
+ -- Anders Ardo <anders@eit.lth.se>  Sun, 15 Mar 2010 13:02:32 +0100
+
+combine (4.003) karmic; urgency=low
+
+  * Added extra space when concatenating extracted text in HTMLExtractor.pm
+  * Bugfix certain special characters in regexp when optimizing meta/title
+    in generated XML
+  * Added extra field, score, in table urldb to support new URL
+    scheduling algoritms
+  * Added support for new URL scheduling algorithms
+
+ -- Anders Ardo <anders@nike>  Mon, 15 Jun 2009 10:22:38 +0200
+
+combine (4.002) intrepid; urgency=low
+
+  * Fixed tests 05MySQL och 90Installationtest
+  * Added support for exceptions to GeoIP, config-file server2country
+  * Now handles special characters when using files for external parsers
+  * Disabled warnings for unknown config variables
+
+ -- Anders Ardo <anders@dbkit10.eit.lth.se>  Mon, 30 Mar 2009 09:09:35 +0200
+
+combine (4.001) intrepid; urgency=low
+
+  * New version numbering compatible with CPAN
+  * Integration with Solr enterprise search server (http://lucene.apache.org/solr/)
+    similar to Zebra: new module Solr.pm, configuration variable SolrHost,
+    switch SolrIndexing in combineExport
+
+ -- Anders Ardo <anders@eit.lth.se>  Mon, 8 Dec 2008 14:55:21 +0100
+
+combine (3.12) intrepid; urgency=low
+
+  * Added code for simple Lucene integration to templates directory.
+    Contributed by Xianghang Liu
+  * Changed documentation HTML-generator to ht4tex
+
+ -- Anders Ardo <anders@eit.lth.se>  Sun, 16 Nov 2008 18:19:21 +0100
+
+combine (3.11) intrepid; urgency=low
+
+  * Added switches 'collapseinlinks' and 'nooutlinks' to combineExport
+  * Moved tmp-files to /tmp/$$
+  * decoded output from extconverter to Perl internal utf8
+  * Added -nodrm to pdf2html switches
+  * Fixed bug in processing of pure text documents
+  * Added switch ZebraIndexing to combineExport. Enables updating of the
+    configured Zebra server with exported records
+  * Improved indexing of PDF documents
+  * Handled case when $md5 empty in DeleteKey
+  * Fixed bug in Zebra recordId handling
+
+ -- Anders Ardo <anders@eit.lth.se>  Sun, 09 Nov 2008 17:18:10 +0100
+
+combine (3.10) sarge; urgency=low
+
+  * Added a fulltext-index in MySQL table search plus configuration var
+    to enable/disable
+  * Added Zebra deleteRecord
+
+ -- Anders Ardo <anders@eit.lth.se>  Sun, 12 Oct 2008 20:56:51 +0200
+
+combine (3.9) sarge; urgency=low
+
+  * Changed default for useTidy to 0 (Not using Tidy)
+  * Added dependency on libclass-factory-util-perl
+  * Changed test Web-server to combine.it.lth.se
+  * Added Combine/utilPlugIn.pm Combine/classifySVM.pm - support for SVM
+    classifiers (depends SVMLight) plus documentation
+  * Changed *Check_record.pm to use XWI text extraction from
+    utilPlugIn.pm
+  * Added country determination (plus dependency on GeoIp)
+  * Updated extensions of binary files
+  * Added analysePlugin and relTextPlugin to default config
+  * Cleaned FromHTML.pm code
+  * Added call to external relTextPlugin
+  * Added call to Plugin for extra analysis in utilPlugin.pm
+  * Improved title extraction in XWI2XML
+  * Fixed in rules: shell IO redirection
+  * Added table 'localtags' - for storing local name/value pairs to be
+    added by analysePlugin
+
+ -- Anders Ardo <anders@eit.lth.se>  Fri, 26 Sep 2008 15:22:43 +0200
+
+combine (3.8) sarge; urgency=low
+
+  * Perl ABSTRACT now taken from bin/combine
+  * Disable old behaviour to save html as text if extracted text is very
+    short
+  * PosCheckRecord now only uses meta fields that maps to dc.subject and
+    dc.description to match against topic definition
+  * PosCheckRecord now use also the URLpath for topic checking
+  * Added new script: combineReClassify, that reclassifies all records
+  * Enabled gzip HTTP content compression
+  * Moved <META-tag parsing/extraction to FromHTML
+  * Disabled some of the more uncertain binary file detcetions in
+    FromHTML due to charset problems
+  * Charset detection and decoding now done in LWP
+
+ -- Anders Ardo <anders@eit.lth.se>  Wed, 23 Apr 2008 11:14:31 +0200
+
+combine (3.7) sarge; urgency=low
+
+  * Fixed bug with required but non-existant modifiedDate
+  * Added fix from Sean Dreilinger to import SaveConfigString in
+    Combine::Config
+  * Fixed tests: make sure modfiedtime is set, and take into account new
+    MD5 calculation
+  * Now requires v 1.06 od HTML::Tidy; newer versions handle UTF8
+    differently
+  * Applied patch from Sean Dreilinger: make Combine work with newer
+    Config::General (SaveConfigString)
+  * Added doc/Installationtest.pl as new test t/90Installationtest.t
+
+ -- Anders Ardo <anders@eit.lth.se>  Thu, 27 Sep 2007 08:52:10 +0200
+
+combine (3.6) sarge; urgency=low
+
+  * Bugfixes in DataBase.pm MD5-sum calculation
+
+ -- Anders Ardo <anders@it.lth.se>  Mon, 26 Mar 2007 10:36:04 +0200
+
+combine (3.5) sarge; urgency=low
+
+  * Added bin/combineRank - utility for calculating ranking
+     values like PageRank
+  * Changed package numbering convention
+  * Documentation updates
+
+ -- Anders Ardo <anders@it.lth.se>  Wed, 13 Dec 2006 16:09:43 +0100
+
+combine (3.4-5) sarge; urgency=low
+
+  * Disabled parsing of really short files
+  * Changed syntax of output redirection: ' >& /dev/null' to
+     '> /dev/null 2> /dev/null'
+  * Added test in 50FromHTML.t to avoid using HTML::Tidy when not
+    available
+  * Fixed bug with improper SQL esacping in MySQLhdb.pm
+  * Fixed bug with expire time giving error-messages '... too small'
+  * Added more tests
+  * Changed combineINIT to disable Tidy in configuration when HTML::Tidy
+    not available
+  * Made ZOOM optional
+
+ -- Anders Ardo <anders@it.lth.se>  Tue,  5 Dec 2006 12:57:18 +0100
+
+combine (3.4-4) sarge; urgency=low
+
+  * New switch 'myconf' for combineINIT to append a local configuration
+    file to the standard job-specific configuration
+  * Improved error checking for MySQL connection
+  * Workaround for mysterious MySQL user access bug
+  * Moved AutoRecycleLinks from job_default.cfg to default.cfg
+
+ -- Anders Ardo <anders@it.lth.se>  Wed,  8 Nov 2006 12:33:15 +0100
+
+combine (3.4-3) sarge; urgency=low
+
+  * Removed obsolete flag xwi->check_nofollow
+  * Documentation updates
+  * Removing obsolete files: DTDs and ValidateWP7
+  * Added omit-xml-declaration="yes" to combine2dc.xsl
+
+ -- Anders Ardo <anders@it.lth.se>  Fri,  3 Nov 2006 10:31:14 +0100
+
+combine (3.4-2) sarge; urgency=low
+
+  * Added external parsers for Excel, PowerPoint and RTF
+  * Fixed bug that prevented RobotRules cache to be used
+  * Moved setting of agent and from for UserAgent into
+    UA::TruncatingUserAgent
+
+ -- Anders Ardo <anders@it.lth.se>  Fri, 20 Oct 2006 09:08:08 +0200
+
+combine (3.4-1) sarge; urgency=low
+
+  * Added possibility to connect directly to a Zebra server
+
+ -- Anders Ardo <anders@it.lth.se>  Sat, 14 Oct 2006 12:01:55 +0200
+
+combine (3.3-2) sarge; urgency=low
+
+  * Removed the (empty) combine-doc package. Documentation is included
+    in the package combine.
+  * Restructured XML export: moved basic XML generation from
+    combineExport to XWI2XML.pm.
+  * Implemented possibility to apply XSLT script on exported records
+  * Added standard export XSLT scripts for alvis and dc
+  * Now builds and includes doc in the source dist
+  * Added module (Zebra.pm) and config var for direct connection the
+    Zebra indexer
+  * Fixed bug in UTF-8 handling for exported XML
+
+ -- Anders Ardo <anders@it.lth.se>  Fri,  6 Oct 2006 12:02:45 +0200
+
+combine (3.3-1) sarge; urgency=low
+
+  * Implemented plugin modules for document classifications in focused mode
+  * Added template for classify plugin
+
+ -- Anders Ardo <anders@it.lth.se>  Sun,  1 Oct 2006 11:23:07 +0200
+
+combine (3.2-2) sarge; urgency=low
+
+  * Fixes and updates in PODs
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Thu, 27 Sep 2006 15:31:00 +0200
+
+combine (3.2-1) sarge; urgency=low
+
+  * Fixes to make it work with MySQL 5
+  * Now suggests pdftohtml untex
+  * Disabled 'word-2000' in tidy.cfg since it conflicts with 'bare'
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 22 Aug 2006 10:07:00 +0200
+
+combine (3.1-4) sarge; urgency=low
+
+  * Added possibility to use HTTP proxy (conf variable httpProxy)
+     (thanks to Joost Zuurbier)
+  * Added conf variable UserAgentFollowRedirects controlling
+    how redirects are handled (thanks to Joost Zuurbier)
+  * Changed combineExport to use Alvis::Pipeline directly
+  * Moved conf-files from libcombine to combine package
+  * Added conffiles file to debian/
+  * Improved documentation
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Thu, 15 Jun 2006 09:38:00 +0200
+
+combine (3.1-3) sarge; urgency=low
+
+  * All binaries now without '-w' switch
+  * Perl testsuite added in directory t
+  * New configuration variable WaitIntervalHost
+  * Some bug fixes
+  * combineExport supports the action attribute to XML
+    element documentRecord
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Fri, 2 Jun 2006 15:38:00 +0200
+
+combine (3.1-2) sarge; urgency=low
+
+  * combineExport now supports enhanced ALVIS XML format
+  * new configuration var 'AutoRecycleLinks', default=1
+    enables automatic recycling of new links
+  * combineINIT takes new parameter --topic <file> 
+    which enables focused mode using the given file
+    as topicdefinition
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Fri, 24 Mar 2006 12:11:00 +0200
+
+combine (3.1-1) sarge; urgency=low
+
+  * New SQL doc
+  * Bumped version to comply with conventions
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Wed, 07 Mar 2006 15:37:00 +0200
+
+combine (3.0.0-14) stable; urgency=low
+
+  * Bug fixes in export
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Wed, 01 Mar 2006 10:37:00 +0200
+
+combine (3.0.0-13) stable; urgency=low
+
+  * Efficiency improvement
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Fri, 13 Jan 2006 13:37:00 +0200
+
+combine (3.0.0-12) stable; urgency=low
+
+  * Added delete functionality to combineUtil
+  * Added a few extensions for binary files to config-files
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Thu, 12 Jan 2006 10:37:00 +0200
+
+combine (3.0.0-11) stable; urgency=low
+
+  * Added combineUtil for database statistic, sanity and cleaning functionality
+  * Changed Config to use include for additional configuration serveralias and exclude
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 03 Jan 2006 09:50:00 +0200
+
+combine (3.0.0-10) stable; urgency=low
+
+  * Added dependecy on libalvis-cannonical
+  * Changed to use Alvis::Canonical
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 19 Dec 2005 15:24:00 +0200
+
+combine (3.0.0-9) stable; urgency=low
+
+  * Removed erronous quoting of '"' in exported XML-records
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 13 Dec 2005 13:38:00 +0200
+
+combine (3.0.0-8) stable; urgency=low
+
+  * Added handling of Alvis Pipeline exports
+  * Added modifications for OAI including incremental exports
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Sat, 10 Dec 2005 14:38:00 +0200
+
+combine (3.0.0-7) stable; urgency=low
+
+  * UTF-8 fixes
+  * Updated Tidy.cfg
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 01 Dec 2005 08:58:00 +0200
+
+combine (3.0.0-6) stable; urgency=low
+
+  * Updates in documentation
+  * Added DTD files to conf
+  * Updated combineExport new switches - recordid, md5, validate
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Tue, 08 Nov 2005 14:39:00 +0200
+
+combine (3.0.0-5) stable; urgency=low
+
+  * Updates in documentation
+  * Added some Topic definition files
+  * combineINIT now creates empty files 'stopwords.txt'
+  * combineINIT now sets permission on /var/run/combine/xxx
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Mon, 07 Nov 2005 16:16:00 +0200
+
+combine (3.0.0-4) stable; urgency=low
+
+  * Added man pages
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Thu, 03 Nov 2005 13:11:00 +0200
+
+combine (3.0.0-3) stable; urgency=low
+
+  * Bug fixes in combine, combineCtrl, SD_SQL.pm
+  * Added combineINIT 
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Wed, 02 Nov 2005 15:15:35 +0200
+
+combine (3.0.0-2) stable; urgency=low
+
+  * Bug fixes in Check_record.pm, Config.pm, FromHTML.pm, PosCheck_record.pm,
+    combine, combineCtrl, combineExport
+
+ -- Anders Ardo <anders.ardo@it.lth.se>  Wed, 02 Nov 2005 14:10:35 +0200
+
+combine (3.0.0-1) stable; urgency=low
+
+  * Initial Release.
+  * Code taken from AlvisCombine cvs project
+	
+ -- Anders Ardo <anders.ardo@it.lth.se>  Mon, 25 Apr 2005 14:10:35 +0200

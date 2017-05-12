@@ -1,0 +1,461 @@
+#!/usr/bin/perl
+
+# cpanel - bin/taskqueuectl                       Copyright(c) 2014 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+
+use strict;
+use warnings;
+
+use cPanel::TaskQueue::PluginManager ();
+use cPanel::TaskQueue::Ctrl          ();
+use Getopt::Long;
+use Term::ReadLine;
+
+my $term;
+my @shell_help = (
+    [ 'shell', '    Provide a command prompt where you can execute multiple commands.' ],
+    [ 'quit',  '    Exit the shell.' ],
+);
+
+main() unless caller;
+
+sub main {
+    my $queue_dir = '.';
+    my $qname     = 'main';
+    my $sname;
+    my $plugindirs = [];
+    my $namespaces = [];
+    my $plugins    = [];
+    my $logfile;
+    my $serial;
+
+    handle_config_file('taskqueue.cfg');
+
+    GetOptions(
+        'dir=s',        \$queue_dir,
+        'qname=s',      \$qname,
+        'sname=s',      \$sname,
+        'plugindir=s@', \$plugindirs,
+        'namespace=s@', \$namespaces,
+        'plugin=s@',    \$plugins,
+        'logfile=s',    \$logfile,      # keep config file compatible between tools.
+        'serial=s',     \$serial,
+    );
+
+    $namespaces = [ 'cPanel::TaskProcessors', ] unless @{$namespaces};
+    die "Missing plugin directories.\n" unless @{$plugindirs};
+    unshift @INC, @{$plugindirs} if @{$plugindirs};
+    $sname = $qname unless defined $sname;
+
+    load_plugins( $plugindirs, $namespaces, $plugins );
+
+    my $ctrl = cPanel::TaskQueue::Ctrl->new( { 'qdir' => $queue_dir, 'qname' => $qname, 'sname' => $sname, 'serial' => $serial } );
+
+    process_command($ctrl);
+    exit 0;
+}
+
+sub _man {
+    my ($ctrl) = shift;
+    unless (@_) {
+        print "\n", map { $_, "\n" } $ctrl->help(), map { @{$_}, '' } @shell_help;
+    }
+    elsif ( $_[0] eq 'shell' ) {
+        local $" = "\n";
+        print "\n@{$shell_help[0]}\n\n";
+    }
+    elsif ( $_[0] eq 'quit' ) {
+        local $" = "\n";
+        print "\n@{$shell_help[1]}\n\n";
+    }
+    else {
+        print "\n", map { $_, "\n" } $ctrl->help(@_);
+    }
+}
+
+sub _help {
+    my ($ctrl) = shift;
+    unless (@_) {
+        print "\n", map { $_, "\n" } $ctrl->synopsis(), map { $_->[0], '' } @shell_help;
+    }
+    elsif ( $_[0] eq 'shell' ) {
+        print "\n$shell_help[0]->[0]\n\n";
+    }
+    elsif ( $_[0] eq 'quit' ) {
+        print "\n$shell_help[1]->[0]\n\n";
+    }
+    else {
+        print "\n", map { $_, "\n" } $ctrl->synopsis(@_);
+    }
+}
+
+sub process_command {
+    my ($ctrl) = @_;
+
+    unless (@ARGV) {
+        print "Missing command argument.\nUsage:\n\n";
+        print join( "\n", $ctrl->help(), @shell_help ), "\n\n";
+        exit;
+    }
+
+    if ( $ARGV[0] eq 'shell' ) {
+        @ARGV = ();
+        my %cmds = (
+            man  => sub { _man( $ctrl,  @_ ); },
+            help => sub { _help( $ctrl, @_ ); },
+        );
+
+        while (1) {
+            my $line = prompt(' > ');
+            last if $line =~ /^\s*(?:q(?:uit)?|exit|bye)\s*$/i;
+
+            my ( $cmd, @args ) = split( / /, $line );
+            if ( exists $cmds{$cmd} ) {
+                $cmds{$cmd}->(@args);
+            }
+            else {
+                safe_run( $ctrl, parse_line($line) );
+            }
+        }
+    }
+    else {
+        exit( safe_run( $ctrl, @ARGV ) );
+    }
+}
+
+sub safe_run {
+    my ( $ctrl, @args ) = @_;
+
+    eval { $ctrl->run(@args); 1; } or do {
+        if ( $@ eq "Must Restart\n" ) {
+
+            # Command requested a restart.
+            exit 0;
+        }
+        print "$@\nSupported commands:\n\n";
+        print join( "\n", $ctrl->synopsis() ), "\n\n";
+        return 1;
+    };
+    return 0;
+}
+
+sub prompt {
+    my ($prompt) = (@_);
+    unless ( defined $term ) {
+        $term = Term::ReadLine->new('taskqueue');
+        $term->ornaments(0);
+    }
+    chomp( my $line = $term->readline($prompt) );
+    $term->addhistory;
+    return $line;
+}
+
+sub parse_line {
+    my ($line) = @_;
+    my $cmd = $line;
+    if ( $line =~ s/^\s*(\w+)\s*// ) {
+        $cmd = $1;
+    }
+    else {
+        $line = '';
+    }
+
+    my @args = map { /^(["'])(.*)\1$/ ? $2 : $_ } ( $line =~ m/('(?:[^']|\\')*'|"(?:[^"]|\\")*"|\S+)/g );
+    return $cmd, @args;
+}
+
+sub load_plugins {
+    my ( $plugindirs, $namespaces, $plugins ) = @_;
+    if ( @{$plugins} ) {
+        foreach my $modname ( @{$plugins} ) {
+            cPanel::TaskQueue::PluginManager::load_plugin_by_name($modname);
+        }
+    }
+    else {
+        cPanel::TaskQueue::PluginManager::load_all_plugins(
+            directories => $plugindirs,
+            namespaces  => $namespaces,
+        );
+    }
+}
+
+sub handle_config_file {
+    my ($config) = @_;
+    if ( @ARGV and $ARGV[0] =~ /^\@(.*)$/ ) {
+        $config = $1;
+        shift @ARGV;
+    }
+    unshift @ARGV, config_file($config) if -e $config;
+}
+
+sub config_file {
+    my ($file) = @_;
+    open my $fh, '<', $file or die "Unable to open config file '$file': $!";
+    local $/;
+    my $cfg = <$fh>;
+    close $fh;
+    $cfg =~ s/#.*?\n/\n/g;
+    $cfg =~ tr/\n/ /s;
+    return split( ' ', $cfg );
+}
+
+__END__
+
+=head1 NAME
+
+taskqueuectl - Simple program for querying and manipulating a cPanel::TaskQueue
+
+=head1 SYNOPSIS
+
+    $ taskqueuectl list verbose
+
+    $ taskqueuectl queue 'command arg1 arg2' 'othercmd arg1 arg2'
+
+    $ taskqueuectl shell
+
+In order to make use of the C<cPanel::TaskQueue>, you need some way to queue
+the commands you want to process or schedule commands for later execution. It
+is also useful to be able to query the queue to see what commands are planned
+to run.
+
+The C<taskqueuectl> program provides an interface to perform these functions
+from a command line. It also provides a shell which allows running multiple
+commands without restarting the program each time. The program does not provide
+every piece of functionality you will probably need for working with the queue,
+it is not designed to be the perfect client.
+
+Instead, it provides a starting point that shows you how different operations
+should be performed and gives a platform for experimenting with a running
+queue. It can also be used as a minimal command line client for querying a
+queue that is actually being managed by a more complete system.
+
+=head1 DESCRIPTION
+
+The C<taskqueuectl> program provides a simple interface to query and modify a
+cPanel::TaskQueue. It does not provide any support for running the commands in
+the queue.
+
+In order to execute the C<taskqueuectl> program, you need to specify some
+configuration information so that the program can find the queue and plugins
+needed to function. This configuration is provided either by command line
+parameters or a configuration file.
+
+=head1 CONFIGURATION
+
+The C<taskqueuectl> program is configured through command line options or a
+configuration file. If the first parameter to the program starts with an C<@>,
+the rest of the argument is treated as a configuration file name. If no
+configuration is passed on the command line, the program defaults to reading
+C<taskqueue.cfg> in the current directory.
+
+The configuration file just contains the command line options, one per line.
+Blank lines are ignored. Everything after the C<#> character is treated as
+a comment and discarded.
+
+The command line options that configure the program are
+
+=over 4
+
+=item --dir={queuedir}
+
+This required parameter specifies a directory in which we can find the
+C<TaskQueue>'s state files. The files to be accessed should be readable by the
+current user for the program to work.
+
+=item --qname={queue name}
+
+This optional parameter specifies the name associated with the C<TaskQueue>
+object. It is used to create the name of the C<TaskQueue> state file. If not
+supplied, a default value of C<main> is used.
+
+=item --sname={scheduler name}
+
+This optional parameter specifies the name associated with the
+C<TaskQueue::Scheduler> object. It is used to create the name of the
+C<TaskQueue::Scheduler> state file. If not supplied, the specified queue name
+is used.
+
+=item --plugindir={directory}
+
+This required parameter may be specified multiple times to specify one or more
+directories to search for plugins. This directory name should not contain the
+namespace.
+
+For example, if we are looking for the plugin C<TaskProcessor::NewCommands> in
+the namespace C<TaskProcessor>, and the plugin file is located at
+C</usr/local/lib/taskplugins/TaskProcessor/NewCommands.pm>. The plugindir
+would be C</usr/local/lib/taskplugins> and the namespace would be C<TaskProcessor>.
+
+These directories are also added to the Perl include directory list to allow
+loading any plugins we find.
+
+=item --namespace={ns}
+
+This optional parameter may be supplied multiple times to specify namespaces to
+search for plugins. If none are supplied, the default C<cPanel::TaskProcessors>
+is used.
+
+=item --plugin={modulename}
+
+This optional parameter may be specified multiple times to specify the particular
+plugins to load. If this parameter is supplied, the plugin directories are not
+searched for plugins. Instead, only the specified plugins are loaded.
+
+=item --logfile={filename}
+
+This parameter is not actually used. But it is supported so that the
+configuration of all of the tools is consistent.
+
+=item --serial={serializer}
+
+This optional parameter allows easy selection of serialization format of the
+state files. The value may be C<storable> or C<yaml>. If not supplied, the
+program uses the default serialization format (C<storable>).
+
+=back
+
+=head1 COMMANDS
+
+The C<taskqueuectl> program supports a number of commands to query or
+manipulate the configured C<TaskQueue>. The official list of executable
+commands is defined by the C<cPanel::TaskQueue::Ctrl> module. You can use
+C<perldoc cPanel::TaskQueue::Ctrl> to get more information on the commands:
+
+=over 4
+
+=item queue 'cmd string' ...
+
+Queue the supplied command string or command strings. If the command string
+contains spaces, it must be quoted.
+
+=item unqueue {taskid} ...
+
+Unqueue one or more tasks by id.
+
+=item schedule [at {time}] 'cmd string' ...
+
+Schedule the specifies command string to be queued at the time specified by
+C<{time}> where C<{time}> is in epoch seconds. If the C<at {time}> phrase is
+missing, the commands string is scheduled to be queued now (or the next step in
+processing).
+
+More than one command string may be specified.
+
+=item schedule after {seconds} 'cmd string' ...
+
+Schedule the specifies command string to be queued in C<{seconds}> seconds.
+More than one command string may be specified.
+
+=item unschedule {taskid} ...
+
+Unschedule one or more tasks by id.
+
+=item list [verbose] [active|waiting|scheduled]
+
+List the tasks currently in the task queue. If the C<verbose> option is
+specified, display more information about each task.
+
+The C<active>, C<waiting>, and C<scheduled> options causes the list command
+to only display tasks in the specified state. If none of these options is
+supplied the list command defaults to displaying them all.
+
+=item find task {taskid}
+
+Find a task in the processing or waiting state with the matching task id.
+
+=item find command {cmdname}
+
+Display all commands that match the specified command name. This is just the
+name of the command, not the full command string.
+
+=item plugins [verbose]
+
+Display which plugins were found and loaded. If the verbose option is provided,
+also display all of the commands.
+
+=item commands [modulename]
+
+List commands supported by all supported plugins. If a module name is supplied,
+only display commands for that plugin.
+
+=item status
+
+Print the status of the Task Queue and Scheduler.
+
+=back
+
+In addition, there are a few commands that don't effect the C<TaskQueue> but
+just apply to the C<taskqueuectl> program itself.
+
+=over 4
+
+=item shell
+
+Using the C<shell> command on the command line opens a command line shell that
+you can use for entering multiple commands, one per line. The shell does not
+allow you to execute the C<shell> command again.
+
+=item help [cmd]
+
+Display a short synopsis of the various commands. If a C<taskqueuectl> command
+is supplied as an argument, only the synopsis for that command is displayed.
+
+=item man [cmd]
+
+Display a synopsis and explanatory text on the various commands. If a
+C<taskqueuectl> command is supplied as an argument, only the synopsis and
+explanation for that command is displayed.
+
+=item quit
+
+=item q
+
+=item exit
+
+These commands are synonyms that all exit the shell.
+
+=back
+
+=head1 DEPENDENCIES
+
+In addition to the normal dependencies of the L<cPanel::TaskQueue> module, this
+script requires L<Term::Readline> to run.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No outstanding bugs.
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2014, cPanel, Inc. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

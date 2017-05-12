@@ -1,0 +1,68 @@
+---
+abstract: 'detect outdated CPAN modules in your environment.'
+author:
+  - 'Tokuhiro Matsuno'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: cpan-outdated
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  App::cpanoutdated:
+    file: lib/App/cpanoutdated.pm
+    version: '0.32'
+requires:
+  CPAN::DistnameInfo: '0.1'
+  ExtUtils::Installed: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  HTTP::Tiny: '0.012'
+  IO::Zlib: '0'
+  Module::CoreList: '0'
+  Module::Metadata: '1.000007'
+  Pod::Usage: '0'
+  URI: '0'
+  local::lib: '1.006008'
+  perl: '5.008001'
+  version: '0'
+resources:
+  bugtracker: https://github.com/tokuhirom/cpan-outdated/issues
+  homepage: https://github.com/tokuhirom/cpan-outdated
+  repository: git://github.com/tokuhirom/cpan-outdated.git
+version: '0.32'
+x_authority: cpan:TOKUHIROM
+x_contributors:
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'kmx <kmx@volny.cz>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Paul Findlay <paul@findlay.net.nz>'
+  - 'Sharl Morlaroll <sharl_github@haun.org>'
+  - 'Oleg Gashev <oleg@gashev.net>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'opendevnet <grtodd@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Joenio Costa <joenio@colivre.coop.br>'
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Ben Bullock <benkasminbullock@gmail.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

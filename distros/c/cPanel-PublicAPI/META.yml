@@ -1,0 +1,30 @@
+---
+abstract: 'A perl interface for interacting with cPanel'
+author:
+  - 'cPanel, Inc. <integration@cpanel.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: cPanel-PublicAPI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::CookieJar: '0'
+  HTTP::Tiny: '0.042'
+  IO::Socket::INET: '1.31'
+  IO::Socket::SSL: '1.988'
+  JSON::XS: '2'
+  Test::Exception: '0'
+  Test::More: '0'
+  URI::Escape: '3'
+version: '2.2'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

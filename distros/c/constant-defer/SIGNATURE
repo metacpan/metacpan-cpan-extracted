@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 31cfdda6317ecd9dd3dfd80ad8ce126d758813aa Changes
+SHA1 346c0df713070c774753d4ce3359a766f02d3e17 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 7755b71f002f2095ff04d24601b3421108c22eca META.json
+SHA1 b37a66188c02ffecdd524ac971ca0fe234e64291 META.yml
+SHA1 b6d115e5b78512358986fba87d223288f45a9901 Makefile.PL
+SHA1 16a62183a94aa6d126c0be4a22a28f16b17e8c42 README
+SHA1 0c1b11273cf9c01e8ccad8cd72fffe0821c9a5d0 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 206410a5764d004630d14e5fb6a0f2b139c0a47b debian/control
+SHA1 98cb9509973a193aa755f28a96ec84677efd33f4 debian/copyright
+SHA1 91666c26f38fa205050c1273601a58e160160d1c debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 7dbe6d7d60aa7d008194241d9ae7d9190c9cf2a4 debian/watch
+SHA1 51d58edc4faf28e6dadbd6f19796f5f52ef6fbe7 devel/Memoize/ToConstant.pm
+SHA1 6ba73e607fd311d6fb77332ee61fcb317e7ed92f devel/Memoize/ToConstant.t
+SHA1 a47696a45185dedbd80dcd43114e08b901c53337 devel/Memoize/t-memoize-toconst-2.pl
+SHA1 6b881d857b5b9e884dc2bd1b10d2ca587c58c105 devel/Memoize/t-memoize-toconst.pl
+SHA1 28f9fbc7df6cd5bbecd14377a0046a8687e28d48 devel/MyConstantDeferExport.pm
+SHA1 7bf6a08cfca4e7ad72ff852815a9bf88edd8c471 devel/Singleton/Const.pm
+SHA1 d4982d0f3c1fdfe5c13599432a01c9997c370ff0 devel/circular.pl
+SHA1 616de7e5e1509f674bee0daad7d9f5bc375279f5 devel/constant-lexical.pl
+SHA1 3e2ebd33b8fa26a030a51327ebe5eefb483652dc devel/import.pl
+SHA1 30867f46349b0a9de3362880fc1890e42a9386d1 devel/junk/Attribute-MemoizeToConstant.pm
+SHA1 9febabcfa584162848315b2f81d4fae18a1096f9 devel/name.pl
+SHA1 b41d4e9cb1880e538e9fcd0f20287d6f9ea67c26 devel/package-constants.pl
+SHA1 7da963e42e7e0d85c5d291ffb84bd150112d15f6 devel/run.pl
+SHA1 cc54d877973af513bc1648df4afcb0da86effac7 devel/walk.pl
+SHA1 965f9ac6922cb150f9f296dffe275a0841ee5266 examples/instance.pl
+SHA1 09b94c5696f2b0cfd7ef15439a26240185aa78e5 examples/simple.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 2bf973221f2265a93d12ca25bd82df3c83bf024e lib/constant/defer.pm
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 5b2f434cb581437f69881e62291dfeb5a6f0e876 t/constant-defer.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 d66edcb63ec58cec45a9b1953bb1c1192bc2e4fd xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFU5uPMLFMCIV9q3ToRArBtAJ96VvzHkysuOKTjrHCAiRvzBOurfgCgkjrn
+tGEM31WGaSa0wy3R04Hsu7w=
+=RR8s
+-----END PGP SIGNATURE-----

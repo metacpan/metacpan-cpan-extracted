@@ -1,0 +1,123 @@
+1.1.6:
+- Fixed a bug that would display a recursion icon for non-recursive events
+  that had participants and spanned multiple days
+- Show and highlight the current hour in the day view
+- Events are now ordered horizontally in chronological order in day view
+  (thanks to Josh Hiner for submitting a bug report and test case)
+- Missing string "Everyday" for recurrence
+- New Dutch translation (thanks to Remco B. Brink <remco@rc6.org>!!)
+- SENDMAIL default value is now really /usr/sbin/sendmail
+- remindd now correctly checks for -D
+- Added a hint for people who don't understand that clicking on an hour will
+  add an event
+
+1.1.5:
+- No longer print " - " for empty date formats
+- From: in confirmation email has initiator's address
+- \n is converted to <br> in event descriptions for participants
+- Makefile now supports PREFIX
+- Event description now renders URLs and email addresses as hyperlinks
+- Smaller margin in task box for more space
+- Better handling of default configuration directive values
+- The default action is now configureable
+- Lots of comments added to the code. I am no longer ashamed of it! ;)
+- /var/run/remindd.pid now contains the real PID
+- New Swedish translation (thanks to Frank Hoffsummer
+  <frank.hoffsummer@svt.se>!!)
+
+1.1.4.2:
+- Fixed a bug that would cause the date printed at the top of a day view to
+  always be today.
+
+1.1.4.1:
+- Fixed bug that would print 0:00 as the start and end time for any event in
+  the month and week views.
+
+1.1.4:
+- Empty parentheses are not shown for empty status
+- Current day (in red) checks for current year
+- chronosadmin's batch mode now works correctly and deleting a user deletes
+  its tasks
+- One can now run multiple Chronos servers per system.
+- remindd doesn't anymore die when an event's initiator has been deleted
+- A confirmation email tells the recipient where to go to confirm her
+  presence.
+- Fixed a crash that would happen if the date of a recurrent event was changed
+- New Portuguese translation (thanks to Augusto Cesar Sandoval
+  <augusto@ciblis.net>!!)
+- Bullets in front of events in month and week view
+- Most date formats are now customizable. The default for month and week views
+  is smaller and thus more readable.
+
+1.1.3:
+- Entering a task without a title is now impossible.
+- remindd now works (sorry, need more eyes for testing ;)
+
+1.1.2:
+- Move /var/www/ssl/chronos to /var/www/ssl/chronos_static and make /chronos
+  an alias for /Chronos. Old browsers reportedly had some difficulties with
+  uppercase.
+- Installation now doesn't complain about Apache::DBI missing (thanks to Stas
+  Bekman <stas@stason.org>!!)
+- Sometimes a user would see events in Showmonth or Showweek which he
+  shouldn't see
+- Reminder emails no longer contain html entities instead of 8bit characters
+- Possibility to have attachments at event creation
+- Better attachment size reporting
+- make test doesn't hang, meaning Chronos can be installed using CPAN
+- Bigger texteareas for the verbose out there
+- Disk icon for events containing attachments
+- Viewing today's showday will cause a refresh every hour so that the view
+  follows the flow of time
+- An event spanning multiple days is now shown in each of these days in month
+  and week views
+- Better CSS for browsers that don't understand border-collapse
+- Events spanning multiple days and ending on the same time as they started
+  don't have one empty cell at the bottom anymore
+
+1.1.1:
+- Holidays would show up as "0" instead of nothing if HOLIDAYS wasn't defined
+- In showmonth, holidays of the next month wouldn't show up
+- Viewing events with reminders would occasionnaly cause a crash
+
+1.1.0:
+- File attachments
+- Ability to remove/add participants to an event after it has been created
+- No time associated with an event (for "all day" events)
+- Status is not shown if "Ask for confirmation" wasn't checked
+- Locale-dependant holidays
+- Important database format changes
+
+1.0.4:
+- New German translation (thanks to Peer Oliver Schmidt <pos@theinternet.de>!!)
+- New Norwegian translation (thanks to Tarjei Knapstad <tarjeik@chemcon.no>!!)
+- Fix bug in chronos_install_db where /etc/chronos.conf would not be owned by
+  the right user.
+
+1.0.3:
+- Still better installation instructions
+- New italian translation (thanks to Enzo Bontempo <enzo@bontempo.it>!!)
+- Possible languages show up in chronosadmin when creating a user
+- Better translation handling in case strings are missing
+- Misc minor display fixes.
+
+1.0.2:
+- chronosadmin and chronos_install_db have been made language-aware. remindd
+  uses /usr/share/chronos/lang/* like everyone else.
+- Added an easter egg.
+- Abbreviate month names in Showmonth's header.
+- Better installation instructions.
+
+1.0.1:
+- Fixed a bug in Showmonth and Showweek which would enable a user to see
+  everyone else's events.
+- Added "Month | Week | Day" links in EditEvent and EditTask.
+- A reminder set 36 hours before event would show as 1 day. Fixed.
+- Participants are ordered by name in EditEvent.
+- When switching user in month or week view, the view is not switched back to
+  day view.
+- Events which start and end at the same time are now displayed correctly.
+- Misc. fixes to day view.
+
+1.0:
+- Initial release.

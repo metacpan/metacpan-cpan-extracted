@@ -1,0 +1,21 @@
+I have wrapped Lucene API in a Java class LuceneIndexer.java and use
+it to index xwi object in Lucene.pm. Lucene.pm is similar to Zebra.pm.
+In order to use that java class LuceneIndexer.java should be complied
+and put under java classpath so our makefile has to be modified.
+
+Apache Lucene is a high-performance, full-featured text search engine
+library written entirely in Java. It can be found at
+   http://lucene.apache.org/
+
+And we also need to add
+
+  " use Inline Java  => 'STUDY',
+              STUDY => ['LucenIndexer'];"
+
+in use declarations in bin/combine.
+
+If there are any problems, please let me know.
+
+
+Best regards,
+Xianghang Liu

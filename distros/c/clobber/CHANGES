@@ -1,0 +1,19 @@
+Revision history for Perl extension Clobber.
+
+0.04  2010-06-17
+      Corrected sysopen default permissions to match core sysopen.
+
+0.03  2010-06-17
+      Added prompt if we're interactive and Term::ReadKey is available.
+
+      Added sysopen protection.
+
+      List another rationale for use in synopsis.
+
+0.02  2010-06-16
+
+      Rough draft with basic functionality
+
+0.01  Wed Jun 16 20:20:36 2010
+	- original version; created by h2xs 1.23 with options
+		-X clobber

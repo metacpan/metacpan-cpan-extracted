@@ -1,0 +1,37 @@
+---
+abstract: 'Manage a FIFO queue of tasks to perform.'
+author:
+  - 'cPanel, Inc. <cpan@cpanel.net>'
+build_requires:
+  Carp: '0'
+  Cwd: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: cPanel-TaskQueue
+requires:
+  Fcntl: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Term::ReadLine: '0'
+  Text::Wrap: '0'
+  Unix::PID: '0.21'
+  YAML::Syck: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+version: '0.800'

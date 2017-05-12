@@ -1,0 +1,62 @@
+{
+   "abstract" : "L<Gtk2> frontend for the C<Circle> application host",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "circle-fe-gtk",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "Glib" : "0",
+            "Gtk2" : "0",
+            "IO::Async" : "0.14",
+            "IO::Async::Loop::Glib" : "0",
+            "Net::Async::Tangence::Client" : "0.08",
+            "Tangence::ObjectProxy" : "0.18"
+         }
+      }
+   },
+   "provides" : {
+      "Circle::FE::Gtk" : {
+         "file" : "lib/Circle/FE/Gtk.pm",
+         "version" : "0.130560"
+      },
+      "Circle::FE::Gtk::Tab" : {
+         "file" : "lib/Circle/FE/Gtk/Tab.pm",
+         "version" : 0
+      },
+      "Circle::FE::Gtk::Widget::Box" : {
+         "file" : "lib/Circle/FE/Gtk/Widget/Box.pm",
+         "version" : 0
+      },
+      "Circle::FE::Gtk::Widget::Entry" : {
+         "file" : "lib/Circle/FE/Gtk/Widget/Entry.pm",
+         "version" : 0
+      },
+      "Circle::FE::Gtk::Widget::Label" : {
+         "file" : "lib/Circle/FE/Gtk/Widget/Label.pm",
+         "version" : 0
+      },
+      "Circle::FE::Gtk::Widget::Scroller" : {
+         "file" : "lib/Circle/FE/Gtk/Widget/Scroller.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "0.130560"
+}

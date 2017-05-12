@@ -1,0 +1,171 @@
+0.32 2017-03-22T09:42:04Z
+    - Tests: add compatibility with dot-less-@INC perls (5.25.11+) #36, #37
+      (syohex)
+
+0.31 2016-05-26T20:38:01Z
+    - Check also core modules (unless explicitely excluded) to report
+      dual-life (core+CPAN) modules #32
+
+0.30 2016-05-03T23:29:25Z
+    - Use HTTP::Tiny instead of LWP::UserAgent (grinnz, dolmen)
+    - Lazy load the modules the script optionally uses (dolmen)
+    - Meta: declare dependencies including from perl core
+
+0.29 2015-07-28T14:18:42Z
+
+    - Limit the modules to check #28
+      (miyagawa)
+    - MAJOR SPEEDUP: skip already reported dists early #27
+      (dolmen)
+    - Use local index copy #25
+      (dolmen)
+
+0.28 2013-03-28T10:26:27Z
+
+    - Fixed deps
+      (reported by aer0++)
+
+0.27 2013-03-28T09:08:51Z
+
+    - packaging, again
+
+0.26 2013-03-28T02:43:34Z
+
+    - re-packaging
+
+0.25 2013-03-28T02:13:05Z
+
+    commit 6843e0eb2fed8e0cbffabae0b3b87b49d75fd177
+    Author: Oleg Gashev <oleg@gashev.net>
+    Date:   Wed Mar 27 16:21:05 2013 -0400
+
+    Fix lintian warning: manpage-has-bad-whatis-entry usr/share/man/man3/App::cpanoutdated.3pm.gz.
+    http://lintian.debian.org/tags/manpage-has-bad-whatis-entry.html.
+
+0.24
+
+    commit 542e8c296fc59c28d8e98aae7a65b3cf67cb12d1
+    Author: Sharl Morlaroll <sharl_github@haun.org>
+    Date:   Tue Oct 23 01:19:00 2012 +0900
+
+    fix --exclude-core
+
+0.23
+
+    - setup abstract
+    https://rt.cpan.org/Public/Bug/Display.html?id=77958
+
+0.22
+
+    - better error diag, reported by ssb++
+
+0.21
+
+    - Fixed: Failure if module CPAN version is 'bogus'
+      https://rt.cpan.org/Public/Bug/Display.html?id=73465
+      (Reported by dolmen)
+
+0.20
+
+    - use Module::Metadata for better handling of version and package extra
+      (Tatsuhiko Miyagawa)
+
+0.19
+
+    - better packaging
+
+0.18
+
+    - hmmm. i released broken dist at last night with too much alchole...
+      me--.
+
+0.17
+
+    - fixed cpan doc fix(Olaf Alders)
+
+0.16
+
+    - skip perl distribution not only for perl-X.Y.Z.tar.gz but also perl-X.Y.Z.tar.bz2(kmx)
+
+0.15
+
+    - --compare-changes deprecated. It can use cpan-listchanges instead.(nihen)
+
+0.14
+
+    - doc enhancements(gfx)
+
+0.13
+
+    - Support -p|--print-package option for cpanm version tracking
+      (miyagawa)
+
+0.12
+
+    - Do not install old distribution.
+      (reported by leedo)
+      https://github.com/tokuhirom/cpan-outdated/issues/issue/4/
+    - Do not modify @INC on -l and -L.
+      It breaks lazy loading in LWP.
+
+0.11
+
+    - removed -I option(sorry, It's my misstake.)
+    - added -l and -L option for local::lib support.
+      Option meaning is same as cpanm.
+      suggested by Sebastian Willert [RT#59454]
+
+0.10
+
+    - added -I option, suggested by Sebastian Willert [RT#59454]
+
+0.09
+
+    - added --compare-changes option(by nihen++)
+
+0.08
+
+    - fixed Win32::GUI::Constants::Tags issue.
+      02packages.details.txt.gz says version number is 'undef'.
+      but EU::MM says '0.04'.
+      (reported by aer0++, fixed by chiba++)
+
+      It's distribution issue. But I added workaround.
+
+0.07
+
+    - depend to EU::MM 6.56 for better version number parsing.
+      (thanks to chiba++)
+
+0.06
+
+    - version number comparator should be more permissive
+      RT#58165(reported by Rafael Kitover)
+
+0.05
+
+    - allow specifying alternate mirror urls(doy++)
+
+0.04
+
+    - oops. 0.03 is wrong release.
+      ( no feature changes)
+
+0.03
+
+    - added workaround for MM->parse_version() issue around Authen::Simple::Apache.
+      (The issue was reported to EU::MM authors)
+      (reported by rafl++)
+    - switch to version.pm instead of copied CPAN::Version.
+      Yes, it's not 5.8 core module.
+      But, if you want to use this command, you can install version.pm :P
+      (suggested by hanekomu++)
+
+0.02
+
+    - shut up warnings on v-string
+      (reported by aer0++)
+
+0.01
+
+    - initial release

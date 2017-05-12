@@ -1,0 +1,22 @@
+---
+name: constant-boolean
+version: 0.02
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+abstract: Define TRUE and FALSE constants.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=constant-boolean
+  license: http://dev.perl.org/licenses/
+  repository: http://dexter-cpan.googlecode.com/svn/constant-boolean
+requires:
+  Symbol::Util: 0.02
+  perl: 5.006
+provides:
+  constant::boolean:
+    file: lib/constant/boolean.pm
+    version: 0.02
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

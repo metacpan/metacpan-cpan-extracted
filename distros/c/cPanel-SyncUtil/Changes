@@ -1,0 +1,36 @@
+Revision history for Perl extension cPanel::SyncUtil.
+
+0.8  Fri Mar  6 11:50:00 2015
+    - sha512 hash added to .cpanelsync for files
+    - Clean up make test diag messages
+    - Fix hash radomization issue with unit tests in perl 5.18
+
+0.7  Wed Jan 26 07:34:41 2011
+    - set $File::Find::prune when %ignore_name is triggered (thanks TODDR)
+    - Drop $Cpanel::SyncUtil::is_setuid in favor of more sane "get_mode_string" function/argument
+    - Added get_mode_string() and get_mode_string_preserve_setuid()
+
+0.6  Tue Jan 25 10:41:00 2011
+    - add %Cpanel::SyncUtil::ignore_name containing default .svn and .git values
+    - make zero length file waning respect verbose setting
+    - prevent "Missing argument in sprintf at ..." warnings from being triggered
+    - Added $Cpanel::SyncUtil::is_setuid coderef to enable specifying that known setuid binaries
+
+0.5  Thu Aug 12 19:27:35 CDT 2010
+    - sort cpanelsync file list
+
+0.4  Thu Aug  5 12:24:08 CDT 2010
+    - perltidy
+    - dropped 'use version'
+    - Added "Your webserver and cpanelsync aware directories" to POD
+    
+0.0.3  Thu Nov  8 09:07:00 2007
+	- added Ben Thomas' build_cpanelsync(), compress_files(), get_files_from_cpanelsync(), bzip_file(), _read_dir_recursively(),  _get_bzip_binary(), and _chown_recursively() functions/tests to help make it easier to work with
+	- created POD for those changes
+	
+0.0.2  Mon Jun 19 10:31:02 2006 
+	- fixed problem with sample script, no change to module except version
+
+0.0.1  Wed Mar 22 14:44:49 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n cPanel::SyncUtil

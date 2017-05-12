@@ -1,0 +1,13 @@
+Combine for Debian
+-----------------------
+
+Combine consists of 2 necessary packages combine,
+with main applications, and libcombine-perl, with
+Combine specific Perl modules.
+Documentation is separated out into a 3rd
+package combine-doc.
+
+For detailed documentation see DocMain.pdf
+or the Combine Web-site http://combine.it.lth.se/
+
+ -- anders.ardo@it.lth.se, Mon,  6 Mar 2006 12:10:35 +0200

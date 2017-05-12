@@ -1,0 +1,510 @@
+#!/usr/bin/perl
+## $Id: combineINIT 308 2009-06-15 08:18:24Z it-aar $
+
+# Copyright (c) 1996-1998 LUB NetLab, 2002-2005 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Getopt::Long;
+use Combine::Config;
+
+#defaults (see also Combine::Config;
+#CHANGE to Combine::Config::GetDefaults ##
+my $dbhost='localhost';
+my $dbuser='combine';
+my $database='alvistest';
+my $configDir = '/etc/combine/';
+my $configFile = 'combine.cfg';
+
+my $jobname;
+my $username;
+my $hostname;
+my $topic;
+my $help;
+my $baseconf;
+my $myconf;
+GetOptions('jobname:s' => \$jobname, 'username:s' => \$username, 'myconf:s' => \$myconf,
+	   'topic:s' => \$topic, 'baseconfigdir:s' => \$baseconf,
+	   'hostname:s' => \$hostname, 'help' => \$help);
+
+if (defined($help)) { Getopt::Long::HelpMessage('See man page combineINIT'); }
+if (defined($jobname)) { $database = $jobname; }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($username)) { $dbuser = $username; }
+if (defined($hostname)) { $dbhost = $hostname; }
+if (defined($baseconf)) {
+   if ( ! (-d "$baseconf") ) {Getopt::Long::HelpMessage('Base config dir does not exist!');}
+   if ( substr($baseconf,-1,1) ne '/' ) { $baseconf .= '/'; }
+   $configDir = $baseconf;
+}
+
+print "Using $configDir as the base configuration directory\n";
+if ( ! (-w "$configDir") ) {
+  Getopt::Long::HelpMessage("You dont have permission to write in $configDir");
+}
+
+my $configFileDefault = $configDir . 'job_default.cfg';
+
+OK("I will create a MySQL database named $database at the host $dbhost with access for the MySQL user $dbuser\n");
+
+use DBI;
+my $sv = DBI->connect("DBI:mysql:database=;host=$dbhost", 
+                    'root', '');             #!!Handle passwd
+if (!$sv) {
+  print STDERR "ERROR connecting to MySQL as root without password: "  . $DBI::errstr . "\n";
+  exit;
+}
+
+print "Connected to MySQL server at $dbhost\n";
+
+#create/reinit database
+my $sth =  $sv->prepare(qq{SHOW DATABASES;});
+$sth->execute;
+while (my ($db) = $sth->fetchrow_array) {
+   if ( $db eq $database ) {
+       OK("$database exists! Do you want me reinitialize it? (You will loose all data in $database)\n"); 
+       last;
+   }
+}
+
+##START DOC SQL##
+print "Create database: $database\n";
+my $res = $sv->do(qq{DROP DATABASE IF EXISTS $database;}); 
+$res = $sv->do(qq{CREATE DATABASE $database DEFAULT CHARACTER SET utf8;}); 
+$res = $sv->do(qq{USE $database;}); 
+
+print "Creating MySQL tables\n";
+##All tables use UTF-8
+##
+##Summary tables '^'=primary key, '*'=key:
+##TABLE hdb: recordid^, type, dates, server, title, ip, ...
+##TABLE links: recordid*, mynetlocid*, urlid*, netlocid*, linktype, anchor  (netlocid for urlid!!)
+##TABLE meta: recordid*,  name, value
+##TABLE html: recordid^, html
+##TABLE analys: recordid*, name, value
+##TABLE topic: recordid*, notation*, absscore, relscore, terms, algorithm
+##TABLE localtags: netlocid, urlid, name, value
+##TABLE search: recordid^, stext*
+##
+##(TABLE netlocalias: netlocid*, netlocstr^)
+##(TABLE urlalias: urlid*, urlstr^)
+##TABLE topichierarchy: node^, father*, notation*, caption, level
+##TABLE netlocs: netlocid^, netlocstr^, retries
+##TABLE urls: netlocid*, urlid^, urlstr^, path
+##TABLE urldb: netlocid*, urlid^, urllock, harvest*, retries, netloclock
+##TABLE newlinks urlid^, netlocid
+##TABLE recordurl: recordid*, urlid^, lastchecked, md5*, fingerprint*^
+##TABLE admin: status, queid, schedulealgorithm
+##TABLE log: pid, id, date, message
+##TABLE que: queid^, urlid, netlocid
+##TABLE robotrules: netlocid*, rule, expire
+##TABLE oai: recordid, md5^, date*, status
+##TABLE exports: host, port, last
+
+print "Data tables: hdb, html, links, meta, analys, topic, localtags, search\n";
+
+$res = $sv->do(qq{CREATE TABLE hdb (
+  recordid int(11) NOT NULL default '0',
+  type varchar(50) default NULL,
+  title text,
+  mdate timestamp NOT NULL,
+  expiredate datetime default NULL,
+  length int(11) default NULL,
+  server varchar(50) default NULL,
+  etag varchar(25) default NULL,
+  nheadings int(11) default NULL,
+  nlinks int(11) default NULL,
+  headings mediumtext,
+  ip mediumblob,
+  PRIMARY KEY  (recordid)
+) ENGINE=MyISAM AVG_ROW_LENGTH = 20000 MAX_ROWS = 10000000 DEFAULT CHARACTER SET=utf8;});
+#maybe index on type aswell??
+
+$res = $sv->do(qq{CREATE TABLE html (
+  recordid int(11) NOT NULL default '0',
+  html mediumblob,
+  PRIMARY KEY  (recordid)
+) ENGINE=MyISAM AVG_ROW_LENGTH = 20000 MAX_ROWS = 10000000 DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE links (
+  recordid int(11) NOT NULL default '0',
+  mynetlocid int(11) default NULL,
+  urlid int(11) default NULL,
+  netlocid int(11) default NULL,
+  anchor text,
+  linktype varchar(50) default NULL,
+  KEY recordid (recordid),
+  KEY urlid (urlid),
+  KEY mynetlocid (mynetlocid),
+  KEY netlocid (netlocid)
+) ENGINE=MyISAM MAX_ROWS = 1000000000 DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE meta (
+  recordid int(11) NOT NULL default '0',
+  name varchar(50) default NULL,
+  value text,
+  KEY recordid (recordid)
+) ENGINE=MyISAM MAX_ROWS = 1000000000 DEFAULT CHARACTER SET=utf8;});
+#maybe index on name?
+
+$res = $sv->do(qq{CREATE TABLE analys (
+  recordid int(11) NOT NULL default '0',
+  name varchar(100) NOT NULL,
+  value varchar(100),
+  KEY recordid (recordid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE topic (
+  recordid int(11) NOT NULL default '0',
+  notation varchar(50) default NULL,
+  abscore int(11) default NULL,
+  relscore int(11) default NULL,
+  terms text default NULL,
+  algorithm varchar(25),
+  KEY notation (notation),
+  KEY recordid (recordid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE localtags (
+  netlocid int(11) NOT NULL DEFAULT '0',
+  urlid int(11) NOT NULL DEFAULT '0',
+  name varchar(100) NOT NULL,
+  value varchar(100) NOT NULL,
+  PRIMARY KEY tag (netlocid,urlid,name(100),value(100))
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE search (
+  recordid int(11) NOT NULL default '0',
+  stext mediumtext,
+  PRIMARY KEY (recordid),
+  FULLTEXT (stext)
+) ENGINE=MyISAM AVG_ROW_LENGTH = 20000 MAX_ROWS = 10000000 DEFAULT CHARACTER SET=utf8;});
+
+
+print "Administrative tables: netlocalias, urlalias, topichierarchy, netlocs, urls, urldb, newlinks, recordurl, admin, log, que, robotrules\n";
+
+$res = $sv->do(qq{CREATE TABLE netlocalias (
+  netlocid int(11),
+  netlocstr varchar(150) NOT NULL,
+  KEY netlocid (netlocid),
+  PRIMARY KEY netlocstr (netlocstr)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE urlalias (
+  urlid int(11),
+  urlstr tinytext,
+  KEY urlid (urlid),
+  PRIMARY KEY urlstr (urlstr(255))
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+##topichierarchy have to initialized manually
+$res = $sv->do(qq{CREATE TABLE topichierarchy (
+  node int(11) NOT NULL DEFAULT '0',
+  father int(11) DEFAULT NULL,
+  notation varchar(50) NOT NULL DEFAULT '',
+  caption varchar(255) DEFAULT NULL,
+  level int(11) DEFAULT NULL,
+  PRIMARY KEY node (node),
+  KEY father (father),
+  KEY notation (notation)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE netlocs (
+  netlocid int(11) NOT NULL auto_increment,
+  netlocstr varchar(150) NOT NULL,
+  retries int(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (netlocstr),
+  UNIQUE INDEX netlockid (netlocid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+#Where to put   netloclock NOT NULL default '0', here or in urldb
+
+$res = $sv->do(qq{CREATE TABLE urls (
+  netlocid int(11) NOT NULL DEFAULT '0',
+  urlid int(11) NOT NULL auto_increment,
+  urlstr tinytext,
+  path tinytext,
+  PRIMARY KEY urlstr (urlstr(255)),
+  INDEX netlocid (netlocid),
+  UNIQUE INDEX urlid (urlid)
+) ENGINE=MyISAM MAX_ROWS = 1000000000 DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE urldb (
+  netlocid int(11) NOT NULL default '0',
+  netloclock int(11) NOT NULL default '0',
+  urlid int(11) NOT NULL default '0',
+  urllock int(11) NOT NULL default '0',
+  harvest tinyint(1) NOT NULL default '0',
+  retries int(11) NOT NULL default '0',
+  score int(11) NOT NULL default '0',
+  PRIMARY KEY  (urlid),
+  KEY netlocid (netlocid),
+  KEY harvest (harvest)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+#newlinks uses 'urlid' as primary key in order to
+#weed out duplicates directly when links are inserted into
+#the table. Uses MyISAM in order to survive restarts.
+#Links are validated during recycling
+$res = $sv->do(qq{CREATE TABLE newlinks (
+  urlid int(11) NOT NULL,
+  netlocid int(11) NOT NULL,
+  PRIMARY KEY  (urlid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE recordurl (
+  recordid int(11) NOT NULL auto_increment,
+  urlid int(11) NOT NULL default '0',
+  lastchecked timestamp NOT NULL,
+  md5 char(32),
+  fingerprint char(50),
+  KEY md5 (md5),
+  KEY fingerprint (fingerprint),
+  PRIMARY KEY (urlid),
+  KEY recordid (recordid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+#urlid PRIMARY KEY?
+
+$res = $sv->do(qq{CREATE TABLE admin (
+  status enum('closed','open','paused','stopped') default NULL,
+  schedulealgorithm enum('default','bigdefault','advanced') default 'default',
+  queid int(11) NOT NULL default '0'
+) ENGINE=MEMORY DEFAULT CHARACTER SET=utf8;});
+##advanced means use config variable SchedulingAlgorithm
+##Initialise admin to 'open' status
+$res = $sv->do(qq{INSERT INTO admin VALUES ('open','default',0)});
+
+$res = $sv->do(qq{CREATE TABLE log (
+  pid int(11) NOT NULL default '0',
+  id varchar(50) default NULL,
+  date timestamp NOT NULL,
+  message varchar(255) default NULL
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE que (
+  netlocid int(11) NOT NULL default '0',
+  urlid int(11) NOT NULL default '0',
+  queid int(11) NOT NULL auto_increment,
+  PRIMARY KEY  (queid)
+) ENGINE=MEMORY DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE robotrules (
+  netlocid int(11) NOT NULL default '0',
+  expire int(11) NOT NULL default '0',
+  rule varchar(255) default '',
+  KEY netlocid (netlocid)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+#Fixes for OAI server
+$res = $sv->do(qq{CREATE TABLE oai (
+  recordid int(11) NOT NULL default '0',
+  md5 char(32),
+  date timestamp,
+  status enum('created', 'updated', 'deleted'),
+  PRIMARY KEY (md5),
+  KEY date (date)
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+$res = $sv->do(qq{CREATE TABLE exports (
+  host varchar(30),
+  port int,
+  last timestamp DEFAULT '1999-12-31'
+) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+
+print "Create user $dbuser with required priviligies: SELECT,INSERT,UPDATE,DELETE,CREATE,CREATE TEMPORARY TABLES,ALTER,LOCK TABLES\n";
+$res = $sv->do(qq{GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,CREATE TEMPORARY TABLES,
+   ALTER,LOCK TABLES ON $database.* TO $dbuser;});
+$res = $sv->do(qq{GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,CREATE TEMPORARY TABLES,
+   ALTER,LOCK TABLES ON $database.* TO $dbuser\@localhost;});
+##END DOC SQL##
+
+$configDir = $configDir . $database;
+$configFile = $configDir . '/' . $configFile;
+
+print "Create config directory $configDir and initial combine.cfg there\n";
+system("mkdir $configDir");
+
+if ( -w $configFile ) {
+	OK("$configFile exists! Do you want to replace with a new one? All your previous data will be lost!");
+}
+system("cat $configFileDefault > $configFile");
+open(CONF,">>$configFile");
+print CONF "          #format mysqluser\@host:databasename\n";
+print CONF "MySQLdatabase   = \"$dbuser\@$dbhost:$database\"\n";
+my $tidyInMyconf=0;
+my $doCheckRecord=0;
+if ($myconf) {
+#    if (-f "$myconf") {
+#	system("cat $myconf >> $configFile");
+    if (open(MYCONF,"<$myconf")) {
+	print CONF "# START local configuration from $myconf\n";
+	while (<MYCONF>) {
+	    print CONF;
+	    if (/^[^#]*useTidy/) { $tidyInMyconf=1; }
+	    if (/^[^#]*doCheckRecord/) { $doCheckRecord=1; }
+	}
+	print CONF "# END local configuration from $myconf\n";
+    } else {
+	print STDERR "WARNING: Can't open file $myconf\n";
+    }
+}
+eval {require HTML::Tidy;};
+if ($@ && ($tidyInMyconf==0)) {
+    print CONF "# HTML::Tidy not found - disabling\n";
+    print CONF "useTidy = 0\n";
+}# else { print " ok\n"; }
+if ($topic && -f "$topic") {
+    if ($doCheckRecord==0) {print CONF "doCheckRecord = 1\n";}
+    system("cp $topic $configDir/topicdefinition.txt");
+} else {
+    if ($doCheckRecord==0) {print CONF "doCheckRecord = 0\n";}
+}
+close(CONF);
+
+system("touch $configDir/stopwords.txt");
+system("touch $configDir/config_serveralias");
+system("touch $configDir/config_exclude");
+
+my $runDir = '/var/run/combine/';
+print "Create directory $runDir if it does not exist\n";
+system("mkdir $runDir");
+$runDir .= $database;
+print "Create directory $runDir writeable for all\n";
+system("mkdir $runDir");
+system("chmod a+rw $runDir");
+
+#Check that everything was OK
+#MySQL 
+my %tables = (
+  hdb => 1,
+  html => 1,
+  links => 1,
+  meta => 1,
+  analys => 1,
+  topic => 1,
+  netlocalias => 1,
+  urlalias => 1,
+  topichierarchy => 1,
+  netlocs => 1,
+  urls => 1,
+  urldb => 1,
+  newlinks => 1,
+  recordurl => 1,
+  admin => 1,
+  log => 1,
+  que => 1,
+  robotrules => 1,
+  oai => 1,
+  exports => 1,
+  localtags => 1,
+  search => 1
+	      );
+my $noOfTables = scalar(keys %tables);
+
+my $csv = DBI->connect("DBI:mysql:database=$jobname;host=localhost", 
+		   'combine', '');             #!!Handle passwd
+if (!$csv) { 
+  print STDERR "ERROR: problems connecting to $jobname as user 'combine' after running combineINIT: " . $DBI::errstr . "\n";
+  exit;
+}
+
+my $csth =  $csv->prepare(qq{SHOW TABLES;});
+$csth->execute;
+my $i=0;
+while (my ($table) = $csth->fetchrow_array) { delete($tables{$table}); $noOfTables--; }
+if ($noOfTables!=0) {
+    print STDERR "ERROR with the number of tables created\n";
+    exit;
+}
+
+#Config
+if (-f "$configFile") {
+} else {
+    print STDERR "ERROR: Can't read configuration file $configFile\n";
+    exit;
+}
+
+#
+print "All initialization done. If you did see any errors above you will have to fix them manually :-(\n";
+
+sub OK {
+  my ($mess) = @_;
+  print "$mess\n";
+  print "OK (yes/no):\n";
+
+print "Input not implemented yet\n";
+#if NO the die (...)
+
+  return 1;
+}
+
+__END__
+
+
+=head1 NAME
+
+combineINIT - Initializations of MySQL and config directories
+
+
+=head1 SYNOPSIS
+
+combineINIT --jobname <name> [--username <mysqluser> [--hostname <mysqlhost>]] [--topic <topicDefinitionFile>] [--myconf <MyConfigFile>]
+
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+username and hostname pertain to the MySQL server that is used
+
+topic is a file that contains a valid topic definition
+
+myconf is a local configuration file
+
+=head1 DESCRIPTION
+
+Creates a Mysql database, database tables and initializes it. If
+the database exists it is dropped and recreated. A job specific configuration
+directory is created in F</etc/combine/> and populated with a
+default configuration file.
+
+If a topic definition filename is given, focused crawling using this
+topic defintion is enabled per default. Otherwise focused
+crawling is disabled, and Combine works as a general crawler.
+
+The contents of the file specified with 'myconf' is appended to
+the standard job-specific configuration file.
+
+=head1 EXAMPLES
+
+=over 4
+
+=item C<combineINIT --jobname aatest>
+
+Creates a Mysql database called C<aatest> on localhost with access for
+the MySQL user C<combine>. A configuration directory
+F</etc/combine/aatest/> is created and populated with a default
+configuration file.
+
+=back
+
+=head1 SEE ALSO
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005, 2006 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

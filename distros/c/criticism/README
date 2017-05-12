@@ -1,0 +1,101 @@
+NAME
+    criticism - Perl pragma to enforce coding standards and best-practices
+
+SYNOPSIS
+      use criticism;
+
+      use criticism 'gentle';
+      use criticism 'stern';
+      use criticism 'harsh';
+      use criticism 'cruel';
+      use criticism 'brutal';
+
+      use criticism ( -profile => '/foo/bar/perlcriticrc' );
+      use criticism ( -severity => 3, -verbose => '%m at %f line %l' );
+
+DESCRIPTION
+    This pragma enforces coding standards and promotes best-practices by
+    running your file through Perl::Critic before every execution. In a
+    production system, this usually isn't feasible because it adds a lot of
+    overhead at start-up. If you have a separate development environment,
+    you can effectively bypass the "criticism" pragma by not installing
+    Perl::Critic in the production environment. If Perl::Critic can't be
+    loaded, then "criticism" just fails silently.
+
+    Alternatively, the "perlcritic" command-line (which is distributed with
+    Perl::Critic) can be used to analyze your files on-demand and has some
+    additional configuration features. And Test::Perl::Critic provides a
+    nice interface for analyzing files during the build process.
+
+    If you'd like to try Perl::Critic without installing anything, there is
+    a web-service available at <http://perlcritic.com>. The web-service does
+    not yet support all the configuration features that are available in the
+    native Perl::Critic API, but it should give you a good idea of what it
+    does. You can also invoke the perlcritic web-service from the command
+    line by doing an HTTP-post, such as one of these:
+
+      $> POST http://perlcritic.com/perl/critic.pl < MyModule.pm
+      $> lwp-request -m POST http://perlcritic.com/perl/critic.pl < MyModule.pm
+      $> wget -q -O - --post-file=MyModule.pm http://perlcritic.com/perl/critic.pl
+
+    Please note that the perlcritic web-service is still alpha code. The URL
+    and interface to the service are subject to change.
+
+CONFIGURATION
+    If there is exactly one import argument, then it is taken to be a named
+    equivalent to one of the numeric severity levels supported by
+    Perl::Critic. For example, "use criticism 'gentle';" is equivalent to
+    setting the "-severity => 5", which reports only the most dangerous
+    violations. On the other hand, "use criticism 'brutal';" is like setting
+    the "-severity => 1", which reports every violation. If there are no
+    import arguments, then it defaults to 'gentle'.
+
+    If there is more than one import argument, then they will all be passed
+    directly into the Perl::Critic constructor. So you can use whatever
+    arguments are supported by Perl::Critic.
+
+    The "criticism" pragma will also obey whatever configurations you have
+    set in your .perlcriticrc file. In particular, setting the
+    "criticism-fatal" option to a true value will cause your program to
+    immediately "die" if any Perl::Critic violations are found. Otherwise,
+    violations are merely advisory. This option can be set in the global
+    section at the top of your .perlcriticrc file, like this:
+
+      # Top of your .perlcriticrc file...
+      criticism-fatal = 1
+
+      # per-policy configurations follow...
+
+    You can also pass "('-criticism-fatal' => 1)" as import arguments, just
+    like any other Perl::Critic argument. See "CONFIGURATION" in
+    Perl::Critic for details on the other configuration options.
+
+DIAGNOSTICS
+    Usually, the "criticism" pragma fails silently if it cannot load
+    Perl::Critic. So by not installing Perl::Critic in your production
+    environment, you can leave the "criticism" pragma in your production
+    source code and it will still compile, but it won't be analyzed by
+    Perl::Critic each time it runs.
+
+    However, if you set the "DEBUG" environment variable to a true value or
+    run your program under the Perl debugger, you will get a warning when
+    "criticism" fails to load Perl::Critic.
+
+NOTES
+    The "criticism" pragma applies to the entire file, so it is not affected
+    by scope or package boundaries and "use"-ing it multiple times will just
+    cause it to repeatedly process the same file. There isn't a reciprocal
+    "no criticism" pragma. However, Perl::Critic does support a
+    pseudo-pragma that directs it to overlook certain lines or blocks of
+    code. See "BENDING THE RULES" in Perl::Critic for more details.
+
+AUTHOR
+    Jeffrey Ryan Thalhammer <thaljef@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2006-2007 Jeffrey Ryan Thalhammer. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. The full text of this license can
+    be found in the LICENSE file included with this module.
+

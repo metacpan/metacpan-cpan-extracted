@@ -1,0 +1,17 @@
+bin/cnutt-feed
+Build.PL
+Changes
+INSTALL
+lib/Cnutt/Feed.pm
+lib/Cnutt/Feed/Actions/Fetch.pm
+lib/Cnutt/Feed/Actions/Get.pm
+lib/Cnutt/Feed/Actions/List.pm
+lib/Cnutt/Feed/Mailbox.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+TODO

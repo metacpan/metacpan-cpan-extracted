@@ -1,0 +1,27 @@
+Revision history for classes
+
+0.943 Wed Nov 22 22:47:11 EST 2006
+    Deprecated 'needs' since 'use' is needed by compilers and
+    builders to identify needed modules.
+    Changed classes::init_args() to throw X::UnknownAttr if passed
+    key of attribute for which there is not a declaration/setter
+    (as convinced by ken1).
+
+0.942 Thu Oct 19 12:15:25 EDT 2006
+    Added X::Undefined exception class.
+    Changed X::classes::traceable default Order class attr
+      from ['item'] to ['item','message'], which allows:
+        X::Failed->throw([5,'File not found'])
+
+0.941 Sat Sep 16 02:02:20 EDT 2006
+    Fixed dubious error in unit test script.
+    Typos and spelling corrections.
+
+0.940 Thu Sep 14 09:06:04 EDT 2006
+    First CPAN release.
+    Still needs classestut, classescb filled in later.
+    Still needs X::classes and X::classes::traceable documented.
+    Could use a few more unit tests to get 100% Devel::Cover-age
+
+0.10 Wed May 10 07:04:15 EDT 2006
+    Initial code upload to sourceforge (public release).

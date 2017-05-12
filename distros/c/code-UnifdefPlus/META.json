@@ -1,0 +1,37 @@
+{
+   "abstract" : "processes conditional parts of makefiles, c/c++ and kconfig files",
+   "author" : [
+      "John Ulvr <perldev@ulvr.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "code-UnifdefPlus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "code::UnifdefPlus" : {
+         "file" : "lib/UnifdefPlus.pm",
+         "version" : "v0.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.005.004",
+   "x_serialization_backend" : "JSON version 2.90"
+}

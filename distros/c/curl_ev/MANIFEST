@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+CurlEV.pm
+test.pl
+example.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

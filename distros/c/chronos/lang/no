@@ -1,0 +1,167 @@
+# $Id: no,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Tarjei Knapstad <tarjeik@chemcon.no>
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Måned
+week=Uke
+Day=Dag
+today=I dag
+myagenda=Min Dagsplan
+status_UNCONFIRMED=UBEKREFTET
+status_CONFIRMED=BEKREFTET
+status_CANCELED=AVLYST
+eventname=Hendelse:
+eventstart=Start:
+eventend=Slutt:
+eventdescription=Beskrivelse:
+eventrecur=Gjentakelse:
+eventnotrecur=Ikke gjentatt
+eventrecurweek=Denne dag hver uke
+eventrecurmonth=Denne dag hver måned
+eventrecuryear=Denne dag hvert år
+eventrecurend=Slutt på gjentakelse:
+eventparticipants=Deltakere:
+eventconfirm=Be om bekreftelse:
+eventsave=Lagre
+errorstartdate=Start dato er ikke gyldig.
+errorstarttime=Start tid er ikke gyldig.
+errorenddate=Slutt dato er ikke gyldig.
+errorendtime=Slutt tid er ikke gyldig.
+errorrecurenddate=Slutt dato for gjentakelse er ugyldig.
+errorrecurendtime=Slutt tid for gjentakelse er ugyldig.
+errorendbeforestart=Slutt tid er før start tid.
+errorrecurendbeforestart=Slutt tid for gjentakelse er før slutt tiden.
+errorrecurendbeforestart=Slutt tid for gjentakelse er før  start tiden.
+errormissingname=Hendelsen mangler navn.
+reminder=Påminnelse:
+remind_me=Påminnelse via email %1 %2 før hendelsen starter.
+min=minutt(er)
+hour=time(r)
+day=dag(er)
+error=Feil
+weeknum=Uke %1 , år %2
+weeknum2=Uke %1 av %2
+eventdel=Slett
+initiator=Initiativtaker for hendelsen
+cancel=Avbryt
+confirm=Bekreft
+confirm_subject=Inkalling til møte.
+confirm_body=<<EOF
+Dette er en automatisk melding. Vennligst ikke svar direkte.
+
+%%INITIATOR%% ber om din tilstedeværelse den %%DATE%%.
+
+Hendelse: %%NAME%%
+Beskrivelse: %%DESCRIPTION%%
+
+Vennligst bekreft at du kan stille.
+
+-- 
+Chronos %%VERSION%% av Linux Québec Technologies
+EOF
+errornotauthorized=Du har ikke tilgang til å utføre dette.
+tasklist=Liste over gjøremål
+tasktitle=Tittel:
+tasknotes=Notater:
+taskpriority=Prioritet:
+newtask=Legg til gjøremål
+options=Opsjoner
+userprefs=Bruker preferanser
+lang=Språk:
+agendatype=Dagsplan type:
+publicrw=Lese og skrivetilgang for alle
+publicr=Kun lesetilgang for alle
+private=Privat
+indivpriv=Individuelle privilegier:
+nopriv=Ingen privilegier
+r=Les
+rw=Les/skriv
+email=Email addresse:
+name=Navn:
+password=Passord:
+create_db_intro=<<EOF
+Dette scriptet vil lage en MySQL database med de tabeller som er nødvendig for Chronos.
+
+EOF
+create_db_pass=root's MySQL passord:
+create_db_dbname=Chronos database navn: [chronos]
+create_db_exists=Denne databasen eksisterer. Slette?
+create_db_deleted=Database %s er slettet
+create_db_created=Database %s er laget
+create_db_tablecreated=Table %s er laget
+create_db_user=Brukernavn for å koble til databasen: [chronos]
+create_db_dbpass=Passord: [tilfedldig generert]
+create_db_grant=Privilegier gitt til %s på %s.*
+create_db_added=Informasjonen er lagt til i /etc/chronos.conf
+create_db_success=Chronos installasjonen er fullført.
+chronosadmin_usage=<<EOF
+Usage:
+    %s [-u brukernavn] [-p [passord]] [--autodel] [--new-user]
+    [--new-users-batch[=FIL]] [--del-user=brukernavn] [database[@host]]
+
+Options:
+    -u brukernavn
+        Brukernavn for å koble til databasen.
+    -p password
+        Passord for å koble til databasen.
+    --autodel
+	Ikke be om bekreftelse for å slette en eksisterende
+	bruker. Nyttig for batch filer.
+    --new-user
+	Lag en ny bruker interaktivt.
+    --new-users-batch[=FIL]
+	Lager ny brukere fra en fil (eller STDIN hvis filnavn ikke
+	oppgis), der hver linje ser slik ut:
+            brukernavn,passord,email,tilgang
+    --del-user=brukernavn
+        Slett en bruker.
+EOF
+chronosadmin_exists=Brukeren %s eksisterer fra før. Slette?
+chronosadmin_created=Brukeren %s er laget
+chronosadmin_deleted=Brukeren %s er slettet
+chronosadmin_confirm=Bekreft:
+chronosadmin_pass=Passord
+chronosadmin_username=Brukernavn (max 16 bokstaver)
+chronosadmin_email=Email addresse
+chronosadmin_lang=Språk
+chronosadmin_realname=Fullt navn
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Påminnelse
+
+Dette er en automatisk melding. Vennligst ikke svar direkte.
+
+Jeg minner deg om at følgende snart skal skje.
+
+Navn:   %%NAME%%
+Start:  %%START%%
+Slutt:    %%END%%
+Beskrivelse:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% av Linux Québec Technologies
+EOF
+en=Engelsk
+fr=Fransk
+it=Italiensk
+de=Tysk
+no=Norsk

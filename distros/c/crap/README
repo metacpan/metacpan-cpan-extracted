@@ -1,0 +1,44 @@
+NAME
+
+    crap - just don't take any
+
+VERSION
+
+    version 0.08
+
+SYNOPSIS
+
+      no crap;
+    
+      # strict and warnings are enabled
+    
+      $foo = 'bar'; # wrong
+    
+      use crap;
+    
+      # no strictures or warnings now
+    
+      $bar = 'foo' # This is 'okay' now
+
+DESCRIPTION
+
+    Enables strict and warnings without all the typing.
+
+    It also makes STDOUT 'hot' turning off buffering.
+
+    To enable just type no crap in your script.
+
+    use crap disables strict and warnings and restores previous settings to
+    STDOUT bufferingness.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

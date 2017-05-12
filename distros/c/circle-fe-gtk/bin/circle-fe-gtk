@@ -1,0 +1,304 @@
+#!/usr/bin/perl -w
+
+#  You may distribute under the terms of the GNU General Public License
+#
+#  (C) Paul Evans, 2008-2013 -- leonerd@leonerd.org.uk
+
+use strict;
+use warnings;
+
+use Glib qw( TRUE FALSE );
+use Gtk2 qw( init );
+
+use Net::Async::Tangence::Client;
+
+use Circle::FE::Gtk::Tab;
+
+use IO::Async 0.14;
+use IO::Async::Loop::Glib;
+
+use Getopt::Long;
+
+use List::Util qw( max first );
+
+my $accelgrp;
+
+sub setup_menu
+{
+   my ( $menushell, $items ) = @_;
+
+   foreach my $i ( 0 .. $#$items/2 ) {
+      my ( $name, $ref ) = @{$items}[$i*2, $i*2+1];
+
+      my $code;
+      my $subitems;
+
+      my $accelpath;
+      my ( $accelkey, $accelmod );
+
+      if( ref $ref eq "HASH" ) {
+         $code     = $ref->{code};
+         $subitems = $ref->{subitems};
+
+         $accelpath = "<Circle>/$ref->{accelpath}";
+         $accelkey = Gtk2::Gdk->keyval_from_name( $ref->{keyname} );
+         $accelmod = $ref->{mod};
+      }
+      elsif( ref $ref eq "CODE" ) {
+         $code = $ref;
+      }
+      elsif( ref $ref eq "ARRAY" ) {
+         $subitems = $ref;
+      }
+
+      my $mi = Gtk2::MenuItem->new( $name );
+
+      if( defined $accelpath ) {
+         if( defined $accelkey and defined $accelmod ) {
+            Gtk2::AccelMap->add_entry( $accelpath, $accelkey, $accelmod );
+         }
+
+         $mi->set_accel_path( $accelpath );
+      }
+
+      if( $code ) {
+         $mi->signal_connect( activate => $code );
+      }
+      elsif( $subitems ) {
+         my $submenu = Gtk2::Menu->new();
+         $mi->set_submenu( $submenu );
+
+         $submenu->set_accel_group( $accelgrp );
+
+         setup_menu( $submenu, $subitems );
+      }
+
+      $menushell->append( $mi );
+   }
+}
+
+my $loop = IO::Async::Loop::Glib->new();
+
+my $IDENTITY;
+
+GetOptions(
+   'identity|i=s' => \$IDENTITY,
+) or exit 1;
+
+my $URL = shift @ARGV or die "Need URL as argv[1]\n";
+
+if( !defined $IDENTITY ) {
+   my $hostname = `hostname -f`; chomp $hostname;
+   $IDENTITY = $ENV{USER} . "@" . $hostname . "/GTK2";
+}
+
+my $conn = Net::Async::Tangence::Client->new(
+   identity => $IDENTITY,
+
+   on_closed => sub {
+      print STDERR "Connection closed\n";
+      exit(0);
+   },
+
+   on_error => sub { print STDERR "Received MSG_ERROR: $_[0]\n"; },
+);
+
+$loop->add( $conn );
+
+my $mainwin = Gtk2::Window->new();
+$mainwin->set_title( "Circle" );
+
+$mainwin->signal_connect( 'delete-event' => sub { $loop->loop_stop; } );
+
+$accelgrp = Gtk2::AccelGroup->new();
+
+$mainwin->add_accel_group( $accelgrp );
+
+my $top_vbox = Gtk2::VBox->new();
+$mainwin->add( $top_vbox );
+
+my $menu = Gtk2::MenuBar->new();
+$top_vbox->pack_start( $menu, FALSE, TRUE, 0 );
+
+setup_menu( $menu,
+   [ "Circle" => [
+        "Quit" => sub { $loop->loop_stop },
+        ],
+     "Tab" => Circle::FE::Gtk::Tab::gen_menu(),
+   ]
+);
+
+my $notebook = Gtk2::Notebook->new();
+$top_vbox->pack_start( $notebook, TRUE, TRUE, 0 );
+
+$notebook->set_tab_pos( 'bottom' );
+$notebook->can_focus( FALSE );
+
+my $surpress_switch_page = 0;
+
+my @tabs;
+
+$notebook->signal_connect( 'switch-page' => sub {
+   my ( undef, $page, $pagenum ) = @_;
+   return if $surpress_switch_page;
+
+   my $tab = $Circle::FE::Gtk::Tab::current_tab = $tabs[$pagenum];
+   $tab->activated;
+
+   return 1; # Again again...
+} );
+
+my $tabkeys = "1234567890".
+              "qwertyuiop".
+              "sdfghjkl;'".
+              "zxcvbnm,./";
+
+$notebook->signal_connect( 'key-press-event' => sub {
+   my ( undef, $event ) = @_;
+
+   my $key = $event->keyval;
+   my $mod = $event->state & [ 'shift-mask', 'control-mask', 'mod1-mask' ];
+
+   if( $key == ord("a") and $mod == 'mod1-mask' ) {
+      activate_next_active_tab();
+      return 1;
+   }
+   elsif( $key < 128 and $mod == 'mod1-mask' and
+          ( my $pagenum = index( $tabkeys, chr($key) ) ) > -1 ) {
+      $notebook->set( "page", $pagenum );
+   }
+
+   return 0;
+} );
+
+$conn->connect_url( $URL );
+
+$mainwin->show_all;
+
+my $rootobj;
+$loop->loop_once until $rootobj = $conn->rootobj;
+
+my $session;
+$rootobj->call_method(
+   method => "get_session",
+   args   => [ [ 'tabs' ] ],
+   on_result => sub {
+      ( $session ) = @_;
+   }
+);
+$loop->loop_once until $session;
+
+$session->watch_property(
+   property => "tabs",
+   on_set => sub {
+      my ( $objarray ) = @_;
+
+      # A bug in GTK perhaps? If there's no current page
+      # selected before we add any, then every page gets the
+      # 'switch-page' signal fired on it when we add them.
+      my $old_surpress_switch_page = $surpress_switch_page;
+      $surpress_switch_page = 1 if $notebook->get_current_page == -1;
+
+      $notebook->remove_page( 0 ) while $notebook->get_n_pages > 0;
+      @tabs = ();
+
+      foreach my $obj ( @$objarray ) {
+         my $tab = new_tab( $obj );
+         $notebook->append_page( $tab->get_widget, $tab->get_label );
+         push @tabs, $tab;
+      }
+
+      $surpress_switch_page = $old_surpress_switch_page;
+      $notebook->show_all;
+   },
+   on_push => sub {
+      my ( @new ) = @_;
+      foreach my $obj ( @new ) {
+         my $tab = new_tab( $obj );
+         $notebook->append_page( $tab->get_widget, $tab->get_label );
+         push @tabs, $tab;
+      }
+      $notebook->show_all;
+   },
+   on_shift => sub {
+      my ( $count ) = @_;
+      # Unlikely to actually be used, but we'll implement it anyway
+      $notebook->remove_page( 0 ) for 1 .. $count;
+      shift @tabs;
+   },
+   on_splice => sub {
+      my ( $index, $count, @objs ) = @_;
+      
+      $notebook->remove_page( $index ) for 1 .. $count;
+
+      my @newtabs;
+
+      foreach my $i ( 0 .. $#objs ) {
+         my $tab = new_tab( $objs[$i] );
+         $notebook->insert_page( $tab->get_widget, $tab->get_label, $index + $i );
+         push @newtabs, $tab;
+      }
+
+      splice @tabs, $index, $count, @newtabs;
+      $notebook->show_all;
+   },
+   on_move => sub {
+      my ( $index, $delta ) = @_;
+
+      $notebook->reorder_child( $tabs[$index]->get_widget, $index + $delta );
+
+      splice @tabs, $index+$delta, 0, ( splice @tabs, $index, 1, () );
+   },
+   want_initial => 1,
+);
+
+$loop->loop_forever;
+
+sub new_tab
+{
+   my ( $obj ) = @_;
+
+   my $tab = Circle::FE::Gtk::Tab->new(
+      object => $obj,
+   );
+
+   if( $obj->proxy_isa( "Circle.RootObj") ) {
+      $tab->set_label_text( "Global" );
+   }
+   else {
+      $obj->watch_property(
+         property => "tag",
+         on_set => sub {
+            my ( $newtag ) = @_;
+            $tab->set_label_text( $newtag );
+         },
+         want_initial => 1,
+      );
+   }
+
+   my $widget = $tab->get_widget;
+
+   $obj->subscribe_event(
+      event => "destroy",
+      on_fire => sub {
+         while( ( my $pagenum = $notebook->page_num( $widget ) ) > -1 ) {
+            $notebook->remove_page( $pagenum );
+         }
+      }
+   );
+
+   return $tab;
+}
+
+sub activate_next_active_tab
+{
+   my @otherindexes = ( $notebook->get("page") + 1 .. $#tabs, 0 .. $notebook->get("page") - 1 );
+
+   my $maxlevel = max map { $tabs[$_]->{object}->prop("level") } @otherindexes;
+
+   return unless $maxlevel;
+
+   my $next = first { $tabs[$_]->{object}->prop("level") == $maxlevel } @otherindexes;
+
+   $notebook->set( "page", $next );
+}

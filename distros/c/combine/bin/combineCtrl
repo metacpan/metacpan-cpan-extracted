@@ -1,0 +1,264 @@
+#! /usr/bin/perl
+
+## $Id: combineCtrl 234 2007-02-21 10:34:59Z anders $
+
+# Copyright (c) 1996-1998 LUB NetLab, 2002-2005 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Getopt::Long;
+use Combine::SD_SQL;
+use Combine::Config;
+
+my $configfile;
+my $jobname;
+my $nHarvPars;
+my $help;
+GetOptions('jobname:s' => \$jobname,
+	   'harvesters:i' => \$nHarvPars, 'help' => \$help, 
+	   'configfile:s' => \$configfile );
+if (defined($help)) { Getopt::Long::HelpMessage('See man page combineCtrl'); }
+if (defined($jobname)) { Combine::Config::Init($jobname); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+
+my $access_sd = new Combine::SD_SQL;
+my $pidDir = "/var/run/combine/$jobname";
+
+if    ($ARGV[0] eq "open")    { print $access_sd->open; }
+elsif ($ARGV[0] eq "stat")    { print $access_sd->stat; }
+elsif ($ARGV[0] eq "load")    { 
+    my $n=0;
+    while (<STDIN>) {
+	if (/(https?:\/\/[^\s\"><]+)/) {
+	    my $url = $1;
+	    $access_sd->putNorm($url);
+	    $n++
+	    }
+    }
+    print "Added $n URLs to the harvest-queue\n";
+}
+elsif ($ARGV[0] eq "start") {
+    print $access_sd->initMemoryTables;
+    $nHarvPars = 1 unless $nHarvPars;
+    print "Starting $nHarvPars combine harvesters/parsers with name=$jobname\n";
+    for (my $i = 1; $i <= $nHarvPars; $i++) {
+	my $j = "$i\_$jobname";
+	system("combineRun $pidDir/combineRun_$j combine --jobname $jobname --logname $j &");
+    }
+    print "OK\n";
+}
+elsif ($ARGV[0] eq "kill") {
+    sub KillPars {
+	my $header = shift();
+	my $files = shift();
+	my $killOpt = shift();
+	
+	$files = `ls $files`;
+	$files =~ tr/\n/ /;
+	if ($files ne '') {
+	    print "KILL: Killing $header...\n";
+	    my $procs = `cat $files`;
+	    $procs =~ tr/\n/ /;
+	    if ($procs =~ /\d\d\d/ ) { `(kill $killOpt $procs; rm $files)`; }
+	} else {
+	    print "WARN Can't find anything for $header in $files\n";
+	}
+    }
+    KillPars('combineRun', "$pidDir/combineRun*");
+    KillPars('combine',      "$pidDir/combine*");
+    print "KILL-ALL: Done\n";
+}
+elsif ($ARGV[0] eq "howmany") { print $access_sd->howmany; }
+elsif ($ARGV[0] eq "recyclelinks")    { print $access_sd->RecycleNew; }
+elsif ($ARGV[0] eq "reharvest")    { print $access_sd->RecycleOld; }
+elsif ($ARGV[0] eq "close")   { print $access_sd->sd_close(); }
+elsif ($ARGV[0] eq "stop")    { print $access_sd->stop; }
+elsif ($ARGV[0] eq "pause")   { print $access_sd->pause; }
+elsif ($ARGV[0] eq "continue") { print $access_sd->continue; }
+elsif ($ARGV[0] eq "initMemoryTables")    { print $access_sd->initMemoryTables; }
+elsif ($ARGV[0] eq "exit")    { print $access_sd->exit; }
+elsif ($ARGV[0] eq "get")     { print $access_sd->get; }
+elsif ($ARGV[0] eq "sort")    { print $access_sd->sort; }
+elsif ($ARGV[0] eq "hosts")   { print $access_sd->hosts; }
+elsif ($ARGV[0] eq "records")   { print $access_sd->recordsNo; }
+elsif ($ARGV[0] eq "algorithm")   { 
+    Getopt::Long::HelpMessage('Algorithm not supported yet');
+   if ( $#ARGV == 1 ) {
+      if ( $ARGV[1] eq "roundrobin" ) {
+         print $access_sd->algorithm(1);
+      } elsif ( $ARGV[1] eq "sorted" ) {
+         print $access_sd->algorithm(2);
+      } elsif ( $ARGV[1] eq "slightly_sorted" ) {
+         print $access_sd->algorithm(3);
+      } elsif ( $ARGV[1] eq "site" ) {
+         print $access_sd->algorithm(4);
+      } else {
+        Getopt::Long::HelpMessage('No valid algorithm');
+      }
+   } else {
+        Getopt::Long::HelpMessage('Algorithm');
+   } 
+}
+else {
+    $access_sd->sd_close; 
+    Getopt::Long::HelpMessage('No valid action');
+}
+
+$access_sd->sd_close; 
+
+__END__
+
+
+=head1 NAME
+
+combineCtrl - controls a Combine crawling job
+
+
+=head1 SYNOPSIS
+
+combineCtrl  <action> --jobname <name>
+
+where action can be one of start, kill, load, recyclelinks, reharvest, stat,
+howmany, records, hosts, initMemoryTables, open, stop, pause, continue
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+=head2 Actions starting/killing crawlers
+
+=over 4
+
+=item start
+
+takes an optional switch C<--harvesters n> where C<n> is the number of
+crawler processes to start
+
+=item kill
+
+kills all active crawlers (and their associated combineRun monitors) for jobname
+
+=back
+
+=head2 Actions loading or recycling URLs for crawling
+
+=over 4
+
+=item load
+
+Read a list of URLs from STDIN (one per line) and schedules them for crawling
+
+=item recyclelinks
+
+Schedule all newly found (since last invocation of recyclelinks) 
+links in crawled pages for crawling
+
+=item reharvest
+
+Schedules all pages in the database for crawling again (in order to check if
+they have changed)
+
+=back
+
+=head2 Actions for controlling scheduling of URLs
+
+=over 4
+
+=item open
+
+opens database for URL scheduling (maybe after a stop)
+
+=item stop
+
+stops URL scheduling
+
+=item pause
+
+pauses URL scheduling
+
+=item continue
+
+continues  URL scheduling after a pause
+
+=back
+
+=head2 Misc actions 
+
+=over 4
+
+=item stat
+
+prints out rudimentary status of the ready queue (ie eligible now) of URLs to be crawled
+
+=item howmany
+
+prints out rudimentary status of all URLs to be crawled
+
+=item records
+
+prints out the number of ercords in the SQL database
+
+=item hosts
+
+prints out rudimentary status of all hosts that have URLs to be crawled
+
+=item initMemoryTables
+
+initializes the administrative MySQL tables that are kept in memory
+
+=back
+
+=head1 DESCRIPTION
+
+Implements various control functionality to administer a crawling job,
+like starting and stoping crawlers, injecting URLs into the crawl queue,
+scheduling newly found links for crawling, controlling scheduling, etc.
+
+This is the preferred way of controling a crawl job.
+
+=head1 EXAMPLES
+
+=over 4
+
+=item C<echo 'http://www.yourdomain.com/' | combineCtrl load --jobname aatest>
+
+Seed the crawling job C<aatest> with a URL
+
+=item C<combineCtrl start --jobname aatest --harvesters 3>
+
+Start 3 crawling processes for job C<aatest>
+
+=item C<combineCtrl recyclelinks --jobname aatest> 
+
+Schedule all new links crawling
+
+=item C<combineCtrl stat --jobname aatest> 
+
+See how many URLs that are eligible for crawling right now.
+
+=back
+
+=head1 SEE ALSO
+
+combine
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

@@ -1,0 +1,12 @@
+MANIFEST
+META.yml
+META.json
+Build.PL
+Makefile.PL
+Changes
+README
+eg/constant.pl
+lib/constant/tiny.pm
+t/00-load.t
+t/constant.t
+t/pod.t

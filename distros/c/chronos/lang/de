@@ -1,0 +1,166 @@
+# $Id: de,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Peer Oliver Schmidt <pos@theinternet.de>
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Monat
+week=Woche
+Day=Tag
+today=Heute
+myagenda=Mein Kalender
+status_UNCONFIRMED=UNBESTÄTIGT
+status_CONFIRMED=BESTÄTIGT
+status_CANCELED=ABGEBROCHEN
+eventname=Termin Titel:
+eventstart=Start:
+eventend=Ende:
+eventdescription=Beschreibung:
+eventrecur=Wiederholung:
+eventnotrecur=Nicht Wiederholen
+eventrecurweek=Diesen Tag jede Woche
+eventrecurmonth=Diesen Tag jeden Monat
+eventrecuryear=Diesen Tag jedes Jahr
+eventrecurend=Ende der Wiederholungen:
+eventparticipants=Teilnehmer:
+eventconfirm=Bestätigung erbitten?:
+eventsave=Speichern
+errorstartdate=Startdatum ist nicht korrekt.
+errorstarttime=Startzeit ist nicht korrekt.
+errorenddate=Endedatum ist nicht korrekt.
+errorendtime=Endezeit ist nicht korrekt.
+errorrecurenddate=Datum Ende Wiederholung ist nicht korrekt.
+errorrecurendtime=Zeit Ende Wiederholung ist nicht korrekt.
+errorendbeforestart=Ende ist vor dem Start.
+errorrecurendbeforestart=Wiederholungsende ist vor dem Start.
+errorrecurendbeforeend=Wiederholungsendezeit ist vor der Endezeit.
+errormissingname=Der Termin hat keinen Titel.
+reminder=Erinnerung:
+remind_me=Erinnere mich via eMail %1 %2 vor dem Terminstart.
+min=Minute(n)
+hour=Stunde(n)
+day=Tag(e)
+error=Fehler
+weeknum=Woche %1 des Jahres %2
+weeknum2=Woche %1 in %2
+eventdel=Löschen
+initiator=Termin Planer
+cancel=Abbruch
+confirm=Bestätigung
+confirm_subject=Bestätigung
+confirm_body=<<EOF
+Dies ist eine automatisch erstellte Nachricht. Bitte nicht
+direkt antworten.
+
+%%INITIATOR%% erbittet die Teilnahme am %%DATE%%.
+Titel des Termins: %%NAME%%
+Beschreibung: %%DESCRIPTION%%
+
+Bitte die Teilnahme bestätigen.
+
+-- 
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+errornotauthorized=Sie sind für diese Aktion nicht zugelassen.
+tasklist=Aufgabenliste
+tasktitle=Titel:
+tasknotes=Notiz:
+taskpriority=Priorität:
+newtask=Aufgabe hinzufügen
+options=Optionen
+userprefs=Benutzer Voreinstellungen
+lang=Sprache:
+agendatype=Kalender Typ:
+publicrw=Öffentlich zum Lesen und Schreiben
+publicr=Öffentlich zum Lesen
+private=Privat
+indivpriv=Individuelle Rechte:
+nopriv=Keine Rechte
+r=Lesen
+rw=Lesen/Schreiben
+email=Email Adresse:
+name=Name:
+password=Kennwort:
+create_db_intro=<<EOF
+Dieses Skript wird die notwendigen Tabellen für Chronos in MySQL erstellen
+
+EOF
+create_db_pass=root's MySQL Kennwort:
+create_db_dbname=Chronos' Datenbankname: [chronos]
+create_db_exists=Die Datenbank existiert schon. Löschen?
+create_db_deleted=Datenbank %s gelöscht
+create_db_created=Datenbank %s erstellt
+create_db_tablecreated=Tabelle %s erstellt
+create_db_user=Benutzername um mit der Datenbank zu kommunizieren: [chronos]
+create_db_dbpass=Kennwort: [random]
+create_db_grant=Rechte für %s auf %s erteilt.*
+create_db_added=Informationen wurden zu /etc/chronos.conf hinzugefügt.
+create_db_success=Chronos Installation erfolgreich beendet.
+chronosadmin_usage=<<EOF
+Benutzung:
+    %s [-u benutzername] [-p [kennwort]] [--autodel] [--new-user]
+    [--new-users-batch[=DATEI]] [--del-user=benutzername] [database[@host]]
+
+Options:
+    -u benutzername
+        Der Name um sich mit der Datenbank zu verbinden.
+    -p password
+        Das Kennwort zur Anmeldung an die Datenbank.
+    --autodel
+        Löschen wird ohne Rückfragen durchgeführt. Hilfreich in 
+        Batchjobs.
+    --new-user
+        Einen neuen Benutzer interaktiv anlegen.
+    --new-users-batch[=DATEI]
+        Neue Benutzer mit Hilfe einer Datei (bzw über STDIN) anlegen. Pro Zeile:
+            benutzername,kennwort,email,zugriffsrechte(rw)
+    --del-user=benutzername
+        Einen Benutzer löschen
+EOF
+chronosadmin_exists=Der Benutzer %s existiert schon. Löschen?
+chronosadmin_created=Benutzer %s erstellt
+chronosadmin_deleted=Benutzer %s gelöscht
+chronosadmin_confirm=Bestätigung:
+chronosadmin_pass=Kennwort
+chronosadmin_username=Benutzername (max 16 Charakter)
+chronosadmin_email=Email Adresse
+chronosadmin_lang=Sprache
+chronosadmin_realname=Vollständiger Name
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Erinnerung
+
+Dies ist eine automatisch erstellte Nachricht. Bitte nicht
+direkt antworten.
+
+Ich erinnere daran, dass der folgende Termin bald beginnt:
+
+Titel:  %%NAME%%
+Start:  %%START%%
+Ende:   %%END%%
+Beschreibung:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+en=Englisch
+fr=Französich
+it=Italienisch
+de=Deutsch

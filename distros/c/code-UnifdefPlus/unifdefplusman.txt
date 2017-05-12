@@ -1,0 +1,157 @@
+unifdef(1) - Linux man page
+
+
+Name
+
+unifdef+ - resolve and simplify preprocessor conditionals in C/C++, makefiles and Kconfig files.
+
+
+Synopsis
+
+      unifdef+ [options] file
+      unifdef+ [options] -F file
+      unifdef+ [options] [-I file] [-O file]
+      unifdef+ --version
+
+
+Description
+
+The unifdef+ utility takes in a list of defined or undefined symbols, and uses these to simplify preprocessor conditials (or their equivalents) within c, c++, makefile and kconfig files.    
+
+For C or C++, unifdef+ acts on #if, #ifdef, #ifndef, #elif, #else and #endif lines.  It will simplify any expressions on said lines based on a list of symbols which are marked as defined or undefined.  It will not simplify any part of any expression that does not contain any of the passed in defines.   If the expression is resolved to either a TRUE or FALSE statement, unifdef+ will remove the conditional directive, and remove any inactive code.    For the c/c++ languages, unifdef+ is smart about preserving any whitespace or comments within simplified directives.
+
+For Kconfig files, unifdef+ will process if statements and depends on statements.   For each of these, it will take the expression and attempt to simplify it according to the passed in variables.  For depends-on statements, If the expression resolves to false, it will remove the entire entry.   If the expression resolves to true, it will remove the depends-on line.   For if statements, at the end of a line, it will remove the line if the expression resolves to false, or remove the if if the expression resolves to true.   For if/else/endif directives, it will remove any inactive parts.
+
+For Makefiles, it will attempt to resolve any ifdef, ifeq or ifneq statements.   It attempts to simplify the expression.   It should be noted, that at the time of writing this, unifdef+ only supports the $(or ...), $(and...), $(strip ...) makefile functions.   See limitations at the bottom of this man page.
+
+The purpose of unifdef+ is to help manage features within code.   If proper conventions are followed, a feature can be removed completely from a tree using the unifdef+ utility.   It can also be used to generate patch files used for porting.
+
+
+Available options:
+
+-D name[=val]	
+declare name as defined.  All compiler directives related to name will be simplified as if name was defined as val.  If val is not specified, a value of 'y' will be assumed.  This option may be repeated multiple times
+
+-U name	
+declare name as undefined.  All compiler directives related to name will be simplified as if name was undefined.  This option may be repeated multiple times.
+
+-I filename	
+take input from filename
+
+-O filename	
+Send output to filename
+
+-F filename	
+Modify filename in place
+
+--simplifiedonly	
+Only output lines within a simplified #if/#elif/#else/#endif clause
+
+--lang=language	
+Specify the language being used.   Currently supported languages include C, Makefile, Kconfig, KMakefile (note, for C++, use C).   Kmakefile is the same as Makefile, except it simplifies obj-$(VAR) statements as well.  If not specified, unifdef+ will attempt to determine the language based on the input file name from either the -I or -F option, or, failing this, will default to C
+
+--dbg	
+run with debugging enabled
+
+--help	
+outputs usage help
+
+--version	
+outputs the current version of unifdef+
+
+      
+
+Example:
+
+unifdef+ -D VER=5 -U FOO somefile.c
+
+This will update somefile.c, and replace any #if conditionals using the FOO or the VER macros.   So, if the file looked as so:
+
+    /* somefile.c -- example file */  
+    #if 0
+    /* This line is NOT removed, as unifdef does not simplify statements
+       which do not contain the passed in macros. */
+    #endif
+
+    #if defined(FOO)
+    /* this line will be removed, as foo is known to not be defined */
+    #elif (VER > 4 && SUBVER < 3 + 2)
+    /* The above conditional will be simplified, but because
+       SUBVER is not known, it will not be removed. */
+    #else
+    /* This line will remain as well, as SUBVER is not known */
+    #endif
+
+It would resolve to:
+
+    /* somefile.c -- example file */
+
+    #if 0
+    /* This line is NOT removed, as unifdef does not simplify statements
+       which do not contain the passed in macros. */
+    #endif
+
+    #if (SUBVER < 3 + 2) 
+    /* The above conditional will be simplified, but because
+       SUBVER is not known, it will not be removed.  */
+    #else
+    /* This line will remain as well, as SUBVER is not known */
+    #endif
+
+Of course, unifdef+ is much more powerful than this.  It preserves whitespace and comments in the conditionals, follows order of operations, will work with nested directives, etc.
+
+
+History:
+
+unifdef+ was originally written by John Ulvr at Broadcom, then pushed to opensource.   It was used to track modifications made to the Linux Kernel.   The tool is based on the unifdef tool.  Unlike its predicessor, unifdef+ can handle much more complex conditional expressions, and is able to simplify them without sacrificing readability.   It was later modified to handle Kconfig files and Makefiles.
+
+
+Exit Status:
+
+The unifdef+ utility returns 0 if the output is not modified, 1 if the output is modified, or 2 if it has trouble parsing the input.
+
+
+See Also
+
+unifdef(1), diff(1)
+
+
+Usage:
+
+The unifdef+ tool is intended to track features within large code trees.   Using the tool, you can easily generate patches for a particular feature, or remove a feature entirely out of a code tree.  One common convention used with unifdef, is to do something similar to the following:
+
+    #ifdef SOME_FEATURE
+    // new code
+    #else
+    // original code
+    #endif
+If you follow this convention, if you run unifdef+ -USOME_FEATURE, you will end up with exactly your original code.  This makes it simple to selectively distribute features to various parties, or to remove features once they have become depricated.   In addition, it is also simple to write a script to enforce this convention (run unifdef+, and do a diff between the result and the original file).    This was originally used with a high degree of success to track hundreds of modifications to the Linux kernel code.
+
+
+Limitations:
+
+The C/C++ version is complete as far as I can tell (please let me know if I missed something).   That being said, if you ran unifdef+ -UFOO on the the following:
+
+    #ifdef FOO
+    #define FOOBAR
+    #endif
+
+    #ifdef FOOBAR
+    /* this line will NOT be removed */
+    #endif
+
+it will not remove the #ifdef FOOBAR statement or body.   This is done on purpose, and if your code does use these type of conventions, you need to manually remove the references to FOOBAR (you could use unifdef+ -U FOOBAR for that of course).
+
+The Makefile removal is still quite young, and does not process functions outside of $(or ..), $(and ..), or $(strip ..).   These functions, however, should be sufficient to implement most functionality.   It also does not process anything within expanded macros/functions.   Furthermore, it will not evaluate complex expressions as being unequal.   For example, if you had ifeq "$(FOO)_XX" "$(BAR)_YY" for some unknown $(FOO) and $(BAR), it would not be able to determine that this should resolve to false.   It is planned to have this remove any obj-$(FOO) += file.c  lines in the future for Kbuild makefiles (where FOO is defined as n or undefined), but this is not yet implemented. 
+
+For Kconfig files, it undersands and can resolve tristate expressions, and it still follows order of operations.  That being said, for if/else/endif statements, it simply removes the code in between (whereas the real kconfig processor actually appends the if statement to all lines in  the body and the processes them).   In particular, if you have an include inside of an if/endif body, it does not expand the include file, and will not warn the user that the file is no longer included.
+
+
+Known Bugs:
+
+(as of version 0.5)
+* whitespace immediately after opening brace or before closing brace in c files is not preserved
+
+If you discover any other bugs, please let me know at perldev@ulvr.com
+
+

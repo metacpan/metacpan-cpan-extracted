@@ -1,0 +1,58 @@
+---
+abstract: 'Terminal frontend for the C<Circle> application host'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: circle-fe-term
+provides:
+  Circle::FE::Term:
+    file: lib/Circle/FE/Term.pm
+    version: '0.170850'
+  Circle::FE::Term::Ribbon:
+    file: lib/Circle/FE/Term/Ribbon.pm
+  Circle::FE::Term::Ribbon::horizontal:
+    file: lib/Circle/FE/Term/Ribbon.pm
+  Circle::FE::Term::Tab:
+    file: lib/Circle/FE/Term/Tab.pm
+  Circle::FE::Term::Widget::Box:
+    file: lib/Circle/FE/Term/Widget/Box.pm
+  Circle::FE::Term::Widget::Entry:
+    file: lib/Circle/FE/Term/Widget/Entry.pm
+  Circle::FE::Term::Widget::Entry::Widget:
+    file: lib/Circle/FE/Term/Widget/Entry.pm
+  Circle::FE::Term::Widget::Label:
+    file: lib/Circle/FE/Term/Widget/Label.pm
+  Circle::FE::Term::Widget::Scroller:
+    file: lib/Circle/FE/Term/Widget/Scroller.pm
+  Circle::FE::Term::Widget::Scroller::Widget:
+    file: lib/Circle/FE/Term/Widget/Scroller.pm
+requires:
+  Convert::Color: '0.06'
+  Convert::Color::XTerm: '0'
+  File::ShareDir: '1.00'
+  IO::Async: '0.14'
+  Net::Async::Tangence::Client: '0.13'
+  String::Tagged: '0'
+  Tangence::ObjectProxy: 0.20_001
+  Text::Balanced: '0'
+  Tickit: '0.55'
+  Tickit::Async: '0'
+  Tickit::Event: '0.58'
+  Tickit::Style: '0.40'
+  Tickit::Term: '0.27'
+  Tickit::Widget::Entry: '0.20'
+  Tickit::Widget::HBox: '0.32'
+  Tickit::Widget::Scroller: '0.15'
+  Tickit::Widget::Tabbed: '0.019'
+  Tickit::Widget::VBox: '0.31'
+  Tickit::Window: '0.42'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.170850'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

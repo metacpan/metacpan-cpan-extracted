@@ -1,0 +1,144 @@
+class Circle.Commandable {
+  method do_command(str);
+}
+
+class Circle.WindowItem {
+  isa Circle.Commandable;
+
+  event raise();
+
+  method reset_level();
+  method get_widget() -> obj;
+
+  smashed prop tag = str;
+  smashed prop level = int;
+}
+
+class Circle.RootObj {
+  isa Circle.WindowItem;
+
+  method get_session(list(str)) -> obj;
+
+  event network_added(obj);
+
+  prop networks = hash of obj;
+}
+
+class Circle.Session.Tabbed {
+  prop tabs = array of obj;
+
+  event raise_item(obj);
+}
+
+class Circle.Net.IRC {
+  isa Circle.WindowItem;
+
+  method get_isupport(str) -> any;
+
+  event connected();
+  event disconnected();
+
+  prop nick = str;
+  prop away = bool;
+  prop channels = objset of obj;
+  prop users    = objset of obj;
+}
+
+class Circle.Net.IRC.Target {
+  isa Circle.WindowItem;
+
+  method msg(str);
+  method notice(str);
+  method act(str);
+
+  event msg(str,str);
+  event notice(str,str);
+  event act(str, str);
+
+  smashed prop name = str;
+  smashed prop net = obj;
+  smashed prop real = bool;
+}
+
+class Circle.Net.IRC.User {
+  isa Circle.Net.IRC.Target;
+
+  event change_nick(str,str,str,str);
+
+  prop ident = str;
+  prop presence = str;
+}
+
+class Circle.Net.IRC.Channel {
+  isa Circle.Net.IRC.Target;
+
+  method mode(str,list(str));
+  method topic(str);
+
+  event self_joined();
+  event self_parted();
+  event join(str);
+  event part(str,str);
+  event kick(str,str,str);
+  event topic(str,str);
+
+  prop topic = str;
+  prop occupants = hash of dict(any);
+  prop occupant_summary = hash of int;
+  prop my_flag = str;
+  prop mode = hash of str;
+  prop modestr = str;
+}
+
+class Circle.Net.Raw {
+  isa Circle.WindowItem;
+
+  event connected(str,int);
+  event disconnected();
+
+  prop connected = bool;
+}
+
+class Circle.Widget {
+  smashed prop classes = array of str;
+  smashed prop focussed = bool;
+}
+
+class Circle.Widget.Box {
+  isa Circle.Widget;
+
+  smashed prop orientation = str; # TODO: enumeration
+  smashed prop children = array of dict(any);
+}
+
+class Circle.Widget.Entry {
+  isa Circle.Widget;
+
+  method enter(str);
+
+  smashed prop autoclear = bool;
+  prop text = str;
+  prop history = queue of str;
+
+  prop completions = objset of obj;
+}
+
+class Circle.Widget.Entry.CompleteGroup {
+  smashed prop only_at_sol = bool;
+  smashed prop prefix_sol = str;
+  smashed prop suffix_sol = str;
+
+  smashed prop items = array of str;
+}
+
+class Circle.Widget.Label {
+  isa Circle.Widget;
+
+  prop text = str;
+}
+
+class Circle.Widget.Scroller {
+  isa Circle.Widget;
+
+  prop displayevents = queue of list(any);
+}

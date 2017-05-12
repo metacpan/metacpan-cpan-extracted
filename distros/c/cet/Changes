@@ -1,0 +1,11 @@
+2.00 - 2013-11-06 15:26:50
+       initial distribution
+
+2.01 - 3013-11-10 14:16:10
+       added a forgotten PREREQ_PM
+
+2.02 - 2013-11-24 17:42:18
+       Modified Make and Install process
+       in hopes of being less error prone
+       Also renamed the script to cet, and
+       hence the distribution.

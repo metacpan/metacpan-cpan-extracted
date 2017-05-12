@@ -1,0 +1,46 @@
+Revision history for circular-require
+
+0.12  2016-03-17
+      - test changes only; elininate some order-of-loading problems
+
+0.11  2013-07-24
+      - convert to Devel::OverrideGlobalRequire
+
+0.10  2013-01-09
+      - stop using deprecated Package::Stash api
+
+0.09  2012-01-07
+      - fix some bugs in require VERSION when circular::require is loaded
+        (reported by Exodist)
+
+0.08  2012-01-06
+      - loading B on demand causes issues, stop doing that
+      - deleting CORE::GLOBAL::require on "use circular::require" makes require
+        calls that were already bound stop working, stop doing that (it's
+        unnecessary now that we're dynamic scoped anyway)
+      - bump the perl version requirement to 5.10, since the hint hash didn't exist before then
+        - i'd be willing to accept patches to restore the functionality on 5.8,
+          i just don't feel like writing it myself
+
+0.07  2012-01-06
+      - make this module use dynamic scope rather than being entirely global
+
+0.06  2012-01-06
+      - show the entire cycle in the warning
+
+0.05  2012-01-04
+      - allow using -hide to avoid reporting unhelpful packages in the error
+        message (Exodist)
+      - fix a bunch more bugs
+
+0.04  2011-12-19
+      - fix the previous workaround (Exodist)
+
+0.03  2011-07-18
+      - work around annoying base.pm behavior (reported by wooster)
+
+0.02  2011-01-25
+      - handle 'require VERSION' properly on 5.8 (ether)
+
+0.01  2011-01-25
+      - Initial release

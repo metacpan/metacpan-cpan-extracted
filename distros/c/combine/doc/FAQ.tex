@@ -1,0 +1,271 @@
+\section{Frequently asked questions}
+\label{faq}
+\begin{enumerate}
+\item What does the message 'Wide character in subroutine entry ...' mean?
+
+That something is horribly wrong with the character encoding of this page.
+
+\item What does the message 'Parsing of undecoded UTF-8 will give garbage when decoding entities ...' mean?
+
+That something is wrong with character decoding of this page.
+
+\item I can't figure out how to restrict the crawler to pages below
+'{\tt http://www.foo.com/bar/}'?
+
+ Put an
+appropriate regular expression in the <allow> section of the configuration
+file. Appropriate means
+a Perl regular expression, which means that you have to escape special
+characters. Try with\\
+\verb+URL http:\/\/www\.foo\.com\/bar\/+
+
+
+\item I have a simple configuration variable set, but Combine does not obey it?
+
+Check that there are not 2 instances of the same simple configuration
+variable in the same configuration file. Unfortunately this will break
+configuration loading.
+
+
+\item If there are multiple <allow> entries, must an
+URL fit all or any of them?
+
+A match to any of the entries will make that URL allowable for crawling.
+You can use any mix of HOST: and URL entries
+
+\item It would also be nice to be able to crawl local files.
+
+Presently the crawler only accepts HTTP, HTTPS, and FTP as protocols.
+
+\item \label{slowcrawl}
+Crawling of a single host is VERY slow.
+Is there some way for me to speed the crawler up?
+
+
+Yes it's one of the built-in limitations to keep the crawler beeing 'nice'.
+It will only access a particular server once every 60 seconds by default.
+You can change the default by adjusting the following configuration variables,
+but please keep in mind that you increase the load on the server.\\
+WaitIntervalSchedulerGetJcf=2\\
+WaitIntervalHost = 5\\
+
+
+\item Is it possible to crawl only one single web-page?
+
+Use the command:\\
+\verb+combine --jobname XXX --harvesturl http://www.foo.com/bar.html+
+
+\item How can I crawl a fixed number of link steps from a set of seed
+pages?
+For example one web-page and all local links on that web-page (and not
+any further?
+
+Initialize the database and load the seed pages. Turn of automatic
+recycling of links  by setting the simple configuration variable
+'AutoRecycleLinks' to 0.
+
+
+Start crawling and stop when '{\tt combineCtrl --jobname XXX howmany}'
+equals 0.
+
+Handle recycling manually using 'combineCtrl, with action 'recyclelinks'.
+%(see section \ref{combineCtrl}).
+(Give the command {\tt combineCtrl --jobname XXX recyclelinks}')
+
+Iterate to the depth of your liking.
+
+\item I run combineINIT but the configuration directory is not
+created?
+
+You need to run combineINIT as root, due to file protection
+permissions.
+
+\item Where are the logs?
+
+They are stored in the SQL database <jobname> in the table {\tt log}.
+
+\item What are the main differences between Std ({\tt classifyPlugIn =
+Combine::Check\_record}) and PosCheck ({\tt classifyPlugIn =
+Combine::PosCheck\_record}) algorithms for automated subject
+classification?
+
+Std can handle Perl regular expressions in terms and does not
+take into account if the term is found in the beginning or end of the document.
+PosCheck can't handle Perl regular expressions but is faster, and takes word position and proximity into account.
+
+For detailed descriptions see sections
+\hyperref{Algorithm 1}{Algorithm 1 (}{)}{std}
+\hyperref{Algorithm 2}{Algorithm 2 (}{)}{pos}.
+
+\item I don't understand what this means. Can you explain it to me ? Thank you !
+
+\begin{verbatim}
+40: sundew[^\s]*=CP.Drosera
+40: tropical pitcher plant=CP.Nepenthes
+\end{verbatim}
+
+It's part of the topic definition (term list) for the topic 'Carnivorous plants'.
+It's well described in the documentation, please see
+section \ref{topicdef}.
+The strange characters are Perl regular expressions mostly used for truncation etc.
+
+\item
+I want to get all pages about "icecream" from "www.yahoo.com". And I don't have clear idea about how to write the topic
+definition file. Can you show me an example?
+
+So for getting all pages about 'icecream' from 'www.yahoo.com' you have to:
+\begin{enumerate}
+\item write a topic definition file according to the format above, eg containing topic specific
+   terms. The file is essential a list of terms relevant for the topic. Format of the file is
+   "numeric\_importance: term=TopicClass" e.g. "{\tt 100: icecream=YahooIce}"
+   (Say you call your topic 'YahooIce'). A few terms might be:\\
+\begin{verbatim}
+100: icecream=YahooIce
+100: ice cone=YahooIce
+\end{verbatim}
+  and so on stored in a file called say TopicYahooIce.txt
+
+\item Initialization\\
+{\tt sudo combineINIT -jobname cptest -topic TopicYahooIce.txt}
+
+\item Edit the configuration to only allow crawling of www.yahoo.com
+Change the <allow> part in /etc/combine/focustest/combine.cfg from
+
+\begin{verbatim}
+#use either URL or HOST: (obs ':') to match regular expressions to either the
+#full URL or the HOST part of a URL.
+<allow>
+#Allow crawl of URLs or hostnames that matches these regular expressions
+HOST: .*$
+</allow>
+\end{verbatim}
+
+to
+
+\begin{verbatim}
+#use either URL or HOST: (obs ':') to match regular expressions to either the
+#full URL or the HOST part of a URL.
+<allow>
+#Allow crawl of URLs or hostnames that matches these regular expressions
+HOST: www\.yahoo\.com$
+</allow>
+\end{verbatim}
+
+\item Load some good seed URLs
+
+\item Start 1 harvesting process
+\end{enumerate}
+
+\item
+Why load some good seeds URLs and what the seeds URLs mean.
+
+This is just a way of telling the crawler where to start.
+
+\item
+ My problem is that the
+installation there requires root access, which I cannot get.
+Is there a
+way of running Combine without requiring any root access?
+
+The are three things that are problematic
+\begin{enumerate}
+  \item Configurations are stored in /etc/combine/...
+  \item Runtime PID files are stored in /var/run/combine
+  \item You have to be able to create MySQL databases accessible by combine
+\end{enumerate}
+
+If you take the source and look how the tests (make test) are made you might find a way to
+fix the first. Though this probably involves modifying the source - maybe only the Combine/Config.pm
+
+The second is strictly not necessary and it will run even if /var/run /combine does not exist, although not
+   the command \verb+combineCtrl --jobname XXX kill+
+
+On the other hand the third is necessary and I can't think of a way around it except making a local installation of MySQL and use
+that.
+
+\item What does the following entries from the log table mean?
+\begin{enumerate}
+\item
+\verb+| 5409 | HARVPARS 1_zltest | 2006-07-14 15:08:52 | M500; SD empty, sleep 20 second... |+
+
+This means that there are no URLs ready for crawling (SD empty).
+Also you can use combineCtrl to see current status of ready queue etc
+
+
+\item
+\verb+| 7352 | HARVPARS 1_wctest | 2006-07-14 17:00:59 | M500; urlid=1; netlocid=1; http://www.shanghaidaily.com/+
+
+Crawler process 7352 got a URL (http://www.shanghaidaily.com/) to check
+(1\_wctest is a just a name non significant)
+M500 is a sequence number for an individual crawler starting at 500 and when it reaches 0 this crawler
+process is killed and another is created.
+urlid and netlocid are internal identifiers used in the MySQL tables.
+
+\item
+\verb+| 7352 | HARVPARS 1_wctest | 2006-07-14 17:01:10 | M500; RobotRules OK, OK+
+
+Crawler process have checked that this URL (identified earlier in the log by pid=7352 and M500) can be crawled according to the Robot Exclusion protocol.
+
+\item
+\verb+| 7352 | HARVPARS 1_wctest | 2006-07-14 17:01:10 | M500; HTTP(200 = "OK")  => OK+
+
+It has fetched the page (identified earlier in the log by pid=7352 and M500) OK
+
+\item
+\verb+| 7352 | HARVPARS 1_wctest | 2006-07-14 17:01:10 | M500; Doing: text/html;200;0F061033DAF69587170F8E285E950120;Not used |+
+
+It is processing the page (in the format text/html) to see if it is of topical interest
+0F061033DAF69587170F8E285E950120 is the MD5 checksum of the page
+\end{enumerate}
+
+\item
+In fact, I  want to  know  which  crawled  URLs  are  corresponding  to      the  certain  topic  class
+such as CP.Aldrovanda . Can you tell me how can I know ?
+
+You have to get into the raw MySQL database and perform a query like
+
+SELECT urls.urlstr FROM urls,recordurl,topic WHERE urls.urlid=recordurl.urlid AND
+recordurl.recordid=topic.recordid AND topic.notation='CP.Aldrovanda';
+
+Table urls contain all URLs seen by the crawler.
+Table recordurl connect urlid to recordid.
+recordid is used in all tables with data from the crawled Web pages.
+
+\item What is the meaning of the item "ALL"  in the notation column of the topic table?
+
+If you use multiple topics in your topic-definition
+(ie the string after '=') then all the relevant topic scores for this page is summed
+and given the topic notation 'ALL'.
+
+Just disregard it if you only use one topic-class.
+
+\item
+Combine should crawl all pages underneath \verb+www.geocities.com/boulevard/newyork/+,
+but not go outside the domain (i.e. going to \verb+www.yahoo.com+) but also not
+going higher in position (i.e.
+\verb+www.geocities.com/boulevard/atlanta/+).\\
+Is it possible to set up Combine like this?
+
+Yes, change the <allow>-part of your configuration file combine.cfg
+to select what URLs should be allowed for crawling (by default everything
+is allowed). See also section \ref{urlfilt}.
+
+So change\\
+\begin{verbatim}
+<allow>
+#Allow crawl of URLs or hostnames that matches these regular expressions
+HOST: .*$
+</allow>
+\end{verbatim}
+to something like
+
+\begin{verbatim}
+<allow>
+#Allow crawl of URLs or hostnames that matches these regular expressions
+URL http:\/\/www\.geocities\.com\/boulevard\/newyork\/
+</allow>
+\end{verbatim}
+
+(the backslashes are needed since these patterns are in fact Perl regular expressions)
+
+\end{enumerate}

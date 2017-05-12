@@ -1,0 +1,260 @@
+#! /usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+
+use Cnutt::Feed;
+
+=encoding utf8
+
+=head1 NAME
+
+Cnutt-feed - A rss/atom reader which delivers entries to your mailboxes
+
+=head1 VERSION
+
+Version 1.21
+
+=cut
+
+our $VERSION = '1.21';
+
+=head1 DESCRIPTION
+
+RSS and Atom feed to mailboxes converter
+
+=head1 SYNOPSIS
+
+cnutt-feed [options] [action [arguments]]
+
+=head1 OPTIONS
+
+=over
+
+=item B<--help>
+
+Print this help text
+
+=item B<--(no)verbose>
+
+Be verbose (or not)
+
+=item B<--(no)html>
+
+Produce messages containing html (or not)
+
+=item B<--(no)delete>
+
+Delete messages no longer present in the feed (or not) (not implemented)
+
+=item B<--config>
+
+Name of the config file (default ~/.cnutt/cnutt-feed)
+
+=item B<--all>
+
+Apply the command on all the feeds defined in config file
+
+=back
+
+=head1 ARGUMENTS
+
+Arguments take the form B<action> other_arguments
+
+=over
+
+=item B<list> url
+
+list the feeds available at the address url
+
+=item B<get> url mailbox
+
+fetch the content of the feed url and put the messages in the mailbox
+
+=item B<fetch> name
+
+fetch a feed called name according the configuration file
+
+When B<--all> is provided, all the feeds will be fetched, except the
+ones provided after the B<fetch> command.
+
+=back
+
+=head1 CONFIGURATION
+
+A standard INI file with key = value entries.
+
+First lines are for default options.
+
+Stanza are used for defining feeds.
+
+    [feedshortname] # whatever you want, must be unique
+        url = http://foo.bar # mandatory
+        mailbox = /path/to/feed/mailbox # mandatory
+
+Optional parameters are
+
+    verbose= 1|0 (default 1)
+    html = 1|0 (default 1)
+    delete = 1|0 (default 0)
+
+Options can be put in a stanza or at the beginning of the file.
+
+Options given on the command line override options given in stanza,
+which override options given in the default section at the beginning of
+the configuration file.
+
+=head1 FILES
+
+    ~/.cnutt/cnutt-feed
+
+Main configuration file (used with B<fetch>).
+
+=cut
+
+# process command line options
+my %options = (
+               version => 0,
+               delete => undef,
+               html => undef,
+               verbose => undef,
+               all => undef,
+               help => 0,
+               config => $ENV{HOME} . "/.cnutt/cnutt-feed",
+               );
+GetOptions(\%options, qw(
+                         version
+                         delete|d!
+                         html!
+                         verbose|v!
+                         help|h
+                         config|c=s
+                         all
+                         ));
+
+pod2usage({
+    -exitval => 1,
+    -verbose => 2,
+}) if $options{help};
+
+pod2usage({
+    -message => 'Cnutt-feed @VERSION@',
+    -exitval => 1,
+    -verbose => 99,
+    -sections => "BLAH", # dummy value to print nothing
+}) if $options{version};
+
+# getting action
+my $action = shift;
+pod2usage({
+    -message => "Need an action. Use --help.",
+    -exitval => 2,
+    -verbose => 0,
+}) if (!defined($action));
+
+my $cnutt = Cnutt::Feed->new(%options);
+
+# ls mode
+# list the feeds from an url
+if ($action eq "list") {
+    my $url = shift;
+
+    # verification
+    pod2usage({
+        -message => "Action ls needs 1 arguments: URL. Use --help.",
+        -exitval => 2,
+        -verbose => 1,
+    }) if (!defined($url));
+
+    $cnutt->ls($url);
+
+    exit 0;
+}
+
+# get mode
+# take an url and a mailbox on the command line and download
+# the feed to the mailbox
+if ($action eq "get") {
+    my $url = shift;
+    my $mb = shift;
+
+    # verification
+    pod2usage({
+        -message => "Action get needs 2 arguments: URL and mailbox. Use --help.",
+        -exitval => 2,
+        -verbose => 0,
+    }) if (!defined($url) || !defined($mb));
+
+    $cnutt->get($url, $mb);
+
+    exit 0;
+}
+
+# fetch mode
+# take a feed name and fetch it according the config file data
+if ($action eq "fetch") {
+    my @names = @ARGV;
+
+    pod2usage({
+        -message => "Action fetch needs 1 arguments: feed name. Use --help.",
+        -exitval => 2,
+        -verbose => 0,
+    }) if (@names == 0 && !$options{all});
+
+    $cnutt->fetch(@names);
+
+    exit 0;
+}
+
+=head1 AUTHOR
+
+Olivier Schwander, C<< <olivier.schwander at ens-lyon.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-cnutt-feed at
+rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=cnutt-feed>. I will
+be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+A darcs repository is available here :
+
+L<http://chadok.info/darcs/cnutt/cnutt-feed>
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=cnutt-feed>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/cnutt-feed>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/cnutt-feed>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/cnutt-feed>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007-2008 Olivier Schwander, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,61 @@
+NAME
+    constant::def - Perl pragma to declare previously undeclared constants
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Define compile-time constant only if it wasn't previously defined
+    elsewhere. The main reason is to use for debugging constants, since
+    there is no way to change the value, except by editing the source
+
+        # common way: (redefine may be done only in source file)
+        use constant DEBUG => ...;
+        # or 
+        BEGIN { *DEBUG = sub () { ... } }
+        # or 
+        sub DEBUG () { ... }
+
+        ################
+
+        # complex way: redefine works, if done before use of module
+        # in main.pl
+        BEGIN { *My::Module::Debug = sub () { 1 }; }
+        use My::Module;
+
+        # in My/Module.pm
+        BEGIN { defined &DEBUG or do { my $debug = $ENV{MY_MODULE_DEBUG} || 0; *DEBUG = sub () { $debug } } }
+
+        ################
+
+        # using this distribution
+        # redefine works, if done before use of module
+
+        # in main.pl
+        use constant::abs 'My::Module::DEBUG' => 1;
+        use My::Module;
+
+        # in My/Module.pm
+        use constant::def DEBUG => $ENV{MY_MODULE_DEBUG} || 0;
+
+    Syntax is fully compatible with "constant"
+
+SEE ALSO
+    constant::abs, constant
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-constant-def at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=constant-def>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

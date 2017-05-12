@@ -1,0 +1,187 @@
+# $Id: nl,v 1.1 2002/09/04 23:25:17 nomis80 Exp $
+#
+# Copyright (C) 2002  Remco B. Brink <remco@rc6.org>
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Maand
+week=Week
+Day=Dag
+today=Vandaag
+myagenda=Mijn Agenda
+status_UNCONFIRMED=ONBEVESTIGD
+status_CONFIRMED=BEVESTIGD
+status_CANCELED=AFGEZEGD
+eventname=Gebeurtenis:
+eventstart=Begin:
+eventend=Einde:
+eventdescription=Beschrijving:
+eventrecur=Herhaling:
+eventnotrecur=Not herhalend
+eventrecurweek=Deze dag elke week
+eventrecurmonth=Deze dag elke maand
+eventrecuryear=Deze dag elk jaar
+eventrecurend=Einde van herhaling:
+eventparticipants=Deelnemers:
+eventconfirm=Vraag om bevestiging:
+eventsave=Opslaan
+errorstartdate=Start datum is ongeldig.
+errorstarttime=Start tijd is ongeldig.
+errorenddate=Eind datum is ongeldig.
+errorendtime=Eind tijd is ongeldig.
+errorrecurenddate=Eind datum voor herhaling is ongeldig.
+errorrecurendtime=Eind tijd voor herhaling is ongeldig.
+errorendbeforestart=Eind tijd is voor start tijd.
+errorrecurendbeforestart=Eind tijd voor herhaling is voor start tijd.
+errorrecurendbeforeend=Eind tijd voor herhaling is voor eind tijd.
+errormissingname=Naam voor gebeurtenis ontbreekt.
+reminder=Herinnering:
+remind_me=Herinner mij via email %1 %2 voor de gebeurtenis begint.
+min=minuut (minuten)
+hour=uur (uren)
+day=dag (dagen)
+error=Fout
+weeknum=Week %1 in jaar %2
+weeknum2=Week %1 in %2
+eventdel=Verwijder
+initiator=Initiatiefnemer voor gebeurtenis
+cancel=Afbreken
+confirm=Bevestigen
+confirm_subject=Bevestiging
+confirm_body=<<EOF
+Dit is een geautomatiseerd bericht. Antwoord hier niet direct op.
+
+%%INITIATOR%% vraagt om Uw aanwezigheid op %%DATE%%.
+Naam gebeurtenis: %%NAME%%
+Beschrijving: %%DESCRIPTION%%
+
+Wees zo vriendelijk Uw aanwezigheid te bevestigen door naar de volgende URL te gaan:
+%%CONFIRMURL%%
+
+-- 
+Chronos %%VERSION%% van Linux Québec Technologies
+EOF
+errornotauthorized=U bent niet geautoriseerd deze actie te ondernemen.
+tasklist=Takenlijst
+tasktitle=Titel:
+tasknotes=Notities:
+taskpriority=Prioriteit:
+newtask=Voeg een taak toe
+options=Opties
+userprefs=Gebruikersinstellingen
+lang=Taal:
+agendatype=Agenda type:
+publicrw=Lees en schrijftoegang voor allen
+publicr=Alleen leestoegang voor allen
+private=Prive
+indivpriv=Individuele privileges:
+nopriv=Geen privileges
+r=Lezen
+rw=Lezen/schrijven
+email=Email adres:
+name=Naam:
+password=Wachtwoord:
+create_db_intro=<<EOF
+Dit script zal de MySQL database en tabellen voor Chronos opzetten.
+
+EOF
+create_db_pass=root's MySQL wachtwoord:
+create_db_dbname=Naam voor Chronos database: [chronos]
+create_db_exists=Deze database bestaat al. Verwijderen?
+create_db_deleted=Database %s verwijderd
+create_db_created=Database %s aangemaakt
+create_db_tablecreated=Tabel %s aangemaakt
+create_db_user=Gebruikersnaam om met de database te verbinden: [chronos]
+create_db_dbpass=Wachtwoord: [random]
+create_db_grant=Privileges gegeven aan %s op %s.*
+create_db_added=Informatie toegevoegd aan /etc/chronos.conf
+create_db_success=Chronos installatie was succesvol
+chronosadmin_usage=<<EOF
+Usage:
+    %s [-u gebruikersnaam] [-p [wachtwoord]] [--autodel] [--new-user]
+    [--new-users-batch[=BESTAND]] [--del-user=gebruikersnaam] [database[@host]]
+
+Options:
+    -u gebruikersnaam
+        Naam van de gebruiker om met de database te verbinden.
+    -p wachtwoord
+        Het wachtwoord om met de database te verbinden.
+    --autodel
+        Vraag niet om bevestiging wanneer een gebruiker verwijderd wordt. Praktisch
+        voor batch bestanden.
+    --new-user
+        Maak een nieuwe gebruiker aan in interactieve modus.
+    --new-users-batch[=FILE]
+        Maak gebruikers aan vanuit een bestand (of standaard STDIN) met op elke regel:
+            gebruikersnaam,wachtwoord,email adres, toegang
+    --del-user=gebruikersnaam
+        Verwijder een gebruiker.
+    --show-holidays
+        Dit commando laat een overzicht zien van alle vakantie profielen welke op Uw
+	systeem aanwezig zijn. U kunt dan achteraf een regel in Uw chronos.conf file
+	opnemen zoals:
+            HOLIDAYS=US  # Amerika
+EOF
+chronosadmin_exists=De %s gebruiker bestaat reeds. Verwijderen?
+chronosadmin_created=Gebruiker %s aangemaakt
+chronosadmin_deleted=Gebruiker %s verwijderd
+chronosadmin_confirm=Bevestiging:
+chronosadmin_pass=Wachtwoord
+chronosadmin_p=MySQL wachtwoord
+chronosadmin_username=Gebruikersnaam (maximaal 16 characters)
+chronosadmin_email=Email adres
+chronosadmin_lang=Taal
+chronosadmin_realname=Volledige naam
+chronosadmin_connectok=Verbonden met de MySQL database
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Herinnering
+
+Dit is een geautomatiseerd bericht. Antwoord hier niet direct op.
+
+Ik herinner U dat de volgende gebeurtenis binnenkort zal gebeuren.
+
+Naam:   %%NAME%%
+Start:  %%START%%
+Einde:  %%END%%
+Beschrijving:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% door Linux Québec Technologies
+EOF
+apacheuser=De gebruiker onder wie Apache draait
+en=Engels
+fr=Frans
+it=Italiaans
+de=Duits
+no=Noors
+po=Portugees
+sv=Zweeds
+nl=Nederlands
+attachments=Bijgesloten bestanden:
+new_attachment=Nieuwe bijgesloten bestanden:
+participants_to_add=Voeg deelnemers toe:
+remove_part=Verwijder
+notime=Geen tijd
+errornotitle=Deze taak mist een titel.
+remindd_forking=Splitsen...
+remindd_forkerror=Kon niet splitsen: %s
+remindd_setsiderror=Kon geen nieuwe sessie starten: %s
+remindd_usage=Gebruik: %s [-D] [-f <configuratie bestand>]

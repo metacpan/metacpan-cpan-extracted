@@ -1,0 +1,89 @@
+\section{Configuration}
+\label{configuration}
+Configuration files use a simple format consisting of either name/value pairs
+or complex variables in sections. Name/value pairs are encoded as single lines 
+formated like '{\tt name~=~value}'. Complex variables are encoded as multiple
+lines in named sections delimited as in XML, using '{\tt <name> ... </name>}'.
+Sections may be nested for related configuration variables.
+Empty lines and lines starting with '{\tt \#}' (comments) are ignored.
+
+
+The most important configuration variables are the complex variables
+{\tt <url><allow>} (allows certain URLs to be harvested) and {\tt
+<url><exclude>} (excludes certain URLs from harvesting) which are used
+to limit your crawl to just a section of the WWW, based on the URL.
+Loading URLs to be crawled into the system checks each URL first
+against the Perl regular expressions of {\tt <url><allow>} and if it
+matches goes on to match it against {\tt <url><exclude>} where it's
+discarded if it matches, otherwise it's scheduled for crawling.
+(See \hyperref{'URL filtering'}{section }{ 'URL filtering'}{urlfilt}).
+
+\subsection{Configuration files}
+All configuration files are stored in the {\tt /etc/combine/}
+directory tree. All configuration variables have reasonable defaults (section \ref{configvars}).
+
+\subsubsection{Templates}
+The values in
+\begin{description}
+\item[job\_default.cfg] contains job specific defaults. It is copied to a
+subdirectory named after the job by {\tt combineINIT}.
+
+\item[SQLstruct.sql]
+contains structure of the internal SQL database used both for administration
+and for holding data records. \hyperref{Details}{Details in section }{}{sqlstruct}.
+
+\item[Topic\_*] contains various contributed topic definitions.
+\end{description}
+
+\subsubsection{Global configuration files}
+Files used for global parameters for all crawler jobs.
+\begin{description}
+
+\item[default.cfg] is the global defaults. It is loaded first.
+Consult \hyperref{'Configuration Variables'}{section }{}{configvars}
+and \hyperref{'Default configuration files'}{appendix }{}{conffiles} for details.
+Values can be overridden from
+the job-specific configuration file {\tt combine.cfg}.
+
+\item[tidy.cfg] configuration for Tidy cleaning of HTML code.
+
+\end{description}
+
+\subsubsection{Job specific configuration files}
+The program {\tt combineINIT} creates
+a job specific sub-directory in {\tt /etc/combine} and populates it with some files including {\tt combine.cfg}
+initialized with a copy of {\tt job\_default.cfg}.
+You should always change the value of the variable {\tt Operator-Email} 
+in this file and set it to something
+reasonable. It is used by Combine to identify you to the crawled Web-servers.
+
+The job-name have to be given to all programs
+when started using the \verb+--jobname+ switch. 
+
+\begin{description}
+
+\item[combine.cfg] the job specific configuration. It is loaded second
+ and overrides the global defaults. Consult \hyperref{section 'Configuration Variables'}{section }{}{configvars}
+and \hyperref{'Default configuration files'}{appendix }{}{conffiles} for details.
+
+\item[topicdefinition.txt] contains the topic definition for
+focused crawl if the \verb+--topic+ switch is given to {\tt combineINIT}.
+The format of this file is described in \hyperref{'Topic definition'}{section }{}{topicdef}.
+
+\item[stopwords.txt] a file with words to be excluded from the automatic topic
+classification processing. One word per line. Can be empty (default) but must be present.
+
+\item[config\_exclude] contains more exclude patterns.
+Optional, automatically included by {\tt combine.cfg}. Updated by {\tt combineUtil}.
+
+\item[config\_serveralias] contains patterns for resolving Web server aliases.
+Optional, automatically included by {\tt combine.cfg}. Updated by {\tt combineUtil}.
+\item[sitesOK.txt] optionally used by the
+ \hyperref{built-in automated classification algorithms}{built-in automated classification algorithms (section }{)}{autoclass} to bypass
+the topic filter for certain sites.
+\end{description}
+
+\subsubsection{Details and default values}
+Further details are found in
+\hyperref{'Configuration variables'}{section }{ 'Configuration variables'}{configvars} which lists
+all variables and their default values.

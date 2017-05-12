@@ -1,0 +1,20 @@
+Classification modules interfacing with the MPCA Component Analysis system from
+http://www.componentanalysis.org/wiki/index.php/Component_Analysis
+
+MPCA preparations:
+  1. create a model
+  2. start the 'mpserve' and 'ydin' as daemons with approriate
+     parameters using your model
+
+The Combine classification modules communicate with the MPCA
+system through the network interface provided by 'ydin'.
+You have to add a configuration variable 'MPCAHostPort' (in
+your job-specific configuration file 'combine.cfg') which
+provides the host and port that 'ydin' is set up to use.
+
+  Example:
+MPCAHostPort = localhost:10203
+
+The modules provided here need to be in a location where Perl
+can find them.
+

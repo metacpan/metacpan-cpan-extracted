@@ -1,0 +1,27 @@
+Revision history for Cnutt-feed
+
+1.2i    Tue Jun 15 13:48:00 CEST 2009
+		Updated tests and MANIFEST
+
+1.2     Tue Jun 15 13:30:00 CEST 2009
+        Use Module::Build now.
+		Removed Module::Install support.
+
+1.1     Tue Mar 10 15:20:00 CEST 2009
+        Added module Cnutt::Feed, the main script is now only a wrapper
+        Fewer English mistakes
+        Allow ~ in mailboxes paths
+
+1.0     Sun Nov 23 14:31:50 CEST 2008
+        Name changed to Cnutt-feed
+        The daemon mode disappear, use the crontab
+        Beautified code, fewer warnings
+        Good behavior in strange cases
+
+0.9     Mon Mar 10 19:01:31 CEST 2008
+        Fully working
+        Try with a daemon mode using POE
+
+0.0     Wed Aug 1 16:58:01 CEST 2007
+        First version
+

@@ -1,0 +1,12 @@
+Revision history for cPanel-MemTest
+
+0.3 Fri Feb 12 2010
+    changed $VERSION to numerically comparable
+    RT 41691 - Build.PL does not work as expected (Thanks TODDR)
+
+0.0.2  Fri Oct  5 14:36:43 2007
+      clarified warning thrown when memory runs out
+
+0.0.1  Wed Oct  3 17:06:44 2007
+       Initial release. Original version by John Koston rewritten at his request for CPAN.
+

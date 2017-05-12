@@ -1,0 +1,52 @@
+NAME
+    constant::boolean - Define TRUE and FALSE constants.
+
+SYNOPSIS
+      use constant::boolean;
+
+      use File::Spec;
+
+      sub is_package_exist {
+        my ($package) = @_;
+        return FALSE unless defined $package;
+        foreach my $inc (@INC) {
+            my $filename = File::Spec->catfile(
+                split( /\//, $inc ), split( /\::/, $package )
+            ) . '.pm';
+            return TRUE if -f $filename;
+        };
+        return FALSE;
+      };
+
+      no constant::boolean;
+
+DESCRIPTION
+    Defines `TRUE' and `FALSE' constants in caller's namespace. You could
+    use simple values like empty string or zero for false, or any non-empty
+    and non-zero string value as true, but the `TRUE' and `FALSE' constants
+    are more descriptive.
+
+    It is virtually the same as:
+
+      # double "not" operator is used for converting scalar to boolean value
+      use constant TRUE => !! 1;
+      use constant FALSE => !! '';
+
+    The constants exported by `constant::boolean' are not reported by
+    Test::Pod::Coverage, so it is more convenient to use this module than to
+    define `TRUE' and `FALSE' constants by yourself.
+
+    The constants can be removed from class API with `no constant::boolean'
+    pragma or some universal tool like namespace::clean.
+
+AUTHOR
+    Piotr Roszatycki <dexter@cpan.org>
+
+LICENSE
+    Copyright 2008, 2009 by Piotr Roszatycki <dexter@cpan.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

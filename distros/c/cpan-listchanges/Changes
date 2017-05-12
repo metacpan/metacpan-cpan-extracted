@@ -1,0 +1,26 @@
+Revision history for Perl extension App::cpanlistchanges
+
+0.07  2015-07-21 01:37:05 PDT
+        - update cpanmetadb URL
+
+0.06  2013-04-07 01:29:17 PDT
+        - Convert Milla and it fixes bad NAME in Makefile
+
+0.05  Thu Jan 27 14:40:28 PST 2011
+        - Support distributions released under multiple CPAN IDs
+        - Automatically enable PAGER pipe. Use --no-pager to disable it
+        - Fixed dependencies
+
+0.04  Tue Jan 25 21:56:57 PST 2011
+        - Fixed a subtle bug in the version output in the changes view
+
+0.03  Tue Jan 25 21:47:46 PST 2011
+        - Support 'HEAD' in the version comparison
+
+0.02  Tue Jan 25 21:44:42 PST 2011
+        - Added -h and pod2usage
+        - Added --all which displays all the changelog regardless of local/remote versions
+        - Added Module@from..to version comparison notation
+
+0.01  Thu Dec 23 14:13:13 2010
+        - original version

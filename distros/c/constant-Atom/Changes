@@ -1,0 +1,59 @@
+Revision history for perl module constant::Atom
+
+0.10 2014-08-23
+    - constant/Atom.pm also had a hardcoded $VERSION. Doh.
+    - Added tests for some failure cases, as the result of
+      looking at the results from Devel::Cover
+
+0.09 2014-08-19
+    - Forgot to remove $VERSION from constant::Atom::Strict when switching
+      the dist to Dist::Zilla.
+    - use 'parent' rather than 'base' in constant::Atom::Strict
+
+0.08 2014-08-16
+    - Improved the abstract (NAME section).
+    - Improved formatting of SYNOPSIS.
+    - Improved DESCRIPTION.
+    - Got rid of all hard tabs.
+    - Improved SEE ALSO, and added link to my review of constant modules.
+
+0.07 2014-02-02
+
+    - Switched to Dist::Zilla
+    - Moved test.pl to t/original.t
+    - Added a bunch of module links to SEE ALSO
+    - Min perl version 5.6.0
+    - Tidied up structure and formatting of pod
+
+0.06 2013-10-25
+
+    - I hadn't been updating version number in constant::Atom::Strict
+
+0.05 2013-10-24
+
+    - github repo now included in metadata
+
+0.04 2013-07-21
+
+    - Removed the auto generated meta files from the repo and MANIFEST
+    - Tidied up pod errors
+
+0.03 2013-07-21
+
+    - github repo now mentioned in the pod
+    - made sure this file conformed to CPAN::Changes::Spec
+
+0.02 2012-01-20
+
+    - fixed overloading bug: != was testing equality rather than inequality
+    - fixed some typos in the documentation
+    - added this Changes file
+
+0.011 2004-05-08
+
+    - fixed documentation,
+      which was referring to Atom rather than constant::Atom
+
+0.01 2004-05-07
+
+    - initial release

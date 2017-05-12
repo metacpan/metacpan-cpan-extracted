@@ -1,0 +1,6 @@
+# $Id: pod.t 4 2006-05-12 20:18:10Z rmuhle $
+
+use Test::More;
+eval "use Test::Pod 1.14";
+plan skip_all => "Test::Pod 1.14 required for testing POD" if $@;
+all_pod_files_ok();

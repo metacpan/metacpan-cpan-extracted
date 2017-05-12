@@ -1,0 +1,35 @@
+=pod
+
+=head1 NAME
+
+classescb - OO programming with classes pragma cookbook
+
+=head1 DESCRIPTION
+
+A collection of examples using the classes pragma for object-oriented
+Perl programming drawn from real-world examples.
+
+More later...
+
+=head1 SEE ALSO
+
+L<classes>
+
+=head1 AUTHOR
+
+Robert S. Muhlestein (rmuhle at cpan.org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005, 2006 Robert S. Muhlestein (rmuhle at
+cpan.org) Some rights reserved. This document is
+licensed under a Creative Commons Attribution 2.5 License
+(http://creativecommons.org/licenses/by/2.5/).
+
+See L<classes> for copyright and licensing information of the
+C<classes> pragma module itself.
+
+=cut
+
+
+

@@ -1,0 +1,228 @@
+#!/usr/bin/perl 
+# $Id: chronos_install_db,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+use strict;
+use DBI;
+use Chronos::Static qw(gettext get);
+
+my $lang = gettext( '', 1 );
+
+print $lang->{create_db_intro};
+print "$lang->{create_db_pass} ";
+system "stty -echo";
+chomp( my $root_db_pass = <STDIN> );
+system "stty echo";
+print "\n";
+
+my $dbh =
+  DBI->connect( "dbi:mysql:", 'root', $root_db_pass, { RaiseError => 1 } );
+my $databases = $dbh->selectall_arrayref("SHOW DATABASES");
+my $db_name;
+print "$lang->{create_db_dbname} ";
+chomp( $db_name = <STDIN> );
+$db_name ||= 'chronos';
+foreach (@$databases) {
+    if ( $_->[0] eq $db_name ) {
+        print "$lang->{create_db_exists} [N/y] ";
+        if ( <STDIN> =~ /^y/i ) {
+            $dbh->do("DROP DATABASE $db_name");
+            printf "$lang->{create_db_deleted}\n", $db_name;
+        } else {
+            undef $db_name;
+        }
+        last;
+    }
+}
+
+$dbh->do("CREATE DATABASE $db_name");
+$dbh->do("USE $db_name");
+printf "$lang->{create_db_created}\n", $db_name;
+
+$dbh->do(<<EOF);
+CREATE TABLE user (
+    user CHAR(16) BINARY PRIMARY KEY,
+    password CHAR(16) BINARY,
+    email TINYTEXT,
+    name TINYTEXT,
+    public_readable ENUM('N','Y') NOT NULL,
+    public_writable ENUM('N','Y') NOT NULL,
+    lang CHAR(2) NOT NULL DEFAULT 'fr'
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'user';
+
+$dbh->do(<<EOF);
+CREATE TABLE acl (
+    user CHAR(16) BINARY NOT NULL,
+    object CHAR(16) BINARY NOT NULL,
+    can_read ENUM('N','Y') NOT NULL,
+    can_write ENUM('N','Y') NOT NULL,
+    PRIMARY KEY (user, object)
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'acl';
+
+$dbh->do(<<EOF);
+CREATE TABLE events (
+    eid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    initiator CHAR(16) BINARY,
+    name TINYTEXT NOT NULL,
+    start_date DATE NOT NULL,
+    start_time TIME,
+    end_date DATE NOT NULL,
+    end_time TIME,
+    description TEXT,
+    rid INT UNSIGNED,
+    reminder DATETIME,
+    reminder_sent ENUM('N','Y') NOT NULL,
+    INDEX (initiator),
+    INDEX (rid)
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'events';
+
+$dbh->do(<<EOF);
+CREATE TABLE participants (
+    eid INT UNSIGNED NOT NULL,
+    user CHAR(16) BINARY NOT NULL,
+    status ENUM('UNCONFIRMED','CONFIRMED','CANCELED'),
+    reminder DATETIME,
+    reminder_sent ENUM('N','Y') NOT NULL,
+    PRIMARY KEY (eid, user)
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'participants';
+
+$dbh->do(<<EOF);
+CREATE TABLE recur (
+    rid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    every ENUM('DAY','WEEK','MONTH','YEAR') NOT NULL,
+    last DATE NOT NULL
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'recur';
+
+$dbh->do(<<EOF);
+CREATE TABLE tasks (
+    tid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user CHAR(16) BINARY NOT NULL,
+    title TINYTEXT NOT NULL,
+    notes TEXT,
+    priority ENUM('1','2','3','4','5','6','7','8','9') NOT NULL,
+    INDEX (user)
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'tasks';
+
+$dbh->do(<<EOF);
+CREATE TABLE attachments (
+    aid INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    eid INT UNSIGNED,
+    filename VARCHAR(255),
+    notes TEXT,
+    file LONGBLOB,
+    size INT UNSIGNED,
+    INDEX (eid)
+)
+EOF
+printf "$lang->{create_db_tablecreated}\n", 'attachments';
+
+print "$lang->{create_db_user} ";
+chomp( my $db_user = <STDIN> );
+$db_user ||= 'chronos';
+print "$lang->{create_db_dbpass} ";
+system "stty -echo";
+chomp( my $db_pass = <STDIN> );
+system "stty echo";
+print "\n";
+
+while ( not $db_pass ) {
+    foreach ( 1 .. 8 ) {
+        $db_pass .= chr( ( 48 .. 57, 65 .. 90, 97 .. 122 )[ rand 62 ] );
+    }
+}
+my $db_pass_quoted = $dbh->quote($db_pass);
+$dbh->do(
+"GRANT INSERT, SELECT, UPDATE, DELETE ON $db_name.* TO $db_user\@localhost IDENTIFIED BY $db_pass_quoted"
+);
+$dbh->do("FLUSH PRIVILEGES");
+printf "$lang->{create_db_grant}\n", $db_user, $db_name;
+
+my @conf;
+if ( -f "/etc/chronos.conf" ) {
+    open CONF, "/etc/chronos.conf"
+      or die "Can,t open /etc/chronos.conf for reading: $!\n";
+    @conf = <CONF>;
+    close CONF;
+}
+open CONF, "> /etc/chronos.conf"
+  or die "Can't open /etc/chronos.conf for writing: $!\n";
+foreach (@conf) {
+    next if /^(?:DB_NAME|DB_USER|DB_PASS)\s*=/i;
+    print CONF $_;
+}
+print CONF <<EOF;
+DB_NAME=$db_name
+DB_USER=$db_user
+DB_PASS=$db_pass
+EOF
+close CONF;
+chmod 0400, "/etc/chronos.conf";
+my $apache_uid = getpwnam get_apache_user();
+chown $apache_uid, 0, "/etc/chronos.conf";
+print "$lang->{create_db_added}\n";
+
+print "\n$lang->{create_db_success}\n";
+
+sub get_apache_user {
+    # In case someone doesn't want to use 'apache'
+    my $user;
+
+    if ( -f "/etc/httpd/conf/httpd.conf" ) {
+        open CONF, "/etc/httpd/conf/httpd.conf";
+        while (<CONF>) {
+            next unless /^\s*User\s+(\S+)/;
+            $user = $1;
+            last;
+        }
+        close CONF;
+    } else {
+        my @ps = `ps aux`;
+        foreach (@ps) {
+            next unless /\bhttpd\b/;
+            next if /^root/;
+            ($user) = $_ =~ /^(\S+)/;
+            last;
+        }
+    }
+    if ( not $user ) {
+        if ( getpwnam 'apache' ) {
+            $user = 'apache';
+        } elsif ( getpwnam 'nobody' ) {
+            $user = 'nobody';
+        }
+    }
+
+    return get( $lang->{apacheuser}, { Default => $user } );
+}
+
+# vim: set et ts=4 sw=4 ft=perl:

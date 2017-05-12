@@ -1,0 +1,120 @@
+Revision history for cPanel-TaskQueue
+
+0.800     2016-03-14 18:11:28+00:00 UTC
+     - Correct deferral logic to clear tags when a task completes
+     - Correct flawed load logic relating to resuming after pause.
+0.700    2014-10-15 16:37:12 America/Chicago
+     - Add ability to flush all scheduled tasks to the waiting queue, whether
+       or not they have reached their scheduled time.
+     - Add the ability to delete all scheduled tasks.
+     - Add the ability to delete all unprocessed tasks.
+     - Corrected handling of optional --serial parameter in taskqueuectl.
+     - Added flush_scheduled_tasks to Ctrl logic to support the new
+       functionality.
+     - Added delete_unprocessed_tasks to Ctrl logic to support the new
+       functionality.
+0.606     2014-02-20 12:56:10 America/Chicago
+       Only update state file if not already up to date.
+0.605     2013-04-12 11:09:30 America/Chicago
+       Remove concurrency problem that could result in lost tasks. Weaken
+       reference to data object that causes a memory leak.
+0.604     2012-11-29 12:41:58 America/Chicago
+       Correct scheduler code to use the new reconstitute method to restore
+       task objects loaded from disk.
+0.603     2012-11-26 10:47:36 America/Chicago
+       Add flag to prevent YAML::Syck from reblessing objects from disk. This
+       turns out to be a security problem. Add c::TQ::Task::reconstitute class
+       method to recreate Task objects that have been serialized.
+0.602     2012-10-26 16:06:06 America/Chicago
+       Correct importing of cPanel::TaskQueue::Scheduler in the module
+       cPanel::TaskQueue::ChildProcessor. Failed if configuration had been set
+       to non-defaults elsewhere in the code.
+0.601     2011-09-15 16:19:13 America/Chicago
+       Better handling of conversion of state files in taskqueuectrl.
+       Add 'info' command that displays serialization information.
+       Corrected error is pause/resume handling.
+       Added a 'process' command to force the TaskQueue to execute a task.
+0.600     2011-09-14 12:40:57 America/Chicago
+       Add support for serializing the queue and scheduler data in Storable
+       format as well as YAML.
+       Default the queue and scheduler to Storable for serialization.
+       Provide command in taskqueuectl to convert from one serialization format
+       to another.
+       Improve test coverage.
+0.504     2011-07-28 12:14:24 America/Chicago
+       Testing had shown no more problems. Upgrading to an official release.
+0.503_04  2011-07-15 13:26:37 America/Chicago
+       One more attempt to kill the race condition reported by CPANTESTERS.
+0.503_03  2011-07-11 11:15:02 America/Chicago
+       Many CPANTESTERS machines apparently do not allow writing to /tmp, but
+       still have File::Spec->tmpdir() returning that directory. Modified temp
+       directory handlign in tests.
+       Modify test to reduce failure due to race condition.
+0.503_02  2011-01-25 12:12:37 America/Chicago
+       More CPANTESTERS cleanup.
+0.503_01  2011-01-04 15:55:34 America/Chicago
+       Clean up errors found by CPANTESTERS.
+       Correct t/taskqueue_processor_checked_system.t to allow it to pass on
+       a Solaris or Windows system.
+       Fixed the same test to correctly handle a missing Test::Exception module.
+       Attempt to make statefile_load_save test more robust.
+       Make task_scheduler test more robust.
+0.503     2011-01-03 10:49:47 America/Chicago
+       Fix a Fork/exception interaction in cPanel::TaskQueue::ChildProcessor
+       that results in multiple server processes running.
+0.502     2010-11-22 12:13:24 America/Chicago
+       Pass the logger object from the CacheFile to the process_task routine
+       on the processor. This way the processor can log properly.
+       Make certain that a task with no processor is removed from the queue.
+       Add checked_system utility method in Processor object.
+0.501     2010-11-17 13:39:41 America/Chicago
+       Correct dependencies to remove local testing modules.
+       Remove other unnecessary dependencies.
+0.500     2010-11-03 13:27:14 America/Chicago
+       Move exception handling toward best practice.
+       Rename the CacheFile concept to StateFile, which is more accurate.
+       Add ability to pause processing waiting tasks into the processing phase.
+       Add support deferral logic.
+0.400  Tue Jul 13 13:00:00 2010
+       Change namespace to reside in cPanel modules.
+       Make taskqueued more robust as a daemon.
+       First external release.
+0.306  Tue Jul 8 15:00:00 2010
+       Add the Ctrl code and the taskqueuectl script.
+       Add taskqueuerun program to perform one process step in the quue.
+       Add taskqueued program as a basic queue running daemon.
+0.305  Thu May 13 10:00:00 2010
+       Extended testing.
+       Add support to PluginManager for loading particular plugins.
+       Protect ChildProcessor from SIGCHLD events.
+0.302  Tue May 4 12:00:00 2010
+       Reduce aggressiveness of the file locking on the queue file in the
+         code checking for completed child processess.
+0.301  Fri Apr 29 16:30:00 2010
+       Prevent scheduler from updating schedule file unnecessarily.
+       Reduce file locking for schedule and queue files that are not changing.
+0.300  Wed Sep 9 10:30:00 2009
+       Added logic to recover from a corrupted cachefile on initial load.
+       Split POD out of source files to speed loading.
+       Add notify mechanism.
+       Bumped all version numbers for consistency.
+0.2.2  Wed Aug 19 15:44:00 2009
+       Corrected error reporting in the case the cachefiles are corrupted.
+0.2.0  Wed Apr 1 12:00:00 2009
+       Reducing memory footprint: remove warnings, Class::Std, List::Util,
+       File::Spec, File::Path, and Cwd.
+0.1.2  Wed Mar 11 16:00:00 2009
+       Added find_command and extended test coverage.
+       Increased robustness thanks to more extensive testing. Corrected a
+       couple of errors on error-recovery paths.
+       Fixed a bad assumption in the file locking code.
+       Updated documentation on some of the classes.
+       Add the Cookbook documentation.
+0.1.1  Not Released
+       Better queue and scheduling cachefile formats. Corrected typo in docs.
+0.1.0  Wed Feb 18 15:00:00 2009
+       First release for use in the CPanel code.
+0.0.5  Not Yet Released
+       Redo the logging and locking policy code to something more reasonable.
+0.0.4  Tue Dec  2 12:27:27 2008
+       Initial internal release.

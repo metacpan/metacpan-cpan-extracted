@@ -1,0 +1,26 @@
+Revision history for constant::lexical
+
+2.0002   12 June, 2016
+         For  perl 5.18.0  and  higher,  constant::lexical  now  uses
+         perl’s built-in lexical subroutine feature,  and  no  longer
+         requires Lexical::Sub.
+
+2.0001   8 January, 2012
+       •‘use constant::lexical’ with no arguments now works.  (Oops!)
+         Thanks to Neil Bowers for reporting this (RT #73694).
+       • String evals no longer stop  constants  from  going  out  of
+         scope in perl 5.10.x.
+
+2        14 March, 2010
+       • True lexical constants for perl 5.11.2 and higher
+       • For older perls, we now require constant 1.03 explicitly, so
+         users don’t have to.
+
+1.00000  22 November, 2009
+         No changes apart from the version number.
+
+0.01     29 July, 2008
+         Renamed to constant::lexical, as suggested by brian d foy.
+
+0.01     24 July, 2008
+         Released as constant::private

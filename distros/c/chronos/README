@@ -1,0 +1,142 @@
+INSTALLING
+==========
+
+Look at the INSTALL file.
+
+WHAT IS CHRONOS?
+================
+
+Chronos is a Web agenda/calendar for Intranets (even if it can be used from
+anywhere). It can send reminders by email. You can schedule multi-user events.
+It is fast and light on resources (the balance size/speed can be tweaked by
+tweaking mod_perl and Apache).
+
+WHY WRITE YET ANOTHER WEB AGENDA?
+=================================
+
+All others are one of these:
+    - Proprietary
+    - Ugly
+    - Broken/buggy
+
+Chronos is not
+    - Proprietary
+    - Ugly
+    - Broken/buggy
+
+Chronos is released under the GPL (see the file COPYING to understand what it
+means to release a software under the GPL). Linux Québec Technologies is the
+copyright holder and is backing the development of this software. Chronos's look is 
+based on Prospector, whose look is based on Sun's agenda. The look has been enhanced
+with the power of style sheets, while always being careful to stay as close as
+possible to HTML 4.01.
+
+The following browsers are compatible with HTML 4.01 and
+CSS2 and therefore can be used to view Chronos as it was intended to be viewed:
+    - Mozilla 1.0+
+    - Internet Explorer 5.5+
+The following browsers can display Chronos relatively correctly, though some
+features will look uglier:
+    - Konqueror 3.0
+    - Internet Explorer 5.0
+    - Opera 6.0
+These browsers are too old/dumb and therefore Chronos looks ugly on them:
+    - Netscape 4.x
+Other browsers have not been tested. Send email to
+chronoss-devel@lists.sourceforge.net if you want one of them to be included in
+this list. Note that all browsers should be able to at least display Chronos as
+we try to be standards-compliant. Particularly, text browsers can be used to
+access Chronos.
+
+Lastly, Chronos is not buggy. All time calculations are done with Date::Calc. You
+will _not_ find yourself clicking on the first of the next month and getting
+sent to the first of the current month. And Chronos benefits from the Open
+Source movement: many eyes can fix many bugs. If you find a bug (even if Chronos
+is definitively *not* buggy), send email to chronoss-devel@lists.sourceforge.net.
+It should be squashed within a day.
+
+THIS RELEASE
+============
+
+1.1.6 features the new Dutch translation (thanks to Remco B. Brink
+<remco@rc6.org>!!) along with some bugfixes. As usual, check the ChangeLog for
+details.
+
+Chronos is currently available in the following languages:
+    - English
+    - French
+    - Italian (incomplete)
+    - German
+    - Norwegian
+    - Portuguese
+    - Swedish
+    - Dutch
+
+OLDER RELEASES
+==============
+
+1.1.5: New icons, new Swedish translation, couple of bugfixes, URLs and email
+addresses highlighted as clickable links, and others.
+
+1.1.4.2 fixes another major bug that would cause the date at the top of a day
+view to be always today.
+
+1.1.4.1 fixes a major bug that would print 0:00 for any event in month and week
+views.
+
+New Portuguese translation by Augusto Cesar Sandoval. Cosmetic and non-cosmetic
+bugfixes. Most date formats are now customizable. It is now possible to run
+multiple Chronos servers on the same system. More user-friendly confirmation
+email.
+
+remindd simply didn't work in 1.1.2, it does now in 1.1.3. Sorry.
+
+1.1.2 brings minor bugfixes and visual enhancements. Apache::DBI does not
+complain anymore, meaning that Chronos is installable by CPAN and installation
+will be overall easier.
+
+1.1.1 fixes some minor bugs that inevitably appear in .0 releases.
+
+1.1.0 brings major feature enhancements: file attachments, participant
+management, events with no time associated, more intuitive status management and
+locale-dependant holidays. Minor documentation, installation and look issues
+have also been fixed.
+
+1.0.4 features two new translations: German by Peer Oliver Schmidt and Norwegian
+by Tarjei Knapstad. Minor installation bugs have been squashed.
+
+1.0.3 introduces the Italian translation by Enzo Bontempo, fixes some language
+issues and minor display glitches. This could be the last 1.0.x release, unless
+translations for other languages get written.
+
+1.0.2 fixes some language issues (sorry English speakers), has better
+installation instructions and an easter egg.
+
+1.0.1 is an early release. It is fully working but lacks documentation. This
+will be addressed in 1.0.2, which should be out shortly. Also, this software was
+developed by French-speaking people so there may be some artifacts of that in
+various places in the code. This will surely disappear over time.
+
+1.0 was fully working but a few cosmetic bugs had to be ironed out.
+
+FUTURE RELEASES
+===============
+
+1.2.0 will have the following features:
+    - Week starting on Sunday and 5-day work week
+    - Palm Pilot integration
+
+Future plans/dreams:
+    - Ability to choose from different stylesheets (themeability!)
+    - SMS reminders
+    - Send reminder to address ____________
+    - WinPopup/ICQ/AIM/MSN (maybe)/Yahoo/Jabber reminders
+
+CONTACT
+=======
+
+Send questions/suggestions/flames/patches to chronoss-devel@lists.sourceforge.net.
+
+Linux Québec Technologies offers professionnal support for this software.
+Visit Linux Québec Technologies at http://www.linuxquebec.com.
+Send support inquiries to info@linuxquebec.com.

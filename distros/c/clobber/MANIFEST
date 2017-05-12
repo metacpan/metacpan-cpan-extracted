@@ -1,0 +1,6 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+lib/clobber.pm
+META.yml                                 Module meta-data (added by MakeMaker)

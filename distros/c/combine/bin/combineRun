@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+# $Id: combineRun 18 2005-11-03 16:22:19Z anders $
+
+# Copyright (c) 1996-1998 LUB NetLab
+# 
+# See the file LICENCE included in the distribution.
+
+$pidfile = shift @ARGV;
+
+open(PID,">$pidfile");
+print PID "$$\n";
+close PID;
+
+while (1) {
+
+  if ( system(@ARGV) < 0 )  {
+     sleep 30;
+  }
+
+}
+
+
+__END__
+
+
+=head1 NAME
+
+combineRun - starts, monitors and restarts a combine harvesting process
+
+=head1 SYNOPSIS
+
+combineRun <pidfile> <combine command to run>
+
+=head1 DESCRIPTION
+
+Starts a program and monitors it in order to make sure there is alsways
+a copy running. If the program dies it will be restarted with the same
+parameters. Used by C<combineCtrl> when starting combine crawling.
+
+=head1 SEE ALSO
+
+combineCtrl
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

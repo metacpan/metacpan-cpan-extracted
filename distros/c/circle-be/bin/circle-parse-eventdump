@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Slurp qw( slurp );
+use Getopt::Long;
+use POSIX qw( strftime );
+use Text::Balanced qw( extract_bracketed );
+use YAML qw( LoadFile );
+
+GetOptions(
+   'timestamp|t=s' => \(my $TIMESTAMP = "%Y/%m/%d %H:%M:%S"),
+   'theme=s' => \(my $THEME = "../circle-fe-term/share/circle-fe-term.theme"), # TODO
+) or exit 1;
+
+my $filename = shift @ARGV; defined $filename or die "Require a filename\n";
+
+my %theme;
+{
+   foreach ( slurp $THEME ) {
+      next unless m/^(.*?)=(.*)$/;
+      $theme{$1} = $2;
+   }
+}
+
+my $events = LoadFile( $filename );
+
+foreach my $ev ( @$events ) {
+   my ( $type, $time, $args ) = @$ev;
+   my $timestamp = strftime $TIMESTAMP, localtime $time;
+
+   my $template = $theme{$type} or (print "<<unrecognised event $type>>\n"), next;
+
+   my $text = process( $template, $args );
+
+   print "$timestamp: $text\n";
+}
+
+sub process
+{
+   my ( $template, $args ) = @_;
+
+   my $ret = "";
+   while( length $template ) {
+      if( $template =~ s/^\$(\w+)// ) {
+         my $val = $args->{$1};
+         my @parts = ref $val eq "ARRAY" ? @$val : ( $val );
+         foreach my $part ( @parts ) {
+            $ret .= ref $part eq "ARRAY" ? $part->[0] : $part;
+         }
+      }
+      elsif( $template =~ m/^{/ ) {
+         my $piece = extract_bracketed( $template, "{}" );
+         s/^{//, s/}$// for $piece;
+
+         my ( $code, $content ) = split( m/ /, $piece, 2 );
+         $ret .= process( $content, $args );
+      }
+      else {
+         $template =~ s/^([^\$\{]+)//;
+         $ret .= $1;
+      }
+   }
+
+   return $ret;
+}

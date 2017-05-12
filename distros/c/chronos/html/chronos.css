@@ -1,0 +1,226 @@
+body {
+	font-family: serif;
+	font-size: 12pt;
+	background-color: #6E7B8B;
+}
+
+table {
+	border: 1px black solid;
+	background-color: #6E7B8B;
+}
+
+table.dayview {
+	border-right: 1px black solid;
+	border-bottom: 1px black solid;
+	border-collapse: collapse;
+}
+
+td.top {
+	background-color: black;
+	color: white;
+	font-weight: bold;
+}
+
+td.header {
+	background-color: #CCCCCC;
+	font-weight: bold;
+}
+
+td.dayview {
+	background-color: #CCCC99;
+	border-top: 1px black solid;
+	text-align: left;
+}
+
+td.weektaskview {
+	background-color: #CCCC99;
+	border-top: 1px black solid;
+	border-right: 1px black solid;
+	text-align: left;
+}
+
+th.dayview {
+	background-color: #CCCC99;
+	border-left: 1px black solid;
+	border-top: 1px black solid;
+	font-weight: bold;
+}
+
+td.dayviewhour {
+	background-color: #CCCC99;
+	border-top: 1px black solid;
+	border-left: 1px black solid;
+	border-right: 1px black solid;
+	text-align: center;
+	width: 50px;
+}
+
+td.dayviewcurhour {
+    background-color: white;
+    border: 2px black dashed;
+    text-align: center;
+    width: 50px;
+}
+
+td.event {
+	background-color: white;
+	border-right: 1px black solid;
+	border-top: 1px black solid;
+	border-left: 1px black solid;
+	vertical-align: top;
+}
+
+td.dayheader {
+	background-color: #CCCC99;
+	border: 1px black solid;
+	font-weight: bold;
+}
+
+th.minimonth {
+	background-color: black;
+	font-weight: bold;
+	color: white;
+	text-align: center;
+}
+
+table.minimonth {
+	background-color: white;
+	padding: 2px;
+	text-align: center;
+}
+
+table.taskview {
+	background-color: white;
+	text-align: left;
+    padding: 2px;
+}
+
+td.minimonthfooter {
+	background-color: #CCCCC0;
+	font-weight: bold;
+	font-size: 10pt;
+	text-align: center;
+}
+	
+a {
+	color: black;
+}
+
+a:visited {
+	color: black;
+}
+
+a.daycurmonth {
+	color: blue;
+	font-size: 12pt;
+}
+
+a.daycurmonth:visited {
+	color: blue;
+	font-size: 12pt;
+}
+
+td.curday {
+	border: 2px black dashed;
+}
+
+a.today {
+	color: red;
+	font-size: 12pt;
+    font-weight: bold;
+}
+
+a.today:visited {
+	color: red;
+	font-size: 12pt;
+    font-weight: bold;
+}
+
+a.event {
+	color: blue;
+}
+
+a.event:visited {
+	color: blue;
+}
+
+a.dayothermonth {
+	color: #CCCCCC;
+}
+
+a.dayothermonth:visited {
+	color: #CCCCCC;
+}
+
+a.minimonthheader {
+	color: white;
+	text-decoration: none;
+}
+
+a.minimonthheader:visited {
+	color: white;
+}
+
+table.editevent {
+	background-color: white;
+	border: 1px black solid;
+	width: 100%;
+}
+
+td.eventlabel {
+	font-weight: bold;
+    vertical-align: top;
+    border-bottom: 1px black dotted;
+}
+
+td.dayothermonth {
+	border: 1px black solid;
+	vertical-align: top;
+	text-align: left;
+	background-color: #CCCC99;
+	font-size: 10pt;
+}
+
+td.daycurmonth {
+	border: 1px black solid;
+	vertical-align: top;
+	text-align: left;
+	background-color: white;
+	font-size: 10pt;
+}
+
+a.header {
+	color: white;
+}
+
+a.header:visited {
+	color: white;
+}
+
+img {
+	border: none;
+}
+
+td.attachment {
+	font-family: sans-serif;
+	font-size: 10pt;
+	font-weight: bold;
+}
+
+a.attachment {
+	color: blue;
+}
+
+a.attachment:visited {
+	color: blue;
+}
+
+table.attachments {
+	border: none;
+	background-color: white;
+	padding: 10px;
+}
+
+ul {
+    margin: 0px;
+}

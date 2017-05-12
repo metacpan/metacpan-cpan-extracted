@@ -1,0 +1,25 @@
+cPanel version 0.0.1
+============================
+
+See
+ perldoc cPanel
+for more info
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+ perl -MCPAN -e 'install cPanel;'
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

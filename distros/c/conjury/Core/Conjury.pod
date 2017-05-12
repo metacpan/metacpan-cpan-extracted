@@ -1,0 +1,142 @@
+=head1 NAME
+
+Conjury - Introduction to Perl Conjury
+
+=head1 DESCRIPTION
+
+Perl Conjury is a general purpose software construction framework.
+It's an alternative to the venerable B<make> utility, but since it is
+written entirely in Perl, its capabilities extend to functions
+traditionally implemented using a text preprocessor to generate
+F<Makefile> files, i.e. to configure for product variants.
+
+The Perl Conjury system is a modular framework.  The core software is
+very general.  For example, to compile and link executable programs
+written in C or C++, you'll need the F<Conjury::C> module-- bundled
+separately.
+
+To use Perl Conjury, you will need Perl installed on your system.  The
+command line utility is named B<cast>, and it is a very short Perl
+script.  It simply loads the F<Conjury::Core> module, which does the
+heavy lifting: parsing the arguments and interpreting the files
+containing the "spells" for constructing your products from their
+sources.
+
+Before the B<cast> utility loads the F<Conjury::Core> module, it first
+tries to add the top of the source file hierarchy to the Perl library
+search path.  It does this by looking for a F<Conjury> directory in
+the current directory, then its parent, that that directory's parent,
+all the way to the root of the current directory.  Application
+specific modules for constructing the software should be placed in
+this directory and use the C<Conjury> namespace.
+
+You can carry all the general purpose Perl Conjury modules around with
+your source code, in whole or in part-- altering them for your own
+ends, if you like.  Alternatively, you can just require that they be
+properly installed in the Perl site library.  Your choice.
+
+If you use the F<Conjury::Core> module from the Perl Conjury
+distribution, then files named F<Conjury.pl>, which you place in the
+same directories as the source, contain the code for constructing the
+products.  These are written in Perl, and use modules from the Perl
+Conjury distribution as well as application-specific modules that are
+part of the source for the software under construction.
+
+You'll need a F<Conjury.pl> file at the top of your source file
+hierarchy, but you may use the C<Conjury::Core::deferral>
+function to create spells that defer action to other spells defined in
+F<Conjury.pl> files you place in different locations in the source file
+hierarchy.
+
+=head1 FILES
+
+=over 4
+
+=item F<Conjury.pl>
+
+These files are Perl libraries (i.e. they are not executed directly,
+but rather loaded by the B<cast> utility) that contain the code for
+constructing products from the source file with which they are
+associated.
+
+=item F<Conjury>
+
+This directory is found at the top of the source file hierarchy for
+the software under construction.
+
+=back
+
+=head1 SEE ALSO
+
+More documentation can be found in L<cast>, L<Conjury::Core> and, of
+course-- L<Perl>.
+
+=head1 NOTES
+
+You're wondering-- why the name "Conjury" of all things?  It's very simple.
+
+If you have much experience owning and maintaining the code
+responsible for constructing a large, complex, cross-platform software
+system using B<make>, you've probably seen all manner of horrific
+mechanisms for generating F<Makefile> files using arcane translators
+and text processors.  Some commercial software development
+environments even seem to perpetuate the problem to promote particular
+platforms.
+
+These systems tend to combine the worst features of several languages
+together into the sort of Lovecraftian crawling horror that makes Perl
+seem like a harmless, fluffy bunny in comparison-- thus, the
+motivation for this work.
+
+If you haven't yet, you really must see the sequence in that 1950's
+era animated feature film in which the most famous mouse in the world
+is "the sorcerer's apprentice," and he has used his master's magical
+arts to create an army of animated broomsticks to carry his water for
+him. It is the image of the mouse swirling around in the vortex of a
+whirlpool in the torrent of water his broomsticks dutifully create for
+him, while he is frantically thumbing through the documentation
+looking for the spell that will shut them all down, that the author
+had in mind when he was casting about for a name for this framework.
+
+=head1 CREDIT AND ATTRIBUTION
+
+James Woodyatt <F<jhw@wetware.com>>
+
+The venerable B<make> and its derivatives have inspired many attempts
+at better ways to approach basically the same problem. Perl Conjury is
+not the first, and it will doubtless not be the last. The author
+wishes to give due credit to the authors of B<jam> and B<cons> for the
+deep thinking that inspired this work-- in particular, the idea of
+journaling MD5 signatures to track which productions are up-to-date is
+a very good one, and the author slammed his forehead with his open
+palm very hard when he first saw it in the B<cons> utility.
+
+=head1 LICENSE
+
+Copyright (c) 1999-2000 James H. Woodyatt.
+All rights reserved.
+
+Redistribution and use of the software in source and machine-readable
+forms, with or without modification, are permitted provided that the
+following conditions are met:
+
+1. Redistributions of source code must contain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in machine-readable form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND ITS
+CONTRIBUTORS ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO THE IMPLIED MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE
+COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+OF USE, DATA OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBLITY OF SUCH
+DAMAGE.

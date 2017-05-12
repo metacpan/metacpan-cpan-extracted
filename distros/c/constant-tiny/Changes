@@ -1,0 +1,15 @@
+Revision history for constant-tiny
+
+1.02 - 2015.08.15 (SAPER)
+  - Bugfix: [RT #99169] fix test failing with Perl 5.21.4 and newer. Thanks
+    to Slaven Rezic for the patch, and Todd Wade for pinging me.
+  - Bugfix: [RT #103958] fix a new warning added with Perl 5.21.4. Thanks to
+    Slaven Rezic for the patch, and Todd Wade for pinging me.
+
+1.01 - 2013.05.05 (SAPER)
+  - Bugfix: Avoid "redefine" warning if constant.pm is already loaded.
+  - Tests: Fix a mistake and skip the tests which are not relevant.
+
+1.00 - 2013.03.20 (SAPER)
+  - First released version.
+

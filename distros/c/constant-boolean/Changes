@@ -1,0 +1,19 @@
+------------------------------------------------------------------------
+0.02 | Piotr Roszatycki <dexter@debian.org> | 2009-11-28
+
+New:
+
+* Imported symbols can be removed with "no constant::boolean" pragma.
+
+Changes:
+
+* Built with the lates Module::Build.
+
+* Requires Symbol::Util >= 0.02 for unimport method.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@debian.org> | 2008-12-27
+
+* Initial release
+
+------------------------------------------------------------------------

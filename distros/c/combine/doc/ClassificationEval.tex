@@ -1,0 +1,172 @@
+\section{Evaluation of automated subject classification}
+\label{autoclasseval}
+
+\subsection{Approaches to automated classification}
+According to \cite{Golub_Review}, one can distinguish between three major approaches to automated classification: text categorization, document clustering, and string-to-string matching. 
+
+Machine learning, or text categorization, is the most widespread approach to automated classification of text, in which characteristics of pre-defined categories are learnt from intellectually categorized documents. However, intellectually categorized documents are not available in many subject areas, for different types of documents or for different user groups. For example, today the standard text classification benchmark is a Reuters RCV1 collection \cite{Lewis_etal_04}, which has about 100 classes and 800000 documents. This would imply that for a text categorization task some 8000 training and testing documents per class are needed. Another problem is that the algorithm works only for that document collection on which parts it has been trained. In addition, \cite{Yang_99} claims that the most serious problem in text categorization evaluations is the lack of standard data collections and shows how different versions of the same collection have a strong impact on performance, whereas other versions do not. 
+
+In document clustering, the predefined categories (the controlled vocabulary) are automatically produced: both clusters' labels and relationships between them are automatically generated. Labelling of the clusters is a major research problem, with relationships between the categories, such as those of equivalence, related-term and hierarchical relationships, being even more difficult to automatically derive (\cite{Svenonius_2000}, p.168). "Automatically-derived structures often result in heterogeneous criteria for category membership and can be difficult to understand" \cite{Chen_Dumais_2000}. Also, clusters change as new documents are added to the collection. 
+
+In string-to-string matching, matching is conducted between a controlled vocabulary and text of documents to be classified. This approach does not require training documents. Usually weighting schemes are applied to indicate the degree to which a term from a document to be classified is significant for the document's topicality. The importance of the controlled vocabularies such as thesauri in automated classification has been recognized in recent research. \cite{Bang_etal_06} used a thesaurus to improve performance of the k-NN classifier and managed to improve precision for about 14 \%, without degrading recall. \cite{Medelyan_06} showed how information from a subject-specific thesaurus improved performance of key-phrase extraction by more than 1,5 times in F1, precision, and recall. \cite{Garces_etal_06} demonstrated that subject ontologies could help improve word sense disambiguation.
+
+Thus, the chosen approach to automated subject classification in the crawler was string-matching. Apart from the fact that no training documents are required, a major motivation to apply this approach was to re-use the intellectual effort that has gone into creating such a controlled vocabulary. Vocabulary control in thesauri is achieved in several ways, out of which the following are beneficial for automated classification:
+\begin{itemize}
+\item the terms are usually noun phrases, which are content words;
+\item the meaning of the term is restricted to that most effective for the purposes of a particular thesaurus, which is indicated by the addition of scope notes and definitions, providing additional context for automated classification;
+\item three main types of relationships are displayed in a thesaurus:
+ 1) equivalence (synonyms, lexical variants, terms treated as synonyms for general purposes); 2) hierarchical (generic, whole-part or instance relationships); 3) associative (terms that are closely related conceptually but not hierarchically and are not members of an equivalence set). 
+\end{itemize}
+In automated classification, equivalence terms allow for discovering the concepts and not just words expressing them. Hierarchies provide additional context for determining the correct sense of a term, and so do associative relationships.
+
+\subsubsection{Description of the used string-matching algorithm}
+Automated classification approach used for evaluation was \hyperref{string-matching of terms}{string-matching of terms (cf. section }{)}{autoclass} from an engineering-specific controlled vocabulary Engineering Index (Ei) thesaurus and classification scheme, used in Elsevier's Compendex database. Ei classification scheme is organized into six categories which are divided into 38 subjects, which are further subdivided into 182 specific subject areas. These are further subdivided, resulting in some 800 individual classes in a five-level hierarchy. In Ei there are on average 88 intellectually selected terms designating one class.
+
+The algorithm searches for terms from the Ei thesaurus and classification scheme in documents to be classified. In order to do this, a term list is created, containing class captions, different thesauri terms and classes which the terms and captions denote. 	The term list consists of triplets: term (single word, Boolean term or phrase), class which the term designates or maps to, and weight. Boolean terms consist of words that must all be present but in any order or in any distance from each other. The Boolean terms are not explicitly part of the Ei thesaurus, so they had to be created in a pre-processing step. They are considered to be those terms which contain the following strings: '\verb+and+', '\verb+vs.+' (short for versus), '\verb+,+' (comma), '\verb+;+' (semi-colon, separating different concepts in class names), '\verb+(+' (parenthesis, indicating the context of a homonym), '\verb+:+' (colon, indicating a more specific description of the previous term in a class name), and '\verb+--+' (double dash, indicating heading--subheading relationship). Upper-case words from the Ei thesaurus and classification scheme are left in upper case in the term list, assuming that they are acronyms. All other words containing at least one lower-case letter are converted into lower case. Geographical names are excluded on the grounds that they are not being engineering-specific in any sense. 
+
+The following is an excerpt from the Ei thesaurus and classification scheme, based on which the excerpt from the term list (further below) was created.\\
+From the classification scheme (captions):
+\begin{verbatim}
+931.2 Physical Properties of Gases, Liquids and Solids
+...
+942.1 Electric and Electronic Instruments
+...
+943.2 Mechanical Variables Measurements
+\end{verbatim}
+From the thesaurus:
+\begin{verbatim}
+TM Amperometric sensors
+UF Sensors--Amperometric measurements
+MC 942.1
+
+TM Angle measurement
+UF Angular measurement
+UF Mechanical variables measurement--Angles
+BT Spatial variables measurement
+RT Micrometers
+MC 943.2
+
+TM Anisotropy
+NT Magnetic anisotropy
+MC 931.2
+\end{verbatim}
+TM stands for the preferred term, UF for synonym, BT for broader term, RT for related term, NT for narrower term; MC represents the main class. Below is an excerpt from one term list, as based on the above examples:
+\begin{verbatim}
+1: electric @and electronic instruments=942.1,
+1: mechanical variables measurements=943.2,
+1: physical properties of gases @and liquids @and solids=931.2,
+1: amperometric sensors=942.1,
+1: sensors @and amperometric measurements=942.1,
+1: angle measurement=943.2,
+1: angular measurement=943.2,
+1: mechanical variables measurement @and angles=943.2,
+1: spatial variables measurement=943.2,
+1: micrometers=943.2,
+1: anisotropy=931.2,
+1: magnetic anisotropy=931.2
+\end{verbatim}
+
+The algorithm looks for strings from a given term list in the document to be classified and if the string (e.g. 'magnetic anisotropy' from the above list) is found, the class(es) assigned to that string in the term list ('931.2' in our example) are assigned to the document. One class can be designated by many terms, and each time the class is found, the corresponding weight ('1' in our example) is assigned to the class.
+
+The scores for each class are summed up and classes with scores above a certain cut-off (heuristically defined) can be selected as the final ones for that document. Experiments with different weights and cut-offs are described in the following sections.
+
+
+\subsection{Evaluation methodology}
+\subsubsection{Evaluation challenge}
+According to \cite{International_85}, intellectually-based subject indexing is a process involving the following three steps: determining the subject content of the document, conceptual analysis to decide which aspects of the subject should be represented, and translation of those concepts or aspects into a controlled vocabulary. These steps are based on the library's policy in respect to their collections and user groups. Thus, when in automated classification study, the used document collection is the one in which documents have been indexed intellectually, the policies based on which indexing has been conducted should also be known, and automated classification should then be based on those policies as well.
+ 
+Ei thesaurus and classification scheme is rather big and deep (five hierarchical levels), allowing many different choices. Without a thorough qualitative analysis of automatically assigned classes one cannot be sure if, for example, the classes assigned by the algorithm, which were not intellectually assigned, are actually wrong, or if they were left-out by mistake or because of the indexing policy.
+
+In addition, subject indexers make errors such as those related to exhaustivity policy (too many or too few terms get assigned), specificity of indexing (usually this error means that not the most specific term found was assigned), they may omit important terms, or assign an obviously incorrect term (\cite{Lancaster_03}, p.86-87). In addition, it has been reported that different people, whether users or subject indexers, would assign different subject terms or classes to the same document. Studies on inter-indexer and intra-indexer consistency report generally low indexer consistency (\cite{Olson_01}, p. 99-101). There are two main factors that seem to affect it: 1) higher exhaustivity and specificity of subject indexing both lead to lower consistency (indexers choose the same first term for the major subject of the document, but the consistency decreases as they choose more classes or terms); 2) the bigger the vocabulary, or, the more choices the indexers have, the less likely they will choose the same classes or terms (ibid.). Few studies have been conducted as to why indexers disagree \cite{Hjorland06}. 
+
+Automated classification experiments today are mostly conducted under controlled conditions, ignoring the fact that the purpose of automated classification is improved information retrieval, which should be evaluated in context (cf. \cite{1Ingwersen_05}). As Sebastiani (\cite{Sebastiani_02} p. 32) puts it, ``the evaluation of document classifiers is typically conducted experimentally, rather than analytically. The reason is that we would need a formal specification of the problem that the system is trying to solve (e.g. with respect to what correctness and completeness are defined), and the central notion that of membership of a document in a category is, due to its subjective character, inherently nonformalizable''.
+
+Due to the fact that methodology for such experiments has yet to be developed, as well as due to limited resources, we follow the traditional approach to evaluation and start from the assumption that intellectually assigned classes in the data collection are correct, and the results of automated classification are being compared against them.
+
+\subsubsection{Evaluation measures used}
+Assuming that intellectually assigned classes in the data collection are correct, evaluation in this study is based on comparison of automatically derived classes against the intellectually assigned ones. Ei classes are much related to each other and often there is only a small topical difference between them. The topical relatedness is expressed in numbers representing the classes: the more initial digits any two classes have in common, the more related they are. Thus, comparing the classes at only the first few digits instead of all the five (each representing one hierarchical level), would also make sense. Evaluation measures used were the standard microaveraged and macroaveraged precision, recall and F1 measures (\cite{Sebastiani_02}, p.33) for complete matching of all digits as well as for partial matching.
+
+\subsubsection{Data collection}
+In the experiments, the following data collections were used:
+\begin{enumerate}
+\item For deriving significance indicators assigned to different Web page elements \cite{ardo05:_ECDL}, and identifying issues specific to Web pages \cite{GolubChall} some 1000 Web pages engineering, to which Ei classes had been manually assigned as part of the \htmladdnormallinkfoot{EELS subject gateway}{http://eels.lub.lu.se/} were used.
+\item For deriving weights based on the type of controlled vocabulary term \cite{GolubRole},
+and for enriching the term list with terms extracted using natural language processing,
+the data collection consisted of 35166 document records from the \htmladdnormallinkfoot{Compendex database}{http://www.engineeringvillage2.org/}. From each document record the following elements were utilized: an identification number, title, abstract and intellectually pre-assigned classes, for example:\\[2mm]
+{\small\tt
+{\bf Identification number}:  03337590709\\
+{\bf Title}:  The concept of relevance in IR\\
+{\bf Abstract}:  This article introduces the concept of relevance as viewed and applied in the context of IR evaluation, by presenting an overview of the multidimensional and dynamic nature of the concept. The literature on relevance reveals how the relevance concept, especially in regard to the multidimensionality of relevance, is many faceted, and does not just refer to the various relevance criteria users may apply in the process of judging relevance of retrieved information objects. From our point of view, the multidimensionality of relevance explains why some will argue that no consensus has been reached on the relevance concept. Thus, the objective of this article is to present an overview of the many different views and ways by which the concept of relevance is used - leading to a consistent and compatible understanding of the concept. In addition, special attention is paid to the type of situational relevance. Many researchers perceive situational relevance as the most realistic type of user relevance, and therefore situational relevance is discussed with reference to its potential dynamic nature, and as a requirement for interactive information retrieval (IIR) evaluation.\\
+{\bf Ei classification codes}:  903.3 Information Retrieval \& Use, 723.5 Computer Applications, 921 Applied Mathematics
+}
+
+In our collection we included only those documents that have at least one class in the area of Engineering, General, covered by 92 classes we selected. The subset of 35166 documents was selected from the Compendex database by simply retrieving the first documents offered by the Compendex user interface, without changing any preferences. The query was to find those documents that were assigned a certain class. A minimum of 100 documents per class was retrieved at several different points in time during the last year. Compendex is a commercial database so the subset cannot be made available to others. However, the authors can provide documents' identification numbers on request. In the data collection there were on average 838 documents per class, ranging from 138 to 5230.
+
+\item For comparing classification performance of the string-matching algorithm against a machine-learning one \cite{ardo06:_ECDL}, the data collection consisted of a subset of paper records from the Compendex database, classified into six selected classes. In this run of the experiment, only the six classes were selected in order to provide us with indications for further possibilities. Classes 723.1.1 (Computer Programming Languages), 723.4 (Artificial Intelligence), and 903.3 (Information Retrieval and Use) each had 4400 examples (the maximum allowed by the Compendex database provider), 722.3 (Data Communication Equipment and Techniques) 2800, 402 (Buildings and Towers) 4283, and 903 (Information Science) 3823 examples.
+\end{enumerate}
+
+\subsection{Results}
+
+\subsubsection{The role of different thesauri terms}
+In one study \cite{GolubRole}, it has been explored to what degree different types of terms in Engineering Index influence automated subject classification performance. Preferred terms, their synonyms, broader, narrower, related terms, and captions were examined in combination with a stemmer and a stop-word list. The best performance measured as mean F1 macroaveraged and microaverage F1 values has the preferred term list, and the worst one the captions list. Stemming showed to be beneficial in four out of the seven different term lists: captions, narrower, preferred, and synonyms. Concerning stop words, the mean F1 improved for narrower and preferred terms. Concerning the number of classes per document that get automatically assigned, when using captions less than one class is assigned on average even when stemming is applied; narrower and synonyms improve with stemming, close to our aim of 2,2 classes that have been intellectually assigned. The most appropriate number of classes get assigned when preferred terms are used with stop-words. 
+
+Based on other term types, too many classes get assigned, but that could be dealt with in the future by introducing cut-offs. 
+Each class is on average designated by 88 terms, ranging from 1 to 756 terms per class. The majority of terms are related terms, followed by synonyms and preferred terms. By looking at the 10 top-performing classes, it was shown that the sole number of terms designating a class does not seem to be
+proportional to the performance. Moreover, these best performing classes do not have a similar distribution of types of terms designating them, i.e. the percentage of certain term types does not seem to be directly related to performance. The same was discovered for the 10 worst-performing classes.
+
+In conclusion, the results showed that preferred terms perform best, whereas captions perform worst. Stemming in most cases showed to improve performance, whereas the stop-word list did not have a significant impact. The majority of classes is found when using all the terms and stemming: micro-averaged recall is 73 \%. The remaining 27 \% of classes were not found because the words in the term list designating the classes did not exist in the text of the documents to be classified. This study implies that all types of terms should be used for a term list in order to achieve best recall, but that higher weights could be given to preferred terms, captions and synonyms, as the latter yield highest precision. Stemming seems useful for achieving higher recall, and could be balanced by introducing weights for stemmed terms. Stop-word list could be applied to captions, narrower and preferred terms.
+
+\subsubsection{Enriching the term list using natural language processing}
+In order to allow for better recall, the basic term list was enriched with new terms. From the basic term list, preferred and synonymous terms were taken, since they give best precision, and based on them new terms were extracted. These new terms were derived from documents issued from the Compendex database, using multi-word morpho-syntactic analysis and synonym acquisition. Multi-word morpho-syntactic analysis was conducted using a unification-based partial parser FASTER which analyses raw technical texts and, based on built-in meta-rules, detects morpho-syntactic variants. The parser exploits morphological (derivational and inflectional) information as given by the database CELEX. Morphological analysis was used to identify derivational variants (e.g. effect of gravity: gravitational effect), and syntactical analysis to insert word inside a term (e.g. flow measurement: flow discharge measurements), permute components of a term (e.g. control of the inventory: inventory control) or add a coordinated component to a term (e.g. control system: control and navigation system). 
+
+Synonyms were acquisited using a rule-based system, SynoTerm which infers synonymy relations between complex terms by employing semantic information extracted from lexical resources. Documents were first preprocessed and tagged with part-of-speech information and lemmatized. Terms were then identified using the term extractor YaTeA based on parsing patterns and endogenous disambiguation.  The semantic information provided by the database WordNet was used as a bootstrap to acquire synonym terms of the basic terms. 
+
+The number of classes that were enriched using these natural language processing methods is as follows: derivation 705, out of which 93 adjective to noun, 78 noun to adjective, and 534 noun to verb derivations; permutation 1373; coordination 483; insertion 742; preposition change 69; synonymy 292 automatically extracted, out of which 168 were manually verified as correct. 
+
+By combining all the extracted terms into one term list, the mean F1 is 0.14 when stemming is applied, and microaveraged recall is 0.11. This implies that enriching the original Ei-based term list should improve recall. In comparison to results we get when gained with the original term list (micro-averaged recall with stemming 0.73), here the best recall, also microaveraged and with stemming, is 0.76.
+
+\subsubsection{Importance of HTML structural elements and metadata}
+In \cite{ardo05:_ECDL} the aim was to determine how significance indicators assigned to different Web page elements (internal metadata, title, headings, and main text) influence automated classification. The data collection that was used comprised 1000 Web pages in engineering, to which Engineering Information classes had been manually assigned. The significance indicators were derived using several different methods: (total and partial) precision and recall, semantic distance and multiple regression. It was shown that for best results all the elements have to be included in the classification process. The exact way of combining the significance indicators turned out not to be overly important: using the F1 measure, the best combination of significance indicators yielded no more than 3 \% higher performance results than the baseline.
+
+\subsubsection{Challenges and recommendations for classification of Web pages}
+Issues specific to Web pages were identified and discussed in \cite{GolubChall}. The focus of the study was a collection of Web pages in the field of engineering. Web pages present a special challenge: because of their heterogeneity, one principle (e.g. words from headings are more important than main text) is not applicable to all the Web pages of a collection. For example, utilizing information from headings on all Web pages might not give improved results, since headings are sometimes used simply instead of using bold or a bigger font size.
+
+A number of weaknesses of the described approach were identified:
+\begin{enumerate}
+\item Class not found at all, because the words in the term list designating the classes were not found in the text of the Web page to be classified.
+\item Class found but below threshold, which has to do with weighting and cut-off values. This is because in the approach only classes with scores above a pre-defined cut-off value are selected as the classes for the document: the final classes selected are those with scores that contain at least 5 \% of the sum of all the scores assigned in total, or, if such a class doesn't exist, the class with the top score is selected. Another reason could be that the classification algorithm is made to always pick the most specific class as the final one, which is in accordance with the given policy for intellectual classification.
+\item Wrong automatically assigned class. Based on the sample, four different sub-problems have been identified:
+\begin{itemize}
+\item words recognized as homonyms or distant synonyms; 
+\item word found on a Web page is there because it is an instance of what it represents, and it is not about such instances (e.g. a Web page on online tutorials and e-learning programs for technical fields gets wrongly classified as a Web page on 'education');
+\item too distant term-class mappings, including cases when one term in the term list is mapped to several different classes;
+\item words mentioned on the Web page have little to do with the Web page's aboutness, e.g. an institution's Web page gets wrongly classified as 'facsimile systems and technology', because among their contact information, there is also a fax number, and the word 'fax' is mapped to that class.
+\end{itemize}
+\item Automatically assigned class that is not really wrong, which probably has to do with the subject indexing policy such as exhaustivity. 
+\end{enumerate}
+
+Ways to deal with those problems were proposed for further research. These include enriching the term list with synonyms and different word forms, adjusting the term weights and cut-off values and word-sense disambiguation. In our further research the plan is to implement automated methods. On the other hand, the suggested manual methods (e.g. adding synonyms) would, at the same time, improve Ei's original function, that of enhancing retrieval. Having this purpose in mind, manually enriching a controlled vocabulary for automated classification or indexing would not necessarily create additional costs. 
+
+
+\subsubsection{Comparing and combining two approaches}
+In \cite{ardo06:_ECDL} a machine-learning and a string-matching approach to automated subject classification of text were compared as to their performance on a test collection of six classes. Our first hypothesis was that, as the string-matching algorithm uses manually constructed model, we expect it to have higher precision than the machine learning with its automatically constructed model. On the other hand, while the machine-learning algorithm builds the model from the training data, we expect it to have higher recall in addition to being more flexible to changes in the data. Experiments have confirmed the hypothesis only on one of the six classes. Experimental results showed that SVM on average outperforms the string-matching algorithm. Different results were gained for different classes. The best results in string-matching are for class 402, which we attribute to the fact that it has the highest number of term entries designating it (423). Class 903.3, on
+the other hand, has only 26 different term entries designating it in the string-matching term list, but string-matching largely outperforms SVM in precision (0.97 vs. 0.79). This is subject to further investigation.
+
+The two approaches being complementary, we investigated different combinations of the two based on combining their vocabularies. 
+The linear SVM in the original setting was trained with no feature selection except the stop-word removal. Additionally, three experiments were conducted using feature selection, taking:
+\begin{enumerate}
+\item only the terms that are present in the controlled vocabulary;
+\item the top 1000 terms from centroid tf-idf vectors for each class (terms that are characteristic for the class - descriptive terms);
+\item the top 1000 terms from the SVM-normal trained on a binary classification problem for each class (terms that distinguish one class form the rest distinctive terms).
+\end{enumerate}
+
+In the experiments with string-matching algorithm, four different term lists were created, and we report performance for each of them:
+\begin{enumerate}
+\item the original one, based on the controlled vocabulary;
+\item the one based on automatically extracted descriptive keywords from the documents belonging to their classes;
+\item the one based on automatically extracted distinctive keywords from the documents belonging to their classes;
+\item the one based on union of the first and the second list.
+\end{enumerate}
+
+SVM performs best using the original set of terms, and string-matching approach also has best precision when using the original set of terms. Best recall for string-matching is achieved when using descriptive terms. Reasons for these results need further investigation, including a larger data collection and combining the two using predictions. 
+

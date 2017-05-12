@@ -1,0 +1,32 @@
+NAME
+    CSV2TXT.pm - Version 2.0 13th December 2002
+
+DESCRIPTION
+    CSV2TXT.pm is a PERL5 module to converter csv files to text files.
+
+SYNOPSIS
+    my $csv = Text::CSV2TXT->new(
+        $input,              # the csv file
+        $delimiter,          # csv delimiter
+        $alignment,          # cell alignment
+        $addblanks,          # blanks added at the end of every cell
+        $decimal             # max decimal number
+    );
+
+Remember: you can fin the last release and the last documentation at
+http://www.sanface.com/csv2txt.htm
+Are you interested into cvs2pdf?
+Try our shareware at http://www.sanface.com/csv2pdf.html
+
+AUTHOR
+
+     SANFACE Software sanface@sanface.com
+     http://www.sanface.com/
+
+COPYRIGHT
+
+© SANFACE Software
+
+All Rights Reserved. This program is free software. It may be used,
+redistributed and/or modified under the same terms as Perl itself.
+

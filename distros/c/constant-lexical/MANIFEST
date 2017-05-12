@@ -1,0 +1,12 @@
+Changes
+lib/constant/lexical.pm
+Makefile.PL
+MANIFEST
+README
+t/crash.t
+t/test.t
+t/Test/Builder/Module.pm
+t/Test/Builder.pm
+t/Test/More.pm
+xs/lexical.xs
+META.yml                                 Module meta-data (added by MakeMaker)

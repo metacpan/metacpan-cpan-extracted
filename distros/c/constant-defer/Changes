@@ -1,0 +1,36 @@
+Copyright 2009, 2010, 2011, 2015 Kevin Ryde
+
+This file is part of constant-defer.
+
+constant-defer is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+constant-defer is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with constant-defer.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+Version 6, February 2015
+    - TEST_REQUIRES and test.suggests per Kent Fredric RT#102107
+
+Version 5, February 2011
+    - fixes for perl 5.6 and earlier
+
+Version 4, September 2010
+    - docs clarify not inlined, as suggested by Adam Kennedy
+
+Version 3, September 2010
+    - test manifest only as an author test
+
+Version 2, October 2009
+    - avoid a circular ref in the initial sub created
+
+Version 1, September 2009
+    - the first version

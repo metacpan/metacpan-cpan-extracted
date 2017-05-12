@@ -1,0 +1,11 @@
+ Cnutt-feed
+
+* TODO Gestion correcte des encodages de caractères
+  avec google news ça buggue pas tout le temps
+  avec les blogs wordpress ça à l'air de bien passer
+
+* TODO Option delete pour supprimer les anciennes entrées qui ne sont plus dans le flux
+  existe dans les options mais ne fait rien pour le moment
+
+* TODO plus de plantage quand des images liées dans le html sont inaccessible
+	réglé à coup de eval, fait disparaître complètement le message

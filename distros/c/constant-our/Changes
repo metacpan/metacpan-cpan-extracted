@@ -1,0 +1,41 @@
+Revision history for constant::our
+
+0.07 2012-05-13
+
+    - Fixed tests for Windows
+    - Add warn and die tests
+    - Separate functional and release tests
+    - Replace option auto_build->cpan in Build.PL
+
+0.06 2011-12-31
+
+    - Insert in Build.PL auto_build option
+    - Add alfa version %package_use, %package_set and %package_set_implicitly
+
+0.05 2011-12-30
+
+    - Fixed version in META
+    - Fixed pod
+    - Add test versions
+
+0.04 2011-12-29
+
+    - Rename MYMETA.yml to META.yml
+    - Rename MYMETA.json to META.json
+
+0.03 2011-12-29
+
+    - Add MYMETA.yml MYMETA.json
+    - Fixed pod
+    - Fixed README
+
+0.02 2011-12-28
+
+    - Fixed MANIFEST to match contents of dist
+    - Reformatted pod for constant::our, so narrative text is in ordinary
+      paragraphs, not verbatim
+
+0.01 2010-12-16
+
+    - First version, released on an unsuspecting world.
+

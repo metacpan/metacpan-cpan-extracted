@@ -1,0 +1,29 @@
+coroutine0 version 0.02
+=======================
+
+For the purposes of this module, a coroutine is considered to be a subroutine that
+maintains its state and execution position between calls to it.  To return from
+a coroutine but start up where you left off, use C<YIELD> instead of C<return> to
+send a result back to the caller.
+
+The coroutine declaration syntax leaves much to be desired.  The 0 is suffixed to
+the module name so the coroutine module, when it finally appears, will not have
+to support this clunky code-in-string-paired-with-BODY-keyword syntax.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002,2003 david nicol
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

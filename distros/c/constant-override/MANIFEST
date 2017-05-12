@@ -1,0 +1,12 @@
+lib/constant/override.pm
+Changes
+LICENSE
+README
+MANIFEST			This list of files
+Makefile.PL
+t/001basic.t
+t/002pod.t
+t/003pod-coverage.t
+t/100constant.t
+t/101prototypes.t
+META.yml                                 Module meta-data (added by MakeMaker)

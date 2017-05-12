@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+
+#  You may distribute under the terms of the GNU General Public License
+#
+#  (C) Paul Evans, 2008-2010 -- leonerd@leonerd.org.uk
+
+use strict;
+use warnings;
+
+use Error qw( :warndie );
+
+use Circle;
+use IO::Async::Loop 0.37;
+use IO::Async::Stream;
+
+use Errno qw( ECONNREFUSED );
+use Getopt::Long;
+use Socket qw( AF_INET SOCK_STREAM );
+
+my $PORT;
+my $SOCKPATH;
+my $STDIO;
+
+GetOptions(
+   'p|port=i'   => \$PORT,
+   's|socket=s' => \$SOCKPATH,
+   'stdio'      => \$STDIO,
+   'help' => sub { usage(0) },
+) or usage(1);
+
+sub usage
+{
+   my ( $exitcode ) = @_;
+
+   print { $exitcode ? \*STDERR : \*STDOUT } <<'EOF';
+circle-be [options...]
+
+Options:
+
+   --port, -p PORT           Listen on given TCP port
+
+   --socket, -s SOCKET       Listen on given UNIX socket path
+
+   --stdio                   Listen on STDIN/STDOUT
+
+EOF
+
+   exit $exitcode;
+}
+
+defined($PORT) + defined($SOCKPATH) + defined($STDIO) > 1 and
+   die "Cannot specify more than one of --port, --socket and --stdio\n";
+
+defined($PORT) or defined($SOCKPATH) or defined($STDIO) or
+   usage(1);
+
+my $loop = IO::Async::Loop->new();
+
+my $circle = Circle->new( loop => $loop );
+
+if( defined $PORT ) {
+   $circle->listen(
+      addr => {
+         family   => 'inet',
+         socktype => 'stream',
+         port     => $PORT,
+         ip       => '0.0.0.0', # fscking....
+      },
+      on_fail => sub { print STDERR "Cannot $_[0] - $_[-1]\n"; },
+      on_listen_error  => sub { print STDERR "Cannot listen\n"; },
+   );
+}
+elsif( defined $SOCKPATH ) {
+   if( -e $SOCKPATH ) {
+      if( IO::Socket::UNIX->new( Peer => $SOCKPATH ) ) {
+         # success - existing server running
+         die "Unable to listen on $SOCKPATH - an existing server is running\n";
+      }
+      elsif( $! == ECONNREFUSED ) {
+         # OK - no server listening
+         unlink $SOCKPATH or die "Cannot unlink $SOCKPATH - $!\n";
+      }
+      else {
+         die "Unable to probe if $SOCKPATH is in use - $!\n";
+      }
+   }
+   $circle->listen(
+      addr => {
+         family   => 'unix',
+         socktype => 'stream',
+         path     => $SOCKPATH,
+      },
+      on_fail => sub { print STDERR "Cannot $_[0] - $_[-1]\n"; },
+      on_listen_error => sub { print STDERR "Cannot listen\n"; },
+   );
+}
+elsif( $STDIO ) {
+   $circle->on_stream( IO::Async::Stream->new_for_stdio );
+}
+
+$SIG{__WARN__} = sub {
+   local $SIG{__WARN__}; # disable during itself to avoid looping
+   $circle->warn( @_ );
+};
+
+$SIG{PIPE} = "IGNORE";
+
+$loop->run;

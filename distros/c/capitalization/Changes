@@ -1,0 +1,12 @@
+Revision history for Perl extension capitalization
+
+0.03  Fri May  6 03:02:10 JST 2005
+	* Added support for ALUPPERCASE methods and documentation
+	  (Thanks to Ruslan U. Zakirov)
+
+0.02  Fri May  6 01:08:10 JST 2005
+	- Now _Bar() is callable by _bar()
+	  (Thanks to Ruslan U. Zakirov)
+
+0.01  Thu Feb  7 07:28:31 2002
+	- original version

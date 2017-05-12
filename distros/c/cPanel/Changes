@@ -1,0 +1,6 @@
+Revision history for Perl extension cPanel.
+
+0.0.1  Wed Mar 22 14:52:10 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n cPanel
+

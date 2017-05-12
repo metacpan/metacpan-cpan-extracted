@@ -1,0 +1,163 @@
+#!/usr/bin/perl
+
+## $Id: combineSVM 263 2008-09-03 13:38:22Z anders $
+
+# Copyright (c) Ignacio Garcia Dorado, Anders Ardö 2008
+#
+# See the file LICENCE included in the distribution.
+
+use strict;
+use warnings;
+use Combine::Config;
+use Combine::selurl;
+use Combine::MySQLhdb;
+use Combine::utilPlugIn;
+use Getopt::Long;
+use Algorithm::SVMLight;
+
+my $s = new Algorithm::SVMLight;
+
+my $jobname;
+my $configfile;
+my $good;
+my $bad;
+my $train;
+my $help;
+GetOptions('jobname:s' => \$jobname, 'help' => \$help,
+           'goodurls:s' => \$good, 'badurls:s' => \$bad,
+           'modelSVM:s' => \$train,
+           'configfile:s' => \$configfile );
+if (defined($help)) { Getopt::Long::HelpMessage('See man page combineSVM'); }
+if (defined($jobname)) { Combine::Config::Init($jobname); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+if (!defined($good)) {$good='goodURL.txt'; print STDERR "Using $good for good URLs\n";}
+if (!defined($bad)) {$good='badURL.txt'; print STDERR "Using $bad for bad URLs\n";}
+
+my $sv=Combine::Config::Get('MySQLhandle');
+
+# FIRST WE FETCH ALL BAD AND GOOD PAGES
+my @goodBad=("+1","-1");
+
+#my %set_num;
+#my $i=1;
+
+foreach my $goodBad (@goodBad){
+	if($goodBad eq "+1"){
+		open (TRAINING, "<$good");
+	}
+	else{
+		open (TRAINING, "<$bad");
+	}
+	print "START $goodBad\n";
+	while (my $web = <TRAINING>) {
+		chomp($web);
+		my %set=();
+                my %attr;
+		my $u = new Combine::selurl($web,undef,'sloppy' =>1);
+		if($u && $u->validate){
+			my $urlstr=$u->normalise();
+			my $recordId=GetRecordId($urlstr);
+			next if($recordId==-1);
+			my $xwi = Combine::MySQLhdb::Get($recordId);
+			my @text=Combine::utilPlugIn::GetTEXTinWeb($xwi);
+                        my $label = $goodBad;
+
+			foreach my $term (sort @text){
+				next if (length $term<1);
+				if(!(exists $set{$term})){
+					$set{$term}=1;
+                                        $attr{$term} = 1;
+				}
+			}
+                        my %instance;
+                        $instance{"attributes"} = {%attr};
+                        $instance{"label"}      = $label + 0;
+                        $s->add_instance(%instance);
+		}
+	}
+	close(TRAINING);
+}
+
+#TRAIN
+$s->train;
+
+#SAVE RESULT
+if (!defined($train)) {my $train = 'SVMmodel.txt';}
+print STDERR "Saving the trained SVM model in $train\n";
+
+$s->write_model($train);
+
+sub GetRecordId{
+	my ($web) = @_;
+	my (@recordid) =$sv->selectrow_array(
+	              qq{select recordid from recordurl,urls where recordurl.urlid= urls.urlid and urlstr="$web";});
+	if(!@recordid){
+		my @args=("combine","--jobname",$jobname,"--harvest",$web);
+		system(@args) == 0 or return -1;
+		@recordid =$sv->selectrow_array(
+	  	            qq{select recordid from recordurl,urls where recordurl.urlid= urls.urlid and urlstr="$web";}); 
+	}
+	if(!@recordid){
+		return -1;
+	}
+	else{
+		return $recordid[0];
+	}
+}
+
+print "end\n";
+
+__END__
+
+
+=head1 NAME
+
+combineSVM - generate a SVM model from good and bad examples
+
+
+=head1 SYNOPSIS
+
+combineSVM --jobname <name> [--good <good-file>] [--bad <bad-file>] [--train <model-file>] [--help]
+
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+good is the name of a file with good URLs, one per line. Default 'goodURL.txt'
+
+bad is the name of a file with bad URLs, one per line. Default 'badURL.txt'
+
+train is the name of the file where the trained SVM model will be stored. Default 'SVMmodel.txt'
+
+=head1 DESCRIPTION
+
+Takes two files, one with positive examples (good) and one with negative examples (bad) and
+trains a SVM classifier using these. The resulting model is stored in the file <train>.
+
+The example files should contain one URL per line and nothing else.
+
+=head1 SEE ALSO
+
+combine
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Ignacio Garcia Dorado
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Ignacio Garcia Dorado, Anders Ardö 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

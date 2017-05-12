@@ -1,0 +1,51 @@
+\documentclass[11pt,a4paper,oneside,onecolumn]{article}
+\usepackage{a4}
+  \usepackage[dvips]{graphics}
+  \usepackage{epsfig}
+  \usepackage{html}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\textwidth=15cm
+\textheight=23cm
+\oddsidemargin=-0.1cm
+
+\begin{document}
+
+\title{Documentation for the Combine (focused) crawling system\\
+}
+\author{Anders Ardö, Koraljka Golub}
+\maketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\part{Overview}
+\input{documentation}
+
+\newpage
+
+\part{Gory details}
+\label{gory}
+\input{FAQ}
+\input{ConfigVars}
+\input{DepGraph}
+
+\newpage
+
+\part{ }
+\appendix
+\section{APPENDIX}
+\label{appendix}
+\input{InstallationTest}
+\input{PlugInTemplate}
+\input{defaultConfig}
+\input{SQL}
+
+\subsection{Manual pages}
+\label{manpages}
+\input{ManPages}
+
+\end{document}

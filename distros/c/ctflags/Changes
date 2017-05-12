@@ -1,0 +1,17 @@
+Revision history for Perl extension ctflags.
+
+0.04  Feb 28 2004
+	- unexistant test files removed from MANIFEST
+
+0.03  Fri Jan 31 2003
+	- README file updated
+
+0.02  Fri Jan 31 2003
+	- cleaned up for CPAN distribution
+	- documentation for ctflags::long written
+	- documentation for ctflags::config updated
+
+0.01  Tue Oct  1 16:24:01 2002
+	- original version; created by h2xs 1.22 with options
+		-AX -n ctflags
+

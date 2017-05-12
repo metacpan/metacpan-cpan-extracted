@@ -1,0 +1,4 @@
+Revision history for Perl extension cPanel::nginx.
+
+0.01  Mon Mar 19 20:14:22 2012
+	- released functions getAuthHash for geting WHM access hash and getXMLAPIResult for geting cPanel XMLAPI response

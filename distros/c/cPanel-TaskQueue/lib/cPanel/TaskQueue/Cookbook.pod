@@ -1,0 +1,898 @@
+=head1 NAME
+
+cPanel::TaskQueue::Cookbook - some tasty uses of the cPanel::TaskQueue modules.
+
+=head1 DESCRIPTION
+
+This cookbook attempts to collect some of the normal modes of operation of the
+C<cPanel::TaskQueue> modules. It describes some tasks you might want to accomplish
+and what you need to do to accomplish them.
+
+=head1 RECIPES
+
+=head2 Basics
+
+This section describes some of the fundamentals of using the C<cPanel::TaskQueue>
+modules.
+
+=head3 Create a TaskQueue
+
+Before using a C<cPanel::TaskQueue>, you need to create one.
+
+The first time you instantiate a C<cPanel::TaskQueue> object, it creates the
+object and the cached version of the C<TaskQueue> on disk.
+
+   use cPanel::TaskQueue;
+
+   my $q = cPanel::TaskQueue->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/'
+   });
+
+If the specified I<state_dir> is writable, a state file will be created in this
+directory to hold the C<TaskQueue> data.
+
+=head3 I want a TaskQueue with different defaults.
+
+The C<TaskQueue> has several configurable parameters that you can use to customize
+the functioning of the queue. These parameters are changed by adding more named
+parameters to the C<new> call, when creating the C<cPanel::TaskQeue> object. For
+example,
+
+   my $q = cPanel::TaskQueue->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/', max_running=>10
+    });
+
+changes the number of tasks that are allowed to run at the same time to 10 from
+the default of 2.
+
+You can also set more than one of these parameters at a time. For example, if
+you need to modify all of the timeout values, you code do
+
+   my $q = cPanel::TaskQueue->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/',
+       default_timeout => 30, max_timeout => 600,
+       default_child_timeout => 30*60,
+   });
+
+This sets the default and maximum timeout values for an I<in-process> task to
+30 secs and 10 minutes, respectively. We also set the timeout value for a child
+task to 30 minutes.
+
+=head3 I need to delay the queuing of tasks for some time in the future.
+
+Before using a C<cPanel::TaskQueue::Scheduler>, you need to create one.
+
+The first time you instantiate a C<cPanel::TaskQueue::Scheduler> object, it creates the
+object and the cached version of the C<Scheduler> on disk.
+
+   use cPanel::TaskQueue::Scheduler;
+
+   my $s = cPanel::TaskQueue::Scheduler->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/'
+   });
+
+If the specified I<state_dir> is writable, a state file will be created in this
+directory to hold the C<Scheduler> data.
+
+=head3 I need to access a TaskQueue defined elsewhere.
+
+Let's say you want to access a C<TaskQueue> that has been instantiated elsewhere
+(in this program or another). All you have to do is create a C<cPanel::TaskQueue>
+object with the same I<name> and I<state_dir> as the previous one to have access
+for queuing new tasks and such.
+
+   use cPanel::TaskQueue;
+
+   my $q = cPanel::TaskQueue->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/'
+   });
+
+This C<TaskQueue> is equivalent to any other C<TaskQueue> instantiated with the
+same I<name> and I<state_dir>.
+
+=head3 I need to access a Scheduler defined elsewhere.
+
+Let's say you want to access a C<Scheduler> that has been instantiated elsewhere
+(in this program or another). All you have to do is create a C<cPanel::TaskQueue::Scheduler>
+object with the same I<name> and I<state_dir> as the previous one to have access
+for queuing new tasks and such.
+
+   use cPanel::TaskQueue::Scheduler;
+
+   my $s = cPanel::TaskQueue::Scheduler->new({
+       name=>'tasks', state_dir=>'/var/taskqueue/'
+   });
+
+This C<Scheduler> is equivalent to any other C<Scheduler> instantiated with the
+same I<name> and I<state_dir>.
+
+=head3 Using a Scheduler Token
+
+When working with the C<TaskQueue> system, you may need to pass a C<Scheduler>
+object to another process and access it there. (This is actually how the retry
+logic works. We can't reliably serialize/deserialize a C<cPanel::TaskQueue::Scheduler>
+object because of the potential for inconsistent handling of the locks, so the
+C<Scheduler> provides a method to retrieve a I<Token> that can be used to
+reconstruct an equivalent C<Scheduler> object.
+
+   # in one place in the code.
+   my $token = $s->get_token();
+
+   # From some other place in the code or another process.
+   my $s2 = cPanel::TaskQueue::Scheduler->new({ token=>$token });
+
+At this point, C<$s> and C<$s2> reference the same C<Scheduler> file safely and
+can be treated as one instance of the object.
+
+=head3 I want to add a command processor of my own.
+
+The C<TaskQueue> system would not be too useful without an ability to add more
+commands to process. You can add commands to the C<TaskQueue> system with the
+C<cPanel::TaskQueue::register_task_processor> class method.  It associates a
+command name with a new processor object.
+
+   cPanel::TaskQueue->register_task_processor( 'doit', MyTasks::Doit->new() );
+
+If there was no I<doit> command registered, this associates the supplied new
+object as the processor for this command.
+
+=head3 My task processor is too simple to need a full object.
+
+Say you have a very simple command to process and don't want to create a class
+to process it. You can also call C<register_task_processor> with a code reference
+and it will create the necessary wrapper to do what you want. It expects to pass
+the arguments from the command request to the coderef.
+
+   cPanel::TaskQueue->register_task_processor( 'echo', sub { print @_; } );
+
+If you use this method, you obviously have to accept the default behavior for
+all of the other features of the C<Processor> object.
+
+=head3 I have too many tasks to register them individually.
+
+Once you have more than a handful of C<cPanel::TaskQueue::Processor>s, registering
+them individually by hand is going to get tedious and error-prone. The
+C<cPanel::TaskQueue::PluginManager> class solves this problem. This class expects
+packages defining C<cPanel::TaskQueue::Processor>-derived objects to define a
+class method C<to_register> that returns a list of pairs of I<command name> and
+I<processing object>. The C<PluginManager> can use this information to register
+the classes automatically.
+
+   use cPanel::TaskQueue::PluginManager;
+   cPanel::TaskQueue::PluginManager::load_plugins(
+       '/home/fred/MyTasks', 'TaskQueue::MyPlugins'
+   );
+
+This loads all of the files from the namespace C<TaskQueue::MyPlugins> in the
+directory F</home/fred/MyTasks> (or equivalently the F<*.pm> files in the directory
+F</home/fred/MyTasks/TaskQueue/MyPlugins>) provided that F</home/fred/MyTasks>
+is part of C<perl>'s include path. Now, if you have all of your C<TaskProcessor>
+plugins in a single directory and namespace, you can load them all at once.
+
+=head3 I have so many tasks that one plugin namespace is not enough.
+
+If your plugins exist in more than one group, you can apply L</"Loading
+Plugins"> once for each combination of root directory and namespace. But, the
+C<PluginManager> provides another convenience method to make this easier:
+C<load_all_plugins>.
+
+   use cPanel::TaskQueue::PluginManager;
+   cPanel::TaskQueue::PluginManager::load_all_plugins(
+       directories => [ '/usr/lib/TaskPlugins', '/home/fred/MyTasks' ],
+       namespaces => [ 'cPanel::TaskQueue::Plugin', 'TaskQueue::MyPlugins', 'TaskProcessors::Plugin' ]
+   );
+
+As with C<load_plugins>, each listed directory must be part of C<perl>'s include
+path. In each supplied directory, we attempt to load any plugins in each of the
+specified namespaces. In this example, that would be 6 directories in all.
+
+=head3 How do I define a Plugin Module?
+
+The only distinguishing feature of a C<TaskQueue> plugin module is the class
+method C<to_register>. This method must exist in the package declared by the
+module and it must return a list of array references. Each of these array
+references should contain two items: a I<command name> and a
+C<cPanel::TaskQueue::Processor>-derived object or code reference that can process
+this command.
+
+    package TaskQueue::MyPlugins::TestTasks;
+
+    {
+        package TaskQueue::MyPlugins::TestTasks::SimpleChild;
+        use base 'cPanel::TaskQueue::ChildProcessor;
+        # define the rest of the class.
+    }
+
+    sub to_register {
+        return (
+            [ 'echo', sub { print "@_\n"; return; } ],
+            [ 'sleep', sub { sleep $_[0]; return; } ],
+            [ 'child', TaskQueue::MyPlugins::TestTasks::SimpleChild->new() ],
+        );
+    }
+
+Although people normally create one class per module, it is often useful in
+plugins to define a set of simple classes to support a set of related commands
+in a single module. The C<to_register> method simplifies this use case.
+
+=head2 Queuing Commands
+
+This section focuses on using the C<TaskQueue>-based code to execute a set of
+tasks. This section assumes that the appropriate C<cPanel::TaskQueue::Processor>-derived
+objects have been created and registered already. If you need help with
+C<Processors>, see L</"Defining Processors">.
+
+=head3 I need to queue a command.
+
+You will need a C<cPanel::TaskQueue> object to queue a command. If you do not
+have a C<cPanel::TaskQueue> object, see L</"I need to access a TaskQueue defined elsewhere.">
+
+Assume you have a processor for the command I<notify> that takes the name of a user
+and a message to send. You can use the following code (assuming C<$tq> is your C<TaskQueue>):
+
+   my $qid = $tq->queue_task( 'notify fred "Hi, Fred! This is your wake-up call."' );
+
+The return value of C<queue_task> is a I<queue_id> which you could use to remove
+the task before it is processed. If the value is C<undef> it usually means that
+the task was considered to be a duplicate, it has invalid arguments, or there
+is no processor for I<notify>.
+
+
+=head3 I need to schedule a command to be executed after a particular time.
+
+You will need a C<cPanel::TaskQueue::Scheduler> object to schedule a command.
+If you do not have a C<cPanel::TaskQueue::Scheduler> object, see
+L</"I need to access a Scheduler defined elsewhere.">
+
+Assume you have a processor for the command I<notify> that takes the name of a
+user and a message to send. If you want to queue the command on Feb 13, 2009 at
+5:31::30 pm, you can do the following (assuming C<$ts> is your C<TaskQueue::Scheduler>):
+
+    my $sid = $ts->schedule_task(
+        'notify fred "Hi, Fred! This is your wake-up call."',
+        {at_time=>123456789}
+    );
+
+The I<at_time> parameter of this method is the time you want to execute the
+command in epoch seconds. The command will not be queued before that point. The
+actual time that the command is queued will be determined by the processing code.
+
+=head3 I need to schedule a command to be executed after a delay.
+
+You will need a C<cPanel::TaskQueue::Scheduler> object to schedule a command.
+If you do not have a C<cPanel::TaskQueue::Scheduler> object, see
+L</"I need to access a Scheduler defined elsewhere.">
+
+Assume you have a processor for the command I<notify> that takes the name of a
+user and a message to send. If you want to queue the command in an hour, you can
+do the following (assuming C<$ts> is your C<TaskQueue::Scheduler>):
+
+    my $sid = $ts->schedule_task(
+        'notify fred "Hi, Fred! This is your wake-up call."',
+        {delay_seconds=>3600}
+    );
+
+The I<delay_seconds> parameter of this method is the number of seconds to delay
+before queuing the command. The command will be queued some time after the delay
+specified. The actual time that the command is queued is determined by the
+processing code.
+
+=head3 I need to schedule a task that will retry if it doesn't complete.
+
+You will need a C<cPanel::TaskQueue::Scheduler> object to schedule a command.
+If you do not have a C<cPanel::TaskQueue::Scheduler> object, see
+L</"I need to access a Scheduler defined elsewhere.">
+
+Assume you have a C<ChildProcessor> for the command I<notify> that takes the name of a
+user and a message to send. If you want to queue the command in an hour and have it retry
+up to 5 times, you can do the following (assuming C<$ts> is your C<TaskQueue::Scheduler>):
+
+    my $sid = $ts->schedule_task(
+        'notify fred "Hi, Fred! This is your wake-up call."',
+        {delay_seconds=>3600, attempts=>5}
+    );
+
+The I<delay_seconds> parameter of this method is the number of seconds to delay
+before queuing the command. The command will be queued some time after the delay
+specified. The actual time that the command is queued is determined by the
+processing code. If this task times out, the task will be rescheduled up to 4
+more times, as specified by the I<attempts> parameter.
+
+=head2 Defining Processors
+
+In order to have commands to queue, we must have code that executes those commands.
+The C<cPanel::TaskQueue::Processor> class defines the interface for this
+functionality. The C<cPanel::TaskQueue::ChildProcessor> class extends that
+interface to better handle long running tasks. To add you own functionality,
+define a new class that derives from one of these and provides the extra
+functionality you need. The following sections should help in understanding what
+you might want to change in your subclasses.
+
+=head3 I need a simple processor that executes some code quickly.
+
+Derive your class from C<cPanel::TaskQueue::Processor> and override the
+C<process_task> method. You will also need to make certain your new command is
+registered with the C<TaskQeue> system.
+
+For example,
+
+    package TaskQueue::Messaging::Ping;
+    use strict;
+    use warnings;
+
+    use Messaging();
+    use base 'cPanel::TaskQueue::Processor';
+
+    sub process_task {
+        my ($self, $task, $logger) = @_;
+
+        my $target = $task->args()->[0];
+        my $m = Messaging->new( $target );
+        $m->ping();
+        return;
+    }
+
+This example assumes that there is a C<Messaging> module that does all of the
+work, of course. This task will run in-process, so any further queue processing
+is blocked until it completes.
+
+=head3 I need a command that only accepts certain valid arguments.
+
+In general, the arguments to your command will require some level of validation.
+This validation is provided by overriding the C<is_valid_args> method of
+C<cPanel::TaskQueue::Processor>.  For example, let's say that the I<notify>
+command expects a user name and a message string. Your validation method might
+look like this:
+
+    sub is_valid_args {
+        my ($self, $task) = @_;
+
+        return if 2 != @{$task->args()};
+        return unless $task->get_arg( 0 ) =~ /^[-\w]+$/;
+    }
+
+The method verifies that we have both arguments and that the first looks like a
+valid user name.
+
+=head3 I need a command that is smarter about squashing duplicates.
+
+The default method of recognizing duplicates is to verify that the command name
+and all of the arguments are identical. If you want to consider similar commands
+identical (say I<notify> and I<email> are close enough) or you don't want to
+compare all of the arguments, then you need to override the C<is_dupe> method
+of C<cPanel::TaskQueue::Processor>.
+
+For example, let's say that the I<notify> and I<email> commands are close enough
+that we want to treat them as duplicates. Your duplicate processing would then
+look like this:
+
+    sub is_dupe {
+        my ($self, $a, $b) = @_;
+
+        return unless $a->command() =~ /^(?:email|notify)$/;
+        return unless $b->command() =~ /^(?:email|notify)$/;
+
+        my $a_args = $a->args();
+        my $b_args = $b->args();
+        return unless @{$a_args} == @{$b_args};
+
+        foreach my $i ( 0 .. $#{$a_args} ) {
+            return unless $a_args->[$i] eq $b_args->[$i];
+        }
+
+        return 1;
+    }
+
+So, we treat I<email> and I<notify> as the same for duplicate processing, but
+we still check all of the arguments to make sure they are the same.
+
+=head3 I need a command that overrides some other commands in the queue.
+
+Sometimes a command may invalidate the need for other commands in the queue. For
+example, a command to restart a server is not very useful if a command to shut
+down the server is in the queue behind it. To provide the ability to remove
+commands that have previously been queued in favor of a new command, you can
+override the C<overrides> method of C<cPanel::TaskQueue::Processor>.
+
+For example, let's say we have a special feature in the I<notify> command to
+send a message to I<ALL>. This should obviously override a notification to any
+individual with the same message.  The C<overrides> method would then look like
+this:
+
+    sub overrides {
+        my ($self, $new, $old) = @_;
+        return unless $old->command() eq 'notify';
+        return unless $new->get_arg( 0 ) eq 'ALL';
+
+        return $old->get_arg( 1 ) eq $new->get_arg( 1 );
+    }
+
+If the old command is not a I<notify> or the current I<notify> is not sent to
+I<ALL>, we won't override.  This version of the subroutine takes advantage of
+fact that there are only two parameters, to do a simple test of the message.
+
+=head3 I need a command that may take a long time to process, without stopping queue.
+
+Some tasks should probably run in the background. If your task is waiting on a
+network resource or server, we shouldn't tie up the queue-processing process
+while we wait. If this describes your task, derive from C<cPanel::TaskQueue::ChildProcess>
+instead of C<cPanel::TaskQueue::Process> and override C<_do_child_task> instead
+of C<process_task>.
+
+For example, let's say you have a task that needs to make a request to a webserver
+to complete its work. You might implement that as follows:
+
+    package MyTasks::WebRequest;
+
+    use strict;
+    use warnings;
+    use base 'cPanel::TaskQueue::ChildProcessor';
+    use LWP::Simple ();
+
+    my %url_of = (
+         # assume a hash of keywords to urls
+    );
+
+    sub is_valid_args {
+        my ($self, $task) = @_;
+        return exists $url_of{ $task->get_arg( 0 ) };
+    }
+
+    sub _do_child_task {
+        my ($self, $task, $logger) = @_;
+
+        if ( !LWP::Simple::get( $url_of{ $task->get_arg( 0 ) } ) ) {
+            $logger->warn( "Could not access site for '", $task->get_arg( 0 ), "'.\n" );
+        }
+
+        return;
+    }
+
+When the task is processed, a child process will be launched that will perform
+this function. Meanwhile, control will return to the queue-processing code which
+may be able to launch another task while this one runs.
+
+=head3 I need a command that takes longer than normal to process.
+
+Some background processes may need to run for a very long time. The default
+timeout for a child process is an hour, which should handle most jobs. However,
+if you need to run a very long process, such as a backup or data migration, an
+hour may not be enough. On the other hand, you might have a task that is guaranteed
+to complete in ten minutes if it is successful. You might want to reduce the
+timeout in that case.
+
+To provide this ability, override the C<get_child_timeout> method to return the
+appropriate value. A false return value uses the default timeout.
+
+If you needed a 2 hour timeout, your C<get_child_timeout> method would look like
+this:
+
+    sub get_child_timeout {
+        my ($self) = @_;
+
+        return 2 * 3600;
+    }
+
+=head3 I want to specify the amount of time to delay a retry.
+
+If a child process times out, the default retry is scheduled 15 minutes later.
+Depending on the task, this delay may not be enough (or may be too much). You
+can change this value by overriding the C<get_reschedule_delay> method from
+C<cPanel::TaskQueue::ChildProcessor>. This method is passed the C<$task> as a
+parameter and should return the number of seconds until the task should be queued
+again. For example,
+
+    sub get_reschedule_delay {
+        my ($self, $task) = @_;
+
+        # wait two hours if we're down to our last try.
+        return 2*3600 if 1 == $task->retries_remaining();
+        # Otherwise try in one hour.
+        return 3600;
+    }
+
+=head3 I want to retry on failure, not just on timeout.
+
+If your process fails quickly but you would still like to retry, you can call
+the C<cPanel::TaskQueue::ChildProcessor::retry_task> method directly. This method
+expects the I<task> as a required parameter. It also excepts a reschedule delay
+that will override the C<get_reschedule_delay> value.
+
+As an example, let's say that the main code of the task is in the method C<doit>,
+which throws an exception on error. You could add retry on error as follows:
+
+    sub _do_child_task {
+        my ($self, $task) = @_;
+
+        eval {
+            doit();
+        };
+        if ($@) {
+            my $ex = $@;
+
+            # Specific retry on two errors
+            return $self->retry_task( $task, 3600 ) if $ex =~ /try again later/;
+            return $self->retry_task( $task, 300 )  if $ex =~ /unavailable/;
+
+            # Let the unrecognized ones go through.
+            Carp::croak $ex;
+        }
+    }
+
+This example not only shows the ability to retry, but also the ability to pick
+a different delay for the different tasks. We also allow exceptions we don't
+recognize to continue to the calling code which we expect to handle them.
+
+=head3 I have a command that should not run when another command is running.
+
+If you have two or more commands that may be in the queue that you want to
+prevent from running simultaneously, you need to enable I<deferral> support
+in the task processor. Each C<TaskQueue::Processor> supports a couple of methods
+for this purpose. The first and simplest is C<deferral_tags>. This method
+returns a list of tag strings.
+
+The TaskQueue system maintains a list of tags for tasks that are currently being
+processed. If the TaskQueue attempts to begin processing of a new task and its
+C<deferral_tags> method returns any strings in the list of currently processing
+tags, that task will be deferred. As an example, you could add the following
+method to your processor.
+
+    sub deferral_tags {
+        my ($self, $task) = @_;
+
+        return qw(foo bar foobar);
+    }
+
+This method takes a task object, because the deferral tags could depend on the
+actual task. For example, a task could have different deferral tags based on its
+arguments. This approach gives good flexibility without a complicated interface.
+
+=head3 I have a command that needs to be deferred in a more complicated way.
+
+When a new task is considered for processing (because it is at the beginning of
+of the waiting queue and the TaskQueue is not processing its maximum number of
+tasks), the C<is_task_deferred> method of the task processor for this task is
+called.
+
+By default, this method compares the deferral tags for this task against a
+supplied hash containing the currently active tags. By replacing this method
+in a C<TaskQueue::Processor>, you can make the deferral decision much more
+complex. The method receives a C<$task> object and the C<$defer_hash>.
+
+A particular task object will be tested for deferral when it becomes available
+for processing. If it has previously been deferred, it will also be tested
+when a task completes processing to determine if it is still deferred.
+
+=head2 Queue Processing
+
+=head3 I want to process the next command in the queue.
+
+You will need a C<cPanel::TaskQueue> object to process commands from that queue. If you do not
+have a C<cPanel::TaskQueue> object, see L</"I need to access a TaskQueue defined elsewhere.">
+
+You process the next command in the queue as follows:
+
+   $tq->process_next_task();
+
+This method returns true if the processing is complete or false if a child task
+was launched. This method also blocks until a task in the queue can be executed.
+If there are too many outstanding processes, this method will block until a task
+can be executed.
+
+If there are no items in the queue, this method returns true.
+
+=head3 I want to process the next command in the queue without blocking.
+
+You will need a C<cPanel::TaskQueue> object to process commands from that queue.
+If you do not have a C<cPanel::TaskQueue> object, see L</"I need to access a TaskQueue defined elsewhere.">
+
+If you only want to process an item from the queue if there is a process slot
+open, you need to test the state of the processing queue before execution as
+follows:
+
+    if ( $tq->has_work_to_do() ) {
+        $tq->process_next_task();
+    }
+
+One problem with this approach occurs if more than one process is executing items
+out of the queue, that would generate a race condition between the test and the
+process methods. This is only one reason why you should avoid having more than
+one processing program.
+
+=head3 I want to wait until the commands that are currently processing are complete.
+
+You will need a C<cPanel::TaskQueue> object to process commands from that queue.
+If you do not have a C<cPanel::TaskQueue> object, see L</"I need to access a TaskQueue defined elsewhere.">
+
+For some uses, you might want to stop processing the queue and wait for all of the currently executing child
+tasks to complete before continuing.
+
+    $tq->finish_all_processing();
+
+B<Warning:> This method can block for an extremely long period of time depending on how the
+queue is configured and what tasks are currently being processed.
+
+=head3 I want to know when the next scheduled task should start.
+
+You will need a C<cPanel::TaskQueue::Scheduler> object for this action. If you
+do not have a C<cPanel::TaskQueue::Scheduler> object, see
+L</"I need to access a Scheduler defined elsewhere.">
+
+The scheduler always knows when the next scheduled task should run:
+
+    my $secs = $ts->seconds_until_next_task();
+
+If this number is 0 or negative, the next scheduled command is ready to be queued.
+
+=head3 I want to be queue all scheduled tasks that are ready for processing.
+
+The most useful thing to do with the scheduler is to queue any commands that are
+ready to be queued.  You will need both a C<cPanel::TaskQueue::Scheduler> object
+and a C<cPanel::TaskQueue> object for this action. If you do not have a
+C<cPanel::TaskQueue::Scheduler> object, see L</"I need to access a Scheduler defined elsewhere.">
+If you do not have a C<cPanel::TaskQueue> object, see  L</"I need to access a TaskQueue defined elsewhere.">
+
+   my $count = $ts->process_ready_tasks( $tq );
+
+The return value is the number of tasks queued in this call. This is necessary
+because it is very possible that more than one task will be ready to be queued
+at any given point in time.
+
+=head3 I need a processing loop to efficiently handle the Tasks in a TaskQueue.
+
+When processing tasks in the C<cPanel::TaskQueue>, we want to process the
+C<Task>s as quickly as possibly without wasting a lot of CPU time if there is
+no work to do. Although the C<cPanel::TaskQueue> class has methods for
+processing individual tasks, a continuous, efficient processing loop requires a
+little more code.
+
+Given a C<cPanel::TaskQueue> object in C<$queue>, the following loop could be
+the core of a processing system.
+
+    while ( $is_running ) {
+        eval {
+            if ( $queue->has_work_to_do() ) {
+                $queue->process_next_task();
+            }
+            else {
+                sleep $wait;
+            }
+        };
+        warn "Exception detected: $@" if $@;
+    }
+
+This code assumes the variable C<$is_running> is controlled by some other code
+to determine if the processing loop should stop. It also assumes C<$wait> holds
+the number of seconds to wait between attempts to run tasks. The value of
+C<$wait> is used to trade off between CPU load when there are no tasks to run
+and the speed with which the loop will recognize new tasks.
+
+The C<eval> statement protects the loop from stopping due to exceptions.
+
+Each pass through the loop processes a C<Task> if one is available. One feature
+of this design is that the loop does not sleep if there are C<Task>s to be
+processed. If you don't want to process C<Task>s as fast as possible, you need
+to modify the loop.
+
+=head3 I need a processing loop to efficiently handle the Tasks in both the TaskQueue and a Scheduler.
+
+When processing C<Task>s that might need scheduling, we need to use both a
+C<cPanel::TaskQueue> and a C<cPanel::TaskQueue::Scheduler>. Although the loop
+for processing C<Task>s without scheduling is pretty straight-forward. This
+processing loop is a bit more finicky.
+
+Given a C<cPanel::TaskQueue> object in C<$queue> and a
+C<cPanel::TaskQueue::Scheduler> object in C<$sched>, the following loop would
+perform the necessary processing.
+
+    while ( $is_running ) {
+        eval {
+            $sched->process_ready_tasks( $queue );
+            if ( $queue->has_work_to_do() ) {
+                $queue->process_next_task();
+            }
+            else {
+                my $wait = $sched->seconds_until_next_task();
+                # loop if some task is now ready
+                next if defined $wait and 0 == $wait;
+
+                $wait = $wait_time if !$wait || $wait > $wait_time;
+                sleep $wait;
+            }
+        };
+        warn "Exception detected: $@" if $@;
+    }
+
+This code assumes the variable C<$is_running> is controlled by some other code
+to determine if the processing loop should stop. It also assumes C<$wait_time>
+holds the number of seconds to wait between attempts to run tasks. The value of
+C<$wait_time> is used to trade off between CPU load when there are no tasks to
+run and the speed with which the loop will recognize new tasks.
+
+The C<eval> statement protects the loop from stopping due to exceptions.
+
+This loop is somewhat more complicated due to the need to service the
+C<Scheduler> in a timely fashion. Any time we don't have something to process,
+we want to sleep the lesser of the default wait time and the time until the
+next scheduled event. We also want to schedule C<Task>s as soon as they are
+ready. It is also important to check the C<Scheduler> on every pass through
+the loop, otherwise a series of long-running C<Task>s could prevent us from
+scheduling C<Task>s that are now ready.
+
+=head2 Logging
+
+The C<cPanel::TaskQueue> system has a slightly unusual system for logging that
+is an artifact of the original incarnation of the code. All reporting of
+information to the outside world is handled through a I<Logger Object>
+interface that is defined in the C<cPanel::TaskQueue> documentation.
+
+=head3 How do I log TaskQueue errors through our normal C<Log::Dispatch> interface?
+
+In addition to using C<Log::Dispatch>, we will log notifications to the screen
+rather than sending them through a separate system.
+
+    package Policy::LogiDispatch;
+    use strict;
+    use warnings;
+    use Log::Dispatch;
+
+    sub new {
+        my ($class) = shift;
+        my $self = {
+            logger => Log::Dispatch->new(
+                outputs => [
+                    [ 'File',   min_level => 'info', filename => 'logfile' ],
+                    [ 'Screen', min_level => 'alert', ],
+                ],
+            )
+        };
+        return bless, $class;
+    }
+
+    # Log an error and then 'die'.
+    sub throw {
+        my $self = shift;
+        $self->{logger}->error( @_ );
+        die @_;
+    }
+
+    # Log a warning
+    sub warn {
+        my $self = shift;
+        $self->{logger}->warning( @_ );
+    }
+
+    # Log an info message
+    sub info {
+        my $self = shift;
+        $self->{logger}->info( @_ );
+    }
+
+    # Send a notification through email
+    sub notify {
+        my $self = shift;
+        $self->{logger}->alert( @_ );
+    }
+    1;
+
+Objects of this type can be supplied when creating a specific C<cPanel::TaskQueue>.
+This ties the C<TaskQueue> logging into the C<Log::Log4perl> system.
+
+=head3 How do I log TaskQueue errors through our normal C<Log::Log4perl> interface?
+
+To use the C<Log::Log4perl> module for logging, you will need an adapter object
+that converts the interface to match what C<cPanel::TaskQueue> expects. In the
+example, we will also use C<Email::Sender> to perform the notifications.
+
+    package Policy::Log4perl;
+    use strict;
+    use warnings;
+    use Log::Log4perl;
+    use Email::Sender::Simple qw(sendmail);
+    use Email::Sender::Transport::SMTP ();
+
+    my $SMTP_HOST    = 'smtp.exampl.com';
+    my $SMTP_PORT    = 25;
+    my $FROM_ADDRESS = 'whm-donoreply@exampl.com';
+
+    my $transport = Email::Sender::Transport::SMTP->new(
+        { host => $SMTP_HOST, port => $SMTP_PORT }
+    );
+
+    sub new {
+        my ($class) = shift;
+        my $self = {
+            logger => Log::Log4perl->get_logger( @_ )
+        };
+        return bless, $class;
+    }
+
+    # Log an error and then 'die'.
+    sub throw {
+        my $self = shift;
+        $self->{logger}->error( @_ );
+        die @_;
+    }
+
+    # Log a warning
+    sub warn {
+        my $self = shift;
+        $self->{logger}->warn( @_ );
+    }
+
+    # Log an info message
+    sub info {
+        my $self = shift;
+        $self->{logger}->info( @_ );
+    }
+
+    # Send a notification through email
+    sub notify {
+        my $self = shift;
+        eval {
+            sendmail(
+                join( "\n", @_ ),
+                {
+                    from => $FROM_ADDRESS,
+                    transport => $transport,
+                }
+            );
+            1;
+        } or do {
+            $self->{logger}->error( "Notification failed: $@" );
+        };
+    }
+    1;
+
+Objects of this type can be supplied when creating a specific C<cPanel::TaskQueue>.
+This ties the C<TaskQueue> logging into the C<Log::Log4perl> system.
+
+=head3 How do I log without supplying a notification interface?
+
+If you don't want to provide a separate notification system, redefine the C<notify>
+method to do something else. Using the C<Log::Log4perl> example in the last
+question, you could do the following:
+
+    sub notify {
+        my $self = shift;
+        $self->{logger}->error( 'NOTIFY:', @_ );
+        return;
+    }
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported in these recipes.
+
+=head1 SEE ALSO
+
+cPanel::TaskQueue::Processor, cPanel::TaskQueue::Task, and cPanel::StateFile
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2010, cPanel, Inc. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

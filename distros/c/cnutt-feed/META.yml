@@ -1,0 +1,44 @@
+---
+name: cnutt-feed
+version: 1.21
+author:
+  - 'Olivier Schwander <olivier.schwander@ens-lyon.org>'
+abstract: A rss/atom reader which delivers entries to your mailboxes
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::Tiny: 0
+  Email::Address: 0
+  Email::Date: 0
+  Email::Folder: 0
+  Email::LocalDelivery: 0
+  Email::MIME::CreateHTML: 0
+  HTML::Encoding: 0
+  HTML::Entities: 0
+  HTML::FormatText::WithLinks: 0
+  HTML::TreeBuilder: 0
+  MIME::EncWords: 0
+  XML::Feed: 0
+build_requires:
+  Test::Dependencies: 0
+provides:
+  Cnutt::Feed:
+    file: lib/Cnutt/Feed.pm
+    version: 1.1
+  Cnutt::Feed::Actions::Fetch:
+    file: lib/Cnutt/Feed/Actions/Fetch.pm
+    version: 1.0
+  Cnutt::Feed::Actions::Get:
+    file: lib/Cnutt/Feed/Actions/Get.pm
+    version: 1.0
+  Cnutt::Feed::Actions::List:
+    file: lib/Cnutt/Feed/Actions/List.pm
+    version: 1.0
+  Cnutt::Feed::Mailbox:
+    file: lib/Cnutt/Feed/Mailbox.pm
+    version: 1.0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

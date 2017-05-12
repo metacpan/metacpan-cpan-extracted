@@ -1,0 +1,169 @@
+NAME
+
+    App::unifdef+ - simplify pre-conditionals in C, Makefile and Kconfig files
+
+SYNOPSIS
+
+        unifdef+ [-D define=val] [-U undifined] ... file
+
+    Run unifdef --help for more options.
+
+DESCRIPTION
+
+    unifdef+ is a script to simplify conditional parts of source files based
+    on passed in defines and undefined values.   It simplifies conditions and,
+    if resolved will remove any inapplicable parts of the file.   It does not
+    simplify any portions of code which do not use any of the passed in macros
+    (so it will not simplify an #if TRUE ... #endif clause)   
+    
+    For C++/C files, it operates on preprocessor conditionals.  For Makefiles 
+    it operates on ifeq, ifdef statements, and in Kconfig file, it operates on 
+    dependson and if clauses.
+    
+    For C/C++, it is fully functional, and will simplify multiline statements,
+    with whitespace, and comments, and honors the C operator precidence.
+    
+    For Kconfig files it handles multi-variable, and tristate conditionals,
+    and honors the Kconfig operator precidence.  (It also handles comments
+    properly)
+    
+    For Makefile, support is limited to the functions, catination, the 
+    $(or ...) $(and ...) and $(strip ...) functions.
+
+ EXAMPLE
+ 
+  C / C++
+    
+    if you had source file foo.c:
+        
+        /* FOO.c */
+        #if  ( defined(UNDEF1) && defined(UNKNOWN1) ) || \
+             !defined DEF1  // resolves to false
+            /* block will NOT appear */
+        #elif DEF1 <= 3 && UNKNOWN1 > (3 + 2)   // (condition simplifies)
+            /* block will appear */
+        #elif DEF1 > 3  // condition resolves to false (1 < 3...)
+            /* block will NOT appear */
+        #else
+            /* block will appear, as an else to the unknown */
+        #endif
+        
+    and you ran:
+     
+        unifdef+ -D DEF1=1 -D DEF2=2 -U UNDEF1 foo.c
+     
+    it would modify foo.c in place to read:
+     
+        /* FOO.c */
+        #if UNKNOWN1 > (3 + 2)   // (condition simplifies)
+            /* block will appear */
+        #else
+            /* block will appear, as an else to the unknown */
+        #endif        
+
+ MAKEFILE
+ 
+     If you had a makefile foo.mak:
+     
+		/* FOO.mak */
+		ifeq ( $(and $(CONFIG_DEF_Y),$(CONFIG_UNKNOWN)), y )
+		      # block will will appear, and above
+		      # conditional will be simplified
+		else ifeq "$(CONFIG_UNDEF)" "y"
+		      # block will not appear
+		else ifdef CONFIG_DEF_Y
+		      # block will appear
+		else
+		      # block will NOT appear
+		endif
+         
+     and you ran:
+     
+         unifdef+ -D CONFIG_DEF_Y=y -U CONFIG_UNDEF -I foo.mak
+     
+     it would read in foo.mak, and output to stdout:
+     
+		/* FOO.mak */
+		ifeq ($(CONFIG_UNKNOWN),y)
+		      # block will will appear, and above
+		      # conditional will be simplified
+		else
+		      # block will appear
+		endif
+
+KCONFIG
+     If you had a kconfig file   Kconfig.foo:
+     
+        #Kconfig.foo
+        
+        config FOOBAR
+            tristate "Some feature"
+            depends on DEF1 && DEF2
+            default m if DEF1
+            default y if UNDEF1
+            help
+                 supports multiline help
+        
+                 including blank lines between help entries
+        
+        config FOOBARED2
+             tristate "Some feature"
+             depends on UNDEF1 && DEF2
+        
+        
+        if UNDEF1
+             # block removed
+        endif
+        
+    and you ran
+    
+        unifdef+ -D DEF1=y -D DEF2=m -U UNDEF1 Kconfig.foo
+               
+    It would modify Kconfig.foo in place, and output:
+    
+        #Kconfig.foo
+        
+        config FOOBAR
+            tristate "Some feature"
+            depends on DEF2
+            default m
+            help
+                 supports multiline help
+        
+                 including blank lines between help entries 
+ 
+INSTALLATION
+
+    You should install unifdef+ using cpan tools:  cpan code::UnifdefPlus
+ 
+DEPENDENCIES
+
+    perl 5.10 or later.
+
+QUESTIONS
+
+COPYRIGHT
+
+    Copyright 2017 - John Ulvr
+ 
+LICENSE
+
+    This software is licensed under the same terms as Perl.
+
+CREDITS
+
+ CONTRIBUTORS
+
+    Many thanks to Joel Peshkin for helping write this module
+
+ ACKNOWLEDGEMENTS
+
+COMMUNITY
+
+NO WARRANTY
+
+    This software is provided "as-is," without any express or implied
+    warranty. In no event shall the author be held liable for any damages
+    arising from the use of the software.
+
+

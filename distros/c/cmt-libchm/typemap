@@ -1,0 +1,24 @@
+
+#############################################################################
+TYPEMAP
+
+#chm_size_t              T_UV
+#chm_ssize_t             T_IV
+
+LONGUINT64              T_UV64
+LONGINT64               T_UV64
+
+PCHMFILE                T_PTRREF
+PCHMUNITINFO            T_PTRREF
+
+#############################################################################
+INPUT
+
+T_UV64
+    memcpy(&$var, SvPV_nolen($arg), sizeof($ntype))
+
+#############################################################################
+OUTPUT
+
+T_UV64
+    sv_setpvn($arg, &$var, sizeof($ntype)); 

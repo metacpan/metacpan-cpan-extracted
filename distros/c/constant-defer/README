@@ -1,0 +1,36 @@
+Copyright 2009 Kevin Ryde
+
+This file is part of constant-defer.
+
+constant-defer is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+constant-defer is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with constant-defer.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+constant::defer makes subroutines similar to the builtin constant.pm,
+but with the value calculation deferred until the sub is actually run.
+
+    use constant::defer FOO => sub { calculate;
+                                     return $something };
+
+This is handy for big or slow things only needed sometimes, or where
+at least the pain can be put off the point needed.
+
+Lazy or deferred calculations can be hidden behind a scalar variable
+too.  The choice between a sub and a variable is a matter of style or
+personal preference.  Both ways have advantages, see the
+constant::defer POD for some notes.
+
+The constant-defer home page is
+
+    http://user42.tuxfamily.org/constant-defer/index.html

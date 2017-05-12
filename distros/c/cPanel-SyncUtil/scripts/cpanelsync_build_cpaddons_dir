@@ -1,0 +1,211 @@
+#!/usr/bin/perl
+# cpanel10 - cpanelsync_build_cpaddons_dir        Copyright(c) 2006 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+use strict;
+use warnings;
+
+use cPanel::SyncUtil;
+
+use File::Spec;
+
+my $version   = '0.0.1';
+my $copyright = 'Copyright(c) 2006 cPanel, Inc.';
+
+# intitialize input vars
+my $user = '';    # -u user who's home directory this is
+
+# my $group         = ''; # -g $user's group
+my $vendor        = '';    # -v "cPAddon Vendor Info url" default output
+my $cpaddons_root = '';    # -d path of http://[cphost][cphuri' from your "cPAddon Vendor Info url"
+my $clustersync   = '';    # -s optional script to sync (-t sync)  file to other servers however you need, executed with same args as $0
+
+my $message = '';
+my %options = cPanel::SyncUtil::_get_opts_hash('qha:c:n:u:g:d:v:s:');
+
+if ( exists $options{'h'} || !scalar keys %options ) {
+    print <<"EOM";
+$0 v $version $copyright
+
+    This application assists in setting up a cpanelsync directory structure
+suitable for usage with cPanel servers.
+
+Usage:   $0 [option]
+
+Command Line Options:
+    Booleans Flag:
+        -h
+    Argument Flags:
+        -c cPAddon_category
+        -n cPAddon_name
+        -a Action
+        -u user
+        -g group (defaults to the value of -u if not given)
+        -d directory
+        -v cPAddon_vendor_name
+        -s sync/script to use with -a sync (gets same arguments as $0)
+
+EOM
+    exit;
+}
+
+# Directory
+if ( exists $options{'d'} ) {
+    if ( !-d $options{'d'} ) {
+        $message .= "Directory $options{'d'} is not a directory\n";
+    }
+    else {
+        $cpaddons_root = $options{'d'};
+    }
+}
+else {
+    $message .= "Directory must be specified with the -d option\n";
+}
+
+# name
+if ( exists $options{'n'} ) {
+    if ( !$options{'n'} ) {
+        $message .= "cPAddon name is required with -n\n";
+    }
+}
+
+# catagory
+if ( exists $options{'c'} ) {
+    if ( !$options{'c'} ) {
+        $message .= "cPAddon catagory is required with -c\n";
+    }
+}
+
+# user
+if ( !$options{'u'} ) {
+    $message .= "You must specify a user with -u\n";
+}
+else {
+    $user = $options{'u'};
+}
+
+# group
+my $group = !$options{'g'} ? $user : $options{'g'};
+
+# vendor
+if ( $options{'v'} !~ m{^\w+$} ) {
+    $message .= "You must specify your Vendor name\n";
+}
+else {
+    $vendor = $options{'v'};
+}
+
+# sync script
+if ( $options{'a'} eq 'sync' ) {
+    if ( !$options{'s'} || !-x $options{'s'} ) {
+        $message .= "Please specify the path to your sync script with -s\n";
+    }
+    else {
+        $clustersync =
+            $options{'s'} =~ m{^/} || $options{'s'} =~ m{^[.]}
+          ? $options{'s'}
+          : "./$options{'s'}";
+    }
+}
+
+# action
+if ( exists $options{'a'} ) {
+    if (   $options{'a'} ne 'bz2'
+        && $options{'a'} ne 'all'
+        && $options{'a'} ne 'lock'
+        && $options{'a'} ne 'unlock'
+        && $options{'a'} ne 'sync' ) {
+        $message .= "Option -a requires a valid argument (bz2|lock|unlock|sync|all) Note: all does bz2, unlock, then sync\n";
+    }
+}
+else {
+    $message .= "Action must be specified with the -a option (bz2|lock|unlock|sync|all)\n";
+}
+
+if ($message) {
+    print $message;
+    exit 1;
+}
+
+my $root = File::Spec->catdir( $cpaddons_root, $vendor );
+
+chdir $cpaddons_root or die "Could not go into base dir: $!";
+
+if ( $options{'a'} eq 'all' ) {
+    delete $options{'a'};
+
+    my @cmds;
+    for ( sort keys %options ) {
+        push @cmds, "-$_", $options{$_};
+    }
+
+    system $0, '-a', 'bz2',    @cmds;
+    system $0, '-a', 'unlock', @cmds;
+    system $0, '-a', 'sync',   @cmds;
+
+    exit;
+}
+
+cPanel::SyncUtil::_chown_pwd_recursively( $user, $group );
+
+if ($clustersync) {
+    if ( -x $clustersync ) {
+        exec $clustersync, @ARGV if $options{'a'} eq 'sync';
+    }
+    else {
+        die "$clustersync is not executable";
+    }
+}
+
+if ( $options{'a'} eq 'bz2' ) {
+    cPanel::SyncUtil::_raw_dir( $cpaddons_root, 'cPAddonsAvailable', 1, cPanel::SyncUtil::_read_dir('./cPAddonsAvailable') )
+      or warn "_raw_dir cPAddonsAvailable/: $!";
+
+    my @md5files = grep { m/\.pm$/ } cPanel::SyncUtil::_read_dir('./cPAddonsMD5');
+    cPanel::SyncUtil::_raw_dir( $cpaddons_root, 'cPAddonsMD5', 1, @md5files )
+      or warn "_raw_dir cPAddonsMD5/: $!";
+}
+elsif ( $options{'a'} eq 'lock' ) {
+    cPanel::SyncUtil::_lock(qw(./ cPAddonsAvailable/ cPAddonsMD5/));
+}
+elsif ( $options{'a'} eq 'unlock' ) {
+    cPanel::SyncUtil::_unlock(qw(./ cPAddonsAvailable/ cPAddonsMD5/));
+}
+
+die "-c may only be one of the directories in $root"
+  if defined $options{'c'} && $options{'c'} ne '' && !-d "$root/$options{'c'}";
+
+chdir $root or die "Could not go into $root: $!";
+
+ROOT:
+for my $dir ( cPanel::SyncUtil::_read_dir($root) ) {
+    next ROOT
+      if !cPanel::SyncUtil::_safe_cpsync_dir($dir)
+      || ( defined $options{'c'} && $options{'c'} ne '' && $dir ne $options{'c'} );
+
+    cPanel::SyncUtil::_chown_pwd_recursively( $user, $group );
+
+  SUBDIR:
+    for my $name ( cPanel::SyncUtil::_read_dir($dir) ) {
+        next SUBDIR
+          if $name =~ /^\./
+          || !cPanel::SyncUtil::_safe_cpsync_dir("$dir/$name")
+          || ( defined $options{'n'} && $options{'n'} ne '' && $name !~ /^$options{'n'}/ );
+
+        if ( $options{'a'} eq 'bz2' ) {
+            system 'bzip2', '-k', "$dir/$name.pm";
+            cPanel::SyncUtil::_raw_dir( "$dir", $name, 1 )
+              or warn "cPanel::SyncUtil::_raw_dir  $root/$dir: $!";
+            cPanel::SyncUtil::_sync_touchlock_pwd();
+        }
+        elsif ( $options{'a'} eq 'lock' ) {
+            cPanel::SyncUtil::_lock("$dir/$name/");
+        }
+        elsif ( $options{'a'} eq 'unlock' ) {
+            cPanel::SyncUtil::_unlock("$dir/$name/");
+        }
+        cPanel::SyncUtil::_chown_pwd_recursively( $user, $group );
+    }
+}

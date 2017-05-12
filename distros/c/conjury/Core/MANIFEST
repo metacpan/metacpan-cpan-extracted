@@ -1,0 +1,9 @@
+MANIFEST		This file
+ChangeLog		The change journal
+README			Read about how to install the software
+LICENSE			Agree with terms before using Perl Conjury
+Makefile.PL		Perl Makefile builder
+cast			Command Line Interface
+Conjury.pod		Introductory documentation
+lib/Conjury/Core.pm		The core module of Perl Conjury
+lib/Conjury/Core/Prototype.pm	The prototype enforcement code in Perl Conjury

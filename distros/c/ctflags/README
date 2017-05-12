@@ -1,0 +1,32 @@
+ctflags version 0.03
+====================
+
+This module allows to set Perl constants from environment variables or
+from command line options.
+
+the initial objetive of this module was to allow to mimic from Perl the so common C
+debug macros that allow to conditionally compile or leave alone pieces
+of code at compile time (actually ctflags stands for compile time
+flags).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require any other module.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

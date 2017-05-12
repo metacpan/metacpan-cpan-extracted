@@ -1,0 +1,107 @@
+constant::our
+This pragma extends standard pragma 'constant'.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DESCRIPTION
+
+As you may know, when a constant is used in an expression, Perl replaces it with its value at compile time, and may
+then optimize the expression further.
+
+You can inspect this behavior by yourself:
+
+    $ perl -MO=Deparse -e'use constant{DEBUG => 1}; warn "1"; if(DEBUG){warn "2"} warn "3";'
+    use constant ({'DEBUG', 1});
+    warn '1';
+    do {
+        warn '2'
+    };
+    warn '3';
+
+All warns are here.
+
+    $ perl -MO=Deparse -e'use constant{DEBUG => 0}; warn "1"; if(DEBUG){warn "2"} warn "3";'
+    use constant ({'DEBUG', 0});
+    warn '1';
+    '???';
+    warn '3';
+
+Notice the '???' instead of the second 'warn'.
+
+So you can do something like this:
+
+    # in the main script
+    use constant DEBUG => 0;
+    
+    # in a module
+    if(main::DEBUG)
+    {
+        # some debug code goes here
+    }
+
+But you should declare all constants you use, you can't simply write
+
+    if (main::DEBUG_SQL)
+    {
+    }
+
+without corresponding
+
+    use constant DEBUG_SQL => 0;
+
+in the main script.
+
+With constant::our you can freely use "undeclared" constants in your condition statements.
+
+    # main script
+    use constant::our {
+        DEBUG => 1,
+        DEBUG_CACHE => 1,
+        };
+    
+    ######################
+    package My::Cool::Tools;
+    use constant::our qw(DEBUG DEBUG_SQL); # don't need DEBUG_CACHE, but want (undeclared) DEBUG_SQL
+    
+    DEBUG && warn "DEBUG: $debug_info";              # DEBUG --> 1
+    DEBUG && DEBUG_SQL && warn "DEBUG_SQL: $query";  # DEBUG_SQL --> undef
+    
+    stderr:
+    "DEBUG: ..."
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc constant::our
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=constant::our
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/constant::our
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/constant::our
+
+    Search CPAN
+        http://search.cpan.org/dist/constant::our
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Green
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

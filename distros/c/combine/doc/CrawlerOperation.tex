@@ -1,0 +1,616 @@
+\section{Crawler internal operation}
+\label{operation}
+The system is designed for continuous operation.
+The harvester processes a URL in several steps as detailed
+in Figure \ref{combinearch}.  As a start-up initialization the
+frontier has to be seeded with some relevant URLs. All URLs are
+normalized before they are entered in the database.
+Data can be exported in various formats including the \htmladdnormallinkfoot{ALVIS XML
+document format}{http://www.alvis.info/alvis/architecture} and
+\htmladdnormallinkfoot{Dublin Core}{http://dublincore.org/} records.
+
+\begin{figure}[htb]
+%\begin{minipage}{0.35\textwidth}
+\begin{center}
+ \includegraphics[height=0.6\textheight]{CrawlerArchitecture.xfig.eps}
+\end{center}
+%\end{minipage}
+\caption{Architecture for the Combine focused crawler.}
+\label{combinearch}
+\end{figure}
+
+The steps taken during crawling (numbers refer to Figure \ref{combinearch}):
+\begin{enumerate}
+\item The next URL is fetched from the scheduler.
+%, which is responsible for
+%  ensuring that the crawler as a whole behaves 'nicely' to
+%  Web-servers. Mainly this is ensured by enforcing that an individual server is
+%  never accessed more than once each minute. A second rule prohibits
+%  the crawler to access a specific URL more than once a
+%  month.
+
+\item Combine obeys the \htmladdnormallinkfoot{Robots
+  Exclusion Protocol}{http://www.robotstxt.org/wc/exclusion.html}.
+Rules are cached locally.
+
+\item The page is retrieved using a GET, GET-IF-MODIFIED, or HEAD HTTP request.
+% If the page corresponding to the URL is in the
+%  database, a GET-IF-MODIFIED HTTP request is used. URLs which are
+%  considered to lead to binary content (like MPEG video, etc) are only
+%  accessed with a HTTP HEAD request.
+
+\item The HTML code is cleaned and normalized.
+
+\item The character-set is detected and normalized to UTF-8.
+%An effort is done to determine the character-set used in the
+%  page, which is then converted to UTF-8, the internal
+%  character representation used by Combine.
+
+\item 
+
+\begin{enumerate}
+\item The page (in any of the formats PDF, PostScript, MSWord, MSExcel, MSPowerPoint, RTF and TeX/LaTeX) is converted to HTML or plain 
+text by an external program.
+%If the page is in a format not supported by the internal parsers
+% it is first sent to an
+%  external program that converts it to HTML (or plain text). The
+% distribution is configured to handle
+%  formats like PDF, PostScript, MS Word, and TeX/LaTeX. New formats
+%can be supported by just adding a configuration line identifying an
+% external program that can convert that format to either HTML or plain text.
+
+\item Internal parsers handles HTML, plain text and images.
+This step extracts structured information like metadata (title, keywords, description ...), HTML links,
+  and text without markup.
+\end{enumerate}
+
+\item The document is sent to the \hyperref{topic filter}{topic filter
+(see section }{)}{autoclass}. If the 
+Web-page is relevant with respect to the focus topic,
+processing continues with:
+
+\begin{enumerate}
+\item Heuristics like score propagation.
+
+% In order to take into account the hierarchical
+%structure of the classification system,
+%scores are propagated to the most specific
+%classifications suggested by the topic filter.  This is achieved by assigning, for each
+%leaf node in the list, the sum of it's score and all scores for all
+%suggested classifications above in the classification tree, to that
+%leaf node.
+
+\item Further analysis, like genre and language
+  identification.
+
+\item Updating the record database.
+ %with a structured record containing all of the above information.
+
+\item Updating the frontier database with HTML links and URLs
+  extracted from plain text.% All URLs are normalized before they are entered in the database.
+
+\end{enumerate}
+
+\end{enumerate}
+
+Depending on several factors like configuration, hardware, network,
+workload, the crawler normally processes between 50 and 200
+URLs per minute.
+%In general focused crawling using 'reasonable'
+%topic definitions can do 100 - 150 URLs per minute.
+
+\subsection{URL selection criteria}
+In order to successfully select and crawl one URL the following conditions
+(in this order) have to be met:
+\begin{enumerate}
+\item The URL has to be selected by the scheduling algorithm (section
+\ref{sched}).\\
+
+{\em Relevant configuration variables:}
+WaitIntervalHost (section \ref{WaitIntervalHost}),
+WaitIntervalHarvesterLockRobotRules (section \ref{WaitIntervalHarvesterLockRobotRules}),
+WaitIntervalHarvesterLockSuccess (section \ref{WaitIntervalHarvesterLockSuccess})
+
+\item The URL has to pass the allow test.
+
+{\em Relevant configuration variables:} allow (section \ref{allow})
+
+\item The URL is not be excluded by the exclude test (see section
+\ref{urlfilt}).
+
+{\em Relevant configuration variables:} exclude (section \ref{exclude})
+
+\item The Robot Exclusion Protocol has to allow crawling of the URL.
+
+\item Optionally the document at the URL location has to pass the topic filter
+(section \ref{autoclass}).
+
+
+{\em Relevant configuration variables:}
+classifyPlugIn (section \ref{classifyPlugIn}),
+doCheckRecord (section \ref{doCheckRecord}).
+
+\end{enumerate}
+
+\subsection{Document parsing and information extraction}
+
+Each document is parsed and analyzed by the crawler in order to store
+structured document records in the internal MySQL database. The
+structure of the record includes the fields:
+\begin{itemize}
+\item Title
+\item Headings
+\item Metadata
+\item Plain text
+\item Original document
+\item Links -- HTML and plain text URLs
+\item Link anchor text
+\item Mime-Type
+\item Dates -- modification, expire, and last checked by crawler
+\item Web-server identification
+\end{itemize}
+
+Optional some extra analysis can be done, see section \ref{analysis}.
+
+The system selects a document parser based on the Mime-Type together
+with available parsers and converter programs.
+\begin{enumerate}
+\item For some mime-types an external program
+is called in order to convert the document to a format handled internally (HTML or plain text).
+
+{\em Relevant configuration variables:} converters (section \ref{converters})
+
+\item Internal parsers handle HTML, plain text, TeX, and Image.
+
+{\em Relevant configuration variables:} converters (section \ref{converters})
+
+\end{enumerate}
+
+Supporting a new document format is as easy as providing a program
+that can convert a document in this format to HTML or plain text.
+Configuration of the mapping between document format (Mime-Type) and converter program is done in the complex configuration variable 'converters' (section  \ref{converters}). 
+
+Out of the box Combine handle the following document formats: plain text, HTML,
+PDF, PostScript, MSWord, MSPowerPoint, MSExcel, RTF, TeX, and images.
+
+%\subsection{Record management}
+%
+%    #actions according the following truth table based presence in recordurl
+%    #urlid: there is a document in the database for this url
+%    #recordid: there is as documenent in the database with the same MD5 as the new page
+%#
+%    #              recordid       |        ! recordid
+%    #  urlid   if same md5        |    delete(urlid_recordid);
+%    #           update(lastcheck) |    update(urlid); insertRec
+%    #          else delete(urlid_recordid);|
+%    #           add(urlid)        |
+%    # -----------------------------------------------------------------------------
+%    # ! urlid  add(urlid)         |   add(urlid); insertRec
+
+\subsection{URL filtering}
+\label{urlfilt}
+Before an URL is accepted for scheduling (either by manual loading or
+recycling) it is normalized and validated. This process comprises a
+number of steps:
+\begin{itemize}
+\item Normalization
+\begin{itemize}
+\item General practice: host-name lowercasing, port-number
+substitution, canonical URL
+
+\item Removing fragments (ie '\#' and everything after that)
+
+\item Cleaning CGI repetitions of parameters
+
+\item Collapsing dots ('./', '../') in the path
+
+\item Removing CGI parameters that are session ids, as identified by
+patterns in the configuration variable sessionids (section \ref{sessionids})
+
+\item Normalizing Web-server names by resolving aliases. Identified by
+patterns in the \hyperref{configuration variable serveralias}{configuration variable serveralias (section }{)}{serveralias}.
+These patterns can be generated by using the program
+{\tt combineUtil} to analyze a crawled corpus.
+\end{itemize}
+
+\item Validation: A URL has to pass all three validation steps
+outlined below.
+\begin{itemize}
+\item URL length has to be less than configuration variable
+maxUrlLength (section \ref{maxUrlLength})
+
+\item Allow test: one of the Perl regular expressions in the
+configuration variable
+allow (section \ref{allow}) must match the URL
+
+\item Exclude test: none of the Perl regular expressions in the
+configuration variable
+ exclude (section \ref{exclude}) must match the URL
+
+\end{itemize}
+Both allow and exclude can contain two types of regular expressions
+identified by either '{\tt HOST:}' or '{\tt URL}' in front of the
+regular expression. The '{\tt HOST:}' regular expressions are matched only against the
+Web-server part of the URL while the '{\tt URL}' regular expressions
+are matched against the entire URL.
+\end{itemize}
+
+\subsection{Crawling strategy}
+\label{sched}
+The crawler is designed to run continuously in order to keep
+crawled databases as up-to-date as possible.
+Starting and halting crawling is done manually.
+The configuration variable \hyperref{AutoRecycleLinks}{AutoRecycleLinks (section }{)}{AutoRecycleLinks} determines if the crawler should
+follow all valid new links or just take those that already are
+marked for crawling.
+
+All links from a relevant document are extracted, normalized and stored
+in the structured record. Those links that pass the selection/validation
+criteria outlined below are marked for crawling.
+
+\hspace{-\parindent}To mark a URL for crawling requires:
+\begin{itemize}
+\item The URL should be from a page that is relevant (i.e. pass the focus filter).
+\item The URL scheme must be one of HTTP, HTTPS, or FTP.
+\item The URL must not exceed the maximum length (configurable, default 250 characters).
+\item It should pass the 'allow' test (configurable, default all URLs passes).
+\item It should pass the 'exclude' test (configurable, default excludes malformed URLs, some CGI pages, and URLs with file-extensions for binary formats).
+\end{itemize}
+
+At each scheduling point one URL from each available (unlocked) host is selected to 
+generate a ready queue, which is then processed completely 
+before a new scheduling is done.
+Each selected URL in the ready queue thus fulfills these requirements:
+\begin{itemize}
+\item URL must be marked for crawling (see above).
+\item URL must be unlocked (each successful access to a URL locks it for
+a configurable time \hyperref{WaitIntervalHarvesterLockSuccess}{WaitIntervalHarvesterLockSuccess (section }{)}{WaitIntervalHarvesterLockSuccess}).
+\item Host of the URL must be unlocked (each access to a host locks it for a configurable time \hyperref{WaitIntervalHost}{WaitIntervalHost (section }{)}{WaitIntervalHost}).
+\end{itemize}
+
+This implements a variant of BreathFirst crawling where a page is fetched if and only if 
+a certain time threshold is exceeded 
+since the last access to the server of that page.
+
+\subsection{Built-in topic filter -- automated subject classification using string matching}
+\label{autoclass}
+The built-in topic filter is an approach to automated classification,
+that uses a topic definition with a pre-defined controlled vocabulary of
+topical terms, to determine relevance judgement. Thus it does not rely
+on a particular set of seed pages, or a collection of pre-classified
+example pages to learn from. It does require that some of the seed pages
+are relevant and contain links into the topical area.
+One simple way of creating a set of seed pages would be to use terms
+from the controlled vocabulary as queries for a general-purpose search
+engine and take the result as seed pages.
+
+The system for automated topic classification (overview in Figure \ref{topicfilter}), that determines
+topical relevance in the topical filter, is based on matching subject
+terms from a controlled vocabulary in a topic
+definition with the text of the document to be classified
+\cite{ardo99:_online99}. The topic definition uses
+subject classes in a hierarchical classification system (corresponding
+to topics) and terms
+associated with each subject class. Terms can be single words, phrases,
+ or Boolean AND-expressions connecting terms.
+Boolean OR-expressions are implicitly handled by having several
+different terms associated with the same subject class (see section \ref{termlist}).
+
+The algorithm works by string-to-string matching of terms and
+text in documents.
+Each time a match is found the document is awarded points based on
+which term is matched and in which structural part of the document
+(location) the match is found \cite{ardo05:_ECDL}.  The points are summed to make the final
+relevance score of the document. If the score is above a cut-off value the
+document is saved in the database together with a (list of) subject
+classification(s) and term(s).
+
+\begin{figure}[htb]
+\begin{center}
+%\epsfig{file=DLarch.xfig.eps, width=\textwidth}
+%\includegraphics[width=\textwidth]{DLarch.xfig.eps}
+ \includegraphics[width=\textwidth]{TopicFilter.xfig.eps}
+\end{center}
+\caption{Overview of the automated topic classification algorithm}
+\label{topicfilter}
+\end{figure}
+
+By providing a list of known relevant sites in the configuration
+file {\tt sitesOK.txt} (located in the job specific configuration directory) the above test can be bypassed. It works by checking the host
+part of the URL against the list of known relevant sites and if a
+match is found the page is validated and saved in the database
+regardless of the outcome of the algorithm.
+
+\subsubsection{Topic definition}
+\label{topicdef}
+Located in {\tt /etc/combine/<jobname>/topicdefinition.txt}.
+Topic definitions use triplets (term,
+relevance weight, topic-classes) as its basic entities. Weights
+are signed integers and indicate the relevance of the term with respect to
+the topic-classes. Higher values indicate more relevant terms. A large
+negative value can be used to exclude documents containing that term.
+Terms should be all lowercase.
+
+Terms can be:
+\begin{itemize}
+  \item single words
+  \item a phrase (i.e. all words in exact order)
+  \item a Boolean AND-expression connecting terms (i.e. all terms must
+      be present but in any order). The Boolean AND operator is encoded as '@and'.
+\end{itemize}
+A Boolean OR-expression has to be entered as separate term triplets.
+The Boolean expression ``{\tt polymer AND (atactic OR syndiotactic)}''
+thus has to be translated into two separate triplets, one containing
+the term ``{\tt polymer @and atactic}'', and another with ``{\tt
+polymer @and syndiotactic}''.
+
+Terms can include (Perl) regular expressions like:
+\begin{itemize}
+  \item a '{\tt ?}' makes the character immediately preceding optional, i.e.
+      the term ``{\tt coins?}'' will match both ``{\tt coin}'' and ``{\tt coins}''
+  \item a ``{\tt [\^{ }$\backslash$s]*}'' is truncation (matches all
+      character sequences except space ' '),\\
+      ``{\tt glass art[\^{ }$\backslash$s]*}'' will match 
+      ``{\tt glass art}'', ``{\tt glass arts}'', ``{\tt glass
+      artists}'', ``{\tt glass articles}'', and so on.
+\end{itemize}
+
+It is important to understand that each triplet in the topic definition
+ is considered by itself
+without any context, so they must {\bf each} be topic- or sub-class specific in order to
+be useful. Subject neutral terms like ``use'', ``test'', ``history'' should
+not be used.
+If really needed they have to be qualified so that they become topic
+specific (see examples below).
+
+\hspace{-\parindent}Simple guidelines for creating the triplets and assigning weights are:
+\begin{itemize}
+  \item   Phrases or unique, topic-specific terms, 
+ should be used if possible, and
+    assigned the highest weights, since they normally are most discriminatory.
+  \item   Boolean AND-expressions are the next best.
+  \item   Single words can be too general and/or have several meanings or uses
+    that make them less specific and those should thus be assigned
+    a small weights.
+  \item   Acronyms can be used as terms if they are unique.
+  \item   Negative weights should be used in order to exclude concepts.
+\end{itemize}
+
+\label{termlist}
+\subsubsection{Topic definition (term triplets) BNF grammar}
+TERM-LIST :== TERM-ROW '{\bf$<$cr$>$}' \verb+||+ '{\bf\#}' {\bf $<$char$>$}+ '{\bf$<$cr$>$}' \verb+||+ '{\bf$<$cr
+$>$}' \\
+TERM-ROW :== WEIGHT '{\bf: }' TERMS '{\bf=}' CLASS-LIST  \\
+WEIGHT :== ['{\bf-}']{\bf$<$integer$>$}  \\
+TERMS :== TERM [' {\bf @and} ' TERMS]*  \\
+TERM :== WORD ' ' [WORD]*   \\
+WORD :== {\bf$<$char$>$}+\verb+||+{\bf$<$char$>$}+{\bf$<$perl-reg-exp$>$}  \\
+CLASS-LIST :== CLASSID ['{\bf,}' CLASS-LIST]  \\
+CLASSID :== {\bf$<$char$>$}+  \\
+
+A line that starts with '\#' is ignored and so are empty lines.
+
+{\bf$<$perl-reg-exp$>$} is only supported by the plain
+matching algorithm described in section \ref{std}.
+
+``CLASSID'' is a topic (sub-)class specifier, often from a hierarchical
+classification system like \htmladdnormallinkfoot{Engineering Index}{http://www.ei.org/}.
+
+\subsubsection{Term triplet examples}
+
+\begin{verbatim}
+50: optical glass=A.14.5, D.2.2
+30: glass @and fiberoptics=D.2.2.8
+50: glass @and technical @and history=D.2
+50: ceramic materials @and glass=D.2.1.7
+-10000: glass @and art=A
+\end{verbatim}
+
+The first line says that a document containing the term ``{\tt optical
+glass}'' should be awarded 50 points for each of the two classes A.14.5 and
+D.2.2.
+
+``{\tt glass}'' as a single term is probably too general, qualify it with more terms
+  like: ``{\tt glass @and fiberoptics}'' , or ``{\tt glass @and technical @and history}''
+  or  use a phrase like ``{\tt glass fiber}'' or ``{\tt optical glass}''.
+
+  In order to exclude documents about artistic use of glass the term 
+  ``{\tt glass @and art}'' can be used with a (high) negative score.
+
+An example from the topic definition for 'Carnivorous Plants' using
+  regular expressions is given below:
+\begin{verbatim}
+#This is a comment
+75: d\.?\s*californica=CP.Drosophyllum
+10: pitcher[^\s]*=CP
+-10: pitcher[^\s]* @and baseball=CP
+\end{verbatim}
+The term ``{\tt d$\backslash$.?$\backslash$s*californica}''
+ will match {\tt D californica, D. californica, D.californica} etc.
+
+The last two lines assure that a document containing ``{\tt pitcher}'' gets
+10 points but if the document also contains ``{\tt baseball}'' the points are removed.
+
+\subsubsection{Algorithm 1: plain matching}
+\label{std}
+
+This algorithm is selected by setting the configuration parameter\\
+\verb+    classifyPlugIn = Combine::Check_record+
+
+The algorithm produces a list of suggested topic-classes (subject classifications) and
+corresponding relevance scores using the algorithm:
+
+\vbox{
+\[ \mbox{Relevance\_score} = \]
+\[ \sum_{\mbox{all locations}} \left( \sum_{\mbox{all terms}} (hits[\mbox{location}_{j}][\mbox{term
+}_{i}] * weight[\mbox{term}_{i}] * weight[\mbox{location}_{j}]) \right) \]}
+
+\begin{description}
+\item[term weight] ($weight[\mbox{term}_{i}]$) is taken from the topic definition
+triplets. 
+\item[location weight] ($weight[\mbox{location}_{j}]$) are
+defined ad hoc for locations like title, metadata, HTML headings, and plain
+text. However the exact values for these weights does not seem to play
+a large role in the precision of the algorithm \cite{ardo05:_ECDL}.
+\item[hits] ($hits[\mbox{location}_{j}][\mbox{term}_{i}]$) is the
+number of times $\mbox{term}_{i}$ occur in the text of $\mbox{location}_{j}$
+\end{description}
+
+The summed relevance score might, for certain applications, have to be
+normalized with respect to text size of the document.
+
+One problem with this algorithm is that a term that is found in the
+beginning of the text contributes as much as a term that is found at
+the end of a large document. Another problem is the distance and thus
+the coupling between two terms in a Boolean expression might be very
+large in a big document and this is not taken into account by the
+above algorithm.
+
+\subsubsection{Algorithm 2: position weighted matching}
+\label{pos}
+This algorithm is selected by setting the configuration parameter\\
+\verb+    classifyPlugIn = Combine::PosCheck_record+
+
+In response to the problems cited above we developed a modified
+version of the algorithm that takes into account word position in the
+text and proximity for Boolean terms. It also eliminates the need to
+assign ad hoc weights to locations. The new algorithm works as
+follows.
+
+First all text from all locations are concatenated (in the natural importance order
+title, metadata, text) into one chunk of text. Matching of terms is done
+against this chunk. Relevance score is calculated as
+
+\vbox{
+\[ \mbox{Relevance\_score} = \]
+\[ \sum_{\mbox{all terms}} \left( \sum_{\mbox{all matches}}
+\frac{weight[\mbox{term}_{i}]}{\log(k * position[\mbox{term}_{i}][\mbox{match}_{j}]) * proximity[\mbox{term}_{i}][\mbox{match}_{j}]} \right) \]}
+
+\begin{description}
+\item[term weight] ($weight[\mbox{term}_{i}]$) is taken from the topic
+ definition triplets
+
+\item[position] ($position[\mbox{term}_{i}][\mbox{match}_{j}]$) is the position
+in the text (starting from 1) for $\mbox{match}_{j}$ of $\mbox{term}_{i}$.
+The constant factor $k$ is normally $0.5$
+
+\item[proximity] ($proximity[\mbox{term}_{i}][\mbox{match}_{j}]$) is
+
+\begin{tabular}{cl}
+ 1 & for non Boolean terms\\
+ $\log(distance\_between\_components)$ & for Boolean terms\\
+\end{tabular}
+\end{description}
+
+In this algorithm a matched term close to the start of text contributes
+more to the relevance score than a match towards the end of the
+text. And for Boolean terms the closer the components are the higher
+the contribution to the relevance score.
+
+\subsection{Built-in topic filter -- automated subject classification using SVM}
+Topic filetring using SVM (Support Vector Machines) classifiers are supported using the
+\htmladdnormallinkfoot{SVMLight package}{http://svmlight.joachims.org/}. This package has to be
+installed manually together with the Algorithm::SVMLight Perl module. For installation hints see
+\htmladdnormallinkfoot{CPAN SVMLight README}{http://search.cpan.org/src/KWILLIAMS/Algorithm-SVMLight-0.08/README} or 
+'\htmladdnormallinkfoot{installing-algorithm-svmlight-linux-ubuntu}{http://www.dale-emmons.com/content/installing-algorithm-svmlight-linux-ubuntu}'
+
+SVM classifiers need a trained model before they can be used.
+
+The procedure to get started is as follows:
+\begin{itemize}
+\item Make sure that \htmladdnormallinkfoot{Algorithm::SVMLight}{http://search.cpan.org/~kwilliams/Algorithm-SVMLight-0.08/} and \htmladdnormallinkfoot{SVMLight}{http://svmlight.joachims.org/} are installed.
+\item Collect examples of good and bad URLs that defines your topic (the more the better).
+\item Generate a SVM model with the program {\tt combineSVM}.
+\item Initialize a new job with {\tt combineINIT}.
+\item Copy the SVM model to the job's configuration directory {\tt /etc/combine/<jobname>/SVMmodel.txt}.
+\item Edit the configuration file {\tt /etc/combine/<jobname>/combine.cfg} and add the following:
+\begin{verbatim}
+doCheckRecord = 1
+classifyPlugIn = Combine::classifySVM
+SVMmodel = SVMmodel.txt
+\end{verbatim}
+\item Then proceed with crawling as normal.
+\end{itemize}
+
+\subsection{Topic filter Plug-In API}
+The configuration variable \hyperref{classifyPlugIn}{classifyPlugIn (section }{)}{classifyPlugIn} is used to find
+the Perl module that implements the desired topic filter.
+The value should be formatted as a valid Perl module identifier (i.e.
+the module must be somewhere in the Perl module search path).
+Combine will call a subroutine named '\verb+classify+' in this module,
+providing an XWI-object as in parameter. An XWI-object is a structured object holding all information from
+parsing a Web-page.
+The subroutine must
+return either 0 or 1, where\\
+\hspace*{\parindent}0: means record fails to meet the classification criteria, i.e. ignore this record\\
+\hspace*{\parindent}1: means record is OK, store it in the database, and follow the links
+
+More details on how to write a Plug-In can be found in the example
+\hyperref{classifyPlugInTemplate.pm}{classifyPlugInTemplate.pm (see Appendix }{)}{classifyPlugInTemplate}.
+
+\subsection{Analysis}
+\label{analysis}
+Extra analysis, enabled by the configuration variable 
+doAnalyse (section \ref{doAnalyse}), tries to determine
+the language of the content and the country of the Web-server.
+Both are stored in the internal database.
+
+\subsection{Duplicate detection}
+Duplicates of crawled documents are automatically detected with the
+aid of a MD5-checksum calculated on the contents of the document.
+
+The MD5-checksum is used as the master record key in the internal
+database thus preventing pollution with duplicate pages. All URLs
+for a page are stored in the record, and a page is not deleted from
+the database until the crawler has verified that it's unavailable
+from all the saved URLs.
+
+\subsection{URL recycling}
+URLs for recycling come from 3 sources:
+\begin{itemize}
+\item Links extracted during HTML parsing.
+\item Redirects (unless configuration variable \hyperref{UserAgentFollowRedirects}{UserAgentFollowRedirects (section }{)}{UserAgentFollowRedirects} is set).
+\item URLs extracted from plain text (enabled by the configuration variable
+extractLinksFromText (section \ref{extractLinksFromText})).
+\end{itemize}
+
+Automatic recycling of URLs is enabled by the configuration variable
+AutoRecycleLinks (section \ref{AutoRecycleLinks}). It can also be done
+manually with the command\\
+\verb+combineCtrl --jobname XXXX recyclelinks+
+
+The command \verb+combineCtrl --jobname XXXX reharvest+ marks all
+pages in the database for harvesting again.
+
+\subsection{Database cleaning}
+
+The tool {\tt combineUtil} implements functionality for cleaning the database.
+
+\begin{description}
+\item[sanity/restoreSanity] checks respectively restore
+ consistency of the internal database.
+
+\item[deleteNetLoc/deletePath/deleteMD5/deleteRecordid] deletes
+records from the data\-base based on supplied parameters.
+
+\item[serverAlias] detects Web-server aliases in the database.
+All detected alias groups are added to the \hyperref{serveralias configuration}{serveralias configuration (section }{)}{serveralias}.
+Records from aliased servers (except for the first Web-server) will be deleted.
+\end{description}
+
+\subsection{Complete application -- SearchEngine in a Box}
+
+The
+ \htmladdnormallinkfoot{SearchEngine-in-a-Box}{http://combine.it.lth.se/SearchEngineBox/}
+ system is based on the two systems Combine Focused Crawler and
+ \htmladdnormallinkfoot{Zebra text indexing and retrieval
+ engine}{http://www.indexdata.dk/zebra/}. This system allows you build
+ a vertical search engine for your favorite topic in a few easy
+ steps.
+
+The \htmladdnormallink{SearchEngine-in-a-Box}{http://combine.it.lth.se/SearchEngineBox/} Web-site contains instructions and downloads
+to make this happen. Basically it makes use of the
+\hyperref{ZebraHost}{ZebraHost (see section }{)}{ZebraHost}
+configuration variable which enables direct communication between
+the crawler and the database system and thus indexes records as soon
+as they are crawled. This also means that they are directly searchable.

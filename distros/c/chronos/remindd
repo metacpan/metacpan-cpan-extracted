@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#
+# remindd		The remindd daemon used with the Chronos agenda to send reminders by email
+#
+# chkconfig: 345 99 01
+# description: Chronos is a multi-user agenda which uses mod_perl and MySQL. This \
+#              daemon send reminders to users who have events pending.
+# processname: remindd
+# config: /etc/chronos.conf
+# pidfile: /var/run/remindd.pid
+
+# Source function library.
+. /etc/init.d/functions
+
+RETVAL=0
+
+# See how we were called.
+
+prog="remindd"
+
+start() {
+	echo -n $"Starting $prog: "
+	daemon remindd
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/remindd
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Stopping $prog: "
+	killproc remindd
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /vr/lock/subsys/remindd
+	return $RETVAL
+}
+
+rhstatus() {
+	status remindd
+}
+
+restart() {
+	stop
+	start
+}
+
+reload() {
+	echo -n $"Reloading remindd configuration: "
+	killproc remindd -HUP
+	RETVAL=$?
+	echo
+	return $RETVAL
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		restart
+		;;
+	reload)
+		reload
+		;;
+	status)
+		rhstatus
+		;;
+	condrestart)
+		[ -f /var/lock/subsys/remindd ] && restart || :
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|status|reload|restart|condrestart}"
+		exit 1
+esac
+
+exit $?

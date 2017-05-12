@@ -1,0 +1,28 @@
+Build.PL
+Changes
+lib/constant/boolean.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/10use.t
+t/20example.t
+t/test.pl
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/distribution.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/signature.t
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

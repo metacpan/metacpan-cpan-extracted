@@ -1,0 +1,389 @@
+# Copyright (c) 1999-2000, James H. Woodyatt
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#   Redistributions of source code must retain the above copyright
+#   notice, this list of conditions and the following disclaimer.
+#
+#   Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions and the following disclaimer in
+#   the documentation and/or other materials provided with the
+#   distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE. 
+
+require 5.005;
+use strict;
+
+my (%prototype, %validator);
+
+package Conjury::C::Darwin;
+
+BEGIN {
+    use Conjury::C;
+    use vars qw(@ISA);
+    @ISA = qw(Conjury::C);
+
+    $validator{cc_language} = sub {
+	my ($x, $y) = (shift, undef);
+	$y = q/not 'c', 'c++' or 'objective-c'/
+	  unless ($x =~ m/\A(c|c\+\+|objective-c)\Z/i);
+	return $y;
+    };
+}
+
+package Conjury::C::Darwin::Compiler;
+use vars qw(@ISA);
+use Carp qw(croak);
+use Conjury::Core qw(cast_error %Option);
+
+sub _new_f()    { __PACKAGE__ . '::new'     }
+
+BEGIN {
+    @ISA = qw(Conjury::C::Compiler);
+
+    my $proto;
+
+    $proto = Conjury::Core::Prototype->new;
+    $proto->optional_arg
+      (Program => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (No_Scanner => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (Language => $validator{cc_language});
+    $proto->optional_arg
+      (Options => \&Conjury::Core::Prototype::validate_array_of_scalars);
+    $proto->optional_arg
+      (Journal => \&Conjury::Core::Prototype::validate_hash);
+    $prototype{_new_f()} = $proto;
+}
+
+my $cc_scanner = sub {
+    my ($program, $c_file, $parameters) = @_;
+
+    my $verbose = exists $Option{'verbose'};
+    my $command = "$program";
+    for (@$parameters) {
+	$command .= ' ';
+	$command .= /\s/ ? "'$_'" : $_;
+    }
+    $command .= " -M $c_file";
+
+    print "scanning $c_file ...\n";
+    print "$command\n" if $verbose;
+
+    cast_error "Unable to scan file '$c_file'"
+      unless open(PIPE, "$command |");
+    my @make_rule = <PIPE>;
+    close PIPE || cast_error 'Scan failed.';
+
+    print @make_rule if $verbose;
+    
+    for (@make_rule) {
+	chomp;
+	s/\s*\\?$//;
+	s/^\S+:\s*//;
+    }
+
+    return split('\s+', join(' ', @make_rule));
+};
+
+sub new {
+    my ($class, %arg) = @_;
+    my $error = $prototype{_new_f()}->validate(\%arg);
+    croak _new_f, "-- $error" if $error;
+
+    $class = ref($class) if ref($class);
+
+    my $program = $arg{Program};
+    $program = 'cc' unless defined($program);
+
+    my $language = $arg{Language};
+    $language = 'c' unless defined($language);
+    $language = lc($language);
+    $program =~ s/cc/c++/ if $language eq 'c++';
+
+    my $no_scanner = $arg{No_Scanner};
+    my $journal = $arg{Journal};
+    my $scanner = undef;
+
+    $scanner = sub { &$cc_scanner($program, @_) }
+      if (defined($journal) && !$no_scanner);
+
+    my $suffix_rule = sub {
+	my $name = shift;
+	$name .= '.o'
+		  unless $name =~ s/\.(c|C|cc|cxx|c\+\+|m|i|ii|s|S)\Z/.o/;
+	return $name;
+    };
+
+    my $self = eval {
+      Conjury::C::Compiler->new
+	(Program => $program,
+	 Suffix_Rule => $suffix_rule,
+	 Options => $arg{Options},
+	 Scanner => $scanner,
+	 Journal => $journal);
+    };
+    if ($@) { $@ =~ s/ at \S+ line \d+\n//; croak $@; }
+
+    $self->{Language} = $language;
+
+    bless $self, $class;
+}
+
+
+package Conjury::C::Darwin::Linker;
+use vars qw(@ISA);
+use Carp qw(croak);
+
+sub _new_f()    { __PACKAGE__ . '::new'     }
+
+BEGIN {
+    @ISA = qw(Conjury::C::Linker);
+
+    my $proto;
+
+    $proto = Conjury::Core::Prototype->new;
+    $proto->optional_arg
+      (Program => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (Language => $validator{cc_language});
+    $proto->optional_arg
+      (Options => \&Conjury::Core::Prototype::validate_array_of_scalars);
+    $proto->optional_arg
+      (Journal => \&Conjury::Core::Prototype::validate_hash);
+    $prototype{_new_f()} = $proto;
+}
+
+sub new {
+    my ($class, %arg) = @_;
+    my $error = $prototype{_new_f()}->validate(\%arg);
+    croak _new_f, "-- $error" if $error;
+
+    $class = ref($class) if ref($class);
+
+    my $program = $arg{Program};
+    $program = 'cc' unless defined($program);
+
+    my $language = $arg{Language};
+    $language = 'c' unless defined($language);
+    $language = lc($language);
+    $program =~ s/cc/c++/ if $language eq 'c++';
+
+    my $self = eval {
+      Conjury::C::Linker->new
+	(Program => $program,
+	 Options => $arg{Options},
+	 Journal => $arg{Journal});
+    };
+    if ($@) { $@ =~ s/ at \S+ line \d+\n//; croak $@; }
+
+    $self->{Language} = $language;
+
+	my $opt_header = $self->{Options}->[0];
+    if ($language eq 'objective-c') {
+	my $opt_trailer = $self->{Options}->[1];
+	push @$opt_trailer, '-lobjc';
+    }
+
+    bless $self, $class;
+}
+
+package Conjury::C::Darwin::Archiver;
+use vars qw(@ISA);
+use Conjury::Core qw(%Option);
+use Carp qw(croak);
+use Config;
+
+sub _new_f()	{ __PACKAGE__ . '::new'	 }
+sub _library_spell_f()  { __PACKAGE__ . '::library_spell'   }
+
+BEGIN {
+    @ISA = qw(Conjury::C::Archiver);
+
+    my $proto;
+
+    $proto = Conjury::Core::Prototype->new;
+    $proto->optional_arg
+      (Program => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (No_Scanner => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (Options => \&Conjury::Core::Prototype::validate_array_of_scalars);
+    $proto->optional_arg
+      (Journal => \&Conjury::Core::Prototype::validate_hash);
+	$proto->required_arg
+	  (Mode => \&Conjury::Core::Prototype::validate_scalar);
+    $prototype{_new_f()} = $proto;
+
+    $proto = Conjury::Core::Prototype->new;
+    $proto->required_arg
+      (Name => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->required_arg
+      (Objects => \&Conjury::Core::Prototype::validate_array_of_scalars);
+    $proto->optional_arg
+      (Options => \&Conjury::Core::Prototype::validate_array_of_scalars);
+    $proto->optional_arg
+      (Directory => \&Conjury::Core::Prototype::validate_scalar);
+    $proto->optional_arg
+      (Factors => \&Conjury::Core::Prototype::validate_array);
+    $prototype{_library_spell_f()} = $proto;
+}
+
+sub new {
+    my ($class, %arg) = @_;
+    my $error = $prototype{_new_f()}->validate(\%arg);
+    croak _new_f, "-- $error" if $error;
+	
+	my $mode = $arg{Mode};
+	croak _new_f, "-- Mode must be either 'static' or 'dynamic'"
+	    unless ($mode eq 'static' or $mode eq 'dynamic');
+
+    $class = ref($class) if ref($class);
+
+    my $program = $arg{Program};
+	$program = 'libtool' unless defined($program);
+	    
+    my @arglist = ( );
+    push @arglist, (Program => $program) if (defined $program);
+    push @arglist, (Options => $arg{Options}, Journal => $arg{Journal});
+
+    my $self = eval { Conjury::C::Archiver->new(@arglist) };
+    if ($@) { $@ =~ s/ at \S+ line \d+\n//; croak $@; }
+	
+	$self->{Mode} = $mode;
+
+    bless $self, $class;
+}
+
+sub library_spell {
+    my ($self, %arg) = @_;
+    my $error = $prototype{_library_spell_f()}->validate(\%arg);
+    croak _library_spell_f, "-- $error" if $error;
+
+    my $directory = $arg{Directory};
+    my $name = $arg{Name};
+    my $options = $arg{Options};
+    $options = defined($options) ? [ @$options ] : [ ];
+
+    my $ar_options = $self->{Options};
+    unshift @$options, @$ar_options;
+
+    my $objects = $arg{Objects};
+
+    my $factors_ref = $arg{Factors};
+    my @factors = defined($factors_ref) ? @$factors_ref : ();
+
+    my $program = $self->{Program};
+    my $journal = $self->{Journal};
+	my $mode = $self->{Mode};
+
+    my $product = "lib${name}$Config{_a}";
+    $product = File::Spec->catfile($directory, $product)
+      if defined($directory);
+    $product = File::Spec->canonpath($product);
+
+    my @command = ($program, "-$mode", '-o', $product, @$options, @$objects);
+    my $command_str = join ' ', @command;
+
+    my $action = sub {
+	print "$command_str\n";
+
+	my $result;
+	if (!exists($Option{'preview'})) {
+	    unlink $product;
+	    $result = system @command;
+	}
+
+	return $result;
+    };
+
+    my $profile = __PACKAGE__ . ' ' . $command_str;
+
+    push @factors, @$objects;
+
+    return Conjury::Core::Spell->new
+      (Product => $product,
+       Factors => \@factors,
+       Profile => $profile,
+       Action => $action,
+       Journal => $journal);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Conjury::C::Darwin -- Perl Conjury with the Darwin C/C++ tools
+
+=head1 SYNOPSIS
+
+  c_compiler Vendor => 'Darwin',
+    Language => I<language>,
+    No_Scanner => 1,
+    Program => I<program>,
+    Options => [ I<opt1>, I<opt2>, ... ],
+    Journal => I<journal>;
+
+  c_linker Vendor => 'Darwin',
+    Language => I<language>,
+    Program => I<program>,
+    Options => [ I<opt1>, I<opt2>, ... ],
+    Journal => I<journal>;
+
+  c_archiver Vendor => 'Darwin',
+    Mode => $static_or_dynamic, # either 'static' or 'dynamic'
+    Language => I<language>,
+    Program => I<program>,
+    Options => [ I<opt1>, I<opt2>, ... ],
+    Journal => I<journal>;
+
+=head1 DESCRIPTION
+
+The optional 'Program', 'Options' and 'Journal' arguments to the
+Darwin-specific specializations of the C<c_compiler> and C<c_linker>
+functions are simply passed through unmodified to the base class
+constructor.
+
+The optional 'Language' argument specifies the langauge for which
+the compiler or linker should be invoked.  The C language is the
+default if not otherwise specified.  The value is case-insensitive
+and may be any one of the following: 'c', 'c++' or 'objective-c'.
+
+The optional 'No_Scanner' argument in the C<c_compiler>
+specialization specifies that the processing overhead of scanning
+all the source files for their dependency trees is unnecessary.
+If you are only building from clean source file hierarchies (with
+no existing products from previous runs), then the construction
+time of large builds may be improved with this option.
+
+The Darwin archiver tools is the 'libtool' program, and it should
+be used for both static and dynamic libraries.  If it is used, the
+'Mode' argument is required for specifying which kind of library
+the object will be used to create.
+
+=head1 SEE ALSO
+
+More documentation can be found in L<Conjury>, L<cast>, L<Conjury::Core>
+and L<Conjury::C>.
+
+=head1 AUTHOR
+
+James Woodyatt <jhw@wetware.com>

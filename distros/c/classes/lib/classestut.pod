@@ -1,0 +1,35 @@
+=pod
+
+=head1 NAME
+
+classestut - OO programming with classes pragma tutorial
+
+=head1 DESCRIPTION
+
+A tutorial to help Perl programmers quickly start programming using
+classes pragma conventions.
+
+More later...
+
+=head1 SEE ALSO
+
+L<classes>
+
+=head1 AUTHOR
+
+Robert S. Muhlestein (rmuhle at cpan.org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005, 2006 Robert S. Muhlestein (rmuhle at
+cpan.org) Some rights reserved. This document is
+licensed under a Creative Commons Attribution 2.5 License
+(http://creativecommons.org/licenses/by/2.5/).
+
+See L<classes> for copyright and licensing information of the
+C<classes> pragma module itself.
+
+=cut
+
+
+

@@ -1,0 +1,195 @@
+#!/usr/bin/perl -w
+
+#  You may distribute under the terms of the GNU General Public License
+#
+#  (C) Paul Evans, 2010-2012 -- leonerd@leonerd.org.uk
+
+use strict;
+use warnings;
+
+use Tickit::Async;
+use Tickit::Term qw( BIND_FIRST );
+use Tickit::Widget::Tabbed 0.005;
+use Tickit::Widget::VBox;
+use Tickit::Window 0.57;  # ->bind_event
+
+use Net::Async::Tangence::Client 0.13; # ->connect_url returns Future
+
+use Circle::FE::Term::Tab;
+use Circle::FE::Term::Ribbon;
+
+use IO::Async::Loop;
+
+use Text::Balanced qw( extract_bracketed );
+use Getopt::Long;
+
+my $loop = IO::Async::Loop->new();
+
+my $IDENTITY;
+
+GetOptions(
+   'identity|i=s' => \$IDENTITY,
+   'help' => sub { usage(0) },
+) or usage(1);
+
+sub usage
+{
+   my ( $exitcode ) = @_;
+
+   print { $exitcode ? \*STDERR : \*STDOUT } <<'EOF';
+circle-fe-term [options...] [URL]
+
+Options:
+
+   --identity, -i IDENTITY   Use the given session identity for reconnection
+
+URL should be one of:
+
+   sshunix://host/path/to/socket
+   sshexec://host/path/to/command?with+arguments
+   exec:///path/to/command?with+arguments
+   tcp://host:port/
+   unix:///path/to/socket
+
+EOF
+
+   exit $exitcode;
+}
+
+my $URL = shift @ARGV or usage(1);
+
+if( !defined $IDENTITY ) {
+   my $hostname = `hostname -f`; chomp $hostname;
+   $IDENTITY = $ENV{USER} . "@" . $hostname . "/Term";
+}
+
+my $client = Net::Async::Tangence::Client->new(
+   identity => $IDENTITY,
+
+   on_closed => sub {
+      warn "Connection closed\n";
+      exit(0);
+   },
+
+   on_error => sub { warn "Received MSG_ERROR: $_[0]\n"; },
+);
+
+$loop->add( $client );
+
+my $rootobj = $client->connect_url( $URL )->get;
+
+my $t = Tickit::Async->new;
+
+$loop->add( $t );
+
+# TODO: think about whether this can be extracted into some kind of Tickit::App::Plugin or somesuch?
+my $esc_held;
+my $esc_indicator_window =$t->rootwin->make_float( 0, 0, 1, 4 );
+$esc_indicator_window->hide;
+$esc_indicator_window->pen->chattr( rv => 1 );
+$esc_indicator_window->bind_event( expose => sub {
+   my ( $win, undef, $info ) = @_;
+   $info->rb->text_at( 0, 0, "ESC-" );
+} );
+my $esc_timer = IO::Async::Timer::Countdown->new(
+   delay => 3,
+   on_expire => sub {
+      $esc_held = 0;
+      $esc_indicator_window->hide;
+   },
+);
+$t->add_child( $esc_timer );
+
+$t->term->bind_event( key => BIND_FIRST, sub {
+   my ( $term, $ev, $info ) = @_;
+
+   if( $esc_held ) {
+      $esc_held = 0;
+      $esc_indicator_window->hide;
+      $esc_timer->stop;
+
+      $term->emit_key(
+         type => "key",
+         str  => "M-" . $info->str,
+         mod  => $info->mod | 2,  # TODO: ALT?
+      );
+
+      return 1;
+   }
+
+   if( $info->type eq "key" and $info->str eq "Escape" ) {
+      $esc_held = 1;
+      $esc_indicator_window->reposition( $t->rootwin->lines - 1, 0 );
+      $esc_indicator_window->show;
+      $esc_timer->start;
+
+      return 1;
+   }
+
+   return 0;
+} );
+# End TODO
+
+my $top_vbox = Tickit::Widget::VBox->new;
+
+# TODO: Consider a menubar
+
+my $tabbed = Tickit::Widget::Tabbed->new(
+   tab_position => "bottom",
+   pen_active   => Tickit::Pen->new( b => 1, u => 1 ),
+   tab_class    => "Circle::FE::Term::Tab",
+   ribbon_class => "Circle::FE::Term::Ribbon",
+);
+
+$t->bind_key( "C-n" => sub { $tabbed->next_tab } );
+$t->bind_key( "C-p" => sub { $tabbed->prev_tab } );
+
+$top_vbox->add( $tabbed, expand => 1 );
+
+$t->set_root_widget( $top_vbox );
+
+my $f = $rootobj->call_method(
+   "get_session" => [ 'tabs' ],
+)->then( sub {
+   my ( $session ) = @_;
+
+   $session->watch_property_with_initial( "tabs",
+      on_set => sub {
+         my ( $objarray ) = @_;
+
+         foreach my $obj ( @$objarray ) {
+            $tabbed->add_tab( Tickit::Widget::VBox->new, object => $obj );
+         }
+      },
+      on_push => sub {
+         my @new = @_;
+         foreach my $obj ( @new ) {
+            $tabbed->add_tab( Tickit::Widget::VBox->new, object => $obj );
+         }
+      },
+      on_shift => sub {
+         my ( $count ) = @_;
+         $tabbed->remove_tab( 0 ) for 1 .. $count;
+      },
+      on_splice => sub {
+         my ( $index, $count, @objs ) = @_;
+
+         # $count times, remove the one at $index, as they'll shuffle down
+         $tabbed->remove_tab( $index ) for 1 .. $count;
+
+         # TODO: I have no idea wtf is going on here
+         foreach my $i ( 0 .. $#objs ) {
+            my $obj = $objs[$i];
+            die "TODO: insert tab\n";
+         }
+      },
+      on_move => sub {
+         my ( $index, $delta ) = @_;
+
+         $tabbed->move_tab( $index, $delta );
+      },
+   );
+});
+$t->adopt_future( $f );
+
+$t->run;

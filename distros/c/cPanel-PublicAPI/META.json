@@ -1,0 +1,49 @@
+{
+   "abstract" : "A perl interface for interacting with cPanel",
+   "author" : [
+      "cPanel, Inc. <integration@cpanel.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "cPanel-PublicAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::CookieJar" : "0",
+            "HTTP::Tiny" : "0.042",
+            "IO::Socket::INET" : "1.31",
+            "IO::Socket::SSL" : "1.988",
+            "JSON::XS" : "2",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "URI::Escape" : "3"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

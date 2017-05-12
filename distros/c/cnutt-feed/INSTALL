@@ -1,0 +1,29 @@
+Install instructions
+====================
+
+Basically:
+
+$ perl Makefile.PL
+$ make
+$ make install
+
+If you want to install perlconsole system-wide, at least the last command must
+be run as root (e.g. with sudo).
+
+Dependencies
+============
+
+Cnutt-feed depends on the following modules:
+ - Config::Tiny
+ - Email::Address
+ - Email::Date
+ - Email::Folder
+ - Email::LocalDelivery
+ - Email::MIME::CreateHTML
+ - HTML::Encoding
+ - HTML::Entities
+ - HTML::FormatText::WithLinks
+ - HTML::TreeBuilder
+ - MIME::EncWords
+ - XML::Feed
+

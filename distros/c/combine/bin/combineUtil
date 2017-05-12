@@ -1,0 +1,919 @@
+#! /usr/bin/perl
+
+## $Id: combineUtil 233 2007-02-21 10:34:25Z anders $
+
+# Copyright (c) 1996-1998 LUB NetLab, 2002-2005 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Getopt::Long;
+use Combine::Config;
+use Combine::SD_SQL;
+use Combine::MySQLhdb;
+
+my $configfile;
+my $jobname;
+my $help;
+# switches
+my @netlocs = ();
+my $preferred;
+my @aliases = ();
+my $md5;
+my $recordid;
+my @pathsubstrs = ();
+GetOptions('jobname:s' => \$jobname, 'help' => \$help, 
+	   'netlocstr=s' => \@netlocs,
+	   'pathsubstr=s' => \@pathsubstrs,
+	   'aliases=s' => \@aliases, 'preferred:s' => \$preferred,
+	   'md5:s' => \$md5, 'recordid:i' => \$recordid,
+	   'configfile:s' => \$configfile );
+if (!defined($ARGV[0])) { Getopt::Long::HelpMessage('No action'); }
+if (defined($help)) { Getopt::Long::HelpMessage('See man page combineUtil'); }
+if (defined($jobname)) { Combine::Config::Init($jobname); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+
+@netlocs = split(/,/,join(',',@netlocs));
+@aliases = split(/,/,join(',',@aliases));
+@pathsubstrs = split(/,/,join(',',@pathsubstrs));
+
+my $sv =  Combine::Config::Get('MySQLhandle');
+Combine::MySQLhdb::Open(); #Init???
+
+if    ($ARGV[0] eq 'classtat')    { &clasStat(); exit; }
+elsif ($ARGV[0] eq 'termstat')    { &termStat(); exit; }
+elsif ($ARGV[0] eq 'sanity')    { &sanity(); exit; }
+elsif ($ARGV[0] eq 'stats')    { &stats(); exit; }
+elsif ($ARGV[0] eq 'all')    { 
+    &stats();
+    &sanity();
+    &clasStat();
+    &termStat();
+    exit;
+}
+
+my $access_sd = new Combine::SD_SQL;
+
+my $res = $access_sd->stat; 
+my $stat='';
+if ( $res =~ /^Status: open; / ) { $stat='open'; }
+$access_sd->pause;
+$access_sd->reSchedule;
+print STDERR "WARN This program will stop your harvesting! You need to restart it manually\n";
+system("combineCtrl --jobname $jobname kill"); 
+
+if ($ARGV[0] eq 'serveralias')    { &serverAlias(); }
+elsif ($ARGV[0] eq 'resetOAI')    { &resetOAI(); }
+elsif ($ARGV[0] eq 'restoreSanity')    { &RestoreSanity(); }
+elsif ($ARGV[0] eq 'deleteNetLoc') { &handleDeleteNetLoc; }
+elsif ($ARGV[0] eq 'deletePath') { &handleDeletePath; }
+elsif ($ARGV[0] eq 'deleteMD5' && defined($md5)) { &handleDeleteMD5(); }
+elsif ($ARGV[0] eq 'deleteRecordid' && defined($recordid)) { &deleteRecordId($recordid); }
+elsif (($ARGV[0] eq 'addAlias') && defined($preferred)) {
+   &handleServerAlias(); #deletes all in @aliases
+} else { 
+    if ( $stat eq 'open') { $access_sd->open; }
+    Getopt::Long::HelpMessage('Wrong switches or Unknown action: See man page combineUtil'); 
+}
+
+if ( $stat eq 'open') { $access_sd->open; }
+
+##########################################################
+sub stats {
+    my $sth = $sv->prepare(qq{select count(distinct(recordid)) from recordurl});
+    $sth->execute;
+    my ($res)=$sth->fetchrow_array();
+    print "TOTAL NUMBER OF RECORDS: $res\n";
+
+    $sth = $sv->prepare(qq{select count(distinct(netlocid)) from urls,recordurl where recordurl.urlid=urls.urlid});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    print "TOTAL NUMBER OF SERVERS: $res\n";
+
+    $sth = $sv->prepare(qq{select count(distinct(urlid)) from links});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    print "TOTAL NUMBER OF DISTINCT URLs IN LINKS: $res\n";
+
+    print "DOCUMENT LANGUAGES\n";
+    $sth = $sv->prepare(qq{select value,sum(1) from analys where name='language' group by value});
+    $sth->execute;
+    while ( my ($val,$sum)=$sth->fetchrow_array() ) {
+	print "  $val: $sum\n";
+    }
+
+    print "RECORDS PER SERVER\n";
+    $sth = $sv->prepare(qq{select netlocstr,sum(1) as ant from netlocs,urls,recordurl where recordurl.urlid=urls.urlid and urls.netlocid=netlocs.netlocid group by netlocstr order by ant desc});
+    $sth->execute;
+    while ( my ($val,$sum)=$sth->fetchrow_array() ) {
+	print "  $val: $sum\n";
+    }
+
+    print "DOCUMENT TYPES\n";
+    $sth = $sv->prepare(qq{select type,sum(1) as ant from hdb group by type order by ant desc});
+    $sth->execute;
+    while ( my ($val,$sum)=$sth->fetchrow_array() ) {
+	print "  $val: $sum\n";
+    }
+
+    print "LINKTYPES\n";
+    $sth = $sv->prepare(qq{select linktype,sum(1) as ant from links group by linktype order by ant desc});
+    $sth->execute;
+    while ( my ($val,$sum)=$sth->fetchrow_array() ) {
+	print "  $val: $sum\n";
+    }
+
+}
+
+sub sanity {
+
+    print "Sanity checks on a Combine database, all counts should be 0\n";
+    print "Might be slow on large databases\n";
+    my $sanity=0;
+
+    my $sth = $sv->prepare(qq{SELECT count(recordurl.recordid) FROM recordurl LEFT JOIN hdb ON recordurl.recordid=hdb.recordid WHERE hdb.recordid IS NULL});
+    $sth->execute;
+    my ($res)=$sth->fetchrow_array();
+    if ( $res != 0 ) { $sanity++; }
+    print "#Records in recordurl but not in hdb: $res\n";
+
+    foreach my $table ('hdb', 'analys', 'html', 'links', 'meta', 'topic') {
+	$sth = $sv->prepare(qq{SELECT count($table.recordid) FROM $table LEFT JOIN recordurl ON $table.recordid=recordurl.recordid WHERE recordurl.recordid IS NULL});
+	$sth->execute;
+	($res)=$sth->fetchrow_array();
+	if ( $res != 0 ) { $sanity++; }
+	print "#Records in $table but not in recordurl: $res\n";
+    }
+
+    $sth = $sv->prepare(qq{SELECT count(recordurl.urlid) FROM recordurl LEFT JOIN urls ON recordurl.urlid=urls.urlid WHERE urls.urlid IS NULL});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    if ( $res != 0 ) { $sanity++; }
+    print "#URLid in recordurl but not in urls: $res\n";
+
+    $sth = $sv->prepare(qq{SELECT count(oai.recordid) FROM oai LEFT JOIN hdb ON oai.recordid=hdb.recordid WHERE oai.status!='deleted' AND hdb.recordid IS NULL});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    if ( $res != 0 ) { $sanity++; }
+    print "#recordid's in oai as 'created' or 'updated' but not in hdb: $res\n";
+
+    $sth = $sv->prepare(qq{SELECT count(oai.recordid) FROM oai LEFT JOIN hdb ON oai.recordid=hdb.recordid WHERE oai.status='deleted' AND hdb.recordid IS NOT NULL});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    if ( $res != 0 ) { $sanity++; }
+    print "#records marked as deleted in oai but still in hdb: $res\n";
+
+    $sth = $sv->prepare(qq{SELECT count(hdb.recordid) FROM hdb LEFT JOIN oai ON hdb.recordid=oai.recordid WHERE oai.status='deleted'});
+    $sth->execute;
+    ($res)=$sth->fetchrow_array();
+    if ( $res != 0 ) { $sanity++; }
+    print "#same thing: $res\n";
+
+#    $sth = $sv->prepare(qq{SELECT count(hdb.recordid) FROM hdb LEFT JOIN oai ON hdb.recordid=oai.recordid WHERE oai.recordid IS NULL});
+#    $sth->execute;
+#    ($res)=$sth->fetchrow_array();
+#    if ( $res != 0 ) { $sanity++; }
+#    print "#records in hdb but not in oai - SLOW?? WHY?: $res\n";
+
+    if ( $sanity > 0 ) { print "WARNING: $sanity of the sanity checks failed\n"; }
+}
+
+sub clasStat {
+
+    my $res = '';
+    my $n=0;
+    my $sth = $sv->prepare(qq{SELECT notation,sum(1) AS ant FROM topic GROUP BY notation ORDER BY ant DESC;});
+    $sth->execute;
+    while (my ($cls,$ant)=$sth->fetchrow_array) {
+#	$class{$cls}=$ant;
+	$res .= "$cls: $ant records\n";
+	$n++;
+    }
+
+    print "Total $n different classes\n";
+    print "Class code vs # of records within that class\n";
+    print $res;
+}
+
+sub termStat {
+    my %terms;
+    my $sth = $sv->prepare(qq{SELECT terms FROM topic;});
+    $sth->execute;
+
+    while (my ($t)=$sth->fetchrow_array) {
+	my @c = split(', ', $t);
+	foreach my $c (@c) {
+	    $c =~ s/^[^\(]+\(//;
+	    my @t = split(', ', $c);
+	    foreach my $term (@t) {
+		next if ($term eq '');
+		$terms{$term}++;
+	    }
+	}
+    }
+
+    my $n=0;
+    foreach my $k ( keys(%terms) ) { $n++; }
+    print "Term match statistics; $n different terms\n";
+    print "Term   vs   # of term occurences\n";
+    foreach my $k (sort { $terms{$b}<=>$terms{$a}; } keys(%terms)) {
+       print "$k $terms{$k}\n";
+    }
+}
+
+
+sub resetOAI {
+#Reset the OAI table to make all records 'created'
+#Removes all history, ie 'deleted' records
+    my $res = $sv->do(qq{DROP TABLE IF EXISTS oai});
+    $res = $sv->do(qq{CREATE TABLE oai (
+     recordid int(11) NOT NULL default '',
+     md5 char(32),
+     date timestamp,
+     status enum('created', 'updated', 'deleted'),
+     PRIMARY KEY (md5),
+     KEY date (date)
+    ) ENGINE=MyISAM DEFAULT CHARACTER SET=utf8;});
+    $res = $sv->do(qq{INSERT IGNORE INTO  oai SELECT recordid,md5,lastchecked,'created' FROM recordurl});
+}
+
+sub RestoreSanity {
+#Removes all insane records
+    require Combine::MySQLhdb;
+
+    print "Might be slow on large databases\n";
+    my $sth = $sv->prepare(qq{SELECT recordurl.recordid FROM recordurl LEFT JOIN hdb ON recordurl.recordid=hdb.recordid WHERE hdb.recordid IS NULL});
+    $sth->execute;
+    my $n = 0;
+    while ( my ($rid)=$sth->fetchrow_array() ) {
+	Combine::MySQLhdb::DeleteKey($rid);
+	  $n++;
+    }
+    print "Deleted $n records in recordurl but not in hdb\n";
+
+
+    foreach my $table ('hdb', 'analys', 'html', 'links', 'meta', 'topic') {
+	$sth = $sv->prepare(qq{SELECT $table.recordid FROM $table LEFT JOIN recordurl ON $table.recordid=recordurl.recordid WHERE recordurl.recordid IS NULL});
+	$sth->execute;
+	$n=0;
+	while ( my ($rid)=$sth->fetchrow_array() ) {
+	    Combine::MySQLhdb::DeleteKey($rid);
+	      $n++;
+	}
+	print "Deleted $n records in $table but not in recordurl\n";
+    }
+
+    $sth = $sv->prepare(qq{SELECT recordurl.recordid FROM recordurl LEFT JOIN urls ON recordurl.urlid=urls.urlid WHERE urls.urlid IS NULL});
+    $sth->execute;
+    $n=0;
+    while ( my ($rid)=$sth->fetchrow_array() ) {
+	Combine::MySQLhdb::DeleteKey($rid);
+	  $n++;
+    }
+    print "Deleted $n records with URLid in recordurl but not in urls\n";
+
+    $sth = $sv->prepare(qq{SELECT oai.recordid FROM oai LEFT JOIN hdb ON oai.recordid=hdb.recordid WHERE oai.status!='deleted' AND hdb.recordid IS NULL});
+    $sth->execute;
+    $n=0;
+    while ( my ($rid)=$sth->fetchrow_array() ) {
+	my $res = $sv->do(qq{UPDATE oai SET status='deleted' WHERE oai.recordid=$rid});
+	$n++;
+    }
+    print "Marked $n records as deleted in oai since they are not in hdb\n";
+
+    $sth = $sv->prepare(qq{SELECT oai.recordid FROM oai LEFT JOIN hdb ON oai.recordid=hdb.recordid WHERE oai.status='deleted' AND hdb.recordid IS NOT NULL});
+    $sth->execute;
+    $n=0;
+    while ( my ($rid)=$sth->fetchrow_array() ) {
+	my $res = $sv->do(qq{UPDATE oai SET status='updated',date=NOW() WHERE oai.recordid=$rid});
+	$n++;
+    }
+    print "Marked $n records as updated in oai since they are still in hdb\n";
+
+#    $sth = $sv->prepare(qq{SELECT hdb.recordid FROM hdb LEFT JOIN oai ON hdb.recordid=oai.recordid WHERE oai.status='deleted'});
+#    $sth->execute;
+
+#SLOW!!
+#    $sth = $sv->prepare(qq{SELECT hdb.recordid FROM hdb LEFT JOIN oai ON hdb.recordid=oai.recordid WHERE oai.recordid IS NULL});
+#    $sth->execute;
+#    $n=0;
+#    while ( my ($rid)=$sth->fetchrow_array() ) {
+#	$res = $sv->do(qq{INSERT IGNORE INTO  oai SELECT recordid,md5,lastchecked,'created' FROM recordurl WHERE recordid=$rid});
+#	$n++;
+#    }
+#    print "Inserted $n records in oai from recordurl\n";
+
+    &sanity();
+}
+
+#######################
+
+sub serverAlias {
+    my ($verbose) = @_;
+    use Net::hostent;  
+    use Socket;
+
+    my %same;
+    my %netlocs;
+    my %netlocstr;
+    my %ip;
+
+#Get basic information about database records with more than one URL
+#but different urlids and different netlocids
+    my $sth = $sv->prepare(qq{SELECT u1.netlocid,n1.netlocstr,u2.netlocid,n2.netlocstr,sum(1) FROM recordurl AS t1, recordurl AS t2,urls AS u1, urls AS u2, netlocs AS n1, netlocs AS n2 WHERE t1.recordid=t2.recordid AND t1.urlid != t2.urlid AND u1.urlid=t1.urlid AND u2.urlid=t2.urlid AND u1.netlocid<u2.netlocid AND u1.netlocid=n1.netlocid AND u2.netlocid=n2.netlocid GROUP BY u1.netlocid,u2.netlocid;});
+
+#this one counts a little to optimistic if there are several URLs from 1
+#netlocid for the same recordid
+#eg
+# recid  urlid   urlstr
+# 1562 | 32938 | http://www.belstonecarnivores.netfirms.com/
+# 1562 | 76212 | http://www.belstonecarnivores.netfirms.com/index.htm
+
+    my $nn=0;
+    $sth->execute;
+    while (my ($netloc1,$netlocstr1,$netloc2,$netlocstr2,$ant)=$sth->fetchrow_array) {
+	my $key = "$netloc1, $netloc2";
+	$same{$key}{'antrecid'}=$ant;
+	$same{$key}{'antpath'}=0;
+	$same{$key}{'nl1'}=$netloc1;
+	$same{$key}{'nstr1'}=$netlocstr1;
+	$same{$key}{'nl2'}=$netloc2;
+	$same{$key}{'nstr2'}=$netlocstr2;
+	$same{$key}{'substr'}=0;
+	$same{$key}{'wwwsubstr'}=0;
+	$same{$key}{'bothwww'}=0;
+	if ( index($netlocstr1,$netlocstr2) >= 0 ) {
+	    $same{$key}{'substr'}=1;
+	    if ( $netlocstr1 eq 'www.'.$netlocstr2) { $same{$key}{'wwwsubstr'}=1; }
+	} elsif ( index($netlocstr2,$netlocstr1) >= 0 ) {
+	    $same{$key}{'substr'}=-1;
+	    if ( $netlocstr2 eq 'www.'.$netlocstr1) { $same{$key}{'wwwsubstr'}=1; }
+	}
+	if (($netlocstr1 =~ /^www\./) && ($netlocstr2 =~ /^www\./)) {
+	    $same{$key}{'bothwww'}=1;
+	}
+	$netlocs{$netloc1}{'urls'}=0;
+	$netlocs{$netloc2}{'urls'}=0;
+	$netlocstr{$netlocstr1}{'urls'}=0;
+	$netlocstr{$netlocstr2}{'urls'}=0;
+    }
+
+    #how many of the above have the same path? OPTIMIZED
+    my $sth1 = $sv->prepare(qq{select u1.netlocid,u2.netlocid,u1.path,sum(1) from recordurl as t1, recordurl as t2, urls as u1,  urls as u2 where u1.path=u2.path and t1.recordid=t2.recordid AND t1.urlid != t2.urlid AND u1.urlid=t1.urlid AND u2.urlid=t2.urlid AND u1.netlocid < u2.netlocid GROUP BY u1.netlocid,u2.netlocid;});
+    $sth1->execute();
+    while (my ($netloc1,$netloc2,$path,$ant)=$sth1->fetchrow_array) {
+	my $key = "$netloc1, $netloc2";
+	$same{$key}{'antpath'}=$ant;
+    }
+
+    foreach my $nl (keys(%netlocs)) {$netlocs{$nl}{'urls'}=-1;}
+    $sth = $sv->prepare(qq{SELECT urls.netlocid,sum(1) FROM recordurl,urls WHERE recordurl.urlid=urls.urlid GROUP BY urls.netlocid; });
+    $sth->execute;
+    while (my ($nl,$n) = $sth->fetchrow_array()) {
+	if (defined($netlocs{$nl})) { $netlocs{$nl}{'urls'}=$n; }
+    }
+
+    my $h;
+    foreach my $host (keys(%netlocstr)) {
+	my $nl=$host;
+	$host=~s/:\d+$//;
+	unless ($h = gethost($host)) {
+	    warn "$0: no such host: $host\n";
+	    next;
+	}
+	$netlocstr{$nl}{'really'}=$h->name;
+	$netlocstr{$nl}{'aliases'}=join(", ", @{$h->aliases});
+	my $a=inet_ntoa($h->addr);
+	$netlocstr{$nl}{'addr'}=$a;
+	push(@{$ip{$a}},$nl);
+#Not used?
+#	if ($h = gethostbyaddr($h->addr)) {
+#	    if (lc($h->name) ne lc($host)) {
+#		#   printf "\tThat addr reverses to host %s!\n", $h->name;
+#		$netlocstr{$nl}{'reverse'}=$h->name;
+#		#	    $host = $h->name;
+#		#	    redo;
+#	    } 
+#	}
+    }
+
+    my %psame;
+    foreach my $k (keys(%same)) {
+	my $n1=0; my $n2=0;
+	my $nl=$same{$k}{'nl1'};
+	$n1=$netlocs{$nl}{'urls'};
+	$nl=$same{$k}{'nl2'};
+	$n2=$netlocs{$nl}{'urls'};
+	my $h1=$same{$k}{'nstr1'};
+	my $h2=$same{$k}{'nstr2'};
+
+	my $fp=1.0; #fuzzy probability for beeing same
+	#ip
+	if ($netlocstr{$h1}{'addr'} eq $netlocstr{$h2}{'addr'}) {
+	    $fp *= 1.0;
+	} else {
+	    $fp *= 0.5;
+	}
+	#substring
+	#maybe change weights www=1.5, substr=1.0, noSubstr=0.4??
+	if ($same{$k}{'substr'}==1) { $fp *= 1.0; } else { $fp *= 0.4; }
+	if ($same{$k}{'wwwsubstr'}==1) { $fp *= 1.5; } else { $fp *= 1.0; }
+	if ($same{$k}{'bothwww'}==1) { $fp *= 0.7; } else { $fp *= 1.0; }
+	#samepath number
+	if ($same{$k}{'antpath'}>=5) { $fp *= 1.0; } else { $fp *= $same{$k}{'antpath'}/5.0; }
+	#samepath % of MIN(u1,u2)
+	if ($n1<$n2) {
+	    $fp *= $same{$k}{'antpath'}/$n1;	
+	} else {
+	    $fp *= $same{$k}{'antpath'}/$n2;	
+	}
+	#Top page same?
+	$psame{$k}=$fp;
+    }
+
+    my %clust;
+    my %clist;
+    my $nextclid=1;
+    foreach my $k (sort {$psame{$a} <=> $psame{$b};} (keys(%psame))) {
+	print "$psame{$k}: $same{$k}{'nstr1'}, $same{$k}{'nstr2'}, $k\n";
+	my $h1r; my $h2r; my $ip;
+	my $n1=0; my $n2=0;
+	my $nl=$same{$k}{'nl1'};
+	$n1=$netlocs{$nl}{'urls'};
+	$nl=$same{$k}{'nl2'};
+	$n2=$netlocs{$nl}{'urls'};
+	my $h1=$same{$k}{'nstr1'};
+	my $h2=$same{$k}{'nstr2'};
+	if ($netlocstr{$h1}{'really'} eq $h1) {$h1r=1} else {$h1r=0;}
+	if ($netlocstr{$h2}{'really'} eq $h2) {$h2r=1} else {$h2r=0;}
+	if ($netlocstr{$h1}{'addr'} eq $netlocstr{$h2}{'addr'}) { $ip=1; }
+	else { $ip=0; }
+	print "  URLS=($n1, $n2) SAMErecid=$same{$k}{'antrecid'}, SAMEpath=$same{$k}{'antpath'}, SUB=$same{$k}{'substr'}; WWWSUB=$same{$k}{'wwwsubstr'};  BOTHWWW=$same{$k}{'bothwww'}; IP=$ip; REALLY=($h1r, $h2r)\n";
+	my $h=$same{$k}{'nstr1'};
+#    print "  $h: $netlocstr{$h}{'really'}; $netlocstr{$h}{'addr'}; $netlocstr{$h}{'reverse'}\n";
+	$h=$same{$k}{'nstr2'};
+#    print "  $h: $netlocstr{$h}{'really'}; $netlocstr{$h}{'addr'}; $netlocstr{$h}{'reverse'}\n";
+	print "\n";
+#Clustering $h1 = $h2
+	next if ($psame{$k} < 0.15);
+	my $clid1=$clust{$h1};
+	my $clid2=$clust{$h2};
+	my $pr=0;
+#    if (($h1 =~ /bestcarnivorousplants/) || ($h2 =~ /bestcarnivorousplants/) ) {print "$h1=$clid1; $h2=$clid2; $nextclid\n";$pr=1;}
+	if ( $clid1<1 && $clid2<1 ) {
+	    $clust{$h1}=$nextclid;
+	    push(@{$clist{$nextclid}},$h1);
+	    $clust{$h2}=$nextclid;
+	    push(@{$clist{$nextclid}},$h2);
+	    print " $h1=$h2=$nextclid \n" if ($pr==1);
+	    $nextclid++;
+	} elsif ($clid1<1) {
+	    $clust{$h1}=$clid2;
+	    push(@{$clist{$clid2}},$h1);
+	    print " $h1=$clid2 \n" if ($pr==1);
+	} elsif ($clid2<1) {
+	    $clust{$h2}=$clid1;
+	    push(@{$clist{$clid1}},$h2);
+	    print " $h2=$clid1 \n" if ($pr==1);
+	} elsif ( $clid1 == $clid2 ) {
+	    #do nothing
+	} else {
+	    print "  Join clusters $clid1 and $clid2 \n" if ($pr==1);
+	    push(@{$clist{$clid1}},@{$clist{$clid2}});
+	    foreach my $h (@{$clist{$clid2}}) { $clust{$h}=$clid1; }
+	    delete($clist{$clid2});
+	}
+    }
+
+    print "\nClusters\n";
+    foreach my $c (keys(%clist)) {
+	print $c . ': ' . join(', ',@{$clist{$c}}) . "\n";
+	my $pref = @{$clist{$c}}[0];
+	foreach my $h (@{$clist{$c}}) {
+	    if ( ($pref =~ /^www\./) && ($h =~ /^www\./) ) {
+		#select the shortest (maybe check with preferred IP?)
+#	    if (length($pref) > length($h)) {$pref=$h;}
+		my $np=$netlocs{$pref}{'urls'};
+		my $nh=$netlocs{$h}{'urls'};
+print "NP=$np; NH=$nh;\n"; ###???### CHECK!!
+		if ($nh > $np) {$pref=$h;}
+	    } elsif ( !($pref =~ /^www\./) && ($h =~ /^www\./) ) {
+		$pref=$h;
+	    } elsif ( ($pref =~ /^www\./) && !($h =~ /^www\./) ) {
+		#keep $pref
+	    } else {
+#	    if (length($pref) > length($h)) {$pref=$h;}
+		my $np=$netlocs{$pref}{'urls'};
+		my $nh=$netlocs{$h}{'urls'};
+		if ($nh > $np) {$pref=$h;}
+	    }
+	}
+	my $ali='';
+	foreach my $h (@{$clist{$c}}) {
+	    if ( $pref ne $h ) {
+		print "  Replacing $h with $pref\n";
+		$ali .= "$h,";
+	    }
+	}
+	$ali =~ s/,$//;
+	print "combineUtil --jobname $jobname --preferred=$pref --aliases=$ali\n";
+	$preferred=$pref;
+	@aliases = split(/,/,$ali);
+	&handleServerAlias();
+    }
+}
+
+#Algorithm for handling server aliases
+# stop harvesting
+# find all clusters of server-alaiases
+# determine preferred server name
+#      1. starting with www.
+#      2. shortest name? preferred IP?, most pages?
+# foreach cluster
+#   foreach alias within cluster
+#     remove alias from netlocs
+#     change all urlid with netlocid=alias to preferred
+#                (See page-alias: recordurl,links,urls,urldb,newlinks??)
+######WE NEED A NEW URLID!!!!
+#     change all netlocid from alias to preferred
+#          (robotrules,netlocs,links,...
+#
+# reset queue
+# print manual restart
+#   ?Handling of page-aliases?
+#   Update the config_serveralias file (used by normalize in selurl.pm)
+
+
+#algorithm
+# in-parameter: list of netlocstr
+# foreach netlocstr in list
+#   pause harvesting
+#   update admin set queid=MAX
+#   add exclude pattern to config_exclude
+#   translate netlocstr to $netlocid
+#   delete from urldb where netlocid=$netlocid
+#   delete from robotrules where netlocid=$netlocid
+#   delete from newlinks where netlocid=$netlocid
+#   #dont delete from urls since those urlids may be used by links
+#    FIX LinksUrls
+#   @recids = select recordurl.recordid from recordurl,urls where 
+#                 urls.netlocid=$netlocid AND recordurl.urlid=urls.urlid
+#   foreach $rid (@recids) MySQLhdb::DeleteKey($rid)
+
+####################
+####################
+
+sub handleServerAlias {
+    foreach my $alias (@aliases) {
+#Just for debugging
+#	print "list of URLs for $alias\n";
+#	$sth = $sv->prepare(qq{SELECT urlstr FROM urls,netlocs WHERE netlocstr like ? AND urls.netlocid=netlocs.netlocid;});
+#        $sth->execute($alias);
+#        my $nl;
+#        while (($nl)=$sth->fetchrow_array) { print "$nl\n"; }
+	deleteNetloc($alias);
+        cleanLinksUrlsNetlocs($preferred, $alias);
+    }
+    my $conf = "$preferred " . join(' ',@aliases) . "\n";
+    my $configDir = Combine::Config::Get('configDir');
+    print "CHECK!!! Updating $configDir/config_serveralias with: $conf";
+    open(EXCL,">>$configDir/config_serveralias");
+    print EXCL $conf;
+    close(EXCL);
+}
+
+##################################################################
+sub handleDeleteNetLoc {
+  foreach my $netloc (@netlocs) {
+    my $excl=$netloc;
+    if ( $netloc =~ /^%\./ ) {
+	$excl =~ s|%||g;
+	my $sth = $sv->prepare(qq{SELECT netlocstr FROM netlocs WHERE netlocstr like ?;});
+	$sth->execute($netloc);
+	my $nl;
+	while (($nl)=$sth->fetchrow_array) {
+	    deleteNetloc($nl);
+	}
+    } elsif ( $netloc =~ /%/ ) {
+	print "WARN: '%' in netlocstr not handled: '$netloc'\n";
+	print "      unless it starts with '%.'\n";
+	next;
+    } else {
+	deleteNetloc($netloc);
+    }
+    $excl =~ s|\.|\\.|g;
+    my $configDir = Combine::Config::Get('configDir');
+    print "CHECK!!! Updating $configDir/config_exclude with 'HOST: $excl\$'\n";
+    open(EXCL,">>$configDir/config_exclude");
+    print EXCL "HOST: $excl\$\n";
+    close(EXCL);
+  }
+}
+
+###################################################################algorithm
+# in-parameter: list of Path substrings: pathsubstr
+#   pause harvesting
+#   update admin set queid=MAX
+#   add exclude pattern to config_exclude by converting to Perl regexp
+#   update urldb set harvest=0 where path like Pathsubstr
+#   @recids = select recordid from recordurl,urls where recordurl.urlid=urls.urlid
+#              and path like '%Pathsubstr%';
+#   foreach $rid (@recids)
+#       delete from hdb where recordid=$rid
+#       delete from html where recordid=$rid
+#       delete from links where recordid=$rid
+#       delete from meta where recordid=$rid
+#       delete from analys where recordid=$rid
+#       delete from topic where recordid=$rid
+#       delete from recordurl where recordid=$rid
+sub handleDeletePath {
+  foreach my $pathsubstr (@pathsubstrs) {
+      if (($pathsubstr eq '') || ($pathsubstr eq '%') || (length($pathsubstr)<4)) {
+	  print "Ignoring dangerous pattern: '$pathsubstr'\n";
+	  next;
+      }
+      print "Doing pattern: '$pathsubstr'\n";
+    my $excl=$pathsubstr;
+    my $sth = $sv->prepare(qq{UPDATE urldb,urls SET harvest=0 WHERE urldb.urlid=urls.urlid AND path LIKE ?;});
+    $sth->execute($pathsubstr);
+    $sth = $sv->prepare(qq{SELECT recordid FROM recordurl,urls WHERE recordurl.urlid=urls.urlid AND path LIKE ?;});
+    $sth->execute($pathsubstr);
+    my $recid;
+    while (($recid)=$sth->fetchrow_array) {
+	    deleteRecordId($recid);
+	}
+    $excl =~ s|^%||;
+    if ( ! ($excl =~ s|%$||) ) { $excl .= '$'; }
+    $excl =~ s|\.|\\.|g;
+    $excl =~ s|\?|\\?|g;
+    $excl =~ s|%|\\.\\*|g;
+    print "Updating etc/config_exclude with '$excl'\n";
+    open(EXCL,">>etc/config_exclude");
+    print EXCL "$excl\n";
+    close(EXCL);
+  }
+}
+
+
+##################################################################
+sub cleanLinksUrlsNetlocs {
+    my ($pref, $alias) = @_;
+    print "Doing PREF=$pref; ALIAS=$alias;\n"; # return;
+    if (($pref eq '') || ($alias eq '')) {
+	print STDERR "ERR PREF=$pref; ALIAS=$alias;\n";
+	return 0;
+    }
+    #get netlocids
+    my $sthClean = $sv->prepare(qq{SELECT netlocid FROM netlocs WHERE netlocstr=?});
+    $sthClean->execute($pref);
+    my ($nlidPref) = $sthClean->fetchrow_array;
+    $sthClean->execute($alias);
+    my ($nlidAlias) = $sthClean->fetchrow_array;
+    if (($nlidPref <= 0) || ($nlidAlias <= 0)) {
+	print STDERR "ERR PREF=$pref ($nlidPref); ALIAS=$alias ($nlidAlias);\n";
+	return 0;
+    }
+    print "got PREF=$pref ($nlidPref); ALIAS=$alias ($nlidAlias);\n";
+    #Algorithm
+    #foreach urlidAlias with netlocid=nlidAlias
+    #  if a copy (same path) exists with netlocid=nlidPref
+    #    change urlid,netlocid to urlidPref,nlidPref in links
+    #    delete from urls where urlid=urlidAlias
+    #  else
+    #    change netlocid,urlstr in urls to nlidPref,'$pref . $path'
+    #    change netlocid to nlidPref in links
+    #  endif
+    #endforeach
+    #change mynetlocid to nlidPref in links where mynetlocid=nlidAlias
+    #delete from netlocs where netlocid=nlidAlias
+
+    $sthClean = $sv->prepare(qq{SELECT urlid,path FROM urls WHERE netlocid=?});
+    $sthClean->execute($nlidAlias);
+    while (my($urlidAlias,$path) = $sthClean->fetchrow_array) {
+	my $sth1 = $sv->prepare(qq{SELECT urlid FROM urls WHERE urlstr=?});
+	my $urlstr='http://' . $pref . $path;
+	$sth1->execute($urlstr);
+	my $urlidPref;
+	if ( ($urlidPref) = $sth1->fetchrow_array ) {
+#	    print "DELETE FROM urls WHERE urlid=$urlidAlias\n";
+	    $sv->prepare(qq{DELETE FROM urls WHERE urlid=?})->execute($urlidAlias);
+#	    print "UPDATE links SET urlid=$urlidPref, netlocid=$nlidPref WHERE urlid=$urlidAlias\n";
+	    $sv->prepare(qq{UPDATE links SET urlid=?, netlocid=? WHERE urlid=?})->execute($urlidPref, $nlidPref, $urlidAlias); 
+	} else {
+#	    print "UPDATE urls SET netlocid=$nlidPref, urlstr=$urlstr WHERE urlid=$urlidAlias\n";
+	    $sv->prepare(qq{UPDATE urls SET netlocid=?, urlstr=? WHERE urlid=?})->execute($nlidPref, $urlstr, $urlidAlias);
+#	    print "UPDATE links SET netlocid=$nlidPref WHERE urlid=$urlidAlias\n";
+	    $sv->prepare(qq{UPDATE links SET netlocid=? WHERE urlid=?})->execute($nlidPref,$urlidAlias); 
+	}
+    }
+#    print "UPDATE links SET mynetlocid=$nlidPref WHERE mynetlocid=$nlidAlias\n";
+    $sv->prepare(qq{UPDATE links SET mynetlocid=? WHERE mynetlocid=?})->execute($nlidPref,$nlidAlias); 
+#    print "DELETE FROM netlocs WHERE netlocid=$nlidAlias\n";
+    $sv->prepare(qq{DELETE FROM netlocs WHERE netlocid=?})->execute($nlidAlias);
+}
+
+##################################################################
+
+sub deleteNetloc {
+    my ($nl) = @_;
+    return 0 if ( $nl eq '' );
+    #   translate netlocstr to id
+    my $sth1 = $sv->prepare(qq{SELECT netlocid FROM netlocs WHERE netlocstr=?;});
+    $sth1->execute($nl);
+    my $nlid;
+    if ( !( ($nlid)=$sth1->fetchrow_array ) ) { return 0; }
+print "Deleting $nl =$nlid\n"; #####return 0; ############################################SAFEnet
+    #   delete from urldb where netlocid=id
+    $sv->prepare(qq{DELETE FROM urldb WHERE netlocid=?;})->execute($nlid);
+    #   delete from robotrules where netlocid=id
+    $sv->prepare(qq{DELETE FROM robotrules WHERE netlocid=?;})->execute($nlid);
+    #   delete from newlinks where netlocid=id
+    $sv->prepare(qq{DELETE FROM newlinks WHERE netlocid=?;})->execute($nlid);
+
+    #   @recids
+    $sth1 = $sv->prepare(qq{SELECT recordid FROM recordurl,urls WHERE urls.netlocid=? AND recordurl.urlid=urls.urlid;});
+    $sth1->execute($nlid);
+    my $recid;
+    my $ant=0;
+    while (($recid)=$sth1->fetchrow_array) {
+	deleteRecordId($recid);
+	$ant++;
+    }
+    print "deleteNetloc: $nlid, with $ant records\n";
+    #Info left in netlocs,urls. Save or Delete?
+    return 1;
+}
+
+sub handleDeleteMD5 {
+    print "deleteMD5: $md5\n";
+    my $sth = $sv->prepare(qq{SELECT recordid FROM recordurl WHERE md5=?});
+    $sth->execute($md5);
+    my $rid = $sth->fetchrow_array();
+    return deleteRecordId($rid);
+}
+
+sub deleteRecordId {
+    my ($rid) = @_;
+    return 0 if ($rid <= 0);
+    print "deleteRecordId: $rid\n";
+    Combine::MySQLhdb::DeleteKey($rid);
+
+    #       delete from hdb where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM hdb WHERE recordid=?;})->execute($rid);
+    #       delete from html where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM html WHERE recordid=?;})->execute($rid);
+    #       delete from links where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM links WHERE recordid=?;})->execute($rid);
+    #       delete from meta where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM meta WHERE recordid=?;})->execute($rid);
+    #       delete from analys where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM analys WHERE recordid=?;})->execute($rid);
+    #       delete from topic where recordid=$rid
+#    $sv->prepare(qq{DELETE FROM topic WHERE recordid=?;})->execute($rid);
+    #       delete from recordurl where recordid=$rid	
+#    $sv->prepare(qq{DELETE FROM recordurl WHERE recordid=?;})->execute($rid);
+
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+combineUtil - various operations on the Combine database
+
+=head1 SYNOPSIS
+
+combineUtil  <action> --jobname <name>
+
+where action can be one of stats, termstat, classtat,
+ sanity, all, serveralias, resetOAI, restoreSanity,
+ deleteNetLoc, deletePath, deleteMD5, deleteRecordid,
+ addAlias
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+=head2 Actions listing statistics
+
+=over 3
+
+=item stats
+
+Global statistics about the database
+
+=item termstat
+
+generates statistics about the terms from topic ontology matched in documents
+(can be long output)
+
+=item classtat
+
+generates statistics about the topic classes assigned to documents
+
+=back
+
+=head2 Actions for sanity controlls
+
+=over 3
+
+=item sanity
+
+Performs various sanity checks on the database
+
+=item restoreSanity
+
+Deletes records which sanity checks finds insane
+
+=item resetOAI
+
+Removes all history (ie 'deleted' records) from the OAI
+table. This is done by removing the OAI table and
+recreating it from the existing database.
+
+=back
+
+=head2 Action all
+
+Does the actions: stats, sanity, classtat, termstat
+
+=head2 Actions for deleting records
+
+=over 4
+
+=item deleteNetLoc
+
+Deletes all records matching the ','-separated list of server net-locations
+(server-names optionally with port) in the switch --netlocstr.
+Net-locations can include SQL wild cards ('%').
+ 
+=item deletePath
+
+Deletes all records matching the ','-separated list of URl
+paths (excluding net-locations) in the switch --pathsubstr. Paths can include SQL wild cards ('%').
+ 
+=item deleteMD5
+
+Delete the record which has the MD5 in switch --md5
+
+=item deleteRecordid
+
+Delete the record which has the recordid in switch --recordid
+
+=back
+
+=head2 Actions for handling server aliases
+
+=over 2
+
+=item serverAlias
+
+Detect server aliases in the current database and do
+a 'addAlias' on each detected alias.
+
+=item addAlias
+
+Manually add a serveralias to the system. Requires switches
+--aliases and --preferred
+
+=back
+
+=head1 DESCRIPTION
+
+Does various statistics generation as well as performing sanity checks on the database
+
+=head1 EXAMPLES
+
+=over 4
+
+=item C<combineUtil termstat --jobname aatest>
+
+Generate matched term statistics
+
+=back
+
+=head1 SEE ALSO
+
+combine
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

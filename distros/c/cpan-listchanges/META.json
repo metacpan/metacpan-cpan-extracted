@@ -1,0 +1,79 @@
+{
+   "abstract" : "list changes for CPAN modules",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "cpan-listchanges",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Algorithm::Diff" : "0",
+            "CPAN::DistnameInfo" : "0",
+            "LWP" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Usage" : "0",
+            "Try::Tiny" : "0",
+            "YAML" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/cpan-listchanges/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/cpan-listchanges",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/cpan-listchanges.git",
+         "web" : "https://github.com/miyagawa/cpan-listchanges"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Fitz Elliott <felliott@fiskur.org>"
+   ]
+}
+

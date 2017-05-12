@@ -1,0 +1,189 @@
+# $Id: en,v 1.5 2002/09/16 23:20:31 nomis80 Exp $
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Month
+week=Week
+Day=Day
+today=Today
+myagenda=My Agenda
+status_UNCONFIRMED=UNCONFIRMED
+status_CONFIRMED=CONFIRMED
+status_CANCELED=CANCELED
+eventname=Event name:
+eventstart=Start:
+eventend=End:
+eventdescription=Description:
+eventrecur=Recurrence:
+eventnotrecur=Not recurrent
+eventrecurday=Everyday
+eventrecurweek=This day every week
+eventrecurmonth=This day every month
+eventrecuryear=This day every year
+eventrecurend=End of recurrence:
+eventparticipants=Participants:
+eventconfirm=Ask for confirmation:
+eventsave=Save
+errorstartdate=Start date is not valid.
+errorstarttime=Start time is not valid.
+errorenddate=End date is not valid.
+errorendtime=End time is not valid.
+errorrecurenddate=Recurrence end date is not valid.
+errorrecurendtime=Recurrence end time is not valid.
+errorendbeforestart=End time happens before start time.
+errorrecurendbeforestart=Recurrence end time happens before start time.
+errorrecurendbeforeend=Recurrence end time happens before end time.
+errormissingname=Event is missing a name.
+reminder=Reminder:
+remind_me=Remind me by email %1 %2 before event starts.
+min=minute(s)
+hour=hour(s)
+day=day(s)
+error=Erreur
+weeknum=Week %1 of year %2
+weeknum2=Week %1 of %2
+eventdel=Delete
+initiator=Event initiator
+cancel=Cancel
+confirm=Confirm
+confirm_subject=Convocation
+confirm_body=<<EOF
+This is an automated message. Do not reply directly.
+
+%%INITIATOR%% asks for your presence on %%DATE%%.
+Event name: %%NAME%%
+Description: %%DESCRIPTION%%
+
+Please confirm your presence by going to
+%%CONFIRMURL%%
+
+-- 
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+errornotauthorized=You are not authorized to do this action.
+tasklist=Task list
+tasktitle=Title:
+tasknotes=Notes:
+taskpriority=Priority:
+newtask=Add a task
+options=Options
+userprefs=User preferences
+lang=Language:
+agendatype=Agenda type:
+publicrw=Public for reading and writing
+publicr=Public for reading only
+private=Private
+indivpriv=Individual privileges:
+nopriv=No privileges
+r=Read
+rw=Read/write
+email=Email address:
+name=Name:
+password=Password:
+create_db_intro=<<EOF
+This script will create the MySQL database and the tables necessary to Chronos.
+
+EOF
+create_db_pass=root's MySQL password:
+create_db_dbname=Chronos' database name: [chronos]
+create_db_exists=This database exists. Delete?
+create_db_deleted=Database %s deleted
+create_db_created=Database %s created
+create_db_tablecreated=Table %s created
+create_db_user=Username used to connect to the DB: [chronos]
+create_db_dbpass=Password: [random]
+create_db_grant=Privileges granted to %s on %s.*
+create_db_added=Informations added to /etc/chronos.conf
+create_db_success=Chronos installation successfully completed
+chronosadmin_usage=<<EOF
+Usage:
+    %s [-u username] [-p [password]] [--autodel] [--new-user]
+    [--new-users-batch[=FILE]] [--del-user=username] [database[@host]]
+
+Options:
+    -u username
+        The user name with which to connect to the DB.
+    -p password
+        The password with which to connect to the DB.
+    --autodel
+        Do not ask for confirmation when deleting an existing user. Useful for
+        batch files.
+    --new-user
+        Create a new user in interactive mode.
+    --new-users-batch[=FILE]
+        Create users from a file (or STDIN by default) containing, on each line:
+            username,password,email,access
+    --del-user=username
+        Delete a user.
+    --show-holidays
+        This command prints out the holiday profiles available on your system.
+        You can afterward include a line in your chronos.conf that looks like
+        this:
+            HOLIDAYS=US  # United States
+EOF
+chronosadmin_exists=The %s user already exists. Delete?
+chronosadmin_created=User %s created
+chronosadmin_deleted=User %s deleted
+chronosadmin_confirm=Confirmation:
+chronosadmin_pass=Password
+chronosadmin_p=MySQL password
+chronosadmin_username=Username (max 16 characters)
+chronosadmin_email=Email address
+chronosadmin_lang=Language
+chronosadmin_realname=Real name
+chronosadmin_connectok=Connected to MySQL database
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Reminder
+
+This is an automated message. Do not reply directly.
+
+I remind you that the event below will be happening soon.
+
+Name:   %%NAME%%
+Start:  %%START%%
+End:    %%END%%
+Description:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+apacheuser=User Apache runs as
+en=English
+fr=French
+it=Italian
+de=German
+no=Norwegian
+po=Portuguese
+sv=Swedish
+nl=Dutch
+attachments=Attached files:
+new_attachment=New attachment:
+participants_to_add=Add participants:
+remove_part=Remove
+notime=No time
+errornotitle=This task is missing a title.
+remindd_forking=Forking...
+remindd_forkerror=Couldn't fork: %s
+remindd_setsiderror=Can't start a new session: %s
+remindd_usage=Usage: %s [-D] [-f <config file>]
+clickhour=Click on an hour to add an event

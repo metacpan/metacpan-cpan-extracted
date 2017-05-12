@@ -1,0 +1,29 @@
+---
+abstract: 'Perl pragma to declare constants'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: constant
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  Irc: irc://irc.perl.org/#p5p
+  Mailinglist: http://lists.perl.org/list/perl5-porters.html
+  bugtracker: "https://rt.perl.org/rt3/Search/Results.html?Query=Queue='perl5' AND Content LIKE 'module=constant' AND (Status='open' OR Status='new' OR Status='stalled')"
+  homepage: https://metacpan.org/module/constant
+  license: http://dev.perl.org/licenses/
+  repository: git://perl5.git.perl.org/perl.git
+version: '1.33'

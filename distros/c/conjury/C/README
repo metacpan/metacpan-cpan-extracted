@@ -1,0 +1,61 @@
+Conjury::C -- Perl Conjury with C/C++ compilers, linkers and archivers
+----------------------------------------------------------------------
+
+
+The Perl Conjury system is a general purpose software construction
+framework. It's an alternative to the venerable make utility, but
+since it is written entirely in Perl, its capabilities extend to
+functions traditionally implemented using a text preprocessor to
+generate Makefile files, i.e. to configure for product variants.
+
+Perl Conjury is a modular framework. The core software is very
+general. For example, to compile and link executable programs written
+in C or C++, you'll need the Conjury::C module-- this module.
+
+The software is in the early development phase.  All the interfaces
+are subject to change in subsequent versions.
+
+To use Conjury::C, you'll need to install Perl 5.005 (or a more
+recent version) on your system.  You'll also need to download and
+install the Conjury::Core distribution and anything it requires.
+
+When you're ready, the procedure is straightforward:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+(Note: at this writing there are no tests to perform.  This will be
+fixed before the software is submitted to the CPAN.)
+
+After you've installed it, the documentation is available through the
+perldoc interface.  There is no online documentation yet.
+
+	% perldoc Conjury::C
+	% perldoc Conjury::C::GNU
+
+The software is designed to be functional on all the platforms where
+Perl can use the 'system' builtin function.  It hasn't been run on any
+platforms other than Solaris 2.5.1 and Linux 2.2 yet.
+
+There is no tutorial for Perl Conjury yet, but a moderately complex
+example is available.  The author has written a C++ library that uses
+Perl Conjury instead of make.  The README and the source tarball can
+be found at the following locations:
+
++ http://www.wetware.com/jhw/src/puck.readme
++ http://www.wetware.com/jhw/src/puck.tar.gz
+
+
+-----
+Copyright 1999, James Woodyatt
+
+Perl Conjury with C/C++ tools is open source software.  You may modify
+and redistribute it, provided you agree to the terms of its BSD-style
+license.  See the LICENSE file accompanying the distribution.
+
+
+--
+j h woodyatt <jhw@wetware.com>
+last modified: 01 sep 1999

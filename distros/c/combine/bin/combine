@@ -1,0 +1,405 @@
+#! /usr/bin/perl
+
+## $Id: combine 305 2009-03-30 07:24:01Z it-aar $
+
+# Copyright (c) 1996-1998 LUB NetLab, 2002-2005 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Combine::Config;
+use Combine::XWI;
+use Combine::UA;
+use Combine::RobotRules;
+use Combine::LogSQL;
+use Combine::FromHTML;
+use Combine::FromImage;
+use Combine::FromTeX;
+use Combine::utilPlugIn;
+use Combine::DataBase;
+use HTTP::Date;
+use HTTP::Status;
+use URI::URL;
+
+use POSIX qw(locale_h);
+setlocale(LC_CTYPE, "en_US.ISO-8859-1");
+
+use Getopt::Long;
+# switches
+my $HarvestURL; #Only harvest this if present
+my $name='';
+my $configfile;
+my $baseConfig;
+my $jobname;
+GetOptions('logname|name:s' => \$name,
+    'jobname:s' => \$jobname,
+    'configfile:s' => \$configfile,
+    'baseconfigdir:s' => \$baseConfig,
+    'harvesturl|url:s' => \$HarvestURL);
+if (defined($jobname)) { Combine::Config::Init($jobname,$baseConfig); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+
+# configurable vars
+my $mintime =       Combine::Config::Get('WaitIntervalSchedulerGetJcf');
+
+my $ua_name = 'COMBINE/2.0';
+my $locktime_not_modified =
+  Combine::Config::Get('WaitIntervalHarvesterLockNotModified');
+my $locktime_not_found =
+  Combine::Config::Get('WaitIntervalHarvesterLockNotFound');
+my $locktime_successful =
+  Combine::Config::Get('WaitIntervalHarvesterLockSuccess');
+my $locktime_robotrules =
+  Combine::Config::Get('WaitIntervalHarvesterLockRobotRules');
+my $locktime_unavailable =
+  Combine::Config::Get('WaitIntervalHarvesterLockUnavailable');
+my $retry_limit = Combine::Config::Get('HarvestRetries'); 
+   # when we've tried a url 10 times and failed, we consider it gone...
+
+my $doCheckRecord = Combine::Config::Get('doCheckRecord');
+my $checkRecord;
+if ( $doCheckRecord ) {
+  my $classifyPlugIn = Combine::Config::Get('classifyPlugIn');
+  if (!defined($classifyPlugIn)) {
+    #backwards compatibility
+    my $autoClassAlg = Combine::Config::Get('autoClassAlg');
+    if ($autoClassAlg eq 'PosCheck') { $classifyPlugIn = 'Combine::PosCheck_record'; }
+    else { $classifyPlugIn = 'Combine::Check_record'; } #Old default
+  }
+  eval "require $classifyPlugIn";
+  $checkRecord = sub { $classifyPlugIn->classify(@_) };
+}
+
+my $maxMissions =    Combine::Config::Get('HarvesterMaxMissions');
+my $loglev = Combine::Config::Get('Loglev');
+my $extractLinksFromText = Combine::Config::Get('extractLinksFromText');
+my $doAnalyse = Combine::Config::Get('doAnalyse');
+my $sv = Combine::Config::Get('MySQLhandle');
+
+my $log = new Combine::LogSQL "HARVPARS " . $name;
+Combine::Config::Set('LogHandle', $log);
+my $lognew = new Combine::LogSQL "NEW-URL " . $name;
+
+my $rrd = new Combine::RobotRules or die "Can't new RobotRules";
+
+use Combine::SD_SQL;
+my $sd = new Combine::SD_SQL;
+
+my $stop=0;
+
+$SIG{USR1} = sub { 
+    $stop = 1; 
+};
+
+open(PIDF,">/var/run/combine/$jobname/combine_$name");
+print PIDF "$$\n";
+close(PIDF);
+
+#Configure converters;
+my %extConverter;
+my %intConverter;
+my $cv = Combine::Config::Get('converters');
+foreach my $c (keys(%{$cv})) {
+#    print "ConvMIME: $c\n";
+    my $mime = $$cv{$c};
+    my @MIME = ();
+    if(ref($mime) eq "ARRAY") { @MIME = @{$mime}; }
+    else { @MIME = ($mime); }
+    foreach my $l (@MIME) {
+	my @conv = split(/\s*;\s*/, $l);
+#	print "Converter: $c " . join(' ; ',@conv) . "\n";
+	if ( ($conv[1] ne '') && (!defined($extConverter{$c})) ) {
+	    my ($exe,$tmp) = split(/\s+/,$conv[1]);
+	    my $res = `which $exe`;
+#	    print "  EXE $exe: $res\n";
+	    if ( $res ne '' ) {
+		$extConverter{$c} = $conv[1];
+		$intConverter{$c} = $conv[2];
+	    }
+	} elsif ( ($conv[1] eq '') && (!defined($intConverter{$c})) ) {
+		$intConverter{$c} = $conv[2];
+	}
+    }
+}
+#foreach my $t (keys(%intConverter)) { print "$t int: $intConverter{$t}; $extConverter{$t};\n"; }
+
+my ($netlocid, $urlid, $url_str, $netlocStr, $urlPath, $checkedDate, $num, $code, $msg, $httpResponse, $expire, $xwi, $count);
+if ( ! defined($HarvestURL) ) { $num = $maxMissions; } else { $num=0; }
+my $xhdb;
+
+while (1) { # the main loop
+    if ($num < 0 or $stop == 1) {
+        rmdir("/tmp/$$");
+	system("rm /var/run/combine/$jobname/combine_$name");
+      exit;
+    }
+    $log->prefix("M$num");
+    $code = '';
+    $msg = '';
+    $httpResponse = '';
+    if ( ! defined($HarvestURL) ) { ($netlocid,$urlid,$url_str, $netlocStr, $urlPath, $checkedDate) = $sd->get_url; }
+    else {    
+	warn("Direct harvesting of: $HarvestURL");
+	$num--;
+        # do SD-PUT in order to get url into urldb and assigned an urlid
+       ($netlocid,$urlid,$url_str, $netlocStr, $urlPath, $checkedDate) = $sd->putNorm($HarvestURL, 1);
+    }
+#    print "HarvPars got:  ($netlocid,$urlid,$url_str, $netlocStr, $urlPath)\n";
+    if ( (!defined($url_str)) || ($url_str eq '') ) {
+	$log->say("SD empty, sleep $mintime second...") if ($loglev > 2);
+	sleep $mintime;
+	next;
+    }
+    $xwi = new Combine::XWI;
+    $xwi->jcf('Not used');
+    $xwi->url($url_str);
+    $xwi->url_add($url_str);
+    $xwi->urlpath($urlPath);
+    $xwi->urlid($urlid);
+    $xwi->netlocid($netlocid);
+
+    $xhdb = new Combine::DataBase( $xwi, $sv, $log);
+
+#later!!
+#    if ( $jcf->nrt >= 100 ) {
+#	$sd->lock($url_str,$locktime_not_found,$code); #urlid??
+#	$xhdb->delete; 
+#	$log->say("Del site:" . $jcf->as_string);
+#	$num--;
+#	next;
+#    }
+
+    $log->say("urlid=$urlid; netlocid=$netlocid; $url_str");
+    if ( $rrd->check($netlocid, $netlocStr, $urlPath) ) { #Check Robot Rules
+        my @UaFetch = &Combine::UA::fetch($xwi, $checkedDate);
+        ($code, $msg) = @UaFetch;
+	if (!defined($msg)) { $msg=''; }
+        $httpResponse = "HTTP($code = \"$msg\") ";
+	$log->say("RobotRules OK, $msg") if ($loglev > 5);
+        my $truncated = $xwi->truncated();
+        if ($truncated) {
+          $log->say($httpResponse .
+                         'Truncation: ' . $truncated .
+                         ', ' .
+                         $url_str);
+        }
+    } else {
+	$sd->lock($netlocid,$urlid,$locktime_robotrules,$code);
+	$xhdb->delete; 
+	$num--;
+	$log->say("RobotRules disallow") if ($loglev > 1);
+	next;
+    }
+
+# Page fetched - process according to status code
+    if ($code eq "200" or $code eq "206") {
+
+	$sd->lock($netlocid,$urlid,$locktime_successful,$code);
+	$log->say($httpResponse . " => OK") if ($loglev > 1);
+	parse($xwi);
+#INIT  $xwi->recordid !!!
+	my $md5=$xwi->md5;
+#Done in Database.pm	$xwi->recordid($md5);
+
+	# check the robots meta-tag
+	my $robot_tag = defined($xwi->metarobots) ? $xwi->metarobots : '';
+	if ( $robot_tag=~/noindex/i or $robot_tag=~/none/i ) {
+	    $xhdb->delete;
+	}
+	# use an external routine to do any further tests on the record
+	# Check_record does automatic classification as a side effect
+	# the algorithm used is determined by autoClassAlg config param (see above)
+	elsif ( $doCheckRecord && (! $checkRecord->($xwi)) ) {
+	    $xhdb->delete;
+	}
+	else {
+	    if ( $extractLinksFromText ) { textLinks($xwi); }
+	    if ( $doAnalyse ) { Combine::utilPlugIn::analyse($xwi); }
+	    $xhdb->insert;
+#	    logLinks($xwi);
+	    if ( ! ($robot_tag=~/nofollow/i) ) { #'none' is taken care of above
+		$xhdb->newLinks;
+	    }
+	}
+    }
+#What about code 300???
+    elsif ($code eq "301" or $code eq "302" or $code eq "303") {
+        $log->say($httpResponse . "Redirection: " . $url_str)
+	  if ($loglev > 1);
+	$sd->lock($netlocid,$urlid,$locktime_successful,$code);
+#	logRedirect($xwi);
+	$xhdb->newRedirect;
+	$xhdb->delete;
+    }
+    elsif ($code eq "304") {
+	$log->say($httpResponse . "not modified: " . $url_str) if ($loglev > 1);
+	$sd->lock($netlocid,$urlid,$locktime_not_modified,$code); 
+	$sd->UpdateLastCheckTime($urlid);
+    }
+    elsif ( $code eq "408" or &HTTP::Status::is_server_error($code) ) {  
+#        if ($jcf->inc_nrt > $retry_limit) {
+        if ( 0 > $retry_limit) {
+#NRT in sd!! TO BE FIXED
+           $log->say($httpResponse . "Del url :" . $url_str);
+           $log->say($httpResponse . "Give up: " . $url_str)
+	     if ($loglev > 1);  
+           $sd->lock($netlocid,$urlid,$locktime_not_found,$code); 
+	   $xhdb->delete;
+        } else { 
+           $log->say($httpResponse . $url_str);
+           $sd->lock($netlocid,$urlid,$locktime_unavailable,$code); 
+# OK?	   if ( $httpResponse =~ / \(Bad hostname \'([^\']+)\'\)/ ) {
+	   if ( $httpResponse =~ / \(Bad hostname / ) {
+	       $sd->hostlock($netlocid,$locktime_not_found); 
+	   }
+        }
+    }
+    elsif (&HTTP::Status::is_error($code) ) { # other errors 
+	$sd->lock($netlocid,$urlid,$locktime_not_found,$code); 
+	$xhdb->delete;
+	$log->say($httpResponse . "Not found: " . $url_str)
+	  if ($loglev > 1);  
+    }
+    else {
+	# should implement the new handler
+	$log->say($httpResponse .
+                     "unknown action $code: " .
+                     $url_str . "\n");
+    }
+    $num--;
+}
+
+sub parse {
+    my ($xwi) = @_;
+    my $doing= $xwi->type . ";" . $xwi->stat . ";" . $xwi->md5 . ";" . $xwi->jcf;
+    $log->say("Doing: $doing");
+    return unless ($xwi->stat eq "200" or $xwi->stat eq "206");
+    my $mime = $xwi->type;
+    my $result = '';
+    if ( defined($extConverter{$mime}) ) {
+	$log->say("External converter $extConverter{$mime}");
+        mkdir("/tmp/$$");
+        my $fil=substr($url_str,rindex($url_str,'/')+1,length($url_str)-rindex($url_str,'/')-1);
+	$fil =~ tr/0-9a-zA-Z:_\-./_/c; #For shell consumption
+        if (length($fil)<3) {$fil='Unknown';}
+	open(TMP, ">/tmp/$$/$fil");
+	print TMP ${$xwi->content};
+        close(TMP);
+	if ( ($mime eq 'application/pdf') && Combine::Config::Get('PattiSpecial') ) {
+	    $result = Encode::decode('utf8',`cd /tmp/$$; $extConverter{$mime} $fil $url_str`);
+	} else {
+	    $result = Encode::decode('utf8',`cd /tmp/$$; $extConverter{$mime} $fil`);
+	}
+        unlink "/tmp/$$/$fil";
+        if ( $result eq '' ) { $result="Error: Failed conversion $extConverter{$mime}"; }
+    }
+    if ( defined($intConverter{$mime}) ) {
+	if ( $intConverter{$mime} =~ /Guess/ ) {
+	    $xwi = &Combine::FromHTML::trans(\$result, $xwi, $intConverter{$mime});
+	} elsif ( $intConverter{$mime} eq 'HTML' ) {
+	    $xwi = &Combine::FromHTML::trans(\$result, $xwi, 'HTML');
+	} elsif ( $intConverter{$mime} eq 'Text' ) {
+	    $xwi = &Combine::FromHTML::trans(\$result, $xwi, 'TEXT');
+	} elsif ( $intConverter{$mime} =~ /TeX/ ) {
+	    $xwi = &Combine::FromTeX::trans(\$result, $xwi, $intConverter{$mime});
+	} elsif ( $intConverter{$mime} eq 'Image' ) {
+	    $xwi = &Combine::FromImage::trans(\$result, $xwi);
+	}
+	$log->say("Internal converter: $intConverter{$mime};");
+    }
+    return;
+}
+
+sub textLinks {
+    my ($xwi) = @_;
+    my $text;
+    if (defined($xwi->text)) { $text = ${$xwi->text}; } else { return; }
+    my %links;
+    while ($text =~ m|(http://[^\s<>\"\'\)]+)|gi) { $links{$1}=1; }
+    $xwi->link_rewind;
+    while (1) {
+        my ($urlstr, $netlocid, $urlid, $anchor, $ltype) = $xwi->link_get;
+        last unless ($urlstr || $netlocid);
+	if (defined($links{$urlstr})) { delete($links{$urlstr}); }
+    }
+    foreach my $l (keys(%links)) {
+	$xwi->link_add($l, 0, 0, '', 'text');
+    }
+}
+
+__END__
+
+
+=head1 NAME
+
+Combine - Focused Web crawler framework
+
+
+=head1 SYNOPSIS
+
+combine --jobname <name> --logname <id>
+
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+logname is used as identifier in the log (in MySQL table log)
+
+
+=head1 DESCRIPTION
+
+Does crawling, parsing, optional topic-check and stores in MySQL
+database Normally started with the C<combineCtrl> command. Briefly it
+get's an URL from the MySQL database, which acts as a common
+coordinator for a Combine job. The Web-page is fetched, provided it
+passes the robot exclusion protocoll. The HTML ic cleaned using
+C<Tidy> and parsed into metadata, headings, text, links and link
+achors. Then it is stored (optionaly provided a topic-check is passed
+to keep the crawler focused) in the MySQL database in a structured
+form.
+
+A simple workflow for a trivial crawl job might look like:
+
+    Initialize database and configuration
+  combineINIT --jobname aatest
+    Enter some seed URLs from a file with a list of URLs
+  combineCtrl  load --jobname aatest < seedURLs.txt
+    Start 2 crawl processes
+  combineCtrl  start --jobname aatest --harvesters 2
+
+    For some time occasionally schedule new links for crawling
+  combineCtrl recyclelinks --jobname aatest
+    or look at the size of the ready queue
+  combineCtrl stat --jobname aatest
+
+    When satisfied kill the crawlers
+  combineCtrl kill --jobname aatest
+    Export data records in a highly structured XML format
+  combineExport --jobname aatest
+
+For more complex jobs you have to edit the job configuration file.
+
+=head1 SEE ALSO
+
+combineINIT, combineCtrl
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

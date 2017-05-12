@@ -1,0 +1,111 @@
+NAME
+
+    constant::tiny - Perl pragma to declare constants
+
+
+DESCRIPTION
+
+    This module is a lightweight version of the Perl standard module
+    "constant.pm". Here are the keys differences:
+
+    *   only works on Perl 5.10+ in order to simplify a good part of the
+        code
+
+    *   doesn't support Unicode names; please use the standard "constant.pm"
+        module if you need to create constants with Unicode names
+
+    *   stricter rules about valid names, only allow names with alphanums
+        ("[a-zA-Z0-9]" and underscore ("_"), allowing one optional leading
+        underscore
+
+    In order to simplify its usage, "constant:tiny" uses the normal
+    "constant" API. The main advatange is that switching your code to
+    "constant::tiny" means simply adding it before the first "use constant".
+    The disadvantage is that, obviously, both modules can't be used at the
+    same time. If the normal "constant" was loaded before "constant::tiny",
+    the latter won't do anything, letting the normal "constant" do the work.
+
+    Other than this, the usage is (nearly) exactly the same as with the
+    standard "constant" module. For more details, please read constant.
+
+  Rationale
+
+    The original reason to write this module was that, starting with version
+    1.24, "constant" always loaded utf8_heavy.pl, which consumes some
+    memory. Usually, this is not problematic, but in some particular cases
+    (embedded Perl, frequently forked programs a la CGI), the increased
+    memory cost can become a concern.
+
+    Therefore, this module was written as a alternative solution, with no
+    support for Unicode names, so that programs working in memory
+    constrained environments could have a better control.
+
+    Funnily enough, the day "constant::tiny" was released on CPAN (the code
+    had been written two months earlier as a proof of concept), Brad Gilbert
+    proposed a patch for "constant" in order to delay loading utf8_heavy.pl
+    until necessary.
+
+    Therefore "constant::tiny" is less useful (which is good news), but can
+    still address specific needs, if you want to restrict constant names to
+    alphanums only.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc constant::tiny
+
+    You can also look for information at:
+
+    * Search CPAN
+        http://search.cpan.org/dist/constant-tiny/
+
+    * Meta CPAN
+        https://metacpan.org/module/constant::tiny
+
+    * RT: CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/Public/Dist/Display.html?Name=constant-tiny>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/constant-tiny
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/constant-tiny
+
+
+ACKNOWLEDGEMENTS
+
+    This module is heavily based on "constant.pm", originaly written by Tom
+    Phoenix, Casey West, Nicholas Clark, Zefram and many other folks from
+    the Perl 5 Porters.
+
+
+AUTHOR
+
+    Sebastien Aperghis-Tramoni <sebastien at aperghis.net>
+
+
+LICENSE
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

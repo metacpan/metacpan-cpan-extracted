@@ -1,0 +1,65 @@
+2001-04-30  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/Core.pm): Removed the Conjury::Core::Stage package
+        to be a separate module in the Conjury bundle.  This means the
+        'find_stage' function is moved too.
+        * Implemented 'Glob' argument to the 'dispell' function.
+        * Removed support for the --undo option, which was not as well
+        designed as one would hope.  The new 'dispell' spell is the right
+        thing to use now. 
+
+2001-03-24  james woodyatt  <jhw@wetware.com>
+
+	*  (lib/*/*.pm): Fixed issues with whitespace to make the source
+        code more friendly to a wider audience. 
+
+2000-09-15  james woodyatt  <jhw@wetware.com>
+
+	*  (lib/Conjury/Core.pm): Made each Conjury.pl execute in a
+	separate temporary package.  This keeps namespace pollution from
+	becoming a major problem.
+
+	*  (lib/Conjury/Core.pm): Fixed a typo and improved the POD a
+	little.
+
+2000-04-19  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/Core.pm): PUBLISHED TO CPAN-- $VERSION=1.003
+	Requires perl5.005 now.  It never really worked with an earlier
+	version.
+
+	* (*):  Updated license to terms that match the 'new and
+	improved' BSD-style license, i.e. the advertising clause is
+	removed.
+
+	* (lib/Conjury/Core/Prototype.pm): Updated the standard prototype
+	functions so that they are more useful.
+	
+	* (lib/Conjury/Core.pm): Added new spell function
+	Conjury::Core::dispell, which is used to for creating spells that
+	erase products of other spells.
+	* Renamed '$verifier' to '$validator'... describes its purpose
+	much more clearly.
+	* Minor updates to POD content.
+	* Rewrote much of the argument validation code for better
+	checking of caller arguments.
+	* Changed the semantics of the '--undo' option, which was never
+	really well thought out in the first place.  See the POD content
+	for details.
+
+2000-01-24  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/Core/Prototype.pm): Created.
+
+	* (lib/Conjury/Core.pm): Uses Conjury::Core::Prototype for
+	parameter syntax checking and uses __PACKAGE__ where appropriate.
+
+1999-10-04  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/Core.pm): Published to CPAN-- $VERSION=1.002
+
+	* (ChangeLog): Added file.
+	
+	* (cast Conjury.pod Makefile.PL Core.pm): Change namespace from
+	Conjure::xxxxx to Conjury::xxxxx.
+

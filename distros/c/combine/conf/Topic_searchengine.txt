@@ -1,0 +1,19 @@
+#This is the topic definition file, format is defined in
+# WP7 Req/Spec document
+#For examples see files Topic_*.txt in this directory
+100: search project=OK
+100: search result=OK
+50: search engine=OK
+100: google pagerank=OK
+100: keyword phrase=OK
+100: information retrieval=OK
+100: content search=OK
+100: search listing=OK
+100: search engine result=OK
+100: internet search=OK
+100: intranet search=OK
+100: search toolbar=OK
+100: targeted search traffic=OK
+100: search engine optimization=OK
+100: SEO=OK
+

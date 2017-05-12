@@ -1,0 +1,100 @@
+# $Id: it,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Enzo Bontempo <enzo@bontempo.it>
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Mese
+week=Settimana
+Day=Giorno
+today=Oggi
+myagenda=Agenda personale
+status_UNCONFIRMED=NON CONFERMATO
+status_CONFIRMED=CONFERMATO
+status_CANCELED=CANCELLATO
+eventname=Nome Evento:
+eventstart=Inizio:
+eventend=Fine:
+eventdescription=Descrizione:
+eventrecur=Ricorrenza:
+eventnotrecur=Non ricorrente
+eventrecurweek=Questo giorno ogni settimana
+eventrecurmonth=Questo giorno ogni mese
+eventrecuryear=Questo giorno ogni anno
+eventrecurend=Fine ricorrenza:
+eventparticipants=Partecipanti:
+eventconfirm=Richiesta conferma:
+eventsave=Salva
+errorstartdate=Data di inizio non valida.
+errorstarttime=Orario di inizio non valido.
+errorenddate=Data fine non valida.
+errorendtime=Orario fine non valido.
+errorrecurenddate=Data fine ricorrenza non valida.
+errorrecurendtime=Orario fine ricorrenza non valido.
+errorendbeforestart=Incoerenza del tempo di inizio-fine.
+errorrecurendbeforestart=Incoerenza del tempo della ricorrenza.
+errorrecurendbeforeend=Incoerenza del tempo della ricorrenza.
+errormissingname=Nome evento non inserito.
+reminder=Avverti:
+remind_me=Avvertimi alla email %1 %2 prima che l'evento si verifichi.
+min=minuto(i)
+hour=ora(e)
+day=giorno(i)
+error=Errore
+weeknum=Settimana %1 dell'anno %2
+weeknum2=Settimana %1 di %2
+eventdel=Cancella
+initiator=Lancia evento
+cancel=Cancella
+confirm=Conferma
+confirm_subject=Convocazione
+confirm_body=<<EOF
+Questo e' un messaggio automatico. Non rispondere direttamente.
+
+%%INITIATOR%% chiede la vostra presenza il %%DATE%%.
+Nome evento: %%NAME%%
+Descrizione: %%DESCRIPTION%%
+
+Per favore, confermate la vostra presenza.
+
+-- 
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+errornotauthorized=Operazione non autorizzata.
+tasklist=Lista eventi
+tasktitle=Titolo:
+tasknotes=Note:
+taskpriority=Priorita':
+newtask=Aggiungi un evento
+options=Opzioni
+userprefs=Preferenze utente
+lang=Lingua:
+agendatype=Tipo Agenda:
+publicrw=Pubblicare per lettura e scrittura
+publicr=Pubblicare solo per lettura
+private=Privato
+indivpriv=Privilegi individuali:
+nopriv=Nessun privilegio
+r=Leggi
+rw=Leggi/Scrivi
+email=Indirizzo Email:
+name=Nome:
+password=Password:
+it=Italiano
+en=Inglese
+fr=Francese

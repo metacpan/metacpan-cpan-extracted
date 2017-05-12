@@ -1,0 +1,379 @@
+#!/usr/bin/perl
+# Exports records from AlvisCombine SQL database in XML-format
+# Takes switches
+
+## $Id: combineExport 323 2010-03-15 12:16:47Z it-aar $
+
+# Copyright (c) 2004-2005 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+my $jobname;
+my $configfile;
+my $baseConfig;
+my $dbase;
+my $help;
+my $profile;
+my $charsetopt;
+my $include;
+my $exclude;
+my $nrToExport;
+my $recidExp;
+my $md5Exp;
+my $pipehost;
+my $pipeport;
+my $incremental;
+my $xsltScript;
+my $verbose;
+my $collapseinlinks;
+my $nooutlinks;
+my $ZebraIndex;
+my $SolrIndex;
+
+use strict;
+use Combine::MySQLhdb;
+use Combine::Config;
+use Combine::XWI2XML;
+use DBI;
+use HTTP::Date;
+use Encode;
+use Getopt::Long;
+
+GetOptions('configfile:s' => \$configfile, 'database|sql:s' => \$dbase,
+	   'jobname:s' => \$jobname,
+           'baseconfigdir:s' => \$baseConfig,
+	   'help|?' => \$help, 'profile:s' => \$profile,
+	   'charset:s' => \$charsetopt, 'include:s' => \$include,
+	   'exclude:s' => \$exclude, 'number:i' => \$nrToExport,
+           'recordid:i' => \$recidExp, 'md5:s' => \$md5Exp,
+	   'pipehost:s' => \$pipehost, 'pipeport:i' => \$pipeport,
+           'incremental' => \$incremental, 'xsltscript:s' => \$xsltScript,
+           'verbose' => \$verbose, 'collapseinlinks' => \$collapseinlinks,
+           'nooutlinks' => \$nooutlinks, 'ZebraIndex' => \$ZebraIndex,
+           'SolrIndex' => \$SolrIndex
+	   );
+if ($help) { Getopt::Long::HelpMessage('See man page combineExport'); }
+if (defined($jobname)) { Combine::Config::Init($jobname, $baseConfig); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+if (defined($dbase)) { warn "Switch 'database' not implemented"; } #ConfigSQL::Init('',$dbase); }
+
+my $baseConfig = Combine::Config::Get('baseConfigDir') . '/'; #'/etc/combine/';
+
+if (defined($ZebraIndex)) {
+  warn "Using default Zebra configuration: profile=combine, nooutlinks, collapseinlinks";
+  $profile='combine';
+  $collapseinlinks=1;
+  $nooutlinks=1;
+}
+if (defined($SolrIndex)) {
+  warn "Using default Solr configuration: profile=combine, nooutlinks, collapseinlinks converted by /etc/combine/solr.xsl";
+  $profile='combine';
+  $collapseinlinks=1;
+  $nooutlinks=1;
+}
+#configuration processing
+my $charset = 'UTF-8';
+my $includeHTML=0;
+my $canonicalDoc=0;
+my $xmlNS = '';
+#profile - default alvis
+if (!defined($profile)) { $profile='alvis'; }
+else { $profile = lc($profile); }
+if ($profile eq 'alvis') {
+    $charset = 'UTF-8';
+    $includeHTML=1;
+    $canonicalDoc=1;
+    $xmlNS = 'xmlns="http://alvis.info/enriched/"';
+    $xsltScript = $baseConfig . 'combine2alvis.xsl';
+} elsif ($profile eq 'dc') {
+    $charset = 'UTF-8';
+    $includeHTML=0;
+    $canonicalDoc=0;
+    $xmlNS = 'xmlns:dc="http://purl.org/dc/elements/1.1/"';
+    $xsltScript = $baseConfig . 'combine2dc.xsl';
+} elsif ($profile eq 'combine') {
+    $charset = 'UTF-8';
+    $includeHTML=0;
+    $canonicalDoc=0;
+    $xmlNS = '';
+} else {
+    Getopt::Long::HelpMessage("Undefined profile: $profile");
+}
+if (defined($charsetopt)) {
+    if ($charsetopt =~ /utf-8|utf8/i) { $charset = 'UTF-8'; }
+    elsif ($charsetopt =~ /iso-latin|isolatin|latin/i) { $charset = 'LATIN1'; }
+    else { print STDERR "Unkown charset: $charsetopt; using $charset\n"; }
+}
+if (defined($include)) {
+  #tobedone
+}
+if (defined($exclude)) {
+  #tobedone
+}
+
+my $limit='';
+if (defined($nrToExport) && $nrToExport>0) {$limit="LIMIT $nrToExport";}
+
+#use ALVIS Pipeline?
+my $pipe;
+my $pipeUpdateLast;
+if (defined($pipehost) || defined($pipeport)) {
+    if (defined($pipehost) && defined($pipeport)) {
+	require Alvis::Pipeline;
+	$pipe = new Alvis::Pipeline::Write(host => $pipehost, port => $pipeport,loglevel => 10)
+	    or die "can't create ALVIS write-pipe for host '$pipehost', port '$pipeport': $!";
+	if (defined($nrToExport) || defined($recidExp) || defined($md5Exp)) {
+	    warn("NOT updating exports table with last export");
+	} else { $pipeUpdateLast = 1; }
+	warn("Using ALVIS Pipeline for host '$pipehost', port '$pipeport'");
+    } else {
+	die("You must define both pipehost and pipeport to use ALVIS Pipeline");
+    }
+} elsif (defined($incremental)) {
+    if (defined($nrToExport) || defined($recidExp) || defined($md5Exp)) {
+	warn("NOT updating exports table with last export");
+    } else { $pipeUpdateLast = 1; $pipehost='localhost'; $pipeport=0; }
+}
+
+my $sv = Combine::Config::Get('MySQLhandle');
+
+my $n=0; #counter no of records exported
+my $level=0; #Used to calculate indentation for pretty printing
+
+if (defined($recidExp)) {
+    $recidExp = 'WHERE recordid=' . $recidExp;
+} else { $recidExp=''; }
+if (defined($md5Exp)) {
+    $md5Exp = "WHERE md5='$md5Exp'";
+} else {$md5Exp=''; }
+
+my $xmlhead='';
+my $xmlfoot='';
+if (! defined($pipe) ) {
+    print  "<?xml version=\"1.0\" encoding=\"$charset\"?>\n";
+    print '<documentCollection version="1.1"' . " $xmlNS>\n";
+} else {
+    $xmlhead="<?xml version=\"1.0\" encoding=\"$charset\"?>\n<documentCollection $xmlNS version=\"1.1\">\n";
+    $xmlfoot="</documentCollection>\n";
+}
+#FIX the namespace for non ALVIS formats
+
+my $sth;
+my $last;
+my $now;
+if (defined($pipe) || defined($incremental)) {
+    if (defined($pipeUpdateLast)) {
+        $sth = $sv->prepare(qq{SELECT last,NOW() FROM exports WHERE host=? AND port=?});
+        $sth->execute($pipehost,$pipeport);
+        ($last,$now)=$sth->fetchrow_array;
+        my $firstTime='';
+        if (!defined($last)) {
+            $sv->prepare(qq{INSERT INTO exports SET host=?,port=?})->execute($pipehost,$pipeport);
+            $sth = $sv->prepare(qq{SELECT last,NOW() FROM exports WHERE host=? AND port=?});
+            $sth->execute($pipehost,$pipeport);
+            ($last,$now)=$sth->fetchrow_array;
+            $firstTime=" AND status!='deleted'";
+        }
+#        print "T: got $last, $now\n";
+        $sth = $sv->prepare(qq{SELECT recordid,md5,status FROM oai WHERE date>'$last' AND date<'$now' $firstTime;});
+    } else {
+        $sth = $sv->prepare(qq{SELECT recordid,md5,status FROM oai $recidExp $md5Exp $limit;});
+    }
+} else {
+    $sth = $sv->prepare(qq{SELECT distinct(recordid),md5,'created' FROM recordurl $recidExp $md5Exp $limit;});
+}
+$sth->execute;
+while ( my ($recordid,$recordmd5,$status)=$sth->fetchrow_array) {
+    $n++;
+    $level=1;
+
+    my $rec = '';
+    if (defined($verbose)) { print STDERR "RID=$recordid; Status=$status; No=$n\n"; }
+    if ($status eq 'deleted') {
+        $rec = "<documentRecord id=\"$recordmd5\" action=\"delete\"></documentRecord>\n";
+    } elsif ( ($ZebraIndex) && (my $zh = Combine::Config::Get('ZebraHost')) ) {
+      require Combine::Zebra;
+      my $xwi = Combine::MySQLhdb::Get($recordid);
+      Combine::Zebra::update($zh,$xwi);
+    } elsif ( ($SolrIndex) && (my $sh = Combine::Config::Get('SolrHost')) ) {
+      require Combine::Solr;
+      my $xwi = Combine::MySQLhdb::Get($recordid);
+      Combine::Solr::update($sh,$xwi);
+    } elsif ($charset eq 'UTF-8') {
+        $rec = Encode::encode('utf8',toXML($recordid, $includeHTML, $canonicalDoc));
+    } elsif  ($charset eq 'LATIN1') {
+        $rec = Encode::encode('latin1',toXML($recordid, $includeHTML, $canonicalDoc));
+    }
+    if (defined($pipe)) {
+	$pipe->write($xmlhead . $rec . $xmlfoot) || warn('Alvis pipeline write failed');
+    } else {
+      print "$rec\n";
+    }
+}
+
+if ( !defined($pipe) ) { print "</documentCollection>\n"; }
+
+if (defined($pipeUpdateLast)) {
+  # $now holds time when incremental export started
+  $sv->prepare(qq{UPDATE exports SET last=? WHERE host=? AND port=?})->execute($now,$pipehost,$pipeport);
+}
+
+##################SUBS#####################
+sub toXML {
+  my ($recordid,$iHTML,$cDoc) = @_;
+  my $xwi = Combine::MySQLhdb::Get($recordid);
+  my $xml = Combine::XWI2XML::XWI2XML($xwi, $iHTML, $cDoc, $collapseinlinks, $nooutlinks);
+
+  if ( defined($xsltScript) ) {
+    #apply XSLT transformation
+    use XML::LibXSLT;
+    use XML::LibXML;
+  
+    my $parser = XML::LibXML->new();
+    my $xslt = XML::LibXSLT->new();
+  
+    my $source = $parser->parse_string(Encode::encode('utf8',$xml));
+    my $style_doc = $parser->parse_file($xsltScript);
+    my $stylesheet = $xslt->parse_stylesheet($style_doc);
+    my $results = $stylesheet->transform($source);
+    $xml = $stylesheet->output_string($results);
+  }
+
+  return $xml;
+}
+
+__END__
+
+
+=head1 NAME
+
+combineExport - export records in XML from Combine database
+
+
+=head1 SYNOPSIS
+
+combineExport --jobname <name> [--profile alvis|dc|combine --charset utf8|isolatin --number <n> --recordid <n> --md5 <MD5> --incremental --xsltscript ...]
+
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+=over 9
+
+=item --profile
+
+Three profiles: alvis, dc, and combine . alvis and combine are similar XML formats.
+
+'alvis' profile format is defined by the Alvis enriched document format DTD.
+It uses charset UTF-8 per default.
+
+'combine' is more compact with less redundancy.
+
+'dc' is XML encoded Dublin Core data.
+
+=item --charset
+
+Selects a specific characterset from UTF-8, iso-latin-1
+Overrides --profile settings.
+
+=item --collapseinlinks
+
+Skip inlinks with duplicate anchor-texts (ie just one inlink per unique anchor-text).
+
+=item --nooutlinks
+
+Do not include any outlinks in the exported records.
+
+=item --ZebraIndex
+
+ZebraIndex sends XML records directly to the Zebra server defined in Combine
+configuration variable 'ZebraHost'.
+It uses the default Zebra configuration: profile=combine, nooutlinks, collapseinlinks
+and is compatible with the direct Zebra indexing done during harvesting when
+'ZebraHost' is defined in the Combine configuration. Requires that the Zebra server
+is running.
+ 
+=item --SolrIndex
+
+SolrIndex sends XML records directly to the Solr server defined in Combine
+configuration variable 'SolrHost'.
+It uses the default Solr configuration: profile=combine, nooutlinks, collapseinlinks
+and is compatible with the direct Solr indexing done during harvesting when
+'SolrHost' is defined in the Combine configuration. Requires that the Solr server
+is running.
+ 
+=item --xsltscript
+
+Generates records in Combine native format and converts them using this XSLT script
+before output. See example scripts in /etc/combine/*.xsl
+
+=item --number
+
+the max number of records to be exported
+
+=item --recordid
+
+Export just the one record with this recordid
+
+=item --md5
+
+Export just the one record with this MD5 checksum
+
+=item --pipehost, --pipeport
+
+Specifies the server-name and port to connect to and export data using the Alvis Pipeline.
+Exports incrementally, ie all changes since last call to combineExport with the same pipehost
+and pipeport.
+
+=item --incremental
+
+Exports incrementally, ie all changes since last call to combineExport using --incremental
+
+
+=back
+
+
+=head1 DESCRIPTION
+
+
+=head1 EXAMPLES
+
+ Export all records in Alvis XML-format to the file recs.xml
+   combineExport --jobname atest > recs.xml
+
+ Export 10 records to STDOUT
+   combineExport --jobname atest --number 10
+
+ Export all records in UTF-8 using Combine native format
+   combineExport --jobname atest --profile combine --charset utf8 > Zebrarecs.xml
+
+ Incremental export of all changes from last call using localhost at port 6234 using the
+ default profile (Alvis)
+   combineExport --jobname atest --pipehost localhost --pipeport 6234
+
+=head1 SEE ALSO
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+Alvis XML schema (--profile alvis) at
+L<http://project.alvis.info/alvis_docs/enriched-document.xsd>
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 - 2006 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+ See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut

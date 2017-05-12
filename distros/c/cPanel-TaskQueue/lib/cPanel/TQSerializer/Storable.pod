@@ -1,0 +1,52 @@
+# cpanel - cPanel/TQSerializer/Storable.pm        Copyright(c) 2014 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+=head1 NAME
+
+cPanel::TQSerializer::Storable - Store TaskQueue state in a Storable file
+
+=head1 DESCRIPTION
+
+Used internally by the L<cPanel::TaskQueue> and L<cPanel::TaskQueue::Scheduler>
+classes to store state information to disk.
+
+=head1 INTERFACE
+
+=head2 $serial->load( $fh )
+
+Loads an array of items from a storable file referenced by the filehandle
+C<$fh> and returns the list.
+
+=head2 $serial->save( $fh, @list_to_store )
+
+Saves an array of items into a storable file referenced by the filehandle
+C<$fh>.
+
+=head2 $serial->filename( $stub )
+
+Given the stub of a filename, return the name with an appropriate extension for
+this serializer.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+ModName requires no configuration files or environment variables.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+=head1 AUTHOR
+
+G. Wade Johnson  C<< wade@cpanel.net >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2014, cPanel, Inc. All rights reserved.
+This code is subject to the cPanel license. Unauthorized copying is prohibited
+

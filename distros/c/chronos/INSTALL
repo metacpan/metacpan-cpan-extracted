@@ -1,0 +1,314 @@
+REQUIREMENTS
+============
+
+	mod_perl 1.x
+	apache 1.x
+	mysql
+	sendmail or postfix (for reminders)
+	Apache::DBI
+	DBI
+	DBD::mysql
+	Date::Calc
+	Apache::Request
+	HTML::Entities
+    URI::Find
+
+On a RedHat 7.3 system, these requirements can be fulfilled by following these
+steps:
+
+	1) Install these RPMs:
+		- mod_perl
+		- apache
+		- mysql-server
+		- sendmail and/or postfix
+		- perl-DBI
+		- perl-DBD-MySQL
+		- perl-Date-Calc
+		- perl-libwww-perl
+		- apache-devel (to be able to compile in the next step)
+		
+	2) Download, compile, test and install the remaining Perl modules by
+	executing this command:
+		perl -MCPAN -e 'install Apache::DBI;
+                        install Apache::Request;
+                        install URI::Find'
+	Make sure you have the basic development tools needed to compile stuff,
+	namely gcc and make.
+
+
+UPGRADING TO 1.1.x
+==================
+
+The table structure has changed between 1.0.x and 1.1.x. You can back up your
+database, create the new tables and restore your backup by following these
+steps:
+
+0) Install the new Chronos 1.1.x
+
+    Follow step 1 in INSTALLATION INSTRUCTIONS below. You can also optionally
+    follow step 7 if you want the new holidays feature.
+
+1) Back up your database
+
+        mysqldump -u <chronos user> -p<chronos password> -n -t \
+            <chronos database> > ~/chronos.bak.sql
+
+2) Create the new database
+
+        chronos_install_db
+
+    Specify a new name for the database so that you don't erase the old one, just
+    in case. Things can *always* go wrong.
+
+3) Convert the backup to the new format
+
+        chronos_convert ~/chronos.bak.sql
+
+3) Restore the backup
+
+    Note that the chronos user, chronos password and chronos database may have
+    been changed by chronos_install_db. Refer to /etc/chronos.conf.
+   
+        mysql -u <chronos user> -p<chronos password> <new chronos database> \
+            < ~/chronos.bak.sql
+
+4) Test things out
+
+5) Replace old DB (optional)
+
+    Bring down mysqld. Remove the old DB and rename the new DB:
+
+        service mysqld stop
+        rm -rf /var/lib/mysql/<old DB name>
+        mv /var/lib/mysql/<new DB name> /var/lib/mysql/<old DB name>
+        service mysqld start
+        vi /etc/chronos.conf
+        (change DB_NAME to the old DB name)
+        :wq
+        service httpd restart
+
+
+GENERAL UPGRADING
+=================
+
+(short instructions, refer below for more details)
+
+1) perl Makefile.PL && make && make install
+2) service httpd restart
+3) install -m 755 remindd /etc/init.d (or wherever your startup scripts are)
+4) service remindd restart
+
+
+INSTALLATION INSTRUCTIONS
+=========================
+
+1) Install the modules and programs:
+
+	perl Makefile.PL
+	make
+	make install
+
+2) Configure Apache
+
+2.a) Add these lines to httpd.conf:
+
+		<VirtualHost _default_:443>
+			DocumentRoot "/var/www/ssl"
+			<Location /Chronos>
+	    		SetHandler perl-script
+		    	PerlHandler Chronos
+			    PerlAuthenHandler Chronos::Authen
+    			Require valid-user
+	    		AuthName "Chronos"
+		    	AuthType Basic
+                # Following line is optional (in case you want to run more than
+                # one Chronos servers on one system). Default is
+                # "/etc/chronos.conf".
+                PerlSetVar ChronosConfig "/etc/chronos.conf"
+			</Location>
+            # The alias is for stupid browsers
+            Alias /chronos /Chronos
+		</VirtualHost>
+
+	/var/www/ssl is used to host static content like style sheets and images.
+    You can move it if you wish. Also, feel free to not use SSL, but remember
+    that passwords will be sent in clear text.
+
+	If you already have a "<VirtualHost _default_:443>" section (which is very
+	likely, given that distros now ship mod_ssl by default), you can put the
+	rest inside the existing one. If there is already a "DocumentRoot"
+	instruction for the existing VirtualHost section, you can either use this
+	one and move Chronos' files or move your own files to /var/www/ssl.
+
+2.b) Preload modules (optional but recommended)
+
+    mod_perl can preload modules in the parent httpd when Apache starts up. What
+    this means is that the memory used by the modules will be shared between
+    children instead of every one of them spawning a new copy of them in memory.
+    Also, preloading modules means a shorter delay when spawning children. The
+    only downside is a _possibly_ longer initial startup time.
+
+    A sample preloading script has been provided for you. Just copy startup.pl
+    somewhere Apache will be able to find it (I usually prefer
+    /etc/httpd/conf/). Then add the following line to httpd.conf:
+
+        PerlRequire /some/where/startup.pl
+
+    You can give a filename relative to the ServerRoot. In my case, I use
+
+        PerlRequire conf/startup.pl
+
+    because the ServerRoot is set to /etc/httpd/.
+
+2.c) Low memory configuration
+
+    There is always a tradeoff between memory consumption and speed. In the case
+    of Apache, it pre-spawns children so that it is always ready to answer
+    queries. This requires memory but it makes sure Apache is always fast.
+    However, if you have low amounts of memory (32 MB and less), the amount of
+    swapping necessary can negate the speed improvement. To use less memory:
+
+        1) Be sure the modules are preloaded and shared among children (see
+           2.b).
+           
+        2) Preload less children by using the following directives:
+
+            MinSpareServers 1
+            MaxSpareServers 1
+            StartServers 1
+
+        3) Limit the maximum number of children to spawn (on-demand, not
+           preloaded) by using the following directive:
+
+            MaxClients 5
+
+        4) (optional) Limit the number of requests per child to limit the
+           effects of memory leaks. After this number of requests, children are
+           killed so that any memory leaked can be reclaimed. The usefulness of
+           this command is limited because Perl modules simply don't leak
+           memory. However, Chronos may use C modules (Date::Calc comes to mind)
+           which may have undiscovered memory leaks. This is simply a preventive
+           directive.
+
+            MaxRequestsPerChild 100
+
+    I haven't investigated how to reduce memory usage of MySQL because my 32 MB
+    server was a fast as it could get with the above settings. If someone wants
+    to write some notes about that process here, please notify
+    chronoss-devel@lists.sourceforge.net.
+
+3) Configure MySQL (optional but recommended)
+
+    MySQL by default has a limit of 1 MB on the size of inserts. That should not be
+    a problem unless people want to attach big files to events. You can make the
+    limit higher by using "-O max_allowed_packet=###" when starting mysqld. Replace
+    '###' by a number of bytes. You can use 'M' to specify megabytes, like "-O
+    max_allowed_packets=100M". You can go as high as 4 GB, but make sure you have
+    enough RAM to hold all that data in memory! ;) If someone knows of a way to
+    stream POST requests to the database (instead of holding it all in memory and
+    then dumping it in the database), please write to
+    chronoss-devel@lists.sourceforge.net.
+
+4) Create the database
+
+	chronos_install_db
+
+5) Create a user
+
+	chronosadmin -p --new-user
+
+    If the user you're connecting as (usually root) has an empty MySQL password,
+    don't use the -p switch. -p means "This is the password" (if you supply a
+    password) or "Prompt me for a password" (if you don't supply a password). In
+    fact, it works exactly like "mysql" or "mysqladmin" except that you don't
+    use "-p<password>", you use "-p <password>" (notice the space). I find this
+    clearer and it's parsed automatically with Getopt::Long.
+
+    chronosadmin has other uses. Type "chronosadmin --help" to know about them.
+
+6) Have remindd start automatically on boot and start it
+
+    install -m 755 remindd /etc/init.d (or wherever your startup scripts are)
+	/sbin/chkconfig --add remindd
+	/sbin/chkconfig remindd on
+	/sbin/service remindd start
+
+    These steps are Red Hat-centric. Boot scripts are one area where distros
+    vary a lot. I trust you can figure out how to accomplish this step on your
+    favorite distro.
+
+7) Setup the holiday scheme (optional)
+
+    If you want Chronos to display holidays matching your locale, first execute
+    the command
+        chronosadmin --show-holidays
+    This will print a list of the available holiday schemes. Choose one matching
+    your locale (I live in Québec, Canada and my scheme is 'CA-QC') and add it
+    to your /etc/chronos.conf like this:
+        HOLIDAYS=CA-QC
+
+    If no 'HOLIDAYS' directive is found, no holidays will be printed.
+
+    The holiday schemes are not maintained by the Chronos team but this is open
+    source and can always be improved. Mail your improvements to
+    chronoss-devel@lists.sourceforge.net, they will be forwarded to the
+    appropriate entity.
+
+8) Configure Chronos
+
+    Take a look at the chronos.conf.sample file to see what options are
+    available. Beware: chronos_install_db will have created a /etc/chronos.conf
+    file with the selected database connection information.
+
+8) Restart Apache and go to https://your.host.here/Chronos.
+
+    NOTE: Under some circonstances, Apache loads the mod_perl module only when
+    started with the "-DPERL" option. Read the Apache documentation for more
+    information. (Yes, that really means that you are on your own here.)
+
+
+TROUBLESHOOTING
+===============
+
+If it doesn't work, you can follow this questionnaire to help you diagnose the
+problem. If it still doesn't work, please write to
+chronoss-user@lists.sourceforge.net.
+Include the answers to the questions below along with copy-pasted output. Don't
+write "It doesn't work." Write "It doesn't work and here's the output: ...".
+
+1)  Does Apache's error log contain something related to Chronos or Perl? On Red
+    Hat this log is /var/log/httpd/error_log.
+
+2)  Does increasing the loglevel to 'debug' ("LogLevel debug") yield info?
+
+3)  After you have started Apache, are there httpd processes living?
+
+4)  Is MySQL up? Can it answer queries? Try to connect to the database specified
+    in /etc/chronos.conf with the username and password specified in that same
+    file. A "SHOW TABLES" command should print something like this:
+
+        mysql> show tables;
+        +-------------------+
+        | Tables_in_chronos |
+        +-------------------+
+        | acl               |
+        | attachments       |
+        | events            |
+        | participants      |
+        | recur             |
+        | tasks             |
+        | user              |
+        +-------------------+
+        7 rows in set (0.02 sec)
+
+5)  Put Chronos in a non-SSL section. Restart Apache. Telnet to port 80 and get
+    the page manually like this:
+
+        telnet some.host.com 80
+        GET /Chronos
+
+    Does that give you some useful info?
+
+6)  Start mysqld in log mode with the option "--log=/some/file". Every
+    connection and request will be logged in that file. Does it contain anything
+    after you have tried to connect to Chronos?

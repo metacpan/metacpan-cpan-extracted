@@ -1,0 +1,9 @@
+MANIFEST		This file.
+ChangeLog		The change journal.
+README			Read about how to install the software
+LICENSE			Agree with terms before using
+Makefile.PL		Perl Makefile builder.
+lib/Conjury/C.pm		C/C++ compilers, linkers and archivers.
+lib/Conjury/C/Darwin.pm		Specialty: Darwin C/C++ tools (GNU derived).
+lib/Conjury/C/GNU.pm		Specialty: GNU C/C++ tools.
+lib/Conjury/C/Sun.pm		Specialty: Sun Workshop C/C++ tools.

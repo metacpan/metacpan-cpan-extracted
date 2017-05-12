@@ -1,0 +1,30 @@
+cPanel-nginx version 0.01
+==================================
+
+This is a Perl extension for integration cPanel and webserver NGINX <http://nginx.org/en/>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP::UserAgent
+  HTTP::Request
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Aleksey Vaganov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.x.x or,
+at your option, any later version of Perl 5 you may have available.
+
+

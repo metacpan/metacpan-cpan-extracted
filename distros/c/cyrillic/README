@@ -1,0 +1,32 @@
+Cyrillic Software Suite
+=======================
+
+Copyright (c) 1998, John Neystadt.
+
+All Russian WEB sites have to provide different encodings of Russian texts.
+Four main encodings are CP1251 for Windows, KOI8 for UNIX, MAC for Macintosh
+and transliteration for users accepting only English texts. 
+
+This suite is intended for webmasters solving various issues related to
+multiple charsets. 
+
+You may install these scripts on your web site for free. To obtain permision
+for redistribution or any other usage, please contact john@neystadt.org. 
+
+Drop me a line if you deploy these scripts on your site. 
+
+WWW Cyrillic Encoding Suite is a set of PERL packages and scripts, intended
+to be used by WWW CGIs. 
+
+Included:
+	* CPAN modules of
+		- Convert::Cyrillic
+		- Convert::Cyrillic::Utils
+		- Lingua::DetectCharset
+	* Scripts (available separately)
+		- cyr-mail-filter.pl - charset mapper for for cyrillic mailing
+			lists
+		- code.pl - cgi for on-the-fly charset mapping
+
+For updated versions:
+	http://www.neystadt.org/cyrillic/

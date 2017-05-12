@@ -1,0 +1,99 @@
+#! /usr/bin/perl
+
+## $Id: combineReClassify 307 2009-05-27 11:02:52Z it-aar $
+
+# Copyright (c) 2002-2005 Anders Ardö
+#
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Combine::Config;
+use Combine::LogSQL;
+use Combine::DataBase;
+use Combine::MySQLhdb;
+use Combine::XWI;
+use DBI;
+
+use Getopt::Long;
+# switches
+my $classnames;
+my $verbose;
+my $configfile;
+my $baseConfig;
+my $jobname;
+GetOptions('jobname:s' => \$jobname,
+    'classnames:s' => \$classnames,
+    'verbose' => \$verbose,
+    'configfile:s' => \$configfile,
+    'baseconfigdir:s' => \$baseConfig);
+if (defined($jobname)) { Combine::Config::Init($jobname,$baseConfig); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+
+my $doCheckRecord = Combine::Config::Get('doCheckRecord');
+my $checkRecord;
+if ( $doCheckRecord ) {
+  my $classifyPlugIn = Combine::Config::Get('classifyPlugIn');
+  if (!defined($classifyPlugIn)) {
+    #backwards compatibility
+    my $autoClassAlg = Combine::Config::Get('autoClassAlg');
+    if ($autoClassAlg eq 'PosCheck') { $classifyPlugIn = 'Combine::PosCheck_record'; }
+    else { $classifyPlugIn = 'Combine::Check_record'; } #Old default
+  }
+  if ($verbose) { print "Using $classifyPlugIn as classifier\n"; }
+  eval "require $classifyPlugIn";
+  $checkRecord = sub { $classifyPlugIn->classify(@_) };
+} else { Getopt::Long::HelpMessage('Job $jobname does not do topic-classification (doCheckRecord=0)') }
+
+my $log = new Combine::LogSQL "ReClassify ";
+Combine::Config::Set('LogHandle', $log);
+Combine::MySQLhdb::Open();
+my $sv = Combine::Config::Get('MySQLhandle');
+
+my $where;
+
+if (defined($classnames)) {
+  my @cls = split(',',$classnames);
+  foreach my $i (0..$#cls) { $cls[$i] = "notation='" . $cls[$i] . "'"; }
+  $where = ' WHERE ' . join(' OR ', @cls);
+}
+my $q = 'SELECT distinct(recordid) FROM topic' . $where . ';';
+if ($verbose) { print "SQL Query=$q\n"; }
+my $sth = $sv->prepare(qq{$q});
+$sth->execute;
+while (my ($recordid)=$sth->fetchrow_array) {
+    if ($verbose) { print "Doing $recordid\n"; }
+    my $xwi = Combine::MySQLhdb::Get($recordid);
+    my $xhdb = new Combine::DataBase( $xwi, $sv, $log);
+    $xhdb->delete;
+    Combine::MySQLhdb::DeleteKey($recordid);
+    #Both topic and robot are filled by check
+    $xwi->topic_reset;
+    $xwi->robot_reset;
+    my $res = $checkRecord->($xwi);
+    if ( $res ) {
+#            if ( $doAnalyse ) { analyse($xwi); }
+            $xhdb->insert;
+    }
+    if ($verbose) { print "Recordid $recordid Res=$res\n"; }
+}
+
+__END__
+
+=head1 NAME
+
+combineReClassify - main program that reanalyse records in a combine database
+
+=head DESCRIPTION
+
+Algorithm:
+  select relevant records based on cls parameter
+  for each record
+     get record from database
+     delete analyse infor from the record
+     analyse the record
+     if still_relevant
+        save in database
+
+
+=cut

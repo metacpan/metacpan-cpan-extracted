@@ -1,0 +1,177 @@
+# $Id: po,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Augusto Cesar Sandoval <augusto@ciblis.net>
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Mês
+week=Semana
+Day=Dia
+today=Hoje
+myagenda=Minha Agenda
+status_UNCONFIRMED=NÃO CONFIRMADO
+status_CONFIRMED=CONFIRMADO
+status_CANCELED=CANCELADO
+eventname=Nome do Evento:
+eventstart=Inicio:
+eventend=Fim:
+eventdescription=Descrição:
+eventrecur=Recorrente:
+eventnotrecur=Não recorrente
+eventrecurweek=Neste dia toda semana
+eventrecurmonth=Neste dia todo mês
+eventrecuryear=Neste dia todo ano
+eventrecurend=Fim da recorrencia:
+eventparticipants=Participantes:
+eventconfirm=Solicitar Confirmação:
+eventsave=Salvar
+errorstartdate=Data de Início inválida.
+errorstarttime=Hora de Início inválida.
+errorenddate=Data de Término inválida.
+errorendtime=Horário de Término inválida.
+errorrecurenddate=Data Final de recorrência inválida.
+errorrecurendtime=Horário Final de recorrência inválido.
+errorendbeforestart=Horário Final anterior ao Horário Inicial.
+errorrecurendbeforestart=Horário Final de recorrência anterior ao Horário de Início.
+errorrecurendbeforeend=Horário Final de recorrência anterior do Horário de Fim
+errormissingname=Por favor, informe o nome do evento.
+reminder=Lembrar:
+remind_me=Lembrar pelo email %1 %2 antes do início do evento.
+min=minuto(s)
+hour=hora(s)
+day=dia(s)
+error=Erro
+weeknum=Semana %1 do ano %2
+weeknum2=Semana %1 do %2
+eventdel=Excluir
+initiator=Inicio do Evento
+cancel=Cancelar
+confirm=Confirmar
+confirm_subject=Confirmação
+confirm_body=<<EOF
+Esta é uma mensagem automática. Por favor não responda.
+
+%%INITIATOR%% solicita a confirmação da sua presença na data %%DATE%%.
+Nome do Evento: %%NAME%%
+Descrição: %%DESCRIPTION%%
+
+Por favor confirme sua presença.
+
+-- 
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+errornotauthorized=Você não tem permissão para realizar esta operação.
+tasklist=Lista de tarefas.
+tasktitle=Título:
+tasknotes=Notas:
+taskpriority=Prioridades:
+newtask=Nova tarefa
+options=Opções
+userprefs=Preferências do usuário
+lang=Língua:
+agendatype=Tipo de Agenda:
+publicrw=Público para leitura e escrita
+publicr=Público somente para leitura
+private=Privativa
+indivpriv=Privilégios individuais:
+nopriv=Sem privilégios
+r=Leitura
+rw=Leitura/escrita
+email=Endereço de email:
+name=Nome:
+password=Senha:
+create_db_intro=<<EOF
+Este script irá criar o Banco de Dados MySQL e as tabelas necessárias ao Chronos.
+EOF
+create_db_pass=Senha de root do MySQL:
+create_db_dbname=Nome do Banco de Dados do Chronos: [chronos]
+create_db_exists=Este Banco de Dados já existe. Excluir?
+create_db_deleted=Banco de Dados %s excluído
+create_db_created=Banco de Dados %s criado
+create_db_tablecreated=Tabela %s criada
+create_db_user=Usuário para conectar ao Banco de Dados: [chronos]
+create_db_dbpass=Senha: [random]
+create_db_grant=Privilégios permitidos para %s em %s.*
+create_db_added=Informações adicionadas para o arquivo /etc/chronos.conf
+create_db_success=Chronos instalado com sucesso
+chronosadmin_usage=<<EOF
+Sintaxe:
+    %s [-u username] [-p [password]] [--autodel] [--new-user]
+    [--new-users-batch[=FILE]] [--del-user=username] [database[@host]]
+
+Opções:
+    -u username
+        Usuário para conectar ao Banco de Dados.
+    -p password
+        Senha para conectar ao Banco de Dados.
+    --autodel
+        Não solicita confirmação quando usuário for deletado. Usado normalmente 
+        para arquivos batch.
+    --new-user
+        Cria um novo usuário no modo interativo.
+    --new-users-batch[=FILE]
+        Cria usuários a partir de um arquivo (ou STDIN por default) contendo em
+        cada linha:
+            usuário,senha,email,acesso
+    --del-user=username
+            Exclui usuário.
+    --show-holidays
+        Este comando mostra os feriados cadastrados em seu sistema.
+        Você pode incluir a linha a seguir no arquivo chronos.conf.
+            HOLIDAYS=BR-SP  # Brasil/São Paulo
+EOF
+chronosadmin_exists=O usuário %s já existe. Excluir o existente?
+chronosadmin_created=Usuário %s criado
+chronosadmin_deleted=Usuário %s excluído
+chronosadmin_confirm=Confirmação:
+chronosadmin_pass=Senha
+chronosadmin_p=Senha do MySQL 
+chronosadmin_username=Usuário (máximo de 16 caracteres)
+chronosadmin_email=Endereço de email
+chronosadmin_lang=Idioma
+chronosadmin_realname=Nome Real 
+chronosadmin_connectok=Conectado ao banco de dados MySQL 
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Lembrar
+
+Esta é uma mensagem automática. Por favor, não responda.
+Este email é para lembrá-lo do evento que está descrito abaixo:
+
+Nome:    %%NAME%%
+Início:  %%START%%
+Fim:     %%END%%
+Descrição:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% by Linux Québec Technologies
+EOF
+apacheuser=Apache esta rodando no modo usuário
+en=Inglês
+fr=Francês
+it=Italiano
+de=Alemão
+no=Norueguês
+po=Português
+attachments=Arquivos anexados:
+new_attachment=Novo anexo:
+participants_to_add=Adicionar participante:
+remove_part=Remover
+notime=Sem horário

@@ -1,0 +1,36 @@
+Source: combine
+Section: web
+Priority: optional
+Maintainer: Anders Ardo <anders.ardo@it.lth.se>
+Build-Depends: debhelper (>> 4.0.0)
+Standards-Version: 3.5.8
+
+Package: combine
+Section: web
+Architecture: all
+Depends: ${perl:Depends}, libcombine-perl (= ${Source-Version}), mysql-server-4.1 | mysql-server-5.0, libdbd-mysql-perl, libcompress-zlib-perl, libalvis-canonical-perl, libxml-libxslt-perl
+Recommends: pstotext, antiword, pdftohtml, untex, xlhtml, ppthtml, unrtf, libhtml-tidy-perl (= 1.06)
+Suggests: libalvis-pipeline-perl, libnet-z3950-zoom-perl (>= 1.20)
+Conflicts: 
+Description: Web focused crawler framework
+ Combine is an open system for crawling [harvesting and threshing (indexing)]
+ Internet resources. The name is derived from the combine-harvester since
+ the two perform their jobs in a similar way.
+ .
+ It is modified for focused crawling by integrating the automated topic
+ classification algorithms.
+ .
+ Combine is highly configurable and completely written in Perl
+ .
+ This package contains executables, configuration and documentation
+
+Package: libcombine-perl
+Section: perl
+Architecture: all
+Depends: ${perl:Depends}, libwww-perl, libhtml-parser-perl,liburi-perl, mysql-server-4.1 | mysql-server-5.0, libdbd-mysql-perl, liblingua-stem-perl, liblingua-identify-perl, libconfig-general-perl, libxml-libxml-perl, libxml-parser-perl, libimage-exiftool-perl, libclass-factory-util-perl, libgeo-ip-perl, libtext-affixes-perl
+Recommends: libtext-extractwords-perl, libtext-ngram-perl
+Description: Library for Web focused crawler
+ Combine is an open system for focused crawling Internet resources
+ .
+ This package contains library modules
+

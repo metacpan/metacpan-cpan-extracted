@@ -1,0 +1,59 @@
+constant::lexical, version 2.0002
+
+This module creates constants in the manner of constant.pm, but
+limits their visibility to the enclosing lexical scope.
+
+
+CHANGES IN THIS RELEASE
+
+This version reverts back to using  Lexical::Sub  for perls 5.18  and
+5.20,  since the perl’s built-in lexical sub feature  is  not  stable
+enough before  perl 5.22  (specifically before  v5.21.10-26-gd655d9a),
+and caused WWW::Scripter::Plugin::Ajax to crash.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install constant::lexical"
+
+    [sudo] cpan constant::lexical
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+DEPENDENCIES
+
+This module requires perl 5.8.0 or later, and depending on your version of
+perl, it may require another module:
+
+• For perl 5.8 to 5.10: Sub::Delete
+• For perl 5.12 to 5.20: Lexical::Sub
+• For perl 5.22 and higher: no other modules
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc constant::lexical
+
+Or try using man (it's faster, in my experience):
+
+    man constant::lexical
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2008, 2010, 2012, 2016 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

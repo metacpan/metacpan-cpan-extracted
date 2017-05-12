@@ -1,0 +1,61 @@
+font=Monospace 9
+#font=Sans 9
+textcolor=grey80
+bgcolor=black
+
+level0=black
+level1=brown
+level2=red
+level3=#4070ff
+
+highlight=yellow
+
+#RRGGBB
+ansi.col00=#000000
+ansi.col01=#990000
+ansi.col02=#00bb00
+ansi.col03=#bbbb00
+ansi.col04=#0000ff
+ansi.col05=#bb00bb
+ansi.col06=#00bbbb
+ansi.col07=#999999
+ansi.col08=#606060
+ansi.col09=#ff0000
+ansi.col10=#00ff00
+ansi.col11=#ffff00
+ansi.col12=#6868ff
+ansi.col13=#ff00ff
+ansi.col14=#00ffff
+ansi.col15=#ffffff
+
+timestamp={fg:#55F ({fg:#0BB %H:%M})} 
+datestamp=%Y/%m/%d
+
+datemessage={fg:#55F ({fg:#0BB --:--})} {indent Day is now $datestamp}
+
+# Generic events
+response={fg:white -{fg:blue !}-} {indent $text}
+warning={fg:white -{fg:#FB2 {b !}}-} {fg:#FB2 {indent $text}}
+error={fg:white -{fg:red {b !}}-} {bg:#B33 {fg:black $text}}
+status={fg:white -{fg:green {b *}}-} {indent $text}
+
+text=$text
+
+# IRC events
+irc.irc={fg:red <$prefix>} $command $args
+irc.text={fg:darkcyan -{fg:white $server}-} $text
+
+irc.motd={fg:blue MOTD:} $text
+
+irc.join={fg:#0B0 ***} {fg:#5F5 Joins:} {indent }{fg:#0BB $nick} {fg:#606060 [{fg:#55F $userhost}]} has joined {fg:#5F5 $channel}
+irc.part={fg:#806000 ***} {fg:#FB3 Parts:} {indent }{fg:#0BB $nick} {fg:#606060 [{fg:#55F $userhost}]} has left {fg:#5F5 $channel} ({i $partmsg})
+irc.kick={fg:#806000 ***} {fg:#FB3 Kicks:} {indent }{fg:#0BB $kicked} {fg:#606060 [{fg:#55F kickeduser@kickedhost}]} was kicked from {fg:#5F5 $channel} by {fg:#55F $kicker} ({i $kickmsg}) 
+irc.quit={fg:#B00 ***} {fg:#F55 Quits:} {indent }{fg:#0BB $nick} {fg:#606060 [{fg:#55F $userhost}]} ({i $quitmsg})
+irc.nick={fg:#0BB ***} {fg:#5FF $oldnick} is now known as {fg:#5FF $newnick}
+irc.topic={fg:#55F ***} {fg:#0BB {fg:#5FF Topic} change by {fg:#5FF $nick} on {fg:#5F5 $channel}:} {indent $topic}
+irc.mode={fg:#0BB ***} {fg:#5FF Mode} change for {fg:#5F5 $channel} by {fg:#5FF $moder}: {fg:#5FF $mode}
+irc.mode_is={fg:#0BB ***} {fg:#5FF Mode} for {fg:#5F5 $channel}: {indent }{fg:#5FF $mode}
+irc.msg={fg:#B6B <{fg:white $nick}>} {indent $text}
+irc.notice={fg:white -{fg:#B6B $nick}-} {indent $text}
+irc.act={fg:#B6B * $nick} {indent $text}
+irc.away={fg:#088 ***} {fg:#299 $nick} {fg:#999 is away:} {indent $text}

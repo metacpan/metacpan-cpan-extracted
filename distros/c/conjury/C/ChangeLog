@@ -1,0 +1,49 @@
+2001-04-30  james woodyatt  <jhw@wetware.com>
+
+        * (lib/Conjury/C.pm): Incremented verson number to 1.004.
+
+	* (Makefile.PL): Added PREREQ_PM for Digest::MD5 and Conjury::Core.        
+
+2001-03-24  james woodyatt  <jhw@wetware.com>
+
+	*  (lib/*/*.pm): Fixed issues with whitespace to make the source
+        code more friendly to a wider audience.
+        
+        *  (lib/Conjury/C/Darwin.pm): Added support for compiling with the
+        Darwin compiler/linker tool chain.  Darwin is the BSD foundation layer
+        of Mac OS X.
+
+2000-09-15  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/C/GNU.pm,lib/Conjury/C/Sun.pm): Fixed a minor bug
+	processing the value of the No_Scanner object.
+
+2000-04-19  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/C.pm): Published to CPAN-- $VERSION=1.003
+	Updated to use the prototyping features of Conjury-Core-1.003 and
+	later.
+	
+	* (<*>): Changed terms of LICENSE to match those of the 'new and
+	improved' BSD-style licesne, i.e. does not have any advertising
+	clauses.
+
+2000-02-10  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/C/Sun.pm): Added support for Sun Visual Workshop C/C++.
+
+2000-01-24  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/C.pm): Incremented version number to 1.003.
+
+	* (lib): Moved C.pm and C/GNU.pm into a lib/Conjury/ subdirectory,
+	and made related changes to build code.
+
+1999-10-04  james woodyatt  <jhw@wetware.com>
+
+	* (lib/Conjury/C.pm): Published to CPAN-- $VERSION=1.002
+	
+	* (C.pm GNU.pm MANIFEST Makefile.PL README): Changed namespace
+	from Conjure::xxxxx to Conjury::xxxxx.
+	(ChangeLog): Added file.
+

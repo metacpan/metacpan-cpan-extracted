@@ -1,0 +1,20 @@
+Here various contributed classification PlugIn modules will
+be made available.
+
+The top-level file classifyPlugInTemplate.pm provides a
+skeleton for writing your own PlugIns.
+
+Use the Configuration variable classifyPlugIn to point to
+your PlugIn, default value:
+classifyPlugIn = Combine::Check_record
+
+It should be formatted as a Perl module identifier and it
+must reside in the Perl module search path. Possibly use
+$ export PERL5LIB=/home/MyPath/PluginDirectory
+to point to the directory where the module is located.
+
+To see the Perl module search path use:
+$ perl -e 'printf "%d %s\n", $i++, $_ for @INC'
+
+
+

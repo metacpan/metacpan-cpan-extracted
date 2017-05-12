@@ -1,0 +1,12 @@
+Revision history for Perl extension callee
+
+1.100820  2010-03-23 19:34:00 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02 Mon 2010.02.08 23:57:12 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - use Exporter qw(import)
+     - updated skeleton
+     - use 5.008003 (for Exporter 5.57)
+
+0.01 Thu Feb 12 21:50:06 CET 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

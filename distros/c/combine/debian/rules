@@ -1,0 +1,121 @@
+#!/usr/bin/make -f
+# Sample debian/rules that uses debhelper.
+# This file is public domain software, originally written by Joey Hess. 
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# Force compat level four
+export DH_COMPAT=4
+
+# Ignore CVS information
+export DH_ALWAYS_EXCLUDE=CVS
+
+# These are used for cross-compiling and for saving the configure script
+# from having to guess our platform (since we know it already)
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+
+# make perl work
+ifndef PERL
+PERL = /usr/bin/perl
+endif
+
+# define debian control dir
+DEBIANDIR =$(CURDIR)/debian
+
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	# Add here commands to configure the package.
+	#./configure --host=$(DEB_HOST_GNU_TYPE) --build=$(DEB_BUILD_GNU_TYPE) --prefix=$(DEBIANDIR)/tmp/usr --mandir=\$${prefix}/share/man --infodir=\$${prefix}/share/info $(CONFIG_FLAGS)
+
+	touch configure-stamp
+
+
+build: build-stamp
+build-stamp: configure-stamp
+	dh_testdir
+
+	# Add here commands to compile the package.
+	perl Makefile.PL INSTALLDIRS=vendor
+	$(MAKE)
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f configure-stamp
+	rm -f build-stamp
+
+	# Add here commands to clean up after the build process.
+	-$(MAKE) clean
+	#-$(MAKE) distclean
+
+	dh_clean
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+
+	# Add here commands to install the package into debian/tmp
+	#$(MAKE) prefix=`pwd`/debian/`dh_listpackages`/usr install
+	$(MAKE) install PREFIX=$(CURDIR)/debian/tmp/usr
+	#docs need to be remade and copied to the right location
+	# add configuration file by hand - there must be a better way to do it
+	mkdir -p debian/tmp/etc/combine
+	cp conf/default.cfg debian/tmp/etc/combine/default.cfg
+	cp conf/SQLstruct.sql debian/tmp/etc/combine/SQLstruct.sql
+	cp conf/tidy.cfg debian/tmp/etc/combine/tidy.cfg
+	cp conf/job_default.cfg debian/tmp/etc/combine/job_default.cfg
+	cp conf/Topic_carnivor.txt debian/tmp/etc/combine/Topic_carnivor.txt
+	cp conf/Topic_materialscience.txt debian/tmp/etc/combine/Topic_materialscience.txt
+	cp conf/Topic_searchengine.txt debian/tmp/etc/combine/Topic_searchengine.txt
+	cp conf/combine2alvis.xsl debian/tmp/etc/combine/combine2alvis.xsl
+	cp conf/combine2dc.xsl debian/tmp/etc/combine/combine2dc.xsl
+	cp conf/solr.xsl debian/tmp/etc/combine/solr.xsl
+	mkdir -p debian/tmp/var/run/combine
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+#	dh_installdocs
+#	dh_installexamples --package=tkl
+	dh_install
+#	dh_installmenu
+#	dh_installdebconf	
+#	dh_installlogrotate
+#	dh_installemacsen
+#	dh_installcatalogs
+#	dh_installpam
+#	dh_installmime
+#	dh_installinit
+#	dh_installcron
+#	dh_installinfo
+#	dh_installman
+#	dh_link
+#	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_perl
+#	dh_python
+#	dh_makeshlibs
+	dh_installdeb
+#	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: configure build clean binary-indep binary-arch binary install

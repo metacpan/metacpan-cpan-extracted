@@ -1,0 +1,27 @@
+
+This is the Perl distribution callee.
+
+## Installation
+
+callee installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan callee
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+callee documentation is available as in POD.
+So you can do:
+
+    % perldoc callee
+
+to read the documentation with your favorite pager.

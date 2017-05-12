@@ -1,0 +1,133 @@
+Revision history for Circle
+
+0.170740  2017/03/16 14:54:14
+        [CHANGES]
+         * Added `/channels del`
+         * Added `-all` option to `/show` command
+         * Extracted `Circle::Net` common base class
+         * Accept `--` to command parser to indicate end of named options,
+           allowing positional argument text to begin with `-`
+
+        [BUGFIXES]
+         * Bundle multiple JOIN messages together to avoid flooding IRC
+           servers on connect
+         * Refuse to start a second time if the UNIX socket appears to be
+           alive
+         * More graceful handling of IRC streaming errors
+
+0.142470  2014/09/05 17:46:57
+        [CHANGES]
+         * Added a logging system
+         * Rebuilt the Circle::Configurable subsystem, allows inheritable
+           settings
+         * Support late-loading of Tangence::Class definitions of Circle::Net,
+           subclasses thus paving the way for out-of-tree network types
+
+        [BUGFIXES]
+         * Make unit tests work again on latest NaTangence
+
+0.140500  2014/02/20 15:02:21
+        [CHANGES]
+         * Make IRC /disconnect message optional
+         * Added /whois, /requery
+         * Added overlong PRIVMSG splitting over multiple messages
+
+        [BUGFIXES]
+         * Don't try to look up IO::Socket::SSL::SSL_VERIFY_NONE when
+           IO::Socket::SSL may not be loaded
+         * IRC network connect with alternate ident now obeys it
+         * NaIRC 0.09 is now a regular Stream, not a Protocol
+
+0.132860  2013/10/14 15:00:44
+        [CHANGES]
+         * Connect IRC using Futures
+         * Allow networks to be deleted
+         * Support SSL
+         * Added /reconnect command to IRC
+
+0.132150 CHANGES:
+         * Implement a /disconnect IRC command
+         * Added /dumpevents and associated event log formatter
+         * Allow /topic alone to redisplay the full text of a channel topic
+         * Bugfix to 'on_enter' handling of channel topic Entry widget
+         * Configurable use of mIRC colouring hints
+
+0.131390 CHANGES:
+         * Allow circlerc location to be overridden by an env.var.
+         * An attempt at IRC reconnect logic
+         * Allow widgets to declare a set of style classes
+         * Longer ping times
+         * Load channel keys on startup
+         * Bugfix: IO::Async::OS has ->socketpair now
+         * Use new named server numerics from NaIRC 0.07
+         * Handle a few more channel information numerics
+
+0.130560 CHANGES:
+         * Bugfix to user ident string setting
+         * Bugfix to server name display on server-forced MODE changes
+         * Updates for Tangence 0.18
+
+0.130330 CHANGES:
+         * Support channel join keys
+         * Display user ident string above the main event scroller in user
+           query windows
+         * Bugfix "channel()" rules engine condition
+         * Bugfixes to IRC network disconnect handling
+
+0.123420 CHANGES:
+         * Implement tab-completion groups
+         * Provide tab-complete for IRC channel names, and occupants in each
+           channel
+         * Added /tab goto command to raise a window on all the FEs
+           + TODO: Consider only for one FE
+
+0.123270 CHANGES:
+         * Maintain a network status display for IRC networks in the tag name
+           widget
+         * Handle ping timeout
+         * Avoid harmless "lvalue in substr()" warning from IO::Async
+
+0.122910 CHANGES:
+         * Added /rules condition of isaction (for IRC)
+         * Added /rules actions of rewrite (globally) and chaction (for IRC)
+         * Added /rules chain for output on IRC and Raw networks
+
+0.122820 CHANGES:
+         * Switched to date-based version numbering scheme
+             http://rjbs.manxome.org/rubric/entry/1749
+
+         * Added --help option
+         * Added some unit testing
+         * Ensure that CommandInvocation objects don't hold the underlying
+           Tangence connection
+         * Cleaner handling of configured-vs-running nick
+         * Require --stdio flag to listen on STDIO
+         * Display IRC network name on network and channel tab status bars
+         * Parse IRC formatting for actual-italics and RV
+
+0.04    CHANGES:
+         * Initial attempt at real unit tests
+         * Send application-level warnings to root object as 'warning' events
+         * Install circle.tan into sharedir
+         * Allow setting a local host name to bind for IRC connections
+
+        BUGFIXES:
+         * Add NaIRC to Loop at construct time
+         * Make stdin/stdout connect scheme actually work
+         * Remove kickee on IRC KICK, not kicker
+
+0.03    CHANGES:
+         * Updated for Tangence 0.06
+         * Persistance of sessions in config
+
+0.02    CHANGES:
+         * Updated for Tangence 0.03
+         * Added '/kick' command
+         * Persistance of IRC channels in config
+
+        BUGFIXED:
+         * 'use strict; use warnings;' in all files
+         * Declare dependency on String::Tagged
+
+0.01    First version, released on an unsuspecting world.
+

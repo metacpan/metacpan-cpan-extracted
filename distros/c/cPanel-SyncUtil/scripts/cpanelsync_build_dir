@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+# cpanel10 - cpanelsync_build_dir                 Copyright(c) 2006 cPanel, Inc.
+#                                                           All rights Reserved.
+# copyright@cpanel.net                                         http://cpanel.net
+# This code is subject to the cPanel license. Unauthorized copying is prohibited
+
+use strict;
+use warnings;
+use Cwd;
+
+use cPanel::SyncUtil qw(_raw_dir _chown_pwd_recursively _safe_cpsync_dir);
+
+# recursiveley do pwd or directopry given as argument
+my $root = defined $ARGV[0] && -d $ARGV[0] ? $ARGV[0] : '.';
+
+# set these however you wish
+my $user = $<;
+my ($group) = split /\s+/, $(;
+
+my $recurse;    # since $recurse uses itself...
+$recurse = sub {
+    my ($root) = @_;
+    my $start = Cwd::cwd();
+
+    _raw_dir( $start, $root );
+    chdir $root or die "Could not go up into $root: $!";
+    _chown_pwd_recursively( $user, $group );
+
+  ROOTS:
+    for my $dir ( cPanel::SyncUtil::_read_dir('.') ) {
+        next ROOTS if !_safe_cpsync_dir($dir);
+        $recurse->($dir);
+    }
+
+    chdir $start or die "Could not go back into $start: $!";
+};
+
+$recurse->($root);

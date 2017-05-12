@@ -1,0 +1,359 @@
+#! /usr/bin/perl
+
+## $Id: combineRank 235 2007-03-06 14:49:50Z anders $
+
+# Copyright (c) 2006 Anders Ardö
+# 
+# See the file LICENCE included in the distribution.
+
+use strict;
+use Getopt::Long;
+use Combine::Config;
+use Combine::GraphAlgorithm;
+use DBI;
+
+my $configfile;
+my $jobname;
+my $help;
+my $verbose;
+GetOptions('jobname:s' => \$jobname, 'help' => \$help, 
+           'verbose' => \$verbose,
+	   'configfile:s' => \$configfile );
+if (defined($help)) { Getopt::Long::HelpMessage('See man page combineRank'); }
+if (defined($jobname)) { Combine::Config::Init($jobname); }
+else { Getopt::Long::HelpMessage('No jobname suplied'); }
+if (defined($configfile)) { warn "Switch 'configfile' not implemented"; } #Config::Init('',$configfile); }
+
+
+if    ($ARGV[0] eq "PageRank")    { &PageRank(0,$verbose); }
+elsif ($ARGV[0] eq "PageRankBL")    { &PageRank(1,$verbose); }
+elsif ($ARGV[0] eq "NetLocRank")    { &NetLocRank($verbose); }
+elsif ($ARGV[0] eq "exportLinkGraph")    { &exportLinkGraph($verbose); }
+else { Getopt::Long::HelpMessage('Unkown action - see man page combineRank'); }
+
+#################SUBS################################################################
+
+sub PageRank {
+  my ($addBackLinks) = @_;
+  my $start=time();
+  my %urlmap;
+  my $g = new Combine::GraphAlgorithm;
+  my $sv =  Combine::Config::Get('MySQLhandle');
+
+#create mapping between urlid and recordid
+#  all urls (linked to) from links
+my $sth = $sv->prepare(qq{SELECT DISTINCT(recordurl.urlid),recordurl.recordid,abscore FROM recordurl,topic WHERE recordurl.recordid=topic.recordid AND notation='ALL'});
+        $sth->execute;
+        while ( my ($id,$recordid,$score)=$sth->fetchrow_array) {
+            $urlmap{$id}=$score;
+	    $g->setScore($id,$score);
+        }
+	if ($verbose) { my $t=time()-$start;  print "Time: $t\n"; }
+
+#Get all links without internal linking
+	$sth = $sv->prepare(qq{SELECT recordurl.urlid,links.urlid FROM recordurl,links WHERE recordurl.recordid=links.recordid AND links.mynetlocid!=links.netlocid GROUP BY recordurl.urlid,links.urlid;});
+	$sth->execute;
+	my $n=0;
+	while ( my ($idfrom,$idto)=$sth->fetchrow_array) {
+	    next if (!defined($urlmap{$idto}));
+	    next if (!defined($urlmap{$idfrom}));
+	    next if ($idfrom == $idto);
+
+	    $g->addLink($idfrom,$idto,$urlmap{$idto});
+
+	    $n++;
+	}
+	if ($verbose) {
+          print "Got $n unique links\n";
+          my $t=time()-$start;
+          print "Time: $t\n";
+        }
+     if ($addBackLinks) {
+       #add backlinks to probability matrix
+       if ($verbose) {print "Adding backlinks\n";}
+       $g->addBackLinks();
+     }
+
+if ($verbose) {print "Finished getting data - calling PageRank\n";}
+my %rank = $g->PageRank(0,1);
+
+ if ($verbose) {my $t=time()-$start; print "Time: $t\n";}
+$n=0; my $sum=0.0;
+foreach my $m (keys(%rank)) {
+    $n++; $sum += $rank{$m};
+    my $tmp=$rank{$m};
+
+    if ($verbose) {print "INSERT INTO PageRank SET urlid=$m, rank=$tmp, type='noInternalLinks';\n";}
+}
+if ($verbose) {my $mean = $sum/$n; print "$n pages; SumPageRank=$sum => mean = $mean\n";}
+
+}
+
+sub NetLocRank {
+my $start=time();
+my $g = new Combine::GraphAlgorithm;
+my %NetlocRank;
+  my $sv =  Combine::Config::Get('MySQLhandle');
+        my %urlmap;
+
+#create mapping between urlid and recordid
+#  all netlocs that have records with links in the database
+#  use summed score for all pages as score for netloc
+        my $sth = $sv->prepare(qq{select netlocid,sum(abscore) FROM recordurl,urls,topic  WHERE recordurl.urlid=urls.urlid AND recordurl.recordid=topic.recordid AND notation='ALL' GROUP BY netlocid;});
+        $sth->execute;
+	my $n=0;
+        while ( my ($id,$score)=$sth->fetchrow_array) {
+            $urlmap{$id}=$n;
+	    $g->setScore($id,$score);
+	    $n++;
+        }
+
+#Get all links between netlocs (no weights)
+#	$sth = $sv->prepare(qq{SELECT mynetlocid,netlocid FROM links GROUP BY mynetlocid,netlocid;});
+#Get all links between netlocs (weights = summed score of target pages)
+#             group by
+#               /    \
+#links: mynetlocid netlocid urlid
+#                             ||
+#recordurl:                 urlid recordid
+#                                    ||
+#topic:                           recordid abscore
+#
+	$sth = $sv->prepare(qq{SELECT mynetlocid,netlocid,sum(abscore) FROM links,recordurl,topic WHERE links.urlid=recordurl.urlid AND recordurl.recordid=topic.recordid AND notation='ALL' GROUP BY mynetlocid,netlocid;});
+	$sth->execute;
+	$n=0;
+	while ( my ($idfrom,$idto,$weight)=$sth->fetchrow_array) {
+	    next if (!defined($urlmap{$idto}));
+	    if (!defined($urlmap{$idfrom})) { print "ERR $idfrom as mynetlocid in links but not recordurl\n"; next; }
+	    next if ($idfrom == $idto); #??
+
+	    $g->addLink($idfrom,$idto,$weight);
+
+	    $n++;
+	}
+	if ($verbose) {print "Got $n unique links\n";}
+        if ($verbose) { my $t=time()-$start; print "Time: $t\n";}
+
+#backlinks??
+if ($verbose) {print "Finished getting data - calling PageRank\n";}
+%NetlocRank = $g->PageRank(0,0);
+
+if ($verbose) { my $t=time()-$start;  print "Time: $t\n";}
+$n=0; my $sum=0.0;
+foreach my $m (keys(%NetlocRank)) {
+    $n++; $sum += $NetlocRank{$m};
+    my $tmp=$NetlocRank{$m};
+
+    if ($verbose) {print "INSERT INTO PageRank SET urlid=$m, rank=$tmp, type='netLocs';\n";}
+
+}
+if ($verbose) {my $mean = $sum/$n; print "$n pages; SumPageRank=$sum => mean = $mean\n";}
+
+###########################
+#Get all netloc urlid scores
+my $nsth = $sv->prepare(qq{SELECT recordurl.urlid,recordurl.recordid,abscore FROM recordurl,topic,urls WHERE recordurl.recordid=topic.recordid AND recordurl.urlid=urls.urlid AND notation='ALL' AND netlocid=? GROUP BY recordurl.urlid;});
+
+#Get all netloc internallinks
+$sth = $sv->prepare(qq{SELECT recordurl.urlid,links.urlid FROM recordurl,links WHERE recordurl.recordid=links.recordid AND links.mynetlocid=links.netlocid and links.mynetlocid=? GROUP BY recordurl.urlid,links.urlid;});
+
+foreach my $netlocid (keys(%urlmap)) {
+#Get all links within a netloc
+    my $g = new Combine::GraphAlgorithm;
+
+    my %urlidmap = ();
+    #create mapping between urlid and recordid
+    #  all urls (linked to) from links
+    my $n=0;
+    $nsth->execute($netlocid);
+    while ( my ($id,$recordid,$score)=$nsth->fetchrow_array) {
+	$urlidmap{$id}=$score;
+	$g->setScore($id,$score);
+	$n++;
+    }
+    if ($verbose) {print "Got score for $n nodes\n";}
+
+    $sth->execute($netlocid);
+    $n=0;
+    while ( my ($idfrom,$idto)=$sth->fetchrow_array) {
+	next if (!defined($urlidmap{$idto}));
+	next if (!defined($urlidmap{$idfrom}));
+	next if ($idfrom == $idto);
+
+	$g->addLink($idfrom,$idto,$urlidmap{$idto});
+	
+	$n++;
+    }
+    if ($verbose) {
+      print "Got $n unique links\n";
+      my $t=time()-$start;  print "Time: $t\n";
+      print "Finished getting data for $netlocid - calling PageRank\n";
+    }
+#    next if $n==0;
+
+#backlinks??
+    my %rank = $g->PageRank(0,1);
+    if ($verbose) { my $t=time()-$start; print "Time: $t\n";}
+    $n=0; $sum=0.0; my $nsum=0.0;
+    my $nlrank=$NetlocRank{$netlocid};
+    foreach my $m (keys(%rank)) {
+	$n++; $sum += $rank{$m};
+	my $tmp=$rank{$m};
+##my $ntmp;#?????
+##	my $totrank=$ntmp * $nlrank;
+
+	my $DocRank = $tmp * $nlrank;
+
+	if ($verbose) {
+          print "INSERT INTO PageRank SET urlid=$m, rank=$tmp, type='local';\n";
+	  print "INSERT INTO PageRank SET urlid=$m, rank=$DocRank, type='local*netLoc';\n";
+        }
+
+    }
+    if ($verbose) {
+      my     $mean = $sum/$n;
+      print "$n pages; SumPageRank=$sum => mean = $mean; NormSum=$nsum\n";
+      print "-----------------------\n";
+    }
+}
+
+}
+
+##########################################################
+sub exportLinkGraph {
+
+my $sv = Combine::Config::Get('MySQLhandle');
+
+#TODO get mappings for identical pages and use that to replace urlid's
+
+my $antPages=0;
+my $antLinks=0;
+
+my %map;
+my $sthMap = $sv->prepare(qq{SELECT r1.urlid,r2.urlid FROM recordurl as r1, recordurl as r2 WHERE r1.recordid=r2.recordid AND r1.urlid<r2.urlid});
+$sthMap->execute();
+while ( my ($uid1,$uid2)=$sthMap->fetchrow_array) {
+  $map{$uid2}=$uid1;
+}
+
+my $sthLinks = $sv->prepare(qq{SELECT urlid FROM links WHERE recordid=?;});
+my $sth = $sv->prepare(qq{SELECT distinct(recordid),urlid,md5 FROM recordurl;});
+$sth->execute;
+while ( my ($recordid,$urlid,$recordmd5)=$sth->fetchrow_array) {
+    if (defined($map{$urlid})) { $urlid=$map{$urlid}; }
+    $sthLinks->execute($recordid);
+    my $row = '';
+    my %seen = ();
+    $seen{$urlid}=1;
+    my $n=0;
+    while ( my ($linkurlid)=$sthLinks->fetchrow_array) {
+      if (defined($map{$linkurlid})) { $linkurlid=$map{$linkurlid}; }
+       next if (defined($seen{$linkurlid}));
+       $seen{$linkurlid}=1;
+       $row .= "$linkurlid "; $n++;
+    }
+    $row =~ s/ $//;
+    if ( $row ne '' ) { $antPages++; $antLinks+=$n; print "$urlid $row\n"; }
+}
+
+print STDERR "Pages=$antPages; Links=$antLinks\n";
+}
+
+__END__
+
+
+=head1 NAME
+
+combineRank - calculates various Ranks for a Combine crawled database
+
+
+=head1 SYNOPSIS
+
+combineRank  <action> --jobname <name> --verbose
+
+where action can be one of PageRank, PageRankBL, NetLocRank, and
+exportLinkGraph. Results on STDOUT.
+
+=head1 OPTIONS AND ARGUMENTS
+
+jobname is used to find the appropriate configuration (mandatory)
+
+verbose enables printing of ranks to STDOUT as SQL INSERT statements
+
+=head2 Actions calculating variants of PageRank
+
+=over 4
+
+=item PageRank
+
+calculate standard PageRank
+
+=item PageRankBL 
+
+calculate PageRanks with backlinks added for each link
+
+=item NetLocRank 
+
+calculate SiteRank for each site and a local DocRank for documents within each site.
+Global ranks are then calulated as SiteRank * DocRank
+
+=back
+
+=head2 Actions exporting link data
+
+=over 4
+
+=item exportLinkGraph 
+
+export linkgraph from Combine database
+
+=back
+
+=head1 DESCRIPTION
+
+Implements calculation of different variants of PageRank.
+
+Results are written to STDOUT and can be huge for large databases.
+
+Linkgraph is exported in ASCII as a sparse matrix, one row per line.
+First integer is the ID (urlid) of a page with links. The rest of
+integers on the line are IDs for pages linked to. Ie
+121 5624 23416 51423 267178
+means that page 121 links to pages 5624 23416 51423 267178
+
+=head1 EXAMPLES
+
+=over 4
+
+=item C<combineRank --jobname aatest --verbose PageRankBL>
+
+calculate PageRank with backlinks, result on STDOUT
+
+=item C<combineRank --jobname aatest --verbose exportLinkGraph>
+
+export the linkgraph to STDOUT
+
+=back
+
+=head1 SEE ALSO
+
+combine
+
+Combine configuration documentation in F</usr/share/doc/combine/>.
+
+=head1 AUTHOR
+
+Anders Ardö, E<lt>anders.ardo@it.lth.seE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006 Anders Ardö
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+See the file LICENCE included in the distribution at
+ L<http://combine.it.lth.se/>
+
+=cut
+

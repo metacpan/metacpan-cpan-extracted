@@ -1,0 +1,6 @@
+2001-04-30  james woodyatt  <jhw@wetware.com>
+
+	Created by removing this code from Conjury-Core where it never really
+        belonged and distributing it in a separate extension.
+
+

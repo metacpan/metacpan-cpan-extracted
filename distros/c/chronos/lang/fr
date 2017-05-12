@@ -1,0 +1,192 @@
+# $Id: fr,v 1.4 2002/09/16 23:20:31 nomis80 Exp $
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+month=Mois
+week=Semaine
+Day=Journée
+today=Aujourd'hui
+myagenda=Mon Agenda
+status_UNCONFIRMED=À CONFIRMER
+status_CONFIRMED=CONFIRMÉ
+status_CANCELED=ANNULÉ
+eventname=Nom de l'événement:
+eventstart=Début:
+eventend=Fin:
+eventdescription=Description:
+eventrecur=Récurrence:
+eventnotrecur=Pas récurrent
+eventrecurday=Tous les jours
+eventrecurweek=Ce jour à chaque semaine
+eventrecurmonth=Ce jour à chaque mois
+eventrecuryear=Ce jour à chaque année
+eventrecurend=Fin de la récurrence:
+eventparticipants=Participants:
+eventconfirm=Demander confirmation:
+eventsave=Enregistrer
+errorstartdate=La date de début n'est pas valide.
+errorstarttime=L'heure de début n'est pas valide.
+errorenddate=La date de fin n'est pas valide.
+errorendtime=L'heure de fin n'est pas valide.
+errorrecurenddate=La date de fin de récurrence n'est pas valide.
+errorrecurendtime=L'heure de fin de récurrence n'est pas valide.
+errorendbeforestart=Le moment de fin se situe avant le moment de début dans le temps.
+errorrecurendbeforestart=Le momdent de fin de récurrence se situe avant le moment de début de l'événement dans le temps.
+errorrecurendbeforeend=Le moment de fin de récurrence se situe avant le moment de fin de l'événement dans le temps.
+errormissingname=Il manque un nom à l'événement.
+reminder=Aide-mémoire:
+remind_me=M'avertir par courrier électronique %1 %2 à l'avance.
+min=minute(s)
+hour=heure(s)
+day=jour(s)
+error=Erreur
+weeknum=Semaine %1 de l'an %2
+weeknum2=Semaine %1 de %2
+eventdel=Effacer
+initiator=Initiateur de l'événement
+cancel=Annuler
+confirm=Confirmer
+confirm_subject=Convocation
+confirm_body=<<EOF
+Ceci est un message automatisé. N'y répondez pas directement.
+
+%%INITIATOR%% demande votre présence le %%DATE%%.
+Nom de l'événement: %%NAME%%
+Description: %%DESCRIPTION%%
+
+Veuillez confirmer votre présence en vous rendant à
+%%CONFIRMURL%%
+
+-- 
+Chronos %%VERSION%% par Linux Québec Technologies
+EOF
+errornotauthorized=Vous n'êtes pas autorisé à commettre cette action.
+tasklist=Liste des tâches
+tasktitle=Titre:
+tasknotes=Notes:
+taskpriority=Priorité:
+newtask=Ajouter une tâche
+options=Options
+userprefs=Préférences de l'usager
+lang=Langue:
+agendatype=Type d'agenda:
+publicrw=Publique en lecture et écriture
+publicr=Publique en lecture seulement
+private=Privé
+indivpriv=Privilèges individuels:
+nopriv=Aucun privilège
+r=Lecture
+rw=Lecture et écriture
+email=Adresse de courrier électronique:
+name=Nom et prénom:
+password=Mot de passe:
+create_db_intro=<<EOF
+Ce script créera la base de données MySQL et les tables qui seront nécessaires au
+fonctionnement de Chronos.
+
+EOF
+create_db_pass=Mot de passe MySQL de root:
+create_db_dbname=Nom de la base de données de Chronos que je vais créer: [chronos]
+create_db_exists=Cette base de données existe. Effacer?
+create_db_deleted=Base de données %s supprimée
+create_db_created=Base de données %s créée
+create_db_tablecreated=Table %s créée
+create_db_user=Nom d'usager qui se connectera à la BD: [chronos]
+create_db_dbpass=Mot de passe: [générer]
+create_db_grant=Permissions accordées à %s sur %s.*
+create_db_added=Informations ajoutées à /etc/chronos.conf
+create_db_success=Installation de Chronos effectuée avec succès
+chronosadmin_usage=<<EOF
+Usage:
+    %s [-u username] [-p [password]] [--autodel] [--new-user]
+    [--new-users-batch[=FILE]] [--del-user=username] [--show-holidays]
+    [database[@host]]
+
+Options:
+    -u username
+        Le nom d'usager avec lequel se connecter à la BD.
+    -p password
+        Le mot de passe avec lequel se connecter à la BD.
+    --autodel
+        Ne pas demander pour deleter un usager s'il existe déjà et qu'on veut en
+        créer un du même nom. Utile pour le batch.
+    --new-user
+        Créer un nouvel usager en mode intéractif.
+    --new-users-batch[=FILE]
+        Créer des usagers à partir d'un fichier (ou STDIN par défaut) qui contient
+        sur chaque ligne
+            username,password,email,access
+    --del-user=username
+        Supprimer un utilisateur.
+    --show-holidays
+        Cette commande imprime les profiles de jours fériés disponibles sur
+        votre système. Vous pouvez après inclure une ligne dans votre
+        chronos.conf qui ressemblerait à ceci:
+            HOLIDAYS=CA-QC  # Canada/Québec
+EOF
+chronosadmin_exists=L'usager %s existe déjà. Effacer?
+chronosadmin_created=Usager %s créé
+chronosadmin_deleted=Usager %s supprimé
+chronosadmin_confirm=Confirmation:
+chronosadmin_pass=Mot de passe
+chronosadmin_p=Mot de passe MySQL
+chronosadmin_username=Nom d'usager (max. 16 caractères)
+chronosadmin_email=Adresse de courriel
+chronosadmin_lang=Langue
+chronosadmin_realname=Nom réel de l'usager
+chronosadmin_connectok=Connecté à la base de données MySQL
+remindd_template=<<EOF
+To: %%TO%%
+From: Chronos
+Subject: Aide-mémoire
+
+Ceci est un message automatisé. N'y répondez pas directement.
+
+Je vous rappelle que l'événement ci-dessous aura lieu bientôt.
+
+Nom:    %%NAME%%
+Début:  %%START%%
+Fin:    %%END%%
+Description:
+%%DESCRIPTION%%
+
+--
+Chronos %%VERSION%% par Linux Québec Technologies
+EOF
+apacheuser=Usager en tant que lequel Apache tourne
+en=Anglais
+fr=Français
+it=Italien
+de=Allemand
+no=Norvégien
+po=Portugais
+sv=Suédois
+nl=Hollandais
+attachments=Fichiers attachés:
+new_attachment=Nouveau fichier attaché:
+participants_to_add=Ajout de participants:
+remove_part=Enlever
+notime=Pas d'heure
+errornotitle=Il manque un titre à cette tâche.
+remindd_forking=Je fork...
+remindd_forkerror=Je n'ai pas pu forker: %s
+remindd_setsiderror=Je n'ai pas pu créer une nouvelle session: %s
+remindd_usage=Usage: %s [-D] [-f <fichier de config>]
+clickhour=Cliquez sur une heure pour ajouter un événement

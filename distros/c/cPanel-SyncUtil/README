@@ -1,0 +1,29 @@
+cPanel::SyncUtil version 0.7
+============================
+
+See
+ perldoc cPanel::SynUtil
+for more info
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+ perl -MCPAN -e 'install cPanel::SyncUtil;'
+
+DEPENDENCIES
+
+This module requiressome other modules. See the Makefile.PL for details.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 cPanel, Inc.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

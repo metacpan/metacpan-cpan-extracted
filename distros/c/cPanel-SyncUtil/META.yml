@@ -1,0 +1,32 @@
+---
+abstract: 'Perl extension for creating utilities that work with cpanelsync aware directories'
+author:
+  - 'cPanel Inc. <http://cpanel.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: cPanel-SyncUtil
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Tar: '0'
+  Digest::MD5::File: '0'
+  Digest::SHA: '0'
+  File::Find: '0'
+  File::Slurp: '0'
+  Getopt::Std: '0'
+resources:
+  homepage: http://cpanel.net
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/CpanelInc/cPanel-SyncUtil
+version: '0.8'

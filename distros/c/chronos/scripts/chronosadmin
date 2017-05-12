@@ -1,0 +1,172 @@
+#!/usr/bin/perl 
+# $Id: chronosadmin,v 1.1.1.1 2002/08/19 20:38:06 nomis80 Exp $
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+use strict;
+use Getopt::Long;
+use Chronos::Static qw(gettext lang get);
+
+my $text = gettext( '', 1 );
+
+my ( $db_user, $db_pass, $db, $autodel, $new_user, $db_pass, $new_users_batch,
+    $deluser );
+GetOptions(
+    'help'              => \&usage,
+    'new-user'          => \$new_user,
+    'u=s'               => \$db_user,
+    'p:s'               => \$db_pass,
+    'new-users-batch:s' => \$new_users_batch,
+    'autodel!'          => \$autodel,
+    'del-user=s'        => \$deluser,
+    'show-holidays'     => \&holidays,
+  )
+  or usage();
+$db = shift || 'chronos';
+
+db_pass($db_pass) if defined $db_pass;
+my $dbh = dbh();
+print "$text->{chronosadmin_connectok}\n";
+new_user() if $new_user;
+new_users_batch($new_users_batch) if defined $new_users_batch;
+del_user($deluser)                if $deluser;
+
+sub db_pass {
+    $db_pass = shift
+      || get( $text->{chronosadmin_p}, { Password => 1, NoConfirm => 1 } );
+}
+
+sub usage {
+    printf $text->{chronosadmin_usage}, $0;
+}
+
+{
+    my $dbh;
+
+    sub dbh {
+        if ( not $dbh ) {
+            $dbh =
+              DBI->connect(
+                "dbi:mysql:$db;mysql_read_default_file=$ENV{HOME}/.my.cnf",
+                $db_user, $db_pass, { RaiseError => 1, PrintError => 0 } );
+        }
+        return $dbh;
+    }
+}
+
+sub new_user {
+    my $username = get( $text->{chronosadmin_username} );
+    my $password = get( $text->{chronosadmin_pass}, { Password => 1 } );
+    my $email    = get( $text->{chronosadmin_email} );
+    my @langs = grep { -f } </usr/share/chronos/lang/*>;
+    s|/usr/share/chronos/lang/|| foreach @langs;
+    my $lang =
+      get( $text->{chronosadmin_lang}, { Default => lang(), Enum => \@langs } );
+    my $name = get( $text->{chronosadmin_realname} );
+    newuser( $username, $password, $email, $lang, $name );
+}
+
+sub newuser {
+    my ( $username, $password, $email, $lang, $name ) = @_;
+
+    my $username_quoted = $dbh->quote($username);
+    my $password_quoted = $dbh->quote($password);
+    my $email_quoted    = $dbh->quote($email);
+    my $name_quoted     = $dbh->quote($name);
+
+    if (
+        $dbh->selectrow_array(
+            "SELECT user FROM user WHERE user = $username_quoted"
+        )
+      )
+    {
+        if ($autodel) {
+            del_user($username);
+        } else {
+            printf "$text->{chronosadmin_exists} [N/y] ", $username;
+            if ( <STDIN> =~ /^y/i ) {
+                del_user($username);
+            } else {
+                return 0;
+            }
+        }
+    }
+    $dbh->do(
+"INSERT INTO user (user, password, email, lang, name) VALUES($username_quoted, PASSWORD($password_quoted), $email_quoted, '$lang', $name_quoted)"
+    );
+    printf "$text->{chronosadmin_created}\n", $username;
+}
+
+sub del_user {
+    my $username = shift or die "I need a username\n";
+    my $username_quoted = $dbh->quote($username);
+
+    $dbh->do("DELETE FROM user WHERE user = $username_quoted");
+
+    my $sth =
+      $dbh->prepare(
+        "SELECT eid FROM events WHERE initiator = $username_quoted");
+    $sth->execute;
+    while ( my $eid = $sth->fetchrow_array ) {
+        if (
+            $dbh->selectrow_array(
+                "SELECT eid FROM participants WHERE eid = $eid"
+            )
+          )
+        {
+            $dbh->do("UPDATE events SET initiator = NULL WHERE eid = $eid");
+        } else {
+            $dbh->do("DELETE FROM events WHERE eid = $eid");
+            $dbh->do("DELETE FROM attachments WHERE eid = $eid");
+        }
+    }
+    $sth->finish;
+
+    $dbh->do("DELETE FROM acl WHERE user = $username_quoted");
+    $dbh->do("DELETE FROM acl WHERE object = $username_quoted");
+    $dbh->do("DELETE FROM participants WHERE user = $username_quoted");
+    $dbh->do("DELETE FROM tasks WHERE user = $username_quoted");
+
+    printf "$text->{chronosadmin_deleted}\n", $username;
+}
+
+sub new_users_batch {
+    my $file = shift;
+
+    my $INPUT;
+    if ($file) {
+        open $INPUT, $file or die "Can't open $file for reading: $!\n";
+    } else {
+        open $INPUT, "<&STDIN" or die "Couldn't dup STDIN: $!\n";
+    }
+    while (<$INPUT>) {
+        chomp;
+        newuser( split /,/ );
+    }
+}
+
+sub holidays {
+    # Don't always load the module, it is rarely used. Saves startup time.
+    eval "use Date::Calendar::Profiles";
+    print join ( "\n", sort keys %$Date::Calendar::Profiles::Profiles );
+    exit 0;
+}
+
+# vim: set et ts=4 sw=4 ft=perl:

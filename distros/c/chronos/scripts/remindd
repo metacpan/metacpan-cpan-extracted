@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+# $Id: remindd,v 1.4 2002/09/05 00:46:08 nomis80 Exp $
+#
+# Copyright (C) 2002  Linux Québec Technologies
+#
+# This file is part of Chronos.
+#
+# Chronos is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# Chronos is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Foobar; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+use strict;
+use Date::Calc qw(:all);
+use Chronos::Static qw(dbh from_date from_time gettext conf);
+use POSIX qw(setsid);
+use HTML::Entities;
+use Getopt::Long;
+
+my $text = gettext();
+my ( $debug, $config_file );
+GetOptions(
+    'D'   => \$debug,
+    'f=s' => \$config_file,
+  )
+  or die sprintf "$text->{remindd_usage}\n", $0;
+
+unless ( $debug ) {
+    printf "$text->{remindd_forking}\n";
+    my $pid = fork;
+    if ( $pid ) {
+        open PID, "> /var/run/remindd.pid";
+        print PID "$pid\n";
+        close PID;
+        exit;
+    }
+    die sprintf "$text->{remindd_forkerror}\n", $! unless defined $pid;
+    setsid() or die sprintf "$text->{remindd_setsiderror}\n", $!;
+}
+
+our $conf = conf();
+our $dbh  = dbh();
+$SIG{HUP} = sub { $dbh = dbh() };
+
+my $sth_events =
+  $dbh->prepare(
+"SELECT * FROM events WHERE reminder_sent = 'N' AND reminder <= NOW() AND initiator IS NOT NULL"
+  );
+my $sth_participants =
+  $dbh->prepare(
+"SELECT eid, user FROM participants WHERE reminder_sent = 'N' AND reminder <= NOW()"
+  );
+my $sth_user =
+  $dbh->prepare("SELECT name, email, lang FROM user WHERE user = ?");
+my $sth_events_eid    = $dbh->prepare("SELECT * FROM events WHERE eid = ?");
+my $sth_update_events =
+  $dbh->prepare("UPDATE events SET reminder_sent = 'Y' WHERE eid = ?");
+my $sth_update_participants =
+  $dbh->prepare(
+    "UPDATE participants SET reminder_sent = 'Y' WHERE eid = ? AND user = ?");
+
+while (1) {
+    # On commence par les initiateurs
+    $sth_events->execute;
+    while ( my $event = $sth_events->fetchrow_hashref ) {
+        $sth_user->execute( $event->{initiator} );
+        my ( $name, $email, $lang ) = $sth_user->fetchrow_array;
+        $sth_user->finish;
+        sendmail( $event, $email, $lang );
+        $sth_update_events->execute( $event->{eid} );
+    }
+
+    # On fait les participants
+    $sth_participants->execute;
+    while ( my ( $eid, $user ) = $sth_participants->fetchrow_array ) {
+        $sth_events_eid->execute($eid);
+        my $event = $sth_events_eid->fetchrow_hash;
+        $sth_events_eid->finish;
+        $sth_user->execute($user);
+        my ( $name, $email, $lang ) = $sth_user->fetchrow_array;
+        $sth_user->finish;
+        sendmail( $event, $email, $lang );
+        $sth_update_participants->execute( $eid, $user );
+    }
+
+    select( undef, undef, undef, 50 );
+}
+
+sub sendmail {
+    my ( $event, $email, $lang ) = @_;
+    Language( Decode_Language($lang) );
+
+    my $text = gettext($lang);
+    my $mail = decode_entities( $text->{remindd_template} );
+
+    $mail =~ s/\%\%TO\%\%/$email/g;
+
+    $mail =~ s/\%\%NAME\%\%/$event->{name}/g;
+
+    my ( $syear, $smonth, $sday, $shour, $smin ) =
+      ( from_date( $event->{start_date} ), from_time( $event->{start_time} ) );
+    my $start =
+      Date_to_Text_Long( $syear, $smonth, $sday )
+      . ( defined $shour ? sprintf ' %d:%02d', $shour, $smin : '' );
+    $mail =~ s/\%\%START\%\%/$start/g;
+
+    my ( $eyear, $emonth, $eday, $ehour, $emin ) =
+      ( from_date( $event->{end_date} ), from_time( $event->{end_time} ) );
+    my $end =
+      Date_to_Text_Long( $eyear, $emonth, $eday )
+      . ( defined $ehour ? sprintf ' %d:%02d', $ehour, $emin : '' );
+    $mail =~ s/\%\%END\%\%/$end/g;
+
+    $mail =~ s/\%\%DESCRIPTION\%\%/$event->{description}/g;
+    $mail =~ s/\%\%VERSION\%\%/$Chronos::Static::VERSION/g;
+
+    open MAIL, "| $conf->{SENDMAIL} -oi -t";
+    print MAIL $mail;
+    close MAIL;
+}
+
+# vim: set et ts=4 sw=4 ft=perl:

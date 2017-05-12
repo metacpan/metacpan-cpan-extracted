@@ -1,0 +1,30 @@
+---
+abstract: 'define unique symbols (constant functions with opaque values)'
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Data::Dumper: '0'
+  Storable: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: constant-Atom
+requires:
+  Carp: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/constant-Atom
+  repository: https://github.com/neilbowers/constant-Atom.git
+version: '0.10'
+x_adopted_by:
+  NEILB: 2014-01-12

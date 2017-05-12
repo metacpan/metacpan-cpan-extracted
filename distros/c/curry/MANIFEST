@@ -1,0 +1,10 @@
+Changes
+lib/curry.pm
+lib/curry/weak.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST
+t/curry.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

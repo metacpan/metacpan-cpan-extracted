@@ -1,0 +1,49 @@
+#######################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/criticism-1.02/Changes $
+#     $Date: 2008-07-27 16:11:59 -0700 (Sun, 27 Jul 2008) $
+#   $Author: thaljef $
+# $Revision: 206 $
+########################################################################
+
+[1.02] Released on 2008-07-27
+
+     Added support for the "fatal-criticism" option.  Setting this
+     option in your .perlcriticrc file will cause your program to
+     immediately die if any violations are found by the criticism
+     pragma.  This release requires Perl-Critic-1.089 or higher.
+
+[1.01] Released on 2007-01-24
+
+     PRODUCTION RELEASE: You may now consider the public API of
+     criticism.pm as stable.
+
+     No code changes since last release.
+
+[0.04] Released on 2006-11-05
+
+     All arguments to Perl::Critic can now be passed through the
+     criticism pragma.
+
+     The default output format has changed slightly to match the
+     output of "perl -c".  This enables EPIC users to integrate
+     with Perl::Critic.
+
+     Now requires Perl::Critic 0.21 or higher.
+
+[0.03] Released 2006-01-30
+
+     Now internally trapping failures to load Perl::Critic.  This saves
+     developers from having to write ugly code that conditionally loads
+     the criticism pragma.
+
+     Revised documentation.
+
+[0.02] Released 2006-01-15
+
+     Fixed stupid bug.  Doh!
+
+     Expanded documentation.
+
+[0.01] Released 2006-01-14
+
+     Initial release.  Enjoy!
