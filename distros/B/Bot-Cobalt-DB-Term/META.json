@@ -1,0 +1,50 @@
+{
+   "abstract" : "Terminal frontend to Bot::Cobalt::DB",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bot-Cobalt-DB-Term",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Term::ReadLine::Perl" : "0"
+         },
+         "requires" : {
+            "Bot::Cobalt" : "0.003",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Term::ReadLine" : "0",
+            "Term::UI" : "0",
+            "Text::ParseWords" : "0",
+            "perl" : "v5.12.1"
+         }
+      }
+   },
+   "provides" : {
+      "Bot::Cobalt::DB::Term" : {
+         "file" : "lib/Bot/Cobalt/DB/Term.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.001"
+}

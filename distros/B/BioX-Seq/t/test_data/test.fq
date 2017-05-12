@@ -1,0 +1,18 @@
+@Test1 some description here
+ATTGAGGGGATTGAGATAGGGTGGAGTANNNTGGAT
++Test1 some description here
+433229299291929292922291919292292211
+@Test2 another description with wrapped lines
+ATTGAGAATGACCGATA
+AACT
++
+@11944491019494440
+111
+@Test3 yet another description, invalid sequence
+AAGGTAGAATGACCAGGTAGACCCAGTACCA
++
+444444444444444444444444444
+@Test4 valid but should die before here
+AAGCA
++
+1111#

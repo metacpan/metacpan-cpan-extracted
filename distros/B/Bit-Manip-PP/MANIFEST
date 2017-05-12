@@ -1,0 +1,25 @@
+appveyor.yml
+Changes
+examples/xs_vs_pp.pl
+lib/Bit/Manip/PP.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/05-bit_count.t
+t/10-bit_get.t
+t/15-bit_set.t
+t/20-bit_toggle.t
+t/25-bit_on.t
+t/30-bit_off.t
+t/35-bit-bin.t
+t/40-bit_mask.t
+t/45-bit_clr.t
+t/50-_ref.t
+t/55-_check_value.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

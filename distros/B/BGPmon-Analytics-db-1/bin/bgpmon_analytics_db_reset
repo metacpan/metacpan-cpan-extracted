@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+bgpmon_analytics_db_reset
+A script to reset a BGP database to an empty state
+
+=cut
+
+=head1 DEPENDENCIES
+
+The following Perl modules must be installed to use this script:
+
+Getopt::Long
+Cwd
+
+=cut
+
+=head1 USAGE
+
+> ./bgpmon_analytics_db_reset --dbname=database --dblogin=username
+
+=cut
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Colorado State University
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom
+    the Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.\
+
+    Authors: Jason Bartlett
+             Cathie Olschanowsky
+    Date: 17 August 2012
+          9 January 2013
+
+=cut
+
+BEGIN{
+        our $VERSION = '1.07';
+};
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Cwd 'abs_path';
+
+## get the location of this script -- the db scripts can be found
+## relative to it
+my $loc  = sprintf("%s", __FILE__);
+$loc =~ /.*(\/.*?$)/; 
+my $sub = $1;
+$loc =~ s/$sub$//;
+$loc = abs_path($loc);
+
+#Variables to hold the database name and login name
+#The default value for both values is bgpmon_db bgpmon_db_user
+my $dbname = "bgpmon_db";
+my $dblogin = "bgpmon_db_user";
+my $help = 0;
+my $ret = GetOptions(	"dbname=s" => \$dbname,
+			"dblogin=s" => \$dblogin,
+                        "help|h" => \$help);
+if($help){
+  print STDERR "$0 [-h] [--dbname=name] [--dblogin=login]\n\n";
+  exit 0;
+}
+
+#Restore the table structure and function definitions
+`psql -f $loc/bgpmon_analytics_db_0_pphTables.psql $dbname $dblogin`;
+if($?){
+  print STDERR "ERROR: the following error occured during " .
+               "bgpmon_analytics_db_0_pphTables.psql $dbname $dblogin\n $!\n";
+  exit 0;
+}
+`psql -f $loc/bgpmon_analytics_db_1_pphFunctions.psql $dbname $dblogin`;
+if($?){
+  print STDERR "ERROR: the following error occured during " .
+              "bgpmon_analytics_db_1_pphFunctions.psql $dbname $dblogin\n $!\n";
+  exit 0;
+}
+`psql -f $loc/bgpmon_analytics_db_2_pphQueryFuncs.psql $dbname $dblogin`;
+if($?){
+  print STDERR "ERROR: the following error occured during " .
+             "bgpmon_analytics_db_2_pphQueryFuncs.psql $dbname $dblogin\n $!\n";
+  exit 0;
+}
+
+1;

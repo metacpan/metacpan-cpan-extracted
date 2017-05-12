@@ -1,0 +1,22 @@
+---
+abstract: 'Simple interface to benchmark applications.'
+author:
+  - 'Alberto Simões <ambs@cpan.org> Nuno Carvalho <smash@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Benchmark-Apps
+requires:
+  Time::HiRes: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://natura.di.uminho.pt/svn/main/Benchmark-Apps/
+version: '0.05'

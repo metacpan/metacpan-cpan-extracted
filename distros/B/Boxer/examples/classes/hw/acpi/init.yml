@@ -1,0 +1,3 @@
+parameters:
+  pkg:
+    - acpi-support-base

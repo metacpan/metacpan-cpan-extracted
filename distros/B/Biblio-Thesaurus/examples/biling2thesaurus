@@ -1,0 +1,101 @@
+#!/usr/bin/perl -s
+
+our ($bl,$l1,$l2,$sep,$rel,$norel);
+$sep ||= ":";
+$rel ||= "BT" unless $norel;
+die("usage: $0 [-l1=EN] [-l2=PT] [-rel=IOF] [-sep=:] [-norel] file\n") 
+    unless $l1 || $l2;
+# $l1 = 1 unless $l2;
+
+print "%baselang $bl\n%lang $bl $l1 $l2\n\n" if $bl;
+
+while(<>){
+ if(/^[%]enc(?:oding)?\s+(\S+)/){
+    print $_;
+ }
+ elsif(/(.+)$sep(.+)$sep(.+)/){
+   if($l1){ print "$2\n$l1  $1\n", ($norel ? "": "$rel $3\n" ), "\n" ; }
+   else   { print "$1\n$l2  $2\n", ($norel ? "": "$rel $3\n" ), "\n" ; }
+ }
+ elsif(/(.+)$sep(.+)/){
+   if($l1){ print "$2\n$l1  $1\n\n" ; }
+   else   { print "$1\n$l2  $2\n\n" ; }
+ }
+ elsif(/^\s*$/){ print "\n";}
+}
+
+__END__
+
+=head1 NAME
+
+biling2thesaurus - converts a ":"-separated bilingual dictionary to ISO thesaurus
+
+=head1 SYNOPSIS
+
+ biling2thesaurus [-l1=EN|-l2=FR]  bilingDict > thesaurus
+
+=head1 DESCRIPTION
+
+Converts a Bilingue dictionary into a ISO-thesaurus.
+
+Input format: lines containing
+
+ term1 : term2 : class
+
+or 
+
+ term1: term2
+
+
+
+=head2 Input Format
+
+ <term1 lang1>:<term1 lang2>:<class>
+ <term2 lang1>:<term2 lang2>:<class>
+
+Input files may have a encoding declaration. Example:
+
+ %encoding UTF-8
+
+=head2 Output Format
+
+ <term1 lang1>
+ LANG2  <term1 lang2>
+ BT    <class>
+
+ <term2 lang1>
+ LANG2  <term2 lang2>
+ BT    <class>
+
+=head1 Options
+
+ -l1=FR
+     baselang is lang2;
+     lang1 is french
+
+ -l2=FR
+     baselang is lang1;
+     lang2 is french
+
+ -rel=IOF
+     Relation tag is IOF (default  BT)
+
+ -norel
+     Ignore classes in the inputfile (default: show relations)
+
+ -sep="::"
+     field separator is "::" (default ":")
+
+ -bl=PT
+     baselang is PT (makes a %baselang PT in output file)
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      
+

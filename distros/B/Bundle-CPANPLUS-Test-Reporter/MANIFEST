@@ -1,0 +1,7 @@
+Bundle-CPANPLUS-Test-Reporter-0.05/MANIFEST
+CHANGES
+lib/Bundle/CPANPLUS/Test/Reporter.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml                                 Module meta-data (added by MakeMaker)

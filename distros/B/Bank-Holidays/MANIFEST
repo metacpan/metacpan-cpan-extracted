@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bank-Holidays.t
+t/Is-A-Holiday.t
+t/Not-A-Holiday.t
+lib/Bank/Holidays.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

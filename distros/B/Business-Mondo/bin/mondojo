@@ -1,0 +1,110 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Mojolicious::Lite;
+use Business::Mondo;
+use Business::Mondo::Transaction;
+use HTML::GoogleMaps::V3;
+use Mojo::JSON qw/ decode_json /;
+use File::Slurper qw/ read_text /;
+
+$ENV{MOJO_LOG_LEVEL} = 'debug';
+
+get '/' => sub {
+	my ( $c ) = @_;
+
+	return $c->render( json => [
+		map { { $_->to_hash } } _get_transactions()
+	] );
+};
+
+get '/map' => sub {
+	my ( $c ) = @_;
+
+	my $map          = HTML::GoogleMaps::V3->new( zoom => 8 );
+	my @transactions = _get_transactions();
+
+	foreach my $t ( @transactions ) {
+		if ( my $m = $t->merchant ) {
+			if ( my $addr = $m->address ) {
+				$map->add_marker(
+					point => [ $addr->longitude,$addr->latitude ]
+				);
+
+				# center around most recent transaction
+				$map->center( [ $addr->longitude,$addr->latitude ] );
+			}
+		}
+	}
+
+	my ( $head,$map_div ) = $map->onload_render;
+
+	$c->render(
+		template     => 'map',
+		head         => $head,
+		map          => $map_div,
+		transactions => [ (reverse(@transactions))[0..7] ],
+	);
+};
+
+app->start;
+
+sub _get_transactions {
+
+	my @transactions;
+
+	if ( $ENV{MONDOJO_TOKEN} && $ENV{MONDOJO_ACCOUNT_ID} ) {
+
+		my $mondo = Business::Mondo->new( token => $ENV{MONDOJO_TOKEN} );
+		@transactions = $mondo->transactions( account_id => $ENV{MONDOJO_ACCOUNT_ID} );
+
+	} elsif ( my $file = $ENV{MONDOJO_TEST_FILE} ) {
+		my $data = decode_json( Encode::encode( 'UTF-8',read_text( $file ) ) );
+
+		foreach my $e ( @{ $data->{transactions} // [] } ) {
+			push( @transactions,Business::Mondo::Transaction->new(
+				%{ $e },
+				client => Business::Mondo->new->client,
+			) );
+		}
+
+	}
+
+	return @transactions;
+}
+
+__DATA__
+@@ map.css.ep
+
+@@ map.html.ep
+<!DOCTYPE HTML>
+<html>
+	<head>
+	    <meta charset="UTF-8">
+		<link href="map.css" rel="stylesheet" />
+		<%== $head %>
+	</head>
+	<body onload="html_googlemaps_initialize()">
+		<div class="box">
+			<%== $map %>
+			<div class="transaction_list">
+			<% foreach my $transaction ( @{ $transactions } ) { %>
+				<div class="transaction">
+					<%= $transaction->merchant->emoji if $transaction->merchant %> /
+					<%= Encode::decode( 'UTF-8',$transaction->currency ) %> /
+					<%= Encode::decode( 'UTF-8',$transaction->local_currency ) %> /
+					<%= $transaction->created %> /
+					<%= $transaction->merchant->name if $transaction->merchant %>
+				</div>
+			<% } %>
+			</div>
+		</div>
+	</body>
+</html>
+
+@@ marker.html.ep
+<div class="merchant_emoji">
+	<%== $merchant->name %>
+</div>

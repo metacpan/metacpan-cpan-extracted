@@ -1,0 +1,6 @@
+Revision history for Perl extension BGPmon::CPM::Demo.
+
+0.01  Wed Dec 14 10:01:39 2011
+	- original version; created by h2xs 1.23 with options
+		-XA -n BGPmon::CPM::Demo
+

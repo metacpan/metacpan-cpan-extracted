@@ -1,0 +1,56 @@
+{
+   "abstract" : "Create PDF invoices according to the Swiss ESR standard",
+   "author" : [
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-Payment-SwissESR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t",
+         "example",
+         "setup"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "3.0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oetiker/business-payment-swissesr/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/GPL-3.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/oetiker/business-payment-swissesr"
+      }
+   },
+   "version" : "v0.13.3"
+}

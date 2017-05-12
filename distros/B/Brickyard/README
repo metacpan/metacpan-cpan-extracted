@@ -1,0 +1,301 @@
+NAME
+    Brickyard - Plugin system based on roles
+
+SYNOPSIS
+        use Brickyard;
+        my $brickyard = Brickyard->new(base_package => 'My::App');
+        my $root_config = MyApp::RootConfig->new;
+        $brickyard->init_from_config('myapp.ini', $root_config);
+        $_->some_method for $brickyard->plugins_with(-SomeRole);
+
+DESCRIPTION
+    This is a lightweight plugin system based on roles. It does not use
+    Moose but relies on "Role::Basic" instead, and very few other modules.
+
+    It takes its inspiration from Dist::Zilla, but has much less flexibility
+    and therefore is also much less complex.
+
+METHODS
+  new
+    Constructs a new object. Takes an optional hash of arguments to
+    initialize the object.
+
+  base_package
+    Read-write accessor for the base package name that is used in
+    "expand_package()". Defaults to "MyApp".
+
+  parse_ini
+    Takes a string that contains configuration in "INI" format and parses it
+    into an array of configuration sections. It returns a reference to that
+    array.
+
+    Using an array, as opposed to a hash, ensures that the section order is
+    preserved, so we know in which order to process plugins in Brickyard's
+    "plugins_with()" method.
+
+    Each array element corresponds to an "INI" section. Each section is
+    itself a reference to an array with three elements:
+
+    The first element is the section name. The second element is the package
+    name of the plugin; it is obtained by expanding the section name using
+    "expand_package()". The third element is a reference to a plugin
+    configuration hash; it is the section's payload. If a section payload
+    key occurs several times, it is turned into an array reference in the
+    plugin configuration hash.
+
+    The first section is the global section, denoted by the name "_". Any
+    payload in the "INI" configuration that occurs before the first section
+    ends up in this section.
+
+    For example:
+
+        ; A comment
+        name = Foobar
+
+        [@Default]
+
+        [Some::Thing]
+        foo = bar
+        baz = 43
+        baz = blah
+
+    is parsed into this structure:
+
+        [ '_',        'MyApp::Plugin::_',             { name => 'Foobar' } ],
+        [ '@Default', 'MyApp::PluginBundle::Default', {} ],
+        [   'Some::Thing',
+            'MyApp::Plugin::Some::Thing',
+            {   'baz' => [ '43', 'blah' ],
+                'foo' => 'bar'
+            }
+        ]
+
+    What if you want to pass more complex configuration like a hash of
+    arrays? An "INI" file is basically just a key-value mapping. In that
+    case you can use a special notation for the key where you use dots to
+    separate the individual elements - array indices and hash keys. For
+    example:
+
+        foo.0.web.1  = bar
+        foo.0.web.2  = baz
+        foo.0.mailto = the-mailto
+        foo.1.url    = the-url
+
+    And this would be parsed into this structure:
+
+        foo => [
+            { web    => [ undef, 'bar', 'baz' ],
+              mailto => 'the-mailto',
+            },
+            { url => 'the-url' }
+        ]
+
+  expand_package
+    Takes an abbreviated package name and expands it into the real package
+    name. "INI" section names are processed this way so you don't have to
+    repeat common prefixes all the time.
+
+    If "@" occurs at the start of the string, it is replaced by the base
+    name plus <::PluginBundle::>.
+
+    A "-" is replaced by the base name plus "::Role::".
+
+    A "=" is replaced by the empty string, so the remainder is returned
+    unaltered.
+
+    If the package name still hasn't been altered by the expansions
+    mentioned above, custom expansions are applied; see below.
+
+    As a fallback, the base name plus "::Plugin::" is prepended.
+
+    The base name is normally whatever "base_package()" returns, but if the
+    string starts with "*", the asterisk is deleted and "Brickyard" is used
+    for the base name.
+
+    A combination of the default prefixes is not expanded, so "@=", for
+    example, is treated as the fallback case, which is probably not what you
+    intended.
+
+    Here are some examples of package name expansion:
+
+        @Service::Default     MyApp::PluginBundle::Service::Default
+        *@Filter              Brickyard::PluginBundle::Filter
+        *Filter               Brickyard::Plugin::Filter
+        =Foo::Bar             Foo::Bar
+        Some::Thing           MyApp::Plugin::Some::Thing
+        -Thing::Frobnulizer   MyApp::Role::Thing::Frobnulizer
+
+    You can also define custom expansions. There are two ways to do this.
+    First you can pass a reference to an array of expansions to the
+    "expand()" method, or you can define them using the "expand" key in the
+    configuration's root section. Each expansion is a string that is
+    evaluated for each package name. Custom expansions are useful if you
+    have plugins in several namespaces, for example.
+
+    Here is an example of defining a custom expansion directly on the
+    Brickyard object:
+
+        my $brickyard = Brickyard->new(
+            base_package => 'My::App',
+            expand       => [ 's/^%/MyOtherApp::Plugin::/' ],
+        );
+
+    Here is an example of defining it in the configuration's root section:
+
+        expand = s/^%/MyOtherApp::Plugin::/
+
+        [@Default]
+
+        # this now refers to MyOtherApp::Plugin::Foo::Bar
+        [%Foo::Bar]
+        baz = 44
+
+  init_from_config
+    Takes a configuration file name specification or a reference to a string
+    containing the "INI" string, a root object, and an optional callback.
+    The file specification can be a simple file name or a colon-separated
+    list of file names. Each of these files is parsed with "parse_ini()" and
+    merged. The result is passed to "init_from_config_structure()", along
+    with the root object and optional callback - see its documentation for
+    what these things do.
+
+    When two configurations are merged, the root sections are merged like a
+    hash, but any plugin sections are appended in the order they are found.
+
+    This mechanism exists so you can, for example, have sensitive
+    information like passwords in a separate file. For example:
+
+        $ cat myapp.ini
+        key1   = foo
+        key2.0 = bar0
+        key2.1 = bar1
+        [@Default]
+
+        $ cat secret.ini
+        username = admin
+        password = mysecret
+        [Foo::Bar]
+
+    To process both configuration files, use:
+
+        $brickyard->init_from_config(
+            'myapp.ini:secret.ini', $root_config, $callback
+        );
+
+    This is the same as having the following all-in-one configuration file:
+
+        key1     = foo
+        key2.0   = bar0
+        key2.1   = bar1
+        username = admin
+        password = mysecret
+
+        [@Default]
+        [Foo::Bar]
+
+    We use colons to separate configuration file names so it's easy to get
+    the specification from an environment variable.
+
+    If the first argument is a scalar reference, it is assumed that it
+    refers to the "INI" string. So you could pass the configuration
+    directly, without having a separate configuration file, like this:
+
+        my $config = <<EOINI;
+        key1     = foo
+        key2.0   = bar0
+        key2.1   = bar1
+
+        [@Default]
+        [Foo::Bar]
+        EOINI
+
+        $brickyard->init_from_config(\$config, $root_config, $callback);
+
+  init_from_config_structure
+    Takes a configuration structure and a root object, and an optional
+    callback. For each configuration section it creates a plugin object,
+    initializes it with the plugin configuration hash and adds it to the
+    brickyard's array of plugins.
+
+    Any configuration keys that appear in the configuration's root section
+    are set on the root object. So the root object can be anything that has
+    set-accessors for all the configuration keys that can appear in the
+    configuration's root section. One exception is the "expand" key, which
+    is turned into a custom expansion; see above.
+
+    The configuration needs to be a reference to a list of sections as
+    returned by "init_from_config()", for example.
+
+    If an object is created that consumes the Brickyard::Role::PluginBundle
+    role, the bundle is processed recursively.
+
+    If the callback is given, each value from a key-value pair is filtered
+    through that callback. For example, you might want to support
+    environment variable expansion like this:
+
+        $brickyard->init_from_config(
+            'myapp.ini',
+            $root_config,
+            sub {
+                my $value = shift;
+                $value =~ s/\$(\w+)/$ENV{$1} || "\$$1"/ge;
+                $value;
+            }
+        );
+
+  plugins
+    Read-write accessor for the reference to an array of plugins.
+
+  plugins_with
+    Takes a role name and returns a list of all the plugins that consume
+    this role. The result is cached, keyed by the role name.
+
+  plugins_agree
+    Takes a role name and a code reference and calls the code reference once
+    for each plugin that consumes the role. It returns 1 if the code returns
+    a true value for all plugins, 0 otherwise.
+
+    An example will make this clearer:
+
+        # Let the plugins decide
+        sub value_is_valid {
+            my ($self, $value) = @_;
+            $self->brickyard->plugins_agree(-ValueChecker =>
+                sub { $_->value_is_valid($value) }
+        }
+
+  reset_plugins
+    Clears the array of plugins as well as the cache - see "plugins_with()".
+
+  expand
+    Holds custom package name expansions; see above.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Brickyard>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Brickyard/>.
+
+    The development version lives at <http://github.com/hanekomu/Brickyard>
+    and may be cloned from <git://github.com/hanekomu/Brickyard.git>.
+    Instead of sending patches, please fork this project using the standard
+    git and github infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

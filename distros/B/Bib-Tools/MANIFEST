@@ -1,0 +1,14 @@
+Changes
+ignore.txt
+lib/Bib/Tools.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/test.t
+t/pod-coverage.t
+t/pod.t
+examples/handle_query.pl
+examples/query.html
+examples/post.js
+META.json                                Module JSON meta-data (added by MakeMaker)

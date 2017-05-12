@@ -1,0 +1,56 @@
+Revision history for Perl extension Business::OnlinePayment::LinkPoint.
+
+0.10    Wed Jun 18 14:44:54 PDT 2008
+        - add PREREQ_PM on lpperl
+
+0.09    Wed Jul 11 18:07:20 PDT 2007
+        - Trim all non-numeric characters from phone numbers when doing an ACH
+          transaction, as per undocumented suggestion from LinkPoint.
+        - ACH transactions: "SUBMITTED" indicates success
+
+0.08	Tue May  1 18:26:15 PDT 2007
+        - Improve error message for declined checks.
+        - Update for new test account.
+        - Add "cargs" argument including "-k" when in test mode.
+        - Move tests from t2/ and have them actually work out of the box.
+        - get rid of old Exporter / AutoLoader cruft
+        - patch from Mark D. Anderson <mda@discerning.com>:
+          - addrnum should be first digit string, not first word
+          - avoid uninitialized variable warnings in lpperl due to webspace and
+            debug
+          - Map customer_ip, customer_id, invoice_number and description fields
+          - Pass email, company, fax fields
+          - Set lpperl debug if our $DEBUG is set
+          - Better/supplimental download link for lpperl.pm
+
+0.07	Thu Apr 6 18:27:32 2007 UTC
+	- Add account type mapping
+        - map bank_state onto bankstate
+	- make echeck synonymous with check
+
+0.06	Thu Apr 5 22:59:27 2007 UTC
+	- Add check capability
+
+0.05	Thu Jan  6 16:11:01 PST 2005
+	- Add patch from William McKee <william@knowmad.com> to support
+	  returns by order number
+	- add debugging flag, now off by default
+
+0.04 Sun Aug  1 18:29:23 PDT 2004
+	- LinkPoint API 3.5: s/lperl/lpperl/i.  oh great.
+
+0.03 Sun Aug 10 21:57:16 PDT 2003
+	- better error message when LinkPoint doesn't return a statusMessage
+	- update for LinkPoint API 2.6
+
+0.02  Tue Aug 13 2002
+	- quiet "Use of uninitialized value" warnings from lperl.pm
+	- eliminate warnings about redefined subroutines (and do so in a
+	  5.005-friendly way)
+	- better URLs for linkpoint perl wrapper
+	- don't spew debugging output by default
+	- move load.t test from t1/ to t2/
+
+0.01  Wed Nov 21 04:00:26 2001
+	- original version; created by ivan 1.0
+

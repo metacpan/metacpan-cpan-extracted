@@ -1,0 +1,64 @@
+%module{Box2D};
+
+%name{Box2D::b2PolygonShape} class b2PolygonShape : public %name{Box2D::b2Shape} b2Shape  
+{ 
+
+int32 GetVertexCount();
+
+%{
+
+b2PolygonShape *
+b2PolygonShape::new( )
+	CODE:
+		RETVAL= new b2PolygonShape();
+	OUTPUT:
+		RETVAL 
+
+void
+b2PolygonShape::Set( ... )
+	CODE:
+		b2Vec2 vertices[b2_maxPolygonVertices];
+		int i;
+		int count = (items - 1);
+		if( count > b2_maxPolygonVertices )
+			count = b2_maxPolygonVertices;
+		for(i = 0; i < count; i++)
+			vertices[i] = *(b2Vec2*)stack_to_object( ST(i + 1) );
+		THIS->Set( vertices, count );
+
+void
+b2PolygonShape::SetAsBox( x, y, ... )
+	float32 x
+	float32 y
+	CODE:
+		if ( items == 3 )
+		{
+			THIS->SetAsBox( x, y );
+		}
+		else if ( items == 5 )
+		{
+			THIS->SetAsBox( x, y, *(b2Vec2*)stack_to_object( ST(3) ), (float32)SvNV( ST(4) ) );
+		}
+
+void
+b2PolygonShape::SetAsEdge( v1, v2 )
+	b2Vec2* v1
+	b2Vec2* v2
+	CODE:
+		THIS->SetAsEdge( *v1, *v2 );
+
+b2Vec2*
+b2PolygonShape::GetVertex( index )
+	int index
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2*)&(THIS->GetVertex(index));
+	OUTPUT:
+		RETVAL
+
+
+%}
+	
+};
+

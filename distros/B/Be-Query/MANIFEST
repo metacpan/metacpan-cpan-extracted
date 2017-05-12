@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+Query.pm
+Query.xs
+test.pl

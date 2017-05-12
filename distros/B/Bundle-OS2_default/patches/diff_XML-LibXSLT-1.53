@@ -1,0 +1,12 @@
+--- ./Makefile.PL-pre	Sun May 12 02:10:16 2002
++++ ./Makefile.PL	Thu Dec  4 17:57:12 2003
+@@ -245,7 +245,8 @@ use Conftest; \$loaded++;
+ EOT
+     close($cfile);
+     xsystem("$^X Makefile.PL " . join(' ', map { "'$_=$config{$_}'" } keys %config));
+-    xsystem("$Config{make} test 'OTHERLDFLAGS=$opt'");
++    my $file = $config{MAKEAPERL} ? "-f Makefile.aperl FIRST_MAKEFILE=Makefile.aperl" : "";
++    xsystem("$Config{make} $file test 'OTHERLDFLAGS=$opt'");
+ }
+ 
+ sub try_link {

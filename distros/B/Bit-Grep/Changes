@@ -1,0 +1,6 @@
+Revision history for Perl extension Bit::Grep.
+
+0.01  Wed Sep  1 12:31:22 2010
+	- original version; created by h2xs 1.23 with options
+		-An Bit::Grep
+

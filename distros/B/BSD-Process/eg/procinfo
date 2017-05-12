@@ -1,0 +1,53 @@
+#! /usr/bin/perl -w
+#
+# procinfo - display summary about all current processes
+#
+# Copyright (C) David Landgren 2006
+
+use strict;
+use BSD::Process;
+
+use Config;
+my $RUNNING_ON_FREEBSD_5 = $Config{osvers} =~ /^5/;
+
+use vars '$VERSION';
+$VERSION = '0.1';
+
+my @pid;
+if (@ARGV) {
+    @pid = @ARGV;
+}
+else {
+    @pid = BSD::Process::list();
+}
+
+for my $pid (sort {$a <=> $b} @pid) {
+    
+    my $proc = BSD::Process->new($pid);
+
+    print "$proc->{comm}($proc->{pid})";
+    print " old=$proc->{ocomm}"      if $proc->comm ne $proc->ocomm;
+    print " owned by $proc->{login}" if $proc->login;
+    print " (u=$proc->{utime} s=$proc->{stime})\n";
+
+    print "process has posix advisory lock\n"       if $proc->advlock;
+    print "process has controlling terminal\n"      if $proc->controlt;
+    print "process is a kernel thread\n"            if $proc->kthread;
+    print "process has no loadavg calc\n"           if $proc->noload;
+    print "process has parent waiting\n"            if $proc->ppwait;
+    print "process has started profiling\n"         if $proc->profil;
+    print "process has stopped profiling\n"         if $proc->stopprof;
+    print "process has had threads\n"               if !$RUNNING_ON_FREEBSD_5 and $proc->hadthreads;
+    print "process has set id privileges\n"         if $proc->sugid;
+    print "process is a system process\n"           if $proc->system;
+    print "threads should exit not wait\n"          if $proc->single_exit;
+    print "process is traced by a debugger\n"       if $proc->traced;
+    print "something is waiting for this process\n" if $proc->waited;
+    print "process is preparing to exit\n"          if $proc->wexit;
+    print "process called exec\n"                   if $proc->exec;
+    print "process is locked\n"                     if $proc->locked;
+    print "controlling terminal active\n"           if $proc->isctty;
+    print "process is session leader\n"             if $proc->issleader;
+    print "\n" if @pid > 1;
+}
+

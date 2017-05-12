@@ -1,0 +1,43 @@
+Barcode-Code93
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Barcode::Code93
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Barcode-Code93
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Barcode-Code93
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Barcode-Code93
+
+    Search CPAN
+        http://search.cpan.org/dist/Barcode-Code93/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Mark A. Stratman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

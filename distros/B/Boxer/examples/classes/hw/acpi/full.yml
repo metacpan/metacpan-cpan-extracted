@@ -1,0 +1,7 @@
+classes:
+  - hw.acpi
+parameters:
+  pkg:
+    - acpi-support
+  pkg-auto:
+    - acpi-support-base

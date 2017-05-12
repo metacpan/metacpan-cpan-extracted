@@ -1,0 +1,78 @@
+<h3 align="center">Order</h3>
+<form name="order_form" id="order_form" onSubmit="return false">
+<table align="center">
+<tr>
+<td>Customer:</td>
+<td align="left"><: $customer_name_menu :></td>
+</tr>
+<tr>
+<td>Billing address:</td>
+<td align="left"><: $billing_address_menu :></td>
+</tr>
+<tr>
+<td>Customer address:</td>
+<td align="left"><: $customer_address_menu :></td>
+</tr>
+<tr>
+<td>Delivery address:</td>
+<td align="left"><: $delivery_address_menu :></td>
+</tr>
+<tr>
+<td>Country:</td>
+<td align="left"><: $country_menu :></td>
+</tr>
+<tr>
+<td>Zone:</td>
+<td align="left"><div id="zone_menu"><: $zone_menu :></div></td>
+</tr>
+<tr>
+<td>Tax class:</td>
+<td align="left"><: $tax_class_menu :></td>
+</tr>
+<tr>
+<td>Payment method:</td>
+<td align="left"><: $payment_method_menu :></td>
+</tr>
+<tr>
+<td colspan="2"><hr /></td>
+</tr>
+<tr>
+<td colspan="2">
+<table align="center">
+<tr>
+<td align="center">Shopping Cart</td>
+</tr>
+<tr>
+<td align="center"><div id="order_result_div"></div></td>
+</tr>
+<tr>
+<td align="center"><div id="order_message_div"></div></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan="2"><hr /></td>
+</tr>
+</table>
+<table align="center">
+<tr>
+<td align="left" colspan="3">Product</td>
+<td>Quantity</td>
+</tr>
+<tr>
+<td align="left" colspan="3"><: $product_menu :></td>
+<td align="left"><input name="quantity" id="quantity" type="text" size="10" maxlength="10" class="required" title="Quantity is required" /></td>
+</tr>
+<tr>
+<td colspan="4"><hr /></td>
+</tr>
+<tr>
+<td align="center"><button id="add_to_cart">Add to cart</button></td>
+<td align="center"><button id="cancel_order">Cancel order</button></td>
+<td align="center"><button id="checkout">Checkout</button></td>
+<td align="center"><button id="reset">Reset</button></td>
+</tr>
+</table>
+<input type="hidden" name="sid" id="sid" value="<: $sid :>" />
+</form>

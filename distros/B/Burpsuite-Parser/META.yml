@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Burpsuite-Parser
+version:            0.01
+abstract:           Parse Burpsuite scan data with Perl
+author:
+    - Joshua "Jabra" Abraham < jabra@spl0it.org >
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Object::InsideOut:  0
+    Test::Class:        0
+    Test::More:         0
+    XML::LibXML:        0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

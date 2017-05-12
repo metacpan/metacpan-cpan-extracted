@@ -1,0 +1,11 @@
+Revision history for Perl extension Bundle::Math.
+
+1.00  Sat Apr  3 12:24:51 2004
+	- original version as uploaded to CPAN
+
+1.01  Sun Jun 13 17:48:12 2004
+	- Added Bundle::Math::Statistics
+
+1.02  Fri Jan 21 15:00:44 2005
+	- Added Bundle::Math::Symbolic
+

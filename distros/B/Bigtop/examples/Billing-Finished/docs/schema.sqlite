@@ -1,0 +1,70 @@
+CREATE TABLE my_company (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    address varchar,
+    city varchar,
+    state varchar,
+    zip varchar,
+    description varchar,
+    contact_name varchar,
+    contact_email varchar,
+    contact_phone varchar
+);
+
+INSERT INTO my_company ( name, address, city, state, zip, description, contact_name, contact_email, contact_phone )
+    VALUES ( 'Crow Motors', '12 E. Main', 'Paxton', 'NE', 69155, 'Car and Implement Sales and Service', 'EJ', 'ej@example.com', '1-800-CROW-MOT' );
+
+CREATE TABLE customer (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    address varchar,
+    city varchar,
+    state varchar,
+    zip varchar,
+    description varchar,
+    contact_name varchar,
+    contact_email varchar,
+    contact_phone varchar
+);
+
+INSERT INTO customer ( name, address, city, state, zip, description, contact_name, contact_email, contact_phone )
+    VALUES ( 'Groover Nordqvist', '502 E. Third', 'Paxton', 'NE', 69155, 'Prime Customer', 'Groover', 'gnordqvist@example.com', 'Unlisted' );
+
+CREATE TABLE line_item (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    due_date date,
+    name varchar,
+    invoice INTEGER,
+    hours INTEGER,
+    charge_per_hour INTEGER,
+    notes text,
+    description text
+);
+
+CREATE TABLE invoice (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    number varchar,
+    status INTEGER,
+    sent date,
+    paid date,
+    my_company INTEGER,
+    customer INTEGER,
+    notes text,
+    description text
+);
+
+CREATE TABLE status (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    description varchar
+);
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Working', 'Work in Progress, NOT Billed' );
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Sent', 'Mailed to Customer' );
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Paid', 'Payment Received' );
+

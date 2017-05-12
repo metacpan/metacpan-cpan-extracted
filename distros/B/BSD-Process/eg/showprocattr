@@ -1,0 +1,159 @@
+#! /usr/bin/perl -w
+
+use strict;
+use BSD::Process;
+use Getopt::Std;
+
+use vars '$VERSION';
+$VERSION = '0.2';
+
+getopts( 'anqrV', \my %opt );
+
+print "$VERSION\n" and exit if $opt{V};
+
+if ($opt{q}) {
+    print "$_\n" for sort(BSD::Process::attr());
+    exit;
+}
+elsif ($opt{a}) {
+    my $len  = BSD::Process::attr_len();
+    for my $pid (@ARGV) {
+        $pid = $$ if $pid eq 'self';
+        my $proc = BSD::Process->new(
+            $pid,
+            {
+                resolve => exists($opt{r}) ? 1 : 0,
+            }
+        );
+        next unless defined $proc;
+
+        print "$pid\n" if @ARGV > 1;
+        for my $attr (sort (BSD::Process::attr())) {
+            next if $opt{n} and $proc->{$attr} =~ /^\d+$/ and $proc->{$attr} == 0;
+            printf "%*s %s\n", $len, $attr, $proc->{$attr};
+        }
+    }
+    exit;
+}
+
+my @attr;
+for my $attr (@ARGV) {
+    if (BSD::Process->can($attr)) {
+        push @attr, $attr;
+    }
+    else {
+        warn "ignoring unknown attribute $attr.\n";
+    }
+}
+
+@attr or die "No attributes specified for reporting\n";
+
+my @line;
+my @width = (0) x (1 + @attr);
+
+PROC:
+for my $pid (sort {$a <=> $b} BSD::Process::list) {
+    my $proc = BSD::Process->new(
+        $pid,
+        {
+            resolve => exists($opt{r}) ? 1 : 0,
+        }
+    );
+    my $id = "$proc->{comm}($proc->{pid})";
+    my @out = map {$proc->{$_}} @attr;
+
+    if ($opt{n}) {
+        my $keep = 0;
+        for my $attr (@out) {
+            if ($attr != 0) {
+                $keep = 1;
+                last;
+            }
+        }
+        next PROC unless $keep;
+    }
+
+    unshift @out, $id;
+    for my $idx (0..$#out) {
+        $width[$idx] = length($out[$idx])
+            if $width[$idx] < length($out[$idx]);
+    }
+    push @line, [@out];
+}
+
+exit unless @line;
+
+my @header = ('process', @attr);
+for my $idx (0..$#header) {
+    $width[$idx] = length($header[$idx])
+        if $width[$idx] < length($header[$idx]);
+}
+
+my $fmt = join( ' ', map {'%' . -$_ . 's'} @width) . "\n";
+printf $fmt, @header;
+for my $ln (@line) {
+    printf $fmt, @$ln;
+}
+
+=head1 NAME
+
+showprocattr - Show attributes of current processes
+
+=head1 SYNOPSIS
+
+B<showprocattr> [B<-nrV>] attr [...]
+
+B<showprocattr> B<-a> [B<-nr>] pid (or 'self') [...]
+
+=head1 DESCRIPTION
+
+Display one or more attributes for all processes currently running
+on the system.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-a>
+
+All. Show all attributes of a specified pid. The magic label 'self'
+corresponds to the running process (hence, your perl interpreter).
+
+=item B<-n>
+
+Non-zero. Only display the process if all requested attributes are non-zero.
+When B<-a> is also active, will suppress attributes whose values are zero.
+
+=item B<-q>
+
+Query. Display all the reognised attribute names that may be examined.
+
+=item B<-r>
+
+Resolve. Display uids and gids as names, rather than their numerical
+values.
+
+=item B<-V>
+
+Print the version of this program and exit.
+
+=back
+
+=head1 EXAMPLES
+
+C<procshowattr -n kthread>
+
+Show only the processes that are kernel threads.
+
+=head1 SEE ALSO
+
+L<BSD::Process>
+
+=head1 AUTHOR
+
+David Landgren, copyright (C) 2006. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,21 @@
+T1	term 0 25	Simplification de phrases
+T2	term 33 56	extraction de relations
+T3	term 59 82	extraction de relations
+T4	term 59 100	extraction de relations par apprentissage
+T5	term 114 127	corpus annoté
+T6	term 114 149	corpus annoté de très grande taille
+T7	term 174 212	variations d’expressions des relations
+T8	term 321 357	variabilité syntaxique des relations
+T9	term 270 295	simplification de phrases
+T10	term 392 404	petit corpus
+T11	term 376 404	annotation d’un petit corpus
+T12	term 477 507	annotation des simplifications
+T13	term 519 544	classifieur à base de CRF
+T14	term 541 544	CRF
+T15	term 553 577	extraction des relations
+T16	term 620 641	corpus d’entraînement
+T17	term 646 661	simplifications
+T18	term 687 710	extraction des relation
+T19	term 775 798	extraction de relations
+T20	term 801 810	i2b2 2010
+T21	term 775 810	extraction de relations d’i2b2 2010

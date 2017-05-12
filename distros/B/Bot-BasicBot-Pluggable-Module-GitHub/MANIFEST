@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Bot/BasicBot/Pluggable/Module/GitHub.pm
+lib/Bot/BasicBot/Pluggable/Module/GitHub/Announce.pm
+lib/Bot/BasicBot/Pluggable/Module/GitHub/EasyLinks.pm
+lib/Bot/BasicBot/Pluggable/Module/GitHub/PullRequests.pm
+t/00-load.t
+t/01-parse-config.t
+t/manifest.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

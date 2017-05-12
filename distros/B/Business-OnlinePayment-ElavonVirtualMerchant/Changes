@@ -1,0 +1,13 @@
+Revision history for Perl extension Business::OnlinePayment::ElavonVirtualMerchant.
+
+0.03  Wed Aug 24 11:45:00 2016
+        - Truncate fields to their maximum lengths
+
+0.02  Fri Mar 04 19:00:05 2011
+	- Added ship-to and company fields.  Patch from Josh Rosenbaum.
+	- Modified response parser to handle magic numbers surrounding the name/value
+	  pairs.  Reported by Ivan Kohler.
+
+0.01  Fri Mar 20 20:43:30 2009
+	- original version
+

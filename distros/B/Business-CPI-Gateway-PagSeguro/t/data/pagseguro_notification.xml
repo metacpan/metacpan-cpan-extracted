@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<transaction>
+    <date>2011-02-10T16:13:41.000-03:00</date>
+    <code>9E884542-81B3-4419-9A75-BCC6FB495EF1</code>
+    <reference>__PAYMENT_ID__</reference>
+    <type>1</type>
+    <status>__STATUS__</status>
+    <lastEventDate>2011-02-15T17:39:14.000-03:00</lastEventDate>
+    <paymentMethod>
+        <type>1</type>
+        <code>101</code>
+    </paymentMethod>
+    <grossAmount>200.00</grossAmount>
+    <discountAmount>0.00</discountAmount>
+    <feeAmount>0.00</feeAmount>
+    <netAmount>200.00</netAmount>
+    <extraAmount>0.00</extraAmount>
+    <installmentCount>1</installmentCount>
+    <itemCount>1</itemCount>
+    <items>
+        <item>
+            <id>1</id>
+            <description>Evento x</description>
+            <quantity>1</quantity>
+            <amount>200.00</amount>
+        </item>
+    </items>
+    <sender>
+        <name>João da Silva</name>
+        <email>joao@hotmail.com</email>
+        <phone>
+            <areaCode>11</areaCode>
+            <number>56273440</number>
+        </phone>
+    </sender>
+</transaction>

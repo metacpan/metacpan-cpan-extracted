@@ -1,0 +1,44 @@
+=encoding utf8
+
+=head1 NAME
+
+BPM::XPDL::Util - XPDL useful constants
+
+=head1 INHERITANCE
+
+ BPM::XPDL::Util
+   is a Exporter
+
+=head1 SYNOPSIS
+
+  use BPM::XPDL::Util ':xpdl21';
+
+=head1 DESCRIPTION
+
+Defines the namespaces used with XPDL.
+
+=head1 FUNCTIONS
+
+=head2 Constants
+
+Defined are C<NS_XPDL_009>, C<NS_XPDL_10>, C<NS_XPDL_20>, C<NS_XPDL_21>, and
+C<NS_XPDL_22>.
+
+=head1 SEE ALSO
+
+This module is part of BPM-XPDL distribution version 0.93,
+built on November 24, 2015. Website: F<http://perl.overmeer.net>
+
+=head1 ACKNOWLEDGEMENTS
+
+Interapy F<http://www.interapy.nl> sponsored the development of
+this software.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2009-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

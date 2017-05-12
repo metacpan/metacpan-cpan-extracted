@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Business/Billing/TMobile/UK.pm
+MANIFEST			This list of files
+script/check_tmobile_allowances
+t/01_distribution.t
+t/02_parse.t
+t/03_scripts.t
+t/test.html
+README
+META.yml

@@ -1,0 +1,17 @@
+Changes
+lib/Biblio/Refbase.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-constructor.t
+t/02-accessors.t
+t/03-static-methods.t
+t/04-methods.t
+xt/cpan-meta.t
+xt/hasversion.t
+xt/minimumversion.t
+xt/pod-coverage.t
+xt/pod.t
+xt/synopsis.t

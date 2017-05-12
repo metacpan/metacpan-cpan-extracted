@@ -1,0 +1,114 @@
+Name
+    Binary::Heap::Array - Extensible array each of whose component arrays is
+    an integral power of two wide.
+
+Synopsis
+      my $a = Binary::Heap::Array::new(ipsw);
+
+      $a->push(1)->push(2);
+      ok $a->size   == 2;
+      ok $a->at( 0) == 1;
+      ok $a->at( 1) == 2;
+      ok $a->at(-1) == 2;
+      ok $a->at(-2) == 1;
+         $a->at( 0)  = 2;
+      ok $a->at(-2) == 2;
+      ok $a->pop    == 2;
+      ok $a->size   == 1;
+      ok $a->shift  == 2;
+      ok $a->size   == 0;
+      $a->unshift(3);
+      ok $a->size   == 1;
+      $a->unshift(2);
+      ok $a->size   == 2;
+      $a->unshift(1);
+      ok $a->size   == 3;
+
+Methods
+  new($flags)
+    sub new(*) # Create a new binary heap array. A string of flags enables
+    optimizations to the base version, which uses the minimum amount of
+    memory at all times, to use more memory to obtain shorter run times,
+    These flags are: 'i' - retain memory for subsequent reuse rather than
+    freeing it as soon as possible; 'p' - add two fields to each array to
+    optimize shift/unshift operations; 's' - add a field to each array to
+    cache the size of the array; 'w' - add a field each array to cache the
+    current width of the array of subarrays.
+
+         Parameter  Description
+      1  $flags     Optimization flags ipsw in any order surrounding quotes are not necessary
+
+  at :lvalue($array, $index)
+    Address the element at a specified index so that it can get set or got
+
+         Parameter  Description
+      1  $array     Array
+      2  $index     index of element
+
+  pop($array)
+    Pop the topmost element from the leading full array and spread the
+    remainder of its contents as sub arrays of the correct size for each
+    preceding empty slot
+
+         Parameter  Description
+      1  $array     Array from which an element is to be popped
+
+  push($array, $element)
+    Push a new element on to the top of the array by accumulating the
+    leading full sub arrays in the first empty slot or create a new slot if
+    none already available
+
+         Parameter  Description
+      1  $array     Array
+      2  $element   element to push
+
+  size($array)
+    Find the number of elements in the binary heap array
+
+         Parameter  Description
+      1  $array     Array
+
+  shift($array)
+    Remove and return the current first element of the array
+
+         Parameter  Description
+      1  $array     Array
+
+  unshift($array, $element)
+    Insert an element at the start of the array
+
+         Parameter  Description
+      1  $array     Array
+      2  $element   element to be inserted
+
+Index
+    "at :lvalue($array, $index)" "new($flags)" "pop($array)" "push($array,
+    $element)" "shift($array)" "size($array)" "unshift($array, $element)"
+
+Installation
+    This module is written in 100% Pure Perl in a single file and is thus
+    easy to read, modify and install.
+
+    Standard Module::Build process for building and installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+See also
+    The arrays used to construct the binary heap array are all an integral
+    power of two wide and thus make good use of the memory allocated by
+    Data::Layout::BuddySystem or similar.
+
+Author
+    philiprbrenan@gmail.com
+
+    http://www.appaapps.com
+
+Copyright
+    Copyright (c) 2017 Philip R Brenan.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

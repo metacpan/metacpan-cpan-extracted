@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5c57aa5840e5183fbb9b3a7e85724d3ad6285332 Build.PL
+SHA1 6bb7e51e1993de80fc6e030c653f60d5deb5e6f6 Changes
+SHA1 0d5138a9589fe0168cda576035d940b7b0b45fed MANIFEST
+SHA1 b08c60094c1ca2e61da58e8600e212263e0ad6d6 META.yml
+SHA1 730a54dadcf6f981f6f705877386f7a65d6dd918 README
+SHA1 0c3322487aaa47b826e5ae4433f9b71ba375022b lib/Build/Daily.pm
+SHA1 605f05a5336cc37a476bb10b218f5ad1a2bd340d t/00_compile.t
+SHA1 9291f699cadf15fbb75740cc0f7cf94c0d442f2e t/01_Build-Daily.t
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 10c564e5ffe84748070827b350edbf3d6b832b20 t/fixme.t
+SHA1 99a32ade65ad06267bae5efcded57641407ef6ba t/mb/lib/Build/Daily/t/mb.pm
+SHA1 e27fa1813c60617b9eb65a38feeb3c222ec41d29 t/mb/lib/Build/Daily/t/mb2.pm
+SHA1 564ae909c25cdba846d643d537946fc1ec5dbfc8 t/mb/lib/Build/Daily/t/mb3.pm
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 127283b49756cae13dc05a49a0220c80132cb920 t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkpp9gEACgkQC0OgUPgL2ScZtACeNc6zREimtB9xE7jJaVTD1Yds
+eLwAn2pwazVXKm04WJwIvLzTTWTMeR6M
+=yU6Z
+-----END PGP SIGNATURE-----

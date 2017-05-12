@@ -1,0 +1,44 @@
+Business-Tax-Avalara
+
+Business::Tax::Avalara provides a perl interface to Avalara's REST-based tax web service.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Business::Tax::Avalara
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-Tax-Avalara
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Business-Tax-Avalara
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Business-Tax-Avalara
+
+    Search CPAN
+        http://search.cpan.org/dist/Business-Tax-Avalara/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Kate Kirby & Guillaume Aubert
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

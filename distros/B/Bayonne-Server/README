@@ -1,0 +1,36 @@
+Bayonne-Libexec version 0.06
+============================
+
+This module is meant for use with GNU Bayonne 2, the voice telephony
+application server of the GNU Project.  The Bayonne Server module allows a perl
+application to use the integrated Bayonne 2 serverResponse web service to monitor
+and control a remote Bayonne server.  This might be used by scripts that perform
+system monitoring, web applications that are written in Perl which must invoke
+some telephony function (such as dialing contact telephone numbers) through a
+Bayonne server, or any other specialized perl application which may wish to use
+Bayonne 2 services.
+
+INSTALLATION
+
+To install these modules type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+The Server module uses LWP::UserAgent and XML::Simple.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by David Sugar, Tycho Softworks
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,171 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+=head1 NAME
+
+brackup-verify-inventory - utility to validate brackup inventory entries 
+against the target
+
+=head1 SYNOPSIS
+
+   brackup-verify-inventory [-q|-v] [--delete] <target_name>
+
+=head2 ARGUMENTS
+
+=over 4
+
+=item <target_name>
+
+Required. The name of the brackup target whose inventory you wish to verify. 
+This must match a [TARGET:NAME] config section in your ~/.brackup.conf.
+
+=back
+
+=head2 OPTIONS
+
+=over 4
+
+=item --delete
+
+Optional. Delete orphaned entries found in the inventory.
+
+=item --verbose|-v
+
+Optional. Give more verbose output.
+
+=item --quiet|-q
+
+Optional. Give no output except for errors.
+
+=back
+
+=head1 SEE ALSO
+
+L<brackup>
+
+L<Brackup::Manual::Overview>
+
+=head1 AUTHOR
+
+Gavin Carr <gavin@openfusion.com.au>
+
+Copyright (c) 2008 Gavin Carr.
+
+This module is free software. You may use, modify, and/or redistribute this
+software under the terms of same terms as perl itself.
+
+=cut
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+use Brackup;
+
+$|=1;
+
+my ($opt_help, $opt_quiet, $opt_verbose, $opt_delete);
+
+my $config_file = Brackup::Config->default_config_file_name;
+
+sub usage {
+    my $why = shift || "";
+    if ($why) { 
+        $why =~ s/\s+$//;
+        $why = "Error: $why\n\n";
+    }
+    die "${why}brackup-verify-inventory [-q|-v] [--delete] <target_name>\nbrackup-verify-inventory --help\n";
+}
+
+usage() unless
+    GetOptions(
+               'config=s'       => \$config_file,
+               'delete'         => \$opt_delete,
+               'quiet|q'        => \$opt_quiet,
+               'verbose|v+'     => \$opt_verbose,
+               'help|h|?'       => \$opt_help,
+               );
+if ($opt_help) {
+    eval "use Pod::Usage;";
+    Pod::Usage::pod2usage( -verbose => 1, -exitval => 0 );
+    exit 0;
+}
+
+usage() unless @ARGV == 1;
+my $target_name = shift @ARGV;
+usage() unless $target_name;
+usage() if $opt_quiet && $opt_verbose;
+
+my $config = eval { Brackup::Config->load($config_file) } or
+    usage($@);
+
+my $target = eval { $config->load_target($target_name) } or
+    usage($@);
+
+my $inv_db = $target->inventory_db
+    or die "Cannot locate target inventory db";
+
+print "Fetching list of chunks from target\n" if $opt_verbose;
+my %chunks = map { $_ => 1 } $target->chunks;
+
+print "Checking inventory entries\n" if $opt_verbose;
+my ($count, $ok, $bad, $skip) = (0, 0, 0, 0);
+my $total = $inv_db->count / 100;
+my %ok = ();
+my $deleting = $opt_delete ? ' - deleting from inventory' : '';
+while (my ($key, $value) = $inv_db->each) {
+    $count++;
+    my ($dig, $size) = split /\s+/, $value;
+    my $path = $target->chunkpath($dig);
+
+    if ($opt_verbose && $opt_verbose == 1) {
+        printf "Checked %s inventory entries (%0.1f%%)\n", $count, $count / $total
+            if $count && $count % 1000 == 0;
+    }
+    elsif ($opt_verbose && $opt_verbose >= 2) { 
+        printf "Checking %s, size %s (%0.01f%%)\n", $path, $size, $count / $total;
+    }
+
+    if ($ok{$dig}) {
+        $ok++;
+        next;
+    }
+
+    if (! $chunks{$dig}) {
+        warn "Error: chunk $path (key $key) is missing on target$deleting\n";
+        $inv_db->delete($key) if $opt_delete;
+        $bad++;
+        next;
+    }
+
+    my $chunk_size = eval { $target->size($path) };
+    if (defined $chunk_size) {
+        if ($chunk_size == $size) {
+            $ok{$dig} = 1;
+            $ok++;
+        }
+        else {
+            warn "Error: chunk $path (key $key) has incorrect size (inv $size, " .
+                 "target $chunk_size)$deleting\n";
+            $inv_db->delete($key) if $opt_delete;
+            $bad++;
+        }
+    }
+    else {
+        warn "Warning: no size returned for chunk $path, skipping\n";
+        $skip++;
+    }
+}
+
+print "Checked $count inventory entries, $ok good, $bad bad, $skip skipped.\n" 
+    unless $opt_quiet;
+exit $bad ? 1 : 0;
+
+# vim:sw=4
+

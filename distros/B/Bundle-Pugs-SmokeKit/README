@@ -1,0 +1,35 @@
+Bundle::Pugs::SmokeKit
+======================
+
+  ### This bundle is obsoleted in favor of Task::Smoke. ###
+  ### Please install that instead.                      ###
+
+Pugs is an experimental implementation of Perl 6. It does not have many
+prerequisites by itself: merely perl 5.6.1 or 5.8.3, and a decently
+new ExtUtils::MakeMaker.
+
+If you wish to run the powerful smoke test system that comes with pugs,
+however, you'll need these modules. Once installed, you can run a smoke
+test and generate a colorful smoke.html by running the following command
+in the pugs build directory:
+
+  make smoke
+
+You are encouraged to submit your results to the public smokeserver,
+especially if you run on an uncommon platform:
+
+  perl util/smokeserv/smoke-client.pl smoke.html
+
+
+
+What does this bundle install?
+==============================
+
+This bundle will bring in:
+
+YAML                         - YAML serialization language
+URI
+MKDoc::XML
+Petal                        - Perl Template Attribute Language
+Test::TAP::Model             - Model for smoke test resuls
+Test::TAP::HTMLMatrix        - Colorful smoke result report

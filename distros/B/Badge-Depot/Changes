@@ -1,0 +1,104 @@
+Revision history for Badge-Depot
+
+0.0104 2016-02-19 22:06:00 UTC
+ [New Features]
+ - New attribute 'zilla' that exposes the Dist::Zilla object if
+   Badge::Depot is used via Pod::Weaver::Section::Badges during a
+   Dist::Zilla build.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 22 insertions(+), 12 deletions(-)
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ Types::Standard (any) --> 1.000005
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) - Module::Build::Tiny
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::ContributorsFromGit
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::ModuleBuildTiny
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1407
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.0103 2015-03-19T18:46:54Z CET
+ [Meta]
+ - Updated iller.yaml syntax.
+
+ [Bug Fixes]
+ - Fixed a markdown syntax error.
+
+ [Documentation]
+ - Added link to Task::Badge::Depot.
+
+0.0102 2015-02-18T14:23:27Z CET
+ [Documentation]
+ - Fixed links to Types::URI.
+
+0.0101 2015-02-17T21:35:56Z CET
+ [Meta]
+ - Removed (unnecessary) cpanfile.
+
+ [Requirements]
+ - Listed as prereq: MooseX::AttributeShortcuts.
+ - Listed as prereq: namespace::autoclean.
+ - Added a dev prereq (in order to link to github from pod).
+
+0.0100 2015-02-17T21:19:06Z CET
+ - Initial release

@@ -1,0 +1,86 @@
+# RSCU values gathered from Ylipolytica (GD_Generate_RSCU_Table_5.53)
+#*
+{TAA} = 1.01
+{TAG} = 1.09
+{TGA} = 0.90
+#A
+{GCA} = 0.58
+{GCC} = 1.67
+{GCG} = 0.55
+{GCT} = 1.19
+#C
+{TGC} = 1.00
+{TGT} = 1.00
+#D
+{GAC} = 1.31
+{GAT} = 0.69
+#E
+{GAA} = 0.61
+{GAG} = 1.39
+#F
+{TTC} = 1.14
+{TTT} = 0.86
+#G
+{GGA} = 1.32
+{GGC} = 1.43
+{GGG} = 0.33
+{GGT} = 0.93
+#H
+{CAC} = 1.19
+{CAT} = 0.81
+#I
+{ATA} = 0.16
+{ATC} = 1.46
+{ATT} = 1.38
+#K
+{AAA} = 0.46
+{AAG} = 1.54
+#L
+{CTA} = 0.38
+{CTC} = 1.50
+{CTG} = 2.33
+{CTT} = 0.87
+{TTA} = 0.13
+{TTG} = 0.78
+#M
+{ATG} = 1.00
+#N
+{AAC} = 1.54
+{AAT} = 0.46
+#P
+{CCA} = 0.56
+{CCC} = 1.69
+{CCG} = 0.58
+{CCT} = 1.17
+#Q
+{CAA} = 0.50
+{CAG} = 1.50
+#R
+{AGA} = 1.06
+{AGG} = 0.37
+{CGA} = 2.31
+{CGC} = 0.58
+{CGG} = 0.98
+{CGT} = 0.69
+#S
+{AGC} = 0.79
+{AGT} = 0.51
+{TCA} = 0.60
+{TCC} = 1.49
+{TCG} = 1.21
+{TCT} = 1.40
+#T
+{ACA} = 0.73
+{ACC} = 1.67
+{ACG} = 0.63
+{ACT} = 0.98
+#V
+{GTA} = 0.23
+{GTC} = 1.26
+{GTG} = 1.60
+{GTT} = 0.90
+#W
+{TGG} = 1.00
+#Y
+{TAC} = 1.52
+{TAT} = 0.48

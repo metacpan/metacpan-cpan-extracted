@@ -1,0 +1,45 @@
+Payments, A1, Wage
+Payments, A2, Private drawing
+Payments, A3, Superannuation
+Payments, A4, ATO/BAS payment
+Payments, A5, Refund (GST-free)
+Payments, A6, Refund (Taxable)
+Payments, A7, Bank charge
+Payments, A8, Interst Paid
+Payments, A9, Loan repayment
+Payments, A10, Purchace of asset
+Payments, A11, Asset improvement
+Payments, A12, Other capital payment
+Payments, A13, Petty cash reimbursement
+Payments, A14, Credit card repayment
+Payments, A15, Private use
+Payments, B1, Purchase
+Payments, B2, Motor vehicle expense
+Payments, B3, Repair and maintenance
+Payments, B4, Rent
+Payments, B5, Telephone
+Payments, B6, Electricity
+Payments, B7, Insurance
+Payments, B8, Sundries
+Payments, B9, Gas
+Payments, B10, Mortgage
+Payments, B11, Water
+Payments, B12, Landscaping
+Payments, B13, Health insurance excess
+Payments, B14, Vet
+Payments, B15, Hardware or software
+Receipts, A1, Interest received
+Receipts, A2, Dividend
+Receipts, A3, Refund (GST-free)
+Receipts, A4, Refund (Taxable)
+Receipts, A5, ATO/BAS refund received
+Receipts, A6, Loan received
+Receipts, A7, Sale of assets
+Receipts, A8, Other capital receipts
+Receipts, A9, Other non-capital receipts
+Receipts, A10, Bankings
+Receipts, B1, Sales
+Receipts, B2, Distribution
+Receipts, B3, Payment to vet
+Receipts, B4, Loan from Visa card
+Receipts, B5, Redraw from mortgage

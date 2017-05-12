@@ -1,0 +1,40 @@
+NAME
+    Business::PaperlessTrans::Client - PaperlessTrans Client object
+
+VERSION
+    version 0.002000
+
+DESCRIPTION
+    PaperlessTrans is a secure and seamless bridge between your IT
+    infrastructure and the Paperless Transactions cloud. This service
+    enables your organization to connect directly and securely for
+    processing credit card and ACH transactions.
+
+ATTRIBUTES
+  user
+    Terminal ID
+
+  pass
+    Terminal Key
+
+  debug
+  test
+METHODS
+  submit
+            my $response = $client->submit( $request );
+
+WITH
+    uses the standard interface provided by:
+
+    MooseY::RemoteHelper::Role::Client
+
+AUTHOR
+    Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

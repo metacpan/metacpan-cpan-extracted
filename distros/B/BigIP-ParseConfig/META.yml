@@ -1,0 +1,9 @@
+--- #YAML:1.0
+name:                BigIP-ParseConfig
+version:             1.1.9
+abstract:            F5/BigIP configuration parser
+license:             perl
+distribution_type:   module
+author:
+    - Scott Schneider <sschneid@gmail.com>
+

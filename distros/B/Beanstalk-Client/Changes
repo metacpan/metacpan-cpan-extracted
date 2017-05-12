@@ -1,0 +1,34 @@
+1.07 -- Tue Dec 18 09:41:22 CST 2012
+
+  * Update repository location
+  * Added support for new command, kick_job [Ian Docherty]
+  * Documentation update
+
+1.06 -- Fri Dec 11 11:00:10 CST 2009
+
+  * Remove requirement of Error as we do not use it
+  * Add quit and pause_tube methods
+  * Update documentation
+
+1.05 Mon Apr  6 15:32:11 CDT 2009
+ * Do not restart read/write if socket has been closed
+
+1.04 Mon Dec 29 14:14:18 CST 2008
+ * Ensure watch_only does not crash if called before connect
+ * Ensure list_tubes_watched returns an empty list on error
+
+1.03 Mon Dec 22 16:09:39 CST 2008
+ * Fix $job->reserve to return true for reserved jobs
+ * Ensure that used tube and watched tube list is restored on reconnect
+
+1.02 Fri Dec  5 06:28:24 CST 2008
+ * Fix skip count in tests when no local beanstalkd server is present
+
+1.01 Tue Dec  2 11:12:51 CST 2008
+ * Do not call AUTOLOAD for DESTORY on Beanstalk::Stats
+ * Do not treat zero-length data or "0" as an error
+ * Added support for touch command
+ * Fix backwards login glitch in reserve for reserve-with-timeout (Rhesa Rozendaal)
+ * Update reserve and buried flags on ::Job when job is deleted or released
+ * Fix prioity parameter to ->put (Ask Bjørn Hansen)
+ * Fix issue reserving jobs >1024 bytes (Ask Bjørn Hansen)

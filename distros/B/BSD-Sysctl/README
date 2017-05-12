@@ -1,0 +1,166 @@
+This file is the README for BSD::Sysctl version 0.11
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+Building this module requires a FreeBSD system and a C compiler.
+Support for OpenBSD and NetBSD will appear in future releases. In
+theory, this module should be able to handle any system that uses
+a sysctl interface to the kernel.
+
+UNINSTALLATION
+
+This Perl module has components which will be found in the following
+directories:
+
+  .../perl5/site_perl/5.x.x/mach/auto/BSD/Sysctl/*
+  .../perl5/site_perl/5.x.x/mach/BSD/Sysctl.pm
+  .../perl5/5.x.x/man/man3/BSD::Sysctl.3
+
+TESTING
+
+This module requires the following module for thorough testing:
+
+  Test::More
+
+This module will use the following modules if they are available:
+(their absence is not a problem).
+
+  Test::Pod
+  Test::Pod::Coverage
+
+In order to test whether setting sysctl variables works, a number
+of preconditions must be met.
+
+Firstly, the test script t/02-set.t must be run with root privileges
+(either as root, or via sudo for example). If not, it will bail out
+gracefully.
+
+Secondly, you must choose the sysctl variable you wish to use.  The
+sysctl(8) man page lists a number of variables that can be modified.
+You must also choose a new value for the variable to store.
+
+BE CAREFUL: if you do not know what you are doing, you can render
+your system unstable, lose network connectivity, lose access to
+your filesystem and/or cause the system to lock up.
+
+If in doubt, a safe choice is a tweak for UDP blackholing:
+
+  net.inet.udp.blackhole
+
+This is usually set to 0, but you can (and often should) set it to
+1. This controls how the system behaves when someone (usually a
+cracker), probes your machine.
+
+Finally, two environment variables must be set. The first variable,
+TEST_BSD_SYSCTL_NAME, holds the name of the variable, and the
+second variable, TEST_BSD_SYSCTL_VALUE, holds the new value to which
+the variable should be set.
+
+On a Bourne shell, the following commands will work:
+
+  % export TEST_BSD_SYSCTL_NAME=net.inet.udp.blackhole
+  % export TEST_BSD_SYSCTL_VALUE=1
+  % sudo make test
+
+When these three preconditions are met, the test script will then
+change the variable to the new value, and then, most importantly,
+set it back to the initial value. In the unlikely event that the
+test script crashes half way through, you will have to restore the
+variable manually to its initial value.
+
+HELPING
+
+Patches welcome!
+
+If you would like to see this module work on other operating systems,
+but don't particularly wish to hack on the source yourself, and you
+have a publically accessible machine on the net, and you are fine
+with the idea of giving me an account on said machine, then drop
+me a line.
+
+I will send you my public key for connecting via ssh. All I need
+is a shell and a C compiler, and I give you my word that I will not
+do anything evil. If required, I will connect only from a fixed
+address (which would allow you to set up an AllowUsers USER@HOST
+rule in your sshd_config file).
+
+IMPLEMENTATION
+
+A sysctl variable is usually specified symbolically, such as
+"net.inet.tcp.sendspace" (also referred to as a MIB). Internally,
+the kernel operates on an equivalent numeric list (also referred
+to as an OID). Furthermore, different variables contain different
+values. They may be numeric or character strings, they may be a
+single value, a list of values, or a set of key/value pairs.
+
+When a sysctl variable is fetched, the module first asks the kernel
+to convert the symbolic name to its numeric equivalent.  If this
+step fails, the module considers that the variable does not exist.
+This step is handled by _mib_info().
+
+If this step succeeds, the module now has the list of numeric values
+(the OID) that corresponds to the variable. It then performs a
+second call to ask the kernel how the result is to be formatted.
+
+It is a reasonable assumption to imagine that different BSD variants
+(perhaps even between major releases of the same operating system)
+will use different techniques for performing this step, and so the
+XS code will probably require a certain amount of conditional
+compilation.
+
+In FreeBSD, the formatting information is returned as a string. For
+instance, "I" is an integer, "IU" is an unsigned integer, "LU" is
+an unsigned long, "A" is an ASCII string.  More complex variables
+return the name of the C struct to use to decode the result, for
+instance the formatting code for "vm.loadavg" is "S,loadavg", which
+implies that the result should be cast to a "struct loadavg".
+
+Sometimes a number of auxilliary header files need to be included
+in order for the header file that defines the structure in question
+to be specified completely. The eg/sizeof.c is handy for figuring
+out what is required.
+
+A performance optimisation concerning the formatting information
+is to map the string names to integers (this means that the results
+can be dealt with in a switch statement, rather than a long if/else
+chain. The mapping table is stored in the mibfmt.map file, and is
+processed by Makefile.PL to produced the C header file needed by
+the XS file.
+
+Once the formatting key has been converted to an integer, the
+information is saved in the %MIB_CACHE hash table.  Each key
+points to a packed list of integers:
+
+  +-------------------------+
+  | format value            |
+  +-------------------------+
+  | count of remaining ints |
+  +-------------------------+
+  | oid element 1           |
+  +-------------------------+
+  | oid element 2           |
+  +-------------------------+
+  | ...                     |
+  +-------------------------+
+  | oid element n           |
+  +-------------------------+
+
+This information can be unpacked in Perl-space with the following
+unpack() template: 'i i/i'.
+
+When adding other operating systems, new format values may be
+appended to the end of the mapping file.
+
+After this step has been performed, _mib_lookup() may then
+proceed with fetching the value associated with the variable.
+The system call is performed, and, assuming no errors, the
+results are formatted (according to what %MIB_CACHE indicates, and
+a scalar, or a reference to an array or hash, is returned.
+
+Reading the source to the sysctl binary is very instructive.  (i.e.
+/usr/src/sbin/sysctl/sysctl.c on FreeBSD).

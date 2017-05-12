@@ -1,0 +1,25 @@
+Bit/FlipFlop version 0.01
+=========================
+
+Bit::FlipFlop is a Perl5 module that facilitates the maintainence of
+one bit (well perhaps slightly more) of state in a Perl program.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl5 and nothing more.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Colin Meyer.  All rights reserved.
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.

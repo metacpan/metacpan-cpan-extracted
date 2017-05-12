@@ -1,0 +1,11 @@
+Revision history for Business::Tax::Canada.
+
+0.03  Fri Mar 30 14:30:00 2007
+	- updated to reflect new lower tax rates effective July 2006. 
+
+0.02  Mon Feb 23 16:47:03 2004
+	- fixed Makefile.PL to not require 5.8.2
+
+0.01  Tue Feb 17 11:55:46 2004
+	- original version
+

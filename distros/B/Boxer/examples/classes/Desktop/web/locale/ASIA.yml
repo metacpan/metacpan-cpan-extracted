@@ -1,0 +1,38 @@
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for Asia
+  pkg:
+    - iceweasel-l10n-ar
+    - iceweasel-l10n-as
+    - iceweasel-l10n-bn-bd
+    - iceweasel-l10n-bn-in
+    - iceweasel-l10n-fa
+    - iceweasel-l10n-gu-in
+    - iceweasel-l10n-he
+    - iceweasel-l10n-hi-in
+    - iceweasel-l10n-id
+    - iceweasel-l10n-ja
+    - iceweasel-l10n-kk
+    - iceweasel-l10n-km
+    - iceweasel-l10n-kn
+    - iceweasel-l10n-ko
+    - iceweasel-l10n-ku
+    - iceweasel-l10n-mai
+    - iceweasel-l10n-ml
+    - iceweasel-l10n-mr
+    - iceweasel-l10n-or
+    - iceweasel-l10n-pa-in
+    - iceweasel-l10n-ru
+    - iceweasel-l10n-si
+    - iceweasel-l10n-ta
+    - iceweasel-l10n-ta-lk
+    - iceweasel-l10n-te
+    - iceweasel-l10n-th
+    - iceweasel-l10n-tr
+    - iceweasel-l10n-vi
+    - iceweasel-l10n-zh-cn
+    - iceweasel-l10n-zh-tw

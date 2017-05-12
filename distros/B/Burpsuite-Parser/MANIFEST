@@ -1,0 +1,19 @@
+Makefile.PL
+README
+AUTHORS
+MANIFEST
+burpsuite.dtd
+scripts/burpsuite_parser.pl
+lib/Burpsuite/Parser.pm
+lib/Burpsuite/Parser.pod
+lib/Burpsuite/Parser/Session.pm
+lib/Burpsuite/Parser/ScanDetails.pm
+lib/Burpsuite/Parser/Issue.pm
+t/00-load.t
+t/01-pod.t
+t/02-modules.t
+t/parser.t
+t/test1.xml
+t/Test.pm
+t/Test/Parser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

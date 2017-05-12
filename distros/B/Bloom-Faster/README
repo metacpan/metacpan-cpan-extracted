@@ -1,0 +1,74 @@
+NAME
+    Bloom::Faster - Perl extension for the c library libbloom.
+
+INSTALLATION
+    see INSTALL
+
+SYNOPSIS
+      use Bloom::Faster;
+  
+      # m = ideal vector size.  
+      # k = # of hash functions to use. 
+
+      my $bloom = new Bloom::Faster({m => 1000000,k => 5});
+
+      # this gives us very tight control of memory usage (a function of m)
+      # and performance (a function of k).  but in most applications, we won't
+      # know the optimal values of either of these.  for these cases, it is 
+      # much easier to supply:
+      #
+      # n = number of expected elements to check for duplicates,
+      # e = acceptable error rate (probability of false positive)
+      #
+      # my $bloom = new Bloom::Faster({n => 1000000, e => 0.00001});
+
+      while (<>) {
+            chomp;
+            # Bloom::Faster->add() returns true when the value is a duplicate.
+            if ($bloom->add($_)) {
+                    print "DUP: $_\n";
+            }
+      }
+
+DESCRIPTION
+    Bloom filters are a lightweight duplicate detection algorithm proposed
+    by Burton Bloom
+    (http://portal.acm.org/citation.cfm?id=362692&dl=ACM&coll=portal), with
+    applications in stream data processing, among others. Bloom filters are
+    a very cool thing. Where occasional false positives are acceptable,
+    bloom filters give us the ability to detect duplicates in a fast and
+    resource-friendly manner.
+
+    The allocation of memory for the bit vector is handled in the c layer,
+    but perl's oo capability handles the garbage collection. when a
+    Bloom::Faster object goes out of scope, the vector pointed to by the c
+    structure will be free()d. to manually do this, the DESTROY builtin
+    method can be called.
+
+    A bloom filter perl module is currently avaible on CPAN, but it is
+    profoundly slow and cannot handle large vectors. This alternative uses a
+    more efficient c library which can handle arbitrarily large vectors (up
+    to the maximum size of a "long long" datatype (at least
+    9223372036854775807, on supported systems ).
+
+  EXPORT
+    None by default.
+
+  Exportable constants
+      HASHCNT
+      PRIME_SIZ
+      SIZ
+
+SEE ALSO
+    libbbloom.so
+
+AUTHOR
+    Peter Alvaro and Dmitriy Ryaboy, <palvaro@ask.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Peter Alvaro and Dmitriy Ryaboy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+

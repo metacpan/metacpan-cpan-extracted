@@ -1,0 +1,15 @@
+=head1 USE
+
+C<Location> literals dump output into the Apache Location directive
+for the controller if you are using the HttpdConf Gantry backend.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Look for C<valid-user> in docs/httpd.conf.
+
+See how the example so cleverly controls indentation so readers never
+have to know the output was generated?

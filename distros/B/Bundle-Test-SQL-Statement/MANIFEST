@@ -1,0 +1,25 @@
+Changes
+lib/Bundle/Test/SQL/Statement.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00error.t
+t/01prepare.t
+t/02execute.t
+t/03import.t
+t/04idents.t
+t/05simple.t
+t/06virtual.t
+t/08join.t
+t/09ops.t
+t/10limit.t
+t/12eval.t
+t/17quoting.t
+t/23dialects.t
+t/SQLtest.pm
+t/TestLib.pm
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

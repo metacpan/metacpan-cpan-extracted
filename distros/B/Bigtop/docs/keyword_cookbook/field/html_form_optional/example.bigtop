@@ -1,0 +1,66 @@
+config {
+    engine MP13;
+    template_engine TT;
+    Init Std {  }
+    SQL SQLite {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+    Conf Gantry { instance kids; }
+}
+app Kids {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    table child {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field name {
+            is varchar;
+            label Name;
+            html_form_type text;
+        }
+        field birth_day {
+            is date;
+            label `Birth Day`;
+            html_form_type text;
+# don't require a birth day:
+            html_form_optional 1;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%name`;
+    }
+    controller Child is AutoCRUD {
+        controls_table child;
+        rel_location child;
+        text_description child;
+        page_link_label Child;
+        method do_main is main_listing {
+            cols name, birth_day;
+            header_options Add;
+            row_options Edit, Delete;
+            title Child;
+            limit_by family;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+            form_name child;
+        }
+    }
+}

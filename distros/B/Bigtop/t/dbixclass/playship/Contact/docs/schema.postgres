@@ -1,0 +1,65 @@
+CREATE SEQUENCE number_seq;
+CREATE TABLE number (
+    id int4 PRIMARY KEY DEFAULT NEXTVAL( 'number_seq' ),
+    name varchar,
+    number varchar,
+    phone_type varchar
+);
+
+CREATE TABLE bday (
+    id SERIAL PRIMARY KEY,
+    contact int4,
+    bday date,
+    anniversary date,
+    known_since date
+);
+
+CREATE TABLE tshirt (
+    id SERIAL PRIMARY KEY,
+    ident varchar
+);
+
+CREATE TABLE color (
+    id SERIAL PRIMARY KEY,
+    ident varchar,
+    foreigner int4
+);
+
+CREATE TABLE tshirt_color (
+    id SERIAL PRIMARY KEY,
+    tshirt int4 REFERENCES tshirt(id),
+    color int4 REFERENCES color(id)
+);
+CREATE TABLE tshirt_author (
+    id SERIAL PRIMARY KEY,
+    tshirt int4 REFERENCES tshirt(id),
+    author int4 REFERENCES author(id)
+);
+CREATE TABLE author (
+    id SERIAL PRIMARY KEY,
+    ident varchar
+);
+
+CREATE TABLE book (
+    id SERIAL PRIMARY KEY,
+    ident varchar
+);
+
+CREATE TABLE author_book (
+    id SERIAL PRIMARY KEY,
+    author int4 REFERENCES author(id),
+    book int4 REFERENCES book(id),
+    extra_field varchar,
+    second_extra boolean
+);
+
+INSERT INTO author_book ( author, book, extra_field )
+    VALUES ( 1, 1, 'hello' );
+
+CREATE SEQUENCE sch.name_seq;
+CREATE TABLE sch.name (
+    id int4 PRIMARY KEY DEFAULT NEXTVAL( 'sch.name_seq' ),
+    name varchar,
+    number varchar
+);
+

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 ebdc658d6021422c9092eda31f749202248e311a Changes
+SHA1 cd955f98383a84fe0c5ee077f82d9b21e68a6a62 INSTALL
+SHA1 062871100d8097d0f764471ee3465d2cb30dcc11 LICENSE
+SHA1 2b3517d8391e69c86208b7831c44f5558e9f7014 MANIFEST
+SHA1 11801d2e49e252c228231c40c1dd74bc4f3539c2 MANIFEST.SKIP
+SHA1 b5c30767401c7ab59fa97263253a5f46bc3d5b22 META.json
+SHA1 356c6b26c32ac0658393bd8c9d9d9f225e3a3975 META.yml
+SHA1 0ab3f77b94299fc37ca459b2694f9b846cefd189 Makefile.PL
+SHA1 5694c40ddd10c138db76e9e26dfad50a6e280a8a README
+SHA1 b870859b28e01da2776f048d283eeb679ef44e88 README.md
+SHA1 86aa5d9e81bc6ebf680eb27dc83c8ef86b4dcf0e dist.ini
+SHA1 aa04d27f2b5ad46726e429e7eee9da30433b96b2 lib/Brannigan.pm
+SHA1 853d6a0ec177a5c166a85a5c7eb54eccdbcb0663 lib/Brannigan/Examples.pod
+SHA1 0739a44ea44a00f294fe4e7e1fb7b750935f566a lib/Brannigan/Tree.pm
+SHA1 c8b2a96626ae2a65b58bcc3d6cfcfe6b473f5825 lib/Brannigan/Validations.pm
+SHA1 a2f2e5a4c96b075e7d4ba80c42664de2ae5ef302 t/00-load.t
+SHA1 89814eacbe1013a78da411edb51c88cde8de08d1 t/01-validations.t
+SHA1 5289c4282d85da9a5b317f218fdaeb1345f1ef30 t/02-simple.t
+SHA1 9b484dbb12b71175b0f1dfbff546c704085c46d6 t/03-complex.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iHUEAREIAB0WIQTYtJGMHsdqxHuiCD1rg4dAAUzXRwUCWJjiXAAKCRBrg4dAAUzX
+R07EAP48iuj4oAEGij2MjjMyaUv7KhX3YQebHGfbcuoi4UZzugD+PzJBUNlAHw2T
+AHPs0la7Nd1ASBszJ36KKxAvuAIt0b8=
+=9TkN
+-----END PGP SIGNATURE-----

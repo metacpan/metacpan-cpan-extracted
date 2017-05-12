@@ -1,0 +1,107 @@
+NAME
+    Business::TNT::ExpressConnect - TNT ExpressConnect interface
+
+SYNOPSIS
+        # read config from config file
+        my $tnt = Business::TNT::ExpressConnect->new();
+
+        # provide username and password
+        my $tnt = Business::TNT::ExpressConnect->new({username => 'john', password => 'secret'});
+
+        # use xml file to define the request
+        my $tnt_prices = $tnt->get_prices({file => $xml_filename});
+
+        #use a hash to define the request (only one of consignmentDetails or pieceLines has to be present)
+        my %params = (
+            sender             => {country => 'AT', town => 'Vienna',    postcode => 1020},
+            delivery           => {country => 'AT', town => 'Schwechat', postcode => '2320'},
+            account            => {accountNumber => 33505, accountCountry => 'SK'},
+            consignmentDetails => {
+                totalWeight         => 1.25,
+                totalVolume         => 0.1,
+                totalNumberOfPieces => 1
+            }
+            pieceLines => [
+                {   pieceLine => {
+                        numberOfPieces    => 2,
+                        pieceMeasurements => {weight => 11, length => 0.44, width => 0.37, height => 1},
+                        pallet            => 0,
+                    }
+                },
+            ],
+        );
+
+        $tnt_prices = $tnt->get_prices({params => \%params});
+
+        warn join("\n",@{$tnt->errors}) unless ($tnt_prices);
+
+        # tnt prices structure
+        $tnt_prices = {
+              '10' => {
+                      'charge_elements' => 'HASH(0x40a5f40)',
+                      'total_price_excl_vat' => '96.14',
+                      'vat_amount' => '19.23',
+                      'price_desc' => '10:00 Express',
+                      'total_price' => '115.37',
+                      'sort_index' => 1,
+                      'currency' => 'EUR'
+                    },
+              '09' => {
+                      'currency' => 'EUR',
+                      'sort_index' => 0,
+                      'charge_elements' => 'HASH(0x40b0130)',
+                      'total_price_excl_vat' => '101.79',
+                      'vat_amount' => '20.36',
+                      'total_price' => '122.15',
+                      'price_desc' => '9:00 Express'
+                    },
+            };
+
+DESCRIPTION
+    Calculate prices for TNT delivery.
+
+    Schema definitions and user guides:
+    https://express.tnt.com/expresswebservices-website/app/pricingrequest.ht
+    ml
+
+CONFIGURATION
+  etc/tnt-expressconnect.ini
+        username = john
+        password = secret
+
+METHODS
+  get_prices(\%hash)
+    get_prices({file => $filename}) or get_prices({params => \%params})
+
+    Returns a hash of tnt products for that request or undef in case of
+    error. $tnt->errors returns an array ref with error messages.
+
+  hash_to_price_request_xml(\%hash)
+    Takes a hash and turns it into a XML::LibXML::Document for a price
+    request.
+
+  http_ping
+    Check if tnt server is reachable.
+
+  tnt_get_price_url
+    Returns the URL of the TNT price check interface.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'; Andrea Pavlovic, `<spinne at
+    cpan.org>'
+
+CONTRIBUTORS
+    The following people have contributed to the meon::Web by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        you?
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

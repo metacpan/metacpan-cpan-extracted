@@ -1,0 +1,5 @@
+Taxon	FI.5m	RI.5m	TR.5m
+Archaea;Euryarchaeota	0.2342192691	0.0	0.4
+Eukaryota;Viridiplantae	0.2142857143	0.9536354057	0.0195488722
+Bacteria;Tenericutes	0.0	0.0	0.0
+Bacteria;Proteobacteria	0.5514950166	0.0463645943	0.5804511278

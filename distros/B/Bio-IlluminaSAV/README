@@ -1,0 +1,52 @@
+NAME
+    Bio::IlluminaSAV - Parse Illumina SAV files
+
+SYNOPSIS
+    Routines for parsing and extracting information from Illumina SAV files
+    (aka "InterOp").
+
+        use IlluminaSAV;
+
+        my $savs = IlluminaSAV->new("/path/to/rundirectory");
+        my @qmetrics = $savs->quality_metrics();
+        my $cur_cycle = $savs->cur_cycle();
+        my $num_reads = $savs->num_reads();
+
+DESCRIPTION
+    Easy access to Illumina's SAV file data.
+
+AUTHOR
+    Andrew Hoerter & Erik Aronesty, <earonesty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 Erik Aronesty / Expression Analysis
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+
+CONSTANTS
+        # constants you can use
+        TILE_METRIC_CLUST_DENS
+        TILE_METRIC_PF_CLUST_DENS
+        TILE_METRIC_NUM_CLUSTERS
+        TILE_METRIC_NUM_PF_CLUSTERS
+        TILE_METRIC_CONTROL_LANE
+
+FUNCTIONS
+    cur_cycle Return the current run extraction cycle
+    cur_copy_cycle Return the current copy cycle
+    max_cycles Return the maximum number of cycles
+    num_lanes Return the number of lanes
+    num_reads Return the number of reads
+    run_info Returns a hash with RunInfo.xml info
+    extraction_metrics Load extraction metrics
+    quality_metrics Load quality metrics
+    error_metrics Load error metrics
+    tile_metrics Load tile metrics
+    corrected_int_metrics Load corrected int metrics
+    control_metrics Load control metrics
+    image_metrics Load image metrics
+    parse_sav_file(PATHNAME) Load binary SAV-format file PATHNAME, inferring
+    the type from the filename
+

@@ -1,0 +1,9 @@
+classes:
+  - Admin.base
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include support and tools for Logical Volume Management
+  pkg:
+    - lvm2

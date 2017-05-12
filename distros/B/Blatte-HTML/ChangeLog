@@ -1,0 +1,5 @@
+2001-05-12  Bob Glickstein  <bobg@marzipan.emphatic.com>
+
+	* lib/Blatte/HTML.pm: change \html_bool_yes and \html_bool_no to
+		  subroutines (to make the values immutable); 
+		  add \html_(p|ent)_(yes|no); fix doc typo.

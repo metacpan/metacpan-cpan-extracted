@@ -1,0 +1,22 @@
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml
+META.json
+Bio/IlluminaSAV.pm
+sample-gaii-run/InterOp/ControlMetricsOut.bin
+sample-gaii-run/InterOp/CorrectedIntMetricsOut.bin
+sample-gaii-run/InterOp/ErrorMetricsOut.bin
+sample-gaii-run/InterOp/ExtractionMetricsOut.bin
+sample-gaii-run/InterOp/QMetricsOut.bin
+sample-gaii-run/InterOp/TileMetricsOut.bin
+sample-gaii-run/RunInfo.xml
+sample-miseq-run/InterOp/ControlMetricsOut.bin
+sample-miseq-run/InterOp/CorrectedIntMetricsOut.bin
+sample-miseq-run/InterOp/ErrorMetricsOut.bin
+sample-miseq-run/InterOp/ExtractionMetricsOut.bin
+sample-miseq-run/InterOp/IndexMetricsOut.bin
+sample-miseq-run/InterOp/QMetricsOut.bin
+sample-miseq-run/InterOp/TileMetricsOut.bin
+sample-miseq-run/RunInfo.xml
+t/01-tests.t

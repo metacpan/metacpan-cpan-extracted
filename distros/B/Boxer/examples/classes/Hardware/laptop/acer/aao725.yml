@@ -1,0 +1,9 @@
+classes:
+  - Hardware.motherboard.amd.c60
+  - Hardware.nic.broadcom.sta
+  - Hardware.laptop
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include support for Acer Aspire One 725 laptop

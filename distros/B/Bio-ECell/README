@@ -1,0 +1,59 @@
+Bio-ECell version 0.01
+======================
+
+Bio::ECell is a Perl interface for the E-Cell Simulation Environment 
+version 3 (http://www.e-cell.org/), a generic cell simulation software 
+for molecular cell biology researches that allow object-oriented modeling 
+and simulation, multi-algorithm/time-scale simulation, and scripting 
+through Python. This module allows scripting of sessions with Perl. 
+
+For the details of the E-Cell API, users should refer to the chapter
+about scripting a simulation session of E-Cell3 Users Manual, available
+at the above-mentioned web-site.
+
+Example:
+
+    use Bio::ECell;
+
+    my $ecell = Bio::ECell::new();
+
+    $ecell->loadModel("simple.eml");
+    $ecell->message("Message from Perl!");
+
+    my $logger = $ecell->createLoggerStub('Variable:/:S:Value');
+    $logger->create();
+
+    print $ecell->getCurrentTime(), "\n";
+    $ecell->run(100);
+    print $ecell->getCurrentTime(), "\n";
+
+    my $data = Bio::ECell->ECDDataFile($logger );
+    $data->setDataName( $logger->getName() );
+    $data->save('S.ecd');
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Inline::Python
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Kazuharu Arakawa (gaou@sfc.keio.ac.jp)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

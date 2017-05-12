@@ -1,0 +1,5 @@
+=head1 Using the Generic Shopping Cart
+
+Currently, the only GUI feature activated is the one allowing you to search for orders by oder number.
+
+So, just type in a number and click Search.

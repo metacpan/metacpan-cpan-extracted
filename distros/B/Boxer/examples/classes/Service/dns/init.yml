@@ -1,0 +1,7 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service-dns:
+      headline:
+        - Domain name service

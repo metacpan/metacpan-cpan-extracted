@@ -1,0 +1,28 @@
+0.04    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.03    2016-01-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix name of main package.
+
+
+0.02    2016-01-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with fixed dist.ini & updated
+          Pod::Weaver::Plugin::Bencher::Scenario (0.04) to show Abstract & list
+          modules that are only listed in scenario's 'modules' property.
+
+
+0.01    2016-01-06 (PERLANCAR)
+
+        - First release.

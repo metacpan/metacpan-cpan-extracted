@@ -1,0 +1,9 @@
+classes:
+  - Admin.apt.auto.core
+parameters:
+  doc:
+    admin:
+      pkg:
+        - mark misc. packages, relevant only as dependencies, as auto-installed
+  pkg-auto:
+    - vim-common

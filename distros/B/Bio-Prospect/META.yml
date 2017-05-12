@@ -1,0 +1,62 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bio-Prospect
+version:      1.04
+version_from: 
+installdirs:  site
+requires:
+    Bio::Align::AlignI:            0
+    Bio::AlignIO:                  0
+    Bio::AnnotatableI:             0
+    Bio::Annotation::Collection:   0
+    Bio::Annotation::SimpleValue:  0
+    Bio::Annotation::TypeManager:  0
+    Bio::AnnotationCollectionI:    0
+    Bio::AnnotationI:              0
+    Bio::DescribableI:             0
+    Bio::FeatureHolderI:           0
+    Bio::IdentifiableI:            0
+    Bio::LocatableSeq:             0
+    Bio::Location::Atomic:         0
+    Bio::Location::CoordinatePolicyI: 0
+    Bio::Location::Fuzzy:          0
+    Bio::Location::FuzzyLocationI: 0
+    Bio::Location::Simple:         0
+    Bio::Location::WidestCoordPolicy: 0
+    Bio::LocationI:                0
+    Bio::PrimarySeq:               0
+    Bio::PrimarySeqI:              0
+    Bio::RangeI:                   0
+    Bio::Root::Exception:          0
+    Bio::Root::IO:                 0
+    Bio::Root::Root:               1
+    Bio::Root::RootI:              1
+    Bio::Seq:                      1.1
+    Bio::SeqI:                     0
+    Bio::SeqUtils:                 0
+    Bio::SimpleAlign:              0
+    Bio::Structure::Chain:         0
+    Bio::Structure::Entry:         0
+    Bio::Structure::IO:            0
+    Bio::Structure::Model:         0
+    Bio::Structure::StructureI:    0
+    Bio::Symbol::Alphabet:         0
+    Bio::Symbol::AlphabetI:        0
+    Bio::Symbol::ProteinAlphabet:  0
+    Bio::Symbol::Symbol:           0
+    Bio::Symbol::SymbolI:          0
+    Bio::Tools::CodonTable:        0
+    Bio::Tools::IUPAC:             0
+    Carp::Assert:                  0.17
+    Data::Dumper:                  2.121
+    Error:                         0.15
+    IO::Scalar:                    2.104 
+    IO::String:                    1.02
+    IO::WrapTie:                   2.102 
+    SOAP::Lite:                    0.55
+    URI:                           1.27
+    URI::Escape:                   3.21
+    XML::Simple:                   2.09
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

@@ -1,0 +1,26 @@
+---
+abstract: 'Additional statistics on your SILAC evidence'
+author:
+  - 'jimi <j@0na.me>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-MaxQuant-Evidence-Statistics
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Statistics::Distributions: 0
+  Test::More: 0
+  Test::More::Behaviour: 0
+  Text::CSV: 0
+version: 0.01

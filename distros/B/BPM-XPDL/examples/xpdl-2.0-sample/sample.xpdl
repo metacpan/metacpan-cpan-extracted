@@ -1,0 +1,1323 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<Package xmlns:xyz="http://www.xyzeorder.com/workflow"
+   Id="1" Name="sample process"
+   xmlns:deprecated="http://www.wfmc.org/2002/XPDL1.0" 
+   xmlns="http://www.wfmc.org/2004/XPDL2.0alpha"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+   xsi:schemaLocation="http://www.wfmc.org/2004/XPDL2.0alpha"> 
+<PackageHeader> 
+<XPDLVersion>2.0</XPDLVersion> 
+<Vendor>Global 360</Vendor> 
+<Created>06/04/2005 14:50:58 PM</Created> 
+</PackageHeader> 
+<ConformanceClass GraphConformance="NON_BLOCKED"/> 
+<Script Type="text/javascript"/> 
+<TypeDeclarations> 
+<TypeDeclaration Id="Order" Name="Order"> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd"/> 
+</TypeDeclaration> 
+<TypeDeclaration Id="OrderStatus" Name="OrderStatus"> 
+<SchemaType> 
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified"> 
+<xsd:element name="Status"> 
+<xsd:simpleType> 
+<xsd:restriction base="xsd:NMTOKEN"> 
+<xsd:enumeration value="ValidData"/> 
+<xsd:enumeration value="InvalidData"/> 
+<xsd:enumeration value="Accept"/> 
+<xsd:enumeration value="BadCredit"/> 
+<xsd:enumeration value="OverLimit"/> 
+<xsd:enumeration value="BadDataFormat"/> 
+</xsd:restriction> 
+</xsd:simpleType> 
+</xsd:element> 
+</xsd:schema> 
+</SchemaType> 
+</TypeDeclaration> 
+<TypeDeclaration Id="CardType" Name="CardType"> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd" xref="cardType" namespace="orderschema/Order"/> 
+</TypeDeclaration> 
+<TypeDeclaration Id="CreditInfo" Name="CreditInfo"> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="CreditInfo"/> 
+</TypeDeclaration> 
+</TypeDeclarations> 
+<Participants> 
+<Participant Id="DBConnection"> 
+<ParticipantType Type="SYSTEM"/> 
+<Description>Reference to Database Resource</Description> 
+</Participant> 
+</Participants> 
+<Pools> 
+<Pool Process="1" Id="2" BoundaryVisible="false"> 
+<Lanes/> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1"/> 
+</NodeGraphicsInfos> 
+</Pool> 
+<Pool Process="2" Id="3" Name="" BoundaryVisible="true"> 
+<Lanes> 
+<Lane Id="0" Name="Lane-0" ParentLane="3"> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1176.0" Height="239.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="22.0" YCoordinate="4.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Lane> 
+</Lanes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1200.0" Height="247.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="0.0" YCoordinate="0.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Pool> 
+<Pool Process="3" Id="5" Name="" BoundaryVisible="true"> 
+<Lanes> 
+<Lane Id="1" Name="Lane-1" ParentLane="5"> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1176.0" Height="80.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="22.0" YCoordinate="252.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Lane> 
+</Lanes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1200.0" Height="88.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="0.0" YCoordinate="248.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Pool> 
+<Pool Process="4" Id="7" Name="" BoundaryVisible="true"> 
+<Lanes> 
+<Lane Id="2" Name="Lane-2" ParentLane="7"> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1176.0" Height="156.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="22.0" YCoordinate="342.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Lane> 
+</Lanes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" Width="1200.0" Height="164.0" BorderColor="-16777216" FillColor="-32"> 
+<Coordinates XCoordinate="0.0" YCoordinate="338.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Pool> 
+</Pools> 
+<WorkflowProcesses> 
+<WorkflowProcess Id="2" Name="EORDER"> 
+<ProcessHeader/> 
+<FormalParameters> 
+<FormalParameter Id="orderString" Mode="IN"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="returnMessage" Mode="OUT"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+<Applications> 
+<Application Id="transformData"> 
+<FormalParameters> 
+<FormalParameter Id="orderStringIn" Mode="IN"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="orderInfo" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="Order"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="checkData"> 
+<FormalParameters> 
+<FormalParameter Id="orderInfo" Mode="IN"> 
+<DataType> 
+<DeclaredType Id="Order"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="statusOut" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="OrderStatus"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="checkVendor"> 
+<FormalParameters> 
+<FormalParameter Id="accountNumberIn" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="amountIn" Mode="IN"> 
+<DataType> 
+<BasicType Type="FLOAT"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="statusOut" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="OrderStatus"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="enterOrder"> 
+<FormalParameters> 
+<FormalParameter Id="orderInfoIn" Mode="IN"> 
+<DataType> 
+<DeclaredType Id="Order"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="orderNumber" Mode="OUT"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="composeMessage"> 
+<FormalParameters> 
+<FormalParameter Id="statusIn" Mode="IN"> 
+<DataType> 
+<DeclaredType Id="OrderStatus"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="orderNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+</Applications> 
+<DataFields> 
+<DataField Id="1" Name="orderNumber" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+<Length>0</Length> 
+<Description/> 
+</DataField> 
+<DataField Id="3" Name="status" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+<Length>0</Length> 
+<Description/> 
+</DataField> 
+<DataField Id="4" Name="orderInfo" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+<Length>0</Length> 
+<Description/> 
+</DataField> 
+</DataFields> 
+<ActivitySets/> 
+<Activities> 
+<Activity Id="10" Name="Transform Data"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="transformData"> 
+<ActualParameters> 
+<ActualParameter>orderString</ActualParameter> 
+<ActualParameter>orderInfo</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="75.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="128.0" YCoordinate="96.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="12" Name="Check Data"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="checkData"> 
+<ActualParameters> 
+<ActualParameter>orderInfo</ActualParameter> 
+<ActualParameter>status</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="XOR"> 
+<TransitionRefs> 
+<TransitionRef Id="17"/> 
+<TransitionRef Id="23"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="75.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="228.0" YCoordinate="98.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="13" Name="check order type"> 
+<Route GatewayType="XOR" MarkerVisible="true"/> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="XOR"> 
+<TransitionRefs> 
+<TransitionRef Id="18"/> 
+<TransitionRef Id="20"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="44.0" Height="44.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="420.0" YCoordinate="70.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="14" Name="Check Vendor Account"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="checkVendor"> 
+<ActualParameters> 
+<ActualParameter>orderInfo.AccountNumber</ActualParameter> 
+<ActualParameter>orderInfo.ToltalAmount</ActualParameter> 
+<ActualParameter>status</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="XOR"> 
+<TransitionRefs> 
+<TransitionRef Id="24"/> 
+<TransitionRef Id="28"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="43.0" Height="43.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="576.0" YCoordinate="130.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="19" Name="Credit Check"> 
+<Implementation> 
+<deprecated:SubFlow Id="3" Execution="SYNCHR"> 
+<deprecated:ActualParameters> 
+<deprecated:ActualParameter>orderInfo.accountNumber</deprecated:ActualParameter> 
+<deprecated:ActualParameter>orderInfo.cardType</deprecated:ActualParameter> 
+<deprecated:ActualParameter>orderInfo.emailAddress</deprecated:ActualParameter> 
+<deprecated:ActualParameter>status</deprecated:ActualParameter> 
+</deprecated:ActualParameters> 
+</deprecated:SubFlow> 
+</Implementation> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="XOR"> 
+<TransitionRefs> 
+<TransitionRef Id="27"/> 
+<TransitionRef Id="25"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="52.0" Height="46.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="563.0" YCoordinate="11.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="21" Name="Compose Rejection Message"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="composeMessage"> 
+<ActualParameters> 
+<ActualParameter>status</ActualParameter> 
+<ActualParameter>orderNumber</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Join Type="XOR"/> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="66.0" Height="42.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="998.0" YCoordinate="195.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="26" Name="Enter Order"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="enterOrder"> 
+<ActualParameters> 
+<ActualParameter>orderInfo</ActualParameter> 
+<ActualParameter>orderNumber</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Join Type="XOR"/> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="49.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="873.0" YCoordinate="73.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="29" Name="Fill Order"> 
+<Implementation> 
+<deprecated:SubFlow Id="4" Execution="SYNCHR"> 
+<deprecated:ActualParameters> 
+<deprecated:ActualParameter>orderNumber</deprecated:ActualParameter> 
+<deprecated:ActualParameter>orderInfo.orderType</deprecated:ActualParameter> 
+<deprecated:ActualParameter>orderInfo.emailAddress</deprecated:ActualParameter> 
+</deprecated:ActualParameters> 
+</deprecated:SubFlow> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="60.0" Height="35.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="996.0" YCoordinate="78.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="30" Name=""> 
+<Route GatewayType="AND" MarkerVisible="true"/> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="AND"> 
+<TransitionRefs> 
+<TransitionRef Id="36"/> 
+<TransitionRef Id="39"/> 
+<TransitionRef Id="40"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="37.0" Height="37.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="941.3999633789062" YCoordinate="81.20000457763672"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="31" Name=""> 
+<Route GatewayType="AND" MarkerVisible="true"/> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Join Type="AND"/> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="41.0" Height="41.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1086.800048828125" YCoordinate="75.19999694824219"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="33" Name="Compose Acceptance Message"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="composeMessage"> 
+<ActualParameters> 
+<ActualParameter>status</ActualParameter> 
+<ActualParameter>orderNumber</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="59.0" Height="43.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="994.0" YCoordinate="22.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="34" Name="Email Confirmation"> 
+<Implementation> 
+<No/> 
+</Implementation> 
+<ExtendedAttributes> 
+<ExtendedAttribute Name="SystemActivity" Value="Email"/> 
+<ExtendedAttribute Name="Email"> 
+<xyz:Email to="orderInfo.emailAddress" subject="Order orderNumber"> 
+<xyz:MessageText>Order number orderNumber is being processed. 
+Thank-you for ordering from PQR Products, Inc</xyz:MessageText> 
+</xyz:Email> 
+</ExtendedAttribute> 
+</ExtendedAttributes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="62.0" Height="40.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="997.0" YCoordinate="131.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="46" Name=""> 
+<Event> 
+<IntermediateEvent Trigger="Error" Target="10"> 
+<ResultError ErrorCode="1"/> 
+</IntermediateEvent> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="50.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="142.0" YCoordinate="121.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="48" Name="start"> 
+<Event> 
+<IntermediateEvent Trigger="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="39.0" Height="39.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="59.0" YCoordinate="103.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="50" Name="end"> 
+<Event> 
+<IntermediateEvent Trigger="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="0" Width="33.0" Height="33.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1150.0" YCoordinate="79.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+</Activities> 
+<Transitions> 
+<Transition Id="16" Name="" From="10" To="12"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="203.5" YCoordinate="122.82308197021484"/> 
+<Coordinates XCoordinate="228.5" YCoordinate="123.2227783203125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="20" Name="" From="13" To="19"> 
+<Condition Type="CONDITION">orderType == "Credit"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="464.1615295410156" YCoordinate="92.83846282958984"/> 
+<Coordinates XCoordinate="506.0" YCoordinate="93.0"/> 
+<Coordinates XCoordinate="507.0" YCoordinate="33.0"/> 
+<Coordinates XCoordinate="563.5" YCoordinate="32.13414764404297"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="18" Name="" From="13" To="14"> 
+<Condition Type="CONDITION">orderType == "PO"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="464.5" YCoordinate="92.5"/> 
+<Coordinates XCoordinate="506.0" YCoordinate="92.0"/> 
+<Coordinates XCoordinate="507.0" YCoordinate="151.0"/> 
+<Coordinates XCoordinate="576.6181030273438" YCoordinate="151.88186645507812"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="28" Name="" From="14" To="26"> 
+<Condition Type="CONDITION">staus == "Accept"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="619.450927734375" YCoordinate="151.95091247558594"/> 
+<Coordinates XCoordinate="816.0" YCoordinate="151.0"/> 
+<Coordinates XCoordinate="817.0" YCoordinate="98.0"/> 
+<Coordinates XCoordinate="853.5" YCoordinate="96.11983489990234"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="24" Name="" From="14" To="21"> 
+<Condition Type="CONDITION">staus == "OverLimit"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="619.3720092773438" YCoordinate="151.8720245361328"/> 
+<Coordinates XCoordinate="681.0" YCoordinate="151.0"/> 
+<Coordinates XCoordinate="683.0" YCoordinate="216.0"/> 
+<Coordinates XCoordinate="993.5" YCoordinate="215.60791015625"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="25" Name="" From="19" To="21"> 
+<Condition Type="OTHERWISE"/> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="589.5" YCoordinate="57.5"/> 
+<Coordinates XCoordinate="589.0" YCoordinate="111.0"/> 
+<Coordinates XCoordinate="743.0" YCoordinate="111.0"/> 
+<Coordinates XCoordinate="743.0" YCoordinate="216.0"/> 
+<Coordinates XCoordinate="993.5" YCoordinate="215.63043212890625"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="35" Name="" From="26" To="30"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="922.5" YCoordinate="98.00992584228516"/> 
+<Coordinates XCoordinate="939.65673828125" YCoordinate="97.15673828125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="36" Name="" From="30" To="29"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="974.5991821289062" YCoordinate="96.90082550048828"/> 
+<Coordinates XCoordinate="996.5" YCoordinate="97.54743194580078"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="37" Name="" From="29" To="31"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1056.5" YCoordinate="96.90939331054688"/> 
+<Coordinates XCoordinate="1078.59423828125" YCoordinate="97.09429168701172"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="39" Name="" From="30" To="33"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="970.4146728515625" YCoordinate="91.71468353271484"/> 
+<Coordinates XCoordinate="1000.2640380859375" YCoordinate="65.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="40" Name="" From="30" To="34"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="970.9235229492188" YCoordinate="108.17644500732422"/> 
+<Coordinates XCoordinate="1001.8546752929688" YCoordinate="131.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="41" Name="" From="33" To="31"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1053.5" YCoordinate="62.4793586730957"/> 
+<Coordinates XCoordinate="1095.1297607421875" YCoordinate="88.3702392578125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="42" Name="" From="34" To="31"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1057.8876953125" YCoordinate="131.5"/> 
+<Coordinates XCoordinate="1095.8941650390625" YCoordinate="104.79414367675781"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="49" Name="" From="48" To="10"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="97.99977111816406" YCoordinate="122.40513610839844"/> 
+<Coordinates XCoordinate="128.5" YCoordinate="122.25675201416016"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="47" Name="" From="46" To="21"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="166.2860107421875" YCoordinate="170.98980712890625"/> 
+<Coordinates XCoordinate="165.0" YCoordinate="216.0"/> 
+<Coordinates XCoordinate="998.5" YCoordinate="216.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="17" Name="" From="12" To="13"> 
+<Condition Type="CONDITION">status == "Valid Claim"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="303.5" YCoordinate="123.5"/> 
+<Coordinates XCoordinate="360.0" YCoordinate="123.0"/> 
+<Coordinates XCoordinate="359.0" YCoordinate="92.0"/> 
+<Coordinates XCoordinate="420.5" YCoordinate="92.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="23" Name="" From="12" To="21"> 
+<Condition Type="CONDITION">status == "Invalid Data"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="264.84259033203125" YCoordinate="148.5"/> 
+<Coordinates XCoordinate="263.0" YCoordinate="177.0"/> 
+<Coordinates XCoordinate="343.0" YCoordinate="177.0"/> 
+<Coordinates XCoordinate="344.0" YCoordinate="216.0"/> 
+<Coordinates XCoordinate="998.5" YCoordinate="216.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="100" Name="" From="31" To="50"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1128.2655029296875" YCoordinate="96.23451232910156"/> 
+<Coordinates XCoordinate="1150.002197265625" YCoordinate="95.77201080322266"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="101" Name="" From="21" To="50"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="1053.5" YCoordinate="62.4793586730957"/> 
+<Coordinates XCoordinate="1095.1297607421875" YCoordinate="88.3702392578125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="27" Name="" From="19" To="26"> 
+<Condition Type="CONDITION">status == "Accept"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="615.5" YCoordinate="34.5"/> 
+<Coordinates XCoordinate="817.0" YCoordinate="34.0"/> 
+<Coordinates XCoordinate="816.0" YCoordinate="97.0"/> 
+<Coordinates XCoordinate="873.5" YCoordinate="98.19938659667969"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+</Transitions> 
+</WorkflowProcess> 
+<WorkflowProcess Id="3" Name="CreditCheck" AccessLevel="PRIVATE"> 
+<ProcessHeader/> 
+<FormalParameters> 
+<FormalParameter Id="accountNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="amount" Mode="IN"> 
+<DataType> 
+<BasicType Type="FLOAT"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="cardType" Mode="IN"> 
+<DataType> 
+<DeclaredType Id="CardType"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="status" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="OrderStatus"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+<Applications> 
+<Application Id="setCreditInfo"> 
+<Description>Creates and initializes a CreditInfo object.</Description> 
+<FormalParameters> 
+<FormalParameter Id="accountNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="amount" Mode="IN"> 
+<DataType> 
+<BasicType Type="FLOAT"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="cardType" Mode="IN"> 
+<DataType> 
+<DeclaredType Id="CardType"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="creditInfo" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="CreditInfo"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="getCreditAuthorization"> 
+<Description>Gets credit authorization from a charge card web service.</Description> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="GetCreditAuthorization"/> 
+</Application> 
+<Application Id="setOrderStatus"> 
+<Description>Converts status returned by credit check to OrderStatus.</Description> 
+<FormalParameters> 
+<FormalParameter Id="creditStatus" Mode="IN"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="orderStatus" Mode="OUT"> 
+<DataType> 
+<DeclaredType Id="OrderStatus"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+</Applications> 
+<DataFields> 
+<DataField Id="creditStatus" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+<Length>0</Length> 
+</DataField> 
+</DataFields> 
+<ActivitySets/> 
+<Activities> 
+<Activity Id="52" Name="start"> 
+<Event> 
+<StartEvent Trigger="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="1" Width="37.0" Height="37.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="81.0" YCoordinate="272.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="53" Name="Set Credit Info"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="setCreditInfo"> 
+<ActualParameters> 
+<ActualParameter>accountNumber</ActualParameter> 
+<ActualParameter>amount</ActualParameter> 
+<ActualParameter>cardType</ActualParameter> 
+<ActualParameter>creditInfo</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="1" Width="75.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="162.0" YCoordinate="265.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="54" Name="Get Credit Authorization"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="getCreditAuthorization"> 
+<ActualParameters> 
+<ActualParameter>creditInfo</ActualParameter> 
+<ActualParameter>creditStatus</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<ExtendedAttributes> 
+<ExtendedAttribute Name="SystemActivity" Value="WebService"/> 
+</ExtendedAttributes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="1" Width="75.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="286.0" YCoordinate="266.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="55" Name="Set Order Status"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="setOrderStatus"> 
+<ActualParameters> 
+<ActualParameter>creditStatus</ActualParameter> 
+<ActualParameter>status</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="1" Width="75.0" Height="50.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="412.0" YCoordinate="267.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="56" Name="end"> 
+<Event> 
+<EndEvent Result="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="1" Width="37.0" Height="37.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="529.0" YCoordinate="275.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+</Activities> 
+<Transitions> 
+<Transition Id="57" Name="" From="52" To="53"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="117.99984741210938" YCoordinate="293.57501220703125"/> 
+<Coordinates XCoordinate="162.5" YCoordinate="293.7554016113281"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="58" Name="" From="53" To="54"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="237.5" YCoordinate="294.14959716796875"/> 
+<Coordinates XCoordinate="286.5" YCoordinate="294.507080078125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="59" Name="" From="54" To="55"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="361.5" YCoordinate="295.1332092285156"/> 
+<Coordinates XCoordinate="412.5" YCoordinate="295.5028076171875"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="60" Name="" From="55" To="56"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="487.5" YCoordinate="294.5947265625"/> 
+<Coordinates XCoordinate="526.0115356445312" YCoordinate="293.1529846191406"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+</Transitions> 
+</WorkflowProcess> 
+<WorkflowProcess Id="4" Name="Fill Order" AccessLevel="PRIVATE"> 
+<ProcessHeader/> 
+<FormalParameters> 
+<FormalParameter Id="orderNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+<Description>Order number assigned to the order.</Description> 
+</FormalParameter> 
+<FormalParameter Id="orderType" Mode="IN"> 
+<DataType> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd" xref="orderType" 
+namespace="orderschema/Order"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="emailAddress" Mode="IN"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+<Participants> 
+<Participant Id="Shipper"> 
+<ParticipantType Type="ROLE"/> 
+<Description>Order shipper</Description> 
+</Participant> 
+</Participants> 
+<Applications> 
+<Application Id="shipOrder"> 
+<Description>This application presents a screen that presents order information 
+for the order identified by shipOrder. The user may update the order with 
+any changes such as back order information. It returns a string indicating 
+whether the order is complete or on back order.</Description> 
+<FormalParameters> 
+<FormalParameter Id="OrderNumberParam" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="Status" Mode="OUT"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+<Description>The String that describes the status -- either "Complete" 
+or "Backorder"</Description> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="charge"> 
+<Description>Charges the credit card and prepares a receipt for a credit order</Description> 
+<ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="ChargeCreditAccount"/> 
+</Application> 
+<Application Id="billAccount"> 
+<Description>Bills the vendor account</Description> 
+<FormalParameters> 
+<FormalParameter Id="orderNumberParam" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="createInvoice"> 
+<Description>Creates an invoice using the order information and stores it on a 
+server.</Description> 
+<FormalParameters> 
+<FormalParameter Id="orderNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="docURI" Mode="OUT"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="createReceipt"> 
+<Description>Creates a receiptusing the order information and stores it on a 
+server.</Description> 
+<FormalParameters> 
+<FormalParameter Id="orderNumber" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+<FormalParameter Id="docURI" Mode="OUT"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+<Application Id="cancelOrder"> 
+<FormalParameters> 
+<FormalParameter Id="orderNumberIn" Mode="IN"> 
+<DataType> 
+<BasicType Type="INTEGER"/> 
+</DataType> 
+</FormalParameter> 
+</FormalParameters> 
+</Application> 
+</Applications> 
+<DataFields> 
+<DataField Id="docURI" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+<Description>URI of receipt or invoice.</Description> 
+</DataField> 
+<DataField Id="orderStatus" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</DataField> 
+<DataField Id="creditInfo" IsArray="FALSE"> 
+<DataType> 
+<DeclaredType Id="CreditInfo"/> 
+</DataType> 
+</DataField> 
+<DataField Id="creditStatus" IsArray="FALSE"> 
+<DataType> 
+<BasicType Type="STRING"/> 
+</DataType> 
+</DataField> 
+</DataFields> 
+<ActivitySets/> 
+<Activities> 
+<Activity Id="61" Name="start"> 
+<Event> 
+<IntermediateEvent Trigger="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="33.0" Height="33.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="81.0" YCoordinate="375.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="62" Name="Ship Order"> 
+<Description>View order and enter fulfillment info</Description> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="shipOrder"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+<ActualParameter>orderStatus</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection and Shipper</Performer> 
+</Performers> 
+<Deadline Execution="ASYNCHR"> 
+<DeadlineDuration>3 days</DeadlineDuration> 
+<ExceptionName>notifyException</ExceptionName> 
+</Deadline> 
+<Deadline Execution="SYNCHR"> 
+<DeadlineDuration>5 days</DeadlineDuration> 
+<ExceptionName>timeoutException</ExceptionName> 
+</Deadline> 
+<TransitionRestrictions> 
+<TransitionRestriction> 
+<Split Type="AND"> 
+<TransitionRefs> 
+<TransitionRef Id="73"/> 
+<TransitionRef Id="74"/> 
+<TransitionRef Id="81"/> 
+<TransitionRef Id="82"/> 
+</TransitionRefs> 
+</Split> 
+</TransitionRestriction> 
+</TransitionRestrictions> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="57.0" Height="39.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="167.0" YCoordinate="373.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="63" Name="Billing"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="billAccount"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="45.0" Height="29.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="388.0" YCoordinate="350.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="64" Name="Create Invoice"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="createInvoice"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+<ActualParameter>docUri</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="47.0" Height="32.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="541.0" YCoordinate="351.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="65" Name="Email Receipt or Invoice"> 
+<Implementation> 
+<No/> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="61.0" Height="42.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="645.0" YCoordinate="370.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="66" Name="end"> 
+<Event> 
+<IntermediateEvent Trigger="None"/> 
+</Event> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="33.0" Height="33.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="807.0" YCoordinate="395.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="67" Name="Create Receipt"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="createReceipt"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+<ActualParameter>docUri</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="52.0" Height="32.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="539.0" YCoordinate="402.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="68" Name="Get Credit Info"> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="getCreditInfo"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+<ActualParameter>creditInfo</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="50.0" Height="31.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="387.0" YCoordinate="402.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="69" Name="Charge Credit Card"> 
+<Implementation> 
+<No/> 
+</Implementation> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="51.0" Height="43.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="458.0" YCoordinate="398.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="70" Name="Raise Alarm"> 
+<Implementation> 
+<No/> 
+</Implementation> 
+<ExtendedAttributes> 
+<ExtendedAttribute Name="SystemActivity" Value="Alarm"/> 
+</ExtendedAttributes> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="53.0" Height="33.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="127.0" YCoordinate="447.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+<Activity Id="71" Name="Cancel Order"> 
+<Description>View order and enter fulfillment info</Description> 
+<Implementation> 
+<Task> 
+<TaskApplication Id="cancelOrder"> 
+<ActualParameters> 
+<ActualParameter>orderNumber</ActualParameter> 
+</ActualParameters> 
+</TaskApplication> 
+</Task> 
+</Implementation> 
+<Performers> 
+<Performer>DBConnection</Performer> 
+</Performers> 
+<NodeGraphicsInfos> 
+<NodeGraphicsInfo Page="1" LaneId="2" Width="59.0" Height="38.0" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="308.0" YCoordinate="445.0"/> 
+</NodeGraphicsInfo> 
+</NodeGraphicsInfos> 
+</Activity> 
+</Activities> 
+<Transitions> 
+<Transition Id="72" Name="" From="61" To="62"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="113.98829650878906" YCoordinate="380.12127685546875"/> 
+<Coordinates XCoordinate="168.5" YCoordinate="382.1752624511719"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="75" Name="" From="63" To="64"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="433.5" YCoordinate="365.4674987792969"/> 
+<Coordinates XCoordinate="541.5" YCoordinate="367.2218933105469"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="76" Name="" From="68" To="69"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="437.5" YCoordinate="419.1833190917969"/> 
+<Coordinates XCoordinate="458.5" YCoordinate="419.70098876953125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="77" Name="" From="69" To="67"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="509.5" YCoordinate="419.9206237792969"/> 
+<Coordinates XCoordinate="539.5" YCoordinate="419.32568359375"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="78" Name="" From="64" To="65"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="588.5" YCoordinate="372.7461853027344"/> 
+<Coordinates XCoordinate="645.5" YCoordinate="385.0826416015625"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="79" Name="" From="67" To="65"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="591.5" YCoordinate="412.4445495605469"/> 
+<Coordinates XCoordinate="645.5" YCoordinate="399.2513732910156"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="80" Name="" From="65" To="66"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="706.5" YCoordinate="395.7386169433594"/> 
+<Coordinates XCoordinate="807.14794921875" YCoordinate="409.29522705078125"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="83" Name="" From="71" To="66"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="262.5" YCoordinate="464.5"/> 
+<Coordinates XCoordinate="706.0" YCoordinate="464.0"/> 
+<Coordinates XCoordinate="808.4353637695312" YCoordinate="418.23101806640625"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="81" Name="notifyException" From="62" To="70"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="184.88658142089844" YCoordinate="412.5"/> 
+<Coordinates XCoordinate="164.15447998046875" YCoordinate="447.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="82" Name="timeoutException" From="62" To="71"> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="206.23150634765625" YCoordinate="412.5"/> 
+<Coordinates XCoordinate="223.3087158203125" YCoordinate="445.5"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="73" Name="" From="62" To="63"> 
+<Condition Type="CONDITION">orderType == "PO"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="224.5" YCoordinate="393.11090087890625"/> 
+<Coordinates XCoordinate="324.0" YCoordinate="393.0"/> 
+<Coordinates XCoordinate="324.0" YCoordinate="365.0"/> 
+<Coordinates XCoordinate="388.5" YCoordinate="365.13006591796875"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+<Transition Id="74" Name="" From="62" To="68"> 
+<Condition Type="CONDITION">orderType == "Credit"</Condition> 
+<ConnectorGraphicsInfos> 
+<ConnectorGraphicsInfo Page="1" BorderColor="-16777216" FillColor="-1114150"> 
+<Coordinates XCoordinate="224.5" YCoordinate="393.11090087890625"/> 
+<Coordinates XCoordinate="324.0" YCoordinate="393.0"/> 
+<Coordinates XCoordinate="324.0" YCoordinate="417.0"/> 
+<Coordinates XCoordinate="387.5" YCoordinate="417.8579406738281"/> 
+</ConnectorGraphicsInfo> 
+</ConnectorGraphicsInfos> 
+</Transition> 
+</Transitions> 
+</WorkflowProcess> 
+</WorkflowProcesses> 
+<ExtendedAttributes> 
+<ExtendedAttribute Name="System" Value="CapeVisions"/> 
+<ExtendedAttribute Name="Creator" Value="Sketchpad Prototype 2"/> 
+</ExtendedAttributes> 
+</Package> 

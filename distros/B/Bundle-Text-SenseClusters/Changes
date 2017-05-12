@@ -1,0 +1,25 @@
+Revision history for Perl extension Bundle::Text::SenseClusters.
+
+1.05  Tue Oct 06, 2015
+
+	- update versions to SenseClusters 1.05
+
+1.01  Sun Apr 06
+
+	- require SenseClusters 1.01
+
+1.00  Sat Mar 29
+
+	- set prereqs such that all should support perl 5.6
+	- moved dependence on Big::Int to Algorithim::RandomMatrixGeneration
+
+0.98  Sun Mar 23
+
+	- renamed as Bundle-Text-SenseClusters
+	- added Text-SenseClusters to the bundle, in addition to 
+	 	dependencies
+
+0.93  Fri Jul  7 22:12:55 2006
+	- original version; created by h2xs 1.23 with options
+		-AXcfn Bundle::SenseClusters
+

@@ -1,0 +1,15 @@
+name = B-Lint-StrictOO
+version = 0.04
+author = Josh Jore <jjore@cpan.org>
+license = Perl_5   
+copyright_holder = Josh Jore
+
+[GatherDir]
+[MetaYAML]
+[MakeMaker]
+[Manifest]
+
+[Prereqs]
+B::Lint  = 1.09
+B::Utils = 0.10
+IPC::Run = 0

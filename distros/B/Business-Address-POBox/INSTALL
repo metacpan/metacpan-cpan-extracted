@@ -1,0 +1,27 @@
+
+This is the Perl distribution Business-Address-POBox.
+
+## Installation
+
+Business-Address-POBox installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Business::Address::POBox
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Business-Address-POBox documentation is available as in POD.
+So you can do:
+
+    % perldoc Business::Address::POBox
+
+to read the documentation with your favorite pager.

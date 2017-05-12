@@ -1,0 +1,41 @@
+---
+plugins:
+    - FileDetails
+global:
+    - ROOT: data/raw
+    - indir: data/raw
+    - outdir: data/processed
+    - file_rule: (.*)$
+    - by_sample_outdir: 1
+    - find_by_dir: 1
+rules:
+    - copy1:
+        local:
+            - INPUT: "{$self->indir}/{$sample}.csv"
+            - TRIMMOMATIC: "{$self->ROOT}/{$sample}_TRIMMOMATIC_THING.gz"
+            - before_meta: "\n#HPC mem=24GB"
+        process: |
+            echo "Working on {$self->{indir}}/{$sample}.csv"
+            cp "{$self->INPUT}" "{$self->{outdir}}/{$sample}.csv"
+    - copy2:
+        local:
+            - indir: "{$self->ROOT}"
+            - INPUT: "{$self->indir}/{$sample}.csv"
+            - before_meta: |
+                HPC THINGS
+
+                #
+                #HPC mem=24GB
+                #
+        process: |
+            echo "Working on {$self->{indir}}/{$sample}.csv" && \
+                echo "This should be UNDEF {$self->TRIMMOMATIC}" && \
+                cp "{$self->{indir}}/{$sample}.csv" "{$self->{outdir}}/{$sample}.csv"
+    - no_outdir:
+        local:
+            - create_outdir: 0
+        process: |
+            "#there should be no outdir\n";
+
+
+

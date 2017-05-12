@@ -1,0 +1,31 @@
+#NEXUS
+[Features tested: RespectCase, Equate, MatchChar]
+
+
+BEGIN TAXA;
+	dimensions ntax=4;
+	taxlabels A B C D;  
+END;
+
+BEGIN CHARACTERS;
+	dimensions nchar=19;
+	format
+		datatype=protein
+		RespectCase
+		missing=?
+		gap=-
+		Equate='x=G'[this may not work 'v=(MB)']
+		MatchChar=.
+		;
+	
+	matrix
+		A	-MQVADISLQG--DAKKxA
+		B	?------MAG.--.I....
+		C	-mG----FSA.--.L...E
+		D	-.G--dVEKGKKIFVQ.CA
+		;
+END;
+
+BEGIN TREES;
+	tree 'basic bush' = ((A:1,B:1):1,(C:1,D:1):1);
+END;

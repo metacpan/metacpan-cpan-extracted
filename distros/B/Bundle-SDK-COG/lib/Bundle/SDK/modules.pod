@@ -1,0 +1,69 @@
+=head1 CONTENTS
+
+=head2 Bundle::CPAN
+
+Gives CPAN shell full capability (history, etc).
+
+=head2 Bundle::Test
+
+Installs a bunch of modules commonly used for testing (including
+Test::Simple, Test::More, Test::Harness, Test::Pod, Test::Builder and
+Test::Warn).
+
+=head2 Test::Pod::Coverage
+
+I use this in all my modules to test for module coverage.
+
+=head2 Bundle::COG
+
+Installs all my modules.
+
+=head2 Astro::MoonPhase
+
+Needed by some stuff on my ~/bin.
+
+=head2 CPAN::Mini
+
+Allows me to keep a minimal CPAN mirror on my machine.
+
+=head2 Date::DayOfWeek
+
+Needed by some stuff on my ~/bin.
+
+=head2 Module::Starter
+
+This is what I use to start all my modules.
+
+=head2 Perl::Tidy
+
+I use this in vim.
+
+=head2 Spork
+
+Fast and clean presentation creation.
+
+=head2 Time::HiRes
+
+Needed by some stuff on my ~/bin.
+
+=head2 WWW::Mechanize
+
+I use this in a lot of projects, especially when testing web sites.
+
+=head2 Devel::Cover
+
+Code coverage metrics for Perl.
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+I got the idea for this very useful (to me) Bundle out of Simon's
+Bundle::SDK::SIMON. Apart from saving me much time whenever I go to a
+new machine, it can also serve as a way to show others what I'm using.
+
+I got the nerve to do it after reading this:
+http://use.perl.org/~Ovid/journal/26818. Afterall, "What is the CPAN
+for?"

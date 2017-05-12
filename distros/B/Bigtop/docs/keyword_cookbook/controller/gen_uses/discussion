@@ -1,0 +1,33 @@
+=head1 USE
+
+If your generated controller module needs to load a module, include a
+C<gen_uses> statement in your controller's block.
+
+C<gen_uses> takes a comma separated list of modules to use.  If you want
+to control their import lists, use pairs.  For example, this will use
+the modules with default importing:
+
+    gen_uses Your::Module, Some::Other::Module;
+
+Add pairs to get the imports of your dreams:
+
+    gen_uses Your::Module => `qw( :everything :and then some )`;
+
+Note that the value will be used literally to produce this:
+
+    use Your::Module qw( :everything :and then some );
+
+So, qw is a good choice (as it usually is).
+
+See also C<stub_uses>, C<uses>, and C<plugins>.  The later is likely
+the only good choice, if the module you want to use is a Gantry plugin.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Look for C<Exotic> in C<lib/Kids/GEN/Child.pm>.  Notice how C<Your::Module>
+lists imports explicitly.  If you don't provide a list, all of the C<@EXPORT>
+items will be explicitly listed.

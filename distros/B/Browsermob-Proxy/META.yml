@@ -1,0 +1,40 @@
+---
+abstract: 'Perl client for the proxies created by the Browsermob server'
+author:
+  - 'Daniel Gempesaw <gempesaw@gmail.com>'
+build_requires:
+  File::Basename: '0'
+  List::Util: '0'
+  Net::Ping: '0'
+  Test::Deep: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+  Test::Spec: '0'
+  Try::Tiny: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Browsermob-Proxy
+requires:
+  Carp: '0'
+  Exporter: '0'
+  IO::Socket::INET: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Moo: '0'
+  Net::HTTP::Spore: '0'
+  Net::HTTP::Spore::Middleware::DefaultParams: '0'
+  Net::HTTP::Spore::Middleware::Format::Text: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gempesaw/Browsermob-Proxy/issues
+  homepage: https://github.com/gempesaw/Browsermob-Proxy
+  repository: https://github.com/gempesaw/Browsermob-Proxy.git
+version: '0.17'

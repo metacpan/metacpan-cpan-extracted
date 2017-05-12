@@ -1,0 +1,11 @@
+[%#
+    Template for generating divs containing controller config blocks.
+    Pass it the following parameters in view.data:
+
+        item       - result of walking postorder with app_block_hashes on
+                     the new field's AST node
+        block      - hash with one key: name (name of item's parent)
+%]
+[% INCLUDE controller_config_block.ttc
+           config_block = view.data.item
+           block        = view.data.block %]

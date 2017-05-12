@@ -1,0 +1,22 @@
+B-Lint-Pluggable
+
+B::Lint::Pluggable used to add plugin support to B::Lint. That has
+since been directly integrated. This module is now obsolete.
+
+INSTALLATION
+
+To install this module, run the following commands. But don't
+bother. It doesn't do anything.
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Joshua ben Jore
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

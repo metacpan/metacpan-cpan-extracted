@@ -1,0 +1,21 @@
+---
+abstract: 'An abstract implementation of a Generic Gene Page XML, with 2 exmples'
+author:
+  - 'Scott Cain and Robert Buels'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-GMOD-GenericGenePage
+provides:
+  Bio::GMOD::GenericGenePage:
+    file: lib/Bio/GMOD/GenericGenePage.pm
+    version: 0.12
+  Bio::GMOD::GenericGenePage::Chado:
+    file: lib/Bio/GMOD/GenericGenePage/Chado.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.12

@@ -1,0 +1,12 @@
+[% PROCESS header %]
+[% PROCESS macros %]
+
+[% FOR mail = mails %]
+<p>
+    [% summary_link(mail) %]
+    <blockquote>
+    [% mail.original %]
+    </blockquote>
+</p>
+[% END %]
+[% INCLUDE pager %]

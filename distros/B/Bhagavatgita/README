@@ -1,0 +1,31 @@
+Bhagavatgita version 2.05
+=========================
+
+Module for accessing  contents of Bhagavatgita.
+Bhagavatgita meaning The Song of the Bhagavan(God), also called Gita, is a 700-verse scripture that is part of the Hindu epic Mahabharata. This scripture contains a conversation between Pandava prince Arjuna and his guide Lord Krishna on a variety of theological and philosophical issues.The material used is a transulation by A.C. Bhaktivedanta Swami Prabhupada
+
+Please note that certain verses has been transulated into a single combined english verse e.g verses 16,17 and 18 are transulated into a single enlgish verse.Check this site to make clarity on that, "http://vedabase.net/bg/1/en". Hence displaying verses 1-16 is same as displaying verses 1-17 or 1-18.
+
+Glossary is obtained from "https://sites.google.com/site/iskconcapechat/home/books-group/lexicon-dictionary-concordance/glossary-of-bhagavad-gita"
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Dileep Mani
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,69 @@
+{
+   "abstract" : "interface to the CIPRES REST API",
+   "author" : [
+      "Jeremy Volkening <jdv@base2bio.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-CIPRES",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Net::Ping" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Time::Piece" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0",
+            "XML::LibXML" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::CIPRES" : {
+         "file" : "lib/Bio/CIPRES.pm",
+         "version" : "0.003003"
+      },
+      "Bio::CIPRES::Error" : {
+         "file" : "lib/Bio/CIPRES/Error.pm",
+         "version" : "0.001"
+      },
+      "Bio::CIPRES::Job" : {
+         "file" : "lib/Bio/CIPRES/Job.pm",
+         "version" : "0.001"
+      },
+      "Bio::CIPRES::Output" : {
+         "file" : "lib/Bio/CIPRES/Output.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jvolkening/p5-Bio-CIPRES"
+      }
+   },
+   "version" : "0.003003"
+}

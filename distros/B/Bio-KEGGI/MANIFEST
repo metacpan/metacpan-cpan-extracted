@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Bio/KEGG.pm
+lib/Bio/KEGG/genome.pm
+lib/Bio/KEGG/ko.pm
+lib/Bio/KEGG/pathway.pm
+lib/Bio/KEGGI.pm
+lib/Bio/KEGGI/genome.pm
+lib/Bio/KEGGI/ko.pm
+lib/Bio/KEGGI/pathway.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

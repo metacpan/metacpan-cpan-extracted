@@ -1,0 +1,1 @@
+   <form action="[% c.uri_for("/final4/save_picks/$player.id") %]" id="final_4" %]"> 

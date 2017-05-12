@@ -1,0 +1,92 @@
+Revision history for Perl module Bio::DB::Das::Chado
+
+0.2 Wed Apr 22 14:47:52 2009
+    - Stand alone module moved out of the GBrowse package
+
+0.21 Thu May  7 20:17:33 EDT 2009
+    - Fixed Segment features method to support API needed for GBrowse2
+    - Fixed a bug that caused CDS inferrence to fail for single exon
+      genes that have either a 5' or 3' UTR (but not both) to fail
+
+0.22 Thu May 28 15:53:03 EDT 2009
+    - Added a rel2abs method to the Segment feature so that uploaded
+      annotations will work correctly.
+
+0.23 Thu Jun  4 11:55:24 EDT 2009
+    - Fixes to accomidate changes to the Chado GFF3 loader; there is still
+      an outstanding bug associated with searching when the same ID
+      is used in different GFF3 files.  While this will be solved soon,
+      a release is needed for a demo.
+
+0.24 Wed Jun 17 03:29:06 EDT 2009
+    - made the srcfeature method always return something; it no longer depends
+      on the call to the constructor to set it.
+    - Made using organism information more robust; now checks abbreviation
+      and "genus species", and if it fails at everything, throws an error.
+    - Added an option to the Chado constructor called -reference_class that
+      allows the user to specify what feature type_id to use as the srcfeature.
+      For example, if you have motifs mapped to a polypeptide and that
+      polypeptide mapped to a region, you can speicify either "region" or
+      "polypeptide" for the reference_class.  Note that this does not
+      automatically turn on recursive mapping, so by default, the motifs
+      wouldn't be visible on the region.  I honestly don't know for sure if
+      recursive mapping still works--I haven't tested it in a long time.
+    - Fixed a bug that sometimes prevented GBrowse from finding the subfeatures
+      of features (like mRNAs of genes couldn't be found).
+
+0.25 Thu Apr 29 22:10:43 EDT 2010
+    - Bumping version number to make CPAN happy.
+
+0.26 Fri May 14 11:37:37 EDT 2010
+    - Making the dbh method in Chado.pm create a db handle if one doesn't
+      already exist (it is not clear to me how this happens, since the
+      constructor for Chado.pm is supposed to create it, but whatever).
+    - Silenced uninit squawks when gbrowse_details page is rendered
+
+0.3 Fri Jun 25 09:32:01 EDT 2010
+    - Added documentation for the Chado constructor
+    - Changed the class method so that it always returns 'Sequence', which is
+      really the right thing for it to do: class only makes sense in the
+      context of Bio::DB::GFF.
+    - Added a -fulltext option for using full text searching in postgres 8.4
+      or better.  See perldoc Bio::DB::Das::Chado and gmod_chado_fts_prep.pl
+      for more info, as well as the web page on the GMOD wiki: 
+      http://gmod.org/wiki/Chado_Full_Text_Search 
+    - Added feature_summary and coverage_array methods to Chado.pm to support
+      the feature summary functionality of GBrowse2; see the GMOD wiki page
+      describing this feature: http://gmod.org/wiki/Chado_gbrowse_summary_view
+
+0.31 Tue Apr  5 12:32:31 EDT 2011
+    - Added gmod_chado_fts_prep.pl and gmod_create_summary_statistics.pl to
+      the MANIFEST.
+    - Improved how the interval stats table data get generated.
+    - Added support for the primary_seq method to the Segment object.
+    - Added support for using srcfeatureslice in command line instances.
+    - Improved GFF and other dump formats from GBrowse (though they are still
+      probably less than perfect).
+    
+0.32 Thu Jun 23 16:08:33 EDT 2011
+    - Fixed a bug that caused the density plot to fail when in the summary
+      view when the source of the feature isn't provided in the track def.
+
+0.33 Thu Oct 20 10:52:55 EDT 2011
+    - Added rudimentary support for non-public schemas (mostly for Tripal).
+    - Fixed a bug that caused all features to show up when only features
+      for one seq_id was requested and srcfeatureslice isn't set.
+    - Added a build time "recommends" for Bio::GMOD::DB::Config 1.22
+      so that the support for schemas will work.
+
+0.34 Thu Sep 27 15:09:34 EDT 2012
+    - Made -srcfeatureslice on by default
+    - Added a -tripal option to fix the adaptor's tendancy to find multiple features
+      where there is only one when a foreign key links from analysisfeature to
+      features to which those analyses don't belong (that is, Tripal links a BLAST
+      result to the mRNA that was searched with, rather than the standard behavior
+      of linking it with a match feature that has two srcfeatures in featureloc).
+
+0.35 Thu Oct 25 15:53:05 EDT 2012
+    - Added "as_string" as an alias to asString (ugh--Javaish) in Segment.pm
+    - Added ability to Segment's srcfeature_id method to introspect to find it.
+    - Removed instances of "defined(@_)" because it's stupid and not allowed
+      in perl 5.21.
+

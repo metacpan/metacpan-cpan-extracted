@@ -1,0 +1,14 @@
+Payments, EXCL, Excluded from GST
+Payments, FREE, GST-free
+Payments, INPUT, For making input taxed sales
+Payments, MIXED, Mixed (GST-free and taxable)
+Payments, NO GST, No GST in price
+Payments, NREG, Not registered for GST
+Payments, TAXED, GST Taxable
+Receipts, EXCL, Excluded from GST
+Receipts, EXPORT, Export sales
+Receipts, FREE, GST-free
+Receipts, INPUT, Input taxed
+Receipts, NREG, Not registered for GST
+Receipts, RCTI, Recipient created tax invoice
+Receipts, TAXED, GST Taxable

@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+# created on 2013-11-05
+
+use warnings;
+use strict;
+use 5.010;
+use File::Spec;
+
+use List::MoreUtils qw/minmax/;
+my $dir = shift // '.';
+my %times;
+
+opendir(my $dh, $dir) || die "can't opendir $dir $!";
+while(my $f = readdir($dh)) {
+  next if($f =~ /^\./);
+  next unless($f =~ /^(.*?)\.l\d+\.\d+$/);
+  my $jn = $1;
+  open my $fh, '<',File::Spec->catfile($dir, $f)  or die "Can't open filehandle: $!";
+  while(my $l = <$fh>) {
+    chomp $l;
+    if($l =~ /^comp.time:.*\((\d+)\)$/ ) {
+      $times{$jn} //= [];
+      push @{$times{$jn}}, int($1/(60*3))*3;
+    }
+  }
+  $fh->close;
+}
+
+closedir $dh;
+
+while(my ($jn, $vals) = each %times) {
+  say STDERR "---{{{ " . $jn . " (" . scalar(@$vals) . ") }}}---";
+  my ($min, $max) = minmax(@$vals);
+  my $size = $max - $min + 1;
+  $size /= 3;
+  $size = int($size) + 1;
+  open my $disth, '|-', "distribution --height=$size --pseudocnt --char=\\| | sort -n" or die "Can't open filehandle: $!";
+  for my $v (@$vals) {
+    say $disth $v;
+  }
+  for(my $v = $min; $v <= $max; $v+=3) {
+    say $disth $v;
+  }
+  $disth->close;
+}

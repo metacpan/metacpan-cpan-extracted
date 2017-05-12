@@ -1,0 +1,56 @@
+Revision history for Bundle-WWW-Scraper-ISBN-Drivers
+====================================================
+
+1.11    2014-10-31
+        - fixed license fields in META.json to be lists.
+        - added Bookstore driver.
+        - updated core ISBN modules requiments to v1.00.
+        - extended META test suite.
+
+1.10    2013-10-02
+        - added git repository links to metadata.
+
+1.09    2013-03-03
+        - removed Emporium Books driver - site no longer online
+
+1.08    2013-02-17
+        - removed A1Books driver - site no longer online
+        - removed EdenBooks driver - site no longer online
+        - META update: resources & license.
+
+1.07    2012-10-28
+        - change file dates changed to meet W3CDTF standards.
+        - Test-JSON-Meta => Test-CPAN-Meta-JSON.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - implemented Perl::Critic suggestions.
+
+1.06    2010-11-18
+        - added Blackwell driver.
+        - added Foyles driver.
+        - added PickABook driver.
+        - added Waterstones driver.
+
+1.05    2010-11-02
+        - added BarnesNoble driver.
+        - added WHSmith driver.
+
+1.04    2010-09-14
+        - added EdenBooks driver.
+        - added GoogleBooks driver.
+
+1.03    2010-09-14
+        - added BookDepository driver.
+        - added EmporiumBooks driver.
+
+1.02    2010-09-06
+        - added OpenLibrary driver.
+        - added WordPower driver.
+
+1.01    2010-08-10
+        - added A1Books driver.
+        - added Booktopia driver.
+
+1.00    2010-08-10
+        - initial release

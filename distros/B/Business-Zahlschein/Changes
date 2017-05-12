@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::Zahlschein.
+
+0.01  Mon Nov 16 14:35:12 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n Business::Zahlschein
+
+0.02  Mon Nov 16 18:55:39 2009
+	- Doku

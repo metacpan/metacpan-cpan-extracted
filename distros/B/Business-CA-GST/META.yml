@@ -1,0 +1,29 @@
+---
+abstract: 'Look up Canadian Federal Sales Tax rates'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-CA-GST
+requires:
+  Carp: '0'
+  Moo: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/business-ca-gst/issues
+  homepage: https://github.com/oalders/business-ca-gst
+  repository: https://github.com/oalders/business-ca-gst.git
+version: '1.03'

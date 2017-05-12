@@ -1,0 +1,34 @@
+2001-11-05 00:42   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: bump version number
+
+2001-11-05 00:41   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST.SKIP, ChangeLog: sync
+
+2001-11-04 19:46   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog: sync
+
+2001-11-04 19:46   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: use the appropriateversion of the libservlet bundle
+
+2001-10-25 17:34   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog: sync
+
+2001-07-25 04:22   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: move apache connector to apache cvs module
+
+2001-07-13 17:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, Wombat.pm: Initial revision
+
+2001-07-13 17:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, Wombat.pm: imported wombat 0.8.2 dev
+

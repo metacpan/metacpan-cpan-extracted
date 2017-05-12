@@ -1,0 +1,17 @@
+Changes
+lib/B/Keywords.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/10basic.t
+t/11keywords.t
+t/export.t
+t/z_kwalitee.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

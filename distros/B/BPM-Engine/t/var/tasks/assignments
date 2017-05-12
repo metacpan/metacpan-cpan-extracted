@@ -1,0 +1,72 @@
+
+        <WorkflowProcess Id="tasks1" Name="tasks1">
+            <ProcessHeader/>
+            <DataFields>
+                <DataField Id="common2" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'I0'</InitialValue>
+                </DataField>
+            </DataFields>
+            <Activities>
+                <Activity Id="A" Name="A">
+                  <Implementation>
+                    <No/>
+                  </Implementation>
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'A2'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="Start">
+                          <Target>common</Target>
+                          <Expression>'A1'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Activity>
+                <Activity Id="B" Name="B">
+                  <Implementation>
+                    <No/>
+                  </Implementation>
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'B2'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" From="A" To="B">
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'T2'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'T3'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="Start">
+                          <Target>common</Target>
+                          <Expression>'T1'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Transition>
+            </Transitions>
+            <Assignments>
+                <Assignment AssignTime="End">
+                    <Target>common</Target>
+                    <Expression>'P2'</Expression>
+                </Assignment>
+                <Assignment AssignTime="Start">
+                    <Target>common</Target>
+                    <Expression>'P0'</Expression>
+                </Assignment>
+                <Assignment AssignTime="Start">
+                    <Target>common</Target>
+                    <Expression>'P1'</Expression>
+                </Assignment>
+            </Assignments>
+        </WorkflowProcess>

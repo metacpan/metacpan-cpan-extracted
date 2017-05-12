@@ -1,0 +1,38 @@
+Revision history for Perl extension Bad::Words
+
+0.09  Mon Jan 27 12:47:58 PST 2014
+	correct second typo in Makefile.PL
+
+0.08  Mon Jan 27 12:47:58 PST 2014
+	correct typo in Makefile.PL
+
+0.07  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.06  Thu May 23 16:30:43 PDT 2013
+	big OOPS! in v0.05
+	sub noregex must return the method pointer
+
+0.05  Thu May 23 15:10:17 PDT 2013
+	add code to check "adwords", and "remove" lists for 
+	undefined enteries and zero length strings.
+	updated documentation
+	added sub 'noregex' to remove words from
+	the list matching a 'regex' string
+
+0.04  Wed May 22 17:49:18 PDT 2013
+	correct a bunch of typo's, thanks to 
+	Jeremy Mates <jeremy.mates@gmail.com>
+
+0.03  Wed May 22 16:56:41 PDT 2013
+	added keywords
+	added 24 additonal words
+	added USAGE
+	added method to remove words from bad list
+
+0.02  Wed May 22 14:47:39 PDT 2013
+	escape HERE mark in 'Fu('
+
+0.01  Tue May May 21 22:10 PDT 2013
+	initial release
+

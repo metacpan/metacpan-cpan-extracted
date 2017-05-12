@@ -1,0 +1,402 @@
+5.8, 5.6 and earlier had a good core perl compiler, but we are much better.
+
+Still missing in general are:
+
+  - attribute handlers (i.e. run-time attributes)
+  - compile-time perlio layers
+  - compile-time re-eval groups (?{})
+  - smartmatch subrefs
+  - compile-time stash-magic delete renames to ANON
+
+B::C is stable and used in production for -O0 and -O3. For bigger programs
+not all methods in certain packages or eval strings might be detected,
+you'd need to add them manually via -u<packagename>.
+
+B::CC is very unstable, work is in progress. Certain alioth benchmarks are 6x faster.
+Recursive function calls and certain dynamic ops are not yet supported.
+
+The Bytecode compiler is only stable for >=5.8.
+The CPAN Bytecode compiler is disabled for 5.6, we keep the old.
+The old core compiler fails for 50% of the testcases.
+
+Windows and other OS with strict linking <5.16 will fail to install due to some
+not exported libperl symbols. Looks at the patches in ramblings or use cperl,
+which includes the compilers.
+
+Security:
+The latest released compiler version is only recommended up to 5.14.4.
+Newer perl versions do work, but 5.16.x-5.26 upstream are too insecure
+to be recommended for production.
+5.20 finally properly handles unicode names, but identifiers and package
+names are still handled as binary blobs, which could lead to TR39 issues.
+Check your code automatically (not manually, because new identifiers
+are not identifiable anymore) for syntax spoofs, confusables, strip
+\\0 from package names and enable use warnings 'syscalls'.
+See http://websec.github.io/unicode-security-guide/
+cperl since 5.26 fixed all the known issues.
+
+C and CC: Same ok and less failures as with 5.6, 5.8 and 5.9.4.
+In 5.8.8 and 5.8.9 we have much less errors in the testsuite for the
+new CPAN compiler and the CORE compiler. See below.
+
+Most B::C and B::CC bugs fixed.
+Compatibility added for all major releases since 5.6.2
+
+Open Problems for B::C:
+See github issues.
+
+See below at the detailed status of the major releases.
+
+TEST STATUS
+-----------
+Regularily tested with every cperl update, since it is in core there.
+
+Regularily tested on cygwin1.7, darwin 64bit intel, centos5, centos6, centos7,
+debian5, debian6, freebsd7, freebsd8, solaris10/intel sunpro, openbsd49, netbsd.
+With the respective default gcc and clang compilers, with the latest address-sanitizer
+versions.
+
+Not so regurarily on darwin 10.4/ppc, strawberry-5.10.1, strawberry-5.12.2,
+strawberry-5.14, strawberry-5.16 and activeperl-5.10.1/msvc8
+
+List of failed tests:
+
+CORE (old)
+----
+
+5.6.2:
+t/bytecode      3,6,8..10,12,15,16,18,28,31,35,38,39
+t/c             8,15,16,22,27,28,31			   | 27 worked in 5.6.2!
+t/c_o1          8,15,16,22,27,28,31
+t/c_o2          8,15,16,22,27,28,31
+t/cc            15,18,21,25,27,28,30..32
+t/cc_o1         15,18,21,25,27,28,30..32
+t/cc_o2         10,15,16,18,21,25,26,27,28,30..32
+
+5.8:  			                          	   | non-threaded
+t/bytecode      27,44,33,39
+t/c             11,14,15,20,23,27..29,31,101,102 	   | 5,7-12,14-20,22-23,25,27,28,30,31
+t/c_o1          1,3-8,10..12,14,15,17..25,27..29,31,101,102| 7-12,14-20,22-23,25,27,28,30,31
+t/c_o2          1,3-12,14,15,17..25,27..29,31,101,102      | 7-12,14-20,22-23,25,27,28,30,31
+t/cc            7,11,14,15,18..21,23..25,28..32,101..103	
+t/cc_o1         7,11,14,15,18..21,23..32,101..103		
+t/cc_o2         7,10,11,14..16,18-21,23..32,101..103
+
+Recipe:
+  p=perl5.6.2
+  t/testc.sh -q -c
+  for t in $(seq -f"%02.0f" 32); do rm ccode 2>/dev/null; $p -MO=C,-occode.c ccode$t.pl 2>/dev/null && $p script/cc_harness ccode.c -o ccode >/dev/null; echo -n "$t: "; $p ccode$t.pl; echo -n " => "; ./ccode; echo; done
+  p=perl5.8.9
+  for t in $(seq -f"%02.0f" 35); do rm ccode 2>/dev/null; $p -MO=C,-occode.c ccode$t.pl 2>/dev/null && $p script/cc_harness -Bstatic ccode.c -o ccode >/dev/null; echo -n "$t: "; $p ccode$t.pl; echo -n " => "; ./ccode; echo; done
+  p=perl5.8.9d-nt
+  for t in $(seq -f"%02.0f" 35); do rm ccode 2>/dev/null; $p -MO=C,-occode.c ccode$t.pl 2>/dev/null && $p script/cc_harness -Bdynamic ccode.c -o ccode >/dev/null; echo -n "$t: "; $p ccode$t.pl; echo -n " => "; ./ccode; echo; done
+
+
+B::C (new)
+----
+t/testc.sh -q -c; t/testcc.sh -q -c or make test TEST_VERBOSE=1
+
+See t/test.pl for the TODO tests:
+Only 42..43 < 5.12
+
+CPAN Modules
+------------
+See t/modules.t:is_todo() We only try to compile use module, not the testsuite.
+We only try B::C with -O3 so far.
+The full module testsuite is run with t/testm.sh -t [OPTS] Module
+
+Compile-time status from top100:
+5.6.2      fail 12.5% Test::* Moose* DateTime* FCGI
+5.8.5      pass 100%
+5.8.8      fail 1%  Test::Tester
+5.8.9      pass 100%
+5.10.1     pass 100%
+                    Attribute::Handlers #TODO 5.10.1d with threads
+5.12.5     pass 100%
+5.14.4     pass 100%
+5.16.3     fail 1%  Module::Build (out of memory/use-after-free)
+5.18.2     fail 2%  ExtUtils::ParseXS (re-eval)
+                    Module::Build (out of memory/use-after-free)
+5.20.0     fail 1%  ExtUtils::ParseXS (re-eval)
+
+cperl status
+------------
+C and CC are shipped with cperl, hence it is supported.
+Also all merges from core which are not rejected.
+
+5.26 status
+-----------
+The new signatures are not yet supported (the 3 ARG ops).
+
+5.24 status
+-----------
+stable C, used in production
+Bytecode still broken, some CC tests got broken with 5.23.9
+
+5.22 status
+-----------
+Bytecode: broken by upstream. refused to fix it.
+sibling/lastsib with PERL_OP_PARENT broken for sort (18,19,25)
+
+5.20 status
+-----------
+fully supported since 1.48
+
+5.18 status
+-----------
+fully supported since 1.48
+
+5.10, 5.12, 5.14, 5.16, 5.18, 5.20 status
+----------------------------------------
+TODO for B::C
+  see github issues https://github.com/rurban/perl-compiler/issues/
+  Most of them have either easy workarounds or are not fixable.
+
+  - attribute handlers (i.e. run-time attributes)
+  - compile-time perlio layers
+  - re-eval groups (?{})
+  - smartmatch subrefs
+  - compile-time stash-magic delete renames to ANON
+
+Fix CC
+  several other issues detected (and mostly fixed) by Heinz Knutzen
+  minimize pad copies from local to pad
+  label not defined (utf8::SWASHNEW)
+  -faelem is fast but still a bit unstable
+
+DONE
+----
+fixed with 1.48:
+  bytecode compiler for >=5.18
+  C/CC walker, dumping all external, non compiler added packages properly
+    and detecting required compiler added packages also.
+  RTLD_NOLOAD on BSD for run-time remapping of .so syms
+  Moose XS init
+
+fixed with 1.47:
+  run-time remapping of .so syms with special support by Encode-2.58
+  fix %INC cleanup
+  non-const %warnings::Bits with -O3
+  lexical subs threaded
+  Coro
+  some readonly related problems: re-eval, hashes
+  byteloader binmode for 5.18
+  mro and maybe::next
+
+fixed with 1.46:
+  global destruction of our and global objects
+  utf8 qr and utf8 /i initialization with -fppaddr
+  @-
+  lexical warnings on 5.8
+  -O4 CvSTART cops
+  mro: c3 and maybe|next:: method calls
+  Encode dlsym patching of compile-time XS handles (Net::DNS, IO::Socket::SSL)
+  $/, $@ and $\, esp. when localized
+  dump all used @ISA's
+  GvFORM pseudo CVs (B::FM) on 5.10
+  __DATA__ blocks in packages without printing wrong warnings
+  Replace each %hash with foreach sort keys (no random misses of functions)
+
+fixed with 1.44:
+  SvLEN and PV ptr for empty shared hash keys
+  cop_hints to support lexical numeric hints pragmas (use bytes, use open, ...)
+  -O3 with ~ and ~~ formatstrings
+  skip saving a cv on defined(&cv)
+  format STDOUT/STDERR
+  Save empty bodyless subs if they exist, for signal handlers, prototypes declarations
+    and cvrefs
+  PVMG PV overwriting the RV, overload sub
+
+fixed with 1.43:
+  static strings and heks with LEN=0
+  restore of many more dynamic magic variables: @+,@-,$$,${^UNICODE} ${^UTF8LOCALE}
+   $; $\ $, $/ $" $| $^A $^L $: $% $- $= $^H $^R
+  and allow other GP entries for ENV, ARGV, ...
+  do not set newGP for symbols, thus do not disturb pre-initialization, esp. XS CVs
+  do not boot internal core XS packages twice
+  better load-order for dynaloaded modules, which helps esp. on windows
+  improved deeper walker, detect more missing empty packages
+  HvAUX init without magic (iterators)
+  new PADLIST type
+  unicode and binary strings and heks
+  COW support
+  proper len of QR refs
+  stash symtab magic for PMf_ONCE m?? and reset
+  lexwarns
+  (See Changes for all fixes)
+
+fixed with 1.42:
+  my_share_hek (global destruction)
+  Turn off CvDYNFILE
+  save @ISA of empty child classes
+
+fixed with 1.40:
+  static PerlIO Layers
+  synced %INC
+  defer eval section after dl_init
+
+fixed with 1.39:
+  improved eval AUTOLOAD
+
+fixed with 1.37:
+  fixed wrong test 46, test for Exporter STASH in *main:: STASH
+  copy-on-grow with LEN=0 and FAKE clash with share_hek
+  share_hek re-implemented
+  init of READONLY hash keys
+  re-hash everything at startup (oCERT-2011-003)
+  find UNIVERSAL methods, load SelectSaver with IO
+  hv_clear_placeholders
+  %+, %-, %!
+  %SIG
+  magic->PTR when SV (>5.6)
+  attributes::reftype
+  inc_cleanup (partially)
+  CV prototypes (>5.10)
+  ignore aelemfast SPECIAL pads (5.8.[45])
+  strip version object overload from XS packages (i91)
+  restore stdio handles from BEGIN blocks (Test::NoWarnings)
+  B::COP::stashflags (>5.15.4)
+  lost PL_regex_pad, (5.15 threaded)
+
+fixed with 1.36:
+  5.15 XSLoader and hash init
+  support lexical warnings
+  better __DATA__ detection and support, 
+    still IO::File not IO::Scalar handle though
+  fixed test 29 mostly (use IO)
+
+fixed with 1.35:
+  improve package_pv detection for methods,
+  detect previously missing packages within the main source file 
+  run-time %ENV
+
+fixed with 1.32:
+  improved scanner, try_isa, mark_package force, ...
+  do not gp_free shared GPs 
+  Internals::V
+  dl_init of cached deleted packages
+
+fixed with 1.30:
+  cc_queue sort 18 ccpp
+  dl_init regression
+  xs_init (soname by context)
+  5.14 support
+  package_pv detection for method_named
+  AUTOLOAD goto xsub and SelfLoader esp. on 5.8 (27). 
+    use AutoLoader works okay. (test 27, 31)
+  >5.11.3 test 32 catch evaltry die
+  fixed test 29 >5.10 DEBUGGING for -O0 (use IO)
+
+fixed xpvio off-by-one error for 5.10 (test 29)
+
+mark a package which is autoloaded from XS
+
+fixed forbidden REGEXP IVX/NVX access since 5.12
+
+fixed evaltry (test 12), NVX was shared with 2 xpad_cop_seq ints
+  which accidently just worked before 1.17, but not after using the %g 
+  representation changed with 1.16. Also fixed in Bytecode, fixing tests 9,10,12.
+
+fixed several minor bugs only in modules, no short testcases yet. See Changes
+
+fixed PP_ENTEREVAL (CC test 12) for 5.10 with 1.14.
+  Nullify ending retop for the string to CALLRUNOPS.
+
+fixed __DATA__ IO (test 15) on 5.10 and 5.11 with 1.12. 
+  On 5.6 it is hard to fix (re-implement PerlIO::scalar).
+
+fixed RV => IV on blead (test 16 tiearray magic obj HVref) with 1.11
+
+fixed GV -> BM magic (index) without needing fbm_compile with 1.09. Just 5.8.9 not.
+
+fixed non-xsub AUTOLOAD (31) with 1.08
+
+ccode17_o1 namepad[1] to PL_sv_undef 
+
+GVCV for 5.11 (27)
+
+runtime require $scalar (28)
+
+RVs for 5.11 (29)
+
+index (fbm_compile) for GVs fixed with 1.04_31
+
+test 14+23 destruction of GvPVX of the empty main:: stash fixed by adding a dummy.
+
+cccode19 sort failure via custom sortcv fixed with B::CC 1.02_03. endless loop
+
+autoload subs from main::, from packages it works ok (test 8)
+	fixed with 1.04_25
+
+panic: illegal pad in pad_new: 0x18c4368[0x18cf6e8] with DEBUGGING only
+        CvPADLIST: curpad<=>comppad
+        fixed with 1.04_22
+
+pvx: seems to be fixed now in bc, and c
+  With the move of the pvx field from xpv to the sv, we have to solve 
+  that differently for the Bytecode and C backend.
+  Bytecode can simply mimic the old XPV behaviour of a 3 field struct 
+  (pvx, cur, len) to simplify pv handling.
+
+hv: crash at invalid entry in hv_store in B::HV::save fixed
+
+hek: new implementation, needs static optimization via heksect
+
+regexp: match works, split still broken
+
+bc 10: padv+sassign => Modification of a read-only value attempted at 
+bytecode10.pl line 1. Only on cygwin, not on linux!
+The bytecode is exactly the same, it must be pp_entersub() with &$cv()
+Is FAKE flag of the padsv is missing or should we check for readonly pads?
+  g  <1> entersub[t4] vKS/TARG,1
+  => Perl_sv_force_normal_flags()
+	if (SvREADONLY(sv) && (!SvFAKE(sv)) && (IN_PERL_RUNTIME)) => die
+	SV = NULL(0x0) at 0x12207c0
+	  REFCNT = 2147483129
+	  FLAGS = (READONLY)
+-Dt crash fixed by core patch pl-dump-const.patch
+
+cop_io status?
+  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2006-05/msg00770.html
+
+5.8 status
+----------
+I've restored full 5.8 backwards compatibility, mainly for test comparison.
+But since the new B::C compiler is better than the CORE compiler, it is installed.
+
+TEST COVERAGE
+-------------
+Bytecode:
+coverage for ret(0) ldsv(1) ldop(2) stsv(3) stop(4) stpv(5) ldspecsv(6) 
+ldspecsvx(7) newsv(8) newsvx(9) nop(10) newop(11) newopx(12) newopn(13) 
+newpv(14) pv_cur(15) pv_free(16) sv_upgrade(17) sv_refcnt(18) sv_refcnt_add(19) 
+sv_flags(20) xrv(21) xpv(22) xpv_cur(23) xpv_len(24) xiv(25) xnv(26) 
+xlv_targoff(27) xlv_targlen(28) xlv_targ(29) xlv_type(30) xbm_useful(31) 
+xbm_previous(32) xbm_rare(33) xfm_lines(34) comment(35) xio_lines(36) xio_page(37) 
+xio_page_len(38) xio_lines_left(39) xio_top_name(40) xio_top_gv(41) xio_fmt_name(42) 
+xio_fmt_gv(43) xio_bottom_name(44) xio_bottom_gv(45) xio_type(46) xio_flags(47) 
+xcv_xsubany(48) xcv_stash(49) xcv_start(50) xcv_root(51) xcv_gv(52) xcv_file(53) 
+xcv_depth(54) xcv_padlist(55) xcv_outside(56) xcv_outside_seq(57) xcv_flags(58) 
+av_extend(59) av_pushx(60) av_push(61) xav_fill(62) xav_max(63) xav_flags(64) 
+xhv_name(65) hv_store(66) sv_magic(67) mg_obj(68) mg_private(69) mg_flags(70) 
+mg_name(71) mg_namex(72) xmg_stash(73) gv_fetchpv(74) gv_fetchpvx(75) gv_stashpv(76) 
+gv_stashpvx(77) gp_sv(78) gp_refcnt(79) gp_refcnt_add(80) gp_av(81) gp_hv(82) 
+gp_cv(83) gp_file(84) gp_io(85) gp_form(86) gp_cvgen(87) gp_line(88) gp_share(89) 
+xgv_flags(90) op_next(91) op_sibling(92) op_ppaddr(93) op_targ(94) op_type(95) 
+op_opt(96) op_latefree(97) op_latefreed(98) op_attached(99) op_first(102) op_last(103) 
+op_pmreplroot(105) op_pmreplstart(106) op_pmreplrootpo(108) op_pmstash(109) 
+op_pmreplrootgv(110) pregcomp(111) op_pmflags(112) unused(113) op_reflags(114) 
+op_sv(115) op_pv(117) op_pv_tr(118) op_redoop(119) op_nextop(120) op_lastop(121) 
+cop_label(122) cop_stash(125) cop_filegv(126) push_begin(134) push_init(135) 
+push_end(136) curstash(137) defstash(138) data(139) incav(140) load_glob(141) 
+regex_padav(142) comppad_name(144) xgv_stash(145) signal(146) formfeed(147)
+
+Abbrevations
+------------
+bc 	B::ByteCode 
+c  	B::C
+cc 	B::CC
+-D 	-DDEBUGGING perl, also used as d version suffix, eg 5.8.8d
+-nt 	not threaded perl
+
+2014-01-15 14:48:08 rurban

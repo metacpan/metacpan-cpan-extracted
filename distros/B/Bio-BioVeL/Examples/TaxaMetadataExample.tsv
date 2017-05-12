@@ -1,0 +1,7 @@
+TaxonID	SampleType	GeographicalOrigin	Pathogenic_Potential	Biomass	host	phenology
+Tax1	soil	UK,NL	yes	0.45	citrus	D
+Tax2	root	ITA	yes	1.2	citrus	C
+Tax3	soil	ITA,FR	no	2.3	tomatoe	D
+Tax4	soil	RU,FR	yes	0.3	tomatoe	D
+Tax5	root	RU,ITS	yes	4	tomatoe	E
+Tax6	soil	NL	no	4.2	tomatoe	E

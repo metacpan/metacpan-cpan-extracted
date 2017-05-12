@@ -1,0 +1,11 @@
+Revision history for Bot::IRC::X::Dice
+
+1.03      2016-11-10 20:35:28-08:00 America/Los_Angeles
+        - Removed pointless call to math expression module
+
+1.02      2016-11-10 18:34:14-08:00 America/Los_Angeles
+        - Anchor match pattern for improved co-plugin operation
+        - Fixed stupid POD bug that scrambled synopis display
+
+1.01      2016-11-08 11:35:04-08:00 America/Los_Angeles
+        - First version, released on an unsuspecting world

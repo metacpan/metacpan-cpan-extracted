@@ -1,0 +1,501 @@
+
+=head1 NAME
+
+Box2D::b2Body - A rigid body.
+
+=head1 SYNOPSIS
+
+  my $body = $world->CreateBody( $body_def );
+
+  my $fixture = $body->CreateFixture();
+
+  my $position = $body->GetPosition();
+
+  my $center = $body->GetWorldCenter();
+
+  $body->SetAngularVelocity( $v );
+  $body->SetLinearVelocity( Box2D::b2Vec2->new( $vx, $vy ) );
+
+=head1 DESCRIPTION
+
+A rigid body. These are created via C<Box2D::b2World::CreateBody>.
+
+=head1 METHODS
+
+=head2 ApplyAngularImpulse( $impulse )
+
+Apply an angular impulse.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$impulse> - the angular impulse in units of kg*m*m/s
+
+=back
+
+=head2 ApplyForce( $force, $point )
+
+Apply a force at a world point. If the force is not applied at the center of mass, it will generate a torque and affect the angular velocity. This wakes up the body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$force> - the world force vector, usually in Newtons (N).
+
+=item * C<Box2D::b2Vec2> C<$point> - the world position of the point of application.
+
+=back
+
+=head2 ApplyLinearImpulse( $impulse, $point )
+
+Apply an impulse at a point. This immediately modifies the velocity. It also modifies the angular velocity if the point of application is not at the center of mass. This wakes up the body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$impulse> - the world impulse vector, usually in N-seconds or kg-m/s.
+
+=item * C<Box2D::b2Vec2> C<$point> - the world position of the point of application.
+
+=back
+
+=head2 ApplyTorque( $torque )
+
+Apply a torque. This affects the angular velocity without affecting the linear velocity of the center of mass. This wakes up the body.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$torque> - about the z-axis (out of the screen), usually in N-m.
+
+=back
+
+=head2 CreateFixture( $shape, $density )
+
+Creates a fixture from a shape and attach it to this body. This is a convenience function. Use b2FixtureDef if you need to set parameters like friction, restitution, user data, or filtering. If the density is non-zero, this function automatically updates the mass of the body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Shape> C<$shape> - the shape to be cloned.
+
+=item * C<float32> C<$density> - the shape density (set to zero for static bodies). Warning:This function is locked during callbacks.
+
+=back
+
+Returns a C<Box2D::b2Fixture>
+
+=head2 CreateFixtureDef( $def )
+
+Creates a fixture and attach it to this body. Use this function if you need to set some fixture parameters, like friction. Otherwise you can create the fixture directly from a shape. If the density is non-zero, this function automatically updates the mass of the body. Contacts are not created until the next time step.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2FixtureDef> C<$def> - the fixture definition. Warning:This function is locked during callbacks.
+
+=back
+
+Returns a C<Box2D::b2Fixture>
+
+=head2 DestroyFixture( $fixture )
+
+Destroy a fixture. This removes the fixture from the broad-phase and destroys all contacts associated with this fixture. This will automatically adjust the mass of the body if the body is dynamic and the fixture has positive density. All fixtures attached to a body are implicitly destroyed when the body is destroyed.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Fixture> C<$fixture> - the fixture to be removed. Warning:This function is locked during callbacks.
+
+=back
+
+=head2 GetAngle()
+
+Get the angle in radians.
+
+Returns a C<float32> - the current world rotation angle in radians.
+
+=head2 GetAngularDamping()
+
+Get the angular damping of the body.
+
+Returns a C<float32>
+
+=head2 GetAngularVelocity()
+
+Get the angular velocity.
+
+Returns a C<float32> - the angular velocity in radians/second.
+
+=head2 GetInertia()
+
+Get the rotational inertia of the body about the local origin.
+
+Returns a C<float32> - the rotational inertia, usually in kg-m^2.
+
+=head2 GetLinearDamping()
+
+Get the linear damping of the body.
+
+Returns a C<float32>
+
+=head2 GetLinearVelocity()
+
+Get the linear velocity of the center of mass.
+
+Returns a C<Box2D::b2Vec2> - the linear velocity of the center of mass.
+
+=head2 GetLinearVelocityFromLocalPoint( $localPoint )
+
+Get the world velocity of a local point.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localPoint>
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the world velocity of a point.
+
+=head2 GetLinearVelocityFromWorldPoint( $worldPoint )
+
+Get the world linear velocity of a world point attached to this body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$worldPoint>
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the world velocity of a point.
+
+=head2 GetLocalCenter()
+
+Get the local position of the center of mass.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetLocalPoint( $worldPoint )
+
+Gets a local point relative to the body's origin given a world point.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$worldPoint>
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the corresponding local point relative to the body's origin.
+
+=head2 GetLocalVector( $worldVector )
+
+Gets a local vector given a world vector.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$worldVector>
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the corresponding local vector.
+
+=head2 GetMass()
+
+Get the total mass of the body.
+
+Returns a C<float32> - the mass, usually in kilograms (kg).
+
+=head2 GetNext()
+
+Get the next body in the world's body list.
+
+Returns a C<Box2D::b2Body>
+
+=head2 GetPosition()
+
+Get the world body origin position.
+
+Returns a C<Box2D::b2Vec2> - the world position of the body's origin.
+
+=head2 GetTransform()
+
+Get the body transform for the body's origin.
+
+Returns a C<Box2D::b2Transform> - the world transform of the body's origin.
+
+=head2 GetType()
+
+Get the type of this body.
+
+Returns a C<Box2D::b2BodyType>
+
+=head2 GetUserData()
+
+Get the user data pointer that was provided in the body definition.
+
+Returns a C<scalar>
+
+=head2 GetWorld()
+
+Get the parent world of this body.
+
+Returns a C<Box2D::b2World>
+
+=head2 GetWorldCenter()
+
+Get the world position of the center of mass.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetWorldPoint( $localPoint )
+
+Get the world coordinates of a point given the local coordinates.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localPoint> - a point on the body measured relative the the body's origin.
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the same point expressed in world coordinates.
+
+=head2 GetWorldVector( $localVector )
+
+Get the world coordinates of a vector given the local coordinates.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localVector> - a vector fixed in the body.
+
+=back
+
+Returns a C<Box2D::b2Vec2> - the same vector expressed in world coordinates.
+
+=head2 IsActive()
+
+Get the active state of the body.
+
+Returns a C<bool>
+
+=head2 IsAwake()
+
+Get the sleeping state of this body.
+
+Returns a C<bool> - true if the body is sleeping.
+
+=head2 IsBullet()
+
+Is this body treated like a bullet for continuous collision detection?
+
+Returns a C<bool>
+
+=head2 IsFixedRotation()
+
+Does this body have fixed rotation?
+
+Returns a C<bool>
+
+=head2 IsSleepingAllowed()
+
+Is this body allowed to sleep.
+
+Returns a C<bool>
+
+=head2 ResetMassData()
+
+This resets the mass properties to the sum of the mass properties of the fixtures. This normally does not need to be called unless you called SetMassData to override the mass and you later want to reset the mass.
+
+=head2 SetActive( $flag )
+
+Set the active state of the body. An inactive body is not simulated and cannot be collided with or woken up. If you pass a flag of true, all fixtures will be added to the broad-phase. If you pass a flag of false, all fixtures will be removed from the broad-phase and all contacts will be destroyed. Fixtures and joints are otherwise unaffected. You may continue to create/destroy fixtures and joints on inactive bodies. Fixtures on an inactive body are implicitly inactive and will not participate in collisions, ray-casts, or queries. Joints connected to an inactive body are implicitly inactive. An inactive body is still owned by a b2World object and remains in the body list.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 SetAngularDamping( $angularDamping )
+
+Set the angular damping of the body.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$angularDamping>
+
+=back
+
+=head2 SetAngularVelocity( $omega )
+
+Set the angular velocity.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$omega> - the new angular velocity in radians/second.
+
+=back
+
+=head2 SetAwake( $flag )
+
+Set the sleep state of the body. A sleeping body has very low CPU cost.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag> - set to true to put body to sleep, false to wake it.
+
+=back
+
+=head2 SetBullet( $flag )
+
+Should this body be treated like a bullet for continuous collision detection?
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 SetFixedRotation( $flag )
+
+Set this body to have fixed rotation. This causes the mass to be reset.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 SetLinearDamping( $linearDamping )
+
+Set the linear damping of the body.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$linearDamping>
+
+=back
+
+=head2 SetLinearVelocity( $v )
+
+Set the linear velocity of the center of mass.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$v> - the new linear velocity of the center of mass.
+
+=back
+
+=head2 SetSleepingAllowed( $flag )
+
+You can disable sleeping on this body. If you disable sleeping, the body will be woken.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 SetTransform( $position, $angle )
+
+Set the position of the body's origin and rotation. This breaks any contacts and wakes the other bodies. Manipulating a body's transform may cause non-physical behavior.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$position> - the world position of the body's local origin.
+
+=item * C<float32> C<$angle> - the world rotation in radians.
+
+=back
+
+=head2 SetType( $type )
+
+Set the type of this body. This may alter the mass and velocity.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2BodyType> C<$type>
+
+=back
+
+=head2 SetUserData( $data )
+
+Set the user data. Use this to store your application specific data.
+
+Parameters:
+
+=over 4
+
+=item * C<scalar> C<$data>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2BodyDef>
+
+=item * L<Box2D::b2World>
+
+=item * L<Box2D::b2Shape>
+
+=item * L<Box2D::b2Fixture>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

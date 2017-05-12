@@ -1,0 +1,13 @@
+#!/usr/local/bin/perl
+
+use Pod::Simple::HTMLBatch;
+use Cwd 'abs_path';
+
+my $batchconv = Pod::Simple::HTMLBatch->new;
+$batchconv->add_css( abs_path('./proserver_guide.css'), 1 );
+$batchconv->css_flurry( 0 );
+$batchconv->javascript_flurry( 0 );
+my @search_dirs = ('../lib');
+push( @search_dirs, @INC );
+-d 'pod_html' || mkdir( 'pod_html' );
+$batchconv->batch_convert( \@search_dirs, 'pod_html' );

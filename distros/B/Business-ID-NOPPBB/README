@@ -1,0 +1,29 @@
+SYNOPSIS
+
+     use Business::ID::NOPPBB qw(validate_nop_pbb);
+    
+     my $res = validate_nop_pbb(str => '327311000109900990');
+     $res->[0] == 200 or die "Invalid NOP PBB!";
+    
+     # get structure
+     use Data::Dumper;
+     print Dumper $res->[2];
+    
+     # will print something like
+     {
+         province => 32,
+         locality => 73,
+         district => 110,
+         village  => '001',
+         block    => '099',
+         object   => '0099',
+         special  => 0,
+         canonical => '32.73.110.001.099-0099.0',
+     }
+
+DESCRIPTION
+
+    This module provides one function: validate_nop_pbb.
+
+    This module has Rinci metadata.
+

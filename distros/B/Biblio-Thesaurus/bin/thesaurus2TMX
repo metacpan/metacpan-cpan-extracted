@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w -s
+
+use strict;
+use Biblio::Thesaurus;
+use XML::TMX::Writer;
+
+our ($comment);
+
+my $thesaurus = shift or die_usage();
+my $the = thesaurusLoad($thesaurus);
+
+my $tmx = new XML::TMX::Writer();
+
+$tmx->start_tmx();
+my $blang = $the->baselang();
+my $tu;
+
+$the->downtr( {
+	       -default  => sub {
+		 $tu->{$rel} = join(", ",@terms) if $the->{languages}{$rel};
+		 ""
+	       },
+	       -eachTerm => sub {
+		 if ($term ne "_top_") {
+		   $tu->{$blang} = $term;
+		   $tmx->add_tu(%$tu);
+		 }
+		 $tu = {};
+	       },
+	      });
+$tmx->end_tmx();
+
+
+sub die_usage {
+  die "Usage: $0 <thesaurus>\n";
+}
+
+
+

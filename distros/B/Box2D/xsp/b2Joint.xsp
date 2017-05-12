@@ -1,0 +1,65 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+enum b2JointType
+{
+	e_unknownJoint,
+	e_revoluteJoint,
+	e_prismaticJoint,
+	e_distanceJoint,
+	e_pulleyJoint,
+	e_mouseJoint,
+	e_gearJoint,
+	e_lineJoint,
+	e_weldJoint,
+	e_frictionJoint,
+};
+
+enum b2LimitState
+{
+	e_inactiveLimit,
+	e_atLowerLimit,
+	e_atUpperLimit,
+	e_equalLimits
+};
+
+%name{Box2D::b2Joint} class b2Joint
+{
+
+%{
+
+int
+b2Joint::GetType()
+	CODE:
+		RETVAL = (int)THIS->GetType();
+	OUTPUT:
+		RETVAL
+
+b2Body*
+b2Joint::GetBodyA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		RETVAL = THIS->GetBodyA();
+	OUTPUT:
+		RETVAL
+
+b2Body*
+b2Joint::GetBodyB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		RETVAL = THIS->GetBodyB();
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

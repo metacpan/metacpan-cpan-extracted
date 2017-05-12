@@ -1,0 +1,16 @@
+Revision history for B-Hooks-Parser
+
+0.05      2016-07-13 01:26:33Z
+  - release 0.04_01 as stable, with tooling updates.
+
+0.04_01   2009-09-25 15:48:45Z
+  - Store static data more safely.
+
+0.03      2009-07-28 06:14:09Z
+  - Require ExtUtils::Depends 0.302.
+
+0.02      2008-11-11 17:23:54Z
+  - Various documentation fixes and improvements.
+
+0.01      2008-10-02 16:52:19Z
+  - Initial release.

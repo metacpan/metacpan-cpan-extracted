@@ -1,0 +1,9 @@
+[% USE ANSIColor 'color' %]
+[% "$nation" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FILTER color 'yellow' %][% FILTER format('%-12s') %]Year[% END %][% INCLUDE 'fragments/nation_attributes_header.tt' %][% END %]
+[% FOREACH t IN statistics.keys.sort %][% FILTER format('%-12s') %][% t %][% END %]
+[%- nationstats = statistics.$t -%] 
+[%- INCLUDE 'fragments/nation_attributes.tt' -%]
+[% END %]

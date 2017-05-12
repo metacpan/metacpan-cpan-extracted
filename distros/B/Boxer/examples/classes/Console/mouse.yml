@@ -1,0 +1,8 @@
+classes:
+  - cli.gpm
+  - Console
+parameters:
+  doc:
+    console:
+      pkg:
+        - enable console mouse support

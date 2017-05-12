@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Utility functions tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="mb"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="sinon.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="../../share/www/static/q.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var is = strictEqual;
+var faketimer;
+
+function fakeTimer() {
+    if(defined(faketimer)) {
+        faketimer.restore();
+    }
+    faketimer = sinon.useFakeTimers();
+}
+
+var fakeserver;
+
+// SlowStartServer starts slowly.
+// At first it responds with 404 for fail_num times.
+// After that it starts responding with 200.
+//
+// @param fail_num Number of failed responses.
+// @param fail_code HTTP erro code. It's 404 by default.
+var SlowStartServer = function(fail_num, fail_code) {
+    var self = this;
+    self.fail_num = fail_num;
+    self.count = 0;
+    self.reqs = [];
+    self.fail_code = fail_code || 404;
+    self.xhr = sinon.useFakeXMLHttpRequest();
+    self.xhr.onCreate = function(req) {
+        self.reqs.push(req);
+    };
+};
+SlowStartServer.prototype = {
+    pendingNum: function() { return this.reqs.length },
+    respond: function() {
+        var self = this;
+        var i, request;
+        for(i = 0 ; i < self.reqs.length ; i++) {
+            request = self.reqs[i];
+            if(self.count < self.fail_num) {
+                request.respond(self.fail_code, {"Content-Type": "text/plain"}, "" + self.count);
+            }else {
+                request.respond(200, {"Content-Type": "text/plain"}, "" + self.count);
+            }
+            self.count++;
+        }
+        self.reqs = [];
+    },
+    restore: function() { this.xhr.restore() },
+};
+
+asyncTest("ajaxRetry (succeed at first request)", function() {
+    var res;
+    // serverSlowStart(0);
+    fakeserver = new SlowStartServer(0);
+    var pending = bb.ajaxRetry({url: "/"});
+    ok(!defined(res), "response is not returned yet");
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    pending.promise.then(function(data) {
+        res = data;
+    }, function(reason) {
+        ok(false, "ajaxRetry should succeed: " + reason);
+    }).then(function() {
+        is(res, "0", "response received at count = 0");
+        fakeserver.restore();
+        start();
+    });
+});
+
+asyncTest("ajaxRetry (fail several times)", function() {
+    var res;
+    // serverSlowStart(5);
+    fakeserver = new SlowStartServer(5);
+    fakeTimer();
+    var pending = bb.ajaxRetry({url: "/"});
+    pending.promise.then(
+        function(data) { res = data },
+        function() { ok(false, "the ajax call should not be an error.") }
+    );
+    ok(!defined(res), "response is not returned yet");
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    is(fakeserver.pendingNum(), 0, "0 request pending");
+    faketimer.tick(200);
+    is(fakeserver.pendingNum(), 0, "0 request pending (not yet requested)");
+    faketimer.tick(200000);
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    faketimer.tick(1000);
+    is(fakeserver.pendingNum(), 0, "0 request pending (retry backoff)");
+    faketimer.tick(200000);
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    faketimer.tick(200000);
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    faketimer.tick(200000);
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    fakeserver.respond();
+    faketimer.tick(200000);
+    is(fakeserver.pendingNum(), 1, "1 request pending");
+    faketimer.restore();
+    Q.fcall(function() {
+        ok(!defined(res), "successful response is not returned yet");
+        fakeserver.respond();
+        return pending.promise;
+    }).then(function(data) {
+        is(res, "5", "response received at count = 5");
+    }, function(reason) {
+        ok(false, "ajaxRetry should succeed: " + reason);
+    }).then(function() {
+        fakeserver.restore();
+        start();
+    });
+});
+
+asyncTest("ajaxRetry (cancel)", function() {
+    var pending_req;
+    var ajax_xhr;
+    var ajax_spy = sinon.spy(jQuery, "ajax");
+    var ajax_abort_spy;
+    var next_executed = false;
+    var error_executed = false;
+    fakeserver = new SlowStartServer(0)
+    pending_req = bb.ajaxRetry({url: "/"});
+    is(fakeserver.pendingNum(), 1, "1 pending request");
+    is(ajax_spy.callCount, 1, "$.ajax() called once");
+    ajax_xhr = ajax_spy.getCall(0).returnValue;
+    ajax_abort_spy = sinon.spy(ajax_xhr, "abort");
+    pending_req.cancel();
+    pending_req.promise.then(function() {
+        ok(false, "fulfilled callback should not be executed.");
+    }, function(reason) {
+        ok(true, "rejected callback should be executed.");
+    }).then(function() {
+        is(ajax_abort_spy.callCount, 1, "ajaxXHR.abort() called once");
+    }).fail(function(reason) {
+        ok(false, "error: " + reason);
+    }).then(function() {
+        fakeserver.restore();
+        start();
+    });
+});
+
+asyncTest("ajaxRetry (tryMax)", function() {
+    var next_executed = false;
+    var error_executed = false;
+    fakeserver = new SlowStartServer(1);
+    var pending = bb.ajaxRetry({url: "/", tryMax: 1})
+    Q.fcall(function() {
+        is(fakeserver.pendingNum(), 1, "1 pending request");
+        ok(!next_executed, "next callback is not executed");
+        ok(!error_executed, "error callback is not executed");
+        fakeserver.respond();
+    });
+    pending.promise.then(function() {
+        next_executed = true;
+    }, function() {
+        error_executed = true;
+    }).then(function() {
+        ok(!next_executed, "next callback is not executed");
+        ok(error_executed, "error callback is executed");
+    }).fail(function(reason) {
+        ok(false, "error: " + reason);
+    }).then(function() {
+        fakeserver.restore();
+        start();
+    });
+});
+
+$.each([400, 401, 403, 500, 501, 503], function(i, code) {
+    asyncTest("ajaxRetry (code = "+ code +")", function() {
+        fakeserver = new SlowStartServer(100, code);
+        fakeTimer();
+        var pending = bb.ajaxRetry({url: "/", tryMax: 2});
+        is(fakeserver.pendingNum(), 1, "1 request pending");
+        fakeserver.respond();
+        is(fakeserver.pendingNum(), 0, "0 request pending");
+        faketimer.tick(1000);
+        is(fakeserver.pendingNum(), 1, "retried request pending");
+        fakeserver.respond();
+        is(fakeserver.pendingNum(), 0, "0 request pending");
+        faketimer.tick(10000);
+        is(fakeserver.pendingNum(), 0, "no more request");
+        faketimer.restore();
+        pending.promise.then(function() {
+            ok(false, "ajaxRetry should not succeed");
+        }, function() {
+            ok(true, "ajaxRetry failure expected");
+        }).then(function() {
+            fakeserver.restore();
+            start();
+        });
+    });
+});
+
+
+asyncTest("blockEach (1 block)", function() {
+    var counter = 0;
+    bb.blockEach([1,2,3], 10, function(block_array, global_index) {
+        counter++;
+        deepEqual(block_array, [1,2,3], "1 block covers all");
+        is(global_index, 0, "global index OK");
+    }).then(function() {
+        is(counter, 1, "repeats 1 time");
+    }, function() {
+        ok(false, "this blockEach should not fail");
+    }).then(function() {
+        start();
+    });
+});
+
+asyncTest("blockEach (3 blocks)", function() {
+    var counter = 0;
+    var exp_blocks = [[1,2,3], [4,5,6], [7,8]];
+    bb.blockEach([1,2,3,4,5,6,7,8], 3, function(block_array, global_index) {
+        deepEqual(block_array, exp_blocks[counter], "block content OK");
+        is(global_index, counter * 3, "global index OK");
+        counter++;
+    }).then(function() {
+        is(counter, 3, "repeats 3 times");
+    }, function() {
+        ok(false, "this blockEach should not fail");
+    }).then(function() {
+        start();
+    });
+});
+
+asyncTest("blockEach (0 block)", function() {
+    bb.blockEach([], 10, function() {
+        ok(false, "this should not be executed");
+    }).then(function() {
+        ok(true, "blockEach succeeds without executing the callback");
+    }, function() {
+        ok(false, "this blockEach should not fail");
+    }).then(function() {
+        start();
+    });
+})
+
+    </script>
+  </body>
+</html>
+

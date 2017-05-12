@@ -1,0 +1,94 @@
+
+=head1 NAME
+
+Box2D::b2MassData - Holds the mass data computed for a shape.
+
+=head1 SYNOPSIS
+
+  my $massData = Box2D::b2MassData->new();
+  $shape->ComputeMass( $massData, $density );
+  my $mass    = $massData->mass();
+  my $center  = $massData->center();
+  my $inertia = $massData->I();
+
+=head1 DESCRIPTION
+
+This holds the mass data computed for a shape.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+=head2 center()
+
+=head2 center( $center )
+
+The position of the shape's centroid relative to the shape's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$center> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 I()
+
+=head2 I( $I )
+
+The rotational inertia of the shape about the local origin.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$I> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 mass()
+
+=head2 mass( $mass )
+
+The mass of the shape, usually in kilograms.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$mass> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Shape>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict; use warnings;
+
+use LWP::UserAgent;
+use XML::Simple;
+
+my $child = shift || 'Joey';
+
+my $request_xml = <<"EO_XML";
+<?xml version="1.0" encoding="utf-8"?>
+<soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body> 
+      <getBirthDay
+        xmlns="http://localhost:8080/DefaultNamespace">
+            <childName>$child</childName>
+      </getBirthDay>
+  </soap:Body>
+</soap:Envelope>
+EO_XML
+
+my $ua = LWP::UserAgent->new();
+$ua->agent( 'BigtopTestClient/1.0' );
+
+my $request = HTTP::Request->new(
+    POST => 'http://localhost:8080/soap'
+);
+
+$request->content_type( 'text/xml; charset=utf-8' );
+$request->header( 'Host' => 'localhost' );
+$request->header(
+        'SoapAction' => 'http://localhost:8080/soap'
+);
+$request->content( $request_xml );
+
+my $response = $ua->request( $request );
+
+my $parsed_response = XMLin( $response->content );
+my $birth_day       = $parsed_response->{ 'soap:Body'          }
+                                        { getBirthDay_response }
+                                        { childNameReturn      }
+                                        { content              };
+
+print "birth day: $birth_day\n";
+
+#use Data::Dumper; warn Dumper( $parsed_response );

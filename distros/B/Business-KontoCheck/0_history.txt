@@ -1,0 +1,1603 @@
+##################################################################################
+#          PRÜFZIFFERBERECHNUNG VON DEUTSCHEN KONTONUMMERN                       #
+#                  C-/AWK/Perl/PHP/Ruby-Bibliothek                               #
+##################################################################################
+#                                                                                #
+# Autor             : Michael Plugge <m.plugge@hs-mannheim.de>                   #
+# Version           : 5.8                                                        #
+# Datum             : 22.08.2015                                                 #
+##################################################################################
+
+##################################################################################
+###                       22.08.15 Version 5.8 (final)                         ###
+##################################################################################
+
+   Diese Version enthält wieder nur einige kleinere Änderungen:
+
+   - neues Prüfzifferverfahren 87d
+
+   - es gibt jetzt ein Patchfile für gawk 4.1.3
+
+   - Änderungen in konto_check_mini:
+      - die Ausgabe kann als JSON-String formatiert werden (Schalter -j und -J)
+      - bessere Erkennung von IBANs und IPIs: dazu werden die ersten Stellen
+        des übergebenen Strings analysiert, nicht mehr nur die Länge. Z.B. liefert
+        das folgende Kommando die richtigen Ergebnisse:
+         
+  ./konto_check_mini  SI56191000000123438 AT611904300234573201 AZ21NABZ00000000137010001944  \
+     BE68539007547034 BA391290079401028494 HU42117730161111101800000000 DE89370400440532013000 \
+     0900000000DE07550905 54000000000ADSF00345 380000000001234578DW FR1420041010050500013M02606 \
+     DO28BAGR00000001212453611324 BG80BNBG96611020345678 
+
+##################################################################################
+###                       26.05.15 Version 5.7 (final)                         ###
+##################################################################################
+
+
+   Diese Version ist ein reines Bugfix-Release für die Prüfziffermethode 90; bei
+   dieser Methode wurde die Untermethode 90g durch eine irrtümlich nicht entfernte
+   Bedingung nicht mehr getestet, so daß Konten die unter diese Methode fielen,
+   als falsch ausgegeben wurden.
+
+##################################################################################
+###                       13.05.15 Version 5.6 (final)                         ###
+##################################################################################
+
+
+   Diese Version enthält vor allem eine Reihe Änderungen an verschiedenen Prüfziffermethoden:
+
+   - neues Prüfzifferverfahren E2
+
+   - Prüfzifferverfahren 08: Die Konten unter 60 000 werden jetzt als richtig (ohne
+     Prüfzifferberechnung) ausgegeben (siehe dazu den ausführlichen Kommentar im
+     Quellcode in konto_check.c Zeilen 9906 ff).
+
+   - bei den Prüfziffermethoden 28 und 34 wird nicht mehr auf fehlende
+     Unterkonten geprüft (in der PDF-Datei findet sich nichts dazu)
+
+   - Prüfziffermethode 44: es wird ein Sonderfall aus der IBAN-Regel 49 berücksichtigt
+     (näheres dazu in konto_check.c Zeilen 11453 ff)
+
+   - der Compiler-Switch USE_IBAN_RULES wurde entfernt; die Verwendung der IBAN-Regeln
+     wird jetzt immer vorausgesetzt. In dem Zusammenhang entfällt auch die Funktion
+     static int kto_check_blz_x().
+
+   - bei der IBAN-Regel 0 wird nicht mehr auf weggelassene Unterkonten geprüft
+     (das war eine Krücke aus der Zeit, als die IBAN-Regeln noch nicht so verbreitet
+     waren; mittlerweile sind sie für IBAN-Rechnungen jedoch obligatorisch, und damit
+     entfällt auch die Notwendigkeit dafür).
+
+   - in der Funktion iban2bic() wurde die Bundesbank nicht richtig behandelt
+     (bei Konten der Bundesbank wurde ein Fehler zurückgegeben)
+
+   - PHP: bei lut_suche_volltext werden (optional) die gefundenen Suchbegriffe
+     zurückgegeben
+
+   - einige kleinere Änderungen und Korrekturen
+
+   - es gibt jetzt auch eine JSON Online-Version von konto_check; diese ist unter der
+     URL https://www.michael-plugge.de/konto_check/api.php zu erreichen. Das Ergebnis
+     der Prüfung bzw. die angeforderten Informationen wird als JSON kodierter
+     String zurückgeliefert.
+
+
+##################################################################################
+###                       01.09.14 Version 5.5 (final)                         ###
+##################################################################################
+
+   Diese Version enthält nur einige kleinere Änderungen:
+
+   - Fehlerkorrektur in den Funktionen bic_check() und ci_check() (fehlende
+     Stringterminierung)
+
+   - die Funktionen rebuild_blzfile() und pz_aenderungen_enable() sind in allen
+     Ports verfügbar
+
+   - für die Funktionen die einen String zurückgeben, gibt es jetzt auch eine *_id()
+     Variante. Diese geben statt eines Strings ein Handle zurück, das mittels
+     kc_id2ptr() in einen String umgewandelt werden kann. Die Funktionen sind vor allem
+     für die Windows-DLL gedacht, bei der Strings oft eine Sonderbehandlung brauchen.
+     So muß man nur eine Funktion (kc_id2ptr()) in der jeweiligen Umgebung
+     lauffähig machen :-)
+
+   - einige kleinere Bugfixes und Schönheitskorrekturen
+
+##################################################################################
+###                       02.06.14 Version 5.4 (final)                         ###
+##################################################################################
+
+   Diese Version enthält vor allem einige Bugfixes und Ergänzugen zur Version 5.3,
+   sowie eine erste Version des Java-Ports von konto_check. Es sind keine neuen
+   Features implementiert.
+
+    - Änderungen in PZ-Methode 90 implementiert (bei den IBAN-Regeln gibt es keine
+      Änderung)
+
+    - Es gibt eine erste Version für Java; diese läuft allerdings nicht immer
+      stabil, siehe die Datei 00liesmich.txt im Verzeichnis java/. Momentan wird
+      für java deshalb nur der Quellcode mitgeliefert; für den Port ist noch swig
+      (www.swig.org) sowie ein C-Compiler erforderlich.
+
+    - für gawk gibt es ein Patchfile für die Version 4.1.1; dieses wurde direkt
+      von der gawk-Version 4.1.0 übernommen
+
+    - Die Funktionen kto_check_retval2*() wurden in eine eigene Datei retvals.h
+      ausgelagert; die anderen Quellcodedateien können bei Bedarf problemlos nach
+      UTF-8 umkodiert werden.
+
+    - Die neuen Funktionen bic_*(), biq_*() und iban_*() sind jetzt in allen Ports
+      (außer awk) enthalten
+
+    - vor Speicherallokierungen wurde jeweils ein Typecast eingefügt
+
+    - einige Bugfixes in den Funktionen bic_*() und biq_*()
+
+    - Fehler in RETURN_OK für die IBAN-Regeln korriegiert (falls eine Bank durch
+      die Nachfolge-BLZ ersetzt wurde, wurde der Wert OK_BLZ_KTO_REPLACED statt
+      OK_BLZ_REPLACED zurückgegeben
+
+ - die numerischen Funktionen bic_*(), biq_*() und iban_*() geben im Fehlerfall
+   den Wert 0 zurück, wie die entsprechenden lut_*() Funktionen
+
+ - Die Rückgabewerte -80 ... -104 (sie wurden nur im mittlerweile obsoleten
+   dtaus_test benutzt) sind entfernt
+
+ - die Funktion rebuild_blzfile() berücksichtigt jetzt auch die IBAN-Regeln; so ist
+   es z.B. möglich, mit dem Befehl
+
+      ./konto_check -r blz.lut2f blz.rebuild 2
+
+   den zweiten Datensatz der LUT-Datei in eine BLZ-Datei umzuwandeln. Diese
+   Datei stimmt bis auf die vier Testkonten (13051172, 16052072, 80053772 und
+   80053782) und evl. die Reihenfolge bei einzelnen Banken mit der Datei der
+   Deutschen Bundesbank überein. Der letzte Parameter (1 oder 2) gibt die
+   Nummer des zu verwendenden Datensatzes an.
+
+   Die Funktion ist aktuell nur in der C-Datei enthalten, wird in der nächsten
+   Version jedoch auch in die anderen Ports gebracht.
+
+ - Testroutinen für Perl auf die neue LUT-Datei angepasst
+
+
+##################################################################################
+###                       04.03.14 Version 5.3 (final)                         ###
+##################################################################################
+
+ - neue IBAN-Regel 57 implementiert
+
+ - Änderungen in den IBAN-Regeln 54 und 56 implementiert, Klarstellung in
+   IBAN-Regel 42 (Deutsche Bundesbank)
+
+ - Änderung in der Prüfzifferberechnungsmethode 66 implementiert
+
+ - Es ist eine Suche nach den BICs der Hauptstellen implementiert
+
+ - In der LUT-Datei gibt es einen neuen Indexblock über die BICs der Hauptstellen
+
+ - Die Daten der Bundesbank-Datei die mit den Funktionen lut_name(), lut_ort()...
+   abgefragt werden, können jetzt auch für BICS und IBANs abgefragt werden (s.u.)
+
+ - Viele Vergleiche in den IBAN- und BIC-Funktionen die mit strcmp gemacht wurden,
+   wurden auf strcasecmp() umgestellt, so daß die Groß/Kleinschreibung bei IBANs
+   und BICs komplett ignoriert wird.
+
+ - Die  Funktion pz2str() enthält nur noch die wirklich definierten
+   Prüfziffermethoden, dafür jedoch auch die Untermethoden
+
+ - Die Ruby-Dokumentation wird jetzt über yardoc generiert
+
+ - kleinere Änderungen im Ruby-Port
+
+ - Fehler in mini1.vb behoben
+
+ - einige kleinere Bugs behoben
+
+ - neue Funktionen (diese sind momentan erst im C- und PHP-Port
+   implementiert, in den anderen Sprachen kommen sie spätestens in der nächsten Version):
+
+     - lut_suche_bic_h(): Die Funktion entspricht weitgehend der Funktion lut_suche_bic();
+       für die Nebenstellen wird bei dieser Funktion allerdings der BIC der Hauptstelle
+       benutzt.
+
+     - lut_bic_h(char*,int,int*) und lut_bic_hi(int,int,int*): Diese Funktionen geben den
+       BIC der jeweiligen Hauptstelle zurück
+
+     - lut_blz_i(int,int): eine vergessene Funktion, analog zu lut_blz() mit Integerparameter
+       für die BLZ
+
+     - bic_info(char*,int,int*,int*): Diese Funktion sucht Banken mit einem bestimmten BIC
+       und gibt die gefundene Anzahl sowie den Startindex in den internen Arrays zurück. Sie
+       ist für die Funktionsgruppe biq_* (s.u.) gedacht, falls Werte für mehrere Filialen
+       einer Bank bestimmt werden sollen.
+
+     -  bic_aenderung(char*,int,int,int*), bic_loeschung(), bic_iban_regel(),
+        bic_nachfolge_blz(), bic_nr(), bic_pan(), bic_plz(), bic_pz(), bic_bic(), bic_bic_h(),
+        bic_name(), bic_name_kurz(), bic_ort():
+           
+        Die Funktionen dieser Gruppe entsprechen den Funktionen lut_*(), nur
+        daß statt einer BLZ ein BIC angegeben wird.
+
+     - biq_aenderung(int,int*), biq_loeschung(), biq_iban_regel(), biq_nachfolge_blz(),
+        biq_nr(), biq_pan(), biq_plz(), biq_pz(), biq_bic(), biq_bic_h(), biq_name(),
+        biq_name_kurz(), biq_ort() (das q steht für quick):
+   
+        diese Funktionen entsprechen denen der Gruppe bic_*(); statt des BIC
+        wird allerdings ein Index angegeben, der über die Funktion bic_info()
+        bestimmt wird. Der Parameter mode fehlt in dieser Gruppe; er wird auch bei
+        bic_info() spezifiziert.
+
+     - iban_aenderung(), iban_loeschung(), iban_iban_regel(), iban_nachfolge_blz(),
+       iban_nr(), iban_pan(), iban_plz(), iban_pz(), iban_bic(), iban_bic_h(),
+       iban_name(), iban_name_kurz(), iban_ort():
+
+       nochmal eine Gruppe mit gleicher Funktionalität, nur wird statt eines
+       BIC eine IBAN zur Spezifizierung der Banken benutzt. Bei der Banksuche
+       per BIC ist das Problem, daß oft große Gruppen einen BIC teilen (s. z.B.
+       die Postbank), und die Filialinformation (z.B. Ort o.ä.) komplett
+       verlorengeht. Außerdem sind in der Bundesbankdatei nicht alle
+       Filialcodes enthalten, so daß die bic_*() Funktionen manchmal nur mit
+       dem Modus 0 fündig werden (dabei wird im letzten Schritt der Filialteil
+       durch XXX ersetzt; Beispiel ist wieder die Postbank).
+
+
+##################################################################################
+###                       11.11.13 Version 5.2 (final)                         ###
+##################################################################################
+
+ - neues Prüfzifferverfahren E1, gültig ab Dezember 2013
+
+ - IBAN-Regeln 55 und 56 (gültig ab Dezember 2013) implementiert
+
+ - einige Änderungen bei IBAN-Regeln eingebaut (meist gültig ab Dezember 2013)
+
+ - neuer Rückgabewert FALSE_UNTERKONTO_ATTACHED falls bei einer IBAN-Regel ein
+   Unterkonto angehängt wurde und die Kontoprüfung dadurch "falsch" zurückgibt
+
+ - neue Funktion lut_blocks(), die geladene und Blocks mit Fehlerstatus (bei der
+   Initialisierung) ausgibt
+
+ - neue Funktion lut_suche_regel(), die Banken mit einer bestimmten IBAN-Regel sucht
+
+ - neue Funktion kto_check_regel() und kto_check_regel_dbg() für Kontentest
+   unter Berücksichtigung der IBAN-Regeln
+
+ - Perl: vergessene Funktion iban2bic() nachgeliefert
+
+ - Ruby: es gibt die Funktionen bank_suche_* auch in der Bibliothek
+   KontoCheck::, nicht mehr nur in KontoCheckRaw::
+
+ - bei der Initialisierung wird die Fehlermeldung LUT2_OK_WITHOUT_IBAN_RULES
+   nicht mehr ausgegeben; stattdessen wird ein Fehlen des Blocks mit den IBAN-Regeln
+   als Fehler klassifiziert und LUT2_PARTIAL_OK zurückgegeben.
+
+ - blz.lut2f aus dem Repository gelöscht, da im Makefile Abhängigkeiten von
+   konto_check.c stehen und es sonst regelmäßig aktualisiert würde - eine aktuelle
+   Version findet sich bei der stabilen Version.
+
+ - zum Rückgabewert -38 (nicht alle Blocks geladen) gibt es noch zwei
+   Zusatzvarianten: LUT2_NOT_YET_VALID_PARTIAL_OK und LUT2_NO_LONGER_VALID_PARTIAL_OK
+
+ - Die Flessa Korrektur kann jetzt entfallen (die entsprechenden Banken haben
+   jetzt das Löschkennzeichen)
+
+ - verschiedene kleinere Bugs behoben
+
+##################################################################################
+###                       13.09.13 Version 5.1 (final)                         ###
+##################################################################################
+
+ - konto_check ist jetzt auch in das Heise Softwareverzeichnis aufgenommen:
+   http://www.heise.de/download/konto-check-1191953.html
+
+ - es ist jetzt die Datei iban_gen.c enthalten, mit der eine einfache Batch-
+   Konvertierung von BLZ/Konto nach IBAN und BIC möglich ist. Die Ausgabe kann
+   sehr flexibel über einen Formatstring oder vordefinierte Formate erfolgen. In
+   der Windows-Distribution ist auch eine entsprechende Programmdatei enthalten.
+
+   In der neuen Version wird in iban_gen auch die Suche nach Banken unterstützt.
+
+ - Die IBAN-Regel 20 (Deutsche Bank) wurde aktualisiert auf die Version 1.6
+   (Bundesbank-Email vom 30.8.2013). Die neue Version dieser Regel wird zum
+   9. Dezember in den offiziellen IBAN-Regeln veröffentlicht; die Bundesbank
+   hat den Text jedoch schon am 28. August veröffentlicht, mit der Bitte, sie
+   möglichst schon zum 9. September einzusetzen. Der Best Guess Ansatz mit dem
+   Fehlercode 51 (bzw. IBAN_AMBIGUOUS_KTO in konto_check) wird entfernt und
+   durch Verfahren zur Ermittlung eindeutiger IBANs ersetzt.
+
+ - neue Funktion ci_check() für Test von Gläubiger-Identifikationsnummern
+   (Creditor Identifier, CI). Die Funktion wurde weitgehend von iban_check()
+   kopiert, hat aber einige Besonderheiten.
+
+ - bei IBAN-Berechnungen wird getestet, ob alle notwendigen LUT-Blocks geladen
+   sind; falls nicht, werden fehlende Daten per inkrementeller Initialisierung
+   nachgeladen (mittels der Funktion iban_init())
+
+ - Berücksichtigung der IBAN-Regeln bei iban2bic() (wichtig z.B. bei Regel 5 oder
+   falsch erzeugten IBANs). Falls in einer IBAN-Regel vorgegeben wird, daß kein
+   Test der Bankverbindung erfolgen soll, wird das in iban_check() und iban2bic()
+   jetzt auch berücksichtigt
+
+ - in bestimmten Fehlerfällen (Konto ungültig) lieferte iban_bic_gen() keinen BIC;
+   das ist jetzt behoben
+
+ - Unterkonten können nur hinzugefügt werden, falls die beiden ersten Stellen
+   der Kontonummer '00' sind (das wurde nicht immer geprüft)
+
+ - Korrekturen in den Prüfziffermethoden 13b, 63, C7
+
+ - kleine Korrektur in IBAN-Regel 5
+
+ - einige kleinere bug fixes und etwas Kosmetik im C-Code
+
+
+##################################################################################
+###                       02.08.13 Version 5.0 (final)                         ###
+##################################################################################
+
+ - Änderungen der Pruefzifferberechnungsmethoden 57 und 95 (gültig ab 9.9.2013)
+   implementiert. Die Änderungen werden zum Gültigkeitsdatum automatisch aktiviert.
+
+ - Änderungen der IBAN-Regeln zum 9. September 2013 implementiert:
+   IBAN-Regeln 05, 12, 13, 20, 21, 31, 33, 35, 40 aktualisiert auf Version 1
+   IBAN-Regeln 48 - 54 neu implementiert
+
+ - bei iban_gen() wird unterschieden, ob ein Konto ersetzt wurde (z.B. Spendenkonten),
+   oder ob nur ein Unterkonto angehängt wurde. Der Rückgabewert OK_UNTERKONTO_ATTACHED
+   ist jetzt eine positive Statusmeldung, keine Fehlermeldung mehr.
+
+ - neue "schwarze Liste" für IBANs (in der Datei iban.blacklist; nähere Info in der Datei)
+
+ - einige kleinere Änderungen in den IBAN-Regeln berücksichtigt, die von der
+   Deutschen Bundesbank per Mail verbreitet wurden (sie werden erst im Dezember
+   in die offizielle Version aufgenommen, die Institute bitten jedoch darum
+   sie schon zu berücksichtigen; betrifft die Regeln 10, 15 und 43).
+
+ - Überprüfung in iban_check(), ob die übergebene IBAN mit der selbst erzeugten
+   übereinstimmt, oder ob evl. ein Unterkonto nicht angehängt wurde oder eine
+   IBAN-Regel nicht beachtet wurde; so werden falsch erzeugte IBANs erkannt
+
+ - Alle Leerzeichen werden vor der Verarbeitung aus der IBAN entfernt
+   (Funktionen iban2bic() sowie iban_check() )
+
+ - Ruby: die Funktion version() akzeptiert einen optionalen Integer-Parameter, mit
+   dem verschiedene Infos über die konto_check-Bibliothek erfragt werden können
+
+ - Ruby ist jetzt wieder mit im SVN
+
+ - Die Funktion iban_gen() in Ruby, PHP und Perl gibt nun auch die benutzte IBAN-Regel zurück
+
+ - PHP: einige Standardwerte für PHP-Generierung wurden geändert:
+      * Beschreibung der Prüfziffermethoden werden defaultmäßig eingebunden
+      * symbolische Rückgabewerte werden defaultmäßig definiert
+      * BAV Kompatibilität ist standardmäßig aus und hat noch einen zusätzlichen
+        Schalter in konto_check.h (die Funktionalität wird aktuell nicht benutzt)).
+      * Außerdem in konto_check.ini:
+            konto_check.init_default_level=9    (statt 5)
+            konto_check.lut_path1=.             (alt: /etc)
+            konto_check.lut_path2=/etc          (alt: .)
+
+ - Info zu IBAN-Regeln in den Info-Teil der LUT-Datei übernommen
+
+ - Fehler in IBAN-Regel 5 (Commerzbank) bei Kontenkreis 998000000-999499999 berichtigt
+
+ - Fehler in IBAN-Regel 46 berichtigt
+
+ - Fehler in Prüfziffermethode C7 berichtigt: 10-stellige Konten sind ungültig.
+   Der Fehler trat nur auf, wenn die Untermethoden C7a oder C7b direkt
+   aufgerufen wurden (praktisch vor allem bei IBAN-Generierung).
+
+ - Behandlung von Unterkonten in Methode C7 überarbeitet
+
+ - in Prüfziffermethode 16 wird beim Divisionsrest 1 und unterschiedlichen
+   Ziffern an der 9. und 10. Stelle der Wert FALSE zurückgegeben (dies ist die
+   Rückgabe des Bank Account Validators (BAV), sowie des SEPA IBAN Konverters
+   der Sparkassen als auch des VR Bank IBAN Konverters.
+
+ - Bug fix in lut_bic(); die Funktion lieferte manchmal eine access violation
+
+ - Die Funktion lut_bic() liefert wieder für Zweigstellen deren BIC, nicht den
+   der Hauptstelle
+
+ - Die comdirect bank behält ihren BIC aus der Bundesbank-Datei
+
+ - Das Löschflag 'D' bei lut_aenderung() wird berücksichtigt; BLZs mit diesem
+   Flag werden nicht mehr bearbeitet.
+
+
+##################################################################################
+###                       07.06.13 Version 4.6                                 ###
+##################################################################################
+
+ - IBAN-Regeln implementiert und getestet
+ - Änderungen in Prüfziffermethode 51 und 84 (gültig ab 3.6.2013)
+ - Kommentar zu Prüfziffermethode E0 angepasst (Klarstellung)
+ - neue Funktion lut_iban_regel()) zur Bestimmung der IBAN-Regel für eine Bankverbindung
+ - neue Funktion iban_bic_gen() zur Bestimmung einer IBAN sowie BIC und benutzter
+   BLZ/Kontonummer
+ - neue Funktion get_kto_check_version_x() mit etwas mehr Infos
+ - kleiner Bugfix in main.c: bei der Anzeige der Bankdaten in der Konsole wurde
+   bei Prüfziffermethoden ab B0 die erste Stelle der Prüfziffermethode immer
+   falsch ausgegeben.
+
+
+##################################################################################
+###                       28.02.13 Version 4.5                                 ###
+##################################################################################
+
+      Dies ist wieder eine reine Bugfix-Version für Perl, die zwei Fehler in
+      den Perl-Tests korrigiert (eine Bank wurde umbenannt, eine andere gibt es
+      nicht mehr).
+
+##################################################################################
+###                       02.02.13 Version 4.4                                 ###
+##################################################################################
+
+      - neue Prüfziffermethode E0
+      - Änderungen der PZ-Methoden C6 und D1 implementiert
+      - Bug fix in Methode C6
+
+##################################################################################
+###                       13.11.12 Version 4.3                                 ###
+##################################################################################
+
+      dies ist eine reine Bugfix-Version für Perl, die eine vergessene Datei
+      (t/blz.txt) nachliefert sowie (hoffentlich) endlich den Fehler bei
+      test::pod beseitigt.
+
+##################################################################################
+###                       24.10.12 Version 4.2                                 ###
+##################################################################################
+
+      - encoding error in KontoCheck.pm gefixt
+
+      - einige Speicherprobleme gefixt
+
+      - IBAN Generierung der Flessa Bank korrigiert (es wird für alle BLZs der
+        Flessa-Bank dieselbe BLZ benutzt)
+
+      - in Perl gibt es jetzt die Funktion lut_keine_iban_berechnung() sowie
+        eine optionale Variable in generate_lut2(), um eine IBAN-Blacklist an
+        eine LUT-Datei anzuhängen
+
+      - Perl: neue Testdatei generate_lut.t zum Test der Generierung einer LUT-Datei
+
+      - Perl und Ruby: Alle Suchroutinen in KontoCheckRaw haben jetzt die Parameter
+        sort (Ausgabe nach BLZ sortieren) und uniq (für jede Bank nur eine
+        Zweigstelle ausgeben); auch die Ruby-Funktion KontoCheck::suche()
+        unterstützt die beiden Parameter.
+
+     - diverse kleinere Änderungen
+
+##################################################################################
+###                       30.05.12 Version 4.1                                 ###
+##################################################################################
+
+Die Version 4.1 enthält die neuen Suchfunktionen lut_suche_volltext()
+und lut_suche_multiple() sowie einige kleinere Änderungen.
+
+ - Die neue Funktion lut_suche_volltext() realisiert eine Volltextsuche in den
+   Feldern Bankname, Kurzname und Ort. Alle in diesen drei Feldern vorkommenden
+   Worte werden indiziert und in zwei Blocks der LUT-Datei geschrieben. Die
+   Volltextsuche sucht dann nach jeweils einem Wort, das in einem der drei Felder
+   vorkommt.
+   
+ - Eine weitere neue Funktion ist lut_suche_multiple(); mit dieser Funktion ist
+   es möglich, Banken zu suchen, die mehrere Kriterien erfüllen. Es können bis zu
+   26 Teilsuchen definiert werden, die dann beliebig miteinander verknüpft werden
+   können. Als Verknüpfung sind "Addition" (+), "Subtraktion" (-) und
+   "Multiplikation" (*) definiert. 
+
+   Die Funktion lut_suche_multiple() sucht alle Banken, die mehreren Kriterien 
+   entsprechen. Dabei können bis zu 26 Teilsuchen definiert werden, die beliebig
+   miteinander verknüpft werden können (additiv, subtraktiv und multiplikativ).
+   Ein kleines Readme zu den Suchfunktionen und ihren Parametern wird bald folgen.
+
+ - neue Prüfziffermethode D9 implementiert (gültig ab 4.6.2012)
+
+ - in PHP 5.4 wurde das API geändert; kleine Anpassung notwendig
+
+ - neu im AWK-Port sind die Funktionen iban_gen(), iban_check(), ipi_gen() und ipi_check().
+
+ - die IBAN-Länge wird für die verschiedenen Länder getestet
+
+ - diverse kleinere Bugfixes
+
+ - neues "mini" mini.vb mit Visual Basic .NET Interface
+
+##################################################################################
+###                       26.07.11 Version 4.0                                 ###
+##################################################################################
+
+Die Version 4.0 enthält einige wesentliche Änderungen in der Suche nach Banken
+sowie in der Kodierung der Ausgabe. Außerdem wurde in der Funktion iban_gen()
+noch eine Prüfung hinzugefügt, ob die Bank einer Selbstberechnung der IBAN
+widersprochen hat. Hier die wichtigsten Änderungen im Einzelnen:
+
+ - Es gibt eine neue Funktion kto_check_encoding(), mit der die Kodierung der
+   Ausgabe (sowohl für Fehlermeldungen als auch die Felder der LUT-Datei
+   (Bankname, Kurzname, Ort) festgelegt werden kann. Die Funktion
+   kto_check_retval2txt() gibt die Ausgabe entsprechend der gewählten Kodierung
+   aus; eine neue Funktion (kto_check_retval2iso()) übernimmt die Rolle der
+   alten Funktion, die immer die Kodierung ISO-8859-1 benutzte.
+
+ - Die Sortierungsroutinen wurden umgeschrieben, so daß Umlaute in allen
+   Kodierungen erkannt werden. Außerdem können die Suchbegriffe jetzt auch in
+   einer beliebigen Kodierung angegeben werden, sogar mit HTML Entities. Alle
+   Zeichen werden auf eine interne Repräsentation mit 12 Bit umgesetzt; dabei
+   werden Groß- und Kleinbuchstaben gleich behandelt und Umlaute sowie
+   Buchstaben mit Akzenten als eigene Zeichen direkt nach dem entsprechenden
+   Grundbuchstaben einsortiert. Dies erscheint mir konsistenter als die alte
+   Version, bei denen diese Zeichen mit den Grundbuchstaben einfach gleichgesetzt
+   wurden, und auch besser als die Version, z.B Umlaute unter <Grundbuchstabe+e>
+   zu sortieren.
+
+ - In der alten Version wurde beim ersten Aufruf einer Suchroutine der
+   entsprechende Suchindex jeweils neu generiert. Die Suchindizes sind nun als
+   LUT-Blocks gespeichert und können sehr schnell eingelesen werden. Die
+   benötigte Zeit für den ersten Suchvorgang (in PHP) reduziert bei meinem
+   Laptop dadurch von ca. 35ms (mit Generierung des Index) auf weniger als 1ms
+   (mit vorberechnetem Index-Block aus der LUT-Datei). Alle weiteren
+   Suchvorgänge laufen dann sehr schnell ab (sie benötigen etwa 40 Mikrosekunden).
+   
+   In der SVN-Version 53 ist noch ein Fehler bei der Generierung der
+   Indexblocks enthalten; der Index für die Kurzbezeichnung der Institute wird
+   beim kombinierten Block für Namen und Kurznamen nicht richtig erzeugt. In
+   der aktuellen Version wurde der Fehler berichtigt; der Indexblock der alten
+   LUT-Datei vom 9.7.2011 auf SF.net war allerdings auch fehlerhaft; die Datei
+   sollte durch die aktuelle Version ersetzt werden.
+
+ - Falls dem Suchmuster bei Stringsuche ein ! vorangestellt wird, wird eine
+   genaue Suche durchgeführt. Es werden nur die Ergebnisse zurückgeliefert,
+   die genau auf das Suchmuster passen.
+
+ - Aufgrund der zusätzlichen Indexblocks (je Set bis zu sechs zusätzliche
+   Blocks) wurde die minimale Slotzahl auf 40 erhöht.
+
+ - Für den Parameter set in der Funktion in generate_lut2() sind jetzt auch die
+   Werte 10, 11 und 12 möglich. Sie entsprechen den Werten 0, 1 und 2 des
+   normalen Aufrufs; es werden jedoch keine Indexblocks generiert.
+
+ - Es gibt eine neue Funktion current_lutfile_name(); diese liefert den Namen
+   und das für die Initialisierung benutzte set zurück. Sie wurde zunächst für
+   die inkrementelle Initialisierung der Indexblocks benötigt, ist aber auch
+   für andere Aufgaben nützlich.
+
+ - Die Funktion iban_gen() wertet jetzt eine Liste von Banken aus, die der
+   IBAN-Berechnung nicht zugestimmt haben. Die Liste ist die Datei CONFIG.INI
+   des SEPA Account Converters; sie kann mit der Funktion lut_keine_iban_berechnung() 
+   direkt in eine LUT-Datei geschrieben werden. Der entsprechende Block wird bei der
+   Initialisierung gelesen und von iban_gen() ausgewertet; falls er nicht in der
+   LUT-Datei enthalten ist, erzeugt das allerdings auch keine Warnung.
+
+   Alle Banken der Liste erzeugen eine Statusmeldung mit dem Wert
+   OK_UNTERKONTO_ATTACHED, OK_UNTERKONTO_POSSIBLE oder OK_UNTERKONTO_GIVEN.
+   Falls einer dieser Stauswerte zurückgegeben wird, ist somit immer Vorsicht
+   geboten; der generierte IBAN sollte direkt bei dem zugehörigen Institut
+   überprüft werden.
+   
+   Weblinks:
+   
+        https://www.sparkasse-rhein-neckar-nord.de/pdf/content/sepa/kurzanleitung.pdf
+        https://www.sparkasse-rhein-neckar-nord.de/firmenkunden/internationales_geschaeft/sepa/vorteile/index.php
+        https://www.sparkasse-rhein-neckar-nord.de/firmenkunden/internationales_geschaeft/sepa/vorteile/sepa_account_converter.msi
+
+ - Im AWK-Port wurde die Funktion iban_gen() hinzugefügt
+
+ - es wurde der AWK-Port für awk 4.0.0 implementiert. Diese AWK-Version enthält
+   ein komplett neues API; es ist allerdings leichter zu lesen als das alte.
+
+ - Es gibt die Beispielsdatei mini.cs für C#.net, sowie eine Interface-Datei für C#
+
+ - Die Änderungen der Prüfzifferberechnungsmethoden B6 und D1 (gültig ab 5.9.11) sind implementiert
+
+ - diverse kleinere Änderungen und Bugfixes
+
+
+##################################################################################
+###                       13.04.11 Version 3.6                                 ###
+##################################################################################
+
+ - neue Prüfziffermethode D7 und D8 implementiert (gültig ab 6.6.2011)
+
+ - Änderungen in den Prüfziffermethoden B8, C6 und D4 implementiert (gültig ab 6.6.2011)
+
+ - Bugfix in Methode D6 (falls sich in D6a für die Prüfziffer 10 ergab, wurde die
+   Meldung "ungültiges Konto" zurückgegeben, statt mit D6b weiterzutesten).
+
+ - diverse kleinere Bugfixes (viele bedingt durch Compiler-Warnungen im Ruby-Port)
+
+##################################################################################
+###                       06.01.11 Version 3.5                                 ###
+##################################################################################
+
+ - neue Prüfziffermethode D6 implementiert (gültig ab 7.3.2011)
+
+ - neue Berechnung für Prüfziffermethode D1 (gültig ab 7.3.2011)
+
+ - die Variablen lut_set_* enthalten jetzt explizit auch BLZ und Prüfziffer
+
+ - Fehler in den *BIC-Routinen beseitigt, der unter NetBSD/64 Bit und
+   Dragonfly/64Bit zum Absturz führte
+
+ - Fix für Compilerproblem unter Solaris
+
+ - für generate_lut2() wird jetzt eine minimale Anzahl Slots vorgegeben; falls
+   der angegebene Wert kleiner ist, wird er korrigiert
+
+ - kleine Änderungen im Perl-Port:
+      - einige Testkonten aktualisiert, neue Testwerte eingefügt
+      - etwas zusätzliche POD-Dokumentation für generate_lut2() in KontoCheck.pm
+
+
+##################################################################################
+###                       13.11.10 Version 3.4                                 ###
+##################################################################################
+
+ - neue Prüfziffermethode D5 implementiert (gültig ab Dezember 2010)
+
+ - optional können zusätzlich zu gzip verschiedene andere Kompressions-
+   bibliotheken (bzip2, lzo, lzma) eingebunden werden; Auswahl beim
+   Generieren der LUT-Datei über die Funktion set_default_compression().
+   Die benutzte Kompressionsmethode wird in den Klartext-Header der LUT-
+   Datei geschrieben und bei der Initialisierung gelesen.
+
+   Die Ergebnisse der Tests zeigen eine klare Überlegenheit von gzip in
+   der Gesamtwertung; daher wird es auch das Standardverfahren bleiben.
+   Ausführliche Testergebnisse finden sich in der Datei
+   http://kontocheck.svn.sourceforge.net/viewvc/kontocheck/trunk/konto_check/0test_compression.txt?revision=42&view=markup
+
+ - kleinere Korrekturen in der Initialisierung
+
+ - Code etwas aufgeräumt, check_malloc Routinen herausgenommen
+
+ - neue Option -vx (in main.c) und Makro VERBOSE_DEBUG für erweiterte Debug-Routinen
+   bei verzwickten Problemen
+
+
+##################################################################################
+###                       20.06.10 Version 3.3                                 ###
+##################################################################################
+
+Die Version 3.3 enthält einige Bugfixes für die Suchfunktionen; auf 64 Bit Rechnern
+waren diese komplett unbrauchbar und ergaben keine brauchbaren Resultate. Der Fehler
+wurde durch die CPAN Tests entdeckt; er ist jetzt gefixt.
+
+##################################################################################
+###                       13.06.10 Version 3.2                                 ###
+##################################################################################
+
+Die Version 3.2 enthält vor allem Korrekturen und Verbesserungen für den Perl-Port;
+es sind allerdings auch einige allgemeine Bugfixes und Änderungen enthalten:
+
+ - CHECK_MALLOC wird nun defaultmäßig als 0 definiert (macht u.U. Probleme)
+
+ - neue Funktion lut_blz(), die eine Bankleitzahl auf Gültigkeit testet
+
+ - neue Funktion pz2str() zur Umwandlung einer numerischen Prüfziffermethode in die
+   String-Version (2-stellig alphanumerisch)
+
+ - neue Funktion lut_dir_dump_str(), die das Inhaltsverzeichnis einer LUT-Datei
+   in einen String schreibt
+
+ - php/test2.php: Umstellung auf neues API
+
+ - konto_check_mini: kein Programmabbruch mehr, falls die LUT-Datei
+   nicht alle Blocks enthält
+
+ - Perl:
+      - Suchroutinen für Perl komplett neu geschrieben und getestet
+
+      - neue Funktionen lut_*1(), die *immer* in skalarem Kontext arbeiten
+
+      - Funktionen retval2txt_*(ret) hinzugefügt (standen im POD, nur nicht im
+        Programmcode)
+
+      - lut_info(): zusätzliche Rückgabevariable $lut_dir, in der das
+        Verzeichnis der LUT-Datei zurückgegeben wird
+
+      - für die Speicherfreigabe in lut_info() wird die Funktion kc_free() benutzt,
+        da free() in strawberry perl umdefiniert wird und zum Absturz führt.
+
+      - Makefile.PL komplett umgeschrieben; es funktioniert nun für Windows, und sollte
+        eine vorhandene (oder nicht vorhandene) zlib besser erkennen
+
+      - neue Testdateien t/lut_info.t und t/lut_suche.t
+
+
+##################################################################################
+###                       22.05.10 Version 3.1                                 ###
+##################################################################################
+
+Diese Version enthält eine Reihe kleinerer Korrekturen, die Änderungen in den
+Berechnungsmethoden C6 und D1, die zum 7.6.10 gültig werden sowie die neu
+definierte Prüfziffermethode D4.
+
+ - Das Makefile benutzt jetzt die beiden BLZ-Dateien blz_20091207.txt und
+   blz_20100308.txt.
+
+ - falls in einer LUT-Datei beiden Datensätze ungültig sind, wird nun der
+   neuere genommen
+
+ - defaultmäßig werden keine alten LUT-Dateien (Version 1.0/1.1) mehr erzeugt;
+   dieses Verhalten läßt sich über den Compilerschalter GENERATE_OLD_LUTFILE
+   in konto_check.h steuern)
+
+ - Die Funktion iban_gen() überprüft das BLZ/Konto Paar auf auf möglicherweise
+   weggelassene Unterkonten. Falls dies der Fall ist (es kann in den Methoden
+   13, 26, 50, 63, 76 sowie C7 auftreten), wird ein entsprechender Rückgabewert
+   generiert:
+
+      OK_UNTERKONTO_ATTACHED:
+         Warnung: es wurde ein (weggelassenes) Unterkonto angehängt
+      OK_UNTERKONTO_POSSIBLE:
+         Die Kontonummer scheint richtig zu sein, könnte jedoch
+         auch ein (nicht angegebenes) Unterkonto enthalten
+      OK_UNTERKONTO_GIVEN:
+         wahrscheinlich ok; es wurde ein Unterkonto gefunden
+
+   Bei einem Rückgabewert OK sollte die generierte IBAN in Ordnung sein; bei
+   einem der obigen Werte ist jedoch Vorsicht angebracht. Die Funktion ist
+   jetzt auch unter PHP verfügbar.
+
+ - PHP: neue config-Option --enable-symbolic-retvals. Mit der Option wird
+   gesteuert, ob für PHP auch symbolische Rückgabewerte (als Konstanten)
+   definiert werden; die Voreinstellung ist nein (alte Voreinstellung war ja).
+
+   In den letzten Versionen wurde FALSE dabei auch definiert (als int(0)); diese
+   Definition wurde jetzt herausgenommen, um die Kollision mit FALSE als bool(0)
+   zu vermeiden; ansonsten funktionieren Tests wie $ret===FALSE nicht mehr (ein
+   Test mit $ret===false wurde nicht tangiert).
+
+ - neue PHP-Funktion kto_check_retval(). Diese Funktion gibt ein assoziatives
+   Array zurück, bei dem die  - neue PHP-Funktion kto_check_retval(). Diese
+   Funktion gibt ein assoziatives Array zurück, das als Index die Makronamen aus
+   konto_check.h benutzt und den entsprechenden numerischen Wert zurückgibt. Das
+   Array kann gut benutzt werden, wenn man die Makronamen nicht als globale
+   Konstante deklarieren will (Option --enable-symbolic_retvals beim
+   configure-Aufruf).
+
+ - die erste ID für User-Blocks wurde von 1000 auf 500 herabgesetzt; 501 wird
+   gleich für den Default-Block (s.u.) benutzt. Einige kleinere Fehler in der
+   Verarbeitung von User-Blocks wurden noch beseitigt.
+
+ - neue Funktionen zum Lesen und Schreiben von Default-Blocks in der LUT-Datei.
+   Diese Funktionen können benutzerspezifische Daten in die LUT-Datei schreiben
+   (in einem eigenen Block mit der Defaultkennung 501; es sind jedoch auch andere
+   Kennungen möglich). Die Daten werden als Schlüssel/Daten-Paar gespeichert.
+   Für den Schlüssel ist ein C-String erlaubt, während in den Daten auch binäre
+   Daten mit eingebetteten ASCII-NULL-Zeichen erlaubt sind. Die folgenden
+   Funktionen sind definiert:
+
+      kto_check_init_default(char *lut_name,int block_id)
+            Default-Block aus der LUT-Datei einlesen
+
+      kto_check_default_keys(char ***keys,int *cnt)
+            die Funktion gibt ein Array mit den aktuellen Schlüsseln zurück
+
+      kto_check_set_default(char *key,char *val)
+            einen Wert (C-String) in der aktuellen Tabelle eintragen. Bei dieser
+            Funktion muß die Stringlänge nicht angegeben werden. Achtung - der
+            Block wird bei dieser Funktion noch nicht gespeichert, sondern
+            verbleibt nur im Speicher!!! Die Funktion initialisiert bei Bedarf die
+            notwendigen Variablen; es ist keine zusätzliche Initialisierung
+            notwendig (wie auch bei der nächsten Funktion).
+
+      kto_check_set_default_bin(char *key,char *val,int size)
+            einen Binärwert in die aktuelle Tabelle eintragen
+
+      kto_check_get_default(char *key,char **val,int *size)
+            einen Wert aus der aktuellen Tabelle lesen.
+
+      kto_check_write_default(char *lutfile,int block_id)
+            die aktuelle Tabelle in die LUT-Datei schreiben.
+
+ - Es gibt einige zusätzliche Rückgabewerte für den Test von DTAUS-Dateien; der
+   Code dazu ist allerdings noch nicht enthalten (er liegt noch in einer separaten
+   Datei).
+
+ - Im Makefile wurde die Compiler-Option -Wall (alle Warnungen einschalten)
+   aktiviert; dazu mußten noch einige kleinere kosmetische Korrekturen am Code
+   vorgenommen werden.
+
+##################################################################################
+###                       24.10.09 Version 3.0                                 ###
+##################################################################################
+
+Diese Version enthält vor allem Korrekturen; die Speicherprobleme die teilweise
+noch in der Version 2.99 auftraten, sind jetzt behoben. Die Version enthält
+noch einige Debug-Routinen für die malloc() Aufrufe etc.; in einer der nächsten
+Versionen werden sie voraussichtlich wieder entfernt.
+
+Seit der Version 2.99 sind einige neue Suchfunktionen implementiert; sie sind
+allerdings noch nicht dokumentiert. Hier eine kurze Liste der Funktionen (sie
+sind auch unter PHP verfügbar):
+
+      lut_suche_bic()
+      lut_suche_namen()
+      lut_suche_namen_kurz()
+      lut_suche_ort()
+      lut_suche_blz()
+      lut_suche_pz()
+      lut_suche_plz()
+
+##################################################################################
+###                       13.09.09 Version 2.99                                ###
+##################################################################################
+
+Diese Version enthält einige kritische Bugfixes; es wurde in der C Bibliothek
+nicht aller allokierter Speicher freigegeben, was unter PHP zu erheblichen
+Problemen führte. Mittels valgrind und duma wurden die fehlerhaften
+Allokierungen aufgespürt und korrigiert; nun werden alle Speicherblocks auch
+wieder freigegeben.
+
+Es wurden außerdem noch einige neue Funktionen zum Suchen von Bankleitzahlen
+implementiert; eine Beschreibung dieser Funktionen steht allerdings noch aus.
+
+##################################################################################
+###                       09.05.09 Version 2.98                                ###
+##################################################################################
+
+Diese Version enthält viele Korrekturen für PHP; außerdem wird die Perl-Version
+jetzt auf praktisch allen getesteten Plattform- und Betriebssystemvarianten
+fehlerfrei übersetzt und getestet:
+http://matrix.cpantesters.org/?dist=Business-KontoCheck;reports=1
+
+Wichtige Änderungen im Einzelnen:
+
+ - PHP: neue Funktionen generate_lut2(), read_lut_block(),
+        write_lut_block(), copy_lutfile()
+
+ - PHP: Funktion lut_info() erweitert für Infos über Interna der LUT-Datei
+
+ - PHP: diverse Speicherlecks bei Funktionen mit Rückgabevariablen by reference
+        beseitigt
+
+ - PHP: Suchliste für Verzeichnisse und Dateinamen von LUT-Dateien
+
+ - falls bei einer LUT-Datei ein Block gleichen Typs geschrieben wird, kann der
+   gleiche Verzeichnis-Slot dafür benutzt werden (Compiler-Switch)
+
+ - Korrekturen in den Methoden 16, 63, 74, 79, C7
+
+ - Diverse kleinere Änderungen und Bugfixes
+
+##################################################################################
+###                       08.03.09 Version 2.97                                ###
+##################################################################################
+
+ - kleine Korrekturen in den Methoden 16, 58, 63 und 127
+
+ - Berechnung von Kontolänge korrigiert (bei führenden Nullen - die wurden nicht
+   berücksichtigt, sollten es aber doch, wie im Leben ;-)
+
+ - Die PHP-Version 2.96 enthielt einen kleinen aber fatalen Fehler, der u.U. den
+   PHP Interpreter abstürzen ließ (und damit natürlich auch den entsprechenden
+   Server- Prozess); daher wurde die Version auf SF.net gelöscht.
+
+##################################################################################
+###                       02.03.09 Version 2.96                                ###
+##################################################################################
+
+ - Der PHP-Port wurde sehr stark überarbeitet; es gibt jetzt ein neues PHP API,
+   das alte ist allerdings ebenfalls noch verfügbar.
+
+ - Neue Dokumentation in 00liesmich.pdf (noch nicht komplett, aber ein Anfang
+   ist gemacht :-) )
+
+ - Diverse kleinere Änderungen und Bugfixes
+
+##################################################################################
+###                       13.01.09 Version 2.95                                ###
+##################################################################################
+
+ - Diese Version behebt einen Fehler in den Testdateien der Perl-Version. In der
+   neuen LUT-Datei war eine Bank, die in der alten LUT-Datei noch vorhanden war,
+   gelöscht worden; dies führte zu einem FAIL bei allen automatischen Tests. Der
+   Code selbst ist unverändert.
+
+##################################################################################
+###                       13.01.09 Version 2.94                                ###
+##################################################################################
+
+ - Diese Version behebt einen Fehler in der Funktion read_lut_block_int(), der
+   auf 64 Bit-Rechnern die Initialisierung fehlschlagen ließ. Die Variable len
+   war als UINT4 (4 Byte Integer) deklariert; sie wurde **by reference** an die
+   Funktion uncompress() (aus zlib) übergeben, die an der Stelle allerdings eine
+   long- Variable (auf 64 Bit Maschinen üblicherweise mit 8 Byte) erwartete.
+   Dadurch schlug die Initialisierung auf diesen Maschinen üblicherweise fehl,
+   während sie auf 32 Bit Rechnern keine Probleme machte.
+
+ - Prüfziffermethoden D2 und D3 implementiert
+
+ - für die Prüfziffermethode C6 neue Berechnungsmethode (gültig ab 9.3.2009)
+   implementiert, in Methode 28 ein
+
+ - Kleiner Fehler in Methode 28 beseitigt (falls eine Unterkontonummer
+   weggelassen wurde (=> 8stellige Kontonummer), ist der Test nochmals mit der
+   gedachten Unterkontonummer 00 zu wiederholen.
+
+ - Der Code wurde insgesamt noch etwas überarbeitet, um diverse
+   Compiler-Warnungen (bzw. -Fehler) zu beseitigen.
+
+##################################################################################
+###                       08.09.08 Version 2.93                                ###
+##################################################################################
+
+Diese Version ist ein Bugfix-Release, das einen Fehler in der Funktion
+get_lut_info2() behebt. Für den verwendeten Ausgabebuffer wurde ein realloc()
+gemacht, um die Buffergröße auf den tatsächlich verwendeten Wert zu reduzieren;
+es wurde allerdings die alte Adresse zurückgegeben. Auf Systemen, bei denen das
+realloc nur den Speicherbereich ver- keinerte, trat kein Fehler auf; bei
+anderen wurde der Buffer jedoch verschoben, und wenn das Anwender- programm den
+Buffer dann freigeben wollte, stürzte es natürlich ab.
+
+##################################################################################
+###                       23.08.08 Version 2.92                                ###
+##################################################################################
+
+Diese Version ist das zweite Beta-Release für die Version 3.0. Sie enthält die
+Korrekturen der Version 2.7 sowie noch eine Reihe kleinerer Bugfixes etc. Die
+folgenden Änderungen finden sich nur in 2.92:
+
+ - Es gibt ein zweitesa Demo-Programm konto_check_mini, das die zu prüfenden
+   Konto/BLZ-Kombinationen von der Kommandozeile liest; außerdem werden noch
+   Tests von IBAN und Strukturiertem Verwendungszweck unterstützt.
+
+ - Die main-Routine im Beispielsprogramm wurde etwas erweitert; falls keine
+   Datei angegeben wird, geht das Programm in einen interaktiven Modus, in dem
+   interaktiv diverse Tests gemacht werden können sowie die LUT-Datei neu
+   geladen werden kann; außerdem kann auch das benutzte Systemdatum gesetzt
+   werden, um einen Datumswechsel zu simulieren. Hilfe gibt es in dem Batchmodus
+   mit dem Kommando -h.
+
+ - Für die LUT-Datei können jetzt mehrere Suchpfade angegeben werden, die
+   nacheinander durchsucht werden; außerdem sind mehrere Default-Dateinamen
+   möglich. Falls bei der Initialisierung kein Dateiname für die LUT-Datei
+   angegeben wird, werden in allen Default- Verzeichnissen die Defaultnamen
+   probiert; falls eine passende Datei gefunden wird, wird diese genommen. Die
+   Default-Namen und -Pfade können in konto_check.h definiert werden (es sind
+   dieMakros DEFAULT_LUT_NAME und  DEFAULT_LUT_PATH).
+
+ - Die Funktion lut_init() ist jetzt nicht mehr eine Kopie der Funktion
+   kto_check_init(), sondern eine eigene Funktion mit vereinfachtem
+   Aufrufinterface, die i.A. eine inkrementelle Initialisierung macht (näheres
+   in konto_check.c).
+
+ - Es gibt eine neue Funktion get_lut_id(), die die Datei-ID einer LUT-Datei
+   liefert. Diese Funktion wird vor allem für inkrementelle Initialisierung
+   benötigt.
+
+ - Es gibt eine neue Funktion kto_check_retval2utf8(), die das Ergebnis einer
+   Rückgabe in einen UTF-8 kodierten String umwandelt.
+
+ - In einigen Prüfziffermethoden der Debugversion wurde retvals->pz nicht
+   gesetzt; korrigiert.
+
+ - Einige Beschreibungen der Prüfziffermethoden wurden leicht angepasst; alte
+   Versionsbeschreibungen gelöscht.
+
+ - Die Funktion rebuild_blzfile() funktioniert jetzt (wieder); sie dient als
+   Härtetest für die LUT2 Routinen, da eine BLZ-Datei der Bundesbank aus einer
+   LUT-Datei wiederhergestellt wird.
+
+ - Die Testroutinen der Perl-Version wurden komplett neu geschrieben, um aus den
+   automatisierten Tests der CPAN-Tester bessere Rückschlüsse auf Programm-
+   fehler zu erhalten.
+
+ - Die Perl-Version enthält eine abgespeckte Version der ZLIB, damit bei Fehlen
+   des zlib-development Pakets die Kompilierung nicht mit einem Fehler abbricht
+   (das Vorhandensein wird in Makefile.PL überprüft).
+
+ - Die Windows-DLL macht in Verbindung mit PHP oder Access öfters Probleme; die
+   Ursache dafür wurde noch nicht gefunden, wird aber bald angegangen.
+
+##################################################################################
+###                       23.04.08 Version 2.91                                ###
+##################################################################################
+
+   Dies ist die erste Beta-Version für das 3.0 Release von konto_check. Die
+   Dateien 0_history.txt und 00liesmich.txt sind noch weitgehend von 2.6; es
+   gibt sehr viele Änderungen in den Funktionen und im API. Das alte API kann
+   jedoch auch weiterhin benutzt werden; es wird intern auf die neuen Funktionen
+   abgebildet.
+
+##################################################################################
+###                       23.08.08 Version 2.7 (gleichzeitig mit 2.92)         ###
+##################################################################################
+
+Diese Version ist wieder ein Zwischenrelease zur Version 3.0, da zum nächsten
+Termin am 8.9.2008 zwei neue Prüfziffermethoden eingeführt wurden. Die zweite
+Betaversion zu 3.0 (2.92) wird gleichzeitig mit dieser Version freigegeben.
+
+ - Methoden D0 und D1 implementiert
+
+ - in Methode 53 und B6 wurde eine Rückgabe vergessen; dadurch konnten unter
+   Umständen Konten fälschlich als richtig klassifiziert werden.
+
+ - Methode 57 wurde zum 4.12.2006 ziemlig stark geändert; die Änderungen sind
+   jetzt berücksichtigt.
+
+ - Die PHP-Version wurde für die Version 2.7 entfernt, da die Version aufgrund
+   mangelnder Threadfestigkeit und fehlender Initialisierungsfunktionen u.a. für
+   PHP nicht geeignet ist.
+
+ - Die Windows-DLL wird jetzt sowohl in cdecl als auch mit stdcall kompiliert;
+   dann kann jeder die Version benutzen, die für ihn passend ist.
+
+##################################################################################
+###                       210.04.08 Version 2.6                                ###
+##################################################################################
+
+ - Methoden C8 und C9 implementiert
+
+##################################################################################
+###                       216.02.08 Version 2.5                                ###
+##################################################################################
+
+Diese Version ist ein Übergangsrelease, da in der Version 3.0 sehr viel Code
+neu geschrieben wurde; die Version 2.5 enthält noch den alten Code mit einigen
+kleineren Bugfixes und kann als stabile Variante angesehen werden (3.0 ist noch
+etwas experimentell, und macht unter Windows in Zusammen- hang mit VB ziemlig
+Probleme; die C- und Perlversion scheinen dagegen zu laufen).
+
+ - Methode 50b wird nur noch angewendet, falls die Kontonummer nicht mehr als
+   sieben Stellen hat; nur in dem Fall scheint es möglich zu sein, daß ein
+   Unterkonto weggelassen wurde.
+
+ - Bei Methode 74b wird die Prüfziffer (aus der 10. Stelle) modulo 5 genommen,
+   da bei mindestens einer Bank Prüfziffern für 74b >5 vorkommen.
+
+ - Falls in der Bundesbankdatei für eine Bank mehrere Prüfverfahren angegeben
+   sind, wird das der Haupt- stelle benutzt. Die alte Version nutzte als Prüf-
+   zifferverfahren dasjenige, das in der Bankdatei als letztes aufgeführt wurde;
+   dieses ist oft von einer Nebenstelle und ist somit i.A. nicht korrekt.
+
+##################################################################################
+###                       13.11.07 Version 2.4                                 ###
+##################################################################################
+
+Diese Version ist wieder ein Zwischenrelease, um die neu definierte Prüfmethode
+C7 (gültig ab Dezember) in die Library einzufügen; außerdem wurde ein Fehler in
+der Methode B9 beseitigt.
+
+ - Methoden C7 implementiert
+
+ - In Methode B9 war für den Test auf 3 führende Nullen irrtümlich
+   if(kto[3]!='0') (statt if(kto[2]!='0') ) geschrieben; korrigiert.
+
+ - Die Funktion kto_check_test_vars() gibt den Wert der übergebenen Variablen
+   auch in einem String zurück, um so auch Anwendungen zu unterstützen, die die
+   Ausgabe von stderr unterdrücken (insbesondere DLL-Anwendungen unter Windows).
+
+ - neue Funktion kto_check_str(), die dieselbe Funktio- nalität hat wie
+   kto_check(), jedoch als Rückgabe einen kurzen String als Ergebnis liefert
+   (war schon in 2.2 eingeführt).
+
+##################################################################################
+###                       25.08.07 Version 2.3 (nur für Perl)                  ###
+##################################################################################
+
+Dies ist ein kleines Bugfix-Release, das ein Problem bei "make test"
+korrigiert; aufgrund einer fehlenden Datei schlug der Test fehl, so daß die
+unermüdlichen CPAN Tester zwölfmal FAIL meldeten :-( - in dieser Version ist
+die Datei vorhanden, und es gab wieder PASSes.
+
+ - neuer Rückgabewert OK_TEST_BLZ_USED für die Methoden 52, 53, B6 und C0 (keine
+   Warnung mehr nach stderr, falls die Prüfziffermethode direkt angegeben wird,
+   ohne BLZ).
+
+##################################################################################
+###                       21.08.07 Version 2.2                                 ###
+##################################################################################
+
+Diese Version ist nur ein Zwischenrelease, um die neu definierten Prüfmethoden
+C5 und C6, die ab September gültig werden, in die Library einzufügen. Ansonsten
+wurden nur einige Details geändert.
+
+ - Methoden C5 und C6 implementiert - einige Aufräumarbeiten, unbenutzte
+   Prototypen für das LUT2 Datei-Format entfernt. Die Funktionen werden in der
+   nächsten größeren Version eingeführt.
+
+##################################################################################
+###                       26.05.07 Version 2.1                                 ###
+##################################################################################
+
+ - falls die LUT-Datei nicht gefunden wurde, stürzte das Programm beim nächsten
+   Aufruf mit einer access violation ab; korrigiert.
+
+ - falls als Dateiname für die LUT-Datei ein Leerstring angegeben wird, wird
+   jetzt der Defaultname benutzt.
+
+ - die main() Routine kann jetzt auch im Filterbetrieb arbeiten
+
+ - Fehler in Methode 74 beseitigt: wenn die Unterkonto- nummer nicht angegeben
+   war, wurde bei einer Prüf- ziffer von 10 gleich INVALID_KTO zurückgegeben,
+   statt den Test mit Unterkontonummer "00" zu wiederholen.
+
+ - einige Deklarationen mit long ersetzt durch INT4, da auf 64 Bit Systemen
+   Probleme entstanden (betrifft vor allem die Funktion adler32)
+
+ - erste Perl-Version mittels h2xs generiert
+
+ - einige Anpassungen für Perl, Perl Dokumentation
+
+ - Die Versionszählung ist jetzt nur noch zweistellig (vor allem wegen
+   CPAN/PAUSE)
+
+##################################################################################
+###                       13.03.07 Version 2.0.5                               ###
+##################################################################################
+
+ - Methoden C3 und C4 implementiert
+
+##################################################################################
+###                       20.11.06 Version 2.0.4                               ###
+##################################################################################
+
+ - falsche Berechnung in Methode B6 korrigiert
+ 
+ - falsche Berechnung in Methode 74b korrigiert
+
+##################################################################################
+###                       23.08.06 Version 2.0.3                               ###
+##################################################################################
+
+   Default für lut_version in generate_lut() auf 2 (vorher war kein Defaultwert
+   definiert; bei einem ungültigem Wert für lut_version wurde eine fehler- hafte
+   blz.lut Datei generiert, jedoch fälschlich OK zurückgegeben.
+
+##################################################################################
+###                       26.05.06 Version 2.0.2                               ###
+##################################################################################
+
+ - Methoden C1 und C2 implementiert
+ 
+ - neues BLZ-Dateiformat (Bundesbank) eingebaut
+ 
+ - Variable methode_a1_alt gelöscht
+
+##################################################################################
+###                       01.12.05 Version 2.0.1                               ###
+##################################################################################
+
+ - Methoden B9 und C0 implementiert
+
+##################################################################################
+###                       06.08.05 Version 2.0 final                           ###
+##################################################################################
+
+ - Makefiles aktualisiert
+
+ - sharable library für Linux/Unix
+
+ - Fehler bei BLZ-Lookup beseitigt (nicht existierende BLZ wurde u.U. auf die 1.
+   BLZ-Methode geführt)
+
+ - Methoden B1, B2 und B4 bis B8 neu implementiert
+
+ - Die Datei pruefziffermethoden_0509.pdf wurde noch einmal mit den
+   implementierten Methoden verglichen; die Methoden 73, 80, 81, 84, 86, 87, 90,
+   91, A4, A8 wurden danach aktualisiert
+
+ - Variable methode_a1_alt herausgenommen (obsolet)
+
+ - set_globals() an mehreren Stellen in generate_lut() eingefügt (in der
+   threadfesten Version wurde der Rückgabetext nicht in die globalen Variablen
+   eingesetzt, da die Funktion direkt aufgerufen wird).
+
+##################################################################################
+###                       16.12.04 Version 2.0-Beta-2                          ###
+##################################################################################
+
+ - library threadfest gemacht (optional; noch Testphase)
+
+ - Methoden B0 und B3 neu
+
+##################################################################################
+###                       12.10.04 Version 2.0-Beta-1                          ###
+##################################################################################
+
+ - Methoden B1 und B2 neu
+
+ - Marker für vim folding eingeführt
+
+##################################################################################
+###                       16.01.04 Version 2.0-Alpha-2                         ###
+##################################################################################
+
+ - DLL-Support für Windows eingeführt
+
+##################################################################################
+###                       16.01.04 Version 2.0-Alpha-1                         ###
+##################################################################################
+
+ - Geschwindigkeitsoptimierung aller Methoden sowie der Hilfsfunktionen und der
+   main() Routine
+
+ - Methode 80: Der Sonderfall mit 99 an der 3. und 4. Stelle wird jetzt nur noch
+   für die Variante 2 angenommen, nicht global.
+
+ - In Methode 76.2 wurde die 1. Stelle auf 1,2,3,5 getestet; aufgrund der
+   Verschiebung muß jedoch die 3. Stelle getestet werden.
+
+ - Die neu definierten Methoden (A6 bis A9) sind jetzt iplementiert.
+
+ - Methode A1 alt gelöscht
+
+##################################################################################
+###                       16.12.04 Version 1.1.5 (aus 2.0-Beta-2)              ###
+##################################################################################
+
+ - Methoden B0 und B3 neu
+
+##################################################################################
+###                       12.10.04 Version 1.1.4 (aus 2.0-Beta-1)              ###
+##################################################################################
+
+ - Methoden B1 und B2 neu
+ 
+ - Marker für vim folding eingeführt
+
+##################################################################################
+###                       28.01.04 Version 1.1.3                               ###
+##################################################################################
+
+ - Die Fehler in Methode 76.2 und 80 (s.u., Version 2.0-Alpha1 wurden korrigiert
+
+ - Die neu definierten Methoden (A6 bis A9) sind jetzt iplementiert.
+
+ - Methode A1 alt gelöscht
+
+##################################################################################
+###                       210.06.03 Version 1.1.2                              ###
+##################################################################################
+ 
+ - Fehler in Methode 21 behoben (Quersumme der Faktoren fehlte)
+
+ - Methode A1 auf neues Berechnungsverfahren umgestellt
+
+ - (Bei dem Generator für die Testkonten wurde noch einige Pattern berichtigt)
+
+##################################################################################
+###                       25.03.03 Version 1.1.1                               ###
+##################################################################################
+
+ - zusätzlicher Test in read_lut(), ob die LUT-Datei gelesen wurde.
+
+ - eine Reihe Untermethoden wurde anders numeriert (dies betrifft nur die
+   Debug-Version und ist nur für Tests relevant; es hat keine Auswirkung auf das
+   normale Programm).
+
+ - neue Variable pz_str (char[4]), in der die benutzte Prüfmethode und
+   Untermethode zurückgegeben wird. Falls die Untermethode unerwünscht ist, kann
+   sie mit pz_str[2]=0 gelöscht werden. Die Methode entspricht der Notation der
+   Deutschen Bundesbank (00 bis A5), für die Untermethoden werden kleine
+   Buchstaben benutzt (a, b, c...).
+
+##################################################################################
+###                       13.03.03 Version 1.1.0                               ###
+##################################################################################
+
+ Bugfixes:
+ - Methode 95: Ausnahmekonten 0001999999 etc. gelten als richtig (ohne Test; Im
+   Vergleich wurde auf kleiner getestet statt auf kleiner/gleich)
+
+ Weitere Änderungen:
+ - Die Konstanten MAYBE_OK/MAYBE_FALSE werden nicht mehr benutzt und wurden
+   entfernt (dadurch ändern sich die numerischen Rückgabewerte, nicht jedoch die
+   symbolischen).
+
+ - Datei konto_check.h geschrieben mit public interface und möglichen
+   Rückgabewerten.
+
+ - die Methode A1 wird zum 9.6.2003 geändert; das neue Berechnungsverfahren kann
+   über eine globale Variable ausgewählt werden.
+
+ - Die Methoden A2...A5 wurden implementiert (neue Verfahren)
+
+ - Neues Dateiformat für die Datei blz.lut: sie enthält jetzt eine Infozeile, in
+   der das Erzeugungsdatum und der Name der ursprünglichen Bankleitzahlendatei
+   festgehalten wird.
+
+ - neue Funktionen get_lut_info(): gibt (beim neuen Format) die Infozeile der
+   LUT-Datei zurück.
+
+ - neue Funktion get_kto_check_version() zur Versions- kontrolle
+
+ - main() Routine in eigene Datei ausgelagert
+
+ - Test von Untermethoden mit dreistelliger "BLZ"
+
+##################################################################################
+###                       04.02.03 Version 1.0.3                               ###
+##################################################################################
+
+ Bugfixes:
+ - Fehler in den Methoden 47, 52, 87 und 93 behoben
+
+ - falls der 1. Parameter (BLZ/Prüfziffermethode) nur zweistellig angegeben
+   wird, wurde die Funktion init_w() nicht aufgerufen, so daß etliche Varibalen
+   undefiniert blieben.
+
+ - Lizenzbedingungen: Unterschied der LGPL zur normalen GPL im readme und am
+   Programmanfang deutlicher gesagt (nicht nur Hinweis auf den Text)
+
+ - neues blz.lut aus der Datei blz0212.exe
+
+##################################################################################
+###                       06.11.02 Version 1.0.2                               ###
+##################################################################################
+
+main() Routine mit Hilfefunktion, DOS-Exe in das pub-Verzeichnis
+
+##################################################################################
+###                       10.10.02 Version 1.0.1                               ###
+##################################################################################
+
+Einige kleine Fehler wurden noch korrigiert und die main() Funktion etwas erweitert.
+
+##################################################################################
+###                       13.9.02  Version 1.1                                 ###
+##################################################################################
+
+Die Berechnungsmethoden sind jetzt komplett;  bis auf Methode 87 (Pascalcode)
+wurden alle Methoden mit dem Perl-Modul konto.pm mit jeweils ca. 50000...
+100000 Testkontonummern überprüft (dabei wurden auch einige Fehler im
+Perl-Modul aufgedeckt und beseitigt).
+
+Die Funktionen aus blz_utils.c sind jetzt in die Hauptdatei integriert; diese
+kann als stand-alone Programm oder als library verwendet werden.
+
+##################################################################################
+###                       10.07.02  Version 0.3                                ###
+##################################################################################
+
+weitere Berechnungsmethoden; zusätzliche Datei blz_utils.c mit diversen
+Hilfsfunktionen für (wesentlich) schnelleren Zugriff auf die Prüfziffer-
+methoden (unter VMS ergab sich für eine Testdatei mit knapp 200 Einträgen eine
+Beschleunigung von 4,9s auf 0,13s (mit einem remote filesystem); bei Linux (mit
+lokalem Filesystem und blz.txt/blz.lut im Cache) von 175 ms auf 2,4 ms).
+
+Für die Brechnung wird nicht mehr auf die Datei der Deutschen Bundesbank
+zugegriffen, sondern nur noch auf eine generierte Binärdatei (blz.lut); sie
+kann mit der Funktion generate_lut() aus der Bundesbank- datei erzeugt werden.
+
+##################################################################################
+###                       13.06.02  Version 0.2                                ###
+##################################################################################
+
+Berechnungsmethoden umgeschrieben, zusätzliche Methoden eingefügt.
+
+Jede implementierte Methode wird mit dem Perl-Modul Business::konto.pm von
+Andreas Butzko <andreas@butzko.net> mit mindestens 40000 Testkontonummern (oft
+auch mehr) getestet.
+
+##################################################################################
+###                       01.05.02  Version 0.1                                ###
+##################################################################################
+
+   erste Version (nur privat, wenige Methoden)
+
+##################################################################################
+##################################################################################
+##################################################################################
+
+
+##############################################################################
+#          PRÜFZIFFERBERECHNUNG VON ÖSTERREICHISCHEN KONTONUMMERN            #
+#                           C-/Perl-Bibliothek                               #
+##############################################################################
+#                                                                            #
+# Autor             : Michael Plugge <m.plugge@fh-mannheim.de>               #
+# Version           : 1.3                                                    #
+# Datum             : 16.01.2008                                             #
+##############################################################################
+
+Versionen der österreichischen Bibliothek:
+
+
+Version 0.1 (13.7.06, initiale Version)
+==============================
+
+ - Prüffunktionalität komplett
+ - die Datei blz-at.lut wird von einem externen Programm generiert
+
+
+Version 0.2 (20.7.06):
+======================
+
+ - einige VIM-Faltungen eingefügt
+
+ - exit in etlichen Funktionen durch return mit Fehlercode ersetzt
+
+ - kto_check_msg herausgenommen wegen Kollision mit der deutschen Version,
+   funktional ersetzt durch kto_check_retval2txt().
+
+ - kleine Änderungen der main() Routine
+
+ - falls eine BLZ als erstes Zeichen ein - enthält, wird das Konto auch
+   getestet, falls die BLZ gelöscht ist; die Rückgabewerte sind in dem Fall
+   dann OK_GELOESCHT, OK_NO_CHK_GELOESCHT oder FALSE_GELOESCHT.
+
+ - Geschwindigkeitsoptimierungen:
+
+    * search_blz() für die Methodensuche ersetzt durch Array,
+      in dem die Methoden gespeichert sind
+
+    * atoi() zur Umwandlung der BLZ in Integer ersetzt durch eigene Funktion.
+      Eine Arrayvariante zur Umwandlung bringt keinen Geschwindigkeitsvorteil.
+
+    * l_datum (globale Variable) ersetzt durch Array (binär); das Löschdatum
+      erhält man nun über die Funktion get_loesch_datum()
+
+      Die beiden ersten Funktionen waren im Vergleich zur insgesamt benötigten
+      Zeit unverhältnismäßig langsam. Daher wurde die zugehörige Prüftabelle und
+      die Information, ob eine Bankleitzahl gelöscht ist, in zwei Byte-Arrays
+      mit jeweils 100.000 Elementen transferiert; die Arrayabfrage ist natürlich
+      wesentlich schneller als der Funktionsaufruf. Durch diese Umstellung wird
+      die Variable l_datum nicht mehr gesetzt; falls man setzen wollte, müßte
+      der Index für jede Bankleitzahl gespeichert werden. In diesem Fall müßte
+      man für das Array für das Löschdatum ein Integer-Array (4 Byte Integer)
+      benutzen; da das Löschdatum aber wohl nicht oft benötigt wird, wird es
+      nicht mehr in jedem Fall bestimmt, sondern nur noch durch den
+      Funktionsaufruf.
+
+
+ - Fehlerkorrekturen:
+
+   * im Makro ZIFFERNSUMME_7:
+      if(pz1>59)pz1-=56;  ersetzt durch if(pz1>59)pz1-=54;
+      (falsche Ziffer eingefügt => Ziffernsumme wird falsch)
+
+   * in der Funktion kto_check_at (Rechenvorgang der Prüfziffer):
+      methode=*ptr++-'0'; ersetzt durch methode=char2num[*ptr++];
+      (die alte Variante stimmt nur für einen Rechenvorgang bis 9)
+
+   * in der Funktion kto_check_at (Array-Version, nach Rechenvorgang der Prüfziffer):
+      wichtung-='0';  ersetzt durch    wichtung=char2num[wichtung];
+      stelle_1-='1';  ersetzt durch    stelle_1=char2num[stelle_1]-1;
+      (die alte Variante stimmt nur für Werte bis 9)
+
+
+Version 1.0 (1.9.06):
+=====================
+
+ - weitere Tests mit realen Konten, noch keine weiteren Fehler gefunden
+
+ - einige Kommentare eingefügt
+
+ - noch einige VIM-Faltungen eingefügt
+
+ - CRC-Test für die lut-Datei (mit adler32 als Prüfsumme)
+
+ - optional bei generate_lut_at(): Ausgabe der Bankdaten auch als plain-Datei
+   in frei wählbarem Format
+
+ - neue Funktion dump_lutfile(), die den Inhalt einer lut-Datei als Klartext
+   ausgibt (Ausgabefelder: BLZ, Löschdatum, Prüftabelle/-parameter).
+
+ - Funktion generate_lut_at in die Bibliothek integriert; inpar2lut.c ist dadurch
+   obsolet geworden (bzw. nur noch für spezielle Prüfzwecke relevant), und daher
+   aus der Distribution herausgenommen. Die Umlaute werden von CP 850 auf
+   iso-8859-1 umgesetzt (aktuell nur für die plain Ausgabe; es ist jedoch für
+   eine spätere Erweiterung der lut-Datei auf zusätzliche Ausgabefelder
+   relevant).
+
+ - das Präprozessor-Makro HTML_UMLAUTE in kto_check_retval2txt() ist jetzt
+   obsolet; stattdessen gibt es eine zusätzliche Funktion
+   kto_check_retval2html(), die HTML-Umlaute liefert.
+
+ - kleine Änderungen in der Sortier-Routine für generate_lut. Dadurch ändern
+   sich für einige Bankleitzahlen der lut-Datei das Löschdatum, da nun
+   Hauptstellen vor Zweigstellen sortiert werden (es wird nur eine Bank
+   pro BLZ in die lut-Datei aufgenommen; manchmal werden allerdings laut der
+   Bankleitzahlendatei Hauptstellen vor Zweigstellen gelöscht - schwer
+   verständlich, aber so steht es da). Ansonsten ist die lut-Datei mit der alten
+   Version identisch (läßt sich leicht mittels dump_lutfile() überprüfen ;-) ).
+
+ - die library ist jetzt threadfest (sogar ohne Sonderfunktionen wie bei der
+   deutschen Variante).
+
+ - beim Lesen und Schreiben der lut-Datei ist der Modus auf rb bzw. wb gesetzt
+   (das Programm war noch nicht unter Windows getestet).
+
+ - die Prüfroutinen liefern denselben Wert wie Version 0.2 (getestet mit einer
+   Spezialversion, die die Prüfziffer noch vor der Bildung des Modulus
+   berücksichtigt). Ein Problem ist nur die BLZ 00001: in der inporwo.txt finden
+   sich für die BLZ 00001 die folgenden Einträge:
+
+-   53791 00001 00032 GELOESCHT - BANKHAUS CARL SPAENGLER & CO.
+-   53813 00001 00032 BANKKOMMANDITGESELLSCHAFT ANTONI, HACKER & CO.
++   76040 00001 00032 VORARLBERGER LANDESBANK-HOLDING
++  116408 00001 00013 ANTEILSVERWALTUNGSSPARKASSE STOCKERAU
++  163902 00001 00000 GELOESCHT - BANK AUSTRIA TREUHAND & BETEILIGUNGSFONDS AKTIENGESELLSCHAFT
+-  166286 00001 00032 Kathrein & Co. Bankkommanditgesellschaft
+-  184195 00001 00032 BANKHAUS SCHELHAMMER & SCHATTERA
+-  196053 00001 00032 GELOESCHT - Bankhaus Krentschker & Co. Zweigniederlassung Wien
+-  267511 00001 00032 GELOESCHT - RAIFFEISENBANK HARD REG.GEN.M.B.H.
+- 1337939 00001 00032 GELOESCHT - SECURITY KAPITAL-ANLAGEGESELLSCHAFT M.B.H.
+- 4888804 00001 00032 Verwaltungsgenossenschaft der vbankdirekt AG reg.Gen.m.b.H.
+
+   Die drei Einträge mit einem + in der ersten Spalte werden in die blz-at.lut
+   Datei übernommen; falls eine BLZ 00001 auftaucht, wird allerdings der Eintrag
+   mit der ID 163902 (Tabelle 0, immer ok) benutzt. In der Version 0.2 wurde
+   stattdessen der Eintrag mit der ID 76040 (Tabelle 32) benutzt (aufgrund der
+   geänderten Sortierroutine). Die BLZ scheint allerdings keine reale BLZ zu
+   sein, sondern nur ein Testfall, da die Banken auf den ersten Blick nichts
+   miteinander zu tun haben und drei verschiedene Prüfverfahren (0, 13 und 32)
+   angegeben sind.
+
+
+Version 1.1 (8.9.06):
+=======================
+
+Diese Version enthält einige kleine Änderungen, die sich für das cgi-Programm
+als nützlich erwiesen haben, sowie zwei Bugfixes:
+
+ - falls in kto_check_at() für den Parameter lut_name NULL übergeben wird,
+   werden nur die Arrays initialisiert, aber keine lut-Datei geladen. Dies ist
+   nützlich, falls statt einer Bankleitzahl direkt die Prüfparameter angegeben
+   werden (mit vorgestelltem p). Falls für den Parameter lut_name ein Leerstring
+   übergeben wird, wird versucht, die Datei DEFAULT_LUT_NAME zu lesen.
+
+ - der Filedeskriptor trace ist jetzt als globale Variable (in der DLL auch
+   exportiert) deklariert; damit kann die trace-Datei auch aus einem anderen
+   Modul initialisiert werden. Die Trace-Version ist natürlich nicht threadfest,
+   aber sie wird ja nur zur Fehlersuche benötigt.
+
+ - in der Funktion generate_lut_at werden einige große Array-Variablen allokiert
+   (ca. 3,5 MB bei MAX_BLZ_CNT_AT=30000); sie sind jetzt als static deklariert,
+   da ansonsten unter Windows das Programm beim Generieren einer lut-Datei mit
+   einer Schreibschutzverletzung abstürzt.
+
+ - die Funktion dump_lutfile() lieferte keine vernünftigen Werte, da während der
+   Entwicklung (kurzzeitig) die Arrays per malloc allokiert wurden, und später
+   wieder als Arrays deklariert wurden; in der Funktion war noch die
+   malloc-Version, und die Adressierung ging schief.
+
+ - kleine Änderungen in der main() Routine
+
+ - die Fehlermeldungen die von kto_check_retval2txt() geliefert werden, sind
+   jetzt reine Fehlermeldungen, ohne in ### eingeschlossen zu sein
+
+
+Version 1.2 (11.9.06):
+=======================
+
+ - kleiner Fehler in der Trace-Version: falls trace==NULL war, wurden einige
+   Berechnungen nicht gemacht, und das Ergebnis meist als richtig angesehen
+   (dies betrifft nur die Trace-Version, nicht die normale; wurde beim
+   cgi-Programm entdeckt).
+
+ - Die Dateien mit dem INPAR Handbuch und -Vertrag werden nach Rücksprache mit
+   First Data (H. Krickel; jetzt SIX Card Solutions) nicht mehr in das Paket
+   aufgenommen, sondern sollten direkt bei SIX Card Solutions
+   (Andreas.Krickl@six-card-solutions.at) angefragt, bzw. von der Website von
+   SIX Card Solutions Austria heruntergeladen werden (näheres in der Datei
+   00liesmich unter Punkt 5. Prüfparameter).
+
+Version 2.1 (4.6.07):
+=======================
+ - Die Versionszählung läuft jetzt synchron mit der deutschen Version von
+   konto_check, da die beiden Pakete für die Perl-Version zusammen verwendet
+   werden
+ - einige kleinere Änderungen für die Anpassung an Perl
+ - Der Datentyp von adler32 wurde von unsigned long auf UINT4 geändert, um
+   Probleme mit modernen 64 Bit Compilern zu beheben.
+
+Version 1.3 (16.1.08):
+======================
+ - Die eigene Versionszählung für das österreichische Modul wird doch wieder
+   eingeführt.
+
+ - diese Version implementiert das INPAR-Dateiformat; das Programm kann jetzt
+   beide Dateiformate lesen
+
+ - die Funktion dump_lutfile() mußte auf dump_lutfile_at() umbenannt werden,
+   da in der neuen deutschen Bibliothek jetzt auch eine Funktion mit demselben
+   Namen, aber wesentlich erweiterter Funktionalität als Teil der LUT2
+   Routinen vorkommt (diese Funktion ist allerdings nicht nach perl
+   exportiert).
+
+ - einige kleinere Aufräumarbeiten
+

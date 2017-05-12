@@ -1,0 +1,33 @@
+classes:
+  - Desktop.web.locale.EU
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for Europe (UN M.49 definition)
+  pkg:
+    - iceweasel-l10n-ast
+    - iceweasel-l10n-be
+    - iceweasel-l10n-br
+    - iceweasel-l10n-bs
+    - iceweasel-l10n-ca
+    - iceweasel-l10n-csb
+    - iceweasel-l10n-cy
+    - iceweasel-l10n-eu
+    - iceweasel-l10n-fy-nl
+    - iceweasel-l10n-gd
+    - iceweasel-l10n-gl
+    - iceweasel-l10n-hy-am
+    - iceweasel-l10n-is
+    - iceweasel-l10n-kk
+    - iceweasel-l10n-lij
+    - iceweasel-l10n-lv
+    - iceweasel-l10n-mk
+    - iceweasel-l10n-nb-no
+    - iceweasel-l10n-nn-no
+    - iceweasel-l10n-rm
+    - iceweasel-l10n-ru
+    - iceweasel-l10n-sq
+    - iceweasel-l10n-sr
+    - iceweasel-l10n-tr
+    - iceweasel-l10n-uk

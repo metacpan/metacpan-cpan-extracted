@@ -1,0 +1,48 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bundle-CVSMonitor
+version:      1.06
+version_from: lib/Bundle/CVSMonitor.pm
+installdirs:  site
+requires:
+    Array::Window:                 0
+    CGI:                           0
+    CGI::Carp:                     0
+    Chart::Math::Axis:             0.3
+    Class::Autouse:                1.03
+    Class::Default:                1
+    Class::Handle:                 1
+    Class::Inspector:              1.03
+    Clone:                         0.13
+    Config::Tiny:                  1.5
+    Date::Format:                  0
+    File::Copy:                    0
+    File::Find::Rule:              0
+    File::Flat:                    0.8
+    File::NCopy:                   0.32
+    File::Remove:                  0.2
+    File::Spec:                    0.82
+    File::Temp:                    0.12
+    File::Which:                   0
+    FindBin:                       0
+    GD:                            0
+    GD::Graph:                     0
+    GD::Text:                      0
+    Getopt::Long:                  0
+    HTTP::BrowserDetect:           0.97
+    IO::File:                      0
+    Net::Telnet:                   0
+    Number::Compare:               0
+    Proc::ProcessTable:            0
+    Scalar::Util:                  1.09
+    Sort::Versions:                1.4
+    Storable:                      0
+    Text::Glob:                    0
+    Time::Duration:                0
+    Time::ParseDate:               100.010301
+    URI::Escape:                   0
+    Validate::Net:                 0.4
+    XML::Generator:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

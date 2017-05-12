@@ -1,0 +1,14 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+BackBlaze-B2-*
+BackBlaze-B2-*/
+.releaserc
+cover_db
+firefox-versions/
+MYMETA.*
+credentials.json
+app-credentials.json

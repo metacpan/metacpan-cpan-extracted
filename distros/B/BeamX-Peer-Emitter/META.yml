@@ -1,0 +1,46 @@
+---
+abstract: 'Beam::Emitter with peer-to-peer messaging'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BeamX-Peer-Emitter
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  BeamX::Peer::Emitter:
+    file: lib/BeamX/Peer/Emitter.pm
+    version: '0.003'
+  BeamX::Peer::Listener:
+    file: lib/BeamX/Peer/Listener.pm
+    version: '0.003'
+requires:
+  Beam::Emitter: '1.005'
+  Moo: '0'
+  Safe::Isa: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=BeamX-Peer-Emitter
+  repository: git://github.com/djerius/beamx-peer-emitter.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

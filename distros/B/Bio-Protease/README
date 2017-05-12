@@ -1,0 +1,252 @@
+NAME
+    Bio::Protease - Digest your protein substrates with customizable
+    specificity
+
+VERSION
+    version 1.112980
+
+SYNOPSIS
+        use Bio::Protease;
+        my $protease = Bio::Protease->new(specificity => 'trypsin');
+
+        my $protein = 'MRAERVIKP';
+
+        # Perform a full digestion
+        my @products = $protease->digest($protein);
+
+        # products: ( 'MR', 'AER', 'VIKP' )
+
+        # Get all the siscile bonds.
+        my @sites = $protease->cleavage_sites($protein);
+
+        # sites: ( 2, 5 )
+
+        # Try to cut at a specific position.
+
+        @products = $protease->cut($protein, 2);
+
+        # products: ( 'MR', 'AERVIKP' )
+
+DESCRIPTION
+    This module models the hydrolitic behaviour of a proteolytic enzyme. Its
+    main purpose is to predict the outcome of hydrolitic cleavage of a
+    peptidic substrate.
+
+    The enzyme specificity is currently modeled for 37 enzymes/reagents.
+    This models are somewhat simplistic as they are largely regex-based, and
+    do not take into account subtleties such as kinetic/temperature effects,
+    accessible solvent area, secondary or tertiary structure elements.
+    However, the module is flexible enough to allow the inclusion of any of
+    these effects by consuming the module's interface, Bio::ProteaseI.
+    Alternatively, if your desired specificity can be correctly described by
+    a regular expression, you can pass it to the specificity attribute at
+    construction time. See specificity below.
+
+ATTRIBUTES
+  specificity
+    Set the enzyme's specificity. Required. Could be either of:
+
+    *   an enzyme name: e.g. 'enterokinase'
+
+            my $enzyme = Bio::Protease->new(specificity => 'enterokinase');
+
+        There are currently definitions for 37 enzymes/reagents. See
+        Specificities.
+
+    *   a regular expression:
+
+            my $motif = qr/MN[ED]K[^P].{3}/,
+
+            my $enzyme = Bio::Protease->new( specificity => $motif );
+
+        The motif should always describe an 8-character long peptide. When a
+        an octapeptide matches the regex, its 4th peptidic bond (ie, between
+        the 4th and 5th letter) will be marked for cleaving or reporting.
+
+        For example, the peptide AMQRNLAW is recognized as follows:
+
+            .----..----.----..----. .-----.-----.-----.-----.
+            | A  || M  | Q  || R  |*|  N  |  L  |  A  |  W  |
+            |----||----|----||----|^|-----|-----|-----|-----|
+            | P4 || P3 | P2 || P1 ||| P1' | P2' | P3' | P4' |
+            '----''----'----''----'|'-----'-----'-----'-----'
+                              cleavage site
+
+        Some specificity rules can only be described with more than one
+        regular expression (see the case for trypsin, for example). To
+        account for those cases, you can also pass an array reference of
+        regular expressions; all of which should match the given
+        octapeptide:
+
+            my $rule = [$rule1, $rule2, $rule3];
+
+            my $enzyme = Bio::Protease->new( specificity => $rule );
+
+        In the case your particular specificity rule requires an "or"
+        clause, you can use the "|" separator in a single regex.
+
+  Specificities
+    This class attribute contains a hash reference with all the available
+    regexep-based specificities. The keys are the specificity names, the
+    value is an arrayref with the regular expressions that define them.
+
+        my @protease_pool = do {
+            Bio::Protease->new(specificity => $_)
+                for keys %{Bio::Protease->Specificities};
+        }
+
+    As a rule, all specificity names are lower case. Currently, they
+    include:
+
+    * alcalase
+
+    * arg-cproteinase
+
+    * asp-n_endopeptidase
+
+    * asp-n_endopeptidase_glu
+
+    * bnps_skatole
+
+    * caspase_1
+
+    * caspase_2
+
+    * caspase_3
+
+    * caspase_4
+
+    * caspase_5
+
+    * caspase_6
+
+    * caspase_7
+
+    * caspase_8
+
+    * caspase_9
+
+    * caspase_10
+
+    * chymotrypsin
+
+    * chymotrypsin_low
+
+    * clostripain
+
+    * cnbr
+
+    * enterokinase
+
+    * factor_xa
+
+    * formic_acid
+
+    * glutamyl_endopeptidase
+
+    * granzymeb
+
+    * hydroxylamine
+
+    * iodosobenzoic_acid
+
+    * lysc
+
+    * lysn
+
+    * ntcb
+
+    * pepsin_ph1.3
+
+    * pepsin
+
+    * proline_endopeptidase
+
+    * proteinase_k
+
+    * staphylococcal_peptidase i
+
+    * thermolysin
+
+    * thrombin
+
+    * trypsin
+
+    For a complete description of their specificities, you can check out
+    <http://www.expasy.ch/tools/peptidecutter/peptidecutter_enzymes.html>,
+    or look at the regular expressions of their definitions in this same
+    file.
+
+  use_cache
+    Turn caching on, trading memory for speed. Defaults to 0 (no caching).
+    Useful when any method is being called several times with the same
+    argument.
+
+        my $p = Bio::Protease->new( specificity => 'trypsin', use_cache => 0 );
+        my $c = Bio::Protease->new( specificity => 'trypsin', use_cache => 1 );
+
+        my $substrate = 'MAAEELRKVIKPR' x 10;
+
+        $p->digest( $substrate ) for (1..1000); # time: 5.11s
+        $c->digest( $substrate ) for (1..1000); # time: 0.12s
+
+  cache
+    The cache object, which has to do the Cache::Ref::Role::API role. Uses
+    Cache::Ref::LRU by default with a cache size of 5000, but you can set
+    this to your liking at construction time:
+
+        my $p = Bio::Protease->new(
+            use_cache   => 1,
+            cache       => Cache::Ref::Random->new( size => 50 ),
+            specificity => 'trypsin'
+        );
+
+METHODS
+  digest
+    Performs a complete digestion of the peptide argument, returning a list
+    with possible products. It does not do partial digests (see method "cut"
+    for that).
+
+        my @products = $enzyme->digest($protein);
+
+  cut
+    Attempt to cleave $peptide at the C-terminal end of the $i-th residue
+    (ie, at the right). If the bond is indeed cleavable (determined by the
+    enzyme's specificity), then a list with the two products of the
+    hydrolysis will be returned. Otherwise, returns false.
+
+        my @products = $enzyme->cut($peptide, $i);
+
+  cleavage_sites
+    Returns a list with siscile bonds (bonds susceptible to be cleaved as
+    determined by the enzyme's specificity). Bonds are numbered starting
+    from 1, from N to C-terminal. Takes a string with the protein sequence
+    as an argument:
+
+        my @sites = $enzyme->cleavage_sites($peptide);
+
+  is_substrate
+    Returns true or false whether the peptide argument is a substrate or
+    not. Esentially, it's equivalent to calling "cleavage_sites" in boolean
+    context, but with the difference that this method short-circuits when it
+    finds its first cleavable site. Thus, it's useful for CPU-intensive
+    tasks where the only information required is whether a polypeptide is a
+    substrate of a particular enzyme or not
+
+SEE ALSO
+    *   PeptideCutter
+
+        This module's idea is largely based on Expasy's PeptideCutter
+        (<http://www.expasy.ch/tools/peptidecutter/>). For more information
+        on the experimental evidence that supports both the algorithm and
+        the specificity definitions, check their page.
+
+AUTHOR
+    Bruno Vecchi <vecchi.b gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Bruno Vecchi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

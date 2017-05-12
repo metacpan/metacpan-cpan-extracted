@@ -1,0 +1,33 @@
+[% INCLUDE header title="Mails for $year" %]
+[% PROCESS macros %]
+<h1>Mails for [% year %]</h1>
+
+[% INCLUDE searchbox %]
+
+[%     mapping = [ 'January', 'Febuary', 'March', 'April', 'May', 'June', 
+                   'July', 'August', 'September', 'October', 'November', 'December' ];
+%]
+
+<div style="text-align: center;">
+
+<p>
+<b>
+<a href="[% base %]/date/view/[% prev.strftime("%Y") %]">&lt;[% prev.strftime("%Y") %]</a>
+&nbsp;
+<a href="[% base %]/date/view/[% next.strftime("%Y") %]">[% next.strftime("%Y") %]&gt;</a>
+</b>
+</p>
+
+[% count = 0 %]
+<table border="0" class="calendar" cellpadding="1" cellspacing="2">
+[% FOR month = months %]
+    <tr style="height: 40;"><td style="width: 166px; height: 40px; text-align: center;" class="[% month ? 'event' : 'noevent' %]">
+        <a href="[% base | remove('/$') %]/date/list/[% year %]/[% count + 1 | format("%.2d") %]">[% mapping.$count %]</a>
+        [% IF month %]<br/>([% month %])[% END %]
+    </td></tr>
+    [% count = count + 1 %]
+[% END %]
+</table>
+
+</div>
+[% INCLUDE footer %]

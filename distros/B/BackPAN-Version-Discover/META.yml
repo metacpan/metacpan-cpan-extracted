@@ -1,0 +1,36 @@
+---
+abstract: 'Figure out exactly which dist versions you have installed'
+author:
+  - 'Stephen R. Scaffidi <sscaffidi@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BackPAN-Version-Discover
+provides:
+  BackPAN::Index:
+    file: lib/BackPAN/Version/Discover/_BackPAN/Index.pm
+    version: 0.39
+  BackPAN::Version::Discover:
+    file: lib/BackPAN/Version/Discover.pm
+    version: 0.01
+  BackPAN::Version::Discover::Results:
+    file: lib/BackPAN/Version/Discover/Results.pm
+    version: 0.01
+requires:
+  BackPAN::Index: 0.39
+  ExtUtils::Installed: 0
+  File::Find::Rule: 0
+  File::Spec::Functions: 0
+  List::MoreUtils: 0
+  Module::Extract::VERSION: 0
+  Module::Info: 0
+  Path::Class: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

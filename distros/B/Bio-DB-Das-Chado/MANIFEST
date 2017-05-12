@@ -1,0 +1,14 @@
+bin/gmod_chado_fts_prep.pl
+bin/gmod_create_summary_statistics.pl
+Build.PL
+Changes
+lib/Bio/DB/Das/Chado.pm
+lib/Bio/DB/Das/Chado/Segment.pm
+lib/Bio/DB/Das/Chado/Segment/Feature.pm
+LICENSE
+MANIFEST
+META.yml
+README
+t/001_load.t
+Todo
+META.json

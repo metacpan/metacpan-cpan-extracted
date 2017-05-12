@@ -1,0 +1,43 @@
+#
+# See slapd.conf(5) for details on configuration options.
+# This file should NOT be world readable.
+#
+
+# for openldap version > 2.x
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/corba.schema
+include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/core.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/cosine.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/inetorgperson.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/java.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/misc.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/nadf.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/nis.schema
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/openldap.schema
+include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/etc/$(CONFIGURATOR.DIRECTORY_NAME)/schema/$(CONFIGURATOR.DIRECTORY_NAME).schema
+
+# for openldap version < 2.0
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.at.conf
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.oc.conf
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.oc.specific.conf
+#include $(CONFIGURATOR.DEFAULT_LDAP_DIR)/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.acl.specific.conf
+
+schemacheck	on
+defaultaccess	write
+
+pidfile		/var/log/ldap/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.pid
+argsfile	/var/log/ldap/$(CONFIGURATOR.DIRECTORY_NAME)/slapd.args
+
+#######################################################################
+# ldbm database definitions
+#######################################################################
+
+database	ldbm
+suffix		"$(CONFIGURATOR.SUFFIX)"
+directory	/var/lib/ldap/$(CONFIGURATOR.DIRECTORY_NAME)
+
+rootdn		"$(CONFIGURATOR.ROOTDN)"
+rootpw		$(CONFIGURATOR.ROOTPW)
+
+$(CONFIGURATOR.INDEX)
+
+lastmod		on

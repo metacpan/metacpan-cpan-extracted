@@ -1,0 +1,142 @@
+--- ./os.c-pre	Sat Aug 23 02:46:54 2003
++++ ./os.c	Mon Oct  6 20:54:12 2003
+@@ -61,6 +61,11 @@
+ # define fcntl(A,B,C) 0
+ #endif
+ 
++#ifdef __EMX__			/* flock available via perl.h */
++#include "EXTERN.h"
++#include "perl.h"
++#endif
++
+ /*
+ ** Macros for performance tracing.  Normally turned off
+ */
+@@ -1119,6 +1124,68 @@ int isNT(void){
+ # define FIRST_LOCKBYTE   (0xffffffff - N_LOCKBYTE)
+ #endif
+ 
++enum sqlite_flock_t {
++    sqlite_flock_rlock,
++    sqlite_flock_wlock,
++    sqlite_flock_unlock
++};
++
++#if OS_UNIX
++#  if defined(HAVE_FLOCK) || defined(__EMX__)
++static int
++sqlite_flock(int fd, enum sqlite_flock_t how)
++{
++    int type;
++    int s, rc;
++
++    switch (how) {
++    case sqlite_flock_rlock:
++	type = LOCK_SH;
++	break;	
++    case sqlite_flock_wlock:
++	type = LOCK_EX;
++	break;
++    case sqlite_flock_unlock:
++	type = LOCK_UN;
++	break;
++    }
++    rc = flock(fd, type);
++    if( rc != 0 )
++      rc = (errno==EINVAL) ? SQLITE_NOLFS : SQLITE_BUSY;
++    else
++      rc = SQLITE_OK;
++    return rc;
++}
++#  else
++static int
++sqlite_flock(int fd, sqlite_flock_t how)
++{
++    struct flock lock;
++    int s, rc;
++
++    switch (how) {
++    case sqlite_flock_rlock:
++	lock.l_type = F_RDLCK;
++	break;	
++    case sqlite_flock_wlock:
++	lock.l_type = F_WRLCK;
++	break;
++    case sqlite_flock_unlock:
++	lock.l_type = F_UNLCK;
++	break;
++    }
++    lock.l_whence = SEEK_SET;
++    lock.l_start = lock.l_len = 0L;
++    s = fcntl(fd, F_SETLK, &lock);
++    if( s!=0 )
++      rc = (errno==EINVAL) ? SQLITE_NOLFS : SQLITE_BUSY;
++    else
++      rc = SQLITE_OK;
++    return rc;
++}
++#  endif
++#endif
++
+ /*
+ ** Change the status of the lock on the file "id" to be a readlock.
+ ** If the file was write locked, then this reduces the lock to a read.
+@@ -1139,16 +1206,8 @@ int sqliteOsReadLock(OsFile *id){
+     }
+     rc = SQLITE_OK;
+   }else if( id->locked || id->pLock->cnt==0 ){
+-    struct flock lock;
+-    int s;
+-    lock.l_type = F_RDLCK;
+-    lock.l_whence = SEEK_SET;
+-    lock.l_start = lock.l_len = 0L;
+-    s = fcntl(id->fd, F_SETLK, &lock);
+-    if( s!=0 ){
+-      rc = (errno==EINVAL) ? SQLITE_NOLFS : SQLITE_BUSY;
+-    }else{
+-      rc = SQLITE_OK;
++    rc = sqlite_flock(id->fd, sqlite_flock_rlock);
++    if (rc == SQLITE_OK) {
+       id->pLock->cnt = 1;
+       id->locked = 1;
+     }
+@@ -1243,16 +1302,8 @@ int sqliteOsWriteLock(OsFile *id){
+   int rc;
+   sqliteOsEnterMutex();
+   if( id->pLock->cnt==0 || (id->pLock->cnt==1 && id->locked==1) ){
+-    struct flock lock;
+-    int s;
+-    lock.l_type = F_WRLCK;
+-    lock.l_whence = SEEK_SET;
+-    lock.l_start = lock.l_len = 0L;
+-    s = fcntl(id->fd, F_SETLK, &lock);
+-    if( s!=0 ){
+-      rc = (errno==EINVAL) ? SQLITE_NOLFS : SQLITE_BUSY;
+-    }else{
+-      rc = SQLITE_OK;
++    rc = sqlite_flock(id->fd, sqlite_flock_wlock);
++    if (rc == SQLITE_OK) {
+       id->pLock->cnt = -1;
+       id->locked = 1;
+     }
+@@ -1355,18 +1406,9 @@ int sqliteOsUnlock(OsFile *id){
+     id->pLock->cnt--;
+     rc = SQLITE_OK;
+   }else{
+-    struct flock lock;
+-    int s;
+-    lock.l_type = F_UNLCK;
+-    lock.l_whence = SEEK_SET;
+-    lock.l_start = lock.l_len = 0L;
+-    s = fcntl(id->fd, F_SETLK, &lock);
+-    if( s!=0 ){
+-      rc = (errno==EINVAL) ? SQLITE_NOLFS : SQLITE_BUSY;
+-    }else{
+-      rc = SQLITE_OK;
++    rc = sqlite_flock(id->fd, sqlite_flock_wlock);
++    if (rc == SQLITE_OK)
+       id->pLock->cnt = 0;
+-    }
+   }
+   sqliteOsLeaveMutex();
+   id->locked = 0;

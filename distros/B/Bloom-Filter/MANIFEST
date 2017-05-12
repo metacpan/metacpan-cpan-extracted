@@ -1,0 +1,12 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+lib/Bloom/Filter.pm
+t/add.t
+t/changes.t
+t/check.t
+t/defaults.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

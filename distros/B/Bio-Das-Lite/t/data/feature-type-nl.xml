@@ -1,0 +1,11 @@
+<?xml version='1.0' standalone='no' ?>
+<!DOCTYPE DASGFF SYSTEM 'dasgff.dtd' >
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle/features?segment=P50225">
+    <SEGMENT id="P50225" version="4e24bfab8e5366a47b094fa7169e0351" start="1" stop="295">
+      <FEATURE id="P50225" label="P50225">
+        <TYPE id="go-process-summary" cvId="BS:01021" category="summary">biological_process</TYPE> 
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>

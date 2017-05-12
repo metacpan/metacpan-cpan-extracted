@@ -1,0 +1,379 @@
+#!/usr/bin/perl
+use Cwd;
+use Config;
+
+print "Setting up a Bryar blog in this directory\n\n";
+
+sub write_file {
+    my ($name, $content) = @_;
+    open OUT, ">".$name or die "Couldn't write to $name - $!\n";
+    print OUT $content;
+    close OUT;
+}
+
+# These are defaults which are written out to be customized, so I don't
+# feel bad about including them here inline.
+
+# Blatant assumption of standard Unix
+write_file("bryar.cgi", "#!/usr/bin/perl\nuse Bryar; Bryar->go()\n");
+chmod 0755, "bryar.cgi";
+
+write_file("bryar.conf",<<EOC);
+name : My Bryar Weblog!
+description : A blog without a more useful description
+baseurl : http://where.will.i.be/
+datadir : @{[ cwd() ]}
+author : your name here
+email : me\@example.com
+EOC
+
+write_file("bryar_first_post.txt", <<EOC);
+My first Bryar blog post!
+
+<p>First post! First post!</p>
+<p>Wow, this Bryar thing is neat, huh?  This space should fill up with helpful 
+hints on what else you can do with Bryar.</p>
+EOC
+
+write_file("blogmacros.tt2", <<'EOC');
+
+# Accepts a DateTime object and returns a date string suitable for ATOM feeds
+# (i.e. in the format specified by ISO 8601).
+MACRO datetimetz(time) BLOCK;
+  SET tz = time.strftime('%z');
+  SET tz = tz.replace('(\d{2})$', ':$1');
+  SET tz = 'Z' IF tz == '+00:00';
+  time.datetime _ tz;
+END;
+
+# Accepts a DateTime object and returns a date string suitable for email Date
+# headers (i.e. in the format specified by RFC 822).
+MACRO datetime822(time) GET time.strftime('%a, %d %b %Y %H:%M:%S %z');
+
+[% MACRO day(entry_time) BLOCK;
+    entry_time.day _ ", " _ entry_time.mday _ " " _
+    entry_time.month _ " " _ entry_time.year;
+END;
+
+MACRO category(entry) BLOCK;
+ "Category : " _ entry.category;
+END;
+
+MACRO author(entry) BLOCK;
+ "Author : " _ entry.author;
+END;
+
+MACRO comment_form(entry) BLOCK;
+  'Post a new comment!
+  <DIV class="comment">
+  <FORM METHOD="POST">
+  Your name: <INPUT NAME="author"><BR>
+  Your address/home page: <INPUT NAME="url"><BR>
+  <HR WIDTH="98%">
+  Your rant:<BR>
+  <textarea NAME="content" COLS=80 ROWS=7></textarea>
+  <BR>
+  <INPUT TYPE="submit" VALUE="Vent">
+  <INPUT TYPE="hidden" NAME="id" VALUE="'; entry.id;
+  '"><INPUT TYPE="hidden" NAME="newcomment" VALUE="1">
+  
+  </FORM>
+  </DIV>
+  ';
+
+END;
+
+MACRO permalink(entry, params) BLOCK;
+ bryar.config.baseurl;
+ IF bryar.arguments.subblog;
+     '/' _ bryar.arguments.subblog;
+ END;
+ entry.url;
+ "?" _ params IF params;
+END;
+
+MACRO comments(entry) BLOCK;
+ '<a href="';
+  permalink(entry, "comments=1");
+ '" title="Leave or view comments on \'entry.title\'">';
+ entry.comments.size || 0;
+ " Comments</a>";
+ IF bryar.arguments.comments;
+     "</P>";
+
+     FOREACH comment = entry.comments; 
+     '<DIV CLASS="comment">';
+     comment.content;
+     '<BR><HR COLOR="#AAAAAA" WIDTH=98%>';
+     '<I>Posted by <A HREF="'; comment.url; '">'; comment.author;
+     '</A> at ';
+     day(comment.timepiece);
+     ' '; 
+     comment.timepiece.time;
+     '</I></DIV>';
+     '<BR>';
+     END;
+     comment_form(entry);
+     "<P>";
+ END;
+END; 
+
+MACRO google_link(query, label) BLOCK;
+ '<a href="http://www.google.com/search?q=';
+ query | html | uri;
+ '" title="Search Google for more stuff link this...">'; 
+ label; 
+ "</a>";
+END;
+
+MACRO keywords(entry) BLOCK;
+    "Keywords :";
+    FOREACH key = entry.keywords.slice(0,2);
+       '[ ';
+       google_link(key, key);
+       '] ';
+    END;
+END;
+%]
+EOC
+
+write_file("template.html", <<'EOC');
+[% PROCESS blogmacros.tt2 %]
+[% INCLUDE head.html %]
+
+[% IF bryar.http_headers.Status.match('^404') %]
+<h2>Error 404: the requested page does not exist!</h2>
+[% END %]
+[% FOREACH entry = documents;
+    entry_time = entry.timepiece;
+    IF entry == documents.first or entry_time.ymd != previous.timepiece.ymd %]
+    <div class="bryarDate"> [% day(entry_time) %] </div>
+    [% END %]
+    [% previous = entry %]
+
+    <div class="bryarEntry">
+        <a name="[%entry.id%]"></a>
+            <h2 class="bryarTitle">[% entry.title | html %]</h2>
+
+            [% entry.content %]
+
+            <br />
+
+    <div class="bryarEntrySource">Posted at 
+        <span class="bryarEntryTime">[% entry_time.time %]</span>
+        by <span class="bryarEntryAuthor">[% bryar.config.author | html %]</span>
+    </div> 
+    
+    <ul class="bryarEntryLinks">     
+        <li><a href="[% permalink(entry, "") %]" title="Permanent link to '[% entry.title | html %]'">#</a></li>
+        <li><a href="http://www.technorati.com/cosmos/search.html?rank=&url=[% permalink(entry, "") %]"><img src="/notebook/images/technorati_bubble.gif" width="19px" height="18px" border="0" align="middle" title="Search Technorati Cosmos..." /></a></li>
+        <li>[% google_link(entry.title, "G") %]</li>
+        <li>[% comments(entry) %]</li>
+     </ul>
+
+    </div>
+[% END %]
+[% IF NOT bryar.arguments.id AND NOT bryar.arguments.since AND
+      documents.last.id != 1 %]
+<p><a href="[% 'before_' _ documents.last.epoch %]">Older posts</a></p>
+[% END %]
+
+[% INCLUDE foot.html %]
+EOC
+
+write_file("head.html", <<EOC);
+<!DOCTYPE HTML>
+<html>
+<head>
+[% IF http_error == '404' %]
+<title>Error 404: The requested page does not exist!</title>
+[% ELSIF bryar.arguments.id %]
+<title>[% documents.first.title | html %]</title>
+[% ELSE %]
+<title>[% bryar.config.name | html %]</title>
+[% END %]
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="[% bryar.config.url %]?format=rss" />
+<link rel="alternate" type="application/atom+xml" title="ATOM" href="[% bryar.config.url %]?format=atom" />
+</head>
+
+<body>
+<div id="bryarHeader">
+    <h1>[% bryar.config.name | html %]</h1>
+</div>
+
+EOC
+
+write_file("foot.html", <<EOC);
+<hr /> 
+
+<em>Powered by <a href="http://search.cpan.org/dist/Bryar/">Bryar!</a></em>
+
+<form>Search &quot;[% bryar.config.name | html %]&quot;: <br />
+   <input name="search" type="text" class="bryarSingleLineBox">
+   <input name="submit" type="submit" value="Search" class="bryarButton" />
+</form>
+<hr />
+Subscribe to full text feeds via:
+<a href="?format=atom" content-type="application/atom+xml">ATOM</a>
+ | 
+<a href="?format=rss2" content-type="application/rdf+xml">RSS2</a>
+ |
+<a href="?format=rss" content-type="application/rdf+xml">RSS</a>
+<br />
+Subscribe to preview feeds via: 
+<a href="?format=atom_excerpt" content-type="application/atom+xml">ATOM</a>
+ |
+<a href="?format=rss2_excerpt" content-type="application/rdf+xml">RSS2</a>
+ |
+<a href="?format=rss_excerpt" content-type="application/rdf+xml">RSS</a>
+<br />
+
+<a href="http://www.feedvalidator.org/check.cgi?url=http://bryar.multiply.org/notebook/bryar.cgi?format=atom"><img src="/notebook/images/valid-atom.png" alt="[Valid Atom]" title="Validate my Atom feed" width="88" height="31" border="0" /></a>
+
+</body>
+</html>
+
+EOC
+
+write_file("template.rss", <<EOC);
+<?xml version="1.0"?>
+<!-- name="generator" content="bryar" -->
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns="http://purl.org/rss/1.0/">
+
+  <channel rdf:about="[% bryar.config.baseurl %]/?format=xml">
+    <title>[% bryar.config.name | html %]</title>
+    <link>[% bryar.config.baseurl %]/</link>
+    <description>[% bryar.config.description | html %]</description>
+    <dc:creator>[% bryar.config.author || item.author | html %]</dc:creator>
+    <dc:language>en-us</dc:language>
+    <dc:date>[% datetimetz(documents.first.datetime) %]</dc:date>
+[% IF 0 %]
+    <sy:updatePeriod>daily</sy:updatePeriod>
+    <sy:updateFrequency>1</sy:updateFrequency>
+    <sy:updateBase>2000-01-01T12:00+00:00</sy:updateBase>
+[% END %]
+    <items>
+      <rdf:Seq>
+      [% FOREACH item=documents %]
+      <rdf:li rdf:resource="[% permalink(item) %]"/>
+      [% END %]
+      </rdf:Seq>
+    </items>
+  </channel>
+
+[% FOREACH item = documents %]
+  <item rdf:about="[% permalink(item) %]">
+    <title>[% item.title | html %]</title>
+    <link>[% permalink(item) %]</link>
+    <description>[% item.content | html %]</description>
+    <dc:date>[% datetimetz(item.datetime) %]</dc:date>
+    <dc:creator>[% bryar.config.author || item.author | html %]</dc:creator>
+  </item>
+[% END %]
+</rdf:RDF>
+EOC
+
+write_file("template.rss2", <<EOC);
+<?xml version="1.0" encoding="iso-8859-1"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+<title>[% bryar.config.name | html %]</title>
+<link>[% bryar.config.baseurl %]</link>
+<description>[% bryar.config.description | html %]</description>
+<dc:language>en-us</dc:language>
+<admin:generatorAgent rdf:resource="http://bryar.multiply.org/" />
+    <dc:date>[%documents.first.timepiece.datetime%]-05:00</dc:date>
+    <items>
+      <rdf:Seq>
+      [% FOREACH item=documents %]
+      <rdf:li rdf:resource="[% permalink(item) %]"/>
+      [% END %]
+      </rdf:Seq>
+    </items>
+  </channel>
+</rss>
+EOC
+
+write_file("template.atom", <<EOC);
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>[% bryar.config.name | html %]</title>
+  <subtitle>[% bryar.config.description | html %]</subtitle>
+  <id>[% bryar.config.baseurl %]/?format=atom</id>
+  <link rel="alternate" type="text/html"
+   href="[% bryar.config.baseurl %]/"/>
+  <link rel="alternate" type="application/rdf+xml" title="RSS"
+   href="[% bryar.config.baseurl %]/?format=xml"/>
+  <link rel="self" type="application/atom+xml" title="ATOM"
+   href="[% bryar.config.baseurl %]/?format=atom"/>
+  <updated>[% datetimetz(documents.first.datetime) %]</updated>
+  <author>
+    <name>[% bryar.config.author | html %]</name>
+    <uri>[% bryar.config.baseurl %]/</uri>
+  </author>
+
+  <generator uri="http://search.cpan.org/dist/Bryar/" version="3.0">Bryar</generator>
+
+[% FOREACH item = documents %]
+  <entry>
+    <title>[% item.title | html %]</title>
+    <link rel="alternate" type="text/html"
+     href="[% permalink(item) %]"/>
+    [% idURL = bryar.config.baseurl | replace('http://', '') | replace('/.*', '') %]
+    <id>tag:[% idURL _ "," _ item.timepiece.year _ ":id_" _ item.id %]</id>
+    <published>[% datetimetz(item.datetime) %]</published>
+    <updated>[% datetimetz(item.datetime) %]</updated>
+[#%
+    <summary type="text">[% FILTER truncate(252) %]
+            [%  item.excerpt(bryar.config.excerpt_words) %]
+        [% END %]
+    </summary>
+%]
+    <content type="html" xml:lang="en" xml:base="[% bryar.config.baseurl %]/">
+      <![CDATA[[% item.content %]]]>
+    </content>
+  </entry>
+[% END %]
+</feed>
+EOC
+
+write_file("calendar.tt2", <<EOC);
+<table class="calendar">
+<thead>
+<tr class="days">
+<th abbr='Sunday' scope='col' title='Sunday'>S</th>
+<th abbr='Monday' scope='col' title='Monday'>M</th>
+<th abbr='Tuesday' scope='col' title='Tuesday'>T</th>
+<th abbr='Wednesday' scope='col' title='Wednesday'>W</th>
+<th abbr='Thursday' scope='col' title='Thursday'>T</th>
+<th abbr='Friday' scope='col' title='Friday'>F</th>
+<th abbr='Saturday' scope='col' title='Saturday'>S</th>
+</tr>
+</thead>
+<tbody>
+[% FOREACH week = bryar.posts_calendar.calendar %]
+  <tr>
+  [% FOREACH day = week %]
+    <td[% IF day.sunday %] class="sunday"[% END %]>
+    [% '<a href="' _ bryar.config.baseurl _ '/' _ day.link _ '">' IF day.link%]
+    [% day.day || '&nbsp;' %][% '</a>' IF day.link %]</td>
+  [% END %]
+  </tr>
+[% END %]
+</tbody>
+</table>
+EOC
+
+chmod 0644, $_ for ("bryar.conf", "1.txt", "head.html", "foot.html",
+                    "template.html","template.rss", "template.atom",
+                    "calendar.tt2", "blogmacros.tt2");
+print "\nDone. Now you want to probably customize 'bryar.conf'.\n";
+print "You should probably also customize template.html, head.html and foot.html\n";
+print "Then point your browser at bryar.cgi, and get blogging!\n";

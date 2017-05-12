@@ -1,0 +1,2 @@
+PRIMER_GC_CLAMP=2
+=

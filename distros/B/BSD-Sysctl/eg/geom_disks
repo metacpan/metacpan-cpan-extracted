@@ -1,0 +1,27 @@
+#!/usr/bin/perl -wT
+
+# script contributed by Sergey Skvortsov
+
+use strict;
+use warnings;
+
+use BSD::Sysctl 'sysctl';
+use POSIX 'ceil';
+use XML::LibXML;
+
+my $geom_xml = sysctl('kern.geom.confxml');
+
+my $parser = XML::LibXML->new();
+my $doc = $parser->parse_string($geom_xml);
+
+my $xpc = XML::LibXML::XPathContext->new($doc);
+my @nodes = $xpc->findnodes('//class[child::name="DISK"]/geom');
+
+for my $node (@nodes) {
+    my $name            = $xpc->findvalue('./name', $node);
+    my $mediasize       = $xpc->findvalue('./provider/mediasize', $node);
+    my $human_mediasize = ceil($mediasize /1024/1024/1024);
+
+    print "disk $name : $human_mediasize GB ($mediasize)\n";
+}
+

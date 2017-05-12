@@ -1,0 +1,28 @@
+Revision history for Bio-LITE-Taxonomy-NCBI
+
+0.01    Mon Oct 8 12:43:04 2010
+        First version, released to CPAN
+
+0.02	Mon Nov 22 18:36:13 2010
+	Small changes in documentation
+
+0.03	Wed Nov 24 13:59:56 2010
+	Fixed Gi2taxid inheritance
+
+0.04	Mon Nov 29 12:41:12 2010
+	Fixed more small bugs with Gi2taxid
+
+0.05    Sat Jan 22 15:35:14 2011
+	Fixed a bug in get_ter_at_level_from_gi method
+
+0.06    Mon Jan 31 09:15:34 2011
+	Fixed a bug in Makefile.PL (Test::More version > 0.87 is needed)
+
+0.07	Tue May 24 12:07:12 2011
+	Small change in the tests to pass changes in Bio::LITE::Taxonomy v0.07
+
+0.08    Mon Aug 27 15:37:17 2012
+	Change in the Bio::LITE::Taxonomy::NCBI::Gi2taxid test
+
+0.09    Fri May 30 09:48:11 2014
+        Added synomyms support in Bio::LITE::Taxonomy::NCBI

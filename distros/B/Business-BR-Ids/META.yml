@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Business-BR-Ids
+version:             0.0022
+abstract:            Modules for dealing with Brazilian identification codes (CPF, CNPJ, ...)
+license:             perl
+author:              
+    - A. R. Ferreira <ferreira@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Scalar::Util:                  1.11
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

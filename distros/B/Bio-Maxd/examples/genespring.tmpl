@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Author" CONTENT="<TMPL_VAR NAME=SUBMITTER_NAME>">
+<META NAME="GENERATOR" CONTENT="GeneSpring/4.2.1">
+<META NAME="GeneSpring type" CONTENT="Experiment">
+<TITLE><TMPL_VAR NAME=EXPERIMENT_NAME></TITLE>
+</HEAD>
+<BODY>
+<H1><TMPL_VAR NAME=EXPERIMENT_NAME></H1>
+<TABLE CELLSPACING=2 VALIGN="TOP">
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Author</TH><TD><TMPL_VAR NAME=SUBMITTER_NAME></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Research Group</TH><TD>Silicon Genetics</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Organization</TH><TD><TMPL_VAR NAME=ORGANIZ_NAME></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Application</TH><TD><A HREF="http://www.sigenetics.com/Prod
+ucts/GeneSpring/index.html">GeneSpring 4.2.1</A></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Created</TH><TD><TMPL_VAR NAME=DATE></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Note</TH><TD>mean of means normalized data</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Genome</TH><TD><TMPL_VAR NAME=ARRAY_NAME></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Contents</TH><TD>Experiment</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Steps from Original Data</TH><TD>0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Identifier</TH><TD>local:39</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Number Of Parameters</TH><TD>3</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Number Of Experiments</TH><TD><TMPL_VAR NAME=NUM_OF_EXP></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Parameters</TH><TD><TABLE BORDER COLS=4 RULES=ALL><TR><TD><B>Name</B></TD><TD>Tissue</TD><TD>Reptition</TD><TD>Code</TD></TR><TR><TD><B>Units</B></TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR><TR><TD><B>Is it a number?</B></TD><TD>no</TD><TD>yes</TD><TD>no</TD></TR><TR><TD><B>Use logarithmic scale?</B></TD><TD>no</TD><TD>no</TD><TD>no</TD></TR><TR><TD><B>Value ordering</B></TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR><TR><TD><B>Error model replicate</B></TD><TD>no</TD><TD>no</TD><TD>no</TD></TR>
+
+<TMPL_LOOP NAME=EXPERIMENT_INFO>
+  <TR>
+  <TD><B><TMPL_VAR NAME="EXPCOUNT"></B></TD>
+  <TD><TMPL_VAR NAME="EXPTISSUE"></TD>
+  <TD><TMPL_VAR NAME="EXPNAME"></TD>
+  <TD><TMPL_VAR NAME="EXPSOURCE"></TD>
+  </TR>
+</TMPL_LOOP>
+
+</TABLE></TD></TR>
+
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Low Signal</TH><TD>50.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Medium Signal</TH><TD>150.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>High Signal</TH><TD>500.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Low Expression</TH><TD>0.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Normal Expression</TH><TD>1.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>High Expression</TH><TD>6.0</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Error Model</TH><TD>distribution</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Default Interpretation</TH><TD>miny=0.0 maxy=5.0 name="Default Interpretation" mode=Ratio show=PMAU errorModel=no param0=Non-continuous param1=Non-continuous param2=Replicate</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>All Samples Interpretation</TH><TD>miny=0.0 maxy=5.0 name="All Samples" mode=Ratio show=PMAU errorModel=yes param0=Non-continuous param1=Non-continuous param2=Replicate</TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Normalizations</TH><TD><TABLE BORDER COLS=4 RULES=ALL><TR><TD><B>Normalization</B></TD><TD><B>Used</B></TD><TD><B>Minimum Value</B></TD><TD><B>Transformation</B></TD></TR><TR><TD><B>Negative Controls</B></TD><TD>no</TD><TD>N/A</TD><TD>subtraction</TD></TR><TR><TD><B>Reference</B></TD><TD>no</TD><TD>10.0</TD><TD>N/A</TD></TR><TR><TD><B>Intensity Dependent Per-spot Normalization</B></TD><TD>no</TD><TD>N/A</TD><TD>N/A</TD></TR><TR><TD><B>Positive Controls</B></TD><TD>no</TD><TD ROWSPAN=2>10.0</TD><TD ROWSPAN=2>affine or linear use PMU</TD></TR><TR><TD><B>Overall Experiment Distribution</B></TD><TD>no</TD></TR><TR><TD><B>Per Gene</B></TD><TD>no</TD><TD>0.01</TD><TD>linear</TD></TR><TR><TD><B>Pos/Neg/Region Files</B></TD><TD>&nbsp;</TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR><TR><TD><B>Force Small Expression Values to Minimum</B></TD><TD>no</TD><TD>0.0</TD><TD>LimitStop</TD></TR><TR><TD><B>Use Normalized Column</B></TD><TD>no</TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR><TR><TD><B>Normalize Experiments to Hard Numbers</B></TD><TD>no</TD><TD>&nbsp;</TD><TD>&nbsp;</TD></TR></TABLE></TD></TR><TR><TH ALIGN=RIGHT VALIGN=TOP>Remove Gene Suffix</TH><TD></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Remove Gene Suffixes</TH><TD></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Remove Gene Prefixes</TH><TD></TD></TR>
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Remove Gene Prefix</TH><TD></TD></TR>
+
+<TR><TH ALIGN=RIGHT VALIGN=TOP>Experiments</TH><TD><TABLE BORDER COLS=25 RULES=ALL>
+<TR><TD><B>&nbsp;</B></TD><TD>Default</TD><TMPL_VAR NAME=EXPLINE></TR>;
+
+<TR><TD><B>File Name</B></TD><TD><TMPL_VAR NAME=DFILENAME></TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Format</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Gene Column</B></TD><TD>1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Headlines</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Signal Column</B></TD><TD>2</TD><TMPL_VAR NAME=SLINE></TR>
+<TR><TD><B>Normalized Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Reference Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Signal Background Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Reference Background Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Experiment Worked Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Experiment Worked Designation</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Experiment Absent Designation</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Experiment Marginal Designation</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Region Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Picture</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Array Image File</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Treat no signal as invalid</B></TD><TD>no</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Reference File Name</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Hard Normalization Number</B></TD><TD>1.0</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Hard Normalization Number Units</B></TD><TD>&nbsp;</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Lower Bound on Signal Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Upper Bound on Signal Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+<TR><TD><B>Standard Deviation Signal Column</B></TD><TD>-1</TD><TMPL_VAR NAME=ELINE></TR>
+
+</TABLE></TD></TR>
+</TABLE>
+<BR CLEAR=ALL><P>
+</BODY>
+</HTML>

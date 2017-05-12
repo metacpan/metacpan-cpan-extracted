@@ -1,0 +1,12 @@
+To see examples for this distribution, it is recommended you read the test
+scripts included under ./t, which cover the basic usage of the modules.
+
+If you have any example scripts that use the distribution in interesting ways
+or make good use of the features available, please feel free to submit one
+(preferably with a pull request on GitHub).
+
+Important: note that any script you submit will be bundled into the
+distribution with the same license as the distribution itself.
+
+Thank you,
+Kate

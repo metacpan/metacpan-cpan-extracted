@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Business-SWIFT
+version:            0.02
+abstract:           Validate SWIFT/BIC Bank identifiers.
+author:
+    - Jerome Eteve <jerome@eteve.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Locales:     0.16
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

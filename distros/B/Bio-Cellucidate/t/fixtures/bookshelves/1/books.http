@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Tue, 09 Feb 2010 19:15:22 GMT
+Content-Type: application/xml; charset=utf-8
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<books type="array">
+  <book>
+    <id type="integer">1</id>
+    <name>My First Book</name>
+  </book>
+  <book>
+    <id type="integer">2</id>
+    <name>My Second Book</name>
+  </book>
+</books>

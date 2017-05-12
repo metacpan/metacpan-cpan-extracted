@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Spinner tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="spinner"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="../../share/www/static/spin.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var spinner;
+
+function isSpinning() {
+    return ($("#spinner .bb-spinner").size() > 0);
+}
+
+test("spinner", function() {
+    var i;
+    ok(defined(bb.Spinner), "bb.Spinner class is defined.");
+    spinner = new bb.Spinner("#spinner");
+    ok(defined(spinner), "spinner is created.");
+    spinner.begin();
+    ok(isSpinning(), "spinner begins spinning");
+    spinner.end();
+    ok(!isSpinning(), "spinner ends");
+    spinner.begin();
+    ok(isSpinning(), "spins");
+    spinner.begin();
+    ok(isSpinning(), "still spins");
+    spinner.end();
+    ok(isSpinning(), "still spins because begin() is called twice");
+    spinner.end();
+    ok(!isSpinning(), "spin ends.");
+    for(i = 0 ; i < 5 ; i++) {
+        spinner.begin();
+    }
+    ok(isSpinning(), "spinning.");
+    spinner.set(0);
+    ok(!isSpinning(), "set(0) make the spinner stop immediately.");
+});
+
+    </script>
+  </body>
+</html>

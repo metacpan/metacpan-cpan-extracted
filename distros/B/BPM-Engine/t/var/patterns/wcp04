@@ -1,0 +1,72 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp4" Name="WCP4+5: Exclusive Choice and Simple Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>An Exclusive Choice is a distinct point in a business process where a branch is divided into two or more branches enabling just one of these several branches [Aalst09]. A Simple Merge is a distinct point in a business process where two or more branches are merged into one single branch. Each incoming branch then activates the subsequent branch [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will follow to activity B, if you set it to C it will proceed to activity C, otherwise activity D will be executed</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <Performer>test</Performer>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B"/>
+                                    <TransitionRef Id="A-C"/>
+                                    <TransitionRef Id="A-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" Name="Transition" From="A" To="B">
+                    <Condition Type="CONDITION">attribute('WhereToGo') == "B"</Condition>
+                </Transition>
+                <Transition Id="A-C" Name="Transition" From="A" To="C">
+                    <Condition Type="CONDITION">attribute('WhereToGo') == "C"</Condition>
+                </Transition>
+                <Transition Id="A-D" Name="Transition" From="A" To="D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="B-E" Name="Transition" From="B" To="E"/>
+                <Transition Id="C-E" Name="Transition" From="C" To="E"/>
+                <Transition Id="D-E" Name="Transition" From="D" To="E"/>
+            </Transitions>
+        </WorkflowProcess>

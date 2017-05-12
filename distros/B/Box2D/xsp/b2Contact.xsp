@@ -1,0 +1,64 @@
+
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Contact} class b2Contact
+{ 
+
+        bool IsTouching() const;
+
+        void SetEnabled(bool flag);
+
+        bool IsEnabled() const;
+
+%{
+
+b2Manifold *
+b2Contact::GetManifold()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Manifold";
+	CODE:
+		RETVAL = THIS->GetManifold();
+	OUTPUT:
+		RETVAL
+
+b2Contact * 
+b2Contact::GetNext()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Contact";
+	CODE:
+		RETVAL = (b2Contact*)(THIS->GetNext());
+	OUTPUT:
+		RETVAL
+
+
+
+b2Fixture * 
+b2Contact::GetFixtureA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Fixture";
+	CODE:
+		RETVAL = (b2Fixture*)(THIS->GetFixtureA());
+	OUTPUT:
+		RETVAL
+
+
+b2Fixture * 
+b2Contact::GetFixtureB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Fixture";
+	CODE:
+		RETVAL = (b2Fixture*)(THIS->GetFixtureB());
+	OUTPUT:
+		RETVAL
+          
+
+
+%}
+
+};

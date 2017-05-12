@@ -1,0 +1,12 @@
+classes:
+  - cli.compression
+parameters:
+  pkg:
+    - arj
+    - cabextract
+    - lhasa
+    - lzop
+    - nomarch
+    - p7zip
+    - unrar-free
+    - zoo

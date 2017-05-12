@@ -1,0 +1,25 @@
+Revision history of B::Size2
+
+2.07 2013-06-06 22:01:31-0700
+    - Fix #3, overloaded objects caused problems (hirose31++)
+
+2.06 2013-06-05 20:32:14-0700
+    - Fix #2, tied arrays caused SEGV (hirose31++)
+
+2.05 2013-05-22 15:08:34
+    - Fix dependencies
+
+2.04 2013-05-22 14:53:14
+    - Make it work on 5.18.0
+
+2.03 2013-05-17 11:34:22
+    - Fix a SEGV about aelemfast (#1, thanks to hirose31)
+
+2.02 2013-02-01 15:08:51
+	- Fix a SEGV
+
+2.01 2013-01-17 16:33:46
+	- Suppress warnings (hirose31++)
+
+2.00 2013-01-17 09:48:42
+    - Forked from B::Size 0.09 to work on newer perls

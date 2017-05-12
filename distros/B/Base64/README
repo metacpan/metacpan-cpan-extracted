@@ -1,0 +1,4 @@
+
+Use this code at your own risk.  I wrote this because I needed it (actually
+ it just made something quite convenient) and thought others might find it
+ useful.  CGI::Session is required.

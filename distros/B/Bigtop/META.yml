@@ -1,0 +1,97 @@
+---
+name: Bigtop
+version: 0.38
+author:
+  - 'Phil Crow, E<lt>crow.phil@gmail.comE<gt>'
+abstract: A web application data language processor
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::General: 0
+  DBIx::Class: 0
+  File::HomeDir: 0
+  Gantry: 3.48
+  HTTP::Server::Simple: 0.27
+  IO::Prompt: 0
+  Inline: 0.4
+  Inline::TT: 0.06
+  JSON: 0
+  Parse::RecDescent: 0
+  Template: 2
+build_requires:
+  Test: 0
+  Test::Files: 0.13
+  Test::More: 0
+  Test::Warn: 0
+provides:
+  Bigtop:
+    file: lib/Bigtop.pm
+    version: 0.38
+  Bigtop::Backend::CGI:
+    file: lib/Bigtop/Backend/CGI.pm
+  Bigtop::Backend::CGI::Gantry:
+    file: lib/Bigtop/Backend/CGI/Gantry.pm
+  Bigtop::Backend::Conf:
+    file: lib/Bigtop/Backend/Conf.pm
+  Bigtop::Backend::Conf::Gantry:
+    file: lib/Bigtop/Backend/Conf/Gantry.pm
+  Bigtop::Backend::Conf::General:
+    file: lib/Bigtop/Backend/Conf/General.pm
+  Bigtop::Backend::Control:
+    file: lib/Bigtop/Backend/Control.pm
+  Bigtop::Backend::Control::Gantry:
+    file: lib/Bigtop/Backend/Control/Gantry.pm
+    version: 0.01
+  Bigtop::Backend::Diagram::GraphvizSql:
+    file: lib/Bigtop/Backend/Diagram/GraphvizSql.pm
+  Bigtop::Backend::HttpdConf:
+    file: lib/Bigtop/Backend/HttpdConf.pm
+  Bigtop::Backend::HttpdConf::Gantry:
+    file: lib/Bigtop/Backend/HttpdConf/Gantry.pm
+  Bigtop::Backend::Init::Std:
+    file: lib/Bigtop/Backend/Init/Std.pm
+  Bigtop::Backend::Model:
+    file: lib/Bigtop/Backend/Model.pm
+  Bigtop::Backend::Model::GantryCDBI:
+    file: lib/Bigtop/Backend/Model/GantryCDBI.pm
+  Bigtop::Backend::Model::GantryDBIxClass:
+    file: lib/Bigtop/Backend/Model/GantryDBIxClass.pm
+  Bigtop::Backend::SQL:
+    file: lib/Bigtop/Backend/SQL.pm
+  Bigtop::Backend::SQL::DB2:
+    file: lib/Bigtop/Backend/SQL/DB2.pm
+  Bigtop::Backend::SQL::MySQL:
+    file: lib/Bigtop/Backend/SQL/MySQL.pm
+  Bigtop::Backend::SQL::Postgres:
+    file: lib/Bigtop/Backend/SQL/Postgres.pm
+  Bigtop::Backend::SQL::SQLite:
+    file: lib/Bigtop/Backend/SQL/SQLite.pm
+  Bigtop::Backend::SiteLook::GantryDefault:
+    file: lib/Bigtop/Backend/SiteLook/GantryDefault.pm
+  Bigtop::Deparser:
+    file: lib/Bigtop/Deparser.pm
+  Bigtop::Grammar:
+    file: lib/Bigtop/Grammar.pm
+  Bigtop::Keywords:
+    file: lib/Bigtop/Keywords.pm
+  Bigtop::Parser:
+    file: lib/Bigtop/Parser.pm
+  Bigtop::ScriptHelp:
+    file: lib/Bigtop/ScriptHelp.pm
+  Bigtop::ScriptHelp::Style:
+    file: lib/Bigtop/ScriptHelp/Style.pm
+  Bigtop::ScriptHelp::Style::Kickstart:
+    file: lib/Bigtop/ScriptHelp/Style/Kickstart.pm
+  Bigtop::ScriptHelp::Style::Pg8Live:
+    file: lib/Bigtop/ScriptHelp/Style/Pg8Live.pm
+  Bigtop::TentMaker:
+    file: lib/Bigtop/TentMaker.pm
+  Bigtop::TentMakerPath:
+    file: lib/Bigtop/TentMakerPath.pm
+  Parse::RecDescent::Bigtop::Grammar:
+    file: lib/Bigtop/Grammar.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

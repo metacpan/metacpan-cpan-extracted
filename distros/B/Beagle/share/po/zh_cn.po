@@ -1,0 +1,245 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Beagle 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-06-12 08:38+0800\n"
+"PO-Revision-Date: 2011-06-12 08:38+0800\n"
+"Last-Translator: sunnavy <sunnavy@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "archives"
+msgstr "存档"
+
+msgid "Archives"
+msgstr "存档"
+
+msgid "search"
+msgstr "搜索"
+
+msgid "Search"
+msgstr "搜索"
+
+msgid "Comments"
+msgstr "评论"
+
+msgid "Comment"
+msgstr "评论"
+
+msgid "delete"
+msgstr "删除"
+
+msgid "edit"
+msgstr "编辑"
+
+msgid "hide"
+msgstr "隐藏"
+
+msgid "show"
+msgstr "显示"
+
+msgid "view"
+msgstr "查看"
+
+msgid "info"
+msgstr "信息"
+
+msgid "all entries"
+msgstr "所有条目"
+
+msgid "article"
+msgstr "文章"
+
+msgid "bark"
+msgstr "微言"
+
+msgid "comment"
+msgstr "评论"
+
+msgid "review"
+msgstr "评价"
+
+msgid "task"
+msgstr "任务"
+
+msgid "newer version is "
+msgstr "新版本在"
+
+msgid "here"
+msgstr "这里"
+
+msgid "about"
+msgstr "关于"
+
+msgid "home"
+msgstr "主页"
+
+msgid "created date"
+msgstr "创建日期"
+
+msgid "public key"
+msgstr "公钥"
+
+msgid "author"
+msgstr "作者"
+
+msgid "Author"
+msgstr "作者"
+
+msgid "draft"
+msgstr "草稿"
+
+msgid "Draft"
+msgstr "草稿"
+
+msgid "format"
+msgstr "格式"
+
+msgid "Format"
+msgstr "格式"
+
+msgid "tags"
+msgstr "标签"
+
+msgid "Tags"
+msgstr "标签"
+
+msgid "No results found."
+msgstr "没有找到结果"
+
+msgid "Previous"
+msgstr "上一篇"
+
+msgid "Next"
+msgstr "下一篇"
+
+msgid "terminal"
+msgstr "终端"
+
+msgid "Attached"
+msgstr "已有附件"
+
+msgid "Attach"
+msgstr "添加附件"
+
+msgid "Attach More"
+msgstr "更多附件"
+
+msgid "Title"
+msgstr "标题"
+
+msgid "Message"
+msgstr "消息"
+
+msgid "Save"
+msgstr "保存"
+
+msgid "create"
+msgstr "创建"
+
+msgid "created"
+msgstr "已创建"
+
+msgid "updated"
+msgstr "已更新"
+
+msgid "deleted"
+msgstr "已删除"
+
+msgid "Sites"
+msgstr "站点"
+
+msgid "Feed Limit"
+msgstr "Feed限制"
+
+msgid "Location"
+msgstr "位置"
+
+msgid "Language"
+msgstr "语言"
+
+msgid "Career"
+msgstr "职业"
+
+msgid "Avatar"
+msgstr "头像"
+
+msgid "Copyright"
+msgstr "版权"
+
+msgid "Email"
+msgstr "邮箱"
+
+msgid "Theme"
+msgstr "主题"
+
+msgid "Url"
+msgstr "网址"
+
+msgid "Public Key"
+msgstr "公钥"
+
+msgid "Layout"
+msgstr "布局"
+
+msgid "Page Limit"
+msgstr "页面限制"
+
+msgid "Work Link"
+msgstr "作品链接"
+
+msgid "work link"
+msgstr "作品链接"
+
+msgid "Work Published"
+msgstr "作品发表时间"
+
+msgid "work published"
+msgstr "作品发表时间"
+
+msgid "Work Publisher"
+msgstr "作品出版商"
+
+msgid "work publisher"
+msgstr "作品出版商"
+
+msgid "Work Author"
+msgstr "作品作者"
+
+msgid "work author"
+msgstr "作品作者"
+
+msgid "Work Title"
+msgstr "作品标题"
+
+msgid "work title"
+msgstr "作品标题"
+
+msgid "Work Translator"
+msgstr "作品译者"
+
+msgid "work translator"
+msgstr "作品译者"
+
+msgid "Work Price"
+msgstr "作品价格"
+
+msgid "work price"
+msgstr "作品价格"
+
+msgid "Work Location"
+msgstr "作品位置"
+
+msgid "work location"
+msgstr "作品位置"
+
+msgid "Work ISBN"
+msgstr "作品ISBN"
+
+msgid "work isbn"
+msgstr "作品isbn"
+
+msgid "width"
+msgstr "宽度"
+

@@ -1,0 +1,11 @@
+#TODO: Add tweak to backup debconf preseed cache
+classes:
+  - Admin
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include backup system Backupninja
+  pkg:
+    - backupninja
+    - debconf-utils

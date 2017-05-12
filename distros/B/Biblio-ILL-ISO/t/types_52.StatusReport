@@ -1,0 +1,100 @@
+$VAR1 = bless( {
+                 'user-status-report' => bless( {
+                                                  'shipped-service-type' => bless( {
+                                                                                     'ENUMERATED' => 1,
+                                                                                     'ENUM_LIST' => {
+                                                                                                      'loan' => 1,
+                                                                                                      'copy-non-returnable' => 2
+                                                                                                    }
+                                                                                   }, 'Biblio::ILL::ISO::ShippedServiceType' ),
+                                                  'most-recent-service' => bless( {
+                                                                                    'ENUMERATED' => 21,
+                                                                                    'ENUM_LIST' => {
+                                                                                                     'eXPIRED' => 20,
+                                                                                                     'rECEIVED' => 8,
+                                                                                                     'cANCEL' => 6,
+                                                                                                     'iLL-REQUEST' => 1,
+                                                                                                     'lOST' => 15,
+                                                                                                     'rECALL' => 9,
+                                                                                                     'iLL-ANSWER' => 4,
+                                                                                                     'sTATUS-OR-ERROR-REPORT' => 19,
+                                                                                                     'cANCEL-REPLY' => 7,
+                                                                                                     'rENEW-ANSWER' => 14,
+                                                                                                     'dAMAGED' => 16,
+                                                                                                     'mESSAGE' => 17,
+                                                                                                     'sTATUS-QUERY' => 18,
+                                                                                                     'fORWARD' => 21,
+                                                                                                     'sHIPPED' => 3,
+                                                                                                     'cHECKED-IN' => 11,
+                                                                                                     'fORWARD-NOTIFICATION' => 2,
+                                                                                                     'rETURNED' => 10,
+                                                                                                     'cONDITIONAL-REPLY' => 5
+                                                                                                   }
+                                                                                  }, 'Biblio::ILL::ISO::MostRecentService' ),
+                                                  'date-of-last-transition' => bless( {
+                                                                                        'generalstring' => '20030811'
+                                                                                      }, 'Biblio::ILL::ISO::ISODate' ),
+                                                  'title' => bless( {
+                                                                      'generalstring' => 'A Title'
+                                                                    }, 'Biblio::ILL::ISO::ILLString' ),
+                                                  'date-requested' => bless( {
+                                                                               'generalstring' => '20030815'
+                                                                             }, 'Biblio::ILL::ISO::ISODate' ),
+                                                  'date-of-most-recent-service' => bless( {
+                                                                                            'generalstring' => '20030813'
+                                                                                          }, 'Biblio::ILL::ISO::ISODate' ),
+                                                  'transaction-results' => bless( {
+                                                                                    'ENUMERATED' => 5,
+                                                                                    'ENUM_LIST' => {
+                                                                                                     'hold-placed' => 6,
+                                                                                                     'estimate' => 7,
+                                                                                                     'will-supply' => 5,
+                                                                                                     'retry' => 2,
+                                                                                                     'conditional' => 1,
+                                                                                                     'locations-provided' => 4,
+                                                                                                     'unfilled' => 3
+                                                                                                   }
+                                                                                  }, 'Biblio::ILL::ISO::TransactionResults' ),
+                                                  'author' => bless( {
+                                                                       'generalstring' => 'Anne Author'
+                                                                     }, 'Biblio::ILL::ISO::ILLString' ),
+                                                  'most-recent-service-note' => bless( {
+                                                                                         'generalstring' => 'This is a history report.'
+                                                                                       }, 'Biblio::ILL::ISO::ILLString' ),
+                                                  'initiator-of-most-recent-service' => bless( {
+                                                                                                 'name-of-person-or-institution' => bless( {
+                                                                                                                                             'name-of-person' => bless( {
+                                                                                                                                                                          'generalstring' => 'David A. Christensen'
+                                                                                                                                                                        }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                                                           }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' ),
+                                                                                                 'person-or-institution-symbol' => bless( {
+                                                                                                                                            'institution-symbol' => bless( {
+                                                                                                                                                                             'generalstring' => 'MWPL'
+                                                                                                                                                                           }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                                                          }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                                                                               }, 'Biblio::ILL::ISO::SystemId' )
+                                                }, 'Biblio::ILL::ISO::HistoryReport' ),
+                 'provider-status-report' => bless( {
+                                                      'ENUMERATED' => 8,
+                                                      'ENUM_LIST' => {
+                                                                       'rECEIVED' => 9,
+                                                                       'oVERDUE' => 13,
+                                                                       'pENDING' => 2,
+                                                                       'nOT-SUPPLIED' => 1,
+                                                                       'lOST' => 17,
+                                                                       'rECALL' => 16,
+                                                                       'cANCEL-PENDING' => 6,
+                                                                       'iN-PROCESS' => 3,
+                                                                       'fORWARD' => 4,
+                                                                       'cANCELLED' => 7,
+                                                                       'sHIPPED' => 8,
+                                                                       'cHECKED-IN' => 15,
+                                                                       'rENEW-PENDING' => 10,
+                                                                       'uNKNOWN' => 18,
+                                                                       'cONDITIONAL' => 5,
+                                                                       'rETURNED' => 14,
+                                                                       'nOT-RECEIVED-OVERDUE' => 11,
+                                                                       'rENEW-OVERDUE' => 12
+                                                                     }
+                                                    }, 'Biblio::ILL::ISO::CurrentState' )
+               }, 'Biblio::ILL::ISO::StatusReport' );

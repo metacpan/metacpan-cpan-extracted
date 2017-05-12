@@ -1,0 +1,60 @@
+#! /usr/bin/env perl
+
+#-------------------------------------------------------------------------------
+# NAME: pingProspectSoapServer
+# PURPOSE: script to verify whether prospect soap server is functional. If not,
+#          then send email to people.  For each failure, send mail once. config
+#          parameters are defined in Bio::Prospect::Init module.
+# USAGE: pingProspectSoapServer
+#
+# $Id: pingProspectSoapServer,v 1.6 2003/11/18 19:45:46 rkh Exp $
+#-------------------------------------------------------------------------------
+
+use Mail::Mailer;
+use SOAP::Lite;
+use Bio::Prospect::Init;
+use warnings;
+use strict;
+use vars qw( $VERSION );
+$VERSION = sprintf( "%d.%02d", q$Revision: 1.6 $ =~ /(\d+)\.(\d+)/ );
+
+my $soap = SOAP::Lite
+    -> uri( "http://$Bio::Prospect::Init::SOAP_SERVER_HOST/Prospect/SoapServer" )
+    -> proxy( "http://$Bio::Prospect::Init::SOAP_SERVER_HOST:$Bio::Prospect::Init::SOAP_SERVER_PORT" )
+    -> on_fault( 
+        sub { 
+            my ($soap,$res) = @_; 
+            notifyAdmins( ( ref $res ) ? $res->faultstring : $soap->transport->status );
+          } );
+
+my $result = $soap->ping();
+
+unless ($result->fault) {
+    unlink $Bio::Prospect::Init::PING_FAILURE_SEMPAHORE 
+      if ( -e $Bio::Prospect::Init::PING_FAILURE_SEMPAHORE );
+} else {
+    notifyAdmins( $result->faultcode . "," . $result->faultstring );
+}
+exit;
+
+
+#-------------------------------------------------------------------------------
+# name: notifyAdmins
+# purpose: email admins that there is a problem with the server. only email once
+# arguments: message
+#-------------------------------------------------------------------------------
+
+sub notifyAdmins {
+  my $msg = shift;
+
+  # email only if there is no notify file.  this prevents me getting spammed
+  # by this script
+  if ( ! -e $Bio::Prospect::Init::PING_FAILURE_SEMPAHORE ) {
+      my $mailer = new Mail::Mailer 'sendmail';
+      $mailer->open( { 'To' => \@Bio::Prospect::Init::PING_FAILURE_EMAILME, 'Subject' => 'Prospect SOAP Server error' } );
+      print $mailer $msg;
+      $mailer->close;
+      system( "touch $Bio::Prospect::Init::PING_FAILURE_SEMPAHORE" );
+  } 
+  exit;
+}

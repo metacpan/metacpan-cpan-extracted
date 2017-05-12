@@ -1,0 +1,386 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Fri, 12 Feb 2010 05:38:07 GMT
+Content-Type: application/xml; charset=utf-8
+Content-Length: 11012
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<model-rules type="array">
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">78</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">79</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">80</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">81</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">82</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">83</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">84</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">85</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">86</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">87</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">88</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">89</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">90</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">91</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">92</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">93</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">94</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">95</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">96</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">97</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">98</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">99</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">100</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">101</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">102</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">103</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">104</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">105</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">106</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">107</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">108</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">109</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">110</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">111</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">112</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">113</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">114</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">115</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">116</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">117</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">118</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">119</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">120</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">121</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">122</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">123</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate>1.0</backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">124</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">125</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">126</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">127</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">128</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">129</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">130</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">131</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">132</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">133</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">134</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">135</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">136</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">137</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">138</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">139</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">140</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">141</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">142</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">143</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">144</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">145</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">146</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">147</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">148</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">149</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">150</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">151</id>
+  </model-rule>
+  <model-rule>
+    <backward-rate nil="true"></backward-rate>
+    <forward-rate>1.0</forward-rate>
+    <id type="integer">152</id>
+  </model-rule>
+</model-rules>
+

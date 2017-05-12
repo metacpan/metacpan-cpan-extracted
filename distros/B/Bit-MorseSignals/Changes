@@ -1,0 +1,43 @@
+Revision history for Bit-MorseSignals
+
+0.08    2013-08-21 21:25 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.07 can skip this update.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.07    2013-08-20 19:50 UTC
+        + Upd : Package metadata overhaul.
+        + Tst : The Kwalitee test has been removed.
+
+0.06    2008-03-20 19:45 UTC
+        + Fix : Read the datatype bits in the right order (lowest weight bit
+                coming first).
+        + Fix : Propagate demangler errors correctly.
+        + Tst : Tests now cover 100% of the code.
+
+0.05    2008-03-13 23:05 UTC
+        + Add : The len and pos emitter methods.
+        + Fix : The usual set of POD typos.
+        + Fix : Propagate demangler errors as warnings.
+        + Tst : Small improvments.
+
+0.04    2008-03-06 14:55 UTC
+        + Doc : POD tweaks.
+        + Fix : Correct dependencies listing in META.yml.
+        + Fix : Demanglers panicking over misformed data caused severe warnings.
+
+0.03    2008-03-03 17:30 UTC
+        + Doc : Clarified synopsises.
+        + Fix : The receiver could access inexistant demanglers if an error
+                occurred during the transfer.
+
+0.02    2008-03-01 12:00 UTC
+        + Add : The samples/jerk.pl example script.
+        + Doc : Typos in POD.
+        + Fix : As the doc says, the datatype should be enforced to PLAIN when
+                the reserved bit is set.
+
+0.01    2008-03-01 10:40 UTC
+        First version, released on an unsuspecting world.
+

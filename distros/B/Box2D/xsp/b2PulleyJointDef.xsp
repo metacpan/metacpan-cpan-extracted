@@ -1,0 +1,138 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2PulleyJointDef} class b2PulleyJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2PulleyJointDef();
+
+%{
+
+void
+b2PulleyJointDef::Initialize( bodyA, bodyB, groundAnchorA, groundAnchorB, anchorA, anchorB, ratio )
+	b2Body* bodyA
+	b2Body* bodyB
+	b2Vec2* groundAnchorA
+	b2Vec2* groundAnchorB
+	b2Vec2* anchorA
+	b2Vec2* anchorB
+	float32 ratio
+	CODE:
+		THIS->Initialize( bodyA, bodyB, *groundAnchorA, *groundAnchorB, *anchorA, *anchorB, ratio );
+
+b2Vec2*
+b2PulleyJointDef::groundAnchorA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->groundAnchorA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->groundAnchorA);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJointDef::groundAnchorB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->groundAnchorB = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->groundAnchorB);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJointDef::localAnchorA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorA);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJointDef::localAnchorB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorB = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorB);
+	OUTPUT:
+		RETVAL
+
+float32
+b2PulleyJointDef::lengthA( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->lengthA = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->lengthA;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PulleyJointDef::maxLengthA( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxLengthA = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxLengthA;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PulleyJointDef::lengthB( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->lengthB = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->lengthB;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PulleyJointDef::maxLengthB( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxLengthB = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxLengthB;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PulleyJointDef::ratio( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->ratio = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->ratio;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

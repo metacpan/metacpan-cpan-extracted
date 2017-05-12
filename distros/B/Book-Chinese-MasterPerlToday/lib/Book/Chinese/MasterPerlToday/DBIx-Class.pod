@@ -1,0 +1,448 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::DBIx-Class - DBIx::Class ORM
+
+=head1 DESCRIPTION
+
+本章主要描述如何组织你的 L<DBIx::Class> ORM 的结构和一些用法。
+
+=head2 声明
+
+=over 4
+
+=item *
+
+L<DBIx::Class> 是和 L<Catalyst> 分开，两者各自独立。只是他们的作者之间有交集。
+
+=item *
+
+DBIx::Class 不是为了性能而开发的。如果你的代码强烈要求性能的话，不建议你使用 DBIx::Class
+
+=item *
+
+如果你觉得 DBIx::Class 很难用，这可能有两个原因，一是你用错了，二是它不是你喜欢的类型。
+
+=back
+
+=head2 概念
+
+=over 4
+
+=item * Schema
+
+Schema 在大部分情况下可以等同于 database
+
+=item * ResultSource, Result
+
+ResultSource 可以认为是一个 table
+
+=item * ResultSet
+
+ResultSet 没有等同的概念，它可以是整个 table，也可以是某个 query 之后的一个结果集。数据的内容不保存在 ResultSet 里，它只是如果获取数据的一些方法。
+
+简单的说，当你调用一个 SQL 的时候，往往需要创建一个 ResultSet
+
+=item * Row
+
+Row 保存你的记录数据。它通常由 ResultSet 返回。
+
+=back
+
+=head2 例子
+
+本章将参考 L<TheSchwartz::Moosified> 的 schema/SQLite.sql 作为 database schema。（请参考 eg/DBIx-Class/schema.sql）
+
+=over 4
+
+=item * db.sqlite
+
+第一步你需要创建一个 database，定义好你的 schema。例如：
+
+    E:\Fayland\chinese-perl-book\eg\DBIx-Class>perl create_sqlite_db.pl
+
+=item * 初始化 DBIx::Class
+
+这里有两种方式可供选择，一种是手工编写所有的 DBIx::Class pm, 另一种是使用 L<DBIx::Class::Schema::Loader> 全自动生成。
+
+通常我会在第一次使用 L<DBIx::Class::Schema::Loader> 的 make_schema_at 来生成，而在以后就手工增加和修改 pm 或再次 make_schema_at。
+
+eg/DBIx-Class/make_schema_at.pl
+
+    use FindBin qw/$Bin/;
+    use DBIx::Class::Schema::Loader qw/ make_schema_at /;
+    
+    my $dbname = "$Bin/db.sqlite";
+    make_schema_at(
+        'TheSchwartz::Schema',
+        { debug => 1, dump_directory => './lib' },
+        [ "dbi:SQLite:dbname=$dbname" ],
+    );
+
+=item * 修改
+
+DBIx::Class::Schema::Loader v0.04006 创建 schema 的时候是用了 load_classes
+
+而从 DBIx::Class 0.081 开始，一个更推荐的做法是 L<load_namespaces|DBIx::Class::Schema/load_namespaces>。
+
+不排除以后 Loader 会改为 load_namespaces。所以以下修改可能很快就过时。
+
+将 TheSchwartz::Schema 里的 load_classes 改为 load_namespaces，将 lib/TheSchwartz/Schema/*.pm 移动到 
+lib/TheSchwartz/Schema/Result/*.pm 并修改 package 增加 Result::
+
+load_namespaces 将从 TheSchwartz::Schema::Result 下载入模块，从 TheSchwartz::Schema::ResultSet 下载入 ResultSet 模块。
+
+=item * 编写 load.t
+
+为了验证所修改的是正确的，我们将使用一个 eg/DBIx-Class/t/00-load.t 文件来测试。
+
+    #!/usr/bin/perl
+    
+    use strict;
+    use warnings;
+    use Test::More tests => 1;
+    
+    use_ok('TheSchwartz::Schema');
+    
+    1;
+
+运行 prove 来测试
+
+    E:\Fayland\chinese-perl-book\eg\DBIx-Class>prove -l t/
+    t\00-load.t .. ok
+    All tests successful.
+    Files=1, Tests=1,  2 wallclock secs ( 0.05 usr +  0.02 sys =  0.06 CPU)
+    Result: PASS
+
+测试的重要性是再说一百次都不会过分。本章将从头到尾贯穿着不同的测试来验证自己所写的代码是自己所需的。
+
+如何编写测试将在 L<Book::Chinese::MasterPerlToday::BeACPANAuthor> 中做简单介绍。
+
+=item * 更多的测试代码
+
+仅仅使用 use_ok 是验证代码是否有语法错误。而我们从上面的测试中无法知道具体的位置移动到底对不对。
+
+eg/DBIx-Class/t/01-basic.t
+
+    #!/usr/bin/perl
+    
+    use strict;
+    use warnings;
+    use Test::More tests => 5;
+    use FindBin qw/$Bin/;
+    use TheSchwartz::Schema;
+    
+    my $dbname = "$Bin/../db.sqlite";
+    my $schema = TheSchwartz::Schema->connect(
+        "dbi:SQLite:dbname=$dbname", '', '', {
+        RaiseError => 1,
+        PrintError => 0,
+    } );
+    isa_ok($schema, 'TheSchwartz::Schema');
+    
+    foreach ('Exitstatus', 'Job', 'Error', 'Funcmap') {
+        isa_ok( $schema->resultset($_), 'DBIx::Class::ResultSet' );
+    }
+    
+    1;
+
+在这里我们创建了 TheSchwartz::Schema 的实例，用 ->connect 方法。然后判断了 4 个 resultset 都能使用 search 方法 (L<DBIx::Class::ResultSet> 提供)，最后我们运行 prove
+
+    E:\Fayland\chinese-perl-book\eg\DBIx-Class>prove -l t/
+    t\00-load.t ... ok
+    t\01-basic.t .. ok
+    All tests successful.
+    Files=2, Tests=10,  1 wallclock secs ( 0.05 usr +  0.05 sys =  0.09 CPU)
+    Result: PASS
+
+=item * ResultSet
+
+DBIx::Class 的正确使用方法就是用 ResultSet（最起码个人认为是正确的）。
+
+与某个 table 相关的代码放到相关的 ResultSet 里，再写一个测试文件。
+
+比如针对 TheSchwartz::Schema::Result::Error 我们写一个 TheSchwartz::Schema::ResultSet::Error, eg/DBIx-Class/lib/TheSchwartz/Schema/ResultSet/Error.pm
+
+    package TheSchwartz::Schema::ResultSet::Error;
+    
+    use strict;
+    use warnings;
+    use base 'DBIx::Class::ResultSet';
+    
+    sub failure_log {
+        my ( $self, $jobid ) = @_;
+    
+        my $rs = $self->search( {
+            jobid => $jobid
+        }, {
+            columns => ['message']
+        } );
+    
+        my @failures;
+        while (my $r = $rs->next) {
+            push @failures, $r->message;
+        }
+    
+        return @failures;
+    }
+    
+    sub failures {
+        return scalar shift->failure_log(@_);
+    }
+    
+    1;
+
+所有的 ResultSet 模块都应该 use base 'DBIx::Class::ResultSet' 或它的继承类。调用的方法可以参考 eg/DBIx-Class/t/02-error.t
+
+    #!/usr/bin/perl
+    
+    use strict;
+    use warnings;
+    use Test::More tests => 5;
+    use FindBin qw/$Bin/;
+    use TheSchwartz::Schema;
+    
+    my $dbname = "$Bin/../db.sqlite";
+    my $schema = TheSchwartz::Schema->connect(
+        "dbi:SQLite:dbname=$dbname", '', '', {
+        RaiseError => 1,
+        PrintError => 0,
+    } );
+    
+    my $dbh = $schema->storage->dbh;
+    # truncate the table so we can run the tests again and again
+    $dbh->do("DELETE FROM error");
+    # insert some faked data
+    my $sth = $dbh->prepare("INSERT INTO error (error_time, jobid, message, funcid) VALUES (?, ?, ?, ?)");
+    $sth->execute(time(), 1, 'Message A', 1);
+    $sth->execute(time(), 2, 'Message B', 1);
+    $sth->execute(time(), 2, 'Message C', 1);
+    
+    # test failure_log/failures
+    my @failures = $schema->resultset('Error')->failure_log( 2 );
+    is scalar @failures, 2;
+    ok( grep { $_ eq 'Message B' } @failures );
+    ok( grep { $_ eq 'Message C' } @failures );
+    
+    my $failure_num = $schema->resultset('Error')->failures( 1 );
+    is $failure_num, 1;
+    $failure_num = $schema->resultset('Error')->failures( 2 );
+    is $failure_num, 2;
+    
+    # truncate the table so it wouldn't effect others
+    $dbh->do("DELETE FROM error");
+    
+    1;
+
+调用的方法跟普通的 ->search 之类的一样，$schema->resultset('Error')->failure_log, $schema->resultset('Error') 其实就是 TheSchwartz::Schema::ResultSet::Error
+
+在 TheSchwartz::Schema::ResultSet::Error 里，如果想调用其他的 resultset 或想用 dbh
+
+    sub test {
+        my ( $self, $args ) = @_;
+        
+        my $schema = $self->result_source->schema;
+        my $dbh = $schema->storage->dbh;
+        $schema->resultset('Job')->do_anything();
+
+所有的 ResultSet 之间可以用 $schema 相连。上述例子虽然没什么大用处，但是显示了基本的作法。
+
+    E:\Fayland\chinese-perl-book\eg\DBIx-Class>prove -l t/02-error.t
+    t/02-error.t .. ok
+    All tests successful.
+    Files=1, Tests=5,  1 wallclock secs ( 0.05 usr +  0.03 sys =  0.08 CPU)
+    Result: PASS
+
+=back
+
+=head2 内部结构介绍
+
+=head3 components 组件
+
+=over 4
+
+=item * 什么是组件？
+
+L<DBIx::Class> 由不同的组件 (component) 构成，不同的组件提供不同的功能。比如在 TheSchwartz::Schema::Result::Error 里，我们有一行代码是
+
+    __PACKAGE__->load_components("Core");
+
+而 Core 调用 L<DBIx::Class::Core>, 里面提供了
+
+    __PACKAGE__->load_components(qw/
+      Relationship
+      InflateColumn
+      PK::Auto
+      PK
+      Row
+      ResultSourceProxy::Table/);
+
+这六个组件是最常用和最基础的组件，这是为了方便而提供的。但是有时候你可能并不会用到某个组件，那你可以去掉这个组件。比如在 Error.pm 里我们可以仅仅调用两个组件
+
+    __PACKAGE__->load_components("Row", "ResultSourceProxy::Table");
+
+Row 组件 L<DBIx::Class::Row> 是必须的组件。它为 L<DBIx::Class::ResultSourceProxy> 里 add_columns 提供 register_column 等，并且当你调用 search->first, find, all 所得到的就是基于该组件的实例。
+
+而 ResultSourceProxy::Table 组件 L<DBIx::Class::ResultSource::Table> 也是必须的组件。该组件提供了 __PACKAGE__->table("error"), （由它的父类 L<DBIx::Class::ResultSourceProxy> 提供） ->add_columns, ->set_primary_key 等功能。
+
+当对性能要求比较高的时候，我们可以替换 Core 为某几个组件，如果出错再加回去。当你拥有一个完整的测试集的时候，增加和减少就会变得比较简单。
+
+=item * 扩展组件
+
+DBIx::Class 最常见的插件有两种，一种是 ResultSet 的插件（通过 use base 'DBIx::Class::ResultSet';），另一种就是作为组件。
+
+ResultSet 的插件一般通过覆盖 L<DBIx::Class::ResultSet> 的函数（如我写的 L<DBIx::Class::ResultSet::Void>），或者另外提供某个函数。（还有些插件如 L<DBIx::Class::QueryLog> 就不详细介绍了）
+
+另一种作为组件的插件更为常见。详细的参考 L<DBIx::Class::Manual::Component>，下面只做简单介绍。
+
+编写组件一般都需要覆盖原有函数，请注意 load_components 的顺序，这里使用了 C<Class::C3> 来做一个依次调用。
+
+  sub insert {
+    my $self = shift;
+    # Do stuff with $self, like set default values.
+    return $self->next::method( @_ );
+  }
+
+常见的组件有 L<DBIx::Class::UTF8Columns>, L<DBIx::Class::UUIDColumns> 等。代码都是比较简单，可以查看源代码进行阅读。
+
+=back
+
+=head2 FAQ
+
+=over 4
+
+=item * 获取当个 row
+
+    resultset('Errors')->search( { cond => 'bla' } )->first;
+    resultset('Errors')->single( { cond => 'bla' } );
+
+->first 与 ->single 不同之处在于 ->first 会产生 C<cursor>, 而 ->single 不会。所以 single 略微快一点。但是需要注意的几点是
+
+=over 4
+
+=item * single 里不能有属性
+
+    ->single( { cond => 'bla' }, { order_by => 'rating' } ); # Wrong
+    ->search( { cond => 'bla' }, { order_by => 'rating' } )->single; # Right
+
+=item * single 只能返回一条记录
+
+当 single 选调用的 SQL 返回多于一条数据时，后台会有警告。如果你确定的知道你要用 single 在多条数据里，可以使用 rows
+
+    ->search( { cond => 'bla' }, { rows => 1 } )->single; # Right
+
+=back
+
+另一种获取方式是使用
+
+    resultset('Errors')->search( { cond => 'bla' } )->slice(0);
+
+它将使用 LIMIT/OFFSET 直接得到一条数据。
+
+=item * 复杂的 search
+
+建议阅读 L<DBIx::Class::Manual::Cookbook> 和 L<SQL::Abstract>
+
+    resultset('XXX')->search( {
+        requestor => 'inna',
+        worker => ['nwiger', 'rcwe', 'sfz'],
+        status => { '!=', 'completed' }
+    } );
+    # SQL:
+    # FROM xxx WHERE
+    #   ( requestor = ? ) AND ( status != ? )
+    #   AND ( worker = ? OR worker = ? OR worker = ? )
+
+    resultset('XXX')->search( {
+        date_entered => { '>' => \["to_date(?, 'MM/DD/YYYY')", "11/26/2008"] },
+        date_expires => { '<' => \"now()" }
+    } );
+    # SQL:
+    # FROM xxx WHERE
+    #   date_entered > "to_date(?, 'MM/DD/YYYY') AND date_expires < now()
+
+    resultset('XXX')->search( {
+        -or => [
+            -and => [a => 1, b => 2],
+            -or  => [c => 3, d => 4],
+            e    => [-and => {-like => 'foo%'}, {-like => '%bar'} ]
+        ],
+    } );
+    # SQL:
+    # FROM xxx WHERE
+    #   ( (    ( a = ? AND b = ? ) 
+    #       OR ( c = ? OR d = ? ) 
+    #       OR ( e LIKE ? AND e LIKE ? ) ) )
+
+=item * as_query
+
+如果你对所写的 ->search 不太确定，你可以使用 ->as_query 来 debug
+
+  $schema->resultset('user')->search( {
+    user_id => { 'IN', [1, 2] },
+    -or => [
+      last_visit => { '>', time() - 86400 },
+      last_update => { '>', time() - 86400 },
+    ]
+  }, {
+    columns => ['username'],
+    rows    => 1,
+  } )->as_query;
+
+  [ '(SELECT me.username FROM user me 
+     WHERE ( ( ( last_visit > ?
+              OR last_update > ? )
+        AND user_id IN ( ?, ? ) ) )
+     LIMIT 1)',
+    [ 'last_visit', 1242290843 ]
+  ... ]
+
+=back
+
+=head2 资源
+
+=over 4
+
+=item * 邮件列表：L<http://lists.scsys.co.uk/mailman/listinfo/dbix-class/>
+
+=item * SVN: L<http://dev.catalyst.perl.org/repos/bast/DBIx-Class/>
+
+=item * IRC: irc.perl.org#dbix-class
+
+=back
+
+=head2 小结
+
+限于水平有限，只能简单介绍 DBIx::Class 到此。我会在接下来的 Catalyst 说再次写 DBIx::Class 例子。
+
+至于其他的诸如 Relationship 之类的，欢迎读者补充。
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

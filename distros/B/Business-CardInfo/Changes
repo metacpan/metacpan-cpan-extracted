@@ -1,0 +1,30 @@
+Revision history for Business-CardInfo
+
+0.12  2011-12-15
+  * Bin Update
+
+0.11  2011-09-20
+  * Bin Update
+
+0.10  2011-04-26
+  * Bin Update
+  * Remove Solo as it has been decommissioned.
+
+0.09  2010-12-24
+      Bin Update
+
+0.08  BIN update
+
+0.07  BIN update + New card detection for 'Mastercard Debit'.
+
+0.06  Bugfix + BIN update
+
+0.05  BIN update for Visa Debit
+
+0.04  * Back compat warning * -
+      - Detects and returns 'Visa Debit' and 'International Maestro'
+
+0.02  Support more international Maestro numbers.
+
+0.01  Thu May 27 18:21:00 2008 GMT
+      Initial release.

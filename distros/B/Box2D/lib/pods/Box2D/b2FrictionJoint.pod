@@ -1,0 +1,124 @@
+
+=head1 NAME
+
+Box2D::b2FrictionJoint - Provides translational and angular friction.
+
+=head1 SYNOPSIS
+
+  my $joint = $world->CreateJoint( $joint_def );
+  $joint->SetMaxForce( $max_force );
+  $joint->SetMaxTorque( $max_torque );
+
+=head1 DESCRIPTION
+
+Friction joint. This is used for top-down friction. It provides 2D
+translational friction and angular friction.
+
+=head1 METHODS
+
+=head2 GetAnchorA()
+
+Get the anchor point on bodyA in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Get the anchor point on bodyB in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetMaxForce()
+
+Get the maximum friction force in N.
+
+Returns a C<float32>
+
+=head2 GetMaxTorque()
+
+Get the maximum friction torque in N*m.
+
+Returns a C<float32>
+
+=head2 GetReactionForce( $inv_dt )
+
+Get the reaction force on body2 at the joint anchor in Newtons.
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Get the reaction torque on body2 in N*m. Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head2 SetMaxForce( $force )
+
+Set the maximum friction force in N.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$force>
+
+=back
+
+=head2 SetMaxTorque( $torque )
+
+Set the maximum friction torque in N*m.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$torque>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2FrictionJointDef>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

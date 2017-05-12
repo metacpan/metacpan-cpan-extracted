@@ -1,0 +1,48 @@
+NAME
+    Bot::Cobalt::Plugin::RSS - Monitor RSS feeds via IRC
+
+SYNOPSIS
+      ## In plugins.conf:
+      RSS:
+        Module: Bot::Cobalt::Plugin::RSS
+        Config: plugins/rss.conf
+
+      ## Requires properly configured rss.conf
+      !plugin load RSS
+
+DESCRIPTION
+    A Bot::Cobalt plugin.
+
+    Monitors an arbitrary number of RSS feeds, reporting new headlines to
+    configured contexts/channels.
+
+    Uses XML::RSS::Feed to track and parse feeds.
+
+EXAMPLE CONF
+    An example configuration file can be installed via the Bot::Cobalt tool
+    "cobalt2-plugin-installcf":
+
+      $ cobalt2-plugin-installcf --plugin="Bot::Cobalt::Plugin::RSS" \
+          --dest="cobalt2/etc/plugins/rss.conf"
+
+    If you'd rather write one manually, it might look something like this:
+
+      ---
+      ## example etc/plugins/rss.conf
+      Feeds:
+        MyFeed:
+          URL: 'http://rss.slashdot.org/Slashdot/slashdot'
+          Delay: 300
+          ## If your feed publishes a lot in one go, add delays (sec):
+          Spaced: 30
+          AnnounceTo:
+            Main:
+              - '#eris'
+              - '#otw'
+
+            AlphaChat:
+              - '#perl'
+
+AUTHOR
+    Jon Portnoy <avenj@cobaltirc.org>
+

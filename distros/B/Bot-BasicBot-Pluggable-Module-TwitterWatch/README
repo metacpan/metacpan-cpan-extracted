@@ -1,0 +1,62 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::TwitterWatch - report new tweets
+    matching given search patterns
+
+DESCRIPTION
+    Watches Twitter for tweets matching given search patterns, and reports
+    them.
+
+SYNOPSIS
+    Load the module as with any other Bot::BasicBot::Pluggable module, then
+    tell it what to monitor - use these commands within a channel:
+
+      !twitterwatch search term here
+      !twitterunwatch search term here
+      !twittersearches
+      !twitterignore username
+
+    Each channel has its own just of searches stored.
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-bot-basicbot-pluggable-module-twitterwatch at rt.cpan.org', or
+    through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-Mo
+    dule-TwitterWatch. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Bot::BasicBot::Pluggable::Module::TwitterWatch
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Modu
+        le-TwitterWatch
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-TwitterWatch
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-TwitterW
+        atch
+
+    * Search CPAN
+        http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-TwitterWat
+        ch/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2011 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xpdl="http://www.wfmc.org/2004/XPDL2.0alpha" xmlns:deprecated="http://www.wfmc.org/2002/XPDL1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="CostStructure">
+		<xsd:annotation>
+			<xsd:documentation>
+		Activities incur costs in a number of way, the use up resources which may be people, machines, services, computers, office space, etc.  Activities also use up fixed costs which may be assigned on an activity by activity basis, thus allowing for the assignment of overhead.  Fixed costs are assigned in bulk, that is to say there is one fixed cost per activity.  However resource costs are assigned on a resource by resource basis, each one having a cost and an associated time unit.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:element ref="xpdl:ResourceCosts" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="FixedCost" type="xsd:integer"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ResourceCosts">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ResourceCostName">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:maxLength value="100"/>
+							<xsd:minLength value="0"/>
+							<xsd:whiteSpace value="preserve"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="ResourceCost">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:decimal">
+							<xsd:fractionDigits value="2"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="CostUnitOfTime">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:NMTOKEN">
+							<xsd:enumeration value="second"/>
+							<xsd:enumeration value="minute"/>
+							<xsd:enumeration value="hour"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

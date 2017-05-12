@@ -1,0 +1,49 @@
+@import "../base/main.css";
+
+#menu {
+    text-align: right;
+    margin-right: 1%;
+    margin-top: 0.5%;
+}
+
+#menu div {
+    display: inline;
+}
+
+#menu a.menu {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+#footer {
+    float: left;
+    width: 100%;
+    text-align: center;
+    margin-top: 1%;
+    margin-bottom: 3%;
+    bottom: 0;
+}
+
+div.profile div.meta {
+    float: right;
+    margin-top: 2%;
+    width: 20em;
+}
+
+div.profile div.meta ul {
+    list-style-type: none;
+}
+
+div.profile img {
+    float: left;
+    margin: 1%;
+    margin-right: 3%;
+}
+
+div.meta {
+    margin-top: -0.5%;
+}
+
+a.menu {
+    text-decoration: none;
+}

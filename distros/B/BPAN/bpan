@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+
+warn "BPAN is the new CPAN. Stay tuned...\n";

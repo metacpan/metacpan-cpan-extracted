@@ -1,0 +1,57 @@
+{
+   "abstract" : "DBIx::Class-backed, Bio::Phylo-like API for large phylogenies",
+   "author" : [
+      "Rutger Vos"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Phylo-Forest-DBTree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::Phylo" : "0.52",
+            "DBD::SQLite" : "0",
+            "DBIx::Class" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rvosa/bio-phylo-megatree/issues"
+      },
+      "homepage" : "http://biophylo.blogspot.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rvosa/bio-phylo-megatree.git"
+      },
+      "x_MailingList" : "mailto:bio-phylo@googlegroups.com"
+   },
+   "version" : "v0.1.0"
+}

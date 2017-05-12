@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-OnlinePayment-PlugnPay
+version:      0.03
+version_from: PlugnPay.pm
+installdirs:  site
+requires:
+    Business::OnlinePayment:       3
+    Business::OnlinePayment::HTTPS: 0.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

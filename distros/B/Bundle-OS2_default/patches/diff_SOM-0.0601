@@ -1,0 +1,19 @@
+Toolkit v4 has header files with the same names as EMX ones...
+
+--- ./Makefile.PL-pre	Tue Nov  4 13:57:26 2003
++++ ./Makefile.PL	Thu Dec  4 00:54:10 2003
+@@ -41,8 +41,12 @@ if (!@tk) {
+ if (@tk) {
+     die "Multiple @tk arguments not allowed.\n" if @tk > 1;
+     $tk[0] =~ /TOOLKIT=(.*)/;
+-    $inc = "-I$1/h -I$1/som/include";
+-    $lib = "-L$1/som/lib ";
++    my $d = $1;
++    # Must put standard directories first, otherwise toolkit C LIB headers
++    # get in the way:
++    my @emx = map "-I$_", split /;/, ($ENV{C_INCLUDE_PATH} || "");
++    $inc = "@emx -I$d/h -I$d/som/include";
++    $lib = "-L$d/som/lib ";
+ }
+ 
+ my @opt;

@@ -1,0 +1,32 @@
+0.09  Mon, 12 Mar 2012 19:49:40 +0000
+  * Depend on B::Utils version 0.19, which explicitly exports its XS
+    API symbols for Windows.
+
+0.08  Mon, 26 Sep 2011 19:49:30 +0100
+  * Explicitly export XS API symbols, so that the XS API can be used on
+    Windows.
+
+0.07  Sat, 10 Sep 2011 22:55:30 +0100
+  * Depend on B::Hooks::OP::Check version 0.19, which fixes a serious bug in
+    how it interacts with other modules that hook ops.
+  * Add reserve definition of Newx(), to be portable back to perl 5.8.1.
+  * Include repository and bugtracker resources in META.yml.
+  * Add MYMETA.{json,yml} to MANIFEST.SKIP and .gitignore.
+
+0.06  Sun, 12 Sep 2010 16:05:35 +0200
+  * Add configure dependency on B::Hooks::OP::Check (Closes RT#51019).
+
+0.05  Wed, 16 Dec 2009 02:26:09 +0100
+  * Make sure B::Utils is present at configure time (osfameron).
+
+0.04  Mon, 02 Nov 2009 00:21:49 +0100
+  * Fix header filename in the SYNOPSIS (Yuval Kogman).
+
+0.03  Wed, 12 Nov 2008 06:51:08 +0100
+  * Ignore non-entersub ops.
+
+0.02  Sat, 25 Oct 2008 12:26:34 +0200
+  * Ignore null ops.
+
+0.01  Thu, 16 Oct 2008 22:26:21 +0200
+  * Initial release.

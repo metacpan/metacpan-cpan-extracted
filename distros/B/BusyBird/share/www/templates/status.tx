@@ -1,0 +1,48 @@
+: ## Arguments: ss (status in SafeData), and template functions
+<li class="bb-status" data-bb-status-level="<: bb_level($ss.val('busybird', 'level')) :>">
+  <span class="bb-status-id"><: $ss.val('id') :></span>
+  <div class="bb-status-columns-container">
+    <div class="bb-status-profile-image">
+      <: image(src => $ss.val('user', 'profile_image_url'), width => 48, height => 48) :>
+    </div>
+    <div class="bb-status-main">
+      <div class="bb-status-header">
+        <div class="bb-status-attributes">
+: if !$ss.val('busybird', 'acked_at') {
+          <span class="bb-status-new-label label label-success">NEW</span>
+: }
+          &nbsp;<span class="label label-default">Lv. <: bb_level($ss.val('busybird', 'level')) :></span>
+        </div>
+        <div>
+          <span class="bb-status-username"><: link( $ss.val('user', 'screen_name'), href => $ss.val('busybird', 'user_permalink'), target => "_blank" ) :></span>&nbsp;&nbsp;
+          <span class="bb-status-created-at"><: link( $bb_timestamp($ss.val('created_at')), href => $bb_status_permalink($ss.original()), target => "_blank" ) :></span>
+        </div>
+      </div>
+      <div class="bb-status-text"><: $bb_text($ss.original()) :></div>
+: my $retweeted_by_user_name = $ss.val('busybird', 'retweeted_by_user', 'screen_name');
+: if $retweeted_by_user_name {
+      <div class="bb-status-retweeted-by">
+        <i class="glyphicon glyphicon-retweet"></i> Retweeted by <span class="bb-status-retweeted-by-username"><: $retweeted_by_user_name :></span>
+      </div>
+: }
+    </div>
+  </div>
+: my $image_urls = $bb_attached_image_urls($ss.original());
+: my $extension_exists = $image_urls && $image_urls.size() > 0;
+  <div class="bb-status-extension-container<: if $extension_exists { :> bb-status-extension-toggler <: }:>">
+: if $extension_exists {
+    <div class="bb-status-extension-pane">
+: for $image_urls -> $image_url {
+        <: image(src => $image_url) :>
+: } ## for
+    </div>
+    <div class="bb-status-extension-handle">
+      <button type="button" class="btn-link">
+        <span class="bb-status-extension-expander"><i class="glyphicon glyphicon-chevron-down"></i> Expand</span>
+        <span class="bb-status-extension-collapser"><i class="glyphicon glyphicon-chevron-up"></i> Collapse</span>
+        <i class="glyphicon glyphicon-picture"></i>
+      </button>
+    </div>
+: } ## if
+  </div>
+</li>

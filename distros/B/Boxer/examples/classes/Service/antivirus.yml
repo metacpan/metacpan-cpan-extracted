@@ -1,0 +1,10 @@
+classes:
+  - cli.compression.uncommon
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include antivirus service ClamAV
+  pkg:
+    - clamav-daemon

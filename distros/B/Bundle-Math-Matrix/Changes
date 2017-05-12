@@ -1,0 +1,9 @@
+Revision history for Perl extension Bundle::Math::Matrix.
+
+1.01  Sun May 15 19:45:47 2004
+	- Removed Math::MatrixCplx because it is not availlable from CPAN.
+
+1.00  Sat Apr  3 12:24:51 2004
+	- original version as uploaded to CPAN
+
+

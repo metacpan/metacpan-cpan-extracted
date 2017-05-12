@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <rule source file> <thesaurus source file>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $code = <<"EOF";
+"$ARGV[0]" \$r \$t => sub { print "  \\"\$t\\" [style=\\"filled\\",color=\\"orange\\"] \\"$ARGV[0]\\" -> \$t [ label = \\"\$r\\" ] ;\\n"; }.
+\$t \$r "$ARGV[0]" => sub { print "  \\"\$t\\" [style=\\"filled\\",color=\\"greenyellow\\"] \$t -> \\"$ARGV[0]\\" [ label = \\"\$r\\" ] ;\\n"; }.
+EOF
+
+my $obj = thesaurusLoad($ARGV[1]);
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+
+print "digraph zbr {\n  rankdir=LR\n\"$ARGV[0]\" [style=\"filled\",color=\"red\"]\n";
+$t->process($code);
+print "}\n";

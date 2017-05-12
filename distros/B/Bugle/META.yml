@@ -1,0 +1,24 @@
+---
+abstract: 'Blow your own trumpet'
+author:
+  - 'Ed J <etj@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::Warn: '0.23'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bugle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: '0.8'
+version: '0.04'

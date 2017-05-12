@@ -1,0 +1,69 @@
+: include "/header.tx";
+
+<div class="admin <: $entry.type :>">
+
+: if $entry.id != 'new' {
+<div class="utility">
+: if $entry.type != 'info' {
+<a class="right-most" href="<: $prefix :>entry/<: $entry.id :>"><: _('view') :></a>
+<a href="" name="<: $entry.id :>" class="delete-entry"><: _('delete') :></a>
+: }
+</div>
+: }
+
+<form method="post" enctype="multipart/form-data">
+<input type="hidden" value="<: $entry.id :>" name="id" />
+
+: for $form.fields -> $field {
+: if $field.name != 'body' {
+<div class="wrapper">
+<: $field.render |raw :>
+</div>
+: } }
+
+: if $entry.id != 'new' and $attachments_map[$entry.id] {
+<div class="wrapper">
+<label><: _('Attached') :>:</label>
+: for $attachments_map[$entry.id].keys().sort() -> $name {
+
+<input title="check to delete" type="checkbox" value="<: $name :>" name="delete-attachments" />
+
+: if match($attachments_map[$entry.id][$name].mime_type, '^image/' ) {
+<a class="attachment" href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>">
+<img title="<:$name:>" src="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>" />
+</a>
+
+: }
+: else {
+<a class="attachment" href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>"><: $name :></a>
+: }
+
+: }
+</div>
+: }
+
+
+<div class="wrapper attach">
+<label><: _('Attach') :>:</label>
+<input type="file" name="attachments" />
+</div>
+
+<div class="wrapper">
+<label>&nbsp;</label>
+<input type="button" class="attach-more" value="<: _( 'Attach More' ) :>"</input>
+</div>
+
+<div class="textarea">
+<textarea class="markitup <: $entry.format :>" name="body"><: $entry.body :></textarea>
+</div>
+
+<div class="wrapper">
+<label><: _('Message'):>:</label>
+<input type="text" name="message" />
+<input type="submit" value="<: _('Save') :>" />
+</div>
+
+</form>
+</div>
+: include "/footer.tx";
+

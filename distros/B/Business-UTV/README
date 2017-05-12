@@ -1,0 +1,45 @@
+Business-UTV version 0.01
+=========================
+
+This module provides access to UTV Internet account information.
+Specifically it enables you to programmatically retrieve
+your current monthly download/upload usage and call details 
+from your monthly phone bill.
+
+A gnome2 tray icon is provided that allows you to monitor
+you monthly usage without going to the UTV website.
+
+By definition I have only tested this module against my own account.
+I will endeavour to support other account configurations where possible.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+LWP
+Net::SSLeay
+URI::Escape
+
+The gnome tray applet also requires
+
+Gtk2::TrayIcon
+POSIX
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Peter Sinnott
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,48 @@
+T1	term 0 36	Extraction d'information automatique
+T2	term 0 24	Extraction d'information
+T3	term 40 55	domaine médical
+T4	term 60 83	projection inter-langue
+T5	term 94 113	passage à l'échelle
+T6	term 180 214	méthodes automatiques d’annotation
+T7	term 180 201;220 244	méthodes automatiques extraction d’information
+T8	term 220 244	extraction d’information
+T9	term 204 214	annotation
+T10	term 288 298	ressources
+T11	term 306 312	outils
+T12	term 395 411	corpus parallèle
+T13	term 441 448	phrases
+T14	term 456 460	mots
+T15	term 491 523	corpus médicaux français annotés
+T16	term 491 515	corpus médicaux français
+T17	term 491 506	corpus médicaux
+T18	term 491 497	corpus
+T19	term 550 567	couple de langues
+T20	term 600 623	annoter automatiquement
+A1	termVariant T20 Yes
+T21	termVariant 628 655	textes médicaux en français
+R1	variant_of Arg1:T21 Arg2:T16	
+T22	term 717 753	reconnaissance des entités médicales
+T23	term 808 842	reconnaissance d’entités médicales
+T24	term 850 864	corpus anglais
+T25	term 825 842	entités médicales
+T26	term 736 753	entités médicales
+T27	term 905 941	reconnaissance des entités médicales
+T28	term 945 960	corpus français
+T29	term 965 1009	projection des annotations du corpus anglais
+T30	term 995 1009	corpus anglais
+T31	term 980 991	annotations
+T32	term 1052 1077	hétérogénéité des données
+T33	term 1095 1116	corpus extrait du Web
+T34	term 1139 1158	méthode statistique
+T35	term 1095 1101	corpus
+R2	head_of Arg1:T2 Arg2:T1	
+R3	modifier_of Arg1:T9 Arg2:T6	
+R4	head_of Arg1:T17 Arg2:T16	
+R5	head_of Arg1:T16 Arg2:T15	
+R6	head_of Arg1:T18 Arg2:T17	
+R7	modifier_of Arg1:T25 Arg2:T23	
+R8	head_of Arg1:T35 Arg2:T33	
+T36	term 965 991	projection des annotations
+R9	modifier_of Arg1:T31 Arg2:T36	
+R10	head_of Arg1:T36 Arg2:T29	
+R11	modifier_of Arg1:T30 Arg2:T29	

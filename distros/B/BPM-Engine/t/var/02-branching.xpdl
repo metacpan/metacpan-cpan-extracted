@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+  xmlns:deprecated="http://www.wfmc.org/2004/XPDL2.0alpha"
+  xmlns:sitecorp="http://schemas.sitecorporation.com/bpm"
+  xmlns:tns="http://schemas.xmlsoap.org/tns/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes"
+  xmlns:fn="http://www.w3.org/2004/07/xpath-functions"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" Id="02-branching.xpdl" Name="Advanced Branching and Synchronization Patterns">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <DataFields>
+        <DataField Id="WhereToGo" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+        <DataField Id="pathtaken" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+    </DataFields>
+    <WorkflowProcesses>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp6" Name="WCP6+7: Multiple Choice and Structured Synchronizing Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2004-08-31 22:55:37</Created>
+                <Description>The Multi-Choice pattern describes the splitting of one single branch in two or more parallel branches. As soon as the incoming branch is enabled the thread is immediately passed to one or more of the outgoing branches. Which outgaining branches are selected depends thereby on an internal mechanism or individual decision [Aalst09]. The Structured Synchronizing Merge pattern describes the merger of two or more branches which have been split at a uniquely identifiable point of time earlier in the business process into one single branch. The thread of control is passed to the proceeding branch as soon as all incoming branches have been enabled. This pattern occurs in a structured context so it is essential that there is a Single Multi-Choice (refer to page 8) earlier in the Business Process and the Structured Synchronizing Merge Pattern has to merge all of the branches emanating from the Multi-Choice [Aalst09]. Warning: this process can't contain loops (at least, the branch with synchronizing merge structure mustn't be in a loop)</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="do_B" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="do_C" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp6.A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will follow to activity B, if you set it to C it will proceed to activity C, and if you set it to BC or CB, it will proceed both to B and C</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp6.GW1" Name="OR-Split">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp6.GW1-B"/>
+                                    <TransitionRef Id="wcp6.GW1-C"/>
+                                    <TransitionRef Id="wcp6.GW1-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp6.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp6.C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp6.D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp6.GW2" Name="OR-Join">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp6.E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp6.A-GW1" Name="Transition" From="wcp6.A"   To="wcp6.GW1"/>
+                <Transition Id="wcp6.GW1-B" Name="Transition" From="wcp6.GW1" To="wcp6.B">
+                    <Condition Type="CONDITION">attribute('do_B')</Condition>
+                </Transition>
+                <Transition Id="wcp6.GW1-C" Name="Transition" From="wcp6.GW1" To="wcp6.C">
+                    <Condition Type="CONDITION">attribute('do_C')</Condition>
+                </Transition>
+                <Transition Id="wcp6.GW1-D" Name="Transition" From="wcp6.GW1" To="wcp6.D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp6.B-GW2" Name="Transition" From="wcp6.B"   To="wcp6.GW2"/>
+                <Transition Id="wcp6.C-GW2" Name="Transition" From="wcp6.C"   To="wcp6.GW2"/>
+                <Transition Id="wcp6.D-GW2" Name="Transition" From="wcp6.D"   To="wcp6.GW2"/>
+                <Transition Id="wcp6.GW2-E" Name="Transition" From="wcp6.GW2" To="wcp6.E"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess Id="wcp8" Name="WCP8: Multiple Merge">
+            <ProcessHeader>
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>The Multi-Merge pattern describes the convergence two or more parallel branches into one single branch. Special about this pattern is that each enablement of an incoming branch results in the activation of the proceeding activity within the business process [Aalst09]. Much like the 'Simple Merge' pattern, the "Multi-Merge" (XOR-merge, Uncontrolled Merge) gateway passes on any flow from its ingoing edges without performing synchronization. The two patterns differ in whether the inbound flow is supposed to be exclusive (Simple Merge) or not (Multi-Merge).</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <DataFields>
+                <DataField Id="common" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'common data'</InitialValue>
+                </DataField>
+                <DataField Id="sbflw1data" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'sbflw1 data'</InitialValue>
+                </DataField>
+            </DataFields>
+            <Activities>
+                <Activity Id="wcp8.Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="wcp8.A" Name="[+]">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B, C or D process will follow to activity B, C or D. If you set it to AB, BA, AC, CA, BC, CB, ABC, BCA, ... it will follow to all of the activities mentioned in the variable value</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp8.A-B"/>
+                                    <TransitionRef Id="wcp8.A-C"/>
+                                    <TransitionRef Id="wcp8.A-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp8.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp8.C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp8.D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp8.E" Name="[x]">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp8.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp8.Start-A" From="wcp8.Start" To="wcp8.A"/>
+                <Transition Id="wcp8.A-B" From="wcp8.A" To="wcp8.B">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('B')</Condition>
+                </Transition>
+                <Transition Id="wcp8.A-C" From="wcp8.A" To="wcp8.C">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('C')</Condition>
+                </Transition>
+                <Transition Id="wcp8.A-D" From="wcp8.A" To="wcp8.D">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('D')</Condition>
+                </Transition>
+                <Transition Id="wcp8.B-E" From="wcp8.B" To="wcp8.E"/>
+                <Transition Id="wcp8.C-E" From="wcp8.C" To="wcp8.E"/>
+                <Transition Id="wcp8.D-E" From="wcp8.D" To="wcp8.E"/>
+                <Transition Id="wcp8.E-End" From="wcp8.E" To="wcp8.End"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess Id="wcp37" Name="WCP37: Local Synchronizing Merge">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="multi_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="deferred_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="path_taken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp37.MC" Name="MC">
+                    <Description>Multiple Choice (OR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp37.MC-A"/>
+                                    <TransitionRef Id="wcp37.MC-B"/>
+                                    <TransitionRef Id="wcp37.MC-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp37.A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp37.B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp37.C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp37.DC" Name="DC">
+                    <Description>Deferred Choice (XOR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp37.DC-D"/>
+                                    <TransitionRef Id="wcp37.DC-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp37.D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp37.E" Name="E">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp37.SM" Name="SM">
+                    <Description>Synchronizing Merge (OR-join)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp37.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp37.MC-A" From="wcp37.MC" To="wcp37.A">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp37.MC-B" From="wcp37.MC" To="wcp37.B">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('B')</Condition>                
+                </Transition>
+                <Transition Id="wcp37.MC-C" From="wcp37.MC" To="wcp37.C">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('C')</Condition>                
+                </Transition>
+                <Transition Id="wcp37.A-SM" From="wcp37.A" To="wcp37.SM"/>
+                <Transition Id="wcp37.B-SM" From="wcp37.B" To="wcp37.SM"/>
+                <Transition Id="wcp37.C-DC" From="wcp37.C" To="wcp37.DC"/>
+                <Transition Id="wcp37.DC-D" From="wcp37.DC" To="wcp37.D">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('D')</Condition>                
+                </Transition>
+                <Transition Id="wcp37.DC-E" From="wcp37.DC" To="wcp37.E">
+                    <Condition Type="OTHERWISE"/>                
+                </Transition>
+                <Transition Id="wcp37.D-SM" From="wcp37.D" To="wcp37.SM"/>
+                <Transition Id="wcp37.E-End" From="wcp37.E" To="wcp37.End"/>
+                <Transition Id="wcp37.SM-End" From="wcp37.SM" To="wcp37.End"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess Id="wcp38" Name="WCP38: General Synchronizing Merge">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+                <Description>The convergence of two or more branches which diverged earlier in the process into a single subsequent branch such that the thread of control is passed to the subsequent branch when either (1) each active incoming branch has been enabled or (2) it is not possible that any branch that has not yet been enabled will be enabled at any future time.</Description>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="multi_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="deferred_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="path_taken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp38.MC" Name="MC">
+                    <Description>Multiple Choice (OR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp38.MC-A"/>
+                                    <TransitionRef Id="wcp38.MC-B"/>
+                                    <TransitionRef Id="wcp38.MC-XOR"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp38.XOR" Name="XOR">
+                    <Description>Exclusive (XOR) Join</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp38.A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp38.B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp38.C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp38.DC" Name="DC">
+                    <Description>Deferred Choice (XOR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp38.DC-XOR"/>
+                                    <TransitionRef Id="wcp38.DC-D"/>
+                                    <TransitionRef Id="wcp38.DC-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp38.D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp38.E" Name="E">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp38.SM" Name="SM">
+                    <Description>Synchronizing Merge (OR-join)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp38.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp38.MC-A" From="wcp38.MC" To="wcp38.A">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp38.MC-B" From="wcp38.MC" To="wcp38.B">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('B')</Condition>                
+                </Transition>
+                <Transition Id="wcp38.MC-XOR" From="wcp38.MC" To="wcp38.XOR">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('XOR')</Condition>                
+                </Transition>
+                <Transition Id="wcp38.XOR-C" From="wcp38.XOR" To="wcp38.C"/>
+                <Transition Id="wcp38.A-SM" From="wcp38.A" To="wcp38.SM"/>
+                <Transition Id="wcp38.B-SM" From="wcp38.B" To="wcp38.SM"/>
+                <Transition Id="wcp38.C-DC" From="wcp38.C" To="wcp38.DC"/>
+                <Transition Id="wcp38.DC-D" From="wcp38.DC" To="wcp38.D">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('D')</Condition>                
+                </Transition>
+                <Transition Id="wcp38.DC-E" From="wcp38.DC" To="wcp38.E">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('E')</Condition>                
+                </Transition>
+                <Transition Id="wcp38.DC-XOR" From="wcp38.DC" To="wcp38.XOR">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp38.D-SM" From="wcp38.D" To="wcp38.SM"/>
+                <Transition Id="wcp38.E-End" From="wcp38.E" To="wcp38.End"/>
+                <Transition Id="wcp38.SM-End" From="wcp38.SM" To="wcp38.End"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp41" Name="WCP41+42: Thread Split and Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description></Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp41.A" Name="A" StartQuantity="2">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp41.B" Name="B" CompletionQuantity="2">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp41.A-B" Name="Transition" From="wcp41.A" To="wcp41.B" Quantity="2"/>
+            </Transitions>
+        </WorkflowProcess>
+
+        
+
+
+
+
+        <WorkflowProcess AccessLevel="PRIVATE" Id="WfPIMI_Subflow" Name="WfPIMI Subflow">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-09-07 04:04:45</Created>
+                <Description>not to be instantiated directly, but used only as a subflow process</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="P1" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="P2" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="sbflw_act" Name="Subflow activity">
+                    <Description>This is a subflow</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

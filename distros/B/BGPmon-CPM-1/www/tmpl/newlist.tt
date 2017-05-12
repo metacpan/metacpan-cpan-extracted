@@ -1,0 +1,19 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Create New Critical Prefix List'; %]
+
+[% IF MESSAGE %]
+<p><font color="red">[% MESSAGE %]</font></p>
+[% END %]
+<p><h2>Enter critical prefix list name:</h2></p>
+
+<form action="cpm_workflow.cgi" method="GET">
+  <input type="hidden" name="action" value="createlist" /> 
+  <input type="text" name="list" namesize=20>
+  
+  <p>
+    <input type="button" value="Back" onClick="history.go(-1);">
+    &nbsp
+    <input type="submit" value = "Continue"/>
+  </p>
+</form>    
+
+[% INCLUDE footer.html %]

@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use strict;
+use BSD::Process::Affinity;
+
+if(scalar @ARGV < 2){
+	print "Usage: \@pids affinity_mask\n";
+	exit;
+}
+
+my $affinity = pop @ARGV;
+my $err = 0;
+
+foreach my $pid (@ARGV){
+	eval {
+		BSD::Process::Affinity->get_process_mask($pid)->set($affinity)->update(); 1
+	} or do {
+		$err = 1;
+		$@ =~ s/\s+at \/.*line.*//;
+		print STDERR "pid $pid - $@";
+	}
+}
+
+print " done\n" if !$err;
+
+__END__
+
+=head1 NAME
+
+setaffinity - Manipulate affinities from command line
+
+=head1 SYNOPSIS
+
+Typical usage:
+
+ $ setaffinity 675 676 679 1011
+
+Options synopsis:
+
+ $ setaffinity @pids affinity_mask
+
+=head1 DESCRIPTION
+
+setaffinity expects list of pids with mask to be applied to them all coming last. Mask must be a string
+consisting of 0 and 1. CPU0 comes rightmost, here are two examples:
+
+	0101 - CPU0 + CPU2
+	1000 - CPU3 only
+
+Mask is applied to all specified process, if anything fails, process is not aborted,
+but error description + pid are printed to STDERR.
+
+Note that you can change affinity only of processes you own, only root can change others.
+
+=head1 SEE ALSO
+
+man 2 cpuset_getaffinity
+
+man 2 cpuset
+
+=head1 AUTHOR
+
+Sergey Aleynikov <sergey.aleynikov@gmail.com>
+
+=cut

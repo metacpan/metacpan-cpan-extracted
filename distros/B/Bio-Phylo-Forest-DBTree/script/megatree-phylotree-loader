@@ -1,0 +1,197 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Bio::Phylo::Forest::DBTree;
+use Bio::Phylo::Util::Logger ':levels';
+
+# process command line arguments
+my $verbosity = WARN;
+my ( $infile, $dbfile );
+GetOptions(
+	'infile=s' => \$infile,
+	'dbfile=s' => \$dbfile,
+	'verbose+' => \$verbosity,	
+	'help'     => sub { pod2usage() },
+	'man'      => sub { pod2usage(1) },		
+);
+pod2usage() if not $infile;
+
+=head1 NAME
+
+megatree-phylotree-loader - Loads a tree in the format of L<PhyloTree.org>
+
+=head1 SYNOPSIS
+
+    megatree-loader -i <file> [-d <file>] [-vhm]
+
+=head1 OPTIONS
+
+=over
+
+=item B<< -i <file> >> or B<< -infile <file> >>
+
+Input tree file, in the spreadsheet format as produced by L<PhyloTree.org>, e.g.
+C<PhyloTree Build 17.txt>.
+
+=item B<< -d <file> >> or B<< -dbfile <file> >>
+
+Optional.
+
+Location of a database file, compatible with sqlite3, which will be produced. This file
+can not yet exist. If it does, an error message will be emitted and the program will quit.
+
+If this argument is not provided, the tree topology will be emitted as a comma-separated 
+spreadsheet. (In principle, this spreadsheet could subsequently be loaded into sqlite3
+and then be further indexed by the API.)
+
+=item B<-v> or B<-verbose>
+
+Optional.
+
+With this option, more feedback messages are written during processing. This option can be
+used multiple times, which increases the verbosity further.
+
+=item B<-h> or B<-help>
+
+Optional.
+
+Prints help message / documentation.
+
+=item B<-m> or B<-man>
+
+Optional.
+
+Prints manual page. Additional information is available in the documentation, i.e.
+C<perldoc megatree-phylotree-loader>
+
+=back
+
+=head1 DESCRIPTION
+
+This program produces a database file or a CSV spreadsheet from dump of a haplotype tree
+as emitted by L<PhyloTree.org>. Such a database provides much quicker random access to 
+immutable trees, such as NRY and mtDNA haplotype trees. The example trees that are 
+referred to by the release of L<Bio::Phylo::Forest::DBTree> have been produced in this 
+way. They can be accessed by an API that is compatible with L<Bio::Phylo>, but much more 
+scalable. An example of such API usage is presented by the L<megatree-pruner> script.
+
+=cut
+
+# instantiate helper objects
+my $log = Bio::Phylo::Util::Logger->new(
+	'-level' => $verbosity,
+	'-style' => 'simple',
+	'-class' => [
+		'main',
+		'Bio::Phylo::Forest::DBTree::Result::Node'
+	]		
+);
+
+# set up database stuff
+my ( $sth, $megatree, $dbh );
+if ( $dbfile ) {
+	if ( -e $dbfile ) {
+		$log->fatal("$dbfile already exists, won't overwrite");
+		exit(1);
+	}
+	$log->info("will insert megatree directly into db '$dbfile'");
+	$megatree = Bio::Phylo::Forest::DBTree->connect($dbfile);
+	$dbh = $megatree->dbh;
+	$sth = $dbh->prepare("insert into node(id,parent,name,length) values(?,?,?,?)");
+}
+else {
+	$log->warn("no db file given, CSV output will be written to STDOUT");
+}
+
+# do the thing
+my $idcounter = 2;
+my %idcache;
+read_tree();
+if ( $megatree ) {
+	$log->info("going to compute indexes");
+	$megatree->get_root->_index;
+}
+
+# start reading the phylotree spreadsheet
+sub read_tree {
+	my @path = qw(root);
+	print_branch(@path);
+	my $line = 1;
+	open my $fh, '<', $infile or die $!;
+	LINE: while(<$fh>) {
+
+		# compute depth of current line
+		chomp;
+		my $d;
+		my @line = split /\t/, $_;
+		FIELD: for my $i ( 0 .. $#line ) {
+			if ( $line[$i] ) {
+				$d = $i + 1;
+				last FIELD;	
+			}
+		}
+	
+		# parse id and snps
+		my ( $id, $SNPs ) = grep { /\S/ } @line;
+		$id = "$line - $id";
+		my $label = $SNPs ? "$id / $SNPs" : $id;
+	
+		# update topology
+		$path[$d] = $label;
+
+		# find focal node
+		my $parent;
+		PARENT: for ( my $i = $d - 1; $i >= 0; $i-- ) {
+			if ( $path[$i] ) {
+				$parent = $path[$i];
+				last PARENT;
+			}
+		}
+		print_branch( $label => $parent );
+		$line++;
+		$log->info("inserted node $line") unless $line % 1000;
+	}
+}
+
+# print focal branch
+sub print_branch {
+	my ( $child, $parent ) = @_;
+	
+	# every child and parent ID consists of the concatenation of:
+	# <line number> - <identifier> / <space separated SNPs>
+	# first strip of the '<line number> - '
+	my $label = $child;
+	$label =~ s/^\d+ - //;
+	
+	# now compute the length:
+	my $length = 1;
+	if ( $label =~ /\/ (.+)/ ) {
+		my $SNPs = $1;
+		my @SNPs = split / /, $SNPs;
+		$length  = scalar @SNPs;
+	}
+	
+	# send the output to doprint()
+	if ( $parent ) {
+		$idcache{$child}  = $idcounter++ unless $idcache{$child};
+		$idcache{$parent} = $idcounter++ unless $idcache{$parent};	
+		doprint($idcache{$child},$idcache{$parent},$label,$length);
+	}
+	else {
+		$idcache{$child} = $idcounter++ unless $idcache{$child};
+		doprint($idcache{$child},1,$label,$length);
+	}
+}
+
+# produce output to CSV or DATABASE
+sub doprint {
+	my @values = @_;
+	if ( $sth ) {
+		$sth->execute(@values);
+	}
+	else {
+		print join(',',@values), "\n";
+	}
+}

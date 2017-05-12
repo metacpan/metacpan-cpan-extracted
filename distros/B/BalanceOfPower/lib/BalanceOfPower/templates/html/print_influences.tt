@@ -1,0 +1,11 @@
+<h3>INFLUENCES</h3>
+<p>
+[% ruler = "" %]
+[% FOREACH i IN influences %]
+[% IF ruler != i.node1 %]
+<br /><strong>[% i.node1 %]</strong><br />
+[% ruler = i.node1 %]
+[% END %]
+[% INCLUDE fragments/linked_nation.tt n = i.node1 %] [% i.status_label %] [% INCLUDE fragments/linked_nation.tt n = i.node2 %]<br />
+[% END %]
+</p>

@@ -1,0 +1,87 @@
+# Escherichia coli (Highly expressed genes)
+# Nucleic Acids Res 16, 8207–8211 (1988)
+#F
+{TTT} = 0.34
+{TTC} = 1.66
+#L
+{TTA} = 0.06
+{TTG} = 0.07
+{CTT} = 0.13
+{CTC} = 0.17
+{CTA} = 0.04
+{CTG} = 5.54
+#I
+{ATT} = 0.48
+{ATC} = 2.51
+{ATA} = 0.01
+#M
+{ATG} = 1.00
+#V
+{GTT} = 2.41
+{GTC} = 0.08
+{GTA} = 1.12
+{GTG} = 0.40
+#S
+{TCT} = 2.81
+{TCC} = 2.07
+{TCA} = 0.06
+{TCG} = 0.00
+{AGT} = 0.13
+{AGC} = 0.93
+#P
+{CCT} = 0.15
+{CCC} = 0.02
+{CCA} = 0.42
+{CCG} = 3.41
+#T
+{ACT} = 1.87
+{ACC} = 1.91
+{ACA} = 0.10
+{ACG} = 0.12
+#A
+{GCT} = 2.02
+{GCC} = 0.18
+{GCA} = 1.09
+{GCG} = 0.71
+#Y
+{TAT} = 0.38
+{TAC} = 1.63
+#*
+{TAA} = 1.00
+{TAG} = 0.00
+{TGA} = 0.00
+#H
+{CAT} = 0.45
+{CAC} = 1.55
+#Q
+{CAA} = 0.12
+{CAG} = 1.88
+#N
+{AAT} = 0.02
+{AAC} = 1.98
+#K
+{AAA} = 1.63
+{AAG} = 0.37
+#D
+{GAT} = 0.51
+{GAC} = 1.49
+#E
+{GAA} = 1.64
+{GAG} = 0.36
+#C
+{TGT} = 0.60
+{TGC} = 1.40
+#W
+{TGG} = 1.00
+#R
+{CGT} = 4.47
+{CGC} = 1.53
+{CGA} = 0.00
+{CGG} = 0.00
+{AGA} = 0.00
+{AGG} = 0.00
+#G
+{GGT} = 2.27
+{GGC} = 1.68
+{GGA} = 0.00
+{GGG} = 0.04

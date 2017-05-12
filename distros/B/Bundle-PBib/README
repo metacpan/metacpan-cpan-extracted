@@ -1,0 +1,276 @@
+NAME
+    PBib::PBib - Something like BibTeX, but written in perl and designed to
+    be extensible in three dimensions: bibliographic databases (e.g. BibTeX,
+    OpenOffice), document file formats (e.g. Word, RTF, OpenOffice), styles
+    (e.g. ACM, IEEE)
+
+SYNOPSIS
+            use PBib::PBib;
+            use Biblio::Biblio;
+            my $bib = new Biblio::Biblio();
+            my $pbib = new PBib::PBib('refs' => $bib->queryPapers());
+            $pbib->convertFile($file);
+
+DESCRIPTION
+    I wrote PBib to have something like BibTex for MS Word that can use a
+    various sources for bibliographic references, not just BibTex files, but
+    also database systems. Especially, I wanted to use the StarOffice
+    bibliographic database.
+
+    Now, PBib can be extended in a couple of dimensions:
+
+    - bibliographic styles
+        such as ACM style or IEEE style.
+
+    - document format
+        such as Plain text, (La)TeX, Word, RTF, OpenOffice
+
+    - bibliographic database format
+        such as bibtex, refer, tib, but also database systems with different
+        mappings to database fields.
+
+QUICK START
+  SETUP BIBLIOGRAPHY DATABASE
+    Once you've installed the distribution you have to set up a bibliography
+    database in order to start using PBib and PBibTk.
+
+    Several formats are supported:
+
+    - Perl:DBI databases
+        You can configure the database schema to use, see conf/default.pbib,
+        conf/OOo-table.pbib and some for DBMSs, see conf/mysql.pbib,
+        conf/adabas.pbib. You can "include" the files in your site.pbib file
+        if you are using one of these systems.
+
+    - bibtex files
+    - several other file types that are supported by the bp package.
+
+    I'd recommend to use a mysql database, this works fine for me. See the
+    config/sample user.pbib file for some examples.
+
+    You should specify your default settings in a user.pbib file, which is
+    searched for at a couple of places, e.g. you home directory. (Check that
+    the HOME environment variable on windows is set.) In case you want to
+    provide defaults for your organization, use the local.pbib file.
+
+    You can adapt the mapping of PBib fields to DB fields, see file
+    config/OOo-table.pbib for an example if you want to use a OpenOffice.org
+    bibliography database.
+
+    No support is given to edit the bibliography database, as there are lots
+    of tools around. Check docs/Edit_Bibliography.sxw for a OpenOffice.org
+    document to edit a bibliography database. (That's the form that I use.)
+    Ensure that it's attached to the correct database (Tools>>Data Sources,
+    Edit>>Exchange Database).
+
+  CREATE INPUT DOCUMENTS
+    Cite references
+        In your documents, use [[Cite-Key]] (Double brackets) to place
+        references in the document. These will be replaced by PBib to a
+        reference according to the selected style, e.g. (Tandler, 2004).
+
+        The CiteKey is the key defined in the bibliography database.
+
+    Generate the list of references used
+        Use [{}] as the place holder for the list of references.
+
+    See PBib::Intro for a more detailed description. You can find sample
+    files in the test folder t.
+
+  Supported document formats
+    - MS Word .doc, .rtf
+        .doc will be converted to .rtf before processing (requires MS Word
+        to be installed)
+
+    - Plain Text
+        TeX input is currently handled as plain text, there is no specific
+        style for TeX yet.
+
+    - OpenOffice .sxw
+        OpenOffice Text (.sxw) uses actually a zipped XML document. (You
+        need the Archive::Zip and XML::Parser modules to use this.)
+
+    Not yet supported:
+
+    LaTeX and TeX
+        Should generate s.th. similar to BibTeX. But wait, if you write with
+        TeX, you can *use* BibTeX!
+
+        For now, this is treated as plain text.
+
+    HTML
+        For now, this is treated as plain text.
+
+        At minimum, the correct character encoding should be ensured and
+        some formatting for the References section.
+
+    XML There is support for XML, but of course the generic XML support is
+        very limited. Maybe, support DocBook, or provide an easy way to
+        specify the tags to be used.
+
+  RUN PBIB
+    Provided scripts as front ends for the modules:
+
+    bin/pbib.pl <<filename>>
+
+    Process an input document and write the converted output to a new file
+    called *filename*"-pbib."*ext*.
+
+    bin/PBibTk.pl [<<optional filename>>]
+
+    Open a Tk GUI that allows you to browse you bibliography database and
+    browse the items referenced in your document.
+
+SUCCESS STORIES ;-)
+    I've used PBib/PBibTk to format citations and generate the bibliography
+    for my thesis and several other papers; in fact, I wrote it as I
+    couldn't find another tool that matched my requirements. To get an idea
+    of the scope that PBib can handle: My thesis references about 360
+    papers, there are >900 entries in the database, the thesis converted to
+    a RTF file is about 50MB. Maybe, you want to have a look at
+    <http://elib.tu-darmstadt.de/diss/000506> or
+    <http://ipsi.fraunhofer.de/ambiente/publications/>.
+
+    The bibliographic database I used is available in BibTeX format at
+    <http://tandlers.de/peter/beach/> (with lots of HCI, CSCW, UbiComp
+    references).
+
+CONFIGURATION
+    You can configure PBib in a number of ways, e.g. using config files and
+    environment variables. For detailed information, please refer to module
+    PBib::Config.
+
+    You can use a filename.pbib config file to specify specific
+    configuration for a file.
+
+  Environment Variables
+    PBIBDIR
+        The directory where the PBib scripts are located, e.g.
+        /usr/local/bin.
+
+    PBIBPATH
+        Path to look for config files (and also styles), separated by ';'.
+
+    PBIBSTYLES
+        Path to look for PBib styles, separated by ';'.
+
+    PBIBCONFIG
+        Path to look for PBib config, separated by ';'.
+
+    HOME
+        If set, PBib looks for the user's personal config at
+
+        $HOME/.pbib/styles
+        $HOME/.pbib/conf
+        $HOME
+
+    APPDATA
+        If set, PBib looks for the user's personal config at
+
+        $APPDATA/PBib/styles
+        $APPDATA/PBib/conf
+
+        $APPDATA points on Windows XP to something like "C:\Documents and
+        Settings\<<user>>\Application Data".
+
+  Config Files
+    *ToDo: Explain format of config files ...*, look at PBib::Config and the
+    exsamples provided with this distribution.
+
+DEPENDENCIES
+    PBib itself consists of three packages that can be used independently:
+
+    Biblio
+        Provides an interface to bibliographic databases. The main class is
+        Biblio::Biblio.
+
+        Biblio::File uses Biblio::BP and Biblio::Util that encapsulate the
+        "bp" package mentioned above.
+
+    PBib
+        Main functionality to process documents that contain references.
+
+        PBib uses the format for references returned by Biblio, so it's well
+        designed to be used together. But, PBib can be used with any hash of
+        references that contains the same keys.
+
+        The main class is PBib::PBib. The main script is pbib.pl.
+
+    PBibTk
+        PBibTk provides a GUI for PBib. It uses PBib and Biblio.
+
+        The main class is PBibTk::Main. It is started with the script
+        PBibTk.pl.
+
+    I've thought about deploying these as separate packages, but currently I
+    believe that this way it's easier to install and use.
+
+    This module requires these other modules and libraries:
+
+    bp  The Perl Bibliography Package "bp", by Dana Jacobsen (dana@acm.org)
+        is used. An adapted version of it (with some bug fixes and
+        enhancements) is included in this distribution.
+
+        In fact, bp is really helpful to generate the hashes with literature
+        references from various sources. Please check
+        http://www.ecst.csuchico.edu/~jacobsd/bib/bp/ and the bp README
+        located in lib/Biblio/bp/README.
+
+    Config::General
+        by Thomas Linden <tom@daemon.de>
+
+    Archive::Zip and XML::Parser
+        for OpenOffice support.
+
+METHODS
+    These methods are exported.
+
+    $conf = new PBib::PBib(*options*)
+        Supported Options:
+
+        refs
+        config
+        inDoc
+        outDoc
+    $conv = $pbib->processFile($infile, $outfile, $config, $refs)
+        Calls convertFile() & optionally opens result in editor.
+
+    $conv = $pbib->convertFile($infile, $outfile, $config, $refs)
+        If $infile (filename) is undef, inDoc (document) is used.
+
+        If $outfile (filename) is undef, outDoc (document) is used.
+
+        If $config or $refs is undef, the default values are used (the ones
+        passed to the constructor).
+
+        The converter $conv is passed to the caller.
+
+    logStatistics($logfile, $conv, $options, $duration)
+        Write log file.
+
+    $pbib->scanFile($infile, $config)
+        Returns the foundInfo for the $infile.
+
+    \%foundIDs = $pbib->filterReferencesForFiles(@files)
+        Filter the known references to the ones used in @files, a hash
+        reference is returned. CrossRefs are also included
+        (filterReferences() is used).
+
+    $pbib->filterReferences($filter_refs)
+        Scan the passed refs for the known ones, return a new hash reference
+        with all known references (including CrossRefs).
+
+AUTHOR
+    Peter Tandler <pbib@tandlers.de>
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2002-2005 P. Tandler
+
+    For copyright information please refer to the LICENSE file included in
+    this distribution.
+
+SEE ALSO
+    bin\pbib.pl, bin\PBibTk.pl
+
+    <http://tandlers.de/peter/pbib/>
+

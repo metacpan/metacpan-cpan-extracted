@@ -1,0 +1,123 @@
+1.60     2015-07-21
+
+- Support for the Telephone Verification Service was removed as this service
+  is no longer offered.
+
+
+1.57     2015-01-30
+
+- Make minFraud API client https by default. This distribution now
+  depends on LWP::Protocol::https to ensure that you have the modules
+  needed for SSL support installed.
+
+
+1.56     2014-09-26
+
+- Re-release to fix permission issues.
+
+
+1.55     2014-09-19
+
+- Remove custom DNS cache. ( Boris Zentner )
+
+
+1.54     2012-07-30
+
+- Added more input fields: avs_result, cvv_result,
+  order_amount, order_currency, shopID, txn_type ( Gregory Oschwald )
+
+
+1.53     2012-04-16
+
+- update default servers ( Boris Zentner )
+- Do not force hostname validation, otherwise cached SSL requests fail (
+  Boris Zentner )
+
+
+1.52     2012-03-13
+
+- CreditCardFraudDetection check the countryMatch field instead of
+  score. Score is only avail in minfraud_version <= 1.2 ( Boris Zentner )
+
+
+1.51     2009-09-03
+
+- Fix uri_encoding for wide characters ( Michael Schout )
+- Ignore, when create cache file fail ( Boris Zentner )
+- Removed location verification example and class
+
+
+1.50     2009-02-19
+
+- minfraud3 is really the default server if useDNS => 0 is used ( Boris Zentner )
+
+
+1.49     2009-02-19
+
+- add minfraud3.maxmind.com as primary server ( Boris Zentner )
+
+
+1.48     2008-10-03
+
+- add new optional fields user_agent and accept_language to
+  Business::MaxMind::CreditCardFraudDetection ( Boris Zentner )
+
+
+1.46     2007-10-04
+
+- Fixed bug in setServers if new server list is smaller than the old server list
+- getServers returns reference to an empty list instead of undef if no servers
+  in list
+- Replaced www.maxmind.com and www2.maxmind.com with minfraud1.maxmind.com and
+  minfraud2.maxmind.com
+
+
+1.43     2006-10-02
+
+- Added support for usernameMD5 and passwordMD5
+
+
+1.42     2005-10-13
+
+- Escape input parameters, fixed bug where + sign for telephone verification
+  was not passed
+
+
+1.41     2005-08-07
+
+- In case DNS goes down, reset timestamp on IP address cache file,
+  prevents querying www.maxmind.com over and over
+
+
+1.4     2005-08-01
+
+- Added support for Telephone Verification
+- Use POST method instead of GET method, fixes bug where query string
+  was truncated
+- Added support for bypassing DNS using IP addresses
+- Added shipCity shipRegion shipPostal shipCountry to list of input fields
+
+
+1.3     2005-02-09
+
+- Added requested_type, forwardedIP, emailMD5, shipAddr,
+  txnID, sessionID to list of input fields
+- Added Business::Maxmind::LocationVerification
+- Added getServers and setServers methods
+
+
+1.2     2004-07-02
+
+- Added binName, binPhone, custPhone to list of input fields
+
+
+1.1     2004-07-14
+
+- Replaced h1 and h2 servers with www and www2 (all ending with maxmind.com)
+- Added debug and timeout options
+- Failover if score field not set
+
+
+1.0     2004-05-05
+
+- original version

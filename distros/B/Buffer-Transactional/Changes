@@ -1,0 +1,11 @@
+Revision history for Perl extension Buffer::Transactional
+
+0.02 Thurs. Jan. 7, 2010
+    - Removed MooseX::AttributeHelpers dependency in
+      favor of the new Moose Native Traits.
+
+    * Buffer::Transactional
+      - adding the txn_do method and tests
+
+0.01 Wed. Sept. 16, 2009
+    - First release to an unsuspecting world!

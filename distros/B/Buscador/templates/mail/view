@@ -1,0 +1,36 @@
+[% INCLUDE header title=mail.subject%]
+[% PROCESS macros %]
+[% PROCESS view_macros %]
+
+<h1>[% mail.subject |html %]</h1>
+[% INCLUDE searchbox %]
+<div id="container">
+<div id="sidebar-a">
+<div id="innerbar">
+<p class="searchhints">
+<a href="[%base | remove('/$')%]/mail/thread/[%mail.id%]">View whole thread</a></p><hr />
+[% mail.thread_as_html %]
+[% IF mail.attachments %]
+<hr />
+[% attachments(mail) %]
+[% END%]
+</div>
+</div>
+<div id="content">
+<table class="view">
+    [% addressing_row(mail,"From"); 
+       addressing_row(mail,"To"); 
+       addressing_row(mail, "Cc"); 
+       lists_row(mail); 
+    %]
+    <tr>
+    <td class="field">Date</td>
+    <td><a href="[% base | remove('/$') %]/date/list/[% mail.date.strftime("%Y/%m/%d/") %]">[%mail.date.ymd%]</a></td>
+    </tr>
+</table>
+<pre> [% mail.format_body %]
+</pre>
+</div>
+
+</div>
+[% INCLUDE footer %]

@@ -1,0 +1,28 @@
+Chunk description in .brackup file:
+  Chunks:  offset;raw_length;stored_length;typed_digest
+Proposal to change:
+  Chunks:  offset;raw_length;stored_length;typed_digest(stored);typed_digest(raw);flags
+
+Where flags is comma separate list of \w+.  e.g.  "gz" for gzip compression
+
+------
+
+Document:  purpose of chunks named by their final digest is twofold:
+   1) can verify integrity of storage medium.  is it corrupt?
+   2) hides proof of ownership of contents (when encrypted)
+side-effect:
+   -- when we do compression, we'll be consistent and store it as its
+      compressed digest, even if not encrypted as well.
+
+---
+
+Maybe we don't need per-chunk meta files:
+   -- can get it all from .brackup (meta)files on the server.
+      (TODO: abstract out parser for multiple users)
+
+---
+
+smart chunk-sizing on certain files w/ metadata and data separate:
+like mp3 files and their id3.  have a smart chunker that's the data
+part vs. the id3 part, so updating id3 later doesn't reupload the
+entire data part.  :-)

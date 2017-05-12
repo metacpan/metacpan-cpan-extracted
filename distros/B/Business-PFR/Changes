@@ -1,0 +1,7 @@
+Revision history for Business::PFR
+
+1.0.0   2014-06-20
+        * First public release
+
+1.0.1   2014-06-21
+        * New dependency Perl 5.14

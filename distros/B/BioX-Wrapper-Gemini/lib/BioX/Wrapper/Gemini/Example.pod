@@ -1,0 +1,191 @@
+=head1 Name
+
+BioX::Wrapper::Gemini::Examples - Documentation describing the use of the BioX::Wrapper::Gemini module.
+
+For more detailed Gemini usage please refer to the gemini documentation at L:<Gemini Read the Docs|http://gemini.readthedocs.org/en/latest/>.
+
+=cut
+
+=head2 Full Workflow Example
+
+=head3 Create the Bash script
+
+This set of commands creates an (obviously fake) vcf file, compressed vcf file, and the correct directory structure.
+
+    mkdir example
+    cd example
+    touch test1.vcf
+    touch test2.vcf.gz
+
+    echo "#!/bin/bash" > gemini_process.sh
+    gemini-wrapper.pl --indir `pwd` --outdir `pwd`/processed >> gemini_process.sh
+
+=head3 Directory Structure
+
+Gemini wrapper creates your directory structure for you. If the --outdir option does not exist it will be created for you.
+
+    /example
+        gemini_process.sh
+        /processed
+            /gemini-wrapper
+                /gemini_sqlite
+                /norm_annot_vcf
+        test1.vcf
+        test2.vcf.gz
+
+The normalized compressed vcf files will be in process/gemini-wrapper/norm_annot_vcf .
+
+The sqlite databases will be in /processed/gemini-wrapper/gemini_sqlite .
+
+=head3 See the process file
+
+    #!/bin/bash
+
+    #######################################################################
+    # This file was generated with the following options
+    #	--indir	/home/user/example
+    #	--outdir	/home/user/example/processed
+    #######################################################################
+
+
+    #######################################################################
+    # Starting Sample Info Section
+    #######################################################################
+
+    # test1, test2
+
+    #######################################################################
+    # Ending Sample Info Section
+    #######################################################################
+
+
+    #######################################################################
+    # Starting Bgzip Section
+    #######################################################################
+    # The following samples must be bgzipped before processing can begin
+    # /home/user/example/test1.vcf
+    #######################################################################
+
+    bgzip /home/user/example/test1.vcf && tabix /home/user/example/test1.vcf.gz
+
+    wait
+
+
+    #######################################################################
+    # Finished Bgzip Section
+    #######################################################################
+
+    #######################################################################
+    # Normalizing with VT and annotating with SNPEFF the following samples
+    # test1, test2
+    #######################################################################
+
+    bcftools view /home/user/example/test1.vcf.gz | sed 's/ID=AD,Number=./ID=AD,Number=R/' \
+        | vt decompose -s - \
+        | vt normalize -r $REFGENOME - \
+        | java -Xmx4G -jar $SNPEFF/snpEff.jar -c \$SNPEFF/snpEff.config -formatEff -classic GRCh37.75  \
+        | bgzip -c > \
+        /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test1.norm.snpeff.gz && tabix /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test1.norm.snpeff.gz
+
+
+    bcftools view /home/user/example/test2.vcf.gz | sed 's/ID=AD,Number=./ID=AD,Number=R/' \
+        | vt decompose -s - \
+        | vt normalize -r $REFGENOME - \
+        | java -Xmx4G -jar $SNPEFF/snpEff.jar -c \$SNPEFF/snpEff.config -formatEff -classic GRCh37.75  \
+        | bgzip -c > \
+        /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test2.norm.snpeff.gz && tabix /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test2.norm.snpeff.gz
+
+
+    wait
+
+
+    #######################################################################
+    # Finished Normalize Annotate Section
+    #######################################################################
+
+    #######################################################################
+    # Gemini is loading the following samples
+    # test1, test2
+    #######################################################################
+
+    gemini load -v /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test1.norm.snpeff.gz \
+         -t snpEff \
+         /home/user/example/processed/gemini-wrapper/gemini_sqlite/test1.vcf.db
+
+
+    gemini load -v /home/user/example/processed/gemini-wrapper/norm_annot_vcf/test2.norm.snpeff.gz \
+         -t snpEff \
+         /home/user/example/processed/gemini-wrapper/gemini_sqlite/test2.vcf.db
+
+
+    wait
+
+
+    #######################################################################
+    # Finished Gemini Load Section
+    #######################################################################
+
+=head2 Notes on Default Values
+
+BioX::Wrapper::Gemini assumes you have environmental variables set for the SnpEff install ($SNPEFF), reference genome ($REFGENOME).
+
+You can change this with
+
+    gemini-wrapper.pl --ref /path/to/reference.fa --snpeff /path/to/snpeff
+
+If you change the snpeff variable you will probably need to change the snpeff_opt
+
+    gemini-wrapper.pl --snpef_opt "-c /path/to/snpeff/snpEff.config -formatEff -classic GRCh37.75"
+
+The gemini db_load_opts has the default set as " -t snpeff". If you would instead like to load it with "--skip_cadd --cores 3 -t snpeff" look at the following.
+
+    gemini_wrapper.pl --db_load_opts "--skip_cadd --cores 3 -t snpeff"
+
+This can be easily accomplished with environment modules. For more information please refer to the modules documentation. http://modules.sourceforge.net/
+
+For more functional documentation check out the wikipedia page. https://en.wikipedia.org/wiki/Environment_Modules_(software)
+
+For easy install try
+
+    sudo yum install environment-modules
+
+See what the variables are with
+
+env |grep MODULE
+
+You can create a custom module path with
+
+    export MODULEPATH=/path/to/user/modules:$MODULEPATH
+
+=head3 SnpEff Module example
+
+    #%Module1.0#######################################################################
+    ## SnpEff modulefile
+    ##
+    proc ModulesHelp { } {
+
+            puts stderr "\tAdds the snpeff binaries to your path.\n module load snpeff \n java -jar $SNPEFF/snpEff.jar -c /path/to/configuration/file/snpEff.config <args>"
+    }
+
+    module-whatis   "Adds the snpeff binaries to your path."
+
+    module add java/jdk1.7.0_67
+
+    set ROOT_DIR    /system/apps/software
+    setenv  SNPEFF  $ROOT_DIR/snpEff
+
+    #For analysis and denormalizing
+    module add samtools/1.2
+    prepend-path    PATH    $ROOT_DIR/vt
+
+=head2 Upcoming Functionality
+
+Add in a VEP workflow option
+
+=head1 AUTHOR
+
+Jillian Rowe E<lt>jillian.e.rowe@gmail.comE<gt>
+
+=head1 ACKNOWLEDGEMENTS
+
+This module was originally developed at and for Weill Cornell Medical College in Qatar. With approval from WCMC-Q, this information was generalized and put on github, for which the authors would like to express their gratitude.

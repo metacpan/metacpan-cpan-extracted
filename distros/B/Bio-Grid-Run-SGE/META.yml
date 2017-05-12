@@ -1,0 +1,50 @@
+---
+abstract: 'Distribute (biological) analyses on the local SGE grid'
+author:
+  - 'Joachim Bargsten <jwb@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-Grid-Run-SGE
+requires:
+  AnyEvent: '0'
+  AnyEvent::XMPP: '0'
+  Bio::Gonzales: '0'
+  Capture::Tiny: '0'
+  Clone: '0'
+  Config::Auto: '0'
+  Config::IniFiles: '0'
+  Data::Printer: '0'
+  Error: '0'
+  File::Copy: '0'
+  File::HomeDir: '0'
+  File::Next: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  Getopt::Long::Descriptive: '0'
+  HTTP::Date: '0'
+  IO::Prompt::Tiny: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Mail::Sendmail: '0'
+  Mouse: '0'
+  Parallel::ForkManager: '0'
+  Params::Util: '0'
+  Path::Tiny: '0'
+  Proc::Daemon: '0'
+  Storable: '0'
+  String::ShellQuote: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  XML::LibXML: '0'
+  parent: '0'
+  perl: '5.010'
+version: '0.042'

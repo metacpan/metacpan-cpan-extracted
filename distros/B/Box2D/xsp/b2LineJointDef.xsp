@@ -1,0 +1,134 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2LineJointDef} class b2LineJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2LineJointDef();
+
+%{
+
+void
+b2LineJointDef::Initialize( bodyA, bodyB, anchor, axis )
+	b2Body* bodyA
+	b2Body* bodyB
+	b2Vec2* anchor
+	b2Vec2* axis
+	CODE:
+		THIS->Initialize( bodyA, bodyB, *anchor, *axis );
+
+b2Vec2*
+b2LineJointDef::localAnchorA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorA);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2LineJointDef::localAnchorB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorB = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorB);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2LineJointDef::localAxisA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAxisA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAxisA);
+	OUTPUT:
+		RETVAL
+
+bool
+b2LineJointDef::enableLimit( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->enableLimit = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->enableLimit;
+	OUTPUT:
+		RETVAL
+
+float32
+b2LineJointDef::lowerTranslation( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->lowerTranslation = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->lowerTranslation;
+	OUTPUT:
+		RETVAL
+
+float32
+b2LineJointDef::upperTranslation( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->upperTranslation = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->upperTranslation;
+	OUTPUT:
+		RETVAL
+
+bool
+b2LineJointDef::enableMotor( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->enableMotor = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->enableMotor;
+	OUTPUT:
+		RETVAL
+
+
+float32
+b2LineJointDef::maxMotorForce( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxMotorForce = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxMotorForce;
+	OUTPUT:
+		RETVAL
+
+float32
+b2LineJointDef::motorSpeed( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->motorSpeed = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->motorSpeed;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

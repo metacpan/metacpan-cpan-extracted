@@ -1,0 +1,22 @@
+Revision history for Business-Bitcoin
+
+1.007   Thu Dec 29 11:03:49 2016 -0500
+        First release
+
+1.008   Thu Dec 29 13:16:17 2016 -0500
+        Added findreq method
+
+1.011   Thu Dec 29 13:40:35 2016 -0500
+        Add index creation for address and refid fields
+
+1.021	Thu Jan 19 12:17:31 2017 -0800
+        Added Bitcoin HD Key / Address generation
+
+1.029   Sat Feb 4 00:48:25 2017 -0800
+        Fixed bug in _decompress
+
+1.030   Fri Mar 17 23:24:43 2017 -0700
+        Add 'processed' and 'status' fields, commit method for Requests
+
+1.037   Tue Apr 18 23:19:11 2017 -0700
+        Change key derivation to use penultimate public key, fix bug in _compress

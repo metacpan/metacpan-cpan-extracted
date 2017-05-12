@@ -1,0 +1,16 @@
+Revision history for Bot-BasicBot-Pluggable-Module-Nagios
+
+0.04    2011-10-21
+        Configurable repeat_delay, poll_interval and report_statuses settings.
+
+0.03    2011-10-19
+        Bugfix: services in state 'OK' always stay at attempt e.g. 1/4; don't
+        skip over them, otherwise we can't report service problems resolved.
+
+0.02    2011-10-18
+        Don't alarm on initial check attempts - e.g. check 1/4, don't alarm
+        until 4/4.  Should avoid alarming for brief problems.
+
+0.01    2011-10-15
+        First version, released on an unsuspecting world.
+

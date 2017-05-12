@@ -1,0 +1,29 @@
+---
+abstract: 'Access JIRA via IRC!'
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-BasicBot-Pluggable-Module-JIRA
+requires:
+  Bot::BasicBot::Pluggable::Module: 0.87
+  DateTime: 0.60
+  DateTime::Format::MySQL: 0.04
+  JIRA::Client: 0.24
+  Lingua::StopWords::EN: 0.08
+  Moose: 1.17
+  MooseX::Traits: 0.11
+  POE: 1.293
+  Text::Xslate: 0.2012
+  Try::Tiny: 0.06
+version: 0.03

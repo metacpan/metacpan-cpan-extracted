@@ -1,0 +1,14 @@
+Changes
+lib/Bundle/WWW/Scraper/ISBN/Drivers.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/01basic.t
+t/91pod.t
+t/92podcover.t
+t/94metatest.t
+t/95changedate.t
+t/96metatest.t

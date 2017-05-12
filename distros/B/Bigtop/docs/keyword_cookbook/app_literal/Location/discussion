@@ -1,0 +1,26 @@
+=head1 USE
+
+C<Location> literals dump output into the app's root location in
+C<docs/httpd.conf> files, which are used for mod_perl deployment.
+There is an analogous literal at the controller level.
+
+While you can put anything in a Location literal, PerlSetVars are
+best handled in other ways*.  This literal is really for things like
+
+    require valid-user
+
+*Either allow the HttpdConf Gantry backend to create PerlSetVars based on
+config block parameter/value pairs, or (better) use Gantry::Conf.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Look for C<require valid-user> in docs/httpd.conf.  Also note the use
+of the PerlTop literal to add a use statement for C<Your::Authen::Handler>
+to the Perl block.
+
+See how the example so cleverly controls indentation so readers never
+have to know the output was generated?

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Business-PhoneBill-Allopass
+version:             1.09
+abstract:            A class for micro-payment system from Allopass
+license:             GPL
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    HTTP::Request::Common:         1
+    LWP::UserAgent:                1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Bernard Nauwelaerts <bpn#it-development%be>

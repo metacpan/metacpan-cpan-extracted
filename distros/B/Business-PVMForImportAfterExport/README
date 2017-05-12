@@ -1,0 +1,33 @@
+NAME
+    PVMForImportAfterExport - a module for Postversandmanager in Austria
+
+SYNOPSIS
+      use warnings;
+      use strict;
+      use PVMForImportAfterExport qw( PvmDateiErstellen AdresslisteDazu );
+
+      my $dateiEin      = "Datei.txt";       # Eingabedatei
+      my $dateiPvm      = "DateiPVM.csv";    # Datei für den Import in den Postversandmanager
+      my $aufbau        = "D\t";             # Aufbau der Eingabedatei F = fixe Satzlänge, D = delimited, \t oder ; oder ... = Trennzeichen
+      my $idStelle      = 3;                 # Stelle/Feld der eindeutigen ID
+      my $idLaenge      = 0;                 # Länge der eindeutigen ID (nur bei fixer Satzlänge auszufüllen, ansonsten 0)
+      my $lkzStelle     = 1;                 # Stelle/Feld des LKZ
+      my $lkzLaenge     = 0;                 # Länge des LKZ (nur bei fixer Satzlänge auszufüllen, ansonsten 0)
+      my $plzStelle     = 2;                 # Stelle/Feld der PLZ
+      my $plzLaenge     = 0;                 # Länge der PLZ (nur bei fixer Satzlänge auszufüllen, ansonsten 0)
+      my $buendelung    = "J";               # J = mit Bündelung, N = keine Bündelung
+      my $dateiAdrListe = "Adressliste.csv"; # Name der Adressliste die vom Postversandmanager kommt
+      my $dateiAus      = "Datei.fertig";    # Ausgabedatei
+
+      # forwards Import
+      PvmDateiErstellen($dateiEin, $dateiPvm, $aufbau, $idStelle, $idLaenge, $lkzStelle, $lkzLaenge, $plzStelle, $plzLaenge, $buendelung);
+      # ... Postversandmanager works
+      # after Export
+      AdresslisteDazu($dateiAdrListe, $dateiEin, $dateiAus, $idStelle, $idLaenge, $aufbau);
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

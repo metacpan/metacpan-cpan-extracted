@@ -1,0 +1,9 @@
+# DISCLAIMER HERE...
+# DISCLAIMER THERE...
+
+#desc	16S copy number	something else
+Streptococcus	1	0.523
+#Goatpox virus	4	0.461
+Goatpox virus	3	0.461
+Lumpy skin disease virus	0.1	0.0012
+

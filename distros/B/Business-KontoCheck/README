@@ -1,0 +1,61 @@
+vim:tw=80:ft=text:ai
+
+Business::KontoCheck version 5.7
+================================
+
+This module checks the validity of German and Austrian Bank Account Numbers.
+All currently defined test methods by Deutsche Bundesbank (currently: 00 to
+E0, February 2013) are implemented.
+
+The Österreichische Bundesbank uses a quite different approach. The basic
+tests are more generic; the concrete tests are described by the hash file,
+which is sold by SIX Card Solutions Austria GmbH, Wien. Specifications may be
+downloaded from http://www.six-card-solutions.at/downloads.asp
+
+The original library is a C library; the Perl port was build using the h2xs
+tool.
+
+If you want support only for german or only for austrian Bank Account Numbers,
+edit line 15 of Makefile.PL. To use only the german module, use
+-DINCLUDE_KONTO_CHECK_AT=0, to use only the austrian module, use
+-DINCLUDE_KONTO_CHECK_DE=0.
+
+A longer description and the history file are included as 00liesmich.txt and
+0_history.txt (both in german). The C library is available from
+http://www.informatik.hs-mannheim.de/konto_check
+
+
+DOCUMENTATION
+
+The C source code contains the description of each check method. A synopsis and
+short description of (most) export functions is included in the file
+lib/Business/KontoCheck.pm; this is can be read after installation using the
+command "perldoc Businesss::KontoCheck".
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+(you need to be root for the last step)
+
+
+DEPENDENCIES
+
+This module requires a C compiler and the zlib to build the library.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2015 by Michael Plugge
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.8 or, at your option,
+any later version of Perl 5 you may have available (Perl and glue part).
+
+The C library is covered by the GNU Lesser General Public License.

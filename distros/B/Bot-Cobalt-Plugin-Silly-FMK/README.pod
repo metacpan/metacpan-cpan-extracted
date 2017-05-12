@@ -1,0 +1,45 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bot::Cobalt::Plugin::Silly::FMK - Bot::Cobalt plugin for asking who the bot would F, M, or K
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+Because the "game" that this plugin is based on contains a somewhat offensive
+word, you can change the word the bot uses to refer to it.
+
+   ## In plugins.conf
+   FMK:
+      Module: Bot::Cobalt::Plugin::Silly::FMK
+      Opts:
+         censor: hug
+
+=head1 DESCRIPTION
+
+A L<Bot::Cobalt> plugin.
+
+Play the game of F-Marry-Kill with the bot.  Essentially you just give it
+three names in a comma separated list, and it randomizes them.  A very stupid,
+trivial plugin, that people seem to enjoy nonetheless.
+
+   #mychannel> !fmk Scott, Ann, Barry
+   < mybot> Hug: [Ann] - Marry: [Barry] - Kill: [Scott]
+
+=head1 AUTHOR
+
+Scott Miller <scott.j.miller@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Scott Miller.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,10 @@
+--- #YAML:1.0
+name: Business-GestPayCrypt
+version: 0.41
+author:
+  - Marco Gazerro <gazerro@open2b.com>
+abstract: |-
+  Perl interface to the italian online payment system GestPay
+license: perl
+provides: {}
+generated_by: Module::Build version 0.24

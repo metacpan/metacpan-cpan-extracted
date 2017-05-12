@@ -1,0 +1,7 @@
+Revision history for Bash-Completion-Plugins-App-Cmd
+
+0.02 December 13 2015
+     - Fix to work with later versions of App::Cmd (thanks, Ken Crowell!)
+
+0.01 September 02 2012
+     - Initial release.  Option switches are not yet supported.

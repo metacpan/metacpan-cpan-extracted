@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Business/Tax/VAT/Validation.pm
+README
+COPYING
+t/00_use.t
+t/01_local_check.t
+t/02_local_check_nok.t
+xt/03_distant_check.t
+t/pod.t
+t/pod-coverage.t
+examples/vat_cli.pl
+examples/vat.cgi
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,100 @@
+bioperl-network Installation
+
+1. Requirements
+2. Installing bioperl-network (Unix or Cygwin)
+3. Installing bioperl-network (Windows and ActiveState Perl)
+
+
+1. Requirements 
+
+   Perl 5.6.1 is required, but 5.8 or greater is recommended.
+
+	The bioperl-network package depends on the core BioPerl package. See 
+	http://www.bioperl.org/wiki/Getting_BioPerl or the BioPerl INSTALL file
+   for instructions for downloading and installing BioPerl. You should
+   install at least the corresponding version of Bioperl: since this
+   is bioperl-network 1.6, bioperl 1.6 or greater is recommended.
+	
+   bioperl-network also depends on Perl's Graph package. See CPAN at 
+   www.perl.org for instructions on downloading and installing Graph,
+   use Graph version .86 or greater.
+
+   Reading PSI XML files using bioperl-network requires the XML::Twig 
+   module. See CPAN at www.perl.org for instructions on downloading 
+   and installing XML::Twig.
+
+
+2. Installing bioperl-network (Unix, Mac OS X and Cygwin)
+
+   Installation instructions at the following address apply here:
+   http://www.bioperl.org/wiki/Installing_Bioperl_for_Unix
+   The following sections summarize the essential points from there.
+
+   Using CPAN:
+
+   To install using CPAN you will need a recent version (v1.8802 has
+   been tested) of it and your prefer_installer conf set to 'MB':
+    
+    >cpan
+    cpan>o conf prefer_installer MB
+    cpan>o conf commit
+    cpan>q
+    
+   Now find the name of the bioperl-network version you want:
+
+    >cpan
+    cpan>d /bioperl-network/
+    Database was generated on Mon, 20 Nov 2006 05:24:36 GMT
+    Distribution id = C/CJ/CJFIELDS/BioPerl-network-1.6.0.tar.gz
+  
+   Now install:
+
+    cpan>install C/CJ/CJFIELDS/BioPerl-network-1.6.0.tar.gz
+
+   If you've installed everything perfectly then you may pass all the tests
+   run in the './Build test' phase.
+   It's also possible that you may fail some tests. Possible explanations:
+   problems with local Perl installation, previously undetected bug in
+   Bioperl, flawed test script and so on. A few failed tests may not affect
+   your usage of bioperl-network.
+
+   If you decide that the failed tests will not affect how you intend to use
+   bioperl-network and you'd like to install anyway do:
+
+    cpan>force install C/CJ/CJFIELDS/BioPerl-network-1.6.0.tar.gz
+
+   This is what most experienced Bioperl users would do. However, if you're
+   concerned about a failed test and need assistance or advice then contact
+   bioperl-l@bioperl.org.
+    
+    
+	Manual installation:
+
+    >gunzip bioperl-network-<release-version>.tar.gz
+    >tar xvf bioperl-network-<release-version>.tar
+    >cd bioperl-network
+    
+   where <release-version> is the current release.
+    
+    >perl Build.PL
+    
+   You can run regression tests and install bioperl-network using the
+   following commands:
+    
+    >./Build test  
+    >./Build install
+
+   You may have to have root privileges in order to run './Build install' 
+   successfully on Unix. See the BioPerl INSTALL file for alternative approaches
+   if you don't have root or administrative privileges.
+
+
+3. Installing bioperl-network (Windows and ActiveState Perl)
+
+   The following page on the BioPerl website has up-to-date
+   instructions on how to install bioperl-network on Windows:
+
+    http://www.bioperl.org/wiki/Installing_Bioperl_on_Windows
+
+   The instructions are aimed at bioperl-core, but apply
+   equally to bioperl-network.

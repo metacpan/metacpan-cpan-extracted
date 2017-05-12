@@ -1,0 +1,6 @@
+sub gen (&) { shift }
+gen { 'bar' };
+*ken = \ & gen;
+ken();
+sub { shift } ->();
+

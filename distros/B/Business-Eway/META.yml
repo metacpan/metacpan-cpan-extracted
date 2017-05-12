@@ -1,0 +1,25 @@
+---
+name: Business-Eway
+version: 0.03
+author:
+  - 'eWAY Europe Ltd <support@eway.co.uk>'
+abstract: 'eWAY - eCommerce the SAFE and EASY way'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Crypt::SSLeay: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI::Escape: 0
+  XML::Simple: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Business::Eway:
+    file: lib/Business/Eway.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

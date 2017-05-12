@@ -1,0 +1,136 @@
+---
+name: BBCode-Parser
+version: 0.34
+author:
+  - 'Donald King <dlking@cpan.org>'
+abstract: Parses BBCode tags
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  HTML::Entities: 0
+  URI: 0
+  perl: 5.6.1
+provides:
+  BBCode::Body:
+    file: lib/BBCode/Body.pm
+    version: 0.34
+  BBCode::Parser:
+    file: lib/BBCode/Parser.pm
+    version: 0.34
+  BBCode::Tag:
+    file: lib/BBCode/Tag.pm
+    version: 0.34
+  BBCode::Tag::ABBR:
+    file: lib/BBCode/Tag/ABBR.pm
+    version: 0.34
+  BBCode::Tag::ACRONYM:
+    file: lib/BBCode/Tag/ACRONYM.pm
+    version: 0.34
+  BBCode::Tag::B:
+    file: lib/BBCode/Tag/B.pm
+    version: 0.34
+  BBCode::Tag::BR:
+    file: lib/BBCode/Tag/BR.pm
+    version: 0.34
+  BBCode::Tag::Block:
+    file: lib/BBCode/Tag/Block.pm
+    version: 0.34
+  BBCode::Tag::CODE:
+    file: lib/BBCode/Tag/CODE.pm
+    version: 0.34
+  BBCode::Tag::COLOR:
+    file: lib/BBCode/Tag/COLOR.pm
+    version: 0.34
+  BBCode::Tag::EMAIL:
+    file: lib/BBCode/Tag/EMAIL.pm
+    version: 0.34
+  BBCode::Tag::ENT:
+    file: lib/BBCode/Tag/ENT.pm
+    version: 0.34
+  BBCode::Tag::FONT:
+    file: lib/BBCode/Tag/FONT.pm
+    version: 0.34
+  BBCode::Tag::HIDDEN:
+    file: lib/BBCode/Tag/HIDDEN.pm
+    version: 0.34
+  BBCode::Tag::HR:
+    file: lib/BBCode/Tag/HR.pm
+    version: 0.34
+  BBCode::Tag::HTML:
+    file: lib/BBCode/Tag/HTML.pm
+    version: 0.34
+  BBCode::Tag::I:
+    file: lib/BBCode/Tag/I.pm
+    version: 0.34
+  BBCode::Tag::IMG:
+    file: lib/BBCode/Tag/IMG.pm
+    version: 0.34
+  BBCode::Tag::Inline:
+    file: lib/BBCode/Tag/Inline.pm
+    version: 0.34
+  BBCode::Tag::LI:
+    file: lib/BBCode/Tag/LI.pm
+    version: 0.34
+  BBCode::Tag::LIST:
+    file: lib/BBCode/Tag/LIST.pm
+    version: 0.34
+  BBCode::Tag::OL:
+    file: lib/BBCode/Tag/OL.pm
+    version: 0.34
+  BBCode::Tag::Q:
+    file: lib/BBCode/Tag/Q.pm
+    version: 0.34
+  BBCode::Tag::QUOTE:
+    file: lib/BBCode/Tag/QUOTE.pm
+    version: 0.34
+  BBCode::Tag::S:
+    file: lib/BBCode/Tag/S.pm
+    version: 0.34
+  BBCode::Tag::SIZE:
+    file: lib/BBCode/Tag/SIZE.pm
+    version: 0.34
+  BBCode::Tag::SUB:
+    file: lib/BBCode/Tag/SUB.pm
+    version: 0.34
+  BBCode::Tag::SUP:
+    file: lib/BBCode/Tag/SUP.pm
+    version: 0.34
+  BBCode::Tag::Simple:
+    file: lib/BBCode/Tag/Simple.pm
+    version: 0.34
+  BBCode::Tag::TEXT:
+    file: lib/BBCode/Tag/TEXT.pm
+    version: 0.34
+  BBCode::Tag::TT:
+    file: lib/BBCode/Tag/TT.pm
+    version: 0.34
+  BBCode::Tag::U:
+    file: lib/BBCode/Tag/U.pm
+    version: 0.34
+  BBCode::Tag::UL:
+    file: lib/BBCode/Tag/UL.pm
+    version: 0.34
+  BBCode::Tag::URL:
+    file: lib/BBCode/Tag/URL.pm
+    version: 0.34
+  BBCode::Tag::xEMAIL:
+    file: lib/BBCode/Tag/xEMAIL.pm
+    version: 0.34
+  BBCode::Tag::xIMG:
+    file: lib/BBCode/Tag/xIMG.pm
+    version: 0.34
+  BBCode::Tag::xURL:
+    file: lib/BBCode/Tag/xURL.pm
+    version: 0.34
+  BBCode::TagSet:
+    file: lib/BBCode/TagSet.pm
+    version: 0.34
+  BBCode::Util:
+    file: lib/BBCode/Util.pm
+    version: 0.34
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

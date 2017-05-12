@@ -1,0 +1,130 @@
+=head1 NAME
+
+Bio::Grep::Cookbook - Bio::Grep Cookbook
+
+=head1 DESCRIPTION
+
+This collection of recipes intends to provide you solutions for the most
+common problems and to make the development process easier. 
+
+=head1 RECIPES
+
+
+All recipes assume that the database is generated in the directory I<data>.
+The analyses of the search results are omitted, meaning you have to append
+something like
+
+  while ( my $res = $sbe->next_res ) {
+    ...
+  }
+
+to the recipes.
+
+
+=head2 Search for DNA motifs
+
+=over
+
+You want to search for DNA motifs.
+
+B<Solution A>:  (Assumes that the number of possible motifs is rather small and the database is
+large)
+
+  use Bio::Grep;
+  use Bio::SeqIO;
+ 
+  my $sbe = Bio::Grep->new('Vmatch');
+ 
+  my $out = Bio::SeqIO->new( -format => 'Fasta',
+                             -file   => '>motifs.fasta',
+                           );
+ 
+  # you have an array with DNA sequences
+  my @motifs = ( 'aaaaaa', 'gggggg' );
+  
+  for my $i (0 .. $#motifs ) {
+     my $seq = Bio::Seq->new(
+             -id => $i,
+             -seq => $motifs[$i],
+         );
+     $out->write_seq($seq);
+  }
+ 
+  $sbe->search({
+     datapath   => 'data',
+     database   => 'Test.fasta',
+     query_file => 'motifs.fasta',
+     complete   => 1,
+  });
+
+
+B<Solution B>: (Assumes that the number of possible motifs is large and the
+database is small)
+ 
+  use Bio::Grep;
+ 
+  my $sbe = Bio::Grep->new('RE');
+ 
+  my $motif = '[AC]{4}TAAAA[AGCT]GG';
+ 
+  $sbe->search({
+     datapath  => 'data',
+     database  => 'Test.fasta',
+     query      => $motif,
+  });
+
+Note that the search for exact matches is fast with Vmatch, so the enumeration
+of all possible motifs (Solution A) can often be the best method.
+
+=back
+
+=head1 FEEDBACK
+
+Have you solved your (not too exotic ;)) problem with L<Bio::Grep> and a
+solution is not yet listed here? Contribute it to this
+Cookbook!
+
+Please report any bugs, feature requests and recipes to
+C<bug-bio-grep@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+
+=head1 AUTHOR
+
+Markus Riester, E<lt>mriester@gmx.deE<gt>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (C) 2007-2008  by M. Riester. 
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

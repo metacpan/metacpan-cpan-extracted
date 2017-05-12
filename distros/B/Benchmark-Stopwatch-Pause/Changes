@@ -1,0 +1,12 @@
+Revision history for Benchmark-Stopwatch-Pause
+
+0.01    
+         an inital local build, mostly a hodgepodge of things.
+0.02  
+         18/06/07
+         a rebuild that is a true extension of Benchmark::Stopwatch.
+0.03
+         19/06/07
+         I screwed up and didnt put any reqs in Makefile.pl... so all the CPANTS tests fail. Sorry folks.
+        
+

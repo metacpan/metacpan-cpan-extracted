@@ -1,0 +1,24 @@
+Revision history for BERT
+
+0.06    Sun Jan 22 22:57:43 PHT 2012
+          - Requires perl v5.8
+          - Another attempt to fix float comparison in t/01-bert.t
+
+0.05    Sat Aug 13 12:20:55 PHT 2011
+          - Added more tests
+          - Fixed float comparison in t/01-bert.t
+
+0.04    Mon Aug  8 10:33:11 PHT 2011
+          - Fixed 64-bit decoding of int
+
+0.03    Wed Aug  3 16:19:19 PHT 2011
+          - Added CPAN meta data
+          - Updated README
+          - Added pod for BERT::Constants and BERT::Types
+
+0.02    Wed Aug  3 05:32:13 PHT 2011
+          - Bumped up version to replace the incorrect tar ball previously uploaded to CPAN.
+
+0.01    Wed Aug  3 04:50:27 PHT 2011
+          - First version, released on an unsuspecting world.
+

@@ -1,0 +1,43 @@
+Revision history for Perl extension Business::OnlinePayment::IPPay.
+
+0.09  Tue Jun 10 23:26:54 PDT 2014
+        - Set UDField3 per IPPay request
+        - Require password
+        - When IPPay returns a non-sensical response, don't include it in the
+          error message unless debug is on
+        - Correct introspection: info_compat, not info_version
+
+0.08  Fri Dec 14 12:54:14 PST 2012
+        - Pass ACH account type
+
+0.07  Sun Oct 28 23:24:21 PDT 2012
+        - add Reverse Authorization support, patch from dougforpres
+        - gateway URL change -- note this version will be the minimum required
+          once IPPay turns off the old URL
+
+0.06  Wed Jan 26 13:15:21 PST 2011
+        - fix january bug in tests
+
+0.05  Mon Jul 19 10:19:34 EDT 2010
+        - add introspection info used in Business::OnlinePayment 3.01+
+        - (0.05_02) add ECHECK_void_requires_account to introspection info
+        - add a quick routing_code validation for a better error message
+        - never send an empty country for shipping or billing address
+
+0.04  Tue Jul 22 12:19:54 2008 EDT
+	- force country and ship country to ISA-3166-alpha-3
+
+0.03  Sun Jul 10 21:00:58 2008 EDT
+	- require Business::OnlinePayment::HTTPS 0.09
+	- remove unnecessary requirements
+	- ensure transaction id and transaction are from the same server
+	- more debugging info
+
+0.02  Sun Jul  3 17:44:08 2008 PDT
+	- add live default server;
+	- send billing address as shipping address for card transactions
+          where no shipping address is provided
+
+0.01  Sun Jun 22 17:56:23 2008 EDT
+	- original version;
+

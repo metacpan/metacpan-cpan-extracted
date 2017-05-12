@@ -1,0 +1,26 @@
+---
+abstract: 'Music Chord Progression Analysis Module, with writing Guitar Tabs methods.'
+author:
+  - 'DUKKIE <dukkiedukkie@yahoo.co.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BokkaKumiai
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires: {}
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/dukkie/BokkaKumiai.git
+version: 0.01

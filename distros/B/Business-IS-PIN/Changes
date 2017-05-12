@@ -1,0 +1,39 @@
+Revision history for Perl extension Business::IS::PIN
+
+0.06 2010-03-12 21:21:08
+
+    - Fix RT#55252: "Persons born on the 30th/31st mistakenly
+      identified as companies" reported by Philip Newton.
+
+    - Move the module over to Dist::Zilla while I was at it
+
+0.05 Fri Dec 21 2007
+
+    - Stopped using Module::Install in favour of ExtUtils::MakeMaker
+
+    - Use split(//) not unpack('(A)*'). split is faster in 5.10 (yay me!)
+      and the unpack format doesn't work in 5.6p
+
+0.04 Wed Feb 21 2007
+
+    - Renamed to Business::IS::PIN, Business::**:: is the usual place
+      for these validation modules
+
+    - Minor changes to docs
+
+0.03 Thu Feb 1 2007
+
+    - Tyop in first POD section
+
+    - Compiles again!
+
+0.02 Tue Jan 30 2007
+
+    - Fixed typos in initial release (I did not, for one, invent a
+      time machine)
+
+    - A lot more POD
+
+0.01 Tue Jan 30 2007
+
+    - Initial release

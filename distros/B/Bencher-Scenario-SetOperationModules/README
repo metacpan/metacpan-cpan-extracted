@@ -1,0 +1,7 @@
+SEE ALSO
+
+    Benchmark::Featureset::SetOps
+
+    Excluded modules: Set::Bag (expects hashes instead of arrays),
+    Set::SortedArray (members are sorted).
+

@@ -1,0 +1,5 @@
+1.02:	HTML::HeadParser added to level 2 to make libwww test itself
+1.06:	Added XML tools and DBD tools.
+1.07:   Update to the new structure of dependencies.
+	CGI::Request is not present on CPAN.
+	Add many new modules to part 6, and new parts 7 and 8.

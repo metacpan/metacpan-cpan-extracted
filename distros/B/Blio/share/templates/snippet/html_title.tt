@@ -1,0 +1,1 @@
+[% blio.name %] /  [% IF node.parent %] [% node.parent.title %] / [% END %] [% node.title -%]

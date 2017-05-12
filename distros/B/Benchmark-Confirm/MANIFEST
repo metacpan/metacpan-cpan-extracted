@@ -1,0 +1,23 @@
+Build.PL
+LICENSE
+Changes
+lib/Benchmark/Confirm.pm
+Makefile.PL
+cpanfile
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/00_compile.t
+t/01_string.t
+t/02_code_ref.t
+t/03_hash_ref.t
+t/04_array_ref.t
+t/05_scalar_ref.t
+t/06_nothing.t
+t/07_atonce.t
+t/08_reset_confirm.t
+xt/01_perlcritic.t
+xt/02_pod-coverage.t
+xt/03_pod.t
+xt/04._notabs.t

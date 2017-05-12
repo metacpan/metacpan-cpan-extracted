@@ -1,0 +1,37 @@
+: include "header.tx";
+<div class="admin-list">
+<ul>
+: for $entries -> $entry {
+<li class="contrast">
+
+<div class="type">
+    <span title="type"><: $entry.type :></span>
+</div>
+
+<div class="id">
+    <a title="id" href="<: $prefix :>admin/entry/<: $entry.id :>"><: $entry.id :></a>
+</div>
+
+<div class="summary">
+    <a title="summary" href="<: $prefix :>admin/entry/<: $entry.id :>"><: $entry.summary :></a>
+</div>
+
+<div class="view">
+    <a href="<: $prefix :>entry/<: $entry.id :>">view</a>
+</div>
+
+<div class="edit">
+    <a href="<: $prefix :>admin/entry/<: $entry.id :>">edit</a>
+</div>
+
+<div class="delete">
+<a href="" name="<:$entry.id:>" class="delete-entry">delete</a>
+</form>
+
+</li>
+: }
+</ul>
+</div>
+
+: include "page.tx";
+: include "footer.tx";

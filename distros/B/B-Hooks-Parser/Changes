@@ -1,0 +1,73 @@
+Revision history for B-Hooks-Parser
+
+0.19    2017-04-04 19:35:08Z
+  - re-release 1.18 as stable (fixes compile issues on recent blead releases)
+
+0.18    2016-08-30 00:24:10Z (TRIAL RELEASE)
+  - avoid use of sub_inwhat (RT#116685; see also RT#102918 and perl RT#123865)
+
+0.17    2016-08-03 05:08:02Z
+  - add missing make dependency on stolen_chunk_of_toke.c (Father
+    Chrysostomos, RT#116679)
+
+0.16    2015-07-28 05:55:58Z
+  - no changes since trial release
+
+0.15    2015-07-22 16:17:48Z (TRIAL RELEASE)
+  - restore the prototype of hook_parser_setup() for the C interface (Vincent
+    Pit)
+  - restore B::Hooks::Parser::Install::Files, lost since version 0.13
+
+0.14    2015-07-22 02:16:31Z (TRIAL RELEASE)
+  - fix segfaults on clang by defining PERL_NO_GET_CONTEXT (thanks, Vincent
+    Pit!  closes github #1, #2, RT#94463)
+
+0.13    2015-06-06 20:54:32Z
+  - switch tooling off of Module::Install
+
+0.12    2013-05-11
+  - fix test that breaks in 5.17.4 (RT#80070, Father Chrysotomos)
+  - Require ExtUtils::Depends 0.302 for win32 support (RT#77311, Alexandr
+    Ciornii)
+
+0.11    2012-06-18 16:01:00Z
+  - Document get_lex_stuff and clear_lex_stuff.
+  - Document return type of C version of set_linestr.
+
+0.10    2012-02-06 13:10:00Z
+  - In the Perl API, don't be confused by NULs in the parser buffer.
+  - Fix off-by-one error in buffer length check for set_linestr.
+  - Jump through some hoops to avoid compiler warnings.
+  - Add MYMETA.{json,yml} to MANIFEST.SKIP and .gitignore.
+  - Note repository and bugtracker locations.
+
+0.09    2009-06-03 11:20:21Z
+  - Don't redefine various macros if they already exist.
+  - Add B::Hooks::Toke::skipspace function (Liu Kang-min).
+
+0.08    2008-12-12 15:36:57Z
+  - Add an inject function. This is a small convenience wrapper around
+    get_linestr, get_linestr_offset, substr and set_linestr to inject code at
+    the parsers current position.
+
+0.07    2008-11-06 00:12:47Z
+  - Make string eval line string growing work on < 5.10.0.
+
+0.06    2008-11-05 11:24:33Z
+  - Declare all public functions in the header file.
+
+0.05    2008-11-05 10:35:55Z
+  - Grow the line string for string evals ins setup().
+
+0.04    2008-11-04 20:59:31Z
+  - Fix bug in clear_lex_stuff, making it actually work.
+
+0.03    2008-11-04 01:49:33Z
+  - Bind various lexer functions. This is still experimental and not documented
+    yet.
+
+0.02    2008-10-22 19:18:14Z
+  - Don't segfault if PL_linestr needs relocation in set_linestr.
+
+0.01    2008-10-21 13:03:59Z
+  - Initial release.

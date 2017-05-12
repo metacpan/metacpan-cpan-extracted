@@ -1,0 +1,64 @@
+{
+   "abstract" : "Perl compiler",
+   "author" : [
+      "Malcolm Beattie (retired), Reini Urban <perl-compiler@googlegroups.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "B-C",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "B::Debug" : "1.16",
+            "B::Flags" : "0.15",
+            "IPC::Run" : "0",
+            "Opcodes" : "0.10"
+         },
+         "requires" : {
+            "B::Flags" : "0.15",
+            "ExtUtils::Embed" : "1.25",
+            "IPC::Run" : "0",
+            "Opcodes" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rurban/perl-compiler/issues"
+      },
+      "homepage" : "http://www.perl-compiler.org",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rurban/perl-compiler/"
+      }
+   },
+   "version" : "1.55",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

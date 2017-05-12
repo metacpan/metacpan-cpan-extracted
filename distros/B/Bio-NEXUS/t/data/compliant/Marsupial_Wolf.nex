@@ -1,0 +1,65 @@
+#NEXUS 
+
+
+BEGIN DATA;
+DIMENSIONS  NTAX=8 NCHAR=116;
+
+[!Data on cytochrome b from 
+
+Thomas, R.H., W. Schaffner, A.C. Wilson, and S. PŠŠbo.  1989.  DNA phylogeny of the extinct marsupial wolf.  Nature, 340: 465-467.
+
+See p. 22 of the MacClade book.]
+FORMAT DATATYPE=DNA  MISSING=? GAP=-  MATCHCHAR=. ;OPTIONS  MSTAXA=UNCERTAIN ;
+
+MATRIX
+[                       10        20        30        40        50        60        70        80        90        100       110    ]
+[                       .         .         .         .         .         .         .         .         .         .         .      ]
+
+Thylacinus     CTTTGGATCCTTACTAGGAATCTGCCTAGTCATTCAAATCTTAACAGGCTTATTTCTAGCAATACATTACACATCAGACACATCAACTGCCTTCTCCTCAGTAGCACATATCTGTC   [116]
+Sarcophilus    ...C..G..T...T.......A......A.T........TC.C..C..AC....C...........C.....C..T.......TC..C.....T.....C.....C..C..T....   [116]
+Dasyurus       .........YC..T.....G.A......A.T.........C.C......C....C...........C.....T.........CTT..C..T........C.....C..C..T..C.   [116]
+Echymipera     T.....C..A...............T.......C......C.C.....AC....C.....C...........G........CCT...A..T.....A..C..G..T..C..T..C.   [116]
+Trichosurus    ...C.....AC.......C......T..ACT..A......C.T...........CT.......G..C.....CG.T..T...G....A..T.....A........C..C.......   [116]
+Phalanger      .........AC..T....TT........ACA..C...............C.....T..........C.....TC.C...........A..T..T..A...A.C..C..C....C..   [116]
+Philander      T.....T..AC.T........A......A.T.........C.C......C.....T....T........T............CT...C..A..T..A........C........C.   [116]
+Bos            T..C..T...C.C..G............A..C.A......C.C......C....C...........C........C......A....A..A........T..TA.C........C.   [116]
+;
+END;
+
+
+BEGIN CODONS;
+CODONPOSSET * UNTITLED = 
+		N: 1 116, 
+		1: 2-113\3, 
+		2: 3-114\3, 
+		3: 4-115\3;
+CODESET * UNTITLED = mtDNA.mam: all ;
+END;
+
+BEGIN ASSUMPTIONS;
+	OPTIONS  DEFTYPE=unord PolyTcount=MINSTEPS ;
+END; 
+
+BEGIN TREES; 
+
+	TRANSLATE
+		1	Thylacinus,
+		2	Sarcophilus,
+		3	Dasyurus,
+		4	Echymipera,
+		5	Trichosurus,
+		6	Phalanger,
+		7	Philander,
+		8	Bos
+	;
+	TREE  * Fig._2_tree =  [&R] ((((1,(3,2)),((5,6),4)),7),8);
+
+END;
+
+
+
+BEGIN MACCLADE;
+Version 3.05;
+LastModified -1425155089;
+Singles 0000&/0;
+END;

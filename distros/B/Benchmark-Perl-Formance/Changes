@@ -1,0 +1,299 @@
+Revision history for Benchmark-Perl-Formance
+
+0.53      2016-04-23
+        - fix calling benchmarkanything reporting
+
+0.52      2016-04-22
+        - fix rxmicro bug [rurban]
+        - scale down RxMicro in 'fast' mode
+
+0.51      2016-03-31
+        - allow cygwin on AssertOS
+          (because cpantesters matrix was GREEN there)
+
+0.50      2016-03-30
+        - assert OS=Unix for the time being
+
+0.49      2015-10-01
+        - better error handling for executing plugins
+
+0.48      2015-09-25
+        - fix error catching in Shootout wrapper
+
+0.47      2015-09-24
+        - fix error reporting in some Shootout plugins
+
+0.46      2015-09-24
+        - no compile tests for benchmark plugins, as they
+          depend on optional CPAN deps
+
+0.45      2015-09-24
+        - --benchmarkanything-report now uses more lightweight
+          BenchmarkAnything::Reporter for sending results via HTTP
+        - no more checking if receiver exists before we run benchmark, as
+          it was not reliable anyway.
+        - instead we now have a more robust local result file writing in
+          case report sending fails
+
+0.44      2015-09-22
+        - new modes --benchmarkanything[-report]
+            --benchmarkanything
+              enables other options to do The Right Thing for storing
+              results in a BenchmarkAnything store (but does not send).
+            --benchmarkanything-report
+              additionally sends the results by using
+              BenchmarkAnything::Storage::Frontend::Lib which in turn
+              follows its configuration
+        - With those you should never think about storing your results,
+          for more info see http://benchmarkanything.org
+        - store perlformance env vars
+          env vars of ^perlformance_ become env_perlformance_...
+
+0.43      2015-09-03
+        - yet another accessor benchmark: Moo
+
+0.42      2015-09-03
+        - new benchmarks for several accessor modules
+
+0.41      2015-09-03
+        - new regex benchmarks (RxMicro.*)
+
+0.40      2015-04-20
+        - new option --outfile=FILE
+
+0.39      2015-04-19
+        - split outstyle into --outstyle=yaml and --outstyle=yamlish so we
+          can have real YAML and YAMLish suitable for TAP embedding
+        - only --outstyle=yamlish applies --indent and --tapdescription
+        - --outstyle now case-insensitive
+
+0.38      2015-04-17
+        - plugin:MatrixReal - new - pure perl matrix operations
+        - plugin:Prime - maintenance - install Math::Primality by default
+        - plugin:SpamAssassin - maintenance
+        - deps: JSON mandatory
+
+0.37      2015-04-17
+        - fix missing dependencies
+
+0.36      2015-04-17
+        - meta information overhaul (Sys::Info, Config, Config::Perl::V)
+        - metric names now always prefixed with "perlformance.perl5."
+        - plugin:FibOOSig - stress functions with signatures
+        - plugin:SpamAssassin - reworked, simplified, different runs
+        - new option --outstyle=json
+
+0.35      2015-04-06
+        - rework metainformation, mostly for Tapper augmentation
+
+0.34      2015-04-05
+        - adapt to bootstrap-perl changes
+        - carved out cpu speed stabilization code
+        - generate results following Tapper's BenchmarkAnythingData schema
+
+0.33      2012-09-19
+        - drop tests that require dependencies
+
+0.32      2012-09-18
+        - fix dependency cleanup, no more [AutoPrereqs]
+
+0.31      2012-09-07
+        - very few dependencies now,
+          not even Perl::Formance::Cargo anymore,
+          completely rely on Task::PerlFormance for that
+        - therefore now more usable for quick microbenchmarks
+        - capture more errors and handle gracefully
+        - avoid output flooding
+
+0.30      2012-08-17
+        - set $0 to plugin name
+          (sorry for the micro releases, I'm on vacation :-))
+
+0.29      2012-08-17
+        - FibMXDeclare: disabled in --plugins=ALL
+          (it is extremely too slow to make any sense)
+
+0.28      2012-08-16
+        - Dist::Zill'ified
+        - depend on newer Devel::Size
+        - remove legacy MooseTS code completely
+        - Plugin::DPath without Safe.pm
+        - rework P6STD plugin to work again
+        - polish debug/verbose output
+
+0.27      2012-05-24
+        - conditionally use Devel::Size only if available
+
+0.26      2012-01-26
+        - MooseTS: disabled in --plugins=ALL
+          This benchmark idea turned out to not work as
+          expected. Disable it for easier living.
+
+        - RegexpCommonTS: no more in with prove -Q (quiet) mode as under
+          circumstances with 5.9.x quirks that's not available. It makes
+          the benchmark slightly slower.
+
+0.25      2012-01-04
+        - fix SpamAssassin plugin (set used Bayes plugin explicitely)
+
+0.24      2011-11-22
+        - modify variation in exe names for codespeed: now only perl-5.15
+          in contrast to perl-5.15.5, but additionally name threads and
+          64bit-support.
+
+0.23      2011-08-13
+        - Codespeed support
+          it can generate additional data blocks in TAP that
+          already fit the structure needed by Codespeed
+          (http://github.com/tobami/codespeed)
+
+0.22      2010-08-04
+        - Big Rescale
+          - The --fastmode is now slower but actually returning useful
+            values for experimenting speed improvements or configurations.
+            This probably makes it the preferred mode for everyday users.
+          - The normal mode (targeted to compare real strong machines)
+            now takes less time on some crazy workloads that went mental
+            even for big machines.
+
+        - some more tests
+
+0.21      2010-07-30
+        - Maintenance release
+          - fixed missing PLUGIN_VERSION in output
+          - fix missing plugin titles
+          - document --plugins=ALL
+          - drop dependency to Test::Aggregate::Nested (orphaned experiment)
+
+        - introduced an "Incubator" plugin as an experimental,
+          non-official playing field
+
+0.20      2010-07-27
+        - default set of plugins now "mostly harmless", ie., which
+          should work with same dependencies as Perl::Formance itself:
+          - Fib FibOO, Mem, Prime, Rx, fasta, regexdna, binarytrees,
+            revcomp, nbody, spectralnorm
+          - additionaly a new --plugins=ALL option which runs all known
+            plugins.
+
+        - all plugins now have their own version numbers
+
+        - RxCmp plugin: new re::engine::RE2
+
+        - Mem plugin: now implemented something
+
+        - Threads plugin:
+          - less inner thread overhead
+          - divides Threads + ThreadsShared
+
+        - PerlCritic plugin: runs Perl::Critic on itself, using a bundled
+          snapshot or the installed CPAN version, both on the snapshot
+          code
+
+        - Bugfixes and maintenance
+          - forgotten tmpdir cleanups
+          - code cleanup for Perl::Critic
+          - try hiding bundled code from PAUSE indexer
+          - Perl 5.8'ify by using "our"
+          - dropped useless exports
+
+        - new option --version
+          - in combination with -v prints all plugin versions
+
+        - Stabilize OS run environment (mostly Linux)
+          - disk sync
+          - flush caches
+          - disable Core Performance Boost
+          - disable Adress Space Layout Randomization
+          - These features will need "root" to have an effect
+
+        - Now every plugin is forked before running.
+
+        - No more all plugin loading at once; as that used to influence
+          the runtime of plugins depending on what else was loaded.
+
+0.12      2010-07-13
+        - Adapt to changed DPath API v0.40
+
+0.11      2010-07-10
+        - Imroved --outstyle=summary output
+
+0.10      2010-07-09
+        - introduce output style option
+           --outstyle=summary
+           --outstyle=yaml
+          which now defaults to "summary" to ease interactive use.
+
+0.09      2010-07-07
+        - new benchmark to stress MooseX::Declare method calls
+
+        - provide Devel::Platform::Info with cmdline option -p
+
+        - allow generic defines vie -Dkey=value
+          - usually to configure plugins
+
+        - refactored use of env variables, now all set via cmdline
+          options:
+            --fastmode
+            --usethreads
+            -DThreads_threadcount=64
+
+        - now requires Perl 5.8
+
+0.08      2010-05-11
+        - new benchmark around running Perl6 STD.pm / gimme5 / viv
+
+        - new benchmark using DPath to stress lookup, traversing and
+          copying data structures
+
+        - scaled down too aggressive Shootdown benchmarks:
+          - knucleotide
+          - binarytrees
+          - nbody
+
+0.07      2010-04-16
+        - Bummer! ::Cargo is required.
+
+0.06      2010-04-14
+        - Bummer! "More robustness" in 0.05 must have sounded like an
+          euphemism for "now crashing reliably". Fix tests by using the
+          Data::YAML::Reader which is the sister of the YAML generating
+          module Data::YAML::Writer. Other YAML modules occasionally break.
+
+0.05      2010-04-12
+        - search executables like sa-learn or prove only besides $^X
+
+        - more yaml robustness tries as they all crash in a different
+          way on strange platforms; do some some eval-style try/catch
+          en passant...
+
+0.04      2010-04-12
+        - sub-plugins (like Shootout/*.pm) now get same place in result
+          hash regardless of beeing started as part of bundle, i.e via
+          --plugins=Shootout or directly via --plugins=Shootout::foo. This
+          makes evaluation easier.
+
+        - most dependencies now only "recommends" but take care cou
+          install them anyway, eg. via PERL_AUTOINSTALL=--defaultdeps
+
+        - output overall runtime
+
+        - distro maintenance: meta info, test cleanup, verbose debug
+          printing
+
+0.03      2010-04-03
+        - doc fixes
+
+        - add re::engine::Plan9 to benchmark of regex engines
+
+0.02      2010-04-01
+        - YAML improvements for easier embedding into TAP
+          - verbose text now looks like TAP # diagnostics
+          - new commandline --tapdescription="some description" to generate
+            a leading "ok some description" line before the YAML
+
+        - took out some benchmarks from default plugin list that
+          occasionally segfaulted
+
+0.01      2008-08-12
+        - Initial version

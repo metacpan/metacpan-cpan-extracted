@@ -1,0 +1,137 @@
+Biblio::ILL::ISO
+================
+
+Biblio::ILL::ISO is a module for handling ISO-protocol Interlibrary 
+Loan messages.
+
+According to the ISO standard maintained by the National Library of
+Canada (http://www.nlc-bnc.ca/)
+there are 20 message types:
+
+   ILL-Request               Forward-Notification
+   Shipped                   ILL-Answer
+   Conditional-Reply         Cancel
+   Cancel-Reply              Received
+   Recall                    Returned
+   Checked-In                Overdue
+   Renew                     Renew-Answer
+   Lost                      Damaged
+   Message                   Status-Query
+   Status-Or-Error-Report    Expired
+
+Each of these message types is built up from a collection of basic
+types (such as Transaction-Id, Service-Date-Time, Client-Id, etc).
+There are about a hundred basic types.
+
+In the Biblio::ILL::ISO module, each basic type is implemented as
+an object derived from a common base, Biblio::ILL::ISO::ILLASNtype.
+(the "special" types, ENUMERATED and SEQUENCE_OF, are also derived
+from ILLASNtype, and have certain basic types derived from them in
+turn).
+
+All of the basic type objects are collected into one message-type
+meta-object, Biblio::ILL::ISO::ISO, from which the various message-
+type objects are derived.  Biblio::ILL::ISO::ISO.pm is best thought
+of as a "pure virtual" class - it's just a base to derive the "real"
+message-type classes.
+
++---------------------------------------+
+| The 20 message-types                  |
++---------------------------------------+
+| Biblio::ILL:ISO::ISO.pm               |
++---------------------------------------+
+| The hundred or so basic-types         |
++-------------+--------------+----------+
+|          | ENUMERATED  | SEQUENCE_OF  |
+|          +-------------+--------------|
+| Biblio::ILL::ISO::ILLASNtype.pm       |
++---------------------------------------+
+
+To get a feel for how all this works, take a look at the scripts
+in the pl/ directory (especially pl/ISO-msg-t-dumper.pm, which creates
+the test cases for messages, and pl/ISO-t-dumper.pm, which creates
+the test cases for basic types (if you want to dig that deeply)).
+
+Messages are encoded to / decoded from BER-encoded files.
+
+For encoding of messages, the module uses Convert::ASN1, which expects
+a hash containing the data.  The objects implement an as_asn() method
+which returns this hash (and is invoked in the message-type object's
+encode() method).
+
+Likewise, for decoding of messages, the module uses Convert::ASN1,
+which returns a hash of the data.  The objects implement a from_asn()
+method which builds the message-type object from this hash (and is
+invoked in the message-type object's decode() method).
+
+Fortunately, you shouldn't have to worry about all that.
+
+Some "special" objects
+----------------------
+asn.pm                The ASN.1 definition from the ILL ISO 
+		      Maintenance Agency (http://www.nlc-bnc.ca/).
+		      The ASN.1 definition has been tweaked so that
+		      Convert::ASN1 can understand it.
+
+ENUMERATED.pm         A base object for building enumerated types 
+		      (there are a lot of them - grep for ENUMERATED
+		      in the lib/Biblio/ILL/ISO directory).
+
+SEQUENCE_OF.pm	      A base object for building lists of other types
+		      (there are a few of them).
+
+ILLASNtype.pm	      The basic-types base object.
+
+ISO.pm		      The message-types base object.
+
+ILL_ASN_type_list.pm  A convenience.  Includes all of the basic-types
+		      (to avoid having to retype it a hundred times!)
+
+Some examples
+-------------
+In the pl/ directory, see ISOtypetest.pm, ISO-t-dumper.pm, and
+ISO-msg-t-dumper.pm.
+
+In the pl/messages directory, there are a read and a write script for
+each of the message types.
+
+
+Some caveats
+------------
+Currently, ASN.1 extension handling in Biblio::ILL::ISO doesn't work,
+pending further understanding on my part ;-)  This is a big issue - all
+message-types can make use of ASN.1 extensions - but it's not a 
+show-stopper. According to the ASN.1 definition, the extensions are
+optional.... Unfortunately, I suspect that they are common.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+There have been some issues with the test cases.  To rebuild the
+test cases, run the following two scripts from the Biblio::ILL::ISO
+directory (the new test cases end up in the t/ directory):
+
+   pl/ISO-t-dumper.pm
+   pl/ISO-msg-t-dumper.pm
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Convert::ASN1 (BER encoding/decoding)
+  Data::Dumper  (generating the basic types' test cases)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 David Christensen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

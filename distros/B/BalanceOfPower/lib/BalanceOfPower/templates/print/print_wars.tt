@@ -1,0 +1,15 @@
+[% USE ANSIColor 'color' %]
+[% "WARS" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% FOREACH w IN wars %]
+[% "### WAR $w.name" | color 'yellow' %]
+[% FOREACH sw IN w.conflicts %][% FILTER collapse %][% IF sw.node1_faction == 0 %]
+[% "[$sw.army1] $sw.node1" | color 'bold' 'white' %] --> [% sw.node2 %] [[% sw.army2 %]]
+[% ELSE %]
+[[% sw.army1 %]] [% sw.node1 %] --> [% "$sw.node2 [$sw.army2]" | color 'bold' 'white' %][% END %][% END %]
+[% END %][% END %]
+
+[% FOREACH cw IN civil_wars %][% cw %] is fighting civil war
+[% END %]
+
+

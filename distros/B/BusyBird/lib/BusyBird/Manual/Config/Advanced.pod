@@ -1,0 +1,151 @@
+=pod
+
+=head1 NAME
+
+BusyBird::Manual::Config::Advanced - advanced topics about configuring BusyBird
+
+=head1 DESCRIPTION
+
+=head2 Use plackup to Start BusyBird
+
+L<BusyBird> configuration file C<~/.busybird/config.psgi> is just a L<PSGI> application script,
+so you can directly use L<plackup> command to start L<BusyBird>.
+
+    $ plackup -s Twiggy ~/.busybird/config.psgi
+
+L<BusyBird> needs a L<PSGI> server that supports the non-blocking "delayed response" feature.
+We recommend to use L<Twiggy>.
+
+In fact, L<busybird> command is a simple front-end for L<Plack::Runner>.
+L<plackup> command accepts more options than L<busybird> command.
+
+=head2 Plack Middlewares
+
+Because C<~/.busybird/config.psgi> is just a L<PSGI> application script,
+you can use any L<Plack> middlewares as you like.
+
+To use L<Plack::Builder> with L<BusyBird>,
+enclose the C<end> statement at the bottom with C<builder> block.
+
+    use BusyBird;
+    use Plack::Builder;
+    
+    Plack::Builder::builder {
+        Plack::Builder::enable "AccessLog", format => '%h %l %u %t "%r" %>s %b %{X-Runtime}o';
+        Plack::Builder::enable "Runtime";
+        end;
+    };
+
+C<end> statement returns the L<PSGI> application of L<BusyBird>.
+
+=head2 Multiple BusyBird Instances
+
+You can set up multiple L<BusyBird> instances in a single L<PSGI> application.
+To do that, you have to use L<BusyBird::Main> objects directly,
+because C<busybird>, C<timeline> and C<end> functions from L<BusyBird> module
+operate only on the singleton instance.
+
+Here is an example of the complete C<~/.busybird/config.psgi> file.
+
+    use strict;
+    use warnings;
+    use utf8;
+    use BusyBird::Main;
+    use BusyBird::Main::PSGI qw(create_psgi_app);
+    use Plack::Builder;
+    
+    my @busybird = (
+        BusyBird::Main->new,
+        BusyBird::Main->new,
+    );
+    
+    $busybird[0]->set_config(
+        time_zone => "+0900"
+    );
+    $busybird[0]->timeline("home");
+    
+    $busybird[1]->set_config(
+        time_zone => "UTC"
+    );
+    $busybird[1]->timeline("another_home");
+    
+    builder {
+        enable "AccessLog";
+        mount "/busybird0" => create_psgi_app($busybird[0]);
+        mount "/busybird1" => create_psgi_app($busybird[1]);
+    };
+
+See L<BusyBird>, L<BusyBird::Main> and L<BusyBird::Main::PSGI> for detail.
+
+=head2 Customize Logging
+
+Sometimes L<BusyBird> components write log messages when it's necessary.
+
+By default the log messages are printed to STDERR, but you can customize this behavior
+by setting C<$BusyBird::Log::Logger> variable in C<~/.busybird/config.psgi>.
+
+    use BusyBird::Log;
+    use Log::Dispatch;
+    
+    my $log = Log::Dispatch->new(
+        outputs => [
+            [
+                'Syslog',
+                min_level => 'info',
+                ident     => 'BusyBird'
+            ]
+        ]
+    );
+    $BusyBird::Log::Logger = sub {
+        my ($level, $msg) = @_;
+        $log->log(level => $level, message => $msg);
+    };
+
+See L<BusyBird::Log> for detail.
+
+
+=head2 Customize User Interface Completely
+
+C<~/.busybird/config.psgi> let you configure various aspects of L<BusyBird>,
+but you might want to customize its user interface completely.
+
+To do that, set C<sharedir_path> global config parameter.
+C<sharedir_path> is the path to the directory containing
+static files for L<BusyBird>, including HTML templates, JavaScript files and themes.
+
+B<< WARNING: Customizing "share" directory is only for testing purposes. The directory's content may be changed drastically in future releases. >>
+
+To customize user interface, follow the steps below.
+
+=over
+
+=item 1.
+
+Copy the original "share" directory.
+
+The location of the "share" directory depends on how you installed L<BusyBird>.
+The example below assumes that you installed it under C</usr/local>.
+
+    $ cp -a /usr/local/share/perl/5.14.2/auto/share/dist/BusyBird ~/my_sharedir
+
+=item 2.
+
+Change the content of C<~/my_sharedir> as you like.
+
+=item 3.
+
+Set C<sharedir_path> parameter in C<~/.busybird/config.psgi>.
+
+    busybird->set_config(
+        sharedir_path => "$ENV{HOME}/my_sharedir"
+    );
+
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+

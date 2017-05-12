@@ -1,0 +1,146 @@
+Bio::Graphics - Generate GD images of Bio::Seq objects
+
+
+SYNOPSIS
+
+This is a simple GD-based renderer (diagram drawer) for DNA and
+protein sequences.  It is used from Perl like this:
+
+  use Bio::Graphics;
+  use Bio::DB::BioFetch;  # or some other Bio::SeqI generator
+  # get a Bio::SeqI object somehow
+  my $bf     = Bio::DB::BioFetch->new;
+  my $cosmid = $bf->get_Seq_by_id('CEF58D5');
+
+  my @features = $cosmid->all_SeqFeatures;
+  my @CDS      = grep {$_->primary_tag eq 'CDS'}  @features;
+  my @gene     = grep {$_->primary_tag eq 'gene'} @features;
+  my @tRNAs    = grep {$_->primary_tag eq 'tRNA'} @features;
+  # let the drawing begin...
+  my $panel = Bio::Graphics::Panel->new(
+				      -segment => $cosmid,
+				      -width  => 800
+				     );
+
+  $panel->add_track(arrow => $cosmid,
+	  	   -bump => 0,
+		   -double=>1,
+		   -tick => 2);
+
+  $panel->add_track(transcript  => \@gene,
+		   -bgcolor    =>  'blue',
+		   -fgcolor    =>  'black',
+		   -key        => 'Genes',
+		   -bump       =>  +1,
+		   -height     =>  10,
+		   -label      => 1,
+		   -description=> 1
+		 ) ;
+
+  $panel->add_track(transcript2  => \@CDS,
+		    -bgcolor    =>  'cyan',
+		    -fgcolor    =>  'black',
+		    -key        => 'CDS',
+		    -bump       =>  +1,
+		    -height     =>  10,
+		    -label      => 1,
+		    -description=> 1,
+		 );
+
+  $panel->add_track(generic    => \@tRNAs,
+		    -bgcolor   =>  'red',
+		    -fgcolor   =>  'black',
+		    -key       => 'tRNAs',
+		    -bump      =>  +1,
+		    -height    =>  8,
+		    -label      => 1,
+		   );
+
+  my $gd = $panel->gd;
+  print $gd->can('png') ? $gd->png : $gd->gif;
+
+DESCRIPTION
+
+The Bio::Graphics::Panel class provides drawing and formatting
+services for any object that implements the Bio::SeqFeatureI
+interface, including Ace::Sequence::Feature, Das::Segment::Feature and
+Bio::DB::Graphics objects.  It can be used to draw sequence
+annotations, physical (contig) maps, protein domains, or any other
+type of map in which a set of discrete ranges need to be laid out on
+the number line.
+
+The module supports a drawing style in which each type of feature
+occupies a discrete "track" that spans the width of the display.  Each
+track will have its own distinctive "glyph", a configurable graphical
+representation of the feature.
+
+The module also supports a more flexible style in which several
+different feature types and their associated glyphs can occupy the
+same track.  The choice of glyph is under run-time control.
+
+Semantic zooming (for instance, changing the type of glyph depending
+on the density of features) is supported by a callback system for
+configuration variables.  The module has built-in support for Bio::Das
+stylesheets, and stylesheet-driven configuration can be intermixed
+with semantic zooming, if desired.
+
+You can add a key to the generated image using either of two key
+styles.  One style places the key captions at the top of each track.
+The other style generates a graphical key at the bottom of the image.
+
+Note that this modules depends on Bio::Perl, GD and the
+Text::Parsewords module.
+
+A good tutorial on this module can be found at
+http://www.bioperl.org/wiki/HOWTO:Graphics.
+
+BUILDING AND INSTALLING
+
+From the directory in which this README file is located:
+
+  % perl ./Build.PL
+  % ./Build test
+  % ./Build install
+
+The last step may need to be run as root.
+
+You can test whether the module is working by running the testit.pl
+script located in the eg subdirectory.  It produces a PNG file, so you
+should pipe the output to an image displayer, such as xv:
+
+  eg/testit.pl | xv -
+
+THE FEATURE_DRAW.PL SCRIPT
+
+This module contains a simple script named "feature_draw.pl" that
+takes a file of annotations and generates an image.  When first built,
+the script lives in the "scripts" subdirectory.  After installation,
+the script will be moved into your system-wide scripts directory
+(usually /usr/bin or something similar).
+
+There is a sample features file in the "eg" subdirectory.  After
+building, but before installation, you can run the following command
+from the directory in which this README file is located:
+
+  %  scripts/feature_draw.pl eg/feature_data.txt | display -
+
+This is piping the output directly to the "display" program, part of
+the ImageMagick package.  Replace with your favorite PNG-capable
+display program.
+
+After installation, feature_draw.pl will be available on your command
+path.  Run "man feature_draw.pl" to see the manual page, or use the -h
+option to get a quick summary of usage.
+
+THE GENERIC GENOME BROWSER
+
+The gbrowse script, part of the Generic Genome Browser package, has
+been moved into its own package.  It creates a high-performance
+web-based genome browser based on the Bio::Graphics package.  You can
+get it by anonymous CVS to SourceForge:
+
+ cvs -d:pserver:anonymous@cvs.gmod.sourceforge.net:/cvsroot/gmod \
+	co Generic-Genome-Browser
+
+Lincoln Stein <lincoln.stein@oicr.on.ca>
+12 December 2008

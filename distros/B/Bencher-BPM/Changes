@@ -1,0 +1,13 @@
+Revision history for Bencher-BPM
+
+0.002   2016-10-20 (PERLANCAR)
+
+        - Rename --time to --timethese which is clearer. Add --cmpthese for
+          completeness sake.
+
+        - Tweak some stuffs.
+
+
+0.001   2016-10-20 (PERLANCAR)
+
+        - First release.

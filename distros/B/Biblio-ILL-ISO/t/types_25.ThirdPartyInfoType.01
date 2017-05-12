@@ -1,0 +1,13 @@
+$VAR1 = bless( {
+                 'permission-to-partition' => 0,
+                 'permission-to-change-send-to-list' => 0,
+                 'preference' => bless( {
+                                          'ENUMERATED' => 2,
+                                          'ENUM_LIST' => {
+                                                           'unordered' => 2,
+                                                           'ordered' => 1
+                                                         }
+                                        }, 'Biblio::ILL::ISO::Preference' ),
+                 'permission-to-forward' => 0,
+                 'permission-to-chain' => 0
+               }, 'Biblio::ILL::ISO::ThirdPartyInfoType' );

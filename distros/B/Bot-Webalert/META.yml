@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Bot-Webalert
+version:             0.01
+abstract:            IRC bot watches Web sites and reports changes to IRC channels
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Bot::BasicBot:                 0.81
+    HTTP::Cookies:                 5
+    HTTP::Request::Common:         5
+    Log::Log4perl:                 1
+    POE:                           1.003
+    POE::Component::Client::HTTP:  0.85
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

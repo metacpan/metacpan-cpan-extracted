@@ -1,0 +1,7 @@
+Revision history for Bot-BasicBot-Pluggable-Module-PasteBin
+
+0.01 Mon May 17 10:40:00 GMT 2009
+        - Initial Release
+        - Check Automaticly the Pastebin.com page for pastes
+          from people from channel where bot is
+

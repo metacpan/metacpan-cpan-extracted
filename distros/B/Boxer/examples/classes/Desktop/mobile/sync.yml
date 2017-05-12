@@ -1,0 +1,14 @@
+#TODO: Stop listing evolution-data-server when DebianParl 1.0.5 is obsolete
+classes:
+  - Console.mobile.sync
+  - Desktop.media
+parameters:
+  doc:
+    desktop-mobile:
+      pkg:
+        - include SyncEvolution desktop tool
+  pkg:
+    - sync-ui
+    - evolution-data-server
+  pkg-auto:
+    - evolution-data-server

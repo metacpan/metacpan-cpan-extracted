@@ -1,0 +1,39 @@
+: if template_exists( $entry.type ~ '_entry_attachments.tx' ) {
+:   include $entry.type ~ '_entry_attachments.tx';
+: } else {
+<div class="attachments">
+
+: if $attachments_map[$entry.id] {
+<hr class="attachments" />
+: }
+
+<div class="preview">
+: for $attachments_map[$entry.id].keys().sort() -> $name {
+: if match($attachments_map[$entry.id][$name].mime_type, '^image/' ) {
+<a target="_blank" href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>">
+<img src="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>" title="<: $name :>" />
+</a>
+: } elsif $attachments_map[$entry.id][$name].mime_type == 'video/x-flv' || $attachments_map[$entry.id][$name].mime_type == 'video/x-flv' == 'application/x-shockwave-flash' {
+<object>
+<embed width="600" height="400" autostart="false" src="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>" title="<: $name :>" />
+</object>
+: } elsif match($attachments_map[$entry.id][$name].mime_type, '^video/' ) {
+<video controls="controls" src="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>" title="<: $name :>">
+<: $name :>
+</video>
+: } elsif match($attachments_map[$entry.id][$name].mime_type, '^audio/' ) {
+<audio controls="controls" src="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>" title="<: $name :>">
+<: $name :>
+</audio>
+: }
+
+: }
+</div>
+
+: include '_wedge.tx' { template => 'entry_attachments_start.tx' };
+: for $attachments_map[$entry.id].keys().sort() -> $name {
+:   include 'entry_attachment.tx' { name => $name };
+: }
+: include '_wedge.tx' { template => 'entry_attachments_end.tx' };
+</div>
+: }

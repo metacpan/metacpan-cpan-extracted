@@ -1,0 +1,82 @@
+2012-05-26  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, MANIFEST, t/00load.t, t/00test-pod.t,
+	t/10-test-basic.t: Add a couple of boiler-plate tests.
+
+2012-05-26  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/CodeLines.pm, t/10-test-basic.t: Strawberry perl doesn't
+	handle backtick. Skip test
+
+2012-04-02  r <rocky@gnu.org>
+
+	* lib/B/CodeLines.pm: Bump version
+
+2012-04-02  r <rocky@gnu.org>
+
+	* .gitignore, B/CodeLines.pm, MANIFEST, MANIFEST.SKIP, META.json,
+	META.yml, dolines.pl, dolines.sh: Get ready for release 1.0
+
+2012-04-02  r <rocky@gnu.org>
+
+	* README.pod: Correct a small typo in -exec example
+
+2012-04-02  r <rocky@gnu.org>
+
+	* : commit 706a85f9b6fad6e2e12196adb0f583e8cf6efa2f Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Sun Apr 1 06:48:25 2012 -0400
+
+2012-04-01  Rocky Bernstein <rocky@cpan.org>
+
+	* README.pod: Fill out example.
+
+2012-04-01  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, Build.PL, CHANGES, GNUmakefile, MANIFEST,
+	MANIFEST.SKIP, README.pod, examples/dolines.pl,
+	examples/dolines.sh, lib/B/CodeLines.pm, t/.gitignore,
+	t/10-test-basic.t: Module to list executable lines of a Perl
+	program.
+
+2012-03-18  r <rocky@gnu.org>
+
+	* B/CodeLines.pm, Lines.pm, dolines.pl, dolines.sh: Rename B::Lines
+	to B::CodeLines and move directories around.
+
+2012-03-17  r <rocky@gnu.org>
+
+	* .gitignore, Lines.pm, dolines.pl: dolines.pm: Remove "syntax OK"
+	line. Lines.pm: shorten more.
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Reduce bulk
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Reduce bulk more
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Reduce bulk more
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Undo last change
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Reduce bulk of Lines.pm
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm: Reduce bulk of Lines.pm
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Lines.pm, dolines.sh: Add shell front-end test
+
+2012-03-17  r <rocky@gnu.org>
+
+	* Starting point for lines module
+

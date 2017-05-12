@@ -1,0 +1,14 @@
+v0.8.5  2014-01-26
+    - Convert to Build.PL
+    - Add the LICENSE file (Kwalitee).
+
+v0.8.4  2013-12-23
+    - Made Makefile.PL non-executable.
+    - Add t/pod.t and t/00-load.t
+    - Fix compilation errors.
+
+v0.8.1  2003-06-5
+    - Removed Pod::Usage and made the files inside the archive non-executable
+
+v0.8.0  2003-06-2
+    - Bundle Created

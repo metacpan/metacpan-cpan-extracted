@@ -1,0 +1,15 @@
+Revision history for Perl extension Business::OnlinePayment::BankOfAmerica.
+
+1.02  Tue Nov 19 15:40:05 2002
+	- update for new incompatible BofA settlement return
+
+1.01  Tue Aug 13 18:00:25 2002
+	- update README
+	- declare dependancy on Business::OnlinePayment
+
+1.00  Tue Sep 25 20:28:51 2001
+	- upload to CPAN.
+
+0.01  Sun Sep 13 00:40:03 2001
+	- original version; created by ivan 1.0
+

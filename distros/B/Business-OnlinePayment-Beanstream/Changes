@@ -1,0 +1,14 @@
+Revision history for perl extension Business::OnlinePayment::Beanstream
+
+0.02  2008-11-24
+        - use Server to Server API
+        - comments about limited test mode
+        - use Business::OnlinePayment::HTTPS
+        - rename 'expiration' parameter consistent with other BOP modules
+        - use trnApproved to determine is-success
+        - add avs-code
+        - by Randall Whitman <www.whizman.com> on contract to
+          DonorWare LLC dba donor.com <cpan@donor.com>.
+
+0.01 -  Thu May 16 13:13:57 2002
+        - original version.

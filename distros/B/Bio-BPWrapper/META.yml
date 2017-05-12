@@ -1,0 +1,45 @@
+---
+abstract: 'wrappers of popular BioPerl classes (`Bio::SeqIO`, `Bio::Seq`, `Bio::AlignIO`, `Bio::SimpleAlign'
+author:
+  - 'Y. Hernandez'
+  - 'P. Pagan'
+  - 'G. Ramrattan'
+  - 'W.-G. Qiu'
+  - 'R. Bernstein'
+build_requires:
+  Test::More: '0.81'
+  rlib: '0.02'
+configure_requires:
+  Module::Build: '0.4211'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-BPWrapper
+provides:
+  Bio::BPWrapper:
+    file: lib/Bio/BPWrapper.pm
+    version: '1.04'
+  Bio::BPWrapper::AlnManipulations:
+    file: lib/Bio/BPWrapper/AlnManipulations.pm
+  Bio::BPWrapper::GetoptLong:
+    file: lib/Bio/BPWrapper/GetoptLong.pm
+    version: '2.39'
+  Bio::BPWrapper::GetoptLong::CallBack:
+    file: lib/Bio/BPWrapper/GetoptLong.pm
+  Bio::BPWrapper::GetoptLong::Parser:
+    file: lib/Bio/BPWrapper/GetoptLong.pm
+  Bio::BPWrapper::PopManipulations:
+    file: lib/Bio/BPWrapper/PopManipulations.pm
+  Bio::BPWrapper::SeqManipulations:
+    file: lib/Bio/BPWrapper/SeqManipulations.pm
+requires:
+  Bio::Root::Version: v1.6.924
+  perl: v5.10.0
+  rlib: '0.02'
+resources:
+  bugtracker: https://github.com/bioperl/bp-utils/issues
+  repository: https://github.com/bioperl/bp-utils
+version: '1.04'

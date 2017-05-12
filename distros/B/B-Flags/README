@@ -1,0 +1,58 @@
+NAME
+    B::Flags - Friendlier flags for B
+
+SYNOPSIS
+      use B::Flags;
+      # some ops
+      print B::main_root->flagspv;
+      print B::main_root->privatepv;
+      print $some_b_sv_object->flagspv;
+
+DESCRIPTION
+    Stringification of flags.
+
+    By default, "$foo->flags" when passed an object in the "B" class will
+    produce a relatively meaningless number, which one would need to grovel
+    through the Perl source code in order to do anything useful with. This
+    module adds "flagspv" to the SV and op classes and "privatepv" to the op
+    classes, which makes them easier to understand.
+
+METHODS
+    OP->flagspv
+        Returns stringification of the OP flags.
+
+        Adds now SIBLING to abstract the new LASTSIB/MORESIB flags since
+        5.21/5.22 and the old "op_sibling" pointer. Since 5.22 missing the
+        SIBLING flags indicates a PARENT at the "op_sibparent" pointer, with
+        -DPERL_OP_PARENT.
+
+    OP->privatepv
+        Returns stringification of the OP private flags.
+
+    SV->flagspv [type]
+        Returns stringification of the SV flags.
+
+        With the optional type only the flags for the given SvTYPE are used.
+        type 0 is for the SvFLAGS only. This way you can seperate between
+        sv->FLAGS and specialized AvFLAGS, GvFLAGS, CvFLAGS, ... in seperate
+        struct fields.
+
+        Note that only the names of bitmasked SV and OP flags are returned,
+        not pseudo flags, like TAINTED, which is stored as magic.
+
+AUTHOR
+    Simon Cozens, simon@cpan.org
+
+MAINTAINER
+    Abhijit Menon-Sen, ams@cpan.org
+
+    Reini Urban, rurban@cpan.org
+
+SEE ALSO
+    perl(1).
+
+LICENSE
+    AL & GPL.
+
+    Copyright 2001 Simon Cozens Copyright 2010,2013,2014,2015 Reini Urban
+

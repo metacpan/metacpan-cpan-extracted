@@ -1,0 +1,52 @@
+  * Only optionally (not by default) include tweaks.
+  * Include README on whether it is a Debian Blend or Debian Pure Blend.
+  * Isolate package auto-install flagging only relevant for upgrades.
+  * Fail (or optionally warn) if both installing and avoiding a package.
+  * Handle bugs as parameters, and extend data documentation.
+  * Resolve named suites (e.g. stretch) from relative (e.g. testing).
+  * Use warnings::warnif instead of carp (and croak?). Or Throwable?
+  * Use IPC::PrettyPipe
+
+Initial release:
+
+  * Reimplement commands and classes from current make-based boxer:
+    + bootstrap
+    + install
+    + Bootstrap::Multistrap
+    + Install::Device
+
+Later releases...
+
+  * Use Object::Remote
+    + Add subclass to use Rex::Inline
+    + Add subclass to use debootstrap/cdebootstrap/multistrap
+  * Limit coercion and type checks
+    <http://blogs.perl.org/users/joel_berger/2013/05/typetiny-rescues-moo.html#comment-1104703>
+  * Implement additional commands and classes to create a system:
+    + bless
+    + Bootstrap::Debootstrap
+    + Bootstrap::Live-build
+    + Bless::Extlinux
+  * Implement commands and classes to interact with an existing system:
+    + refresh
+    + detect
+    + distill
+  * Implement commands and classes to interact with config classes:
+    + list
+    + enable
+    + disable
+  * Implement commands and classes to echange config classes:
+    + push
+    + pull
+    + publish
+  * Implement trojan" functionality for install and bless classes, to
+    embed as trigger unfolding at first boot in target environment.
+  * Implement alternate CLI shim tools which mimic conventional tools,
+    to bring boxer flexibility to existing unmodified scripts.
+  * Implement web export and/or service usable with debian-installer for
+    static/live boxer-driven "Hands-off" <http://www.hands.com/d-i/>.
+  * Implement commands and classes to interact with bug trackers:
+    + triage
+  * Implement PXE target - i.e. DHCP+TFTP services serving preseed file.
+    + <https://wiki.fogproject.org/wiki/index.php?title=IPXE>.
+    + <https://wiki.fogproject.org/wiki/index.php?title=FOG_on_a_MAC>

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+use Carp;
+
+use 5.010;
+use Bio::SeqIO;
+use Bio::TreeIO;
+use List::MoreUtils qw/any/;
+
+my ( $treefile, $infile, $outfile ) = @ARGV;
+die "$treefile is no file" unless ( -f $treefile );
+die "$infile is no file"   unless ( -f $infile );
+die "$outfile is no file"  unless ( defined $outfile );
+
+my $trees = Bio::TreeIO->new(
+    -format => 'newick',
+    -file   => $treefile,
+);
+
+my $outseq = Bio::SeqIO->new(
+    -format => 'fasta',
+    -file   => ">$outfile",
+);
+
+while ( my $t = $trees->next_tree ) {
+    my @l = $t->get_leaf_nodes;
+
+    @l = grep {$_} @l;
+
+    my $inseq = Bio::SeqIO->new(
+        -format => 'fasta',
+        -file   => $infile,
+    );
+    while ( my $so = $inseq->next_seq ) {
+        $outseq->write_seq($so) if ( any { $so->display_id eq $_->id } @l );
+    }
+}

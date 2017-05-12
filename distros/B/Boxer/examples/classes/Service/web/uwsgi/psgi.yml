@@ -1,0 +1,9 @@
+classes:
+  - Service.web.uwsgi
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - install uWSGI plugin for Perl PSGI interface
+  pkg:
+    - uwsgi-plugin-psgi

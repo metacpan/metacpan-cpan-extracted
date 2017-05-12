@@ -1,0 +1,21 @@
+# a sample ~/.brackup.conf
+
+[TARGET:raidbackups]
+type = Filesystem              # this can be any Brackup::Target::<foo> subclass
+path = /raid/backup/brackup
+
+[SOURCE:proj]
+path = /raid/bradfitz/proj/
+chunk_size = 5m
+gpg_recipient = 5E1B3EC5
+
+[SOURCE:bradhome]
+chunk_size = 64MB
+path = /raid/bradfitz/
+ignore = ^\.thumbnails/
+ignore = ^\.kde/share/thumbnails/
+ignore = ^\.ee/minis/
+ignore = ^build/
+ignore = ^(gqview|nautilus)/thumbnails/
+
+

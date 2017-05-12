@@ -1,0 +1,5 @@
+tools to measure size of Perl OPs and [SAV]Vs
+
+The "execution order" option under Apache::Status can only be run once 
+unless you are using Perl 5.6.0+ or apply the patches/b_clearsym_60.pat 
+to older Perls.

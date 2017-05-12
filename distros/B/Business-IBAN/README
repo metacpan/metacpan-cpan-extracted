@@ -1,0 +1,84 @@
+Business::IBAN - Validate and generate IBANs
+
+  use Business::IBAN;
+  use Locale::Country;
+  my $cc = country2code('Germany');
+  my $iban = Business::IBAN->new();
+  my $ib = $iban->getIBAN(
+  {
+    ISO => $cc, # or "DE", etc.
+    BIC => 12345678, # Bank Identifier Code, meaning the BLZ
+                     # in Germany
+    AC => "1234567890",
+  });
+  # or
+  my $ib = $iban->getIBAN(
+  {
+    ISO => "DE",
+    BBAN => 123456781234567890,
+  });
+  if ($ib) {
+    print "IBAN is $ib\n";
+  }
+  else {
+    $iban->printError();
+    # or
+    my @errors = $iban->getError();
+    # print your own error messages (for description of error-
+    # codes see section ERROR-CODES
+  }
+  if ($iban->valid($ib)) {
+    print "$iban is valid\n";
+  }
+  else {
+    $iban->printError();
+  }
+
+With this module you can validate IBANs (International Bank
+Account Number) like "IBAN DE97123456781234567890".
+Note that this dos not (and cannot) assure that the bank
+account exists or that the bank account number for the
+bank itself is valid.
+You can also create an IBAN if you supply
+
+- your BBAN (Basic Bank Account Number),
+  (or for germany your BLZ and account
+  number are sufficient),
+
+- and your country code (ISO3166)
+
+It requires the module Locale::Country, which you can get
+from www.cpan.org. It's a standard module since perl-version
+5.7.2.
+
+EXPORT
+
+None by default. All methods are accessed over the object.
+
+ERROR-CODES
+
+You can print your own error-messages. The array you get from
+  my @errors = $iban->getError();
+are numbers which stand for the following errors:
+
+	0: No Country or Iso-Code
+	1: No BBAN (Bank-Number) or Bank Identifier and Accountnumber
+	2: Could not find country
+	3: IBAN must containt two-letter ISO-Code at the begining
+	4: IBAN must only contain numbers after the ISO-code,
+	5: IBAN is invalid
+
+CAVEATS
+
+Please note that this program is intended to validate IBANs and generate
+them for you if you have your BBAN. It's not for generating valid
+numbers for illegal purposes. The algorithm is simple and publicly
+available for everyone. You can find informations about the IBAN at
+
+http://www.ecbs.org
+
+http://www.iban.ch
+
+AUTHOR
+
+Tina Mueller. tinita at cpan.org

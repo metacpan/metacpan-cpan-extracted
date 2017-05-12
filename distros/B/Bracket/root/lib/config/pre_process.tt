@@ -1,0 +1,24 @@
+ [%- 
+
+   static_uri = c.uri_for('/static');
+
+   # Define javascript uri's we'd like to load
+   jquery_uri = '//ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js';
+   regional_bracket = static_uri _ '/javascript/bracket_picks.js';
+   final_4_bracket = static_uri _ '/javascript/final4_picks.js';
+   # Put the javascript uri's into the array to be added to <head>
+   javascripts  = [ jquery_uri regional_bracket ];   
+   
+   # Final four needs different javascript
+   IF final_4_javascript;
+   javascripts  = [ jquery_uri final_4_bracket ];
+   END;
+   
+   # Define CSS uri's to load
+   main_css = static_uri _ '/css/main.css';
+   reset_css = static_uri _ '/css/reset.css';
+   responsable_css = static_uri _ '/css/responsable.css';
+   style_sheets = [ main_css reset_css responsable_css ];
+   
+
+ -%]

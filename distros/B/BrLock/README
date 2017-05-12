@@ -1,0 +1,22 @@
+BrLock is a module featuring a distributed lock, using the algorithm
+Carvalho and Roucariol, On mutual exclusion in computer networks,
+ACM Communications, Feb83. 
+
+The algorithm features minimal messages for acquiring the next lock, 
+but with the trade-off of network being reliable enough to ensure that
+all nodes are alive. In fact, one node won't be able to acquire the 
+next lock if it can't communicate to all other nodes, unless the node
+was the last one to acquire the lock. 
+
+If this is a hard constraint for you, you may want to use IPC::Lock. 
+
+
+INSTALLATION
+
+To install this module issue these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

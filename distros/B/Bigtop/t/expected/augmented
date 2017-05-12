@@ -1,0 +1,265 @@
+config {
+    engine MP20;
+    template_engine TT;
+    Init Std {  }
+    Conf Gantry { conffile `docs/app.gantry.conf`; instance address; }
+    HttpdConf Gantry { gantry_conf 1; }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Address {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+        doc_rootp `/static` => no_accessor;
+        show_dev_navigation 1 => no_accessor;
+    }
+    config CGI {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        app_rootp `/cgi-bin/address.cgi` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    table family_address {
+        field id {
+            is int4, primary_key;
+        }
+        field identifier {
+            is `varchar(13)`;
+            label Identifier;
+            html_form_type text;
+        }
+        field full_description {
+            is varchar;
+            label `Full Description`;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        field state {
+            is varchar, `DEFAULT 'KS'`;
+            label State;
+            html_form_type text;
+            html_form_default_value KS;
+        }
+        field created {
+            is date;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%identifier`;
+        refered_to_by birth_date => bdays, z, a, anniversary_date;
+    }
+    controller FamilyAddress is AutoCRUD {
+        controls_table family_address;
+        rel_location family_address;
+        text_description `family address`;
+        page_link_label `Family Address`;
+        method do_main is main_listing {
+            cols identifier, full_description;
+            header_options Add;
+            row_options Edit, Delete;
+            title `Family Address`;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+    table birth_date {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field ident {
+            is varchar;
+            label Ident;
+            html_form_type text;
+        }
+        field description {
+            is varchar;
+            label Description;
+            html_form_type text;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%ident`;
+        field family_address {
+            is int4;
+            label `Family Address`;
+            refers_to family_address => id;
+            html_form_type select;
+        }
+        refered_to_by a;
+    }
+    controller BirthDate is AutoCRUD {
+        controls_table birth_date;
+        rel_location birth_date;
+        text_description `birth date`;
+        page_link_label `Birth Date`;
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title `Birth Date`;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+    table a {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field ident {
+            is varchar;
+            label Ident;
+            html_form_type text;
+        }
+        field description {
+            is varchar;
+            label Description;
+            html_form_type text;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%ident`;
+        field family_address {
+            is int4;
+            label `Family Address`;
+            refers_to family_address => id;
+            html_form_type select;
+        }
+        field birth_date {
+            is int4;
+            label `Birth Date`;
+            refers_to birth_date => id;
+            html_form_type select;
+        }
+    }
+    controller A is AutoCRUD {
+        controls_table a;
+        rel_location a;
+        text_description a;
+        page_link_label A;
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title A;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+    table b {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field ident {
+            is varchar;
+            label Ident;
+            html_form_type text;
+        }
+        field description {
+            is varchar;
+            label Description;
+            html_form_type text;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%ident`;
+    }
+    controller B is AutoCRUD {
+        controls_table b;
+        rel_location b;
+        text_description b;
+        page_link_label B;
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title B;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+    join_table a_b {
+        joins a => b;
+    }
+    table anniversary_date {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field anniversary_date {
+            is date;
+            label `Anniversary Date`;
+            html_form_type text;
+        }
+        field gift_pref {
+            is varchar, `DEFAULT 'money'`;
+            label `Gift Pref`;
+            html_form_type text;
+            html_form_optional 1;
+            html_form_default_value money;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%anniversary_date`;
+        field family_address {
+            is int4;
+            label `Family Address`;
+            refers_to family_address => id;
+            html_form_type select;
+        }
+    }
+    controller AnniversaryDate is AutoCRUD {
+        controls_table anniversary_date;
+        rel_location anniversary_date;
+        text_description `anniversary date`;
+        page_link_label `Anniversary Date`;
+        method do_main is main_listing {
+            cols anniversary_date, gift_pref;
+            header_options Add;
+            row_options Edit, Delete;
+            title `Anniversary Date`;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+}

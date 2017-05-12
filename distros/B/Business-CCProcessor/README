@@ -1,0 +1,36 @@
+Business-CCProcessor version 0.0.1
+
+Poor man's credit card processing module, to hand a transaction
+off to a secure processor without handling credit card numbers
+locally.  Use perldoc to access the documentation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Hugh Esco
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the Gnu Public License.

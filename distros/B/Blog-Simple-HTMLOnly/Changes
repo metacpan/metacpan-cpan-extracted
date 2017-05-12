@@ -1,0 +1,31 @@
+Revision history for Perl extension Blog::Simple::HTMLOnly.
+
+0.05	2002-01-03
+	Depends in Makefile.PL
+
+0.04  Thu Feb 23 12:12:12 2006
+	- added and updated methods
+	- allowed redner_this_blog date to include wildcards to show all blogs for a certain day
+	- updated examples
+	
+0.03  Tue Feb 21 18:18:18 2006
+	- tidied some errors found when installing anew
+	- everything had PC line-endings, for some reason.
+	
+0.02  Tue May  6 10:05:37 2003
+	- included two simple demo scripts
+	- corrected oversight which prevented content elements
+	  from being rendered
+	- added more POD
+	- turned 'our' to 'use vars' for 5.6.0 compat
+	- removed sub-classing of Blog::Simple, as it imported
+	  XML::XSLT, nullifying the whole effort
+	- removed references to XML::XSLT
+	- added more flocks
+
+0.01  Tue May  6 10:05:37 2003
+	- original version; created by h2xs 1.21 with options
+		-X -n Blog::Simple::HTMLOnly
+	- sub-classed Blog::Simple, replacing XML::XSLT with
+	  HTML::TokeParser
+	- added flocks

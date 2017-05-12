@@ -1,0 +1,11 @@
+Revision history for BioX-Workflow-Plugin-Drake
+
+0.12  2015-11-30 13:03:34 GST
+    - Bug fix with process
+
+0.11  2015-11-23 10:12:41 GST
+    - Fixed cpanfile
+
+0.10  2015-11-19 12:30:59 GST
+    - Initial release for BioX::Workflow::Plugin::Drake, previously
+        BioX::Workflow::Drake

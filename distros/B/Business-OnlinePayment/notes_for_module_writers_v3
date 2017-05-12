@@ -1,0 +1,145 @@
+These are the module writer's notes for v3.  See the regular
+"notes_for_module_writers" file first.
+
+
+= Business::OnlinePayment::HTTPS =
+
+  If your gateway is HTTPS-based, use (or convert to)
+  Business::OnlinePayment::HTTPS !!
+
+  Note: The correct thing for modern B:OP: gateway modules that need to
+   speak HTTPS to do is to use Business::OnlinePayment::HTTPS and depend on
+   "Net::HTTPS::Any" (since B:OP itself doesn't).
+
+
+= Handling failures =
+
+    - If your processor module encounters a setup problem, communication
+      error or other problem that's prevents the card from even being
+      run, you should die (or croak) with a useful error message.  Setting
+      is_success to 0 and returning normally should only be done when the
+      transaction *processing* was sucessful (or at least elicited some sort
+      of result from the gateway), but the transaction itself returned a
+      "normal" decline status of some sort.
+      
+    - (NEW IN 3.00_04) You should set "failure_status" depending on the
+      specific failure result, if (and only if) the failure results from one
+      of the defined statuses:
+
+      - "expired"
+      - "nsf" (non-sufficient funds / credit limit)
+      - "stolen"
+      - "pickup"
+      - "blacklisted"
+      - "inactive" (inactive card or not authorized for card-not-present) (?)
+      - "decline" (other card/transaction declines only, not other errors)
+  
+
+= (NEW IN 3.01) Introspection =
+
+  - Add an _info subroutine to your module that returns a hashref of
+    information:
+
+      sub _info {
+        {
+          'info_compat'           => '0.01', # always 0.01 for now,
+                                             # 0.02 will have requirements
+          'gateway_name'          => 'Example Gateway',
+          'gateway_url'           => 'http://www.example.com/',
+          'module_version'        => $VERSION,
+          'supported_types'       => [ qw( CC ECHECK ) ],
+          'token_support'         => 0, #card storage/tokenization support
+          'test_transaction'      => 0, #set true if ->test_transaction(1) works
+          'partial_auth'          => 0, #can gateway partial auth (new in 3.04)
+          'supported_actions'     => [
+                                       'Normal Authorization',
+                                       'Authorization Only',
+                                       'Post Authorization',
+                                       'Void',
+                                       'Credit',
+                                     ],
+        };
+      }
+
+    # or a more complicated case with module_notes, different supported actions
+    #  per type, and special void requirements:
+
+      sub _info {
+        {
+          'info_compat'           => '0.01', # always 0.01 for now,
+                                             # 0.02 will have requirements
+          'gateway_name'          => 'Example Gateway',
+          'gateway_url'           => 'http://www.example.com/',
+          'module_version'        => $VERSION,
+          'module_notes'          => 'usage notes',
+          'supported_types'       => [ qw( CC ECHECK ) ],
+          'token_support'         => 1,
+          'test_transaction'      => 1,
+          'partial_auth'          => 1, #can gateway partial auth (new in 3.04)
+          'supported_actions'     => { 'CC' => [
+                                         'Normal Authorization',
+                                         'Authorization Only',
+                                         'Post Authorization',
+                                         'Void',
+                                         'Credit',
+                                         'Recurring Authorization',
+                                         'Modify Recurring Authorization',
+                                         'Cancel Recurring Authorization',
+                                       ],
+                                       'ECHECK' => [
+                                         'Normal Authorization',
+                                         'Void',
+                                         'Credit',
+                                       ],
+                                     },
+          'CC_void_requires_card' => 1,
+          'ECHECK_void_requires_account' => 1, #routing_code, account_number, name 
+        };
+      }
+
+
+= authorization and order_number (NEWLY DOCUMENTED IN 3.01) =
+
+  Gateways will return one or two values from Authorization Only and
+  Normal Authorization transactions that must be submitted back with a
+  Post Authorization, Void, or Credit transaction.
+
+  If the gateway returns one value, return this as "authorization"
+
+  If the gateway returns two values, return one as "authorization" and the
+  other as "order_number".  Typically "authorization" is the more low-level
+  value returned from the underlying processing network while "order_number"
+  is a unique tranaction id generated by the gateway.
+
+
+= Moo (NEWLY DOCUMENTED IN 3.04) =
+
+  Feel free to write gateway modules which use Moo.  Please do not require
+  Moo newer than 0.091011 at this time (until 2018 or so).
+
+
+= Partial authorizations (NEWLY DOCUMENTED IN 3.04) =
+
+  If your gateway supports partial authorizations:
+
+  - Declare this in your "sub _info" introspection subroutine:
+      'partial_auth' => 1,
+
+  - Add "partial_auth_amount" to your build_subs call in set_defaults, or add
+    one:
+      $self->build_subs('partial_auth_amount');
+
+  - Honor the transaction 'partial_auth' flag as follows:
+    + If this transaction flag is unset, the application is not expecting to
+      handle a partial authorzation.  So, either set the gateway flag disabling
+      partial authorizations, or (if your gatweay does not have such a
+      setting), immediately void any partial authorization received and
+      return is_success 0.
+    + If this transaction flag is set, the application can handle a partial
+      authorization.  Make sure the flag to enable them is passed to the
+      gateway, if necessary.  When a partial authorization is received, return
+      is_success 1, and the amount as "partial_auth_amount":
+        $self->partial_auth_amount( $partial_amount );
+      For normal full authorizations, "partial_auth_amount" must not be set.
+
+

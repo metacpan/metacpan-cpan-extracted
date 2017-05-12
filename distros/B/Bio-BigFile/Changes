@@ -1,0 +1,41 @@
+Version 1.07
+        * Allow -types to be used as an alias for -type in calls to features()
+	  and get_seq_stream().
+
+Version 1.06
+	* Strip whitespace from the ends of BigWigSet metadata files.
+
+Version 1.05
+	* Added patch to Jim Kent build tree to allow for compilation on
+	MacOS X.
+
+Version 1.04 
+	 * Added the following methods to Bio::DB::BigWig::Summary objects: 
+	 chr_stats(),    chr_mean(),    chr_stdev(), 
+	 global_stats(), global_mean(), global_stdev().
+	 * Fixed BigWigSet->get_feature_by_id() to return correct class of
+	   object (e.g. summary).
+
+Version 1.03
+	* Added a get_seq_stream() method to BigWig summary objects so that users can
+	  easily access the intervals underlying a statistical summary.
+
+Version 1.02
+	* BigWigSet now operates correctly on remote HTTP and FTP directories.
+	* Added instructions and patch file for compiling on MacOSX platforms.
+
+Version 1.01 
+        * fixed bug in build process -- not finding jkweb.a library or
+	header files when path entered at the prompt.
+
+Version 1.0
+	* first release
+
+Version 0.95 Sun Mar 21 18:40:02 CET 2010
+	* Documentation mostly done.
+        * High level interfaces to BigWig and BigBed now pretty-compatible with BioPerl
+Version 0.9 Thu Mar 11 23:16:00 EST 2010
+	* Fixed bug in Bio::DB::BigWig->seq_ids
+	* Added support for udcSetDefaultDir
+Version 0.01 Thu Feb  4 10:01:29 EST 2010
+	* Initial design.

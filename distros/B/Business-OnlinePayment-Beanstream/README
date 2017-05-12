@@ -1,0 +1,12 @@
+Copyright (c) original was not specified here
+Copyright (c) 2008 DonorWare LLC
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::Beanstream, a Business::OnlinePayment
+backend module for Beanstream.  It is only useful if you have a merchant
+account with Beanstream: http://www.beanstream.com
+
+As of Business::OnlinePayment::Beanstream 0.02, this module is developed
+against BOP version 3.  Developer expects it to work with BOP-2 plus
+added HTTPS.pm (from BOP-3).

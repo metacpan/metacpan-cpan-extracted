@@ -1,0 +1,329 @@
+Seq-entry ::= set {
+  class nuc-prot ,
+  descr {
+    title "Leishmania major polyadenylate-binding protein 1 (PAB1) gene,
+ complete cds." ,
+    source {
+      org {
+        taxname "Leishmania major" ,
+        db {
+          {
+            db "taxon" ,
+            tag
+              id 5664 } } ,
+        orgname {
+          name
+            binomial {
+              genus "Leishmania" ,
+              species "major" } ,
+          mod {
+            {
+              subtype strain ,
+              subname "Friedlin" } } ,
+          lineage "Eukaryota; Euglenozoa; Kinetoplastida; Trypanosomatidae;
+ Leishmania" ,
+          gcode 1 ,
+          mgcode 4 ,
+          div "INV" } } ,
+      subtype {
+        {
+          subtype chromosome ,
+          name "35" } ,
+        {
+          subtype other ,
+          name "MHOM/IL/81" } } } ,
+    create-date
+      std {
+        year 1998 ,
+        month 10 ,
+        day 17 } ,
+    pub {
+      pub {
+        sub {
+          authors {
+            names
+              std {
+                {
+                  name
+                    name {
+                      last "Bates" ,
+                      first "E" ,
+                      initials "E.J." } } ,
+                {
+                  name
+                    name {
+                      last "Smith" ,
+                      first "D" ,
+                      initials "D.F." } } } ,
+            affil
+              std {
+                affil "Imperial College of Science, Technology and Medicine" ,
+                div "Biochemistry" ,
+                city "London" ,
+                country "UK" ,
+                street "Exhibition Road" ,
+                postal-code "SW7 2AZ" } } ,
+          medium email ,
+          date
+            std {
+              year 1998 ,
+              month 9 ,
+              day 18 } } } } ,
+    pub {
+      pub {
+        gen {
+          cit "Unpublished" ,
+          authors {
+            names
+              std {
+                {
+                  name
+                    name {
+                      last "Bates" ,
+                      first "E" ,
+                      initials "E.J." } } ,
+                {
+                  name
+                    name {
+                      last "Smith" ,
+                      first "D" ,
+                      initials "D.F." } } } } ,
+          title "Cloning and characterisation of a Leishmania major poly
+ A-binding protein" } } } ,
+    pub {
+      pub {
+        sub {
+          authors {
+            names
+              std {
+                {
+                  name
+                    name {
+                      last "Bates" ,
+                      first "E" ,
+                      initials "E.J." } } ,
+                {
+                  name
+                    name {
+                      last "Smith" ,
+                      first "D" ,
+                      initials "D.F." } } } ,
+            affil
+              std {
+                affil "Imperial College of Science, Technology and Medicine" ,
+                div "Biochemistry" ,
+                city "London" ,
+                country "UK" ,
+                street "Exhibition Road" ,
+                postal-code "SW7 2AZ" } } ,
+          medium email ,
+          date
+            std {
+              year 1999 ,
+              month 10 ,
+              day 12 } ,
+          descr "Sequence update by submitter" } } } ,
+    update-date
+      std {
+        year 2000 ,
+        month 2 ,
+        day 29 } ,
+    pub {
+      pub {
+        article {
+          title {
+            name "Poly(A)-binding protein I of Leishmania: functional analysis
+ and localisation in trypanosomatid parasites." } ,
+          authors {
+            names
+              std {
+                {
+                  name
+                    name {
+                      last "Bates" ,
+                      initials "E.J." } } ,
+                {
+                  name
+                    name {
+                      last "Knuepfer" ,
+                      initials "E." } } ,
+                {
+                  name
+                    name {
+                      last "Smith" ,
+                      initials "D.F." } } } ,
+            affil
+              str "Wellcome Laboratories for Molecular Parasitology,
+ Department of Biochemistry, Imperial College of Science, Technology and
+ Medicine, London SW7 2AZ, UK." } ,
+          from
+            journal {
+              title {
+                iso-jta "Nucleic Acids Res." ,
+                ml-jta "Nucleic Acids Res" ,
+                issn "1362-4962" ,
+                name "Nucleic acids research." } ,
+              imp {
+                date
+                  std {
+                    year 2000 ,
+                    month 3 ,
+                    day 1 } ,
+                volume "28" ,
+                issue "5" ,
+                pages "1211-1220" ,
+                language "eng" } } ,
+          ids {
+            pubmed 10666465 ,
+            medline 20133040 } } ,
+        muid 20133040 ,
+        pmid 10666465 } } } ,
+  seq-set {
+    seq {
+      id {
+        genbank {
+          name "AF093062" ,
+          accession "AF093062" ,
+          version 2 } ,
+        gi 6019463 } ,
+      descr {
+        molinfo {
+          biomol genomic } } ,
+      inst {
+        repr raw ,
+        mol dna ,
+        length 2795 ,
+        seq-data
+          ncbi4na '41422482142424121421884422282221248242824282188828888188828
+418882124248211212422188288828182124111141111211211211211212822221222128212242
+212121142121212124212142888242242821212121124844111411112411142142428482F42882
+484882888288882248888218882188282888188821282111844284284284822144114284284222
+244844242182142242141844121142241824141824288221828124884424122884124221221821
+124142242142844844142828821142248824421221822841124842484888422424121821821242
+142428242844428184428124821128824121122124121424244141144241824148221841128821
+142484824484121118424812422881848442142142424122224222822428121424421124421124
+888824841141122844141144184844121421141422842124121828821221148824428241882828
+228421144811842144124144144421141422424428124428824882128821114124141248224221
+144124281884841141841124424284224182124228214144121141144242828124844221128821
+882422421184212422884224242824844221128821241124848181821142144842842241224841
+121144124821824141148828824211148884424421821248224284214228421144121141424422
+424848824228828421128824111142124124124224821144244884114241842124122182121824
+124421821244212284484141142848124812142424222142242421424142422821884222882412
+141148121842142122114222884481121122848124842421128824122284148821244424244122
+842824142828821144148184424144821141428422484841844841424141484444841422424428
+824488824841488888241124224124144221124224282842424141841184482421842841124421
+142222821824841121884222112422424182142428121211824842422842148822142142422842
+141841841842482141842122142241842248884824421422144422482241842484422424484482
+422142142844484482424242144422182241842241842218212212142142242144484224242142
+212144488824221242248244214824488824842114241242241142128222284424184822224141
+242242242842242241821212212144112824111421848242222144142142424224228844484122
+482828822811144848124141882242214124844242241141821244481848822824141841112221
+144144248124148842821124122141142412824144142424841214144242818424842821144242
+182141244248114241411422142144242248848482114228414214144111142884242828242184
+224242282122821421488282141281844122228828288288882242218288182228282124148284
+882428182144224841414141444428144844424428884848482848281848184248414448842488
+484282484884884184284182144141444142441144228212441841281441884218888888884884
+282121211882841148428481442212288224282288844888282821841848844844222222812212
+128222122122122212418221488224888124418411441842484188114821418114144242481148
+218442428484288228282228282218288882288882488824842221821888882288282424482184
+828482822142222284888824821144842228822288221214228422888848144848421844428484
+844841414214214841842121411411111144144114211188248481144484184414442414414142
+488442444812418112414184282281111284244284184142124844141142241144112121141114
+211111111144114821224111121114141111188881211112411411448848411144144811142442
+1414810'H ,
+        hist {
+          replaces {
+            date
+              std {
+                year 1999 ,
+                month 10 ,
+                day 12 } ,
+            ids {
+              gi 3764100 } } } } ,
+      annot {
+        {
+          data
+            ftable {
+              {
+                data
+                  gene {
+                    locus "PAB1" } ,
+                location
+                  int {
+                    from 262 ,
+                    to 1944 ,
+                    strand plus ,
+                    id
+                      gi 6019463 } } } } } } ,
+    seq {
+      id {
+        genbank {
+          accession "AAC64372" ,
+          version 2 } ,
+        gi 6019464 } ,
+      descr {
+        molinfo {
+          biomol peptide ,
+          tech concept-trans } ,
+        title "polyadenylate-binding protein 1 [Leishmania major]" } ,
+      inst {
+        repr raw ,
+        mol aa ,
+        length 560 ,
+        topology not-set ,
+        seq-data
+          ncbieaa "MAAAVQEAAAPVAHQPQMDKPIEIASIYVGDLDATINEPQLVELFKPFGTILNVRVCRD
+IITQRSLGYGYVNFDNHDSAEKAIESMNFKRVGDKCVRLMWQQRDPALRYSGNGNVFVKNLEKDVDSKSLHDIFTKFG
+SILSCKVMQDEEGKSRGYGFVHFKDETSAKDAIVKMNGAADHASEDKKALYVANFIRRNARLAALVANFTNVYIKQVL
+PTVNKDVIEKFFAKFGGITSAAACKDKSGRVFAFCNFEKHDDAVKAVEAMHDHHIDGITAPGEKLYVQRAQPRSERLI
+ALRQKYMQHQALGNNLYVRNFDPEFTGADLLELFKEYGEVKSCRVMVSESGVSRGFGFVSFSNADEANAALREMNGRM
+LNGKPLIVNIAQRRDQRYTIVRLQFQQRLQMMMRQMHQPMPFVGSQGRPMRGRGGRQQLGGRAQGHPMPMPSPQQPQG
+AAQPQGFATPSAVGFVQATPKHSPGDVPETPPLPPITPQELESMSPQEQRAALGDRLFLKVYEIPPDVAPKITGMFLE
+MKPKEAYELLNDQKRLEERVTEALCVLKAHQTA" ,
+        hist {
+          replaces {
+            date
+              std {
+                year 1999 ,
+                month 10 ,
+                day 12 } ,
+            ids {
+              gi 3764101 } } } } ,
+      annot {
+        {
+          data
+            ftable {
+              {
+                data
+                  prot {
+                    name {
+                      "polyadenylate-binding protein 1" } ,
+                    desc "polyA-binding protein" } ,
+                location
+                  int {
+                    from 0 ,
+                    to 559 ,
+                    strand plus ,
+                    id
+                      gi 6019464 } } } } } } } ,
+  annot {
+    {
+      data
+        ftable {
+          {
+            data
+              cdregion {
+                frame one ,
+                code {
+                  id 1 } } ,
+            product
+              whole
+                gi 6019464 ,
+            location
+              int {
+                from 262 ,
+                to 1944 ,
+                strand plus ,
+                id
+                  gi 6019463 } } } } } }
+

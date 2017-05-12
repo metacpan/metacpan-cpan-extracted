@@ -1,0 +1,55 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Manifold} class b2Manifold
+{
+
+b2Manifold();
+
+%{
+
+b2Vec2*
+b2Manifold::localNormal()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localNormal = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localNormal);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2Manifold::localPoint()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localPoint = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localPoint);
+	OUTPUT:
+		RETVAL
+
+int32
+b2Manifold::pointCount()
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->pointCount = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->pointCount;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};

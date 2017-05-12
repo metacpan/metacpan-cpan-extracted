@@ -1,0 +1,10 @@
+TYPEMAP
+bsd_devstat*      T_BSD_DEVSTAT
+
+INPUT
+T_BSD_DEVSTAT
+    $var = XS_STATE(bsd_devstat*, $arg);
+
+OUTPUT
+T_BSD_DEVSTAT
+    XS_STRUCT2OBJ($arg, "BSD::devstat", $var);

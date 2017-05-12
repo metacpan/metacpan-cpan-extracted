@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/BLASTaid.pm
+t/00.load.t
+t/pod.t
+t/BLASTaid.t
+t/REPORT.blast
+bin/BLASTaid

@@ -1,0 +1,22 @@
+2001-11-04 19:23   Brian Moseley <bcm@maz.org>
+
+	* libservlet.pm: add IO::Handle dependency and bump version number
+
+2001-11-04 19:18   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST.SKIP: sync
+
+2001-11-04 18:55   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog: sync
+
+2001-07-13 15:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, libservlet.pm: Initial revision
+
+2001-07-13 15:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, libservlet.pm: imported libservlet 0.9.1
+

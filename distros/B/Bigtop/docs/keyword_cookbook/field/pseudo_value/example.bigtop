@@ -1,0 +1,138 @@
+config {
+    engine MP13;
+    template_engine TT;
+    Init Std {  }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    HttpdConf Gantry { gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+    Conf Gantry { instance phoneprov; }
+}
+app PhoneProv {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    table directory_info {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field phone_num {
+            is varchar;
+            label `Phone Num`;
+            html_form_type text;
+            searchable 1;
+            html_form_optional 0;
+            accessor phone_num_acc;
+        }
+        field install_date {
+            is date;
+            label `Install Date`;
+            html_form_type text;
+            searchable 1;
+            html_form_optional 0;
+        }
+
+        # This is the definition of our pseudo field, so we'll make use of the
+        # pseudo_value statement.  Note that bigtop will put the pseudo_value
+        # statement into a DBIx::Class '+select' hashref with the pseudo field
+        # name as the alias in '+as', and the reason why it's defined as a ref
+        # is because it's literal SQL.
+        field days_until_install {
+            is int4;
+            pseudo_value `\q[me.install_date - to_date( to_char(now(), 'MM/DD/YYYY'), 'MM/DD/YYYY' ) AS days_until_install]`;
+            label `Days Until Install`;
+        }
+
+        foreign_display `%phone_num, %install_date (%PON)`;
+    }
+    controller DirectoryInfo is AutoCRUD {
+        controls_table directory_info;
+        rel_location directory_info;
+        text_description directory_info;
+        page_link_label `Directory Info`;
+        method do_main is main_listing {
+            cols phone_num, install_date;
+
+            # We want to use the 'days_until_install' pseudo column in our
+            # do_main controller, so tell bigtop about it.
+            pseudo_cols days_until_install;
+
+            header_options Add;
+            row_options Edit, Delete;
+            title `Directory Info`;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+            form_name directory_info;
+        }
+    }
+    table e911 {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field phone_num {
+            is varchar;
+            label `Phone Num`;
+            html_form_type text;
+            searchable 1;
+            html_form_optional 0;
+            accessor phone_num_acc;
+        }
+        field install_date {
+            is date;
+            label `Install Date`;
+            html_form_type text;
+            searchable 1;
+            html_form_optional 0;
+        }
+
+        # This is the definition of our pseudo field, so we'll make use of the
+        # pseudo_value statement.  Note that bigtop will put the pseudo_value
+        # statement into a DBIx::Class '+select' hashref with the pseudo field
+        # name as the alias in '+as', and the reason why it's defined as a ref
+        # is because it's literal SQL.
+        field days_until_install {
+            is int4;
+            pseudo_value `\q[me.install_date - to_date( to_char(now(), 'MM/DD/YYYY'), 'MM/DD/YYYY' ) AS days_until_install]`;
+            label `Days Until Install`;
+        }
+
+        foreign_display `%phone_num, %install_date (%PON)`;
+    }
+    controller E911 is AutoCRUD {
+        controls_table e911;
+        rel_location e911;
+        text_description e911;
+        page_link_label E911;
+        method do_main is main_listing {
+            # In this controller we want to see our pseudo column actually
+            # displayed on the main listing, so we'll just include it in the
+            # cols statement.  This is different from the directory_info
+            # controller where we just wanted to use the pseudo column for
+            # some control structures in the do_main method.
+            cols phone_num, install_date, days_until_install;
+
+            header_options Add;
+            row_options Edit, Delete;
+            title E911;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+            form_name e911;
+        }
+    }
+}

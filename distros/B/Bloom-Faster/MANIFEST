@@ -1,0 +1,19 @@
+bloom.c
+bloom.h
+Changes
+fallback/const-c.inc
+fallback/const-xs.inc
+Faster.xs
+hashes.h
+INSTALL
+jenkins.c
+lib/Bloom/Faster.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+suggestions.c
+t/Bloom.t
+tester.plx
+typemap

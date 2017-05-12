@@ -1,0 +1,58 @@
+package Bio::Chado::Schema::Result::Composite;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Composite - A collection of bridge codes that have multiple dependancies
+so they don't happily go where is most obvious
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Composite module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Composite::AllFeatureNames>
+
+L<Bio::Chado::Schema::Result::Composite::Dfeatureloc>
+
+L<Bio::Chado::Schema::Result::Composite::FLoc>
+
+L<Bio::Chado::Schema::Result::Composite::FType>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureContains>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureDifference>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureDisjoint>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureDistance>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureIntersection>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureMeets>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureMeetsOnSameStrand>
+
+L<Bio::Chado::Schema::Result::Composite::FeatureUnion>
+
+L<Bio::Chado::Schema::Result::Composite::FeaturesetMeets>
+
+L<Bio::Chado::Schema::Result::Composite::FnrType>
+
+L<Bio::Chado::Schema::Result::Composite::FpKey>
+
+L<Bio::Chado::Schema::Result::Composite::Gff3atts>
+
+L<Bio::Chado::Schema::Result::Composite::Gff3view>
+
+L<Bio::Chado::Schema::Result::Composite::Gffatts>
+
+=cut
+
+1;

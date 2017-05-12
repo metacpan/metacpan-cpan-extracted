@@ -1,0 +1,70 @@
+{
+   "abstract" : "verify Austrian Social Securtiy numbers",
+   "author" : [
+      "Mark Hofstetter <mark@hofstetter.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-AT-SSN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MarkHofstetter/Business-AT-SSN/issues"
+      },
+      "homepage" : "https://github.com/MarkHofstetter/Business-AT-SSN",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/MarkHofstetter/Business-AT-SSN.git",
+         "web" : "https://github.com/MarkHofstetter/Business-AT-SSN"
+      }
+   },
+   "version" : "0.92",
+   "x_contributors" : [
+      "Mark Hofstetter <mark@univie.ac.at>",
+      "MarkHofstetter <mark@hofstetter.at>"
+   ]
+}
+

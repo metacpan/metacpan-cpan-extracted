@@ -1,0 +1,59 @@
+package Bio::Chado::Schema::Result::Cv;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Cv - Controlled vocabularies and ontologies
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Cv module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Cv::Chadoprop>
+
+L<Bio::Chado::Schema::Result::Cv::CommonAncestorCvterm>
+
+L<Bio::Chado::Schema::Result::Cv::CommonDescendantCvterm>
+
+L<Bio::Chado::Schema::Result::Cv::Cv>
+
+L<Bio::Chado::Schema::Result::Cv::CvCvtermCount>
+
+L<Bio::Chado::Schema::Result::Cv::CvCvtermCountWithObs>
+
+L<Bio::Chado::Schema::Result::Cv::CvLeaf>
+
+L<Bio::Chado::Schema::Result::Cv::CvLinkCount>
+
+L<Bio::Chado::Schema::Result::Cv::CvPathCount>
+
+L<Bio::Chado::Schema::Result::Cv::CvRoot>
+
+L<Bio::Chado::Schema::Result::Cv::Cvprop>
+
+L<Bio::Chado::Schema::Result::Cv::Cvterm>
+
+L<Bio::Chado::Schema::Result::Cv::CvtermDbxref>
+
+L<Bio::Chado::Schema::Result::Cv::CvtermRelationship>
+
+L<Bio::Chado::Schema::Result::Cv::Cvtermpath>
+
+L<Bio::Chado::Schema::Result::Cv::Cvtermprop>
+
+L<Bio::Chado::Schema::Result::Cv::Cvtermsynonym>
+
+L<Bio::Chado::Schema::Result::Cv::Dbxrefprop>
+
+L<Bio::Chado::Schema::Result::Cv::StatsPathsToRoot>
+
+=cut
+
+1;

@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% title | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FOREACH t IN treaties %][% FILTER collapse %]
+[% t.node1 %] <-> [% t.node2 %] 
+[% END %]
+[% END %]

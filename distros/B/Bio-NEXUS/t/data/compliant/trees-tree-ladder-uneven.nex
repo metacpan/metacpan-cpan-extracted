@@ -1,0 +1,25 @@
+#NEXUS
+
+BEGIN TAXA;
+      dimensions ntax=8;
+      taxlabels A B C D E F G H;  
+END;
+
+BEGIN CHARACTERS;
+      dimensions nchar=5;
+      format datatype=protein missing=? gap=-;
+      charlabels one two three four five;
+      matrix
+A     --QNE
+B     --QNE
+C     TWO--
+D     THREE
+E     FORE-
+F     FIVE-
+G     SIX--
+H     SEVEN;
+END;
+
+BEGIN TREES;
+       tree ladder_uneven = (((((((A:1,B:2):1,C:2):1,D:4):1,E:4):1,F:6):1,G:6):1,H:8);
+END;

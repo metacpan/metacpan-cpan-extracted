@@ -1,0 +1,21 @@
+---
+abstract: 'Perl interface for parsing Bro logfiles'
+author:
+  - 'Johanna Amann <johanna@icir.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bro-Log-Parse
+requires:
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/0xxon/perl-bro-log-parse/issues
+  homepage: https://github.com/0xxon/perl-bro-log-parse
+  repository: https://github.com/0xxon/perl-bro-log-parse.git
+version: '0.07'

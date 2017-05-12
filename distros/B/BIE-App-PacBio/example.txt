@@ -1,0 +1,21 @@
+=head1 EXAMPLE DATA
+
+The L<data|http://david.abcc.ncifcrf.gov/manuscripts/PacBio_Data> provides an example for PacBio CCS data,
+which was used in our data analysis, software and algorithm development.
+
+It is from a project of de novo sequencing for B<MSG> isoforms in human I<pneumocystis>.
+I<Pnuemocystis> is a fungus which could infect people with depressed immunity, such as cancer patient, AIDS patient. It affects much the life quality and shortens the life time of those patients.
+B<MSG> is the I<major surface glycoprotein> located on the surface of I<pneumocystis>.
+B<MSG> is believed to be very critical in I<pneumocystis> invading hosts.
+Yet people don't know much about B<MSG> gene.
+That is why we wanted to sequence B<MSG>.
+
+There are about 50 to 100 copies of B<MSG> gene on I<pneumocystis> genome.
+The similarity among them is in the range of 80~90%.
+The high similarity hurdled assembly very much when we tried other short-read sequencing platforms.
+PacBio RS can produce long accurate read, which greatly facilitates our B<MSG> sequencing.
+
+The example data contains the mixture of 10 known 1.5kb known B<MSG> fragments, which was used as a control in our PacBio sequencing.
+Researchers could use it to test our QC software and the upcoming algorithm for quality improving.
+
+=cut

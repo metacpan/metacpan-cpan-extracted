@@ -1,0 +1,42 @@
+use strict;
+
+use Test::More 'no_plan';
+use File::Spec;
+
+use Bigtop::Keywords;
+
+#----------------------------------------------------------------------
+# Make sure the docs exist
+#----------------------------------------------------------------------
+
+my $base_dir = File::Spec->catdir( qw( docs keyword_cookbook ) );
+my $doc_for  = Bigtop::Keywords->get_full_doc_hash();
+
+if ( -d $base_dir ) {
+    pass( 'Keyword cookbook dir found' );
+}
+else {
+    fail( 'Keyword cookbook missing, quitting' );
+    exit;
+}
+
+foreach my $keyword_type ( keys %{ $doc_for } ) {
+    foreach my $keyword ( keys %{ $doc_for->{ $keyword_type } } ) {
+        my $subdir = File::Spec->catdir( $base_dir, $keyword_type, $keyword );
+        if ( -d $subdir ) {
+            pass( "$subdir present" );
+
+            my $discuss = File::Spec->catfile( $subdir, 'discussion' );
+            my $example = File::Spec->catfile( $subdir, 'example' );
+
+            if ( -f $discuss ) { pass( "$discuss exists" ); }
+            else               { fail( "$discuss absent" ); }
+
+            if ( -f $example ) { pass( "$example exists" ); }
+            else               { fail( "$example absent" ); }
+        }
+        else {
+            fail( "$subdir absent" );
+        }
+    }
+}

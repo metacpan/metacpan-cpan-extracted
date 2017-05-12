@@ -1,0 +1,15 @@
+Revision history for Business-TW-TSIB-CStorePayment
+
+0.04    Jan 6 2008
+        Fix manifest.
+
+0.03    Jan 6 2008
+        Fix checksum.
+        Parse summary file.
+
+0.02    Nov 4 2007
+        Fix dependency: require DateTime.
+
+0.01    Nov 2 2007
+        Initial CPAN release.
+

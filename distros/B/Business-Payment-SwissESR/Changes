@@ -1,0 +1,32 @@
+Revision history for Business::Payment::SwissESR
+
+0.13.3 2016-06-14
+  - fixed unescaped brace in regexp
+
+0.13.2 2016-06-04
+  - fixed unescaped brace in regexp
+
+0.13.1 2016-05-31
+  - fixed unescaped brace in regexp
+  
+0.13.0 2016-03-09
+  - optimized placement of text on esr form
+  
+0.12.0 2016-02-26
+  - learn how to parse typ4 records
+
+0.11.1 2015-09-23
+  - fixed scalebox division by zero error
+  - better handling of tex errors
+
+0.11.0 2015-07-22
+  - use enlargethispage with a negative value to
+    make sure the payment slip stays protected from normal page content
+
+0.10.0 2015-07-22
+  - revamped positioning system, shifting only the payment slip now
+  - added tiny dot 3cm from the bottom and 3cm from the left border of the
+    paper to assist with positioning
+  - provide scale control
+  - bodyLaTeX now does not contain an address anymore.
+  - text will wrap to the next page automatically.

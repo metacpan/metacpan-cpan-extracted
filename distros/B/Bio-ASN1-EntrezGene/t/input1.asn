@@ -1,0 +1,382 @@
+Entrezgene ::= {
+  track-info {
+    geneid 3 ,
+    status live ,
+    create-date
+      std {
+        year 2003 ,
+        month 8 ,
+        day 28 ,
+        hour 20 ,
+        minute 30 ,
+        second 0 } ,
+    update-date
+      std {
+        year 2005 ,
+        month 2 ,
+        day 17 ,
+        hour 12 ,
+        minute 9 ,
+        second 0 } } ,
+  type pseudo ,
+  source {
+    genome genomic ,
+    origin natural ,
+    org {
+      taxname "Homo sapiens" ,
+      common "human" ,
+      db {
+        {
+          db "taxon" ,
+          tag
+            id 9606 } } ,
+      syn {
+        "man" } ,
+      orgname {
+        name
+          binomial {
+            genus "Homo" ,
+            species "sapiens" } ,
+        lineage "Eukaryota; Metazoa; Chordata; Craniata; Vertebrata;
+ Euteleostomi; Mammalia; Eutheria; Euarchontoglires; Primates; Catarrhini;
+ Hominidae; Homo" ,
+        gcode 1 ,
+        mgcode 2 ,
+        div "PRI" } } ,
+    subtype {
+      {
+        subtype chromosome ,
+        name "12" } } } ,
+  gene {
+    locus "A2MP" ,
+    desc "alpha-2-macroglobulin pseudogene" ,
+    maploc "12p13.3-p12.3" ,
+    locus-tag "HGNC:8" } ,
+  location {
+    {
+      display-str "12p13.3-p12.3" ,
+      method
+        map-type cyto } } ,
+  gene-source {
+    src "LocusLink" ,
+    src-int 3 ,
+    src-str2 "3" ,
+    gene-display FALSE ,
+    locus-display FALSE ,
+    extra-terms FALSE } ,
+  locus {
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NC_000012" ,
+      version 9 ,
+      seqs {
+        int {
+          from 9275468 ,
+          to 9278174 ,
+          strand minus ,
+          id
+            gi 51511728 ,
+          fuzz-from
+            lim lt ,
+          fuzz-to
+            lim gt } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_009714" ,
+      version 16 ,
+      seqs {
+        int {
+          from 2143175 ,
+          to 2145881 ,
+          strand minus ,
+          id
+            gi 37543832 ,
+          fuzz-from
+            lim lt ,
+          fuzz-to
+            lim gt } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_086792" ,
+      version 1 ,
+      seqs {
+        int {
+          from 4337316 ,
+          to 4340022 ,
+          strand minus ,
+          id
+            gi 51471135 ,
+          fuzz-from
+            lim lt ,
+          fuzz-to
+            lim gt } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NG_001067" ,
+      version 1 ,
+      seqs {
+        int {
+          from 176 ,
+          to 2880 ,
+          strand plus ,
+          id
+            gi 20270626 ,
+          fuzz-from
+            lim lt ,
+          fuzz-to
+            lim gt } } } } ,
+  properties {
+    {
+      type comment ,
+      label "Nomenclature" ,
+      version 0 ,
+      source {
+        {
+          anchor "HUGO Gene Nomenclature Committee" } } ,
+      properties {
+        {
+          type property ,
+          label "Official Symbol" ,
+          text "A2MP" ,
+          version 0 } ,
+        {
+          type property ,
+          label "Official Full Name" ,
+          text "alpha-2-macroglobulin pseudogene" ,
+          version 0 } } } } ,
+  comments {
+    {
+      type comment ,
+      heading "LocusTagLink" ,
+      version 0 ,
+      source {
+        {
+          src {
+            db "HGNC" ,
+            tag
+              id 8 } } } } ,
+    {
+      type comment ,
+      heading "RefSeq Status" ,
+      label "PROVISIONAL" ,
+      version 0 } ,
+    {
+      type comment ,
+      version 0 ,
+      refs {
+        pmid 2478422 } } ,
+    {
+      type comment ,
+      heading "NCBI Reference Sequences (RefSeq)" ,
+      version 0 ,
+      comment {
+        {
+          type genomic ,
+          heading "Reference" ,
+          accession "NG_001067" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 20270626 } ,
+              anchor "NG_001067" } } ,
+          seqs {
+            int {
+              from 1 ,
+              to 3003 ,
+              strand plus ,
+              id
+                gi 20270626 } } } } } ,
+    {
+      type comment ,
+      heading "Related Sequences" ,
+      version 0 ,
+      products {
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "M24415" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 187575 } ,
+              anchor "M24415" } } ,
+          seqs {
+            int {
+              from 177 ,
+              to 2881 ,
+              strand plus ,
+              id
+                gi 187575 } } ,
+          products {
+            {
+              type peptide ,
+              text "None" ,
+              version 0 } } } } } ,
+    {
+      type comment ,
+      heading "Additional Links" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "Evidence Viewer" ,
+                tag
+                  str "3" } ,
+              anchor "Evidence Viewer" ,
+              url "http://www.ncbi.nlm.nih.gov/sutils/evv.cgi?taxid=9606&conti
+g=NT_009714.16&gene=A2MP&lid=3&from=2143176&to=2145882" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "ModelMaker" ,
+                tag
+                  str "3" } ,
+              anchor "ModelMaker" ,
+              url "http://www.ncbi.nlm.nih.gov/mapview/modelmaker.cgi?taxid=96
+06&contig=NT_009714.16&gene=A2MP&lid=3" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "AceView" ,
+                tag
+                  id 3 } ,
+              anchor "AceView" ,
+              url "http://www.ncbi.nlm.nih.gov/IEB/Research/Acembly/av.cgi?c=l
+ocusid&org=9606&l=3" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "GDB" ,
+                tag
+                  str "GDB:128103" } } } } } } } ,
+  unique-keys {
+    {
+      db "LocusID" ,
+      tag
+        id 3 } } ,
+  xtra-index-terms {
+    "LOC3" } }
+Entrezgene ::= {
+  track-info {
+    geneid 4 ,
+    status discontinued ,
+    create-date
+      std {
+        year 2003 ,
+        month 8 ,
+        day 28 ,
+        hour 20 ,
+        minute 30 ,
+        second 0 } ,
+    update-date
+      std {
+        year 2005 ,
+        month 2 ,
+        day 17 ,
+        hour 12 ,
+        minute 9 ,
+        second 0 } } ,
+  type protein-coding ,
+  source {
+    genome genomic ,
+    origin natural ,
+    org {
+      taxname "Homo sapiens" ,
+      common "human" ,
+      db {
+        {
+          db "taxon" ,
+          tag
+            id 9606 } } ,
+      syn {
+        "man" } ,
+      orgname {
+        name
+          binomial {
+            genus "Homo" ,
+            species "sapiens" } ,
+        lineage "Eukaryota; Metazoa; Chordata; Craniata; Vertebrata;
+ Euteleostomi; Mammalia; Eutheria; Euarchontoglires; Primates; Catarrhini;
+ Hominidae; Homo" ,
+        gcode 1 ,
+        mgcode 2 ,
+        div "PRI" } } ,
+    subtype {
+      {
+        subtype chromosome ,
+        name "1" } } } ,
+  gene {
+    desc "adenovirus-12 chromosome modification site 1C" ,
+    maploc "1q42-q43" ,
+    syn {
+      "A12M1" } } ,
+  prot {
+    name {
+      "adenovirus-12 chromosome modification site 1C" ,
+      "Adenovirus-12 chromosome modification site-1q1" } } ,
+  location {
+    {
+      display-str "1q42-q43" ,
+      method
+        map-type cyto } } ,
+  gene-source {
+    src "LocusLink" ,
+    src-int 4 ,
+    src-str2 "4" ,
+    gene-display FALSE ,
+    locus-display FALSE ,
+    extra-terms FALSE } ,
+  locus {
+    {
+      type genomic ,
+      version 0 } } ,
+  comments {
+    {
+      type comment ,
+      heading "RefSeq Status" ,
+      label "WITHDRAWN" ,
+      version 0 } ,
+    {
+      type comment ,
+      heading "Additional Links" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "GDB" ,
+                tag
+                  str "GDB:118950" } } } } } } } ,
+  unique-keys {
+    {
+      db "LocusID" ,
+      tag
+        id 4 } } ,
+  xtra-index-terms {
+    "LOC4" } }

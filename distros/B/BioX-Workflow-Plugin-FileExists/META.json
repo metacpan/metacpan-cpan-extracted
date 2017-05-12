@@ -1,0 +1,73 @@
+{
+   "abstract" : "a plugin to BioX::Workflow",
+   "author" : [
+      "Jillian Rowe <jillian.e.rowe@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BioX-Workflow-Plugin-FileExists",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BioX::Workflow" : "0",
+            "Data::Dumper" : "0",
+            "Data::Pairs" : "0",
+            "Moose::Role" : "0",
+            "perl" : "5.008005",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jerowe/BioX-Workflow-Plugin-FileExists/issues"
+      },
+      "homepage" : "https://github.com/jerowe/BioX-Workflow-Plugin-FileExists",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jerowe/BioX-Workflow-Plugin-FileExists.git",
+         "web" : "https://github.com/jerowe/BioX-Workflow-Plugin-FileExists"
+      }
+   },
+   "version" : "0.13"
+}
+

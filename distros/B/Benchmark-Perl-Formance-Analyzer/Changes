@@ -1,0 +1,25 @@
+Revision history for Benchmark-Perl-Formance-Analyzer
+
+0.007     2016-04-25
+        - auto-generate chartbundle templates
+        - generate dashboard overview page
+
+0.006     2015-09-28
+        - replace File::Slurp with File::Slurper
+
+0.005     2015-09-15
+        - use BenchmarkAnything::Evaluations in with plain functions
+
+0.004     2015-09-11
+        - refactring: use another lib for data transformation
+
+0.003     2015-09-01
+        - first chart generation
+        - currently HTML with Javascript google charts
+
+0.002     2015-04-21
+        - new option --whitelist to only process those metrics
+
+0.001     2015-04-20
+        - process Benchmark::Perl::Formance results
+          (Tapper BenchmarkAnythingData format)

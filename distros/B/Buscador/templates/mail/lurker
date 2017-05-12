@@ -1,0 +1,69 @@
+[% PROCESS header title="$subject - Chronological View" %]
+[% PROCESS macros %]
+[% PROCESS view_macros %]
+
+<h1>[% mail.subject | html %]</h1>
+
+[% INCLUDE searchbox %]
+<div id="content">
+
+<p class="searchhints">
+You can also view this thread in <a href="[% base|remove('/$') %]/mail/thread/[% mail.id %]">traditional thread view</a>
+or as an SVG <a href="[% base|remove('/$') %]/mail/arc/[% mail.id %]">thread arc</a></p>
+
+[%     mapping = { ' ' => 'blank',
+                   '|' => 'vertical',
+                   '-' => 'horizontal',
+                   'L' => 'corner',
+                   'T' => 'tee',
+                   '{' => 'cross',
+                  }
+%]
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">[%- y = 0 -%]
+    [%- FOREACH row = root -%]
+        [%- y = loop.count -%] 
+        <tr height="24" class="[% loop.count % 2 == 0 ? "row1" : "row2" %]" id="row_[% loop.count %]" onMouseOver="rollIn(this)" onMouseOut="rollOut(this)">
+        [%- FOREACH cell = row -%]
+            [%- tmp = loop.count ; x = loop.count - 1 -%]
+            [%- IF cell.message -%]
+                [%- message = cell.message -%]
+                [%- IF root.$y && root.$y.$x && root.$y.$x != ' ' && root.$y.$x != '-' -%][%# something beneath us %]
+                    [%- IF row.$tmp && row.$tmp != ' ' && row.$tmp != '|' -%]
+                       [%- img = 'message-top-bottom-right' -%]
+                    [%- ELSE -%]
+                       [%- img = 'message-top-bottom' -%]
+                    [%- END -%] 
+                [%- ELSE -%] 
+                    [%- img = 'message-terminal' -%]
+                [%- END -%]
+                <td width="24" style="height: 24px;"><a name="[% message.id %]" href="[% base | remove('/$') %]/mail/view/[% message.id %]"><img src="[% config.img_base %]/[% img %].png" height="24" width="24" alt="*" border="0"></a></td>
+             [%- ELSE -%]
+                [%- IF cell == '+' || cell == 'L' -%][%# may really be a tee, or a corner %]
+                    [%- cell = row.$tmp.match('[+{-]') ? 'T' : 'L' -%]
+                [%- END -%]
+                <td width="24" height="24"><img src="[% config.img_base %]/[% mapping.$cell %].png" height="24" width="24" alt="[% cell %]"></td>
+             [%- END -%]
+        [%- END -%]
+        <td width="48" height="24"><img src="[% config.img_base %]/blank.png" width="48" height="24"></td>
+        <td rowspan="2" style="vertical-align: top; height: 24px;"><small> [% IF message.subject %][% summary_link(message) %]<i>[% message.date.cdate %]</i><br/>[% message.original %][% END %]</small></td>
+        </tr>
+        <tr class="[% loop.count % 2 == 0 ? "row1" : "row2" %]">
+        [%- FOREACH cell = row -%]
+        [%- x = loop.count - 1 %]
+          [%- IF cell != ' ' && root.$y && root.$y.$x && !root.$y.$x.match('[ +-]') -%][%# something beneath %]
+               <td width="24" height="24"background="[% config.img_base %]/vertical.png">&nbsp;</td>
+          [%- ELSE -%]
+           <td width="24"></td>
+          [%- END -%]
+        [%- END -%]
+            <td></td>
+            <td></td>
+        </tr>
+    [% END %]
+</table>
+
+</div>
+
+[% make_atom("mail/thread/atom/$mail.id") %]
+[% INCLUDE footer %]

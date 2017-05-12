@@ -1,0 +1,18 @@
+Release history for Benchmark-CSV
+
+0.001002 2017-03-09T07:00:06Z 86db020
+ - BugFix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +13 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+0.001001 2014-09-18T10:21:56Z
+ [Bugfix]
+ - Dont require gettime, and if its not available, dont expose dependent methods
+
+0.001000 2014-09-17T12:16:30Z
+ - First version.

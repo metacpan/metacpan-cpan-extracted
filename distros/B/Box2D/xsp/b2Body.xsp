@@ -1,0 +1,416 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+
+%module{Box2D};
+
+%name{Box2D::b2Body} class b2Body 
+{
+
+%{
+
+void
+b2Body::new( )
+	CODE:
+		warn("Do nothing");
+
+
+b2Fixture *
+b2Body::CreateFixtureDef(fixtureDef)
+	b2FixtureDef* fixtureDef
+	PREINIT:
+		const char* CLASS = "Box2D::b2Fixture";
+	CODE:
+		RETVAL = THIS->CreateFixture( (const b2FixtureDef*)fixtureDef );
+	OUTPUT:
+		RETVAL
+
+b2Fixture *
+b2Body::CreateFixture(shape, density)
+	b2Shape * shape
+	float32 density
+	PREINIT:
+		const char* CLASS = "Box2D::b2Fixture";
+	CODE:
+		RETVAL = THIS->CreateFixture( (const b2Shape *) shape, density );
+	OUTPUT:
+		RETVAL
+
+void
+b2Body::DestroyFixture( fixture )
+	b2Fixture* fixture
+	CODE:
+		THIS->DestroyFixture( fixture );
+
+void
+b2Body::SetTransform( position, angle )
+	b2Vec2* position
+	float32 angle
+	CODE:
+		THIS->SetTransform( *position, angle );
+
+
+b2Transform*
+b2Body::GetTransform( )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Transform";
+	CODE:
+		RETVAL = (b2Transform*)&(THIS->GetTransform());
+	OUTPUT:
+		RETVAL
+
+
+b2Vec2 *
+b2Body::GetPosition()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2 *)&(THIS->GetPosition());
+	OUTPUT:
+		RETVAL 
+
+float32
+b2Body::GetAngle()
+	CODE:
+		RETVAL = THIS->GetAngle();
+	OUTPUT:
+		RETVAL
+
+b2Vec2 *
+b2Body::GetWorldCenter()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2 *)&(THIS->GetWorldCenter());
+	OUTPUT:
+		RETVAL 
+
+b2Vec2 *
+b2Body::GetLocalCenter()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2 *)&(THIS->GetLocalCenter());
+	OUTPUT:
+		RETVAL 
+
+
+void
+b2Body::SetLinearVelocity( v )
+	b2Vec2 * v
+	CODE:
+		THIS->SetLinearVelocity( *v );
+
+
+b2Vec2 *
+b2Body::GetLinearVelocity()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetLinearVelocity();
+		RETVAL = new b2Vec2(lv);
+	OUTPUT:
+		RETVAL 
+
+void 
+b2Body::SetAngularVelocity(omega)
+	float32 omega
+	CODE:
+		THIS->SetAngularVelocity( omega );
+
+float32 
+b2Body::GetAngularVelocity()
+	CODE:
+		RETVAL = THIS->GetAngularVelocity();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::ApplyForce( force, point )
+	b2Vec2 * force
+	b2Vec2 * point
+	CODE:
+		THIS->ApplyForce( *force, *point );
+
+
+
+void 
+b2Body::ApplyTorque(torque)
+	float32 torque
+	CODE:
+		THIS->ApplyTorque( torque );
+
+
+void
+b2Body::ApplyLinearImpulse( impulse, point )
+	b2Vec2 * impulse
+	b2Vec2 * point
+	CODE:
+		THIS->ApplyLinearImpulse( *impulse, *point );
+
+
+void 
+b2Body::ApplyAngularImpulse(impulse)
+	float32 impulse
+	CODE:
+		THIS->ApplyAngularImpulse( impulse );
+
+
+float32 
+b2Body::GetMass()
+	CODE:
+		RETVAL = THIS->GetMass();
+	OUTPUT:
+		RETVAL
+
+
+float32 
+b2Body::GetInertia()
+	CODE:
+		RETVAL = THIS->GetInertia();
+	OUTPUT:
+		RETVAL
+
+
+
+b2Vec2 *
+b2Body::GetWorldPoint(localPoint)
+	b2Vec2* localPoint
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetWorldPoint(*localPoint);
+		RETVAL =  new b2Vec2(lv);
+	OUTPUT:
+		RETVAL 
+
+
+b2Vec2 *
+b2Body::GetWorldVector(localVector)
+	b2Vec2* localVector
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetWorldVector(*localVector);
+		RETVAL =  &lv;
+	OUTPUT:
+		RETVAL 
+
+b2Vec2 *
+b2Body::GetLocalPoint(worldPoint)
+	b2Vec2* worldPoint
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetLocalPoint(*worldPoint);
+		RETVAL =  &lv;
+	OUTPUT:
+		RETVAL 
+
+
+b2Vec2 *
+b2Body::GetLocalVector(worldVector)
+	b2Vec2* worldVector
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetLocalVector(*worldVector);
+		RETVAL =  &lv;
+	OUTPUT:
+		RETVAL 
+
+b2Vec2 *
+b2Body::GetLinearVelocityFromWorldPoint(worldPoint)
+	b2Vec2* worldPoint
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetLinearVelocityFromWorldPoint(*worldPoint);
+		RETVAL =  &lv;
+	OUTPUT:
+		RETVAL 
+
+b2Vec2 *
+b2Body::GetLinearVelocityFromLocalPoint(localPoint)
+	b2Vec2* localPoint
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2 lv = THIS->GetLinearVelocityFromLocalPoint(*localPoint);
+		RETVAL =  &lv;
+	OUTPUT:
+		RETVAL 
+
+float32
+b2Body::GetLinearDamping()
+	CODE:
+		RETVAL = THIS->GetLinearDamping();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetLinearDamping( linearDamping )
+	float32 linearDamping 
+	CODE:
+		THIS->SetLinearDamping( linearDamping );
+
+float32
+b2Body::GetAngularDamping()
+	CODE:
+		RETVAL = THIS->GetAngularDamping();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetAngularDamping( angularDamping )
+	float32 angularDamping 
+	CODE:
+		THIS->SetAngularDamping( angularDamping );
+
+
+void
+b2Body::SetType(type)
+	int type 
+	CODE:
+		THIS->SetType( (b2BodyType)type );
+
+
+int
+b2Body::GetType()
+	CODE:
+		RETVAL = (int)THIS->GetType();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetBullet(flag)
+	bool flag 
+	CODE:
+		THIS->SetBullet( flag );
+
+
+
+bool
+b2Body::IsBullet()
+	CODE:
+		RETVAL = THIS->IsBullet();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetSleepingAllowed(flag)
+	bool flag 
+	CODE:
+		THIS->SetSleepingAllowed( flag );
+
+
+
+bool
+b2Body::IsSleepingAllowed()
+	CODE:
+		RETVAL = THIS->IsSleepingAllowed();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetAwake(flag)
+	bool flag 
+	CODE:
+		 THIS->SetAwake( flag );
+
+
+
+bool
+b2Body::IsAwake()
+	CODE:
+		RETVAL = THIS->IsAwake();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetActive(flag)
+	bool flag 
+	CODE:
+		THIS->SetActive( flag );
+
+
+
+bool
+b2Body::IsActive()
+	CODE:
+		RETVAL = THIS->IsActive();
+	OUTPUT:
+		RETVAL
+
+
+void
+b2Body::SetFixedRotation(flag)
+	bool flag 
+	CODE:
+		THIS->SetFixedRotation( flag );
+
+
+
+bool
+b2Body::IsFixedRotation()
+	CODE:
+		RETVAL = THIS->IsFixedRotation();
+	OUTPUT:
+		RETVAL
+
+
+b2Body*
+b2Body::GetNext()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		RETVAL = THIS->GetNext();
+	OUTPUT:
+		RETVAL
+
+
+b2World*
+b2Body::GetWorld()
+	PREINIT:
+		const char* CLASS = "Box2D::b2World";
+	CODE:
+		RETVAL = THIS->GetWorld();
+	OUTPUT:
+		RETVAL
+
+
+SV*
+b2Body::GetUserData ( )
+	PPCODE: 
+		 void* userData = THIS->GetUserData();
+		 if (!userData)
+		  XSRETURN_EMPTY;
+		  ST(0) = (SV *)userData;
+		  XSRETURN(1);
+
+void
+b2Body::SetUserData ( ... )
+	PPCODE: 
+		if ( items > 1)
+			THIS->SetUserData( (void *)new_data( ST(1) ) );
+
+
+
+
+%}
+
+void ResetMassData();
+	
+};
+

@@ -1,0 +1,14 @@
+# example cnf file for DoTS
+
+name=kegg_title
+module=kegg_title
+version=
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.genome.ad.jp/pub/kegg/pathways/
+ftp_files=map_title.tab
+
+label=Kegg_Pathway_ID, dotset=Pathway_ID
+label=Kegg_Pathway_Name, dotset=Pathway_Name

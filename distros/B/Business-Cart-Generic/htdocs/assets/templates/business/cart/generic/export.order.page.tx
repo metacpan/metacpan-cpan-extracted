@@ -1,0 +1,15 @@
+<html>
+
+<head>
+
+<title>Order <: $id :></title>
+
+</head>
+
+<body>
+
+: include "basic.table.tx" {border => $border, row => $row};
+
+</body>
+
+</html>

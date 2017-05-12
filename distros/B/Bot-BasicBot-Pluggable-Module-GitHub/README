@@ -1,0 +1,110 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::GitHub - GitHub-related modules for
+    IRC bots running Bot::BasicBot::Pluggable
+
+DESCRIPTION
+    A set of modules for Bot::BasicBot::Pluggable bots, providing useful
+    GitHub-related functionality.
+
+    If your team use GitHub and colloborate on IRC, these may well be of
+    interest to you. They're already in use on the Dancer project's IRC
+    channel, and internally at my workplace, UK2.
+
+    Most communication with GitHub uses Net::GitHub::V2, and can use
+    authentication with an API key for private repositories.
+
+MODULES
+    The following modules are included - see the documentation for each for
+    more details on how to use them.
+
+    Bot::BasicBot::Pluggable::Module::GitHub::EasyLinks
+        Provide quick URLs to view issues/pull requests etc when someone
+        mentions one - for example:
+
+          <user> Go have a look at Issue 42
+          <bot1> Issue 42 (It doesn't work) https://github.com/....
+          <user> I fixed that in 5fcbb01
+          <bot1> Commit 5fcbb01 (Retarded logic fail.) - https://github.com/....
+ 
+        You can set a default project per-channel, so the above examples
+        will look at whatever project is set as default for the channel the
+        message was in.
+
+        You can also explicitly tell it to look at any other GitHub project:
+
+          <user> 5fcbb01 @ bigpresh/Bot-BasicBot-Pluggable-Module-GitHub
+          <bot1> Commit 5fcbb01 (Retarded logic fail.) - https://github.com/...
+
+    Bot::BasicBot::Pluggable::Module::GitHub::PullRequests
+        Monitor pull requests for GitHub projects.
+
+        Example:
+
+          <@bigpresh> !pr
+          < sophie> Open pull requests for sukria/Dancer : 8 pull requests open
+                    (felixdo:3, perlpilot:1, jamhed:1, dams:1, ambs:1, JTimothyKing:1)
+
+    Bot::BasicBot::Pluggable::Module::GitHub::Announce
+        Announces issues raised/closed for each channel's default project.
+
+        Periodically checks on issues for each project, and reports changes,
+        for example:
+
+          < sophie> Issues closed : 667 (YAML::XS for Session::YAML) by jamhed :
+                    https://github.com/sukria/Dancer/issues/667
+
+Loading modules
+    See the Bot::BasicBot::Pluggable documentation for how to load these
+    modules into your bot.
+
+    Do not load this module directly; load the modules named above
+    individually, to get just the functionality you require.
+
+    This module is intended only to provide a base for the other modules,
+    including shared functionality and common documentation.
+
+Configuring the default project repo
+    The modules above need to know what GitHub project repository they
+    should refer to.
+
+    The project (and, optionally, authentication details, if it's not a
+    public project) are configured with the `!setgithubproject' command in a
+    private message to the bot.
+
+    You'll need to be authenticated to the bot in order to set the project
+    (see the auth module).
+
+    You set the project with:
+
+      !setgithubproject #channel user/projectname
+
+    That sets the default project repo to `projectname' owned by `user' on
+    GitHub (in other words, <https://github.com/user/projectname>).
+
+    If the project is a private repository which requires authentication,
+    you can also tell the bot what user and token it should use to
+    authenticate:
+
+      !setgithubproject #channel user/privateproject someuser:githubtokenhere
+
+    You can generate/find an API token for your GitHub account at
+    https://github.com/account/admin
+
+AUTHOR
+    David Precious `<davidp@preshweb.co.uk'>
+
+ACKNOWLEDGEMENTS
+    James Ronan `<james@ronanweb.co.uk'>
+
+CONTRIBUTING
+    Contributions are very welcome.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

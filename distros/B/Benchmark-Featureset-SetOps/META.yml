@@ -1,0 +1,43 @@
+---
+abstract: 'Compare various array/set handling modules'
+author:
+  - 'Ron Savage (ron@savage.net.au)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Pod: '1.51'
+  Test::Simple: '1.302052'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Benchmark-Featureset-SetOps
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Config: '0'
+  Config::Tiny: '2.23'
+  Date::Simple: '3.03'
+  File::Copy: '2.3'
+  File::HomeDir: '1'
+  File::Slurper: '0.009'
+  Moo: '2.002004'
+  Path::Class: '0.37'
+  Set::Array: '0.3'
+  Set::Scalar: '1.29'
+  Set::Tiny: '0.04'
+  Text::Xslate: v3.3.9
+  Types::Standard: '1.000005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Benchmark-Featureset-SetOps
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ronsavage/Benchmark-Featureset-SetOps.git
+version: '1.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

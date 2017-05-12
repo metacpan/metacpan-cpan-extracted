@@ -1,0 +1,18 @@
+<h3>TARGETS</h3>
+<div class="row">
+    <div class="col-md-12">
+        <p><strong>Mission Points:</strong> [% points %]</p>
+    </div>
+    [% FOREACH t IN targets %]
+    <div class="col-md-6">
+        <div class="well">
+            <h4>[% t.type %]</h4>
+            [% IF t.type == 'FALL' %]
+            <p><strong>Fall of [% INCLUDE fragments/linked_nation.tt n = t.target_obj.name %]</strong><br />
+            [% t.description %]</p>
+            <p>Turns remaining: [% t.countdown %]</p>
+            [% END %]
+        </div>
+    </div>
+    [% END %]
+</div>

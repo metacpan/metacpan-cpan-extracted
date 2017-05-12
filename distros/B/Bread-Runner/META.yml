@@ -1,0 +1,23 @@
+---
+abstract: 'run ALL the apps via Bread::Board'
+author:
+  - 'Thomas Klausner <domm@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bread-Runner
+requires:
+  Bread::Board: '0'
+  Log::Any: '0'
+resources:
+  repository: git://github.com/domm/Bread-Runner.git
+version: '0.901'
+x_serialization_backend: 'YAML::Tiny version 1.69'

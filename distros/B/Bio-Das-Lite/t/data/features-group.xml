@@ -1,0 +1,29 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASGFF SYSTEM "http://www.biodas.org/dtd/dasgff.dtd">
+<DASGFF>
+  <GFF version="1.0" href="url">
+  <SEGMENT id="id" start="start" stop="stop" type="type" version="X.XX" label="label">
+      <FEATURE id="id" label="label">
+         <TYPE id="id" category="category" reference="yes|no">type label</TYPE>
+         <METHOD id="id"> method label </METHOD>
+         <START> start </START>
+         <END> end </END>
+         <SCORE> [X.XX|-] </SCORE>
+         <ORIENTATION> [0|-|+] </ORIENTATION>
+         <PHASE> [0|1|2|-]</PHASE>
+         <NOTE> note text </NOTE>
+	 <LINK href="url"> link text </LINK>
+	 <TARGET id="id" start="x" stop="y">target name</TARGET>
+         <PARENT id="id2" />
+      </FEATURE>
+      <FEATURE id="id2" label="label">
+         <TYPE id="type">type</TYPE>
+         <NOTE> group note 1 text </NOTE>
+         <LINK href="groupurl1"> group link text 1</LINK>
+         <NOTE> group note 2 text </NOTE>
+         <LINK href="groupurl2"> group link text 2</LINK>
+         <TARGET id="id" start="x" stop="y">target name</TARGET>
+      </FEATURE>
+  </SEGMENT>
+  </GFF>
+</DASGFF>

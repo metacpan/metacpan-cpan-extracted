@@ -1,0 +1,27 @@
+0.12
+	- add auto_checkpoint
+
+0.11
+	- Enable locking by default
+	- Add deadlock detection (enabled by default)
+	- txn_begin/txn_commit/txn_rollback no longer take arbitrary transaction
+	  arguments due to deadlocks caused when not reenabling the parent
+	  transaction after rolling back a child transaction.
+
+0.10
+	- Try to not die if DB_MULTIVERSION isn't defined and the user is not trying to use it
+
+0.09
+	- Add version detection logic
+	- Better diagnostics in test suite
+
+0.08
+	- In the test suite, report $BereleyDB::Error whenever a status assertion
+	  fails.
+
+0.07
+	- Only evaluate DB_TXN_SNAPSHOT when it will actually be meaningful to
+	  avoid errors on BDB versions that don't support it 
+
+0.01-0.06
+	- Initial release cycle

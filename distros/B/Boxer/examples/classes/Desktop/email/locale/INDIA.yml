@@ -1,0 +1,26 @@
+#TODO: switch from bn-bd to bn-in if that emerges at some point
+#TODO: switch from ta-lk to ta (or ta-in) if that emerges at some point
+# languages (and in paranthesis: locales, and scripts when exceptional)
+# union: Hindi(hi,devanagari) English(en-GB)
+# 8th Schedule additions: Assamese(as) Bengali(bn) Bodo(brx) Dogri(doi)
+#   Gujarati(gu) Kannada(kn) Kashmiri(ks,persian/perso-arabic)
+#   Konkani(kok) Maithili(mai,tirhuta) Malayalam(ml)
+#   Manipuri/Meitei/Meithei(mni) Marathi(mr) Nepali(ne) Oriya(or)
+#   Punjabi(pa,gurmukhi/shahmukhi) Sanskrit(sa)
+#   Santali(sat,ol chiki/ol cemet) Sindhi(sd,khudabadi,landa) Tamil(ta)
+#   Telugu(te) Urdu(ur)
+# state only: Garo(grt) Khasi(kha) Kokborok(trp/ria/tpe/usi/xtr) Mizo(lus)
+# bn-bd en-gb pa-in ta-lk
+classes:
+  - Desktop.email
+  - Desktop.email.bidi
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include Icedove locales for official languages of India
+  pkg:
+    - icedove-l10n-bn-bd
+    - icedove-l10n-en-gb
+    - icedove-l10n-pa-in
+    - icedove-l10n-ta-lk

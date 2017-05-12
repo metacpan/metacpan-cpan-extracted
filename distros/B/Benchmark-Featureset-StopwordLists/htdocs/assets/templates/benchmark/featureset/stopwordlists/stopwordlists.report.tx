@@ -1,0 +1,59 @@
+<html>
+<head>
+<title>Perl Modules for Stop Word Lists</title>
+<link rel="stylesheet" type="text/css" href="<: $default_css :>">
+<link rel="stylesheet" type="text/css" href="<: $fancy_table_css :>">
+</head>
+<body>
+
+<h3 class="global_toc_text">Purpose</h3>
+
+<p align="center">To report on a personal selection of stand-alone modules which offer stop word lists.</p>
+
+<table align="center">
+<tr><td>Module names are read from data/module.list.ini, which is shipped with the distro.</td></tr>
+<tr><td>Each module's data has an indicator - 'include = Yes/No' - which makes it easy to edit & re-run.</td></tr>
+<tr><td>But, because each <strong>included</strong> module has a different mechanism for returning the list of words, their names are also hard-coded in the source code.</td></tr>
+<tr><td>Excluded modules are listed at the end of this report.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Report generator</h3>
+
+: include "fancy.table.tx" { data => $report_generator };
+
+<hr />
+
+<h3 class="global_toc_text">Modules included</h3>
+
+: include "basic.table.tx" { row => $modules_included };
+
+<hr />
+
+<h3 class="global_toc_text">Words</h3>
+
+: include "basic.table.tx" { row => $word_data };
+
+<hr />
+
+<h3 class="global_toc_text">Modules excluded</h3>
+
+: include "basic.table.tx" { row => $modules_excluded };
+
+<table align="center">
+<tr><td>Modules are excluded if they are not stand-alone,</td></tr>
+<tr><td>or if they require the user to supply the stopword list.</td></tr>
+<tr><td>Lastly, modules are excluded if they use one of the other modules listed in this report.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+: include "fancy.table.tx" { data => $environment };
+
+<hr />
+
+</body>
+</html>

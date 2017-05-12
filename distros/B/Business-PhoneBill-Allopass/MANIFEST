@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+Allopass.pm
+Allopass/Simple.pm
+Allopass/Infos.pm
+README
+COPYING
+t/use.t
+t/pod.t
+t/pod-coverage.t
+examples/ex1.pl
+examples/Simple.txt
+META.yml                                 Module meta-data (added by MakeMaker)

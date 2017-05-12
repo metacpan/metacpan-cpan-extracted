@@ -1,0 +1,68 @@
+NAME
+
+    Bio::MLST::Check - Multilocus sequence type checking using blast
+
+VERSION
+
+    version 2.1.1706216
+
+SYNOPSIS
+
+    High throughput multilocus sequence typing (MLST) checking.
+
+DESCRIPTION
+
+    This application is for taking Multilocus sequence typing (MLST)
+    sources from multiple locations and consolidating them in one place so
+    that they can be easily used (and kept up to date). Then you can
+    provide FASTA files and get out sequence types for a given MLST
+    database. Two spreadsheets are outputted, one contains the allele
+    number for each locus, and the ST (or nearest ST), the other contains
+    the genomic sequence for each allele. If more than 1 allele gives 100%
+    identity for a locus, the contaminated flag is set. Optionally you can
+    output a concatenated sequence in FASTA format, which you can then use
+    with tree building programs. New, unseen alleles are saved in FASTA
+    format, with 1 per file, for submission to back to MLST databases.
+
+    It requires NCBI Blast+ to be installed and for blastn and makeblastdb
+    to be in your PATH.
+
+       # Add this environment variable to your ~/.bashrc file - do this once
+       export MLST_DATABASES=/path/to/where_you_want_to_store_the_databases
+       
+       # Download the latest copy of the databases (run it once per month)
+       download_mlst_databases
+       
+       # Find the sequence types for all fasta files in your current directory
+       get_sequence_type -s "Clostridium difficile" *.fa
+    
+       use Bio::MLST::Check;
+       Bio::MLST::Check->new(
+         'species'           => 'E.coli',
+         'base_directory'    => '/path/to/dir',
+         'raw_input_fasta_files'  => ['myfasta.fa'],
+         'makeblastdb_exec'  => 'makeblastdb',
+         'blastn_exec'       => 'blastn',
+         'output_directory'  => '/path/to/output',
+         'output_fasta_files'=> 1,
+       );
+
+METHODS
+
+ create_result_files
+
+    Creates a spreadsheet of results, FASTA files with novel sequences and
+    optionally a concatentated sequence (FASTA) for tree building.
+
+AUTHOR
+
+    Andrew J. Page <ap13@sanger.ac.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

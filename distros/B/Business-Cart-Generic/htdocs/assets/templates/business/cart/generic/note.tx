@@ -1,0 +1,5 @@
+<table align="center">
+: for $data -> $item {
+<tr><td><: $item.td :></td></tr>
+: }
+</table>

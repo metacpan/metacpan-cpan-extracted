@@ -1,0 +1,66 @@
+<?xml version="1.0" standalone="no"?>
+<dasstructure xmlns="http://www.efamily.org.uk/xml/das/2004/06/17/dasstructure.xsd" xmlns:data="http://www.efamily.org.uk/xml/data/2004/06/17/dataTypes.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.efamily.org.uk/xml/das/2004/06/17/dasstructure.xsd http://www.efamily.org.uk/xml/das/2004/06/17/dasstructure.xsd">
+  <object dbAccessionId="TEST" intObjectId="TEST" objectVersion="1" type="protein structure" dbSource="PDB" dbVersion="20070116" dbCoordSys="PDBresnum,Protein Structure"/>
+  <chain id=" " SwissprotId="null">
+    <group name="ARG" type="amino" groupID="1">
+      <atom atomID="1" atomName=" N  " x="32.231" y="15.281" z="-13.143"/>
+      <atom atomID="2" atomName=" CA " x="32.184" y="14.697" z="-11.772"/>
+      <atom atomID="3" atomName=" C  " x="33.438" y="13.89" z="-11.387"/>
+      <atom atomID="4" atomName=" O  " x="34.102" y="13.07" z="-12.066"/>
+      <atom atomID="5" atomName=" CB " x="30.797" y="14.065" z="-11.625"/>
+      <atom atomID="6" atomName=" CG " x="30.976" y="12.589" z="-11.819"/>
+      <atom atomID="7" atomName=" CD " x="29.608" y="12.016" z="-11.694"/>
+      <atom atomID="8" atomName=" NE " x="28.942" y="12.335" z="-12.945"/>
+      <atom atomID="9" atomName=" CZ " x="27.67" y="12.696" z="-13.05"/>
+      <atom atomID="10" atomName=" NH1" x="26.901" y="12.777" z="-11.999"/>
+      <atom atomID="11" atomName=" NH2" x="27.161" y="12.963" z="-14.255"/>
+      <atom atomID="12" atomName="1D  " x="32.983" y="14.824" z="-13.703"/>
+      <atom atomID="13" atomName="2D  " x="31.275" y="15.112" z="-13.535"/>
+      <atom atomID="14" atomName="3D  " x="32.174" y="16.346" z="-13.05"/>
+      <atom atomID="15" atomName=" HA " x="32.192" y="15.563" z="-11.115"/>
+      <atom atomID="16" atomName="1HB " x="30.392" y="14.428" z="-10.697"/>
+      <atom atomID="17" atomName="2HB " x="30.182" y="14.438" z="-12.437"/>
+      <atom atomID="18" atomName="1HG " x="31.369" y="12.359" z="-12.8"/>
+      <atom atomID="19" atomName="2HG " x="31.591" y="12.143" z="-11.105"/>
+      <atom atomID="20" atomName="1HD " x="29.656" y="10.965" z="-11.482"/>
+      <atom atomID="21" atomName="2HD " x="29.218" y="12.381" z="-10.794"/>
+      <atom atomID="22" atomName=" DE " x="29.457" y="12.292" z="-13.843"/>
+      <atom atomID="23" atomName="1DH1" x="25.93" y="13.038" z="-12.118"/>
+      <atom atomID="24" atomName="2DH1" x="27.324" y="12.549" z="-11.1"/>
+      <atom atomID="25" atomName="1DH2" x="27.786" y="12.886" z="-15.076"/>
+      <atom atomID="26" atomName="2DH2" x="26.154" y="13.214" z="-14.269"/>
+    </group>
+    <group name="PRO" type="amino" groupID="2">
+      <atom atomID="27" atomName=" N  " x="33.738" y="14.173" z="-10.126"/>
+      <atom atomID="28" atomName=" CA " x="34.897" y="13.603" z="-9.39"/>
+      <atom atomID="29" atomName=" C  " x="34.652" y="12.135" z="-9.374"/>
+      <atom atomID="30" atomName=" O  " x="33.583" y="11.537" z="-9.255"/>
+      <atom atomID="31" atomName=" CB " x="34.826" y="14.292" z="-8.056"/>
+      <atom atomID="32" atomName=" CG " x="33.927" y="15.515" z="-8.135"/>
+      <atom atomID="33" atomName=" CD " x="32.967" y="15.143" z="-9.243"/>
+      <atom atomID="34" atomName=" HA " x="35.676" y="14.152" z="-9.928"/>
+      <atom atomID="35" atomName="1HB " x="34.431" y="13.672" z="-7.369"/>
+      <atom atomID="36" atomName="2HB " x="35.763" y="14.517" z="-7.635"/>
+      <atom atomID="37" atomName="1HG " x="33.695" y="15.873" z="-7.33"/>
+      <atom atomID="38" atomName="2HG " x="34.491" y="16.303" z="-8.682"/>
+      <atom atomID="39" atomName="1HD " x="32.028" y="14.742" z="-9.058"/>
+      <atom atomID="40" atomName="2HD " x="32.88" y="16.031" z="-9.875"/>
+    </group>  
+    <group name="PO4" type="hetatm" groupID="70">
+      <atom atomID="920" atomName=" P  " x="32.672" y="12.772" z="10.325"/>
+      <atom atomID="921" atomName=" O1 " x="33.53" y="14.005" z="10.556"/>
+      <atom atomID="922" atomName=" O2 " x="31.499" y="12.81" z="11.272"/>
+      <atom atomID="923" atomName=" O3 " x="32.136" y="12.729" z="8.909"/>
+      <atom atomID="924" atomName=" O4 " x="33.561" y="11.57" z="10.555"/>
+    </group>
+  </chain>
+  <het>
+    <group name="UNK" type="hetatm" groupID="324">
+      <atom atomID="925" atomName=" UNK" x="23.599" y="13.195" z="-7.043"/>
+    </group>
+  </het>
+  <connect atomSerial="79" type="bond">
+    <atomID atomID="78"/>
+    <atomID atomID="888"/>
+  </connect>
+</dasstructure>

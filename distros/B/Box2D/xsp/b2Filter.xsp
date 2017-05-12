@@ -1,0 +1,51 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Filter} class b2Filter
+{
+
+b2Filter();
+
+%{
+
+uint16
+b2Filter::categoryBits( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->categoryBits = (uint16)SvNV( ST(1) );
+		}
+		RETVAL = THIS->categoryBits;
+	OUTPUT:
+		RETVAL
+
+uint16
+b2Filter::maskBits( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maskBits = (uint16)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maskBits;
+	OUTPUT:
+		RETVAL
+
+int16
+b2Filter::groupIndex( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->groupIndex = (int16)SvNV( ST(1) );
+		}
+		RETVAL = (int16)THIS->groupIndex;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};

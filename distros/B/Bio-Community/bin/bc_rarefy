@@ -1,0 +1,229 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_rarefy
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Bio::Community::Tools::Rarefier;
+use Method::Signatures;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_rarefy - Rarefy communities
+
+=head1 SYNOPSIS
+
+  bc_rarefy -input_files   my_communities.generic   \
+            -output_prefix my_converted_communities \
+            -sample_size   1000
+
+=head1 DESCRIPTION
+
+This script reads a file containing biological communities and performs
+rarefaction, i.e. repeatedly takes a random subset of the community members,
+in order to normalize communities by member count. Rarefaction is useful to
+simulate an identical sampling effort for all communities. The output is a file
+containing rarefied, representative communities (integers). See
+L<Bio::Community::Tools::Rarefier> for more information.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to rarefy. When providing communities
+in a format that supports only one community per file (e.g. gaas), you can
+provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_rarefy'
+
+=item -ss <sample_size> | -sample_size <sample_size>
+
+Number of members to randomly take at each bootstrap iteration. If omitted, the
+sample size defaults to the size (member count) of the smallest community.
+
+=for Euclid:
+   sample_size.type: +integer
+
+=item -dt <dist_threshold> | -dist_threshold <dist_threshold>
+
+Keep doing bootstrap iterations until the distance between the current average
+community and the average community at the previous iteration becomes less than
+the specified threshold. Default: dist_threshold.default
+
+=for Euclid:
+   dist_threshold.type: +num
+   dist_threshold.default: 1e-3
+
+=item -nr <num_repetitions> | -num_repetitions <num_repetitions>
+
+Perform the specified number of bootstrap iterations instead of a dynamic number
+of iterations based on a distance threshold. As a special case, use 'inf' to
+assume an infinite number of repetitions.
+
+=for Euclid:
+   num_repetitions.type: string
+
+=item -wa <write_average> | -write_average <write_average>
+
+Write the average bootstraped communities (decimals) in addition to the rarefied
+communities (integers): 1 is yes, 0 is no. Default: write_average.default
+
+=for Euclid:
+   write_average.type: integer, write_average == 0 || write_average == 1
+   write_average.type.error: <write_average> must be 0 or 1 (not write_average)
+   write_average.default: 0
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+rarefy( $ARGV{'input_files'}, $ARGV{'output_prefix'}, $ARGV{'sample_size'},
+   $ARGV{'dist_threshold'}, $ARGV{'num_repetitions'}, $ARGV{'write_average'} );
+exit;
+
+
+func rarefy ($input_files, $output_prefix, $sample_size, $dist_threshold,
+   $num_repetitions, $write_average) {
+
+   # Read input communities
+   my $meta = Bio::Community::Meta->new();
+   my $communities = [];
+   my $format;
+   for my $input_file (@$input_files) {
+      my $in = Bio::Community::IO->new( -file => $input_file );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+   # Prepare normalizer
+   my $normalizer = Bio::Community::Tools::Rarefier->new(
+      -metacommunity => $meta,
+      -verbose       => 1,
+   );
+   if (defined $dist_threshold) {
+      $normalizer->threshold($dist_threshold);
+   }
+   if (defined $num_repetitions) {
+      $normalizer->num_repetitions($num_repetitions);
+   }
+   if (defined $sample_size) {
+      $normalizer->sample_size($sample_size);
+   }
+
+   # Bootstrap and write average communities
+   my $out_meta = $normalizer->get_avg_meta;
+   if ($write_average) {
+      write_communities($out_meta, $output_prefix, $format, 'average');
+   }
+
+   # Calculate and write rarefied communities
+   $out_meta = $normalizer->get_repr_meta;
+   write_communities($out_meta, $output_prefix, $format, '');
+
+   return 1;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type='') {
+   $type ||= '';
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format => $output_format,
+            -file   => '>'.$output_file,
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

@@ -1,0 +1,19 @@
+=head1 USE
+
+If you use the C<contact_us> keyword, bigtop will create a CONTACT US POD
+section in all of the controller modules.  This includes the base module
+and its GEN piece, but not other GEN modules nor any models.
+
+=head1 THE EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<example> in these files:
+
+ docs/kids.bigtop
+ lib/GENKids.pm
+ lib/Kids.pm
+ lib/Kids/Child.pm
+

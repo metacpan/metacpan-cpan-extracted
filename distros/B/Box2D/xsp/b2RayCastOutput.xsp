@@ -1,0 +1,43 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2RayCastOutput} class b2RayCastOutput
+{
+
+b2RayCastOutput();
+
+%{
+
+b2Vec2*
+b2RayCastOutput::normal( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->normal = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->normal);
+	OUTPUT:
+		RETVAL
+
+float32
+b2RayCastOutput::fraction( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->fraction = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->fraction;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

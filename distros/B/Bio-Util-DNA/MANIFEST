@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Bio/Util/DNA.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

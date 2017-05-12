@@ -1,0 +1,259 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_relative_to_absolute
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Scalar::Util;
+use Method::Signatures;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_relative_to_absolute - Convert relative abundances into absolute
+
+=head1 SYNOPSIS
+
+  bc_relative_to_absolute -input_files      my_communities.generic \
+                          -abundance_file   my_counts.tsv          \
+                          -round_abundance  1                      \
+                          -output_prefix    my_results
+
+=head1 DESCRIPTION
+
+This script reads files containing biological communities and a file of
+abundance for these communities. The relative abundance of each member is
+multiplied by the total abundance for its community and rounded (if requested)
+to obtain the absolute abundance of this member.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input files containing the communities to process. All files must have the same
+format, which can be one of generic (tab-delimited table), qiime, gaas or
+unifrac. See L<Bio::Community::IO> for more information on these format.
+
+=for Euclid:
+   input_files.type: readable
+
+=item -af <abundance_file> | -abundance_file <abundance_file>
+
+File containing the total abundance for each community. Each line in the file should
+be tab-separated and have two columns: community name, total abundance.
+
+=for Euclid:
+   abundance_file.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -ra <round_abundance> | -round_abundance <round_abundance>
+
+Specify whether or not the absolute abundance should be rounded to the nearest
+integer. Default: round_abundance.default
+
+=for Euclid:
+   round_abundance.type: integer, round_abundance == 0 || round_abundance == 1
+   round_abundance.default: 0
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Several output files will be created if
+the requested output format can only hold a single community. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_relative_to_absolute'
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+relative_to_absolute(
+   $ARGV{'input_files'}, $ARGV{'abundance_file'}, $ARGV{'round_abundance'},
+   $ARGV{'output_prefix'}
+);
+
+exit;
+
+
+func relative_to_absolute ($input_files, $abundance_file, $round_abundance, $output_prefix) {
+
+   # Read input communities
+   my $meta = Bio::Community::Meta->new();
+   my $communities = [];
+   my $format;
+   for my $input_file (@$input_files) {
+      my $in = Bio::Community::IO->new( -file => $input_file );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         my $tot_count = $community->get_members_count;
+         if ( ($tot_count < 99.9) || ($tot_count > 100.1) ) {
+            warn "Warning: The members in community ".$community->name." did ".
+               "not add up to 100% (got $tot_count).\n";
+         }
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+   # Read total abundances
+   my $abundances = read_abundance_file($abundance_file);
+
+   # Add total abundances to communities
+   my $rounded_meta;
+   if ($round_abundance) {
+      $rounded_meta = $meta->clone;
+      while (my $community = $rounded_meta->next_community) {
+         $rounded_meta->remove_community($community);
+      }
+   }
+   while (my $community = $meta->next_community) {
+      my $name = $community->name;
+      my $abundance = $abundances->{$name};
+      if (not defined $abundance) {
+         die "Error: No total abundance specified for community '$name'\n";
+      }
+      print "Processing community '$name' (total abundance: $abundance)\n";
+
+      $community->set_members_abundance($abundance);
+
+      if ($round_abundance) {
+         # Calculate rounded absolute abundance
+         my $tmp_community = $community->clone;
+         while (my $member = $community->next_member) {
+            $tmp_community->remove_member($member);
+            $tmp_community->add_member($member, $community->get_abs_ab($member));
+            # counts in $tmp_community represent decimal absolute abundance
+         }
+         require Bio::Community::Tools::Rarefier;
+         my $rarefier = Bio::Community::Tools::Rarefier->new(
+            -metacommunity   =>
+                Bio::Community::Meta->new(-communities =>[$tmp_community]),
+            -sample_size     => $abundance,
+            -num_repetitions => 'inf',
+         );
+         my $rounded_community = $rarefier->get_repr_meta->next_community;
+         # counts are now integers representing absolute abundance
+         $rounded_meta->add_communities([$rounded_community]);
+      }
+
+   }
+   if ($round_abundance) {
+      $meta = $rounded_meta;
+   }
+
+   write_communities($meta, $output_prefix, $format, '');
+
+   return 1;
+}
+
+
+func read_abundance_file ($file) {
+   my %abundances;
+   open my $in, '<', $file or die "Error: Could not read file $file\n$!\n";
+   while (my $line = <$in>) {
+      next if $line =~ m/^#/;
+      next if $line =~ m/^\s*$/;
+      chomp $line;
+      my ($name, $abundance) = split "\t", $line;
+      if (not Scalar::Util::looks_like_number($abundance)) {
+         die "Error: Total abundance for community '$name', '$abundance', does ".
+             "not look numeric\n";
+      }
+      $abundances{$name} = $abundance;
+   }
+   close $in;
+   return \%abundances;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type='') {
+   $type ||= '';
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format         => $output_format,
+            -file           => '>'.$output_file,
+            -abundance_type => 'absolute',
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

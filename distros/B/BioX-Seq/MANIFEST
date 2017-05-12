@@ -1,0 +1,26 @@
+Build.PL
+Changes
+lib/BioX/Seq.pm
+lib/BioX/Seq/Fetch.pm
+lib/BioX/Seq/Stream.pm
+lib/BioX/Seq/Stream/FASTA.pm
+lib/BioX/Seq/Stream/FASTQ.pm
+lib/BioX/Seq/Stream/TwoBit.pm
+lib/BioX/Seq/Utils.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test.t
+t/test_data/test.fa
+t/test_data/test.fq
+t/test_data/test2.fa.gz
+t/test_data/test2.fa.gz.fai.cmp
+t/test_data/test3.2bit
+t/test_data/test4.fa

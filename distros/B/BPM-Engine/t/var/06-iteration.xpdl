@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+  xmlns:deprecated="http://www.wfmc.org/2004/XPDL2.0alpha"
+  xmlns:sitecorp="http://schemas.sitecorporation.com/bpm"
+  xmlns:tns="http://schemas.xmlsoap.org/tns/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes"
+  xmlns:fn="http://www.w3.org/2004/07/xpath-functions"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" Id="06-iteration.xpdl" Name="Iteration Patterns">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <DataFields>
+        <DataField Id="WhereToGo" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+        <DataField Id="pathtaken" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+    </DataFields>
+    <WorkflowProcesses>
+
+
+        <WorkflowProcess Id="wcp21a" Name="WCP21: Structured Loop (Pre-Test, while-loop)">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+                <Description>The Structured Loop pattern describes the possibility of executing an activity or sub-process repeatedly. This loop has either a pre-test or a post-test condition which means that the condition is either evaluated at the beginning or the end of a loop. The loop itself has a single entry point and a single exit point. [Aalst09].</Description>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="cycle" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp21a.Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="wcp21a.A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp21a.B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp21a.B-C"/>
+                                    <TransitionRef Id="wcp21a.B-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp21a.C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp21a.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp21a.Start-A" From="wcp21a.Start" To="wcp21a.A"/>
+                <Transition Id="wcp21a.A-B" From="wcp21a.A" To="wcp21a.B"/>
+                <Transition Id="wcp21a.B-C" From="wcp21a.B" To="wcp21a.C">
+                    <Condition Type="CONDITION">attribute('cycle') > 0</Condition>
+                </Transition>
+                <Transition Id="wcp21a.B-End" From="wcp21a.B" To="wcp21a.End">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp21a.C-A" From="wcp21a.C" To="wcp21a.A"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess Id="wcp21b" Name="WCP21: Structured Loop (Post-Test, repeat-loop)">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+                <Description>The Structured Loop pattern describes the possibility of executing an activity or sub-process repeatedly. This loop has either a pre-test or a post-test condition which means that the condition is either evaluated at the beginning or the end of a loop. The loop itself has a single entry point and a single exit point. [Aalst09].</Description>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="cycle" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp21b.Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="wcp21b.A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp21b.B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="wcp21b.C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp21b.C-A"/>
+                                    <TransitionRef Id="wcp21b.C-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp21b.D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp21b.Start-A" From="wcp21b.Start" To="wcp21b.A"/>
+                <Transition Id="wcp21b.A-B" From="wcp21b.A" To="wcp21b.B"/>
+                <Transition Id="wcp21b.B-C" From="wcp21b.B" To="wcp21b.C"/>
+                <Transition Id="wcp21b.C-A" From="wcp21b.C" To="wcp21b.A">
+                    <Condition Type="CONDITION">attribute('cycle') > 0</Condition>
+                </Transition>
+                <Transition Id="wcp21b.C-D" From="wcp21b.C" To="wcp21b.D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10a" Name="WCP10: Arbitrary Cycles I">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp10a.A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp10a.Join1" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp10a.Join2" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.C" Name="C">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will loop to activity B and otherwise it'll go to activity D</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp10a.Split1" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10a.Split1-Join1"/>
+                                    <TransitionRef Id="wcp10a.Split1-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.D" Name="D">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to C process will loop to activity C and otherwise it'll go to activity E</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp10a.Split2" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10a.Split2-Join2"/>
+                                    <TransitionRef Id="wcp10a.Split2-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp10a.A-Join1" Name="Transition" From="wcp10a.A" To="wcp10a.Join1"/>
+                <Transition Id="wcp10a.Join1-B" Name="Transition" From="wcp10a.Join1" To="wcp10a.B"/>
+                <Transition Id="wcp10a.B-Join2" Name="Transition" From="wcp10a.B" To="wcp10a.Join2"/>
+                <Transition Id="wcp10a.Join2-C" Name="Transition" From="wcp10a.Join2" To="wcp10a.C"/>
+                <Transition Id="wcp10a.C-Split1" Name="Transition" From="wcp10a.C" To="wcp10a.Split1"/>
+                <Transition Id="wcp10a.Split1-Join1" Name="Transition" From="wcp10a.Split1" To="wcp10a.Join1">
+                    <Condition Type="CONDITION">attribute('repeatBC')</Condition>
+                </Transition>
+                <Transition Id="wcp10a.Split1-D" Name="Transition" From="wcp10a.Split1" To="wcp10a.D"/>
+                <Transition Id="wcp10a.D-Split2" Name="Transition" From="wcp10a.D" To="wcp10a.Split2"/>
+                <Transition Id="wcp10a.Split2-Join2" Name="Transition" From="wcp10a.Split2" To="wcp10a.Join2">
+                    <Condition Type="CONDITION">attribute('repeatCD')</Condition>
+                </Transition>
+                <Transition Id="wcp10a.Split2-E" Name="Transition" From="wcp10a.Split2" To="wcp10a.E"/>
+            </Transitions>
+        </WorkflowProcess>
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10r" Name="WCP10: Arbitrary Cycles (routing)">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp10a.Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="wcp10a.Join" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.JoinSplit" Name="XOR-XOR">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10a.JoinSplit-Join"/>
+                                    <TransitionRef Id="wcp10a.JoinSplit-Split"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.Split" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10a.Split-JoinSplit"/>
+                                    <TransitionRef Id="wcp10a.Split-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10a.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp10a.Start-Join" Name="Transition" From="wcp10a.Start" To="wcp10a.Join"/>
+                <Transition Id="wcp10a.Join-JoinSplit" Name="Transition" From="wcp10a.Join" To="wcp10a.JoinSplit"/>
+                <Transition Id="wcp10a.JoinSplit-Join" Name="Transition" From="wcp10a.JoinSplit" To="wcp10a.Join">
+                    <Condition Type="CONDITION">attribute('repeat1')</Condition>
+                </Transition>
+                <Transition Id="wcp10a.JoinSplit-Split" Name="Transition" From="wcp10a.JoinSplit" To="wcp10a.Split"/>
+                <Transition Id="wcp10a.Split-JoinSplit" Name="Transition" From="wcp10a.Split" To="wcp10a.JoinSplit">
+                    <Condition Type="CONDITION">attribute('repeat2')</Condition>
+                </Transition>
+                <Transition Id="wcp10a.Split-End" Name="Transition" From="wcp10a.Split" To="wcp10a.End"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10b" Name="WCP10: Arbitrary Cycles II">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp10b.A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp10b.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.C" Name="C">
+                    <Description></Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10b.C-B"/>
+                                    <TransitionRef Id="wcp10b.C-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.D" Name="D">
+                    <Description></Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10b.D-C"/>
+                                    <TransitionRef Id="wcp10b.D-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp10b.A-B" Name="Transition" From="wcp10b.A" To="wcp10b.B"/>
+                <Transition Id="wcp10b.B-C" Name="Transition" From="wcp10b.B" To="wcp10b.C"/>
+                <Transition Id="wcp10b.C-B" Name="Transition" From="wcp10b.C" To="wcp10b.B">
+                    <Condition Type="CONDITION">whereToGo=="B"</Condition>
+                </Transition>
+                <Transition Id="wcp10b.C-D" Name="Transition" From="wcp10b.C" To="wcp10b.D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp10b.D-C" Name="Transition" From="wcp10b.D" To="wcp10b.C">
+                    <Condition Type="CONDITION">whereToGo=="C"</Condition>
+                </Transition>
+                <Transition Id="wcp10b.D-E" Name="Transition" From="wcp10b.D" To="wcp10b.E">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>
+
+        <WorkflowProcess Id="wcp10b2" Name="WCP10: Arbitrary Cycles (nested-loops)">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="inner_loop" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="outer_loop" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="wcp10b.Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="wcp10b.A-XOR-Join" Name="A-XOR-Join">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.B-OR-Join" Name="B-OR-Join">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.C-OR-Split" Name="C-OR-Split">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10b.C-OR-Split-B-OR-Join"/>
+                                    <TransitionRef Id="wcp10b.C-OR-Split-D-XOR-Split"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.D-XOR-Split" Name="D-XOR-Split">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp10b.D-XOR-Split-A-XOR-Join"/>
+                                    <TransitionRef Id="wcp10b.D-XOR-Split-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp10b.End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp10b.Start-A-XOR-Join" From="wcp10b.Start" To="wcp10b.A-XOR-Join"/>
+                <Transition Id="wcp10b.A-XOR-Join-B-OR-Join" From="wcp10b.A-XOR-Join" To="wcp10b.B-OR-Join"/>
+                <Transition Id="wcp10b.B-OR-Join-C-OR-Split" From="wcp10b.B-OR-Join" To="wcp10b.C-OR-Split"/>
+                <Transition Id="wcp10b.C-OR-Split-B-OR-Join" From="wcp10b.C-OR-Split" To="wcp10b.B-OR-Join">
+                    <Condition Type="CONDITION">attribute('inner_loop') > 0</Condition>                
+                </Transition>
+                <Transition Id="wcp10b.C-OR-Split-D-XOR-Split" From="wcp10b.C-OR-Split" To="wcp10b.D-XOR-Split">
+                    <Condition Type="CONDITION">1</Condition>
+                </Transition>
+                <Transition Id="wcp10b.D-XOR-Split-A-XOR-Join" From="wcp10b.D-XOR-Split" To="wcp10b.A-XOR-Join">
+                    <Condition Type="CONDITION">attribute('outer_loop') > 0</Condition>                
+                </Transition>
+                <Transition Id="wcp10b.D-XOR-Split-End" From="wcp10b.D-XOR-Split" To="wcp10b.End">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PRIVATE" Id="WfPIMI_Subflow" Name="WfPIMI Subflow">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-09-07 04:04:45</Created>
+                <Description>not to be instantiated directly, but used only as a subflow process</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="P1" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="P2" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="sbflw_act" Name="Subflow activity">
+                    <Description>This is a subflow</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

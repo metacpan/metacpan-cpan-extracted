@@ -1,0 +1,8 @@
+Revision history for Perl extension BSD::devstat
+
+0.02    Thu Apr  1 23:26:36 2010
+        - Rename to compstat-gen.PL to hide from index and not
+          install.
+
+0.01    Sun Mar 24 19:57:58 2010
+        - original version

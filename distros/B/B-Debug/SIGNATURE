@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 de7103701689a139bed62c0003b50750f5bd1577 Changes
+SHA1 1fa102688dd2d79dbf4cf269aabd2e5482ab7734 Copying
+SHA1 cc35b873d7db45b18b66e91eea941211c267e2c9 Debug.pm
+SHA1 2fbba8e743be0849676ceeea62da6321598a25d7 MANIFEST
+SHA1 470caa352feb93e877382937267b651a645a5b51 META.json
+SHA1 35b93748b9a23b41432e5fd766bc2635bd7c4041 META.yml
+SHA1 ad1609d8a6ca2576ecf7b40bdf42cb05dd33dddb Makefile.PL
+SHA1 bd376ea580f55c62dd4451db9931102d6df39490 README
+SHA1 1f67036bd20a28adb18d972acbc23e45a9449557 t/debug.t
+SHA1 8e6c77dd1d7e2bb99d62e199e1b19b6090e405f5 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlhNh+kACgkQmm2SYo/9yUKz7ACdHqNBPkRaZttIHjAmIQPXagRM
+exIAn2MWFQlvSbp1zHLMVAHuuZnr2ezB
+=S+xN
+-----END PGP SIGNATURE-----

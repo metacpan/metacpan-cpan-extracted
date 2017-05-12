@@ -1,0 +1,52 @@
+Revision history for Perl extension BSD::Getfsent.
+
+0.17 Sun Feb 10 19:14:33 CET 2008
+
+ - Reworded documentation and clarified the code.
+
+0.16 Sat Jan 26 20:18:33 CET 2008
+
+ - Prematurely bail out within the getfsent.t test-file when the fstab
+   file doesn't exist and/or isn't from type file.
+
+ - Added logic to skip comments in a fstab file.
+
+ - Reformatted/-worded documentation.
+
+0.15 Sat Jan 12 14:12:31 CET 2008
+
+ - Added the test-file getfsent.t which tests the getfsent() function.
+
+ - Adjusted the documentation (moved the description section to
+   functions/getfsent) and reworded some explanation.
+
+ - Beautified the code layout.
+
+0.14 Wed Mar 29 21:04:51 CEST 2006
+
+ - Updated Build.PL with newly added dist_author & dist_version_from
+   fields; furthermore, changed requires, build_requires, recommends,
+   create_readme & create_makefile_pl fields to appropriate values.
+
+ - Added INSTALL containing install instructions.
+
+ - Replaced Filehandle module with IO::File and added warnings pragma.
+
+0.13 2005/03/17
+
+ - Suitable Build.PL added.
+
+ - Minor additions to the docs.
+
+0.12 2005/02/23
+
+ - Namespace changed from previously Filesys::Getfsent
+   to BSD::Getfsent as proposed by others.
+
+0.07 2004/02/23
+
+ - Distribution name changed to uppercased 'Getfsent'.
+
+0.01 2004/01/30
+
+ - Initial version.

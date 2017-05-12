@@ -1,0 +1,18 @@
+Revision history for Browser-Open
+
+0.04     2012-03-09
+       - Added support for MSWin32. RT #58862
+       - Added browser list for freebsd. RT #61758
+       - Added sensible-browser option for linux. RT #56544
+
+0.03     Mon Nov  9 23:52:13 UTC 2009
+       - Fixed tests to work better in case no command is found
+       - added more commands, courtesy of the App::SD::CLI::Command::Browser
+       - added a `open_browser_cmd_all()`
+
+0.02     Sat Oct 17 12:24:03 UTC 2009
+       - added a bunch of alternatives for Linux
+
+0.01     Sat Oct 17 11:40:08 UTC 2009
+       - first released version
+       - first implementation

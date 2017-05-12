@@ -1,0 +1,47 @@
+Revision history for Perl extension Business::OnlinePayment::eSelectPlus
+
+0.07  Wed Aug 21 11:53:36 PDT 2013
+        - eSelectPlus cust_id: Use customer number instead of invoice number
+        - eSelectPlus order_id: Append "-invoice_num" per documentation
+
+0.06  Mon Nov 12 14:28:16 PST 2012
+        - Fix voids even if an amount is passed (now ignored)
+        - Add missing t/void_{ca,us}.t tests
+
+0.05  unreleased to CPAN (Sat Nov 10 14:20:42 PST 2012)
+        - Pre-auth, capture/completion, voids and credits are now supported.
+          Note: testing preauth seems to work only with test store #1 (CAD).
+        - Backwards-compatibility note (align usage of 'authorization' &
+          'order_number' with notes_for_module_writers_v3 (3.0.1)):
+          + authorization() now returns gateway transaction number (TransId)
+            rather than bank authorization code (AuthCode)
+          + order_number() now returns ReceiptId rather than ReferenceNum
+        - by Randall Whitman <www.whizman.com> on contract to
+          DonorWare LLC dba donor.com <cpan @ donor . com>.
+
+0.04  unreleased
+        - Fix voids ("purchasecorrection" not "void")
+
+0.03  Tue Mar  1 13:40:08 PST 2011
+        - Update for compatibility with US Moneris.  Backwards-compatibility
+          note: Users of previous versions must now specify 'currency'=>'CAD'
+
+0.02  unreleased (2008-04-02)
+        - Server name of production server
+        - Honor test_transaction mode in submit, by overriding user/pass,
+          as well as setting server name to QA server.
+        - Check HTTP errors.
+        - Set avs-code.
+        - Use ResponseCode rather than ISO for result-code.
+          We do not have enough info about "ISO" response codes to make use
+          of them.  There may be good reasons why the ISO codes could be
+          preferable, but we would need more information.
+          For now, the ResponseCode.
+        - Use AuthCode rather then Txn-number for authorization.
+        - Remove extra spaces and other odd characters in Message.
+        - by Randall Whitman <www.whizman.com> on contract to
+          DonorWare LLC dba donor.com <cpan @ donor . com>.
+        - fix tests, die on connection errors per B:OP spec  (ivan)
+
+0.01  Wed Mar 16 02:39:29 PST 2005
+	- original version; created by ivan 1.0

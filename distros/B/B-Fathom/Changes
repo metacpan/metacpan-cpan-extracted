@@ -1,0 +1,31 @@
+Revision history for Perl extension B::Fathom.
+
+0.01  Thu Sep 17 20:51:37 EDT 1998
+        - Original version; created by h2xs 1.18
+
+0.02  Mon Sep 21 10:30:35 EDT 1998
+        - Added SYNOPSIS section
+        - More comments
+        - Stopped importing functions from B::
+
+0.03  Tue Oct 20 22:13:46 EDT 1998
+        - Enhanced -v option to provide more debugging info
+        - Treat function calls as listops -- tally () around the arguments
+
+0.04  Wed Aug 18 10:17:17 EDT 1999
+        - More documentation
+        - Added OO interface
+        - A real test in the testsuite
+        - Code cleanup (if this module isn't readable, then we are all doomed)
+        - A subroutine _per se_ now counts as a statement
+
+0.05  Wed Aug 18 10:17:17 EDT 1999
+        - Add support for both EMBED and non-EMBED versions of perl
+
+0.06  Thu Aug 19 12:14:12 EDT 1999
+        - fathom() can now be called repeatedly
+
+0.07  Thu Sep  7 10:14:42 EDT 2000
+        - Fix to support Perl 5.6.0
+        - Changed contact info
+

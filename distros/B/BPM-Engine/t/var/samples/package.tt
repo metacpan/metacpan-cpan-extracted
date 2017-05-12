@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1" Id="[% id %]" Name="[% title %]">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <WorkflowProcesses>
+[% FOREACH item IN items %]
+[% wp = BLOCK %][% INCLUDE "t/var/samples/$item" %][% END -%]
+[% repl = {
+    id = 'Id="ex' _ loop.count _ '.',
+    fr = 'From="ex' _ loop.count _ '.',
+    to = 'To="ex' _ loop.count _ '.',
+    } %]
+[% wp.replace('Activity Id="','Activity ' _ repl.id).replace('Transition Id="','Transition ' _ repl.id).replace('TransitionRef Id="','TransitionRef ' _ repl.id).replace('From="',repl.fr).replace('To="',repl.to) -%]
+[% END %]
+    </WorkflowProcesses>
+</Package>

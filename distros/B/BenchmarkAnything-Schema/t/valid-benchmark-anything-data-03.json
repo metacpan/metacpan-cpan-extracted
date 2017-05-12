@@ -1,0 +1,10 @@
+{
+    "BenchmarkAnythingData" : [
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 34.56789,
+            "UNIT"     : "ms",
+            "comment"  : "string unit"
+        }
+    ]
+}

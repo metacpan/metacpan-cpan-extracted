@@ -1,0 +1,94 @@
+application: mcprimers [
+  documentation: "Designs PCR primers for molecular cloning with a specific plasmid"
+  groups: "Nucleic:Primers"
+]
+
+section: input [
+  information: "Input section"
+  type: "page"
+]  
+
+  string: vectorfile  [
+    parameter: "Y"
+    knowntype: "string"
+    information: "Vector file"
+    help: "Vector file using CloningVector format"
+  ]
+  
+  datafile: infile  [
+    parameter: "Y"
+    knowntype: "dna fasta"
+    information: "FASTA sequence"
+    help: "FASTA DNA only"
+  ]  
+
+endsection: input
+
+section: additional [
+  information: "Additional section"
+  type: "page"
+]
+
+  string: primerfile [
+    information: "Boulder format Primer3 parameter file"
+    knowntype: "string"
+    help: "Boulder format Primer3 parameter file"
+    additional: "Y"    
+  ]
+
+  string: excluedsites [
+    information: "Excluded sites"
+    knowntype: "string"
+    help: "Comma seperated list of excluded sites"
+    additional: "Y"    
+  ]
+
+  list: clamp [
+    information: "GC clamping"
+    help: "GC clamping"
+    values: "both;3prime"
+    default: "both"
+    additional: "Y"    
+  ]
+  
+  integer: searchafterstart  [
+    default: 18
+    minimum: 0
+    maximum: 60
+    information: "Shift search right into ORF from start codon"
+    help: "Shift search right into ORF from start codon"
+    additional: "Y"    
+  ]  
+  
+  integer: searchbeforestop  [
+    default: 0
+    minimum: 0
+    maximum: 60
+    information: "Shift search left into ORF from stop codon"
+    help: "Shift search left into ORF from stop codon"
+    additional: "Y"    
+  ]
+   
+  integer: maxchanges  [
+    default: 3
+    minimum: 0
+    maximum: 3
+    information: "Maximum number of mutagenis changes per primer"
+    help: "Maximum number of mutagenis changes per primer"
+    additional: "Y"    
+  ]
+
+endsection: additional
+
+section: output [
+  information: "Output section"
+  type: "page"
+]
+
+  outfile: outfile  [
+    parameter: "Y"
+    knowntype: "primer3 output"
+    help: "Primer3 output"
+  ]
+  
+endsection: output

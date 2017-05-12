@@ -1,0 +1,5 @@
+# QIIME v1.3.0 OTU table
+#OTU ID	20100302	20100304	20100823	Consensus Lineage
+0	40	0	76	k__Bacteria;p__Proteobacteria;c__Alphaproteobacteria;o__Rickettsiales;f__;g__Candidatus Pelagibacter;s__
+1	0	142	2	k__Archaea;p__Euryarchaeota;c__Thermoplasmata;o__E2;f__Marine group II;g__;s__
+2	41	0	43	No blast hit

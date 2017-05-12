@@ -1,0 +1,9 @@
+Improve the documentation.
+
+Expand the self-tests.
+
+Make the blatte(1) program more general.  Don't hardwire the function
+names x and y, and make it easier to change their behavior and to
+import more/different modules.
+
+Better error-detection and -recovery.

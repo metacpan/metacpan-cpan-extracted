@@ -1,0 +1,146 @@
+#!perl
+
+# Cheap importer tool for darkbot6/cobalt1 RDB files.
+
+my $VERSION = '0.23';
+
+use 5.10.1;
+use strict;
+use warnings;
+
+use Cwd;
+
+use File::Path;
+
+use Bot::Cobalt::DB;
+
+use IRC::Utils qw/decode_irc/;
+
+use Time::HiRes;
+
+$|++;
+
+say "This simplistic tool will convert darkbot/cobalt1 RDBs.";
+
+print "Path to randstuff.ini: ";
+my $randstuff_ini_path = <STDIN>;
+chomp($randstuff_ini_path);
+
+die "could not find randstuffs at $randstuff_ini_path\n"
+  unless -e $randstuff_ini_path;
+
+open my $rstuff_fh, '<', $randstuff_ini_path
+  or die "could not open $randstuff_ini_path: $!\n";
+my @randstuff_ini = <$rstuff_fh>;
+close $rstuff_fh;
+
+my $rdbref = { };
+$rdbref->{main} = { };
+
+for my $item (@randstuff_ini) {
+  $item =~ s/\s+$//;
+  $item = decode_irc($item);
+
+  my @v = ( 'a' .. 'f', 0 .. 9 );
+  my $idx = join '', map { $v[rand @v] } 1 .. 4;
+  ## regen 0000 keys:
+  until ($idx ne '0000') {
+    $idx = join '', map { $v[rand @v] } 1 .. 4;
+  }
+  $idx .= $v[rand @v] while exists $rdbref->{main}->{$idx};
+
+  $rdbref->{main}->{$idx} = [ $item, time(), '-Imported' ];
+}
+
+say "Added ".scalar @randstuff_ini." randstuffs from randstuff.ini";
+
+say "We can attempt to add RDBs as well.";
+say "We'll look for .rdb files in the specified directory.";
+say "A blank line will skip RDBs.";
+print "Path to RDB dir: ";
+my $rdb_dir_path = <STDIN>;
+chomp($rdb_dir_path);
+
+if ($rdb_dir_path) {
+  die "No such dir: $rdb_dir_path\n" unless -d $rdb_dir_path;
+
+  my $oldcwd = getcwd();
+  chdir $rdb_dir_path || die "Could not chdir to $rdb_dir_path\n";
+  my @rdb_files = glob("*.rdb");
+  
+  for my $rdb_file (@rdb_files) {
+
+    my $rdb_name = $rdb_file;
+    $rdb_name =~ s/\.rdb$//;
+
+    unless ($rdb_name =~ /^[A-Za-z0-9]+$/) {
+      warn "Skipping $rdb_name - not a valid RDB name\n";
+      warn "Must be in the A-Z a-z 0-9 set";
+      next
+    }
+
+    open my $rdb_fh, '<', $rdb_file
+      or print "could not open $rdb_file: $!\n"
+      and next;
+    my @current_rdb = <$rdb_fh>;
+    close $rdb_fh;
+
+    for my $item (@current_rdb) {
+      $item =~ s/\s+$//;
+      $item = decode_irc($item);
+      my $digest = sha256_hex($item.rand.Time::HiRes::time);
+      my @splitd = split //, $digest;
+      my $idx = join '', splice(@splitd, -4);
+      $idx .= pop @splitd while exists $rdbref->{$rdb_name}->{$idx} and @splitd;
+      $rdbref->{$rdb_name}->{$idx} = [ $item, time(), '-Imported' ];
+      
+    }
+    say "RDB $rdb_name : ".scalar @current_rdb." items added";
+  }
+  
+  chdir $oldcwd;
+  say "Total RDBs: ".scalar keys %$rdbref;
+}
+
+
+say "Finished reading RDBs.";
+say "I need a place to dump these RDBs.. it must be a directory.";
+say "(A default Cobalt install places them in cobalt2/var/db/rdb/)";
+say "If the specified dir doesn't exist, it will be created.";
+print "Path: ";
+my $output_dir = <STDIN>;
+chomp($output_dir);
+die "No output directory specified" unless $output_dir;
+
+mkpath($output_dir) unless -e $output_dir;
+
+die "Output dir $output_dir not a directory\n"
+  unless -d $output_dir;
+
+
+for my $rdb (keys %$rdbref) {
+
+  my $dbfile = $output_dir ."/". $rdb .".rdb";
+
+  say "Creating $dbfile";
+
+  my $cdb = Bot::Cobalt::DB->new(
+    file => $dbfile,
+  );
+
+  unless ( $cdb->dbopen ) {
+    warn "dbopen failure for $rdb, skipping\n";
+    next
+  }
+  
+  for my $rdbidx (keys %{ $rdbref->{$rdb} }) {
+    unless ( $cdb->put($rdbidx, $rdbref->{$rdb}->{$rdbidx}) ) {
+      warn "!! db put failure on $rdb item index $rdbidx"; 
+    }
+  }
+  
+  $cdb->dbclose;
+
+}
+
+say "Done.";

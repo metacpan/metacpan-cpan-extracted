@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+use lib ".";
+use DBI;
+use DBD::mysql;
+use Bio::Maxd;
+use Sys::Hostname;
+
+  my $dbase = "maxd";
+  my $hostname = hostname();
+  $host = $ENV{'MAXD_HOSTDB'} || $hostname || "localhost";
+  print "Verifying MaxD for database '$dbase' at host '$host'.\n";
+  my($user,$pass) = split(/\//,$ENV{'MAXD_USERID'});
+
+  my $maxd = new Bio::Maxd(-host=>$host,-dbase=>$dbase,-user=>$user,-pass=>$pass);;
+  my %tables = getAllTables($maxd->{'dbh'});
+  verifySequenceTables($maxd->{'dbh'},%tables);
+
+sub verifySequenceTables {
+  my($dbh,%tables) = @_;
+  foreach $table (qw(Hybridisation Image Measurement Description)) {
+    my $newTable = $table . "_Seq";
+    my $st = "select max(ID) from $table";
+    my $sh = $dbh->prepare($st);
+    my $rv = $sh->execute;
+    my ($id)= $sh->fetchrow_array;
+    $dbh->do(qq{DROP TABLE IF EXISTS $newTable});
+    my $ok = $dbh->do(qq{CREATE TABLE $newTable (id INT NOT NULL)});
+    print "verified $newTable\n" if ($ok);
+    $ok += $dbh->do(qq{INSERT INTO $newTable VALUES ($id)});
+  }
+}
+
+sub getAllTables {
+  my($dbh) = @_;
+  my($tname,%tables);
+  my $st = "show tables";
+  my $sh = $dbh->prepare($st);
+  my $rv = $sh->execute;
+  while($tname= $sh->fetchrow_array) {
+    $tables{$tname}++;
+  }
+  return %tables;
+}

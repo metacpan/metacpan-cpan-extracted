@@ -1,0 +1,97 @@
+NAME
+    B::Stats - print optree statistics
+
+SYNOPSIS
+      perl -MB::Stats myprog.pl # all
+      perl -MO=Stats myprog.pl  # compile-time only
+      perl -MB::Stats[,OPTIONS] myprog.pl
+
+DESCRIPTION
+    Print statistics for all generated ops.
+
+    static analysis at compile-time, static analysis at end-time to include
+    all runtime added modules, and dynamic analysis at run-time, as with a
+    profiler.
+
+    The purpose is to help you in your goal:
+
+        no bloat;
+
+OPTIONS
+    Options can be bundled: "-c,-e,-r" eq "-cer"
+
+    -c *static*
+        Do static analysis at compile-time. This does not include all
+        run-time require packages. Invocation via -MO=Stats does this
+        automatically.
+
+    -e *end*
+        Do static analysis at end-time. This is includes all run-time
+        require packages. This calculates the heap space for the optree.
+
+    -r *run*
+        Do dynamic run-time analysis of all actually visited ops, similar to
+        a profiler. Single ops can be called multiple times.
+
+    -a *all (default)*
+        Same as -cer: static compile-time, end-time and dynamic run-time.
+
+    -t *table*
+        Tabular list of -c, -e and -r results.
+
+    -u *summary*
+        Short summary only, no op class. With -t only the final table(s).
+
+    -F *Files*
+        Prints included file names
+
+    -x *fragmentation* NOT YET
+        Calculates the optree *fragmentation*. 0.0 is perfect, 1.0 is very
+        bad.
+
+        A perfect optree has no null ops and every op->next is immediately
+        next to the op.
+
+    -f<op,...> *filter* NOT YET
+        Filter for op names and classes. Only calculate the given ops, resp.
+        op class.
+
+          perl -MB::Stats,-fLOGOP,-fCOP,-fconcat myprog.pl
+
+    -llogfile
+        Print output only to this file. Default: STDERR
+
+          perl -MB::Stats,-llog myprog.pl
+
+METHODS
+    compile
+        Static -c check at CHECK time. Triggered by -MO=Stats,-OPTS
+
+    rcount ($opcode)
+        Returns run-time count per op type.
+
+    rcount_all()
+        Returns an AV ref for all opcounts, indexed by opcode.
+
+    reset_rcount()
+        Resets to opcount array for all ops to 0
+
+    output ($count-hash, $ops, $name)
+        General formatter
+
+    output_runtime
+        -r formatter.
+
+        Prepares count hash from the runtime generated structure in XS and
+        calls output().
+
+    output_table
+        -t formatter
+
+        Does not work together with -r
+
+LICENSE
+    This module is available under the same licences as perl, the Artistic
+    license and the GPL.
+
+SEE ALSO

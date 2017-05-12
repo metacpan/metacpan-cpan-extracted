@@ -1,0 +1,339 @@
+#!/usr/bin/perl
+
+use Getopt::Std;
+%options = ();
+getopts("v:d:w:",\%options);
+
+##################################
+# -v on|off: for visualisation
+# -d dbname: for customdb
+# -w username: for webblast user (webblast)
+##################################
+
+`SGE_QMASTER_PORT=701`;
+
+
+#$qdir =  directory containing qstat
+$qdir = '/opt/gridengine/bin/lx26-amd64';  # glinux';
+
+
+# get username
+$cuser = `whoami`;
+
+$cuser =~ s/^\s+//;
+$cuser =~ s/\s+$//; 
+
+if ($cuser !~ /\w/) {
+    # user unknown 
+    print STDERR "cannot retrieve username in rocksblast\n";
+    exit(1);
+}
+
+print STDERR "rocksblast user is: $cuser\n";
+
+$create_html = 'off';
+if (defined $options{v}) {
+    if ($options{v} =~ /on|off/) {
+	$create_html = $options{v};	
+    } else {
+	print "usage: rocksblast -v on|off -d custdbname\n";
+	print "\t-v on\t\t\t: OPTIONAL turns html visualisation on\n";
+	print "\t-v off <default>\t: OPTIONAL turns html visualisation off\n";
+	print "\t-d database_name\t: OPTIONAL uses custom blast database in /home/YOURNAME/blast/custdb/\n";
+	print "you used: -v $options{v}\n";
+	exit(0);
+    }
+
+}
+
+if ($cuser eq 'Proteomics') {
+	$create_html = 'off';
+}
+
+if (defined $options{w}) {
+    # means called by webblast
+    # -w value = session_id
+    $batch_home_dir = '/home/' . $cuser . '/web/' . $options{w};       
+} else {
+    $batch_home_dir = '/home/' . $cuser . '/blast';
+    
+}
+$job_dir = $batch_home_dir;
+$pbs_batch_script_dir = $job_dir . '/tmp/tmp_scripts';
+$pbs_error_dir = $job_dir . '/tmp/tmp__error';
+$pbs_output_dir = $job_dir . '/tmp/tmp_output';
+$blast_db_dir = '/state/partition1/blast/db';
+$pbs_scripts_dir = '/export/home/opt/scripts';
+
+
+
+$global_script_template = `cat /home/btlh/blast_template_script`;
+$global_blastix_template = `cat /export/home/opt/scripts/blastix_template_script`;
+
+# test if existing
+unless (opendir BATCHDIR, $job_dir) {
+	die("error opening $job_dir\n");
+}
+          
+if (-e "$job_dir/blast.lock") {
+    die("blast.lock exists, please remove first\n");
+}
+	
+#Read the configuration file in the job dir
+$configfile = "$job_dir/blast.conf";
+die ("missing blast config file\n") unless (-e "$configfile");
+die ("cannot blast config file\n")  unless (open CONFIGFILE, $configfile);	
+
+
+CONFIGLOOP: while ($line = <CONFIGFILE>) {
+		$line =~ s/^\s+//;
+		next CONFIGLOOP if ($line =~ /^#/);
+		next CONFIGLOOP if ($line !~ /\S/);
+		$line =~ s/#.+$//;
+		$line =~ s/\s+$//;
+		($id, $value) = split /\s+/, $line, 2;
+		$prio = 0;
+		if ($id eq 'priority') {
+		    if ((int($value) >= -1023) && (int($value) <= 1024)) {
+			$prio = $value;
+		    }
+    		} 
+		
+				    
+		if ($id eq 'blast_db') {		    
+		  
+                     ################### SETTING BLASTDB LOCATION/NAME #################
+
+                     $default_blastdb_dir = '/state/partition1/blast/db/';
+
+                    #if ($ARGV[1]) {
+                        # custom db must be used
+                    #    $value = $job_dir . '/custdb/' . $ARGV[1];
+		     if (defined $options{d}) {
+			 # use custom db
+			 $value = $job_dir . '/custdb/' . $options{d};
+		    } else {
+		        $value = $default_blastdb_dir . $value;
+
+		    }
+
+                    ###################################################################
+
+		}
+
+		$Blast_param{$id} = $value;	
+	    }
+	    close CONFIGFILE;
+	
+#Adapt the general batch script template for this specific blast job
+$job_script_template = $global_script_template;
+foreach (keys %Blast_param) {
+	my $value = $Blast_param{$_};
+	$job_script_template =~ s/$_/$value/g;
+}
+	
+$submit_dir = "$job_dir/submit";
+		
+die ("cannot open $submit_dir") unless (opendir JOBDIR, "$submit_dir");
+@jobcontent = grep(!/^\./,readdir JOBDIR);
+closedir JOBDIR;
+
+$dependcount = @jobcontent;
+$todocount = $dependcount;
+
+
+if ($todocount > 10000) {
+    print "This job is to big to create html for, so turned this feature off\n";
+    $create_html = 'off';
+}
+
+if ((@jobcontent) >= 1) {
+	## oke there's something to do
+	## but first lock this dir 
+	## this lockfile is removed when the blastixjob has finished
+	## the actual code to do this can be found in blastic.pl
+	 `touch $job_dir/blast.lock`;
+	 `echo '$dependcount' > $job_dir/blast.lock`;
+			
+$arrayjobcount = 0;
+
+
+# cleanup things before
+print "Before starting this blastjob some cleaning up must be done, please wait\n";
+`ls $job_dir/tmp/tmp_scripts | xargs -i rm $job_dir/tmp/tmp_scripts/{}`;
+`ls $job_dir/tmp/tmp_output | xargs -i rm $job_dir/tmp/tmp_output/{}`;
+`ls $job_dir/tmp/tmp_error | xargs -i rm $job_dir/tmp/tmp_error/{}`;
+#`ls $job_dir/out | xargs -i rm $job_dir/out/{}`;
+#`ls $job_dir/seq | xargs -i rm $job_dir/seq/{}`;
+if (-e "$job_dir/tmp/*.sh") {
+     `rm $job_dir/tmp/*.sh`;
+}
+
+
+
+JOBLOOP: foreach $to_be_blasted (@jobcontent) {
+
+                $arrayjobcount++;
+             	
+		if (($todocount - $arrayjobcount) % 100 == 0) {
+		    print "CREATING SGE SCRIPTS: " . ($todocount - $arrayjobcount) . " sequences to go\r";
+
+		}
+		
+		$nf = $to_be_blasted;
+		$nf =~ s/ /_/g;
+		
+		# no dots in filename exept extension of course
+		$nf =~ s/(\.\w*$)//;
+		$extension = $1;		
+		$nf =~ s/\./_/g;
+		$nf .= $extension;
+		
+		# check on extension name				
+		#$nf =~ s/\.fasta/_fasta\.seq/;
+		#$nf =~ s/\.fas/_fas\.seq/;
+		#$nf =~ s/\.pro/_pro\.seq/;		
+		
+		$nftot = "$submit_dir/$nf";		
+		$of = "$submit_dir/$to_be_blasted";
+		
+		unless ($nftot eq $of) {
+		   `mv '$of' '$nftot'`;
+		   $to_be_blasted = $nf;
+		   print STDERR "mv $of $nf\n";
+		}
+
+		############
+		
+		$blast_out = $job_dir . '/out/' . $to_be_blasted;
+		$blast_out =~ s/\..+$/\.out/;
+		$file_submit = $submit_dir    . '/' . $to_be_blasted;
+		$file_seq    = $job_dir . '/seq/' . $to_be_blasted;
+		
+		#produce blast job script
+		$single_script_template = $job_script_template;
+		$single_script_template =~ s/inputfile/$file_submit/g;
+		$single_script_template =~ s/outputfile/$blast_out/g;
+		$single_script_template =~ s/seqdonefile/$file_seq/g;
+		$single_script_template =~ s/blast_user/$cuser/g;
+		
+		
+		$pbs_error_file = $pbs_error_dir   . '/' . $Blast_param{'job_name'}  . '_' . $to_be_blasted;
+		$pbs_error_file =~ s/\..+/\.ER/;
+		$pbs_output_file = $pbs_output_dir . '/' . $Blast_param{'job_name'}  . '_' . $to_be_blasted;
+		$pbs_output_file =~ s/\..+/\.OU/;
+		
+
+		$tmp_script_filename = $pbs_batch_script_dir . '/array-job' . $arrayjobcount;	  
+
+		############################
+                #write the blast script
+                ###########################
+		
+		open SCRIPT_OUT, ">$tmp_script_filename";
+		print SCRIPT_OUT $single_script_template;
+		close SCRIPT_OUT;
+		#make it executable for this user
+		`chmod u+x $tmp_script_filename`;
+			                      		                  
+	} ## end do all seqs in jobdir
+
+
+# create the basic sge_arrayjob_run.sh
+print "\nCREATING JOB_ARRAY SCRIPT\n";
+open SCRIPT_OUT, ">$job_dir/tmp/sge_arrayjob_run.sh";
+print SCRIPT_OUT "#!/bin/bash\n";
+print SCRIPT_OUT "export SGE_ROOT=/opt/gridengine" . "\n";
+print SCRIPT_OUT 'echo "Task id is $SGE_TASK_ID"' . "\n";
+print SCRIPT_OUT "$job_dir/tmp/tmp_scripts/array-job" . '$SGE_TASK_ID' . "\n";
+close SCRIPT_OUT;
+
+##############################################################################
+# NOW SUBMIT A SGE ARRAY JOB
+##############################################################################
+$ENV{'SGE_ROOT'} = '/opt/gridengine';
+
+
+
+
+
+$submitcommand = "$qdir/qsub -t 1-$arrayjobcount:1 -N $Blast_param{'job_name'} -p $prio -e $job_dir/tmp/tmp_error -o $job_dir/tmp/tmp_output $job_dir/tmp/sge_arrayjob_run.sh";
+#print $submitcommand;
+$retval = `$submitcommand`;
+print STDERR "JOB_ARRAY: $retval\n";
+$retval =~ /^Your\s*job(-array)?\s*(\d+)/; #/job-array (\d+?)\./;
+$job_id = $2;
+print STDERR "JOB ID: $job_id\n";
+
+####################################
+# HTML part if parameter set
+###################################
+if ($create_html eq 'on') {
+		   		
+				
+	  	   
+		        $blastix_base_dir = $job_dir;
+		        $id = $Blast_param{'job_name'};
+			$align = $Blast_param{'blastic_short'};
+		        	  
+		        # create script
+			
+			$job_blastix_template = $global_blastix_template;
+	                $job_blastix_template =~ s/GODIR/$blastix_base_dir/g;
+			$job_blastix_template =~ s/GOID/$id/g;
+			$job_blastix_template =~ s/GOALIGN/$align/g;	  		
+			 
+			$blastix_script_name = $pbs_batch_script_dir . '/' . $Blast_param{'job_name'}  . '_BLASTIX';
+			
+			open SCRIPT_OUT, ">$blastix_script_name";
+			print SCRIPT_OUT $job_blastix_template;
+			close SCRIPT_OUT;
+			
+			$pbs_blastix_error_file = $pbs_error_dir   . '/' . $Blast_param{'job_name'}  . '_BLASTIX.ER';
+			$pbs_blastix_output_file = $pbs_output_dir . '/' . $Blast_param{'job_name'}  . '_BLASTIX.OU';
+											
+
+			# create the sge sh script to run run blastic
+			open SCRIPT_OUT, ">$job_dir/tmp/sge_blastix_run.sh";
+			print SCRIPT_OUT "#!/bin/bash\n";
+			print SCRIPT_OUT "export PERL5LIB=/home/opt/lib/perl\n";
+			print SCRIPT_OUT "$blastix_script_name\n";
+			close SCRIPT_OUT;
+			
+                        #make it executable for this user
+			`chmod u+x $blastix_script_name`;
+
+			##################################
+			# now submit the job
+			##################################
+
+			print STDERR "QSUB: $qdir/qsub -hold_jid $job_id -N $Blast_param{'job_name'} -p $prio -e $job_dir/tmp/tmp_error -o $job_dir/tmp/tmp_output $job_dir/tmp/sge_blastix_run.sh\n";
+
+
+			$retval = `$qdir/qsub -hold_jid $job_id -N $Blast_param{'job_name'} -p $prio -e $job_dir/tmp/tmp_error -o $job_dir/tmp/tmp_output $job_dir/tmp/sge_blastix_run.sh`;
+			
+			#print STDERR "$qdir/qsub -hold_jid $job_id -N $Blast_param{'job_name'} -p $prio -e $job_dir/tmp/tmp_error -o $job_dir/tmp/tmp_output $job_dir/tmp/sge_blastix_run.sh\n";
+			
+			print STDERR "HTML: $retval\n";	
+						
+} else {
+    # html off but at least delete lock file after finished (deletion is arranged in blastix script when html = on
+    open DELLOCK, ">$pbs_batch_script_dir/dellock.sh";
+    print DELLOCK "rm -f $job_dir/blast.lock\n";
+    close SCRIPT_OUT;
+
+    # submit with hold
+    $retval = `$qdir/qsub -hold_jid $job_id -N $Blast_param{'job_name'} -p $prio -e $job_dir/tmp/tmp_error -o $job_dir/tmp/tmp_output $pbs_batch_script_dir/dellock.sh`;
+    print STDERR  "LOCKFILE: $retval\n";
+    
+		    
+} # fi html on
+
+
+
+
+} else {
+		print "This one is easy, nothing to do, please put something in submit if you want to blast\n";
+}
+
+print STDERR "ROCKSBLAST SCRIPT DONE\n";

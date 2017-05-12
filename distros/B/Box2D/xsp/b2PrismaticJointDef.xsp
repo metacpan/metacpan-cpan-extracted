@@ -1,0 +1,145 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2PrismaticJointDef} class b2PrismaticJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2PrismaticJointDef();
+
+%{
+
+void
+b2PrismaticJointDef::Initialize( bodyA, bodyB, anchor, axis )
+	b2Body* bodyA
+	b2Body* bodyB
+	b2Vec2* anchor
+	b2Vec2* axis
+	CODE:
+		THIS->Initialize( bodyA, bodyB, *anchor, *axis );
+
+b2Vec2*
+b2PrismaticJointDef::localAnchorA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorA);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PrismaticJointDef::localAnchorB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorB = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorB);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PrismaticJointDef::localAxis1( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAxis1 = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAxis1);
+	OUTPUT:
+		RETVAL
+
+float32
+b2PrismaticJointDef::referenceAngle( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->referenceAngle = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->referenceAngle;
+	OUTPUT:
+		RETVAL
+
+bool
+b2PrismaticJointDef::enableLimit( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->enableLimit = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->enableLimit;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PrismaticJointDef::upperTranslation( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->upperTranslation = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->upperTranslation;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PrismaticJointDef::lowerTranslation( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->lowerTranslation = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->lowerTranslation;
+	OUTPUT:
+		RETVAL
+
+bool
+b2PrismaticJointDef::enableMotor( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->enableMotor = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->enableMotor;
+	OUTPUT:
+		RETVAL
+
+
+float32
+b2PrismaticJointDef::maxMotorForce( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxMotorForce = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxMotorForce;
+	OUTPUT:
+		RETVAL
+
+float32
+b2PrismaticJointDef::motorSpeed( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->motorSpeed = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->motorSpeed;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

@@ -1,0 +1,46 @@
+namespace : %
+    classes : %
+        DataFile : @
+            getFileName
+            load
+            setFileName
+            save
+            __init__
+        ECDDataFile : @
+            load
+            getSizeOfLine
+            setSizeOfColumn
+            getNote
+            getSize
+            setDataName
+            setNote
+            getLabel
+            __init__
+            setLabel
+            getData
+            setData
+            getHeaderString
+            getSizeOfColumn
+            setSizeOfLine
+            getHeaderList
+            save
+            setFileName
+            getDataName
+            setSize
+    functions : @
+filtered : <<EOV
+import sys
+import string
+import getopt
+import os
+
+import ecell
+import ecell.ecs
+import ecell.emc
+import ecell.eml
+import ecell.Session
+
+from ecell.ECDDataFile import *
+
+
+EOV

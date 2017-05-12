@@ -1,0 +1,26 @@
+Bundle::Math version 1.02
+=========================
+
+This is a bundle of mathematics related modules.
+It is divided into several categories as sub-bundles.
+
+INSTALLATION
+
+To install this module, please use the CPAN shell or better yet CPANPLUS.
+
+SEE ALSO
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+bundlemath-module at steffen-mueller dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004-2005 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

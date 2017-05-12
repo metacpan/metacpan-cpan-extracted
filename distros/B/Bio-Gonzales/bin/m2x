@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+# created on 2014-09-03
+
+use warnings;
+use strict;
+use 5.010;
+
+use Bio::Gonzales::Matrix::IO qw/:DEFAULT xlsx_spew/;
+use Bio::Gonzales::Util::File qw/openod/;
+
+use Pod::Usage;
+use Getopt::Long;
+
+my %opt = ( sep => "\t", csv_header => 1 );
+GetOptions( \%opt, 'help|h', 'sep=s', 'xlsx_header|xh=s', 'csv_header|ch!', 'force|f' ) or pod2usage(2);
+
+pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
+pod2usage(2)
+  unless ( @ARGV && @ARGV == 2 );
+
+my %out_spec;
+
+if($opt{xlsx_header}) {
+  my @cols = map { s/^\s*//; s/\s*$//; $_ } split /,/, $opt{xlsx_header};
+
+  $out_spec{header} = \@cols;
+}
+
+my $in_f  = shift;
+my $out_f = shift;
+
+die "input file or output file missing " unless ( $in_f && $out_f );
+my ( $in_fh, $out_fh );
+if ( $in_f eq '-' ) {
+  $in_fh = \*STDIN;
+} else {
+  $in_fh = openod( $in_f, '<' );
+}
+
+if ( $out_f eq '-' ) {
+  $out_fh = \*STDOUT;
+} else {
+  die "$out_f exists" if ( -e $out_f  && !$opt{force});
+  open $out_fh, '>', $out_f or die "Can't open filehandle: $!";
+}
+
+my $d = mslurp( $in_fh, { sep => $opt{sep} } );
+
+shift @$d unless($opt{csv_header});
+xlsx_spew( $out_fh, $d , \%out_spec );
+close $in_fh;
+close $out_fh;
+
+__END__
+=head1 NAME
+
+m2x - matrix (CSV) data to xlsx format
+
+=head1 SYNOPSIS
+
+    m2x [OPTIONS] INFILE OUTFILE
+
+    Convert data from INFILE to OUTFILE. If INFILE is '-', read data from standard
+    input. If OUTFILE is '-', write data to standard output.
+
+    OPTIONS (defaults in parentheses)
+      -s, --sep <separator>        set the column separator for INFILE (<TAB>)
+      -xh, --xlsx_header <list>    add a header to OUTFILE, <list> can have the
+                                   form: col1,col2,...,coln
+      -ch,  -noch,                 keep/skip csv header/the first line of INFILE (keep)
+           --csv_header,
+           --no-csv_header
+           
+      -f, --force                  overwrite OUTFILE if it exists (don't overwrite)
+
+=head1 AUTHOR
+
+jw bargsten, C<< <jwb at cpan dot org> >>
+
+=cut

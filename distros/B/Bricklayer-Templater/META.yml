@@ -1,0 +1,21 @@
+---
+abstract: 'yet another templating system. Pure perl, highly flexible'
+author: 'Jeremy A. Wall <Jeremy@MarzhillStudios.com>'
+build_requires:
+  Test::MockObject: 1.08
+  Test::More: 0.7
+distribution_type: module
+generated_by: Module::Install version 0.67
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Bricklayer-Templater
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  perl: 5.6.0
+version: 0.9.8

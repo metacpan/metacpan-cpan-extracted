@@ -1,0 +1,14 @@
+V0.11 released Wed Jun 25 13:37:37 EDT 2003
+
+-- Remove GD modules from list as build is very problematic and nothing in
+   the core really uses it except survey graphing.
+
+V1.10 released Mon Dec 29 22:58:07 EST 2014
+
+-- Add JSON for new JSON support
+
+V1.14 released Wed Dec 23 13:52:55 EST 2015
+
+-- Add Bundle::Interchange
+
+-- Remove modules duplicated by Bundle::Interchange

@@ -1,0 +1,41 @@
+Revision history for Perl extension BSD::Process
+
+0.07 2013-06-22 13:37:32 UTC
+    - The args method is now implemented (thanks to az5112 on github).
+    - The module compiles correctly on FreeBSD 9.x
+    - Improved module metadata (Kwalitee)
+
+0.06 2011-04-10 19:06:52 UTC
+    - Interact correctly with the CPAN toolchain, and fix a test
+      error.
+    - Introduce P() and resolve().
+    - Documentation improvements.
+
+0.05 2007-10-25 11:42:33 UTC
+    - rework _procinfo extensively to minimise the number of large
+      code blocks appearing in the function
+    - _all() benefits from #define PID_FIELD too (simplification)
+    - Makefile.PL and author tests best practices tweaks
+
+0.04 2007-10-07 22:11:41 UTC
+    - Fixed silly cut'n'paste errors for FreeBSD 4.x and 5.x
+      that lead to C compilation errors
+    - Fix test errors
+
+0.03 2007-09-27 09:22:26 UTC
+    - All platforms now handle all attributes. If the requested
+      attribute is not implemented (for instance, jid/jail_id on
+      FreeBSD 4.x), -1 is returned.
+    - Miscellaneous tidy ups of the test suite.
+
+0.02 2006-11-02 15:14:30 UTC
+    - support for FreeBSD 5.x added
+    - support for FreeBSD 4.x improved
+    - eg/* received minor functionality improvements
+    - guards for tests that involve processes doing
+      privilege separation.
+    - added SEE ALSO for other modules
+
+0.01  2006-09-13 13:18:10 UTC
+    - original version; created by genpm v1.2
+

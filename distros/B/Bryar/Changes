@@ -1,0 +1,113 @@
+Revision history for Perl extension Bryar.
+
+4.0 - 2009-10-25
+    - First release by new maintainer Marco d'Itri.
+    - Fixed and improved the calendar template.
+    - Removed debugging statements from posts_calendar().
+    - Added support for FastCGI using CGI::Fast.
+    - Use croak instead of exit in report_error() or FastCGI processes will die.
+    - Made report_error() return status 500.
+    - HTML-escape the text output by report_error().
+    - Added a Renderer class which generates a Google sitemap using
+      WWW::Google::SiteMap.
+    - Use Template::Provider::Encoding to support non-ASCII posts.
+    - Moved the Template Toolkit macros to a common file.
+    - Added the ".tt2" extension to the calendar template.
+    - Added macros to print DateTime objects as ISO 8601 and RFC 822 strings.
+    - Updated the ATOM template to the 1.0 format.
+    - Added a Bryar::Document::url() method useful in templates to get the
+      relative URL of posts.
+    - Fixed the permalinks when categories are used.
+    - Added support to generate arbitrary HTTP headers. Templates can modify
+      them by manipulating the bryar.http_headers hash.
+    - Added support for caching the formatted pages using Cache::Cache.
+    - Return a 404 error when no posts matching the parameters are available.
+    - Treat all input and output streams as UTF-8.
+    - Added to the URL parser support for requesting posts older than a certain
+      date, using the format /before_<timestamp>. Updated the HTML template.
+    - Cleaned up the default templates.
+    - Removed from the Template::Toolkit environment the "recent" and "archive"
+      variables. They are undocumented, not used in the example template and
+      cost two extra runs of the collector.
+    - HTML-escape errors reported by Template::Toolkit.
+    - Added support for the If-Modified-Since HTTP validator.
+    - Instantiate the renderer/source/collector/frontend classes if they have
+      a constructor.
+    - Ignore commented and empty lines in the configuration file.
+    - Made the FlatFile data source not automatically replace a double \n
+      with a <p> tag. This is an incompatible change.
+    - Replaced some uses of die with report_error().
+    - Optimization: cut two stat(2) calls from each call to make_document().
+    - Optimization: cache getpwuid(3) calls because they parse /etc/passwd
+      every time.
+    - Example: render new posts as text and post them to a newsgroup.
+    - Example: fastcgi daemon with a lighttpd configuration.
+    - Example: a simple WYSIWYG editor for posts, based on fckeditor.
+
+3.1 - 2009-05-28
+    - remote execution bug fixed
+
+3.0 - 2007-01-20
+    - First release by new maintainer David Cantrell
+    - Comments now accept an 'email' field from the user
+    - The default Template Toolkit renderer has a lot more of TT's options
+      turned on to support more complex templates
+    - For the FlatFile datasource *only* (but this is the default source):
+      - journal entries whose files' timestamps are in the future are
+        'embargoed'
+      - you *must* specify your email address so you can be notified of
+        comments
+      - comments are emailed to the journal's owner by shelling out to the
+        'mail' program
+      - comments are now subject to a crude spam filter:
+        - the string 'http://' appearing three or more times is presumed to
+          be spam, and the comment is simply thrown away
+        - the string 'http://' appearing one or two times means the comment
+          might be spam and the journal's owner is emailed so he can decide
+          whether to add it to the *.comments file by hand or not
+
+2.6 - Wed Feb 11 11:35:16 GMT 2004
+    - Static rendering
+    - Fixes to Config.pm accessors
+    - CGI micro-optimization.
+
+2.5 - Sun Feb  8 21:26:16 GMT 2004
+    - Emergency release - unbreak comments.
+
+2.4 - Sun Feb  8 15:12:21 GMT 2004
+    - Get default MIME types right
+    - Refactor FlatFile to allow selecting post extensions, etc.
+
+2.3 - Fri Jan 23 13:21:18 GMT 2004
+    - Added ETag support from Marco d'Itri
+    - Added calendars, again from Marco d'Itri
+
+2.2 - Fri Jan 23 12:57:18 GMT 2004
+    - Added the dummy files that *really* allow a runthrough without
+      mod_perl
+    - Added support for Atom, made this generic by allowing you to register
+      your own formats and skins.
+    - Added an Atom template, thanks to Steve Peters
+
+2.1 - Thu Dec 11 13:55:09 GMT 2003
+    - Bryar::DataSource::Base now returns a true value, which is always
+      handy
+    - Added a dated flatfile data source.
+    - Tweaks to the test suite to allow a runthrough without mod_perl
+
+2.0 - Sat Aug 16 13:42:15 BST 2003
+    - Experimental Mod_perl handler
+    - Experimental DBI driver
+
+1.2 - Sat Jun 14 22:50:06 BST 2003
+    - Added support for comments.
+
+1.1  Sat May 24 18:46:33 BST 2003
+    - HTML fix and duplicate Cwd removed, thanks to Matt Cashner.
+    - Allowed searching for content of flat-file documents
+    - Used subblogs to set category
+    - Make times gmtime, not local; helps with 8601 compliance.
+
+1.0  Sun May 18 21:05:33 2003
+    - original version; created by h2xs 1.22 with options -b 5.6.0 -AXn Bryar
+

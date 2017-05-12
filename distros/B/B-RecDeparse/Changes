@@ -1,0 +1,65 @@
+Revision history for B-RecDeparse
+
+0.10    2015-03-12 18:15 UTC
+        + Fix : [RT #99809] : Fix for 5.21.5
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+        + Tst : Work around a change of behaviour of B::Deparse in 5.21.x
+                that causes sub references compiled inside "use strict 'vars'"
+                to be fully qualified when deparsed.
+
+0.09    2014-10-04 17:30 UTC
+        + Fix : [RT #99177] : Fix for 5.21.4.
+                Thanks Father Chrysostomos for reporting and contributing a
+                patch.
+
+0.08    2013-09-01 17:30 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.07 can skip this update.
+        + Doc : POD headings are now properly linkable.
+        + Doc : Miscellaneous POD tweaks.
+
+0.07    2013-08-21 21:15 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.06 can skip this update.
+        + Tst : Author tests are no longer bundled with this distribution.
+                They are only made available to authors in the git repository.
+
+0.06    2013-08-20 19:25 UTC
+        This is a maintenance release. The code contains no functional change.
+        Satisfied users of version 0.05 can skip this update.
+        + Tst : Some tests will no longer warn with development versions of
+                B::Deparse.
+        + Tst : The Kwalitee test has been removed.
+
+0.05    2011-02-27 21:15 UTC
+        + Chg : perl 5.8.1 is required.
+        + Fix : [RT #63842] : Breakage on some imported subs.
+                This was actually a problem with how undeclared subroutines
+                or @_ were deparsed.
+                Thanks Kent Fredric for reporting and suggesting a fix.
+        + Fix : Empty or XS subroutines won't be (wrongly) deparsed anymore.
+        + Fix : Recursive subroutines won't be deparsed more than one level.
+        + Fix : Work around Kwalitee test misfailures.
+        + Upd : Resources in META.yml.
+
+0.04    2008-11-12 19:50 UTC
+        + Fix : Compatibility with 5.8.9.
+        + Fix : Only fool single_delim when we're coming from B::RecDeparse.
+        + Tst : Function calls in other packages.
+        + Upd : META.yml spec updated to 1.4.
+
+0.03    2008-08-20 14:30 UTC
+        + Fix : Bug when recursing into a sub that had a gv op which wasn't
+                associated with a rv2cv.
+
+0.02    2008-07-28 21:30 UTC
+        + Chg : Perl 5.8 is now required.
+        + Doc : POD nits.
+        + Fix : Empty README.
+        + Fix : Building on perls with a patchlevel.
+        + Tst : Skip a few harmless failures on perls older than 5.8.7.
+
+0.01    2008-07-28 10:35 UTC
+        First version, released on an unsuspecting world.
+

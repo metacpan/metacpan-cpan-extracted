@@ -1,0 +1,19 @@
+Artistic
+Changes
+Copying
+lib/B/Debugger.pm
+Debugger.xs.gz
+MANIFEST
+Makefile.PL
+lib/Od.pm
+lib/Od_o.pm
+README
+t/interactive.t
+t/z_kwalitee.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

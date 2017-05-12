@@ -1,0 +1,19 @@
+2.1.3 2016 06 3
+
+- Add pod documentation for main module
+
+2.1.2 2016 06 3
+
+- Start perl 5.24 support
+
+2.1.1
+
+- Some small bugs, code branch mergers and reconciliations
+
+2.1.0
+
+- Add perl 5.18
+- Be able to deparse main::
+
+2.0.0
+  Add perl 5.22

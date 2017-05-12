@@ -1,0 +1,22 @@
+ - Benchmarks for Bio::Grep POD to help ppl choosing the right backend. 
+   [ STARTED, still missing are benchmarks for multiple queries and
+     editdistance ]
+ - filter priority (fast filters like FilterRemoveDuplicates should run first 
+   automatically)
+ - interface for multiple queries [ ?? ]
+ - support other file formats (Genbank,...) and input sources (maybe even
+   databases?) [ DONE ]
+ - support agreps regular expressions 
+ - support agrep query_file
+ - create a simple backend that does not require additional software [ DONE ]
+ - remove EMBOSS and bioperl-run, add own alignment calculation 
+ - cleanup testcases [ STARTED ]
+ - Bio::Grep::Cookbook [ STARTED ]
+
+Post 1.0
+
+ - configfile for bgrep
+ - New Back-ends: 
+     * PoSSuM back-end [ ?? ]
+     * Seqan library [ ?? ]
+ - contribute parsers to Bio::Tools::Run    

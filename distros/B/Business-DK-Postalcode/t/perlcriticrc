@@ -1,0 +1,90 @@
+
+# $Id: perlcriticrc,v 1.1 2008-06-11 08:08:00 jonasbn Exp $
+
+severity = 1
+verbose = 8
+
+#------------------------------------------------------------------------------
+
+#https://logiclab.jira.com/wiki/display/OPEN/Perl-Critic-Policy-CodeLayout-RequireTidyCode
+[-CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+script_sections = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#https://logiclab.jira.com/wiki/display/OPEN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print
+
+[-Documentation::RequirePodAtEnd]
+#This one interferes with our DATA section, perhaps DATA should go before POD?
+
+# TODO
+
+[-Documentation::RequirePodLinksIncludeText]
+
+[-ControlStructures::ProhibitCStyleForLoops]
+
+[-CodeLayout::RequireFinalSemicolon]
+
+[-CodeLayout::RequireASCII]
+
+[-Compatibility::PodMinimumVersion]
+
+[-Compatibility::PerlMinimumVersionAndWhy]
+
+[-Modules::RequirePerlVersion]
+
+[-Editor::RequireEmacsFileVariables]
+
+[-Documentation::RequireLinkedURLs]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-RegularExpressions::RequireDotMatchAnything]
+
+[-CodeLayout::RequireTrailingCommaAtNewline]
+
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+
+[-TestingAndDebugging::ProhibitNoStrict]
+
+[-Miscellanea::ProhibitUselessNoCritic]
+
+[-Variables::ProhibitReusedNames]
+
+[-TestingAndDebugging::ProhibitProlongedStrictureOverride]
+
+[-ErrorHandling::RequireUseOfExceptions]
+
+[-Modules::RequireVersionVar]
+
+[-ErrorHandling::RequireCarping]
+
+[-NamingConventions::ProhibitAmbiguousNames]
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+
+[-ControlStructures::ProhibitDeepNests]
+
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-ControlStructures::ProhibitPostfixControls]
+
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+
+[-ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+
+[-Variables::ProhibitUnusedVariables]

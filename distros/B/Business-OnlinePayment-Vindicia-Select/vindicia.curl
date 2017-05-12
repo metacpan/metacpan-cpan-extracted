@@ -1,0 +1,19 @@
+#!/bin/bash
+
+curl --header "Content-Type: text/xml;charset=UTF-8" --header "SOAPAction: http://soap.vindicia.com/v1_1/Select#fetchByMerchantTransactionId" --data '<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope
+    xmlns:ns0="http://soap.vindicia.com/v1_1/Select"
+    xmlns:ns1="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+   <ns1:Body>
+      <ns0:fetchByMerchantTransactionId>
+         <auth>
+            <version>1.1</version>
+            <login>ei_bluehost_soap</login>
+            <password>hnjVOkO8wQv84Gg6Y5u4GXXx0pn7g9nX</password>
+         </auth>
+         <merchantTransactionId>TEST123431_1</merchantTransactionId>
+      </ns0:fetchByMerchantTransactionId>
+   </ns1:Body>
+</SOAP-ENV:Envelope>' https://soap.prodtest.sj.vindicia.com/v1.1/soap.pl --trace-ascii -

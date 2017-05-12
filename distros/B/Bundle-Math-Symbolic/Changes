@@ -1,0 +1,11 @@
+Revision history for Perl extension Bundle::Math::Symbolic.
+
+1.02  Mon Oct 10 21:14:18 2005
+	- Added Math::Calculus::*
+	- Added various Math::Symbolic extensions
+
+1.01  Fri Jan 21 23:16:31 2005
+	- Fixed typo in module name. :(
+
+1.00  Fri Jan 21 14:53:12 2005
+	- original version as uploaded to CPAN

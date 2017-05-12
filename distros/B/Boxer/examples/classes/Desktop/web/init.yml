@@ -1,0 +1,11 @@
+classes:
+  - Desktop
+parameters:
+  doc:
+    desktop-web:
+      headline:
+        - Desktop web
+      pkg:
+        - include Iceweasel web browser
+  pkg:
+    - iceweasel

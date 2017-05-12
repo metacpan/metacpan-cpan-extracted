@@ -1,0 +1,15 @@
+Bundle::CygwinVendor
+====================
+
+This is a convenience bundle for cygwin developers to install the
+same vendor modules as the build script.
+
+
+INSTALLATION
+
+For all Perl versions
+
+	$ cpan Bundle::CygwinVendor
+
+
+See http://code.google.com/p/cygwin-rurban/source/browse/trunk/release/perl/modules

@@ -1,0 +1,11 @@
+classes:
+  - Service.log
+parameters:
+  doc:
+    service:
+      pkg:
+        - include Rsyslog plugin for secure remote logging
+  pkg:
+    - rsyslog-gnutls
+  pkg-auto:
+    - rsyslog

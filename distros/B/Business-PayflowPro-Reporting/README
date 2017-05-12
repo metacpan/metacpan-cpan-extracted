@@ -1,0 +1,112 @@
+NAME
+    Business::PayflowPro::Reporting - Payflow Pro Reporting API
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Business::PayflowPro::Reporting;
+        use Data::Dumper;
+        
+    my $bpr = Business::PayflowPro::Reporting->new(
+            user => $cfg{user},
+            vendor => $cfg{vendor},
+            partner => $cfg{partner},
+            password => $cfg{password},
+        ) or die $Business::PayflowPro::Reporting::errstr;
+        
+    my $reportId = $bpr->runReportRequest(
+            reportName => 'TransactionSummaryReport',
+            start_date => '2010-09-17 00:00:00',
+            end_date   => '2010-09-18 23:59:59',
+            pageSize => 50, # optional
+        ) or die $bpr->errstr;
+        print "Get $reportId\n";
+        
+    my $metadata = $bpr->getMetaDataRequest($reportId) or die $bpr->errstr;
+        my $page = $metadata->{numberOfPages};
+        my $columnMetaData = $metadata->{columnMetaData}; # col name
+        foreach my $p (1 .. $page) {
+            my @reportDataRow = $bpr->getDataRequest($reportId, $p); # col value
+            print Dumper(\@reportDataRow);
+        }
+
+DESCRIPTION
+    Payflow Pro Reporting API, read
+    <https://cms.paypal.com/cms_content/US/en_US/files/developer/PP_Reportin
+    g_Guide.pdf> for more details.
+
+    WARN: Report Template stuff is not implemented. drop me a note if you
+    need it, I am glad to do it.
+
+  METHODS
+   CONSTRUCTION
+        my $bpr = Business::PayflowPro::Reporting->new(
+            user => $cfg{user},
+            vendor => $cfg{vendor},
+            partner => $cfg{partner},
+            password => $cfg{password},
+        ) or die $Business::PayflowPro::Reporting::errstr;
+
+    *   user
+
+    *   vendor
+
+    *   partner
+
+    *   password
+
+        config keys from PayPal
+
+    *   debug
+
+    *   test_mode
+
+        Live or Test Transactions
+
+    *   ua_args
+
+        passed to LWP::UserAgent
+
+    *   ua
+
+        LWP::UserAgent or WWW::Mechanize instance
+
+   runReportRequest
+        # Running a Daily Activity Report
+        my $reportId = $bpr->runReportRequest(
+            reportName => 'DailyActivityReport',
+            report_date => '2010-09-18',
+            pageSize => 50, # optional
+        ) or die $bpr->errstr;
+        
+    # or Running a Transaction Summary Report
+        my $reportId = $bpr->runReportRequest(
+            reportName => 'TransactionSummaryReport',
+            start_date => '2010-09-17 00:00:00',
+            end_date   => '2010-09-18 23:59:59',
+            pageSize => 50, # optional
+        ) or die $bpr->errstr;
+
+   getResultsRequest
+    Getting Results by Report ID
+
+        my $report = $bpr->getResultsRequest($reportId) or die $bpr->errstr;
+
+   getMetaDataRequest
+    retrieve the format of the data in a previously run report.
+
+        my $metadata = $bpr->getMetaDataRequest($reportId);
+
+   getDataRequest
+        my @reportDataRow = $bpr->getDataRequest($reportId, $pageNum);
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

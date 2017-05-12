@@ -1,0 +1,27 @@
+Revision history for Business::PhoneBill::Allopass
+1.09    - Makes CPANTS happy
+1.06    - Fix one case where sessions aren't correcly removed 
+          (closing an session at same run time than his opening)
+1.05    - External cookies setting through httpd class (undocumented) 
+1.04    - Return text error if cann't create class 
+1.03    - Fix class constructor: variables not blessed
+        - Fix some pod issues, and make Version findable by CPAN
+1.02    - Fix supid make test bug, where I forgot to update package name
+1.01    - Now known affiliate ID if applicable
+        - Improved object implementation
+1.00    - Changed name of package, in order to conform to the CPAN structure
+
+
+Revision history for Billing::Allopass
+0.04    - Documentation fix
+
+0.03  Wed Mar 05 2003
+        - Adding simple install tests
+        
+0.02  Thu Mar 04 2003
+        - Documentation fix
+        - Automatically create session file if it doesn't exists
+
+0.01  Fri Feb 14 17:40:40 2003
+	- original version; created by h2xs 1.22 with options -XA -n Billing::Allopass
+

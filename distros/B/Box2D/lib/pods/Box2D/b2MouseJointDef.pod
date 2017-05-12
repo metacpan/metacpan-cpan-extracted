@@ -1,0 +1,121 @@
+
+=head1 NAME
+
+Box2D::b2MouseJointDef - Mouse joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2MouseJointDef->new();
+  $joint_def->bodyA( $body_a );
+  $joint_def->bodyB( $body_b );
+  $joint_def->target( $target );
+  $joint_def->maxForce( $max_force );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Mouse joint definition. This requires a world target point, tuning
+parameters, and the time step.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2MouseJointDef>
+
+=head2 dampingRatio()
+
+=head2 dampingRatio( $dampingRatio )
+
+The damping ratio. 0 = no damping, 1 = critical damping.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$dampingRatio> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 frequencyHz()
+
+=head2 frequencyHz( $frequencyHz )
+
+The response speed.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$frequencyHz> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 maxForce()
+
+=head2 maxForce( $maxForce )
+
+The maximum constraint force that can be exerted to move the candidate
+body. Usually you will express as some multiple of the weight
+(multiplier * mass * gravity).
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxForce> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 target()
+
+=head2 target( $target )
+
+The initial world target point. This is assumed to coincide with the
+body anchor initially.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$target> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2MouseJoint>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

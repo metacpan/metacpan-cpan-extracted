@@ -1,0 +1,33 @@
+[% PROCESS header title = entity.most_common_name.name %]
+[% PROCESS macros %]
+
+[% SET names = entity.names.unique %]
+[% IF names.length > 1 %]
+    <h1>[% entity.most_common_name.name |html %]</h1>
+[% INCLUDE searchbox %]
+    <div class="aka">
+        <p>Also known as:</p>
+        <ul>
+            [% FOR my_name = names %]
+                <li><a href="[%base|remove('/$')%]/name/view/[% my_name.id %]">[% my_name.name | html %]</a></li>
+            [% END %]
+    </ul>
+        </div>
+[% ELSE %]
+    <h1>[% names.first.name |html%]</h1>
+[% INCLUDE searchbox %]
+
+<p>See mails mentioning <a href="[%base|remove('/$')%]/name/view/[% names.first.id %]">[%names.first.name |html%]</a></p>
+[% END %]
+
+<p>Addresses</p>
+<ul>
+[% FOR addr = entity.addresses.unique %]
+    <li>[% link_addr(addr) %]</li>
+[% END %]
+</ul>
+
+[% mails_by_addressing(entity) %]
+
+[% make_atom("entity/atom/$entity.id") %]
+[% INCLUDE footer %]

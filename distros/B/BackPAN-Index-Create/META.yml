@@ -1,0 +1,40 @@
+---
+abstract: 'generate an index file for a BackPAN mirror'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Exporter: '0'
+  File::Compare: '0'
+  File::Touch: '0'
+  Test::More: '0.88'
+  lib: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BackPAN-Index-Create
+no_index:
+  package:
+    - BackPAN::Index::Create::TestUtils
+requires:
+  CPAN::DistnameInfo: '0'
+  Carp: '0'
+  Exporter::Lite: '0'
+  Getopt::Long: '0'
+  Module::Loader: '0'
+  Moo: '0'
+  Path::Iterator::Rule: '0'
+  Scalar::Util: '0'
+  autodie: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/BackPAN-Index-Create
+  repository: https://github.com/neilbowers/BackPAN-Index-Create.git
+version: '0.13'

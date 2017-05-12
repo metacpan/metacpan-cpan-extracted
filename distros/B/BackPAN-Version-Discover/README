@@ -1,0 +1,67 @@
+BackPAN-Version-Discover
+
+This module can be used to discover exactly which versions
+of which cpan distributions you have installed, and give
+you the path to those tarball releases on the backpan.
+
+Note: this module is by no means a perfect solution. It makes
+some educated guesses and some assumptions to try and figure
+out exactly what you have installed.
+
+Vendor-packages modules are a particularly odd case, since
+many will be modified, and the maintainers may or may not
+have updated the version numbers. However, most of the time,
+they will at least install these modules to a separate set
+of lib dirs that is designated by the perl binary as being
+the place for them. By default, the scan this module performs
+skips over those modules.
+
+However, on debian-based systems, you can find out what
+packages you have installed that contain perl modules 
+installed under @INC using this shell snippet:
+
+find `perl -e 'print join " ",@INC'` -name '*.pm' 2>/dev/null \
+    | xargs dpkg -S 2>/dev/null | sed 's/:.*$//' | sort -u
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc BackPAN::Version::Discover
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=BackPAN-Version-Discover
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/BackPAN-Version-Discover
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/BackPAN-Version-Discover
+
+    Search CPAN
+        http://search.cpan.org/dist/BackPAN-Version-Discover/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Stephen R. Scaffidi
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,22 @@
+Changes:
+
+Migrated to Module::Build for more informative build process.
+Added XSL stylesheet for sequence command.
+Fixed versioning for SVN-style revisions.
+Now sends "type" parameters to build_features
+Standardised setting of source configuration parameters - now all are retrieved from:
+  method
+  stack
+  ini
+Features command now has consistent way of getting segment version (first from the feature, then the method)
+
+Added SourceAdaptor::hydra method
+Added SourceAdaptor::server_url method
+Added SourceAdaptor::source_url method
+Added SourceAdaptor::strict_boundaries method
+
+Default SourceAdaptor::dsncreated method now gets last modified time from hydra (if available) before the transport
+
+Swapped the default priorities for source_uri and version_uri (i.e. version_uri defaults to dsn, and source_uri defaults to version_uri).
+
+The dsn command now makes use of the title attribute.

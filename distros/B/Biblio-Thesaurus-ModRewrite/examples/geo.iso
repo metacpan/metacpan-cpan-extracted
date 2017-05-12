@@ -1,0 +1,119 @@
+%externals SN URL
+
+%languages 
+
+%baselanguage ?
+
+%inverse NT BT
+%inverse RT RT
+%inverse USE UF
+%inverse UF USE
+%inverse BT NT
+
+
+%description NT Narrower term
+%description LNG ...
+%description CITY-OF ...
+%description COUNTRY-OF ...
+%description IS-A ...
+%description BT Broader term
+%description SN Scope note
+%description USE Synonym
+%description RT Related term
+%description TT Top term
+%description UF Quasi synonym
+%description CAPITAL-OF ...
+%description LAT ...
+
+
+
+Lisboa
+LNG	-9.1657589
+CAPITAL-OF	Portugal
+CITY-OF	Portugal
+LAT	38.7385758
+IS-A	city
+
+Bruxelas
+CAPITAL-OF	Belgica
+CITY-OF	Belgica
+IS-A	city
+
+Vigo
+CITY-OF	Espanha
+IS-A	city
+
+-8.4229034
+
+city
+
+-8.2956069
+
+country
+
+Paris
+CAPITAL-OF	Franca
+CITY-OF	Franca
+IS-A	city
+
+Europa
+
+Braga
+LNG	-8.4229034
+CITY-OF	Portugal
+CITY-OF	Braga
+LAT	41.5517605
+IS-A	city
+
+38.7385758
+
+Madrid
+CAPITAL-OF	Espanha
+CITY-OF	Espanha
+IS-A	city
+
+Franca
+IS-A	country
+
+41.5517605
+
+41.4419546
+
+Espanha
+COUNTRY-OF	Europa
+IS-A	country
+
+Londres
+CAPITAL-OF	Inglaterra
+CITY-OF	Inglaterra
+IS-A	city
+
+Guimaraes
+LNG	-8.2956069
+CITY-OF	Portugal
+LAT	41.4419546
+IS-A	city
+
+39.399872
+
+Inglaterra
+COUNTRY-OF	Europa
+IS-A	country
+
+-9.1657589
+
+Portugal
+LNG	-8.224454
+COUNTRY-OF	Europa
+LAT	39.399872
+IS-A	country
+
+Porto
+CITY-OF	Portugal
+IS-A	city
+
+-8.224454
+
+Belgica
+COUNTRY-OF	Europa
+IS-A	country

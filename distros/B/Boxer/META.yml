@@ -1,0 +1,125 @@
+---
+abstract: 'boxer command line utils'
+author:
+  - 'Jonas Smedegaard (JONASS) <jonass@cpan.org>'
+build_requires:
+  English: '0'
+  File::Spec: '0'
+  Test::Compile: '0'
+  Test::Fixme: '0'
+  Test::MinimumVersion: '0'
+  Test::More: '0.61'
+  Test::Pod: '1.00'
+  Test::Synopsis: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  File::ShareDir::Install: '0.02'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - Debian
+  - Distribution
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Boxer
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Boxer:
+    file: lib/Boxer.pm
+    version: v1.1.5
+  Boxer::CLI:
+    file: lib/Boxer/CLI.pm
+    version: v1.1.5
+  Boxer::CLI::Command:
+    file: lib/Boxer/CLI/Command.pm
+    version: v1.1.5
+  Boxer::CLI::Command::About:
+    file: lib/Boxer/CLI/Command/About.pm
+    version: v1.1.5
+  Boxer::CLI::Command::Aliases:
+    file: lib/Boxer/CLI/Command/Aliases.pm
+    version: v1.1.5
+  Boxer::CLI::Command::Commands:
+    file: lib/Boxer/CLI/Command/Commands.pm
+    version: v1.1.5
+  Boxer::CLI::Command::Compose:
+    file: lib/Boxer/CLI/Command/Compose.pm
+    version: v1.1.5
+  Boxer::File::WithSkeleton:
+    file: lib/Boxer/File/WithSkeleton.pm
+    version: v1.1.5
+  Boxer::Part:
+    file: lib/Boxer/Part.pm
+    version: v1.1.5
+  Boxer::Part::Reclass:
+    file: lib/Boxer/Part/Reclass.pm
+    version: v1.1.5
+  Boxer::Role::Interact:
+    file: lib/Boxer/Role/Interact.pm
+    version: v1.1.5
+  Boxer::Task:
+    file: lib/Boxer/Task.pm
+    version: v1.1.5
+  Boxer::Task::Classify:
+    file: lib/Boxer/Task/Classify.pm
+    version: v1.1.5
+  Boxer::Task::Serialize:
+    file: lib/Boxer/Task/Serialize.pm
+    version: v1.1.5
+  Boxer::Types:
+    file: lib/Boxer/Types.pm
+    version: v1.1.5
+  Boxer::World:
+    file: lib/Boxer/World.pm
+    version: v1.1.5
+  Boxer::World::Flat:
+    file: lib/Boxer/World/Flat.pm
+    version: v1.1.5
+  Boxer::World::Reclass:
+    file: lib/Boxer/World/Reclass.pm
+    version: v1.1.5
+requires:
+  App::Cmd: '0'
+  Capture::Tiny: '0'
+  File::BaseDir: '0'
+  File::ShareDir: '0'
+  IPC::System::Simple: '0'
+  Log::Any::Adapter::Screen: '0'
+  Module::Runtime: '0'
+  Moo: '1.001000'
+  MooX::Role::Logger: '0'
+  Path::Tiny: '0.054'
+  Role::Commons: '0'
+  Template::Tiny: '0.11'
+  Try::Tiny: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '0'
+  YAML::XS: '0'
+  autodie: '0'
+  match::simple: '0'
+  namespace::clean: '0'
+  perl: '5.014000'
+  strictures: '2'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Boxer/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Boxer
+  homepage: https://metacpan.org/release/Boxer
+  license: http://dev.perl.org/licenses/
+  repository: https://anonscm.debian.org/cgit/boxer/Boxer.git
+version: v1.1.5
+x_help_wanted:
+  - documenter
+  - tester
+x_provides_scripts:
+  boxer:
+    file: bin/boxer
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

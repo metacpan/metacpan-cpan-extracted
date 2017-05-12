@@ -1,0 +1,71 @@
+Revision history for BBCode::Parser.
+
+A more detailed revision history is available via Subversion checkout.
+Browse <URL:svn://chronos-tachyon.net/projects/BBCode-Parser> for a complete
+history of the project.
+
+0.33 [2006-04-14 07:21:10 -0500]
+* Added some new options for <a target="_blank">
+
+Thanks go to Kevin Smith <ksmith (AT) ecymtech.com> for suggesting it.
+
+0.32 [2006-03-01 11:42:40 -0600]
+* Backported a fix to BBCode::Parser->DEFAULT from the development trunk
+
+Thanks go to Kevin Smith <ksmith (AT) ecymtech.com> for being the first person
+besides me to tickle this bug and for reminding me that I should've backported
+it as soon as I fixed it.
+
+0.31 [2006-02-05 11:29:19 -0600]
+* Fixed the [IMG SRC][/IMG] wart from 0.30
+
+0.30 [2006-02-04 13:02:03 -0600]
+* Fixed a stupid bug: &entities; weren't treated as [ENT=entities]
+* Big improvements to the "bbtest" demo program.
+  Try "bbtest --help" for usage info.
+* Massive documentation updates
+* Finally added $tag->toText
+* Lots of scattered improvements (see logs -r124:155 for details)
+
+There is, however, one outstanding wart:
+* The current version of [IMG] always needs a closing [/IMG].
+  However, at this point I just want to get 0.30 out the door.
+
+0.23 [2006-01-17 08:28:25 -0600]
+* Rewrote part of the [LIST] tag handling to support implicit list items.  It
+  guesstimates that each line of text is a new list item.  WARNING: Using tags
+  within an implicit list item (e.g. [URL] or [B]) will NOT work.
+* Despite previous reports to the contrary, research shows that HTML 4.01 has
+  absolutely no qualms about nesting block tags inside an <li>.  My bad.
+
+Further thanks to Alex Teslik for his real-world use of this module, which has
+helped shake out the entire 0.20 branch.
+
+0.22 [2006-01-10 10:28:46 -0600]
+* Added a tweak that allows nesting block tags within list items.  Technically
+  not valid HTML, but users expect it.  At some point, I might replace <pre>
+  with <span> and some CSS...
+
+0.21 [2006-01-09 09:47:13 -0600]
+* Added two new named colors: darkred and darkblue.
+* Fixed a glitch that depends on Perl's interaction between $1/$2 and subs.
+* Fixed a non-intuitive parser quirk that made e.g. links to CGI scripts
+  "break" (i.e. need quoting/backslashes when it wasn't strictly necessary).
+
+Thanks go to Alex Teslik <alex (AT) acatysmoof.com> for the bug report that
+led to this release.
+
+0.20 [2005-08-27 06:00:11 -0500]
+* Re-designed a lot of internals
+* Added $parser->clone() and BBCode::Parser->DEFAULT()
+* Added the beginnings of support for application-defined BBCode tags;
+  See tagUserDefined in BBCode::Util.
+  NOTE: The API for this feature will almost certainly change!
+
+0.02 - Never released (should have been forked from r85 on the SVN trunk)
+* Documentation fixes
+
+0.01 [2005-08-22 13:22:43 -0500]
+* Initial release
+
+$Id: Changes 284 2006-12-01 07:51:49Z chronos $

@@ -1,0 +1,53 @@
+package Business::PhoneBill::Allopass::Simple;
+use vars qw($VERSION @ISA @EXPORT $session_file);
+
+$VERSION = "1.01";
+
+use HTTP::Request::Common qw(GET POST);
+use LWP::UserAgent;
+use CGI::Cookie;
+
+my $baseurl = 'http://www.allopass.com/check/vf.php4';
+=head1 NAME
+
+Billing::Allopass::Simple - A class for micro-payment system from allopass I<http://www.allopass.com/>
+
+=head1 SYNOPSIS
+
+  use Business::PhoneBill::Allopass::Simple;
+
+  if (allopass_check($document_id, $RECALL)){
+        print "OK\n";
+  } else {
+        print "NOK\n";
+  }
+  
+=head1 DESCRIPTION
+
+This class provides you a easy api for the allopass.com system. It automatically handles user sessions.
+
+See I<http://www.allopass.com> for more informations on their system and how it basically works.
+
+=head1 FUNCTIONS
+=item B<allopass_check> - Simply checks if a code has been recently validated for this document.
+
+    allopass_check($document_id, $code);
+
+You must perform this check within 2 minutes after the code is entered.
+
+=cut
+sub allopass_check {
+    my ($doc_id, $code, $r) = @_;
+    my ($res, $ua, $req);
+    $ua = LWP::UserAgent->new;
+    $ua->agent('Mozilla/5.0');
+    $req = POST $baseurl,
+        [
+        'CODE'      => $code ,
+	'to'        => $doc_id ,
+        ];
+    #$req->headers->referer($baseurl);
+    $res = $ua->simple_request($req)->as_string;
+    return 1 if _is_res_ok($res);
+    0;
+}

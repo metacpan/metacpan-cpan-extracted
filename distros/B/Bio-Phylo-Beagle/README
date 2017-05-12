@@ -1,0 +1,28 @@
+Bio::Phylo::Beagle - wrapper around the Beagle library
+
+This is perl wrapper code that allows one to use Bio::Phylo's data handling
+capabilities to interface with the Beagle library for likelihood calculations:
+
+* Beagle     - http://dx.doi.org/10.1093/sysbio/syr100
+* Bio::Phylo - http://dx.doi.org/10.1186/1471-2105-12-63
+
+It is based on the SWIG bindings that were orginally developed for python by
+members of the Beagle team:
+
+http://code.google.com/p/beagle-lib/source/browse/trunk/examples/swig_python/README
+
+I developed this on a MacBook Pro with OS X snow leopard. I used the svn
+revision 1082 of Beagle to build against. I found that I needed to update
+my SWIG to version 2.0.4, with pcre (both from source).
+
+On operating systems that support pkg-config and backticks you should be
+able to build and install using the following commands:
+
+perl Makefile.PL
+make
+make test
+(sudo make install) <-- don't do this while these wrappers are experimental
+
+The unit test script t/test_simple.t does the same computation as the python
+test.py script in the Beagle-lib source tree, demonstrating most of the
+current functionality.

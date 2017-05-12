@@ -1,0 +1,22 @@
+bin/counterproc
+Build.PL
+CHANGES
+lib/Biblio/COUNTER.pm
+lib/Biblio/COUNTER/Processor.pm
+lib/Biblio/COUNTER/Processor/Atomize.pm
+lib/Biblio/COUNTER/Processor/Simple.pm
+lib/Biblio/COUNTER/Processor/Validate.pm
+lib/Biblio/COUNTER/Report.pm
+lib/Biblio/COUNTER/Report/Release2/DatabaseReport1.pm
+lib/Biblio/COUNTER/Report/Release2/DatabaseReport2.pm
+lib/Biblio/COUNTER/Report/Release2/DatabaseReport3.pm
+lib/Biblio/COUNTER/Report/Release2/JournalReport1.pm
+lib/Biblio/COUNTER/Report/Release2/JournalReport1a.pm
+lib/Biblio/COUNTER/Report/Release2/JournalReport2.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/01-use.t
+t/99-pod.t
+t/examples/jr1-warnings.csv

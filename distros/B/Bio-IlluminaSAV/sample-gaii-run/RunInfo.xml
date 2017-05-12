@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<RunInfo>
+  <Run Id="GAII-02_H20435_20121204" Number="102">
+    <Instrument>EA-GAII-02</Instrument>
+    <FlowcellId />
+    <QualityTable>qtable-v4.txt</QualityTable>
+    <Cycles Incorporation="226" Cleavage="0" ReadPrep="2" />
+    <Tiles>
+      <Lane Index="1" Incorporation="120" ReadPrep="6" />
+      <Lane Index="2" Incorporation="120" ReadPrep="6" />
+      <Lane Index="3" Incorporation="120" ReadPrep="6" />
+      <Lane Index="4" Incorporation="120" ReadPrep="6" />
+      <Lane Index="5" Incorporation="120" ReadPrep="6" />
+      <Lane Index="6" Incorporation="120" ReadPrep="6" />
+      <Lane Index="7" Incorporation="120" ReadPrep="6" />
+      <Lane Index="8" Incorporation="120" ReadPrep="6" />
+    </Tiles>
+    <Reads>
+      <Read FirstCycle="1" LastCycle="108" />
+      <Read FirstCycle="109" LastCycle="118">
+        <Index Name="Index" FirstCycle="109" LastCycle="118" />
+      </Read>
+      <Read FirstCycle="119" LastCycle="226" />
+    </Reads>
+    <SecondEnd FirstCycle="119" />
+    <ActualIndex>
+      <Cycle>109</Cycle>
+      <Cycle>110</Cycle>
+      <Cycle>111</Cycle>
+      <Cycle>112</Cycle>
+      <Cycle>113</Cycle>
+      <Cycle>114</Cycle>
+      <Cycle>115</Cycle>
+      <Cycle>116</Cycle>
+      <Cycle>117</Cycle>
+      <Cycle>118</Cycle>
+    </ActualIndex>
+  </Run>
+</RunInfo>

@@ -1,0 +1,8 @@
+classes:
+  - Desktop
+  - x11
+parameters:
+  doc:
+    desktop-office:
+      headline:
+        - Desktop office

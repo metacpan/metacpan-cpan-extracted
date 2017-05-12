@@ -1,0 +1,29 @@
+classes:
+  - Desktop.office
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice locales for Asia
+  pkg:
+    - libreoffice-l10n-ar
+    - libreoffice-l10n-fa
+    - libreoffice-l10n-he
+    - libreoffice-l10n-id
+    - libreoffice-l10n-in
+    - libreoffice-l10n-ja
+    - libreoffice-l10n-km
+    - libreoffice-l10n-ko
+    - libreoffice-l10n-ku
+    - libreoffice-l10n-mn
+    - libreoffice-l10n-ne
+    - libreoffice-l10n-ru
+    - libreoffice-l10n-si
+    - libreoffice-l10n-tg
+    - libreoffice-l10n-th
+    - libreoffice-l10n-tr
+    - libreoffice-l10n-ug
+    - libreoffice-l10n-uz
+    - libreoffice-l10n-vi
+    - libreoffice-l10n-zh-cn
+    - libreoffice-l10n-zh-tw

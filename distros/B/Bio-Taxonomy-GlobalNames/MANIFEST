@@ -1,0 +1,18 @@
+Changes
+lib/Bio/Taxonomy/GlobalNames.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/data-input.t
+t/empty-input.txt
+t/input-quotes.txt
+t/unicode-input.txt
+examples/names.dat
+examples/resolve_names.pl
+examples/scientific_names.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

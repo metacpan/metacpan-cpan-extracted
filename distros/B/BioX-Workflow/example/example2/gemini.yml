@@ -1,0 +1,30 @@
+---
+global:
+    - ROOT: data/raw
+    - indir: data/raw
+    - outdir: data/processed
+    - file_rule: (.vcf)$|(.vcf.gz)$
+rules:
+    - bgzip:
+        process: |
+            {
+                if(! -f "$self->{indir}/$sample.vcf.gz"){
+                    $OUT .= "bgzip $self->{indir}/$sample.vcf && tabix $self->{indir}/$sample.vcf.gz\n";
+                }
+
+            }
+    - normalize_snpeff:
+        local:
+            - indir: "{$self->ROOT}"
+        process: |
+            bcftools view {$self->indir}/{$sample}.vcf.gz | sed 's/ID=AD,Number=./ID=AD,Number=R/' \
+                | vt decompose -s - \
+                | vt normalize -r $REFGENOME - \
+                | java -Xmx4G -jar $SNPEFF/snpEff.jar -c \$SNPEFF/snpEff.config -formatEff -classic GRCh37.75  \
+                | bgzip -c > \
+                {$self->{outdir}}/{$sample}.norm.snpeff.gz && tabix {$self->{outdir}}/{$sample}.norm.snpeff.gz
+    - gemini_sqlite:
+        process: |
+            gemini load -v {$self->indir}/{$sample}.norm.snpeff.gz \
+                --skip-cadd -t snpEff \
+               {$self->outdir}/{$sample}.vcf.db

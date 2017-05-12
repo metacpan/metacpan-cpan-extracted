@@ -1,0 +1,45 @@
+dn: $(CONFIGURATOR.BASE)
+objectclass: organization
+o: $(CONFIGURATOR.ORGANIZATION)
+
+dn: cn=root, $(CONFIGURATOR.BASE)
+userpassword: test
+objectclass: person
+cn: root
+sn: root
+
+dn: ou=People, $(CONFIGURATOR.BASE)
+objectclass: organizationalUnit
+ou: People
+
+dn: ou=Admin, $(CONFIGURATOR.BASE)
+objectclass: organizationalUnit
+ou: Admin
+
+dn: cn=pam-user, ou=Admin, $(CONFIGURATOR.BASE)
+userpassword: pampassword
+objectclass: person
+cn: pam-user
+sn: pam-user
+
+dn: uid=test,ou=People, $(CONFIGURATOR.BASE)
+cn: Personne de Test
+givenname: VPTest 
+sn: Test
+userpassword: test
+objectclass: top
+objectclass: VPPerson
+uid: test
+mailHost: svrmail2.vecteurplus.com
+mailLocalAddress: test@svrmail2.vecteurplus.com
+
+dn: uid=postadm,ou=People,$(CONFIGURATOR.BASE)
+userpassword: test
+objectclass: top
+objectclass: VPPerson
+uid: postadm
+cn: Postmaster Administrator
+givenname: Postmaster
+sn: Postmaster
+mailHost: svrmail2.vecteurplus.com
+mailLocalAddress: postadm@svrmail2.vecteurplus.com

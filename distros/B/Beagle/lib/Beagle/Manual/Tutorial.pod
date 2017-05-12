@@ -1,0 +1,105 @@
+=head1 NAME
+
+Beagle::Manual::Tutorial - Tutorial
+
+=head1 DESCRIPTION
+
+=head2 INSTALL
+
+C<Beagle> requires L<git|http://git-scm.com/>, so please make sure you have it
+installed.
+
+C<Beagle> is a plain CPAN module, so you can install it via L<CPAN> or
+L<CPANPLUS> or L<App::cpanminus>:
+
+    $ cpan Beagle
+    $ cpanp -i Beagle
+    $ cpanm Beagle
+
+=head2 INIT CONFIG
+
+    $ beagle config --init
+
+=head2 INIT AND FOLLOW
+
+create a beagle:
+
+    $ beagle init /tmp/foo.git --bare
+
+clone it into Beagle's kennel
+
+    $ beagle follow /tmp/foo.git
+
+you can follow it from another box too, as it's a plain git repository.
+
+=head2 USE
+
+    $ beagle help
+    $ beagle ls # no output as we haven't created anything
+    $ beagle info -n foo --edit # edit foo's info
+    $ beagle article -n foo --title homer --body doh
+    $ beagle bark -n foo 'bart is a good boy'
+    $ beagle ls
+    $ beagle articles
+    $ beagle barks
+    $ beagle cat id1
+    $ beagle update id1
+    $ beagle rm id1
+
+=head2 PULL AND PUSH AND SPREAD
+
+    $ beagle pull -n foo # from original /tmp/foo.git
+    $ beagle push -n foo # to original /tmp/foo.git
+
+    $ beagle spread id1 --command command --template-file short
+    $ beagle help spread 
+
+=head2 START WEB SERVER
+
+    $ beagle web -n foo
+    $ beagle web -n foo --port 8080
+
+=head1 ADVANCED
+
+=head2 SET DEFAULT BEAGLE
+
+it's annoying if we have to specify the beagle name by C<-n foo> in commands,
+here are some ways to avoid this:
+
+=over
+
+=item ENV BEAGLE_NAME
+
+    $ export BEAGLE_NAME=foo
+
+=item share/etc/bashrc
+
+it's in share root of C<Beagle>, which supplies 3 extra "commands":
+C<which>, C<use> and C<switch>.
+
+C<which> shows current beagle name, C<switch> switches default beagle, C<use>
+switches default beagle only in current session.
+
+    $ beagle which
+    $ beagle switch foo
+    $ beagle use foo
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Beagle>, L<Beagle::Manual::ENV>, L<Beagle::Manual::Cookbook>
+
+=head1 AUTHOR
+
+    sunnavy <sunnavy@gmail.com>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+    Copyright 2011 sunnavy@gmail.com
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,43 @@
+Burpsuite-Parser
+
+Parse Burpsuite scan data with Perl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDS / SETUP
+
+    $ cpan
+    cpan> install CPAN
+    exit
+    cpan> install Bundle::CPAN
+    exit
+    cpan> install Object::InsideOut
+
+NOTE: Install libxml2-dev before you install XML::LibXML
+
+$ sudo apt-get install libxml2-dev
+
+    cpan> install XML::LibXML
+    cpan> install Test::More ( if you want to run the tests ) 
+    cpan> install Test::Class ( if you want to run the tests ) 
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Burpsuite::Parser
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Joshua "Jabra" Abraham
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

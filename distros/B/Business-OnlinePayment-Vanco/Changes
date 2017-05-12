@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::OnlinePayment::Vanco.
+
+0.02  Mon Jul 07 18:42:31 2008
+	- turn off debugging
+
+0.01  Fri Feb 29 22:34:17 2008
+	- original version;
+

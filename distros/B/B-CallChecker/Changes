@@ -1,0 +1,13 @@
+version 0.001; 2012-06-17
+
+  * bugfix: don't crash when using Perl ckfun with undef ckobj
+
+  * fix backward compatibility to unthreaded instances of Perl 5.8
+
+  * update tests for a changed error message in Perl 5.17.0
+
+  * convert .cvsignore to .gitignore
+
+version 0.000; 2011-06-15
+
+  * initial released version

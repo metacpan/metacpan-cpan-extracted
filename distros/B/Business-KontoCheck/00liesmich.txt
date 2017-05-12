@@ -1,0 +1,208 @@
+vim:tw=80:ft=text:ai
+
+########################################################################
+# PRÜFZIFFERBERECHNUNG VON DEUTSCHEN UND ÖSTERREICHISCHEN KONTONUMMERN #
+#                        C-/Perl-Bibliothek                            #
+########################################################################
+#                                                                      #
+# Autor             : Michael Plugge <m.plugge@hs-mannheim.de>         #
+# Version           : 5.5                                              #
+# Datum             : 01.09.2014                                       #
+#                                                                      #
+########################################################################
+
+1. Einführung
+=============
+
+Das Modul Business::KontoCheck besteht aus zwei C-Bibliotheken, die an sich
+relativ selbständig sind, aber auch gemeinsam verwendet werden können. Die
+Bibliotheken berechnen anhand von Bankleitzahl und Prüfziffermethode, ob eine
+angegebene Kontonummer plausibel ist. Es kann natürlich nicht ausgesagt werden,
+ob eine etsprechende Kontonummer wirklich existiert; allerdings können Fehler
+bei der Übermittlung auf diese Weise oft entdeckt werden und ersparen so
+kostspielige Rückbuchungen.
+
+Diese Datei bezieht sich vor allem auf die Perlversion der Bibliothek; in der
+C-Version gibt es kleine Unterschiede, besonders in der Paketliste und
+Installation. Die eigentliche Funktionalität ist in beiden Versionen natürlich
+identisch; aufgrund der unterschiedlichen Sprachstruktur gibt es allerdings
+Unterschiede in der Aufrufsyntax, sowohl für Parameter als auch Rückgabewerte.
+
+
+2. Paketliste von Business::KontoCheck (Perl-Bibliothek)
+========================================================
+
+0_history.txt               : Versionsgeschichte
+00liesmich.txt              : diese Datei
+00liesmich.pdf              : etwas Dokumentation (aus der C-Version)
+Changes                     : Versionsgeschichte/Perl
+README                      : kurzes README für CPAN
+MANIFEST                    : Dateiliste (von Perl benötigt)
+blz.lut                     : LUT-Datei für die deutsche Version (nur ein
+                              Datensatz ohne Datum, für automatische Tests)
+blz-at.lut                  : LUT-Datei für die österreichische Version (Testdaten)
+konto_check.h               : C Header-Datei für die deutsche Version
+konto_check-at.h            : C Header-Datei für die österreichische Version
+konto_check.c               : C Quellcode für die deutsche Version
+konto_check-at.c            : C Quellcode für die österreichische Version
+inpar.dat.gz                : (gepackte) Testdatei für das INPAR Datenformat (s.u.)
+test.pl                     : kleine Beispielsdatei
+KontoCheck.xs               : XSUB-Datei mit C/Perl glue code
+lib/Business/KontoCheck.pm  : Perl Interface und Dokumentation
+t/*                         : diverse Testdateien für make test
+zlib.tar.gz                 : abgespeckte Version der zlib
+README.zlib                 : kleines README dazu
+Makefile.PL                 : Perl Makefile
+META.yml                    : (von Perl benötigt)
+ppport.h                    : (von Perl benötigt)
+
+3. Installation
+===============
+
+Die Bibiliothek wird mit den üblichen Kommandos installiert:
+
+   perl makefile.PL
+   make
+   make test
+   make install
+
+(das letzte Kommando muß mit root-Rechten ausgeführt werden). Danach kann die
+Bibliothek mittels "use Business::KontoCheck" eingebunden und verwendet werden.
+
+
+4. Benutzung
+===============
+
+Eine kurze Beschreibung der exportierten Funktionen gibt es in der Datei
+lib/Business/KontoCheck.pm. Die Beschreibung wird bei der Installation auch ins
+Hilfesystem von Perl integriert, so daß die Syntax und Parameter der einzelnen
+Funktionen mittels "perldoc Business::KontoCheck" nachgelesen werden kann.
+
+
+5. Prüfparameter
+================
+
+5.1 Deutsche Banken
+-------------------
+
+Die aktuelle Bankleitzahltabelle wird veröffentlicht von der Deutschen
+Bundesbank:
+
+http://www.bundesbank.de/Redaktion/DE/Standardartikel/Kerngeschaeftsfelder/Unbarer_Zahlungsverkehr/bankleitzahlen_download.html
+
+Dabei ist die Datei blz_*.zip herunterzuladen und auszupacken (aktuell z.B.
+blz_2013_03_04_txt_zip.zip). Die Aktualisierung erfolgt alle 3 Monate. Diese
+Datei kann mittels der Funktion generate_lut() in das LUT-Format für die
+Bibliothek konvertiert werden.
+
+Die aktuellen Prüfziffermethoden werden ebenfalls von der Deutschen Bundesbank
+veröffentlicht:
+
+http://www.bundesbank.de/Redaktion/DE/Downloads/Kerngeschaeftsfelder/Unbarer_Zahlungsverkehr/pruefzifferberechnungsmethoden.pdf?__blob=publicationFile
+
+Allgemeine Informationen und Links gibt es vom Bundesverband deutscher Banken
+unter http://www.bdb.de/verband/Intern.htm
+
+
+5.2 Österreichische Banken 
+--------------------------
+Anders als bei der deutschen Version sind die aktuellen Prüfparameter sind nicht
+frei verfügbar; sie können von der Firma SIX Card Solutions Austria GmbH, Wien
+(http://www.six-card-solutions.at) käuflich bezogen werden. Interessenten wenden
+sich bitte an Andreas.Krickl@six-card-solutions.at.
+
+Das Handbuch zu INPAR mit der Spezifikation des Dateiformats ist ebenfalls von
+SIX Card Solutions Austria unter der Internet-Adresse
+http://www.six-card-solutions.at/downloads.asp erhältlich. 
+
+Diesem Paket liegt eine Datei inpar.dat.gz bei; sie dient als Referenz für das
+Dateiformat der INPAR-Daten. Die Datei ist ebenfalls unter der oben angegebenen
+Adresse verfügbar (als "Testdatei ZIP"). Die Liste ist weder vollständig noch
+aktuell. Sie enthält nur die Daten von 21 Banken, und auch die Prüfparameter
+haben sich teilweise geändert
+
+
+6. BEKANNTE FEHLER
+================== 
+
+Momentan sind keine Fehler in den Prüfziffermethoden bekannt. Falls Sie einen
+Fehler finden, würde ich mich sehr freuen, davon zu hören ;-))).
+
+Eine genauere Übersicht zu dieser Version findet sich in der Datei 00liesmich
+der C-Distribution.
+
+
+7. Technische Informationen 
+============================
+
+7.1. Deutsches Modul
+--------------------
+
+Die Bankleitzahl ist immer 8-stellig.
+
+Die Länge der Kontonummer ist variabel und wird auf 10 Stellen gesetzt,
+indem führenden Nullen ergänzt werden.
+
+Die Datei testkonten.txt ist eine Testdatei mit knapp 600 Kontonummern
+und Bankleitzahlen Einige sind reale Kontonummern, andere sind Testkonten,
+die von der Deutschen Bundesbank zur Verfügung gestellt werden.
+
+Feld 1	-> Bankleitzahl oder Prüfziffer
+Feld 2	-> Kontonummer.
+
+Die Bibliothek wurde mit allen Testkontonummern der Dokumentation der
+Prüfziffernberechnungmethoden der Deutschen Bundesbank (Stand Oktober 2008)
+erfolgreich getestet. Außerdem wurden etliche Millionen Testkontonummern (für
+jede Methode bzw. Teilmethode ca. 50000...100000) mit dem Modul konto122.pl
+von Andreas Butzko und anderen Programmen verglichen.
+
+
+7.2. Österreichisches Modul
+---------------------------
+
+Die Bankleitzahl ist immer 5-stellig.
+
+Die Länge der Kontonummer ist variabel und wird auf 11 Stellen gesetzt,
+indem führenden Nullen ergänzt werden.
+
+In der INPAR-Datei sind einige Banken als gelöscht angegeben, jedoch sind die
+jeweiligen Testparameter angegeben. In diesem Fall besteht die Möglichkeit,
+die Bankleitzahl mit einem vorgestellten - zu versehen; das Konto wird dann
+getestet, und ein entsprechender Wert zurückgegeben (ob es sinnvoll ist, ist
+fraglich; es war allerdings auch kein Aufwand ;-) ). Außerdem lassen sich mit
+einem vorangestellten p direkt die Prüfparameter eingeben. Einige Beispiele
+dazu finden sich in der Datei testkonten-at.txt.
+
+Für die österreichische Version gab es leider keine Vergleichsprogramme;
+allerdings sind die Prüfmethoden des österreichischen Moduls nicht so
+divergent wie die der deutschen Version. In der C Bibliothek gibt es noch eine
+Trace-Version, die alle Berechnungen genau protokolliert und so eine
+Fehlersuche ermöglicht. Zum Test wurden (neben der Trace-Version) einige
+hundert Kontonummern aus dem Internet benutzt.
+
+
+8. COPYRIGHT
+============
+
+Copyright (C) 2002-2013 Michael Plugge.
+
+Diese Bibliothek ist freie Software; Sie dürfen sie unter den Bedingungen der GNU
+Lesser General Public License, wie von der Free Software Foundation
+veröffentlicht, weiterverteilen und/oder modifizieren; entweder gemäß Version
+2.1 der Lizenz oder (nach Ihrer Option) jeder späteren Version.
+
+Die GNU LGPL ist weniger infektiös als die normale GPL; Code, der von Ihnen
+hinzugefügt wird, unterliegt nicht der Offenlegungspflicht (wie bei der
+normalen GPL); außerdem müssen Programme, die diese Bibliothek benutzen, nicht
+(L)GPL lizensiert sein, sondern können beliebig kommerziell verwertet werden.
+Die Offenlegung des Sourcecodes bezieht sich bei der LGPL *nur* auf geänderten
+Bibliothekscode.
+
+Diese Bibliothek wird in der Hoffnung weiterverbreitet, daß sie nützlich sein
+wird, jedoch OHNE IRGENDEINE GARANTIE, auch ohne die implizierte Garantie der
+MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK. Mehr Details
+finden Sie in der GNU Lesser General Public License.
+
+Sie sollten eine Kopie der GNU Lesser General Public License zusammen mit
+dieser Bibliothek erhalten haben; falls nicht, können Sie sie von
+http://www.gnu.org/licenses/lgpl.html im Internet herunterladen.

@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+
+<!--
+ #
+ # You must install EzInstaller to be able to use this install file
+ #
+ # To install EzInstaller, download the following program and execute it :
+ #  * ftp://ftp.babelobjects.org/project/application/latest-ezinstaller.sh
+ #
+ # For more information about EzInstaller, go to :
+ #  * http://www.BabelObjects.Org/html/en/project/application/ezinstaller
+ #
+ # Jean-Christophe Kermagoret (jck@BabelObjects.Org)
+ #
+-->
+
+<!DOCTYPE bo [
+
+<!-- ###################################################### -->
+<!-- ## Part 1 : Modify the values below to suit your needs -->
+<!-- ###################################################### -->
+
+  <!ENTITY bo_cache_conf "/var/cache/babelobjects/conf/application/ezmailserver" >
+  <!ENTITY conf_dir "/usr/local/babelobjects/conf" >
+
+  <!ENTITY openldap_conf_dir "/usr/local/openldap/etc" >
+  <!ENTITY organization "BabelObjects" >
+  <!ENTITY country "Fr" >
+  <!ENTITY base "o=&organization;, c=&country;" >
+  <!ENTITY smtphost "smtp.babelobjects.org" >
+  <!ENTITY mailhost "mail.babelobjects.org" >
+  <!ENTITY maildomain "babelobjects.org" >
+
+]>
+
+<bo>
+<!-- ###################################################### -->
+
+]>
+
+<bo>
+
+  <download>
+    <parameter>
+        <cfg>/var/cache/babelobjects/conf</cfg>
+    </parameter>
+    <parameter>
+        <host>ftp.babelo.org</host>
+    </parameter>
+    <parameter>
+        <login>anonymous</login>
+    </parameter>
+    <parameter>
+        <passwd>''</passwd>
+    </parameter>
+    <parameter>
+        <cache_dir>/var/cache/babelobjects</cache_dir>
+    </parameter>
+    <parameter>
+        <bo_cache_conf>&bo_cache_conf;</bo_cache_conf>
+    </parameter>
+    <parameter>
+        <loglevel>''</loglevel>
+    </parameter>
+  </download>
+
+<!-- ## Do not modify this one !! You have been warned ! -->
+
+  <classes>
+      <parameter>
+         <configurator>BO::Module::Data::Configurator</configurator>
+      </parameter>
+  </classes>
+
+<!-- ###################################################### -->
+
+  <rpms>
+    <rpm>RedHat/make-3.78.1-4.i386.rpm</rpm>
+    <rpm>RedHat/kernel-headers-2.2.14-6.1.1.i386.rpm</rpm>
+    <rpm>RedHat/glibc-devel-2.1.3-15.i386.rpm</rpm>
+    <rpm>RedHat/cpp-1.1.2-30.i386.rpm</rpm>
+    <rpm>RedHat/egcs-1.1.2-30.i386.rpm</rpm>
+    <rpm>RedHat/openssl-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssl-devel-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-clients-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-server-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>openldap-2.0.7-2.i386.rpm</rpm>
+    <rpm>pam_ldap-65-1.i386.rpm</rpm>
+    <rpm>sendmail-8.11.0-2.i386.rpm</rpm>
+    <rpm>db-3.1.14-1.i386.rpm</rpm>
+    <rpm>cyrus-sasl-1.5.24-1.i386.rpm</rpm>
+    <rpm>cyrus-imapd-2.0.7-1.i386.rpm</rpm>
+    <rpm>cyrus-perl-imap-1.0-1.i386.rpm</rpm>
+    <rpm>ldapsdk-4.11-1.i386.rpm</rpm>
+  </rpms>
+ 
+  <services>
+    <service>admin</service>
+    <service>openldap</service>
+    <service>pam_ldap</service>
+    <service>sendmail</service>
+  </services>
+
+  <admin>
+    <file>
+      <default>&bo_base_conf;/admin/ldap2cyrus.pl.default</default>
+      <conf>/root/bin/ldap2cyrus.pl</conf>
+    </file>
+    <parameter>
+        <cyrus_host>localhost</cyrus_host>
+    </parameter>
+    <parameter>
+        <postadm_login>postadm</postadm_login>
+    </parameter>
+    <parameter>
+        <postadm_pw>test</postadm_pw>
+    </parameter>
+    <parameter>
+        <ldap_version>3</ldap_version>
+    </parameter>
+    <parameter>
+        <ldap_host>localhost</ldap_host>
+    </parameter>
+    <parameter>
+        <ldap_port>389</ldap_port>
+    </parameter>
+    <parameter>
+        <ldap_binddn>cn=root, &base;</ldap_binddn>
+    </parameter>
+    <parameter>
+        <ldap_bindpw>test</ldap_bindpw>
+    </parameter>
+    <parameter>
+        <ldap_base>&base;</ldap_base>
+    </parameter>
+  </admin>
+
+  <openldap>
+    <file>
+      <default>&bo_base_conf;/openldap/slapd.conf.default</default>
+      <conf>&openldap_conf_dir;/slapd.conf</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/babelo.schema.default</default>
+      <conf>&openldap_conf_dir;/schema/babelo.schema</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/pleiad.schema.default</default>
+      <conf>&openldap_conf_dir;/schema/pleiad.schema</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/slapd.acl.specific.conf.default</default>
+      <conf>&openldap_conf_dir;/slapd.acl.specific.conf</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/ldif.init.default</default>
+      <conf>&openldap_conf_dir;/ldif.init</conf>
+    </file>
+    
+  <parameter>
+        <default_ldap_dir>/usr/local/openldap</default_ldap_dir>
+  </parameter>
+  <parameter>
+        <directory_name>pleiad</directory_name>
+  </parameter>
+  <parameter>
+        <openldap_conf_dir>/usr/local/openldap/etc/pleiad</openldap_conf_dir>
+  </parameter>
+  <parameter>
+        <suffix>&base;</suffix>
+  </parameter>
+  <parameter>
+        <rootdn>cn=root, &base;</rootdn>
+  </parameter>
+  <parameter>
+        <rootpw>test</rootpw>
+  </parameter>
+  <parameter>
+        <index>
+     index member,owner,objectclass pres,eq
+     index uid,sn,cn pres,eq,sub
+     index givenname,alias,forward,flag,domain,mailserver,begindate,enddate,passwd pres,eq,sub
+</index>
+  </parameter>
+  <parameter>
+        <base>&base;</base>
+  </parameter>
+  <parameter>
+        <country>&country;</country>
+  </parameter>
+  <parameter>
+        <organization>o=&organization;</organization>
+  </parameter>
+  <parameter>
+        <smtphost>&smtphost;</smtphost>
+  </parameter>
+  <parameter>
+        <mailhost>&mailhost;</mailhost>
+  </parameter>
+  <parameter>
+        <maildomain>&maildomain;</maildomain>
+  </parameter>
+  </openldap>
+
+  <pam_ldap>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/imap.default</default>
+      <conf>/etc/pam.d/imap</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/pop.default</default>
+      <conf>/etc/pam.d/pop</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/ldap.conf.default</default>
+      <conf>/etc/ldap.conf</conf>
+    </file>
+    <parameter>
+        <ldap_version>3</ldap_version>
+    </parameter>
+    <parameter>
+        <ldap_host>localhost</ldap_host>
+    </parameter>
+    <parameter>
+        <port>389</port>
+    </parameter>
+    <parameter>
+        <base>ou=Mail Account, &base;</base>
+    </parameter>
+    <parameter>
+        <binddn>cn=root, &base;</binddn>
+    </parameter>
+    <parameter>
+        <bindpw>test</bindpw>
+    </parameter>
+    <parameter>
+        <uid>uid</uid>
+    </parameter>
+    <parameter>
+        <auth_pam_module>pam_ldap.so</auth_pam_module>
+    </parameter>
+    <parameter>
+        <account_pam_module>pam_ldap.so</account_pam_module>
+    </parameter>
+  </pam_ldap>
+
+  <sendmail>
+    <file>
+      <default>&bo_base_conf;/sendmail/sendmail.mc.default</default>
+      <conf>/etc/mail/sendmail.mc</conf>
+    </file>
+    <parameter>
+        <ldap_host>localhost</ldap_host>
+    </parameter>
+    <parameter>
+        <port>389</port>
+    </parameter>
+    <parameter>
+        <base>&base;</base>
+    </parameter>
+    <parameter>
+        <binddn>cn=Mail Alias Server, &base;</binddn>
+    </parameter>
+    <parameter>
+        <bindpw>test</bindpw>
+    </parameter>
+    <parameter>
+        <base_alias>ou=Mail Alias, &base;</base_alias>
+    </parameter>
+    <parameter>
+        <uid>uid</uid>
+    </parameter>
+    <parameter>
+        <not_encrypted_passwd>test</not_encrypted_passwd>
+    </parameter>
+  </sendmail>
+
+  <cyrus>
+  </cyrus>
+
+  <jakarta>
+  </jakarta>
+
+</bo>

@@ -1,0 +1,307 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_summarize
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::DB::Taxonomy;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Bio::Community::Tools::Summarizer;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_summarize - Summarize community composition
+
+=head1 SYNOPSIS
+
+  bc_summarize -input_files   my_communities.generic   \
+               -output_prefix my_converted_communities
+
+=head1 DESCRIPTION
+
+This script reads a file containing biological communities and summarizes it.
+In practice, this means transforming community member counts into relative
+abundance (taking into account any weights that members could have) and merging
+members that have the same lineage. Other popular practices include grouping
+members with a low abundance together into an 'Other' group and representing the
+taxonomy at a higher level, such as phylum level instead of specied level. See
+L<Bio::Community::Tools::Summarizer> for more information.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to summarize. When providing communities
+in a format that supports only one community per file (e.g. gaas), you can
+provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -wf <weight_files>... | -weight_files <weight_files>...
+
+Tab-delimited files containing weights to assign to the community members.
+
+=for Euclid:
+   weight_files.type: readable
+
+=item -wa <weight_assign> | -weight_assign <weight_assign>
+
+When using a files of weights, define what to do for community members whose
+weight is not specified in the weight file (default: weight_assign.default):
+
+* $num : assign to the member the arbitrary weight $num provided
+
+* file_average : assign to the member the average weight in this file.
+
+* community_average : assign to the member the average weight in this community.
+
+* ancestor: go up the taxonomic lineage of the member and assign to it the weight
+of the first ancestor that has a weight in the weights file. Fall back to the
+'community_average' method if no taxonomic information is available for this
+member (for example a member with no BLAST hit).
+
+See the weight_assign() method in Bio::Community::IO for more details.
+
+=for Euclid:
+   weight_assign.type: string
+   weight_assign.default: 'ancestor'
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_summarize'
+
+=item -cr <convert_relab> | -convert_relab <convert_relab>
+
+Convert counts into relative abundances (in percentage, taking into account
+weights): 1 (yes), 0 (no). Default: convert_relab.default
+
+=for Euclid:
+   convert_relab.type: integer, convert_relab == 0 || convert_relab == 1
+   convert_relab.type.error: <convert_relab> must be 0 or 1 (not convert_relab)
+   convert_relab.default: 1
+
+=item -md <merge_dups> | -merge_dups <merge_dups>
+
+Merge community members with the exact same lineage. Default: merge_dups.default
+
+=for Euclid:
+   merge_dups.type: integer, merge_dups == 0 || merge_dups == 1
+   merge_dups.type.error: <merge_dups> must be 0 or 1 (not merge_dups)
+   merge_dups.default: 1
+
+=item -td <taxo_dups> | -taxo_dups <taxo_dups>
+
+By default, the lineage of species has to match character for character for them
+to be considered duplicates. When you activate this option (1:on, 0:off), their
+lineage is parsed and interpreted taxonomically. For example, these three
+members would be duplicates:
+
+  k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria
+  k__Bacteria;p__Proteobacteria;c__Alphaproteobacteria
+  k__Bacteria;p__Proteobacteria;c__Alphaproteobacteria;o__;f__;g__;s__
+
+Default: taxo_dups.default
+
+=for Euclid:
+   taxo_dups.type: integer, taxo_dups == 0 || taxo_dups == 1
+   taxo_dups.type.error: <taxo_dups> must be 0 or 1 (not taxo_dups)
+   taxo_dups.default: 0
+
+=item -rl <relab_lt> | -relab_lt <relab_lt>
+
+Group community members with a relative abundance less than the specified
+threshold (in %) in ALL the communities into an 'Other' group. Default: relab_lt.default %
+
+=for Euclid:
+   relab_lt.type: number, relab_lt >= 0 && relab_lt <= 100
+   relab_lt.type.error: <relab_lt> must be between 0 and 100 (not relab_lt)
+   relab_lt.default: 1
+
+=item -tl <tax_level_min> [.. <tax_level_max>] | -tax_level <tax_level_min> [.. <tax_level_max>]
+
+Group members belonging to the same taxonomic level. For the Greengenes taxonomy,
+level 1 represents kingdom, level 2 represents phylum, and so on, until level 7,
+representing the species level. Members without taxonomic information are
+grouped together in a member with the description 'Unknown taxonomy'. Default:
+none
+
+=for Euclid:
+   tax_level_min.type: number, tax_level_min > 0
+   tax_level_max.type: number, tax_level_max > 0
+   tax_level_min.type.error: <tax_level> must be larger than 0
+   tax_level_max.type.error: <tax_level> must be larger than 0
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+summarize( $ARGV{'input_files'}  , $ARGV{'weight_files'} , $ARGV{'weight_assign'} ,
+           $ARGV{'output_prefix'}, $ARGV{'convert_relab'}, $ARGV{'merge_dups'}    ,
+           $ARGV{'taxo_dups'}    , $ARGV{'relab_lt'}     ,
+           $ARGV{'tax_level'}{'tax_level_min'}, $ARGV{'tax_level'}{'tax_level_max'} );
+exit;
+
+
+func summarize ($input_files, $weight_files, $weight_assign, $output_prefix,
+   $convert2relab, $merge_dups, $taxo_dups, $by_rel_ab, $tax_level_min,
+   $tax_level_max) {
+
+   # Read input communities and do weight assignment
+   my $meta = Bio::Community::Meta->new();
+   my $format;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new(
+         -file          => $input_file,
+         -weight_assign => $weight_assign,
+         #### Consider building the taxonomy only when needed, i.e. when taxonomy summary or weight assignment by taxonomy is required
+         -taxonomy      => Bio::DB::Taxonomy->new( -source => 'list' ), # build taxonomy on-the-fly
+      );
+      if ($weight_files) {
+         $in->weight_files($weight_files);
+      }
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+   # Set up start and end taxonomic level
+   if (defined $tax_level_min) {
+      if (not defined $tax_level_max) {
+         $tax_level_max = $tax_level_min;
+      } else {
+         if ($tax_level_min > $tax_level_max) {
+            ($tax_level_min, $tax_level_max) = ($tax_level_max, $tax_level_min);
+         }
+      }
+   } else {
+      # Keep original taxonomic level
+      $tax_level_min = 0;
+      $tax_level_max = 0;
+   }
+
+   # Summarize communities at all requested taxonomic levels
+   my $summarized_meta = $meta;
+   for (my $tax_level = $tax_level_max; $tax_level >= $tax_level_min; $tax_level--) {
+      my $suffix = '';
+      my $summarizer = Bio::Community::Tools::Summarizer->new(
+         -metacommunity    => $summarized_meta,
+         -merge_dups       => $merge_dups,
+         -identify_dups_by => $taxo_dups ? 'taxon' : 'desc',
+      );
+
+      if ($tax_level) {
+         $summarizer->by_tax_level($tax_level);
+         $suffix = 'L'.$tax_level;
+      }
+      if ($by_rel_ab) {
+         $summarizer->by_rel_ab( ['<', $by_rel_ab] );
+      }
+      my $summarized_meta = $summarizer->get_summary;
+      # Write results, converting to relative abundance if desired
+      write_communities($summarized_meta, $output_prefix, $format, $suffix, $convert2relab);
+   }
+
+   return 1;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type = '',
+   $convert2relab = 1) {
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format         => $output_format,
+            -file           => '>'.$output_file,
+            -abundance_type => $convert2relab ? 'percentage' : 'count',
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

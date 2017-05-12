@@ -1,0 +1,9 @@
+classes:
+  - Admin.base
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include APT hook apt-listchanges
+  pkg:
+    - apt-listchanges

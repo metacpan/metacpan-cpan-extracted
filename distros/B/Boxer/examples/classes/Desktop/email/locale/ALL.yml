@@ -1,0 +1,9 @@
+classes:
+  - Desktop.email
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include all Icedove locales
+  pkg:
+    - icedove-l10n-all

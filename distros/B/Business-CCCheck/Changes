@@ -1,0 +1,45 @@
+Revision history for Perl module Business::CCCheck
+
+0.10 2015-10-29 NEILB
+    - Updated github repo URL after changing my github username
+
+0.09 2014-02-05
+    - Metadata wasn't explicitly saying v2 of GPL
+    - Still wasn't quite the right text for GPL v2.
+
+0.08 2014-02-04
+    - Didn't have the right wording of GPL
+
+0.07 2014-02-02
+    - Added strict and warnings to Business::CCCheck::CardID
+    - Added VERSION to Business::CCCheck::CardID
+    - Change pod section to COPYRIGHT AND LICENSE as is usual
+
+0.06 2014-01-30
+    - Min perl version 5.6.0
+    - Reformatted this file (Changes) according to CPAN::Spec::Changes
+    - moved CCCheck.pm into lib/Business/
+    - Added new function CC_luhn_valid() which does a strict LUHN check
+    - Added README
+    - Fixed some pod errors
+    - Changed COPYRIGHT section to COPYRIGHT AND LICENSE
+      (so tools will see that it's there. Eg kwalitee)
+    - Specified license type as 'gpl' in metadata
+    - Various Makefile.PL modernisations
+
+0.05 2012-08-06
+    - correct type in old distro
+
+0.04 2006-06-06
+    - add EXPORT_TAG :all
+
+0.03  2001-04-30
+    - correct defective CC recognition for MC and Diners/Carte Blanche
+
+0.02 2001-04-19
+    - allow for calls to functions with undefined arguments.
+    - add CC_expired check
+
+0.01 2001-02-26
+    - initial release
+

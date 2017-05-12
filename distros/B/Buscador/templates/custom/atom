@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+[%- USE date -%]
+[%- PROCESS macros -%]
+<feed version="0.3" xmlns="http://purl.org/atom/ns#">
+<title>[% title || "Buscador" %]</title>
+<link rel="alternate" type="text/html" href="[% link || base %]"/>
+<modified>[% date.format(modified, '%Y-%m-%dT%H:%M:%SZ', 'en_US', 1) %]</modified>
+
+[% FOR mail = mails %]
+<entry>
+    <id>mailto:[% mail.id | html %]</id>
+    <title>[% mail.subject | html %]</title>
+    <link rel="alternate" type="text/html" href="[% base |remove('/$') %]/mail/view/[% mail.message_id | html %]" />
+    <issued>[% date.format(mail.epoch_date, '%Y-%m-%dT%H:%M:%SZ', 'en_US', 1) %]</issued>
+    <modified>[% date.format(mail.epoch_date, '%Y-%m-%dT%H:%M:%SZ', 'en_US', 1)%]</modified>
+    <author>
+        [%- SET name = from_mail(mail) -%]
+        <name>[% name || "Unknown" | html %]</name>
+    </author>
+    <summary mode="escaped" type="text/plain">[%- mail.original | html -%]</summary>
+    <content mode="escaped" type="text/plain">[%- mail.body | html -%]</content>
+</entry>
+[% END %]
+
+</feed>

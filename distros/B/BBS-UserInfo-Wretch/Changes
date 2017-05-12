@@ -1,0 +1,11 @@
+Revision history for BBS-UserInfo-Wretch
+
+0.03	2006-08-20
+	- Interchange lastlogintime <-> lastloginip.
+
+0.02	2006-08-20
+	- Fix regular expression about lastloginip.
+
+0.01	2006-08-20
+        - First version.
+

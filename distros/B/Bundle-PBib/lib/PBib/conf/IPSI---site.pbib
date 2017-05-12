@@ -1,0 +1,53 @@
+/* $Id: IPSI---site.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * Config for IPSI: mysql @ pc-nerz
+ *
+ */
+
+
+# use mysql with a remote host
+<biblio>
+	class Database
+	dbms mysql
+	dbhost pc-nerz.ipsi.fraunhofer.de
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+	shortcuts_table shortcuts
+</biblio>
+
+
+
+/*
+ * specify default style
+ */
+
+<<include ../styles/Elsevier/JSS.pbib>>
+
+/*
+ * defaults for general pbib options
+ */
+
+<pbib>
+	showresult	true
+</pbib>
+
+
+/*
+ * $Log: local.pbib,v $
+ * Revision 1.2.2.3  2003/06/16 10:19:51  tandler
+ * "dbhost" works now for mysql
+ *
+ * Revision 1.2.2.2  2003/06/13 18:17:06  tandler
+ * use mysql at pc-nerz
+ *
+ * Revision 1.2.2.1  2003/06/13 18:12:29  tandler
+ * default is ODBC, mysql example with remote host
+ *
+ * Revision 1.2  2003/06/13 16:11:09  tandler
+ * moved default local.pbib to "conf" folder
+ *
+ * Revision 1.1  2003/04/16 15:41:28  tandler
+ * defualt pbib config
+ *
+ */

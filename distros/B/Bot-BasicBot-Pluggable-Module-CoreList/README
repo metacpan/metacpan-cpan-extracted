@@ -1,0 +1,33 @@
+Bot::BasicBot::Pluggable::Module::CoreList - IRC frontend to Module::CoreList
+
+DESCRIPTION
+
+This module is a frontend to the excellent Module::CoreList module
+which will let you know what modules shipped with which versions of perl,
+over IRC.
+
+INSTALL
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Philippe 'BooK' Bruhat
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -1,0 +1,283 @@
+[% IF title %]<h3>[% title %]</h3>[% END %]
+<div class="row">
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>Top Progress</h4>
+    [% key = 'bestprogress' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %]<br />
+    [% END %]
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>Top Wealth</h4>
+    [% key = 'bestwealth' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %]<br />
+    [% END %]
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+  [% key = 'civiloutbreak' %]
+  [% FOREACH e IN events.$key %]
+  <div class="well">
+     <h4>CIVIL WAR OUTBREAK IN [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %]</h4>
+  </div>  
+  [% END %]
+  [% key = 'govwincivil' %]
+  [% FOREACH e IN events.$key %]
+  <div class="well">
+     <h4>GOVERNMENT OF [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] WON THE CIVIL WAR</h4>
+  </div>  
+  [% END %]
+  [% key = 'rebwincivil' %]
+  [% FOREACH e IN events.$key %]
+  <div class="well">
+     <h4>REBELS WON THE CIVIL WAR IN [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %]</h4>
+  </div>  
+  [% END %]
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+  [% key = 'wars' %]
+  [% factions = [ 'glyphicon-tower', 'glyphicon-knight'] %]
+  [% FOREACH w IN events.$key.keys %]
+    [% IF events.$key.$w.warstart %]
+    <div class="well">
+    <h4>WAR [% w %]</h4>
+    <h4>[% INCLUDE fragments/linked_nation.tt n =  events.$key.$w.warstart.involved.0 %] <span class="text-info glyphicon [% factions.0 %]" aria-hidden="false"></span> ATTACCKED [% INCLUDE fragments/linked_nation.tt n =  events.$key.$w.warstart.involved.1 %] <span class="text-info glyphicon [% factions.1 %]" aria-hidden="false"></span>! THIS MEANS WAR!</h4>
+    [% IF events.$key.$w.warlinkedstart %]
+    <strong>Allies interventions</strong>
+    <p>
+    [% FOREACH linked IN events.$key.$w.warlinkedstart %]
+    [% faction1 = linked.values.3 %]
+    [% faction2 = linked.values.4 %]
+    [% INCLUDE fragments/linked_nation.tt n = linked.involved.0 %] <span class="text-info glyphicon [% factions.$faction1 %]" aria-hidden="false"></span> ATTACKED [% INCLUDE fragments/linked_nation.tt n = linked.involved.1 %] <span class="text-info glyphicon [% factions.$faction2 %]" aria-hidden="false"></span><br />
+    [% END %]
+    </p>
+    [% END %]
+    [% IF events.$key.$w.warend %]
+    <h4>LIGHTNING WAR!</h4>
+    <p>
+    [% FOREACH win IN events.$key.$w.warend %]
+    [% INCLUDE fragments/linked_nation.tt n = win.involved.0 %] [% win.values.1 %] WON ON [% INCLUDE fragments/linked_nation.tt n = win.involved.1 %] <br />
+    [% END %]
+    </p>
+    [% END %]
+    </div>
+    [% ELSE %]
+    [% IF events.$key.$w.warend %]
+    <div class="well">
+    <h4>WAR [% w %]</h4>
+    <h4>PEACE!</h4>
+    <p>
+    [% FOREACH win IN events.$key.$w.warend %]
+    [% INCLUDE fragments/linked_nation.tt n = win.involved.0 %] [% win.values.1 %] WON ON [% INCLUDE fragments/linked_nation.tt n = win.involved.1 %]<br /> 
+    [% END %]
+    </p>
+    [% END %]
+    </div>
+    [% END %]
+  [% END %]
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>The market</h4>
+    [% key = 'tradeadded' %]
+    [% IF events.$key.size != "" %]
+    <strong>Added routes: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]<br />
+    [% END %]
+    [% key = 'tradedeleted' %]
+    [% IF events.$key.size != "" %]
+    <strong>Deleted routes: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    [% END %]
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>Diplomacy</h4>
+    [% key = 'comtreatynew' %]
+    [% IF events.$key.size != "" %]
+    <strong>New commercial treaties: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    <br />
+    [% END %]
+    [% key = 'nagtreatynew' %]
+    [% IF events.$key.size != "" %]
+    <strong>New no-aggression treaties: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    <br />
+    [% END %]
+    [% key = 'alliancetreatynew' %]
+    [% IF events.$key.size != "" %]
+    <strong>New alliances: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] [% IF e.values.0 == 'rebsup' %](support during revolution)[% END %]
+        <br />
+    [% END %]
+    <br />
+    [% END %] 
+    [% key = 'comtreatybroken' %]
+    [% IF events.$key.size != "" %]
+    <strong>Broken commercial treaties: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    <br />
+    [% END %] 
+    [% key = 'nagtreatybroken' %]
+    [% IF events.$key.size != "" %]
+    <strong>Broken no-aggression treaties: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    <br />
+    [% END %] 
+    [% key = 'alltreatybroken' %]
+    [% IF events.$key.size != "" %]
+    <strong>Broken alliances: </strong><br />
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    [% END %] 
+
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="well">
+    <h4>Military Aids</h4>
+    [% key = 'militaryaid' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="well">
+    <h4>Economic Aids</h4>
+    [% key = 'economicaid' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="well">
+    <h4>Aids to Insurgents</h4>
+    [% key = 'insurgentsaid' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]<br />
+    [% END %]
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>Military Supports</h4>
+    [% key = 'supstarted' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-success glyphicon glyphicon-share-alt" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'supincreased' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-success glyphicon glyphicon-plus" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'supstopped' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-danger glyphicon glyphicon-remove-circle" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'suprefused' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-danger glyphicon glyphicon-thumbs-down" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'supdestroyed' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-danger glyphicon glyphicon-remove-circle" aria-hidden="false"></span><span class="text-danger glyphicon glyphicon-flash" aria-hidden="false"></span><br />
+    [% END %]
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="well">
+    <h4>Rebel Military Supports</h4>
+    [% key = 'rebsupstarted' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-success glyphicon glyphicon-share-alt" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'rebsupincreased' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-success glyphicon glyphicon-plus" aria-hidden="false"></span><br />
+    [% END %]
+    [% key = 'rebsupstopped' %]
+    [% FOREACH e IN events.$key %]
+        [% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] -&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %] <span class="text-danger glyphicon glyphicon-remove-circle" aria-hidden="false"></span><br />
+    [% END %]
+    </div>
+  </div>
+
+</div>
+<div class="row">
+  <div class="col-sm-12">
+  [% key = 'relchange' %]
+  [% IF events.$key.size != "" %]
+  <h4>Relationship changes</h4>
+  <table class="table table-striped table-bordered" cellspacing="0" width="100%">
+  <thead>
+  <tr>
+    <th>Nations</th>
+    <th>Trend</th>
+    <th>Present status</th>
+    <th>Reason</th>
+  </tr>
+  </thead>
+  <tbody>
+  [% FOREACH e IN events.$key %]
+  <tr>
+    <td>[% INCLUDE fragments/linked_nation.tt n = e.involved.0 %] &lt;-&gt; [% INCLUDE fragments/linked_nation.tt n = e.involved.1 %]</td>
+    <td>
+    [% IF e.values.0 == 'up' %]
+    <span class="text-success glyphicon glyphicon-chevron-up" aria-hidden="false"></span>
+    [% ELSE %]
+    <span class="text-danger glyphicon glyphicon-chevron-down" aria-hidden="false"></span>
+    [% END %]
+    </td>
+    <td>[% e.values.2 %]</td>
+    <td>[% e.values.3 %]</td>
+  </tr>
+  [% END %]
+  </tbody>
+  </table>  
+  [% END %]
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <p>
+    [% key = 'others' %]
+    [% FOREACH e IN events.$key %]
+        [% e.text %]<br />
+    [% END %]
+    </p>
+  </div>
+</div>
+

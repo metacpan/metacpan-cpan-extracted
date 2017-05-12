@@ -1,0 +1,9 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include intrusion detection system fail2ban
+  pkg:
+  - fail2ban

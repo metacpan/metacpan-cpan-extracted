@@ -1,0 +1,11 @@
+[% USE ANSIColor 'color' %]
+[% "WALLET" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FILTER color 'yellow' %][% FILTER format('%-16s') %]NATION[% END %][% FILTER format('%-10s') %]Q[% END %][% FILTER format('%-10s') %]VALUE[% END %][% FILTER format('%-10s') %]INFLUENCE[% END %][% FILTER format('%-10s') %]WAR BONDS[% END %][% END %]
+[% FOREACH n IN market_data.keys -%]
+[%- FILTER format('%-16s') %][% n %][% END %][% FILTER format('%-10s') %][% market_data.$n.stocks %][% END %][% FILTER format('%-10s') %][% market_data.$n.value %][% END %][% FILTER format('%-10s') %][% market_data.$n.influence %][% END %][% FILTER format('%-10s') %][% market_data.$n.war_bonds %][% END %]
+[% END %]
+Stock value: [% stock_value %]
+Money: [% money %]
+Total value: [% total_value %]

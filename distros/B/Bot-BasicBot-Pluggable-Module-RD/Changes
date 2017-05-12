@@ -1,0 +1,10 @@
+Revision history for Perl module Bot::BasicBot::Pluggable::Module::RD
+
+0.02 Thu 13 Jul 2006
+    - RD_Basic to be pulled in by RD, not used as a separate pluggable.
+    - Abandon using the grammar to deal with help; this doesn't play with
+      B::BB::P::M.
+
+0.01 Sun  9 Jul 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+

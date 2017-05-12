@@ -1,0 +1,28 @@
+---
+abstract: 'A transactional buffer for writing data'
+author:
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  IO::Scalar: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Buffer-Transactional
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::UUID: 0
+  IO::File: 0
+  Moose: 0.90
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

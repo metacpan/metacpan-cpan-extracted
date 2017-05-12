@@ -1,0 +1,66 @@
+Revision history for Bio-Trace-ABIF
+
+0.01    2006-10-26/17:30
+        First version, released on an unsuspecting world.
+        
+0.02    2006-11-15/22:30
+        Added method to compute CRL (Contiguous Read Length).
+        A few bugs fixed in the documentation.
+
+1.00    2007-02-16/12:30
+        - Added methods to read all the ab1 file tags specified by the ABIF
+          format, including fsa tags.
+        - Added method write_tag() to overwrite existing data.
+        - Methods returning a scalar now return 'undef' in case of error
+          (e.g., tags not found).
+        - Signed shorts and longs are correctly unpacked.
+        - Methods sorted alphabetically.
+        - Fixed a version mismatch.
+        - contiguous_read_length() has now mandatory arguments. Trimming the
+          ends is now optional. The method returns (-1, -1) when no CRL exists.
+        - Fized a bug in sample_score() occasionally causing division by zero.
+          Also, sample_score() in some cases returned negative values: this has
+          been fixed, too.
+        - Changed the semantics of clear_range_start() and clear_range_stop():
+          both methods return -1 if no clear range exists.
+        - Fixed bugs in clear_range_start() and clear_range_stop() that would
+          cause an error in some (very unfortunate) cases.
+        - Added clear_range() method, which returns an interval (start, stop).
+        - Much faster conversion from binary to floats.
+        - Fixed a bug in analysis_protocol_xml().
+
+1.01    2007-04-03/18:05
+        - Fixed bug causing wrong return values from analyzed_data_for_channel()
+          and raw_data_for_channel() methods.
+
+1.02   2008-12-17/18:42
+        - Fixed a bug in order_base(), raw_trace() and trace() methods.
+          WARNING!
+          Note that the semantics of order_base() has changed! Now, the method
+          returns the channel number, not the array index (to avoid off-by-one
+          errors when using this method with other methods requiring a channel
+          as a parameter).
+        - Fixed a bug in offscale_peaks().
+        - Added a channel() method, returning the channel number corresponding
+          to a given base.
+        - Slightly improved documentation.
+
+1.03   2010-01-13/18:58
+        - open_abif() returns 0 when it opens a file whose directory index is
+          corrupted, instead of producing lots of error messages (bug reported
+          by Malcolm Cook).
+        - Added method peaks() to get the detected peaks from the sample results
+          window in GeneScan (including size, peak height, and peak area).
+          Kindly provided by Jason Gilder (and by one of his students!)
+        - Method module_version() is now public.
+        
+1.04   2010-01-13/19:49
+        - Fixed copyright notice in ABIF.pm.
+
+1.05   2010-02-25/14:04
+        - Fixed a bug causing get_directory() to return bad data in the DATA_ITEM
+          field.
+
+1.06   2016-11-02/12:00
+        - Don't allow pod, critic or kwalitee tests to run for normal user
+          installs.

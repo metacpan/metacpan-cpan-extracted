@@ -1,0 +1,43 @@
+---
+input:
+- format: General
+  #files, list and elements are synonyms
+  files:
+  - ../03_clean_evidence/result/merged.fa.clean
+  chunk_size: 30
+  sep: ^>
+  sep_remove: 1
+  sep_pos: '^'/'$'
+  ignore_first_sep: 1
+
+- format: List
+  list: [ 'a', 'b', 'c' ]
+  
+- format: FileList
+  files: [ 'filea', 'fileb', 'filec' ]
+
+- format: Range
+  list: [ 'from', 'to' ]
+
+job_name: NAME
+mode: Consecutive/AvsB/AllvsAll/AllvsAllNoRep
+
+args: [ '-a', 10, '-b','no' ]
+test: 2
+no_prompt: 1
+
+parts: 3000
+# or
+combinations_per_job: 300
+
+result_dir: result_gff
+working_dir:
+stderr_dir:
+stdout_dir:
+
+log_dir: dir
+tmp_dir: dir
+idx_dir: dir
+
+prefix_output_dirs: 
+

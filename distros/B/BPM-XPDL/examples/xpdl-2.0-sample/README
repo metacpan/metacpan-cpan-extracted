@@ -1,0 +1,7 @@
+
+The sample.xpdl file is manually extracted from the 2.1 spec, and then
+name-space corrected: the namespace use of SubFlow was horrible broken.
+
+Fixed two container errors discovered via xmllint.
+
+The t/20sample.t script creates the output.dd (dd=Data::Dumper)

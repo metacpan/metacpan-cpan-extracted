@@ -1,0 +1,2217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="wsdl-viewer.xsl"?>
+<wsdl:definitions xmlns:tns="http://sas.elluminate.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+                  xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" targetNamespace="http://sas.elluminate.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+    <wsdl:types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://sas.elluminate.com/">
+            <xs:element name="BasicAuth">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="Name" type="xs:string" />
+                        <xs:element minOccurs="1" maxOccurs="1" name="Password" type="xs:string" />
+                    </xs:sequence>
+                    <xs:anyAttribute />
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RemoveRepositoryMultimediaSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveRepositoryPresentationSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="SetSessionMultimediaSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="SetSessionPresentationSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveSessionMultimediaSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveSessionPresentationSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="SendEmailSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveSessionSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveHtmlSessionSuccessResponse" type="tns:SuccessResponse"/>
+            <xs:element name="RemoveRecordingSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="RemoveSessionTelephonySuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="SetRecordingSecureSignOnSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="ClearSessionNonChairListSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="ClearSessionChairListSuccessResponse" type="tns:SuccessResponse" />
+            <xs:element name="SetApiCallbackUrlSuccessResponse" type="tns:SuccessResponse" />
+            <xs:complexType name="SuccessResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="success" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ErrorResponse" type="tns:ErrorResponse" />
+            <xs:complexType name="ErrorResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="command" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="message" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="success" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BuildRecordingUrl" type="tns:RecordingUrl" />
+            <xs:complexType name="RecordingUrl">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BuildSessionUrl" type="tns:SessionUrl" />
+            <xs:complexType name="SessionUrl">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="displayName" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BuildSessionUrlResponse" type="tns:UrlResponse" />
+            <xs:element name="BuildRecordingUrlResponse" type="tns:UrlResponse" />
+            <xs:complexType name="UrlResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="url" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetEmailBody" type="tns:EmailBody" />
+            <xs:complexType name="EmailBody">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionList" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="EmailBodyResponse" type="tns:EmailBodyResponse" />
+            <xs:complexType name="EmailBodyResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="emailBody" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ConvertRecording">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                        <xs:element minOccurs="1" maxOccurs="unbounded" name="format" type="tns:RecordingFormat" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetMobilePlatforms" nillable="true" type="tns:GetMobilePlatforms" />
+            <xs:complexType name="GetMobilePlatforms">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetMobilePlatformResponseCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="MobilePlatformResponse" type="tns:MobilePlatformResponse" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="MobilePlatformResponse" type="tns:MobilePlatformResponse" />
+            <xs:complexType name="MobilePlatformResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="platformName" type="tns:MobilePlatform" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="appDownloadUrl" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetOptionLicenses" nillable="true" type="tns:GetOptionLicenses" />
+            <xs:complexType name="GetOptionLicenses">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetOptionLicenseResponseCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="OptionLicenseResponse" type="tns:OptionLicenseResponse" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="OptionLicenseResponse" type="tns:OptionLicenseResponse" />
+            <xs:complexType name="OptionLicenseResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="optionName" type="tns:OptionLicenseName" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="optionVariationNameCollection" type="tns:OptionVariationNameCollection" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="licensed" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="OptionVariationNameCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="optionVariationName" type="tns:MobilePlatform" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetQuotaLimits" nillable="true" type="tns:GetQuotaLimits" />
+            <xs:complexType name="GetQuotaLimits">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetQuotaLimitsResponseCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="QuotaLimitsResponse" type="tns:QuotaLimitsResponse" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="QuotaLimitsResponse" type="tns:QuotaLimitsResponse" />
+            <xs:complexType name="QuotaLimitsResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="quotaName" type="tns:QuotaTypeName" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="quotaUsage" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="quotaAvailable" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="QuotaTypeName">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="disk" />
+                    <xs:enumeration value="recordingConversion" />
+                    <xs:enumeration value="recordingPlayback" />
+                    <xs:enumeration value="session" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:element name="GetServerConfiguration" nillable="true" type="tns:ServerConfiguration" />
+            <xs:complexType name="ServerConfiguration">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetServerConfigurationResponseCollection" type="tns:ServerConfigurationResponseCollection" />
+            <xs:complexType name="ServerConfigurationResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="ServerConfigurationResponse" type="tns:ServerConfigurationResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ServerConfigurationResponse" type="tns:ServerConfigurationResponse" />
+            <xs:complexType name="ServerConfigurationResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="boundaryTime" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="maxAvailableTalkers" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="maxAvailableCameras" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="raiseHandOnEnter" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="mayUseTelephony" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="mayUseSecureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="mustReserveSeats" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="timeZone" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetServerQuotas" nillable="true" type="tns:ServerQuotas" />
+            <xs:complexType name="ServerQuotas">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetServerQuotasResponseCollection" type="tns:ServerQuotasResponseCollection" />
+            <xs:complexType name="ServerQuotasResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="ServerQuotasResponse" type="tns:ServerQuotasResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ServerQuotasResponse" type="tns:ServerQuotasResponse" />
+            <xs:complexType name="ServerQuotasResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionQuota" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionQuotaAvailable" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="diskQuota" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="diskQuotaAvailable" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetSchedulingManager" nillable="true" type="tns:SchedulingManager" />
+            <xs:complexType name="SchedulingManager">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetSchedulingManagerResponseCollection" type="tns:SchedulingManagerResponseCollection" />
+            <xs:complexType name="SchedulingManagerResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="SchedulingManagerResponse" type="tns:SchedulingManagerResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SchedulingManagerResponse" type="tns:SchedulingManagerResponse" />
+            <xs:complexType name="SchedulingManagerResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="manager" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="version" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetServerVersions" nillable="true" type="tns:ServerVersions" />
+            <xs:complexType name="ServerVersions">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetServerVersionResponseCollection" type="tns:ServerVersionResponseCollection" />
+            <xs:complexType name="ServerVersionResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="ServerVersionResponse" type="tns:ServerVersionResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ServerVersionResponse" type="tns:ServerVersionResponse" />
+            <xs:complexType name="ServerVersionResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="versionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="versionName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="versionMaxTalkersLimit" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="versionMaxFilmersLimit" type="xs:int" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UploadRepositoryPresentation" type="tns:UploadRepositoryContent" />
+            <xs:element name="UploadRepositoryMultimedia" type="tns:UploadRepositoryContent" />
+            <xs:complexType name="UploadRepositoryContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="filename" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="description" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="content" type="xs:base64Binary" xmlns:ns1="http://www.w3.org/2005/05/xmlmime" ns1:expectedContentTypes="application/octet-stream" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRepositoryMultimedia" type="tns:ListRepositoryMultimediaContent" />
+            <xs:complexType name="ListRepositoryMultimediaContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="multimediaId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="description" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRepositoryPresentation" type="tns:ListRepositoryPresentationContent" />
+            <xs:complexType name="ListRepositoryPresentationContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="presentationId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="description" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveRepositoryMultimedia" type="tns:RemoveRepositoryMultimedia" />
+            <xs:complexType name="RemoveRepositoryMultimedia">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="multimediaId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveRepositoryPresentation" type="tns:RemoveRepositoryPresentation" />
+            <xs:complexType name="RemoveRepositoryPresentation">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="presentationId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListSessionMultimedia" type="tns:ListSessionContent" />
+            <xs:element name="ListSessionPresentation" type="tns:ListSessionContent" />
+            <xs:complexType name="ListSessionContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetApiCallbackUrl" type="tns:SetApiCallbackUrl" />
+            <xs:complexType name="SetApiCallbackUrl">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="apiCallbackUrl" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetSessionMultimedia" type="tns:SetSessionMultimediaContent" />
+            <xs:complexType name="SetSessionMultimediaContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="multimediaIds" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetSessionPresentation" type="tns:SetSessionPresentationContent" />
+            <xs:complexType name="SetSessionPresentationContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="presentationId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveSessionMultimedia" type="tns:RemoveSessionMultimediaContent" />
+            <xs:complexType name="RemoveSessionMultimediaContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="multimediaId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveSessionPresentation" type="tns:RemoveSessionPresentationContent" />
+            <xs:complexType name="RemoveSessionPresentationContent">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="presentationId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UploadRepositoryMultimediaResponseCollection" type="tns:MultimediaResponseCollection" />
+            <xs:element name="ListRepositoryMultimediaResponseCollection" type="tns:MultimediaResponseCollection" />
+            <xs:element name="ListSessionMultimediaResponseCollection" type="tns:MultimediaResponseCollection" />
+            <xs:element name="MultimediaResponse" type="tns:MultimediaResponse" />
+            <xs:complexType name="MultimediaResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="MultimediaResponse" type="tns:MultimediaResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="MultimediaResponse">
+                <xs:sequence>
+                    <xs:element name="multimediaId" type="xs:long" />
+                    <xs:element name="description" type="xs:string" />
+                    <xs:element name="size" type="xs:long" />
+                    <xs:element name="creatorId" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UploadRepositoryPresentationResponseCollection" type="tns:PresentationResponseCollection" />
+            <xs:element name="ListRepositoryPresentationResponseCollection" type="tns:PresentationResponseCollection" />
+            <xs:element name="ListSessionPresentationResponseCollection" type="tns:PresentationResponseCollection" />
+            <xs:element name="PresentationResponse" type="tns:PresentationResponse" />
+            <xs:complexType name="PresentationResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="PresentationResponse" type="tns:PresentationResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PresentationResponse">
+                <xs:sequence>
+                    <xs:element name="presentationId" type="xs:long" />
+                    <xs:element name="description" type="xs:string" />
+                    <xs:element name="size" type="xs:long" />
+                    <xs:element name="creatorId" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingFiles">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="1" maxOccurs="unbounded" name="recordingId" type="xs:long" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="ListRecordingFileResponseCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="RecordingFileResponse" type="tns:RecordingFileResponse" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RecordingFileResponseCollection">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="RecordingFileResponse" nillable="true" type="tns:RecordingFileResponse" />
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:complexType name="RecordingFileResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="format" type="tns:RecordingFormat" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="status" type="tns:status" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="url" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordings" type="tns:ListRecordings" />
+            <xs:complexType name="ListRecordings">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionName" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingResponseCollection" type="tns:RecordingResponseCollection" />
+            <xs:element name="RecordingResponse" type="tns:RecordingResponse" />
+            <xs:complexType name="RecordingResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="RecordingResponse" type="tns:RecordingResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordingResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recordingVersion" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomStartDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomEndDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingURL" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="creationDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingSize" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingLong" type="tns:ListRecordingLong" />
+            <xs:complexType name="ListRecordingLong">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionName" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingLongResponseCollection" type="tns:RecordingLongResponseCollection" />
+            <xs:element name="RecordingLongResponse" type="tns:RecordingLongResponse" />
+            <xs:complexType name="RecordingLongResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="RecordingLongResponse" type="tns:RecordingLongResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordingLongResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomStartDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomEndDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingURL" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="creationDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingSize" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingShort" type="tns:RecordingShort" />
+            <xs:complexType name="RecordingShort">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionName" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListRecordingShortResponseCollection" type="tns:RecordingShortResponseCollection" />
+            <xs:element name="RecordingShortResponse" type="tns:RecordingShortResponse" />
+            <xs:complexType name="RecordingShortResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="RecordingShortResponse" type="tns:RecordingShortResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="RecordingShortResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="creationDate" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingSize" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetSession" type="tns:SetSession" />
+            <xs:complexType name="SetSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionName" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="accessType" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="boundaryTime" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairNotes" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="maxTalkers" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="maxCameras" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="mustBeSupervised" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairNotes" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="openChair" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="permissionsOn" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="raiseHandOnEnter" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recordingModeType" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recurrenceCount" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recurrenceDays" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="reserveSeats" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="versionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="allowInSessionInvites" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="hideParticipantNames" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetHtmlSession" type="tns:SetHtmlSession"/>
+            <xs:complexType name="SetHtmlSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="name" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="endTime" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="boundaryTime" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="listChairEnrollee" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="listNonChairEnrollee" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="groupingList" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UpdateSession" type="tns:UpdateSession" />
+            <xs:complexType name="UpdateSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionName" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="accessType" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="boundaryTime" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairNotes" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="maxTalkers" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="maxCameras" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="mustBeSupervised" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairList" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairNotes" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="openChair" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="permissionsOn" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="raiseHandOnEnter" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recordingModeType" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recurrenceCount" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="recurrenceDays" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="reserveSeats" type="xs:int" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="versionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="allowInSessionInvites" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="hideParticipantNames" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UpdateSessionAttendees" type="tns:UpdateSessionAttendees" />
+            <xs:complexType name="UpdateSessionAttendees">
+                <xs:sequence>
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="displayName" type="xs:string" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="isChair" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UpdateHtmlSessionAttendees" type="tns:UpdateHtmlSessionAttendees" />
+            <xs:complexType name="UpdateHtmlSessionAttendees">
+                <xs:sequence>
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="displayName" type="xs:string" />
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="isChair" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="UpdateHtmlSession" type="tns:UpdateHtmlSession"/>
+            <xs:complexType name="UpdateHtmlSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="description" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="startTime" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="endTime" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="boundaryTime" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="listChairEnrollee" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="listNonChairEnrollee" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="groupingList" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="creatorId" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListSession" type="tns:ListSession" />
+            <xs:complexType name="ListSession">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="groupingId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionName" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListHtmlSession" type="tns:ListHtmlSession"/>
+            <xs:complexType name="ListHtmlSession">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="userId" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="groupingId" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="name" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="BuildHtmlSessionUrl" type="tns:BuildHtmlSessionUrl"/>
+            <xs:complexType name="BuildHtmlSessionUrl">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="userId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListSessionResponseCollection" type="tns:SessionResponseCollection" />
+            <xs:element name="SetSessionResponseCollection" type="tns:SessionResponseCollection" />
+            <xs:element name="SetHtmlSessionCollection" type="tns:HtmlSessionCollection"/>
+            <xs:element name="UrlResponse" type="tns:UrlResponse"/>
+            <xs:element name="ListHtmlSessionCollection" type="tns:HtmlSessionCollection"/>
+            <xs:element name="UpdateSessionResponseCollection" type="tns:SessionResponseCollection" />
+            <xs:element name="UpdateHtmlSessionResponseCollection" type="tns:HtmlSessionCollection" />
+            <xs:element name="SessionResponse" type="tns:SessionResponse" />
+            <xs:complexType name="SessionResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="SessionResponse" type="tns:SessionResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="HtmlSessionCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="HtmlSession" type="tns:HtmlSession" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SessionResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="endTime" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="creatorId" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="boundaryTime" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="accessType" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordings" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairNotes" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairNotes" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairList" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairList" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="groupingList" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="openChair" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="permissionsOn" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="mustBeSupervised" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingModeType" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="maxTalkers" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="maxCameras" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="raiseHandOnEnter" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="reserveSeats" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="versionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="allowInSessionInvites" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="hideParticipantNames" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="HtmlSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="id" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionUid" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="name" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="description" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="endTime" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="boundaryTime" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="reserveSeats" type="xs:int" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="userPassword" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionExitUrl" type="xs:string" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="costCenterId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="sessionAccessTypeId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="recordingAccessTypeId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="telephonySessionId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="administratorLoginId" type="xs:long" />
+                    <xs:element minOccurs="0" maxOccurs="1" name="supervisorLoginId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="listChairEnrollee" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="listNonChairEnrollee" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="UrlResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="url" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ClearSessionChairList" type="tns:ClearSessionUserList" />
+            <xs:element name="ClearSessionNonChairList" type="tns:ClearSessionUserList" />
+            <xs:complexType name="ClearSessionUserList">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListSessionAttendance" type="tns:SessionAttendance" />
+            <xs:complexType name="SessionAttendance">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="ListSessionAttendanceResponseCollection" type="tns:SessionAttendanceResponseCollection" />
+
+            <xs:element name="SessionAttendanceResponse" type="tns:SessionAttendanceResponse" />
+            <xs:complexType name="SessionAttendanceResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="SessionAttendanceResponse" type="tns:SessionAttendanceResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SessionAttendanceResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomOpened" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="roomClosed" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="AttendeeResponseCollection" type="tns:AttendeeResponseCollection" />
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="ListHtmlSessionAttendance" type="tns:HtmlSessionAttendance" />
+            <xs:complexType name="HtmlSessionAttendance">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="startTime" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="ListHtmlRoomCollection" type="tns:HtmlRoom" />
+            <xs:complexType name="HtmlRoom">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="name" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="opened" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="closed" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="HtmlAttendee" type="tns:HtmlAttendee" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="HtmlAttendee">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="attendeeName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="wasChair" type="xs:boolean" />
+                    <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="HtmlAttendeeLog" type="tns:HtmlAttendeeLog" />
+                    </xs:sequence>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="HtmlAttendeeLog">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="joined" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="left" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+
+            <xs:element name="ListAttendeeResponseCollection" type="tns:AttendeeResponseCollection" />
+            <xs:element name="AttendeeResponse" type="tns:AttendeeResponse" />
+            <xs:complexType name="AttendeeResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="AttendeeResponse" type="tns:AttendeeResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="AttendeeResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="attendeeName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="attendeeWasChair" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="attendeeJoinedAt" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="attendeeLeftAt" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+
+
+            <xs:element name="SendEmail" type="tns:SendEmail" />
+            <xs:complexType name="SendEmail">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="senderAddr" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="senderName" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="toAddrList" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="subject" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="body" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveSession" type="tns:RemoveSession" />
+            <xs:complexType name="RemoveSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveHtmlSession" type="tns:RemoveHtmlSession"/>
+            <xs:complexType name="RemoveHtmlSession">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="RemoveRecording" type="tns:RemoveRecording" />
+            <xs:complexType name="RemoveRecording">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="TelephonyType">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="thirdParty" />
+                    <xs:enumeration value="integrated" />
+                    <xs:enumeration value="none" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:complexType name="ThirdPartyTelephonyParams">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="isPhone" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionSIPPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionPIN" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetTelephony" type="tns:SetTelephony" />
+            <xs:complexType name="SetTelephony">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="telephonyType" type="tns:TelephonyType" />
+                    <!--Optional: -->
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairPIN" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairPIN" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="isPhone" type="xs:boolean" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionSIPPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionPIN" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="TelephonyResponseItemTypes">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="moderator" />
+                    <xs:enumeration value="participant" />
+                    <xs:enumeration value="serverSIP" />
+                    <xs:enumeration value="serverPhone" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:complexType name="TelephonyResponseItem">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="itemType" type="tns:TelephonyResponseItemTypes" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="uri" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="pin" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="TelephonyResponseItemCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="telephonyType" type="tns:TelephonyType" />
+                    <xs:element minOccurs="0" maxOccurs="3" nillable="true" name="TelephonyResponseItem" type="tns:TelephonyResponseItem" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetTelephonyResponse" type="tns:TelephonyResponseItemCollection" />
+            <xs:element name="GetTelephony" type="tns:GetTelephony" />
+            <xs:complexType name="GetTelephony">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="GetTelephonyResponse" type="tns:TelephonyResponseItemCollection" />
+            <xs:element name="SetSessionTelephony" type="tns:SetSessionTelephony" />
+            <xs:element name="GetTelephonyLicenseInfo" nillable="true" type="tns:GetTelephonyLicenseInfo" />
+            <xs:complexType name="GetTelephonyLicenseInfo">
+                <xs:sequence />
+            </xs:complexType>
+            <xs:element name="GetTelephonyLicenseInfoResponse" type="tns:GetTelephonyLicenseInfoResponse" />
+            <xs:complexType name="GetTelephonyLicenseInfoResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="telephonyType" type="tns:TelephonyType" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SetSessionTelephony">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="chairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="nonChairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="isPhone" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionSIPPhone" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="sessionPIN" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="ListSessionTelephony" type="tns:SessionTelephony" />
+            <xs:element name="RemoveSessionTelephony" type="tns:SessionTelephony" />
+            <xs:complexType name="SessionTelephony">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetSessionTelephonyResponseCollection" type="tns:SessionTelephonyResponseCollection" />
+            <xs:element name="ListSessionTelephonyResponseCollection" type="tns:SessionTelephonyResponseCollection" />
+            <xs:element name="SessionTelephonyResponse" type="tns:SessionTelephonyResponse" />
+            <xs:element name="SessionTelephonyResponseCollection" type="tns:SessionTelephonyResponseCollection" />
+            <xs:complexType name="SessionTelephonyResponseCollection">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="unbounded" name="SessionTelephonyResponse" type="tns:SessionTelephonyResponse" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SessionTelephonyResponse">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairPhone" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="chairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairPhone" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="nonChairPIN" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="isPhone" type="xs:boolean" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionSIPPhone" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="sessionPIN" type="xs:string" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="SetRecordingSecureSignOn" type="tns:RecordingSecureSignOn" />
+            <xs:complexType name="RecordingSecureSignOn">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingId" type="xs:long" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="secureSignOn" type="xs:boolean" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="MobilePlatform">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="android" />
+                    <xs:enumeration value="iphone" />
+                    <xs:enumeration value="ipad" />
+                    <xs:enumeration value="ipod" />
+                    <xs:enumeration value="silk" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="OptionLicenseName">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="telephony" />
+                    <xs:enumeration value="mobile" />
+                    <xs:enumeration value="recordingConversion" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:simpleType name="RecordingFormat">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="vcr" />
+                    <xs:enumeration value="mp3" />
+                    <xs:enumeration value="mp4" />
+                </xs:restriction>
+            </xs:simpleType>
+            <xs:complexType name="status">
+                <xs:sequence>
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="errorCode" type="xs:string" />
+                    <xs:element minOccurs="0" nillable="true" maxOccurs="1" name="errorText" type="xs:string" />
+                    <xs:element minOccurs="1" maxOccurs="1" name="recordingStatus" type="tns:Recstatus" />
+                </xs:sequence>
+            </xs:complexType>
+            <xs:simpleType name="Recstatus">
+                <xs:union memberTypes="tns:RecordingStatus" />
+            </xs:simpleType>
+            <xs:simpleType name="RecordingStatus">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="not_applicable" />
+                    <xs:enumeration value="not_available" />
+                    <xs:enumeration value="in_progress" />
+                    <xs:enumeration value="available" />
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="BasicAuthorizationHeader">
+        <wsdl:part name="BasicAuth" element="tns:BasicAuth" />
+    </wsdl:message>
+    <wsdl:message name="ErrorResponse">
+        <wsdl:part name="fault" element="tns:ErrorResponse" />
+    </wsdl:message>
+    <wsdl:message name="BuildRecordingUrlSoapIn">
+        <wsdl:part name="parameters" element="tns:BuildRecordingUrl" />
+    </wsdl:message>
+    <wsdl:message name="BuildRecordingUrlSoapOut">
+        <wsdl:part name="parameters" element="tns:BuildRecordingUrlResponse" />
+    </wsdl:message>
+    <wsdl:message name="BuildSessionUrlSoapIn">
+        <wsdl:part name="parameters" element="tns:BuildSessionUrl" />
+    </wsdl:message>
+    <wsdl:message name="BuildSessionUrlSoapOut">
+        <wsdl:part name="parameters" element="tns:BuildSessionUrlResponse" />
+    </wsdl:message>
+    <wsdl:message name="ConvertRecordingSoapIn">
+        <wsdl:part name="parameters" element="tns:ConvertRecording" />
+    </wsdl:message>
+    <wsdl:message name="ConvertRecordingSoapOut">
+        <wsdl:part name="parameters" element="tns:RecordingFileResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetEmailBodySoapIn">
+        <wsdl:part name="parameters" element="tns:GetEmailBody" />
+    </wsdl:message>
+    <wsdl:message name="GetEmailBodySoapOut">
+        <wsdl:part name="parameters" element="tns:EmailBodyResponse" />
+    </wsdl:message>
+    <wsdl:message name="GetMobilePlatformsSoapIn">
+        <wsdl:part name="parameters" element="tns:GetMobilePlatforms" />
+    </wsdl:message>
+    <wsdl:message name="GetMobilePlatformsSoapOut">
+        <wsdl:part name="parameters" element="tns:GetMobilePlatformResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetLicensesSoapIn">
+        <wsdl:part name="parameters" element="tns:GetOptionLicenses" />
+    </wsdl:message>
+    <wsdl:message name="GetLicensesSoapOut">
+        <wsdl:part name="parameters" element="tns:GetOptionLicenseResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetQuotaLimitsSoapIn">
+        <wsdl:part name="parameters" element="tns:GetQuotaLimits" />
+    </wsdl:message>
+    <wsdl:message name="GetQuotaLimitsSoapOut">
+        <wsdl:part name="parameters" element="tns:GetQuotaLimitsResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetServerConfigurationSoapIn">
+        <wsdl:part name="parameters" element="tns:GetServerConfiguration" />
+    </wsdl:message>
+    <wsdl:message name="GetServerConfigurationSoapOut">
+        <wsdl:part name="parameters" element="tns:GetServerConfigurationResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetServerQuotasSoapIn">
+        <wsdl:part name="parameters" element="tns:GetServerQuotas" />
+    </wsdl:message>
+    <wsdl:message name="GetServerQuotasSoapOut">
+        <wsdl:part name="parameters" element="tns:GetServerQuotasResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetSchedulingManagerSoapIn">
+        <wsdl:part name="parameters" element="tns:GetSchedulingManager" />
+    </wsdl:message>
+    <wsdl:message name="GetSchedulingManagerSoapOut">
+        <wsdl:part name="parameters" element="tns:GetSchedulingManagerResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="GetServerVersionsSoapIn">
+        <wsdl:part name="parameters" element="tns:GetServerVersions" />
+    </wsdl:message>
+    <wsdl:message name="GetServerVersionsSoapOut">
+        <wsdl:part name="parameters" element="tns:GetServerVersionResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="UploadRepositoryMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:UploadRepositoryMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="UploadRepositoryMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:UploadRepositoryMultimediaResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="UploadRepositoryPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:UploadRepositoryPresentation" />
+    </wsdl:message>
+    <wsdl:message name="UploadRepositoryPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:UploadRepositoryPresentationResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListRepositoryMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRepositoryMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="ListRepositoryMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRepositoryMultimediaResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListRepositoryPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRepositoryPresentation" />
+    </wsdl:message>
+    <wsdl:message name="ListRepositoryPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRepositoryPresentationResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRepositoryMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveRepositoryMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRepositoryMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveRepositoryMultimediaSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRepositoryPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveRepositoryPresentation" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRepositoryPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveRepositoryPresentationSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:ListSessionMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:ListSessionMultimediaResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:ListSessionPresentation" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:ListSessionPresentationResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="SetApiCallbackUrlSoapIn">
+        <wsdl:part name="parameters" element="tns:SetApiCallbackUrl" />
+    </wsdl:message>
+    <wsdl:message name="SetApiCallbackUrlSoapOut">
+        <wsdl:part name="parameters" element="tns:SetApiCallbackUrlSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:SetSessionMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:SetSessionMultimediaSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:SetSessionPresentation" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:SetSessionPresentationSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionMultimediaSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveSessionMultimedia" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionMultimediaSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveSessionMultimediaSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionPresentationSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveSessionPresentation" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionPresentationSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveSessionPresentationSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingFilesSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRecordingFiles" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingFilesSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRecordingFileResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingsSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRecordings" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingsSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRecordingResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingLongSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRecordingLong" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingLongSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRecordingLongResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingShortSoapIn">
+        <wsdl:part name="parameters" element="tns:ListRecordingShort" />
+    </wsdl:message>
+    <wsdl:message name="ListRecordingShortSoapOut">
+        <wsdl:part name="parameters" element="tns:ListRecordingShortResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:ListSession" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:ListSessionResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionAttendanceSoapIn">
+        <wsdl:part name="parameters" element="tns:ListSessionAttendance" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionAttendanceSoapOut">
+        <wsdl:part name="parameters" element="tns:ListSessionAttendanceResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListHtmlSessionAttendanceSoapIn">
+        <wsdl:part name="parameters" element="tns:ListHtmlSessionAttendance" />
+    </wsdl:message>
+    <wsdl:message name="ListHtmlSessionAttendanceSoapOut">
+        <wsdl:part name="parameters" element="tns:ListHtmlRoomCollection" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:SetSession" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:SetSessionResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="SetHtmlSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:SetHtmlSession" />
+    </wsdl:message>
+    <wsdl:message name="SetHtmlSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:SetHtmlSessionCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListHtmlSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:ListHtmlSession" />
+    </wsdl:message>
+    <wsdl:message name="ListHtmlSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:ListHtmlSessionCollection" />
+    </wsdl:message>
+    <wsdl:message name="RemoveHtmlSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveHtmlSession" />
+    </wsdl:message>
+    <wsdl:message name="RemoveHtmlSessionSoapOut">
+    <wsdl:part name="parameters" element="tns:RemoveHtmlSessionSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="BuildHtmlSessionUrlSoapIn">
+    <wsdl:part name="parameters" element="tns:BuildHtmlSessionUrl" />
+    </wsdl:message>
+    <wsdl:message name="BuildHtmlSessionUrlSoapOut">
+        <wsdl:part name="parameters" element="tns:UrlResponse" />
+    </wsdl:message>
+    <wsdl:message name="UpdateSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:UpdateSession" />
+    </wsdl:message>
+    <wsdl:message name="UpdateSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:UpdateSessionResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="UpdateSessionAttendeesSoapIn">
+        <wsdl:part name="parameters" element="tns:UpdateSessionAttendees" />
+    </wsdl:message>
+    <wsdl:message name="UpdateSessionAttendeesSoapOut">
+        <wsdl:part name="parameters" element="tns:UpdateSessionResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="UpdateHtmlSessionAttendeesSoapIn">
+        <wsdl:part name="parameters" element="tns:UpdateHtmlSessionAttendees" />
+    </wsdl:message>
+    <wsdl:message name="UpdateHtmlSessionAttendeesSoapOut">
+        <wsdl:part name="parameters" element="tns:UrlResponse" />
+    </wsdl:message>
+    <wsdl:message name="UpdateHtmlSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:UpdateHtmlSession" />
+    </wsdl:message>
+    <wsdl:message name="UpdateHtmlSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:SetHtmlSessionCollection" />
+    </wsdl:message>
+    <wsdl:message name="SendEmailSoapIn">
+        <wsdl:part name="parameters" element="tns:SendEmail" />
+    </wsdl:message>
+    <wsdl:message name="SendEmailSoapOut">
+        <wsdl:part name="parameters" element="tns:SendEmailSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveSession" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveSessionSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRecordingSoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveRecording" />
+    </wsdl:message>
+    <wsdl:message name="RemoveRecordingSoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveRecordingSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="SetTelephonySoapIn">
+        <wsdl:part name="parameters" element="tns:SetTelephony" />
+    </wsdl:message>
+    <wsdl:message name="SetTelephonySoapOut">
+        <wsdl:part name="parameters" element="tns:SetTelephonyResponse" />
+    </wsdl:message>
+    <wsdl:message name="GetTelephonySoapIn">
+        <wsdl:part name="parameters" element="tns:GetTelephony" />
+    </wsdl:message>
+    <wsdl:message name="GetTelephonySoapOut">
+        <wsdl:part name="parameters" element="tns:GetTelephonyResponse" />
+    </wsdl:message>
+    <wsdl:message name="GetTelephonyLicenseInfoSoapIn">
+        <wsdl:part name="parameters" element="tns:GetTelephonyLicenseInfo" />
+    </wsdl:message>
+    <wsdl:message name="GetTelephonyLicenseInfoSoapOut">
+        <wsdl:part name="parameters" element="tns:GetTelephonyLicenseInfoResponse" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionTelephonySoapIn">
+        <wsdl:part name="parameters" element="tns:SetSessionTelephony" />
+    </wsdl:message>
+    <wsdl:message name="SetSessionTelephonySoapOut">
+        <wsdl:part name="parameters" element="tns:SetSessionTelephonyResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionTelephonySoapIn">
+        <wsdl:part name="parameters" element="tns:ListSessionTelephony" />
+    </wsdl:message>
+    <wsdl:message name="ListSessionTelephonySoapOut">
+        <wsdl:part name="parameters" element="tns:ListSessionTelephonyResponseCollection" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionTelephonySoapIn">
+        <wsdl:part name="parameters" element="tns:RemoveSessionTelephony" />
+    </wsdl:message>
+    <wsdl:message name="RemoveSessionTelephonySoapOut">
+        <wsdl:part name="parameters" element="tns:RemoveSessionTelephonySuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="SetRecordingSecureSignOnSoapIn">
+        <wsdl:part name="parameters" element="tns:SetRecordingSecureSignOn" />
+    </wsdl:message>
+    <wsdl:message name="SetRecordingSecureSignOnSoapOut">
+        <wsdl:part name="parameters" element="tns:SetRecordingSecureSignOnSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="ClearSessionNonChairListSoapIn">
+        <wsdl:part name="parameters" element="tns:ClearSessionNonChairList" />
+    </wsdl:message>
+    <wsdl:message name="ClearSessionNonChairListSoapOut">
+        <wsdl:part name="parameters" element="tns:ClearSessionNonChairListSuccessResponse" />
+    </wsdl:message>
+    <wsdl:message name="ClearSessionChairListSoapIn">
+        <wsdl:part name="parameters" element="tns:ClearSessionChairList" />
+    </wsdl:message>
+    <wsdl:message name="ClearSessionChairListSoapOut">
+        <wsdl:part name="parameters" element="tns:ClearSessionChairListSuccessResponse" />
+    </wsdl:message>
+    <wsdl:portType name="SASDefaultAdapterV3Port">
+        <wsdl:operation name="BuildRecordingUrl">
+            <wsdl:input message="tns:BuildRecordingUrlSoapIn" />
+            <wsdl:output message="tns:BuildRecordingUrlSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="BuildSessionUrl">
+            <wsdl:input message="tns:BuildSessionUrlSoapIn" />
+            <wsdl:output message="tns:BuildSessionUrlSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ConvertRecording">
+            <wsdl:input message="tns:ConvertRecordingSoapIn" />
+            <wsdl:output message="tns:ConvertRecordingSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetEmailBody">
+            <wsdl:input message="tns:GetEmailBodySoapIn" />
+            <wsdl:output message="tns:GetEmailBodySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetOptionLicenses">
+            <wsdl:input message="tns:GetLicensesSoapIn" />
+            <wsdl:output message="tns:GetLicensesSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetQuotaLimits">
+            <wsdl:input message="tns:GetQuotaLimitsSoapIn" />
+            <wsdl:output message="tns:GetQuotaLimitsSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetMobilePlatforms">
+            <wsdl:input message="tns:GetMobilePlatformsSoapIn" />
+            <wsdl:output message="tns:GetMobilePlatformsSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetServerConfiguration">
+            <wsdl:input message="tns:GetServerConfigurationSoapIn" />
+            <wsdl:output message="tns:GetServerConfigurationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetServerQuotas">
+            <wsdl:input message="tns:GetServerQuotasSoapIn" />
+            <wsdl:output message="tns:GetServerQuotasSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetSchedulingManager">
+            <wsdl:input message="tns:GetSchedulingManagerSoapIn" />
+            <wsdl:output message="tns:GetSchedulingManagerSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetServerVersions">
+            <wsdl:input message="tns:GetServerVersionsSoapIn" />
+            <wsdl:output message="tns:GetServerVersionsSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="UploadRepositoryMultimedia">
+            <wsdl:input message="tns:UploadRepositoryMultimediaSoapIn" />
+            <wsdl:output message="tns:UploadRepositoryMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="UploadRepositoryPresentation">
+            <wsdl:input message="tns:UploadRepositoryPresentationSoapIn" />
+            <wsdl:output message="tns:UploadRepositoryPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRepositoryMultimedia">
+            <wsdl:input message="tns:ListRepositoryMultimediaSoapIn" />
+            <wsdl:output message="tns:ListRepositoryMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRepositoryPresentation">
+            <wsdl:input message="tns:ListRepositoryPresentationSoapIn" />
+            <wsdl:output message="tns:ListRepositoryPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRepositoryMultimedia">
+            <wsdl:input message="tns:RemoveRepositoryMultimediaSoapIn" />
+            <wsdl:output message="tns:RemoveRepositoryMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRepositoryPresentation">
+            <wsdl:input message="tns:RemoveRepositoryPresentationSoapIn" />
+            <wsdl:output message="tns:RemoveRepositoryPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionMultimedia">
+            <wsdl:input message="tns:ListSessionMultimediaSoapIn" />
+            <wsdl:output message="tns:ListSessionMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionPresentation">
+            <wsdl:input message="tns:ListSessionPresentationSoapIn" />
+            <wsdl:output message="tns:ListSessionPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetApiCallbackUrl">
+            <wsdl:input message="tns:SetApiCallbackUrlSoapIn" />
+            <wsdl:output message="tns:SetApiCallbackUrlSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionMultimedia">
+            <wsdl:input message="tns:SetSessionMultimediaSoapIn" />
+            <wsdl:output message="tns:SetSessionMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionPresentation">
+            <wsdl:input message="tns:SetSessionPresentationSoapIn" />
+            <wsdl:output message="tns:SetSessionPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionMultimedia">
+            <wsdl:input message="tns:RemoveSessionMultimediaSoapIn" />
+            <wsdl:output message="tns:RemoveSessionMultimediaSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionPresentation">
+            <wsdl:input message="tns:RemoveSessionPresentationSoapIn" />
+            <wsdl:output message="tns:RemoveSessionPresentationSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingFiles">
+            <wsdl:input message="tns:ListRecordingFilesSoapIn" />
+            <wsdl:output message="tns:ListRecordingFilesSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordings">
+            <wsdl:input message="tns:ListRecordingsSoapIn" />
+            <wsdl:output message="tns:ListRecordingsSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingLong">
+            <wsdl:input message="tns:ListRecordingLongSoapIn" />
+            <wsdl:output message="tns:ListRecordingLongSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingShort">
+            <wsdl:input message="tns:ListRecordingShortSoapIn" />
+            <wsdl:output message="tns:ListRecordingShortSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListSession">
+            <wsdl:input message="tns:ListSessionSoapIn" />
+            <wsdl:output message="tns:ListSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListHtmlSession">
+            <wsdl:input message="tns:ListHtmlSessionSoapIn" />
+            <wsdl:output message="tns:ListHtmlSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionAttendance">
+            <wsdl:input message="tns:ListSessionAttendanceSoapIn" />
+            <wsdl:output message="tns:ListSessionAttendanceSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListHtmlSessionAttendance">
+            <wsdl:input message="tns:ListHtmlSessionAttendanceSoapIn" />
+            <wsdl:output message="tns:ListHtmlSessionAttendanceSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetSession">
+            <wsdl:input message="tns:SetSessionSoapIn" />
+            <wsdl:output message="tns:SetSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetHtmlSession">
+            <wsdl:input message="tns:SetHtmlSessionSoapIn" />
+            <wsdl:output message="tns:SetHtmlSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="BuildHtmlSessionUrl">
+            <wsdl:input message="tns:BuildHtmlSessionUrlSoapIn" />
+            <wsdl:output message="tns:BuildHtmlSessionUrlSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateSession">
+            <wsdl:input message="tns:UpdateSessionSoapIn" />
+            <wsdl:output message="tns:UpdateSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="UpdateSessionAttendees">
+            <wsdl:input message="tns:UpdateSessionAttendeesSoapIn" />
+            <wsdl:output message="tns:UpdateSessionAttendeesSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="UpdateHtmlSessionAttendees">
+            <wsdl:input message="tns:UpdateHtmlSessionAttendeesSoapIn" />
+            <wsdl:output message="tns:UpdateHtmlSessionAttendeesSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="UpdateHtmlSession">
+            <wsdl:input message="tns:UpdateHtmlSessionSoapIn" />
+            <wsdl:output message="tns:UpdateHtmlSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SendEmail">
+            <wsdl:input message="tns:SendEmailSoapIn" />
+            <wsdl:output message="tns:SendEmailSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSession">
+            <wsdl:input message="tns:RemoveSessionSoapIn" />
+            <wsdl:output message="tns:RemoveSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveHtmlSession">
+            <wsdl:input message="tns:RemoveHtmlSessionSoapIn" />
+            <wsdl:output message="tns:RemoveHtmlSessionSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRecording">
+            <wsdl:input message="tns:RemoveRecordingSoapIn" />
+            <wsdl:output message="tns:RemoveRecordingSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetTelephony">
+            <wsdl:input message="tns:SetTelephonySoapIn" />
+            <wsdl:output message="tns:SetTelephonySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetTelephony">
+            <wsdl:input message="tns:GetTelephonySoapIn" />
+            <wsdl:output message="tns:GetTelephonySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="GetTelephonyLicenseInfo">
+            <wsdl:input message="tns:GetTelephonyLicenseInfoSoapIn" />
+            <wsdl:output message="tns:GetTelephonyLicenseInfoSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionTelephony">
+            <wsdl:input message="tns:SetSessionTelephonySoapIn" />
+            <wsdl:output message="tns:SetSessionTelephonySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionTelephony">
+            <wsdl:input message="tns:ListSessionTelephonySoapIn" />
+            <wsdl:output message="tns:ListSessionTelephonySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionTelephony">
+            <wsdl:input message="tns:RemoveSessionTelephonySoapIn" />
+            <wsdl:output message="tns:RemoveSessionTelephonySoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="SetRecordingSecureSignOn">
+            <wsdl:input message="tns:SetRecordingSecureSignOnSoapIn" />
+            <wsdl:output message="tns:SetRecordingSecureSignOnSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ClearSessionChairList">
+            <wsdl:input message="tns:ClearSessionChairListSoapIn" />
+            <wsdl:output message="tns:ClearSessionChairListSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="ClearSessionNonChairList">
+            <wsdl:input message="tns:ClearSessionNonChairListSoapIn" />
+            <wsdl:output message="tns:ClearSessionNonChairListSoapOut" />
+            <wsdl:fault message="tns:ErrorResponse" name="ErrorResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="DefaultAdapterBinding" type="tns:SASDefaultAdapterV3Port">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="BuildRecordingUrl">
+            <soap:operation soapAction="http://sas.elluminate.com/BuildRecordingUrl" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="BuildSessionUrl">
+            <soap:operation soapAction="http://sas.elluminate.com/BuildSessionUrl" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ConvertRecording">
+            <soap:operation soapAction="http://sas.elluminate.com/ConvertRecording" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetEmailBody">
+            <soap:operation soapAction="http://sas.elluminate.com/GetEmailBody" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetMobilePlatforms">
+            <soap:operation soapAction="http://sas.elluminate.com/GetMobilePlatforms" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetOptionLicenses">
+            <soap:operation soapAction="http://sas.elluminate.com/GetOptionLicenses" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetQuotaLimits">
+            <soap:operation soapAction="http://sas.elluminate.com/GetQuotaLimits" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetServerConfiguration">
+            <soap:operation soapAction="http://sas.elluminate.com/GetServerConfiguration" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetServerQuotas">
+            <soap:operation soapAction="http://sas.elluminate.com/GetServerQuotas" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetSchedulingManager">
+            <soap:operation soapAction="http://sas.elluminate.com/GetSchedulingManager" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetServerVersions">
+            <soap:operation soapAction="http://sas.elluminate.com/GetServerVersions" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UploadRepositoryMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/UploadRepositoryMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UploadRepositoryPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/UploadRepositoryPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRepositoryMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRepositoryMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRepositoryPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRepositoryPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRepositoryMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveRepositoryMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRepositoryPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveRepositoryPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/ListSessionMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/ListSessionPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetApiCallbackUrl">
+            <soap:operation soapAction="http://sas.elluminate.com/SetApiCallbackUrl" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/SetSessionMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/SetSessionPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionMultimedia">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveSessionMultimedia" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionPresentation">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveSessionPresentation" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingFiles">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRecordingFiles" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordings">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRecordings" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingLong">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRecordingLong" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListRecordingShort">
+            <soap:operation soapAction="http://sas.elluminate.com/ListRecordingShort" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListSession">
+            <soap:operation soapAction="http://sas.elluminate.com/ListSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionAttendance">
+            <soap:operation soapAction="http://sas.elluminate.com/ListSessionAttendance" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListHtmlSessionAttendance">
+            <soap:operation soapAction="http://sas.elluminate.com/ListHtmlSessionAttendance" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetSession">
+            <soap:operation soapAction="http://sas.elluminate.com/SetSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateSession">
+            <soap:operation soapAction="http://sas.elluminate.com/UpdateSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateSessionAttendees">
+            <soap:operation soapAction="http://sas.elluminate.com/UpdateSessionAttendees" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateHtmlSessionAttendees">
+            <soap:operation soapAction="http://sas.elluminate.com/UpdateHtmlSessionAttendees" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="UpdateHtmlSession">
+            <soap:operation soapAction="http://sas.elluminate.com/UpdateHtmlSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetHtmlSession">
+            <soap:operation soapAction="http://sas.elluminate.com/SetHtmlSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="BuildHtmlSessionUrl">
+            <soap:operation soapAction="http://sas.elluminate.com/BuildHtmlSessionUrl" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListHtmlSession">
+            <soap:operation soapAction="http://sas.elluminate.com/ListHtmlSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveHtmlSession">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveHtmlSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SendEmail">
+            <soap:operation soapAction="http://sas.elluminate.com/SendEmail" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSession">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveSession" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveRecording">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveRecording" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetTelephony">
+            <soap:operation soapAction="http://sas.elluminate.com/SetTelephony" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetTelephony">
+            <soap:operation soapAction="http://sas.elluminate.com/SetTelephony" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="GetTelephonyLicenseInfo">
+            <soap:operation soapAction="http://sas.elluminate.com/GetTelephonyLicenseInfo" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetSessionTelephony">
+            <soap:operation soapAction="http://sas.elluminate.com/GetSessionTelephony" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ListSessionTelephony">
+            <soap:operation soapAction="http://sas.elluminate.com/ListSessionTelephony" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="RemoveSessionTelephony">
+            <soap:operation soapAction="http://sas.elluminate.com/RemoveSessionTelephony" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="SetRecordingSecureSignOn">
+            <soap:operation soapAction="http://sas.elluminate.com/SetRecordingSecureSignOn" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ClearSessionChairList">
+            <soap:operation soapAction="http://sas.elluminate.com/ClearSessionChairList" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="ClearSessionNonChairList">
+            <soap:operation soapAction="http://sas.elluminate.com/ClearSessionNonChairList" style="document" />
+            <wsdl:input>
+                <soap:body use="literal" />
+                <soap:header message="tns:BasicAuthorizationHeader" part="BasicAuth" use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+            <wsdl:fault name="ErrorResponse">
+                <soap:fault name="ErrorResponse" use="literal" />
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SASDefaultAdapter">
+        <wsdl:port name="DefaultAdapterPort" binding="tns:DefaultAdapterBinding">
+            <soap:address location="https://sas-int.elluminate.com/site/external/adapter/default/v3/webservice.event" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

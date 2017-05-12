@@ -1,0 +1,26 @@
+---
+name: Business-Billing-TMobile-UK
+version: 0.16
+author:
+  - 'Sagar R. Shah <sagarshah@softhome.net>'
+abstract: The fantastic new Business::Billing::TMobile::UK!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Crypt::SSLeay: 0
+  Encode: 0
+  HTML::TreeBuilder: 0
+  Term::ReadPassword: 0.06
+  WWW::Mechanize: 0
+build_requires:
+  Devel::CheckOS: 1.42
+  Test::More: 0
+provides:
+  Business::Billing::TMobile::UK:
+    file: lib/Business/Billing/TMobile/UK.pm
+    version: 0.16
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

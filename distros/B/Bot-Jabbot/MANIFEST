@@ -1,0 +1,20 @@
+Changes
+examples/bot.conf
+examples/bot.pl
+examples/lib/Jabbot/Module/Logger.pm
+examples/lib/Jabbot/Module/Replier.pm
+examples/lib/Jabbot/Module/Replier/I18N/en.po
+examples/lib/Jabbot/Module/Replier/I18N/ru.po
+lib/Bot/Jabbot.pm
+lib/Bot/Jabbot/I18N/en.po
+lib/Bot/Jabbot/I18N/ru.po
+lib/Bot/Jabbot/Module.pm
+lib/Bot/Jabbot/Module/ChLang.pm
+lib/Bot/Jabbot/Module/ChLang/I18N/en.po
+lib/Bot/Jabbot/Module/ChLang/I18N/ru.po
+lib/Bot/Modules.pod
+lib/Bot/Hints.pod
+Makefile.PL
+MANIFEST			This list of files
+t/00bootstrap.t
+META.yml                                 Module meta-data (added by MakeMaker)

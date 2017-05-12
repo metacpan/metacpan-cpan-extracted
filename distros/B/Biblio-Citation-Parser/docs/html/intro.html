@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Biblio::Citation::Parser 1.10 Documentation - Introduction</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Introduction</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#what_is_paratools">What is ParaTools?</a></li>
+	<li><a href="#who_should_use_paratools">Who should use ParaTools?</a></li>
+	<li><a href="#what_will_it_run_on">What will it run on?</a></li>
+	<li><a href="#this_documentation">This Documentation</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="what_is_paratools">What is ParaTools?</a></h1>
+<p>ParaTools, short for ParaCite Toolkit, is a collection of Perl modules for reference parsing that is designed to be easily expanded and yet simple to use. The parsing modules make up the core of the package, but there are also useful modules to assist with OpenURL creation and the extraction of references from documents. The toolkit is released under the GNU Public License, so can be used freely as long as the source code is provided (see the COPYING file in the root directory of the distribution for more information).</p>
+<p>The toolkit came about as a result of the ParaCite resource, a reference search engine located at <a href="http://paracite.eprints.org,">http://paracite.eprints.org,</a> which uses a template-based reference parser to extract metadata from provided references and then provides search results based on this metadata. The ParaCite parser is provided directly as the Biblio::Citation::Parser::Standard module, with a separate Templates module that can be replaced as new reference templates are located.</p>
+<p>As well as providing examples for the provided parsing modules, ParaTools also includes examples for using the ParaCite web service. This is an alternate interface which provides access to ParaCite's search and parsing functionality for any language that supports the Web Services Description Language (WSDL).</p>
+<p>
+</p>
+<hr />
+<h1><a name="who_should_use_paratools">Who should use ParaTools?</a></h1>
+<p>The ParaTools package has many applications, including:</p>
+<ul>
+<li></li>
+Converting reference lists into valid OpenURLs
+<p></p>
+<li></li>
+Converting existing metadata into valid OpenURLs
+<p></p>
+<li></li>
+Collecting metadata from references to carry out internal searches
+<p></p>
+<li></li>
+Extracting reference lists from documents
+<p></p>
+<li></li>
+Carrying out searches using ParaCite
+<p></p></ul>
+<p>The modularity of ParaTools means that it is very easy to add new techniques (and we would be very pleased to hear of new ones!).</p>
+<p>
+</p>
+<hr />
+<h1><a name="what_will_it_run_on">What will it run on?</a></h1>
+<p>ParaTools should work on any platform that supports Perl 5.6.0 or higher, although testing was primarily carried out using Red Hat Linux 7.3 with Perl 5.6. Where possible platform-agnostic modules have been used for file functionality, so temporary files should be placed in the correct place for the operating system. Memory requirements for ParaTools are minimal, although the template parser and document parser will require more memory as the number of templates and sizes of documents increase.</p>
+<p>
+</p>
+<hr />
+<h1><a name="this_documentation">This Documentation</a></h1>
+<p>This documentation is written in perl POD format and converted into Postscript (which is 2 pages to a sheet for printing), ASCII, PDF, and HTML.</p>
+<p>The latest version of this documentation can be obtained from <a href="http://paracite.eprints.org/files/docs/">http://paracite.eprints.org/files/docs/</a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Introduction</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

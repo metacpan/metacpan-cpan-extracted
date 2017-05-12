@@ -1,0 +1,11 @@
+# sequence_name	sequence_id	relative_abundance_%
+Milk vetch dwarf virus segment 9, complete sequence	gi|20177473|ref|NC_003646.1|	42.6354640657824
+Eyach virus segment 11, complete sequence	gi|20279561|ref|NC_003706.1|	21.2131307962234
+Streptococcus phage SMP, complete genome	gi|119953745|ref|NC_008721.1|	20.5476998872164
+Hyposoter fugitivus ichnovirus segment B15, complete sequence	gi|124484677|ref|NC_008967.1|	5.53409633419142
+Streptococcus prophage 315.1, complete genome	gi|28876145|ref|NC_004584.1|	5.37756058445946
+Streptococcus phage phi3396, complete genome	gi|126011062|ref|NC_009018.1|	3.86288993105389
+Pseudomonas phage phiCTX, complete genome	gi|17313217|ref|NC_003278.1|	0.59757775913946
+Human herpesvirus 1, complete genome	gi|9629378|ref|NC_001806.1|	0.139640309571455
+Ralstonia phage RSL1, complete genome	gi|189426776|ref|NC_010811.1|	0.091940318748811
+Streptococcus prophage SM1, complete genome	gi|32469420|ref|NC_004996.1|	1.36131651433641e-08

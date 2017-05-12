@@ -1,0 +1,83 @@
+#!perl
+
+use strict;
+use warnings;
+use BusyBird::Input::Feed::Run;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Pod::Usage;
+
+my $post_url;
+my $needs_help;
+my $level;
+GetOptions(
+    'p|post=s' => \$post_url,
+    'l|level=i' => \$level,
+    'h|help' => \$needs_help
+);
+
+if($needs_help) {
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit 0;
+}
+
+my $feed_url = shift @ARGV;
+BusyBird::Input::Feed::Run->run(
+    download_url => $feed_url,
+    post_url => $post_url,
+    level => $level,
+);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+busybird_input_feed - command-line tool to import RSS/Atom feeds into BusyBird
+
+=head1 SYNOPSIS
+
+    $ busybird_input_feed [URL] [OPTIONS]
+    
+    ## Download a feed and output JSON statuses to STDOUT
+    $ busybird_input_feed 'http://example.com/feed.rss'
+    
+    ## Input a feed file via STDIN and output JSON statuses to STDOUT
+    $ busybird_input_feed < feed.rss
+    
+    ## Download a feed and post statuses to the BusyBird URL
+    $ busybird_input_feed 'http://example.com/feed.rss' -p 'http://localhost:5000/timelines/home/statuses.json'
+
+=head1 DESCRIPTION
+
+This script imports a RSS/Atom feed, converts it into L<BusyBird> statuses and outputs the statuses in JSON format.
+
+By default, it reads STDIN for a feed and writes statuses to STDOUT.
+If C<URL> argument is set, the feed is downloaded from that URL.
+
+=head1 OPTIONS
+
+=over
+
+=item -p, --post POST_URL
+
+If set, the L<BusyBird> statuses are sent to the specified URL by HTTP POST method.
+Usually, this is the post endpoint of L<BusyBird>. See L<BusyBird::Manual::WebAPI> for detail.
+
+=item -l, --level LEVEL
+
+If set, it sets the statuses' levels to the specified C<LEVEL>.
+C<LEVEL> must be an integer.
+
+=item -h, --help
+
+Show this message.
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+

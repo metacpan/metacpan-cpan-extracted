@@ -1,0 +1,133 @@
+
+=head1 NAME
+
+Box2D::b2FrictionJointDef - Friction joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2FrictionJointDef->new();
+  $joint_def->Initialize( $body_a, $body_b, $anchor );
+  $joint_def->maxForce( $max_force );
+  $joint_def->maxTorque( $max_torque );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Friction joint definition.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2FrictionJointDef>
+
+=head2 Initialize( $bodyA, $bodyB, $anchor )
+
+Initialize the bodies, anchors, axis, and reference angle using the
+world anchor and world axis.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body> C<$bodyA>
+
+=item * C<Box2D::b2Body> C<$bodyB>
+
+=item * C<Box2D::b2Vec2> C<$anchor>
+
+=back
+
+=head2 localAnchorA()
+
+=head2 localAnchorA( $localAnchorA )
+
+The local anchor point relative to bodyA's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localAnchorB()
+
+=head2 localAnchorB( $localAnchorB )
+
+The local anchor point relative to bodyB's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 maxForce()
+
+=head2 maxForce( $maxForce )
+
+The maximum friction force in N.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxForce> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 maxTorque()
+
+=head2 maxTorque( $maxTorque )
+
+The maximum friction torque in N-m.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxTorque> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2FrictionJoint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

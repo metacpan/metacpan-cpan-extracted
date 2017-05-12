@@ -1,0 +1,45 @@
+Revision history for Backticks
+
+1.0     2012/07/10
+
+        * First version.
+
+1.0.1   2012/07/10
+
+        * Updated license, contact info
+
+1.0.2   2012/07/11
+
+        * Documentation update, formating fixes
+
+1.0.3   2012/07/11
+
+        * Typo in docs
+
+1.0.4   2012/07/18
+
+        * Changed from using open() to run commands in an attempt to fix
+          Windows platform problems
+
+1.0.5   2012/07/20
+
+        * Changed to open3() to run commands, fixed error in chomped output
+          on Windows platforms, fixed command escaping in tests, added
+          ->merged to get the merged output of both STDOUT and STDERR
+
+1.0.6   2012/07/21
+
+        * Fixed problem with escaping in tests, causing Win32 builds to fail
+
+1.0.7   2012/08/29
+
+        * Cleaned up accessor code, better documentation
+
+1.0.8   2012/08/30
+
+        * Added tests that prove Filter::Simple's quotelike parsing works
+
+1.0.9   2012/08/30
+
+        * Added some more sanity tests to ensure that Filter::Simple is
+	  working properly.  Fixed Win32 chomped regression issue.

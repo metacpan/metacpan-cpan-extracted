@@ -1,0 +1,10 @@
+config {
+    base_dir `t`;
+    Init Std { }
+}
+app Apps::Checkbook {
+    authors `Phil Crow`;
+    table payeepayor {
+        field id    { is int4, primary_key, assign_by_sequence; }
+    }
+}

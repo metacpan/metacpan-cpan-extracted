@@ -1,0 +1,58 @@
+chr1	ngsutils	gene	10490158	10502872	.	+	.	ID=APITD1
+
+chr1	ngsutils	mRNA	10490158	10502872	.	+	.	ID=NM_199294;Parent=APITD1
+
+chr1	ngsutils	five_prime_UTR	10490158	10490573	.	+	.	Parent=NM_199294
+chr1	ngsutils	CDS	10490574	10490625	.	+	0	Parent=NM_199294
+chr1	ngsutils	CDS	10493898	10494022	.	+	0	Parent=NM_199294
+chr1	ngsutils	CDS	10494713	10494747	.	+	1	Parent=NM_199294
+chr1	ngsutils	CDS	10500403	10500470	.	+	2	Parent=NM_199294
+chr1	ngsutils	CDS	10502321	10502462	.	+	0	Parent=NM_199294
+chr1	ngsutils	three_prime_UTR	10502463	10502872	.	+	.	Parent=NM_199294
+
+chr1	ngsutils	gene	10490158	10512060	.	+	.	ID=APITD1-CORT
+
+chr1	ngsutils	mRNA	10490158	10512060	.	+	.	ID=NM_198544;Parent=APITD1-CORT
+chr1	ngsutils	mRNA	10490158	10512060	.	+	.	ID=NM_199006;Parent=APITD1-CORT
+
+chr1	ngsutils	five_prime_UTR	10490158	10490573	.	+	.	Parent=NM_198544
+chr1	ngsutils	CDS	10490574	10490625	.	+	0	Parent=NM_198544
+chr1	ngsutils	CDS	10493898	10494022	.	+	0	Parent=NM_198544
+chr1	ngsutils	CDS	10494713	10494747	.	+	1	Parent=NM_198544
+chr1	ngsutils	CDS	10500403	10500470	.	+	2	Parent=NM_198544
+chr1	ngsutils	CDS	10511433	10511652	.	+	0	Parent=NM_198544
+chr1	ngsutils	three_prime_UTR	10511653	10512060	.	+	.	Parent=NM_198544
+
+chr1	ngsutils	five_prime_UTR	10490158	10490573	.	+	.	Parent=NM_199006
+chr1	ngsutils	CDS	10490574	10490625	.	+	0	Parent=NM_199006
+chr1	ngsutils	CDS	10493898	10494022	.	+	0	Parent=NM_199006
+chr1	ngsutils	CDS	10494713	10494747	.	+	1	Parent=NM_199006
+chr1	ngsutils	CDS	10511433	10511458	.	+	2	Parent=NM_199006
+chr1	ngsutils	three_prime_UTR	10511459	10512060	.	+	.	Parent=NM_199006
+
+chr1	ngsutils	gene	10490803	10502872	.	+	.	ID=APITD1
+
+chr1	ngsutils	mRNA	10490803	10502872	.	+	.	ID=NR_036462;Parent=APITD1
+
+chr1	ngsutils	five_prime_UTR	10490803	10491458	.	+	.	Parent=NR_036462
+chr1	ngsutils	five_prime_UTR	10493898	10494022	.	+	.	Parent=NR_036462
+chr1	ngsutils	five_prime_UTR	10494713	10494747	.	+	.	Parent=NR_036462
+chr1	ngsutils	five_prime_UTR	10500403	10500470	.	+	.	Parent=NR_036462
+chr1	ngsutils	five_prime_UTR	10502321	10502872	.	+	.	Parent=NR_036462
+
+chr1	ngsutils	gene	10490803	10512060	.	+	.	ID=APITD1-CORT
+
+chr1	ngsutils	mRNA	10490803	10512060	.	+	.	ID=NM_001243768;Parent=APITD1-CORT
+chr1	ngsutils	mRNA	10490803	10512060	.	+	.	ID=NR_037187;Parent=APITD1-CORT
+
+chr1	ngsutils	five_prime_UTR	10490803	10491345	.	+	.	Parent=NM_001243768
+chr1	ngsutils	CDS	10491346	10491458	.	+	0	Parent=NM_001243768
+chr1	ngsutils	CDS	10494713	10494747	.	+	1	Parent=NM_001243768
+chr1	ngsutils	CDS	10500403	10500470	.	+	2	Parent=NM_001243768
+chr1	ngsutils	CDS	10511433	10511652	.	+	0	Parent=NM_001243768
+chr1	ngsutils	three_prime_UTR	10511653	10512060	.	+	.	Parent=NM_001243768
+
+chr1	ngsutils	five_prime_UTR	10490803	10491458	.	+	.	Parent=NR_037187
+chr1	ngsutils	five_prime_UTR	10500403	10500470	.	+	.	Parent=NR_037187
+chr1	ngsutils	five_prime_UTR	10511433	10512060	.	+	.	Parent=NR_037187
+

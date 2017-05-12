@@ -1,0 +1,51 @@
+=head1 NAME
+
+Business::BancaSella::Ric::Mysql - Extract One-Time-Password from a mysql database
+
+=head1 SYNOPSIS
+
+  use Business::BancaSella::Ric;
+  
+  my $ric = new Business::BancaSella::Ric::Mysql(
+  				dbh		=> $DBI_handle,
+				tableName	=> $table_with_otp,
+				fieldName	=> $field_with_otp
+				);
+  my $otp = $ric->extract;
+
+=head1 DESCRIPTION
+
+This module extract an One-Time-Password from a mysql database. 
+
+=head1 METHODS
+
+=head2 dbh()
+
+Set or get and active DBI handle to Mysql database where OTP are stored.
+
+=head2 fieldName()
+
+Set or get the field name of the table where OTP are stored.
+
+=head2 tableName()
+
+Set or get the table name where OTP are dtored
+
+=head2 extract()
+
+Return and delete the first OTP from mysql database.
+
+=head2 prepare(source_file)
+
+Insert into database passwords from $source_file that have one password on each
+row.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+Business::BancaSella::Ric::File
+
+=cut

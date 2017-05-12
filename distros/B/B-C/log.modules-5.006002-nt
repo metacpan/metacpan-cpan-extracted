@@ -1,0 +1,109 @@
+# B::C::VERSION = 1.52_13 060408a 2015-11-05 | module tests for 5.22
+# perlversion = 5.006002-nt
+# path = perl5.6.2-nt
+# platform = linux 64bit non-threaded
+pass Exporter
+pass Text::Tabs
+pass Text::Wrap
+pass Test::Harness
+pass Pod::Escapes
+pass Pod::Simple
+pass IO
+pass Scalar::Util
+pass Getopt::Long
+pass Pod::Parser
+pass ExtUtils::MakeMaker
+pass Test::Simple #TODO 5.6
+pass ExtUtils::Manifest
+pass Pod::Text
+pass constant
+pass Test
+pass Data::Dumper
+pass File::Spec
+pass File::Temp
+pass ExtUtils::Install
+pass Text::ParseWords
+fail ExtUtils::CBuilder
+pass ExtUtils::ParseXS
+pass Module::Build
+pass File::Path
+pass XSLoader
+pass MIME::Base64
+pass Digest
+pass Digest::MD5
+pass Sub::Uplevel
+pass URI
+pass HTML::Tagset
+pass HTML::Parser
+pass Test::Exception #TODO 5.6
+pass Net::Cmd
+pass Compress::Raw::Zlib
+pass Compress::Raw::Bzip2
+pass IO::Compress::Base
+pass LWP
+pass Storable #TODO 5.6
+pass base
+fail List::MoreUtils
+pass Params::Util
+pass Task::Weaken
+pass Class::Accessor
+pass Test::Tester #TODO 5.6
+pass Sub::Install
+pass Attribute::Handlers
+fail Data::OptList
+fail Sub::Exporter
+pass Test::NoWarnings #TODO 5.6
+pass version
+pass Params::Validate
+pass Sub::Name #TODO 5.6
+pass Filter::Util::Call
+pass Algorithm::C3
+pass Class::C3
+pass Scope::Guard
+pass MRO::Compat
+skip Time::HiRes
+pass Class::Data::Inheritable
+pass Try::Tiny
+pass Devel::GlobalDestruction
+pass Class::MOP
+skip Moose
+pass Test::Deep #TODO 5.6
+pass Carp::Clan
+pass Module::Pluggable
+pass if(1) => "Sys::Hostname"
+pass Text::Balanced
+pass DBI
+pass Time::Local
+pass IO::Scalar
+pass Sub::Identify
+pass Class::ISA
+fail FCGI #TODO 5.6
+pass Tree::DAG_Node
+skip Path::Class
+pass Test::Warn #TODO 5.6
+skip Encode
+skip Variable::Magic
+pass CGI
+skip B::Hooks::EndOfScope
+pass Test::Pod #TODO 5.6
+pass Digest::SHA1
+pass namespace::clean
+pass Class::Inspector
+pass Clone
+pass XML::NamespaceSupport
+pass XML::SAX
+skip YAML
+skip MooseX::Types
+pass Class::Singleton
+fail DateTime::TimeZone #TODO 5.6
+fail DateTime::Locale
+fail DateTime #TODO 5.6
+pass IO::String
+pass AppConfig
+pass UNIVERSAL::require
+pass Template::Stash
+# 92 / 100 modules tested with B-C-1.52_13 - perl-5.006002-nt
+# pass  84 /  92 (91.3%)
+# fail   8 /  92 (8.7%)
+# todo  12 /   8 (150.0%)
+# skip   8 / 100 (8.0% not installed)

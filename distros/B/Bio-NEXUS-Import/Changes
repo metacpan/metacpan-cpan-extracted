@@ -1,0 +1,30 @@
+Revision history for Bio-NEXUS-Import
+
+0.2.0  Thu Feb  3 2011
+       - moved author tests to xt
+       - replace blank and minus in labels with underscore (thanks Manuel)
+       - _BLANK formats
+       - github 
+
+0.1.0  Thu Apr 17 2008
+       - added LICENSE file
+       - perlcritic
+       - added perlvar in Build.PL
+
+0.0.4  Tue Aug 21 2007
+       - Bugfixes:
+           * phylip2nex.pl not installed with Build.PL
+           * META.yml damaged
+
+0.0.3  Thu Jul 13 2007
+       - support for leading whitespaces in labels 
+         (caused problems with output of microsat)
+       - -V flag in phylip2nex.pl
+
+0.0.2  Thu Jul 12 2007
+       - exception tests don't output debug text anymore
+       - POD updates
+
+0.0.1  Wed Jul 11 2007
+       Initial release.
+

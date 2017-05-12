@@ -1,0 +1,6 @@
+$VAR1 = bless( {
+                 'monetary-value' => bless( {
+                                              'PrintableString' => '$67.89'
+                                            }, 'Biblio::ILL::ISO::AmountString' ),
+                 'currency-code' => 'CAD'
+               }, 'Biblio::ILL::ISO::Amount' );

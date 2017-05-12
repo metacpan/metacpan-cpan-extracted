@@ -1,0 +1,119 @@
+Revision history for Perl extension Business::OnlinePayment::PayflowPro.
+
+1.01  Tue Sep 22 17:03:00 EDT 2009 plobbes
+	- rt.cpan.org#49349: Fix Reference Transactions
+	  NOTE: enable in PayfloPro manager transaction settings
+	  Josh Rosenbaum
+
+1.00  Sat Aug 22 01:13:34 EDT 2009 plobbes
+	- bump version to 1.00, should have probably done this with
+	  0.07 as it was a radical enough departure from 0.06, also
+	  BOP 3.x is no longer just a developers release
+	- rt.cpan.org#48696 Use CGI::Util instead of CGI
+	  Josh Rosenbaum
+	  + updated code to be faster/more efficient
+	- rt.cpan.org#48816 Request Encoding Issue & Missing fields
+	  Josh Rosenbaum
+	  + use PayPal custom encoding (not URL encoding) per PP spec
+	  + added missing shipping parameters similar to Authorize.Net
+	- rt.cpan.org#48820 %content not reloaded after mapping breaks credits
+	  Josh Rosenbaum
+	  + fix a problem with credits where the ACCT, AMT, and
+	    EXPDATE were being required, because the ORIGID detection
+	    code was not working
+
+0.07  Tue Apr 14 13:49:50 EDT 2009 plobbes
+	- update server names per latest PayPal docs:
+	   payflow.verisign.com => payflowpro.verisign.com
+	   pilot-payflowpro.verisign.com => pilot-payflowpro.paypal.com
+	[0.07_06 Sat Oct 18 14:15:03 EDT 2008] plobbes
+	- include most of the patches from Frédéric Brière at fbriere.net
+	- request_id now only generates a new id when not set
+	- cvv2_code brought back for backwards compatibility
+	- client_certification_id now default to "ClientCertificationIdNotSet"
+	- client_timeout set to 45 by default
+	- several doc updates and some reorg
+	[0.07_05 Wed Apr  4 12:56:57 PDT 2007] ivan
+	- add note about inteface & contacting payflowintegrator@paypal.com
+	[0.07_04 Tue Mar 13 18:26:12 EDT 2007] ivan
+	- ripped out a bunch of hastily-conceived ->param BS more appropriate
+	  for implementation in a base class.  Server names were incorrect.
+	  Tests were broken (some specific to a particular account).
+	- depend on B:OP:HTTPS 0.06 for Crypt::SSLeay fixes
+	[0.07_03 Tue Mar 13 18:26:12 EDT 2007] plobbes
+	- add "shortcut" param 'client_certification_id' (can be
+	  passed as an argument for B::OP->new() which will set the
+	  X-VPS-VIT-CLIENT-CERTIFICATION-ID header
+	[0.07_02 Tue Mar 13 12:32:57 EDT 2007] plobbes
+	- made generic method for deprecating cert_path, etc.
+	- doc'd vendor() and partner() as deprecated but will not put
+	  out warnings on those (B::OP new() behavior would make this annoying)
+	- shortened code for the custom methods (we are not using build_subs())
+	- use path() again as "/commit" is not needed/used by PayflowPro HTTPS
+	- removed code in submit() related to "/commit"
+	- set param("test_server") so the test server name can be changed
+	[0.07_01 Mon Mar 12 01:56:58 EDT 2007] plobbes
+	- rewrite/updates for new B::OP::PayflowPro using HTTP protocol
+	- no longer using PFProAPI.pm (from Verisign/PayPal)
+	- cert_path() is now deprecated
+	- rewrite/updates for new B::OP::PayflowPro using HTTP protocol
+	- no longer use PFProAPI.pm from Verisign/PayPal
+	- now using name-value pair transactions
+	- require: CGI to parse name-value pair responses from server
+	- require: Digest::MD5 to generate (hopefully) unique
+	  request_id which is required by PayflowPro HTTP protocol
+	- new methods: request_id(), param(), debug(), expdate_mmyy()
+	- renamed internal methods to start with an underscore
+	- removed unused remap_fields() method
+	- if unable to parse expiration given in %content no longer croak,
+	  but let PayflowPro servers attempt to deal with the value as-is
+	- submit() now two phased per PFP HTTP protocol
+	- X-VPS-VIT-CLIENT-CERTIFICATION-ID is required (supposedly
+	  this is a temporary requirement from PayPal)
+	- request_id() method will generate a hopefully unique id using
+	  Digest::MD5 for use in the X-VPS-REQUEST-ID HTTP header.  A
+	  'request_id' key may be passed in %content to specify an ID
+	- path() is not used as the PFP HTTP protocol uses two
+	  different URLs (step 1) /transaction, (step 2) /commit
+	- patches to B::OP::HTTPS were required to support needed
+	  functionality
+	- debug() sets $Business::OnlinePayment::HTTPS::DEBUG for debugging
+
+0.06  Thu Mar  1 10:01:33 EST 2007
+	- zip now allows alphanumerics for non-US zips
+
+0.05  Mon Jan 22 00:58:04 EST 2007
+	[Jan 22 2007 by Phil Lobbes <phil at perkpartners.com>]
+	- Test cases: new tests and cleanup of existing tests
+	- Major update of documentation
+	- Now attempt to set avs_code, cvv2_code, result_code,
+	  error_message and authorization on success or failure.
+	- Ran PayflowPro.pm through perltidy (1.12 -> 1.13)
+	[Dec 23 2006 by Phil Lobbes <phil at perkpartners.com>]
+	- CPAN bug #13896 order_number() (which provides access to PNREF)
+	  is not set when transaction fails [FIXED].
+	- Remove AutoLoader/Exporter per Jo Rhett <jrhett at netconsonance.com>
+	- "use" (instead of "require") Business::OnlinePayment
+	- remove build_subs() and get_fields() (provided by B::OP)
+	- Fixed bug: VENDOR set to login instead of vendor
+	  (will still use login if VENDOR is not set)
+	- minor cleanup remove commented out code, reformat docs a little
+
+0.04  Wed Oct 11 04:00:36 PDT 2006
+	- Prevent unnecessary warnings when no AVS response elements are
+	  received, patch from Michael Peters <mpeters@plusthree.com>
+	- have tests work with environment variables
+	- forgot to increment the version number in 0.03
+
+0.03  Tue Aug  2 17:56:11 PDT 2005
+	- Fix inadvertant clobbering of zip code, patch from
+	  <phil@perkpartners.com>, CPAN bug #13896
+
+0.02  Thu Oct  7 15:58:44 PDT 2004
+	- sponsored by Pro Softnet Corp. / ibackup.com:
+	  - cvv2 support
+	  - authorization only, post authorization, void and credit support
+	- patch from Robert Graff <rgraff@workingdemo.com> for credits
+
+0.01  Wed Jan 22 02:47:25 PST 2003
+	- original version; created by ivan 1.0

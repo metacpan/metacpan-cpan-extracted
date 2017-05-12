@@ -1,0 +1,481 @@
+Revision history for Business-CyberSource
+
+0.010008  2017-03-09
+  - Show correct home repository on Metacpan
+  - Show the up-to-date repo, now maintained by Hostgator
+  - Added ShipTo and associated tests
+  - Introduced new ShippingMethod type as enum
+  - Added invoiceNumber to RequestPart Item
+  - Added ShipFrom RequestPart
+  - Added ShipFrom to Request base class
+  - Added ShipFrom to unit and author tests
+  - Added level 2 / level 3 data fields in purchase totals
+  - Added test coverage for level II / level III fields in purchase totals
+  - Added OtherTax RequestPart
+  - Added OtherTax to Request base class
+  - Added OtherTax helper service to breadboard
+  - Added tests for OtherTax
+  - Added InvoiceHeader RequestPart
+  - Added InvoiceHeader helper service to breadboard
+  - Added test for InvoiceHeader
+  - Modified capture test for InvoiceHeader
+  - Added InvoiceHeader credit tests
+  - Added InvoiceHeader to Authorization test
+
+0.010007  2016-07-01
+  - Added support for sending CommerceIndicator in Auth requests
+  - Fixed author tests that were failing based on different CyberSource
+    sandbox behaviour rather than due to bugs in the library
+
+0.010006  2015-02-19
+	- Fixed filename for production CyberSource Transaction WSDL
+
+0.010005  2014-11-19
+	- require Type::Utils version 0.040 for failing cpan test
+
+0.010004  2014-11-18
+	- remove  Moose::Util::TypeConstraints from ::Client GH #2
+
+0.010003  2014-06-19
+	- use strict mode for ::ProjectDistDir
+		- fixes isolated bugs in certain deployments, if you haven't had
+		  problems with ::Client locating the wsdl/xsd this hasn't impacted you
+	[DEPRECATIONS]
+	- added deprecation warnings around alias inializers
+	  - these will be removed as if they were put in 0.01000
+
+0.010002  2014-06-18
+	- fix Type::Tiny code to use Invocant
+
+0.010001  2014-06-18
+	- fix tests for perl 5.20 to not trip on Types::Tiny bug
+	- fix SOAPFault documentation
+
+0.010000  2014-06-17
+	[NEWS]
+	- Converted to Moose::Exception
+	  - IMPORTANT read the removal section
+	  - NEVER ever check for ->isa('Moose::Exception') because that's an
+	    implementation detail and the superclass may change in the future,
+	    check final classes or roles as documented instead (MST)
+	  - read the updated example in Business::CyberSource
+	- Added support for American Express Electronic Verification information
+	[REMOVAL]
+	- Exception::Base - Some exception objects were renamed
+	  - CHECK YOUR EXCEPTION HANDLING, it's probably wrong now, sorry. This
+	    shouldn't change again, having external classes means supporting new
+	    classes will be easier, existing namespaces were awkward for external
+	    classes
+	- MooseX::StrictConstructor
+	- Path::Class
+	[DEPRECATIONS]
+	- several undocumented aliases
+	- trace, Moose::Exception has trace and this conflicted, renamed
+	  http_trace
+
+0.009002  2013-11-29
+	- update encoding
+	- use Test::Requires for NetAddr::IP tests
+
+0.009001  2013-11-29
+	- remove dependency on Class::Load, this is being removed from Moose, use
+	  Module::Runtime instead
+	- reorganize tests
+	- fix documentation
+
+0.009000  2013-08-05
+	[NEWS]
+	- fix bug with different processor where exceptions were thrown on
+	  response
+		- remove MooseX::StrictConstructor ( may be readded later )
+	[DEPRECATIONS]
+	- username, password, production, run_transaction have all been migrated
+	  to the MooseY::RemoteHelper::Role::Client user, pass, test, submit
+	[REMOVAL]
+	- Client->dumper_package, insufficient, hardcode until suitable replacment
+	  written
+	- previous deprecations
+		- billing_info ( use bill_to )
+		- accepted is_accepted ( use is_accept )
+	[NOTES]
+	- due to changes in processor live tests are failing for me, this release
+	  fixes the exceptions but I haven't had the time to improve the live test
+	  suite to fix false positives.
+
+0.008000  2013-05-21
+	[NEWS]
+	- API's deprecated in 0.007006 and older have been removed
+	[DEPRECATIONS]
+	- billing_info ( use bill_to )
+	- accepted is_accepted ( use is_accept )
+
+0.007011  2013-05-17
+	- JCB Cards now identify as discover in Business::CreditCard 0.32
+	- update synopsis example to be more novice friendly with try/catch syntax
+
+0.007010  2012-11-26
+	- allow the constructor to treat undefs as unset
+		- add depedency on MooseX::UndefTolerant
+
+0.007009  2012-11-19
+	- Re-up 0.007008 after fixing pause permissions
+	- add Package Metadata
+
+0.007008  2012-11-19
+	- BillTo state was not checked as required for US and CA
+
+0.007007  2012-11-15
+	- metadata corrections
+
+0.007006  2012-11-15
+	[NEWS]
+	- Tax Service should now be fully supported
+	- massive refactoring of Response objects to use MooseX::RemoteHelper
+		- Response uses strict constructor
+		- please report any exceptions caused by strict constructor that do not
+		  have a status code of 102
+	- debug now takes an integer and will be more verbose
+		- debug 2 shows full SOAP + hashrefs
+		- debug 1 just shows the hashrefs
+		- debug 0 shows nothing
+
+	[DEPRECATIONS]
+	- change ->dcc->dcc_supported to ->dcc->supported
+
+0.007005  2012-11-01
+	- port fixes from 0.006014
+	- debug now takes an integer and will be more verbose
+		- debug 2 shows full SOAP + hashrefs
+		- debug 1 just shows the hashrefs
+		- debug 0 shows nothing
+
+0.007004  2012-10-18
+	- port fixes from 0.006012
+	- insure response object has a trace object
+
+0.007003  2012-10-15
+	- delegate more deprecated methods and improve notice
+
+0.007002  2012-10-15
+	- documentation improvements
+	- more backwards compatability cleanup
+	[DEPRECATIONS]
+	- is_success entirely
+
+0.007001  2012-10-09
+	- remove use of 5.14+ code
+	- update documentation
+	[DEPRECATIONS]
+	- do not check roles in CyberSource Response these are implementation
+	  details now
+
+0.007000  2012-10-08
+	[NEWS]
+	- Tax Service should now be fully supported
+	- massive refactoring of Response objects to use MooseX::RemoteHelper
+	  improvments
+	[DEPRECATIONS]
+	- response object is now composed of sub objects
+	- response factory api changed
+
+0.006014  2012-11-01
+	- actually forgot to merge the patch requiring XML::Compile::WSS 1.04
+
+0.006013  2012-11-01
+	- Require XML::Compile::WSS 1.04
+		- fixes issue with concurrent client objects
+
+0.006012  2012-10-17
+	- fix issues with XML::Compile::SOAP::WSS 1.00 ( Mark Overmeer )
+		- also improve code with new API
+
+0.006011  2012-10-09
+	- use MooseX::Types::CreditCard 0.002
+
+0.006010  2012-10-08
+	- state keyword for soap_client would multiple clients with different
+	  usernames/passwords impossible. Use Moose lazy attribute instead.
+
+0.006009  2012-10-04
+	[FEATURE]
+	- added is_accept and is_reject to response
+	- is_success in the future will mean a non error state (accept or reject)
+
+0.006008  2012-09-26
+	- Fix and improve ::RequestPart::Card documentation
+	- improve use of state for optimization
+	[DEPRECATIONS]
+	- MooseX::Traits will be removed as a dependency
+
+0.006007  2012-09-03
+	- update copyright holder
+
+0.006006  2012-08-30
+	- smarten my performance optimizations
+
+0.006005  2012-08-29
+	- Add missing Dependency File::ShareDir::ProjectDistDir
+	- refactor run_transaction to use state in ways that in theory should
+	  improve performance by not rebuilding the SOAP client every time
+
+0.006004  2012-08-14
+	- MooseX::RemoteHelper::CompositeSerialization was accidentally applied to
+	  Response objects, it has been removed from them
+
+0.006003  2012-08-14
+	- start indexing roles, so pod will render
+
+0.006002  2012-08-14
+	- fix documentation
+	- use Class::Load instead of Module::Runtime
+	- use File::ShareDir::ProjectDistDir instead of File::ShareDir
+
+0.006001  2012-06-13
+	- MooseX::AbstractFactory should be required again for Rules
+
+0.006000  2012-06-13
+	[NEWS]
+	- massive refactoring to use MooseX::RemoteHelper and nested object using
+	  the composite pattern. Due to this many things have been deprecated.
+	  It is possible that some things were accidentally removed, or no
+	  compatability layer was added. If you find something outright missing
+	  please report a bug
+
+	[DEPRECATIONS]
+	- constructors and methods that are now subobjects
+	- Business::CyberSource::CreditCard use
+	  Business::CyberSource::RequestPart::Card
+
+	[FEATURE - EXPERIMENTAL]
+	- rules, see Business::CyberSource::Client rules attribute and
+	  Business::CyberSource::Rule
+	- TaxService Business::CyberSource::RequestPart::Service::Tax
+	  (unfinished and will undergo active development during 0.6.x release )
+
+	[REMOVAL]
+	- skipable and ignore skipable, use rules instead
+	- numerous roles
+	- API's deprecated in 0.005000
+	- Dependance on MooseX::Structured and MooseX::Parameterized
+
+0.005004  2012-06-06
+	- Make optional dependencies recommended
+	- fix bug where score threshold in authorization business rules would
+	  not have been set correctly
+	- fix duplicate initialization in dcc test
+
+0.005003  2012-05-24
+	- Add Missing Dependency DateTime::Format::W3CDTF
+
+0.005002  2012-05-23
+	- remove Bread::Board as a request Test Dependency, it's mostly used in
+	  cases where credentials are required.
+	- remove MooseX::AbstractFactory as a dependency, BC::Factory::Request is
+	  optional and not even recommended.
+
+0.005001  2012-05-23
+	- remove Test::Exception and Data::Dumper::Concise from deps
+	- cleanup tests more
+
+0.005000  2012-05-17
+	[NEWS]
+	- massive test refactoring including use of Bread::Board to simplify tests
+	- carp on deprecated API's
+	- move factories into Factory namespace
+	- improve logic of Factory::Response 
+
+	[FEATURE]
+	- New CreditCard object
+	- Reject without sending request if credit card expiration date is in the past
+
+	[REMOVAL]
+	- datetimes are no longer strings but DateTime objects
+
+0.004008  2012-05-11
+	- make optional attributes read-write and setonce
+	- throw an exception object on receipt of an ERROR from cybersource
+
+0.004007  2012-05-10
+	- refactor tests
+	- more documentation improvements
+	- fix bug where ->create was exposed
+
+0.004006  2012-05-09
+	- improve documentation
+	- Message Abstract Class
+	- Request/Response Extend Message
+	- Request Subclasses now subclass Request
+	- trace now exists on both request and response
+	- update to version 1.71 of CyberSource API
+
+0.004005  2012-05-02
+	[FEATURE]
+	- add debug on BC::Client
+	  - can enable at runtime by setting PERL_BUSINESS_CYBERSOURCE_DEBUG
+	[OTHER]
+	- create Business::CyberSource::ResponseFactory to manage how responses
+	  are created
+
+0.004004  2012-05-02
+	[NEWS]
+	- begin refactoring to patterns
+
+	[FEATURE]
+	- add Business::CyberSource::Client
+
+	[DEPRECATED]
+	- Business::CyberSource::Request (as a factory)
+	- Business::CyberSource::Request::*
+	  	- Methods
+	  		- submit
+	  	- Attributes
+	  	  	- username
+	  	  	- password
+	  	  	- production
+	  	
+0.004003  2011-10-23
+	- add ->comments field
+	- switch to decimal based versions
+
+v0.4.2    2011-10-18
+	- add a field for ->phone_number
+	- fix the way ->ip_address is transmitted
+
+v0.4.1    2011-10-17
+	- fix bug in test 403, where it wasn't providing test creds.
+	- trace setter should be setonce, no init arg, and a private setter, as it
+	  is only to be set internally once.
+
+v0.4.0    2011-10-06
+	- refactor guts to use moose triggers to build a request data hashref
+	- DCC requests were supported, but you couldn't have any follow up
+	  requests. Now you can toggle dcc indicator's on Sale, Authorization,
+	  Capture, and Credit.
+	- add more fields to Items
+	- add support for Full Name with Credit Cards
+
+v0.3.8    2011-10-04
+	- change ->is_success to ->accepted, allow aliases ->is_accepted and ->is
+	  success
+	[DEPRECATED]
+	- ->is_success success as a name doesn't really make sense
+
+v0.3.7    2011-09-27
+	- fix bug where valid REJECT on an expired card was causing an exception
+	  to be thrown
+
+v0.3.6    2011-09-27
+	- fix bug where you could not specify a zip code for US or CA, and the
+	  library would not throw an exception
+	- test initialization of authoriztion object without real credentials
+
+v0.3.5    2011-09-23
+	- fix bug where American Express card_type was not being detected
+	- fix dcc tests
+	- more exception tests
+
+v0.3.4    2011-09-20
+	- working DCC request support
+
+v0.3.3    2011-09-19
+	- add country code conversion from 3 character, and country name
+	- fix bug where rejected sale's were crashing due to giving responses the
+	  wrong inputs
+
+v0.3.2    2011-09-19
+	- fix dependancy issue
+	- add an ->is_success accessor to the response object
+
+v0.3.1    2011-09-15
+	- Sale wasn't actually added in 0.3.0 due to forgotten merge
+	- add support for business rules
+
+v0.3.0    2011-09-14
+	- add support for multiple items
+	- add Sale (Authorization + Capture) Request Object
+
+v0.2.8    2011-09-12
+	- make cv_code and cv_code_raw accessors work
+	- use processor specific value testing
+	- test CVN and AVS values
+	- refactor authorization to make values that are somemtimes available on
+	  reject available
+	
+
+v0.2.7    2011-09-11
+	- use MooseX::StrictConstructor for new checking
+	- add expermimental cv_code and cv_code_raw accessors on authorization
+	  responses. you can use has_cv_code* predicate to check if defined.
+	- decision ERROR now returns an actual response object.
+
+v0.2.6    2011-09-09
+	- no real changes, simply removing trial status
+
+v0.2.5    2011-09-09
+	- more docs
+	- Swap out most of the request type response roles for more generic roles
+
+v0.2.4    2011-09-08
+	- more docs
+	- more type tightening
+	- remove Reject role, it was only providing something common to all
+	  responses
+	- Add StandAloneCredit and FollowOnCredit convenience objects, mostly for
+	  use with our factory
+
+v0.2.3    2011-09-06
+	- make ->ip a Net::Addr
+	- more and improved documentation
+	- tighten down other contraints
+
+v0.2.2    2011-09-04
+	- make code further DRY by reducing duplicated code
+
+v0.2.1    2011-09-02
+	- remove much repeated code
+
+v0.2.0    2011-09-02
+	- use XML::Compile::SOAP instead of SOAP::Lite
+
+v0.1.10   2011-08-31
+	- use more MooseX::Types
+	- fix subtle missing use Business::CyberSource::Response
+
+v0.1.9    2011-08-26
+	- use MooseX::Types and Varchar to make attributes stricter and better
+	  documented accross the board
+
+v0.1.8    2011-08-26
+	- use MooseX::Types::CreditCard
+	  as this type is based on int the ->credit_card method will no longer
+	  return strings with '-' or ' ' in them
+
+v0.1.7     2011-08-25
+	- add basic documentation for requests
+	- disable method documentation generation
+	- change how traits are applied on credit requests
+
+v0.1.6    2011-08-24
+	- provide reason_text attribute on responses
+
+v0.1.5    2011-08-24
+	- Document Business::CyberSource::Request
+
+v0.1.4    2011-08-23
+	- turn Business::CyberSource::Request into an abstract factory for request
+	  objects.
+	- production attribute no longer has a default, so it must always be
+	  created.
+	- credit card expiration month/year most now be an integer
+
+v0.1.3    2011-08-22
+	- experimental CVN and DCC support
+
+v0.1.2    2011-08-18
+	- first implementation of follow-on credits
+
+v0.1.1    2011-08-16
+	- skip tests unless environment variables set
+
+v0.1.0    2011-08-16
+	- Initial release for testing comment and review

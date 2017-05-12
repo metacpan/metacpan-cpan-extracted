@@ -1,0 +1,257 @@
+----
+presentation_topic: bio-chado-schema
+presentation_title: Bio::Chado::Schema
+presentation_subtitle: a standard Perl ORM layer for Chado
+presentation_place: NESCent, Durham, NC
+presentation_date: March 5-7, 2011
+----
+= What is DBIx::Class?
+
+* Object-relational mapping framework for Perl 5
+* is now the de-facto standard
+* very powerful query builder
+
+----
+= What is DBIx::Class?
+
+* query building (the magic of chainable ResultSets)
+* cross-database deployment (using |SQL::Translator| in the backend)
+* lots and lots of plugins availabe (dates, testing, ...)
+
+see http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod
+
+----
+= Data Model
+
+* a set of classes
+* encapsulate the underlying storage
+* providing a nicer, maintainable API for working with the data
+
+This isn't really middleware, it's a code library.
+
+----
+= And therefore, Bio::Chado::Schema 
+
+== As of 0.08: 205 Perl 5 classes
+* every table and view, every module
+* Chado docs mirrored in the POD
+
+http://search.cpan.org/dist/Bio-Chado-Schema
+
++  ( So why do we need this? )
+
+----
+= Chado needs encapsulation
+
+== Chado's design makes for:
+* complex queries
+* steep learning curve
+
+----
+= Chado needs encapsulation
+
+== complex queries
+* generating
+* storing
+* automating
+
+----
+= Chado needs encapsulation
+
+== steep learning curve
+* codifying best practices
+* unified, high-level documentation
+* can help with database administration
+
+----
+= BCS Usage
+
+* open the schema.  ( actual DB connection is deferred )
++  my $chado = Bio::Chado::Schema->connect( 'dbi:Pg:...', $user, $pass );
+
++* get a ResultSet object representing a set of Rows
++  $chado->resultset('Sequence::Feature');
++        ->search({ name => 'something' });
++        ->search_related('organism')
+
++* get an actual data object
++  $chado->resultset('Sequence::Feature')
+        ->find( 232432 );
+
+----
+= BCS Usage
+
++* iterate over the actual data in a set
++  my $stuff = $chado->blahblahblah;
+  while( my $row = $stuff->next ) {
+    # do something
+  }
+
++* traverse relationships
++ say $some_feature->type->name;
+
+----
+= BCS Usage: Joined Select
+
+  # get features via the potato organism, also joining in the cvterms table
++  my $potato_bacs =
+       $chado->resultset('Organism::Organism')
++             ->search({ species => 'Solanum tuberosum' })
++             ->search_related( 'features',
+                               { 'type.name' => 'BAC_clone'},
+                               { 'join' => 'type' },
+                             );
+
+----
+= BCS Usage: Joined Select
+
+  # the equivalent bare SQL
+  my $potato_bacs = $dbh->selectall_arrayref( <<EOS, undef, 'Solanum tuberosum', 'BAC_clone');
+  SELECT features.feature_id
+       , features.dbxref_id
+       , features.organism_id
+       , features.name
+       , features.uniquename
+       , features.residues
+       , features.seqlen
+       , features.md5checksum
+       , features.type_id
+       , features.is_analysis
+       , features.is_obsolete
+       , features.timeaccessioned
+       , features.timelastmodified
+  FROM organism me
+  LEFT JOIN feature features
+         ON features.organism_id = me.organism_id
+  JOIN cvterm type
+         ON type.cvterm_id = features.type_id
+  WHERE type.name = 'BAC_clone' AND species = 'Solanum tuberosum'
+  EOS
+
+----
+= BCS Usage: Loading
+
+  $chado->resultset( 'Cv::Cv' )
+        ->find_or_create({ name => 'My Fake Ontology' })
+        ->create_related(  'cvterm',
+                           { name => 'MyFakeTerm' });
+
+makes the SQL:
+
+  SELECT me.cv_id
+       , me.name
+       , me.definition
+  FROM cv me
+  WHERE ( me.name = 'my fake ontology' )
+
+  INSERT INTO cv ( name )
+          VALUES ( ?    )
+
+----
+= BCS Usage: Transactions
+
+  $chado->txn_do(sub {
+
+      $chado->resultset('Cv::Cv')
+            ->find_or_create({ name => 'My Fake Ontology' })
+            ->create_related( 'cvterm', { name => 'MyFakeTerm' } );
+
+      $chado->do_all_kinds_of_other_stuff;
+  });
+
+----
+= The Real Advantages of DBIC
+
+* easier to manipulate and assemble queries
+* Don't Repeat Yourself
+
+----
+= The Real Advantages of DBIC
+
+* it's all objects.  you can delegate to them, pass them around, etc.
+* HOWEVER:
++** usually you don't want to subclass them
+** but, see |DBIx::Class::Manual::Cookbook|
+
+----
+= The Real Advantages of DBIC
+
+* complex joined queries (Chado queries) are very easy and compact
+
+----
+= The Real Advantages of DBIC
+
+* SQL syntax errors are much more difficult to make
+
+----
+= Using DBIC with your own tables
+
+* use |DBIx::Class::Schema::Loader| to dump a whole set
+* make your own definitions
+
+* your table: other_thing, foreign key feature_id to Chado feature table
+
+  package My::DBIC:::Layer::OtherThing;
+  use base 'DBIx::Class::Core';
+
+  __PACKAGE__->table('other_thing');
+  __PACKAGE__->add_columns(
+    'other_thing_id' => { ... },
+    'name'           => { ... },
+    'definition'     => { ... },
+    'feature_id'     => { ... },
+  );
+  __PACKAGE__->set_primary_key('other_thing_id');
+  __PACKAGE__->add_unique_constraint('ot_c1', ['name']);
+
+  __PACKAGE__->belongs_to(
+    'feature',
+    'Bio::Chado::Schema::Sequence::Feature',
+    { 'foreign.feature_id' => 'self.feature_id' },
+  );
+
+----
+= "Duct tape" your own schema onto BCS
+
+* make an accessor 'other_things' that ties your own DBIC class to BCS
+
++  Bio::Chado::Schema::Sequence::Feature->has_many(
+    'other_things',
+    'My::DBIC::Layer::OtherThing',
+    { 'foreign.feature_id' => 'self.feature_id' },
+  );
+
++* add it to the BCS schema dynamically
++  Bio::Chado::Schema->register_source('OtherThing', 'My::DBIC::Layer::OtherThing');
+
++* use it with the rest
++  $chado->resultset('Sequence::Feature')->other_things;
+
+----
+= Making a composite schema
+
+  package My::Schema;
+  # load our own classes
+  __PACKAGE__->load_namespaces;
+  __PACKAGE__->load_namespaces(
+      result_namespace    => '+Bio::Chado::Schema::Result',
+      resultset_namespace => '+Bio::Chado::Schema::ResultSet',
+    );
+
+----
+= Development Roadmap
+
+* continue to fill in many_to_many rels as needed
+* continue to add more (generic!) convenience methods
+** automate more common querying and loading patterns
+
+----
+= Acknowledgments
+
+* Jonathan Leto (SGN)
+* Aure Bombarely (SGN)
+* Naama Menda (SGN)
+* Siddhartha Basu (dictybase)
+* Lukas Mueller (SGN)
+
+----

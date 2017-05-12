@@ -1,0 +1,22 @@
+---
+name: Bot-BasicBot-Pluggable-Module-Eliza
+version: 0.05
+author:
+  - 'Mario Domgoergen <dom@math.uni-bonn.de>'
+abstract: Eliza for Bot::BasicBot::Pluggable
+license: perl
+resources:
+  license: ~
+requires:
+  Bot::BasicBot::Pluggable: 0.6
+  Chatbot::Eliza: 0
+build_requires:
+  Test::More: 0
+provides:
+  Bot::BasicBot::Pluggable::Module::Eliza:
+    file: lib/Bot/BasicBot/Pluggable/Module/Eliza.pm
+    version: 0.05
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

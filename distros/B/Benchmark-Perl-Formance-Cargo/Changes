@@ -1,0 +1,28 @@
+Revision history for Benchmark-Perl-Formance-Cargo
+
+0.07      2012-08-23
+        - Declare in META files that share/ is not to be indexed
+          [Randy Stauner]
+
+0.06      2012-08-16
+        - re-release due to wrong upload subdir
+
+0.05      2012-08-15
+        - Dist::Zill'ified
+        - lib/auto/ now share/
+        - add cargo perl6-std for P6STD plugin
+        - remove legacy MooseTS cargo
+
+0.03      2012-04-18
+        - no idea where that release came from...
+          (me sleep walking?)
+
+0.02      2010-07-27
+        - snapshot of Perl::Critic sources
+          We will use this to run Perl::Critic on itself, once with the
+          upstream version and once the bundled cargo version. So
+          this source files are used as target source code to be
+          evaluated and as static snapshot of Perl::Critic itself.
+
+0.01      2008-08-13
+        - Initial version

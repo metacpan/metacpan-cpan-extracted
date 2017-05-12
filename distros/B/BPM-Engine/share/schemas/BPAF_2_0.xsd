@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 (http://www.altova.com) by Michael zur Muehlen (Stevens Institute of Technology) -->
+<xs:schema xmlns:bpaf="http://www.wfmc.org/2009/BPAF2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.wfmc.org/2009/BPAF2.0" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="Event">
+		<xs:annotation>
+			<xs:documentation>Business Process Analytics Format Event</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="EventDetails">
+					<xs:complexType>
+						<xs:attribute name="CurrentState" type="bpaf:State" use="required"/>
+						<xs:attribute name="PreviousState" type="bpaf:State"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="DataElement" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="EventID" type="bpaf:ID" use="required"/>
+			<xs:attribute name="ServerID" type="xs:NMTOKEN"/>
+			<xs:attribute name="ProcessDefinitionID" type="xs:NMTOKEN" use="required"/>
+			<xs:attribute name="ProcessInstanceID" type="xs:NMTOKEN" use="required"/>
+			<xs:attribute name="ProcessName" type="xs:string"/>
+			<xs:attribute name="ActivityDefinitionID" type="xs:NMTOKEN"/>
+			<xs:attribute name="ActivityInstanceID" type="xs:NMTOKEN"/>
+			<xs:attribute name="ActivityName" type="xs:string"/>
+			<xs:attribute name="Timestamp" type="xs:dateTime" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="State">
+		<xs:annotation>
+			<xs:documentation>Enumeration of Possible Process and Activity States</xs:documentation>
+		</xs:annotation>
+		<xs:list>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Open"/>
+					<xs:enumeration value="Open.NotRunning"/>
+					<xs:enumeration value="Open.NotRunning.Ready"/>
+					<xs:enumeration value="Open.NotRunning.Assigned"/>
+					<xs:enumeration value="Open.NotRunning.Reserved"/>
+					<xs:enumeration value="Open.NotRunning.Suspended"/>
+					<xs:enumeration value="Open.NotRunning.Suspended.Assigned"/>
+					<xs:enumeration value="Open.NotRunning.Suspended.Reserved"/>
+					<xs:enumeration value="Open.Running"/>
+					<xs:enumeration value="Open.Running.InProgress"/>
+					<xs:enumeration value="Open.Running.Suspended"/>
+					<xs:enumeration value="Closed"/>
+					<xs:enumeration value="Closed.Completed"/>
+					<xs:enumeration value="Closed.Completed.Success"/>
+					<xs:enumeration value="Closed.Completed.Failed"/>
+					<xs:enumeration value="Closed.Cancelled"/>
+					<xs:enumeration value="Closed.Cancelled.Exited"/>
+					<xs:enumeration value="Closed.Cancelled.Error"/>
+					<xs:enumeration value="Closed.Cancelled.Obsolete"/>
+					<xs:enumeration value="Closed.Cancelled.Aborted"/>
+					<xs:enumeration value="Closed.Cancelled.Terminated"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:list>
+	</xs:simpleType>
+	<xs:simpleType name="ID">
+		<xs:annotation>
+			<xs:documentation>Namespace for Event Identifiers</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:NMTOKEN"/>
+	</xs:simpleType>
+</xs:schema>

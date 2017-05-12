@@ -1,0 +1,10 @@
+Bundle-GMOD version 0.01
+========================
+
+The Generic Model Organism Database (GMOD) project (http://www.gmod.org) is
+a collection of software for running a model organism database.  This bundle
+is the minimum required for getting the schema installed in a PostgreSQL
+database and running the Generic Genome Browser (http://www.gmod.org/ggb)
+on it.  Other modules may be required for other components of GMOD.
+
+For questions, please contact Scott Cain, cain@cshl.org.

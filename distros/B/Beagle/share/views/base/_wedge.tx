@@ -1,0 +1,6 @@
+: if $entry && template_exists( $entry.type ~ '_' ~ $template ) {
+:   include $entry.type ~ '_' ~ $template;
+: } elsif template_exists( $template ) {
+:   include $template;
+: }
+

@@ -1,0 +1,66 @@
+{
+   "abstract" : "Split and deconvolute structural RNA multiple sequence alignments",
+   "author" : [
+      "Michael T. Wolfinger <michael@wolfinger.eu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-RNA-RNAaliSplit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Set" : "0",
+            "Bio::AlignIO" : "0",
+            "Bio::Root::Version" : "1.00690001",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "2.0",
+            "IO::Dir" : "0",
+            "IPC::Cmd" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Class" : "0",
+            "Path::Class::Dir" : "0",
+            "Path::Class::File" : "0",
+            "Pod::Usage" : "0",
+            "RNA" : "v2.3.4",
+            "Storable" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.4.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

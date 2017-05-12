@@ -1,0 +1,47 @@
+#
+# This is the configuration file for the LDAP PAM module.
+# To contact the author, mail lukeh\@padl.com.
+#
+
+host $(CONFIGURATOR.LDAP_HOST)
+port $(CONFIGURATOR.PORT)
+ldap_version $(CONFIGURATOR.LDAP_VERSION)
+
+binddn $(CONFIGURATOR.PAMLDAP_BINDDN)
+bindpw $(CONFIGURATOR.PAMLDAP_BINDPW)
+
+base $(CONFIGURATOR.BASE)
+pam_login_attribute $(CONFIGURATOR.UID)
+
+rootbinddn $(CONFIGURATOR.BINDDN)
+
+# Filter to AND with uid=%s
+#pam_filter objectclass=account
+
+# The user ID attribute (defaults to uid)
+#pam_login_attribute uid
+
+# Search the root DSE for the password policy (works
+# with Netscape Directory Server)
+#pam_lookup_policy yes
+
+# Group to enforce membership of
+#pam_groupdn cn=PAM,ou=Groups,dc=padl,dc=com
+
+# Group member attribute
+#pam_member_attribute uniquemember
+
+# Template login attribute, default template user
+# (can be overriden by value of former attribute
+# in user's entry)
+#pam_login_attribute userPrincipalName
+#pam_template_login_attribute uid
+#pam_template_login nobody
+
+# Hash password locally; required for University of
+# Michigan LDAP server, and works with Netscape
+# Directory Server if you're using the UNIX-Crypt
+# hash mechanism and not using the NT Synchronization
+# service.
+#pam_crypt local
+

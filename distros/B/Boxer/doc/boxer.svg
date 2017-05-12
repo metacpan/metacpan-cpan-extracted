@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg id="svg2" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="478.69" width="699.54" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/">
+ <defs id="defs4">
+  <marker id="TriangleOutL" refY="0" refX="0" orient="auto" overflow="visible">
+   <path id="path3992" d="m5.77 0-8.65 5v-10l8.65 5z" fill-rule="evenodd" transform="scale(.8)" stroke="#000" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleInL-0" refY="0" refX="0" orient="auto" overflow="visible">
+   <path id="path3983-6" d="m5.77 0-8.65 5v-10l8.65 5z" fill-rule="evenodd" transform="scale(-.8)" stroke="#000" stroke-width="1pt"/>
+  </marker>
+  <marker id="TriangleOutL-74" refY="0" refX="0" orient="auto" overflow="visible">
+   <path id="path3992-8" d="m5.77 0-8.65 5v-10l8.65 5z" fill-rule="evenodd" transform="scale(.8)" stroke="#000" stroke-width="1pt"/>
+  </marker>
+ </defs>
+ <metadata id="metadata7">
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g id="layer1" transform="translate(33.625 -180.32)">
+  <rect id="rect5928-1-0-6" style="color:#000000" rx="8.0667" ry="8.0667" height="26.551" width="95.925" y="413.75" x="98.655" fill="#ace"/>
+  <rect id="rect5928-1-0" style="color:#000000" rx="8.0667" ry="8.0667" height="26.551" width="95.925" y="316.75" x="282.65" fill="#ace"/>
+  <rect id="rect5928-1" style="color:#000000" rx="8.0667" ry="8.0667" height="26.551" width="95.925" y="518.64" x="297.55" fill="#ace"/>
+  <rect id="rect5928-0" style="color:#000000" rx="8.0667" ry="8.0667" height="26.551" width="95.925" y="417.36" x="469.09" fill="#ace"/>
+  <text id="text3755" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="436.28928" x="296.12244" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3757" x="296.12244" y="436.28928">boxer profiles</tspan></text>
+  <text id="text3759" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="424.70773" x="590.13385" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3761" x="590.13385" y="424.70773">distill</tspan><tspan id="tspan4000" x="590.13385" y="440.95773">detect</tspan><tspan id="tspan3998" x="590.13385" y="457.20773"/></text>
+  <text id="text3763" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="534.98181" x="330.22864" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3765" x="330.22864" y="534.98181">edit</tspan></text>
+  <text id="text3767" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="332.99451" x="309.20108" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3769" x="309.20108" y="332.99451">share</tspan></text>
+  <text id="text3783" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="397.21606" x="1.4140625" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3785" x="1.4140625" y="397.21606">tweaks</tspan><tspan id="tspan4022" x="1.4140625" y="413.46606">debootstrap</tspan><tspan id="tspan4024" x="1.4140625" y="429.71606">tweaks</tspan><tspan id="tspan4026" x="1.4140625" y="445.96606">install</tspan><tspan id="tspan4028" x="1.4140625" y="462.21606">tweaks</tspan></text>
+  <path id="path3844-0" marker-end="url(#TriangleOutL)" d="m344.19 459.21 0.85647 53.101" stroke="#000" stroke-width="1px" fill="none"/>
+  <path id="path3844-0-4" marker-end="url(#TriangleOutL)" d="m273.48 433.12-56.245-5.2871" stroke="#000" stroke-width="1px" fill="none"/>
+  <path id="path3844-0-6" marker-end="url(#TriangleOutL)" d="m466.66 429.7-46.25 1.7129" stroke="#000" stroke-width="1px" fill="none"/>
+  <path id="path3844-0-65" marker-end="url(#TriangleOutL-74)" d="m337.95 350.52 4.2824 49.675" marker-start="url(#TriangleInL-0)" stroke="#000" stroke-width="1px" fill="none"/>
+  <text id="text3083" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="433.03009" x="124.61722" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3085" x="124.61722" y="433.03009">deploy</tspan></text>
+  <text id="text3994" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" transform="translate(-48.126 39.237)" font-size="13px" y="392.39099" x="527" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan3996" x="527" y="392.39099">analyse</tspan></text>
+  <text id="text4002" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" font-size="13px" y="243.62782" x="301.87375" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4004" x="301.87375" y="243.62782">publish</tspan><tspan id="tspan4006" x="301.87375" y="259.87781">clone</tspan><tspan id="tspan4008" x="301.87375" y="276.12781">push</tspan><tspan id="tspan4010" x="301.87375" y="292.37781">pull</tspan></text>
+  <text id="text4012" style="word-spacing:0px;letter-spacing:0px" xml:space="preserve" transform="translate(-48.126 39.237)" font-size="13px" y="535.39099" x="375" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4014" x="375" y="535.39099">adapt (from OS)</tspan><tspan id="tspan4016" x="375" y="551.64099">add</tspan><tspan id="tspan4018" x="375" y="567.89099">enable</tspan><tspan id="tspan4020" x="375" y="584.14099">disable</tspan></text>
+  <text id="text4049" style="word-spacing:0px;letter-spacing:0px" font-weight="bold" xml:space="preserve" font-size="13px" y="349.00769" x="19.374546" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4051" x="19.374546" y="349.00769">New System</tspan></text>
+  <text id="text4053" style="word-spacing:0px;letter-spacing:0px" font-weight="bold" xml:space="preserve" font-size="13px" y="598.00769" x="231.37454" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4055" x="231.37454" y="598.00769">Self</tspan></text>
+  <text id="text4057" style="word-spacing:0px;letter-spacing:0px" font-weight="bold" xml:space="preserve" transform="translate(-33.625 180.32)" font-size="13px" y="56.68988" x="237" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4059" x="237" y="56.68988">The World</tspan></text>
+  <text id="text4061" style="word-spacing:0px;letter-spacing:0px" font-weight="bold" xml:space="preserve" font-size="13px" y="379.00769" x="503.37454" font-family="Verdana" line-height="125%" fill="#000000"><tspan id="tspan4063" x="503.37454" y="379.00769">Existing System</tspan></text>
+ </g>
+</svg>

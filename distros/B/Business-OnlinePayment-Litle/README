@@ -1,0 +1,506 @@
+NAME
+
+    Business::OnlinePayment::Litle - Business::OnlinePayment::Litle -
+    Vantiv (was Litle & Co.) Backend for Business::OnlinePayment
+
+VERSION
+
+    version 0.955
+
+SYNOPSIS
+
+    This is a plugin for the Business::OnlinePayment interface. Please
+    refer to that documentation for general usage, and here for Vantiv
+    specific usage.
+
+    In order to use this module, you will need to have an account set up
+    with Vantiv http://www.vantiv.com/
+
+    Originally created for the Litle & Co. API, which became a part of the
+    Vantiv corporation.
+
+      use Business::OnlinePayment;
+      my $tx = Business::OnlinePayment->new(
+         "Litle",
+         default_Origin => 'NEW',
+      );
+    
+      $tx->content(
+          type           => 'CC',
+          login          => 'testdrive',
+          password       => '123qwe',
+          action         => 'Normal Authorization',
+          description    => 'FOO*Business::OnlinePayment test',
+          amount         => '49.95',
+          customer_id    => 'tfb',
+          name           => 'Tofu Beast',
+          address        => '123 Anystreet',
+          city           => 'Anywhere',
+          state          => 'UT',
+          zip            => '84058',
+          card_number    => '4007000000027',
+          expiration     => '09/02',
+          cvv2           => '1234', #optional
+          invoice_number => '54123',
+      );
+      $tx->submit();
+    
+      if($tx->is_success()) {
+          print "Card processed successfully: ".$tx->authorization."\n";
+      } else {
+          print "Card was rejected: ".$tx->error_message."\n";
+      }
+
+METHODS
+
+ result_code
+
+    Returns the response error code.
+
+ error_message
+
+    Returns the response error description text.
+
+ is_duplicate
+
+    Returns 1 if the request was a duplicate, 0 otherwise
+
+ card_token
+
+    Return the card token if present. You will need to have the card
+    tokenization feature enabled for this feature to make sense.
+
+ card_token_response
+
+    Return the Litle specific response code for the tokenization request
+
+ card_token_message
+
+    Return the Litle human readable response to the tokenization request
+
+ server_request
+
+    Returns the complete request that was sent to the server. The request
+    has been stripped of card_num, cvv2, and password. So it should be safe
+    to log.
+
+ server_request_dangerous
+
+    Returns the complete request that was sent to the server. This could
+    contain data that is NOT SAFE to log. It should only be used in a test
+    environment, or in a PCI compliant manner.
+
+ server_response
+
+    Returns the complete response from the server. The response has been
+    stripped of card_num, cvv2, and password. So it should be safe to log.
+
+ server_response_dangerous
+
+    Returns the complete response from the server. This could contain data
+    that is NOT SAFE to log. It should only be used in a test environment,
+    or in a PCI compliant manner.
+
+ action
+
+    The following actions are valid
+
+      normal authorization
+      authorization only
+      post authorization
+      credit
+      void
+
+ Fields
+
+    Most data fields not part of the BOP standard can be added to the
+    content hash directly, and will be used
+
+    Most data fields will truncate extra characters to conform to the Litle
+    XML length requirements. Some fields (mostly amount fields) will error
+    if your data exceeds the allowed length.
+
+ Products
+
+    Part of the enhanced data for level III Interchange rates
+
+        products        =>  [
+        {   description =>  'First Product',
+            sku         =>  'sku',
+            quantity    =>  1,
+            units       =>  'Months'
+            amount      =>  '5.00',
+            discount    =>  0,
+            code        =>  1,
+            cost        =>  '5.00',
+        },
+        {   description =>  'Second Product',
+            sku         =>  'sku',
+            quantity    =>  1,
+            units       =>  'Months',
+            amount      =>  1500,
+            discount    =>  0,
+            code        =>  2,
+            cost        =>  '5.00',
+        }
+    
+        ],
+
+ _info
+
+    Return the introspection hash for BOP 3.x
+
+ set_defaults
+
+ test_transaction
+
+    Get/set the server used for processing transactions. Possible values
+    are Live, Certification, and Sandbox Default: Live
+
+      #Live
+      $self->test_transaction(0);
+    
+      #Certification
+      $self->test_transaction(1);
+    
+      #Sandbox
+      $self->test_transaction('sandbox');
+    
+      #Read current value
+      $val = $self->test_transaction();
+
+ map_fields
+
+ format_misc_field
+
+    A new method not directly supported by BOP. Used internally to
+    guarantee that XML data will conform to the Litle spec. field - The
+    hash key we are checking against maxLen - The maximum length allowed
+    (extra bytes will be truncated) minLen - The minimum length allowed
+    errorOnLength - boolean 0 - truncate any extra bytes 1 - error if the
+    length is out of bounds isRequired - boolean 0 - ignore undefined
+    values 1 - error if the value is not defined
+
+     $tx->format_misc_field( \%content, [field, maxLen, minLen, errorOnLength, isRequired] );
+     $tx->format_misc_field( \%content, ['amount',   0,     12,             0,          0] );
+
+ format_amount_field
+
+    A new method not directly supported by BOP. Used internally to change
+    amounts from the BOP "5.00" format to the format expected by Litle
+    "500"
+
+    $tx->format_amount_field( \%content, 'amount' );
+
+ format_phone_field
+
+    A new method not directly supported by BOP. Used internally to strip
+    invalid characters from phone numbers. IE "1 (800).TRY-THIS" becomes
+    "18008788447"
+
+    $tx->format_phone_field( \%content, 'company_phone' );
+
+ map_request
+
+    Converts the BOP data to something that Litle can use.
+
+ chargeback_retrieve_support_doc
+
+    A new method not directly supported by BOP. Retrieve a currently
+    uploaded file
+
+     $tx->content(
+      login       => 'testdrive',
+      password    => '123qwe',
+      merchantid  => '123456',
+      case_id     => '001',
+      filename    => 'mydoc.pdf',
+     );
+     $tx->chargeback_retrieve_support_doc();
+     $myFileData = $tx->{'fileContent'};
+
+ chargeback_delete_support_doc
+
+    A new method not directly supported by BOP. Delete a currently uploaded
+    file. Follows the same format as chargeback_retrieve_support_doc
+
+ chargeback_upload_support_doc
+
+    A new method not directly supported by BOP. Upload a new file
+
+     $tx->content(
+      login       => 'testdrive',
+      password    => '123qwe',
+      merchantid  => '123456',
+      case_id     => '001',
+      filename    => 'mydoc.pdf',
+      filecontent => $binaryPdfData,
+      mimetype    => 'application/pdf',
+     );
+     $tx->chargeback_upload_support_doc();
+
+ chargeback_replace_support_doc
+
+    A new method not directly supported by BOP. Replace a previously
+    uploaded file. Follows the same format as chargeback_upload_support_doc
+
+ chargeback_list_support_docs
+
+    A new method not directly supported by BOP. Return a hashref that
+    contains a list of files that already exist on the server.
+
+     $tx->content(
+      login       => 'testdrive',
+      password    => '123qwe',
+      merchantid  => '123456',
+      case_id     => '001',
+     );
+     my $ret = $tx->chargeback_list_support_docs();
+
+    Currently this returns in this format
+
+     $ret = {
+       'file1' => {},
+       'file2' => {},
+     };
+
+    Litle does not currently send any file attributes. However the hash is
+    built for future expansion.
+
+ add_item
+
+    A new method not directly supported by BOP. Interface to adding
+    multiple entries, so we can write and interface with batches
+
+     my %content = (
+       action          =>  'Account Update',
+       card_number     =>  4111111111111111,
+       expiration      =>  1216,
+       customer_id     =>  $card->{'uid'},
+       invoice_number  =>  123,
+       type            =>  'VI',
+       login           =>  $merchant->{'login'},
+     );
+     $tx->add_item( \%content );
+
+ create_batch
+
+    A new method not directly supported by BOP. Send the current batch to
+    Litle.
+
+     $tx->add_item( $item1 );
+     $tx->add_item( $item2 );
+     $tx->add_item( $item3 );
+    
+     my $opts = {
+      login       => 'testdrive',
+      password    => '123qwe',
+      merchantid  => '123456',
+      batch_id    => '001',
+      method      => 'https', # sftp or https
+      ftp_username=> 'fred',
+      ftp_password=> 'pancakes',
+     };
+    
+     $tx->content();
+    
+     $tx->create_batch( %$opts );
+
+ send_rfr
+
+    A new method not directly supported by BOP.
+
+ retrieve_batch_list
+
+    A new method not directly supported by BOP. Get a list of available
+    batch result files.
+
+     my $opts = {
+      ftp_username=> 'fred',
+      ftp_password=> 'pancakes',
+     };
+    
+     my $ret = $tx->retrieve_batch( %$opts );
+     my @filelist = @$ret if $tx->is_success;
+
+ retrieve_batch_delete
+
+    A new method not directly supported by BOP. Delete a batch from Litle.
+
+     my $opts = {
+      login       => 'testdrive',
+      password    => '123qwe',
+      batch_id    => '001',
+      ftp_username=> 'fred',
+      ftp_password=> 'pancakes',
+     };
+    
+     $tx->retrieve_batch_delete( %$opts );
+
+ retrieve_batch
+
+    A new method not directly supported by BOP. Get a batch from Litle.
+
+     my $opts = {
+      login       => 'testdrive',
+      password    => '123qwe',
+      batch_id    => '001',
+      batch_return=> '', # If present, this will be used instead of downloading from Litle
+      ftp_username=> 'fred',
+      ftp_password=> 'pancakes',
+     };
+    
+     $tx->content();
+    
+     $tx->retrieve_batch( %$opts );
+
+ chargeback_activity_request
+
+    Return a arrayref that contains a list of
+    Business::OnlinePayment::Litle::ChargebackActivityResponse objects
+
+     $tx->content(
+      login         => 'testdrive',
+      password      => '123qwe',
+      activity_date => '2012-04-30',
+     );
+    
+     my $ret = $tx->chargeback_activity_request();
+
+ chargeback_update_request
+
+    Return a arrayref that contains a list of
+    Business::OnlinePayment::Litle::ChargebackActivityResponse objects
+
+     $tx->content(
+      login                => 'testdrive',
+      password             => '123qwe',
+      case_id              => '1600010045',
+      merchant_activity_id => '1555',
+      activity             => 'Merchant Accepts Liability',
+     );
+    
+     $tx->chargeback_update_request();
+    
+     $tx->result_code(); # 0 - success, 1 invalid xml
+     $tx->error_message(); # Text version of the error message, if any
+     $tx->phoenixTxnId(); # Unique identifier provided by Litle.
+     $tx->is_success(); # Boolean, did the request work
+
+METHODS AND FUNCTIONS
+
+    See Business::OnlinePayment for the complete list. The following
+    methods either override the methods in Business::OnlinePayment or
+    provide additional functions.
+
+Handling of content(%content) data:
+
+Litle specific data
+
+SPECS
+
+    Currently uses the Litle XML specifications version 8.12 and chargeback
+    version 2.2
+
+TESTING
+
+    In order to run the provided test suite, you will first need to apply
+    and get your account setup with Litle. Then you can use the test
+    account information they give you to run the test suite. The scripts
+    will look for three environment variables to connect: BOP_USERNAME,
+    BOP_PASSWORD, BOP_MERCHANTID
+
+    Currently the description field also uses a fixed descriptor. This will
+    possibly need to be changed based on your arrangements with Litle.
+
+CUSTOM LOG SCRUBBING FUNCTION
+
+    The default card scrubbing leaves the first 6 and last 4 of the card
+    number for logging.
+
+    If you want to provide your own card number scrubber code ref, pass in
+    the default_Scrubber option to the constructor. It takes the card
+    number as the first parameter and should return the masked version.
+
+      my $tx = Business::OnlinePayment->new(
+         "Litle",
+         default_Origin => 'NEW',
+         default_Scrubber => sub {
+             return substr($_[0],-4,4);
+         }
+      );
+
+FUNCTIONS
+
+UNIMPLEMENTED
+
+    Certain features are not yet implemented (no current personal business
+    need), though the capability of support is there, and the test data for
+    the verification suite is there.
+
+        Force Capture
+        Capture Given Auth
+        3DS
+        billMeLater
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-business-onlinepayment-litle at rt.cpan.org. I will be notified,
+    and then you'll automatically be notified of progress on your bug as I
+    make changes.
+
+    You may also add to the code via github, at
+    http://github.com/Jayceh/Business--OnlinePayment--Litle.git
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::OnlinePayment::Litle
+
+    You can also look for information at:
+
+    http://www.vantiv.com/
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Business-OnlinePayment-Litle
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Business-OnlinePayment-Litle
+
+ACKNOWLEDGMENTS
+
+    Heavily based on Jeff Finucane's l<Business::OnlinePayment::IPPay>
+    because it also required dynamically writing XML formatted docs to a
+    gateway.
+
+SEE ALSO
+
+    perl(1). Business::OnlinePayment
+
+AUTHOR
+
+    Jason Hall <jayce@cpan.org>
+
+CONTRIBUTORS
+
+      * Daina Pettit <dpettit@bluehost.com>
+
+      * David Bartle <captindave@gmail.com>
+
+      * Jason Hall <jayce@jaycehall.com>
+
+      * Jason (Jayce^) Hall <jayce@lug-nut.com>
+
+      * Jason Terry <oaxlin@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Jason Hall.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

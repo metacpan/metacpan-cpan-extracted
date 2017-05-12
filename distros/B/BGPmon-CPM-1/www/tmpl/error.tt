@@ -1,0 +1,6 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Error'; %]
+
+<p>Error: [% MESSAGE %]</p>
+<p>Please click <a style="color: #000000" href="cpm_workflow.cgi?action=welcome">here</a> to start over</p> 
+
+[% INCLUDE footer.html %]

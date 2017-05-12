@@ -1,0 +1,27 @@
+=encoding utf8
+
+=head1 NAME
+
+Bio::Grid::Run::SGE::ClusterScript - Write cluster scripts for Bio::Grid::Run::SGE
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 L<Bio::Grid::Run::SGE> SCRIPT FILE STRUCTURE
+
+=head3 Run stuff before the job is started (pre_task)
+
+=head3 Run the job (task)
+
+=head4 Input data 
+
+=head3 Run stuff after the job finished (post_task)
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+jw bargsten, C<< <wissenschaft at bargsten dot org> >>
+
+=cut

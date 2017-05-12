@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Bot/Training/MegaHAL.pm
+share/megahal.trn
+t/00-compile.t
+t/release-pod-syntax.t

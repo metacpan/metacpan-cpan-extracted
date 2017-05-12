@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Bundle/ExCore.pm
+lib/Bundle/ExCore/Perl5012.pm
+lib/Bundle/ExCore/Perl5018.pm
+lib/Bundle/ExCore/Perl5020.pm
+t/00_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,0 +1,17 @@
+MAGE/XML/Handler.pm
+MAGE/XML/Handler/ContentHandler.pm
+MAGE/XML/Handler/DocumentHandler.pm
+MAGE/XML/Handler/ObjectHandler/SQL.pm
+MAGE/XML/Handler/ObjectHandlerI.pm
+MAGE/XML/Reader.pm
+MAGE/XML/Writer.pm
+MAGE/XMLUtils.pm
+MAGE/Tools/MGEDOntologyClassEntry.pm
+MAGE/Tools/MGEDOntologyEntry.pm
+MAGE/Tools/MGEDOntologyHelper.pm
+MAGE/Tools/MGEDOntologyPropertyEntry.pm
+MAGE/SQLUtils.pm
+
+MANIFEST
+Makefile.PL
+META.yml                                 Module meta-data (added by MakeMaker)

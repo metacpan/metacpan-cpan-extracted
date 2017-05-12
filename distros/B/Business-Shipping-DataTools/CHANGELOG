@@ -1,0 +1,32 @@
+Revision history for Business::Shipping::DataTools
+=================================================
+
+1.01
+
+
+ * Upgrade encoding-handler code to deal with all the new additions in 2006.
+
+ * Handle the addition of country codes by removing them (for now). 
+
+ * Update download url.
+ 
+ * UPS moved some files around.
+
+ * UPS finally got around to fixing the following files that were in binary
+   MS Excel format: akz_48.csv akz_air.csv hiz_48pr.csv hiz_ak.csv hiz_hi.csv.
+
+ * New script to help find good (and by exclusion, the bad) characters in 
+   the data files.
+   
+
+1.00  Sep 16 2005  
+
+
+ * Add tier 3 for ground hundredweight. 
+
+ 
+0.01  Sep 14 2004
+
+
+ * Initial revision
+

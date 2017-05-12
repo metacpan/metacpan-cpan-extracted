@@ -1,0 +1,26 @@
+Bundle::LWP5_837 0.01
+
+Bundle listing just LWP version 5.837
+
+LWP version 6 requires perl 5.8.8 or higher.  If your  modules  still
+run on 5.8.7 or lower and you want installation to be  seamless,  you
+can use this single-distribution bundle to install the  previous  ver-
+sion (5.837) on older perls.
+
+Just put something like this in your Makefile.PL:
+
+  ...
+  PREREQ_PM => {
+    $] < 5.008008 && !eval{require LWP} ? ( 'Bundle::LWP5_837' => 0 )
+                                        : (  LWP               => 0 )
+  }
+  ...
+
+COPYRIGHT AND LICENCE
+
+(For this tiny bundle of course, not for LWP)
+
+Copyright © 2011 Father Chrysostomos
+
+This program is free software;  you may redistribute it, modify it or
+both under the same terms as perl.

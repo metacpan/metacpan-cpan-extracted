@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Bio-DOOP-DOOP
+version:             1.04
+abstract:            DOOP API main module
+license:             ~
+author:              
+    - Tibor Nagy <buldozer88@hotmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    DBI:                           1.52
+    GD:                            2.35
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

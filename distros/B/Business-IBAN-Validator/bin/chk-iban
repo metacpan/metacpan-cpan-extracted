@@ -1,0 +1,38 @@
+#! /usr/bin/perl -w
+use strict;
+
+use Business::IBAN::Validator;
+use Pod::Usage;
+
+pod2usage(verbose => 1) if !@ARGV;
+pod2usage(verbose => 1) if grep /^-h|--help$/, @ARGV;
+
+my $v = Business::IBAN::Validator->new();
+
+for my $iban (@ARGV) {
+    eval { $v->validate($iban) };
+    if ($@) {
+        print "$iban: $@";
+    }
+    else {
+        printf "%s: looks ok (%s)\n", $iban, $v->is_sepa($iban) ? 'SEPA' : 'Not SEPA'
+    }
+}
+
+=head1 NAME
+
+chk-iban - Validate the structure of IBANs.
+
+=head1 SYNOPSIS
+
+   $ chk-iban [-h|--help] iban ...
+
+=head1 OPTIONS
+
+  --help|-h       - This message
+
+=head1 STUFF
+
+(c) MMXIII - Abe Timmerman <abeltje@cpan.org>
+
+=cut

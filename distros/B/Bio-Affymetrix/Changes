@@ -1,0 +1,19 @@
+(Rough) Revision history for Perl extension Bio::Affymetrix.
+
+Please note that all versions < 1 are beta- check your results carefully!
+
+0.1: 
+Initial version
+
+0.2: 
+Can now parse GCOS v1.2 CDF files. 
+CDF writing from MAS5 CDF files now supported. 
+Probeset/Probe interface changed. You can now edit the probes, and
+write to log.
+
+0.4:
+Fix for data scrambling in CHP file parsing.
+Preliminary CEL file modules.
+
+0.5
+CEL file parsing

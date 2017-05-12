@@ -1,0 +1,23 @@
+BERT
+
+This is a perl module implementing BERT (Binary ERlang Term) serialization.
+
+See the BERT specification at <http://bert-rpc.org/>.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+AUTHOR
+
+Sherwin Daganato <sherwin@daganato.com>
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

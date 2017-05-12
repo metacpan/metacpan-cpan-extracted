@@ -1,0 +1,19 @@
+# example cnf file for LocusLink
+
+name=RefGene
+module=RefGene
+version=rn3
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://hgdownload.cse.ucsc.edu/goldenPath/
+ftp_files=rn3/database/Hs.refGene.txt
+
+label=Refseq_ID, dotset=RefGene_ID
+label=Strand, dotset=Strand
+label=Chromosome, dotset=Chromosome
+label=Transcription_start, dotset=Genomic_location
+label=Transcription_end, dotset=Genomic_location
+label=Coding_start, dotset=Genomic_location
+label=Coding_end, dotset=Genomic_location

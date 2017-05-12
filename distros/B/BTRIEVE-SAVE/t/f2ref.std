@@ -1,0 +1,44 @@
+
+File Manager Version 6.15
+Copyright 1982 - 1995, Btrieve Technologies, Inc.
+All Rights Reserved.
+
+File Statistics for CC057.BIB
+
+File Version = 6.10
+Page Size = 2048
+Page Preallocation = No
+Key Only = No
+
+Total Number of Records = 8
+Record Length = 14
+Data Compression = No
+Variable Records = Yes
+   Variable-Tail Allocation Tables = No
+   Blank Truncation = No
+Free Space Threshold = 5%
+
+Available Linked Duplicate Keys = 0
+Balanced Key = Yes
+Total Number of Keys = 23
+Total Number of Segments = 23
+
+Key         Position        Type            Null Values*               ACS
+    Segment          Length           Flags              Unique Values     Langname
+  0    1         1       8  Zstring             --                 8    --  yyyymmdd
+  1    1         9       6  Zstring    I MD     --                 8    --  hhmmss           
+
+
+Legend:									    
+ < = Descending Order							    
+ D = Duplicates Allowed
+ I = Case Insensitive
+ M = Modifiable
+ R = Repeat Duplicate
+ A = Any Segment (Manual)
+ L = All Segments (Null)
+ * = The values in this column are hexadecimal.
+?? = Unknown
+-- = Not Specified
+
+The command completed successfully.

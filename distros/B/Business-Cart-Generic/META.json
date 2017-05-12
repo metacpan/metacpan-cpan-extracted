@@ -1,0 +1,339 @@
+{
+   "abstract" : "Basic shopping cart",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-Cart-Generic",
+   "no_index" : {
+      "directory" : [
+         "lib/Business/Cart/Generic/Schema/"
+      ],
+      "file" : [
+         "lib/Business/Cart/Generic/Schema.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Pod" : "1.44"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Brannigan" : "0.8",
+            "CGI" : "3.52",
+            "CGI::Application" : "4.31",
+            "CGI::Untaint" : "1.26",
+            "Config::Tiny" : "2.13",
+            "DBIx::Admin::CreateTable" : "2.07",
+            "DBIx::Class" : "0.08121",
+            "DBIx::Class::Schema::Loader" : "0.06001",
+            "DBIx::Connector" : "0.42",
+            "Data::Session" : "1.03",
+            "File::Copy" : "2.18",
+            "File::HomeDir" : "0.97",
+            "FindBin" : "1.5",
+            "IO::File" : "1.14",
+            "JSON::XS" : "2.3",
+            "Log::Handler::Output::DBI" : "0.11",
+            "Moose" : "0.98",
+            "Path::Class" : "0.23",
+            "Perl6::Slurp" : "0.03",
+            "Text::CSV_XS" : "0.8",
+            "Text::Xslate" : "1.0007",
+            "Try::Tiny" : "0.09",
+            "WWW::Scraper::Wikipedia::ISO3166::Database" : "1.01",
+            "namespace::autoclean" : "0.09",
+            "parent" : "0.224"
+         }
+      }
+   },
+   "provides" : {
+      "Business::Cart::Generic" : {
+         "file" : "lib/Business/Cart/Generic.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Base" : {
+         "file" : "lib/Business/Cart/Generic/Base.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Controller" : {
+         "file" : "lib/Business/Cart/Generic/Controller.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Controller::Initialize" : {
+         "file" : "lib/Business/Cart/Generic/Controller/Initialize.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Controller::Order" : {
+         "file" : "lib/Business/Cart/Generic/Controller/Order.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Controller::Search" : {
+         "file" : "lib/Business/Cart/Generic/Controller/Search.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database" : {
+         "file" : "lib/Business/Cart/Generic/Database.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Base" : {
+         "file" : "lib/Business/Cart/Generic/Database/Base.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Create" : {
+         "file" : "lib/Business/Cart/Generic/Database/Create.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Export" : {
+         "file" : "lib/Business/Cart/Generic/Database/Export.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Import" : {
+         "file" : "lib/Business/Cart/Generic/Database/Import.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Loader" : {
+         "file" : "lib/Business/Cart/Generic/Database/Loader.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Order" : {
+         "file" : "lib/Business/Cart/Generic/Database/Order.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Product" : {
+         "file" : "lib/Business/Cart/Generic/Database/Product.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Database::Search" : {
+         "file" : "lib/Business/Cart/Generic/Database/Search.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Schema" : {
+         "file" : "lib/Business/Cart/Generic/Schema.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Category" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Category.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::CategoryDescription" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/CategoryDescription.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Country" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Country.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Currency" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Currency.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Customer" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Customer.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::CustomerStatuse" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/CustomerStatuse.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::CustomerType" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/CustomerType.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::EmailAddress" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/EmailAddress.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::EmailAddressType" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/EmailAddressType.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::EmailList" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/EmailList.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Gender" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Gender.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Language" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Language.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Log" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Log.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Logon" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Logon.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Manufacturer" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Manufacturer.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ManufacturersInfo" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ManufacturersInfo.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Order" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Order.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::OrderHistory" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/OrderHistory.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::OrderItem" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/OrderItem.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::OrderStatuse" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/OrderStatuse.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::PaymentMethod" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/PaymentMethod.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::PhoneList" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/PhoneList.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::PhoneNumber" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/PhoneNumber.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::PhoneNumberType" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/PhoneNumberType.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Product" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Product.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductClass" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductClass.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductColor" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductColor.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductDescription" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductDescription.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductSize" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductSize.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductStatuse" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductStatuse.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductStyle" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductStyle.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductType" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductType.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::ProductsToCategory" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/ProductsToCategory.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Session" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Session.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::StreetAddress" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/StreetAddress.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::TaxClass" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/TaxClass.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::TaxRate" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/TaxRate.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Title" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Title.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::WeightClass" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/WeightClass.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::WeightClassRule" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/WeightClassRule.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::YesNo" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/YesNo.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Schema::Result::Zone" : {
+         "file" : "lib/Business/Cart/Generic/Schema/Result/Zone.pm",
+         "version" : 0
+      },
+      "Business::Cart::Generic::Util::Config" : {
+         "file" : "lib/Business/Cart/Generic/Util/Config.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Util::Logger" : {
+         "file" : "lib/Business/Cart/Generic/Util/Logger.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::Util::Validator" : {
+         "file" : "lib/Business/Cart/Generic/Util/Validator.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::View" : {
+         "file" : "lib/Business/Cart/Generic/View.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::View::Base" : {
+         "file" : "lib/Business/Cart/Generic/View/Base.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::View::Order" : {
+         "file" : "lib/Business/Cart/Generic/View/Order.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::View::Product" : {
+         "file" : "lib/Business/Cart/Generic/View/Product.pm",
+         "version" : "0.85"
+      },
+      "Business::Cart::Generic::View::Search" : {
+         "file" : "lib/Business/Cart/Generic/View/Search.pm",
+         "version" : "0.85"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "0.85"
+}

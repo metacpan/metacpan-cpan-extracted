@@ -1,0 +1,72 @@
+---
+name: Bio-Grep
+version: v0.10.6
+author:
+  - 'Markus Riester <mriester@gmx.de>'
+abstract: Perl extension for searching in DNA and Protein sequences
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+requires:
+  Bio::AlignIO: 0
+  Bio::Factory::EMBOSS: 0
+  Bio::Index::Fasta: 0
+  Bio::Root::Root: 0
+  Bio::Root::Version: 0
+  Bio::Seq: 0
+  Bio::SeqIO: 0
+  Carp::Assert: 0
+  Class::MethodMaker: 2.02
+  Getopt::Long: 2.32
+  IO::String: 1
+  IPC::Open3: 0
+  Pod::Usage: 0
+  Readonly: 0
+  ToolSet: 0.13
+  UNIVERSAL::require: 0.11
+  autodie: 0
+  perl: v5.8.1
+  version: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Bio::Grep:
+    file: lib/Bio/Grep.pm
+    version: v0.10.6
+  Bio::Grep::Backend::Agrep:
+    file: lib/Bio/Grep/Backend/Agrep.pm
+    version: v0.10.6
+  Bio::Grep::Backend::BackendI:
+    file: lib/Bio/Grep/Backend/BackendI.pm
+    version: v0.10.6
+  Bio::Grep::Backend::GUUGle:
+    file: lib/Bio/Grep/Backend/GUUGle.pm
+    version: v0.10.6
+  Bio::Grep::Backend::RE:
+    file: lib/Bio/Grep/Backend/RE.pm
+    version: v0.10.6
+  Bio::Grep::Backend::Vmatch:
+    file: lib/Bio/Grep/Backend/Vmatch.pm
+    version: v0.10.6
+  Bio::Grep::Filter::FilterI:
+    file: lib/Bio/Grep/Filter/FilterI.pm
+    version: v0.10.6
+  Bio::Grep::Filter::FilterRemoveDuplicates:
+    file: lib/Bio/Grep/Filter/FilterRemoveDuplicates.pm
+    version: v0.10.6
+  Bio::Grep::Root:
+    file: lib/Bio/Grep/Root.pm
+    version: v0.10.6
+  Bio::Grep::SearchResult:
+    file: lib/Bio/Grep/SearchResult.pm
+    version: v0.10.6
+  Bio::Grep::SearchSettings:
+    file: lib/Bio/Grep/SearchSettings.pm
+    version: v0.10.6
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

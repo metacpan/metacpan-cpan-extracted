@@ -1,0 +1,466 @@
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP: I said -Get ready for release 2.1.2
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* circle.yml: Reduce CircleCI dependendcies
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* circle.yml: Try CircleCI.yml
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Travis can't handle Perl 5.24
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm: Get ready for version 2.1.2
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Try Perl 5.24 with Travis
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20-core-520.t, t/20-deparse-524-small.t: First 5.24 test
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Try Perl 5.22 on travis
+
+2016-06-07  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, lib/B/DeparseTree.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/P524.pm: Start Perl 5.24 support
+
+2015-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit 2f5dd20fdfc5c02a21c9b211017c907d6a5efb4a Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Tue Nov 24 20:10:30 2015 -0500
+
+2015-11-24  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm: reconcile some
+	5.20 vs 5.22 differences. Gett ready for 2.1.1 release
+
+2015-11-22  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P522.pm: Some
+	5.22.0 Deparse.pm sync
+
+2015-11-22  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm: One more otherop
+	for indirop (e.g. print) DRY more.
+
+2015-11-19  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, NEWS, TODO: Add NEWS, revise TODO
+
+2015-11-19  Rocky Bernstein <rocky@cpan.org>
+
+	* example/fib.pl, example/multiline.pl,
+	lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/Printer.pm: One more
+	other op. coderef2list -> coderef2info add main2info
+
+2015-11-18  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/Common.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: More dry
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/PP.pm: Tidy a little
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml, README.md: Include 5.18 in tests. Beefier README.md
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/B/DeparseTree.pm, lib/B/DeparseTree/P520.pm: Start a
+	5.18. version
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm: One more otherop
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm: More common;
+	another other_op
+
+2015-11-17  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, lib/B/DeparseTree/Common.pm: 5.18 compatibility
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP: Get ready for release 2.0.2
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/Common.pm,
+	lib/B/DeparseTree/P522.pm: Get ready for release 2.0.2
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm,
+	t/20-core-520.t, t/20-core-522.t: DRY/common more. t: avoid testing
+	outside of 5.20 and 5.22
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm: A Type bug. DRY code
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/PP.pm: Move logops from P5xx to PP
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm: Remove some style options. Use perltidy
+	for those
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm: Bugs
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm: Misc bugs
+
+2015-11-16  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Admnistrivia
+
+2015-11-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm: Another translation bug. Move more to
+	common
+
+2015-11-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/Common.pm: More translation bugs
+
+2015-11-15  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pod: Get ready for version 2.0.1
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/PP.pm,
+	t/20-deparse-520-small.t, t/20-deparse-522-small.t: Build.PL:
+	correct dependencies; rest move out of P520 and P522
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pod: Revise POD to better describe the
+	difference between B::Deparse and B::DeparseTree.
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST: Get ready for release
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP: Get ready for release 2.0.0
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, TODO, lib/B/DeparseTree/Common.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree/PP.pm: Split more common code from P520 and P522.
+	Start file of just OP deparse routines.
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, TODO: Start TODO list
+
+2015-11-13  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: Save
+	other_ops found in _method feeding to e_method feeding to entersub
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: Minor stuff
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20-deparse-520-small.t, t/20-deparse-522-small.t: A couple more
+	tests reinstated
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20-deparse-520-small.t, t/20-deparse-522-small.t: Reinstate
+	another test
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: More
+	translation bug
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	t/20-core-520.t, t/20-core-522.t: Fix translation bugs.
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	testdata/runtests.pl: Another translation bug
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/Printer.pm: More moved
+	to Common.pm. More other_ops. Add length option to short_str
+
+2015-11-12  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: Add more
+	other_ops.
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md: Add travis badge
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST.SKIP: More Perl ignore
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* .travis.yml: Try travis
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md: README.md typo
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* README.md: Tweak README.md
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, README.md: Add README
+
+2015-11-11  Rocky Bernstein <rocky@cpan.org>
+
+	* : commit d17f6a210204cb5550f4614ce5384885d403134c Author: Rocky
+	Bernstein <rocky@cpan.org> Date:   Wed Nov 11 00:51:10 2015 -0500
+
+2015-11-10  Rocky Bernstein <rocky@cpan.org>
+
+	* MANIFEST, lib/B/DeparseTree/Common.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, lib/B/DeparseTree/Printer.pm: Start to
+	split out common files from 5.22 and 5.20 version. Add custom info
+	printing (Printer).
+
+2015-11-10  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: More other
+	ops
+
+2015-11-10  Rocky Bernstein <rocky@cpan.org>
+
+	* testdata/base/term.t, testdata/opbasic/arith.t,
+	testdata/opbasic/magic_phase.t, testdata/opbasic/qq.t: More tests
+
+2015-11-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	t/20-core-520.t, t/20-core-522.t, t/20-deparse-520-small.t,
+	t/20-deparse-522-small.t: reconcile indirop and some 522
+	inconsistancies, start 522 small test.
+
+2015-11-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm: More conversion bugs fixed
+
+2015-11-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree/P522.pm, testdata/runtests.pl: Make sure
+	B::DeparseTree::compile works.
+
+2015-11-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	t/20-core-522.t: Convert e_method(); bug in pp_scalar and pp_split
+
+2015-11-09  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm: More bugs
+
+2015-11-08  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, MANIFEST, lib/B/DeparseTree.pm,
+	lib/B/DeparseTree/P520.pm, lib/B/DeparseTree/P522.pm,
+	lib/B/DeparseTree520.pm, t/20-core-520.t, t/20-core-522.t,
+	t/20-deparse-520-small.t: Start Perl 5.22 support
+
+2015-11-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree/P520.pm,
+	lib/B/DeparseTree520.pm, t/.gitignore: Start to allow for Perl 5.22
+
+2015-11-08  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, MANIFEST, lib/B/DeparseTree.pm, t/10subclass.t,
+	t/20-core-520.t, t/20-deparse-520-small.t,
+	t/Deparse-core-5.20-good.t, t/Deparse-core-5.20.t,
+	t/Deparse-subclass.t: standard style tests. Do lexical level 2
+	tests.
+
+2015-11-08  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, t/Deparse-core-5.20-good.t: Misc bugs
+
+2015-11-07  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, t/Deparse-core-5.20-good.t,
+	t/Deparse-core-5.20.t: Add first tests
+
+2015-11-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm: Misc bugs
+
+2015-11-06  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm: indent_info removes maybe parens. Store
+	maybe parens in tree.  More aggressive about saving parents. DRY
+	info building routines.
+
+2015-11-05  Rocky Bernstein <rocky@cpan.org>
+
+	* GNUmakefile: Administrivia
+
+2015-11-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, lib/B/DeparseTree.pod: Split out pod stuff
+
+2015-11-05  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm: Add other_ops field in info to note ops that
+	are subsumed by or skipped in processing another op.
+
+2015-11-05  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, Build.PL, MANIFEST, MANIFEST.SKIP: Build stuff
+
+2015-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, t/Deparse-subclass.t: WIP convert more
+	routines to tree format
+
+2015-11-03  rocky <rb@dustyfeet.com>
+
+	* lib/B/DeparseTree.pm: WIP convert more routines to tree format
+
+2015-11-03  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm: Fixes to make num.t and pat.t deparse and
+	run ok
+
+2015-11-03  rocky <rb@dustyfeet.com>
+
+	* lib/B/DeparseTree.pm: Fixes to make num.t and pat.t deparse and
+	run ok
+
+2015-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, testdata/.gitignore, testdata/runtests.pl: 
+	Fix up unop routines, more conversions from Deparse to DeparseTree
+
+2015-11-02  rocky <rb@dustyfeet.com>
+
+	* lib/B/DeparseTree.pm, testdata/.gitignore, testdata/runtests.pl: 
+	Fix up unop routines, more conversions from Deparse to DeparseTree
+
+2015-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, testdata/runtests.pl: Bang on getting ifcond
+	working. Add program to run tests
+
+2015-11-02  rocky <rb@dustyfeet.com>
+
+	* lib/B/DeparseTree.pm, testdata/runtests.pl: Bang on getting ifcond
+	working. Add program to run tests
+
+2015-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/DeparseTree.pm, testdata/base/cond.t, testdata/base/if.t,
+	testdata/base/lex.t, testdata/base/num.t, testdata/base/pat.t,
+	testdata/base/rs.t, testdata/base/term.t, testdata/base/while.t,
+	testdata/fib.pl: More bogs and start to work on Perl standard tests
+
+2015-11-02  rocky <rb@dustyfeet.com>
+
+	* lib/B/DeparseTree.pm, testdata/base/cond.t, testdata/base/if.t,
+	testdata/base/lex.t, testdata/base/num.t, testdata/base/pat.t,
+	testdata/base/rs.t, testdata/base/term.t, testdata/base/while.t,
+	testdata/fib.pl: More bogs and start to work on Perl standard tests
+
+2015-11-02  Rocky Bernstein <rocky@cpan.org>
+
+	* example/fib.pl, lib/B/DeparseTree.pm: Fix some of the bugs in
+	indirop and compile
+
+2015-11-02  rocky <rb@dustyfeet.com>
+
+	* example/fib.pl, lib/B/DeparseTree.pm: Fix some of the bugs in
+	indirop and compile
+
+2015-11-01  Rocky Bernstein <rocky@cpan.org>
+
+	* example/fib.pl, lib/B/Deparse.pm, lib/B/DeparseTree.pm: WIP first
+	tests work
+
+2015-11-01  rocky <rb@dustyfeet.com>
+
+	* example/fib.pl, lib/B/Deparse.pm, lib/B/DeparseTree.pm: WIP first
+	tests work
+
+2015-10-30  Rocky Bernstein <rocky@cpan.org>
+
+	* example/fib.pl, example/multiline.pl: Split example
+
+2015-10-30  rocky <rb@dustyfeet.com>
+
+	* example/fib.pl, example/multiline.pl: Split example
+
+2015-10-30  Rocky Bernstein <rocky@cpan.org>
+
+	* lib/B/Deparse.pm: WIP start to add -c for COP address and working
+	with lists
+
+2015-10-30  rocky <rb@dustyfeet.com>
+
+	* lib/B/Deparse.pm: WIP start to add -c for COP address and working
+	with lists
+
+2015-10-30  Rocky Bernstein <rocky@cpan.org>
+
+	* example/multiline.pl, lib/B/Deparse.pm: Original B::Deparse + 1
+	little example
+
+2015-10-30  rocky <rb@dustyfeet.com>
+
+	* Original B::Deparse + 1 little example
+

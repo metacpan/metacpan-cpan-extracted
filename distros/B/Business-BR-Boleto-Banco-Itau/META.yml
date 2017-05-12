@@ -1,0 +1,22 @@
+---
+abstract: 'Implementação das particularidades de boletos do Banco Itau'
+author:
+  - 'Blabos de Blebe <blabos@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-BR-Boleto-Banco-Itau
+requires:
+  Business::BR::Boleto::Role::Banco: '0.000001'
+  Business::BR::Boleto::Utils: '0.000001'
+  Moo: '1.006000'
+resources:
+  bugtracker: https://github.com/blabos/Business-BR-Boleto-Banco-Itau/issues
+  repository: https://github.com/blabos/Business-BR-Boleto-Banco-Itau
+version: '0.000001'

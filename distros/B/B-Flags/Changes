@@ -1,0 +1,84 @@
+Revision history for Perl extension B::Flags.
+
+0.16  2016-02-04 rurban
+	- fix duplicate UTF8 and IsUV
+
+0.15  2015-11-10 rurban
+	- add B::PADLIST support and tests
+        - add typed padname tests
+        - replace EVALED with TYPED for PVMG.
+          EVALED is only defined for rhs regexp.
+        - remove PADNAME, there is no such flag
+        - add NAMELIST for SVpad_NAMELIST with 5.20 only
+        - split AvFLAGS from SvFLAGS only where AvFLAGS are seperated
+          (5.6 - 5.8)
+
+0.14  2015-09-24 rurban
+	- add B::PADNAMELIST and B::PADNAME support and tests
+
+0.13  2015-04-27 rurban
+	- add HUSH_VMSISH
+        - add -DPERL_OP_PARENT support, replace MORESIB and LASTSIB by SIBLING.
+          SIBLING appears now in <5.22 perl ops also as flag, even if it's a pointer,
+          to be consistent with 5.22.
+        - protect against B::NULL
+        - add README, release and test_cover make targets
+
+0.12  2015-04-27 rurban
+        - add more new 5.21.11 flags: MORESIB (Mathieu Arnold)
+        - but no -DPERL_OP_PARENT support yet.
+
+0.11  2014-12-03 rurban
+        - add some new 5.21 flags: LASTSIB, PROTECT
+        - fix test for 5.21.7, no PAD* flags anymore on lexical AVs
+	- tested from 5.6.2 up to 5.21.7
+
+0.10  2013-09-05 10:56:58 rurban
+        - align with core dump.c
+        - rename COW to IsCOW
+	- fix wrong PCS_IMPORTED flag
+        - dont print THINKFIRST on IsCOW
+
+0.09  2013-09-03 10:12:08 rurban@cpan.org
+	- protect SvTAIL from SvSCREAM variables
+        - enable PVMG vars default flags: EVALED,IsUV,UTF8
+
+0.08  2013-08-28 16:50:50 rurban@cpan.org
+	- fix wrong PCS_IMPORTED flag
+        - added gpg signature
+
+0.07  2013-08-28 11:40:39 rurban@cpan.org
+	- add to B::SV::flagspv: COW, THINKFIRST, PADNAME, PADNAMELIST,
+	  TYPED, OUR, STATE
+        - add bits to B::OP::flagspv: OPT, LATEFREE, LATEFREED, ATTACHED,
+	  SLABBED, SAVEFREE, STATIC, FOLDED
+
+0.06  2012-03-06 rurban@cpan.org
+	- fix heap-buffer-overflow detected by address-sanitizer
+	  with empty sv->flagspv
+
+0.05  2011-12-15 rurban@cpan.org
+	- fix for apple clang 1.7 (LLVM 2.9svn), works okay with clang 3.1
+
+0.04  2010-09-11 rurban@cpan.org
+	- add doc for the methods
+        - new optional type argument for SV->flagspv
+          to seperate between sv->FLAGS and special
+          AvFLAGS, GvFLAGS, CvFLAGS, ...
+          type 0 is for SvFLAGS only.
+        - fix OP_IS_FILETEST_ACCESS arg
+        - convert tests to Test::More
+
+0.03  Thu Jul 29 19:33:20 2010 rurban@cpan.org
+	- updates for 5.14
+	- several new svflags
+	- set PROTOTYPE: DISABLE
+
+0.02  2008-03-02 22:11:08 rurban@cpan.org
+	- updates for 5.10 and 5.11@33408
+	- prefixed op want flags with "WANT_"
+
+0.01  Sun May 13 19:35:25 2001
+	- original version; created by h2xs 1.20 with options
+		-A -n B::Flags
+

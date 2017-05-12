@@ -1,0 +1,26 @@
+Name
+    Binary::Heap::Search - Binary search-able heap in 100% Pure Perl
+
+Synopsis
+Installation
+    This module is written in 100% Pure Perl and is thus easy to read,
+    modify and install.
+
+    Standard Module::Build process for building and installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+Author
+    philiprbrenan@gmail.com
+
+    http://www.appaapps.com
+
+Copyright
+    Copyright (c) 2017 Philip R Brenan.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

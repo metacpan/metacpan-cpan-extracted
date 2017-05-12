@@ -1,0 +1,124 @@
+2.0       2014-02-28 16:59:46EST-0500 EST5EDT
+
+1.10      2014-02-28 16:55:28EST-0500 EST5EDT
+
+ * Removed dependency on forking and IO::Pipe for handling implicit
+   FASTA section starts.  Should fix problems on Windows.  Thanks to
+   Francisco Ossandon for the fix!
+
+1.9       2014-01-20 13:05:18EST-0500 EST5EDT
+
+ * Added a check in the Parser to make sure that all lines that share
+   a single ID have the same type.
+
+1.8       2013-10-28 10:57:26 EST5EDT
+
+ * Fixed a bug in which feature lines with no ID, Parent, or
+   Derives_from attributes were being returned as a bare hashref
+   instead of a single-element arrayref as they should be.
+
+1.7       2013-10-02 15:49:40 EST5EDT
+
+ * Added `max_lookback` method to Parser, allowing applications to set
+   a maximum number of features to be stored in case they might be
+   referenced by features coming later in the file.  Can make it
+   possible to parse GFF3 that does not contain enough '###'
+   directives.
+
+1.6       2013-07-26 11:24:16 EST5EDT
+
+ * Improved the error message for when references between features
+   cannot be resolved.  Instead of just Data::Dumper-ing the data
+   structure, prints a formatted report of which references could not
+   be resolved.
+
+1.5       2012-12-14 12:40:58 America/New_York
+
+ * Added minimum Test::More version of 0.88 to tests.
+
+1.4       2012-08-28 15:09:51 America/New_York
+
+ * Fix 1.0-backcompat crashing bug for GFF3 files with multi-location features.
+
+1.3       2012-04-25 09:52:00 America/New_York
+
+ * Correct synopsis section of Bio::GFF3::LowLevel::Parser.
+
+1.2       2012-04-13 17:47:29 America/New_York
+
+ * Removed unnecessary dependency on
+   Bio::GFF3::Transform::SyncDirectives that was causing installation
+   problems.
+
+1.1       2012-04-13 01:32:21 America/New_York
+
+ * Changed the default API of Bio::GFF3::LowLevel::Parser to support
+   multi-loc features.  In order to be able to group feature lines
+   that hand in some cases it would not be possibleave the same ID
+   attribute, it now returns arrayrefs that are groups of the
+   formerly-returned hashrefs.
+
+ * HOWEVER, there is a backward-compatibility layer that back-converts
+   the features to the conform to the return types in 1.1.  Existing
+   users of this code should not be adversely affected.
+
+ * Add better support for Derives_from: feature line hashrefs now have
+   a derived_features attribute holding an arrayref of the features
+   that Derives_from this one.
+
+ * Remove assumptions in the parser about child features coming after
+   their parents in the file.  The GFF3 specification does not require
+   this.
+
+1.0       2012-03-21 00:51:41 America/Los_Angeles
+
+ * made parsing twice as fast as version 0.9, thanks to Devel::NYTProf
+ * fix bad bug with dropping the last few features in files with sync
+   directives
+
+0.9       2012-03-20 20:26:04 America/Los_Angeles
+
+ * write the missing documentation
+ * make all features have child_features, for convenience
+ * strip whitespace from the end of comments before returning them
+
+0.8       2012-03-20 17:24:50 America/Los_Angeles
+
+ * bugfix to handling of windows line-endings: parsers now remove them
+   regardless of the platform on which we are running.
+ * add gff3_parse_directive function to Bio::GFF3::LowLevel
+
+0.7       2011-10-05 14:01:47 America/Los_Angeles
+
+ * when formatting GFF3 attributes, force ID, Name, Alias, and Parent
+   to be printed first.
+
+0.6       2011-09-21 15:22:06 America/Los_Angeles
+
+ * when formatting GFF3 attributes, don't print attributes with no
+   value
+
+0.5       2011-06-08 13:04:39 America/Los_Angeles
+
+ * tweak syncdirectives transform to hopefully work on win32
+
+0.4       2011-04-26 14:45:29 America/Los_Angeles
+
+ * fix tests for older perls
+
+0.3       2011-04-21 16:39:27 America/Los_Angeles
+
+ * fixed bug in SyncDirectives (gff3_insert_sync_directives)
+   transform, did not work if the file contained trailing tabs.
+ * added Bio::GFF3::Transform::FromFasta, which can make gff3 from
+   fasta
+
+0.2       2011-03-08 15:43:01 America/New_York
+
+ * squash some warnings in LowLevel.pm
+ * add -i (in-place) option to gff3_insert_sync_directives
+   command-line script
+
+0.01   2011-02-23 23:45 America/Los_Angeles
+
+ * initial release

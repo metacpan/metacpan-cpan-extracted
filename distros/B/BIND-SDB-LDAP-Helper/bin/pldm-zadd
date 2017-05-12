@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use BIND::SDB::LDAP::Helper;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "pldm-zadd 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-c <config>  A config file.\n".
+			  "-d  Only add a DC structure object.\n".
+			  "-e <email address>  The email address for the one responsible for the zone.\n".
+			  "-E <expire time>  The expire time for the SOA.\n".
+			  "-n <name servers>  This is a comma seperated list of name servers.\n".
+			  "-m <minimum time>  This is the minimum time for the SOA.\n".
+			  "-r <retry time>  This is the retry time for the SOA.\n".
+			  "-R <refresh time>  This is the refresh time for the SOA.\n".
+			  "-t <ttl>  This is the TTL for the zone.\n".
+			  "-z <zone>  This is the zone to add.\n";
+
+		exit 1;
+}
+
+#gets the options
+my %opts=();
+getopts('c:de:E:n:m:r:R:t:z:', \%opts);
+
+#init it
+my $pldm=BIND::SDB::LDAP::Helper->new({configfile=>$opts{c}});
+if ($pldm->{error}) {
+	exit $pldm->{error};
+}
+
+#adds the DC structure only
+if ($opts{d}) {
+	$pldm->addZoneDC($opts{z});
+	if ($pldm->{error}) {
+		exit $pldm->{error};
+	}
+	exit 0;
+}
+
+my @NSs=split(/\,/, $opts{n});
+
+$pldm->addZone({
+				zone=>$opts{z},
+				email=>$opts{e},
+				ns=>\@NSs,
+				ttl=>$opts{t},
+				expire=>$opts{E},
+				minimum=>$opts{m},
+				refresh=>$opts{R},
+				retry=>$opts{r},
+				});
+
+exit 0;
+
+=head1 NAME
+
+pldm-zadd - Adds a new zone in LDAP.
+
+=head1 SYNOPSIS
+
+pldm-zadd [B<-c> <config>] [B<-d>] B<-z> <zone>
+
+pldm-zadd [B<-c> <config>] B<-z> <zone> B<-e> <email address> B<-n> <name servers> [B<-t> <ttl>]
+[B<-E> <expire>] [B<-m> <minimum>] [B<-R> <refresh>] [B<-r> <retry>]
+
+=head1 SWITCHES
+
+=head2 -c <config>
+
+The config file to use if the default is not desired.
+
+=head2 -d
+
+Add it as a DC structure only.
+
+=head2 -e <email>
+
+This is the email address for the SOA.
+
+=head2 -E <expire>
+
+This is the expire for the SOA.
+
+=head2 -n <name servers>
+
+A comma seperated list of name servers.
+
+=head2 -m <minimum>
+
+This is the minimum time for the SOA.
+
+=head2 -r <retry>
+
+This is the retry time for the SOA.
+
+=head2 -R <refresh>
+
+This is the refresh time for the SOA.
+
+=head2 -t <ttl>
+
+This is the TTL for the domain.
+
+=head2 -z <zone>
+
+The zone to add
+
+=head1 EXIT CODES
+
+These reflect the error values returned by BIND::SDB::LDAP::Helper.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+UNIX : System_administration
+
+=head1 OSNAMES
+
+any
+
+=head2 SEE ALSO
+
+BIND::SDB::LDAP::Helper
+
+=head1 README
+
+pldm-zrm - Removes a zone from LDAP.
+
+=cut

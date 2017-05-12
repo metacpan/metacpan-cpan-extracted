@@ -1,0 +1,7 @@
+# Test World
+Italy,ITA,2,d
+France,FRA,2,d
+United Kingdom,GBR,2,d
+Russia,RUS,2,D
+Germany,GER,2,d
+Spain,SPA,2,d

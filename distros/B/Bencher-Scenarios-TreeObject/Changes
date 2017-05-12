@@ -1,0 +1,29 @@
+0.05    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.04    2016-04-14 (PERLANCAR)
+
+	- Benchmark Tree::Object::InsideOut.
+
+
+0.03    2016-03-31 (PERLANCAR)
+
+	- Add tree dataset: tiny1 (3 nodes).
+
+	- Fix dataset, small1 was 63 nodes instead of 31.
+
+
+0.02    2016-03-30 (PERLANCAR)
+
+	- Add scenario: TreeObject::Build.
+
+
+0.01    2016-03-30 (PERLANCAR)
+
+        - First release.

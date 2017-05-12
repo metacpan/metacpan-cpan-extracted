@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <rule source file> <thesaurus source file>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $code = `cat $ARGV[0]`;
+my $obj = thesaurusLoad($ARGV[1]);
+
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+$t->process($code);

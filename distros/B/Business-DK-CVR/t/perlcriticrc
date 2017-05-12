@@ -1,0 +1,32 @@
+
+# $Id: perlcriticrc,v 1.1 2008-06-11 08:08:00 jonasbn Exp $
+
+severity = 1
+verbose = 8
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+script_sections = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Id
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-ControlStructures::ProhibitCStyleForLoops]
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-ValuesAndExpressions::RequireNumberSeparators]
+
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print
+
+# TODO address the following policies
+
+[-Bangs::ProhibitBitwiseOperators]

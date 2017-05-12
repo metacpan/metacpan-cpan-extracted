@@ -1,0 +1,38 @@
+=head1 USE
+
+All field keywords beginning with C<html_form_> are passed directly
+into the form hash.  Thus, they are really defined in form.tt which
+ships with Gantry.
+
+C<html_form_type> specifies the input element type of the field.
+You need a type if the field will appear on any form, but not if it won't.
+The form.tt template understands these types:
+
+    text
+    textarea
+    select
+    display
+
+Some of the commands apply to specific types:
+
+text: html_form_display_size
+
+textarea: html_form_rows and html_form_cols
+
+select: html_form_options (required unless the field is a foreign key)
+
+display: html_form_foreign
+
+See those related statements for type examples.
+
+NOTE: that the html_form_type is not related to the SQL type, which
+is controlled by the C<is> keyword.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in the form method
+in lib/Kids/GEN/Child.pm.

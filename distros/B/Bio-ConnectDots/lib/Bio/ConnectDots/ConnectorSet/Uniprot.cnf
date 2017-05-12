@@ -1,0 +1,31 @@
+# example cnf file for Uniprot
+
+name=Uniprot
+module=Uniprot
+version=7/5/2004
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=SwissProtEntryName, dotset=Gene_Name
+label=SwissProt, dotset=SwissProt_ID
+label=Protein_Desc, dotset=Protein_Desc
+label=Organism, dotset=Organism_Name
+label=Gene_Name, dotset=Gene_Symbol
+label=Alias_Symbol, dotset=Gene_Symbol
+label=NCBI_taxID, dotset=Organism_ID
+label=MEDLINE, dotset=Publication_ID
+label=PubMed, dotset=Publication_ID
+label=EMBL_mRNA_protein, dotset=Sequence_ID
+label=PIR, dotset=Sequence_ID
+label=InterPro, dotset=Protein_Domain_ID
+label=pfam, dotset=Protein_Domain_ID
+label=TIGRFAMs, dotset=Protein_Domain_ID
+label=Keywords, dotset=Keywords
+label=Function, dotset=Reference
+label=Catalytic_Activity, dotset=Reference
+label=Subunit, dotset=Reference
+label=Tissue, dotset=Reference

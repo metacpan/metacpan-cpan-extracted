@@ -1,0 +1,115 @@
+
+=head1 NAME
+
+Box2D::b2PolygonShape - A convex polygon.
+
+=head1 SYNOPSIS
+
+  my $rect = Box2D::b2PolygonShape->new();
+  $rect->SetAsBox( $hx, $hy );
+
+=head1 DESCRIPTION
+
+A convex polygon. It is assumed that the interior of the polygon is to
+the left of each edge.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2PolygonShape>
+
+=head2 GetVertex( $index )
+
+Get a vertex by index.
+
+Parameters:
+
+=over 4
+
+=item * C<int32> C<$index>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetVertexCount()
+
+Get the vertex count.
+
+Returns a C<int32>
+
+=head2 Set( @vertices )
+
+Copy vertices. This assumes the vertices define a convex polygon. It is assumed
+that the exterior is the the right of each edge.
+
+Parameters:
+
+=over 4
+
+=item * C<array> C<@vertices>
+
+=back
+
+=head2 SetAsBox( $hx, $hy )
+
+=head2 SetAsBox( $hx, $hy, $center, $angle )
+
+Build vertices to represent an oriented box.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$hx> - the half-width.
+
+=item * C<float32> C<$hy> - the half-height.
+
+=item * C<Box2D::b2Vec2> C<$center> (optional) - the center of the box in local
+coordinates.
+
+=item * C<float32> C<$angle> (optional) - the rotation of the box in local
+coordinates.
+
+=back
+
+=head2 SetAsEdge( $v1, $v2 )
+
+Set this as a single edge.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$v1>
+
+=item * C<Box2D::b2Vec2> C<$v2>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Shape>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

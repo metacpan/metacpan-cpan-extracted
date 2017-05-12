@@ -1,0 +1,5 @@
+parameters:
+  doc:
+    framework-media:
+      headline:
+        - Package framework

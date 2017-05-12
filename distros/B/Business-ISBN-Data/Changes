@@ -1,0 +1,96 @@
+Revision history for Perl module 
+
+20140910.003 2015-12-15T12:25:58Z
+	* Hide the Business::ISBN namespace
+
+20140910.02 - 2014-09-22
+	* Look in the current directory for RangeMessage.xml if it's
+	not in other locations. This can help with various Perl app
+	packagers. (But, also try ISBN_RANGE_MESSAGE env var)
+
+20140910.001 - 2014-09-18
+	* Update to the latest data (2014-09-10)
+
+20120719.01 - 2012-07-26
+	Specify the Test::More version so I can use subtest.
+	No code or feature changes
+
+20120719 - 2012-07-23
+	* Support data from RangeMessage.xml. You can use the latest
+	data from ISBN without updating this module.
+
+20120718 - 2012-07-23
+	* Daniel Jakubik updated the data for July 18, 2012
+
+20081208 - 2008-12-05
+	* Latest data update.
+
+20081020 - 2008-10-20
+	* Updated publisher codes thanks to Yakov Shafranovich
+	* Version number is now the update date of the module,
+	in YYYYMMDD. This not the date of the ISBN Agency
+	updates though.
+
+1.17 - 2007-10-27
+	* Update to docs to point to latest URL for ISBN International
+
+1.16 - 2007-10-25
+	* distro cleanups. No need to upgrade.:wq
+
+1.15 - 2007-08-31
+	[BUGFIX] RT #29078: Fix publihser ranges for Greece
+
+1.14 - 2007-05-18
+	* *Added 7000-8499 range from Greece (960) to fix RT #27107
+
+1.13 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.12 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.11 - 2006-05-18
+	* Updated distro and kwalitee. No need to upgrade.
+
+1.10 - 2005-03-08
+	* Doc fixup, no big whoop: no need to upgrade
+
+1.09 - 2005-03-08
+	* added POD coverage test and fixed up the problems it found
+
+1.09 - 2004-12-14
+	* updated the publisher ranges and the country prefixes for the latest
+	data as of November 2004.  See http://www.isbn-international.or
+	* Added the script I used to take the raw data and turn it into the
+	module
+	* I recommend this update for everyone.  Lots of publisher ranges have
+	changed
+
+1.08 - 2004-10-08
+	* no change in functionality or data: no need to upgrade
+	* added strictures to the package
+
+1.07 - 2004-09-14
+	* distro cleanup:  no need to upgrade
+
+1.06 - 2004-09-14
+	* small clean-ups for distribution bits---no need to upgrade
+
+1.05 - 2003-11-27
+	* updated publisher codes
+
+1.05 - 2003-11-27
+	* update publisher ranges
+
+1.05 - 2003-11-27
+	* Updated publisher ranges
+
+1.03 - 2002-11-25
+	* fixed Makefile to install in right place
+
+1.02 - 2002-11-25
+	* this is the first release as a separate module
+	* added additional publishers (4xxx) for english countries
+

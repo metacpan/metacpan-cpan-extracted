@@ -1,0 +1,21 @@
+severity=1
+verbose=11
+
+[-Documentation::RequirePodSections]
+[-Documentation::RequirePodLinksIncludeText]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-Miscellanea::RequireRcsKeywords]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[InputOutput::RequireBriefOpen]
+lines = 15
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/release/perltidyrc
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+#[Documentation::PodSpelling]
+#stop_words = 

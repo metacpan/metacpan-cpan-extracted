@@ -1,0 +1,126 @@
+
+
+
+  <div class='app_block_literal'
+       id='div_ident_6'>
+      
+      
+        
+        <fieldset>
+        <legend>
+            Literal 
+            ( <a href='javascript:show_or_hide( "hideable_ident_6" );'>
+                edit or hide</a> |  
+<a href="#" name='app_body_delete::ident_6' onclick='javascript:delete_block( this )'>delete</a>
+       
+
+            )
+        </legend>
+         <table>
+            <tr><td> Literal Type: </td>
+                <td>
+                    <select
+                        id='Literal::type_select::ident_6'
+                        onchange='javascript:type_change(
+                            "ident_6",
+                            this.value
+                        )'
+                    >
+                        <option value='None'>- Not Set -</option>
+
+                        <option value='Location'
+  
+                        > Location     </option>
+
+                        <option value='HttpdConf'
+  
+                        > HttpdConf </option>
+
+                        <option value='SQL'
+  
+                        > SQL     </option>
+
+                        <option value='PerlTop'
+  
+                        > PerlTop     </option>
+
+                        <option value='PerlBlock'
+  
+                        > PerlBlock     </option>
+
+                        <option value='Conf'
+  
+                        > Conf     </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> String: </td>
+                <td>
+                    <textarea id='app_block::ident_6'
+                              cols='80' rows='7'
+                              onblur='javascript:update_tree(
+                                "literal",
+                                "ident_6",
+                                this.value
+                              )'
+                    ></textarea>
+                </td>
+            </tr>
+        </table>
+
+      
+
+      <br style='clear: both' />
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+config {
+    engine MP20;
+    template_engine TT;
+    Init Std {  }
+    Conf Gantry { conffile `docs/app.gantry.conf`; instance sample; }
+    HttpdConf Gantry { gantry_conf 1; }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Sample {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+        doc_rootp `/static` => no_accessor;
+        show_dev_navigation 1 => no_accessor;
+    }
+    config CGI {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        app_rootp `/cgi-bin/sample.cgi` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    literal None
+      ``;
+}

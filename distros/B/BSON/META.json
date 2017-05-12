@@ -1,0 +1,224 @@
+{
+   "abstract" : "BSON serialization and deserialization",
+   "author" : [
+      "David Golden <david@mongodb.com>",
+      "Stefan G. <minimalist@lavabit.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BSON",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.010001"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Meta::Contributors" : "0",
+            "Dist::Zilla::Plugin::ReleaseStatus::FromVersion" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "MIME::Base64" : "0",
+            "Math::BigInt" : "0",
+            "Moo" : "2.002004",
+            "Scalar::Util" : "0",
+            "Sys::Hostname" : "0",
+            "Tie::IxHash" : "0",
+            "Time::HiRes" : "0",
+            "Time::Local" : "0",
+            "base" : "0",
+            "boolean" : "0.45",
+            "constant" : "0",
+            "if" : "0",
+            "namespace::clean" : "0",
+            "overload" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "threads::shared" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "JSON::MaybeXS" : "0",
+            "Path::Tiny" : "0.054",
+            "Test::Deep" : "0",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "perl" : "5.010001",
+            "re" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "BSON" : {
+         "file" : "lib/BSON.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Binary" : {
+         "file" : "lib/BSON/Binary.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Bool" : {
+         "file" : "lib/BSON/Bool.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Bytes" : {
+         "file" : "lib/BSON/Bytes.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Code" : {
+         "file" : "lib/BSON/Code.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::DBRef" : {
+         "file" : "lib/BSON/DBRef.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Decimal128" : {
+         "file" : "lib/BSON/Decimal128.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Doc" : {
+         "file" : "lib/BSON/Doc.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Double" : {
+         "file" : "lib/BSON/Double.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Int32" : {
+         "file" : "lib/BSON/Int32.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Int64" : {
+         "file" : "lib/BSON/Int64.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::MaxKey" : {
+         "file" : "lib/BSON/MaxKey.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::MinKey" : {
+         "file" : "lib/BSON/MinKey.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::OID" : {
+         "file" : "lib/BSON/OID.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::ObjectId" : {
+         "file" : "lib/BSON/ObjectId.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::PP" : {
+         "file" : "lib/BSON/PP.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Raw" : {
+         "file" : "lib/BSON/Raw.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Regex" : {
+         "file" : "lib/BSON/Regex.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::String" : {
+         "file" : "lib/BSON/String.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Time" : {
+         "file" : "lib/BSON/Time.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Timestamp" : {
+         "file" : "lib/BSON/Timestamp.pm",
+         "version" : "v1.4.0"
+      },
+      "BSON::Types" : {
+         "file" : "lib/BSON/Types.pm",
+         "version" : "v1.4.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://jira.mongodb.org/browse/PERL"
+      },
+      "homepage" : "https://github.com/mongodb/mongo-perl-bson",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mongodb/mongo-perl-bson.git",
+         "web" : "https://github.com/mongodb/mongo-perl-bson"
+      }
+   },
+   "version" : "v1.4.0",
+   "x_authority" : "cpan:MONGODB",
+   "x_contributors" : [
+      "Eric Daniels <eric.daniels@mongodb.com>",
+      "Olivier Duclos <odc@cpan.org>",
+      "Pat Gunn <pgunn@mongodb.com>",
+      "Petr P\u00edsa\u0159 <ppisar@redhat.com>",
+      "Yury Zavarin <yury.zavarin@gmail.com>",
+      "Oleg Kostyuk <cub@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

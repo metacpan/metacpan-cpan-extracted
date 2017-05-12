@@ -1,0 +1,7 @@
+0.004  2016-12-06 06:22:07 CET
+   - use warnings
+   - tracking project via Travis-CI (.travis.yml)
+   - badges!
+
+0.002  2016-11-11 23:23:21 CET
+   - first release on CPAN (CPAN Testers seems out these days...)

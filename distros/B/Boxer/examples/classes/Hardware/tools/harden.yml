@@ -1,0 +1,8 @@
+classes:
+  - hw.crypto
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include low-level crypto hardening tools

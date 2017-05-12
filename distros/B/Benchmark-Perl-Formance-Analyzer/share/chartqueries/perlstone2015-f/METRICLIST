@@ -1,0 +1,26 @@
+# PerlStone2015 metrics
+perlformance.perl5.PerlStone2015.01overview.opmix1(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::01overview
+perlformance.perl5.PerlStone2015.01overview.opmix2(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::01overview
+perlformance.perl5.PerlStone2015.04control.blocks1(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::04control
+perlformance.perl5.PerlStone2015.04control.blocks2(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::04control
+perlformance.perl5.PerlStone2015.05regex.fixedstr(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::05regex
+perlformance.perl5.PerlStone2015.07lists.push(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::07lists
+perlformance.perl5.PerlStone2015.07lists.unshift(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::07lists
+perlformance.perl5.PerlStone2015.09data.a_alloc(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::09data
+perlformance.perl5.PerlStone2015.09data.a_copy(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::09data
+perlformance.perl5.PerlStone2015.binarytrees(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::binarytrees
+perlformance.perl5.PerlStone2015.fannkuch(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::fannkuch
+perlformance.perl5.PerlStone2015.fasta(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::fasta
+perlformance.perl5.PerlStone2015.fib(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::fib
+perlformance.perl5.PerlStone2015.mandelbrot(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::mandelbrot
+perlformance.perl5.PerlStone2015.nbody(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::nbody
+perlformance.perl5.PerlStone2015.regex.backtrack(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.code_literal(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.code_runtime(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.precomp_access(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.runtime_comp(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.runtime_comp_nocache(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.split1(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regex.split2(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regex
+perlformance.perl5.PerlStone2015.regexdna(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::regexdna
+perlformance.perl5.PerlStone2015.spectralnorm(F),Benchmark::Perl::Formance::Plugin::PerlStone2015::spectralnorm

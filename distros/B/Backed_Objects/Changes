@@ -1,0 +1,5 @@
+Revision history for Backed_Objects
+
+1.16    Don't run POD coverage tests as normal user.
+
+1.15    Added $update argument for do_output.

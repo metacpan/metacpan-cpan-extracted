@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+use strict;
+use Bot::Babelfish;
+
+Bot::Babelfish->new(
+        nick => 'babel2', 
+        name => 'Babelfish bot', 
+        server => 'irc.perl.org', 
+        channels => [qw(#babel)], 
+        ignore_list => [qw(dipsy purl)], 
+        debug => 1,
+    )->run
+
+__END__
+
+=head1 NAME
+
+babel - IRC fronted to Babelfish translation service
+
+=head1 SYNOPSIS
+
+Under your favorite shell:
+
+    $ babelbot
+
+On IRC:
+
+    babel [from to:] string to translate
+
+See L<Bot::Babelfish/"COMMANDS"> for the description of supported
+commands.
+
+=head1 DESCRIPTION
+
+This script is an IRC bot that provides an interface to the module
+C<Lingua::Translate>.
+
+See also L<Bot::Babelfish> for more information.
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, E<lt>sebastien@aperghis.netE<gt>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to 
+L<bug-bot-babel@rt.cpan.org>, or through the web interface at 
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-Babelfish>. 
+I will be notified, and then you'll automatically be notified 
+of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 SE<eacute>bastien Aperghis-Tramoni, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

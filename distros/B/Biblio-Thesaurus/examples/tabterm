@@ -1,0 +1,179 @@
+#!/usr/bin/perl -s
+
+our ($l,$t);
+
+#use POSIX qw(locale_h);
+#setlocale(&POSIX::LC_ALL, "pt_PT");
+#use encoding "utf8", STDIN => "latin1";
+use Unicode::Collate;
+my $ptsort = Unicode::Collate::->new();
+
+use Data::Dumper;
+use strict;
+my $meta={};
+my $T = {};
+my %desc=();
+my %inv=qw( 
+  nt bt 
+  bt nt 
+  has pof 
+  pof has 
+  iof inst 
+  inst iof
+  rt rt
+);
+
+my $name=$ARGV[0];
+
+for my $f(@ARGV){ procFile($f); }
+geraThe({output=>"_$name.the"});
+geraTex({output=>"_$name.tex"})  if $t;
+geraList({output=>"_$name.list"}) if $l;
+
+sub procFile{
+  my $file=shift;
+  my $f;
+  open ($f,$file) or die ("cant open $file\n");
+  while(<$f>){
+   my @l=();
+   s/\s*$//;
+   if(/^#/ or /^$/){ next}
+
+   if      (/^%the(?:saurus)?(.*)/)    { 
+      my $a=$1;
+      while($a !~ m/\)\s*$/){ $a .= <$f>; }
+      geratrans($a); } 
+##   elsif   (/^%include\s*"(.*?)"/)     { procFile($1); }
+   elsif   (/^%enc(?:oding)?\s*(\S+)/) { binmode($f,":encoding($1)") 
+              or warn("cant binmode ($!)\n"); } 
+   elsif   (/^%desc\s+(\S+)\s+(.*)/)   { $desc{$1} = $2; } 
+   elsif   (/^%inv(?:erse)?\s+(\S+)\s+(\S+)/) { $inv{$1} = $2; } 
+   elsif   (/^%(.*)/) { warn("????:Erro: $_\n") } 
+   else{ @l = map { [split(/\s*\|\s*/, $_ ) ] } split(/\s*:\s*/,$_); 
+         addthe($meta,@l); 
+       }
+  }
+  close $f;
+}
+
+sub addthe{
+  my ($m,@tup)=@_;
+  my $t = shift(@{$tup[0]});
+  for(keys %{$m->{type}}){
+     for my $v ( @{$tup[$_]}){
+        add3($v,"bt", $m->{type}{$_});
+     } 
+  }
+  for(0.. scalar(@{$m->{rel}})-1){
+     for my $v ( @{$tup[$_]}){
+         add3($t,$m->{rel}[$_],$v);
+         for(keys %{$meta->{add}}){
+           add3($t,$_,$meta->{add}{$_});
+         }
+     }
+  }
+}
+
+sub add3{ my ($t1,$r,$t2)=@_;
+ $T->{$t1}{$r      }{$t2}=1;
+ $T->{$t2}{$inv{$r}}{$t1}=1 if $inv{$r};
+}
+
+sub geratrans{ my $arg=shift;
+  $arg =~ s/^\s*\(?\s*//;
+  $arg =~ s/\s*\)\s*$//;
+  my $n=0;
+  for(split(/\s*:\s*/,$arg)){
+    if(/(.*?)\s*<\s*(.*)/){  
+             $meta->{type}{$n}=$2;
+             push(@{$meta->{rel}},$1); }
+    elsif(/(.*?)\s*=>\s*(.*)/){ 
+             $meta->{add}{$1}=$2;
+             push(@{$meta->{rel}},$1); }
+    else{    push(@{$meta->{rel}},$_); }
+    $n++;
+  }
+}
+
+sub geraList{
+  my %opt =(output => "_output.the");
+  if(ref($_[0]) eq "HASH") {%opt = (%opt, %{shift(@_)})};
+  open (F ,">$opt{output}");
+  binmode(F,":utf8");
+  for (sort( keys %$T)){ print F "$_\n"}
+  close F
+}
+
+sub geraThe{
+#  use locale;
+  my %opt =(output => "_output.the");
+  if(ref($_[0]) eq "HASH") {%opt = (%opt, %{shift(@_)})};
+  open (F ,">$opt{output}");
+  binmode(F,":utf8");
+  print  F qq{
+%enc utf8
+
+};
+  for (keys %inv) { print F "%inv $_ $inv{$_}\n"; }
+  for (keys %desc){ print F "%desc $_ $desc{$_}\n"; }
+
+  for my $t ($ptsort->sort( keys %$T)){
+     print F "\n$t\n";
+     for my $r (keys %{$T->{$t}}){
+        for my $t2 ($ptsort->sort( keys %{$T->{$t}{$r}})){
+          print F "$r $t2\n";
+        }
+     }
+  }
+  close F;
+}
+
+sub geraTex{
+#  use locale;
+  my %opt =(output => "_output.tex");
+  if(ref($_[0]) eq "HASH") {%opt = (%opt, %{shift(@_)})};
+  open (F ,">$opt{output}");
+  binmode(F,":utf8");
+  if($opt{style} eq "agenda"){ 
+    print  F q{
+\documentclass[portuges,a4paper]{article}
+\usepackage{agbook}
+}
+}
+  else {
+    print  F q{
+\documentclass[portuges,a4paper,twocolumn]{book}
+}
+}
+  print  F q{
+\usepackage{babel}
+\usepackage[utf8]{inputenc} 
+%\usepackage[latin1]{inputenc} 
+\usepackage{dict}
+\usepackage{t1enc}
+\usepackage{aeguill}
+\begin{document}
+};
+
+  print F "\\begin{dictionary}\n";
+  my $last="";
+  for my $t ($ptsort->sort( keys %$T)){
+     my $fl = unaccent(substr($t,0,1));
+     if($fl ne $last){print F "\\bigletterc{$fl}\n"; $last = $fl }
+     print  F "\n\\term{",ppttex($t),"}{";
+     for my $r (keys %{$T->{$t}}){
+        print F "\\\\\\textbf{",ppttex($r),"} ";
+        for my $t2 ($ptsort->sort( keys %{$T->{$t}{$r}})){
+          print F ppttex($t2),", ";
+        }
+     }
+     print F "}\n";
+  }
+  print F "\\end{dictionary}\n\\end{document}";
+  close F;
+}
+sub ppttex{ my $a=shift; $a =~ s/([_\$\%\#\&])/\\$1/g; $a; }
+
+sub unaccent{ my $a=shift; 
+ use utf8;
+ $a =~ y/áéíóúàèìòùâêîôûÁÉÍÓÚÂÊÎÔÛ/aeiouaeiouaeiouaeiouaeiou/; uc($a); }

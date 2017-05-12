@@ -1,0 +1,8 @@
+Things to do for BSD::Process
+
+1. Find acces to NetBSD and OpenBSD systems and make it run on them.
+
+2. Find a way to fill out only what attributes are requested,
+   instead of all of them.
+
+3. Think about switching over to Object::Tiny

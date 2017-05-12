@@ -1,0 +1,1281 @@
+=head1 NAME
+
+Bigtop::Docs::FullKeywords - Descriptions of all Bigtop keywords
+
+=head1 Intro
+
+This document is generated from C<Bigtop::Docs::Keywords>.  It lists
+each supported keyword available in the Bigtop language, just as tentmaker
+would, but in POD form.  See the beginning of C<Bigtop::Docs::Syntax>
+for a general description of Bigtop source file structure.  See
+also C<Bigtop::Docs::TentTut>, which -- like this file -- draws from
+C<Bigtop::Keywords>.  You might also find C<Bigtop::Docs::Cookbook> useful.
+
+=head1 Categories
+
+Bigtop keywords come in many categories.  Each subsection below describes
+one category.  Here is a brief description of where the keywords
+from each categories appear in the Bigtop source file.
+
+=over 4
+
+=item config
+
+These keywords appear in the Bigtop config block that begins each bigtop
+file.
+
+This is not to be confused with the app level config block which
+appears inside the app block.  There are no defined keywords in the app
+config blocks, use whatever conf variable names you like there.  The
+same goes for controller level config blocks.
+
+=item app
+
+These keywords appear at the top level of the app block.
+
+=item app_literal
+
+Literals are not blocks and do not have statements like blocks.  They have
+this form:
+
+    literal type `whatever string you like`;
+
+where C<literal> introduces the literal and C<type> is one of the
+C<app_literal> keywords listed below.  So, for these 'keyword' should
+really be called 'type.'
+
+=item controller_literal
+
+Just like app_literals, but appearing inside controller blocks.
+
+=item table
+
+These keywords appear at the top level of table blocks, which in turn
+appear at the top level of the app block.
+
+=item join_table
+
+These keywords appear at the top level of join_table blocks, which appear
+at top level of the app block.
+
+=item field
+
+These keywords appear in field blocks, which in turn appear inside table
+or join_table blocks.
+
+=item controller
+
+These keywords appear in controller blocks, which are at the top level of
+the app block.
+
+=item method
+
+These keywords appear in method blocks, which appear inside controller blocks.
+
+=back
+
+Now that you know where the keywords may appear, here they are.  The
+categories appear in alphabetical order.  The keywords themselves are
+grouped logically (or so it seems to me).  The keyword order within
+the category is shared with tentmaker (though tentmaker excludes
+keywords which don't apply to the controller or method type).
+
+
+=head2 app
+
+=over 4
+
+=item no_gen
+
+Skip this app completely
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item location
+
+Base Location of the app [defaults to /]
+Do not use if you have a Base Controller.
+
+
+=item authors
+
+Who to blame for the app
+
+
+Values for authors statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a name and C<optional_value> is a email address.
+
+You may supply a comma separated list of values for
+authors statements.
+
+This statement is only occasionally used.
+
+=item contact_us
+
+How to send complaints or join the project
+
+
+=item copyright_holder
+
+Who owns the app [defaults to 1st author]
+
+
+You may supply a comma separated list of values for
+copyright_holder statements.
+
+=item license_text
+
+Restrictions [defaults to Perl license]
+
+
+=item uses
+
+List of modules used by base module
+Do not use if you have a Base Controller.
+
+
+You may supply a comma separated list of values for
+uses statements.
+
+=item label
+
+Documentation label for app
+
+
+=item email
+
+DEPRECATED
+
+
+Where to send complaints (think mailing list)
+
+
+=back
+
+=head2 app_literal
+
+=over 4
+
+=item Conf
+
+top level of Gantry::Conf file
+
+
+=item PerlTop
+
+immediately after shebang line in httpd.conf
+<Perl> block and in the CGI scripts
+
+
+=item PerlBlock
+
+in the httpd.conf <Perl> block (in order
+with controllers)
+
+
+=item HttpdConf
+
+between location directives in httpd.conf
+
+
+=item Location
+
+in the base Location directive for the app
+
+
+=item SQL
+
+dumped directly into all schemas
+
+
+=back
+
+=head2 config
+
+=over 4
+
+=item engine
+
+mod_perl 1.3, mod_perl 2.0, CGI, etc.
+
+
+Only certain values are legal for statement.keyword statements.
+Please choose from these options:
+
+=over 4
+
+=item MP13
+
+mod_perl 1.3
+
+=item MP20
+
+mod_perl 2.0
+
+=item CGI
+
+CGI/FastCGI
+
+
+=back
+
+=item template_engine
+
+Template Toolkit, Mason, etc.
+
+
+Only certain values are legal for statement.keyword statements.
+Please choose from these options:
+
+=over 4
+
+=item TT
+
+Template Toolkit
+
+=item Default
+
+No Templating
+
+
+=back
+
+=item plugins
+
+List of Plugins i.e. AuthCookie Static
+
+
+=item base_dir
+
+DEPRECATED
+
+
+parent of build dir
+
+
+=item app_dir
+
+DEPRECATED
+
+
+build dir. relative to parent dir
+
+
+=back
+
+=head2 controller
+
+=over 4
+
+=item no_gen
+
+Skip this controller completely
+
+
+Applies to all controller types.
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item location
+
+Absolute Location of this controller [non-base controllers
+must have either a location or a rel_location.]
+
+
+Applies to all controller types.
+
+
+This statement is virtually required.
+
+=item rel_location
+
+Location of this controller relative to app location
+[non-base controllers must have location or rel_location.]
+
+Applies to controllers of type: AutoCRUD, CRUD, SOAP, SOAPDoc, and stub.
+
+
+This statement is virtually required.
+
+=item controls_table
+
+Table this controller manages
+
+
+Applies to all controller types.
+
+
+This statement is virtually required.
+
+=item gen_uses
+
+List of modules used in gen module
+use list ex: qw( :default )
+
+
+Applies to all controller types.
+
+
+Values for gen_uses statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a module and C<optional_value> is a literal use list.
+
+You may supply a comma separated list of values for
+gen_uses statements.
+
+=item stub_uses
+
+List of modules used in stub module
+
+
+Applies to all controller types.
+
+
+Values for stub_uses statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a module and C<optional_value> is a literal use list.
+
+You may supply a comma separated list of values for
+stub_uses statements.
+
+=item uses
+
+List of modules used by gen and stub modules
+
+
+Applies to all controller types.
+
+
+Values for uses statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a module and C<optional_value> is a literal use list.
+
+You may supply a comma separated list of values for
+uses statements.
+
+=item plugins
+
+List of plugins used by gen module
+
+
+Applies to all controller types.
+
+
+You may supply a comma separated list of values for
+plugins statements.
+
+=item text_description
+
+Required for Gantry's AutoCRUD
+
+Applies to controllers of type: AutoCRUD and base_controller.
+
+
+This statement is frequently used.
+
+=item page_link_label
+
+Link text in navigation bar
+[use only for navigable controllers]
+
+
+Applies to all controller types.
+
+
+This statement is frequently used.
+
+=item autocrud_helper
+
+Gantry::Plugins::AutoCRUDHelper for your ORM
+
+Applies to controllers of type: AutoCRUD and base_controller.
+
+
+=item skip_test
+
+Skip default page hit test of this controller
+
+
+Applies to all controller types.
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item soap_name
+
+Base of all WSDL names
+
+Applies to controllers of type: SOAP and SOAPDoc.
+
+
+This statement is required.
+
+=item namespace_base
+
+Base URL of WSDL namespace including domain
+
+Applies to controllers of type: SOAP and SOAPDoc.
+
+
+This statement is required.
+
+=back
+
+=head2 controller_literal
+
+=over 4
+
+=item Location
+
+in Location block for this controller
+
+
+=item GantryLocation
+
+in GantryLocation block for this controller
+
+
+=back
+
+=head2 extra_sql
+
+=over 4
+
+=item sql
+
+Literal SQL, use bind parameters, see below.
+
+
+This statement is required.
+
+=item expects
+
+What your SQL needs for positional binding.  [optional, omit if you have no bound parameters]
+
+
+Values for expects statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a name and C<optional_value> is a type.
+
+You may supply a comma separated list of values for
+expects statements.
+
+This statement is virtually required.
+
+=item returns
+
+Names of columns in SQL output.  [optional, omit if you expect no returned rows]
+
+
+Values for returns statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a name and C<optional_value> is a type.
+
+You may supply a comma separated list of values for
+returns statements.
+
+This statement is virtually required.
+
+=back
+
+=head2 field
+
+=over 4
+
+=item no_gen
+
+Skip this field completely
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item not_for
+
+Tell Model and/or SQL to skip this field
+
+
+Only certain values are legal for statement.keyword statements.
+Please choose from these options:
+
+=over 4
+
+=item SQL
+
+SQL
+
+=item Model
+
+Model
+
+
+=back
+
+You may supply a comma separated list of values for
+not_for statements.
+
+=item is
+
+SQL type clause phrases, e.g.:
+
+    int4
+    varchar
+    primary_key
+    auto
+
+
+
+You may supply a comma separated list of values for
+is statements.
+
+This statement is required.
+
+=item accessor
+
+DBIx::Class alternate accessor name for this column
+
+
+You may supply a comma separated list of values for
+accessor statements.
+
+=item add_columns
+
+DBIx::Class alternate column addition
+
+
+All values for add_columns statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a key and C<its_value> is a value.
+
+You may supply a comma separated list of values for
+add_columns statements.
+
+=item refers_to
+
+Where this foreign key points
+
+
+Values for refers_to statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a table and C<optional_value> is a column.
+
+This statement is only occasionally used.
+
+=item quasi_refers_to
+
+Where this column usually points
+
+
+Values for quasi_refers_to statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a table and C<optional_value> is a column.
+
+=item on_delete
+
+What to do when foreign key column's row dies
+
+
+=item on_update
+
+What to do when foreign key column's row changes
+
+
+=item label
+
+Default on-screen label for field
+
+
+This statement is virtually required.
+
+=item searchable
+
+Include this field in searches?
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item html_form_type
+
+form type: text, textarea, select
+
+
+Only certain values are legal for statement.keyword statements.
+Please choose from these options:
+
+=over 4
+
+=item undefined
+
+-- Choose One --
+
+=item text
+
+text
+
+=item textarea
+
+textarea
+
+=item select
+
+select
+
+=item display
+
+display
+
+
+=back
+
+This statement is virtually required.
+
+=item html_form_optional
+
+May user skip this field?
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item html_form_constraint
+
+Data::FormValidator constraint, e.g.: 
+
+    qr{^\d$}
+
+
+
+=item html_form_default_value
+
+Form element value when no other is available
+
+
+=item html_form_cols
+
+cols attribute of text area
+
+Applies only to fields of type textarea.
+
+
+=item html_form_rows
+
+rows attribute of text area
+
+Applies only to fields of type textarea.
+
+
+=item html_form_display_size
+
+width attribute if type is text
+
+Applies only to fields of type text.
+
+
+=item html_form_class
+
+class attribute for the form field
+
+Applies only to fields of type text.
+
+
+=item html_form_hint
+
+form field hint
+
+
+=item html_form_options
+
+Choices for fields of type select 
+[ignored for refers_to fields]
+
+Applies only to fields of type select.
+
+
+All values for html_form_options statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a label and C<its_value> is a database value.
+
+You may supply a comma separated list of values for
+html_form_options statements.
+
+=item html_form_foreign
+
+Display field is a foreign key
+
+Applies only to fields of type display.
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item html_form_onchange
+
+Name of Javascript function to call on change
+
+Applies only to fields of type select.
+
+
+=item html_form_fieldset
+
+Name of fieldset to group this field into
+
+
+=item date_select_text
+
+link text for date popup window
+
+Applies only to fields of type text.
+
+
+=item html_form_raw_html
+
+appears before this field's table row
+
+
+=item non_essential
+
+Tells modeler: retrieve only when accessed
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item pseudo_value
+
+This is the definition for a pseudo field. By defining it, you're declaring the field as a pseudo field
+
+
+=item unique_name
+
+Declare this field as unique, and use the value for the constraint name
+
+
+=back
+
+=head2 join_table
+
+=over 4
+
+=item joins
+
+Which tables does this one join?
+
+
+All values for joins statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a table and C<its_value> is a table.
+
+This statement is required.
+
+=item names
+
+What should I call each has many?
+
+
+All values for names statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a has many name and C<its_value> is a has many name.
+
+=item data
+
+What to INSERT INTO table upon initial creation
+
+
+All values for data statements must be pairs like:
+
+    name => its_value
+
+
+You may supply a comma separated list of values for
+data statements.
+
+You may use multiple data statements.
+
+=back
+
+=head2 method
+
+=over 4
+
+=item no_gen
+
+Skip this method completely
+
+
+Applies to all method types.
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item extra_args
+
+Extra args for any method
+
+Applies to methods of type: AutoCRUD_form, CRUD_form, base_links, links, main_listing, and stub.
+
+
+You may supply a comma separated list of values for
+extra_args statements.
+
+=item order_by
+
+Exact text of SQL order by
+
+Applies to methods of type: main_listing.
+
+
+=item rows
+
+How many rows should appear per listing page?
+
+Applies to methods of type: main_listing.
+
+
+This statement is frequently used.
+
+=item paged_conf
+
+Take rows per page from this (conf var) accessor
+
+Applies to methods of type: main_listing.
+
+
+=item cols
+
+Fields to include in main_listing
+
+Applies to methods of type: main_listing.
+
+
+You may supply a comma separated list of values for
+cols statements.
+
+This statement is virtually required.
+
+=item col_labels
+
+Labels for fields on main_listing
+[optional default uses field labels]
+
+Applies to methods of type: main_listing.
+
+
+You may supply a comma separated list of values for
+col_labels statements.
+
+=item pseudo_cols
+
+Pseudo Fields to include in main_listing
+
+Applies to methods of type: main_listing.
+
+
+You may supply a comma separated list of values for
+pseudo_cols statements.
+
+This statement is virtually required.
+
+=item livesearch
+
+Places a search box on results page
+
+Applies to methods of type: main_listing.
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item header_options
+
+User actions affecting the table [like Add]
+
+Applies to methods of type: main_listing.
+
+
+Values for header_options statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a label and C<optional_value> is a location.
+
+You may supply a comma separated list of values for
+header_options statements.
+
+This statement is virtually required.
+
+=item header_option_perms
+
+The table permission which controls options
+Pick from create, retrieve, update, or delete
+
+Applies to methods of type: main_listing.
+
+
+All values for header_option_perms statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a header option label and C<its_value> is a controlling permission.
+
+You may supply a comma separated list of values for
+header_option_perms statements.
+
+=item row_options
+
+User actions affecting rows [like Edit]
+Locations should not end with / or 
+include $id
+
+Applies to methods of type: main_listing.
+
+
+Values for row_options statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a label and C<optional_value> is a location.
+
+You may supply a comma separated list of values for
+row_options statements.
+
+This statement is virtually required.
+
+=item row_option_perms
+
+The table permission which controls options
+Pick from create, retrieve, update, or delete
+
+Applies to methods of type: main_listing.
+
+
+All values for row_option_perms statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a row option label and C<its_value> is a controlling permission.
+
+You may supply a comma separated list of values for
+row_option_perms statements.
+
+=item limit_by
+
+If an arg is supplied, show only matching rows
+
+Applies to methods of type: main_listing.
+
+
+=item where_terms
+
+Where clause will include these equality tests
+
+Applies to methods of type: main_listing.
+
+
+All values for where_terms statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a table and C<its_value> is a table.
+
+You may supply a comma separated list of values for
+where_terms statements.
+
+=item title
+
+Browser title bar title for main_listing
+
+Applies to methods of type: base_links and main_listing.
+
+
+This statement is frequently used.
+
+=item html_template
+
+Template to use for main_listing
+[defaults to results.tt or main.tt]
+
+Applies to methods of type: base_links and main_listing.
+
+
+=item authed_methods
+
+Controller methods that require auth
+
+Applies to methods of type: hashref.
+
+
+Values for authed_methods statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a method and C<optional_value> is a group.
+
+You may supply a comma separated list of values for
+authed_methods statements.
+
+=item permissions
+
+Set table permissions e.g. crudcr--cr--
+
+Applies to methods of type: hashref.
+
+
+Values for permissions statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a bits and C<optional_value> is a group.
+
+=item literal
+
+Supply a custom perl hashref
+
+Applies to methods of type: hashref.
+
+
+You may supply a comma separated list of values for
+literal statements.
+
+=item all_fields_but
+
+Fields to exclude from a form
+[either all_fields_but or fields is REQUIRED]
+
+Applies to methods of type: AutoCRUD_form and CRUD_form.
+
+
+You may supply a comma separated list of values for
+all_fields_but statements.
+
+This statement is virtually required.
+
+=item fields
+
+Fields to include on a form
+[either all_fields_but or fields is REQUIRED]
+
+Applies to methods of type: AutoCRUD_form and CRUD_form.
+
+
+You may supply a comma separated list of values for
+fields statements.
+
+This statement is virtually required.
+
+=item extra_keys
+
+Extra keys to put in the form method hash
+
+Applies to methods of type: AutoCRUD_form and CRUD_form.
+
+
+All values for extra_keys statements must be pairs like:
+
+    name => its_value
+
+where C<name> is a key and C<its_value> is a value.
+
+You may supply a comma separated list of values for
+extra_keys statements.
+
+=item form_name
+
+Form name [used with date selections]
+
+Applies to methods of type: AutoCRUD_form and CRUD_form.
+
+
+=item expects
+
+Things your SOAP method receives
+
+Applies to methods of type: SOAP and SOAPDoc.
+
+
+Values for expects statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a name and C<optional_value> is a type.
+
+You may supply a comma separated list of values for
+expects statements.
+
+This statement is required.
+
+=item returns
+
+Things your SOAP method returns
+
+Applies to methods of type: SOAP and SOAPDoc.
+
+
+Values for returns statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a name and C<optional_value> is a type.
+
+You may supply a comma separated list of values for
+returns statements.
+
+This statement is required.
+
+=back
+
+=head2 table
+
+=over 4
+
+=item no_gen
+
+Skip this table completely
+
+
+This field is boolean, use 1 for true or 0 for false.
+
+
+=item not_for
+
+Tell Model and/or SQL to skip this table
+
+
+Only certain values are legal for statement.keyword statements.
+Please choose from these options:
+
+=over 4
+
+=item SQL
+
+SQL
+
+=item Model
+
+Model
+
+
+=back
+
+You may supply a comma separated list of values for
+not_for statements.
+
+=item foreign_display
+
+Pattern string for other tables: %last, %first
+
+
+This statement is frequently used.
+
+=item refered_to_by
+
+Table has many rows from this other table
+
+
+Values for refered_to_by statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+where C<name> is a foreign table and C<optional_value> is a name of has many.
+
+You may supply a comma separated list of values for
+refered_to_by statements.
+
+=item model_base_class
+
+Models inherit from this [has good default]
+
+
+=item sequence
+
+Which sequence to take default keys from
+
+
+This statement is only occasionally used.
+
+=item label
+
+Documentation label for table
+
+
+=item data
+
+What to INSERT INTO table upon initial creation
+
+
+Values for data statements may be individual values
+or pairs like:
+
+    name => optional_value
+
+
+You may supply a comma separated list of values for
+data statements.
+
+You may use multiple data statements.
+
+=back
+
+=head1 AUTHOR
+
+The skip/podsyntax script generated this file Sat Jul 10 17:04:08 2010.
+The script was written by Phil Crow E<lt>crow.phil\@gmail.comE<gt>.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2007 by Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+But keep in mind that it was generated.  Make modifications to the
+generting script.
+
+=cut

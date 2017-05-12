@@ -1,0 +1,50 @@
+Revision history for Business-BankList-Indonesia
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+	- [dzil] Update syntax of lint-prereqs directive (-> lint_prereqs)
+	  to be more IOD-compliant.
+
+	- Move pericmd CLI script list-id-banks to
+	  App-IndonesianBankingUtils to reduce dependencies for our dist.
+
+	- Fix arguments (need to be array).
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.05     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.04    2012-07-11 (SHARYANTO)
+
+        - Data update (rev bc00a6a3, Wed Jul 11 12:22:39 2012 +0700).
+
+
+0.03    2012-07-06 (SHARYANTO)
+
+        - No functional changes. Fix POD.
+
+
+0.02    2012-07-06 (SHARYANTO)
+
+        - No functional changes. Fix POD.
+
+
+0.01    2012-07-06 (SHARYANTO)
+
+        - First version.

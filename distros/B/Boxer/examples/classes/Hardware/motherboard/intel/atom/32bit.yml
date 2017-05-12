@@ -1,0 +1,9 @@
+classes:
+  - hw.x86.i686
+  - hw.firmware
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include core support for board with older 32bit Intel Atom CPU

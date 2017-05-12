@@ -1,0 +1,25 @@
+--- src/lib/cheapcgi.c.orig	2010-01-13 18:45:56.000000000 -0500
++++ src/lib/cheapcgi.c	2010-03-29 11:34:14.000000000 -0400
+@@ -13,6 +13,10 @@
+ #ifndef GBROWSE
+ #include "mime.h"
+ #endif /* GBROWSE */
++#ifdef __APPLE__
++#include <crt_externs.h>
++#endif
++
+ #include <signal.h>
+ 
+ static char const rcsid[] = "$Id$";
+@@ -179,7 +183,11 @@
+ char **env = NULL;
+ struct hash *hash = newHash(6);
+ struct cgiVar *list = NULL, *el;
++#ifdef __APPLE__
++#define environ  (*_NSGetEnviron())
++#else
+ extern char **environ;
++#endif
+ 
+ 
+ //debug

@@ -1,0 +1,9 @@
+: if template_exists( $entry.type ~ '_entry_attachment.tx' ) {
+:   include $entry.type ~ '_entry_attachment.tx';
+: } else {
+<div class="attachment">
+: include '_wedge.tx' { template => 'entry_attachment_start.tx' };
+<a href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>"><: $name :></a>
+: include '_wedge.tx' { template => 'entry_attachment_end.tx' };
+</div>
+: }

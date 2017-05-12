@@ -1,0 +1,55 @@
+{
+   "abstract" : "Sample Perl Bloom filter implementation",
+   "author" : [
+      "Maciej Ceglowski <maciej@ceglowski.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bloom-Filter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Bloom-Filter"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Xaerxess/Bloom-Filter.git",
+         "web" : "https://github.com/Xaerxess/Bloom-Filter"
+      }
+   },
+   "version" : "1.2"
+}

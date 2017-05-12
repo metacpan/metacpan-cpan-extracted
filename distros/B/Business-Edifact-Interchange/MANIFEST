@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/SampleQuote.txt
+examples/test2qty.ceq
+examples/prquotes_73050_20110826.ceq
+examples/quotes.edi
+examples/INVOIC_019371B.CEI
+examples/2_BLSINV224768.CEI
+examples/invoice_example
+lib/Business/Edifact/Interchange.pm
+lib/Business/Edifact/Message.pm
+lib/Business/Edifact/Message/LineItem.pm
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/parseinvoice.t
+t/parseinvoice2.t
+t/parsequote.t
+t/parsequote2.t
+t/pod-coverage.t
+t/pod.t
+t/quotefreetext.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,8 @@
+Sequence.1	Sample.1	0.25
+Sequence.1	Sample.2	0
+Sequence.2	Sample.1	0.15
+Sequence.3	Sample.1	0.2
+Sequence.4	Sample.2	0.9
+Sequence.5	Sample.1	0.4
+Sequence.6	Sample.3	1
+Sequence.6	Sample.2	0.1

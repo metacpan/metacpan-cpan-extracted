@@ -1,0 +1,48 @@
+{
+   "abstract" : "RSS feed monitor for Bot::Cobalt",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bot-Cobalt-Plugin-RSS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::Cobalt" : "0.003",
+            "File::Spec" : "0",
+            "XML::RSS::Feed" : "0",
+            "perl" : "v5.12.1"
+         }
+      }
+   },
+   "provides" : {
+      "Bot::Cobalt::Plugin::RSS" : {
+         "file" : "lib/Bot/Cobalt/Plugin/RSS.pm",
+         "version" : "0.002"
+      },
+      "Bot::Cobalt::Plugin::RSS::Conf" : {
+         "file" : "lib/Bot/Cobalt/Plugin/RSS/Conf.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.002"
+}

@@ -1,0 +1,42 @@
+Business-PayPal-NVP version 1.10
+================================
+
+  my $pp = new Business::PayPal::NVP(%args);
+  my %response = $pp->SomeMethod(%method_args);
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+TESTING
+
+To run the tests you'll need to have a PayPal Sandbox account. create
+a file named 'auth.txt' in this module's root directory (i.e., where
+this README file is found) in the following format:
+
+  user = your.TEST.api.username.for.paypal.tld
+  pwd  = your.TEST.api.password
+  sig  = your.TEST.api.signature
+
+The test harness will read this file and try to connect to PayPal's
+test server and make some calls there.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  LWP
+  URI::Escape
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2016 by Scott Wiersdorf
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,6 @@
+Revision history for Perl extension CGI::Session::Serialize::Base64.
+
+0.01  Mon Mar  1 16:21:00 2004
+	- original version; created by h2xs 1.20 with options
+		-X -n CGI::Session::Serialize::Base64
+

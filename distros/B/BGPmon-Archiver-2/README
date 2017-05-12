@@ -1,0 +1,55 @@
+This README describes the BGPmon Archiver.
+
+DESCRIPTION
+------------
+
+The BGPmon Archiver will connect to a BGPmon instance and write the XML output
+to disk, one message per line. Messages are organized according to the peer
+address. Depending on the options specified, the XML message is translated to a
+pipe ('|') delimited format, similar to the one produced by libbgpdump.
+
+INSTALLATION
+-------------
+
+perl Makefile.PL
+make
+make install
+
+Copy the sample configuration file from the etc/ directory and put it in a
+standard location. Change the paths specified by the 'directory' and
+'peerdirectory' parameters to the appropriate paths for your setup.
+
+If you want to control the archiver via the system's init processes, copy the
+bgpmon-archiver script from the scripts/ directory to /etc/init.d.  This script
+expects that the archiver process will be run by user 'bgpmon'.  If you plan to
+use a different user to run the archiver, edit this script and change '--user
+bgpmon' to the user you would like to use.
+
+Next, make the script executable:
+
+chmod +x /etc/init.d/bgpmon-archiver
+
+If you would like the archiver to start up automatically each time the machine
+restarts/reboots, do the following:
+
+On Ubuntu:
+update-rc.d bgpmon-archiver defaults
+
+On Fedora:
+chkconfig --level 12345 bgpmon-archiver on
+
+DEPENDENCIES
+-------------
+
+POSIX
+File::Path
+BGPmon::Log
+BGPmon::Fetch
+BGPmon::Translator::XFB2BGPdump
+BGPmon::Translator::XFB2PerlHash::Simple
+Cwd
+
+AUTHOR
+-------
+
+Kaustubh Gadkari <kaustubh@cs.colostate.edu>

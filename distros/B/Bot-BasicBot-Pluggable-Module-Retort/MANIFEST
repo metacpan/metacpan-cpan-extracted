@@ -1,0 +1,6 @@
+Changes
+lib/Bot/BasicBot/Pluggable/Module/Retort.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/001-use.t

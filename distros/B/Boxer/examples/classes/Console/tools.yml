@@ -1,0 +1,16 @@
+classes:
+  - cli.less
+  - Console
+parameters:
+  doc:
+    console:
+      pkg:
+        - include console helper tools
+  pkg:
+    - dfc
+    - info
+    - man-db
+    - manpages
+    - mr
+    - mtr-tiny
+    - ncdu

@@ -1,0 +1,105 @@
+        <WorkflowProcess Id="mixed-join" Name="mixed-join">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="data_ok" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Description/>
+                    <Event>
+                        <StartEvent Trigger="None"/>
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Start-A"/>
+                                    <TransitionRef Id="Start-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A" Name="Enter Order">
+                    <Description/>
+                    <Implementation>
+                        <Task/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B"/>
+                                    <TransitionRef Id="A-C"/>
+                                    <TransitionRef Id="A-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="Compose Acceptance Message">
+                    <Description/>
+                    <Implementation>
+                        <Task/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="Email Confirmation">
+                    <Description/>
+                    <Implementation>
+                        <Task/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="Fill Order">
+                    <Description/>
+                    <Implementation>
+                        <Task/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="E" Name="Join">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="AND"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Description/>
+                    <Event>
+                        <EndEvent/>
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-A" From="Start" To="A" Name="">
+                    <Condition Type="CONDITION">attribute('data_ok')</Condition>
+                </Transition>
+                <Transition Id="Start-End" From="Start" To="End" Name="">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="A-B" From="A" To="B" Name=""/>
+                <Transition Id="A-C" From="A" To="C" Name=""/>
+                <Transition Id="A-D" From="A" To="D" Name=""/>
+                <Transition Id="B-E" From="B" To="E" Name=""/>
+                <Transition Id="C-E" From="C" To="E" Name=""/>
+                <Transition Id="D-E" From="D" To="E" Name=""/>
+                <Transition Id="E-End" From="E" To="End" Name=""/>
+            </Transitions>
+            <ExtendedAttributes/>
+        </WorkflowProcess>

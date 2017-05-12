@@ -1,0 +1,12 @@
+: include "header.tx";
+<script type="text/javascript">
+    $(function() {
+    $('#term').terminal("term", { prompt: 'beagle <: $name :>>',
+        greetings: ''
+    });
+    });
+</script>
+
+<div id="term">
+</div>
+: include "footer.tx";

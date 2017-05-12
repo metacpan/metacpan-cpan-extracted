@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Bio/DOOP/Cluster.pm
+lib/Bio/DOOP/ClusterSubset.pm
+lib/Bio/DOOP/DBSQL.pm
+lib/Bio/DOOP/DOOP.pm
+lib/Bio/DOOP/Graphics/Feature.pm
+lib/Bio/DOOP/Motif.pm
+lib/Bio/DOOP/Sequence.pm
+lib/Bio/DOOP/SequenceFeature.pm
+lib/Bio/DOOP/Util/Search.pm
+lib/Bio/DOOP/Util/Filt.pm
+lib/Bio/DOOP/Util/Sort.pm
+lib/Bio/DOOP/Util/Run/Mofext.pm
+lib/Bio/DOOP/Util/Run/Fuzznuc.pm
+lib/Bio/DOOP/Util/Run/GeneMerge.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

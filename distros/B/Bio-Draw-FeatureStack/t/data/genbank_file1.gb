@@ -1,0 +1,200 @@
+LOCUS       NC_003279               6098 bp    DNA     linear   INV 28-JAN-2011
+DEFINITION  Caenorhabditis elegans chromosome I, complete sequence.
+ACCESSION   NC_003279 REGION: 9358456..9364553
+VERSION     NC_003279.6  GI:193203938
+DBLINK      Project: 158
+KEYWORDS    HTG.
+SOURCE      Caenorhabditis elegans
+  ORGANISM  Caenorhabditis elegans
+            Eukaryota; Metazoa; Nematoda; Chromadorea; Rhabditida;
+            Rhabditoidea; Rhabditidae; Peloderinae; Caenorhabditis.
+REFERENCE   1  (bases 1 to 6098)
+  CONSRTM   The C.elegans Sequencing Consortium
+  TITLE     Direct Submission
+  JOURNAL   Submitted (11-AUG-2003) Nematode Sequencing Project, Wellcome Trust
+            Sanger Institute, Hinxton, Cambridge CB10 1SA, UK, and Genome
+            Sequencing Center, Washington University, St. Louis, MO 63110, USA.
+            E-mail: sequence@wormbase.org
+COMMENT     REVIEWED REFSEQ: This record has been curated by WormBase. The
+            reference sequence was derived from CHROMOSOME_I.
+            On Jun 27, 2008 this sequence version replaced gi:134000149.
+            This record corresponds to Wormbase release WS195.
+FEATURES             Location/Qualifiers
+     source          1..6098
+                     /organism="Caenorhabditis elegans"
+                     /mol_type="genomic DNA"
+                     /strain="Bristol N2"
+                     /db_xref="taxon:6239"
+                     /chromosome="I"
+     gene            611..5489
+                     /gene="dyf-5"
+                     /locus_tag="M04C9.5"
+                     /note="abnormal DYe Filling"
+                     /db_xref="GeneID:187442"
+                     /db_xref="WormBase:WBGene00001121"
+     mRNA            join(611..717,1514..1606,1730..1829,2440..2901,3052..3132,
+                     3202..3429,3592..3698,3828..3919,4239..4462)
+                     /gene="dyf-5"
+                     /locus_tag="M04C9.5"
+                     /transcript_id="NM_060092.2"
+                     /db_xref="GI:193203046"
+                     /db_xref="GeneID:187442"
+                     /db_xref="WormBase:WBGene00001121"
+     mRNA            join(689..717,1514..1606,1730..1829,2440..2901,3052..3132,
+                     3202..3429,3592..3698,3828..3919,4239..4373,5356..5489)
+                     /gene="dyf-5"
+                     /locus_tag="M04C9.5"
+                     /transcript_id="NM_001136314.1"
+                     /db_xref="GI:212642196"
+                     /db_xref="GeneID:187442"
+                     /db_xref="WormBase:WBGene00001121"
+     CDS             join(689..717,1514..1606,1730..1829,2440..2901,3052..3132,
+                     3202..3429,3592..3698,3828..3919,4239..4373,5356..5489)
+                     /gene="dyf-5"
+                     /locus_tag="M04C9.5"
+                     /codon_start=1
+                     /protein_id="NP_001129786.1"
+                     /db_xref="GI:212642197"
+                     /db_xref="GeneID:187442"
+                     /db_xref="WormBase:WBGene00001121"
+     CDS             join(689..717,1514..1606,1730..1829,2440..2901,3052..3132,
+                     3202..3429,3592..3698,3828..3919,4239..4462)
+                     /gene="dyf-5"
+                     /locus_tag="M04C9.5"
+                     /inference="similar to RNA sequence, mRNA (same
+                     species):INSD:AM498742.1"
+                     /codon_start=1
+                     /protein_id="NP_492493.2"
+                     /db_xref="GI:193203047"
+                     /db_xref="GeneID:187442"
+                     /db_xref="WormBase:WBGene00001121"
+     gene            3178..3201
+                     /locus_tag="M04C9.8"
+                     /db_xref="GeneID:6418599"
+                     /db_xref="WormBase:WBGene00050921"
+     misc_RNA        3178..3201
+                     /locus_tag="M04C9.8"
+                     /product="M04C9.8"
+                     /note="C. elegans microRNA mir-1019"
+                     /transcript_id="NR_023945.1"
+                     /db_xref="GI:193203048"
+                     /db_xref="GeneID:6418599"
+                     /db_xref="WormBase:WBGene00050921"
+     gene            complement(5710..>6098)
+                     /gene="ppfr-1"
+                     /locus_tag="F16A11.3"
+                     /note="Protein Phosphatase Four Regulatory subunit"
+                     /db_xref="GeneID:172761"
+                     /db_xref="WormBase:WBGene00008878"
+     mRNA            complement(5710..>6098)
+                     /gene="ppfr-1"
+                     /locus_tag="F16A11.3"
+                     /transcript_id="NM_001026217.2"
+                     /db_xref="GI:86561101"
+                     /db_xref="GeneID:172761"
+                     /db_xref="WormBase:WBGene00008878"
+ORIGIN      
+        1 caatcaatgg ttaaccatac acatttttca acaaaaaatt tttaacgttt tctactctcc
+       61 ggtaataatt ttctgctgtc tcttaatgta cttcacagat gaaactttga ttaaataaaa
+      121 cgcaacagct acatttgctt tacttgatta attttgaatg accgcacatt aaaaaaatat
+      181 ttttaaattt aaaaaaaatg catgttttcc ggaaaccctc cctgagatcc tcccacacca
+      241 tcttcgagca tgtaaaatct tccaactctt cgaggctctt agtttctcta tctaattacc
+      301 gaaagtgcat agcatgctca cctgtttgtg agcacaaatg tgagctccga gctgcttccc
+      361 ttcctcatct cgtcttcttc ttgtgctccg ccgtttgctc ttggttacca tagaaactgt
+      421 ctgttacacc cttttctctt cttcatgctt cttctctttt agtctttcct ctcatggctc
+      481 actcactcgt cttttccaat atctgaacct atgttcatgc tcactgcttt ctctctattt
+      541 tttatcgcgc gtattttctc atatttctca tttctcttca atttttctaa acgttttttc
+      601 ttgttttcag ctgcaaaacg ggtcagattg acaataaaag gacgccaaat accggaaagt
+      661 agaaaggaaa atataagggc aagaagccat gtcatcggct gttaaacttg ctgatcggta
+      721 cgttttttat cattttttgt aggtttccgg gcaaaaggag aaagtgtaga gttcacaaag
+      781 ttctgaatac aaaaactaat tgcaggtgaa aaatttgttt agatgttaat accaaaaagt
+      841 acacccaata atatatttta aaaatggaaa aaaaagtatt tgtaacggtg tgtaaagatg
+      901 ttcgtcgatt aaggtgttca tagttgtagt caatgattcc aaagattatt taaatgtcag
+      961 gatatggcca gttgaatgtt aagtaactgt agtagggtac tgtcctgagt ttattttttt
+     1021 ttaaccagtt ttatgctcca aaattgtgtt attgccggaa tgcctttatg gcaaaactgt
+     1081 gttgtaccac aaattaagtg aaatcaaaat ttagggcgtt catattagcg cccgtcgagc
+     1141 gcgccacgct gttacgccgc agaaaagtgg tgagaggcag aaaaatagac ttttttgaaa
+     1201 ttttttaaaa ttttgagatt atagttttga cagtttttgc aagagattgt agtttatgag
+     1261 ttttctcttt ttttcttggg tgcccaccga attcattagt ttaacgcaaa aatctattta
+     1321 cttgttcatc tattttgtct accaaataca caataaattc ttcctctttt ctgtctgcaa
+     1381 ttatgacgcc acggattcgc agaaaaacga atattgccag tttccgtatt tttcacatta
+     1441 gtggggatta tatcctctgt attgttatgt ctatttattt tttattatcg tcaaaaacag
+     1501 acaatatttt tagatatctg atgacaaaaa ggcttggaga tggaacattc ggtgaagtta
+     1561 tgcttgcaaa gaaaatagac actggtgatc gagttgcaat taaaaggtgt gtagttgaat
+     1621 ggatccagat aataatgccc agactattta aagttttcaa tcattttagt tcgttttgca
+     1681 cgaaattcat gttgtttgat aaaacttaat gagaattagt tttttgcaga atgaagaaaa
+     1741 agttctacag ttgggaagaa gcaatgagct tacgagaagt gaaatccctc aaaaaactca
+     1801 atcatccgaa tattattaaa ttgagagagg taagagaaaa ctcagaaaga ttagatttcg
+     1861 ttgcgaaata ttcatgcata agtcacaaaa atacgaaaat ctgaactcaa aaagtaatat
+     1921 gactctctct gattaatttt tagccaattt ttttttcaaa atgcacataa tcattctcaa
+     1981 aactatatag tcaaacatac aacttttaaa ctacggaaag agtcgaacat tcggaaatat
+     2041 gaaaattttg aaaaactaaa gtgacttatt ttttccattt tcatagtcct agtgatggtt
+     2101 tagaatggcg actactgtag tgttactgta atggtttggt gaaggtactg aaaatagtac
+     2161 tgtaggatta ctggaactat tctgaaaatc cgttcaaagc ttttgaggga agactgagtt
+     2221 gagtgtcata acactgcaga gcctctgagg aatcactgtc ctgtagagtt actgtagcta
+     2281 cactgtaaaa ttttagaaac ttcttgaatt ctctagatgc ttttgaaaaa cttgtaaaaa
+     2341 ctccttcaat atttatgaaa aaattttaaa atggacaatt ggatgcattt tctgtagttg
+     2401 tacaacaaat aaataaataa ttgaaatccc attttgcagg taattcgtga aaatgacatt
+     2461 ctctactttg tgttcgagtt tatgcaagaa aatctgtacg agctaatgaa agatcgtgat
+     2521 cgttattttc cggaaagtgt tattcgaaat ataatatatc aagtactaca aggacttgca
+     2581 ttcatgcata aaaatggatt ctttcatcga gatatgaaac ccgaaaatat aatgtgtaat
+     2641 ggaacagaac ttgtgaaaat tgctgatttt ggattggcac gagaaatcag atcaaaacca
+     2701 ccatatacag attatgtatc aacaagatgg tatagagcac ctgaaattct tctgagatct
+     2761 acttcataca actcaccaat tgatatgtgg gcattgggat gcattatggc agaactttat
+     2821 attctaagac cacttttccc tggaacttct gaaatggatc aattattcaa aataatatca
+     2881 attcttggaa ctccaaataa ggttcgttct ttattatgac ggggtggaag cagaattttt
+     2941 cttcatttcc ccacgaacat accttagcaa tccgtgaact ctgttacaaa tttaacaagt
+     3001 agagaacacc aatagactga tcacatttat tcaatatatt aataatttca ggatgaatgg
+     3061 ccagaaggtt atcaattagc ttcagcaatg aacttccgtt tccaacaagt tgtagcaaca
+     3121 ccaatggaac aggtgagcat tgttcgagtt tcatttttaa taaaatttat ttaaaaactg
+     3181 taattccaca ttgctttcca ggttgtgaac acaataagta aagaaggaat gaaattaatg
+     3241 atggatatga tgctttggaa tccagagaaa cgtccgaatg ctaatcaatc acttcgctat
+     3301 aaatatttcc aagttgctga aaagttgggt gctccagttg ttagtcaacc agctcctgga
+     3361 agtattcgaa agacaagtgc agcttcagtt aaaagtgata cgaaagcaat gacagctaag
+     3421 gcggcaaagg ttggttatca ctaatttttt ttgctgaaca atgatgcagc tgtaatttga
+     3481 agttaatcga atcttcaaga tatttaagga aataagcatt actttttgta gatggtagaa
+     3541 attatttcca gacttacaga gaatctatac aataaaaagt agacatttca gaaagattac
+     3601 attggatcag aaaatgtgtc tcctcaacaa ccagccaaag ttattgaccg tcacataaat
+     3661 cgcaatctac ctctcaataa ggaaactctt tttgaaaagt aggttgcata tctgttctac
+     3721 agttgattcg cgacgtccag ggatcggacg ttgcaagtta tcagtgtctt actaaactag
+     3781 aattattcag aaaagttaag acttacattc acaaattaca atttcagatc agataacaag
+     3841 cctctgggac caacaaaatc aaatgaagca aagccgacag caaaggagat atatttatca
+     3901 aaaagcaaat atgtgcccgg tactgtcaaa aataaattca aaaaatcttg taaattatga
+     3961 aaattatgtt ttccttattt tgtaagtatt tagttttttt caacgtagtt ttaagccata
+     4021 atgctcactt tcaaagcctt ctctattaca tttgtataat ttatttttaa gcttcaacat
+     4081 attaaagtta taaaaattat ttattcagta aaatggttgg acttgctcat accttatttg
+     4141 aattgtgatt gttcaatttt ttaaaaattg gtattactta caaaaatctc cctaagtttc
+     4201 tatattttct tgtcctttct atttctttca attttcaggc caagtatcca aagacactca
+     4261 tcaaaatcaa ataatgacaa caaatggatt aactggaaca actaaaacga caacattttc
+     4321 tgcaaaaaaa gagggtcgaa cggcagttca aacaaggttc gagtatgcgt acggttcgtc
+     4381 gttttgttct tctcataaat ctctcttttt gtttgttttt ttacttcctt ttggcgcatg
+     4441 cctttcttcc caatattctt agtgtttgca attgcttttg ttcgatcaaa gattttatag
+     4501 caaaactgat atatctatga aaaaaaatct gccaaaaagg tcaatgtaat acttctaact
+     4561 atataattag ccgaaaactt gagaacatag ttctattttt tggaaattgt tccaaaccgc
+     4621 tcatggtgct gaaatatcca aaaatcataa taaaacaaag acgttttttg acatttttta
+     4681 tttactatta gagtcaaata gtagttatag ctctttttca ctaatcataa ttttggaagt
+     4741 cgagaaagtt attcctccaa gttttatatt ttcattgtgt tttaaatgtt cgtatttaag
+     4801 cattctgggg gtcgaacctg cagcaaatct cgaaattact caagatgacc atagttttgt
+     4861 aaaatatgga aattttccaa aaccaaagtt ttttttaact aaattttttt gtgttttatt
+     4921 atcatatttg gtgaagtcgg actattacat ttgtacttag actaaacacc aaacaaaaaa
+     4981 gttgagttgt gaaaattaaa ttgatagttt caactatcaa gaaaattttc gctttctaat
+     5041 gtttttgaaa aataagtcac gtctcgttcg caccattttt tttgaatcct taacgttcag
+     5101 aatttgaacc tctgaaaaat tgaaatatat cttttttaat ttgaaattaa tagtcttgtg
+     5161 gtgtcgattt tgataactaa tgagattgta attctatgag agtgaccgag ttttctcttt
+     5221 tataagcacg tttagtttag acactataaa gttacaacaa atcttttttc tgatttatca
+     5281 tattcctatt tttttcattc atttcccaat atagttttca ttcctaattt ttgtttttta
+     5341 actttgaaat tacaggttac atcccaagct tcggagcaag acagacggga ccaacagtgt
+     5401 cgaatcaaac aaataatcat tcagcaaata attctcattc accaaataaa atgagtaata
+     5461 cgggtcgagt cgattgggca gccaagtgag tctttttttc gagttttcca aatttgaaat
+     5521 gctttcagat atgtaaaata gtcaccatcg ttcgaaatat tgcataatct tcgctacagt
+     5581 accccgtttt caaggacttc tcccttggcg gtgaagtcag gaaaaatgcc tagcgtgatt
+     5641 cttttaattt atttttttta aattttcacc caactctctt tcataaaatg tggaataaac
+     5701 tacgaattca catgtattat accacaaatt aggcactatg gctacaaaaa aatcaataaa
+     5761 tgaagtaaga gggcagagca cgcacaatta agtgaaacat gaaaaccgag tgtgagaaat
+     5821 tgtgggcggg gagaagaaaa tgggaagaaa gtggataaaa ggagctgtca acagcggagt
+     5881 ttaagtatga ccaagaaaaa tggaataaat ggggatggaa aactgaaata attgaaattg
+     5941 atactctagt aataaatacc acacataaaa ttctaaaaat tccaagaaaa aaacgggaca
+     6001 attacacaag aaacctagaa aaaaagtatt ttaatgggaa aagatcggcc agcgatcaca
+     6061 ttttgaatca aatcctaaaa cttcaagttt ggaagaaa
+//
+

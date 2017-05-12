@@ -1,0 +1,93 @@
+Revision history for Business::Colissimo
+
+0.2200 Mon Nov 12 08:42:34 2012 CET
+
+    [BUG FIXES]
+
+    * Add prerequisite on GD which is required for the png method of
+      Barcode::Code128.
+
+    [DOCUMENTATION]
+
+    * Show that recommendation level is valid only in expert_f and expert_om
+      modes.
+
+0.2100 Tue Jul  3 16:41:24 2012 CEST
+
+    [BUG FIXES]
+
+    * Fix calculation of tracking bar codes for expert_i mode.
+    * Fix insurance/recommendation level check for access_f mode.
+
+0.2000 Fri Jun 29 13:08:31 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for acknowledgement of receipt and customs duty free.
+    * Add organisation method.
+
+    [BUG FIXES]
+
+    * Allow up to 10 alphanumerics for international postal codes.
+ 
+0.1000 Mon May  7 08:40:37 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for producing correct bar codes for Expert International.
+
+    [BUG FIXES]
+
+    * Fix broken output from logo method for KPG countries. 
+
+    [TESTS]
+
+    * Add tests for logo method.
+
+0.0200 Sun Feb 26 18:26:12 2012 IST
+
+    [ENHANCEMENTS]
+
+    * Add support for changing barcode image padding.
+
+    [BUG FIXES]
+
+    * Fix regular expression for insurance resp. recommendation level.
+
+0.0100 Fri Feb 10 10:04:55 2012 CET
+
+    [API CHANGES]
+
+    * Set default barcode image scale to 1px.
+    * Set default barcode height to 77px.
+
+    [ENHANCEMENTS]
+
+    * Add support for changing barcode image scale.
+    * Add support for changing barcode height.
+    * Remove border from barcode images.
+    * Add testing mode.
+
+0.0002 Mon Jan 30 11:46:13 2012 CET
+
+    [API CHANGES]
+
+    * Rename mode access to access_f and mode expert to expert_f.
+    * Add mode expert_oem.
+
+    [ENHANCEMENTS]
+
+    * Add spacing parameter to barcode method.
+    * Add logo method.
+    * Allow generation of barcode images for arbitrary barcodes.
+
+    [TESTS]
+
+    * Add test for size and format of barcode images.
+    * Update barcode tests with checks for exact barcode numbers.
+
+0.0001 Fri Nov 11 19:51:33 2011 CET
+
+    * Initial release
+
+

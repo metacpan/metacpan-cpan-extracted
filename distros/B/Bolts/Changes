@@ -1,0 +1,61 @@
+0.143171  2014-11-13 14:03:30-06:00 America/Chicago
+    
+    * Interface Change: Bolts::Util::artifact() now returns an array of the form
+      { $name => $artifact } rather than just $artifact.
+    * It is now possible to pass an artifact object (i.e., an object
+      implementing Bolts::Role::Artifact) as the definition of an artifact.
+    * Drop get() from the Bolts::Role::Locator interface. It provides nothing
+      useful in the way of functionality.
+
+0.143170  2014-11-13 10:22:18-06:00 America/Chicago
+
+    * Bugfix: The self() helper was missing from the Bolts package.
+    * Adding Bolts:Util::artifact() as a generalized abstraction of the Bolts
+      sugar (so it can be shared with Bolts::Role)
+    * Fleshing out the artifacts accessor of Bolts::Meta::Class::Trait::Bag,
+      which had been mentioned in the documentation previously, but had not yet
+      been implemented.
+    * Add Bolts::Role::Opaque to hide the internals of an artifact from locators
+      during aquisition.
+    * Better checking on keys and indexes when locating within an array or hash.
+    * During acquisition, if one of the acquired items is a locator, pass
+      control of acquisition to the nested locator.
+
+0.142930  2014-10-20 11:17:32CDT-0500 America/Chicago
+
+    * Interface Change: The dep() sugar method in Bolts now uses paths that are
+      based on the top-level bag and not the local bag/contains definition.
+    * Add a new blueprint, parent_bag, defined in Bolts::Blueprint::ParentBag,
+      which just retrieves the bag of the parent during artifact resolution.
+    * Add a sugar method to Bolts named self(), which provides a quick way of
+      creating a parent_bag dependency.
+
+0.142860  2014-10-13 10:20:59CDT-0500 America/Chicago
+
+    * Bugfix: The push key to Bolts::artifact() was incorrectly using a 1-based
+      index for injector keys rather than a 0-based index.
+    * Replaced Bolts::Role::Locator with a version that only declares the
+      required parameters.
+    * Copied the original Bolts::Role::Locator to Bolts::Role::RootLocator and
+      made it implement Bolts::Role::Locator
+    * Converted Bolts::Role::SelfLocator, Bolts::Locator, and
+      Bolts::Meta::Locator to use Bolts::Role::RootLocator.
+    * Made Bolts::Meta::Class::Trait::Locator into an implementation of
+      Bolts::Role::Locator.
+    * Added a new init_locator attribute to Bolts::Artifact
+    * Changed blueprint, scope, and injectors so that they can take a special
+      initializer argument during construction that takes the form of a
+      Bolts::Meta::Initializer reference that can be used to acquire the
+      blueprint, scope, and injectors (respectively) rather than require they be
+      delivered directly by the caller. This is much nicer to use directly now.
+    * Added Bolts::Role::Initializer and the Bolts::Intializer attribute trait
+      to make objects that can be initialized through the use of their own
+      personal locator convenient. This is a slight deviation from pure IOC, but
+      very convenient in some cases.
+    * Modify locator_for() and meta_locator_for() in Bolts::Util to return
+      the same locator object for each invocation after the first for a given
+      object reference.
+
+0.142650  2014-09-22 00:33:43CDT-0500 America/Chicago
+
+    * Initial release.

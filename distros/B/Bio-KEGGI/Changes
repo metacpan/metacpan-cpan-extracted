@@ -1,0 +1,9 @@
+Revision history for Bio-KEGGI
+
+0.0.2   Mon Sep 6 11:05:00 CCT 2010
+        First version, released on an unsuspecting world.
+0.1.2   Thu Jan 20 15:00:00 CCT 2011
+        Added a new moudle Bio::KEGG::gene for KEGG organism gene entries.
+        Fixed bugs.
+0.1.5   Mon Mar 28 16:15:00 CCT 2011
+        Fixed POD bugs.

@@ -1,0 +1,24 @@
+#!/usr/bin/perl -wT
+use strict;
+use lib qw(lib ../lib);
+use Bio::Das::Lite;
+use Data::Dumper;
+$Bio::Das::Lite::DEBUG = 0;
+
+my $das              = Bio::Das::Lite->new();
+my $sources          = $das->registry_sources();
+my $count_all        = scalar @{$das->registry_sources()};
+my $count_stylesheet = scalar @{$das->registry_sources({
+							'capability' => ['stylesheet']
+						       })};
+my $count_protein    = scalar @{$das->registry_sources({
+							'category'   => ['Protein Sequence']
+						       })};;
+
+print Dumper($das->registry_sources());
+
+print STDERR qq(
+all        = $count_all
+stylesheet = $count_stylesheet
+protein    = $count_protein
+\n);

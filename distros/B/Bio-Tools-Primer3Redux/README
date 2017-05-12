@@ -1,0 +1,51 @@
+Bio-Tools-Primer3Redux
+
+This is a set of modules for running and parsing Primer3 output using BioPerl.
+It is meant as an update for the previous Primer3 perl modules
+(Bio::Tools::Primer3 and Bio::Tools::Run::Primer3) to use both Primer3 v1.x and
+v2.x (which had significant API changes from v1.x).
+
+However, due to changes in the API of the parser to allow for more informational
+storage, these have been renamed to Bio::Tools::Primer3Redux.  
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::Tools::Primer3Redux
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Tools-Primer3Redux
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-Tools-Primer3Redux
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-Tools-Primer3Redux
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-Tools-Primer3Redux/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Chris Fields
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

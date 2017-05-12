@@ -1,0 +1,22 @@
+<div class="tags">
+<table class="tags">
+: for $tags.keys().sort(-> $a, $b { lc($a) cmp lc($b) } ) -> $tag {
+: if $~tag.index % 5 == 0 {
+<tr>
+: }
+<td class="hover tag">
+<a class="hover" name="<: $tag :>" class="tag" target="_blank" href="<: $prefix :>tag/<: $tag :>">
+: if $tag ~~ $entry_types {
+    <: _($tag) :>
+: } else {
+    <: $tag :>
+: }
+(<: size($tags[$tag]) :>)</a>
+<div class="glance"></div>
+</td>
+: if $~tag.index % 5 == 4 || $~tag.is_last {
+</tr>
+: }
+: }
+</table>
+</div>

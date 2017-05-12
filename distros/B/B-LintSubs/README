@@ -1,0 +1,43 @@
+NAME
+    B::LintSubs - Perl compiler backend to check sub linkage
+
+SYNOPSIS
+    perl -MO=LintSubs [*FILE*] [-e PROGRAM]
+
+DESCRIPTION
+    When using "use strict", subroutine names are not checked at the
+    callsite; this makes the following a perfectly valid program at
+    compiletime, that only blows up at runtime
+
+     use strict;
+     foobar();
+
+    When using the "B::LintSubs" checker instead, this is detected:
+
+     $ perl -MO=LintSubs -e 'use strict;
+                             foobar();'
+     Undefined subroutine foobar called at -e line 2
+
+    Imported functions from other modules are of course detected:
+
+     $ perl -MO=LintSubs -e 'use strict; 
+                             use List::Util qw( max );
+                             $_ = max( 1, 2, 3 )'
+     -e syntax OK
+
+    In order to handle situations where external code is conditionally
+    referenced at runtime, any fully-qualified references to other functions
+    are printed with a warning, but not considered fatal. The programmer is
+    assumed to Know What He Is Doing in this case:
+
+     $ perl -MO=LintSubs -e 'if( 1 ) { require Data::Dumper; 
+                                       Data::Dumper::Dump( "Hello" ) }'
+     Unable to check call to Data::Dumper::Dump in foreign package at -e line 1
+     -e syntax OK
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+
+    Based on the "B::Lint" module by Malcolm Beattie,
+    <mbeattie@sable.ox.ac.uk>.
+

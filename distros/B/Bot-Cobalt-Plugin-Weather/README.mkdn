@@ -1,0 +1,35 @@
+# NAME
+
+Bot::Cobalt::Plugin::Weather - Weather retrieval plugin for Bot::Cobalt
+
+# SYNOPSIS
+
+    # In your plugins.conf:
+    WX:
+      Module: Bot::Cobalt::Plugin::Weather
+      Opts:
+        API_Key: "my OpenWeatherMap API key here"
+        # OpenWeatherMap's free tier allows 60 requests per minute (default):
+        RateLimit: 60
+        # Caching is on by default:
+        DisableCache: 0
+        # Defaults are probably fine:
+        CacheExpiry: 1200
+        CacheDir: ~
+
+    # On IRC:
+    > !wx Boston, MA
+    > !wx forecast Toronto, Canada
+    # Previous queries remembered per-user for three minutes:
+    > !wx hourly
+
+# DESCRIPTION
+
+A weather conditions/forecast retrieval plugin for [Bot::Cobalt](https://metacpan.org/pod/Bot::Cobalt).
+
+Uses [http://www.openweathermap.org/](http://www.openweathermap.org/) via [POEx::Weather::OpenWeatherMap](https://metacpan.org/pod/POEx::Weather::OpenWeatherMap) /
+[Weather::OpenWeatherMap](https://metacpan.org/pod/Weather::OpenWeatherMap) for retrieval.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

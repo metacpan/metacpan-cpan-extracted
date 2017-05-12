@@ -1,0 +1,26 @@
+Revision history for Perl extension Business::DE::KontoCheck.
+
+0.12 Sun Nov  5 03:53:48 CET 2006
+- added pod
+- added example
+- added method get_info_to_blz
+- changed to new blzfile format
+
+0.09 Thu Jul 13 21:43:14 CEST 2006
+- Added note that I don't develop check methods any more
+
+0.08  Mon Oct 21 22:58:08 2002
+  - methods 69-74
+
+0.07  Mon Oct 21
+  - method 63 fixed
+
+0.06  Wed Oct 16
+  - warning-free, new method getMethod2BLZ()
+
+0.05  Sat Sep 28 20:07:12 2002
+  - methods 00-68
+
+0.01  Tue Aug 14 15:16:38 2001
+	- original version; created by h2xs 1.20 with options
+		-A -n Business::DE::Konto

@@ -1,0 +1,98 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.35.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 593328bd00ab97304904017a7a0596daa3bb331f Build.PL
+SHA1 dfac199a7539a404407098a2541b9482279f690d COPYING
+SHA1 804f28b02cdc560f0cb079efcbe7a2370f040379 Changes
+SHA1 3899c7ba49646059421aceaa36078fad1f87069a MANIFEST
+SHA1 16cbedb019dfc948f5103e3bd3bcb320d78ccf1e MANIFEST.SKIP
+SHA1 3baf8cc89338a2b3b089442b1c3d51985afacb1b META.yml
+SHA1 7e9e2553e95913392d02f7841987ce8b9fb01d1d Makefile.PL
+SHA1 584563648c29540efa35d8a3d4b239be18e61033 README
+SHA1 51a9ec777ed118244d09ae2ce3a933d947f9150d bin/babble
+SHA1 3eaebed6f866a31217df910af7246ae40f86db14 examples/algernon.ini
+SHA1 84119e88f70c5b1ec8b3ed283e454223315474d7 lib/Babble.pm
+SHA1 735c4de3d9e19d5d0f41f77cb313787957e193aa lib/Babble/Cache.pm
+SHA1 04986b979c2c7c82ef85d8382239083eac191b34 lib/Babble/Cache/Class/Hash.pm
+SHA1 1fa94f3036d5356747fc2791a58ae2973f4d1626 lib/Babble/Cache/Dumper.pm
+SHA1 fa14d9f3a022212195315c5935db2a69719b72e1 lib/Babble/Cache/Storable.pm
+SHA1 cf1157bbd0bdff4028e087add9a3e177f1ae8f26 lib/Babble/DataSource.pm
+SHA1 cf428a3c074cc2dd62bd191906d18226deb7b282 lib/Babble/DataSource/DBI.pm
+SHA1 c8d714be70d4021a02990570ad0a98342f47a45d lib/Babble/DataSource/FlatFile.pm
+SHA1 b3187462e849f39a845d8ed2ab49879e2c082d1c lib/Babble/DataSource/Mail.pm
+SHA1 1ad02228cf08702d55d31ce1bc6e4e46edd59516 lib/Babble/DataSource/OPML.pm
+SHA1 1fae50aab2e14d67a9a9bf815c88adf721c51e1c lib/Babble/DataSource/RSS.pm
+SHA1 886c1d8a4df4047b1647deadd03ef6ef14805152 lib/Babble/Document.pm
+SHA1 6652315d78b913b67ab32bc78eef514b974806b3 lib/Babble/Document/Collection.pm
+SHA1 5d7d7b6693d9756ef4e896178a00c2da688902d3 lib/Babble/Encode.pm
+SHA1 829df8c741bf1169a3fc107cebf553e03a717496 lib/Babble/Output.pm
+SHA1 10077b6c1a34a4ebc063c0838d59407a64ad3cc1 lib/Babble/Output/RSS.pm
+SHA1 85008ed62a27ca33909f4b158fc6505b41310361 lib/Babble/Output/TTk.pm
+SHA1 e047b86dbc6c1b7cf896cd22098281f9335357e3 lib/Babble/Processors.pm
+SHA1 bca7e8a6283e0d82e6285c3aa8c92637d51e737d lib/Babble/Processors/Extra.pm
+SHA1 8bb000da5ada1bc0bea36af283b0643b0cbd361c lib/Babble/Theme.pm
+SHA1 aefe4c246949f0060195703bcfee0152d90931b3 lib/Babble/Theme/XML.pm
+SHA1 bae3379187d27c445e4d1453d33155b5bb7c3f93 lib/Babble/Theme/XML/XML.foaf.tmpl
+SHA1 785cdd96bde3c7fe7c3d1d317a6790814462f20a lib/Babble/Theme/XML/XML.opml.tmpl
+SHA1 62e32ee8ee395e3086a20ba581c02c256d8502e1 lib/Babble/Theme/XML/XML.rss10.tmpl
+SHA1 0f51c772450dff5ed0de82b6e43b2de5d944a78f lib/Babble/Theme/XML/XML.rss20.tmpl
+SHA1 09dcd165875e6c91986a64a90afdb03d379c653a lib/Babble/Theme/advogato.pm
+SHA1 b4ac24643c5f2315eeb68fbd9753645267baf10b lib/Babble/Theme/advogato/advogato.css
+SHA1 94fec12907b0a90e1ff399b05e24094a4ecafdea lib/Babble/Theme/advogato/advogato.html.tmpl
+SHA1 0bdea6d64e7cf5b910c9589107557c00328d5815 lib/Babble/Theme/advogato/head.html.tmpl
+SHA1 0156534ccfbd0b3e8a8faf5ac2658f3dae7ec047 lib/Babble/Theme/advogato/main_content.html.tmpl
+SHA1 162e310b6fd39851e4062291498e21be535568d6 lib/Babble/Theme/advogato/sidebar.html.tmpl
+SHA1 cc32a5cbc18f3ea204da1851dbad7bc8409b24b8 lib/Babble/Theme/planet.pm
+SHA1 55c14c85a0798580caadca66e2e32f3b1cf52e55 lib/Babble/Theme/planet/banner.html.tmpl
+SHA1 3892d9a9908776243f47ce9026397d203bb5c4bd lib/Babble/Theme/planet/head.html.tmpl
+SHA1 7a95a9d079d8a0555d5173dce07717c668ce718b lib/Babble/Theme/planet/main_content.html.tmpl
+SHA1 334895f9984db597f2ea3bd618b666cb328fc63c lib/Babble/Theme/planet/planet.css
+SHA1 b0296fa366a3b850027cb0ed75f8afb93b4898c9 lib/Babble/Theme/planet/planet.html.tmpl
+SHA1 27f5b010de806cceeeb256ba1c0aa11b30580271 lib/Babble/Theme/planet/sidebar.html.tmpl
+SHA1 794a6495d054a14e74ff4f47ccfd82ef535b37c6 lib/Babble/Theme/planet_gray.pm
+SHA1 9e920e100df437036988caaf9507ade34fda8667 lib/Babble/Theme/planet_gray/banner.html.tmpl
+SHA1 6c5e8dea8abcca3edf6a105e1ae04f0a7467ec43 lib/Babble/Theme/planet_gray/head.html.tmpl
+SHA1 37244a24091e5faea8bea97fe2d72ae6e9a2d1a7 lib/Babble/Theme/planet_gray/main_content.html.tmpl
+SHA1 831f19429d0826957ee28c019fe0a86663054d70 lib/Babble/Theme/planet_gray/planet_gray.css
+SHA1 a73bacd9aa3bcc39e3fac65ed344cd8119b292c4 lib/Babble/Theme/planet_gray/planet_gray.html.tmpl
+SHA1 04f30296d25a36e6f25169775f6f4b0f57cb861b lib/Babble/Theme/planet_gray/sidebar.html.tmpl
+SHA1 d18709e14674e8b7dc512a199894e25b5ebb90cc lib/Babble/Theme/sidebar.pm
+SHA1 96ea3923226a2738d2ad70adcf3378678c6fbc59 lib/Babble/Theme/sidebar/sidebar.html.tmpl
+SHA1 bf6a026c90b40cc46861757320b2ea2e57480fc1 lib/Babble/Transport.pm
+SHA1 bfb58fc2729bde5ab5aada9111802e375592b0f2 lib/Babble/Transport/LWP.pm
+SHA1 a1c9b57c211f17078fbac1e463bd153b8a730c08 lib/Babble/Utils.pm
+SHA1 460145cd9a4d473fbc1511db4c4e51c8d6b88925 t/0-signature.t
+SHA1 cfd6cc19981ad9371ca26d2e9898455932af1bcb t/babble.t
+SHA1 e218b1f67391d0fdcd0fc367affd54dc8c54f7fd t/data/1.mbox
+SHA1 41ef3c12fe8cbb60cbdba4c26ebcdc745b72b855 t/data/1.opml
+SHA1 822eff353154ad0050639363fa673a918174b32e t/data/1.rss
+SHA1 acc5c45ca1e0712bc2ec6b13bdf5216ee7ced35f t/data/1.txt
+SHA1 1fd6ebb6244c0cf60a1e84a0d9376e1573f17be2 t/data/2.txt
+SHA1 83f58324a4f78ed826ff04f16665638692dfd05a t/datasource/flatfile.t
+SHA1 68f79d9faa0aebac6436de487674547a684d6011 t/datasource/mail.t
+SHA1 a93d10cd27597986c0250cf032cdcdabc1dae3d2 t/datasource/opml.t
+SHA1 66c99e766ed00885a5d79d40bca0ced8515598c8 t/datasource/rss.t
+SHA1 e7ed20ee3fe9f7978c98f45e95e97ea26a5fd199 t/document.t
+SHA1 3eb733bb96f76ebed32e8b3c59d8b6b4ac2d760a t/dummy/Babble/Output/test.pm
+SHA1 7a598249319b2787f35c448657fe38bd887ff2f6 t/pod.t
+SHA1 9138d0043b89d39a9421635d6d2abe36543b7edf tools/install-theme.PL
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.4 (GNU/Linux)
+
+iD8DBQFAjA/mR47eFMOy/N4RArIzAJ48cY1+8u5/gpjkZMi7dAmyEO1jiQCguw2L
+sLIk7uNY7JZR7l9ymuwYbBs=
+=qaEl
+-----END PGP SIGNATURE-----

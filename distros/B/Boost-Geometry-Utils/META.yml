@@ -1,0 +1,27 @@
+---
+abstract: 'Bindings for the Boost Geometry library'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires:
+  ExtUtils::Typemaps::Default: 0.05
+  ExtUtils::XSpp: 0.16
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::CppGuess: 0.07
+  Module::Build: 0.38
+  Module::Build::WithXSpp: 0.10
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Boost-Geometry-Utils
+provides:
+  Boost::Geometry::Utils:
+    file: lib/Boost/Geometry/Utils.pm
+    version: 0.15
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.15

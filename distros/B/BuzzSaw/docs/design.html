@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BuzzSaw - Design</title>
+  </head>
+
+  <body>
+    <h1>BuzzSaw - Design</h1>
+
+    <p>The following sections give a high-level overview of the design
+    of the BuzzSaw log processing framework. The implementation is
+    based on the <a href="intro.html#philosophy">design philosophy</a>
+    described in the introductor section of the documentation.</p>
+
+    <p>The entire BuzzSaw system can really be reduced down to the
+    need to do two specific tasks: importing of data and report
+    generation. The whole system revolves around the central database
+    into which all necessary data is stored.</p>
+
+    <h2>The Database</h2>
+
+    <p>All events of interest are stored in the database. The decision
+    was made to use the PostgreSQL server because of it's excellent
+    feature set, reliability and scalability. It was clear from the
+    outset that there would be the potential to eventually store a
+    very large number of log messages (and associated derived data) so
+    scalability and speed is of particular concern.</p>
+
+    <p>A full description of the database schema is given
+    elsewhere. The high-level view is that each log message of
+    interest is recorded as an <em>event</em>. Associated with
+    each <em>event</em> is a set of zero or more <em>tags</em> and
+    zero or more pieces of <em>extra_info</em>. An <em>event</em> is
+    split down into fields representing the date/time, hostname, user,
+    program, process pid of the program and the full message. Tags are
+    simple labels applied to an event (e.g. <code>auth_failure</code>)
+    whereas extra information entries have both an arbitrary name and
+    value (e.g. <code>source_address</code>. For speed many of these
+    fields and combinations of fields are indexed to improve query
+    times.</p>
+
+    <p>The BuzzSaw interface to the database (see
+    the <code>BuzzSaw::DB</code> module for full details) is built
+    using the Perl <code>DBIx::Class</code> object-relational
+    mapper. This is an excellent module which provides the ability to
+    very easily handle complex queries. For speed in a few parts of
+    the code base we do use raw SQL statements via the standard DBI
+    module but that is only where absolutely essential.</p>
+
+    <p>The implementation of various internal processes relies on
+    PostgreSQL functions and triggers which means that BuzzSaw is
+    currently only going to work with PostgreSQL. Having said that,
+    it's not likely to require a lot of work to rewrite those features
+    into the language supported by some other database engine if
+    required.</p>
+
+    <h2>Importing</h2>
+
+    <p>The import process is driven by
+    the <code>BuzzSaw::Importer</code> Perl module. The import process
+    reads through the log messages from each data source. If an event
+    has not previously been stored in the database then it will be
+    parsed and the event data will be put through the stack of
+    filters. If any filter declares an interest in an event then it
+    will be stored at the end of the process. Additionally, any filter
+    can attach tags and associated extra information even if it does
+    not declare an interest in the event being stored.</p>
+
+    <h3>Data Sources</h3>
+
+    <p>The importer process can have any number of data sources. A
+    data source is any implementation of
+    the <code>BuzzSaw::DataSource</code> Moose role. The data source
+    is required to deliver log messages one at a time to the importer
+    process.</p>
+
+    <p>Currently there is only
+    the <code>BuzzSaw::DataSource::Files</code> Perl module. This
+    module can search through a hierarchy of directories and find
+    files which match a POSIX or Perl regular expression. As well as
+    standard text files, it supports opening files which are
+    compressed with gzip or bzip2. When a file is opened a lock is
+    recorded in the database to avoid multiple processes working on
+    the same data concurrently. When the reading of a file has
+    completed the name is recorded in the database along with the
+    SHA-256 checksum of the file contents. This helps avoid
+    reprocessing files which have been seen previously.</p>
+
+    <h3>Parsing</h3>
+
+    <p>Each data source requires a parser module which implements
+    the <code>BuzzSaw::Parser</code> Moose role. The parser module is
+    used to split a log entry into separate parts, e.g. date, program,
+    pid, message. Mostly this is a case of being able to handle the
+    particular date/time format being used in the log entry. The
+    parser module is called on every log message so it is expected to
+    be fast.</p>
+
+    <p>
+    Currently there is only the <code>BuzzSaw::Parser::RFC3339</code>
+    Perl module. This handles date/time stamps which are formatted
+    according to the guidelines in RFC3339 (e.g. looks
+    like <code>2013-03-28T11:57:30.025350+00:00</code>).
+    </p>
+
+    <h3>Filtering</h3>
+
+    <p>After a log message has been parsed into various fields as
+    an <em>event</em> it is passed through a stack of filters. All
+    events will go through the filter stack in the same sequence.  It
+    is possible to make decisions in one filter based on the results
+    of previous filters. If one or more filters declare an interest in
+    an event it will be stored. It is not possible for a filter to
+    overturn a positive vote from any previous filter.</p>
+
+    <p>A filter is an implementation of
+    the <code>BuzzSaw::Filter</code> Moose role. Currently there are
+    the following filters: Cosign, Kernel, Sleep, SSH and
+    UserClassifier. Most of them are straightforward filters that
+    examine events and return a note of interest, where necessary,
+    along with some tags or other information. The UserClassifier
+    module is slightly different in that it never declares an
+    interest, it just adds extra details when the userid field has
+    been set by any previous filter in the stack (e.g. Cosign or
+    SSH). Typically this module is added last in the stack so that it
+    can process the userid value from any previous filter.</p>
+
+    <h2>Reporting</h2>
+
+    <p>The reporting process is driven by
+      the <code>BuzzSaw::Reporter</code> Perl module. This module has
+      a record of reports which should be generated on an hourly,
+      daily, weekly or monthly basis. When it is run it is possible to
+      run it in two modes. Either it is limited to running a specific
+      set of reports (e.g. only hourly) or it is possible to ask it to
+      run all jobs of all types which have not been run recently
+      enough. So, in the latter case, if a weekly job has not been run
+      for 8 days it would be run immediately. A record is kept of when
+      each report was last run.</p>
+
+    <p>A report will select all events which are have certain tags
+    which occurred within a specified time period. The ordering of the
+    events records retrieved can be controlled.</p>
+
+    <p>A report can be generated using the
+    generic <code>BuzzSaw::Report</code> module or, more typically, by
+    implementing a specific sub-class which is used to specify the
+    names of the relevant tags, the time period of interest, the name
+    of the template to be used, etc. For convenience, when using a
+    sub-class most of these attributes will have sensible defaults
+    based on the name of the Perl module.</p>
+
+    <p>A sub-class of the <code>BuzzSaw::Report</code> module can
+    override specific parts of the process to do additional complex
+    processing beyond the straightforward selection of events and
+    subsequent printing of the raw data. For example, the Kernel
+    report carries out extra analsis of the kernel logs to collate
+    events which are associated with particular types of problem
+    (e.g. an out-of-memory error or a kernel panic).</p>
+
+    <p>A report is generated by passing the events and any results
+    from additional processing to a template which is handled using
+    the Perl Template Toolkit. A report can be simply printed to
+    stdout or sent via email to multiple recipients.</p>
+
+  </body>
+</html>

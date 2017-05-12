@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bundle-Devel
+version:      0.2
+version_from: lib/Bundle/Devel.pm
+installdirs:  site
+requires:
+    Devel::Cover:                  0
+    Devel::Coverage:               0
+    Devel::DProf:                  0
+    Devel::Profile:                0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

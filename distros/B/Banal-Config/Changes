@@ -1,0 +1,11 @@
+Revision history for Banal-Config
+
+0.11    Mon Jul 28 2014
+        Had forgotten to specify Moose dependency in Makefile.PL. Found the issue thanks to reports recieved from CPANTesters over the night.
+        
+0.10    Sun Jul 27 2014
+        Releasing it.
+        
+0.01    July 2014
+        First version, released on an unsuspecting world.
+

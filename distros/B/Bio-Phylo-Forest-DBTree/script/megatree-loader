@@ -1,0 +1,236 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Bio::Phylo::Forest::DBTree;
+use Bio::Phylo::Util::Logger ':levels';
+
+# autoflush STDOUT so writing isn't buffered
+$|++;
+
+# process command line arguments
+my $verbosity = WARN;
+my ( $infile, $dbfile );
+GetOptions(
+	'infile=s' => \$infile,
+	'dbfile=s' => \$dbfile,
+	'verbose+' => \$verbosity,
+	'help'     => sub { pod2usage() },
+	'man'      => sub { pod2usage(1) },	
+);
+pod2usage() if not $infile;
+
+=head1 NAME
+
+megatree-loader - Loads a Newick tree into a database or a spreadsheet
+
+=head1 SYNOPSIS
+
+    megatree-loader -i <file> [-d <file>] [-vhm]
+
+=head1 OPTIONS
+
+=over
+
+=item B<< -i <file> >> or B<< -infile <file> >>
+
+Input tree file in Newick format.
+
+=item B<< -d <file> >> or B<< -dbfile <file> >>
+
+Optional.
+
+Location of a database file, compatible with sqlite3, which will be produced. This file
+can not yet exist. If it does, an error message will be emitted and the program will quit.
+
+If this argument is not provided, the tree topology will be emitted as a comma-separated 
+spreadsheet. (In principle, this spreadsheet could subsequently be loaded into sqlite3
+and then be further indexed by the API.)
+
+=item B<-v> or B<-verbose>
+
+Optional.
+
+With this option, more feedback messages are written during processing. This option can be
+used multiple times, which increases the verbosity further.
+
+=item B<-h> or B<-help>
+
+Optional.
+
+Prints help message / documentation.
+
+=item B<-m> or B<-man>
+
+Optional.
+
+Prints manual page. Additional information is available in the documentation, i.e.
+C<perldoc megatree-loader>
+
+=back
+
+=head1 DESCRIPTION
+
+This program produces a database file or a CSV spreadsheet from a (very large) Newick tree
+file. Such a database provides much quicker random access to immutable trees, such as very
+large metabarcoding trees, the NCBI taxonomy, etc. The example trees that are referred to
+by the release of L<Bio::Phylo::Forest::DBTree> have been produced in this way. They can
+be accessed by an API that is compatible with L<Bio::Phylo>, but much more scalable. An
+example of such API usage is presented by the L<megatree-pruner> script.
+
+=cut
+
+# instantiate helper objects
+my $log = Bio::Phylo::Util::Logger->new( 
+	'-level' => $verbosity, 
+	'-style' => 'simple',
+	'-class' => [
+		'main',
+		'Bio::Phylo::Forest::DBTree::Result::Node'
+	]
+);
+
+# setup database handles
+my ( $sth, $megatree, $dbh );
+if ( $dbfile ) {
+	if ( -e $dbfile ) {
+		$log->fatal("$dbfile already exists, won't overwrite");
+		exit(1);
+	}
+	$log->info("will insert megatree directly into db '$dbfile'");
+	$megatree = Bio::Phylo::Forest::DBTree->connect($dbfile);
+	$dbh = $megatree->dbh;
+	
+	# http://search.cpan.org/~ishigaki/DBD-SQLite-1.54/lib/DBD/SQLite.pm#Transactions
+	$sth = $dbh->prepare("insert into node(id,parent,name,length) values(?,?,?,?)");
+	$dbh->{'AutoCommit'} = 1;	
+	$dbh->begin_work;		
+}
+else {
+	$log->warn("no db file given, CSV output will be written to STDOUT");
+}
+my $idcounter = 2;
+my %idcache;
+
+# do the conversion
+my $newick = slurp($infile);
+my $labeled = label_nodes($newick);
+if ( $labeled =~ /^(.+);$/ ) {
+	my $clade = $1;
+	$log->info("captured outer clade, going to traverse");
+	traverse( $clade );
+	if ( $megatree ) {
+		$log->info("going to compute indexes");
+		$megatree->get_root->_index;
+		$dbh = $megatree->dbh;
+		$dbh->commit;
+	}
+}
+else {
+	die "no ; in newick: $labeled";
+}
+
+# read the provided file into a string, strip line breaks
+sub slurp {
+	my $file = shift;
+	$log->info("going to read file $file");
+	open my $fh, '<', $file or die $!;
+	my @lines = <$fh>;
+	chomp @lines;
+	return join '', @lines;
+}
+
+# attach new, unique labels to interior nodes
+sub label_nodes {
+	my $string = shift;
+
+	# strip previously existing node labels
+	$string =~ s/\)'[^']+'/\)/g;
+	$string =~ s/\)[^:\),]+/\)/g;
+	$string =~ s/\)$/e\)/; # add “e” near the end
+	
+	# apply new labels
+	my @tokens = split ( /\)/, $string );
+	my $line = '';
+	my $counter = 1;
+	for my $i ( 0 .. $#tokens ) {
+		$line .= $tokens[$i] . ')n' . $counter++;
+	}
+	$line =~ s/e(\)n\d+)$/$1/; #remove “e”
+	$line .= ';';
+
+	return $line;
+}
+
+# recursively traverse megatree
+sub traverse {
+	my ( $tokens, $parent, %seen ) = @_;
+	no warnings 'recursion';
+	my $max = length($tokens) - 1;
+	
+	# split tokens into clades, traverse
+	my ( $depth, $label, $clade, @clades ) = ( 0, '', '' );
+	for my $i ( 0 .. $max ) {
+	
+		# take a single character from the token string
+		my $t = substr $tokens, $i, 1;
+		
+		# have completed a clade, store it
+		if ( ( $t eq ',' ^ $t eq ')' ) && $depth == 1 ) {
+			push @clades, $clade;
+			$clade = '';
+		}
+		
+		# extending clade
+		elsif ( $depth > 0 ) {
+			$clade .= $t;
+		}
+		
+		# at level zero, either the node label or at
+		# beginning of token string
+		elsif ( $depth == 0 && $t ne '(' ) {
+			$label .= $t;
+		}
+		
+		$depth++ if $t eq '(';
+		$depth-- if $t eq ')';		
+	}
+	print_branch( $label, $parent ) unless $seen{$label}++;
+	push @clades, $clade if $clade;	
+	traverse( $_, $label, %seen ) for @clades;
+}
+
+# print focal branch as CSV
+sub print_branch {
+	my ( $child, $parent ) = @_;
+	if ( $parent ) {
+		$parent =~ s/:.+//;	
+		my $length = 0;
+		if ( $child =~ /(.+?):(.+)/ ) {
+			( $child, $length ) = ( $1, $2 );
+		}
+		$idcache{$child}  = $idcounter++ unless $idcache{$child};
+		$idcache{$parent} = $idcounter++ unless $idcache{$parent};	
+		doprint($idcache{$child},$idcache{$parent},$child,$length);
+	}
+	else {
+		my $length = 0;
+		if ( $child =~ /(.+?):(.+);\)/ ) {
+			( $child, $length ) = ( $1, $2 );
+		}		
+		$idcache{$child} = $idcounter++ unless $idcache{$child};
+		doprint($idcache{$child},1,$child,$length);
+	}
+	$log->info("wrote node $idcounter") unless $idcounter % 1000;
+}
+
+sub doprint {
+	my @values = @_;
+	if ( $sth ) {
+		$sth->execute(@values);
+	}
+	else {
+		print join(',',@values), "\n";
+	}
+}

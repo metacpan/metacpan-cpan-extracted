@@ -1,0 +1,9 @@
+classes:
+  - hw.x86.amd64
+  - hw.firmware
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include core support for board with AMD C-60 (Brazos) APU and Bobcat CPU

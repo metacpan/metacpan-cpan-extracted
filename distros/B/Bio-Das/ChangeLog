@@ -1,0 +1,54 @@
+2005-08-24  Lincoln Stein  <lstein@cshl.edu>
+	* Minor tweak to API to work more nicely with gbrowse.
+
+2005-04-20  Lincoln Stein  <lstein@cshl.edu>
+	* Added support for arbitrary sequence retrieval contributed by Andreas Kahari
+
+2004-07-08  Lincoln Stein <lstein@cshl.edu>
+	* Hard-code Errno constants on Windows platforms
+	* Throw exception when requested to perform non-overlaps range query.
+	
+2004-06-20  Lincoln Stein <lstein@cshl.edu>
+	* Compatibility fixes for Bio::PrimarySeqI
+	
+2004-02-23  Lincoln Stein <lstein@cshl.edu>
+	* Fixed lots of little aggregator bugs that interfered with
+	GBrowse.
+	* Workaround for Ensembl/Dazzle implementation which puts
+	"ensembl" in the method field of all features rather than
+	in the source field.
+	
+2004-01-14  Lincoln Stein <lstein@cshl.edu>
+	* Added prerequisite for Bio::Root::Root (in bioperl).
+	* Added META.yml to manifest.
+
+2004-01-12  Lincoln Stein <lstein@cshl.edu>
+	* Documented Bio::Das::Map
+	
+2004-01-02  Lincoln Stein <lstein@cshl.edu>
+	* Fixed authentication routines so that auth information isn't sent
+	in the URL.  Also fixed handling of authentication so that when one
+	server needs to be authenticated, it doesn't cancel processing of requests
+	from other servers.
+	* Cleaned up and completed documentation.
+	
+2003-12-29  Lincoln Stein <lstein@cshl.edu>
+
+	* Numerous small compatibility changes to work as a remote annotation
+	source for gbrowse. Stylesheets should be working
+	properly now.
+	
+2003-05-24  Tony Cox  <avc@sanger.ac.uk>
+
+        * Checked in modules to run a small DAS reference server from an AGP file
+
+2003-05-22  Tony Cox  <avc@sanger.ac.uk>
+
+        * Fixes feature requests so that they can use feature_id/group_id
+        * Additions to feature XML parser. Just about all tags/attributes are now available.
+
+2002-11-13  Lincoln Stein  <lstein@cshl.org>
+
+	* HTTP request now sends Host: header, allowing virtual hosts to
+	function properly
+

@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 46510e26ab216f0194bbe240fd0fdd7068973e37 Changes
+SHA1 e82b86fbf553c726c15982116eba3c819ff36bd4 MANIFEST
+SHA1 4ea0ce02adf45bc6b19075ab99225e2d99c341fb META.yml
+SHA1 e7e6fe0f50155a2c02699f91da7d37d102d4ce7d Makefile.PL
+SHA1 dbe3c8d3a17dc6fde88a161c98ec0371ff64d981 README
+SHA1 8842ca38ce27ccf75e1ce8f5dfb93fa62d933b2e inc/Module/AutoInstall.pm
+SHA1 1ebec4119486a032a5612a403e8d7b7be973e938 inc/Module/Install.pm
+SHA1 bec3c7f9af6e1a3cb4d143249956c98af30f0552 inc/Module/Install/AutoInstall.pm
+SHA1 24038af925a69df41972971356ccce885b0fe2ad inc/Module/Install/Base.pm
+SHA1 8f96eddfef548c9328457fbb17a121631cda356b inc/Module/Install/Can.pm
+SHA1 ec29048e48edd9c9c55f9de7b773bd7c904335ad inc/Module/Install/Fetch.pm
+SHA1 01862227830d2547f38275eaee0eb9f5add5a252 inc/Module/Install/Include.pm
+SHA1 0384525d85d51e99532e3ad8729d870113646d14 inc/Module/Install/Makefile.pm
+SHA1 38c657de4d91f5a60ff8e6c6f6a5547daf7c4ab2 inc/Module/Install/Metadata.pm
+SHA1 5c25f1104c0038041e3b93e0660c39171e4caf2b inc/Module/Install/Win32.pm
+SHA1 94d47349c803c4bd2a9230d25e4db0b6aaf1acd8 inc/Module/Install/WriteAll.pm
+SHA1 0f2ff4409f612c9451c603536736f26bb335d274 lib/Beanstalk/Client.pm
+SHA1 5c1e37b111a64c2df5eaa8aba251259789bd8277 lib/Beanstalk/Job.pm
+SHA1 986556314912e679b709ed4eb7e2aaf19fdba495 lib/Beanstalk/Pool.pm
+SHA1 3c56e2cebbedfb64800c942b44de7544c13823f4 lib/Beanstalk/Stats.pm
+SHA1 e02e33a55e1a26b60af7c0dccaffd614fb4908e5 t/00-client.t
+SHA1 9e181109528a39595b9cb13d8c0f3e031571d857 t/01-job.t
+SHA1 0cc9748647c1772052fe8257e4eeebe09de67088 t/02-command.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAlDQlTEACgkQR0BL4gbYw3Rg0ACfb9HLgj/uCouzK+I/S6cYh1cB
+N1UAnjw0UrbLb3jhzg7OQjA7EDHnlrMv
+=wUbf
+-----END PGP SIGNATURE-----

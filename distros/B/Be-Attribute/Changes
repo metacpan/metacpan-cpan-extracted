@@ -1,0 +1,9 @@
+Revision history for Perl extension Be::attribute.
+
+0.2   Thu Jun 19 13:38:26 JST 2008
+	- Why a new version after nine years? Because I'm sick of automated
+	  testing mail.
+
+0.01  Tue Apr 27 01:05:37 1999
+	- original version; created by h2xs 1.19
+

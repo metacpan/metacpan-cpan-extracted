@@ -1,0 +1,14 @@
+0.142230  2014-08-11 10:05:24-05:00 America/Chicago
+
+    * Initial release.
+    * OFun::CodeName service adds the ability to give terms fun and exciting
+      code names.
+    * OFun::Dice provides a DND style dice role tool, coin flipping, a
+      utility to choose N items from a list of items, and shuffle command..
+    * OFun::Hailo provides your bot with the ability to spew back inane chatter.
+    * OFun::Insult allows you to insult people, places, and things (or praise
+      them if you prefer).
+    * OFun::Karma tracks up-votes and down-votes in the channel so you can see
+      how hated your most-hated-RDBMS is and how loved the funny people in your
+      chat are.
+    * Oh, and there are no tests. I'm evil. I know.

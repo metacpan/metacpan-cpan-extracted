@@ -1,0 +1,695 @@
+=head1 NAME
+
+Bigtop::Docs::AutoBackends - lists all backends and their config statements
+
+=head1 Intro
+
+Bigtop is a facade for a set of backends which do the actual generation.
+Each generating backend lives in the Bigtop::Backend:: namespace.  Further,
+each backend has a type or family.  For example, there are three generators
+in the SQL family.  All of them live in the Bigtop::Backend::SQL:: namespace.
+Finally, each backend is in a module, whose name completes the package name.
+For example the PostgreSQL backend is Bigtop::Backend::SQL::Postgres.
+
+Below are listes all the current Bigtop backends (at least the ones
+that ship with Bigtop, your local system could have others).  In addition
+to briefly describing what the backend is responsible for building, there
+is also a description of all the keywords you can put in the backend's
+config block to control its behavior.
+
+All backends are listed in the Bigtop config block, which begins each
+bigtop file.  That list controls what the user is allowed to build.
+The order of appearance controls the order of generation when the user
+chooses to build all, as in
+
+    bigtop docs/app.bigtop all
+
+A typical backend block looks like this:
+
+    CGI Gantry { with_server 1; }
+
+Here there is a backend type C<CGI>, a specific backend
+C<Bigtop::Backend::CGI::Gantry> and a block with one statement:
+C<with_server>.
+
+That block goes in the config block at the top of the file:
+
+    config {
+        # config statements like 'engine' statements
+        CGI Gantry { with_server 1; }
+        # ... other backends
+    }
+
+Now that you know what backend blocks look like, and where to put them,
+it's time for the L<Litany of Backends>.
+
+=head1 Litany of Backends
+
+Below is a subsection for each backend type.  Within the subsection is
+a list of backends in that type family.
+
+Note that the list below is in alphabetical order by type family,
+but you almost always need to list an Init:: backend first.  They are
+responsible for making the build directory among other things.
+
+=head2 CGI
+
+=over 4
+
+=item Gantry
+
+This CGI Gantry makes the following:
+
+=over 4
+
+=item app.cgi
+
+CGI or FastCGI dispatching script
+
+=item app.server
+
+Stand alone Gantry::Server [optional]
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item fast_cgi
+
+This statement takes a boolean value use 0 or 1.
+
+Make the script for use with FastCGI
+
+=item gantry_conf
+
+This statement takes a boolean value use 0 or 1.
+
+check here if you use the Conf Gantry backend
+
+=item with_server
+
+This statement takes a boolean value use 0 or 1.
+
+Turns on stand alone Gantry::Server generation
+
+=item server_port
+
+Specifies the port for stand alone server [ignored unless Build Server is checked]
+
+=item gen_root
+
+used to make a default root on request, now you get defaults by defaul
+
+=item flex_db
+
+This statement takes a boolean value use 0 or 1.
+
+Adds command line args to stand alone server to allow easy DBD switching
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 Conf
+
+=over 4
+
+=item Gantry
+
+This Conf Gantry makes the following:
+
+=over 4
+
+=item docs/AppName.gantry.conf
+
+Your config info for immediate use with Gantry::Conf
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item instance
+
+Your Gantry::Conf instance
+
+=item conffile
+
+Your master conf file [use a full path]
+
+=item gen_root
+
+used to make a default root on request, now you get defaults by defaul
+
+=item template
+
+A custom TT template.
+
+=back
+
+=item General
+
+This Conf General makes the following:
+
+=over 4
+
+=item docs/AppName.conf
+
+Your config info in Config::General format
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item gen_root
+
+used to make a default root on request, now you get defaults by defaul
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 Control
+
+=over 4
+
+=item Gantry
+
+This Control Gantry makes the following:
+
+=over 4
+
+=item lib/AppName.pm
+
+Base module stub [safe to change]
+
+=item lib/AppName/*.pm
+
+Controller stubs [safe to change]
+
+=item lib/AppName/GEN/*.pm
+
+Generated code [please, do not edit]
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item run_test
+
+This statement takes a boolean value use 0 or 1.
+
+Makes tests which hit pages via a simple server
+
+=item full_use
+
+This statement takes a boolean value use 0 or 1.
+
+use Gantry qw( -Engine=... ); [defaults to false]
+
+=item dbix
+
+This statement takes a boolean value use 0 or 1.
+
+Makes controllers usable with DBIx::Class
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 Diagram
+
+=over 4
+
+=item GraphvizSql
+
+This Diagram GraphvizSql makes the following:
+
+=over 4
+
+=item docs/schema.diagram
+
+Graphviz dot file for SQL data model
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item template
+
+A custom TT template.
+
+=item skip_layout
+
+This statement takes a boolean value use 0 or 1.
+
+Do NOT run a Graphviz layout program like dot.
+
+=item layout_program
+
+Some Graphviz layout program like neato. [Default is dot]
+
+=item layout_flags
+
+Command line flags for Graphviz layout program. [Default is -Tpdf]
+
+=back
+
+=back
+
+=head2 HttpdConf
+
+=over 4
+
+=item Gantry
+
+This HttpdConf Gantry makes the following:
+
+=over 4
+
+=item docs/httpd.conf
+
+Include file for mod_perl apache conf
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item gantry_conf
+
+This statement takes a boolean value use 0 or 1.
+
+check here if you use the Conf Gantry backend
+
+=item skip_config
+
+This statement takes a boolean value use 0 or 1.
+
+do not generate PerlSetVar statements [checking gantry_conf makes this true]
+
+=item full_use
+
+This statement takes a boolean value use 0 or 1.
+
+use Gantry qw( -Engine=... ); [defaults to true]
+
+=item gen_root
+
+used to make a default root on request, now you get defaults by defaul
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 Init
+
+=over 4
+
+=item Std
+
+This Init Std makes the following:
+
+=over 4
+
+=item Build.PL
+
+Module::Build script
+
+=item Changes
+
+Almost empty Changes file
+
+=item README
+
+Boilerplate README
+
+=item lib/
+
+lib dir used by Control and Model backends
+
+=item t/
+
+testing dir used by Control backend
+
+=item docs/name.bigtop
+
+Copy of your bigtop file [create mode only]
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip MANIFEST generation
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 Model
+
+=over 4
+
+=item GantryCDBI
+
+This Model GantryCDBI makes the following:
+
+=over 4
+
+=item lib/AppName/Model/*.pm
+
+Class::DBI style model stubs [safe to change]
+
+=item lib/AppName/Model/GEN/*.pm
+
+Class::DBI style model specifications [please, do not change]
+
+=back
+
+Notes:
+
+=over 4
+
+=item *
+
+This backend is incompatible with other Model backends.
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item model_base_class
+
+Defaults to Gantry::Utils::CDBI
+
+=item template
+
+A custom TT template.
+
+=back
+
+=item GantryDBIxClass
+
+This Model GantryDBIxClass makes the following:
+
+=over 4
+
+=item lib/AppName/Model/*.pm
+
+DBIx::Class style model stubs [safe to change]
+
+=item lib/AppName/Model/GEN/*.pm
+
+DBIx::Class style model specifications [please, do not change]
+
+=back
+
+Notes:
+
+=over 4
+
+=item *
+
+This backend requires "For use with DBIx::Class" to be checked for the Control Gantry backend.
+
+=item *
+
+This backend is incompatible with other Model backends.
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item model_base_class
+
+Defaults to Gantry::Utils::DBIxClass
+
+=item template
+
+A custom TT template.
+
+=item extra_components
+
+Things other than PK::Auto and Core to load. Separate multiples with spaces.
+
+=back
+
+=back
+
+=head2 SQL
+
+=over 4
+
+=item DB2
+
+This SQL DB2 makes the following:
+
+=over 4
+
+=item docs/schema.db2
+
+SQL for DB2 database creation
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item template
+
+A custom TT template.
+
+=back
+
+=item MySQL
+
+This SQL MySQL makes the following:
+
+=over 4
+
+=item docs/schema.sqlite
+
+MySQL database schema
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item template
+
+A custom TT template.
+
+=back
+
+=item Postgres
+
+This SQL Postgres makes the following:
+
+=over 4
+
+=item docs/schema.postgres
+
+Postgres database schema
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item template
+
+A custom TT template.
+
+=back
+
+=item SQLite
+
+This SQL SQLite makes the following:
+
+=over 4
+
+=item docs/schema.sqlite
+
+SQLite database schema
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item template
+
+A custom TT template.
+
+=back
+
+=back
+
+=head2 SiteLook
+
+=over 4
+
+=item GantryDefault
+
+This SiteLook GantryDefault makes the following:
+
+=over 4
+
+=item html/genwrapper.html
+
+A sample template toolkit wrapper [please change it]
+
+=back
+
+This backend understands these config block keywords:
+
+=over 4
+
+=item no_gen
+
+This statement takes a boolean value use 0 or 1.
+
+Skip everything for this backend
+
+=item gantry_wrapper
+
+Path to sample_wrapper.tt in the Gantry distribution [defaults to ./html]
+
+=back
+
+=back
+
+=head1 AUTHOR
+
+The skip/backends script generated this file Sat Jul 10 17:04:09 2010.
+The script was written by Phil Crow E<lt>crow.phil@gmail.comE<gt>.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2007 by Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+But keep in mind that it was generated.  Make modifications to the
+generting script.
+
+=cut

@@ -1,0 +1,7 @@
+Changes
+lib/BIND/Conf_Parser.pm
+MANIFEST
+README
+Makefile.PL
+test.pl
+verify_zones

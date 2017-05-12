@@ -1,0 +1,30 @@
+[%
+
+PROCESS blogmacros.tt2;
+
+USE encode2047;
+USE html2text;
+USE wrap;
+
+MACRO post_tag(entry) BLOCK;
+   IF entry.category == 'monourl';
+     '[MONOURL] ';
+   ELSE;
+     ''; #'[BLOG] ';
+   END;
+END;
+
+entry = documents.first;
+
+%]
+From: Marco d'Itri <md@Linux.IT>
+Newsgroups: it.fan.marco-ditri
+Subject: [% post_tag(entry) %][% entry.title | encode2047 %]
+Date: [% datetime822(entry.datetime) %]
+Mime-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+[%+ entry.content | html2text | wrap %]
+Permalink: [% permalink(entry) %]
+

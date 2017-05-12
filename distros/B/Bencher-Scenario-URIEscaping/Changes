@@ -1,0 +1,22 @@
+0.004   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.003   2016-06-17 (PERLANCAR)
+
+	- Add participants (URI::Encode, URI::Encode::XS).
+
+
+0.002   2016-06-16 (PERLANCAR)
+
+	- Add sample data from URI-Escape-XS distribution.
+
+
+0.001   2016-06-16 (PERLANCAR)
+
+        - First release.

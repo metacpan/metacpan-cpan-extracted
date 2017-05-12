@@ -1,0 +1,10 @@
+[% USE ANSIColor 'color' %]
+[% "TARGETS" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FILTER color "cyan" "bold" %]Mission points: [% END -%][% points %]
+
+[% FILTER color "magenta" %]Active targets 
+---[% END %]
+[% FOREACH t IN targets %][% t.name %] ([% t.countdown %] turns remaining)
+[% END %]

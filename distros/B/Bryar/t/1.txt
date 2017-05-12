@@ -1,0 +1,3 @@
+First entry
+
+This is a sample first blog entry in flatfile format.

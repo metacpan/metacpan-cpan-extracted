@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use 5.010;
+use Carp;
+
+use Bio::Gonzales::Seq::Validate::fasta;
+
+my $file = shift;
+die "$file is no file" unless ( -f $file );
+
+my $fh;
+if ( $file =~ /\.gz$/ ) {
+  open $fh, '-|', "pigz -dc <'$file'" or die "Can't open filehandle: $!";
+
+} else {
+  open $fh, '<', $file or croak "Can't open filehandle: $!";
+}
+my $z = Bio::Gonzales::Seq::Validate::fasta->new( fh => $fh );
+my $errors = $z->validate;
+close $fh;
+
+unless ($errors) {
+  say "NO ERRORS, FILE IS VALID";
+  exit;
+}
+
+my @lines = sort { $a <=> $b } keys %{$errors};
+for my $l (@lines) {
+  my $e = $errors->{$l};
+  say "line $l:";
+  map { say "\t$_" } @{$e};
+
+}

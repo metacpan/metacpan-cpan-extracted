@@ -1,0 +1,419 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::Template - Template::Toolkit
+
+=head1 DESCRIPTION
+
+=head2 概念
+
+=over 4
+
+=item * Directives 指令类
+
+指令类的语法一般都是大写的。L<Template::Manual::Directives>
+
+最常用的指令有 PROCESS, INCLUDE, IF, ELSE, END, FOREACH, USE, NEXT, LAST 等
+
+=item * Variables 变量
+
+变量一般通过 stash 设置。L<Template::Manual::Variables>
+
+TT 里有几个内置变量需要注意。如 [% template; component; loop; error; content; %]
+
+=item * VMethods 虚拟方法
+
+虚拟方法大部分由 Perl 内在函数转化而成。L<Template::Manual::VMethods>
+
+比如正则替换，排序，删除或切分等。虚拟方法与变量的类型密切相关。
+
+=item * Filters 过滤器
+
+L<Template::Manual::Filters>
+
+过滤器从内在来说与虚拟方法并无很大区分。所有的虚拟方法都可以转为过滤器，反之亦然。
+
+只不过太多的虚拟方法可能会与 HASH/Object 的 key/method 造成键冲突，所以一般（并不绝对）内置函数成虚拟方法而外部模块的方法转成过滤器。
+
+=item * Plugins 插件
+
+插件一般提供实例和基于实例的多种方法。L<Template::Manual::Plugins>
+
+插件一般是 Template 与其他模块的胶水。也可以通过插件来编写过滤器或虚拟方法。
+
+=back
+
+=head2 细节语法
+
+=over 4
+
+=item * 注释
+
+    [%# a = 77
+       b = 88
+    %]
+    [% # a = 77
+       b = 88
+    %]
+
+在 [% 后紧跟注释符号代表注释整个 [% %], 而之间有空格意味着只注释该行。
+
+=item * 合并多行代码
+
+    [% IF cond;
+        a = a + 1;
+       ELSE;
+        b = b + 2;
+        c = c + 2;
+       END; %]
+
+多行代码用 ';' 分开。
+
+=item * FOREACH 的 loop 变量
+
+    [% FOREACH item IN items;
+        IF loop.first; # 第一个
+            '<b>' _ item _ '</b>';
+            NEXT; # 下一个
+        END;
+        IF loop.even; '<br />'; END; # 双数的时候，等同于 loop.count MOD 2 == 0
+        IF loop.count == 5; # 第五个
+            item _ ' More... ';
+            LAST; # 退出循环
+        END;
+       END; %]
+
+注意 loop.next 是得到下一个元素，而 NEXT 是下一个循环；loop.last 是判断是否是最后一个元素，而 LAST 是退出循环。（可以理解成：指令 NEXT, LAST 并没有任何返回值，而变量 loop.next|last 都有返回值。）
+
+更多更详尽的参考 L<Template::Iterator>
+
+=item * CALL
+
+    [% CALL inc_page_counter(page_count) %]
+
+CALL 与 GET 相似但不输出任何东西（忽略返回结果）。
+
+=back
+
+更多的请参考 L<Template::Manual::Syntax>
+
+=head2 INSERT INCLUDE PROCESS
+
+为了更好的组织和复用代码，我们会经常将一个网页所调用的 tt 模板分为好几个。
+
+而在一个主模版里调用外部模板，我们有好多种办法，介绍如下：
+
+=over 4
+
+=item * INSERT
+
+假设我们有一个外部文件 eg/Template/ex.tt2
+
+    [% foo = 'bar' %]
+    foo = [% foo %] in External File.
+
+INSERT 一般不常用。它仅仅是将外部文件读取然后输出，不经过任何改变。(eg/Template/insert.tt2)
+
+    [% foo = 'main' %]
+    foo = [% foo %] in Main
+    [% INSERT ex.tt2 %]
+    foo = [% foo %] in Main after insert/include/process
+
+输出结果如下：
+
+    E:\Fayland\chinese-perl-book\eg\Template>tpage insert.tt2
+    
+    foo = main in Main
+    [% foo = 'bar' %]
+    foo = [% foo %] in External File.
+    foo = main in Main after insert/include/process
+
+=item * INCLUDE
+
+    [% foo = 'main' %]
+    foo = [% foo %] in Main
+    [% INCLUDE ex.tt2 %]
+    foo = [% foo %] in Main after insert/include/process
+
+输出结果：(eg/Template/include.tt2)
+
+    E:\Fayland\chinese-perl-book\eg\Template>tpage --pre_chomp include.tt2
+    
+    foo = main in Main
+    foo = bar in External File.
+    foo = main in Main after insert/include/process
+
+=item * PROCESS
+
+    [% foo = 'main' %]
+    foo = [% foo %] in Main
+    [% PROCESS ex.tt2 %]
+    foo = [% foo %] in Main after insert/include/process
+
+输出结果：(eg/Template/process.tt2)
+
+    E:\Fayland\chinese-perl-book\eg\Template>tpage --pre_chomp process.tt2
+    
+    foo = main in Main
+    foo = bar in External File.
+    foo = bar in Main after insert/include/process
+
+INCLUDE 和 PROCESS 是最常用的调用方法。如上面的例子说显示的，如果想调用外部模板里的变量不影响主模版里的变量，我们就用 INCLUDE, 反之用 PROCESS
+
+传递参数给外部模板的话，我们一般直接写在 INSERT/PROCESS 的模板后面，如：
+
+    [% INCLUDE ex.tt2 foo = '77' %]
+    [% PROCESS ex.tt2 foo = '77', bar = 88 %]
+
+=item * BLOCK
+
+我们顺便在这里讲讲 BLOCK
+
+有时候在一个页面，我们可能在不同的地方输出相同的一段 HTML，重复写两次代码是愚蠢的。而将这段代码写到外部文件里也是有点繁琐，这时候，我们很大程度上需要 BLOCK (BLOCK 也有其他用处，这里就简单介绍一种用途)
+
+    [% BLOCK guide %]
+    -guide text-
+    [% END %]
+    [% INCLUDE guide %]
+    
+    [% blk_var = BLOCK %]
+    -block var-
+    [% END %]
+    [% blk_var %]
+    
+    [% INCLUDE guide %]
+    [% blk_var %]
+
+eg/Template/block.tt2 输出结果：
+
+    E:\Fayland\chinese-perl-book\eg\Template>tpage --pre_chomp --post_chomp block.tt2
+    -guide text--block var--guide text--block var-
+
+两种写法，用 INCLUDE/PROCESS 的时候，可以跟调用外部文件一样传递参数。如 [% INCLUDE guide foo='77' %]
+
+而 var = BLOCK 更像是定义一个变量。
+
+=back
+
+=head2 filter 过滤器
+
+过滤器是指将一段文字传递进来，然后通过过滤器的函数，最后传递文字回去。我们将通过自定义过滤器来更清楚的了解过滤器的运作过程。
+
+=head3 内置过滤器
+
+Template 定义了一些常用的过滤器，我们将通过语法介绍来认识一些过滤器，更多更详细的介绍请参考 L<Template::Manual::Filters>
+
+    [% # 1 %]
+    [% FILTER html %]
+    <script language="JavaScript" type="text/javascript">
+    <!--
+    document.writeln("Hello, world");
+    //-->
+    </script>
+    [% END %]
+
+    [% # 2 %]
+    [% pi = 3.1415926536 %]
+    [% pi | format('%0.3f') %]
+
+上文是两种过滤器的写法。本质上说 FILTER 和 | 是等价的。所有用 FILTER 的地方都可以用 | 来替换，反之亦然。一种是 [% FILTER html %][% END %] 一种是 [% pi | format('%0.3f') %]
+
+[% FILTER html %][% END %] 可以写作
+
+    [% output = BLOCK %]
+    <script language="JavaScript" type="text/javascript">
+    <!--
+    document.writeln("Hello, world");
+    //-->
+    </script>
+    [% END %]
+    [% output FILTER html %]
+
+两者的效果是一样的，只是 FILTER END 在某些情况下更方便和简洁。
+
+过滤器可以在一个变量上多次使用，类如 [% output | html | truncate(30) %]，这等同于 [% output = output | html %][% output | truncate(30) %], 这里我们使用了变量来接受过滤器返回的值。
+
+=head3 自定义过滤器
+
+我们将过滤器分为两种，一种类如 [% output FILTER html %]，称之为静态过滤器；另一种为 [% pi | format('%0.3f') %] （过滤器上带参数），称之为动态过滤器。
+
+这两种不同的过滤器有两种不同的写法。
+
+=head4 FILTERS
+
+    my $tt = Template->new({
+        FILTERS => {
+            'ucf' => \&ucf,
+            'lcf' => sub { lcfirst uc shift; },
+            'cut' => [ \&cut, 1 ], # our dynamic filter
+        },
+    });
+    
+    sub ucf {
+        my $text = shift;
+        $text = ucfirst lc $text;
+        return $text;
+    }
+    sub cut {
+        my ($context, $len) = @_;
+        return sub {
+            my $text = shift;
+            $text = substr($text, 0, $len);
+            return $text;
+        }
+    }
+
+这是一种通过 Template FILTERS 而定义的过滤器。静态的过滤器通过子程序引用（或匿名子程序），第一次参数而需要过滤的文本。动态过滤器通过传递数组引用（第一参数为子程序引用，第二参数为1）。静态子程序也接受数组引用，但是第二参数为0，如 'ucf' => [ \&ucf, 0 ]
+
+动态过滤器需要返回匿名子程序，过滤器的参数将传递进数组引用的第一个参数子程序引用，而需要过滤的文本将是返回的匿名子程序的第一参数。
+
+测试的代码参考 eg/Template/filter.pl
+
+    [% FILTER ucf %]
+    template is great
+    [% END %]
+    [% lcf_text = 'template is great' %]
+    [% lcf_text | lcf %]
+    
+    [% FILTER cut(6) %]template is great[% END %]
+
+运行结果为
+
+    E:\Fayland\chinese-perl-book\eg\Template>perl filter.pl
+    Template is great
+    tEMPLATE IS GREAT
+    templa
+
+=head4 PLUGINS
+
+L<Template::Plugin::Filter>
+
+    package MyTemplate::Plugin::Filter::Textile;
+
+    use strict;
+    use warnings;
+    use Template::Plugin::Filter;
+    use base qw(Template::Plugin::Filter);
+    use Text::Textile ();
+    
+    sub filter {
+       my ($self, $text) = @_;
+       return Text::Textile::textile($text);
+    }
+    
+    1;
+
+另一种过滤器的写法是通过继承 L<Template::Plugin::Filter>
+
+注册使用的办法有两种，如果你有很多个 MyTemplate::Plugin::Filter 你可以使用 PLUGIN_BASE 来注册。
+
+    my $tt2 = Template->new( {
+        PLUGIN_BASE => 'MyTemplate::Plugin::Filter'
+    } );
+
+如果仅仅是一个或两个的话，可以使用 PLUGINS 来注册该过滤器插件。
+
+    my $tt2 = Template->new({
+        PLUGINS => {
+            Textile => 'MyTemplate::Plugin::Filter::Textile',
+        },
+    });
+
+它的使用方法与普通插件类似
+
+    [% USE Textile %]
+    [% FILTER $Textile %]this is _like_ *so* *cool*[% END %]
+
+运行参考 eg/Template/filter_plugin.pl
+
+    E:\Fayland\chinese-perl-book\eg\Template>perl filter_plugin.pl
+    <p>this is <em>like</em> <strong>so</strong> <strong>cool</strong></p>
+
+上面的例子是静态过滤器，如果想写动态过滤器的话，可以在 package 里写 our $DYNAMIC = 1; 或在 sub init 里定义 $self->{ _DYNAMIC } = 1; 具体可以参考 L<Template::Plugin::Filter> 文档。
+
+如果你很熟悉写 Template 插件的话，其实你可以通过在 sub new 里调用 $context->define_filter('html2text', [ \&html2text, 1 ]); 来定义一个过滤器，而不必继承 L<Template::Plugin::Filter>。例子可以查看 L<Template::Plugin::HtmlToText> 的源码。
+
+=head2 tools 工具
+
+=head3 tpage
+
+L<Template::Tools::tpage>
+
+C<tpage> 用来测试一些简单的 tt2 语法还是比较轻快的。
+
+比如你对 .replace("'", "\'") 是不是正确比较怀疑的话，你可以写个 test.tt2
+
+  [%
+    test = "A'A";
+    test.replace("'", "\'");
+  %]
+
+通过命令行
+
+  $> tpage test.tt2
+  A'A
+
+错误的话可以改改 test.tt2
+
+  [%
+    test = "A'A";
+    test.replace("'", "\\\'");
+  %]
+
+再次运行
+
+  $> tpage test.tt2
+  A\'A
+
+一切 OK, 用 tpage 你可以不用打开浏览器来检测你写的简单改变是不是正确的，非常节省时间。
+
+tpage 还可以传递变量
+
+    $> cat test.tt2
+    [% test.replace("'", "\\\'"); %]
+    $> tpage --define test="A'A" test.tt2
+    A\'A
+    $> tpage --define test="A'A'A" test.tt2
+    A\'A\'A
+
+=head2 资源
+
+=over 4
+
+=item * 主页：<http://template-toolkit.org/>
+
+=item * 邮件列表：L<http://template-toolkit.org/mail/index.html>
+
+=item * IRC: irc.perl.org#tt2
+
+=back
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

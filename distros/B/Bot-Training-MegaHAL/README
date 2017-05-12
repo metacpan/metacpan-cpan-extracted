@@ -1,0 +1,12 @@
+NAME
+    Bot::Training::MegaHAL - Provide megahal.trn via Bot::Training
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

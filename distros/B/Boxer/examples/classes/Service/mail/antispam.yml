@@ -1,0 +1,14 @@
+classes:
+  - Service.mail
+parameters:
+  doc:
+    service:
+      pkg:
+        - include antispam service AMaViS (with SpamAssassin)
+  pkg:
+    - amavisd-new
+    - pyzor
+    - razor
+    - spamassassin
+  pkg-avoid:
+    - spamc

@@ -1,0 +1,24 @@
+Bundle::CertHost version 0.02
+=========================
+
+This is the Bundle that supplies all the CPAN module requirements for PerlCertifiedHosting.com.
+
+INSTALLATION
+
+To install this module, please use the CPAN shell or better yet CPANPLUS.
+
+SEE ALSO
+
+http://www.perlcertifiedhosting.com
+
+Get involved and help this project work!
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009 Lyle Hopkins
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

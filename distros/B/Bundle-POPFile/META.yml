@@ -1,0 +1,32 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bundle-POPFile
+version:      1.02
+version_from: lib/Bundle/POPFile.pm
+installdirs:  site
+requires:
+    Date::Format:                  0
+    Date::Parse:                   0
+    DBI:                           0
+    Digest::MD5:                   0
+    Encode:                        0
+    Encode::Guess:                 0
+    File::Copy:                    0
+    File::Find:                    0
+    File::Path:                    0
+    Getopt::Long:                  0
+    HTML::Tagset:                  0
+    HTML::Template:                0
+    IO::Handle:                    0
+    IO::Select:                    0
+    IO::Socket:                    0
+    IO::Socket::Socks:             0
+    IO::Socket::SSL:               0
+    MIME::Base64:                  0
+    MIME::QuotedPrint:             0
+    Sys::Hostname:                 0
+    Text::Kakasi:                  0
+    XMLRPC::Transport::HTTP:       0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

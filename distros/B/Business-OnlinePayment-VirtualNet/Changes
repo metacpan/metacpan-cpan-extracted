@@ -1,0 +1,12 @@
+Revision history for Perl extension Business::OnlinePayment::VirtualNet
+
+0.02  Wed Sep 11 03:20:27 PDT 2002
+	-quiet "$Business::OnlinePayment::VirtualNet::DEBUG used only once"
+	 warnings in tests under old perls
+	-fix elusive "Error in Batch in Detail Record #0003 field #19" bug:
+	 missing transactoin identifiers should default to zero-fill, not
+	 space fill
+	- change requested ACI from 'N' to 'Y' as per Vital.
+
+0.01  Fri Jul 19 08:25:26 PDT 2002
+	-original version; created by ivan 1.0

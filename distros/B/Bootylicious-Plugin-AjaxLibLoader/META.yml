@@ -1,0 +1,13 @@
+---
+abstract: 'load popular AJAX JavaScript libraries.'
+author:
+  - 'Konstantin Kapitanov <perlovik@gmail.com>'
+generated_by: 'Dist::Zilla version 1.093250'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bootylicious-Plugin-AjaxLibLoader
+requires:
+  Mojo: 0.999910
+version: 0.05

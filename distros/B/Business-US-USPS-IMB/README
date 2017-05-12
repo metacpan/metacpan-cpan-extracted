@@ -1,0 +1,43 @@
+Business-US-USPS-IMB
+====================
+
+INTRODUCTION
+
+This module is an interface to usps4cp, providing access to USPS
+Intelligent Mail Barcode encoder functionality provided by this library.
+You will need the correct fonts in order to create actual barcodes. This
+module only provides a correctly formatted encoding string, not the
+actual barcode.
+
+For more information on this library see the documentation available
+from the following link:
+
+https://ribbs.usps.gov/onecodesolution/download.cfm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   There are not external dependencies needed to install this package.
+   The usps4cb library source is included and licensed under the terms 
+   outlined in the included USPS_LICENSE.txt file. Please be sure you
+   agree with the terms contained therein prior to using this package.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Chris Nighswonger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+The usps4cb library is licensed in accordance with the terms outlined
+in the accompanying USPS_LICENSE.txt file.
+

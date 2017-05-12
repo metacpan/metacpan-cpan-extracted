@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+brackup - do a backup using Brackup
+
+=head1 SYNOPSIS
+
+ $ brackup [-v] --from=<source> --to=<target> [--output=my_backup.brackup] [--save-stats]
+
+=head2 OPTIONS
+
+=over 4
+
+=item --from=NAME
+
+Required.  The source or root of your backup.  Must match a [SOURCE:NAME]
+config section in your ~/.brackup.conf (which is auto-created for you
+on first run, so then you just have to go modify it). See L<Brackup::Root>
+for more.
+
+=item --to=NAME
+
+Required.  The destination or target for your backup.  Must match a 
+[TARGET:NAME] config section in your ~/.brackup.conf. See L<Brackup::Target>
+for more.
+
+=item --output=FILE
+
+Optional.  Defaults to "source-target-YYYYMMDD.brackup".  This is the 
+"metafile" index you'll need to do a restore.
+
+=item --config=FILE
+
+Specify the configuration file to use; defaults to ~/.brackup.
+
+=item --save-stats[=FILE]
+
+Optional.  Flag to indicate that stats output should be recorded to a
+file. If =FILE is omitted, defaults to "source-target-YYYYMMDD.stats."
+
+=item --verbose|-v
+
+Show status during backup.
+
+=item --dry-run
+
+Don't actually store any data on the target.
+
+=item --du-stats
+
+Prints the size, in kB, of data underneath each directory
+(recursively) which will be backed up.
+
+=item --zenityprogress
+
+Produces output suitable for piping into C<zenity --progress> to get a
+pretty GUI progress bar while running a backup.  This option is
+incompatable with C<--verbose>, as both print to STDOUT.
+
+=item --list-sources
+
+List the names of the sources defined in your configuration file.
+
+=item --list-targets
+
+List the names of the targets defined in your configuration file.
+
+=back
+
+=head1 WARRANTY
+
+Brackup is distributed as-is and comes without warranty of any kind,
+expressed or implied.  We aren't responsible for your data loss.
+
+=head1 SEE ALSO
+
+L<Brackup::Manual::Overview>
+
+L<brackup-restore>
+
+L<brackup-target>
+
+L<Brackup::Root>
+
+L<Brackup::Target>
+
+=head1 AUTHOR
+
+Brad Fitzpatrick E<lt>brad@danga.comE<gt>
+
+Copyright (c) 2006-2007 Six Apart, Ltd. All rights reserved.
+
+This module is free software. You may use, modify, and/or redistribute this
+software under the terms of same terms as perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+use Cwd;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+use Brackup;
+use Brackup::Util qw(noclobber_filename);
+
+my ($src_name, $target_name, $backup_file, $stats_file, $opt_help);
+my $opt_dryrun;
+my $opt_verbose;
+my $opt_du_stats;
+my $opt_zenityprogress;
+my ($opt_list_sources, $opt_list_targets);
+
+my $config_file = Brackup::Config->default_config_file_name;
+my $arguments = join(' ', @ARGV);
+
+usage() unless
+    GetOptions(
+               'from=s'    => \$src_name,
+               'to=s'      => \$target_name,
+               'verbose'   => \$opt_verbose,
+               'zenity-progress' => \$opt_zenityprogress,
+               'output=s'  => \$backup_file,
+               'save-stats:s' => \$stats_file,
+               'help'      => \$opt_help,
+               'dry-run'   => \$opt_dryrun,
+               'du-stats'  => \$opt_du_stats,
+               'config=s'  => \$config_file,
+               'list-sources'   => \$opt_list_sources,
+               'list-targets'   => \$opt_list_targets,
+               );
+usage() if @ARGV;
+
+if ($opt_help) {
+    eval "use Pod::Usage;";
+    Pod::Usage::pod2usage( -verbose => 1, -exitval => 0 );
+    exit 0;
+}
+
+if ($opt_verbose && $opt_zenityprogress) {
+    die "Can't use --verbose and --zenity-progress at the same time";
+}
+
+my $config = eval { Brackup::Config->load($config_file) } or
+    usage($@);
+
+if ($opt_du_stats && $src_name) {
+    my $root = eval { $config->load_root($src_name); } or
+        die "Bogus --from name";
+    $root->du_stats;
+    exit 0;
+}
+
+if ($opt_list_sources) {
+    print join("\n", $config->list_sources), "\n";
+    exit 0;
+}
+if ($opt_list_targets) {
+    print join("\n", $config->list_targets), "\n";
+    exit 0;
+}
+
+usage() unless $src_name && $target_name;
+
+my $cwd = getcwd();
+
+sub usage {
+    my $why = shift || "";
+    if ($why) {
+        $why =~ s/\s+$//;
+        $why = "Error: $why\n\n";
+    }
+    die "${why}brackup --from=[source_name] --to=[target_name] [--output=<backup_metafile.brackup>]\nbrackup --help\n";
+}
+
+my $root = eval { $config->load_root($src_name); } or
+    usage($@);
+
+my $target = eval { $config->load_target($target_name); } or
+    usage($@);
+
+
+my @now = localtime();
+$backup_file ||= sprintf("%s-%s-%04d%02d%02d.brackup", 
+    $root->name, $target->name, $now[5]+1900, $now[4]+1, $now[3]);
+$backup_file =~ s!^~/!$ENV{HOME}/! if $ENV{HOME};
+$backup_file = "$cwd/$backup_file" unless $backup_file =~ m!^/!;
+
+if (defined $stats_file) {
+  if ($stats_file eq '') {
+    ($stats_file = $backup_file) =~ s/(\.brackup)?$/.stats/;
+  }
+  else {
+    $stats_file = "$cwd/$stats_file" unless $stats_file =~ m!^/!;
+  }
+}
+$backup_file = noclobber_filename($backup_file);
+$stats_file = noclobber_filename($stats_file) if $stats_file;
+
+my $backup = Brackup::Backup->new(
+                                  root           => $root,
+                                  target         => $target,
+                                  dryrun         => $opt_dryrun,
+                                  verbose        => $opt_verbose,
+                                  zenityprogress => $opt_zenityprogress,
+                                  );
+
+if (my $stats = eval { $backup->backup($backup_file) }) {
+    warn "Backup complete.\n" if $opt_verbose;
+
+    $stats->set('Run Arguments:' => $arguments);
+    if ($opt_dryrun || $opt_verbose) {
+        $stats->print;
+    }
+    if ($stats_file) {
+        $stats->print($stats_file);
+    }
+    exit 0;
+} else {
+    warn "Error running backup: $@\n";
+    exit 1;
+}

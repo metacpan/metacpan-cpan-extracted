@@ -1,0 +1,39 @@
+package Bio::Chado::Schema::Result::Genetic;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Genetic - Genotypes and mutant alleles
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Genetic module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Genetic::Environment>
+
+L<Bio::Chado::Schema::Result::Genetic::EnvironmentCvterm>
+
+L<Bio::Chado::Schema::Result::Genetic::FeatureGenotype>
+
+L<Bio::Chado::Schema::Result::Genetic::Genotype>
+
+L<Bio::Chado::Schema::Result::Genetic::Genotypeprop>
+
+L<Bio::Chado::Schema::Result::Genetic::Phendesc>
+
+L<Bio::Chado::Schema::Result::Genetic::PhenotypeComparison>
+
+L<Bio::Chado::Schema::Result::Genetic::PhenotypeComparisonCvterm>
+
+L<Bio::Chado::Schema::Result::Genetic::Phenstatement>
+
+=cut
+
+1;

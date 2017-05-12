@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::OnlinePayment::Jettis.
+
+0.02  Sun Jan 25 02:43:21 PST 2009
+        -change SOR flag from Y to N to allow Jettis to scrub transactions
+
+0.01  Sat Nov  9 13:39:46 PST 2002
+	-original version; created by ivan 1.0
+

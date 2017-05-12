@@ -1,0 +1,58 @@
+NAME
+    Business::HK::IdentityCard - validate identity card numbers used in Hong
+    Kong
+
+VERSION
+    version 1.000
+
+SYNOPSIS
+        use Business::HK::IdentityCard;
+
+        my $hkid = Business::HK::IdentityCard->new('A123456(3)');
+        if ($hkid->is_valid())
+        {
+            print $hkid->as_string() . " is valid\n";
+        }
+
+DESCRIPTION
+    This module validates identity card numbers used in Hong Kong. See
+    <http://en.wikipedia.org/wiki/Hong_Kong_Identity_Card> for further
+    details on the format.
+
+METHODS
+  new
+    Accepts a scalar representing the ID. IDs look like A123456(3), ie an
+    alphabetic prefix, siz digits and a check digit. The prefix can be one
+    or two characters and the brackets are optional for the check digit.
+
+  is_valid
+    Returns true if the ID provided is a correct HK ID. This will confirm
+    that the format is correct and the checksum is valid.
+
+  as_string
+    Returns the ID formatted as a string using the conventional format, ie
+    upper-case letters and checksum in brackets.
+
+  as_string_no_checksum
+    Returns the ID formatted as a string without the checksum. As the
+    checksum is not officially part of the ID, some systems may store IDs in
+    this format.
+
+SOURCE AVAILABILITY
+    Source code can be found on Github. Pull requests for bug fixes welcome.
+
+        http://github.com/rupertl/business-hk-identitycard/tree/master
+
+THANKS
+    Thanks to David Webb for advice on how the checksum for double prefix
+    IDs should be calculated.
+
+AUTHOR
+    Rupert Lane <rupert@rupert-lane.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Rupert Lane.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

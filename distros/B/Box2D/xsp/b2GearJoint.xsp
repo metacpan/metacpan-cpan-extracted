@@ -1,0 +1,51 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2GearJoint} class b2GearJoint : public %name{Box2D::b2Joint} b2Joint
+{
+
+float32 GetReactionTorque(float32 inv_dt);
+
+void SetRatio(float32 ratio);
+
+float32 GetRatio();
+
+%{
+
+b2Vec2*
+b2GearJoint::GetAnchorA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorA());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2GearJoint::GetAnchorB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorB());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2GearJoint::GetReactionForce(inv_dt)
+	float32 inv_dt
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetReactionForce(inv_dt));
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

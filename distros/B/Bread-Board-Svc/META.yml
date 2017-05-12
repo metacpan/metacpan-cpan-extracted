@@ -1,0 +1,21 @@
+---
+abstract: 'shortcuts for Bread::Board::service function'
+author:
+  - 'Roman Daniel <roman@daniel.cz>'
+build_requires:
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bread-Board-Svc
+requires:
+  Bread::Board: '0.33'
+  List::Util: '1.42'
+  Type::Params: '0'
+  Types::Standard: '0'
+version: '0.02'

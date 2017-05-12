@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<RunInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2">
+  <Run Id="MS-01_H21324_130129_M01378_0016" Number="15">
+    <Flowcell>000000000-A20DD</Flowcell>
+    <Instrument>M01378</Instrument>
+    <Date>130129</Date>
+    <Reads>
+      <Read NumCycles="51" Number="1" IsIndexedRead="N" />
+      <Read NumCycles="6" Number="2" IsIndexedRead="Y" />
+    </Reads>
+    <FlowcellLayout LaneCount="1" SurfaceCount="2" SwathCount="1" TileCount="14" />
+  </Run>
+</RunInfo>

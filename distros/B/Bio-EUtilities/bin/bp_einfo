@@ -1,0 +1,156 @@
+#!perl
+
+use strict;
+use warnings;
+
+# PODNAME:  bp_einfo
+# ABSTRACT: Query einfo to find all available databases or information about a specific database (field information or links to other NCBI databases).
+# AUTHOR:   Chris Fields <cjfields@bioperl.org>
+# OWNER:    2009-2012 Chris Fields
+# LICENSE:  Perl_5
+
+
+use Getopt::Long;
+use Bio::DB::EUtilities;
+
+my ($db, @fields, @links, $outfile, $email);
+GetOptions(
+       'e|email:s'          => \$email,
+       'd|db|database:s'    => \$db,
+       'f|field:s'          => \@fields,
+       'l|link:s'           => \@links,
+       'o|out|outfile:s'    => \$outfile,
+       'h|help'             => sub { exec('perldoc',$0); exit; }
+       );
+
+my $outfh;
+if( $outfile ) {
+    open($outfh, ">$outfile") || die("$outfile: $!");
+} else {
+    $outfh = \*STDOUT;
+}
+
+if (!defined $db) {
+    my $eutil = Bio::DB::EUtilities->new(-eutil => 'einfo',
+                                         -email => $email);
+    print $outfh join("\n",$eutil->get_available_databases);
+    exit;
+} else {
+    my $eutil = Bio::DB::EUtilities->new(-eutil => 'einfo',
+                                         -db => $db,
+                                         -email => $email);
+    if (@links || @fields) {
+        for my $fi ($eutil->get_FieldInfo) {
+            my $code = $fi->get_field_code;
+            if (grep {$_ eq $code} @fields) {
+                print $outfh $fi->to_string."\n";
+            }
+        }
+        for my $li ($eutil->get_LinkInfo) {
+            my $nm = $li->get_link_name;
+            if (grep {$_ eq $nm} @links) {
+                print $outfh $li->to_string."\n";
+            }
+        }
+    } else {
+        $eutil->print_FieldInfo;
+        $eutil->print_LinkInfo;
+    }
+}
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+bp_einfo - Query einfo to find all available databases or information about a specific database (field information or links to other NCBI databases).
+
+=head1 VERSION
+
+version 1.75
+
+=head1 SYNOPSIS
+
+ bp_einfo [-d database] [-f Field Code] [-l Link Name] [-o outfile]
+
+=head1 DESCRIPTION
+
+Command line options:
+
+  -e/--email
+        Valid email (required by NCBI policy)
+
+  -d/--db/--database
+        NCBI database to query
+        (default = none, which shows available databases)
+
+  -f/--field
+        print out information about a specific field code
+        (default = none)
+
+  -l/--link
+        print out information about a specific link name
+        (default = none)
+
+  -o/--out
+        outfile
+        (default = STDOUT)
+
+  -h/--help
+        show this documentation
+
+As per NCBI's policy regarding eutils access, a valid email is required.  This
+is not enforced here (if one is provided you will get a standard warning), but
+don't be surprised if this doesn't work after June 1, 2010 unless one is
+supplied.
+
+If -d is not specified, field and link arguments are ignored and all available
+databases are printed instead.
+
+If either link names or field codes (or both) are specified, nothing else is
+printed out (only the info requested).  You can specify as many fields and/or
+links as you want by using multiple -f/-l E<lt>ARGE<gt> on the command line.
+
+=head1 FEEDBACK
+
+=head2 Mailing lists
+
+User feedback is an integral part of the evolution of this and other
+Bioperl modules. Send your comments and suggestions preferably to
+the Bioperl mailing list.  Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support
+
+Please direct usage questions or support issues to the mailing list:
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and
+reponsive experts will be able look at the problem and quickly
+address it. Please include a thorough description of the problem
+with code and data examples if at all possible.
+
+=head2 Reporting bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+of the bugs and their resolution. Bug reports can be submitted via the
+web:
+
+  https://github.com/bioperl/%%7Bdist%7D
+
+=head1 AUTHOR
+
+Chris Fields <cjfields@bioperl.org>
+
+=head1 COPYRIGHT
+
+This software is copyright (c) 2009-2012 by Chris Fields.
+
+This software is available under the same terms as the perl 5 programming language system itself.
+
+=cut

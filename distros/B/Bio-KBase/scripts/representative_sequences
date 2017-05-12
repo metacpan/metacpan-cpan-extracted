@@ -1,0 +1,231 @@
+#!perl
+use strict;
+use Data::Dumper;
+use Carp;
+
+#
+# This is a SAS Component
+#
+
+=head1 representative_sequences
+
+Example:
+
+    representative_sequences [arguments] < input > output
+
+This is a pipe command. The input is taken from the standard input, and the
+output is to the standard output.
+
+=head2 Documentation for underlying call
+
+This script is a wrapper for the CDMI-API call representative_sequences. It is documented as follows:
+
+we return two arguments.  The first is the list of representative triples,
+and the second is the list of sets (the first entry always being the
+representative sequence)
+
+=over 4
+
+=item -e Existing Representatives
+
+These are sequences that are currently represenatives and the command extends this set.
+
+=item -o order-option
+
+order sequences using the designated option (note that -b is another way
+to get a long-to-short ordering).  Supported options are
+
+    long-to-short
+    default (as is)
+
+=item -b
+
+order input sequences by size (long to short)
+
+=item -c cluster_type
+
+behavior of clustering algorithm (0 or 1, D=1)
+
+cluster_type 0 is the original method, which has only the representative
+for each group in the blast database.  This can randomly segregate
+distant members of groups, regardless of the placement of other very
+similar sequences.
+    
+cluster_type 1 adds more diverse representatives of a group in the blast
+database.  This is slightly more expensive, but is much less likely to
+split close relatives into different groups.
+
+=item -d  seq_clust_dir  - directory for files of clustered sequencees
+
+With the -d option, each cluster of sequences is written to a 
+distinct file in the specified directory.
+
+=item -f id_clust_file  - file with one line per cluster, listing its ids 
+
+With the -f option, for each cluster, a tab-separated list
+of ids is written to the specified file.  
+
+=item -m measure_of_sim - measure of similarity to use:
+
+Sequences are removed if there similarity to a "kept" sequence exceeds a specified 
+threshold (see -similarity below)
+
+The possible measures of similarity that you can specify are as follows:
+      
+identity_fraction  (default),
+positive_fraction  (proteins only), or
+score_per_position (0-2 bits)
+
+=item -s similarity     - similarity required to be clustered (D = 0.8)
+
+The similarity threshhold used to determine when sequences are deleted (but
+represented by a kept sequence).
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$seq_set is a seq_set
+$rep_seq_parms is a rep_seq_parms
+$return_1 is an id_set
+$return_2 is a reference to a list where each element is an id_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+rep_seq_parms is a reference to a hash where the following keys are defined:
+	existing_reps has a value which is a seq_set
+	order has a value which is an int
+	alg has a value which is an int
+	type_sim has a value which is an int
+	cutoff has a value which is a float
+id_set is a reference to a list where each element is an id
+
+</pre>
+
+=end html
+
+=begin text
+
+$seq_set is a seq_set
+$rep_seq_parms is a rep_seq_parms
+$return_1 is an id_set
+$return_2 is a reference to a list where each element is an id_set
+seq_set is a reference to a list where each element is a seq_triple
+seq_triple is a reference to a list containing 3 items:
+	0: an id
+	1: a comment
+	2: a sequence
+id is a string
+comment is a string
+sequence is a string
+rep_seq_parms is a reference to a hash where the following keys are defined:
+	existing_reps has a value which is a seq_set
+	order has a value which is an int
+	alg has a value which is an int
+	type_sim has a value which is an int
+	cutoff has a value which is a float
+id_set is a reference to a list where each element is an id
+
+
+=end text
+
+=back
+
+=head2 Input Format
+
+    The input is a fasta-formatted set of sequences.  These sequences
+    should not contain indels.
+
+=head2 Output Format
+
+    FASTA output of the representatives is always written to STDOUT.
+
+    The -d option will cause a directory to be built containing the clusters.
+
+    The -f option will cause an abbreviated format of the clusters (just IDs) to
+    be written
+
+=cut
+
+use SeedUtils;
+
+my $usage = "usage: representative_sequences [arguments] < input > output";
+
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+
+my $existing;
+my $order;
+my $b_arg;
+my $cluster_alg;
+my $clusterD;
+my $clusterF;
+my $simM;
+my $sim_cutoff;
+
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('e=s' => \$existing,
+						       'o=s' => \$order,
+						       'b'   => \$b_arg,
+						       'c=i' => \$cluster_alg,
+						       'd=s' => \$clusterD,
+						       'f=s' => \$clusterF,
+						       'm=i' => \$simM,
+						       's=f' => \$sim_cutoff);
+if (! $kbO) { print STDERR $usage; exit }
+my $options = {};
+my @existing_seed;
+if ($existing)
+{
+    if (! (-s $existing))
+    {
+	print STDERR "The file of existing representatives does not exist\n";
+	print STDERR $usage;
+	exit;
+    }
+    @existing_seed = &gjoseqlib::read_fasta($existing);
+    $options->{existing_reps} = \@existing_seed;
+}
+
+if ($b_arg)
+{
+    $options->{order} = 1;  # 1 means "long-to-short"
+}
+if ($order)
+{
+    $options->{order} = $order;
+}
+if ($cluster_alg)          { $options->{alg} = $cluster_alg }
+if ($simM)                 { $options->{type_sim} = $simM   }
+if ($sim_cutoff)           { $options->{cutoff} = $sim_cutoff   }
+my $fasta = &gjoseqlib::read_fasta;
+my %to_seq = map { $_->[0] => $_ } @$fasta;
+my($reps,$clusters) = $kbO->representative_sequences($fasta,$options);
+my @fasta_reps = map { $to_seq{$_} } @$reps;
+&gjoseqlib::print_alignment_as_fasta(\@fasta_reps);
+if ($clusterD)
+{
+    my $file = "group000001";
+    (-d $clusterD) || mkdir($clusterD,0777) || die "could not make $clusterD";
+    foreach my $clust (sort { @$b <=> @$a } @$clusters)
+    {
+	my @fasta_cluster = map { $to_seq{$_} } @$clust;
+	&gjoseqlib::print_alignment_as_fasta("$clusterD/$file",\@fasta_cluster);
+	$file++;
+    }
+}
+
+if ($clusterF)
+{
+    open(CLUSTERS,">",$clusterF) || die "could not open $clusterF";
+    foreach my $clust (sort { @$b <=> @$a } @$clusters)
+    {
+	print CLUSTERS join("\t",@$clust),"\n";
+    }
+    close(CLUSTERS);
+}

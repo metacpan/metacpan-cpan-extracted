@@ -1,0 +1,14 @@
+---
+abstract: 'free book in Chinese <Master Perl Today>'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+generated_by: 'Dist::Zilla::Plugin::MetaYAML version 1.092200'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Book-Chinese-MasterPerlToday
+requires: {}
+resources:
+  repository: http://github.com/fayland/chinese-perl-book
+version: 0.02

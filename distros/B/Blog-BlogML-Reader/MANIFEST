@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/02parse.t
+t/03posts.t
+t/04posts_range.t
+t/05post_by_id.t
+t/06posts_by_date.t
+t/07cats.t
+t/08posts_by_cat.t
+t/09meta.t
+t/10trim.t
+t/example.xml
+lib/Blog/BlogML/Reader.pm
+t/example.xml
+example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

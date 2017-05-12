@@ -1,0 +1,211 @@
+
+=head1 NAME
+
+B::Deobfuscate - Deobfuscate source code
+
+=head1 SYNOPSIS
+
+  perl -MO=Deobfuscate,-csynthetic.yml,-y synthetic.pl
+
+=head1 DESCRIPTION
+
+B::Deobfuscate is a backend module for the Perl compiler that generates perl
+source code, based on the internal compiled structure that perl itself
+creates after parsing a program. It adds symbol renaming functions to the
+L<B::Deparse> module. An obfuscated program is already parsed and interpreted
+correctly by the L<B::Deparse> program. Unfortunately, if the obfuscation
+involved variable renaming then the resulting program also has obfuscated
+symbols.
+
+This module takes the last step and fixes names like $z5223ed336 to be a word
+from a dictionary. While the name still isn't meaningful it is at least easier
+to distinguish and read. Here are two examples - one from L<B::Deparse> and one
+from B::Deobfuscate.
+
+Initial input
+
+  if(@z6a703c020a){(my($z5a5fa8125d,$zcc158ad3e0)=File::Temp::tempfile(
+  'UNLINK',1));print($z5a5fa8125d "=over 8\n\n");(print($z5a5fa8125d
+  @z6a703c020a)or die(((("Can't print $zcc158ad3e0: $!"))); print($z5a5fa8125d
+  "=back\n");(close(*$z5a5fa8125d)or die(((("Can't close ".*$za5fa8125d.": $!")
+  ));(@z8374cc586e=$zcc158ad3e0);($z9e5935eea4=1);}
+
+After L<B::Deparse>:
+
+  if (@z6a703c020a) {
+      (my($z5a5fa8125d, $zcc158ad3e0) = File::Temp::tempfile('UNLINK', 1));
+      print($z5a5fa8125d "=over 8\n\n");
+      (print($z5a5fa8125d @z6a703c020a)
+          or die((((q[Can't print ] . $zcc158ad3e0) . ': ') . $!)));
+      print($z5a5fa8125d "=back\n");
+      (close(*$z5a5fa8125d)
+          or die((((q[Can't close ] . *$za5fa8125d) . ': ' . $!)));
+      (@z8374cc586e = $zcc158ad3e0);
+      ($z9e5935eea4 = 1);
+  }
+
+After B::Deobfuscate:
+
+  if (@parenthesises) {
+      (my($scrupulousity, $postprocesser) = File::Temp::tempfile('UNLINK', 1));
+      print($scrupulousity "=over 8\n\n");
+      (print($scrupulousity @parenthesises)
+          or die((((q[Can't print ] . $postprocesser) . ': ') . $!)));
+      print($scrupulousity "=back\n");
+      (close(*$scrupulousity)
+          or die((((q[Can't close ] . *$postprocesser) . ': ') . $!)));
+      (@interruptable = $postprocesser);
+      ($propagandaist = 1);
+  }
+
+You'll note that the only real difference is that instead of variable names
+like $z9e5935eea4 you get $propagandist.
+
+=head1 OPTIONS
+
+As with all compiler backend options, these must follow directly after the
+'-MO=Deobfuscate', separated by a comma but not any white space. All options
+defined in B::Deparse are supported here - see the B::Deparse documentation
+page to see what options are provided and how to use them.
+
+=over 4
+
+=item B<-d>I<DICTIONARY FILE>
+
+Normally B::Deobfuscate reads an internal dictionary of easily pronounced
+keywords. If you would like to specify a different dictionary follow the -d
+parameter with the path to the dictionary file. The path may not have commas
+in it and only lines in the dictionary that do not match /\W/ will be used.
+The entire dictionary will be loaded into memory at once.
+
+  -d/usr/share/dict/stop
+
+=item B<-D>I<B::Deobfuscate::Dict:: module>
+
+B::Deobfuscate defaults to using the dictionary at
+B::Deobfuscate::Dict::PGPHashWords. You can ask it to load any other
+module under the B::Deobfuscate::Dict:: namespace by using the
+C<-D...> parameter.
+
+B::Deobfuscate 0.14 and above is distributed with the additional
+dictionary B::Deobfuscate::Dict::Flowers.
+
+=item B<-m>I<REGEX>
+
+Supply a different regular expression for deciding which symbols to rename.
+The default value is /\A[[:lower:][:digit:]_]+\z/. Your expression must be
+delimited by the '/' characters and you may not use that character within the
+expression. That shouldn't be an issue because '/' isn't valid in a symbol
+name anyway.
+
+  -a/\A[[:lower:][:digit:]_]+\z/
+
+=item B<-y>
+
+print two B<YAML> documents to STDOUT instead of the deparsed source code.
+The first document is a configuration document suitable for use with the B<-c>
+parameter. The second document is the deparsed source code. Use this feature
+to generate a configuration document for further, iterative reverse
+engineering.
+
+The intention here is that you could write some software to read this L<YAML>
+document, present the information to the user, accept some alterations to the
+configuration and re-run the deobfuscator with the new input.
+
+=item B<-c>I<FILENAME>
+
+Supply a filename to a L<YAML> configuration file. Normally you would generate
+this file by saving the results of the B<-y> parameter to a file. You can then
+edit the file to provide your own names for symbols and not rely on the random
+symbol picker in B<B::Deobfuscate>. You may create your own L<YAML>
+configuration file as well.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+The B::Deobfuscation symbol renamer can be controlled with by a configuration
+file. Use of this feature requires the L<YAML> module be installed.
+
+ dictionary: '/usr/share/dict/propernames'
+ global_regex: '(?:)'
+ globals:
+   kSDsfDS: Slartibartfast
+   HGFdsfds: Triantaphyllos
+ lexicals:
+   '$SdfSd': '$No'
+   '$GsdDd': '$Ed'
+   '$Ksdfs': '$Ji'
+
+=over 4
+
+=item B<dictionary>
+
+This is a filename path to the operative dictionary.
+
+ dictionary: /usr/share/dict/stop
+
+=item B<global_regex>
+
+This regular expression tests global symbols. Only symbols that match this
+expression may be renamed. The default value is '\A[[:lower:][:digit:]_]\z/.
+In perl, global symbols are independent of their sigil so the values being
+tested are bare. Future versions of B::Deobfuscate may add the sigil to the
+symbol name.
+
+ global_regex: '\A[[:lower:][:digit:]_]\z'
+
+=item B<globals>
+
+This is a hash detailing symbol names as used in the original source and the
+name used in the deobfuscated source. For example - if the original source
+has a variable named @z12345 and you wish to rename all occurrances to 
+@URLList then the hash would associate 'z12345' with 'URLList'. The dictionary
+picker fills these values in automatically.
+
+If you wish to prevent B::Deobfuscate from renaming a symbol then specify the
+new value as '~' (which in YAML terms is undef).
+
+ globals:
+   catfile: ~
+   opt_n: ~
+   opt_t: ~
+   opt_u: ~
+   z1234567890: Postprocesser
+   z2345678901: Constructable
+   z3456789012: Photosynthesises
+   z4567890123: Undiscriminate
+   z5678901234: Parenthesises
+   z6789012345: Animadvertion
+
+=item B<lexicals>
+
+Lexicals is a hash exactly like `globals' except that all the symbol names
+include the sigil which doesn't currently happen for globals.
+
+ lexicals:
+   '$k1234567890': '$ivs'
+   '$k2345678901': '$ehs'
+   '$k3456789012': '$ans'
+   '$k4567890123': '$ons'
+   '$k5678901234': '$ofs'
+   '$k6789012345': '$gos'
+   '$k7890123456': '$dus'
+   '$k8901234567': '$iis'
+   '$k9012345678': '$ats'
+   '$k0123456780': '$ets'
+
+=back
+
+=head1 AUTHOR
+
+Joshua ben Jore <jjore@cpan.org>
+
+=head1 SEE ALSO
+
+L<B::Deparse>
+L<http://www.perlmonks.org/index.pl?node_id=243011>
+L<http://www.perlmonks.org/index.pl?node_id=244604>
+L<YAML>
+
+=cut

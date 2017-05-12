@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Bio/LITE/Taxonomy.pm
+t/00-load.t
+t/03-manifest.t
+t/01-pod.t
+t/04-Taxonomy.t
+t/05-RDP.t
+t/data/bergeyTrainingTree.xml
+META.yml                                 Module meta-data (added by MakeMaker)

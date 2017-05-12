@@ -1,0 +1,84 @@
+Bundle-Ensembl version 0.02
+===========================
+Authors: Ahamarshan JN 
+         www.gpse.org , www.mellorlab.org
+Version: 0.03
+
+NOTES:
+
+   Bundle::Ensembl is a package that automates the installation of required perl modules (as of Ensembl Version 45) 
+for deploying the Ensembl Genome Browser locally.
+
+For the list of modules installed see the file WHAT_MODULES.txt
+
+Not all modules in the list are throughly required there are Core and Non-Core modules, you may check the website
+http://www.ensembl.org/info/software/website/installation/non-ensembl-code.html for core modules and could select only the appropriate ones if need be.
+
+Donot worry if there are failed tests at the end of the installation, they might be as a result of dependency problem with non-core modules.
+
+INSTALLATION
+
+Download the package
+then
+gunzip Bundle_Ensembl-v0.03.tar.gz
+tar -xvf Bundle_Ensembl-v0.03.tar
+cd Bundle_Ensembl_v0.03/
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+you may install it from your terminal with this command (check if you have permissions or 'su' account)
+
+perl -MCPAN -e 'install Bundle::Ensembl';
+
+Follow the on-screen guide....
+
+or you may use the CPAN shell to install
+$ perl -MCPAN -e shell
+cpan>install Bundle::Ensembl
+
+for offline installation you need to download the entire module collection
+I will try to make it available as one complete package here
+www.gpse.org
+
+More information on the modules and installation instructions are available here
+
+http://www.ensembl.org/info/software/website/installation/non-ensembl-code.html
+&
+http://www.ensembl.org/info/software/website/installation/index.html
+
+TESTING:
+
+To test if all the modules necessary are installed 
+use this script ens_modtest.pl
+as 
+$perl ens_modtest.pl
+
+Best Practise:
+For best update your CPAN version by installing
+perl -MCPAN -e 'install Bundle::CPAN';
+then reload CPAN
+Some dependent packages that are needed are
+ftp, ncftpd, lynx, expat (http://sourceforge.net/projects/expat/) most are available as rpm's 
+see http://rpmfind.net
+some like libtidy and tidy might help for advanced configurations but not needed.
+Its better to have these installed.
+Also check if your firewall is configured properly or you may want to switch it to passive state for enabling smooth ftp download, ask your system admin before doing this.
+
+If you want any module to be included please email the author 
+at gene@gpse.org
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007-2009 Ahamarshan .JN www.gpse.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

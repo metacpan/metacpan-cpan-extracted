@@ -1,0 +1,52 @@
+{
+   "abstract" : "A object list of proteinogenic amino acids.",
+   "author" : [
+      "Felipe da Veiga Leprevost <leprevost@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Tools-ProteinogenicAA",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Tools-ProteinogenicAA"
+      },
+      "homepage" : "https://github.com/Leprevost/Bio-Tools-ProteinogenicAA",
+      "repository" : {
+         "url" : "https://github.com/Leprevost/Bio-Tools-ProteinogenicAA"
+      }
+   },
+   "version" : "0.021"
+}

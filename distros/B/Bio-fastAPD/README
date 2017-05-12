@@ -1,0 +1,44 @@
+Bio::fastAPD
+
+The Bio::fastAPD module provides computationally efficient methods for the
+calculation of average pairwise difference (APD), a measure of nucleotide 
+diversity, from multiple sequence alignment (MSA) data. The module also 
+provides rapid standard error estimation of the APD using an efficient 
+jackknife resampling method. Further description of the methods implemented
+in this module, including mathematical justification, will be available in 
+an upcoming peer-reviewed journal article.  
+
+
+INSTALLATION
+
+To install this module, run the following commands from within the fastAPD
+directory:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+To install this module into a specific directory:
+   	perl Makefile.PL PREFIX=/name/of/the/directory
+
+
+EXAMPLE
+
+An example script is provided along with example data consisting of 1000 
+aligned dna reads. 
+
+       perl example_script.t
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014,2015 Joseph D. Baugher
+
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

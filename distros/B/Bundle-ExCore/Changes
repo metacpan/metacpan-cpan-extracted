@@ -1,0 +1,15 @@
+Revision history for Perl bundle Bundle::ExCore.
+
+0.003   Wed, 22 Apr 2015 20:38:35 +0200
+        - added some tests and strictures
+        - removed a redundancy
+
+0.002   Tue, 21 Apr 2015 19:25:50 +0200
+        - changed policy to only bundle main modules of CPAN distros
+          (so we can get rid of truly deprecated submodules)
+        - extended documentation
+
+0.001   Tue, 21 Apr 2015 07:14:08 +0200
+	- original version, created from scratch
+        - covers deletions up to perl-5.21.11
+

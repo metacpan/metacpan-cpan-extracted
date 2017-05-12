@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Thu, 11 Feb 2010 19:37:14 GMT
+Content-Type: application/xml; charset=utf-8
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<models type="array">
+  <model>
+    <id type="integer">121</id>
+    <name>RAF/MEK/ERK Cascase w/out SoS Feedba</name>
+  </model>
+  <model>
+    <id type="integer">117</id>
+    <name>RAF/MEK/ERK Cascade with SoS Feedbac</name>
+  </model>
+</models>

@@ -1,0 +1,39 @@
+---
+abstract: 'Report raw timing results in CSV-style format for advanced processing.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Benchmark-CSV
+provides:
+  Benchmark::CSV:
+    file: lib/Benchmark/CSV.pm
+    version: '0.001002'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  IO::Handle: '0'
+  List::Util: '0'
+  Path::Tiny: '0'
+  Time::HiRes: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Benchmark-CSV/issues
+  homepage: https://github.com/kentnl/Benchmark-CSV
+  repository: https://github.com/kentnl/Benchmark-CSV.git
+version: '0.001002'

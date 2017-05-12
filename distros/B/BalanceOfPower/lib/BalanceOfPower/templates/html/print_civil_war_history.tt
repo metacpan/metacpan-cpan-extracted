@@ -1,0 +1,10 @@
+[% FOREACH wn IN civil_war_names %][% wnname = wn.name %]
+<!-- h4>[% wnname %]</h4 -->
+[% w = civil_wars.$wnname %]
+<h4>Civil War in [% INCLUDE fragments/linked_nation.tt n = w.nation_name %] - [% w.start_date %]</h4>
+<p>
+*** Civil War started in [% w.start_date %] ***<br />
+[% FOREACH t IN w.get_turn_tags %][% FOREACH ev IN w.events.$t %] [% IF t != 'START' %][% t %]: [% END %][% ev.text %]<br />
+[% END %][% END %]*** Civil war ended in [% w.end_date %] ***
+[% END %]
+</p>

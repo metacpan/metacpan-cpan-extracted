@@ -1,0 +1,567 @@
+{
+   "abstract" : "Multilocus sequence type checking using blast",
+   "author" : [
+      "Andrew J. Page <ap13@sanger.ac.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-MLST-Check",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::AlignIO" : "0",
+            "Bio::Perl" : "0",
+            "Bio::PrimarySeq" : "0",
+            "Bio::SeqIO" : "0",
+            "Bio::SimpleAlign" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "2.06",
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Request" : "0",
+            "LWP::Simple" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "POSIX" : "0",
+            "Parallel::ForkManager" : "0",
+            "Regexp::Common" : "0",
+            "Text::CSV" : "0",
+            "Try::Tiny" : "0",
+            "XML::LibXML" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Env::Path" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "File::Touch" : "0",
+            "HTTP::Status" : "0",
+            "IO::Scalar" : "0",
+            "String::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::MLST::Blast::BlastN" : {
+         "file" : "lib/Bio/MLST/Blast/BlastN.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Blast::Database" : {
+         "file" : "lib/Bio/MLST/Blast/Database.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::CDC::Convert" : {
+         "file" : "lib/Bio/MLST/CDC/Convert.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Check" : {
+         "file" : "lib/Bio/MLST/Check.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::CheckMultipleSpecies" : {
+         "file" : "lib/Bio/MLST/CheckMultipleSpecies.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::CompareAlleles" : {
+         "file" : "lib/Bio/MLST/CompareAlleles.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::DatabaseSettings" : {
+         "file" : "lib/Bio/MLST/DatabaseSettings.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Databases" : {
+         "file" : "lib/Bio/MLST/Databases.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Download::Database" : {
+         "file" : "lib/Bio/MLST/Download/Database.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Download::Databases" : {
+         "file" : "lib/Bio/MLST/Download/Databases.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Download::Downloadable" : {
+         "file" : "lib/Bio/MLST/Download/Downloadable.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::FilterAlleles" : {
+         "file" : "lib/Bio/MLST/FilterAlleles.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::NormaliseFasta" : {
+         "file" : "lib/Bio/MLST/NormaliseFasta.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::OutputFasta" : {
+         "file" : "lib/Bio/MLST/OutputFasta.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::ProcessFasta" : {
+         "file" : "lib/Bio/MLST/ProcessFasta.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::SearchForFiles" : {
+         "file" : "lib/Bio/MLST/SearchForFiles.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::SequenceType" : {
+         "file" : "lib/Bio/MLST/SequenceType.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Spreadsheet::File" : {
+         "file" : "lib/Bio/MLST/Spreadsheet/File.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Spreadsheet::Row" : {
+         "file" : "lib/Bio/MLST/Spreadsheet/Row.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Types" : {
+         "file" : "lib/Bio/MLST/Types.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Validate::Executable" : {
+         "file" : "lib/Bio/MLST/Validate/Executable.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Validate::File" : {
+         "file" : "lib/Bio/MLST/Validate/File.pm",
+         "version" : "v2.1.1706216"
+      },
+      "Bio::MLST::Validate::Resource" : {
+         "file" : "lib/Bio/MLST/Validate/Resource.pm",
+         "version" : "v2.1.1706216"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.sanger.ac.uk/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanger-pathogens/mlst_check.git",
+         "web" : "https://github.com/sanger-pathogens/mlst_check"
+      }
+   },
+   "version" : "2.1.1706216",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.016002"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RequiresExternal",
+            "name" : "RequiresExternal",
+            "version" : "1.004"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 0,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               }
+            },
+            "name" : "@Starter/GatherDir",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Starter/PruneCruft",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Starter/ManifestSkip",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Starter/MetaConfig",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.008"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002003",
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000027",
+                  "version" : "0.004"
+               }
+            },
+            "name" : "@Starter/MetaProvides::Package",
+            "version" : "2.004002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Starter/MetaNoIndex",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Starter/MetaYAML",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Starter/MetaJSON",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Starter/License",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Starter/ReadmeAnyFromPod",
+            "version" : "0.161170"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Starter/ExecDir",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Starter/ShareDir",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Starter/PodSyntaxTests",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
+            "name" : "@Starter/Test::ReportPrereqs",
+            "version" : "0.025"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::Compile" : {
+                  "bail_out_on_fail" : "0",
+                  "fail_on_warning" : "author",
+                  "fake_home" : 0,
+                  "filename" : "xt/author/00-compile.t",
+                  "module_finder" : [
+                     ":InstallModules"
+                  ],
+                  "needs_display" : 0,
+                  "phase" : "develop",
+                  "script_finder" : [
+                     ":PerlExecFiles"
+                  ],
+                  "skips" : []
+               }
+            },
+            "name" : "@Starter/Test::Compile",
+            "version" : "2.054"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Starter/MakeMaker",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Starter/Manifest",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Starter/TestRelease",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Starter/RunExtraTests",
+            "version" : "0.029"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Starter/ConfirmRelease",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Starter/UploadToCPAN",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "AutoPrereqs",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoVersion",
+            "name" : "AutoVersion",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::SingleEncoding",
+                        "name" : "@Default/SingleEncoding",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@Default/Name",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@Default/Version",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@Default/prelude",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "SYNOPSIS",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "DESCRIPTION",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "OVERVIEW",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "ATTRIBUTES",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "METHODS",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "FUNCTIONS",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@Default/Leftovers",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@Default/postlude",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@Default/Authors",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@Default/Legal",
+                        "version" : "4.004"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "-Transformer",
+                        "version" : "4.004"
+                     }
+                  ]
+               }
+            },
+            "name" : "PodWeaver",
+            "version" : "4.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Starter/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.008"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "6.008"
+      }
+   },
+   "x_serialization_backend" : "JSON::XS version 2.33"
+}
+

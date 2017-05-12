@@ -1,0 +1,25 @@
+0.05 Monday   2 October 2006
+
+- Remember to include icon 
+
+0.04 Monday  18 September 2006
+
+- Added signal handler so windows system tray script exits correctly on system reboot
+
+0.03 Sunday  17 September 2006
+
+- Fixed bug caused by 0 upload and download
+- Added windows system tray script
+
+0.02 Tuesday  6 June 2006
+
+- Added some real tests
+- Removed errstr from public interface
+- Now checking for http errors
+- Now treating name as string not a regexp
+- Usage now returns current usage in MB without unit eg 1 not 1MB
+- License code under same terms as perl
+
+0.01 Thursday 25 May 2006
+
+- initial CPAN version on module

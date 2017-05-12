@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Carp;
+
+use 5.010;
+
+use Bio::Gonzales::Seq::IO qw/faslurp faiterate/;
+use Bio::Gonzales::Matrix::IO;
+use Data::Dumper;
+
+use Bio::Gonzales::Util::File qw/slurpc/;
+use FindBin;
+
+use Pod::Usage;
+use Getopt::Long;
+
+my %opt = ();
+GetOptions (\%opt, 'help','header') or pod2usage(2);
+
+pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
+
+my ( $idlist, @files ) = @ARGV;
+
+confess "usage: $FindBin::Script <FILE_WITH_RANGES> <FASTA_FILE_1> ... <FASTA_FILE_N>"
+  unless ( $idlist && @files && @files > 0 );
+
+my %ids;
+for my $r ( @{ scalar mslurp( $idlist, { sep => qr/\s+/, header => $opt{header} } ) } ) {
+  my $id = shift @$r;
+  $ids{$id} //= [];
+  push @{ $ids{$id} }, $r;
+}
+
+for my $f (@files) {
+  my $fi = faiterate($f);
+  while ( my $s = $fi->() ) {
+    my $regions = $ids{ $s->id };
+    if ($regions) {
+      for my $r (@$regions) {
+        if ( @$r == 1 ) {
+          print $s;
+        } else {
+          print $s->subseq( $r );
+        }
+      }
+    }
+  }
+}

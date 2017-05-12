@@ -1,0 +1,42 @@
+---
+abstract: 'Plugin system based on roles'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::Class: 0
+  Test::Class::Load: 0
+  Test::Fatal: 0
+  Test::More: 0.94
+  Test::Most: 0
+  parent: 0
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Brickyard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: 0
+  Role::Basic: 0.12
+resources:
+  bugtracker: https://github.com/marcelgruenauer/Brickyard/issues
+  homepage: https://github.com/marcelgruenauer/Brickyard
+  repository: https://github.com/marcelgruenauer/Brickyard.git
+version: 2.0.0
+x_contributors:
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'

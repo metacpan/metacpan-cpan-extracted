@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+# pragmata
+use strict;
+use warnings;
+
+# Standard Perl Library and CPAN modules
+use Business::Billing::TMobile::UK;
+use Data::Dumper;
+use English;
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Term::ReadPassword;
+
+$Term::ReadPassword::USE_STARS = 1;
+
+my($url) = @_;
+
+my(%clo);
+
+GetOptions(\%clo, qw(help|h debug|d=s password|p=s username|u=s)) or pod2usage(2);
+$clo{help} and pod2usage(1);
+
+$0 = 'check_tmobile_allowances' if($clo{password});
+
+$clo{username} ||= read_password("U: ");
+$clo{password} ||= read_password("Password: ");
+
+die "No username specified\n" unless $clo{username};
+die "No password specified\n" unless $clo{password};
+
+my $tmobile = Business::Billing::TMobile::UK->new(%clo);
+
+my $ra_allowances = $tmobile->get_allowances();
+
+print "You have the following allowances remaining:\n";
+
+foreach my $allowance (@$ra_allowances) {
+	print $allowance, "\n";
+}
+
+=head1 NAME
+
+check_tmobile_allowances - Check remaining allowances on TMobile website
+
+=head1 SYNOPSIS
+
+B<check_tmobile_allowances>
+[B<--debug|d>]
+[B<--help|-h>]
+[B<--username|u> I<username>]
+[B<--password|p> I<password>]
+
+=head1 DESCRIPTION
+
+B<check_tmobile_allowances> 
+
+This progam uses Business::Billing::TMobile::UK to fetch your allowances from
+the T-Mobile website and display them on the screen. If you do not specify your
+username and/or password as a command line option you will be prompted to enter
+the details, they will not be echo-ed back to the screen.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--debug|-d>
+
+Enable Debugging Output
+
+=item B<--help|-h>
+
+prints out usage information and exits
+
+=item B<--username|-u> I<username>
+
+Username to login with
+
+=item B<--password|-p> I<password>
+
+Password. If specified the $0 is updated so that people cannot see your
+password by running ps, but note that perl cannot update $0 on all platforms!!
+
+=back
+
+=head1 AUTHOR
+
+Sagar R. Shah
+
+=cut

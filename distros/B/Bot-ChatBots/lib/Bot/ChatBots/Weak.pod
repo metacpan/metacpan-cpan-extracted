@@ -1,0 +1,126 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Weak - Class for weak references
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Weak;
+   my $object = Bot::ChatBots::Weak->new(
+      what => $ref1,
+      hey  => $ref2,
+      look => 'not a reference',
+   );
+   $object->set(ahoy => $ref3);
+
+   # it's a hash reference inside
+   $object->{what}->frobozz; # called on $ref1 if still alive
+
+   # TO_JSON always returns undef
+   my $will_be_undef = $object->TO_JSON;
+
+
+=head1 DESCRIPTION
+
+This module provides a little wrapper class to keep things you want to be
+as weak as possible.
+
+The constructor takes either a hash reference or key/value pairs, and will
+save it internally (the object is a hash reference). All references in
+values will be weakened via L<Scalar::Util/weaken>, so that you don't have
+to worry about circular references.
+
+Additionally, when some JSON encoder tries to encode this object calling
+L</TO_JSON>, it will get C<undef> back. This comes handy if you want to
+e.g. defer some processing and put the whole thing in a queue, while still
+getting rid of things that will not make sense any more while "on the
+other side of the queue".
+
+For example, while defining a hook for a L<Mojolicious> application, you
+might want to save a reference to the C<$app> or to the controller C<$c>
+for usage along the local line. This puts you at risk of creating circular
+references and more importantly these two object will not exist any more
+if you e.g. defer processing in a L<Minion> queue.
+
+=head1 METHODS
+
+
+=head2 B<< clone >>
+
+   my $new_object = $object->clone;
+
+Shallow copy of the initial C<$object>, keeping the weak behaviour.
+
+=head2 B<< get >>
+
+   my $value = $object->get($key);
+
+Method equivalent to C<< $object->{$key} >>. Remember that the object is
+a hash reference, so you can do that directly!
+
+=head2 B<< get_multiple >>
+
+   my @values = $object->get_multiple(@keys);
+
+Method equivalent to C<< @{$object}{@keys} >>. Remember that the object is
+a hash reference, so you can do that directly!
+
+=head2 B<< new >>
+
+   my $object = Bot::ChatBots::Weak->new(%kvpairs);
+   my $object = Bot::ChatBots::Weak->new(\%kvpairs);
+
+Returns a I<Weak> object based on the provided key/value pairs in
+C<%kvpairs>. Every reference in values that is stored in C<$object> is
+weakened via C<Scalar::Util/weaken>.
+
+Returns an object that can be used as a hash reference. If you want to
+add/change a key's value, it's strongly suggested to use L</set> below or
+you might lose the weakening.
+
+=head2 B<< set >>
+
+   $object->set(%kvpairs); # OR
+   $object->set(\%kvpairs);
+
+Set key/value pairs according to what's in C<%kvpairs>. Every value that
+is a reference is stored in a weakened way (i.e. via
+L<Scalar::Util/weaken>).
+
+You MUST use this method for setting values, otherwise the I<weak>
+behaviour is not guaranteed (unless you do it by yourself, which is kind
+of weird).
+
+Returns C<$object> for possible chaining.
+
+=head2 B<< TO_JSON >>
+
+   my $this_is_undef = $object->TO_JSON;
+
+Return C<undef>. This will be called by JSON encoders when configured to
+do so for blessed objects; the provided values avoids freezing any value
+held by this object.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,239 @@
+=head1 NAME
+
+Bio::Tools::ProteinogenicAA - A object list of proteinogenic amino acids.
+
+=head1 SYNOPSIS
+
+Quick summary of what the module does.
+
+    use Bio::Tools::ProteinogenicAA;
+
+    my $p = Bio::Tools::ProteinogenicAA->new();
+    
+    #recover the amino acids list from the object
+    my @aas = @{$p->aminoacids};
+
+    say $aas[0]->short_name
+    ...
+
+=head1 DESCRIPTION
+
+This is a simple module that organizes in a single object a list of proteinogenic amino acids and some of its characteristics. Most of the stored information are important for mass spectrometry based proteomics.
+
+This is an example of how the object is organizied:
+
+    internals: {
+        abbreviation           "Ala",
+        amino_acid             "Alanine",
+        avg_mass               71.0788,
+        codons                 "GCU GCC GCA GCG",
+        formula                "C3H5NO",
+        is_hydrophobic         1,
+        is_polar               0,
+        monoisotopic_mass      71.03711,
+        pH                     "-",
+        pI                     6.01,
+        pK1                    2.35,
+        pK2                    9.87,
+        short_name             "A",
+        side_chain             "-CH3",
+        van_der_waals_volume   67
+    }
+
+=head1 METHODS
+
+
+=head2 amino_acid
+
+    The amino acid common name.
+
+    $aa->amino_acid();
+
+
+=head2 short_name
+
+    The single letter reference.
+
+    $aa->short_name();
+
+
+=head2 abbreviation
+
+    The amino acid short abbreviation.
+
+    $aa->abbreviation();
+
+=head2 pI
+
+    The amino acid isoelectric point.
+    Note: Pyrrolysine have a pI of 0, the true value was not setted yet.
+
+    $aa->pI();
+
+
+=head2 pK1
+
+    The amino acid Dissociation constant (alpha-COOH).
+    Note: Pyrrolysine and Selenocysteine have a pK1 of 0, the true value was not setted yet.
+
+    $aa->pK1();
+
+
+=head2 pK2
+
+    The amino acid Dissociation constant (alpha-NH3).
+    Note: Pyrrolysine and Selenocysteine have a pK2 of 0, the true value was not setted yet.
+
+    $aa->pK2();
+
+
+=head2 side_chain
+
+    The amino acid side chain.
+
+    $aa->side_chain();
+
+
+=head2 is_hydrophobic
+
+    Returns true if the amino acid is hydrophobic.
+
+    $aa->is_hydrophobic();
+
+
+=head2 is_polar
+
+    Returns true if the amino acid is polar.
+
+    $aa->is_polar();
+
+
+=head2 pH
+
+    Returns the amino acids pH.
+
+    $aa->pH();
+
+
+=head2 Van der Walls Volume
+
+    Returns the approximate Van der Walls volume.
+
+    $aa->van_der_waals_volume();
+
+
+=head2 codons
+
+    Returns a string with all codons responsible for the amino acid.
+
+    $aa->codons();
+
+
+=head2 formula
+
+    The amino acid chemical formula.
+
+    $aa->formula();
+
+
+=head2 monoisotopic_mass
+
+    The amino acid monoisotopic_mass (Da).
+
+    $aa->monoisotopic_mass();
+
+
+=head2 avg_mass
+
+    The amino average mass (Da).
+
+    $aa->avg_mass();
+
+
+=head1 AUTHOR
+
+Felipe da Veiga Leprevost, C<< <leprevost at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-bio-tools-proteinogenicaa at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-Tools-ProteinogenicAA>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Bio::Tools::ProteinogenicAA
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Tools-ProteinogenicAA>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Bio-Tools-ProteinogenicAA>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Bio-Tools-ProteinogenicAA>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Bio-Tools-ProteinogenicAA/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Felipe da Veiga Leprevost.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+

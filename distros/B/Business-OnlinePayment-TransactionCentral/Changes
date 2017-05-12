@@ -1,0 +1,33 @@
+Revision history for Perl extension Business::OnlinePayment::TransactionCentral.
+
+0.06  Wed Feb 27 16:49:17 PST 2008
+        - update tests with new regkey for TC test account
+
+0.05  Wed Nov 14 13:26:38 PST 2007
+        - add email->Email mapping
+
+0.04  Wed May 30 11:53:00 PDT 2007
+        - depend on B:OP v3
+        - fix a "false success" problem caused by discrepancy between test and
+          live systems: "Auth" field comes back as "Declined" rather than empty
+
+0.03  Sat May 19 15:03:43 PDT 2007
+        - add/finish ECHECK support (google of TCInterfaceGuide indicated
+          s/processcheck.asp/processcheckonline.asp/)
+        - fix another problem with transactions going through but coming back
+          denied: Returned "Auth" field can have trailing whitespace, wtf!
+        - trim "<html><body> </body></html>" tags off of return info.  This
+          was preventing TransID (B:OP order_number) from being returned.
+        - add tests: order_number, check, bad_check
+
+0.02  Thu Apr 19 17:48:09 PDT 2007
+	- updated example in manpage s/Capstone/TransactionCentral/
+        - add debugging methods response_page, response_code, response_headers
+        - Make sure expiration date has a leading zero
+        - fix problem with transactions going through but coming back denied:
+          Returned "Auth" field can have letters as well as numbers!  sheesh
+
+0.01  Wed Nov 23 05:14:43 2005
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.5.0 -n Business::OnlinePayment::TransactionCentral -v 0.01
+

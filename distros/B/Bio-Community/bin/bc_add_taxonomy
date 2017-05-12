@@ -1,0 +1,208 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_add_taxonomy
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_add_taxonomy - Add a taxonomic lineage to community members
+
+=head1 SYNOPSIS
+
+  bc_add_taxonomy -input_files   my_communities.qiime  \
+                  -taxonomy_file taxonomy.tab          \
+                  -output_prefix my_communities_w_taxo
+
+=head1 DESCRIPTION
+
+This script takes communities in which members have IDs reflecting their position
+in a taxonomic system and add the taxonomic lineage information to each member.
+The string 'unidentified' is given to members for which no taxonomic lineage is
+found.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to manipulate. Your input file need to be
+in a format that makes provisions for member ID and taxonomic assignments (e.g.
+qiime and biom formats). Also, when providing communities in a format that
+supports only one community per file (e.g. gaas), you can provide multiple input
+files. Note that members must have IDs that are valid IDs in the taxonomic sytem
+used, or they will be labelled as 'unidentified'.
+
+=for Euclid:
+   input_files.type: readable
+
+=item -tf <taxonomy_file> | -taxonomy_file <taxonomy_file>
+
+Taxonomy file giving the lineage information for this taxonomic system. This
+file should be in a format similar to that of Greengenes, i.e. tab-delimited
+with two columns: taxonomic ID and taxonomic lineage.
+
+=for Euclid:
+   taxonomy_file.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Several output files will be created if
+the requested output format can only hold a single community. Default:
+output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_add_taxonomy'
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+add_taxo( $ARGV{'input_files'}, $ARGV{'taxonomy_file'}, $ARGV{'output_prefix'} );
+
+exit;
+
+
+func add_taxo ($input_files, $taxonomy_file, $output_prefix) {
+
+   # Read input communities
+   my $meta = Bio::Community::Meta->new;
+   my $format;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new( -file => $input_file );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+   # Assign taxonomy
+   add_tax_str($meta, $taxonomy_file);
+
+   # Write processed communities
+   write_communities($meta, $output_prefix, $format, '');
+
+   return 1;
+}
+
+
+func add_tax_str ($meta, $taxonomy_file) {
+   my $taxa = read_lookup($taxonomy_file);
+   for my $member (@{$meta->get_all_members}) {
+      $member->desc( $taxa->{$member->id} || 'unidentified' );
+   }
+   return 1;
+}
+
+
+func read_lookup ($file) {
+   my $lookup;
+   open my $in, '<', $file or die "Error: Could not read file '$file': $!\n";
+   while (my $line = <$in>) {
+      chomp $line;
+      my ($key, $val) = split "\t", $line, 3;
+      if (not exists $lookup->{$key}) {
+         $lookup->{$key} = $val;
+      }
+   }
+   close $in;
+   print "Read ".scalar(keys(%$lookup))." entries from file '$file'\n";
+   return $lookup;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type='') {
+   $type ||= '';
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format => $output_format,
+            -file   => '>'.$output_file,
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

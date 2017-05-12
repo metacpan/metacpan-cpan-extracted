@@ -1,0 +1,209 @@
+Changes file for Business::DK::CPR
+
+0.13 2015-08-28 Maintenance release, update not required
+
+- Aligned version numbers for Perl packages
+
+
+0.12 2015-08-22 Maintenance release, update not required
+
+- Changed she-bang lines to env based
+
+- Removed SVN keywords, we are now on Github
+
+- Migrating build system from Module::Build to Dist::Zilla
+
+- Upgrading license from Artistic 1.0 to Artistic 2.0
+
+
+0.11 2014-08-15 Maintenance release, update not required
+
+- Addressing Kwalitee, aligning version for version consistency in
+  modules in distribution
+
+
+0.10 2013-08-17 Maintenance release, update not required
+
+- Changed MANIFEST.SKIP to avoid shipping of unfinished test t/boilerplates.t
+  this should never have been included [BDKCPR-14]
+
+  https://logiclab.jira.com/browse/BDKCPR-14
+
+- Added changes.t automatic assertion of the integrity of the Changes file, 
+ see also BDKCPR-13 [BDKCPR-15]
+
+  https://logiclab.jira.com/browse/BDKCPR-15
+
+
+0.09 2013-08-02 Maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [BDKCPR-13]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+  
+  https://logiclab.jira.com/browse/BDKCPR-13
+
+
+0.08 2011-06-14 Maintenance release, update not required
+
+- Added contemporay boiler plate of Perl::Critic test [BDKCPR-8]
+
+- Added Params::Validate to missing requirements [BDKCPR-9]
+
+- Cleaned up generate method [BDKCPR-10]
+
+
+0.07 2011-02-06 Maintenance release, update not required
+
+- Migrated _length method from Business::DK::CVR into this package, since it's use was obsoleted in
+  Business::DK::CVR
+ 
+- Added use of Params::Validate in key places and phased out use of Business::DK::PO
+
+- Made control cifers Readonly
+
+- Updated some information on Perl::Critic policies
+
+- Removed export of _checkdate, this seemed to be only for testing purposes
+
+Feedback from review: [CR-BDKCPR-1] http://logiclab.jira.com/source/cru/CR-BDKCPR-1/
+    
+- Cleaning TODO, BDKCPR-1 implemented the OOP variation
+
+- Removing Komodo IDE project file from Subversion
+
+- Added strictures and warnings to Build.PL
+
+- Added reference to Build.PL (create_makefile_pl)
+
+- Added reference to Business::DK::CPR
+  Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma
+
+
+0.06 2010.08.31 Maintenance release, update not required
+
+- Added documentation and example on Params::Validate integration [BDKCPR-3]
+
+- Added object oriented variant implementation [BDKCPR-1]
+
+- Add prerequisites test [BDKCPR-2]
+
+- Addressing failing test. Issue with Build.PL and Makefile generation
+  see also: http://www.perlmonks.org/?node_id=458282 [BDKCPR-4]
+
+
+0.05 2008-11-15 Bug fix release, update not required (see below)
+
+- Update recommended for perl 5.10 users
+
+- Eliminated use of the marvellous Hash::Merge, problems with Clone under
+  perl 5.10 makes the code break. Hash::Merge uses Clone so I am removing it's
+  use since it is breaking my code:
+  
+  http://rt.cpan.org/Public/Bug/Display.html?id=40957
+
+  I mimicking Hash::Merge's merge in my own simple merge function, which does
+  however demonstrate that use of Hash::Merge might be overkill for this task
+
+- Updated MANIFEST.SKIP wrong distribution listed
+
+- Cleaned regular expressions
+
+
+0.04 2008-11-06 Bug fix release, update recommended
+
+- Introduced Data::FormValidator::Constraints::Business::DK::CPR, this is sort
+  of an example application, it is however just a simple wrapper fitting into
+  the Data::FormValidator::Constraints framework - it is should be usable, not
+  just a demo, but still experimental
+
+- Changed from brute force validation in validation2007, we now do a combination
+  of calculations and assertions (refactoring might be necessary, all tests do
+  pass)
+
+- The generate method now a wrapper around the two specific generators
+
+- Added new methods:
+    - generate1968
+    - generate2007
+
+  for generating CPR numbers compatible with their validate equivalents
+
+- Changed the word sex to gender in the code, sounds nicer
+
+- Added new script to bin/validate_cpr.pl
+
+- Added use of _assert_date to validate methods (missing this was a serious flaw
+  if not to say bug)
+
+- Added use of constants in more places
+
+- Changed the return values for the validate methods:
+    1, indicates male gender
+    2, indicates female gender
+
+- Added a use integer, since we only use integers
+
+- Updated MANIFEST.SKIP to more contemporary version
+
+- Introduced validateCPR a wrapper on validate (validate is a quite
+  polluting name for export).
+
+- Cleaned the code a bit to follow Perl::Critic policies, nothing
+  serious See also the POD section in Business::DK::CPR on TEST AND
+  QUALITY
+
+- Updated POD to adhere to Perl::Critic template (see: t/perlcriticrc)
+
+- Introduced README file generator in Build.PL
+
+- Introduced recursive test flag in Build.PL and restructured test
+  suite to reflect this:
+  
+    t/validate.t -> t/Business/DK/CPR/validate.t
+    t/calculate.t -> t/Business/DK/CPR/calculate.t
+    t/_checkdate.t -> t/Business/DK/CPR/_checkdate.t
+    
+    New tests:
+    
+    t/Business/DK/CPR/validate1968.t
+    t/Business/DK/CPR/validate2007.t
+    
+- Refactored validate to be a wrapper around: validate1968 and validate2007, so
+  the original modulus validation has propagated into validate1968, since 1968
+  was the year CPR was introduced in Denmark
+
+- Introduced validate2007 as an implementation the new validation introduced in
+  2007
+
+- Added LICENSE file 
+
+- Added LICENSE section in POD into. The LICENSE section was not present, but 
+  the information was
+
+
+0.03 2007-03-13 Maintenance release, update not required
+
+- Added Perl::Critic test t/critic.t and related t/perlcriticrc, we currently
+  pass at severity 5, gentle
+
+- Updated to more contemporary versions of:
+    t/pod-coverage.t
+    t/pod.t
+
+  These should be there for the quality, but will not be run as a part of the
+  normal test run, unless the TEST_POD environment variable is set.
+  
+  This seem to be the defacto way of doing things.
+
+
+0.02 2006-03-01 Bug fix release, update not required
+
+- Fixed a small POD error, reported by htoug (thanks)
+
+
+0.01 2006-02-21 Initial version
+
+- Initial version

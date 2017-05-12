@@ -1,0 +1,23 @@
+This directory explains how app level config blocks work.  They go here:
+config {
+    # not here, this is for Bigtop and its backends
+}
+app Name {
+    config {
+        # here we define the conf for your running application
+    }
+    config dev {
+        # here we override conf with special dev replacements
+    }
+}
+
+If you need to know about the bigtop config section see
+keyword_cookbook/config.  Also note that any backend from the
+Bigtop::Backends:: namespace can have a block in that config.
+Look in each backend (or click on the backends tab in tentmaker)
+for what can go in those blocks.
+
+This directory is set up differently from the others, since there
+are no specific keywords in config blocks.  Thus, there are no subdirectories.
+There is only one discussion and one example.bigtop.  Both are in this
+directory.

@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+#part of Bhagavatgita module
+
+use strict;
+use warnings;
+use Bhagavatgita;
+my @random;
+
+@random=gita_random('1');
+print "@random";

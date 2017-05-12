@@ -1,0 +1,14 @@
+Changes
+check_bdb_version.PL
+lib/BerkeleyDB/Manager.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01_basic.t
+t/02_txn.t
+t/03_associate.t
+t/04_streams.t
+t/lib/BerkeleyDB/Manager/Test.pm
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

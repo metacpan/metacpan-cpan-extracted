@@ -1,0 +1,60 @@
+{
+   "abstract" : "import Lingr chat texts into BusyBird",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BusyBird-Input-Lingr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BusyBird::DateTime::Format" : "0.04",
+            "Carp" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.084",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/BusyBird-Input-Lingr/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/BusyBird-Input-Lingr.git",
+         "web" : "https://github.com/debug-ito/BusyBird-Input-Lingr"
+      }
+   },
+   "version" : "0.02"
+}

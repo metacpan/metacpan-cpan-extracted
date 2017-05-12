@@ -1,0 +1,11 @@
+--- ./Makefile.PL-pre	Mon Aug 25 09:49:40 2003
++++ ./Makefile.PL	Sun Oct 12 18:18:18 2003
+@@ -16,6 +16,8 @@ unless (defined $ENV{EGD_PATH}) {
+     }
+ }
+ 
++$| = 1;
++
+ $SIG{__WARN__} = sub {
+     undef $SIG{__WARN__};
+     my $warning  = shift;

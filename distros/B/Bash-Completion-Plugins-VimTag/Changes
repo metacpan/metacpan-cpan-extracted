@@ -1,0 +1,10 @@
+Revision history for Bash-Completion-Plugins-VimTag
+
+2.00 Sat Feb  9 14:38:53 2013 CET
+    [New Features]
+        - total rewrite to use the ctags; does not depend on Vim::Tag or ptags
+          anymore
+
+1.110690 Thu 10 18:12:25 2011 CET
+    [New Features]
+        - initial working version

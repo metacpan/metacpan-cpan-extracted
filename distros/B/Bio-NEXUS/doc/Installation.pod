@@ -1,0 +1,129 @@
+=pod 
+
+=head1 NAME
+
+Installation - Bio::NEXUS Installation Instructions.
+
+=head1 DESCRIPTION
+
+How to install Bio::NEXUS Perl module.
+
+=head1 INSTALLATION
+
+Bio::NEXUS is packaged as a standard CPAN module, and can be installed using the standard procedures described at 
+L<http://www.cpan.org/modules/INSTALL.html> and L<http://search.cpan.org/~jhi/perl-5.8.0/pod/perlmodinstall.pod>. 
+The following sections provide further detail.  If you have read and followed the instructions, but still cannot 
+install the software successfully, contact the L<authors|/AUTHORS>
+with a precise description of any error messages and of the operating system you are using. 
+
+=head2 UN*X Installation Notes
+
+=over 
+
+=item Standard UN*X method from the compressed tar file
+
+The standard procedure for installation is to first uncompress the tar-zipped version of the 
+library in a chosen directory and then perform the standard installation sequence  below. 
+
+	$ cd Bio-NEXUS<version> 
+	$ perl Makefile.PL  
+	$ make
+	$ make test
+	$ make install
+
+The final command requires root permission, because by default the "make" script will perform a system-level installation.  
+For a local installation in a user-specified directory, do: 
+
+    $ make clean
+    $ perl Makefile.pl PREFIX=path/to/user/specified/directory
+
+and continue with make, make test, and make install as above.  
+
+=item Automated UN*X installation using CPAN
+
+The alternative way to install Bio::NEXUS library is directly from CPAN using the
+the following command:
+
+	$ perl -MCPAN -e 'install Bio::NEXUS'
+
+You should have root access for installing the module.
+
+=back 
+
+=head2 Mac OS X Installation Notes
+
+=over
+
+Follow the UN*X instructions given above.  If you have "admin" privileges on your Mac, then you can do a 
+system-level install by issuing the following instead of just "make install": 
+
+    $ sudo make install 
+    
+The system will prompt you for your login password.  
+If you do not have "admin" privileges on your Mac, then you must do a local install as described above 
+for UN*X systems. 
+
+=back 
+
+=head2 Windows Installation Notes
+
+=over
+
+=item Standard method from the tar-zipped file
+
+After you uncompress the distribution file, the procedure is probably this: 
+
+          perl Makefile.PL
+          nmake
+          nmake test
+          nmake install
+
+You may need to use L<http://www.winzip.com/> WinZip (sharware) to decompress and unpack the content of the module.
+
+You may need to download a copy of Microsoft's nmake program from L<ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe>
+
+If you are not familiar with installing modules, or have trouble doing so,you may want to use the alternative method instead (next section) 
+or read the help from the ActiveState page -- L<http://aspn.activestate.com//ASPN/Reference/Products/ActivePerl/faq/Windoze/ActivePerl-Winfaq9.html#How_can_I_use_modules_from_CPAN_>
+
+=item Windoze ActivePerl
+
+Windoze users with ActivePerl can take advantage of the Perl Package Manager (PPM), a utility that allows you to install modules, including modules that contain binary extensions. You should consider using PPM to install a module, as this greatly simplifies the management of modules.
+The commands for installation of Bio-NEXUS library would be.
+
+   	    $ ppm
+  ppm prompt> install Bio-NEXUS 
+
+Additional directions for using PPM are available at L<http://aspn.activestate.com/ASPN/docs/ActivePerl/5.8/faq/ActivePerl-faq2.html>.
+
+=back
+
+=head1 DOCUMENTATION
+
+Documentation of Bio::NEXUS is contained in .pod format, either in the docs directory of the distribution or appended to the scripts.
+Reading the user manual and the brief tutorial should help you use the module effectively for phylogenetics. The tutorial can be read
+interactively with perldoc, for example
+
+  cd docs
+  perldoc Tutorial.pod
+
+or else an html version can be made with pod2html:
+
+  pod2html Tutorial.pod > Tutorial.html
+
+There is also a user manual that is rather incomplete but may be useful in some respects: 
+
+  pod2html UserManual.pod > UserManual.html
+
+After installation, the installation directory of files may be deleted.
+
+=head1 SEE ALSO
+
+L<Tutorial> and L<Bio::NEXUS>
+
+=head1 AUTHORS
+
+Tom Hladish
+
+Arlin stoltzfus
+
+=cut

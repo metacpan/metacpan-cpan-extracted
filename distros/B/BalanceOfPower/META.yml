@@ -1,0 +1,262 @@
+---
+abstract: 'A game inspired by Balance of Power: The 1990 Edition by Chris Crawford '
+author:
+  - "Simone Fare' <cymon@tiscali.it>"
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BalanceOfPower
+provides:
+  BalanceOfPower:
+    file: lib/BalanceOfPower.pm
+    version: '0.400115'
+  BalanceOfPower::CivilWar:
+    file: lib/BalanceOfPower/CivilWar.pm
+    version: '0.400115'
+  BalanceOfPower::Commands:
+    file: lib/BalanceOfPower/Commands.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::AddRoute:
+    file: lib/BalanceOfPower/Commands/AddRoute.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::AidInsurgents:
+    file: lib/BalanceOfPower/Commands/AidInsurgents.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::BoostProduction:
+    file: lib/BalanceOfPower/Commands/BoostProduction.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::BuildTroops:
+    file: lib/BalanceOfPower/Commands/BuildTroops.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::ComTreaty:
+    file: lib/BalanceOfPower/Commands/ComTreaty.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::DeclareWar:
+    file: lib/BalanceOfPower/Commands/DeclareWar.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::DeleteRoute:
+    file: lib/BalanceOfPower/Commands/DeleteRoute.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::DiplomaticPressure:
+    file: lib/BalanceOfPower/Commands/DiplomaticPressure.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::EconomicAid:
+    file: lib/BalanceOfPower/Commands/EconomicAid.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::InMilitaryRange:
+    file: lib/BalanceOfPower/Commands/InMilitaryRange.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::LowerDisorder:
+    file: lib/BalanceOfPower/Commands/LowerDisorder.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::MilitaryAid:
+    file: lib/BalanceOfPower/Commands/MilitaryAid.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::MilitarySupport:
+    file: lib/BalanceOfPower/Commands/MilitarySupport.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::NagTreaty:
+    file: lib/BalanceOfPower/Commands/NagTreaty.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::NoArgs:
+    file: lib/BalanceOfPower/Commands/NoArgs.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::Plain:
+    file: lib/BalanceOfPower/Commands/Plain.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::Progress:
+    file: lib/BalanceOfPower/Commands/Progress.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::RebelMilitarySupport:
+    file: lib/BalanceOfPower/Commands/RebelMilitarySupport.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::RecallMilitarySupport:
+    file: lib/BalanceOfPower/Commands/RecallMilitarySupport.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::RecallRebelMilitarySupport:
+    file: lib/BalanceOfPower/Commands/RecallRebelMilitarySupport.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::Role::Command:
+    file: lib/BalanceOfPower/Commands/Role/Command.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::Role::TreatiesUnderLimit:
+    file: lib/BalanceOfPower/Commands/Role/TreatiesUnderLimit.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::TargetFriends:
+    file: lib/BalanceOfPower/Commands/TargetFriends.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::TargetNation:
+    file: lib/BalanceOfPower/Commands/TargetNation.pm
+    version: '0.400115'
+  BalanceOfPower::Commands::TargetRoute:
+    file: lib/BalanceOfPower/Commands/TargetRoute.pm
+    version: '0.400115'
+  BalanceOfPower::Constants:
+    file: lib/BalanceOfPower/Constants.pm
+    version: '0.400115'
+  BalanceOfPower::Dice:
+    file: lib/BalanceOfPower/Dice.pm
+    version: '0.400115'
+  BalanceOfPower::Executive:
+    file: lib/BalanceOfPower/Executive.pm
+    version: '0.400115'
+  BalanceOfPower::Nation:
+    file: lib/BalanceOfPower/Nation.pm
+    version: '0.400115'
+  BalanceOfPower::Nation::Role::IA:
+    file: lib/BalanceOfPower/Nation/Role/IA.pm
+    version: '0.400115'
+  BalanceOfPower::Nation::Role::Shareholder:
+    file: lib/BalanceOfPower/Nation/Role/Shareholder.pm
+    version: '0.400115'
+  BalanceOfPower::Player:
+    file: lib/BalanceOfPower/Player.pm
+    version: '0.400115'
+  BalanceOfPower::Player::Role::Broker:
+    file: lib/BalanceOfPower/Player/Role/Broker.pm
+    version: '0.400115'
+  BalanceOfPower::Player::Role::Cargo:
+    file: lib/BalanceOfPower/Player/Role/Cargo.pm
+    version: '0.400115'
+  BalanceOfPower::Player::Role::Friend:
+    file: lib/BalanceOfPower/Player/Role/Friend.pm
+    version: '0.400115'
+  BalanceOfPower::Player::Role::Hitman:
+    file: lib/BalanceOfPower/Player/Role/Hitman.pm
+    version: '0.400115'
+  BalanceOfPower::Player::Role::Traveler:
+    file: lib/BalanceOfPower/Player/Role/Traveler.pm
+    version: '0.400115'
+  BalanceOfPower::Printer:
+    file: lib/BalanceOfPower/Printer.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Alliance:
+    file: lib/BalanceOfPower/Relations/Alliance.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Border:
+    file: lib/BalanceOfPower/Relations/Border.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Crisis:
+    file: lib/BalanceOfPower/Relations/Crisis.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Friendship:
+    file: lib/BalanceOfPower/Relations/Friendship.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Influence:
+    file: lib/BalanceOfPower/Relations/Influence.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::MilitarySupport:
+    file: lib/BalanceOfPower/Relations/MilitarySupport.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::RelPack:
+    file: lib/BalanceOfPower/Relations/RelPack.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Role::Relation:
+    file: lib/BalanceOfPower/Relations/Role/Relation.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::TradeRoute:
+    file: lib/BalanceOfPower/Relations/TradeRoute.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::Treaty:
+    file: lib/BalanceOfPower/Relations/Treaty.pm
+    version: '0.400115'
+  BalanceOfPower::Relations::War:
+    file: lib/BalanceOfPower/Relations/War.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Analyst:
+    file: lib/BalanceOfPower/Role/Analyst.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Broker:
+    file: lib/BalanceOfPower/Role/Broker.pm
+    version: '0.400115'
+  BalanceOfPower::Role::CrisisManager:
+    file: lib/BalanceOfPower/Role/CrisisManager.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Diplomat:
+    file: lib/BalanceOfPower/Role/Diplomat.pm
+    version: '0.400115'
+  BalanceOfPower::Role::GameMaster:
+    file: lib/BalanceOfPower/Role/GameMaster.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Herald:
+    file: lib/BalanceOfPower/Role/Herald.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Historian:
+    file: lib/BalanceOfPower/Role/Historian.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Logger:
+    file: lib/BalanceOfPower/Role/Logger.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Mapmaker:
+    file: lib/BalanceOfPower/Role/Mapmaker.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Merchant:
+    file: lib/BalanceOfPower/Role/Merchant.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Player:
+    file: lib/BalanceOfPower/Role/Player.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Rebel:
+    file: lib/BalanceOfPower/Role/Rebel.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Recorder:
+    file: lib/BalanceOfPower/Role/Recorder.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Reporter:
+    file: lib/BalanceOfPower/Role/Reporter.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Ruler:
+    file: lib/BalanceOfPower/Role/Ruler.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Shopper:
+    file: lib/BalanceOfPower/Role/Shopper.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Supporter:
+    file: lib/BalanceOfPower/Role/Supporter.pm
+    version: '0.400115'
+  BalanceOfPower::Role::Warlord:
+    file: lib/BalanceOfPower/Role/Warlord.pm
+    version: '0.400115'
+  BalanceOfPower::Role::WebMaster:
+    file: lib/BalanceOfPower/Role/WebMaster.pm
+    version: '0.400115'
+  BalanceOfPower::Targets::Fall:
+    file: lib/BalanceOfPower/Targets/Fall.pm
+    version: '0.400115'
+  BalanceOfPower::Targets::Role::Target:
+    file: lib/BalanceOfPower/Targets/Role/Target.pm
+    version: '0.400115'
+  BalanceOfPower::Utils:
+    file: lib/BalanceOfPower/Utils.pm
+    version: '0.400115'
+  BalanceOfPower::World:
+    file: lib/BalanceOfPower/World.pm
+    version: '0.400115'
+requires:
+  Array::Utils: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Path: '0'
+  HTML::Entities: '0'
+  IO::Prompter: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Template: '0'
+  Template::Plugin::Filter::ANSIColor: v0.0.3
+  Term::ANSIColor: '0'
+  constant: '0'
+resources:
+  repository: https://github.com/cym0n/BalanceOfPower.git
+version: '0.400115'

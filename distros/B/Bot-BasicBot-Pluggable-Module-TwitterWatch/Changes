@@ -1,0 +1,11 @@
+Revision history for Bot-BasicBot-Pluggable-Module-TwitterWatch
+
+0.02    2011-10-18
+        Bugfix: anchor regex so we only match lines starting with !twitter...
+        Bugfix: complain if !twitter... commands are used in private msg (thanks
+        to ambs for uncovering this one)
+
+0.01    2011-10-05
+        About time I released this.  It's been proven on irc.perl.org/#dancer
+        for some time now.
+

@@ -1,0 +1,91 @@
+;
+; Generated at: 2015-06-21T11:01:24
+; This file was generated with the following options
+;	--workflow	drake.yml
+;	--min	1
+;
+
+;
+; Samples: test1, test2
+;
+;
+; Starting Workflow
+;
+
+;
+; Starting backup
+;
+
+
+
+;
+; Variables 
+; Indir: /home/guests/jir2004/workflow
+; Outdir: /home/guests/jir2004/workflow/output/backup
+; Local Variables:
+;	INPUT: {$self->indir}/{$sample}.csv
+;	OUTPUT: {$self->outdir}/{$sample}.csv
+;	thing: other thing
+;
+
+/home/guests/jir2004/workflow/output/backup/$[SAMPLE].csv <- /home/guests/jir2004/workflow/$[SAMPLE].csv
+	cp $INPUT $OUTPUT
+
+
+;
+; Ending backup
+;
+
+
+;
+; Starting grep_VARA
+;
+
+
+
+;
+; Variables 
+; Indir: /home/guests/jir2004/workflow/output/backup
+; Outdir: /home/guests/jir2004/workflow/output/grep_vara
+; Local Variables:
+;	OUTPUT: {$self->outdir}/{$sample}.grep_VARA.csv
+;	INPUT: {$self->indir}/{$sample}.csv
+;
+
+/home/guests/jir2004/workflow/output/grep_vara/$[SAMPLE].grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/$[SAMPLE].csv
+	echo "Working on /home/guests/jir2004/workflow/output/backup/$SAMPLEcsv"
+	grep -i "VARA" /home/guests/jir2004/workflow/output/backup/$SAMPLE.csv >> /home/guests/jir2004/workflow/output/grep_vara/$SAMPLE.grep_VARA.csv \
+	|| touch /home/guests/jir2004/workflow/output/grep_vara/$SAMPLE.grep_VARA.csv
+
+
+;
+; Ending grep_VARA
+;
+
+
+;
+; Starting grep_VARB
+;
+
+
+
+;
+; Variables 
+; Indir: /home/guests/jir2004/workflow/output/grep_vara
+; Outdir: /home/guests/jir2004/workflow/output/grep_varb
+; Local Variables:
+;	OUTPUT: {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv
+;	INPUT: {$self->indir}/{$sample}.grep_VARA.csv
+;
+
+/home/guests/jir2004/workflow/output/grep_varb/$[SAMPLE].grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/$[SAMPLE].grep_VARA.csv
+	grep -i "VARB" /home/guests/jir2004/workflow/output/grep_vara/$SAMPLE.grep_VARA.csv >> /home/guests/jir2004/workflow/output/grep_varb/$SAMPLE.grep_VARA.grep_VARB.csv || touch /home/guests/jir2004/workflow/output/grep_varb/$SAMPLE.grep_VARA.grep_VARB.csv
+
+
+;
+; Ending grep_VARB
+;
+
+;
+; Ending Workflow
+;

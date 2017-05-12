@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="urn:ietf:params:xml:ns:bgp_monitor" xmlns:bgpm="urn:ietf:params:xml:ns:bgp_monitor"
+  xmlns:xfb="urn:ietf:params:xml:ns:xfb" xmlns:ne="urn:ietf:params:xml:ns:network_elements"
+  elementFormDefault="qualified">
+  <xsd:import id="xfb" namespace="urn:ietf:params:xml:ns:xfb"
+    schemaLocation="xfb_2_00.xsd" />
+  <xsd:import id="ne" namespace="urn:ietf:params:xml:ns:network_elements"
+    schemaLocation="network_elements_2_00.xsd" />
+
+  <xsd:element name="BGP_MONITOR_MESSAGE" type="bgpm:bgp_monitor_message_type" />
+
+  <xsd:complexType name="bgp_monitor_message_type">
+    <xsd:sequence>
+      <xsd:element name="SOURCE" type="bgpm:endpoint_type" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="DEST" type="bgpm:endpoint_type" minOccurs="0" maxOccurs="1" />
+      <xsd:element name="MONITOR" type="bgpm:endpoint_type" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="RELAY" type="bgpm:endpoint_type" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="OBSERVED_TIME" type="bgpm:observed_time_type" minOccurs="1" maxOccurs="1" />
+      <xsd:element name="SEQUENCE_NUMBER" type="xsd:unsignedLong" minOccurs="1" maxOccurs="1"/>
+      <xsd:element name="COLLECTION" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+      <xsd:element name="PARSE_ERROR"  type="xfb:parse_error_type" maxOccurs="1" minOccurs="0" />
+      <xsd:choice minOccurs="1" maxOccurs="1">
+      	<xsd:element name="STATUS" type="bgpm:status_type" minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="xfb:OPEN" /> 
+        <xsd:element ref="xfb:UPDATE" />
+        <xsd:element ref="xfb:NOTIFICATION" />
+        <xsd:element ref="xfb:KEEP_ALIVE" />
+      </xsd:choice>
+      <xsd:element name="OCTET_MESSAGE" type="xsd:hexBinary" maxOccurs="1" minOccurs="0" />
+      <xsd:element name="METADATA" type="bgpm:metadata_type" maxOccurs="unbounded" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  
+  <xsd:complexType name="metadata_type">
+  <xsd:sequence>
+  <xsd:element minOccurs="1" maxOccurs="1" name="NODE_PATH" type="xsd:string"/>
+  <xsd:element minOccurs="1" maxOccurs="1" name="ANNOTATION" type="xsd:string"/>
+  </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="endpoint_type">
+    <xsd:sequence>
+      <xsd:element name="ADDRESS" type="ne:network_address_type" />
+      <xsd:element name="PORT" type="ne:port_type" />
+      <xsd:choice minOccurs="1" maxOccurs="1">
+      <xsd:element name="ASN2" type="ne:asn2_type" />
+      <xsd:element name="ASN4" type="ne:asn4_type"/>
+      </xsd:choice>
+      
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:token" />
+  </xsd:complexType>
+  
+  <xsd:complexType name="observed_time_type">
+  <xsd:choice>
+  <xsd:sequence>
+  <xsd:element name="TIMESTAMP" type="xsd:unsignedInt"/>
+  <xsd:element name="DATETIME"  type="xsd:dateTime"/>
+  </xsd:sequence>  
+  <xsd:sequence>
+  <xsd:element name="PRECISE_TIMESTAMP" type="xsd:unsignedLong"/>
+  </xsd:sequence>
+  
+  </xsd:choice>
+  <xsd:attribute name="precision" type="xsd:boolean" use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="status_type">
+  	<xsd:sequence>
+  		<xsd:element name="TYPE" type="xsd:string"/>
+  	</xsd:sequence>
+  	<xsd:attribute name="Author_Xpath" type="xsd:string"/>
+  	
+  </xsd:complexType>
+  
+  
+  
+
+</xsd:schema>

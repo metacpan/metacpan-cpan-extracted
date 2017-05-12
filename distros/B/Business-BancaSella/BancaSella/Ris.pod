@@ -1,0 +1,57 @@
+=head1 NAME
+
+Business::BancaSella::Ris - Parent class for checking One-Time-Password from different
+storage place
+
+=head1 SYNOPSIS
+
+Currently supported file, fileFast and mysql storage.
+
+For file storage use:
+
+  use Business::BancaSella::Ris;
+
+  my $ris = new Business::BancaSella::Ris(
+  				type 		=> 'file',
+  				file 		=> 'filePath/filename.ric');
+  my $ok = $ris->check($otp);
+  if ($ok) {$ris->remove($otp));
+
+For file fast storage use:
+
+  use Business::BancaSella::Ris;
+
+  my $ris = new Business::BancaSella::Ris(
+  				type 		=> 'filefast',
+  				file 		=> 'filePath/filename.ric');
+  my $ok = $ris->check($otp);
+  if ($ok) {$ris->remove($otp));
+
+For Mysql database use:
+
+  use Business::BancaSella::Ric;
+
+  my $ris = new Business::BancaSella::Ric(
+  				type 		=> 'mysql',
+  				dbh		=> $DBI_handle,
+				tableName	=> $table_with_otp,
+				fieldName	=> $field_with_otp);
+  my $ok = $ris->check($otp);
+  if ($ok) {$ris->remove($otp));
+
+=head1 DESCRIPTION
+
+This module check if One-Time-Password is present in the system storage place
+and it could remove it. 
+Currently are supported only file, fileFast and mysql location for OTP.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Ris::File
+  Business::BancaSella::Ris::Mysql
+
+=cut

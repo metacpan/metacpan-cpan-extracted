@@ -1,0 +1,8 @@
+Revision history for Perl extension Bundle::Personal::lze.
+
+0.04  Mon Mai 16 09::08:00
+	 - updated version for current enviroment
+0.01  Mon Jul  2 22:12:11 2007
+	- original version; created by h2xs 1.23 with options
+		-XA -n Bundle::Personal::lze
+

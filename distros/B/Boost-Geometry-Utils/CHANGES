@@ -1,0 +1,351 @@
+==================================================
+Changes from 2012-03-31 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.15 at 2013-06-21
+-----------------------------------------
+
+    - Added point_within_multi_polygon()
+    - Added point_covered_by_multi_polygon()
+
+-----------------------------------------
+version 0.14 at 2013-06-16
+-----------------------------------------
+
+    - Fix segfault on reading empty multilinestrings
+
+-----------------------------------------
+version 0.13 at 2013-05-20
+-----------------------------------------
+
+    - Remove a possible compilation error
+
+-----------------------------------------
+version 0.12 at 2013-05-19
+-----------------------------------------
+
+    - Fix compilation on some GCC
+
+-----------------------------------------
+version 0.11 at 2013-05-19
+-----------------------------------------
+
+    - Added polygon_area()
+    - Fixed more memory leaks
+
+-----------------------------------------
+version 0.10 at 2013-05-18
+-----------------------------------------
+
+    - Added multi_linestring_multi_polygon_difference()
+    - Fixed memory leak in reading multi_linestring input
+    - Fixed memory leak in reading multi_polygon input
+
+-----------------------------------------
+version 0.09 at 2013-04-11
+-----------------------------------------
+
+    - fix compilation on Windows after recent Boost update
+
+-----------------------------------------
+version 0.08 at 2013-04-08
+-----------------------------------------
+
+    - Updated Boost to 1.53
+    - Revert to double coordinates instead of integer because Boost computes
+      wrong intersection with integers
+
+-----------------------------------------
+version 0.07 at 2013-03-31 17:03:07 +0000
+-----------------------------------------
+
+  Change: cbbf35be3e139a5b21773fa2cf0d9b545dec0d44
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-31 11:45:00 +0000
+
+    Add hints for Pod::Coverage 
+
+  Change: 0defa9741671173d2d5395be2343b0e36e266a4e
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-15 15:47:04 +0000
+
+    New correct_polygon() and correct_multi_polygon() 
+
+  Change: 2b190280466cc54d44f7f1ba7b1a133dcfaeaa07
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-15 15:10:44 +0000
+
+    Added multi_polygon_multi_linestring_intersection() 
+
+  Change: b9d2e24cabae84d503759a9b9c096f488064be2c
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 17:50:01 +0000
+
+    Added multi_linestring_centroi() 
+
+  Change: 66e6cf92fa9594d74e6edf433a7adcd80b73289b
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 17:40:33 +0000
+
+    Added linestring_centroid() 
+
+  Change: 1a5fc63410c5433cfced29f909426e0bf677828b
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 17:37:27 +0000
+
+    Added polygon_centroid() 
+
+  Change: dd48d474f1b4b75a24f96589bad1965c81aa2339
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 17:18:19 +0000
+
+    Added linestring_length 
+
+  Change: 04167004ef25d6fe22c6bfcc6e0463a35c7d06da
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 17:05:26 +0000
+
+    Added multi_linestring_simplify and fixed some files 
+
+  Change: db7138df02bf1e5078f7ebe9d68a196603bca3e2
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-03-14 16:50:42 +0000
+
+    Merge branch 'master' of github.com:alexrj/Boost-Geometry-Utils 
+
+  Change: 29af743cedd602af65deecf056b59ac0c909282a
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-01-28 00:25:03 +0000
+
+    Update POD 
+
+-----------------------------------------
+version 0.06 at 2013-02-01 23:04:44 +0000
+-----------------------------------------
+
+  Change: e2b880930b6f1ca3015d34ee0099f1c629f103ed
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-02-02 00:04:44 +0000
+
+    Update Boost to 1.52 
+
+  Change: 58736a034fb398d7e4f6a00b975a14ce2d122d7a
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-01-27 23:58:02 +0000
+
+    Fixed arrayref to polygon conversion and added unit test 
+
+  Change: 885c60668125cd281b7783baf7dc69951e0d0f2e
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-01-27 16:30:38 +0000
+
+    Finished polygon2perl() and added unit test for conversion roundtrip 
+
+  Change: 1df409ec73fb4de93db234f9634399c64aba0314
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-01-27 15:08:11 +0000
+
+    Update copyright year 
+
+  Change: 0a0b9442fb84af318e888a0064da6f54474fc9ae
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2013-01-27 15:07:56 +0000
+
+    Added a couple conversion methods to help debugging 
+
+  Change: c3fc121bf240a9b15b69d356b4ffc8088ed52609
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-11-01 17:18:17 +0000
+
+    Use integers instead of doubles and fix test to use integers. 
+
+  Change: 71ce53ba110bea82bb32c63e8aef82719bcbea80
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-10 22:28:25 +0000
+
+    Convert polygon() and linestring() functions to use non-wkt
+    conversion. 
+
+  Change: f95918786093c58de80ab62c0f47355c668fb48e
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-08 11:41:27 +0000
+
+    Attempt to fix/workaround leaking memory. 
+
+  Change: fec904e6630837aef63260b5bdde034b6d570ae5
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-08 08:30:55 +0000
+
+    Remove pointless reference to boost::geometry::append. 
+
+  Change: e917ff4dbc3eeaa3e2e51cacb0dad649712310d1
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-08 07:50:09 +0000
+
+    Add point_covered_by_polygon and add tests to cover "edge" cases. 
+
+  Change: 259eed2f7952443be651f87d50772181a363c105
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 23:40:35 +0000
+
+    Add point_within_polygon and linestring_simplify functions and tests.
+
+    There is a bug in point_within_polygon triggered by:
+
+    point_within_polygon($point_in_hole, [$hole_in_square,[]])
+
+    which I've avoided by changing the test. This needs fixing. 
+
+  Change: d93104e6ebb7ed61f6dca2bd660aca10e6343783
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 22:38:18 +0000
+
+    Fix typo that accidentally worked. 
+
+  Change: ffd640666a4dfc64eaa481e701e5fa10456a0b03
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 22:19:50 +0000
+
+    Trivial whitespace change. 
+
+  Change: 07b52f3ca576db64b4488630b5234e18e7687b84
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 22:19:17 +0000
+
+    Put back 64-bit int support. 
+
+  Change: ce6abfcd8966a3873b5f8c0469f56ac34183bfa8
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 22:06:13 +0000
+
+    Support old API and new polygon_multi_linestring_intersection
+    function.
+
+    Old API is the same as before but the new version does the return
+    value conversion using the new XS code path rather than the old wkt
+    code. 
+
+  Change: a36005753777bbe951050c1c6f6b1fdb289063ab
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 20:55:10 +0000
+
+    Refactor add_outer and add_hole to single add_ring function. 
+
+  Change: 3813ed19a4aae58ccaa3b4b2c1aeb58e68aea791
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 20:30:56 +0000
+
+    Remove some debug and add macros to simplify code. 
+
+  Change: ab1b86acb5ce159af54e23c58aed54768ef0ed31
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-07 18:09:58 +0000
+
+    Implement boost to perl conversion for multi_linestring. 
+
+  Change: 9808ba60cc64a6dbaddde6e98493e5c8ea7cf5b9
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-06 23:11:15 +0000
+
+    Convert perl to multi_linestring. 
+
+  Change: 641f20262b6a0fa246b525f3f1639062bc71473a
+  Author: Mark Hindess <soft-github@temporalanomaly.com>
+  Date : 2012-07-06 19:14:09 +0000
+
+    Fix perl to boost polygon conversion.
+
+    Lots of debug left in and lots of cleanup to do but it works. 
+
+  Change: d98d2ecd5377635b1c29e947d7e44a82550ac634
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-07-03 19:10:28 +0000
+
+    Unfinished draft for avoiding the WKT roundtrip and having XS work
+    directly on Perl data structures 
+
+-----------------------------------------
+version 0.05 at 2012-04-10 08:39:45 +0000
+-----------------------------------------
+
+  Change: 680789acf635cfcbdfd5a8c23de5ca99a7ec8680
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-10 10:39:45 +0000
+
+    Added build and configure modules to dist.ini and thus META.yml 
+
+-----------------------------------------
+version 0.04 at 2012-04-09 19:51:56 +0000
+-----------------------------------------
+
+  Change: 3f86a958746db1b72bf49e12e042c87f226089c2
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 21:51:56 +0000
+
+    Put XSLoader::log() outside of BEGIN in order to allow for DZ to add
+    $VERSION 
+
+-----------------------------------------
+version 0.03 at 2012-04-09 19:41:18 +0000
+-----------------------------------------
+
+  Change: 1bdc8c6b368bb403f98a5b9b0b55821f133aff91
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 21:41:18 +0000
+
+    Remove $VERSION so that $Dist::Zilla manages it 
+
+  Change: 3563c5b03dc794210339f785f36cebb02eda22d0
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 21:36:55 +0000
+
+    Windows/MinGW compatibility 
+
+  Change: f61020399095897d9851b49b921f1b23a03502d8
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 14:44:21 +0000
+
+    Removed unused file from repository 
+
+  Change: fa97f24271e153753c9191d1d21717c1b0307cf9
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 14:28:31 +0000
+
+    Prevent Makefile.PL to be generated 
+
+-----------------------------------------
+version 0.02 at 2012-04-09 09:11:10 +0000
+-----------------------------------------
+
+  Change: b41fe3fe2efcb7bf3dc78dcc92cd1ec29791d347
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 11:11:10 +0000
+
+    Commit missing files 
+
+  Change: 8d1a6bb587509e1623ba53d00d9da2f5f1bea47c
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 10:32:37 +0000
+
+    Document undocumented methods 
+
+-----------------------------------------
+version 0.01 at 2012-04-09 08:14:32 +0000
+-----------------------------------------
+
+  Change: 782140226923923bca9a429ce120ebe7ebf6fa38
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 10:14:32 +0000
+
+    More changes 
+
+  Change: a7c5fb071f614c8ce46b97c5db826303bae8b733
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-04-09 00:20:51 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

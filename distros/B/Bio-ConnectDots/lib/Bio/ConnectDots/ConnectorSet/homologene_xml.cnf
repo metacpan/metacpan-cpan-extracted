@@ -1,0 +1,26 @@
+#cnf file for homologene, make sure put dotset ID in label
+name=homologene_xml
+module=homologene_xml
+version=20041220
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.ncbi.nih.gov/pub/HomoloGene/current/
+ftp_files=homologene.xml
+
+label=Homologene_ID, dotset=Gene_Cluster_ID
+label=9606, dotset=Gene_ID
+label=9606_gi, dotset=Sequence_ID
+label=9606_v_10090, dotset=Reciprocal_best
+label=9606_v_10116, dotset=Reciprocal_best
+label=10090, dotset=Gene_ID
+label=10090_gi, dotset=Sequence_ID
+label=10090_v_9606, dotset=Reciprocal_best
+label=10090_v_10116, dotset=Reciprocal_best
+label=10116, dotset=Gene_ID
+label=10116_gi, dotset=Sequence_ID
+label=10116_v_9606, dotset=Reciprocal_best
+label=10116_v_10090, dotset=Reciprocal_best
+label=7227, dotset=Gene_ID
+label=7227_gi, dotset=Sequence_ID

@@ -1,0 +1,42 @@
+---
+abstract: 'input BusyBird statuses from RSS/Atom feed'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  Test::Deep: '0.084'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BusyBird-Input-Feed
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+  file:
+    - README.pod
+requires:
+  BusyBird::DateTime::Format: '0.04'
+  Carp: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  WWW::Favicon: '0'
+  XML::FeedPP: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/BusyBird-Input-Feed/issues
+  repository: git://github.com/debug-ito/BusyBird-Input-Feed.git
+version: '0.05'

@@ -1,0 +1,87 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+enum Type
+{
+	e_unknown = -1,
+	e_circle = 0,
+	e_polygon = 1,
+	e_typeCount = 2,
+};
+
+%name{Box2D::b2Shape} class b2Shape
+{
+
+%{
+
+int
+b2Shape::GetType( )
+	CODE:
+		RETVAL = (int)THIS->GetType();
+	OUTPUT:
+		RETVAL
+
+bool
+b2Shape::TestPoint( xf, p )
+	b2Transform* xf
+	b2Vec2* p
+	CODE:
+		RETVAL = THIS->TestPoint( *xf, *p );
+	OUTPUT:
+		RETVAL
+
+bool
+b2Shape::RayCast( output, input, transform )
+	b2RayCastOutput* output
+	b2RayCastInput* input
+	b2Transform* transform
+	CODE:
+		RETVAL = THIS->RayCast( output, *input, *transform );
+	OUTPUT:
+		RETVAL
+
+void
+b2Shape::ComputeAABB( aabb, xf )
+	b2AABB* aabb
+	b2Transform* xf
+	CODE:
+		THIS->ComputeAABB( aabb, *xf );
+
+void
+b2Shape::ComputeMass( massData, density )
+	b2MassData* massData
+	float32 density
+	CODE:
+		THIS->ComputeMass( massData, density );
+
+int
+b2Shape::m_type( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->m_type = (b2Shape::Type)SvUV( ST(1) );
+		}
+		RETVAL = (int)THIS->m_type;
+	OUTPUT:
+		RETVAL
+
+float32
+b2Shape::m_radius( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->m_radius = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->m_radius;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

@@ -1,0 +1,14 @@
+This example does two things:
+
+1. Shows off Perl's power with text files (paragraph records with
+tab-delimited fields in the first line).
+
+2. Writes a custom key into a save file. This can be used if you have
+third-party software that uses btrieve but does not define a sort that
+you want and you are willing to sacrifice a sort it does do.
+
+For many routine manipulation you should consider /rdb->/rdb
+conversions instead: medium size rdb files are basically easier to deal with
+and more open to other environments. Even large ones can be manipulated 
+easily if they do not need much updating and are not critically dependent
+on transaction support.

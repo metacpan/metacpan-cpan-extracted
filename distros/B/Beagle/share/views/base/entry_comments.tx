@@ -1,0 +1,28 @@
+: if template_exists( $entry.type ~ '_entry_comments.tx' ) {
+:   include $entry.type ~ '_entry_comments.tx';
+: } else {
+: if $admin || $comments_map[$entry.id] {
+<div class="comments">
+: include '_wedge.tx' { template => 'entry_comments_start.tx' };
+
+<h5><a class="comments-toggle" href=""><: _('Comments') :></a></h5>
+
+<div class="content">
+: if $comments_map[$entry.id] {
+
+: my $comments = $comments_map[$entry.id];
+: for $comments.keys().sort( -> $x, $y { $comments[$x].created <=> $comments[$y].created } ) -> $id {
+: include 'entry_comment.tx' { entry => $comments[$id], parent => $entry };
+: }
+
+: }
+</div>
+
+: include '_wedge.tx' { template => 'entry_comments_end.tx' };
+
+: if $admin {
+:   include "create_comment.tx" { parent => $entry };
+: }
+</div>
+: }
+: }

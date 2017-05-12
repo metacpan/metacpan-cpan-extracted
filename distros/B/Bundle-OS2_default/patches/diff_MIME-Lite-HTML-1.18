@@ -1,0 +1,34 @@
+--- ./t/20create_image_part.t-pre	Fri Aug  8 01:36:16 2003
++++ ./t/20create_image_part.t	Fri Sep 19 23:20:34 2003
+@@ -10,7 +10,13 @@ use Cwd;
+ 
+ my $t = "/var/tmp/mime-lite-html-tests";
+ my $p = cwd;
+-my $o = (system("ln -s $p/t $t")==0);
++my $k;
++unless (system("ln -s $p/t $t")==0) {
++  mkdir 'tmp' and $t = "$p/tmp/t";
++  system "cp -r $p/t $t" and die "Can't ln or cp";
++  $k = 1;
++}
++
+ my @files_to_test = glob("$t/docs/img/*.gif");
+ plan tests => ($#files_to_test+1)*2;
+ 
+@@ -36,6 +42,7 @@ foreach my $it ('cid', 'location') {
+       print PROD $rep;
+       close(PROD);
+       my $r = `diff $ref $f.created_by_test`;
++      $r =~ s/\A1c1\n< Content-(\w+): .*\n---\n> Content-\1: .*\n//;
+       is($r, "", $ref);
+       unlink("$f.created_by_test");
+     } # For create .ref file
+@@ -47,4 +54,7 @@ foreach my $it ('cid', 'location') {
+     }
+   }
+ }
+-unlink($t);
++unlink($t) or $k and do {
++  require File::Path;
++  File::Path::rmtree('tmp');
++};

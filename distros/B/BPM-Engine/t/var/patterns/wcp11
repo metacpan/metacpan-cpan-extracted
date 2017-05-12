@@ -1,0 +1,65 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp11" Name="WCP11: Implicit Termination">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>terminate if there is nothing to be done. The "Implicit Termination" pattern is essentially what regular end events do: "swallow" a single token and provide for a rule that completes the process instance (and all contained subflows and tasks) when the last token has ceased to exist. Process termination happens implicitly in a sense that the latter semantics is automatically provided by the runtime and does not have to be taken care of by the process modeler. </Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will folow to activity B, if you set it to C it will proceed to activity C, otherwise process will be implicitly terminated, because there's nothing else to do</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="WfABSP1_Multiple_Choice_Tra1"/>
+                                    <TransitionRef Id="WfABSP1_Multiple_Choice_Tra2"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to D process will folow to activity D, otherwise it will either finish or wait for activity C and possibly E to finish</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to E process will folow to activity E, otherwise it will either finish or wait for activity B and possibly D to finish</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="WfABSP1_Multiple_Choice_Tra1" Name="Transition" From="A" To="B">
+                    <Condition Type="CONDITION">whereToGo.indexOf('B') != -1</Condition>
+                </Transition>
+                <Transition Id="WfABSP1_Multiple_Choice_Tra2" Name="Transition" From="A" To="C">
+                    <Condition Type="CONDITION">whereToGo.indexOf('C') != -1</Condition>
+                </Transition>
+                <Transition Id="WfSP2_Implicit_Termination_Tra3" Name="Transition" From="B" To="D">
+                    <Condition Type="CONDITION">whereToGo=="D"</Condition>
+                </Transition>
+                <Transition Id="WfSP2_Implicit_Termination_Tra4" Name="Transition" From="C" To="E">
+                    <Condition Type="CONDITION">whereToGo=="E"</Condition>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>

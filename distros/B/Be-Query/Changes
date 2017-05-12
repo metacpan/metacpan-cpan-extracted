@@ -1,0 +1,8 @@
+Revision history for Perl extension Be::Query
+
+0.2   Thu Jun 19 13:38:26 JST 2008
+	- so that the automated testing mail won't bug me.
+
+0.01  Mon May  3 18:07:35 PDT 1999
+	- copied from Be::Attribute cuz I'm lazy.
+

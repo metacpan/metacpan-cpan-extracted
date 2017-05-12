@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bundle-KohaSupport.t
+t/pod.t
+lib/Bundle/KohaSupport.pm
+META.yml                                 Module meta-data (added by MakeMaker)

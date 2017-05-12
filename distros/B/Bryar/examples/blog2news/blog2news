@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Bryar;
+use Net::NNTP;
+
+# Template::Plugin::Wrap does not pass the fourth argument to
+# Text::Wrap::wrap, so we have to set it here.
+use Text::Wrap;
+$Text::Wrap::huge = 'overflow';
+
+my $blog = Bryar->new(
+	datadir		=> '/var/www/blog/data',
+	renderer	=> 'Bryar::Renderer::TT',
+);
+
+my $lastdate_file = $blog->{config}->{datadir} . '/.lastdate';
+
+my $lastdate = $ARGV[0] || read_lastdate($lastdate_file)
+	|| die "FATAL: $lastdate_file does not exist.\n";
+
+my @documents = $blog->{config}->collector->collect($blog->config,
+	since => $lastdate
+);
+exit 0 if not @documents;
+
+$blog->config->renderer->register_format('nntp' => 'template.nntp');
+
+my $debug;
+if (-t 0) {
+	warn "DEBUG: $lastdate_file not updated.\n\n";
+	$debug = 1;
+
+	# for debugging purposes, force the output to UTF-8
+	binmode(STDOUT, ':utf8');
+}
+
+my $nntp;
+if (not $debug) {
+	$nntp = new Net::NNTP(
+		Host => 'localhost',
+	);
+	die "Cannot connect" if not $nntp;
+}
+
+my $new_timestamp;
+foreach my $entry (@documents) {
+	my $out = $blog->config->renderer->generate('nntp', $blog, $entry) . "\n";
+
+	if ($debug) {
+		print $out . "\n======\n\n";
+		next;
+	}
+
+	$nntp->post([ split(/^/m, $out) ]);
+	if (not $nntp->ok) {
+		warn "FATAL: cannot post the article.\n"
+			. $nntp->code . ' ' . $nntp->message . "\n";
+		last;
+	}
+	$new_timestamp = $entry->epoch;
+}
+
+write_lastdate($lastdate_file, $new_timestamp) if defined $new_timestamp;
+
+$nntp->quit if $nntp;
+exit 0;
+
+##############################################################################
+sub read_lastdate {
+	my ($file) = @_;
+
+	open(FILE, $file) or die "cannot open $file: $!";
+	my $lastdate = <FILE> || 0;
+	close FILE;
+	chomp $lastdate;
+	return $lastdate;
+}
+
+sub write_lastdate {
+	my ($file, $lastdate) = @_;
+
+	open(FILE, ">$file") or die "cannot open $file: $!";
+	print FILE "$lastdate\n";
+	close FILE or die "cannot close $file: $!";
+}
+

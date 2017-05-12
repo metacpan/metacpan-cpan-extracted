@@ -1,0 +1,9 @@
+Revision history for Perl extension Bundle::Math::Calculus.
+
+1.01  Tue Apr 13 18:55:42 2004
+	- Added Math::Symbolic::Custom::ErrorPropagation
+
+1.00  Sat Apr  3 12:24:51 2004
+	- original version as uploaded to CPAN
+
+

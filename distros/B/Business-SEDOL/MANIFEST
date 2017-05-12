@@ -1,0 +1,8 @@
+README
+SEDOL.pm
+MANIFEST
+Makefile.PL
+t/01-acc.t
+t/02-good.t
+t/03-invalch.t
+t/04-bad.t

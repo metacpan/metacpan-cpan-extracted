@@ -1,0 +1,8 @@
+[% PROCESS header %]
+[% PROCESS macros %]
+
+    <h1>[% address.address | html %]</h1>
+[% INCLUDE searchbox %]
+
+[% mails_by_addressing(address) %]
+[% INCLUDE footer %]

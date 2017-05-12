@@ -1,0 +1,5 @@
+Second blog entry
+
+This is the second blog entry, yay!
+
+# arch-tag: a8918616-772f-4d7f-ad78-bcea2f5b1314

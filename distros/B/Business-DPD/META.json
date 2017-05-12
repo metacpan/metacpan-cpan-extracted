@@ -1,0 +1,98 @@
+{
+   "abstract" : "handle DPD label generation",
+   "author" : [
+      "RevDev"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-DPD",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0.27",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0.084"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.14",
+            "DBIx::Class" : "0.08010",
+            "DateTime" : "0.4304",
+            "DateTime::Format::Strptime" : "0",
+            "HTML::Entities" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "PDF::Reuse" : "0.35",
+            "PDF::Reuse::Barcode" : "0.05",
+            "Path::Class" : "0",
+            "Text::Autoformat" : "1.13",
+            "URI" : "0",
+            "Web::Scraper" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Business::DPD" : {
+         "file" : "lib/Business/DPD.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::DBIC" : {
+         "file" : "lib/Business/DPD/DBIC.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::DBIC::Schema" : {
+         "file" : "lib/Business/DPD/DBIC/Schema.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::DBIC::Schema::DpdCountry" : {
+         "file" : "lib/Business/DPD/DBIC/Schema/DpdCountry.pm"
+      },
+      "Business::DPD::DBIC::Schema::DpdDepot" : {
+         "file" : "lib/Business/DPD/DBIC/Schema/DpdDepot.pm"
+      },
+      "Business::DPD::DBIC::Schema::DpdMeta" : {
+         "file" : "lib/Business/DPD/DBIC/Schema/DpdMeta.pm"
+      },
+      "Business::DPD::DBIC::Schema::DpdRoute" : {
+         "file" : "lib/Business/DPD/DBIC/Schema/DpdRoute.pm"
+      },
+      "Business::DPD::Label" : {
+         "file" : "lib/Business/DPD/Label.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::Render" : {
+         "file" : "lib/Business/DPD/Render.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::Render::PDFReuse" : {
+         "file" : "lib/Business/DPD/Render/PDFReuse.pm",
+         "version" : "0.22"
+      },
+      "Business::DPD::Render::PDFReuse::SlimA6" : {
+         "file" : "lib/Business/DPD/Render/PDFReuse/SlimA6.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.22"
+}

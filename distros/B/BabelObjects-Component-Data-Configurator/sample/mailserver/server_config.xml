@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+  <services>
+    <service>admin</service>
+    <service>openldap</service>
+    <service>pam_ldap</service>
+    <service>sendmail</service>
+  </services>
+
+  <admin>
+    <file>
+      <default>&bo_base_conf;/admin/ldap2cyrus.pl.default</default>
+      <conf>/root/bin/ldap2cyrus.pl</conf>
+    </file>
+    <parameter>
+        <cyrus_host>svrmail2.vecteurplus.com</cyrus_host>
+    </parameter>
+    <parameter>
+        <postadm_login>postadm</postadm_login>
+    </parameter>
+    <parameter>
+        <postadm_pw>test</postadm_pw>
+    </parameter>
+    <parameter>
+        <ldap_version>3</ldap_version>
+    </parameter>
+    <parameter>
+        <ldap_host>svrmail2.vecteurplus.com</ldap_host>
+    </parameter>
+    <parameter>
+        <ldap_port>389</ldap_port>
+    </parameter>
+    <parameter>
+        <ldap_binddn>cn=root, &base;</ldap_binddn>
+    </parameter>
+    <parameter>
+        <ldap_bindpw>test</ldap_bindpw>
+    </parameter>
+    <parameter>
+        <ldap_base>&base;</ldap_base>
+    </parameter>
+  </admin>
+
+  <openldap>
+    <file>
+      <default>&bo_base_conf;/openldap/slapd.conf.default</default>
+      <conf>&openldap_conf_dir;/slapd.conf</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/vecteurplus.schema.default</default>
+      <conf>&openldap_conf_dir;/schema/vecteurplus.schema</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/core.schema.default</default>
+      <conf>&openldap_conf_dir;/schema/core.schema</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/openldap/ldif.init.vecteurplus.default</default>
+      <conf>&openldap_conf_dir;/ldif.init</conf>
+    </file>
+    
+  <parameter>
+        <default_ldap_dir>/usr/local/openldap</default_ldap_dir>
+  </parameter>
+  <parameter>
+        <directory_name>vecteurplus</directory_name>
+  </parameter>
+  <parameter>
+        <openldap_conf_dir>/usr/local/openldap/etc/vecteurplus</openldap_conf_dir>
+  </parameter>
+  <parameter>
+        <suffix>&base;</suffix>
+  </parameter>
+  <parameter>
+        <rootdn>cn=root, &base;</rootdn>
+  </parameter>
+  <parameter>
+        <rootpw>test</rootpw>
+  </parameter>
+  <parameter>
+    <index>
+     index member,owner,objectclass pres,eq
+     index uid,sn,cn pres,eq,sub
+     index givenname,mailAlias,mailLocalAddress,mailRoutingAddress,mailHost pres,eq,sub
+    </index>
+  </parameter>
+  <parameter>
+        <base>&base;</base>
+  </parameter>
+  <parameter>
+        <country>&country;</country>
+  </parameter>
+  <parameter>
+        <organization>o=&organization;</organization>
+  </parameter>
+  <parameter>
+        <smtphost>&smtphost;</smtphost>
+  </parameter>
+  <parameter>
+        <mailhost>&mailhost;</mailhost>
+  </parameter>
+  <parameter>
+        <maildomain>&maildomain;</maildomain>
+  </parameter>
+  </openldap>
+
+  <pam_ldap>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/imap.default</default>
+      <conf>/etc/pam.d/imap</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/pop.default</default>
+      <conf>/etc/pam.d/pop</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/ldap.conf.default</default>
+      <conf>/etc/ldap.conf</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pam_ldap/ldap.secret.default</default>
+      <conf>/etc/ldap.secret</conf>
+    </file>
+    <parameter>
+        <ldap_version>3</ldap_version>
+    </parameter>
+    <parameter>
+        <ldap_host>svrmail2.vecteurplus.com</ldap_host>
+    </parameter>
+    <parameter>
+        <port>389</port>
+    </parameter>
+    <parameter>
+        <base>ou=People, &base;</base>
+    </parameter>
+    <parameter>
+        <binddn>cn=root, &base;</binddn>
+    </parameter>
+    <parameter>
+        <bindpw>test</bindpw>
+    </parameter>
+    <parameter>
+        <uid>uid</uid>
+    </parameter>
+    <parameter>
+        <pamldap_binddn>cn=pam-user, ou=admin, &base;</pamldap_binddn>
+    </parameter>
+    <parameter>
+        <pamldap_bindpw>pampassword</pamldap_bindpw>
+    </parameter>
+    <parameter>
+        <auth_pam_module>pam_ldap.so</auth_pam_module>
+    </parameter>
+    <parameter>
+        <account_pam_module>pam_ldap.so</account_pam_module>
+    </parameter>
+  </pam_ldap>
+
+  <sendmail>
+    <file>
+      <default>&bo_base_conf;/sendmail/sendmail.mc.default</default>
+      <conf>/etc/mail/sendmail.mc</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/sendmail/ldap_routing.m4.default</default>
+      <conf>/usr/lib/sendmail-cf/feature/ldap_routing.m4</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/sendmail/virtusertable.m4.default</default>
+      <conf>/usr/lib/sendmail-cf/feature/virtusertable.m4</conf>
+    </file>
+    <parameter>
+        <ldap_host>svrmail2.vecteurplus.com</ldap_host>
+    </parameter>
+    <parameter>
+        <port>389</port>
+    </parameter>
+    <parameter>
+        <base>&base;</base>
+    </parameter>
+    <parameter>
+        <binddn>cn=root, &base;</binddn>
+    </parameter>
+    <parameter>
+        <bindpw>test</bindpw>
+    </parameter>
+    <parameter>
+        <base_alias>ou=People, &base;</base_alias>
+    </parameter>
+    <parameter>
+        <uid>uid</uid>
+    </parameter>
+    <parameter>
+        <not_encrypted_passwd>test</not_encrypted_passwd>
+    </parameter>
+  </sendmail>
+
+  <cyrus>
+  </cyrus>
+
+  <jakarta>
+  </jakarta>

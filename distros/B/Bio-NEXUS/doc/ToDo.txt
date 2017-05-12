@@ -1,0 +1,118 @@
+Here is a list of miscellaneous items (below this are more specific requests):
+* implement CODONS block more fully (currently just a skeleton)
+* implement NOTES block more fully (currently just a skeleton)
+* implement more of the commands described in Maddison, et al (only about 2/3 currently)
+* move some of the redundant code in block modules up to the Block.pm class
+* test and improve compatibility with Mesquite files
+* test and improve compatibility with MrBayes files
+* test and improve compatibility with PAUP* files 
+* test and improve compatibility with BEAST files  
+* improve utility script for Newick-to-NEXUS conversion (see below)
+
+
+----------------------------------- TO DO --------------------------------------
+
+Title: 
+Date: 
+Submitted by: 
+Importance (5 = critical, 1 = maybe tomorrow): 
+Status (open/done): 
+CrossRef: 
+
+Description:
+
+
+
+----------------------------------- TO DO --------------------------------------
+
+Title: improve tree2nex.pl 
+Date: 8 Feb 2012
+Submitted by: arlin
+Importance (5 = critical, 1 = maybe tomorrow):  2
+Status (open/done): 
+CrossRef: 
+
+Description:
+
+Converting a tree from Newick (aka New Hampshire, Phylip, DND) into NEXUS is a useful operation.  We have 2 scripts that do this: 
+
+exec/newtonexus.pl 
+exec/tree2nex.pl
+
+but neither one is very well implemented.  The second one has a reasonable interface and behavior, but does not use Bio::NEXUS, and does not produce a TAXA block.  It just produces a TREES block that the user can paste into another file.  The first one uses Bio::NEXUS but it is a weak implementation of the idea.  
+
+Implementing and testing basic functionality would be a 2-hour job for someone with skills.  More advanced functionality would take more time.  It should be tested with input files collected from the wild.  Here is a list of desirable capacities. 
+
+Basic functionality: 
+* ingest and process any valid Newick, Phylip, DND tree without error
+* write out a NEXUS file with a TAXA and TREES block 
+* explain the operation fully, with limitations, in the POD
+
+More advanced functionality
+* pipe-ready interface (reads STDIN, writes STDOUT)
+* ability to name tree
+* capacity for NHX trees with option to strip comments
+* capacity to ingest trees with common format errors (e.g., mrbayes)
+
+Possibly unnecessary functionality? 
+* write out Newick (e.g., when user just wants to fix errors, remove nhx)
+* process multiple trees in file, with option to split (to multiple files)
+* rename OTUs with safe (i.e., compatible with other parsers) names, output name-mapping file
+
+--------------------------------- TO DO --------------------------------------
+
+Title: Integrating nextool and nexplot  in Bio::NEXUS module
+Date: 08/31/2006
+Submitted by: Vivek Gopalan
+Importance (5 = critical, 1 = maybe tomorrow): 3
+Status (open/done):  open
+CrossRef: 
+
+Description: "Proposal for integrating nextool and nexplot in the Bio::NEXUS module"
+
+Currently nextool.pl and nexplot.pl are given as executable files along with the module for performing useful and easy way of modifying
+the nexus object contents. The input for these executables are the nexus files along with arguments to perform variousfunctions.
+
+Problems of executables:
+
+1.  During installation, these files are copied to a separate directory (install directory) from the Bio::NEXUS module directory. Hence, users may find it difficult to find these executable files if the PATH variable is not set correctly.
+2. Difficult to integrate with Nexplorer, since the output of these programs are only nexus files rather than Bio::NEXUS object. This also
+caused separate code development of Nexplorer.
+3. The output are only nexus files. Hence users are restricted in analysing the modified Bio::NEXUS object.
+
+My suggestions are 
+
+1 To integrate 'nextool.pl' contents as Bio::NEXUS::Tools::NexModifier or Bio::NEXUS::Tools::NexManipulator module
+2. To integrate 'nexplot.pl' contents as Bio::NEXUS::Tools::NexPlotter or some other name.
+
+For example, To obtain a PostScript output of a manipulated nexus object the following two lines of code can be used
+
+$nex_obj = new Bio::NEXUS::Tools::NexModifier(
+     -input_filename => 'test.nex',
+     -out_filename   => 'out.nex',
+     -exclude_otus   => ['A','B'],
+     -rename_otus    => ['C'=>'Human_gene'],
+     -exclude_otus   => ['Human_gene']
+);
+
+$nexplot_obj = new Bio::NEXUS::Tools::NexPlotter(
+    -input          => $nex_obj, 
+    -out_filename   => 'out.ps',
+    -draw_border    => 1,
+    -show_data      => 1
+);
+
+
+# Main advantages
+1. All the utilities in nextool.pl and nexplot.pl can be integrated into the NexModifier and NexPlotter packages. (Take less time for conversation of the content from the executables to classes)
+2. Easy to integrate to Nexplorer (web based program for manipulation and plotting of NEXUS content) - Only the HTML and JavaScript codes 
+has to mapped to the Bio::NEXUS::Tools::NexPlotter object.
+3. Users can get the modified Bio::NEXUS object or plot data object and then perform other manipulations on these objects.
+4. Provide a starting point for developing a 'command line' scripts for manipulating Bio::NEXUS object.
+5. Easy for code development, since the classes are part of the main module.
+6. Same command can be called multiple times (see exclude_otus above ).
+
+# 
+1. GD, Simple::Postscript, PDF::API2 perl library installation, if plotting of data is required.
+2. Simple documentation for users to effectively use the arguments should be written.
+

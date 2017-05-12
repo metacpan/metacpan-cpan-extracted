@@ -1,0 +1,8 @@
+classes:
+  - Hardware.laptop
+  - Hardware.gl
+  - Admin.apt
+  - Admin.auto
+  - Desktop
+  - Desktop.harden
+  - Framework.media.wildmidi.limit

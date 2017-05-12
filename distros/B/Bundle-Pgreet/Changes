@@ -1,0 +1,14 @@
+Revision history for Penguin Greeting installation bundle Bundle::Pgreet
+
+2005-06-03 [elagache]	1.0.0
+	- Updating version number to indicate part of stable Penguin Greetings
+      release
+
+2004-01-XX [elagache]   0.9.5
+    - I18N::AcceptLanguage to required CPAN modules
+
+2003-08-25 [elagache]	0.9.0
+	-  Added Log::Dispatch to required CPAN modules.
+
+2003-07-31 [elagache]	0.8.9
+	-  Initial release for development of 0.9.0 Penguin Greetings installer.

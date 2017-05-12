@@ -1,0 +1,12 @@
+prepend:DESCRIPTION
+
+    TODO: find another bag comparison module.
+
+    TODO: compare complex elements.
+
+    TODO: compare with Data::Compare + sorting.
+
+SEE ALSO
+
+    Bencher::Scenario::SetComparison
+

@@ -1,0 +1,31 @@
+Revision history for Business-CCProcessor
+
+0.06  Fri Feb  2 12:11:25 2007
+	Added test suite's prerequisites 
+	to Build.PL and Makefil.PL
+
+0.05  Thu Feb 1 16:57:46 2007
+	Added documentation on how to configure verisign to
+	avoid invalid referral url errors, plus removed some
+	private data from test suite.
+
+0.04  Sun Jan 28 04:01:01 2007
+	I've now added a ->button_factory() method, to generate
+	html web forms, based on the data returned by the
+	methods which munge data into the proper format for
+	the credit card processors.
+
+0.03  Sat Jan 27 23:55:34 2007
+	Up to 55 working tests now, although still skipping
+	four of them.  Running out of bugs to squash.
+
+0.02  Sat Jan 27 14:07:29 2007
+	This has its basic three methods roughed out and
+	testing successfully.  The perldoc has been fleshed
+	out to reflect the current state of development.
+	The test suite runs successfully with 47 tests from
+	five test scripts.
+
+0.01  Fri Jan 26 13:58:50 2007
+	Initial release.
+

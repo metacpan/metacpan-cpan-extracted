@@ -1,0 +1,48 @@
+Boxer installation
+==================
+
+Preparations
+------------
+
+On Debian 8+ (Jessie or newer), or Debian unstable (Sid), simply install
+boxer:
+
+    apt install boxer
+
+On Debian 8 (Jessie), you can alternatively install a backport of newer
+boxer:
+
+    echo deb http://debian.jones.dk/ jessie boxer > /etc/apt/sources.list.d/boxer.list
+    apt update
+    apt install boxer
+
+On Debian Wheezy, you can install a backport of boxer:
+
+    echo deb http://debian.jones.dk/ wheezy boxer > /etc/apt/sources.list.d/boxer.list
+    apt-get update
+    apt-get install boxer
+
+
+Usage
+-----
+
+    cp /usr/share/doc/boxer/examples/nodes/parl-greens.yml .
+    boxer compose parl-greens
+
+NB! If code was pulled from CPAN or git, you may need to adapt location
+of example file and environment variables PATH PYTHONPATH PERL5LIB.
+
+
+Development
+-----------
+
+    git clone git://git.debian.org/boxer/Boxer
+    cd Boxer
+    PERL5LIB=lib bin/boxer compose --skeldir share/skel --datadir examples parl-greens
+
+You may want to explore the larger dataset in active use:
+
+    git clone git://source.jones.dk/blends
+
+System compositions are expressed using reclass.  See the README in the
+sample data dir for more info on its structure.

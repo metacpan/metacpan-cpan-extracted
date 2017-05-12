@@ -1,0 +1,42 @@
+{
+   "abstract" : "Finds the executable line numbers in a Perl program given as astring.",
+   "author" : [
+      "Rocky Bernstein <rocky@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "B-CodeLines",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.32"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008008",
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "B::CodeLines" : {
+         "file" : "lib/B/CodeLines.pm",
+         "version" : "1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "1.1"
+}

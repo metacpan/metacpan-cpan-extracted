@@ -1,0 +1,20 @@
+-- you should be able to restore without setting up a config file.
+   if you lost data, that'd be annoying.  restoring from a config
+   file will be supported in the future, but it's not yet.
+
+-- backups must be automatable, never requiring user input. hence public
+   key encryption.
+
+-- restores may prompt for user input ("What's your Amazon S3
+   password?" and "Enter your GPG passphrase."), because they won't be
+   automated or common. and I don't want a restore to require a fully
+   setup ~/.brackup.conf. You probably lost it anyway. So a *.brackup
+   metafile (the one you get after a backup) should contain all the
+   metadata necessary to restore (say, Amazon S3 username), but not
+   secret stuff.
+
+-- targets shouldn't include passwords (say, Amazon S3 password)
+   in the *.brackup (backup "index"/"meta" file).  let the user
+   enter that on restore.  you should, however, put in metadata
+   that'll ease restoring.... like Amazon username, or path, etc.
+

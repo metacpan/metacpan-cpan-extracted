@@ -1,0 +1,75 @@
+Benchmark::Stopwatch::Pause - simple timing of stages of your code with a pause option.
+
+Version 0.03
+
+DESCRIPTION
+
+   This is an extention of the handy Benchmark::Stopwatch module. This is an
+attempt to allow very granular timeing of very specific sections of code. The 
+Stopwatch concept is carried thru in this module, while adding the ability to
+pause your stopwatch as needed.
+
+CHANGES 
+
+Things that differ from Benchmark::Stopwatch
+
+* Laps are now look ahead
+
+   The concept of a lap is diffrent from Benchmark::Stopwatch, they are now look ahead.
+
+   In Benchmark::Stopwatch :
+
+      # ... code that is tracked by lap 'one'
+      $stopwatch->lap('one');
+
+   In Benchmark::Stopwatch::Pause :
+
+      $stopwatch->lap('one');
+      # ... code that is tracked by lap 'one'
+
+   This allows the time from unpause till pause to be tied to your unpause. 
+
+* _start_ is displayed in the summary
+
+   Due to the change in the logic of what a lap is _start_ will be displayed.
+
+* _stop_ is not displayed in summary
+
+   Due to the change in the logic of what a lap is _stop_ will always be a null event.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Benchmark::Stopwatch::Pause
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Benchmark-Stopwatch-Pause
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Benchmark-Stopwatch-Pause
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Benchmark-Stopwatch-Pause
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Benchmark-Stopwatch-Pause
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Ben Hengst
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,12 @@
+classes:
+  - cli.ssh-server
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include remote access to console (ssh)
+  pkg-auto:
+    - ncurses-term
+    - openssh-blacklist
+    - openssh-blacklist-extra

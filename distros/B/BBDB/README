@@ -1,0 +1,60 @@
+What Itch does this Scratch?
+
+Do you have a bunch of different name and address files lying around
+in a bunch of different formats?  I did --  and then I discovered BBDB
+- The Insidious Big Brother DataBase system than runs with (X)EMACS.
+Now I never lose an email address anymore, and I decided to wanted to
+merge all my old name and address files into one central database.
+Only PERL would do for the conversion process, and I needed to be able
+to read and write my existing BBDB file, hence this module.
+
+If you want to use PERL rather than LISP to access or modify your BBDB
+file this module could save you a lot of work.
+
+How do I install it?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If for some reason this doesn't work, the only file that is really
+needed is BBDB.pm.  Try:
+
+   cp BBDB.pm /usr/local/lib/perl5
+
+or where ever you want to put it.
+
+What system does this run on?
+
+I've only tested it under Linux, but I see no reasons why it wouldn't
+work on any other systems.
+
+What about the documentation?
+
+There is POD documentation in the BBDB.pm file.  There are also some
+examples in the example.pl script, which do some useful things and
+demonstrate the functionality of the module.  
+
+I hope this module is useful to you all, and thank you PERL and Linux
+for making my computing dreams come true.
+
+Henry Laxen
+nadine.and.henry@pobox.com
+http://www.maztravel.com/
+
+========================================================================
+
+Many thanks to Colin J. Wynne for finding and fixing bugs in my
+original 1.10 version.  His changes are included in the 1.20 version.
+
+Many thanks to Jack Twilley for finding and fixing some bugs in the
+encoding and decoding of phone numbers and countries.  His changes
+are included in the 1.34 version.
+
+Thanks to Christoph von Nathusius for finding and fixing a problem
+with umlauts, and in fact all characters above 127 decimal.  His changes
+are reflected in the 1.35 version.

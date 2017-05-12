@@ -1,0 +1,112 @@
+Revision history for Perl extension Bundle::DBD::PO.
+
+2.10  Sun Jan 24 13:14:51 2010
+- https://rt.cpan.org/Ticket/Display.html?id=53120
+
+2.09  Tue Dec 22 08:30:00 2009
+- bugfix binmode in Statement.pm (no select statement first, but drop)
+- remove taint tests because of untainted f_dir in DBD::File
+- make Build.PL ready for PPM and CPAN installer
+
+2.08  Sat Aug 29 11::00:00 2009
+- allow 6 plural forms now (Arabic)
+
+2.07  Fri May 29 21::00:00 2009
+- bugfix build dependencies
+
+2.06  Thu May 21 08:00:00 2009
+- repair version
+
+2.05  Sat May 02 18:00:00 2009
+- new examples for Locale::TextDomain
+- new method get_all_header_keys for better debugging
+
+2.04  Sun Mar 01 18:00:00 2009
+- 2nd example fixed
+
+2.03  Sat Feb 21 09:00:00 2009
+- example join fixed
+
+2.02  Wed Dec 17 22:00:00 2008
+- some author tests
+- fix Perl critic errors
+
+2.01  Sat Nov 29 22:00:00 2008
+- more comments in examples
+- new example using SQL join
+- better header acceptance
+
+2.00  Tue Nov 15 21:00:00 2008
+- Allow performance settings at use DBD::PO
+  like ':plural', ':previous', ':format' and 'allow_lost_blank_lines'.
+  To be full compatible to version 1.00 call
+  DBD::PO->init(qw(c-format php-format allow_lost_blank_lines))
+  before DBI->connect(...).
+- allow read/write of msgctxt
+- change tests for plural fields
+- new Test 08_previous.t
+- renew examples
+
+1.00  Tue Oct 21 21:20:00 2008
+- 1st stable version
+- POD
+- perl critic
+
+0.10  Fri Sep 26 22:00:00 2008
+- tenth developer test version
+- code_ref $maketext_to_gettext_scalar at DBD::PO::db is unicode safe now
+- more POD for DBD::PO
+- change from load_file_asarray to load_entry
+- bugfix binmode
+
+0.09  Sat Sep 20 22:00:00 2008
+- ninth developer test version
+- change header parser to non case sensitive
+- change examples and create new example: read using Locale-Maketext
+
+0.08  Thu Sep 18 22:00:00 2008
+- eighth developer test version
+- "... = $dbh->quote(...);" ok now
+- export constants now
+- validation only at constructor (performance)
+- all the Locale::PO bugs fixed in DBD::PO::Locale::PO
+- run Performance tests for DBD:::PO::Locale::PO and DBD::PO::Text::PO
+- run binmode only one time for each file at DBD::PO::Text::PO (performance)
+
+0.07  Fri Sep 05 22:00:00 2008
+- seventh developer test version
+- API changed for read header "msgstr".
+- API changed to connect parameter "po_charset"
+- Do not use special characters in comments.
+  There is no quoting at the moment.
+- Do not use "... = $dbh->quote(...);".
+  The bug is not fixed.
+- Fixed bug of quote "msgid" and all the different "msgstr"s.
+
+0.06  Wed Jul 30 22:00:00 2008
+- sixth developer test version
+- change tests: change use Test::Differences in eval block to require
+- add example
+
+0.05  Tue Jul 29 15:00:00 2008
+- fifth developer test version
+- fixed any problems with charset and eol
+- changed parameter po_charset to charset
+- some Kwalitte
+
+0.04  Sun Jul 27 12:00:00 2008
+- fourth developer test version
+- fixed any problems with charset
+- changed API of method DBD::PO::db::split_header_msgstr
+- crash test and error message for mixed headers and lines
+
+0.03  Wed Jul 23 19:00:00 2008
+- third developer test version
+- fixed any problems of taint mode
+- changed default separator to LF
+
+0.02  Sun Jul 20 17:00:00 2008
+- second developer test version
+
+0.01  Thu Jul 10 15:24:36 2008
+- fist developer test version without any POD

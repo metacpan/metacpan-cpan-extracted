@@ -1,0 +1,6 @@
+Revision history for Perl extension Bio::PDB::Structure.
+
+0.01  Sat Jul 21 20:04:57 2012
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Bio::PDB::Structure
+

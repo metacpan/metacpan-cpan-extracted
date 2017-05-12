@@ -1,0 +1,16 @@
+: if template_exists( $parent.type ~ '_entry_comment_meta.tx' ) {
+:   include $parent.type ~ '_entry_comment_meta.tx';
+: } else {
+<div class="meta">
+: include '_wedge.tx' { template => 'entry_comment_meta_start.tx' };
+
+  <div title="<: $entry.author :>" class="author"><: $entry.author :></div>
+  <div class="date" title="created date <: $entry.created :>" >
+    <: $entry.created_string :>
+  </div>
+
+: include '_wedge.tx' { template => 'entry_comment_meta_end.tx' };
+
+: include 'utility.tx' { no_hide => 1, type => 'comment' };
+</div>
+: }

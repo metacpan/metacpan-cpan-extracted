@@ -1,0 +1,229 @@
+vim:si
+Revision history for Perl extension Business::KontoCheck.
+
+The complete history can be found in 0_history.txt (in german). The perl
+version starts with 2.1; all previous versions are C only libraries.
+
+5.8:
+   - new check method 87d
+
+5.7:
+   - bug fix in method 90 (method 90g was excluded)
+
+5.6
+   - new check method E2
+   - changes in check methods 08, 28, 34, 44 (more details in the source code)
+   - the compiler switch USE_IBAN_RULES is now completely removed
+   - some minor changes and bug fixes
+
+5.5
+   - bug fix in functions bic_check() and ci_check()
+   - the functions rebuild_blzfile() and pz_aenderungen_enable() are available for perl
+
+5.4
+   - changes in check method 90 implemented
+   - removed some obsolete return values (-80 ... -104)
+   - some bug fixes, mainly in the new functions bic_(), biq_*() and iban_*()
+   - changes in testfiles t/* due to changes in the blz file of Deutsche Bundesbank
+   - some minor changes, see the german 0_history.txt
+
+5.3
+   - new IBAN rule 57 implemented
+   - changes in IBAN rules 54 and 56 implemented
+   - changes in check method 66 implemented
+   - search for main branches of banks
+   - many new functions concerning BIC and IBAN (see 0_history.txt and source code)
+   - some minor changes and bug fixes (see file 0_history.txt)
+
+5.2 
+   - new check method E1 implemented
+   - new IBAN rules 55 and 56 implemented
+   - changes for some IBAN rules (5, 10, 15, 20, 43 und 45, valid from 2013-12-09) implemented
+   - new function lut_blocks(), lut_suche_regel(), kto_check_regel(), kto_check_regel_dbg() implemented
+   - function iban2bic() implemented for the perl port
+   - some minor changes (see file 0_history.txt)
+
+5.1 Fri Aug 2, 2013
+   - changed IBAN rule 20 (Deutsche Bank) to version 1.6 according to Bundesbank email
+   - for IBAN calculation missing LUT blocks are fetched automatically
+   - bug fixes in check methods 13b, 63, C7
+   - some minor bug fixes
+
+5.0 Fri Aug 2, 2013
+   - implemented changes for IBAN rules, new IBAN rules 48-54
+   - implemented changes for check methods 57 and 95
+   - test in iban_check() if the given IBAN may contain errors due to
+     not considered IBAN rules etc.
+   - various bug fixes
+
+4.6  Fri Jun 6, 2013
+   - implemented IBAN rules for generation of IBAN and BIC
+   - changes in check methods 51 and 84 implemented
+
+4.5   Thu Mar 28, 2013
+      Again a perl-only bugfix release that corrects some tests due to changes
+      in blz.lut
+
+4.4   Sat Feb 2, 2013
+      - new check method E0 implemented
+      - changes in check methods C6 and D1 implemented
+      - bug fix in check method C6
+
+4.3   Thu Nov 13, 2012
+      This is a perl-only bugfix release that adds a missing file (t/blz.t) and
+      (i hope ;-))) fixes the test::pod encoding bug.
+
+4.2   Thu Oct 24, 2012
+      - fixed encoding error in KontoCheck.pm
+      - fixed some memory problems
+      - fixed IBAN generation of Flessa bank
+      - new testfile t/generate_lut.t for checking the generation of a lutfile
+      - new (optional) variable keine_iban_berechnung in function
+        generate_lut2() for IBAN blacklist block
+      - new function lut_keine_iban_berechnung() for appending an IBAN
+        blacklist block to an existing lutfile
+      - (optional) parameters uniq and sort for search routines
+      - some minor changes
+
+4.1   Wed May 30, 2012
+      - new search routine lut_suche_volltext for fulltext search in the fields
+        Bankname, kurzname and Ort.
+      - new funktion lut_suche_multiple() combining multiple searches
+      - new check method D9 implemented
+      - various minor changes and bugfixes
+
+4.0   Tue Jul 26, 2011
+      - the search routines are rewritten; they are able to deal with all
+        4 supported character sets now (ISO 8859-1, UTF-8, DOS CP-850
+        and HTML entities); also the encoding of output can be changed.
+      - fast initialization of search routines (index blocks in lutfile)
+      - the blacklist for IBAN generation (available from Sparkasse) is now supported
+      - changes for check methods B6 and D1 (valid from 2011-09-05) are implemented
+      - various minor changes and bugfixes
+
+3.6   Wed April 13, 2011
+      - new check methods D7 and D8 implemented
+      - new calculation for check methods B8, C6, D4 implemented
+      - fixed a bug in check method D6
+      - some minor bug fixes
+
+3.5   Thu Jan 6, 2011
+      - new check method D6 implemented
+      - new calculation for check method D1 implemented
+      - fixed a bug in *BIC routines, which caused a crash under NetBSD/64 Bit
+      - some minor changes in generate_lut2(), additional documentation
+
+3.4    Sat Nov 13, 2010
+      - new check method D5 implemented
+      - removed check_malloc routines (no longer needed)
+      - additional compression libraries can be used (bzip2, lzo, lzma or no compression).
+        The standard compression library is still gzip.
+
+3.3    Wed Jul 21, 2010
+      - bug fix in the search routines in konto_check.c; on 64 bit machines these routines
+        failed completely (before the 3.2 release, they were not coverd by the test routines).
+      - (last) change for lut_suche_*(): These functions return in array context also the 
+        return value of the function as 4th parameter.
+      - added some (missing) dummy functions for $use_german=0 and $use_austrian=0
+
+3.2.1  Thu Jul 15, 2010
+      - some minor bugfixes and improvements in test routines
+
+3.2  Tue Jul 13, 2010
+      - complete rewrite of Makefile.PL; works now also for Windows, better recognition of zlib
+      - complete rewrite of search function lut_suche_*(); these functions got a new interface
+        (until 3.1 they were beta for perl, with many problems). All search functions were heavily
+        tested, no memory leak was left.
+      - fixed bugs in lut_info()
+      - new variable $lut_dir in function lut_info(): gives the directory of the lut-file
+      - new function lut_blz() tests the existence of a BLZ
+      - new function pz2str() to convert a numerical check method to the (official) string version
+      - new functions retval2*()
+      - new functions lut_*1(): work  always in scalar context
+      - new testfiles t/lut_info.t and t/lut_suche.t
+
+3.1  Tue May 25, 2010
+      - implemented changes for check methods C6 and D1 valid from 2010-06-07
+      - implemented new check method D4 valid from 2010-06-07
+      - some minor bug fixes
+      - new blz.lut file, valid from 2010-03-08 until 2010-06-06 and 2010-07-06 until 2010-09-05
+      - the C library contains some additional functions, which are not yet available in perl
+
+3.0  Mon Nov 23, 2009
+      - for perl, this is mainly a bug fix release; a number of memory leaks were fixed.
+
+2.98 Sat Apr 4, 2009
+      - fixed some bugs in check methods 16,74,79,97
+      - write_lut(): directory slots may be reused
+      - some bug fixes in write_lut_block() and lut_info()
+      - fixed a bug in konto_check-at.c that caused a fail for the smoke tests on S-390-linux*
+        (many thanks to Oliver Paukstadt for help finding the bug)
+
+2.97 Tue Mar 8, 2009
+      - new member structure pz_pos in the retvals structure (debug version; position of check number)
+      - easter egg include
+      - included function lut_nr()
+      - lut_cleanup reworked
+      - various minor changes
+
+2.95 Tue Jan 13, 2009
+   (nearly the syme as 2.94)
+      - fixed a minor bug in the test suite; two banks are invalid with the
+        new hash file.
+
+2.94 Tue Jan 13, 2009
+   (maybe the last beta before 3.0)
+      - fixed a bug in read_lut_block_int() which caused an error on most 64 bit machines
+      - fixed a bug in check method 28
+      - implemented new check methods D2 and D3
+      - change in check method C6, valid from 2009-03-09
+      - some minor changes to avoid compiler errors/warnings
+
+2.93 Mon Sep 8, 2008
+   third beta for 3.0
+      - fixed a bug in get_lut_info2()
+
+2.92 Sat Aug 23, 2008
+   second beta for 3.0
+      - fixed some bugs in check methods 53, 57 and B6
+      - newly defined check methods D0 and D1 implemented
+      - DEFAULT_LUT_NAME and DEFAULT_LUT_PATH may contain multiple names/paths now
+      - new functions kto_check_retval2utf8()
+      - new test routines for perl
+
+2.91 Wed April 23, 2008
+        This is the first beta for the new 3.0 release. This release
+        contains many changes, including a new lookup table file
+        format, which allows access to all fields of the Bundesbank
+        file. All changes will (later) be described in a separate file.
+
+2.7 Sat Aug 23, 2008
+   minor release: bugfixes, new check methods
+      - fixed some bugs in check methods 53, 57 and B6
+      - newly defined check methods D0 and D1 implemented
+      - removed PHP module for the 2.7 series (due to various problems).
+        The PHP port is available for the 3.x releases (also for 2.92 and later)
+
+2.6 Thu April 10, 2008
+      - bug fixes for check methods 50b and 74b
+      - LUT file generation of reworked
+      - check methods C8 and C9 implemented
+
+2.4 Thu November 13, 2007
+      - added check method C7
+      - bugfix in check method B9
+      - new function kto_check_str
+
+2.3 Sat August 25, 2007
+   bugfix release: 
+      - added two missing files which caused 'make test' to fail
+      - added new return value OK_TEST_BLZ_USED
+
+2.2 Wed August 22, 2007
+   minor release: 
+      - newly defined check methods C5 and C6 implemented
+      - cleanup of old (unused) code and prototypes
+
+2.1  Sat May 26, 2007
+	- first perl version; created by h2xs 1.23 with options
+		-A -n Business::KontoCheck -v 2.1 -g

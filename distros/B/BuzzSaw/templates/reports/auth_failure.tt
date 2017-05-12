@@ -1,0 +1,35 @@
+[%- USE wrap -%]
+
+[%- FILTER wrap(72) -%]
+
+[%- SET full_count = events.size -%]
+
+During the period since [% params.item('start').strftime('%H:%M:%S %A %e %B %Y') %] until [% params.item('end').strftime('%H:%M:%S %A %e %B %Y') %] there [% IF full_count == 0 %]have been no authentication failures[% ELSIF full_count == 1 %]has been one authentication failure[% ELSE %]have been [% full_count %] authentication failures[% END %].
+
+These authentication failures involved [% results.item('users').size %] different user names, [% results.item('targets').size %] different target hosts and [% results.item('sources').size %] different source hosts.
+
+Users
+================================
+
+[% FOREACH entry IN results.item('users') -%]
+[% loop.count() %]. [% entry.item('user') %] [% entry.item('count') %]
+[% LAST IF loop.count() == 10 -%]
+[% END -%]
+
+Targets
+================================
+
+[% FOREACH entry IN results.item('targets') -%]
+[% loop.count() %]. [% entry.item('host') %] [% entry.item('count') %]
+[% LAST IF loop.count() == 10 -%]
+[% END -%]
+
+Sources
+================================
+
+[% FOREACH entry IN results.item('sources') -%]
+[% loop.count() %]. [% entry.item('addr') %] [% entry.item('count') %]
+[% LAST IF loop.count() == 10 -%]
+[% END -%]
+
+[% END %]

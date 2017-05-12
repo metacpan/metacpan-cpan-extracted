@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a5c7caf8d419f9c53afb5077509576a2a12861bb .gitignore
+SHA1 df6788b7228ce6018f6ed895fc946e2788f3fd0d Changes
+SHA1 012fe1ce01fb53ea10dfac7145ee7217b8b3ae85 LICENSE
+SHA1 5280e2675030c21b227a79dc90511c4307e03f55 MANIFEST
+SHA1 76ec85b5bf7cb26bc8799a98a075a243894f56d0 META.json
+SHA1 0b8285309163f21f79b5a6d4e954070670ce4b59 META.yml
+SHA1 7bf6e519b2d19aa6ab27f46d2e385350aa9d4419 Makefile.PL
+SHA1 13dcbf3f9b06b9ae651a415d263354f924d4ee20 README
+SHA1 33d29e757e82fbc8ed6e398440e64ecc252b7fe4 Stats.xs
+SHA1 e6ab0f8a8eb74b7144362619840464be2525353b blog.txt
+SHA1 c68a85c34177d90117ed385c455570807e825756 c_minus
+SHA1 2bf125d995905bd5f57c1dd0a35d375c86893cfa lib/B/Stats.pm
+SHA1 65da7dbd237a1f225a35b108a2f7c36b3f249158 lib/B/Stats/Minus.pm
+SHA1 b34bf60d5e0f355fa1f2fefe186cef0757670de0 speed.md
+SHA1 18d3812b22b3afc420ab14a334785caf86e8167d t/compile.t
+SHA1 9f0ac756ef73ec028afcd37f9cbb7e6f40b09073 t/options.t
+SHA1 91b90d9d7b32f39fd8762c86f6533fec5e98bb2a t/table.t
+SHA1 6caab67575bbd3e400e447cc3487dd52e264630b t/test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlPlTo8ACgkQmm2SYo/9yUJV8gCfXSrQ+npHrnO2JWlLz6E3qvqb
+hGkAn2Uet2rlfe+4cx0sqI/LaGfAwoJI
+=nyCO
+-----END PGP SIGNATURE-----

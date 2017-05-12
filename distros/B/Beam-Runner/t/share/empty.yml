@@ -1,0 +1,12 @@
+$summary: A container with no runnable services
+
+nonrunnable:
+    $class: Moo
+
+unloadable:
+    $class: DOES::NOT::EXIST
+
+hidden_hash:
+    hidden_by:
+        $class: Local::Runnable
+        why: Hashes are not addressable from Beam::Wire->get()

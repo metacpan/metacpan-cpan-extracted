@@ -1,0 +1,72 @@
+
+
+                    Business::OnlinePayment::TCLink v1.03
+                             Freeside Integration
+                       Copyright (C) TrustCommerce 2002
+                         http://www.trustcommerce.com
+                         developer@trustcommerce.com
+
+                               January 10, 2003
+
+I. DESCRIPTION
+
+  Business::OnlinePayment::TCLink Module is a TrustCommerce payment
+module for use with any e-commerce system that supports the Perl
+Business::OnlinePayment API. This document describes using the module
+with the the Freeside open-source billing and account administration
+package, available here:
+
+  http://www.sisd.com/freeside/
+
+II. INSTALLATION
+
+  First, install Freeside and configure it, as per the Freeside
+documentation. Then follow the instructions in README for
+Business::OnlinePayment::TCLink to install it as root.
+
+III. CONFIGURATION
+
+  Login to the Freeside web interface. Click on "Sysadmin" at the top,
+and then click on "View/Edit invoice events". Select the "Batch card"
+invoice event, which causes customer credit card transactions to be run
+as a batch at the end of the day. Click "Disabled" and then "Apply
+changes", because we want to do real-time credit card transactions.
+
+  Click "Add invoice event" and add an event called
+"Business::OnlinePayment". Under "Action", select "Run card with a
+Business::OnlinePayment realtime gateway", and then click "Add invoice
+event." Now transactions should be run through the
+Business::OnlinePayment gateway that you configure.
+
+To select TCLink as the gateway, go to the main menu, click on
+"Sysadmin", and then on "Configuration". Click "Edit Configuration".
+Scroll down to the "Billing configuration options". Take a look at the
+business-onlinepayment setting. The first line of the text area should
+be "TCLink". The second line should be your TrustCommerce customer ID,
+the third your TrustCommerce password, and the fourth line should be the
+type of action to run, such as "Authorization Only" (which is a
+TrustCommerce preauth) or "Normal authorization" (which is a
+TrustCommerce sale). Here is an example:
+
+  TCLink
+  99999
+  password
+  Authorization Only
+
+  When you're done, click "Apply changes". Now you should be fully
+configured for using TCLink.
+
+  Note that more detailed Freeside billing information is available at:
+
+  http://www.sisd.com/freeside/devdocs/billing.html
+
+IV. USAGE
+
+  Using the TCLink payment module via Freeside is as easy as performing
+a real-time credit card transaction through the Freeside web interface.
+Try out a test transaction, and then login to the TrustCommerce Vault to
+ensure that the transaction went through correctly.
+
+  If at any time you would like to change the settings for this module,
+proceed to the billing configuration options on the configuration page as
+described above, and then alter any of the settings that you desire.

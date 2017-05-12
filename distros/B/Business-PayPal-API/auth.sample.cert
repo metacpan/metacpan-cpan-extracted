@@ -1,0 +1,5 @@
+Username = test1_api.mydomain.tld
+Password = myapipassword
+CertFile = /www/var/cert_key_pem.txt
+KeyFile  = /www/var/cert_key_pem.txt
+SellerEmail = email-of-business-test-account@mydomain.tld

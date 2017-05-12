@@ -1,0 +1,871 @@
+# ABSTRACT: A brief introduction to dependency injection with Beam::Wire
+# PODNAME: Beam::Wire::Help::Config
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Beam::Wire::Help::Config - A brief introduction to dependency injection with Beam::Wire
+
+=head1 VERSION
+
+version 1.020
+
+=head1 DESCRIPTION
+
+This is tutorial for Beam::Wire, starting with simple use as a configuration
+file, to complex dependency injection.
+
+This tutorial will guide you through the YAML configuration, its equivalent
+Perl data structure, and the equivalent Perl code that is executed.
+
+=head1 OBJECT CONFIGURATION
+
+The basic Beam::Wire configuration is a hash of hashes describing how to create
+objects (which, in a dependency injection context, are called "services"). The
+top-level keys are the name of the object, and the inner keys are object
+configuration. To configure an object, you need the class and, optionally,
+constructor arguments (C<args>).
+
+    # container.yml
+    malcolm:
+        class: Person
+        args:
+            name: Malcolm Reynolds
+            rank: Captain
+
+     # container.pl
+     my $config = {
+        malcolm => {
+            class => 'Person',
+            args => {
+                name => 'Malcolm Reynolds',
+                rank => 'Captain',
+            },
+        },
+    };
+
+Once we have a configuration file (also called a "container file"), we can give
+it to Beam::Wire and get our objects ("services").
+
+    my $wire = Beam::Wire->new( file => 'container.yml' );
+    my $malcolm = $wire->get( 'malcolm' );
+
+You can also configure objects directly in Beam::Wire.
+
+    my $wire = Beam::Wire->new( config => $config ); # $config from above
+    my $malcolm = $wire->get( 'malcolm' );
+
+The configuration will be used by Beam::Wire to create your object, similar to
+running this code:
+
+    my $malcolm = Person->new(
+        name => 'Malcolm Reynolds',
+        rank => 'Captain',
+    );
+
+=head2 Specifying Constructor Args
+
+Objects have varying ways of specifying arguments to their constructors.
+The most common method, used by most Perl object frameworks, of
+specifying name/value pairs is the easiest:
+
+    # container.yml
+    malcolm:
+        class: Person
+        args:
+            name: Malcolm Reynolds
+            rank: Captain
+
+    # container.pl
+    my $config = {
+        malcolm => {
+            class => 'Person',
+            args => {
+                name => 'Malcolm Reynolds',
+                rank => 'Captain',
+            },
+        },
+    };
+
+For any other kind of constructor arguments, you can specify an arbitrary
+array. If the object's constructor is not called C<new>, you can use the
+C<method> key:
+
+    # container.yml
+    dbh:
+        class: DBI
+        method: connect
+        args:
+            - 'dbi:SQLite:firefly.db'
+            - ~
+            - ~
+            - RaiseError: 1
+
+    # container.pl
+    my $config = {
+        sqlite => {
+            class => 'DBI',
+            method => 'connect',
+            args => [
+                'dbi:SQLite:firefly.db',
+                undef,
+                undef,
+                { RaiseError => 1 },
+            ],
+        },
+    };
+
+This is the same as:
+
+    my $dbh = DBI->connect(
+        'dbi:SQLite:firefly.db',
+        undef,
+        undef,
+        { RaiseError => 1 },
+    );
+
+If you need a single hash reference of arguments, you can use an array
+with a single element, like this:
+
+    # container.yml
+    wash:
+        class: Person
+        args:
+            - name: "Hoban Washburne"
+              rank: Pilot
+
+    # container.pl
+    my $config = {
+        wash => {
+            class => 'Person',
+            args => [
+                {
+                    name => 'Hoban Washburne',
+                    rank => 'Pilot',
+                },
+            ],
+        },
+    };
+
+Which is the same as:
+
+    my $wash = Person->new( {
+        name => 'Hoban Washburne',
+        rank => 'Pilot',
+    } );
+
+=head2 Prefixed Metadata
+
+For brevity's sake, if your constructor takes a hash of arguments, you
+can configure your service using C<$class> instead:
+
+    # container.yml
+    simon:
+        $class: Person
+        name: Simon Tam
+        rank: Doctor
+
+    # container.pl
+    my $config = {
+        simon => {
+            '$class' => 'Person',
+            name => 'Simon Tam',
+            rank => 'Doctor',
+        },
+    };
+
+Which is the same as:
+
+    my $simon = Person->new( {
+        name => 'Simon Tam',
+        rank => 'Doctor',
+    } );
+
+This makes it easy to make a "default class" in your config file:
+
+    use Scalar::Util qw( blessed );
+    my $person = $wire->get( 'person' );
+    if ( !blessed $person ) {
+        $person = Person->new( %$person );
+    }
+
+By prefixing any metadata with the prefix character (default: C<$>), you
+can interleave your args and your metadata.
+
+=head1 OBJECT LIFECYCLE
+
+By default, services are lazy and cached. They are not created until
+they are asked for (lazy), and once created, they are reused if asked
+for again (cached).
+
+=head2 factory
+
+By default, all objects are cached in the container, so asking for the
+same object twice will get the B<exact> same object. To prevent this
+caching, you can force the container to make a new object every time by
+setting the C<lifecycle> to C<factory>. Objects from a factory are not
+cached. For example:
+
+    # container.yml
+    light_drone:
+        class: Drone
+        lifecycle: factory
+        args:
+            model: Light
+            cost: 20
+
+    # container.pl
+    my $config = {
+        light_drone => {
+            class => 'Drone',
+            lifecycle => 'factory',
+            args => {
+                model => 'Light',
+                cost => 20,
+            },
+        },
+    };
+
+This is basically the same as creating a sub to create our objects,
+like so:
+
+    my $light_drone_factory = sub {
+        return Drone->new(
+            model => 'Light',
+            cost => 20,
+        );
+    };
+
+We can then pull infinite numbers of separate drones out of our factory:
+
+    my $wire = Beam::Wire->new( file => 'container.yml' );
+    my $light_drone = $wire->get( 'light_drone' );
+    my $replacement = $wire->get( 'light_drone' );
+    my $other_drone = $wire->get( 'light_drone' );
+
+=head2 eager
+
+Some special kinds of objects have global effects that happen when
+they are created, like a global logging system (like L<Log::Log4perl>).
+
+To force an object to be created as soon as possible, you can set
+C<lifecycle> to C<eager>.
+
+    # container.yml
+    black_box:
+        $class: Logger
+        $lifecycle: eager
+        log_level: warn
+
+    # container.pl
+    my $config = {
+        black_box => {
+            '$class' => 'Logger',
+            '$lifecycle' => 'eager',
+            log_level => 'warn',
+        },
+    };
+
+Once the container has been read, all of the eager objects will be
+created, and cached as normal.
+
+    my $wire = Beam::Wire->new( file => 'container.yml' );
+    # black_box is created automatically
+
+=head1 DEPENDENCY INJECTION
+
+The key feature of a dependency injection container is the ability to
+inject dependencies into the services as they are created. Dependencies
+are other services (objects) that must be created and passed-in to our
+current object.
+
+Unlike above, where we were giving simple arguments to our constructors,
+with dependency injection, we can give other objects as arguments.
+
+=head2 References ($ref)
+
+References allow us to refer to another object in our container. If
+needed, the object is constructed for us, so that when we ask for an
+object, the objects it depends are created automatically.
+
+To refer to another object, use C<$ref>:
+
+    # container.yml
+    serenity:
+        class: Ship
+        args:
+            captain:
+                $ref: malcolm
+            pilot:
+                $ref: wash
+            engineer:
+                $ref: kaylee
+
+    # container.pl
+    my $config = {
+        serenity => {
+            class => 'Ship',
+            args => {
+                captain => { '$ref' => 'malcolm' },
+                pilot => { '$ref' => 'wash' },
+                engineer => { '$ref' => 'kaylee' },
+            },
+        },
+    };
+
+This is equivalent to:
+
+    my $malcolm = Person->new( ... );
+    my $wash = Person->new( ... );
+    my $kaylee = Person->new( ... );
+    my $serenity = Ship->new(
+        captain => $malcolm,
+        pilot => $wash,
+        engineer => $kaylee,
+    );
+
+Remember that, by default, all the objects are cached, so another
+reference to C<malcolm> gets the same shuài space captain. If
+that's not desired, you can use L<the C<lifecycle> config|/OBJECT LIFECYCLE>.
+
+=head2 Anonymous Objects
+
+Instead of having to create a named service, you can create a new,
+anonymous object as a dependency. This is useful when you want to keep
+related objects together in the configuration file.
+
+You can create an anonymous object anywhere you could create a reference
+(C<$ref>). To create an anonymous object, use C<$class> and optionally
+C<$args> and C<$method>.
+
+    # container.yml
+    cargo:
+        class: Box
+        args:
+            contents:
+                $class: Person
+                $args:
+                    name: River Tam
+                    status: Hibernating
+
+    # container.pl
+    my $config = {
+        cargo => {
+            class => 'Box',
+            args => {
+                contents => {
+                    '$class' => 'Person',
+                    '$args' => {
+                        name => 'River Tam',
+                        status => 'Hibernating',
+                    },
+                },
+            },
+        },
+    };
+
+This is equivalent to:
+
+    my $cargo = Box->new(
+        contents => Person->new(
+            name => 'River Tam',
+            status => 'Hibernating',
+        ),
+    );
+
+=head1 OBJECT COMPOSITION
+
+One of the benefits of using Beam::Wire to define your configuration is
+being able to intelligently compose your objects to reduce duplication
+and prevent messy copy/paste jobs.
+
+=head2 extends
+
+If you have a bunch of objects that need to share properties, or that
+only differ in one or two things, you can inherit properties using
+C<extends>:
+
+    # container.yml
+    serenity_crew:
+        class: Person
+        args:
+            ship: Serenity
+            model: Firefly
+    kaylee:
+        extends: serenity_crew
+        args:
+            name: Kaylee Frye
+            rank: Engineer
+
+    # container.pl
+    my $config = {
+        serenity_crew => {
+            class => 'Person',
+            args => {
+                ship => 'Serenity',
+                model => 'Firefly',
+            },
+        },
+        kaylee => {
+            extends => 'serenity_crew',
+            args => {
+                name => 'Kaylee Frye',
+                rank => 'Engineer',
+            },
+        },
+    };
+
+Which ends up composing our object as:
+
+    my $kaylee = Person->new(
+        ship => 'Serenity',     # from "serenity_crew"
+        model => 'Firefly',     # from "serenity_crew"
+        name => 'Kaylee Frye',  # from "kaylee"
+        rank => 'Engineer',     # from "kaylee"
+    );
+
+This allows us to quickly change any object config that extends the
+parent object config (say, to update their C<status> to C<fugitive>).
+
+=head1 NON-OBJECT SERVICES
+
+Not everything in our container needs to be an object. Some services may
+need to share simple configuration values (such as usernames and
+passwords) or even entire configuration files.
+
+=head2 Value Services
+
+Instead of creating an object, we can create simple values like strings,
+numbers, arrays, and hashes using the C<value> key:
+
+    # container.yml
+    bounty:
+        value: 100000
+    itinerary:
+        value:
+            - Heaven
+            - Highgate
+            - Muir
+            - Miranda
+
+    # container.pl
+    my $config = {
+        bounty => {
+            value => 100000,
+        },
+        itinerary => {
+            value => [
+                'Heaven',
+                'Highgate',
+                'Muir',
+                'Miranda',
+            ],
+        },
+    };
+
+These services can be used like any other. You can get the value with
+the C<get()> method:
+
+    my $itinerary = $wire->get( 'itinerary' );
+
+And you can set up relationships with C<$ref>:
+
+    # container.yml
+    serenity_crew:
+        class: Person
+        args:
+            bounty:
+                $ref: bounty
+
+=head2 Config Services
+
+A config service allows you to read a config file and use it as
+a service, giving all or part of it to other objects in your container.
+
+To create a config service, use the C<config> key. The value is the path
+to the file to read. By default, YAML, JSON, XML, and Perl files are
+supported (via L<Config::Any>).
+
+This works very much like a C<value> service (above). The configuration
+file is read, and the data inside is the result.
+
+    # manifest.yml
+    - 12 pair socks
+    - 5 shirts, black
+    - 5 shirts, slightly darker black
+    - 1 strawberry
+
+    # container.yml
+    manifest:
+        config: manifest.yml
+
+    # container.pl
+    my $config = {
+        manifest => {
+            config => 'manifest.yml',
+        },
+    };
+
+These services can be used like any other. You can get the value with
+the C<get()> method:
+
+    my $manifest = $wire->get( 'manifest' );
+
+And you can set up relationships with C<$ref>:
+
+    # container.yml
+    serenity:
+        class: Ship
+        args:
+            cargo:
+                $ref: manifest
+
+If you only need the config file once, you can create an anonymous config
+object.
+
+    # container.yml
+    serenity:
+        class: Ship
+        args:
+            cargo:
+                $config: manifest.yml
+
+=head2 Bare Services
+
+Additionally, any service that does not look like an object config (does
+not pass L<the is_meta method|Beam::Wire/is_meta>) will be treated like
+a bare service. A bare service is like a value service, except that
+references inside are resolved. With this, you can set up arrays and
+hashes of objects.
+
+    # container.yml
+    crew_list:
+        - $ref: malcolm
+        - $ref: zoe
+        - $ref: wash
+        - $ref: kaylee
+        - $ref: jayne
+    crew_manifest:
+        captain:
+            $ref: malcolm
+        pilot:
+            $ref: wash
+        engineer:
+            $ref: kaylee
+
+    # container.pl
+    my $config = {
+        crew_list => [
+            { '$ref' => 'malcolm' },
+            { '$ref' => 'zoe' },
+            { '$ref' => 'wash' },
+            { '$ref' => 'kaylee' },
+            { '$ref' => 'jayne' },
+        ],
+        crew_manifest => {
+            captain => {
+                '$ref' => 'malcolm',
+            },
+            pilot => {
+                '$ref' => 'wash',
+            },
+            engineer => {
+                '$ref' => 'kaylee',
+            },
+        },
+    };
+
+=head1 ADVANCED FEATURES
+
+=head2 Nested Containers
+
+Nested containers can be created by adding Beam::Wire objects to
+a Beam::Wire container. This can be useful for sharing common objects
+(logging, database, or others) between multiple containers, or combining
+multiple containers into one.
+
+    # actors.yml
+    malcolm:
+        class: Actor
+        args:
+            name: Nathan Fillion
+    zoe:
+        class: Actor
+        args:
+            name: Gina Torres
+
+    # container.yml
+    actors:
+        class: Beam::Wire
+        args:
+            file: actors.yml
+
+    # script.pl
+    my $wire = Beam::Wire->new( file => 'container.yml' );
+    my $actor = $wire->get( 'actors/malcolm' );
+
+Nested container file paths are relative to the current container file
+by default. If needed, you can set the L<dir attribute|Beam::Wire/dir>
+to change what directory to search in.
+
+=head2 Event Handlers (on)
+
+If your objects use L<the Beam::Emitter event system|Beam::Emitter>, you
+can attach events to your object using the C<on> key. This ensures that
+when your object is created, all of its event handlers are also created.
+
+The C<on> key should be an array of hashes. The hash key is the name of
+the event. The hash value should be a reference (C<$ref>) or an
+anonymous object (C<$class>), and must include a subroutine to call on
+that service using the C<$sub> key.
+
+    # container.yml
+    serenity:
+        class: Ship
+        on:
+            - compressor_alert:
+                $ref: ignore
+                $sub: ignore_alert
+            - airlock_open:
+                $class: Klaxon
+                $args:
+                    volume: loud
+                $sub: alert
+
+If you're not using YAML, you can organize event handlers as a simple
+hash, or a hash of arrays if you need multiple handlers for the same
+event:
+
+    # container.pl
+    my $config = {
+        serenity => {
+            class => 'Ship',
+            on => {
+                compressor_alert => {
+                    '$ref' => 'ignore',
+                    '$sub' => 'ignore_alert',
+                },
+                airlock_open => {
+                    '$class' => 'Klaxon',
+                    '$args' => {
+                        volume => 'loud',
+                    },
+                    '$sub' => 'alert',
+                },
+            },
+        },
+    };
+
+=head2 Compose Roles (with)
+
+Sometimes we have an object, but we also want to add a role to it.
+Instead of having to create a new, concrete class to compose every
+possible combination of roles, we can instead compose those roles when
+creating the object with the C<with> key.
+
+C<with> can be a single string, which is a role class to compose, or an
+array of strings to compose multiple roles.
+
+    # container.yml
+    shepherd:
+        class: Person
+        with: DarkPast
+
+    # container.pl
+    my $config = {
+        shepherd => {
+            class => 'Person',
+            with => 'DarkPast',
+        },
+    };
+
+Then, when the C<shepherd> object is created, a new, anonymous class is
+created that extends the C<Person> class and adds the C<DarkPast> role.
+
+=head2 Multiple Constructor Methods
+
+Sometimes an object can't be constructed with just a single method. We
+may have to call some methods to set attributes that are puzzlingly not
+exposed in the constructor, or we may want to immediately try to connect
+to a service.
+
+To call multiple methods during construction, we can pass an array to
+the C<method> key. Each member of the array should be a hash containing
+another C<method> key, which will be the method to call, and optionally
+an C<args> key, which will be the arguments to that specific method.
+
+The first constructor method must construct the object itself. Each
+other method will be called on the object, and then the object will be
+used as the service.
+
+    # container.yml
+    malcolm:
+        class: Person
+        method:
+            - method: new
+              args:
+                name: 'Malcolm Reynolds'
+            - method: set_bounty
+              args:
+                - 100000
+            - method: set_rank
+              args:
+                - Captain
+
+    # container.pl
+    my $config = {
+        malcolm => {
+            class => 'Person',
+            method => [
+                {
+                    method => 'new',
+                    args => {
+                        name => 'Malcolm Reynolds',
+                    },
+                },
+                {
+                    method => 'set_bounty',
+                    args => [ 100000 ],
+                },
+                {
+                    method => 'set_rank',
+                    args => [ 'Captain' ],
+                },
+            ],
+        },
+    };
+
+This is equivalent to doing:
+
+    my $malcolm = Person->new( name => 'Malcolm Reynolds' );
+    $malcolm->set_bounty( 100000 );
+    $malcolm->set_rank( 'Captain' );
+    return $malcolm;
+
+It's not a commonly-needed feature, but it exists just in case. Instead
+of doing this, you may be better off wrapping the class that requires
+this in your own class which provides a saner construction API. You
+could then release this wrapper class to CPAN in the C<Beam::Service::*>
+namespace).
+
+=head2 Chained Constructor Methods
+
+Chained constructor methods work the same as multiple constructor
+methods, except the result of the first method is used as the invocant
+of the second method, and the result of the second method is used as the
+invocant of the third method.
+
+To chain a method to its following method, add C<return: chain> to the
+hash of method attributes. The last instance of C<return: chain> will be
+the return value used for the service.
+
+    # container.yml
+    malcolm:
+        class: Person
+        method:
+            - method: new
+              args:
+                name: 'Malcolm Reynolds'
+              return: chain
+            - method: set_bounty
+              args:
+                - 100000
+              return: chain
+            - method: set_rank
+              args:
+                - Captain
+              return: chain
+
+    # container.pl
+    my $config = {
+        malcolm => {
+            class => 'Person',
+            method => [
+                {
+                    method => 'new',
+                    args => {
+                        name => 'Malcolm Reynolds',
+                    },
+                },
+                {
+                    method => 'set_bounty',
+                    args => [ 100000 ],
+                },
+                {
+                    method => 'set_rank',
+                    args => [ 'Captain' ],
+                },
+            ],
+        },
+    };
+
+This is equivalent to doing:
+
+    my $malcolm = Person->new( name => 'Malcolm Reynolds' );
+    $malcolm = $malcolm->set_bounty( 100000 );
+    $malcolm = $malcolm->set_rank( 'Captain' );
+    return $malcolm;
+
+This is useful if you need to connect to a database, and then get
+a specific object for a table (DBIx::Class) or collection (MongoDB).
+
+=head2 Data Paths
+
+You can reference individual items in a C<value> or C<config> service
+using C<$path> references. This uses L<the Data::DPath
+module|Data::DPath> to match parts of the data structure. This is
+a powerful tool that can be used to create automatic filters on data
+structures, even executing Perl code to find items to return.
+
+    # container.yml
+    bounties:
+        value:
+            malcolm: 50000
+            zoe: 35000
+            simon: 100000
+
+    captain:
+        class: Person
+        args:
+            name: Malcolm Reynolds
+            bounty:
+                $ref: bounties
+                $path: /malcolm
+
+B<NOTE:> You cannot use C<$path> and anonymous config objects.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Beam::Wire>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Doug Bell <preaction@cpan.org>
+
+=item *
+
+Al Newkirk <anewkirk@ana.io>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

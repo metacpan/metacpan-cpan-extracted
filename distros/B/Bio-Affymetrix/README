@@ -1,0 +1,50 @@
+Bio-Affymetrix version 0.1
+==========================
+
+AUTHORS
+
+Nick James, David J Craigon
+
+ABSTRACT
+
+These set of modules allow the parsing of files produced by the
+Affymetrix microarray system. If you don't know what one of those is,
+these are not the modules you're looking for.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules or libraries. It does require
+perl 5.8.0 and up though.
+
+EXTRAS
+
+There is a demonstration script in demo. pdoc contains some webpages
+created from perldoc to explain the API.
+
+WEBSITE
+
+All NASC information can be found at http://arabidopsis.info
+
+LIMITATION
+
+The test script is not very comprehensive
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Nick James, David J Craigon, NASC (arabidopsis.info), The
+University of Nottingham
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Affymetrix is a registered trademark of Affymetrix Inc., Santa
+Clara, California, USA.

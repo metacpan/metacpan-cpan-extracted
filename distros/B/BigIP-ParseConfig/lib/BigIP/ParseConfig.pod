@@ -1,0 +1,178 @@
+=head1 NAME
+
+BigIP::ParseConfig - F5/BigIP configuration parser
+
+=head1 SYNOPSIS
+
+  use BigIP::ParseConfig;
+  
+  # Module initialization
+  my $bip = new BigIP::ParseConfig( '/config/bigip.conf' );
+  
+  # Iterate over pools
+  foreach my $pool ( $bip->pools() ) {
+      # Iterate over pool members
+      foreach my $member ( $bip->members( $pool ) ) {
+          # Change port from 80 to 443
+          if ( $member /^(\d+\.\d+\.\d+\.\d+):80/ ) {
+              push @members, "$1:443";
+              my $change = 1;
+          }
+      }
+      # Commit the change above (80->443)
+      if ( $change ) {
+          $bip->modify(
+              type => 'pool',
+              key  => $pool,
+              members => [ @members ]
+          );
+      }
+  }
+  
+  # Write out a new config file
+  $bip->write( '/config/bigip.conf.new' );
+
+=head1 DESCRIPTION
+
+BigIP::ParseConfig provides a Perl interface to reading, writing, and
+manipulating configuration files used on F5 (BigIP) LTM network devices.
+
+This module is currently a work-in-progress.  Please e-mail with problems,
+bug fixes, comments and complaints.
+
+=head1 CONSTRUCTOR
+
+=over 4
+
+=item new ( FILE )
+
+Create a new B<BigIP::ParseConfig> object.
+
+C<FILE> refers to the bigip.conf configuration file, usually found at
+/config/bigip.conf.
+
+B<Example>
+
+  $bip = BigIP::ParseConfig->new( '/config/bigip.conf' );
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item monitors
+
+=item nodes
+
+=item partitions
+
+=item pools
+
+=item profiles
+
+=item routes
+
+=item rules
+
+=item users
+
+=item virtuals
+
+List the names of all found objects of the referring method.
+
+B<Examples>
+
+  @pools = $bip->pools();
+
+  @virtuals = $bip->virtuals();
+
+=item monitor ( MONITOR )
+
+=item node ( NODE )
+
+=item partition ( PARTITION )
+
+=item pool ( POOL )
+
+=item profile ( PROFILE )
+
+=item route ( ROUTE )
+
+=item rule ( RULE )
+
+=item user ( USER )
+
+=item virtual ( VIRTUAL )
+
+Return a hash of the object specified.
+
+B<Examples>
+
+  %sschneid = $bip->user( 'sschneid' );
+
+  $monitor = $bip->pool( 'Production_LDAP_pool')->{'monitor'};
+
+=item members ( POOL )
+
+List the members of a specified pool.
+
+B<Example>
+
+  @members = $bip->members( 'Production_LDAP_pool' );
+
+Note that this is identical to using the I<pool> method:
+
+  @members = @{$bip->pool( 'Production_LDAP_pool' )->{'members'}};
+
+=item modify ( OPTIONS )
+
+Modify the attributes of a specified object.  The following options are B<required>:
+
+=over 4
+
+=item type
+
+The type of object being modified.  Allowed types are: monitor, node, partition,
+pool, profile, route, user, virtual.
+
+=item key
+
+The key (name) of the object being modified.
+
+=back
+
+Following B<type> and B<key> should be a string or a reference to an array of
+strings.  See the example below for more details.
+
+B<Examples>
+
+  $bip->modify(
+      type => 'virtual',
+      key  => 'Production_LDAP_vip',
+      persist => 'cookie'
+  );
+  
+  $bip->modify(
+      type => 'pool',
+      key  => 'Production_LDAP_pool',
+      members => [ '192.168.0.1:636', '192.168.0.2:636' ]
+  );
+
+=item write ( FILE )
+
+Write out a new configuration file.  C<FILE> refers to the bigip.conf configuration
+file, usually found at /config/bigip.conf.
+
+B<Example>
+
+  $bip->write( '/config/bigip.conf.new' );
+
+=back
+
+=head1 AUTHOR
+
+Scott Schneider <sschneid@gmail.com>
+
+=cut
+

@@ -1,0 +1,43 @@
+{
+   "abstract" : "Calculates Canadian GST/PST/HST",
+   "author" : [
+      "Steve Simms <steve@deefs.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-Tax-Canada",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      }
+   },
+   "provides" : {
+      "Business::Tax::Canada" : {
+         "file" : "lib/Business/Tax/Canada.pm",
+         "version" : "0.04"
+      },
+      "Business::Tax::Canada::Price" : {
+         "file" : "lib/Business/Tax/Canada.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/ssimms/business-tax-canada"
+      }
+   },
+   "version" : "0.04"
+}

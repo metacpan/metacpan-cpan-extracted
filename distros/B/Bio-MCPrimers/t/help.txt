@@ -1,0 +1,25 @@
+
+MCPrimers generates molecular cloning PCR primers
+
+Use: mcprimers.pl [options] vector.txt sequence.fasta result.pr3
+
+Options:  -help
+          -stdout
+          -filter
+          -searchpaststart integer (default = 18)
+          -searchbeforestop integer (default = 0)
+          -clamp (both | 3prime)
+          -maxchanges integer
+          -excludedsites comma_seperated_list_with_no_blanks
+          -primerfile primer3_file_name
+          -vectorfile vector_file_name
+          -seqfile FASTA_sequence.fasta
+          -outfile result.pr3
+
+Vector file is specified in Bio::Data::Plasmid::CloningVector
+Sequence file must be DNA nucleotides in FASTA format
+Results file has Primer3 output and extra data
+'=' can be used in specifying parameter values on command line
+
+Use at your risk. Check any solutions you obtain
+

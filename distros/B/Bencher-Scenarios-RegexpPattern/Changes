@@ -1,0 +1,17 @@
+0.003   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.002   2016-09-14 (PERLANCAR)
+
+	- Startup: Add participant Regexp::Pattern::RegexpCommon.
+
+
+0.001   2016-09-13 (PERLANCAR)
+
+        - First release.

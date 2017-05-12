@@ -1,0 +1,36 @@
+Changes
+example/debug_dump.pl
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Best.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+MYMETA.json
+MYMETA.yml
+README
+t/00-load.t
+t/01utility.t
+t/A/Module.pm
+t/AnAlternative.pm
+t/boilerplate.t
+t/LastChance.pm
+t/lib/Load/Trace.pm
+t/Loads/Ok.pm
+t/pod-coverage.t
+t/pod.t
+t/Version/Ok.pm
+t/Version/TooLow.pm
+Tests.PL
+SIGNATURE                                Public-key signature (added by MakeMaker)

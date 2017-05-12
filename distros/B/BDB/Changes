@@ -1,0 +1,185 @@
+Revision history for perl module BDB.
+
+TODO: DB_RECNUM/DB_SET_RECNO?
+TODO: 4.8 set_partition
+
+1.91 Fri Apr 11 06:22:38 CEST 2014
+	- perl5porters broke Async::Interrupt, BDB, EV, IO::AIO, OpenCL
+          without warning by switching the meaning of USE_SOCKETS_AS_HANDLES
+          in 5.18. What's so attractive about giving a shit about backwards
+          compatibility - I will never understand.
+	- make sure DBD.pm is installed to the correct directory.
+        - support up to bdb 6.0.
+        - (xthread) work around compile time bugs in ptw32.
+
+1.9  Mon Dec 26 02:46:09 CET 2011
+	- partial: update for libdb 5.2 (to make it compile only).
+
+1.89 Fri Jul 29 11:29:21 CEST 2011
+	- make it compile and test successfully with libdb 5.1, but
+          do not add any new symbols or functionality.
+
+1.88 Wed Mar 31 02:43:42 CEST 2010
+        - a double fork partially killed the event pipe (great testcase
+          by dormando). affects IO::AIO, BDB and Async::Interrupt.
+        - suck steve's dick and rename our symbols to avoid colliding
+          with nonstandard identifier spam on the broken os x pseudo-os.
+          affects IO::AIO and BDB.
+
+1.87 Tue Dec 22 03:06:09 CET 2009
+	- db 4.8 has removed XA resource manager functionality,
+          cope with it.
+        - add LOGVERSION, LOGVERSION_LATCHING, LOGOLDVER
+          symbols.
+
+1.86 Fri Dec  4 16:03:21 CET 2009
+	- port to broken loser platform.
+
+1.85 Thu Nov 12 03:22:21 CET 2009
+	- speed up object creation/type checking considerably
+          by caching the stashes.
+
+1.84 Wed Aug  5 13:52:21 CEST 2009
+        - require common sense.
+        - use schmorp.h for pipe, taking advantage of eventfd.
+	- fix a bug in event pipe creation code on win32.
+
+1.83 Sun Jan 11 01:52:56 CET 2009
+	- fix db_upgrade, add db_verify.
+
+1.82 Sun Jan  4 11:22:44 CET 2009
+        - use our own socketpair emulation (stolen from libev), as perl's
+          doesn't work on vista, which returns fantasy port numbers
+          in getpeer/sockname.
+
+1.81 Tue Oct 21 04:20:25 CEST 2008
+	- check that mutable arguments can be downgraded - this
+          /very indirectly) ensures that output variables won't
+          have spurious utf-8 flags.
+        - fix opmode checdk in db_c_get, db_c_pget again.
+        - allow undef/default arguments for db_compact, for a
+          crash-free tomorrow!
+        - fix a memleak in db_key_range.
+        - started a common pitfdalls section.
+        - added db_env_log_archive.
+        - added db->set_pagesize.
+        - added BDB::IGNORE_LEASE.
+        - reworked documentation structure.
+
+1.801 Mon Sep 29 04:58:03 CEST 2008
+	- removed ptrace.h and user.h includes thta have been left in
+          erronously.
+        - "port" to buggy windows compilers. again.
+
+1.8  Sat Sep 27 14:01:37 CEST 2008
+	- non-callback requests will now - by default - be executed in the
+          foreground, which is much faster, but doesn't allow parallel
+          processing of other, event-based, requests.
+        - functions that modify their arguments now croak when a constant
+          is passed to them.
+        - db_c_get/db_c_pget requests did not correctly test the operation flags.
+        - db_pget now correctly updates the pkey argument.
+	- keep references to the passed env/db/etc. objects so they
+          can't get destroyed while requests are still outstanding.
+	- fixed a few minor stack issues.
+
+1.71 Tue Jul 29 05:30:24 CEST 2008
+	- add const char * to typemap for possible 5.6 support.
+        - untested support for db4.3.
+        - berkelydb needs seriously larger stacksizes (on x86 at least)
+          then what the default xthread.h provides.
+
+1.7  Thu Jul 17 14:09:25 CEST 2008
+	- use a totally different mechanism to pass callbacks to
+          requests (see manpage).
+        - optional arguments before the callback can now be left out.
+        - use less memory per request, probably be a bit faster, too.
+        - fix a memory leak (callbacks were never freed).
+        - add a basic testsuite.
+        - add (untested) support for cdsgroup_begin and db_exists.
+        - make BDB::VERSION compatible to UNIVERSAL::VERSION.
+
+1.6  Tue Jul  8 10:34:58 CEST 2008
+	- add new BDB::VERSION function for easy version checks.
+	- work around broken bsd headers once more.
+        - support for berkeley db 4.7 added.
+        - add support for log_set_config and it's constants,
+          and set_intermediate_dir_mode.
+        - add db_env_dbrename and db_env_dbremove.
+
+1.5  Sat May 10 22:22:42 CEST 2008
+	- port to solaris perls configured for old posix
+          (analysed by Jost Krieger).
+        - do our own stack memory management for threads - linux
+          allocates outrageous amounts of VM (not so bad unless you
+          use mlockall...), which severely limits the number of threads
+          on 32-bit arches: stack size is the larger of PTHREAD_STACK_MIN
+          and 4096 * sizeof (long) (usually this is 16..64k).
+	- support AnyEvent::BDB.
+
+1.45 Sun Mar 30 10:01:00 CEST 2008
+	- work around win32 perl's broken filehandles
+          (this cannot work in all cases, so watch out).
+
+1.44 Sun Mar 30 08:28:11 CEST 2008
+	- encode filenames as utf-8 (for bdb/win32)
+          or binary (everywhere else).
+	- patch $! to support stringification of BDB errno values
+          (utter hack, this should be pluggable :).
+        - fix prototypes of (void) functions.
+
+1.43 Sun Jan 13 11:52:49 CET 2008
+	- differentiate between nuked and undef objects, so as to
+          not throw an exception when destroying closed handles.
+
+1.42 Tue Dec 25 15:22:50 CET 2007
+	- do not automatically call set_thread_count.
+
+1.41 Sat Dec 22 08:32:41 CET 2007
+	- add cursor->set_priority.
+        - minor optimisations and checks.
+        - port to microsoft pseudo-C again.
+
+1.4  Wed Dec 12 02:20:39 CET 2007
+	- new globals BDB::VERSION and ..VERSION_STRING.
+        - add db_upgrade.
+        - do not die in DESTROY after explicit db_close and similar
+          operations.
+
+1.3  Fri Dec  7 14:36:25 CET 2007
+        - db_put and c_put leaked memory like hell (reported by Danny).
+	- de-IO::AIO-ify the documentation.
+        - port to microsofts pseudo-C from hell.
+        - added mutex_set_increment, mutex_set_tas_spins
+          and mutex_set_max, mutex_set_align.
+
+1.2  Tue Dec  4 11:12:47 CET 2007
+	- after fork, invest some work to make sure that the poll_fileno
+          stays stable (by dup2'ing the new fd over the old one), to make
+          it easier for programs/libs that don't control their forking
+          behaviour and cannot recreate their watchers.
+        - added missing DB::RDONLY (reported by Danny).
+
+1.1  Sun Sep 16 20:15:55 CEST 2007
+	- flag and check TXN_DEADLOCK flag for easier transaction
+          programming (see db_txn_finish).
+        - new custom db_txn_finish request.
+	- improved docs.
+
+1.0  Mon Aug 13 14:02:42 CEST 2007
+	- some updates for db 4.6.
+        - vastly improved documentation, i.e. there is some now.
+        - this module has been tested a lot in the Crossfire TRT server.
+
+0.5  Sun Jul  8 16:57:03 CEST 2007
+	- port to db 4.4.20 (probably any 4.4 version).
+        - added bdb error constants.
+        - add set_errfile/set_msgfile/set_verbose.
+	- shared code between IO::AIO and BDB.
+        - upgrade to xthread.h from IO::AIO for win32 compatibility.
+        - port to win32 (there is an unexplainable hang in
+          db_sequence_get...).
+
+0.1  Mon Mar  5 20:44:18 CET 2007
+	- cloned from IO::AIO.
+

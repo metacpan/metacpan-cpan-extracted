@@ -1,0 +1,35 @@
+0.05    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.04    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.15) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=requires.
+
+
+0.03    2016-03-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Show module startup overhead benchmark for multiple module
+	  versions too.
+
+
+0.02    2016-03-16 (PERLANCAR)
+
+        - [build] Rebuild to actually shows the progression between module
+          versions.
+
+
+0.01    2016-03-15 (PERLANCAR)
+
+        - First release.

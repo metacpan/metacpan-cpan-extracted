@@ -1,0 +1,22 @@
+Revision history for Bio-Taxonomy-GlobalNames
+
+0.07    2014-12-23 00:30
+    - Fixed a failing unicode test and one caused by an old version of Moo.
+
+0.06    2014-03-28 17:40
+    - Fixed a pod bug where a private subroutine was marked as naked.
+
+0.05    2014-03-28 14:54
+    - The module now checks if the GNR website is up.
+
+0.04    2014-01-30 10:11
+    - Switched from Moo to Moo::Lax to avoid issues from FATAL warnings.
+
+0.03    2014-01-23 15:56
+    - Fixed a bug caused by JSON conversion to Perl data structures.
+
+0.02    2014-01-21 16:05
+    - Input files with single or double quotes are now read correctly.
+
+0.01    2013-11-22 23:20
+    - First version.

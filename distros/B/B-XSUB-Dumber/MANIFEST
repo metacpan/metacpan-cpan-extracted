@@ -1,0 +1,8 @@
+Dumber.xs
+lib/B/XSUB/Dumber.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/scalar_util.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

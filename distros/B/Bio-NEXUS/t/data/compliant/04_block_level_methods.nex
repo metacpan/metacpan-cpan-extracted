@@ -1,0 +1,28 @@
+#NEXUS
+
+BEGIN TAXA;
+	dimensions ntax=4;
+	taxlabels A B C D;  
+END;
+
+BEGIN CHARACTERS;
+	title protein;
+	dimensions nchar=11;
+	format
+		datatype=protein
+		missing=?
+		gap=-
+		;
+	
+	matrix
+		A	-MQVADISL-?
+		B	-------MA--
+		C	-MG----FS--
+		D	-MG--DVEKGQ
+		;
+END;
+
+BEGIN TREES;
+        title tb_1;
+	tree 'basic bush' = ((A:1,B:1):1,(C:1,D:1):1);
+END;

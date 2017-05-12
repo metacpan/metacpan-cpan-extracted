@@ -1,0 +1,28 @@
+Binding
+
+This module can help when you need to eval code with caller's variable
+binding. It's similar to Tcl's uplevel function. The name comes from
+the Binding class of Ruby language.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+PadWalker, Data::Dump, Devel::Caller
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Kang-min Liu
+
+This is free software, licensed under:
+
+    The MIT (X11) License

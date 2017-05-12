@@ -1,0 +1,9 @@
+Revision history for Build-Simple
+
+0.002     2013-05-15 20:45:15 Europe/Amsterdam
+          Rewrote testing code to make sense
+          Get rid of List::MoreUtils dependency
+          Switch to Module::Build::Tiny
+
+0.001     2013-04-16 01:14:43 Europe/Amsterdam
+          Initial version

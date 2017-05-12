@@ -1,0 +1,28 @@
+---
+name: Build-Daily
+version: 0.01
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+abstract: module to update daily versions for Module::Build and ExtUtils::MakeMaker
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Module::Build: 0.2808
+build_requires:
+  Test::More: 0
+provides:
+  Build::Daily:
+    file: lib/Build/Daily.pm
+    version: 0.01
+  ExtUtils::MakeMaker:
+    file: lib/Build/Daily.pm
+  Module::Build::Base:
+    file: lib/Build/Daily.pm
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

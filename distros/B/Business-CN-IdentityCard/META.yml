@@ -1,0 +1,18 @@
+---
+name: Business-CN-IdentityCard
+version: 0.05
+author:
+  - Fayland <fayland@gmail.com>
+abstract: Validate the Identity Card NO. in China
+license: perl
+requires:
+  Class::Accessor::Fast: 0
+  Date::Simple: 0
+provides:
+  Business::CN::IdentityCard:
+    file: lib/Business/CN/IdentityCard.pm
+    version: 0.05
+  Business::CN::IdentityCard::District:
+    file: lib/Business/CN/IdentityCard/District.pm
+    version: 0.01
+generated_by: Module::Build version 0.261

@@ -1,0 +1,75 @@
+---
+global:
+  name: Bot-BasicBot-Pluggable-Module-Gitbot
+releases:
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Remove dead code from the tests.
+      - Clean up the .gitignore file.
+      - 'Add version, and Readme handling to the shipit steps.'
+      - Add a README.mkdn so we get something pretty on GitHub.
+      - Update the POD examples.
+    date: 2010-03-07T21:30:59Z
+    tags: []
+    version: 1.00.01
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Remove the bugtracker line from Makefile.PL
+      - Add support for <repo-name>/<ref-name> style linking.
+      - DRY up the creation of the test repositories.
+      - Add support for reporting on multiple matches within a single message.
+      - Refactor to DRY up retrieving information from/about a repository.
+      - Rework the output format.
+    date: 2010-03-04T23:53:23Z
+    tags: []
+    version: 1.00
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Replace subtests with notes.
+      - "Remove response when given something that looks like a SHA1, but can't be found."
+    date: 2010-03-02T20:55:52Z
+    tags: []
+    version: 0.01.06
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Add missing test requirements.
+    date: 2010-02-28T09:29:16Z
+    tags: []
+    version: 0.01.05
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Add missing requirements.
+    date: 2010-02-28T07:22:57Z
+    tags: []
+    version: 0.01.04
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Ignore .author file
+      - Re-generate a proper META.yml
+    date: 2010-02-22T06:37:08Z
+    tags: []
+    version: 0.01.03
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Switch to Module::Install.
+      - Remove automatic Twitter notifications from the ShipIt steps.
+      - Remove Build.PL from the MANIFEST.
+    date: 2010-02-22T06:00:38Z
+    tags: []
+    version: 0.01.02
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Add a package line for the PAUSE indexer to find.
+    date: 2010-02-22T03:25:48Z
+    tags: []
+    version: 0.01.01
+  - author: 'Jacob Helwig <jhelwig@cpan.org>'
+    changes:
+      - Initial Commit
+      - Initial 0.01 version of the module.
+      - Add .shipit file.
+      - Update release date in Changes file.
+      - Setup ShipIt
+    date: 2010-02-22T02:21:17Z
+    tags: []
+    version: 0.01

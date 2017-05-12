@@ -1,0 +1,29 @@
+: include '_wedge.tx' { template => 'content_end.tx' };
+</div>
+</div>
+<div id="footer">
+<div class="magical-number">
+<span class="number"><: $total_size :></span>
+</div>
+<div class="sites">
+: for $info.sites -> $site {
+<a href="<: $site.url :>"><: $site.name :></a>
+&nbsp;
+: }
+</div>
+<div class="updated">
+<span class="datetime"><: $updated :></span>
+</div>
+</div>
+
+<div class="beagle hidden">
+<span name="prefix"><: $prefix :></span>
+<span name="name"><: $name :></span>
+: if $entry {
+<span name="year"><: $entry.created_year :></span>
+: }
+</div>
+
+</body>
+</html>
+

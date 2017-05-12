@@ -1,0 +1,12 @@
+[% USE ANSIColor 'color' %]
+[% "AVAILABLE TRAVELS" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% "# AIR" | color 'yellow' %]
+[% FOREACH n IN plan.air.keys -%]
+[% n %]: [% plan.air.$n.status %] [% IF plan.air.$n.status == 'OK' %][Cost: [% plan.air.$n.cost %]][% END %]
+[% END %]
+[% "# GROUND" | color 'yellow' %]
+[% FOREACH n IN plan.ground.keys -%]
+[% n %]: [% plan.ground.$n.status %] [% IF plan.ground.$n.status == 'OK' %][Cost: [% plan.ground.$n.cost %]][% END %]
+[% END -%]

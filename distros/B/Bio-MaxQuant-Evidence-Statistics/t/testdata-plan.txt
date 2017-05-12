@@ -1,0 +1,13 @@
+Test data can be based on the following...
+
+Topo2alpha = P11388
+Topo2beta1 = Q02880
+Topo2beta2 = Q92547
+Cenp-F     = P49454
+ER         = P03372
+PKC iota   = P41743
+PKC delta  = Q05655
+
+Topos give lots of peptides, and shared too.  
+Cenp-F and ER give many peptides over all, but mostly 0, 1 or 2 in each experiment.
+PKC iota and delta have a good variety of measurements.

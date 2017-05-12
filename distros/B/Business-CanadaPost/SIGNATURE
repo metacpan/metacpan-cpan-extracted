@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 179133bc65ef060bea6049ca70eb8688b3426002 Build.PL
+SHA1 c22f5236c81a2762990d3a1904204520889038dc Changes
+SHA1 cfb00897e82c65c43e4f7fc6a68bf660f082afda INSTALL
+SHA1 8a9ff5c57ef8224d21eaae1d1710845020f16bb8 LICENSE
+SHA1 a826bd5c731c6751b1e161fdde476d899d3e2dbd MANIFEST
+SHA1 f1d4c533acdc9e740b5cd89d31632f8821e13777 META.json
+SHA1 7e040072f62bad903fcbd9d011f080aa9b45ba9b META.yml
+SHA1 86be79c599cca7346c023ef35597fa61fb75986d Makefile
+SHA1 045141033cc8145e580b3f4b761d1412d5e6a62e Makefile.PL
+SHA1 44d99e932cb294c2f9eb93b785fa4f4ccf843465 README
+SHA1 ad379e1769b473a6b8a01dcabb817f4dff64aa46 README.mkdn
+SHA1 ad877fa87c9cf81ac80c28e23c05f4914a54511c lib/Business/CanadaPost.pm
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 1a209f07f9d91a5c12a7db4875e009d9fb805c76 t/Business-CanadaPost.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk7W2IYACgkQ34Hwf+GwC4z9ygCfZqUUeEy13oCYf0+iwO7/M+y7
+Pb4AoKlEm0FPBan/DpkecO6ZRyjncDN+
+=pfwr
+-----END PGP SIGNATURE-----

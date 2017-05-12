@@ -1,0 +1,8 @@
+^\.git\/
+^.*\.tar.gz$
+^.*.bak
+^.*.old
+^.*.swp
+.gitignore
+.travis.yml
+README\.md

@@ -1,0 +1,63 @@
+CREATE TABLE number (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    number varchar,
+    phone_type varchar
+);
+
+CREATE TABLE bday (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    contact INTEGER,
+    bday date,
+    anniversary date,
+    known_since date
+);
+
+CREATE TABLE tshirt (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ident varchar
+);
+
+CREATE TABLE color (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ident varchar,
+    foreigner INTEGER
+);
+
+CREATE TABLE tshirt_color (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tshirt INTEGER,
+    color INTEGER
+);
+CREATE TABLE tshirt_author (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tshirt INTEGER,
+    author INTEGER
+);
+CREATE TABLE author (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ident varchar
+);
+
+CREATE TABLE book (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ident varchar
+);
+
+CREATE TABLE author_book (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    author INTEGER,
+    book INTEGER,
+    extra_field varchar,
+    second_extra boolean
+);
+
+INSERT INTO author_book ( author, book, extra_field )
+    VALUES ( 1, 1, 'hello' );
+
+CREATE TABLE sch.name (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    number varchar
+);
+

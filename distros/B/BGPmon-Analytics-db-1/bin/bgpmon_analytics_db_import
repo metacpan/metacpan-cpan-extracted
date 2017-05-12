@@ -1,0 +1,499 @@
+#!/usr/bin/perl 
+=head1 NAME
+
+bgpmon_analytics_db_import - a script to import XFB-formatted BGP data into
+a postgres database. Data can be imported from a live BGPmon stream,
+an online archive of files, or from a local file.
+
+=cut
+
+=head1 USAGE
+
+> ./bgpmon_analytics_db_import --source archive --URL archive.domain.com 
+--start-time 1234567890 --end-time 2345678901 [--log-level [0-7]]
+[--use_syslog|--log-file logfilename] [--database-name dbname]
+[--database-username dblogin] [--ignore_incomplete_data] [--ignore_data_errors]
+
+> ./bgpmon_analytics_db_import --source bgpmon --server 1.2.3.4 --port 50001
+[--log-level [0-7]] [--use_syslog|--log-file logfilename] [--database-name dbname]
+[--database-username dblogin]
+
+> ./bgpmon_analytics_db_import --source file --xfb-file filename.xml [--log-level [0-7]]
+[--use_syslog|--log-file logfilename] [--database-name dbname]
+[--database-username dblogin] [--ignore_incomplete_data] [--ignore_data_errors]
+
+=cut
+
+=head1 DEPENDENCIES
+
+The following Perl modules need to be installed before using this script:
+
+BGPmon::Log
+
+BGPmon::Translator::XFB2PerlHash::Simple
+
+BGPmon::Configure
+
+POSIX
+
+Data::Dumper
+
+In addition, a Postgres database cluster must be installed and a database
+set up via the reset.pl script.
+
+=cut
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Colorado State University
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom
+    the Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.\
+
+    File: database_import.pl
+
+    Authors: Jason Bartlett
+    Date: 17 August 2012
+
+=cut
+
+use BGPmon::Log qw/log_info log_warn log_err debug/;
+use BGPmon::Translator::XFB2PerlHash::Simple qw/get_peering get_nlri 
+get_mp_nlri get_withdrawn get_mp_withdrawn get_timestamp get_as_path 
+get_as4_path/;
+use BGPmon::Fetch;
+use BGPmon::Configure qw/configure parameter_value/;
+use POSIX qw/strftime/;
+use Data::Dumper;
+
+BEGIN{
+	our $VERSION = '1.07';
+};
+
+#step 1: set up script args (DB name/credentials, data source, log file name,
+#config file name)
+#step 2: fetch data from the specified data source
+#step 3: convert the XML to hashes
+#step 4: grab the fields I'm interested in
+#step 5: insert fields into DB staging table
+#step 6: inject updates into main DB tables
+
+my $db_name = 'bgpmon_db';
+
+#This hash is for IP addresses to be mapped to collector names for
+#disambiguation when importing updates
+my %aliases = (
+                '128.223.51.15' => 'route-views4',
+                '2001:468:d01:33::80df:330f' => 'route-views4',
+		'129.82.138.6' => 'colostate-bgpmon'
+              );
+
+use constant MAX_UPDATES_PER_INJECT => 1000;
+
+#Define parameters for logging (filename, level, use syslog)
+#Define parameters for system state (DB name,DB credentials, config filename)
+#Define parameters for data retrieval (source, Fetch parameters)
+my @params = (
+    {
+        'Name' => BGPmon::Configure::CONFIG_FILE_PARAMETER_NAME,
+        'Type' => BGPmon::Configure::FILE,
+        'Default' => './database-import.conf',
+        'Description' => 'The configuration file to use'
+    },
+    {
+        'Name' => 'database-name',
+        'Type' => BGPmon::Configure::STRING,
+        'Default' => "$db_name",
+        'Description' => 'The name of the database to import updates into'
+    },
+    {
+        'Name' => 'database-username',
+        'Type' => BGPmon::Configure::STRING,
+        'Default' => "bgpmon_db_user", 
+        'Description' => 'The username to provide to the database server'
+    },
+    {
+        'Name' => 'log_file',
+        'Type' => BGPmon::Configure::FILE,
+        'Default' => '../log/database-import.log',
+        'Description' => 'Log file to use'
+    },
+    {
+        'Name' => 'use_syslog',
+        'Type' => BGPmon::Configure::BOOLEAN,
+        'Default' => 0,
+        'Description' => 'Presence indicates use of syslog to log messages'
+    },
+    {
+        'Name' => 'log_level',
+        'Type' => BGPmon::Configure::UNSIGNED_INT,
+        'Default' => 7  #LOG_DEBUG
+    },
+    {
+        'Name' => 'scratch_dir',
+        'Type' => BGPmon::Configure::STRING,
+        'Default' => '/tmp/',
+        'Description' => 'Directory to create a scratch directory in'
+    },
+    {
+        'Name' => 'source',
+        'Type' => BGPmon::Configure::STRING,
+        'Description' => 'Type of source to get data from'
+    },
+    {
+        'Name' => 'URL',
+        'Type' => BGPmon::Configure::STRING,
+        'Description' => 'The URL to fetch data from an online XFB archive'
+    },
+    {
+        'Name' => 'start-time',
+        'Type' => BGPmon::Configure::UNSIGNED_INT,
+        'Description' => 'The starting UNIX timestamp to import archived data from'
+    },
+    {
+        'Name' => 'end-time',
+        'Type' => BGPmon::Configure::UNSIGNED_INT,
+        'Description' => 'The ending UNIX timestamp to import archived data from'
+    },
+    {
+        'Name' => 'server',
+        'Type' => BGPmon::Configure::ADDRESS,
+        'Default' => '127.0.0.1',
+        'Description' => 'The IP address of a running BGPmon instance'
+    },
+    {
+        'Name' => 'port',
+        'Type' => BGPmon::Configure::PORT,
+        'Default' => 50001,
+        'Description' => 'The port to connect to a BGPmon instance on'
+    },
+    {
+        'Name' => 'xfb-file',
+        'Type' => BGPmon::Configure::FILE,
+        'Description' => 'A local filename to read XFB data from'
+    },
+    {
+        'Name' => 'ignore_incomplete_data',
+        'Type' => BGPmon::Configure::BOOLEAN,
+        'Default' => 0,
+        'Description' => 'Flag to ignore incomplete data in files/archives'
+    },
+    {
+        'Name' => 'ignore_data_errors',
+        'Type' => BGPmon::Configure::BOOLEAN,
+        'Default' => 0,
+        'Description' => 'Flag to ignore all data errors in files/archives'
+    }
+);
+
+#If the configuration fails, then print an error message to screen and quit.
+if( configure(@params) ){
+    my $err_code = BGPmon::Configure::get_error_code('configure');
+    my $err_msg = BGPmon::Configure::get_error_msg('configure');
+    print STDERR "Failed to initialize configuration options!\nCode: $err_code\nMessage: $err_msg\n";
+    exit -1;
+}
+
+#Validate the logging parameters
+if( !defined parameter_value('log_level') ||
+    !defined parameter_value('log_file') ||
+    !defined parameter_value('use_syslog') ){
+    print STDERR "ERROR: Logging parameters not set correctly!";
+    exit -1;
+}
+
+#Roll a previous log into an archive file
+if( -e parameter_value('log_file') ){
+    my $log = parameter_value('log_file');
+    my $old_log = "$log.old";
+    `echo ">>>>>>>>>>>>>>>>>>>> LOG ROLLOVER >>>>>>>>>>>>>>>>>>>" >> $log.old`;
+    `cat $log >> $log.old`;
+    `rm -f $log`;
+}
+
+#Now initialize the log
+if( my $ret = BGPmon::Log::log_init( 'prog_name' => $0,
+        'log_level' => parameter_value('log_level'),
+        'use_syslog' => parameter_value('use_syslog'),
+        'log_file' => parameter_value('log_file') ) ){
+    print STDERR 'ERROR: Failed to initialize logging!';
+    exit -1;
+}
+
+#Initialize the scratch directory and data-error flags for Fetch
+BGPmon::Fetch::init_bgpdata('scratch_dir' => parameter_value('scratch_dir'), 
+'ignore_incomplete_data' => parameter_value('ignore_incomplete_data'), 
+'ignore_data_errors' => parameter_value('ignore_data_errors') );
+
+#If both syslog and a file are specified, the log file will be ignored
+if( parameter_value('use_syslog') && defined parameter_value('log_file') ){
+    log_warning('log messages will be written to syslog!');
+}
+
+#Now that logging is initialized, let's log an initial "Hi, I'm up now" msg
+log_info('Data ingestion initialized');
+
+#Now check to make sure that the appropriate args are set depending on source
+if( parameter_value('source') eq 'archive' ){
+    #Make sure the necessary arguments for an archive connection are present
+    if( !defined parameter_value('URL') ||
+        !defined parameter_value('start-time') ||
+        !defined parameter_value('end-time') ){
+        log_err('Archive data source requires a source URL and start/end timestamps!');
+        exit -2;
+    }
+    #If they are, then create a connection and start processing messages
+    else{
+        $ret = start(parameter_value('URL'),parameter_value('start-time'),
+parameter_value('end-time') );
+        $ret = process_data() if !$ret;
+        $ret = inject_updates() if !$ret;
+    }
+}
+elsif( BGPmon::Configure::parameter_value('source') eq 'bgpmon' ){
+    if( !defined parameter_value('server') || !defined parameter_value('port') ){
+        log_err('Live-stream data source requires a server address and port!');
+        exit -2;
+    }
+    else{
+        $ret = start(parameter_value('server'),parameter_value('port') );
+        $ret = process_data() if !$ret;
+        $ret = inject_updates() if !$ret;
+    }
+}
+elsif( BGPmon::Configure::parameter_value('source') eq 'file'){
+    if( !defined parameter_value('xfb-file')){
+        log_err('Local file data requires a filename!');
+        exit -2;
+    }
+    else{
+        $ret = start(parameter_value('xfb-file'));
+        $ret = process_data() if !$ret;
+        $ret = inject_updates() if !$ret;
+    }
+}
+else{
+    log_err('Data source must be one of (archive, bgpmon, file) and proper arguments must be supplied for the appropriate source');
+    exit -1;
+}
+
+#subroutine to call connect_bgpdata with whatever parameters we supplied
+#to the main program
+sub start{
+    my @args = @_;
+    my $code = 0;
+    my $msg = 'NO ERROR. LIFE IS GOOD.';
+
+    $ret = BGPmon::Fetch::connect_bgpdata(@args);
+    if( $ret ){
+        $code = BGPmon::Fetch::get_error_code('connect_bgpdata');
+        $msg = BGPmon::Fetch::get_error_msg('connect_bgpdata');
+        log_err("Failed to connect to data source:\t$code\t$msg");
+        return -3;
+    }
+    log_info('Successfully connected to data source!');
+    return 0;
+}
+
+#subroutine to iterate over whichever data source we provided,
+#extract the necessary data fields, convert them to a bgpdump-esque
+#format, write them to a file, and occasionally inject the file into
+#the database and reset the file
+sub process_data{
+    my $total_msgs = 0;
+
+    while (1){
+	my $peering = {};
+	my $peer = '';
+	my $collector = '';
+	my @timestamp = ();
+	my $new_timestamp = '';
+	my @withdrawn = ();
+	my @nlri = ();
+	my $mp_nlri = {};
+	my $mp_with = {};
+	my @as_path = ();
+	my @asn = ();
+	my $origin = '';
+	my $lasthop = '';
+	my $canonical_collector = '';
+
+        #First, get the next message in the stream and quit if there are no
+        #more messages or if there was an error
+        my $msg = BGPmon::Fetch::read_xml_message();
+        log_info("read message: $msg");
+        my $code = BGPmon::Fetch::get_error_code('read_xml_message');
+
+        return 0 if !defined $msg && !$code;
+        return $code if !defined $msg && $code;
+
+        #Then initialize it through the XFB2PerlHash::Simple interface
+        #This will also catch any non-BGP messages due to the design of Simple
+        if( !BGPmon::Translator::XFB2PerlHash::Simple::init($msg) ){
+            $code = BGPmon::Translator::XFB2PerlHash::Simple::get_error_code('init');
+            log_warn("Failed to initialize message $msg: Error $code");
+            next;
+        }
+
+        #Need peer, collector, prefix, W/A, timestamp, origin, lasthop, AS path
+        $peering = get_peering();
+        next if !keys %$peering;    #Go to next message if no peering info
+
+        #Peering information is returned in a hashref
+        $peer = $peering->{'SRC_ADDR'}->{'ADDRESS'}->{'content'};
+        $collector = $peering->{'DST_ADDR'}->{'ADDRESS'}->{'content'};
+
+        #Timestamp is returned in a UNIX timestamp, but we need to convert
+        #it to a human-readable version to import into Postgres
+        @timestamp = gmtime( get_timestamp() );
+        $new_timestamp = scalar strftime("%Y-%m-%d %H:%M:%S",@timestamp[0],@timestamp[1],@timestamp[2],@timestamp[3],@timestamp[4],@timestamp[5]);
+
+        #Get arrays for any v4 Announce/Withdraw elements
+        @withdrawn = get_withdrawn();
+        @nlri = get_nlri();
+        #Get hashrefs for any MP announce/withdraw attributes
+        $mp_nlri = get_mp_nlri();
+        $mp_with = get_mp_withdrawn();
+
+        #Get the AS Path
+        #Default is to use the AS4 path if present; otherwise use 2-byte AS
+        @as_path = get_as4_path();
+        @as_path = get_as_path() if !scalar(@as_path);
+        #Extract all of the AS numbers from all AS Segments
+        @asn = ();
+
+        foreach $seg (@as_path){
+            my $as_list = $seg->{'AS'};
+            #AS Sets are supposed need to be handled as a unit, so we'll
+            #cheat just a bit, construct a string out of them all, and then
+            #add the string to the final AS path array.
+            if( $seg->{'type'} eq 'AS_SET' ){
+                my @as_set;
+                foreach $as (@$as_list){ push (@as_set, $as->{'content'}); }
+                push (@asn,"(@as_set)");
+            }
+            #Otherwise we had better be looking at an AS sequence, in which
+            #case we just step through and add each one to the array in order.
+            elsif( $seg->{'type'} eq 'AS_SEQUENCE' ){
+                foreach $as (@$as_list){ push (@asn, $as->{'content'}); }
+            }
+            else{
+                log_err('Received AS_SEG with UNKNOWN type!');
+                last;
+            }
+        }
+        
+        #The database expects to have fields for origin and last-hop ASNs.
+        #If the AS path is only one AS long, then lasthop will be null, which
+        #will make the SQL injection fail
+        $origin = $asn[-1];
+        $lasthop = $asn[-2] || "\'\'";
+
+        #Now we need to construct each individual bgpdump-esque entry 
+        #to write to the import file
+        #Open the SQL file if it isn't already
+        log_info('Opening SQL file to write updates') if !defined fileno SQL;
+        open(SQL,">",'up.sql') or die 'Unable to open file to save DB updates' if !defined fileno SQL;
+	#Make the filehandle hot so it writes in order
+	select((select(LOG), $|=1)[0]);
+
+        #Collectors typically have many addresses, so we should look up
+        #their canonical names for import
+        if( defined $aliases{$collector} ){ $canonical_collector = $aliases{"$collector"}; }
+        else{ $canonical_collector = $collector; }
+
+        #First, we write out any MP_UNREACH entries, followed by any normal
+        #WITHDRAWN prefixes.  This way any path changes will be recognized.
+        if( defined $mp_with->{'WITHDRAWN'} ){
+            my $with = $mp_with->{'WITHDRAWN'}->{'PREFIX'};
+            foreach my $pref (@$with){
+                print SQL "$peer|$canonical_collector|".$pref->{'ADDRESS'}->{'content'}."|FALSE|$new_timestamp|||\n";
+                $total_msgs++;
+            }
+        }
+        foreach my $pref (@withdrawn){
+            print SQL "$peer|$canonical_collector|".$pref->{'ADDRESS'}->{'content'}."|FALSE|$new_timestamp|||\n";
+            $total_msgs++;
+        }
+
+        #Now that the withdraws are handled, we can write out any announcements
+        #or path changes.  For consistency, we'll write the MP_REACH entries
+        #first, then any v4 NLRI. Also, I set the array-delimeter character
+        #to a comma so that the AS path prints in a way that postgres will
+        #digest into an ARRAY data type.
+        $" = ',';
+        if( defined $mp_nlri->{'NLRI'} ){
+            my $mp = $mp_nlri->{'NLRI'}->{'PREFIX'};
+            foreach my $pref (@$mp){
+                print SQL "$peer|$canonical_collector|".$pref->{'ADDRESS'}->{'content'}."|TRUE|$new_timestamp|$origin|$lasthop|{@asn}\n";
+                $total_msgs++;
+            }
+        }
+        foreach my $pref (@nlri){
+            print SQL "$peer|$canonical_collector|".$pref->{'ADDRESS'}->{'content'}."|TRUE|$new_timestamp|$origin|$lasthop|{@asn}\n";
+            $total_msgs++;
+        }
+        $" = ' ';
+
+        #Check that we've seen X number of messages so far (set above)
+        if($total_msgs > MAX_UPDATES_PER_INJECT ){
+            close(SQL);
+            return -4 if inject_updates();
+            log_info("Total updates processed: $total_msgs");
+        }   #End of injection
+    }   #End of while(1)
+}   #End of subroutine
+
+sub inject_updates(){
+    #Now inject the updates into the database and apply them to the appropriate tables
+    my $pwd = `pwd`;
+    chomp $pwd;
+    my $db_name = parameter_value('database-name');
+    my $db_login = parameter_value('database-username');
+    my $log = parameter_value('log_file');
+
+    `psql -c "TRUNCATE pph.update_import" -d $db_name -U $db_login`;
+    #This command loads the saved updates into a 'loading table'
+    log_info('COPYing updates into database!');
+    `psql -c "COPY pph.update_import FROM \'$pwd/up.sql\' USING DELIMITERS \'|\' WITH NULL AS \'\';" -d $db_name -U $db_login 2>>$log`;
+    if($?){
+        log_err("COPY failed $?!");
+        return -1;
+    }
+    log_info('COPY complete! Beginning data injection');
+
+    #This command injects the updates into the main DB structure
+    `psql -c "SELECT pph.inject_updates();" -d $db_name -U $db_login 2>>$log`;
+    if($?){
+        log_err("INJECT failed $?!");
+        return -1;
+    }
+    log_info('Injection complete!');
+
+    #Now we can remove the current SQL file and start a new one
+    #next time through the loop
+    `rm -f $pwd/up.sql`;
+    log_info('Reset SQL batch file!');
+
+    return 0;
+}
+
+1;

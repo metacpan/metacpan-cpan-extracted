@@ -1,0 +1,7 @@
+classes:
+  - cli.compression
+parameters:
+  doc:
+    console:
+      pkg:
+        - include console compression tools

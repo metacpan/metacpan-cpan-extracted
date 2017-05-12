@@ -1,0 +1,12 @@
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for Americas
+  pkg:
+    - iceweasel-l10n-es-ar
+    - iceweasel-l10n-es-cl
+    - iceweasel-l10n-es-mx
+    - iceweasel-l10n-pt-br

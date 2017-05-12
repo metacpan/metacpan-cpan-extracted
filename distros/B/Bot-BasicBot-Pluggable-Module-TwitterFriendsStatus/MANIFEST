@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bot-BasicBot-Pluggable-Module-TwitterFriendsStatus.t
+t/pod.t
+lib/Bot/BasicBot/Pluggable/Module/TwitterFriendsStatus.pm
+META.yml                                 Module meta-data (added by MakeMaker)

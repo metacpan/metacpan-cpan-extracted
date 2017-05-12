@@ -1,0 +1,6 @@
+[% USE ANSIColor 'color' %]
+[% "DIPLOMACY FOR $nation" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FOREACH r IN relationships %][% FILTER format('%-16s') %][% IF r.node1 == nation %][% r.node2 %][% ELSE %][% r.node1 %][% END %]:[% END %] [% FILTER format('%-7s') %][% r.colored_status %][% END %]
+[% END %]

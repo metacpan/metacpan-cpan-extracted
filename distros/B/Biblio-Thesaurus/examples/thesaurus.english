@@ -1,0 +1,239 @@
+%baselang EN
+%desc INST   Instance of
+%desc HAS    Has
+%desc BY     Made by
+%desc MAKES  It makes
+
+%ext URL SN
+
+_top_
+NT  urban element
+NT      place
+NT      person
+NT      image
+NT      archive
+NT      music
+NT      associations and institutions
+NT      text
+
+sport and leisure
+NT      orientation
+NT      tracks
+NT      tourism
+
+
+tourism
+NT   fifth and solar ones
+
+archive
+NT encyclopedia,
+NT paginaCooperante, magazine, cultural agenda
+HAS deep
+INST Alfarrábio, Vercial, Geira, Archive of letters of Portuguese music,
+      Cancioneiro, History of Portugal
+
+cultural agenda
+INST    Cultural Braga Agenda
+
+writer
+NT      poet
+
+mathematician
+
+musician
+NT      composer of classic music, musical grouping, composer, singer
+SN      person or set of directamente on people to
+   music
+RT      musical instruments
+MAKES   music
+
+music
+NT      karaoke, score
+NT      musical instruments, destiny, mornas, romances
+NT      music with chords
+NT  etno-musicologia
+UF  song
+
+person
+SN      pg. or set that will count information on one definitive person
+NT      artist, mathematician, personage
+NT      journalist, doctor, industrial, politician, lawyer
+
+artist
+NT      writer, musician, cineasta, sculptor, painter
+
+personage
+SN      historical personage
+NT      monarch, navigator
+
+king
+USE monarch
+
+painter
+SN      he includes artists authors of paintings, drawings, engravings,
+aguarelas
+MAKES   painting, drawing, aguarela
+
+poem
+BY      poet
+
+text
+BY      writer
+NT      legend, conjunct, poem, popular story, biography, monograph, book,
+article
+
+statue
+BY      sculptor
+
+magazine
+UF      periodical
+
+photo
+UF      photograph
+BT      image
+
+image
+NT      drawing, aguarela, photo, painting
+
+languages
+INST    Portuguese, Gallego, Chinese
+NT      grammar
+
+Portuguese
+UF      Portuguese language
+
+software
+SN      programs, script, modules, ...
+NT      script, modulates, CGI
+
+association
+SN      including nuclei, clubs, etc
+UF      group, nucleus
+
+associations and institutions
+NT      association, museum, library, park,
+
+park
+UF      natural park, area-protected
+INST    National park of the Peneda-Gerês, Natural Park of the Alvão
+INST  Protecting Area of the Coast of Esposende
+
+baroque period
+NT      sec. XVIII
+
+science
+NT      mathematics, physicist-chemistry, botany, zoology, ecology,
+astronomy,
+   geology, telecomunicões
+
+astronomy
+
+ecology
+NT      park
+
+literature
+BY      writer
+
+course
+BT      didactics
+
+physicist-chemistry
+
+mathematics
+BY      mathematician
+
+monograph
+SN      text or set of texts concerning a locality
+
+house
+NT coffee
+NT church
+NT convent
+
+coffee
+HAS esplanade
+
+monument
+NT church, paço, convent, ruin
+
+church
+HAS igreja_po, rosette
+
+window
+NT lozenge window
+
+urban element
+NT garden, square, street, monument, detail arq, house
+
+natural/rural element
+NT flower, tree, landscape, mills
+
+detail arq
+NT window, statue, door, varanda, skylight
+
+place
+NT      population, region, city, village, clientele, concelho, district,
+province
+NT  country
+
+city
+INST    Viana of the Castle, Bragança, Port, Braga, Real Village, Miranda of
+the Douro
+INST    Guimarães, Esposende, Póvoa of the Varzim, Keys, Famalicão
+INST    Fafe, Mirandela, Valpaços
+
+village
+INST    Taipas, You put of the Rasp, Bridge of the Bark, Lindoso, Village
+Flower
+INST    Village of the Conde, Monsoon
+
+Minho
+IOF     province
+HAS     Viana of the Castle, Braga, Guimarães, Esposende, Fafe
+HAS     Taipas, You put of the Rasp, Bridge of the Bark, Lindoso
+HAS     It walks, Melgaço, Valença, Famalicão, Monsoon
+
+Trás-os-Montes
+IOF     province
+HAS     Bragança, Real Village, Miranda of the Douro, Keys, Valpaços
+HAS   Village Flower, Mirandela, Mogadouro, Macedo de Cavaleiros, Moncorvo
+
+Coastal Douro
+IOF     province
+HAS     Port
+
+Portugal
+IOF     country
+HAS     Trás-os-Montes, Coastal Douro, Minho
+
+Green Handle
+IOF country
+RT      mornas
+
+etnografia
+NT      agricultural silk, pottery, hemp, incomes, alfaias, etno-musicologia
+
+textile
+NT     hemp, silk, incomes
+
+history
+NT    numismatics, archaeology
+HAS   personage
+
+archaeology
+NT   arqueosítio
+
+guided visit
+SN    Example: virtual strolls, etc
+
+clergyman
+UF priest
+BT  person
+
+
+***********************************************************************************
+WARNING:  All e-mail sent to and from this address will be received or
+otherwise recorded by the A.G. Edwards corporate e-mail system and is
+subject to archival, monitoring or review by, and/or disclosure to,
+someone other than the recipient.
+************************************************************************************

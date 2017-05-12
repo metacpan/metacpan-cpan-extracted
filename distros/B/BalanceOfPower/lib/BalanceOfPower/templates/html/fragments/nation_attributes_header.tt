@@ -1,0 +1,1 @@
+[% FOREACH a IN attributes %]<th>[% a %]</th>[% END %]

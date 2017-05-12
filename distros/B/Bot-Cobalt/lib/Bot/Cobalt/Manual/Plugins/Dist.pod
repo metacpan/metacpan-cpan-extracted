@@ -1,0 +1,115 @@
+=pod
+
+=head1 NAME
+
+Bot::Cobalt::Manual::Plugins::Dist - Packaging Cobalt plugins
+
+=head1 DESCRIPTION
+
+Packaging L<Bot::Cobalt> plugins is just like packaging any other Perl 
+module. 
+
+Typically, the easiest way to do so quickly is via L<Module::Build>. 
+(For more involved distributions you may want to look at 
+L<ExtUtils::MakeMaker>).
+
+(This guide only covers packaging plugins; See 
+L<Bot::Cobalt::Manual::Plugins> for more on writing plugins and 
+L<Bot::Cobalt::Manual::Plugins::Tutorial> for a walk-through.)
+
+=head2 Layout
+
+Create a dist dir for your module:
+
+  $ mkdir Bot-Cobalt-Plugin-MyPlugin
+
+  $ cd Bot-Cobalt-Plugin-MyPlugin
+
+   # create this dist's libdir:
+  $ mkdir -p lib/Bot/Cobalt/Plugin/
+
+  $ cd lib/Bot/Cobalt/Plugin/
+
+   # create your plugin:
+  $ $EDITOR MyPlugin.pm
+
+=head2 Build.PL
+
+L<Module::Build> requires a C<Build.PL> file.
+
+Here's a simple one based around one centralized plugin; your plugin 
+will need to declare a proper $VERSION:
+
+  #!/usr/bin/perl
+  ## Simple example Build.PL
+  my $build = Module::Build->new(
+    module_name   => "Bot::Cobalt::Plugin::User::MyPlugin",
+    dist_abstract => "My Bot::Cobalt plugin",
+    dist_author   => 'Me <myself@example.ext>',
+    license => 'perl',
+    create_makefile_pl => 'small',
+    requires => {
+      'Bot::Cobalt' => 0.01,
+    },
+  );
+  $build->create_build_script;
+
+
+Create a dist tarball:
+  $ ./Build dist
+
+
+Users of your plugin can install the distribution (and dependencies) via 
+C<cpan> by unpacking your plugin dist and specifying the local directory:
+
+  $ cd Bot-Cobalt-Plugin-MyPlugin
+  $ cpan .
+
+...or via Module::Build directly:
+
+  $ perl Build.PL
+
+  $ ./Build
+
+   # may need root access (or perhaps L<local::lib>):
+  $ ./Build install
+
+When your plugin is release-ready, please consider posting it to CPAN.
+
+=head2 Configuration files
+
+L<Bot::Cobalt> comes with the L<cobalt2-plugin-installcf> tool, allowing 
+for easy installation of plugin-specific configuration files to user 
+configuration directories.
+
+In order to provide a configuration file installable via the installcf 
+tool, your plugin needs a Conf.pm module providing a 'conf' class 
+method.
+
+Here's an example demonstrating using the DATA filehandle to provide an 
+example configuration:
+
+  ## In lib/Bot/Cobalt/Plugin/MyPlugin/Conf.pm
+  package Bot::Cobalt::Plugin::MyPlugin::Conf;
+  
+  sub conf { local $/; my $cf = <DATA>; return $cf }
+
+  __DATA__
+  ---
+  ## MyPlugin example configuration.
+  Opts:
+
+    Enable_Snacks:
+      - pie
+      - cake
+
+    Do_Stuff: 1
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut
+

@@ -1,0 +1,60 @@
+======================================================================
+2004-09-02 - ParaTools 1.10 (SellADoor) Released
+======================================================================
+	   - Renamed to Biblio::Citation::Parser
+	   - Forgot to add Citebase.pm (oops!)
+2004-09-01 - ParaTools split into Biblio::CiteParser and Biblio::DocParser
+           - Merged Utils, OpenURL, and Intl
+	   - Switched to Build.PL
+	   - Updated docs to reflect split
+	 
+
+ParaCite Toolkit Changelog
+
+2003-03-07 - Jiao module updated (Phys Rev stuff)
+2003-03-06 - Citebase parser added
+2003-02-01 - Brody docparser added
+2003-01-30 - Fixed $currtemplate vs $original bug in CiteParser::Standard
+2003-01-29 - Now using -raw flag in pdftotext 
+2003-01-28 - Taken out Timer::HiRes for now
+	   - Added AUTHORS file
+
+======================================================================
+2002-12-27 - ParaTools 1 (CellarDoor) Released
+======================================================================
+
+2003-01-27 - Changed $trim to $notrim
+	   - Turned off texinfo for now
+	   - Also require File::Temp
+	   - Lowered version requirement
+	   - Added docs for File::Temp
+	   - Altered notrim docs
+	   - Replaced 'get_references' with 'parse' for consistency.
+	   - Replaced 'get_lines' with 'get_content'.
+	   - 'get_references' now takes a string, 'get_content' returns one.
+	   - Removed line count check from docparse tests
+	   - Added %options to parse methods
+	   - Switched 'parse' and 'new' in the docs
+	   - Fixed the module list and links in INSTALL
+	   - Added the other dependencies to reqsoftware.pod
+2003-01-25 - Added Parser Creation HOW TO
+	   - Increased maxlen from 5 to 6 in DocParser
+	   - Added texinfo docs
+2003-01-24 - Added mv lines to mkdocs to tidy things
+	   - Updated MANIFEST
+	   - Correct pstotext docs
+	   - Converted docs to nice pod
+	   - Now using E<gt> instead of > for compatibility
+           - Lowered publication min length to 4 (5 knocked out 'Mind')
+	   - Added a new template
+           - Documentation, documentation, documentation
+
+2003-01-23 - CVS started.
+
+2003-01-21 - Author regexp improved in CiteParser::Standard
+
+2003-01-20 - Jiao module added to CiteParser
+
+======================================================================
+2002-12-26 - ParaTools 1 Alpha Released
+======================================================================

@@ -1,0 +1,13 @@
+#! /usr/bin/env perl
+use 5.010;
+use strict;
+use warnings FATAL => 'all';
+
+use Bio::SFF::Reader;
+
+my $reader = Bio::SFF::Reader->new(file => $ARGV[0]);
+
+while (my $entry = $reader->next_entry) {
+    say '>', $entry->name;
+    say $entry->bases;
+}

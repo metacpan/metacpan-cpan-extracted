@@ -1,0 +1,8 @@
+[%- SWITCH reason.how -%]
+[%- CASE 'border' -%]border
+[%- CASE 'supporting' -%]support
+[%- CASE 'support' -%]military support from [% reason.who %]
+[%- CASE 'linked' -%]connected nation
+[%- CASE 'control' -%]near connected nation [% reason.who %]
+[%- CASE -%] I don't know
+[%- END -%]

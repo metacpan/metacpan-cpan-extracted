@@ -1,0 +1,19 @@
+Revision history for Bot-Babelfish
+
+0.04    2006.10.15 - SAPER
+        [CODE] Now uses I18N::LangTags::extract_language_tags()
+
+0.03    2006.04.18 - SAPER
+	[CODE] Merged a few fixes locally made on a running bot.
+        [TESTS] Corrected t/01api.t
+
+0.02    2005.03.16 - SAPER
+        [CODE] Switched from WWW::Babelfish to Lingua::Translate. 
+        [CODE] Dropped Cache::File as it doesn't accept wide chars.
+        [CLI] Added 'version' command.
+        [CLI] Added help() function.
+        [DOC] Improved documentation.
+
+0.01    2005.01.17 - SAPER
+        First version, released on an unsuspecting world.
+

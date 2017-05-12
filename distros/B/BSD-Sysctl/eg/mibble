@@ -1,0 +1,95 @@
+#! /usr/bin/perl -w
+
+use strict;
+
+use BSD::Sysctl qw(sysctl sysctl_description sysctl_set);
+use Getopt::Std;
+use IO::Pipe;
+
+use vars '$VERSION';
+$VERSION = '0.1';
+
+getopts( 'CdeosSV', \my %opt );
+
+if ($opt{V}) {
+    print $VERSION, $/;
+    exit;
+}
+
+if ($opt{S}) {
+    # Scan
+    my $s = IO::Pipe->new;
+    $s->reader(qw(/sbin/sysctl -Nao)) or die "Cannot open pipe from sysctl: $!\n";
+    while (<$s> ) {
+        chomp;
+        print "$_: ", pretty(sysctl($_)), "\n";
+    }
+}
+elsif ($opt{s}) {
+    $< and die "Not running as root\n";
+    my $variable = shift or die "No variable name given\n";
+    my $value    = shift or die "No value for $variable given\n";
+
+    my $old = sysctl($variable) or die "Failed to fetch $variable\n";
+    if (sysctl_set($variable, $value)) {
+        print "old value: $old\n";
+        my $new = sysctl($variable);
+        print "new value: $new\n";
+    }
+    else {
+        print "error: \$!=$!\n";
+    }
+}
+else {
+    for my $mib (@ARGV) {
+        if ($opt{o}) { # oid
+            if (my $info = BSD::Sysctl::_mib_info($mib)) {
+                my ($fmtkey, @oid) = unpack( 'i i/i', $info );
+                print "$mib => ", join('.', @oid), " (fmt=$fmtkey)\n";
+            }
+            else {
+                warn "no such mib: $mib\n";
+            }
+        }
+        elsif ($opt{d}) { # description
+            if (my $desc = sysctl_description($mib)) {
+                print "$mib: $desc\n";
+            }
+        }
+        elsif ($opt{e}) { # exists
+            print "$mib ", (
+                BSD::Sysctl::_mib_exists($mib)
+                    ? 'exists'
+                    : 'does not exist'
+                ),
+                $/;
+        }
+        else { # just print
+            if (my $val = sysctl($mib)) {
+                print "$mib: ", pretty($val), "\n";
+            }
+        }
+    }
+}
+
+if ($opt{C}) { # cache dumper
+    for my $k (sort keys %BSD::Sysctl::MIB_CACHE) {
+        print "cache $k => [@{[unpack('i i/i', $BSD::Sysctl::MIB_CACHE{$k})]}]\n";
+    }
+}
+
+sub pretty {
+    my $val = shift;
+    if (ref($val) eq 'HASH') {
+        my $out = "{\n";
+        $out .= "  $_ => $val->{$_}\n" for sort keys %$val;
+        return $out . '}';
+    }
+    elsif (ref($val) eq 'ARRAY') {
+        local $" = ', ';
+        return "[@$val]";
+    }
+    else {
+        return $val;
+    }
+}

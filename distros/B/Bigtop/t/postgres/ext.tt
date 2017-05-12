@@ -1,0 +1,18 @@
+[% BLOCK sql_block %]
+CREATE [% keyword %] [% name %][% child_output %]
+
+[% END %]
+[% BLOCK table_body %]
+ {
+[% FOREACH child_element IN child_output %]
+[% child_element %]
+[% END %]
+}
+[% END %]
+[% BLOCK table_element_block %]
+    [% name %] = [% child_output %];
+[% END %]
+
+[% BLOCK field_statement %]
+    [% keywords.join( ':' ) %]
+[% END %]

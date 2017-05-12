@@ -1,0 +1,40 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::Puppet - Ventriloquy via POE-flavored
+    YAML over TCP
+
+DESCRIPTION
+    Bot::BasicBot::Pluggable::Module::Puppet enables talking in channels as
+    the bot by sending commands to it over a TCP socket.
+
+SYNOPSIS
+    You will need to load the module into your instance:
+
+     $bot->load('Puppet');
+
+    The bot will listen on the address and port specified in the store via
+    the keys "addr" and "port". If not specified, the bind address and port
+    will default to 127.0.0.1 and 28800, respectively.
+
+METHODS
+    init
+        This method is an initialization method called by the constructor
+        inherited from Bot::BasicBot::Pluggable::Module. The plugin object
+        itself is instantiated by the load method in
+        Bot::BasicBot::Pluggable.
+
+        The initialization comprises the entire functionality of this
+        plugin. The real work is done by the POE pieces and the ClientInput
+        callback.
+
+        We instantiate a new POE::Component::Server::TCP object that
+        utilizes a YAML serializer via POE::Filter::Reference. The TCP
+        server expects to receive a hashref that is passed directly to the
+        bot's say method.
+
+BUGS
+    This plugin offers absolutely no access control, so be aware of
+    how/where you deploy it.
+
+AUTHOR
+    Mike Eldridge <diz@cpan.org>
+

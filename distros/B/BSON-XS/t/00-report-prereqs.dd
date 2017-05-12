@@ -1,0 +1,82 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Config::AutoConf' => '0.22',
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Path::Tiny' => '0.052',
+                                        'perl' => '5.008'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'BSON' => '0',
+                                      'BSON::Types' => '0',
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::MakeMaker::Awesome' => '0.35',
+                                      'Dist::Zilla::Plugin::Prereqs' => '0',
+                                      'Dist::Zilla::Plugin::ReleaseStatus::FromVersion' => '0',
+                                      'Dist::Zilla::Plugin::RemovePrereqs' => '0',
+                                      'Dist::Zilla::PluginBundle::DAGOLDEN' => '0.072',
+                                      'English' => '0',
+                                      'File::Spec' => '0',
+                                      'File::Temp' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::License::Apache_2_0' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::LeakTrace' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.96',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1',
+                                      'Tie::IxHash' => '0',
+                                      'blib' => '1.01',
+                                      'inc::MakeMaker' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'BSON' => '1.002001',
+                                      'XSLoader' => '0',
+                                      'boolean' => '0',
+                                      'perl' => '5.008001',
+                                      'strict' => '0',
+                                      'version' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'B' => '0',
+                                   'BSON' => '1.002001',
+                                   'BSON::Types' => '0',
+                                   'Carp' => '0',
+                                   'Data::Dumper' => '0',
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'JSON::MaybeXS' => '0',
+                                   'MIME::Base64' => '0',
+                                   'Math::BigInt' => '0',
+                                   'Path::Tiny' => '0.054',
+                                   'Test::Deep' => '0',
+                                   'Test::More' => '0.96',
+                                   'Tie::IxHash' => '0',
+                                   'base' => '0',
+                                   'constant' => '0',
+                                   'lib' => '0',
+                                   'perl' => '5.008001',
+                                   'utf8' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

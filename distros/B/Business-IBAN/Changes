@@ -1,0 +1,27 @@
+Revision history for Perl extension Business.
+
+0.06 Tue Oct  3 14:16:33 CEST 2006
+- fixed pod errors
+- added example
+
+0.05 Thu Nov  6 19:55:58 CET 2003
+	- *all* characters A-Z must be converted to their ascii-code, not only
+    the ISO-code
+  - added Build.PL for building with Module::Build
+
+0.04 Thu Nov  6 16:52:30 CET 2003
+	- valid() returned true when IBAN contains other than numbers after the
+    ISO-code
+
+0.03  Sat May 18 18:16:49 CET 2002
+	- Outsourcing country-codes -> Locale::Country
+
+0.02  Sun Mar 17 02:32:49 CET 2002
+  - small bugfixes
+  - restrictions documented (BBAN is needed, but not for DE)
+
+0.01  Sat Mar 16 18:40:13 CET 2002
+	- original version; created by h2xs 1.20 with options
+		-XA -n Business
+
+

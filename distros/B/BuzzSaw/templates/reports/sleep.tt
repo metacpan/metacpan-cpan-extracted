@@ -1,0 +1,3 @@
+[% FOREACH e IN events -%]
+[% e.hostname %],[% e.localtime %],[% e.message %]
+[% END -%]

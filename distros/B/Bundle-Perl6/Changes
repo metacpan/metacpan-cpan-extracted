@@ -1,0 +1,49 @@
+Revision history for Perl extension Bundle-Perl6
+
+0.12  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.11  Thu, 29 May 2008 12:00:50 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated t/perlcriticrc
+     - removed Perl6::Bible, superseded by Perl6::Doc
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.10  Fri, 19 Oct 2007 18:44:55 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed copyright to keep Module::Install happy
+
+0.09  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+     - keep Perl::Critic happy
+
+0.08  Sun, 09 Sep 2007 10:35:00 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - brought more or less up-to-date
+
+0.07  Wed, 31 Mar 2004 19:14:33 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added Perl6::Say modules
+
+0.06  Fri, 26 Mar 2004 11:58:39 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - added many Perl6::* modules
+
+0.05  Thu, 02 Aug 2001 12:51:27 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added Want (by Robin Houston)
+
+0.04  Tue, 03 Jul 2001 15:08:34 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added Coro (by Marc Lehmann)
+
+0.03  Tue, 03 Jul 2001 11:34:04 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added Class::Object (by Michael G Schwern)
+     - added Exporter::Simple (by yours truly)
+
+0.02  Sat, 30 Jun 2001 10:18:05 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - added UNIVERSAL::exports (by Michael G Schwern)
+     - added CLASS (by Michael G Schwern)
+
+0.01  Fri, 29 Jun 2001 18:24:29 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

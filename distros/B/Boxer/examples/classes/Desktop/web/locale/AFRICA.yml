@@ -1,0 +1,17 @@
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for Africa
+  pkg:
+    - iceweasel-l10n-ach
+    - iceweasel-l10n-af
+    - iceweasel-l10n-ak
+    - iceweasel-l10n-en-za
+    - iceweasel-l10n-ff
+    - iceweasel-l10n-lg
+    - iceweasel-l10n-nso
+    - iceweasel-l10n-son
+    - iceweasel-l10n-zu

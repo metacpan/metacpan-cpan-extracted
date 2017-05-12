@@ -1,0 +1,145 @@
+NAME
+    Babble - RSS Feed Aggregator and Blog engine
+
+SYNOPSIS
+     use Babble;
+     use Babble::DataSource::RSS;
+
+     my $babble = Babble->new ();
+
+     $babble->add_params (meta_title => "Example Babble");
+     $babble->add_sources (
+            Babble::DataSource::RSS->new (
+                    -id => "Gergely Nagy",
+                    -location => 'http://bonehunter.rulez.org/~algernon/blog/index.xml',
+                    -lwp => {
+                            agent => "Babble/" . $Babble::VERSION . " (Example)"
+                    }
+            )
+     );
+     $babble->collect_feeds ();
+
+     print $babble->output (-theme => "sidebar");
+
+DESCRIPTION
+    "Babble" is a system to collect, process and display RSS feeds. Designed
+    in a straightforward and extensible manner, "Babble" provides near
+    unlimited flexibility. Even though it provides lots of functionality,
+    the basic usage is pretty simple, and only a few lines.
+
+    However, would one want to add new feed item processor functions, that
+    is. also trivial to accomplish.
+
+METHODS
+    "Babble" has a handful of methods, all of them will be enumerated here.
+
+    new (%params)
+        Creates a new Babble object. Arguments to the *new* method are
+        listed below, all of them are optional. All arguments passed to
+        *new* will be stored without parsing, for later use by processors
+        and other extensions.
+
+        -processors
+            An array of subroutines that Babble will run for each and every
+            item it processes. See the PROCESSORS section for more
+            information about these matters.
+
+        -callbacks_collect_start
+            An array of subroutines that Babble will run for each and every
+            datasource when collecting feeds. The routine must take only one
+            argument: a reference to a Babble::DataSource object.
+
+            Calling happens before the collect itself starts.
+
+        -callbacks_collect_end
+            An array of subroutines that Babble will run for each and every
+            datasource when collecting feeds. The routine must take only one
+            argument: a reference to a Babble::DataSource object.
+
+            Calling happens after the collect itself ended.
+
+        -cache
+            A hashref, containing the options to pass down to
+            Babble::Cache->new. See Babble::Cache for details.
+
+        As a side-effect, new() will try to load the cache.
+
+    add_params (%params)
+        Add custom paramaters to the Babble object, which might be usable
+        for the output generation routines.
+
+        See the documentation of the relevant output method for details.
+
+    add_sources (@sources)
+        Adds multiple sources in one go. All elements of *@sources* must be
+        Babble::DataSource objects, or descendants.
+
+    collect_feeds ()
+        Retrieve and process the feeds that were added to the Babble. All
+        processor routines will be run by this very method. Also, if there
+        were any collect callbacks specified when the object was created,
+        they will be run too.
+
+        Please note that this must be called before the *output* method!
+
+    sort ([$params])
+        Sort all the elements in an aggregation by date, and return the
+        sorted array of items. Leaves the work to
+        Babble::Document::Collection->sort().
+
+        Parameters - if any - must be passed as HASH reference!
+
+    all ([$params])
+        Return all items in an aggregation as an array.
+
+        Parameters - if any - must be passed as HASH reference!
+
+    output (%params)
+        Generate the output. This methods recognises two arguments: *-type*,
+        which determines what output method will be used for the actual
+        output itself, and *-theme*, which overrides this, and uses a theme
+        engine instead. (A theme engine is simply a wrapper around a
+        specific output method, with some paramaters pre-filled.)
+
+        The called module needs to be named Babble::Output::$type or
+        Babble::Theme::$theme, and must be a Babble::Output descendant.
+
+    search ($filters)
+        Dispatch everything to Babble::Document::Collection->search().
+
+        See Babble::Document for more information about filters.
+
+    Cache ()
+        Returns the Babble::Cache object stored inside the Babble.
+
+    DESTROY
+        Called when the object gets destroyed. It will try to save the
+        cache.
+
+PROCESSORS
+    Processors are subroutines that take four arguments: An *item*, a
+    *channel*, a *source*, and a "Babble" object (the caller). All of them
+    are references.
+
+    An *item* is a Babble::Document object, *channel* is a
+    Babble::Document::Collection object, and *source* is a
+    Babble::DataSource object.
+
+    Preprocessors operate on *item* in-place, doing whatever they want with
+    it, being it adding new fields, modifying others or anything one might
+    come up with.
+
+    A default set of preprocessors, which are always run first (unless
+    special hackery is in the works), are provided in the Babble::Processors
+    module. Since they are automatically used, one does not need to add them
+    explicitly.
+
+AUTHOR
+    Gergely Nagy, algernon@bonehunter.rulez.org
+
+    Bugs should be reported at <http://bugs.bonehunter.rulez.org/babble>.
+
+SEE ALSO
+    Babble::DataSource, Babble::Document, Babble::Document::Collection,
+    Babble::Output, Babble::Theme, Babble::Processors, Babble::Cache
+

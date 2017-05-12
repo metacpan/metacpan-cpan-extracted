@@ -1,0 +1,6 @@
+If you see 'Hello' in purple and 'World' in red, then it works !
+</p>
+<b><font color="#FF00FF">$(test.Hello)</font></b>,
+<i><font color="#FF0000">$(test.World)</font></i></p>
+
+Enjoy !

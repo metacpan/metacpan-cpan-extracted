@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>StatusContainer tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="spinner"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="./sinon.js"></script>
+    <script src="./uri.js"></script>
+    <script src="../../share/www/static/q.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script src="../../share/www/static/timeline.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var is = strictEqual;
+
+var createStatusHTMLDetail = function(status) {
+    if(!status.busybird) status.busybird = {};
+    if(!status.busybird.level) status.busybird.level = 0;
+    if(!status.user) status.user = {};
+    if(!status.user.screen_name) status.user.screen_name = "";
+    var html = '<li class="bb-status" data-bb-status-level="'+status.busybird.level+'">' + "\n" +
+               '<span class="bb-status-id">'+status.id+"</span>\n";
+    html += '<span class="bb-status-username">' + status.user.screen_name + "</span>\n";
+    html += '<div class="bb-status-extension-container">'
+    if(status.extended_entities) {
+        html += '<div class="bb-status-extension-pane"></div>';
+        html += '<div class="bb-status-extension-handle">';
+        html += '<span class="bb-status-extension-expander">expand</span>';
+        html += '<span class="bb-status-extension-collapser">collapse</span>';
+        html += '</div>';
+    }
+    html += "</div></li>\n";
+    return html;
+};
+
+var createStatusHTML = function(id, level) {
+    return createStatusHTMLDetail({id: id, busybird: {level: level}});
+};
+
+var createStatus = function(id, level) {
+    return $(createStatusHTML(id, level));
+};
+
+var createStatusDOM = function(id, level) {
+    return createStatus(id, level).get(0);
+};
+
+var createStatusDOMDetail = function(status) {
+    return $(createStatusHTMLDetail(status)).get(0);
+};
+
+var setupContainer = function() {
+    $('<ul id="bb-status-container"></ul>').appendTo("#qunit-fixture");
+    return new bb.StatusContainer({selectorContainer: "#bb-status-container", timeline: "test"});
+};
+
+var getStatuses = function() {
+    return $("#bb-status-container").children();
+};
+
+var isVisible = function($elem) {
+    return ($elem.css("display") !== "none");
+};
+
+var getContent = function($statuses) {
+    if(!defined($statuses)) $statuses = getStatuses();
+    return $statuses.map(function() {
+        var $this = $(this);
+        if($this.hasClass("bb-status")) {
+            return isVisible($this) ? $this.find(".bb-status-id").text() : null;
+        }else if($this.hasClass("bb-hidden-statuses-header")) {
+            return {hidden: parseInt($this.find(".bb-hidden-statuses-num").text(), 10)};
+        }else {
+            throw "Unknown DOM element in container";
+        }
+    }).get();
+};
+
+var appendStatusesFromMeta = function(container, status_list) {
+    return container.appendStatuses($.map(status_list, function(elem) {
+        return createStatusDOM(elem.id, elem.level);
+    }));
+};
+
+var FakeStatusServer = function(unacked_num, acked_num) {
+    var self = this;
+    self.status_top = 0;
+    self.status_acked_top = self.status_top + unacked_num;
+    self.status_bottom = self.status_acked_top + acked_num;
+    self.fakeserver = sinon.fakeServer.create();
+    self.fakeserver.respondWith(function(req) { self.respondTo(req) });
+    self.fakeserver.autoRespond = true;
+};
+FakeStatusServer.prototype = {
+    restore: function() { this.fakeserver.restore() },
+    _respondWithStatuses: function(request, start_id, end_id) {
+        var id;
+        var response_string = "";
+        for(id = start_id ; id < end_id ; id++) {
+            response_string += createStatusHTML(id, 0);
+        }
+        request.respond(200, {"Content-Type": "text/html; charset=utf8"}, response_string);
+    },
+    _respondWithNoStatus: function(request) {
+        this._respondWithStatuses(request, 0, 0);
+    },
+    respondTo: function(request) {
+        var self = this;
+        var request_url = URI.parse(request.url);
+        var query = URI.parseQuery(request_url.query || "");
+        var ack_state = defined(query.ack_state) ? query.ack_state : "any";
+        var count = defined(query.count) ? parseInt(query.count, 10) : 20;
+        var max_id = defined(query.max_id) ? parseInt(query.max_id, 10) :
+                     ack_state === "acked" ? self.status_acked_top :
+                                             self.status_top;
+        var boundary = (ack_state === "unacked") ? {begin: self.status_top, end: self.status_acked_top} :
+                       (ack_state === "acked")   ? {begin: self.status_acked_top, end: self.status_bottom} :
+                                                   {begin: self.status_top, end: self.status_bottom};
+        var request_bottom_id = max_id + count;
+        if(max_id < boundary.begin || boundary.end <= max_id) {
+            self._respondWithNoStatus(request);
+            return;
+        }
+        self._respondWithStatuses(request, max_id,
+                                  request_bottom_id <= boundary.end ? request_bottom_id : boundary.end);
+    }
+};
+
+asyncTest("FakeStatusServer", function() {
+    var server = new FakeStatusServer(10, 10);
+    var baseurl = "/timelines/test/statuses.html";
+    bb.ajaxRetry({cache: false, tryMax: 2,url: baseurl+"?ack_state=any&max_id=5&count=100"}).promise.then(function(data) {
+        var $statuses = $(data);
+        is($statuses.filter("li").size(), 15, "any, max_id=5, count=100 OK");
+        return bb.ajaxRetry({cache: false, url: baseurl+"?ack_state=unacked&count=20"}).promise;
+    }).then(function(data) {
+        var $statuses = $(data);
+        is($statuses.filter("li").size(), 10, "unacked, count=20 OK");
+        return bb.ajaxRetry({cache: false, url: baseurl+"?ack_state=acked&count=3&max_id=13"}).promise;
+    }).then(function(data) {
+        is($(data).filter("li").size(), 3, "acked, max_id=13, count=3 OK");
+        return bb.ajaxRetry({cache: false, url: baseurl+"?ack_state=unacked&max_id=14&count=100"}).promise;
+    }).then(function(data) {
+        is($(data).filter("li").size(), 0, "unacked, max_id in acked OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+    }).then(function() {
+        server.restore();
+        start();
+    });
+});
+
+asyncTest("append and prepend", function() {
+    var container = setupContainer();
+    Q.fcall(function() {
+        return container.appendStatuses([createStatusDOM(0)]);
+    }).then(function() {
+        return container.appendStatuses([createStatusDOM(1)]);
+    }).then(function() {
+        return container.prependStatuses([createStatusDOM(2)]);
+    }).then(function() {
+        deepEqual(getContent(), ["2","0","1"], "status IDs OK");
+        return container.appendStatuses([createStatusDOM(3), createStatusDOM(4)]);
+    }).then(function() {
+        deepEqual(getContent(), ["2", "0", "1", "3", "4"], "status IDs OK");
+        return container.prependStatuses([createStatusDOM(5), createStatusDOM(6)]);
+    }).then(function() {
+        deepEqual(getContent(), ["5", "6", "2", "0", "1", "3", "4"], "status IDs OK");
+    }).fail(function(reason) {
+        ok(false, "shold not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        start();
+    });
+});
+
+asyncTest("append and prepend many", function() {
+    var container = setupContainer();
+    var next_id = 0;
+    var createStatuses = function(num) {
+        var doms = [];
+        var i;
+        for(i = 0 ; i < num ; i++, next_id++) {
+            doms.push(createStatusDOM(next_id));
+        }
+        return doms;
+    };
+    var old_block_size = bb.StatusContainer.ADD_STATUSES_BLOCK_SIZE;
+    bb.StatusContainer.ADD_STATUSES_BLOCK_SIZE = 2;
+    Q.fcall(function() {
+        return container.appendStatuses(createStatuses(5));
+    }).then(function() {
+        deepEqual(getContent(), ["0","1","2","3","4"], "initial append OK");
+        return container.prependStatuses(createStatuses(7));
+    }).then(function() {
+        deepEqual(getContent(), ["5", "6", "7", "8", "9", "10", "11", "0","1","2","3","4"], "prepend OK");
+        return container.appendStatuses(createStatuses(5));
+    }).then(function() {
+        deepEqual(getContent(), ["5", "6", "7", "8", "9", "10", "11", "0","1","2","3","4", "12", "13", "14", "15", "16"],
+                  "second append OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        bb.StatusContainer.ADD_STATUSES_BLOCK_SIZE = old_block_size;
+        start();
+    });
+});
+
+asyncTest("setDisplayByThreshold", function() {
+    var con = setupContainer();
+    var status_list = [
+        {id: 0, level: 0},
+        {id: 1, level: 1},
+        {id: 2, level: 2},
+        {id: 3, level: -1},
+        {id: 4, level: 1},
+        {id: 5, level: -1},
+        {id: 6, level: 0},
+        {id: 7, level: 0}
+    ];
+    Q.fcall(function() {
+        return con.setThresholdLevel(-10);
+    }).then(function() {
+        return appendStatusesFromMeta(con, status_list);
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", "3", "4", "5", "6", "7"], "all displayed OK");
+    }).then(function() {
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 0});
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", {hidden: 1}, "4", {hidden: 1}, "6", "7"], "threshold 0 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 1});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 1}, "1", "2", {hidden: 1}, "4", {hidden: 3}], "threshold 1 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 2});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 2}, "2", {hidden: 5}], "threshold 2 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 3});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 8}], "threshold 3 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: -1});
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", "3", "4", "5", "6", "7"], "threshold -1 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses().slice(4,7), threshold: 10});
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", "3", {hidden: 3}, "7"], "partial threshold 10 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses().slice(1,4), threshold: 2});    
+    }).then(function() {
+        deepEqual(getContent(), ["0", {hidden: 1}, "2", {hidden: 1}, {hidden: 3}, "7"], "partial threshold 2 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 2});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 2}, "2", {hidden: 5}], "global threshold reduces successive hidden headers");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 3});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 8}], "threshold 2 -> 3 OK again");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 2});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 2}, "2", {hidden: 5}], "threshold 3 -> 2 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 1});
+    }).then(function() {
+        deepEqual(getContent(), [{hidden: 1}, "1", "2", {hidden: 1}, "4", {hidden: 3}], "threshold 2 -> 1 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: 0});
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", {hidden: 1}, "4", {hidden: 1}, "6", "7"], "threshold 1 -> 0 OK");
+        return bb.StatusContainer.setDisplayByThreshold({$statuses: getStatuses(), threshold: -1});
+    }).then(function() {
+        deepEqual(getContent(), ["0", "1", "2", "3", "4", "5", "6", "7"], "threshold 0 -> -1 OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "failure reason: " + reason);
+    }).then(function() {
+        start();
+    });
+});
+
+asyncTest("set/getThresholdLevel", function() {
+    var con = setupContainer();
+    var status_list = [
+        {id:  0, level: 0},
+        {id:  1, level: 0},
+        {id:  2, level: -1},
+        {id:  3, level: 3},
+        {id:  4, level: 2},
+        {id:  5, level: 0},
+        {id:  6, level: 1},
+        {id:  7, level: 1},
+        {id:  8, level: 3},
+        {id:  9, level: 3},
+        {id: 10, level: 2},
+        {id: 11, level: -1},
+    ];
+    var old_duration = bb.StatusContainer.ANIMATE_STATUS_DURATION;
+    var old_animate_max = bb.StatusContainer.ANIMATE_STATUS_MAX_NUM;
+    bb.StatusContainer.ANIMATE_STATUS_DURATION = 5;
+    bb.StatusContainer.ANIMATE_STATUS_MAX_NUM = 5;
+    Q.fcall(function() {
+        return appendStatusesFromMeta(con, status_list);
+    }).then(function() {
+        is(con.getThresholdLevel(), 0, "threshold level is 0 at first");
+        deepEqual(getContent(), ["0", "1", {hidden: 1}, "3", "4", "5", "6", "7", "8", "9", "10", {hidden: 1}], "threshold 0 display OK");
+        return con.setThresholdLevel(1);
+    }).then(function() {
+        is(con.getThresholdLevel(), 1, "getThresholdLevel 1 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", "4", {hidden: 1}, "6", "7", "8", "9", "10", {hidden: 1}],
+                  "threshold 1 display OK");
+        return con.setThresholdLevel(2);
+    }).then(function() {
+        is(con.getThresholdLevel(), 2, "getThresholdLevel 2 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", "4", {hidden: 3}, "8", "9", "10", {hidden: 1}],
+                  "threshold 2 display OK");
+        return con.setThresholdLevel(3);
+    }).then(function() {
+        is(con.getThresholdLevel(), 3, "getThresholdLevel 3 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", {hidden: 4}, "8", "9", {hidden: 2}],
+                  "threshold 3 display OK");
+        return con.setThresholdLevel(4);
+    }).then(function() {
+        is(con.getThresholdLevel(), 4, "getThresholdLevel 4 OK");
+        deepEqual(getContent(), [{hidden: 12}],
+                  "threshold 4 display OK");
+        return con.setThresholdLevel(10);
+    }).then(function() {
+        is(con.getThresholdLevel(), 10, "getThresholdLevel 10 OK");
+        deepEqual(getContent(), [{hidden: 12}],
+                  "threshold 10 display OK");
+        return con.setThresholdLevel(3);
+    }).then(function() {
+        is(con.getThresholdLevel(), 3, "getThresholdLevel 3 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", {hidden: 4}, "8", "9", {hidden: 2}],
+                  "threshold 10 -> 3 display OK");
+        return con.setThresholdLevel(2);
+    }).then(function() {
+        is(con.getThresholdLevel(), 2, "getThresholdLevel 2 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", "4", {hidden: 3}, "8", "9", "10", {hidden: 1}],
+                  "threshold 3 -> 2 display OK");
+        return con.setThresholdLevel(1);
+    }).then(function() {
+        is(con.getThresholdLevel(), 1, "getThresholdLevel 1 OK");
+        deepEqual(getContent(), [{hidden: 3}, "3", "4", {hidden: 1}, "6", "7", "8", "9", "10", {hidden: 1}],
+                  "threshold 2 -> 1 display OK");
+        return con.setThresholdLevel(0);
+    }).then(function() {
+        is(con.getThresholdLevel(), 0, "getThresholdLevel 0 OK");
+        deepEqual(getContent(), ["0", "1", {hidden: 1}, "3", "4", "5", "6", "7", "8", "9", "10", {hidden: 1}],
+                  "threshold 1 -> 0 display OK");
+        return con.setThresholdLevel(-1);
+    }).then(function() {
+        is(con.getThresholdLevel(), -1, "getThresholdLevel -1 OK");
+        deepEqual(getContent(), ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+                  "threshold 0 -> -1 display OK");
+        return con.setThresholdLevel(-10);
+    }).then(function() {
+        is(con.getThresholdLevel(), -10, "getThresholdLevel -10 OK");
+        deepEqual(getContent(), ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"],
+                  "threshold -1 -> -10 display OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "failure reason: " + reason);
+    }).then(function() {
+        bb.StatusContainer.ANIMATE_STATUS_DURATION = old_duration;
+        bb.StatusContainer.ANIMATE_STATUS_MAX_NUM = old_animate_max;
+        start();
+    });
+});
+
+asyncTest("toggleExtensionPane", function() {
+    var con = setupContainer();
+    var statuses = [
+        {id: 1, extended_entities: {}},
+        {id: 2},
+        {id: 3, extended_entities: {}},
+        {id: 4},
+    ];
+    var getExtensionContainerDOM = function(index) {
+        return $("#bb-status-container li.bb-status").eq(index).find(".bb-status-extension-container").get(0);
+    };
+    var getExtensionStates = function() {
+        var result = [];
+        $("#bb-status-container li.bb-status").each(function() {
+            var state = {};
+            var $status = $(this);
+            $.each(["pane", "expander", "collapser"], function(i, elem_name) {
+                var $elem = $status.find(".bb-status-extension-" + elem_name);
+                if($elem.size() === 1) {
+                    state[elem_name] = ($elem.css("display") !== "none");
+                }
+            });
+            result.push(state);
+        });
+        return result;
+    };
+    var old_duration = bb.StatusContainer.ANIMATE_STATUS_DURATION;
+    var old_animate_max = bb.StatusContainer.ANIMATE_STATUS_MAX_NUM;
+    bb.StatusContainer.ANIMATE_STATUS_DURATION = 5;
+    bb.StatusContainer.ANIMATE_STATUS_MAX_NUM = 5;
+    Q.fcall(function() {
+        return con.appendStatuses($.map(statuses, createStatusDOMDetail));
+    }).then(function() {
+        deepEqual(getExtensionStates(),
+                  [{pane:true, expander:true, collapser:true}, {},
+                   {pane:true, expander:true, collapser:true}, {}],
+                  "initial extension state OK");
+        return con.toggleExtensionPane(getExtensionContainerDOM(0));
+    }).then(function() {
+        deepEqual(getExtensionStates(),
+                  [{pane:false, expander:true, collapser:false}, {},
+                   {pane:true,  expander:true, collapser:true}, {}],
+                  "1st pane collapsed OK");
+        return con.toggleExtensionPane(getExtensionContainerDOM(2));
+    }).then(function() {
+        deepEqual(getExtensionStates(),
+                  [{pane:false, expander:true, collapser:false}, {},
+                   {pane:false, expander:true, collapser:false}, {}],
+                  "2nd pane collapsed OK");
+        return con.toggleExtensionPane(getExtensionContainerDOM(0));
+    }).then(function() {
+        deepEqual(getExtensionStates(),
+                  [{pane:true, expander:false, collapser:true}, {},
+                   {pane:false, expander:true, collapser:false}, {}],
+                  "1st pane expanded OK");
+        return con.toggleExtensionPane(getExtensionContainerDOM(0));
+    }).then(function() {
+        deepEqual(getExtensionStates(),
+                  [{pane:false, expander:true, collapser:false}, {},
+                   {pane:false,  expander:true, collapser:false}, {}],
+                  "1st pane collapsed again OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "failure reason: " + reason);
+    }).then(function() {
+        bb.StatusContainer.ANIMATE_STATUS_DURATION = old_duration;
+        bb.StatusContainer.ANIMATE_STATUS_MAX_NUM = old_animate_max;
+        start();
+    });
+});
+
+asyncTest("loadStatuses", function() {
+    var server = new FakeStatusServer(10, 50);
+    Q.fcall(function() {
+        return bb.StatusContainer.loadStatuses({
+            apiURL: "/timelines/test/statuses.html", ackState: "unacked",
+            countPerPage: 3, maxPageNum: 100
+        });
+    }).then(function(result) {
+        is(result.maxReached, false, "load unacked: maxReached false");
+        is(result.numRequests, 5, "load unacked: 5 requests");
+        deepEqual(getContent($(result.statuses)), ["0","1","2","3","4","5","6","7","8","9"], "statuses OK");
+        return bb.StatusContainer.loadStatuses({
+            apiURL: "/timelines/test/statuses.html", ackState: "unacked",
+            countPerPage: 10, maxPageNum: 100
+        });
+    }).then(function(result) {
+        is(result.maxReached, false, "load unacked: maxReached false");
+        is(result.numRequests, 2, "load unacked: 2 requests needed to determine if all unacked statuses are loaded");
+        deepEqual(getContent($(result.statuses)), ["0","1","2","3","4","5","6","7","8","9"], "statuses OK");
+        return bb.StatusContainer.loadStatuses({
+            apiURL: "/timelines/test/statuses.html", ackState: "unacked",
+            countPerPage: 3, maxPageNum: 2
+        });
+    }).then(function(result) {
+        is(result.maxReached, true, "load unacked: maxReached true");
+        is(result.numRequests, 2, "load unacked: only 2 requests are allowed.");
+        deepEqual(getContent($(result.statuses)), ["0", "1", "2", "3", "4"], "statuses OK");
+        return bb.StatusContainer.loadStatuses({
+            apiURL: "/timelines/test/statuses.html", ackState: "acked",
+            countPerPage: 5, maxPageNum: 1
+        });
+    }).then(function(result) {
+        is(result.maxReached, true, "load acked: maxReached true");
+        is(result.numRequests, 1, "load acked: load 1 page");
+        deepEqual(getContent($(result.statuses)), ["10", "11", "12", "13", "14"], "statuses OK");
+        return bb.StatusContainer.loadStatuses({
+            apiURL: "/timelines/test/statuses.html", ackState: "any",
+            startMaxID: "51", countPerPage: 20, maxPageNum: 1
+        });
+    }).then(function(result) {
+        is(result.maxReached, false, "load acked: max not reached because loaded count is lower than the requested count");
+        is(result.numRequests, 1, "load acked: load 1 page");
+        deepEqual(getContent($(result.statuses)), ["51", "52", "53", "54", "55", "56", "57", "58", "59"], "statuses OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        server.restore();
+        start();
+    });
+});
+
+asyncTest("_ackStatuses", function() {
+    var fakexhr = sinon.useFakeXMLHttpRequest();
+    var query_deferred = Q.defer();
+    var con = setupContainer();
+    var ack_response_promise;
+    fakexhr.onCreate = function(req) {
+        if(!query_deferred.promise.isPending()) {
+            throw "unexpected request";
+        }
+        query_deferred.resolve(req);
+    };
+    var acked_statuses = [];
+    Q.fcall(function() {
+        var i = 0;
+        for(i = 0 ; i < 5 ; i++) {
+            acked_statuses.push(createStatusDOM(i,0));
+        }
+        ack_response_promise = con._ackStatuses(acked_statuses, true);
+        return query_deferred.promise;
+    }).then(function(req) {
+        var request_object = JSON.parse(req.requestBody);
+        deepEqual(request_object, {ids: ["0","1","2","3","4"], max_id: "4"}, "ack request object OK (with max_id)");
+        req.respond(200, {"Content-Type": "application/json"}, JSON.stringify({
+            error: null, count: 5
+        }));
+        return ack_response_promise;
+    }).then(function(response_data) {
+        deepEqual(response_data, {error: null, count: 5}, "ack response object OK");
+        query_deferred = Q.defer();
+        ack_response_promise = con._ackStatuses(acked_statuses, false);
+        return query_deferred.promise;
+    }).then(function(req) {
+        var request_object = JSON.parse(req.requestBody);
+        deepEqual(request_object, {ids: ["0","1","2","3","4"]}, "ack request object OK (without max_id)");
+        req.respond(200, {"Content-Type": "application/json"}, JSON.stringify({
+            error: null, count: 5
+        }));
+        return ack_response_promise;
+    }).then(function(response_data) {
+        deepEqual(response_data, {error: null, count: 5}, "ack response object OK");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        fakexhr.restore();
+        start();
+    });
+});
+
+asyncTest("listenOnThresholdLevelChanged", function() {
+    var con = setupContainer();
+    var event_deferred = Q.defer();
+    con.listenOnThresholdLevelChanged(function(new_threshold) {
+        if(!event_deferred.promise.isPending()) {
+            throw "unexpected event";
+        }
+        event_deferred.resolve(new_threshold);
+    });
+    Q.fcall(function() {
+        con.setThresholdLevel(0);
+        con.setThresholdLevel(1);
+        return event_deferred.promise;
+    }).then(function(new_threshold) {
+        is(new_threshold, 1, "new threshold is 1");
+        event_deferred = Q.defer();
+        con.setThresholdLevel(1);
+        con.setThresholdLevel(1);
+        con.setThresholdLevel(-10);
+        return event_deferred.promise;
+    }).then(function(new_threshold) {
+        is(new_threshold, -10, "new threshold is -10");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        start();
+    });
+});
+
+(function() {
+    var con;
+    var old_animation_duration;
+    var getCursorId = function() {
+        var $cursor_status = $("#bb-status-container").find(".bb-status-cursor");
+        if($cursor_status.size() === 0) return null;
+        return $cursor_status.find(".bb-status-id").text();
+    };
+    var setCursorToIndex = function(index) {
+        var next_cursor = $("#bb-status-container").find(".bb-status").get(index);
+        con.setCursor(next_cursor);
+    };
+    module("move cursor as threshold level changes", {
+        setup: function() {
+            stop();
+            con = setupContainer();
+            old_animation_duration = bb.StatusContainer.ANIMATE_STATUS_DURATION;
+            bb.StatusContainer.ANIMATE_STATUS_DURATION = 10;
+            appendStatusesFromMeta(con, [
+                {id: 0, level: 1},
+                {id: 1, level: 0},
+                {id: 2, level: 2},
+                {id: 3, level: 1},
+                {id: 4, level: 0},
+                {id: 5, level: 0},
+                {id: 6, level: 1},
+                {id: 7, level: 2}
+            ]).then(function() { start() });
+        },
+        teardown: function() {
+            bb.StatusContainer.ANIMATE_STATUS_DURATION = old_animation_duration;
+        },
+    });
+    asyncTest("initially, cursor is at the top", function() {
+        con.setThresholdLevel(0).then(function() {
+            is(getCursorId(), "0", "cursor is at the top");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+    asyncTest("cursor stays when visible", function() {
+        setCursorToIndex(6);
+        con.setThresholdLevel(1).then(function() {
+            is(getCursorId(), "6", "cursor stays at ID = 6");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+    asyncTest("cursor moves when the status gets invisible (upward)", function() {
+        setCursorToIndex(4);
+        con.setThresholdLevel(2).then(function() {
+            is(getCursorId(), "2", "cursor moves ID 4 -> 2");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+    asyncTest("cursor moves when the status gets invisible (downward)", function() {
+        setCursorToIndex(5);
+        con.setThresholdLevel(2).then(function() {
+            is(getCursorId(), "7", "cursor moves ID 5 -> 7");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+    asyncTest("cursor stays when all statuses get invisible", function() {
+        setCursorToIndex(4);
+        con.setThresholdLevel(100).then(function() {
+            is(getCursorId(), "4", "cursor stays at ID = 4");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+    asyncTest("cursor moves downward when top statuses get invisible", function() {
+        setCursorToIndex(0);
+        con.setThresholdLevel(2).then(function() {
+            is(getCursorId(), "2", "cursor moves ID 0 -> 2");
+        }, function() { ok(false, "should not fail") }).then(function() {
+            start();
+        });
+    });
+})();
+
+module("StatusesSummary");
+test("StatusesSummary", function() {
+    var summary;
+    var next_id = 0;
+    var st = function(level, username) {
+        var status_html = createStatusHTMLDetail({
+            id: next_id,
+            busybird: { level: level  },
+            user: { screen_name: username }
+        });
+        next_id++;
+        return $(status_html).get(0);
+    };
+    var getSummary = function(summary_selector) {
+        var result = [];
+        var $level_entries = $(summary_selector).children(".bb-summary-level-entry");
+        $level_entries.each(function() {
+            var $level_entry = $(this);
+            var level_result = {
+                level: $level_entry.find(".bb-summary-level").text(),
+                count_above: $level_entry.find(".bb-summary-count-above-level").text(),
+                count_this:  null,
+                per_user: [],
+            };
+            var $this_level_elem = $level_entry.find(".bb-summary-count-this-level");
+            if($this_level_elem.size() > 0) {
+                level_result.count_this = $this_level_elem.text();
+            }
+            $level_entry.find(".bb-summary-count-per-user-entry").each(function() {
+                var username = $(this).find(".bb-summary-count-username").text();
+                var count = $(this).find(".bb-summary-count-per-user").text();
+                level_result.per_user.push({"name": username, "count": count});
+            });
+            result.push(level_result);
+        });
+        return result;
+    };
+    var statuses = [
+        st(0,  "a"),
+        st(0,  "a"),
+        st(0,  "b"),
+        st(-1, "a"),
+        st(3,  "a"),
+        st(3,  "c"),
+        st(3,  "c"),
+        st(-1, "a"),
+        st(2,  "d")
+    ];
+    is($(statuses).filter(".bb-status").size(), 9, "9 statuses generated");
+    $("#qunit-fixture").append('<div id="bb-status-summary"></div>');
+    summary = new bb.StatusesSummary({selectorContainer: "#bb-status-summary"});
+    summary.showSummaryOf($(statuses));
+    deepEqual(getSummary("#bb-status-summary"), [
+        {level: "3",  count_this: null, count_above: "3", per_user: [{"name": "c", "count": "2"}, {"name": "a", "count": "1"}]},
+        {level: "2",  count_this: "+1", count_above: "4", per_user: [{"name": "d", "count": "1" }]},
+        {level: "0",  count_this: "+3", count_above: "7", per_user: [{"name": "a", "count": "2"}, {"name": "b", "count": "1"}]},
+        {level: "-1", count_this: "+2", count_above: "9", per_user: [{"name": "a", "count": "2" }]},
+    ], "summary OK");
+});
+
+    </script>
+  </body>
+</html>

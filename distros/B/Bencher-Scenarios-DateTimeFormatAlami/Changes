@@ -1,0 +1,24 @@
+Revision history for Bencher-Scenarios-DateTimeFormatAlami
+
+0.004   2016-06-29 (PERLANCAR)
+
+        - Add more datasets.
+
+        - [build] Rebuild to show results split per-dataset.
+
+
+0.003   2016-06-29 (PERLANCAR)
+
+	- Add participant: DateTime::Format::Flexible.
+
+
+0.002   2016-04-07 (PERLANCAR)
+
+	- Add scenario: DateTimeFormatAlami::Parsing.
+
+	- Add ::EN & ::ID to startup bench.
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,14 @@
+Revision history for Baseball::Sabermetrics
+
+0.01    May. 30 2006
+        Welcome to Sabermetrics world.
+
+0.02
+	More built-in formula.
+	Simple error detection.
+	use b1, b2, b3 instead of 1b, 2b, 3b
+
+0.03
+	Fix several bugs for League::CPBL
+	Usability improvement
+	Keep working on ws.pl with Tsao

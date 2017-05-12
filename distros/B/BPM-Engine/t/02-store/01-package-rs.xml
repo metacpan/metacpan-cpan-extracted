@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package>
+    <WorkflowProcesses>
+        <WorkflowProcess Id="OrderPizza" Name="Order Pizza">
+            <Activities>
+                <Activity Id="PlaceOrder" />
+                <Activity Id="WaitForDelivery" />
+                <Activity Id="PayPizzaGuy" />
+            </Activities>
+            <Transitions>
+                <Transition Id="1" From="PlaceOrder" To="WaitForDelivery"/>
+                <Transition Id="2" From="WaitForDelivery" To="PayPizzaGuy"/>
+            </Transitions>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

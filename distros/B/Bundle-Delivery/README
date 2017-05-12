@@ -1,0 +1,27 @@
+Bundle/Delivery version 0.01
+============================
+
+This Bundle will install all the modules needed to run the
+web-publishing, community- management and story-weaving applications
+Delivery and Tapestry, which are available from www.spanner.org/software.
+
+It will install this lot:
+
+  * Apache::Constants
+  * Apache::Request
+  * Apache::Util
+  * Class::DBI::Factory
+  * Date::Calc
+  * Date::Simple
+  * Email::Valid
+  * File::Headerinfo
+  * File::NCopy;
+  * HTML::Entities
+  * HTML::Tagfilter
+  * Imager
+  * Mail::Sendmail
+  * Template
+  * Term::Prompt
+  * Text::CSV
+
+If you have any questions, suggestions or objections, do write to wross@cpan.org.

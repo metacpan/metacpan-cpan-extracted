@@ -1,0 +1,65 @@
+Revision history for Perl extension BSD::Sysctl
+
+0.10 2009-09-25 19:55:25 UTC
+    - Fix coredump bug introduced in 0.09 buffer allocation.
+    - Support for 64-bit values from Emil Mikulic.
+
+0.09 2009-09-14 17:52:15 UTC
+    - Added support for 8.0, better handling of kern.geom.confxml
+      et al., and an example, courtesy of Sergey Skvortsov.
+
+0.08 2007-01-16 21:28:29 UTC
+    - Added an iterator() method to permit iterations through
+      the variable tree.
+    - An iterator may be reset(), its points to something with
+      a name() and a value().
+    - For the sysctl variables that correspond to C structs that we
+      decode, if the OS version does not define a member, then create
+      the hash key anyway, and set it to an empty string. This allows
+      cross-version programs to work with fewer version checks.
+    - Rationalised the example programs.
+    - Added a typemap for Perl 5.6
+
+0.07 2006-10-22 10:17:00 UTC
+    - Didn't realise that there was another test for kern.lastpid
+      in t/01-get.t
+
+0.06 2006-10-10 14:51:55 UTC
+    - Test failure on FreeBSD 4.10: kern.lastpid does not exist,
+      use something else (the module worked, regardless).
+    - Previous release in this Changes file referred to 0.06
+      instead of 0.05.
+
+0.05 2006-10-09 20:59:54 UTC
+    - ia64 support,as seen by looking at:
+      http://portsmon.freebsd.org/portoverview.py?category=sysutils&portname=p5-BSD-Sysctl
+    - sparc support should have come along for free with the
+      patch for amd64.
+
+0.04 2006-10-08 17:39:52 UTC
+    - amd64 support, courtesy of a patch from Douglas Steinwand.
+    - Licensing information clarified in Makefile.PL.
+    - More documentation in Sysctl.pm pod, as well as the README.
+
+0.03 2006-08-31 18:19:42
+    - Object-oriented interface added for getting/setting variables
+      continuously.
+
+0.02 2006-08-31 11:02:43
+    - You can now set the values of variables (assuming they are
+      not read-only).
+    - Fixed up coredumps when sysctl values are zero-length ASCII
+      strings. Removed the %MIB_SKIP hack.
+    - Use a buffer sized for the size of the result, rather than
+      a fixed-length buffer, to retrieve sysctl values that are
+      very large (larger than BUFSIZ). Perhaps still sub-optimal.
+    - Avoided using unnecessary BUFSIZ-sized buffers in a couple
+      of places.
+    - Added a sysctl_description() function to return the
+      OS-defined descriptive name of a sysctl variable.
+    - Now able to retrieve opaque values like kern.geom.confxml.
+    - Use RETVAL directly in _mib_lookup().
+    - Detabbed various files.
+
+0.01 2006-07-23
+    - Initial release.

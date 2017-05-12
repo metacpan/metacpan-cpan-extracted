@@ -1,0 +1,6 @@
+# QIIME
+#OTU ID	Bact.0.2	consensusLineage
+0	2.0	Root; k__Bacteria; p__TM7; c__TM7-3; o__CW040; f__F16
+4	11.0	Root; k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Prevotellaceae
+5	0.0	Root; k__Bacteria; p__Bacteroidetes; c__Bacteroidia; o__Bacteroidales; f__Prevotellaceae
+8	1.0	Root; k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__

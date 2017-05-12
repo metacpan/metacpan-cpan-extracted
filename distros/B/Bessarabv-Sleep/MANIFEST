@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+lib/Bessarabv/Sleep.pm
+t/00-load.t
+t/release-cpan-changes.t
+xt/whitespaces.t

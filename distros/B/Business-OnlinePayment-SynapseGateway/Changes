@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::OnlinePayment::SynapseGateway.
+
+0.01  Tue Jul 20 10:26:44 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Business::OnlinePayment::SynapseGateway
+

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/BIND/SDB/LDAP/Helper.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+bin/pldm-radd
+bin/pldm-rget
+bin/pldm-rls
+bin/pldm-rmod
+bin/pldm-rrm
+bin/pldm-zadd
+bin/pldm-zls
+bin/pldm-zrm

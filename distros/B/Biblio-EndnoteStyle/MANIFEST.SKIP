@@ -1,0 +1,8 @@
+# $Id: MANIFEST.SKIP,v 1.3 2007/01/23 09:36:10 mike Exp $
+
+.cvsignore
+CVS
+archive
+lib/Biblio/CVS
+lib/CVS
+t/CVS

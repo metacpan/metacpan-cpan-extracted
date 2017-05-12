@@ -1,0 +1,11 @@
+Build.PL
+lib/Bio/DB/USeq.pm
+MANIFEST			This list of files
+README
+CHANGES
+t/BioDBUseq.t
+t/data/sample1.useq
+t/data/sample2.useq
+META.yml
+META.json
+scripts/USeqInfo.pl

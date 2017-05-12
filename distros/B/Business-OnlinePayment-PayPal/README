@@ -1,0 +1,31 @@
+Business-OnlinePayment-PayPal
+==========================================
+
+The Business::OnlinePayment::PayPal module is a backend/plugin module
+for using PayPal as a payment processor with Business::OnlinePayment
+API.
+
+This software is available at:
+  http://sourceforge.net/projects/bop-paypal
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Business::OnlinePayment, Business::PayPal::API
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Phil Lobbes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

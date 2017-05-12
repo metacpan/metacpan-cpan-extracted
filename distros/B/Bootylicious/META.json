@@ -1,0 +1,54 @@
+{
+   "abstract" : "Blog software",
+   "author" : [
+      "Viacheslav Tykhanovskyi <vti@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bootylicious",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Basename" : "0",
+            "File::stat" : "0",
+            "FindBin" : "0",
+            "MojoX::Validator" : "0.0016",
+            "Mojolicious" : "7.15",
+            "Time::Local" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/vti/bootylicious/tree/master"
+      }
+   },
+   "version" : "1.14"
+}

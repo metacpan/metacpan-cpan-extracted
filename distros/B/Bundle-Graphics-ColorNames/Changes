@@ -1,0 +1,19 @@
+Revision history for Perl extension Bundle::Graphics::ColorNames.
+
+1.04  Mon Dec 17 2007
+	- added EmergyC and Crayola palettes
+
+1.03  Mon Apr  4 2005
+	- added pod.t test
+	- explicitly added X, HTML, Netscape and Windows palettes
+	- added IE, SVG, and WWW palettes
+
+1.01  Thu Aug 26 2004
+	- added Graphics::ColorNames::GrayScale palette
+	- minor reorganization of POD
+	- fixed typo in POD
+
+1.00  Fri Aug 20 19:10:21 2004
+	- original version; created by h2xs 1.23 with options
+		-v 1.00 -n Bundle::Graphics::ColorNames -X
+

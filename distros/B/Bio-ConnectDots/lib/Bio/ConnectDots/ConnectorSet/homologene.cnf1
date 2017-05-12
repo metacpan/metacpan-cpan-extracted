@@ -1,0 +1,15 @@
+#cnf file for homologene, make sure put dotset ID in label
+name=homologene
+module=homologene
+
+
+dotset=Mouse_Locuslink=>Gene_ID
+dotset=Bakeryeast_Locuslink=>Gene_ID
+dotset=Yeast_Locuslink=>Gene_ID
+dotset=Mosquito_Locuslink=>Gene_ID
+dotset=Celegant_Locuslink=>Gene_ID
+dotset=Human_Locuslink=>Gene_ID
+dotset=Rat_Locuslink=>Gene_ID
+dotset=MalaraParasite_Locuslink=>Gene_ID
+dotset=Fruitfly=>Gene_ID
+dotset=Arabidopsis_thaliana_Locuslink=>Gene_ID

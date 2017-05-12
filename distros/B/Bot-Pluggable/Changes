@@ -1,0 +1,5 @@
+Changes for Bot::Pluggable
+
+0.03
+    - Support any event via the add_event() method
+

@@ -1,0 +1,20 @@
+# NAME
+
+Bot::Pastebot - the original clipboard to chat gateway
+
+# VERSION
+
+version 0.600
+
+# SYNOPSIS
+
+pastebot -f configfile
+
+# DESCRIPTION
+
+See [pastebot](https://metacpan.org/pod/pastebot) for the full documentation, including syntax and
+options for pastebot's configuration files.
+
+Pastebot's documentation may be read by running `perldoc pastebot`.
+
+This Bot::Pastebot module is a placeholder for CPAN.

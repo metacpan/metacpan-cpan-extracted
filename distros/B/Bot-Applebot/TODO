@@ -1,0 +1,5 @@
+* Upon some condition, let the judge draw two adjective cards. Players may
+  select which adjective to use, for better matches.
+* Fix bug where players can't select !notice until they've gotten their cards.
+* Keep track of which players have used !notice in some kind of database.
+

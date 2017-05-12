@@ -1,0 +1,29 @@
+SYNOPSIS
+
+     use Business::ID::Mandiri::Account qw(parse_mandiri_account);
+     my $res = parse_mandiri_account(account => '1200007799880');
+
+DESCRIPTION
+
+    This module parses/validates Bank Mandiri account number. Mandiri is
+    one of the major banks in Indonesia.
+
+    It also contains a routine to list known Mandiri branches (4-digit
+    code, which is not included in account numbers). Data is retrieved from
+    the Gudang Data project (http://github.com/sharyanto/gudangdata ).
+
+    Indonesian keywords: struktur nomor rekening Bank Mandiri, format
+    rekening Mandiri, daftar kode cabang Bank Mandiri
+
+BUGS/NOTES
+
+    List of valid 3-digit branch codes is not yet available/checked.
+
+    Bank Syariah Mandiri (BSM) has a different numbering scheme (10
+    digits).
+
+    Accounts with codes starting with 900 are created using RAOS (remote
+    account operating system), so the actual branch is not immediately
+    evident. You'll need to ask Mandiri for this. (Ref:
+    http://www.kaskus.co.id/thread/51bf2bb48027cf1d34000000/cara-cek-lokasi-rekening-bank-mandiri)
+

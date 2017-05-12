@@ -1,0 +1,12 @@
+<h3>CRISES</h3>
+<p>
+[% i = 0 %]
+[% FOREACH c IN crises %]
+[% IF wars.$i == 1 %]
+[% INCLUDE fragments/crisis.tt %]
+[% ELSE %]
+[% INCLUDE fragments/crisis.tt %]
+[% END %][% i = i + 1 %]
+<br />
+[% END %]
+</p>

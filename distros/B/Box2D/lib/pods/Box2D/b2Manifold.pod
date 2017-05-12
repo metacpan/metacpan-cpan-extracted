@@ -1,0 +1,131 @@
+
+=head1 NAME
+
+Box2D::b2Manifold - Manifold for two touching convex shapes.
+
+=head1 SYNOPSIS
+
+  my $manifold = $contact->GetManifold();
+  my $normal = $manifold->localNormal();
+  my $point = $manifold->localPoint();
+
+=head1 DESCRIPTION
+
+A manifold for two touching convex shapes.
+
+C<Box2D> supports multiple types of contact:
+
+=over 4
+
+=item * clip point versus plane with radius
+
+=item * point versus point with radius (circles)
+
+=back
+
+The local point usage depends on the manifold type:
+
+=over 4
+
+=item * C<e_circles>: the local center of circleA
+
+=item * C<e_faceA>: the center of faceA
+
+=item * C<e_faceB>: the center of faceB
+
+=back
+
+Similarly the local normal usage:
+
+=over 4
+
+=item * C<e_circles>: not used
+
+=item * C<e_faceA>: the normal on polygonA
+
+=item * C<e_faceB>: the normal on polygonB
+
+=back
+
+We store contacts in this way so that position correction can account
+for movement, which is critical for continuous physics. All contact
+scenarios must be expressed in one of these types. This structure is
+stored across time steps, so we keep it small.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+=head2 localNormal()
+
+=head2 localNormal( $localNormal )
+
+not use for Type::e_points
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localNormal> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localPoint()
+
+=head2 localPoint( $localPoint )
+
+usage depends on manifold type
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localPoint> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 pointCount()
+
+=head2 pointCount( $pointCount )
+
+the number of manifold points
+
+Parameters:
+
+=over 4
+
+=item * C<int32> C<$pointCount> (optional)
+
+=back
+
+Returns a C<int32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Contact>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

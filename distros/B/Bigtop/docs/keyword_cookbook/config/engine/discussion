@@ -1,0 +1,14 @@
+=head1 USE
+
+The bigtop config block keyword C<engine> specifies the Gantry engine
+which will serve the app.  But, note that stand alone server scripts
+and CGI scripts ignore the value of this statement, since they must
+use CGI.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<MP20> in docs/httpd.conf.

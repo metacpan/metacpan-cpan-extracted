@@ -1,0 +1,6 @@
+Revision history for Perl extension Befunge::Interpreter.
+
+0.01 April 6, 2000
+
+First version, appears to be bug free and compiliant with befunge-93 spec.
+

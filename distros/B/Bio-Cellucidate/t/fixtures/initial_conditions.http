@@ -1,0 +1,66 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Thu, 11 Feb 2010 19:40:25 GMT
+Content-Type: application/xml; charset=utf-8
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<initial-conditions type="array">
+  <initial-condition>
+    <id type="integer">15</id>
+    <number type="integer">10</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">16</id>
+    <number type="integer">100</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">17</id>
+    <number type="integer">50</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">18</id>
+    <number type="integer">50</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">19</id>
+    <number type="integer">50</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">20</id>
+    <number type="integer">100</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">21</id>
+    <number type="integer">200</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">22</id>
+    <number type="integer">100</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">23</id>
+    <number type="integer">100</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">24</id>
+    <number type="integer">200</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">25</id>
+    <number type="integer">40</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">26</id>
+    <number type="integer">200</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">27</id>
+    <number type="integer">80</number>
+  </initial-condition>
+  <initial-condition>
+    <id type="integer">28</id>
+    <number type="integer">1</number>
+  </initial-condition>
+</initial-conditions>
+

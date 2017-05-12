@@ -1,0 +1,62 @@
+package Bio::Chado::Schema::Result::NaturalDiversity;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::NaturalDiversity - Natural diversity module for dealing with populations, samples, genotypes,
+phenotypes and results of other assays.
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado NaturalDiversity module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperiment>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentContact>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentDbxref>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentGenotype>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentPhenotype>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentProject>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentProtocol>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentPub>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentStock>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentStockDbxref>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentStockprop>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdExperimentprop>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdGeolocation>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdGeolocationprop>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdProtocol>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdProtocolReagent>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdProtocolprop>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdReagent>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdReagentRelationship>
+
+L<Bio::Chado::Schema::Result::NaturalDiversity::NdReagentprop>
+
+=cut
+
+1;

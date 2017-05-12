@@ -1,0 +1,19 @@
+Revision history for BioX-Workflow-Plugin-FileExists
+
+0.13  2016-06-08 12:29:14 GST
+    - Fixed error with ""
+
+0.12  2016-06-08 11:43:04 GST
+    - Fixed error with {} for template toolkit
+
+0.11  2016-06-07 12:36:59 GST
+    - Fixing Version Number mismatch
+
+0.10  2016-06-07 12:29:29 GST
+    - New tag
+
+0.02  2016-06-07 12:18:48 GST
+    - Added a fix for touching files
+
+0.01  2016-06-06 16:07:43 GST
+        - Initial release

@@ -1,0 +1,26 @@
+---
+abstract: "Extends Bio::NEXUS with parsers for file formats of\npopular phylogeny programs"
+author:
+  - 'LIMAONE <limaone@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-NEXUS-Import
+provides:
+  Bio::NEXUS::Import:
+    file: lib/Bio/NEXUS/Import.pm
+    version: v0.2.0
+requires:
+  Bio::NEXUS: 0.67
+  perl: v5.6.1
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/lima1/p5-bio-nexus-import
+version: v0.2.0

@@ -1,0 +1,20 @@
+{{$NEXT}}
+  - Fix travis-ci runtime requirement
+
+0.0.6 Sun Nov 27 16:19:44 2016
+  - Exclude author targets from default Makefile
+
+0.0.5 Tue Nov 15 21:21:04 2016
+  - Add minimum versions for test modules
+
+0.0.4 Sun Nov 6 2016
+  - Fix manifest skip file
+
+0.0.3 Sun Nov 6 2016
+  - Fix imports of optional test modules (#1)
+
+0.0.2 Sat Nov 5 2016
+  - Fixup dist meta data
+
+0.0.1 Sat Oct 29 2016
+  - Initial release

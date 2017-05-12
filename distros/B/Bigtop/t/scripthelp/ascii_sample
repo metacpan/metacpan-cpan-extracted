@@ -1,0 +1,2 @@
+job(ident,descr)<->skill pos->job
+res(id:integer:pk:auto,name=Phil,+body:text)->pos

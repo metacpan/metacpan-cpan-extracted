@@ -1,0 +1,30 @@
+---
+abstract: 'Codon Usage Analyzer.'
+author:
+  - 'Zhenguo Zhang <zhangz.sci@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-CUA
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  File::Sort: '1.01'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  parent: '0'
+  perl: '5.006'
+resources:
+  homepage: http://molevol.altervista.org/
+version: '1.04'

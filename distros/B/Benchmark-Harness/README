@@ -1,0 +1,17 @@
+
+Benchmark::Harness - a simple way to trace Perl program execution, without changing the script.
+
+
+CONTENTS:
+
+Harness.pm      - base class and driver of Benchmark::Harness
+MemoryUsage.pm  - traces memory consumption of subroutine parameters and returned variables
+Trace.pm        - simple trace of subroutine calls
+xsd/BenchmarkHarnessMemoryUsage.xsd - XML Schema of report from MemoryUsage.pm
+xsd/BenchmarkHarnessTrace.xsd       - XML Schema of report from Trace.pm
+
+Installs the normal Perl way:
+
+    perl Makefile.PL
+    make test
+    make install

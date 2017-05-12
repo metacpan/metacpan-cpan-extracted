@@ -1,0 +1,26 @@
+---
+abstract: 'extended Bot::BasicBot::Pluggable for IKC'
+author:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-IKCBot-Pluggable
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+requires:
+  Bot::BasicBot::Pluggable: 0
+  POE: 0
+  POE::Component::IKC::Server: 0
+  POE::Session: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

@@ -1,0 +1,30 @@
+{
+   "charttitle" : "01overview.opmix2(F)",
+   "modulename" : "Benchmark::Perl::Formance::Plugin::PerlStone2015::01overview",
+   "chartlines" : [
+       {
+           "title" : "01overview.opmix2(F)/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.01overview.opmix2(F)" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "01overview.opmix2(F)/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=",   "NAME", "perlformance.perl5.PerlStone2015.01overview.opmix2(F)" ],
+                   [  "=",   "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

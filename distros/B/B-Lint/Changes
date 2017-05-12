@@ -1,0 +1,48 @@
+Revision history for B-Lint
+
+1.20    2014-10-26
+      - install to archlib, as was done in 1.17 and previous, to avoid being
+        skipped over because of and older install appearing first in @INC
+
+1.19    2014-10-23
+        another fix for blead, now to support METHOP
+
+1.18    2014-09-29
+        apply fix for perl v5.21.4
+
+1.17    2013-0126
+        make the use of "deprecate" conditional
+
+1.16    2013-01-23
+        install to sitelib, not corelib on 5.12.0 and later
+
+1.15    2013-01-23
+        Merge changes from perl core:
+        - Stop the indexer from processing private modules
+
+        Add warning that B::Lint will be removed from core, if used from core
+
+1.13    2011-07-09
+        Merge changes from perl core:
+         - Fix typos
+
+1.12    2010-07-10
+        Require Perl 5.6.0 or later (Closes RT#52492)
+
+        Fix spelling error in a warning (Closes RT#56089)
+
+        Merge changes from perl core:
+         - Fix a pod error
+         - Adjust to new core module layout
+         - Enable strictures and warnings for tests
+         - Improve diagnostic for test failures
+         - Add a VERSION to B::Lint::Debug
+
+1.11    2007-10-08
+        Giving credit is important.
+
+1.10    2007-10-08
+        Installs over core B::Lint.
+
+1.09    2007-02-07
+        First version that's separate from bleadperl

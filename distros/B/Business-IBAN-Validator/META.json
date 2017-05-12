@@ -1,0 +1,42 @@
+{
+   "abstract" : "A validator for the structure of IBANs.",
+   "author" : [
+      "Abe Timmerman <abeltje@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-IBAN-Validator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.56"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Util" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}

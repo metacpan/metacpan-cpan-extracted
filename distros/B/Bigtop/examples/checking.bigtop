@@ -1,0 +1,184 @@
+config {
+    engine          CGI;
+    template_engine TT;
+    Init            Std             {}
+    CGI             Gantry          { gen_root 1; with_server 1; flex_db 1; }
+    SQL             SQLite          {}
+    Control         Gantry          { dbix 1; }
+    Model           GantryDBIxClass {}
+    SiteLook        GantryDefault   {}
+}
+app Checkbook {
+    config {
+        dbconn           `dbi:Pg:dbname=checking`  => no_accessor;
+        template_wrapper `genwrapper.tt`           => no_accessor;
+    }
+    table payeepayor {
+        foreign_display `%name`;
+        field id    { is int4, primary_key, auto; }
+        field name  {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field descr {
+            is             varchar;
+            label          Description;
+            html_form_type textarea;
+            html_form_rows 5;
+            html_form_cols 45;
+        }
+    }
+    table category {
+        foreign_display `%type: %subtype`;
+        field id    { is int4, primary_key, auto; }
+        field type  {
+            is                     varchar;
+            label                  Name;
+            html_form_type         text;
+        }
+        field subtype  {
+            is                     varchar;
+            label                  Name;
+            html_form_type         text;
+            html_form_optional     1;
+        }
+    }
+    table status {
+        foreign_display `%descr`;
+
+        field id { is int4, primary_key, auto; }
+        field descr {
+            is             varchar;
+            label          Description;
+            html_form_type text;
+        }
+        data descr => Outstanding;
+        data descr => Cleared;
+        data descr => Reconciled;
+    }
+    table trans {
+        field id { is int4, primary_key, auto; }
+        field status {
+            is                     varchar;
+            label                  Status;
+            refers_to              status;
+            html_form_type         select;
+        }
+        field trans_date {
+            is                     date;
+            label                  `Trans Date`;
+            html_form_type         text;
+            html_form_display_size 10;
+            date_select_text       Select;
+        }
+        field amount {
+            is                     int4;
+            label                  Amount;
+            html_form_type         text;
+            html_form_display_size 10;
+        }
+        field payee_payor {
+            is                     int4;
+            refers_to              payeepayor;
+            label                  `Paid To/Rec'v'd From`;
+            html_form_type         select;
+        }
+        field category {
+            is                     int4;
+            refers_to              category;
+            label                  Category;
+            html_form_type         select;
+        }
+        field descr {
+            is                     varchar;
+            label                  Descr;
+            html_form_type         textarea;
+            html_form_rows         3;
+            html_form_cols         60;
+            html_form_optional     1;
+        }
+    }
+    controller PayeePayor is AutoCRUD {
+        controls_table    payeepayor;
+        text_description `Payee/Payor`;
+        rel_location      payeeor;
+        page_link_label  `Payee/Payor`;
+
+        method do_main is main_listing {
+            title          `Payees/Payors`;
+            cols           name;
+            header_options Add;
+            row_options    Edit, Delete;
+        }
+
+        method form is AutoCRUD_form {
+            form_name      payeeor;
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller Category is AutoCRUD {
+        controls_table    category;
+        text_description `Category`;
+        rel_location      category;
+        page_link_label   Category;
+
+        method do_main is main_listing {
+            title          Category;
+            cols           type, subtype;
+            header_options Add;
+            row_options    Edit, Delete;
+        }
+
+        method form is AutoCRUD_form {
+            form_name      category;
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller Status is AutoCRUD {
+        controls_table    status;
+        text_description `Status`;
+        rel_location      status;
+        page_link_label   Status;
+
+        method do_main is main_listing {
+            title          Status;
+            cols           descr;
+            header_options Add;
+            row_options    Edit, Delete;
+        }
+
+        method form is AutoCRUD_form {
+            form_name      category;
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller Trans is AutoCRUD {
+        uses              Gantry::Plugins::Calendar;
+        controls_table    trans;
+        text_description  Transaction;
+        rel_location      trans;
+        page_link_label   Trans;
+
+        method do_main is main_listing {
+            title          `Transaction`;
+            cols           status, trans_date, amount, payee_payor, category;
+            header_options Add;
+            row_options    Edit, Delete;
+        }
+
+        method form is AutoCRUD_form {
+            form_name      trans;
+            all_fields_but id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                javascript => `$self->calendar_month_js( 'trans' )`;
+        }
+    }
+}

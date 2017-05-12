@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Notification tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="mb"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="sinon.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="../../share/www/static/q.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var is = strictEqual;
+
+var conditionModule = function(param) {
+    var skip_func = param.skip_if;
+    var body = param.body;
+    var old_test = test;
+    var old_asyncTest = asyncTest;
+    var is_skipped = skip_func();
+    if(is_skipped) {
+        asyncTest = test = function(name) {
+            old_test(name + " [SKIPPED]", function() { ok(true, "This test is skipped") });
+        };
+    }
+    module.apply(this, param.module);
+    try {
+        body();
+    } finally {
+        if(is_skipped) {
+            test = old_test;
+            asyncTest = old_asyncTest;
+        }
+    }
+};
+
+var notification;
+var setup = function() {
+    document.title = "Notification tests";
+    notification = new bb.Notification();
+};
+var teardown = function() {
+    notification = null;
+};
+
+module("setTitleNotification()", {
+    setup: setup, teardown: teardown
+});
+
+test("set empty", function() {
+    notification.setTitleNotification("");
+    is(document.title, "Notification tests");
+});
+
+test("set with no arg", function() {
+    notification.setTitleNotification();
+    is(document.title, "Notification tests");
+});
+
+test("set several times", function() {
+    notification.setTitleNotification("(10)");
+    is(document.title, "(10) Notification tests");
+    notification.setTitleNotification();
+    is(document.title, "Notification tests");
+    notification.setTitleNotification("HOGE -");
+    is(document.title, "HOGE - Notification tests");
+});
+
+conditionModule({
+    module: ["Web Notification", { setup: setup, teardown: teardown }],
+    skip_if: function() {
+        return navigator.userAgent.match(/chrom/i);
+    },
+    body: function() {
+        asyncTest("Web Notification clicked", function() {
+            notification.initWebNotification().then(function() {
+                var defer_click = Q.defer();
+                var bomb = setTimeout(function() { defer_click.reject("you are too slow"); }, 5000);
+                notification.showWebNotification({message: "THIS MESSAGE IS OK! CLICK ME!", onClick: function(message) {
+                    defer_click.resolve(message);
+                    clearTimeout(bomb);
+                }});
+                return defer_click.promise;
+            }).then(function(message) {
+                is(message, "THIS MESSAGE IS OK! CLICK ME!", "notification is clicked.");
+            }).fail(function(error) {
+                ok(false, "error: " + error);
+            }).fin(function() {
+                start();
+            });
+        });
+
+        asyncTest("calling showWebNotification() without init is OK", function() {
+            notification.showWebNotification({message: "THIS SHOULD NOT BE APPEARED.", onClick: function() {
+                ok(false, "onClick should not be executed.");
+            }});
+            setTimeout(function() {
+                ok(true, "ok");
+                start();
+            }, 300);
+        });
+    }
+});
+
+
+module("Favicon", {teardown: teardown, setup: function() {
+    document.title = "Notification tests";
+    notification = new bb.Notification({scriptName: "/foo/bar"});
+}});
+
+test("setFaviconAlert()", function() {
+    notification.setFaviconAlert(true);
+    is($("link[rel='shortcut icon']").attr("href"), "/foo/bar/static/favicon_alert.ico");
+    notification.setFaviconAlert(false);
+    is($("link[rel='shortcut icon']").attr("href"), "/foo/bar/static/favicon_normal.ico");
+});
+
+
+    </script>
+  </body>
+</html>

@@ -1,0 +1,99 @@
+=head1 NAME
+
+Bigtop::Docs::TOC - Table of Contents for Bigtop::Docs::* documentation modules
+
+=head1 What Should I Read?
+
+This document is a brief annotated list of each Bigtop::Docs::* module.
+
+Here are the highlights:
+
+    Very lazy people should start with Bigtop::Docs::QuickStart
+    Merely lazy people should start with Bigtop::Docs::TentTut
+    Those allergic to web apps should start with Bigtop::Docs::Tutorial
+    Pedants should look in Bigtop::Docs::Syntax instead
+    Bigtop developers should carefully read Bigtop::Docs::Modules
+
+=over 4
+
+=item C<Bigtop::Docs::About>
+
+Describes the features and motivations of Bigtop.
+
+=item C<Bigtop::Docs::AutoBackends>
+
+Documentation on each available backend and how to configure it.  This
+one is auto-generated, and is therefore more likely to be up to date.
+
+=item C<Bigtop::Docs::Cookbook>
+
+Modeled after the Perl Cookbook, this provides a list of things you might
+want to do, the syntax needed to make Bigtop do them for you, and the
+output produced by them.  It focuses on hand written bigtop files, rather
+than on tentmaker.
+
+=item C<Bigtop::Docs::FullKeywords>
+
+Documents all the valid keywords Bigtop understands by the block in
+which they appear.  This one is auto-generated and shows exactly the
+same information as tentmaker.
+
+=item C<Bigtop::Docs::Modules>
+
+Documents many of the modules in the bigtop distribution including at least:
+Bigtop.pm and Bigtop::Parser.  This includes a description of the grammar
+of the Bigtop language and how to work with it.  (Note that the grammar
+is now in its own file called bigtop.grammar, but this has no effect on
+the docs in Bigtop::Docs::Modules.  It may be out of date, but the extraction
+of the grammar is not the reason.)
+
+=item C<Bigtop::Docs::QuickKeywords>
+
+Abbreviated version of L<Bigtop::Docs::FullKeywords>.  Reduces most
+descriptions to one line.
+
+=item C<Bigtop::Docs::QuickStart>
+
+Guide for the truly impatient.  Explains how to build a complete auto-CRUD
+app from the command line alone using either kickstart syntax or connection
+information for a PostgreSQL 8 database.
+
+=item C<Bigtop::Docs::Syntax>
+
+This is meant to fully describe all of the syntax (including deprecations)
+in the Bigtop language.  It is the encyclopedic version of
+Bigtop::Docs::Keywords and is meant as complete documentation of
+Bigtop::Keywords.
+
+Much of the information here is also in C<Bigtop::Docs::AutoBackends>
+and C<Bigtop::Docs::AutoKeywords>.  But, there is more discussion in this
+one.  The others are more up-to-date on actual keyword availability, etc.
+
+=item C<Bigtop::Docs::TentRef>
+
+A comprehensive tour of tentmaker which assumes you understand the material
+from C<Bigtop::Docs::TentTut>.
+
+=item C<Bigtop::Docs::TentTut>
+
+The tentmaker tutorial.  Explains in detail how to use tentmaker to edit
+Bigtop files.  Filled with beautiful screen shots (sometimes, they are even
+up to date and available to your browser).
+
+=item C<Bigtop::Docs::Tutorial>
+
+If you don't like tentmaker, this is where you should start.  It walks
+through building a moderately complex application from scratch using
+a text editor to enter the proper Bigtop syntax.
+
+=item C<Bigtop::Docs::Vim>
+
+Explains how to install vim syntax highlighting for Bigtop source files.
+
+=back
+
+=head1 AUTHOR
+
+Phil Crow
+
+=cut

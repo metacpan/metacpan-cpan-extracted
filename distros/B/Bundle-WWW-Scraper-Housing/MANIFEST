@@ -1,0 +1,5 @@
+lib/Bundle/WWW/Scraper/Housing.pm
+lib/WWW/Scraper/apartments.pm
+MANIFEST
+Makefile.PL
+README

@@ -1,0 +1,203 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+brackup-target - Manage your backup targets
+
+=head1 SYNOPSIS
+
+ $ brackup-target [opts] <target_name> list_backups
+ $ brackup-target [opts] <target_name> get_backup <backup_file>
+ $ brackup-target [opts] <target_name> get_backups
+ $ brackup-target [opts] <target_name> delete_backup <backup_file>
+ $ brackup-target [opts] <target_name> prune   # remove old backups
+ $ brackup-target [opts] <target_name> gc      # run garbage collector
+
+=head2 OPTIONS
+
+=over 4
+
+=item --dest=DIR
+
+Destination to write files to.  Defaults to current working directory.
+
+=item --verbose|-v
+
+Be verbose with status.
+
+=item --dry-run
+
+Do not actually execute write operations.
+
+=item --keep-backups
+
+To be used in combination with the I<prune> command. This overrides the
+I<keep_backups> option specified in the configuration file.
+
+=item --source <source>
+
+To be used in combination with the I<prune> command. This restricts the
+prune operation to only delete backup files from the given I<source>.
+
+=item --interactive
+
+To be used in combination with the I<gc> command. Runs interactively,
+requiring an explicit confirmation before deleting chunks that have been
+garbage collected. Implies --verbose.
+
+=back
+
+=head1 WARRANTY
+
+Brackup is distributed as-is and comes without warranty of any kind,
+expressed or implied.  We aren't responsible for your data loss.
+
+=head1 SEE ALSO
+
+brackup-restore
+
+=head1 AUTHOR
+
+Brad Fitzpatrick E<lt>brad@danga.comE<gt>
+
+Copyright (c) 2006-2007 Six Apart, Ltd. All rights reserved.
+
+This module is free software. You may use, modify, and/or redistribute this
+software under the terms of same terms as perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+use Cwd;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+use Brackup;
+
+my $config_file;
+my $destdir;
+my $opt_help;
+my $opt_verbose;
+my $opt_keep_backups;
+my $opt_dryrun;
+my $opt_interactive;
+my $opt_source;
+usage() unless
+    GetOptions(
+               'verbose+' => \$opt_verbose,
+               'dest=s'   => \$destdir,
+               'config=s' => \$config_file,
+               'keep-backups=i' => \$opt_keep_backups,
+               'dry-run'   => \$opt_dryrun,
+               'interactive' => \$opt_interactive,
+               'source=s' => \$opt_source,
+               'help'     => \$opt_help,
+               );
+
+if ($destdir) {
+    chdir $destdir or die "Failed to chdir to $destdir: $!\n";
+}
+
+if ($opt_help) {
+    eval "use Pod::Usage;";
+    Pod::Usage::pod2usage( -verbose => 1, -exitval => 0 );
+    exit 0;
+}
+$opt_verbose = 1 if $opt_interactive && ! $opt_verbose;
+
+my $config = eval { Brackup::Config->load($config_file) } or
+    usage($@);
+
+my $target_name = shift or usage();
+my $cmd_name    = shift or usage();
+$cmd_name =~ s/-/_/g;      # accept hyphenated versions of commands
+
+my $target = eval { $config->load_target($target_name); } or
+    usage($@);
+
+my $code = __PACKAGE__->can("CMD_$cmd_name") or
+    usage("Unknown/unimplemented command.");
+
+exit($code->() ? 0 : 1);
+
+
+sub CMD_list_backups {
+    printf("%-32s %-30s %10s\n",
+        'Backup File',
+        'Backup Date',
+        'Size (B)'); 
+    printf("%-32s %-30s %10s\n",
+        '-' x 11,
+        '-' x 11,
+        '-' x 8);
+    foreach my $si (sort { $b->time <=> $a->time } $target->backups) {
+        printf("%-32s %-30s %10s\n",
+               $si->filename,
+               $si->localtime,
+               $si->size || '?');
+    }
+    return 1;
+}
+
+sub CMD_get_backup {
+    my $name = shift @ARGV or
+        die "get_backup requires a filename to download";
+    $target->get_backup($name)
+		or die "Failed to retrieve backup $name\n";
+}
+
+sub CMD_get_backups {
+    foreach my $si ($target->backups) {
+        my $size = $si->size;
+        my $name = $si->filename;
+        no warnings 'uninitialized';
+        if (-s "$name.brackup" == $size || -s "$name.brackup.orig" == $size) {
+            debug("Skipping $name; already have it");
+            next;
+        }
+        debug("Fetching $name");
+        $target->get_backup($si->filename);
+    }
+}
+
+sub CMD_delete_backup {
+    my $name = shift @ARGV or
+        die "delete_backup requires a filename to download";
+    $target->delete_backup($name)
+		or die "Failed to delete backup $name\n";
+}
+
+sub CMD_prune {
+    my $removed_count = $target->prune( keep_backups => $opt_keep_backups,
+                                        dryrun => $opt_dryrun,
+                                        source => $opt_source,
+                                        verbose => $opt_verbose);
+    debug("$removed_count backups " . ($opt_dryrun ? "would be " : "") . "removed from target");
+}
+
+sub CMD_gc {
+    my ($removed_chunks, $total_chunks) = $target->gc(dryrun => $opt_dryrun,
+                                                      verbose => $opt_verbose,
+                                                      interactive => $opt_interactive);
+    debug("$removed_chunks/$total_chunks chunks " . ($opt_dryrun ? "would be " : "") . 
+          "removed from target");
+}
+
+sub debug {
+    my $msg = shift;
+    return unless $opt_verbose;
+    warn "$msg\n";
+}
+
+
+sub usage {
+    my $why = shift || "";
+    if ($why) {
+        $why =~ s/\s+$//;
+        $why = "Error: $why\n\n";
+    }
+    die "${why}brackup-target <target> <cmd> [...]\nbrackup-target --help\n";
+}

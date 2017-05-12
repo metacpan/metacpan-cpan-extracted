@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Schema for ExtendedAttributes used in sample workflow process -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+   <xsd:element name="Coordinates">
+      <xsd:complexType>
+         <xsd:attribute name="xpos" use="optional"/>
+         <xsd:attribute name="ypos" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+   <xsd:element name="Email">
+      <xsd:complexType>
+         <xsd:sequence>
+            <xsd:element name="Attachments" minOccurs="0">
+               <xsd:complexType>
+                  <xsd:sequence>
+                     <xsd:element name="Attachment" minOccurs="0"/>
+                  </xsd:sequence>
+               </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="MessageText" minOccurs="0"/>
+         </xsd:sequence>
+         <xsd:attribute name="to" use="optional"/>
+         <xsd:attribute name="subject" use="optional"/>
+      </xsd:complexType>
+   </xsd:element>
+</xsd:schema>

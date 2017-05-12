@@ -1,0 +1,11 @@
+<div id="menu">
+: include '_wedge.tx' { template => 'menu_start.tx' };
+
+: include 'menu_head.tx';
+: include 'menu_profile.tx';
+: include 'menu_search.tx';
+: include 'menu_archives.tx';
+: include 'menu_tags.tx';
+
+: include '_wedge.tx' { template => 'menu_end.tx' };
+</div>

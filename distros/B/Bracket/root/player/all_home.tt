@@ -1,0 +1,64 @@
+[% site_title = "Bracket  " _ c.config.year %]
+[% page_title = "Leader Board" %]
+[% page_head_title = page_title _ " - " _ site_title %]
+
+
+[% USE Dumper %]
+<table class="container">
+<tr><td class="no_border">
+
+[% i = 1 %]
+<table id="all_player_home">
+<tr><th>Rank</th><th>Player</th><th>Points</th><th class="secondary">Brackets</th>
+<th>
+[% IF !is_game_time %]
+Picks
+[% ELSE %]
+Upsets
+[% END %]
+</th></tr>
+[% FOREACH player IN players.nsort('points').reverse %]
+	<tr class="[% i % 2 == 0 ? 'even' : 'odd' %]" >
+   [% IF player.active == 1 %]
+   <td><span style="font-size:0.88em;">[% i - 1 %]</span></td>
+   <td>
+   <span class="cash">
+   [% i == 2 ? '$' _ c.config.prizes.first_place : i == 3 ? '$' _ c.config.prizes.second_place  : i == 4 ? '$' _ c.config.prizes.third_place : '' %]
+   </span>
+   [% player.first_name | ucfirst %] [% player.last_name | ucfirst %]
+   </td>
+   <td style="text-align:center;">&nbsp;<span class="points">[% player.points %]&nbsp;</span> </td>
+   <td style="font-size:0.92em;" class="secondary">
+   [% FOREACH region IN regions %]
+   <a href="[% c.uri_for("/region/view/$region.id/") _ player.id %]">[% region.name %]</a> 
+   <span class="separator"> | </span>
+   [% END %]
+  <a href="[% c.uri_for("/final4/view/$player.id") %]">Finals</a>
+  <span class="separator"> | </span>
+<br />
+	</td>
+    <td style="font-size: 0.72em;">
+    <span class="separator"></span>
+        [% SET player_id = player.id %]
+        [% IF !is_game_time %] 
+            [% SET picks_made = picks_per_player.$player_id || 0 %]
+            [% IF picks_made < 63;
+               '<span style="color:sienna;">' _ picks_made _ '/63 picked</span>';
+               ELSE %]
+               <span style="color:darkgreen;">complete</span>
+            [% END %]
+        [% ELSE %] 
+            [% SET picks_correct = correct_picks_per_player.$player_id || 0 %]
+            [% SET picks_upset = upset_picks_per_player.$player_id || 0 %]
+            <span style="color:darkgreen;">[% picks_upset %] of [% picks_correct %]</span>
+        [% END %]
+	</td>
+	</tr>
+
+   [% END %]
+	[% i = i +1 %]
+[% END %]
+</table>
+
+</td></tr>
+</table>

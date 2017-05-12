@@ -1,0 +1,31 @@
+"Force" option
+Status option for resuming downloads (ala update_wormbase-dev.pl)
+
+announce to GMOD list
+
+Sync adaptors and XML-generating CGI so that the read from a single XML tempalte
+
+Need to cache adaptors:
+	Should be possible to move between classes when necessary
+
+Before release
+   Regression tests (Archive.pm, Monitor.pm and subclasses)
+   server monitoring (monitor.pm and subclasses)
+   script for monitoring
+   restarting (part of update process / scripts)
+
+show progress on downloads (add in file size, too)
+
+
+Write DTD for defaults; convert Adaptor.pm to parsing XML
+
+Future items:
+1. Option to backup software prior to install.
+
+2 .starting and stopping of servers - is this working / robust
+    during or after an install
+
+3. server monitoring
+  (uses same starting and stopping classes)
+
+4. archiving or removal of pervious blast versions, databases

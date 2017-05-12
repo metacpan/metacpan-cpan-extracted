@@ -1,0 +1,6 @@
+Changes for 0.05    Fri Sep 15 12:21:25 CEST 2006
+=================================================
+
+*   Added Net::DNS to the bundle, as it makes Test::Reporter
+    look up mx records a lot better (rt #21502).
+    

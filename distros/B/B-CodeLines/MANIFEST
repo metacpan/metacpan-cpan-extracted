@@ -1,0 +1,16 @@
+Build.PL
+examples/dolines.pl
+examples/dolines.sh
+lib/B/CodeLines.pm
+t/00test-pod.t
+t/00load.t
+t/10-test-basic.t
+ChangeLog                       list of changes generated from git2cl
+GNUmakefile                     annotated GNU makfile interface to Build.PL
+CHANGES                         What's up
+README.pod                      Overall information
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

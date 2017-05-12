@@ -1,0 +1,15 @@
+use common::sense;
+
+use Bread::Board;
+use Test::More;
+use t::Utils qw(mark_file_loaded);
+
+mark_file_loaded(__FILE__);
+
+sub {
+    my ( $name, $next ) = @_;
+
+    container $name => as {
+        service dsn => 'DSN';
+    };
+};

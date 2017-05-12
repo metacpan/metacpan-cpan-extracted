@@ -1,0 +1,25 @@
+0.004   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.003   2016-04-12 (PERLANCAR)
+
+	- Adjust to PERLANCAR::HTML::Tree::Examples 1.0.2+.
+
+
+0.002   2016-04-01 (PERLANCAR)
+
+        - Add scenario: MojoDOM::Selector.
+
+        - Record version of PERLANCAR::HTML::Tree::Examples in benchmark result
+          metadata.
+
+
+0.001   2016-04-01 (PERLANCAR)
+
+        - First release.

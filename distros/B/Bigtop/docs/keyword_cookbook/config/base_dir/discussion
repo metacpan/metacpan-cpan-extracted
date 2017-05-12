@@ -1,0 +1,20 @@
+=head1 USE
+
+The C<base_dir> statement is deprecated.  It persists to support tests
+which want to place their generated output in out of the way places for
+clutter reduction and easier cleanup.
+
+If you do use it, it will only affect initial generation with -c.
+Then it specifies the parent of the build directory.  By default that
+is the current directory.
+
+The C<base_dir> must already exist.  To also control the name of the
+build dir, use the deprecated C<app_dir> (but please don't).
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Note that the build directory is called C<useless_dir> instead of C<Kids>.

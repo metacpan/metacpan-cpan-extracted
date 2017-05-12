@@ -1,0 +1,121 @@
+This file documents the main classes, data structures, file formats,
+etc used in Brackup.
+
+----------------------------------------------------------------------------
+Class-wise, we have:
+----------------------------------------------------------------------------
+
+  Root -- describes a path on the filesystem to be backed up.  has as
+          properties how small large files are cut up into
+          ("chunk_size"), what files to ignore, and the encryption
+          settings.
+
+  Target -- a destination for the backups.
+
+  File -- a directory, symlink, or file in a Root.
+
+  Chunk -- part of a file, defined as an offset and length.  depending
+           on encryption settings, the serialized backup length can be
+           more or less than the unencrypted length.
+
+  Backup -- a snapshot in time of all a Root's Files and Chunks.
+            during the backup, the Target is consulted to see if it
+            has chunks before they're re-stored.  The backup upon
+	        completion writes a structured file as described below.
+
+  DigestCache -- the digest cache, a property of the Root, acts
+            mostly as a cache, but is pretty important when
+		    using encryption.  If you lose the database, all your
+		    files will need to be re-encrypted, as Brackup won't
+		    know if the chunks already exist, as encryption makes
+		    different files each time.  Note that you don't need
+		    the digest database to do a restore.
+
+
+----------------------------------------------------------------------------
+DigestDatabase
+----------------------------------------------------------------------------
+
+The digest database is an SQLite file, but in theory can be anything
+that implements a dictionary (get/set keys/values).
+
+The keys/values used are:
+
+    <FileCacheKey>  -->  <TypedDigest(original_unencrypted_file)>
+
+    <ChunkCacheKey> -->  <ChunkDetails>
+
+Where:
+
+    FileCacheKey ::= "[" <RootName> "]" <FileRelativePath> ":" join(",", <ctime>, <mtime>, <size>, <inode>)
+
+    ChunkCacheKey ::= <TypedDigest(original_unencrypted_file)> "-" <raw_offset> "-" <raw_length> "-" <gpg-recipient>
+
+    ChunkDetails  ::= <EncryptedLength> " " <TypedDigest(encrypted_chunk)>
+
+    TypedDigest  ::= <DigestAlgo> ":" <hex_digest>
+
+    DigestAlgo   ::= { "sha1" }
+
+
+----------------------------------------------------------------------------
+[backup-name].brackup format (RFC-822-like)
+----------------------------------------------------------------------------
+
+Keys:
+-----
+
+ Path:    relative path
+ Size:    unencrypted size
+ Digest:  unencrypted digest (see TypedDigest format above)
+ Type:    "f" or blank for regular file
+          "l" for symlink
+          "d" for directory
+          "p" for named pipe/fifo
+          "c" for character special (not yet implemented)
+          "b" for block special (not yet implemented)
+          "s" for socket (not implemented as it doesn't make sense)
+ Link:    the symlink's target
+ Chunks:  whitespace-separated "offset;length;enclength;encdigest"
+
+Example:
+--------
+
+Path: Some file.dat
+Size: 4550656
+Digest: sha1:f822dd41714070a09df1cf19e80a12720ed20b43
+Chunks: 0;1048576;1032436;sha1:a303f69348cf6e4c40faf199e11d6705eb200eed
+ 1048576;1048576;1041619;sha1:95e81460845f27940d209b5482c672e3ad0e8646
+ 2097152;1048576;1041937;sha1:a7b9d3eb26cb7b9969032d62576c0c1634ed8665
+ 3145728;1048576;1042934;sha1:645689dfc08e35851ccfb4e9d2d3eb69a684ef92
+ 4194304;356352;343473;sha1:14e65a999edd9f2a54fc218abbee07611c9743b9
+
+Path: Another file.dat
+Size: 3184274
+Digest: sha1:f7e3c4b75fe041f58464c36583fec1f4361a4676
+Chunks: 0;1048576;1030710;sha1:af185012fcf3d178c863b2aaef76f3f83863f579
+ 1048576;1048576;1036044;sha1:1c08a500fba4751aea5d617a92f13373d0fd057e
+ 2097152;1048576;1035307;sha1:313f9ce3ba8a5e9c5361c587fed4e55d720e48c4
+ 3145728;38546;38510;sha1:de1687f379f8b4ce505f0ee5652f1c85505fb5be
+
+Path: trunk/brackup
+Size: 1510
+Digest: sha1:9242d98205094044a938e79b94a1fc505bdf50fe
+Chunks: 0;1510;1819;sha1:34ddb242c4d88a4df82145de2b04dd6c0d26cd58
+
+Path: trunk/brackup.dat
+Size: 15151
+Digest: sha1:1e427622cadb31ea006c273b86457178f38a7c75
+Chunks: 0;15151;5096;sha1:5672f3d6ee89d0c7a039fc050ad4c315f3580533
+
+Path: trunk/B_TO_THE_BIZZLE
+Type: l
+Link: F_TO_THE_FIZZLE
+
+Path: trunk/.svn
+Type: d
+
+Path: trunk/.svn/entries
+Size: 686
+Digest: sha1:9a9b269fa1c7ae74ca0a1a08f028c4e294bf9128
+Chunks: 0;686;1465;sha1:346d53cd2366efb4cb8b4ae918e860f0244dbd5d

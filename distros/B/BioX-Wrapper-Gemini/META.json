@@ -1,0 +1,84 @@
+{
+   "abstract" : "A simple wrapper around the python Gemini library for annotating VCF files.",
+   "author" : [
+      "Jillian Rowe <jillian.e.rowe@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BioX-Wrapper-Gemini",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BioX::Wrapper" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "File::Basename" : "0",
+            "File::Find::Rule" : "0",
+            "File::FindLib" : "0",
+            "File::Path" : "0",
+            "List::Compare" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "MooseX::Getopt::Meta::Attribute::NoGetopt" : "0",
+            "MooseX::Getopt::Usage" : "0",
+            "MooseX::Getopt::Usage::Role::Man" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/jir2004/biox-wrapper-gemini/issues"
+      },
+      "homepage" : "https://bitbucket.org/jir2004/biox-wrapper-gemini",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@bitbucket.org:jir2004/biox-wrapper-gemini.git",
+         "web" : "https://bitbucket.org/jir2004/biox-wrapper-gemini"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Jillian Rowe <jir2004@qatar-med.cornell.edu>"
+   ]
+}
+

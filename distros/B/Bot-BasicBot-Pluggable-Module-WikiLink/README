@@ -1,0 +1,34 @@
+Bot-BasicBot-Pluggable-Module-WikiLink
+
+Plugin for Bot::BasicBot::Pluggable for some simple [[Wiki Style Link]] -> URL conversion
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bot::BasicBot::Pluggable::Module::WikiLink
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Module-WikiLink
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-WikiLink
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-WikiLink
+
+    MetaCPAN
+        http://metacpan.org/release/Bot::BasicBot::Pluggable::Module::WikiLink
+

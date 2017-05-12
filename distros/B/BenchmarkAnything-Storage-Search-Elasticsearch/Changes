@@ -1,0 +1,8 @@
+Revision history for BenchmarkAnything-Storage-Search-Elasticsearch
+
+0.002     2017-02-03
+        - support for 'select' in BenchmarkAnything query
+
+0.001     2017-01-31
+        - initial release
+        - common functions for Elasticsearch support

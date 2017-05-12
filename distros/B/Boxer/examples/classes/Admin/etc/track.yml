@@ -1,0 +1,9 @@
+classes:
+  - Admin
+parameters:
+  doc:
+    admin:
+      tweak:
+        - include config file VCS tracking tool etckeeper
+  pkg:
+    - etckeeper

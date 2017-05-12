@@ -1,0 +1,23 @@
+---
+abstract: "SYP's cozy environment"
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bundle-SYP
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/Bundle-SYP/issues
+  homepage: https://github.com/creaktive/Bundle-SYP
+  repository: git://github.com/creaktive/Bundle-SYP.git
+version: '1.5'
+x_contributors:
+  - 'Sergey Romanov <sromanov-dev@yandex.ru>'

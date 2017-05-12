@@ -1,0 +1,7 @@
+#QIIME v1.3.0 OTU table
+#OTU ID	m5	Consensus Lineage
+0	123	k__Bacteria;p__Bacteroidetes
+1	522	k__Bacteria;p__Proteobacteria
+2	91	k__Bacteria;p__Firmicutes
+3	5	k__Bacteria;p__Proteobacteria
+4	195	k__Bacteria;p__Actinobacteria

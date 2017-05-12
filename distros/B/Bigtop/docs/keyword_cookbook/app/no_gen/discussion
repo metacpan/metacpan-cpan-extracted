@@ -1,0 +1,17 @@
+=head1 USE
+
+The C<no_gen> keyword at the app level turns off all generation.
+Bigtop will do nothing if you have this set.  Use this if you are
+paranoid about someone inadvertantly rebuilding the application.
+
+Note that the value of this statement must be true.  I usually use
+1 as the value.
+
+=head1 THE EXAMPLE
+
+When you try to build the example with:
+
+    bigtop -c example.bigtop all
+
+bigtop, will do nothing (except possibly clutter the screen with falsehoods
+and/or warnings).

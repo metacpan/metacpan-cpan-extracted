@@ -1,0 +1,79 @@
+--- ./Makefile.PL.orig	Fri Feb 21 06:17:32 2003
++++ ./Makefile.PL	Mon Oct  6 19:52:20 2003
+@@ -65,12 +65,18 @@ foreach (@ARGV) {
+ unless ($expat_libpath) {
+   # Test for existence of libexpat
+   my $found = 0;
++ if ($] >= 5.008001) {
++    require ExtUtils::Liblist;		# Buggy before this
++    my ($list) = ExtUtils::Liblist->ext('-lexpat');
++    $found = 1 if $list =~ /-lexpat\b/;
++ } else {
+   foreach (split(/\s+/, $Config{libpth})) {
+     if (-f "$_/libexpat." . $Config{so}) {
+       $found = 1;
+       last;
+     }
+   }
++ }
+ 
+   unless ($found) {
+       die <<'Expat_Not_Installed;';
+@@ -122,12 +128,18 @@ foreach (@ARGV) {
+ unless ($sablot_libpath) {
+   # Test for existence of libexpat
+   my $found = 0;
++ if ($] >= 5.008001) {
++    require ExtUtils::Liblist;		# Buggy before this
++    my ($list) = ExtUtils::Liblist->ext('-lsablot');
++    $found = 1 if $list =~ /-lsablot\b/;
++ } else {
+   foreach (split(/\s+/, $Config{libpth})) {
+     if (-f "$_/libsablot." . $Config{so}) {
+       $found = 1;
+       last;
+     }
+   }
++ }
+ 
+   unless ($found) {
+     die <<'Sablot_Not_Installed;';
+@@ -177,12 +189,18 @@ $js_libname = 'js' unless $js_libname;
+ my $js_found = undef;
+ unless ($js_libpath) {
+     # Test for existence of libexpat
++ if ($] >= 5.008001) {
++    require ExtUtils::Liblist;		# Buggy before this
++    my ($list) = ExtUtils::Liblist->ext("-l$js_libname");
++    $js_found = 1 if $list =~ /-l\Q$js_libname\E\b/;
++ } else {
+     foreach (split(/\s+/, $Config{libpth})) {
+ 	if (-f "$_/lib$js_libname." . $Config{so}) {
+ 	    $js_found = 1;
+ 	    last;
+ 	}
+     }
++ }
+ }
+ 
+ our $libs = ' ';
+@@ -225,7 +243,7 @@ foreach (@ARGV) {
+ }
+ @ARGV = @replacement_args;
+ 
+-my $O_FILES = 'common.o';
++my $O_FILES = "common$Config{obj_ext}";
+ 
+ WriteMakefile(
+ 	      NAME	=> 'XML::Sablotron',
+@@ -238,8 +256,8 @@ WriteMakefile(
+ 	      DIR       => [qw( DOM Situation SXP Processor )],
+ 	      LIBS      => $libs, 
+ 	      OBJECT	=> q( $(O_FILES) ),
+-              OPTIMIZE  => ' ',
+-     CCFLAGS => '-g',
++#              OPTIMIZE  => ' ',
++#     CCFLAGS => '-g',
+ 	      depend => { 'Sablotron.c' => q(DOM/DOM.h DOM/DOM.xsh Processor/Processor.h Processor/Processor.xsh Processor/Handler_stubs.h SXP/SXP.h SXP/SXP.xsh Situation/Situation.h Situation/Situation.xsh Situation/DOMhandler_stubs.h ) },
+ 	      @extras,
+ );

@@ -1,0 +1,20 @@
+UPS Service	UPS Product Code
+Next Day Air Early AM	1DM
+Next Day Air Early AM Letter	1DML
+Next Day Air	1DA
+Next Day Air Letter 	1DAL
+Next Day Air Saver	1DP
+Next Day Air Saver Letter	1DPL
+2nd Day Air A.M.	2DM
+2nd Day Air 	2DA
+2nd Day Air A.M. Letter 	2DML
+2nd Day Air Letter 	2DAL
+3 Day Select 	3DS
+Ground Commercial 	GNDCOM
+Ground Residential	GNDRES
+Canada Standard	STD
+Worldwide Express	XPR
+Worldwide Express Plus	XDM
+Worldwide Express Letter	XPRL
+Worldwide Express Plus Letter	XDML
+Worldwide Expedited	XPD

@@ -1,0 +1,5 @@
+README file for BrickLayer::Templater
+
+Bricklayer::Templater is a templating engine for perl. It is pure perl with few dependencies on other modules. Which should make installing relatively painless.
+
+Bricklayer::Templater is avalailable under the same license and terms as Perl itself.

@@ -1,0 +1,65 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+
+Bundle::Net::Radius::Server
+===========================
+
+This module eases the installation of Net::Radius::Server and its
+prerequisites.
+
+INSTALLATION
+
+Use with CPAN.pm as in
+
+  perl -MCPAN -e 'install Bundle::Net::Radius::Server'
+
+DO YOU WANT TO THANK ME?
+
+If  you consider this  a valuable  contribution, there  is a  web page
+where you can express your gratitude. Please see
+
+	http://mipagina.cantv.net/lem/thanks-en.html (English)
+	http://mipagina.cantv.net/lem/thanks-es.html (Spanish)
+
+SECURITY CONSIDERATIONS
+
+I have no control on the machanisms involved in the storage or
+transport of this distribution. This means that I cannot guarantee
+that the distribution you have in your hands is indeed, the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc". This contains a GPG "detached signature" that makes it
+impossible for anybody to alter this distribution. If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+COPYRIGHT AND LICENSE
+
+Copyright © 2006 Luis E. Muñoz <luismunoz@cpan.org>
+
+This software can be used under the same terms as Perl 5.8.6
+itself. It also carries the same warranties.
+
+Please send bug reports (or patches) as well as feedback and
+suggestions to
+
+luismunoz@cpan.org
+
+When submitting bugs, it is very important that you include the
+relevant information for reproducing the bug. Packet dumps are most
+useful.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (Darwin)
+
+iD8DBQFFgZSSQyDWGRI/hhARAnjMAKCc5UEFSrJZ/61PyFQcYcLWgS714ACffpSL
+yg7flxlMd3X6o1brUPInOPo=
+=75P1
+-----END PGP SIGNATURE-----

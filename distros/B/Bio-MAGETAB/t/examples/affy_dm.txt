@@ -1,0 +1,14 @@
+Normalization REF	TK6 replicate 1	TK6 replicate 1	TK6 replicate 2	TK6 replicate 2	TK6MDR1 replicate 1	TK6MDR1 replicate 1	TK6MDR1 replicate 2	TK6MDR1 replicate 2
+Composite Element REF	CHPSignal	Call	CHPSignal	Call	CHPSignal	Call	CHPSignal	Call
+AFFX-BioB-5_at	172.05	A	141.47	P	103.52	A	634.15	P
+AFFX-BioB-M_at	17.43	A	40.69	P	50.78	P	242.73	P
+AFFX-BioB-3_at	1392.58	A	80.38	P	142.13	A	729.81	P
+AFFX-BioC-5_at	7.4	A	8.02	A	18.42	A	119.96	P
+AFFX-BioC-3_at	90.08	A	8.02	A	7.53	P	102.39	P
+AFFX-BioDn-5_at	13.24	A	4.45	A	6.56	A	93.37	P
+AFFX-BioDn-3_at	7.23	A	5.24	A	12.49	P	137.39	P
+AFFX-CreX-5_at	6.68	A	3.35	A	4.36	A	12.21	A
+AFFX-CreX-3_at	262.31	A	10.36	A	20.49	A	16.89	A
+AFFX-DapX-5_at	76.58	A	50.31	A	31.78	A	20.42	A
+AFFX-DapX-M_at	37.87	A	56.34	A	57.47	A	27.23	A
+AFFX-DapX-3_at	49.99	A	35.63	A	15.78	A	12.28	A

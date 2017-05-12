@@ -1,0 +1,14 @@
+ENVIRONMENT
+
+ BENCHER_RESULT_DIR => str
+
+    Set default for --results-dir.
+
+SEE ALSO
+
+    bencher
+
+    Bencher
+
+    Bencher::Manual::*
+

@@ -1,0 +1,14 @@
+Note: I won't implement other methods and I won't update old ones.
+This is too time consuming for me. Anyone who likes to do this,
+please contact me.
+
+This is just a release to note the above.
+
+Validating german bank account numbers. At the moment there
+are methods 00-74 (from 00-99,A1-A2) implemented. Others will follow.
+The methods 00-68 are tested now.
+Warnings are now eliminated.
+
+for new versions look at http://www.tinita.de/projects/perl/modules/
+Comments, feedback, questions: tinita (at) cpan.org
+2002/10/21

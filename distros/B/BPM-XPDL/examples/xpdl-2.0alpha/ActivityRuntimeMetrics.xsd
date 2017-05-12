@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xpdl="http://www.wfmc.org/2004/XPDL2.0alpha" xmlns:deprecated="http://www.wfmc.org/2002/XPDL1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="RuntimeMetrics">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xpdl:Cost" minOccurs="0"/>
+				<xsd:element ref="xpdl:ActivityTime" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ActivityTime">
+		<xsd:annotation>
+			<xsd:documentation>Activity time represent the run time information gathered from Business Activity Monitoring tools or other monitoring tools with respect  to the start and stop times of each individual activity including input delay time and output delay time.  Time must be measured in a consistent and reliable fashion, as such milliseconds from the start of the day is chosen.  InQueue time is the time a task is waiting to begin when the required input or conditions are met for its initiation.  OutQueue time is the time taken to complete a task when all the conditions are met for its completion.  Acitivity time represents an unbounded array such that here may be captured all acitivity run time information or an average run time representation.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:sequence>
+					<xsd:element name="InQueueStartTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="InQueueFinishTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="WorkStartTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="WorkStopTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="OutQueueStartTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="OutQueueStopTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element ref="Cost" minOccurs="0"/>
+					<xsd:element ref="CostUnit" minOccurs="0"/>
+				</xsd:sequence>
+				<xsd:sequence>
+					<xsd:element name="WaitingStartTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="WaitingStopTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="WorkingStartTime" type="xsd:long" minOccurs="0"/>
+					<xsd:element name="WorkingStopTime" type="xsd:time" minOccurs="0"/>
+					<xsd:element ref="Cost" minOccurs="0"/>
+					<xsd:element ref="CostUnit" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	

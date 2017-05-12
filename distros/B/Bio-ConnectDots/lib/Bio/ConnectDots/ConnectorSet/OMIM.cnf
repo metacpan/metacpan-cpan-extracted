@@ -1,0 +1,16 @@
+# example cnf file for OMIM
+
+name=OMIM
+module=OMIM
+version=07/27/2004
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=OMIM, dotset=Omim_ID
+label=Title, dotset=OMIM_title
+label=Alternate_Title, dotset=OMIM_title
+

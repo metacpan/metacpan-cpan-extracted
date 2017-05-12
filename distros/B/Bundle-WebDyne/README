@@ -1,0 +1,4 @@
+Bundle::WebDyne - install core WebDyne modules. 
+
+WebDyne is a dynamic web framework that allows Perl code to be embedded in
+HTML files.

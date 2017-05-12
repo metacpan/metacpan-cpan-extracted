@@ -1,0 +1,145 @@
+=head1 Name
+
+Bigtop::Docs::About - A document explaining Bigtop's features and history
+
+=head1 Guide to Docs
+
+For a complete and annotated list of Bigtop docs, see L<Bigtop::Docs::TOC>.
+
+=head1 Features
+
+Bigtop is a little language for describing the basic structure of web apps
+including their database layouts and the management of them.
+
+By editing a single description file (with your favorite text editor
+or the browser based 'tentmaker'), you can have a working web app
+by code generation.  There are good defaults to get you started.
+If your data model changes, you can regenerate without risk of
+loosing anything you wrote yourself.  Some of the pieces available include:
+
+=over 4
+
+=item *
+
+httpd.conf suitable for immediate inclusion in a mod_perl backed apache conf
+
+=item *
+
+a cgi dispatching script suitable for immediate deployment to your
+cgi-bin directory
+
+=item *
+
+a stand alone server suitable for immediate execution during development
+
+=item *
+
+schema.* (where * varies by database) with all the sql commands needed
+to build your app's database (including fixed or test data)
+
+=item *
+
+object relational mapping modules for use with DBIx::Class or other similar
+tools
+
+=item *
+
+controllers for each table in the app
+
+=item *
+
+automated CRUD for tables where that makes sense
+
+=item *
+
+very flexible CRUD for more complicated situations
+
+=back
+
+In all cases generated files are completely separated from stub files
+where you write your code.  Once generated, stubs are never overwritten.
+This gives complete safety when regenerating.
+
+Further, if you want to generate other things, it is not hard to alter
+or add them:
+
+=over 4
+
+=item *
+
+Altering what an existing backend generates is usually as simple as
+copying the template out of the backend, altering it, saving that
+on disk, then supplying that name like so:
+
+    config {
+        Type Backend { template `altered_template.tt`; }
+    }
+
+=item *
+
+Making new backends, while not trivial, is not particularly hard (if
+you understand parse trees and recursion).
+The grammar even supports registration of new keywords (so long as
+you don't need new blocks or literals).  When you register them, you
+provide enough information for them to appear in tentmaker as if they
+were native.
+
+=back
+
+=head1 History
+
+While working on the framework now called Gantry, I became convinced
+that I was still doing too much work on each app.  I wanted a way to
+collect all the attributes of my data in one place including:
+
+=over 4
+
+=item *
+
+sql type
+
+=item *
+
+on screen appearance (how wide is the input box etc.)
+
+=item *
+
+whether the user updates it via a form or sees it in summary tables
+
+=item *
+
+etc.
+
+=back
+
+From this I wanted the SQL statements that create the database, the
+models which make it easy for me to access that database, and the controllers
+which do the accessing, plus all the other bells and whistles needed
+for a complete attractive app.
+
+=head1 Further Reading
+
+With Bigtop's kickstart syntax, you can now build a complete CRUD app from
+the command line alone.  Similarly, if you have a postgres 8 database, you
+can build a CRUD app for it from the command line.  See
+C<Bigtop::Docs::QuickStart> for details.
+
+To start using Bigtop, see C<Bigtop::Docs::TentTut> or
+C<Bigtop::Docs::Tutorial>.
+If those go too fast, try the Bigtop section of C<Gantry::Docs::Tutorial>,
+which builds a smaller app.  After those, try C<Bigtop::Docs::Cookbook>.
+For a complete doc list, see C<Bigtop::Docs::TOC>.
+
+=head1 Why the Name
+
+Why did I call it Bigtop?  I see it as a central place in the sometimes
+wild and always disparate world of a web application.  It is where all
+the perfomers come together.  But it's also about as discriminating as
+a circus tent, anyone and anything can easily come in and out.  It's a big
+tent.  Oh, and it's meant to be fun (cue the circus music).
+
+=head1 AUTHOR
+
+Phil Crow <crow.phil@gmail.com>
+
+=cut

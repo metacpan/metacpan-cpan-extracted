@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>[% view.title %]</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<link rel="stylesheet" type="text/css" media="screen"
+			title="Default" href="[% self.css_rootp %]/default.css" />
+
+    </head>
+    <body id="">
+	
+	<!-- START: top nav logo (using page element style) -->
+	<div id="page">
+		<img width="740" src="[% self.img_rootp %]/nav_banner3.jpg" 
+			alt="Billing Logo" />
+	</div>
+	<!-- END: top nav logo -->
+
+	<!-- START: top navigation -->
+	<div id="nav">
+		<div class="lowtech">Site Navigation:</div>	
+		<ul>
+            <li><a href='[% self.app_rootp %]/'>Home</a></li>
+            <!-- Your links here.  Sample: -->
+            <!-- <li><a href='[% self.app_rootp %]/tasks'>Tasks</a></li> -->
+		</ul>
+	</div>
+	<!-- END: top navigation -->
+	
+	<br /><br /><br />
+
+	<!-- START: title bar -->
+	<div id="title">
+		<h1>[% title %]</h1>
+		<p>&nbsp;</p>
+		<!-- form method="get" action="[% app_rootp %]/search">
+		<p>
+			<input type="text" name="searchw" value="search" size="10" />
+			<input type="submit" value="Disabled" />
+		</p>
+		</form -->
+	</div>
+	<!-- END: title bar -->
+	
+	<!-- START: page -->
+	<div id="page">
+	
+		<!-- START: content -->
+		<div id="content">
+	
+			[% content %]
+			
+			<br class="clear" />
+		</div>
+		<!-- END: content -->
+	
+	</div>
+	<!-- END: page -->
+
+	<!-- START: footer -->
+	<div id="footer">
+		[% USE Date %]
+		<p>Page generated on [% Date.format(Date.now, "%A, %B %d, %Y at %l:%M %p") %]
+		[% IF r.user; "for $r.user"; END; %]
+		<br />
+			
+		This site is licensed under a 
+		<a rel="license" href="http://creativecommons.org/licenses/by/2.0/">
+		Creative Commons License</a>,<br />
+		except where otherwise noted.
+		<br />
+		<a rel="license" href="http://creativecommons.org/licenses/by/2.0/">
+		<img src="/images/cc.primary.srr.gif" width="88" 
+			height="31" alt="Creative Commons License" border="0" /></a>
+
+		</p>
+	</div>
+	<!-- END: footer -->
+	
+    </body>
+</html>

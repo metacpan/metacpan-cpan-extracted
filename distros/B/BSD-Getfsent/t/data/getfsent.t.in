@@ -1,0 +1,5 @@
+/dev/wd0a / ffs rw 1 1
+/dev/wd0d /home ffs rw,nodev,nosuid 1 2
+/dev/wd0e /tmp ffs rw,nodev,nosuid 1 2
+/dev/wd0f /usr ffs rw,nodev 1 2
+/dev/wd0g /var ffs rw,nodev,nosuid 1 2

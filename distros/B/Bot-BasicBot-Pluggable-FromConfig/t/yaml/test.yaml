@@ -1,0 +1,10 @@
+server:     irc.perl.org
+nick:       test_bot
+username:   test_bot
+channels:
+    - "#bottest"
+plugins:
+    - module: Karma
+      config:
+            karma_change_response: 0
+            user_num_comments: 5

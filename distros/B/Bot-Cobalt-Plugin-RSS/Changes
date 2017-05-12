@@ -1,0 +1,10 @@
+## Changes for Bot::Cobalt::Plugin::RSS
+
+ * 0.002  (23 July 2012)
+
+   Silence warnings from parse() -- a lot of feeds intermittently cause 
+   (encoding-related?) warnings noise
+
+ * 0.001
+ 
+   Initial release.

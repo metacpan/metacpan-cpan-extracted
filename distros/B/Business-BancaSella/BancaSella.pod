@@ -1,0 +1,227 @@
+=head1 NAME
+
+Business::BancaSella - A wrapper for Banca Sella online payment system 
+(ver 0.11)
+
+=head1 SYNOPSIS
+
+These are only some examples. For more examples, see later...
+
+During encoding...
+
+  use Business::BancaSella;
+  use Business::BancaSella::Ric;
+  use CGI qw/:standard/;
+  
+  my $ric   = new Business::BancaSella::Ric::Mysql(
+                                dbh             => $DBI_handle,
+                                tableName       => $table_name,
+                                fieldName       => $field_name
+                                );
+  my $otp   = $ric->extract;
+  my $bs    = new Business::BancaSella::Encode(
+                               type             => 'gestpay',
+                               id               => $internal_id,
+                               shopping         => $shopping,
+                               otp              => $otp,
+                               amount           => $amount,
+                               language         => 'english',
+                               currency         => 'eur',
+                               );
+  my $bsUri = $bs->uri;
+  redirect($bsUri);
+
+During decoding...
+
+  use Business::BancaSella::Decode;
+  use Business::BancaSella::Ris;
+  use CGI;
+  
+  my $cgi   = new CGI();
+  my $qs    = $cgi->query_string;
+  my $bs    = new Business::BancaSella::Decode(
+                                type            => 'gestpay',
+                                'query_string'  => $qs
+                                );
+  my $ric   = new Business::BancaSella::Ris::Mysql(
+                                dbh             => $DBI_handle,
+                                tableName       => $table_name,
+                                fieldName       => $field_name
+                                );
+  if (!$ric->check($bs->otp)) {
+    &error_page;
+  } else {
+    $ric->remove($bs->otp);
+    if ($bs->result) {
+    	&payment_ok;
+    } else {
+    	&payment_ko;
+    }
+  }  
+
+=head1 DESCRIPTION
+
+Banca Sella is an italian bank which offer an integrated and secure
+online payment system using secure web geteway over SSL.
+
+This module is a wrapper that built web request and receive web  
+response from this payment system encoding and decoding it in an
+object orientated environment.
+
+Usually this module can be used in an e-commerce environment web site
+to support online payment via credit cards.
+
+This documentation doesn't explain what the Banca Sella online
+payment system is and how it works . For more information you can point your 
+browser to Banca Sella's
+home page (http://www.sellanet.it) or directly to GestPay documentation 
+(http://www.sellanet.it/download/SecificheTecnicheOTP1.0.1.pdf).
+
+=head1 OBJECTS STRUCTURE
+
+=head2 Business::BancaSella
+
+Wrapper for Banca Sella online payment system
+
+=head2 Business::BancaSella::Gestpay
+
+Abstract class for Gestpay parameter info
+
+=head2 Business::BancaSella::Gateway
+
+Abstract class for Gateway compatibility parameter info
+
+=head2 Business::BancaSella::Decode
+
+Parent class for decoding systems
+
+=head2 Business::BancaSella::Decode::Gestpay
+
+Uri decoding for return transaction info results from 
+GestPay online system payment.
+
+=head2 Business::BancaSella::Decode::Gateway
+
+Uri decoding for return transaction info results from 
+Gateway online system payment.
+
+=head2 Business::BancaSella::Encode
+
+Parent class for encoding systems
+
+=head2 Business::BancaSella::Encode::Gateway
+
+Uri creator for Gateway online system payment.
+
+=head2 Business::BancaSella::Encode::Gestpay
+
+Uri creator for GestPay online system payment.
+
+=head2 Business::BancaSella::Ric
+
+Parent class for extracting One-Time-Password from different storage place
+
+=head2 Business::BancaSella::Ric::File
+
+Extract One-Time-Password from a standard 
+Banca Sella ASCII file
+
+=head2 Business::BancaSella::Ric::FileFast
+
+Extract One-Time-Password from an improved ASCII file 
+
+=head2 Business::BancaSella::Ric::Mysql
+
+Extract One-Time-Password from a mysql database
+
+=head2 Business::BancaSella::Ris
+
+Parent class for checking One-Time-Password from different storage place
+
+=head2 Business::BancaSella::Ris::File
+
+Check the existance of One-Time-Password 
+in a standard Banca Sella ASCII file.
+
+=head2 Business::BancaSella::Ris::FileFast
+
+Check the existance of One-Time-Password 
+in an improved ASCII file.
+
+=head2 Business::BancaSella::Ris::Mysql
+
+Check the existance of One-Time-Password from a mysql database
+
+=head1  Prerequisites:
+
+=over 4
+
+=item * Perl version 5.6.0 or more recent.
+
+=item * CPAN URI module.
+
+=item * CPAN HTML::Entities module.
+
+=item * CPAN URI::Escape module.
+
+=back
+
+=head1 BUGS
+
+I am aware of no bugs - if you find one, send me an e-mail at info@ebruni.it
+with bugs.
+
+When submitting bug reports, be sure to include full details, including the VERSION of the
+module, and a test script demonstrating the problem!
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 LICENSE
+
+Business::BancaSella - A wrapper for Banca Sella online payment system with Perl 
+Copyright (C) 2001-2002 Bruni Emiliano <info@ebruni.it>
+
+Business::BancaSella::Ric::FileFast and Business::BancaSella::Ris::FileFast
+are written by Marco Gazerro and Mauro Fedele.
+
+This module is free software; you can redistribute it and/or modify it under the terms of
+either:
+
+a) the GNU General Public License as published by the Free Software Foundation; 
+either version 2, or (at your option) any later version, or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+either the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this module, 
+in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License along with this program; if
+not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Gestpay
+  Business::BancaSella::Gateway
+  Business::BancaSella::Decode
+  Business::BancaSella::Decode::Gateway
+  Business::BancaSella::Decode::Gestpay
+  Business::BancaSella::Encode
+  Business::BancaSella::Encode::Gateway
+  Business::BancaSella::Encode::Gestpay
+  Business::BancaSella::Ric
+  Business::BancaSella::Ric::File
+  Business::BancaSella::Ric::FileFast
+  Business::BancaSella::Ric::Mysql
+  Business::BancaSella::Ris
+  Business::BancaSella::Ris::File
+  Business::BancaSella::Ris::FileFast
+  Business::BancaSella::Ris::Mysql
+
+=cut

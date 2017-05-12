@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w -s
+
+our ($ori,$ablt,$rblt,$protcom) ;
+
+my ($bl,$langpat,%l);
+$bl = $ablt if (defined $ablt) && ($ablt =~ /[A-Za-z]+/);
+$bl = $rblt if (defined $rblt) && ($rblt =~ /[A-Za-z]+/);
+
+$/='';
+
+my $s;
+while(<>){
+  chomp;
+  if(/^\%/){
+    if (/\%baselang(?:uage)?\s+(\S+)/) { $bl ||= $1; }
+    while( m/\%lang(?:uage)?\s+(\S+.*)/g)     { 
+      my $ls = $1;
+      for ($ls =~ m/(\S+)/g){ $l{$_} = 1}; 
+      $langpat=join('|',keys %l)}
+  }
+  elsif(/^[#]/)                        {   }
+  elsif(/^(.*)/) { 
+      if($protcom){
+        while( s/^(.*?)\s*,\s*/$1 _and / ){} 
+        if($langpat){while( s/(\n(?:$langpat))(.*?)\s*,\s*/$1$2 _and / ){} }
+      }  
+      $_ .= "\nFROM $ori"   if $ori;
+      $_ = "$bl $_"         if $ablt;
+      $_ =~ s/^$bl\s+//i    if $rblt;
+  }
+  print "$_\n\n";
+}
+
+__END__
+
+=head1 NAME
+
+thesaurusSC - Make thesaurus changes (simple changes)
+
+=head1 SYNOPSIS
+
+ thesaurusSC -ori=Natura file.the    (adds  "FROM Natura" to each entry)
+ thesaurusSC -ablt[=PT]  file.the    (adds  "baselang tag" to each entry)
+ thesaurusSC -rblt[=PT]  file.the    (removes "baselang tag" from each entry)
+ thesaurusSC -protcom  file.the      (protect commas  "," --> "_and ")
+
+=head1 DESCRIPTION
+
+Make simple changes in Thesaurus files.
+
+ 1 add origin
+ 2 add baselang tag
+ 3 removes baselang tag
+ 4 protcom            protect commas in term and language
+ 5 cat               (not yet implemented)
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      

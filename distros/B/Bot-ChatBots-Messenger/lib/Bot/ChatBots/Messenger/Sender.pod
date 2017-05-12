@@ -1,0 +1,158 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Messenger::Sender - Bot::ChatBots Sender for Messenger
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Messenger::Sender;
+
+   my $sender = Bot::ChatBots::Messenger::Sender->new(
+      token => $ENV{TOKEN}, # mandatory!
+   );
+
+   my $specific_sender = Bot::ChatBots::Messenger::Sender->new(
+      token => $ENV{TOKEN}, # mandatory!
+      recipient => $ENV{RECIPIENT_ID},
+   );
+
+   $sender->send(
+      {
+         message   => {text => 'Aloha'},
+         recipient => {id   => $some_id},
+      }
+   );
+
+   # simple text suffices if there's a default recipient
+   $specific_sender->send('Hello, how are you?');
+
+   # well, just try to figure it out by yourself. Here `$input_record`
+   # is some record received e.g. by Bot::ChatBots::Messenger::WebHook
+   $sender->send('text message', $input_record);
+
+
+=head1 DESCRIPTION
+
+This is a sender for Facebook Messenger.
+
+=head1 ACCESSORS
+
+This class consumes the following roles (inheriting all its accessors):
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::Sender>
+
+=item *
+
+L<Bot::ChatBots::Role::UserAgent>
+
+=back
+
+The following additional accessors have a same-named option that can be passed
+to the constructor.
+
+=head2 B<< token >>
+
+   my $token = $obj->token;
+
+Accessor for the token. This MUST be provided upon creation of the object.
+
+=head2 B<< url >>
+
+   my $fb_messenger_url = $obj->url;
+
+The Facebook Messenger API endpoint. Defaults to
+L<https://graph.facebook.com/v2.6/me/messages>.
+
+=head1 METHODS
+
+This class consumes the following roles (inheriting all its methods):
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Role::Sender>
+
+=item *
+
+L<Bot::ChatBots::Role::UserAgent>
+
+=back
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< send_message >>
+
+   $obj->send_message($message); # OR
+   $obj->send_message($message, %args); # OR
+   $obj->send_message($message, \%args);
+
+Do actual sending of a message. This method leverages
+L<Bot::ChatBots::Role::Sender/ua_request> L</ua_request> to do the actual
+network traffic.
+
+A Messenger message is required to have the following structure:
+
+   {
+      message   => {text => $your_message},
+      recipient => {id => $your_recipient_id},
+   }
+
+If the input C<$message> is a hash reference, the C<message> part is
+supposed to be OK.
+
+If the C<recipient> part is missing, it is possibly auto-filled based on
+the following algorithm:
+
+=over
+
+=item *
+
+if a C<$args{record}> is provided, then the C<< $args{record}{channel}{id}
+>> is taken from it;
+
+=item *
+
+otherwise, if the L<Bot::ChatBots::Role::Sender/has_recipient> method
+returns a true value, then L<Bot::ChatBots::Role::Sender/recipient> is
+used;
+
+=item *
+
+otherwise an exception is thrown (L<Ouch> with code 500).
+
+=back
+
+You can also pass a C<$args{callback}> sub reference. This will be passed
+over to the user agent, most probably the L<Mojo::UserAgent> object that
+is provided by L<Bot::ChatBots::Role::Sender>.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::Sender> and
+L<Bot::ChatBots::Role::UserAgent>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,250 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_manage_members
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Getopt::Euclid qw(:minimal_keys);
+use List::Util qw(min);
+
+
+=head1 NAME
+
+bc_manage_members - Delete or rename community members
+
+=head1 SYNOPSIS
+
+  bc_manage_members -input_files   communities.generic              \
+                    -exclude_names Cyanobacteria Eukaryot*          \
+                    -name_prefix   "Root; "                         \
+                    -output_prefix processed_communities
+
+=head1 DESCRIPTION
+
+This script reads files containing biological communities and includes, deletes
+merges, sorts or renames the specified communities. See L<Bio::Community> for
+more information.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to manipulate. When providing communities
+in a format that supports only one community per file (e.g. gaas), you can
+provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_manage_members'
+
+=item -np <name_prefix> | -name_prefix <name_prefix>
+
+Prefix to add to the beginning of all member names. Default: name_prefix.default
+
+=for Euclid:
+   name_prefix.type: string
+   name_prefix.default: ''
+
+=item -ns <name_suffix> | -name_suffix <name_suffix>
+
+Suffix to add to the end of all member names. Default: name_suffix.default
+
+=for Euclid:
+   name_suffix.type: string
+   name_suffix.default: ''
+
+=item -in <include_names>... | -include_names <include_names>...
+
+If names of members are specified, only these members will be included in the
+output file. Member names can be specified using wildcards, which means that
+'marine*2013' will match all names starting with 'marine' and finishing with
+'2013', while '*gut*' will match all names containing 'gut'.
+
+=for Euclid:
+   include_names.type: string
+
+=item -en <exclude_names>... | -exclude_names <exclude_names>...
+
+Names of members to exclude from the output file. As with <include_names>, 
+wildcards are supported.
+
+=for Euclid:
+   exclude_names.type: string
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+manage( $ARGV{'input_files'}, $ARGV{'output_prefix'}  , $ARGV{'name_prefix'},
+        $ARGV{'name_suffix'}, $ARGV{'include_names'}  , $ARGV{'exclude_names'} );
+
+exit;
+
+
+func manage ($input_files, $output_prefix, $name_prefix, $name_suffix,
+   $include_names, $exclude_names) {
+
+   # Process regular expressions
+   my $include_regexps = regexify($include_names) if defined $include_names;
+   my $exclude_regexps = regexify($exclude_names) if defined $exclude_names;
+
+   # Read input communities
+   my $meta = Bio::Community::Meta->new;
+   my $format;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new(
+         -file => $input_file,
+      );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+
+   # Process metacommunity members
+   for my $member (@{$meta->get_all_members}) {
+
+      # Include or exclude members
+      my $include = 0;
+      my $name = $member->desc;
+      if ( $include_regexps ) {
+         # Only include specifically requested communities
+         if ($name ~~ @{$include_regexps}) {
+            $include = 1;
+         }
+      } else {
+         if (not $name ~~ @{$exclude_regexps}) {
+            $include = 1;
+         } # else it is specifically excluded
+      }
+      if (not $include) {
+         while (my $community = $meta->next_community) {
+            $community->remove_member($member);
+            if ($community->get_members_abundance == 0) {
+               warn "Warning: No members left in community '".$community->name."'\n";
+            }
+         }
+      }
+
+      # Rename members
+      $member->desc( $name_prefix.$name.$name_suffix );
+
+   }
+
+   # Write results
+   write_communities($meta, $output_prefix, $format);
+
+   return 1;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format) {
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format => $output_format,
+            -file   => '>'.$output_file,
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+}
+
+
+func regexify ($strings) {
+   # Given strings with wildcards, return the corresponding anchored regexps
+   # Example: 'marine.site1*2013' becomes '^marine\.site1.*2013$'
+   return [ map {
+      my $re = $_;
+      $re = quotemeta($re);
+      $re =~ s/\\\*/.*/g;
+      $re = qr/^$re$/;
+   } @$strings ];
+}
+
+

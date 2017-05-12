@@ -1,0 +1,5 @@
+Revision history for Perl extension Business::OnlinePayment::OCV.
+
+0.01  Sat Nov  9 13:39:46 PST 2002
+	-original version; created by ivan 1.0
+	-based on Business::OCV by Benjamin Low <b.d.low@unsw.edu.au>

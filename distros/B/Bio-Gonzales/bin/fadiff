@@ -1,0 +1,159 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Carp;
+
+use 5.010;
+
+use Bio::Gonzales::Seq::IO qw/faiterate/;
+use Digest::SHA1 qw/sha1_hex/;
+use Getopt::Long::Descriptive;
+
+my ( $opt, $usage ) = describe_options(
+  '%c %o <file1.fa> <file2.fa>',
+  ['diff fasta files based on id, description and sequence identity.'],
+  ['Deactivate options with --no<option>, e.g. %c --noseq'],
+  [],
+  [ 'seq|s!',  'check if sequences are identical. (On by default)',    { default => 1 } ],
+  [ 'id|i!',   'check if ids are identical. (On by default)',          { default => 1 } ],
+  [ 'desc|d!', 'check if descriptions are identical. (On by default)', { default => 1 } ],
+  [ 'rm_gaps', 'remove gaps',                                          { default => 0 } ],
+  [],
+  [ 'verbose|v', "print extra stuff" ],
+  [ 'help',      "print usage message and exit" ],
+  [],
+  ["Report bugs to jw\@bargsten.org"],
+);
+
+print( $usage->text ), exit if $opt->help;
+
+my ( $afile, $bfile ) = @ARGV;
+
+print( $usage->text ), exit
+  unless ( $afile && $bfile && -f $afile && -f $bfile );
+
+say "--- $afile";
+my $aiter = faiterate $afile;
+
+say "+++ $bfile";
+my $biter = faiterate $bfile;
+
+my %compare;
+
+hash_seqs( $aiter, \%compare, 'a' );
+hash_seqs( $biter, \%compare, 'b' );
+
+compare( \%compare, 'a', 'b' );
+
+sub compare {
+  my ( $diff, $taga, $tagb ) = @_;
+
+  for my $v ( values %$diff ) {
+
+    if ( exists( $v->{$taga} ) && exists( $v->{$tagb} ) ) {
+      #is there a difference between them? the only chance could be the number of duplicates
+      #since the key encodes already the rest/uniqueness
+      unless ( @{ $v->{$taga}{duplicates} } == @{ $v->{$tagb}{duplicates} } ) {
+        say "- " . join " ", @{ $v->{$taga} }{ 'id', 'desc' },
+          ">>>> num duplicates: " . scalar @{ $v->{$taga}{duplicates} };
+        say "+ " . join " ", @{ $v->{$tagb} }{ 'id', 'desc' },
+          ">>>> num duplicates: " . scalar @{ $v->{$tagb}{duplicates} };
+      } elsif ( $opt->verbose ) {
+        say "= "
+          . join( " <> ", @{ $v->{$taga} }{ 'sha', 'id', 'desc' } ) . " // "
+          . join( " <> ", @{ $v->{$tagb} }{ 'sha', 'id', 'desc' } );
+
+      }
+    } elsif ( exists( $v->{$taga} ) ) {
+      #only a
+      say "- " . join " <> ", @{ $v->{$taga} }{ 'sha', 'id', 'desc' };
+    } elsif ( exists( $v->{$tagb} ) ) {
+      #only b
+      say "+ " . join " <> ", @{ $v->{$tagb} }{ 'sha', 'id', 'desc' };
+    }
+  }
+
+  return;
+}
+
+sub hash_seqs {
+  my ( $siter, $diff, $tag ) = @_;
+
+  while ( my $s = $siter->() ) {
+    my @key;
+
+    my $sha = "n/a";
+    if ( $opt->seq ) {
+      my $seq = $s->seq;
+      $seq =~ y/-.//d
+        if ( $opt->rm_gaps );
+      $sha = sha1_hex($seq);
+      push @key, $sha;
+    }
+
+    push @key, $s->id
+      if ( $opt->id );
+
+    push @key, $s->desc
+      if ( $opt->desc );
+
+    my $key = join "_", @key;
+
+    $diff->{$key} //= {};
+
+    if ( exists( $diff->{$key}{$tag} ) ) {
+      # we have duplicates within one file
+      push @{ $diff->{$key}{$tag}{duplicates} }, { id => $s->id, desc => $s->desc, sha => $sha };
+    } else {
+      $diff->{$key}{$tag} = { id => $s->id, desc => $s->desc, sha => $sha, duplicates => [] };
+    }
+  }
+  return;
+}
+
+__END__
+
+=head1 NAME
+
+fadiff - diff fasta files
+
+=head1 SYNOPSIS
+
+    ./fadiff [OPTIONS] <FILE_1.FA> <FILE_2.FA>
+
+=head1 DESCRIPTION
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<< --seq (--noseq) >>
+
+Check (or not) if sequences are identical.
+Enabled by default.
+
+=item B<< --id (--noid) >>
+
+Check (or not) if ids are identical.
+Enabled by default.
+
+=item B<< --desc (--nodesc) >>
+
+Check (or not) if descriptions are identical.
+Enabled by default.
+
+=back
+
+=head1 SEE ALSO
+
+L<Bio::Gonzales::Seq::IO>
+
+=head1 AUTHOR
+
+jw bargsten, C<< <joachim.bargsten at wur.nl> >>
+
+=cut

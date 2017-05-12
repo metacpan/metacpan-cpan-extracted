@@ -1,0 +1,14 @@
+=head1 USE
+
+Fields are usually presented to users in main listing tables and on add/edit
+forms.  The C<label> statement provides the textual description of the field
+for the user.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in
+Kids/lib/GEN/Child.pm for 'Birth Day'.

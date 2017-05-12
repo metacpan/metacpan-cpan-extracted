@@ -1,0 +1,75 @@
+{
+   "abstract" : "Role for services to access Beam::Wire features",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Beam-Service",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "2.002004",
+            "Types::Standard" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "1.001005"
+         }
+      }
+   },
+   "provides" : {
+      "Beam::Service" : {
+         "file" : "lib/Beam/Service.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Beam-Service/issues"
+      },
+      "homepage" : "https://github.com/preaction/Beam-Service",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Beam-Service.git",
+         "web" : "https://github.com/preaction/Beam-Service"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:PREACTION",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+}
+

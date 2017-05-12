@@ -1,0 +1,5 @@
+/.build
+/Benchmark-CSV-*
+/examples/*/*.csv
+/examples/*/*.png
+/tmp/

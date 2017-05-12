@@ -1,0 +1,63 @@
+{
+   "abstract" : "custom B-based op checking for subroutines",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "B-CallChecker",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CallChecker" : "0.003",
+            "ExtUtils::CBuilder" : "0.15",
+            "IO::File" : "1.03",
+            "Module::Build" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B" : "0",
+            "Devel::CallChecker" : "0.003",
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "B::CallChecker" : {
+         "file" : "lib/B/CallChecker.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.001"
+}

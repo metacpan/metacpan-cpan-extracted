@@ -1,0 +1,33 @@
+---
+abstract: 'Manipulates foreach iterators'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>.'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::LeakTrace: 0.08
+  Test::More: 0.62
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: B::Foreach::Iterator
+name: B-Foreach-Iterator
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.1
+  perl: 5.8.8
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

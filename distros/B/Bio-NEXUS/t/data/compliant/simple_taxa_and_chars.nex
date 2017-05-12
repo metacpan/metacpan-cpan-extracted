@@ -1,0 +1,18 @@
+#NEXUS
+[simple_taxa_and_chars.nex]
+
+BEGIN TAXA;
+    dimensions ntax=4;
+    taxlabels A B C D;  
+END;
+BEGIN CHARACTERS;
+    dimensions nchar=6;
+    format
+        datatype=protein missing=? gap=- ;
+    matrix
+        A   -MQG-?
+        B   ---G--
+        C   -MGG--
+        D   -MGTGQ
+        ;
+END;

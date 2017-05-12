@@ -1,0 +1,36 @@
+#!/usr/local/bin/perl -w
+###########################################
+# webalert-bot
+# Mike Schilli, 2008 (m@perlmeister.com)
+###########################################
+use strict;
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+use Bot::Webalert;
+use HTTP::Request::Common;
+
+my $bot = Bot::Webalert->new(
+	server   => 'irc.freenode.net',
+	channels => ["#friends_of_webalert"],
+	ua_request  => GET("http://www.yahoo.com"),
+	ua_fetch_interval => 60, # check every minute
+);
+
+my $old_content = "";
+
+sub response_handler {
+    my($resp) = @_;
+
+    if( $resp->is_success() ) {
+	my $new_content = $resp->content();
+	if($old_content ne $new_content) {
+	    $old_content = $new_content;
+	    return "Ladies and Gentlemen, new content on " .
+		$resp->request->url->as_string() . " !";
+	}
+    }
+    return undef;
+}
+
+$bot->run();

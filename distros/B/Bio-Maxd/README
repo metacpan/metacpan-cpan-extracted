@@ -1,0 +1,44 @@
+Bio::Maxd provides methods for uploading and retrieving
+data to/from a maxd (MySQL) database.
+
+"maxd" is a data warehouse and visualization environment for 
+microarray expression data developed by the Microarray Group at
+Manchester Bioinformatics (http://www.bioinf.man.ac.uk/microarray/)
+
+Prerequisites:
+
+      DBI             1.29
+      DBD::mysql      2.1
+      HTML::Template  2.5
+
+To build:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+or 'perl Makefile.PL PREFIX=/path/to/the/directory' to install into
+a private directory other than Perl's default one.
+
+NOTES:
+
+1. You may want to set these environment variables for Maxd.pm 
+   to know where to connect to and where the html templates are:
+
+   setenv MAXD_USERID "userid/password"
+   setenv MAXD_HOSTDB "database_host"
+   setenv MAXD_TEMPLATES "/path/to/where/templates/are"
+
+2. Maxd uses extra tables for simulating a sequence in mysql
+   for the following tables: Hybridisation, Image, Measurement and
+   Description. Please run once the script extendMaxD to create and
+   initialize tables Hybridisation_Seq, Image_Seq, etc.
+
+COPYRIGHT
+
+Copyright (C) 2002 Jaime Prilusky. All rights reserved.
+
+AUTHOR
+
+Jaime Prilusky (Jaime.Prilusky@weizmann.ac.il)

@@ -1,0 +1,24 @@
+Revision history for Perl extension FASTASequence.
+
+0.07  2014-01-05T23:42:11
+    - switch to Dist::Zilla
+
+0.06  2004-03-05T07:59:23
+    - a bug in my upload tool included the distro in the
+      archive. this is now fixed...
+    - switched to Artistic License 2.0
+    - removed Exporter as dependency
+
+0.05  2004-03-04T07:59:23
+    - cleanup of META.yml
+    + more tests
+
+0.03  2004-03-03T07:59:23
+    - export sequence-information to XML
+
+0.02  2004-03-02T07:59:23 
+    - more description lines are accepted
+
+0.01  2004-03-01T07:59:23
+    - original version; created by h2xs 1.22 with options
+        -XA -n FASTASequence

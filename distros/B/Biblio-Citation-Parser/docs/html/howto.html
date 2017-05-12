@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Biblio::Citation::Parser 1.10 Documentation - How-To Guides</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - How-To Guides</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#how_to__modify_templates_in_biblio__citation__parser__standard">HOW TO: Modify Templates in Biblio::Citation::Parser::Standard</a></li>
+	<li><a href="#how_to__integrate_paratools_with_eprints_2">HOW TO: Integrate ParaTools with EPrints 2</a></li>
+	<li><a href="#how_to__create_a_new_parser">HOW TO: Create a New Parser</a></li>
+	<ul>
+
+		<li><a href="#creating_a_citation_parser">Creating a Citation Parser</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="how_to__modify_templates_in_biblio__citation__parser__standard">HOW TO: Modify Templates in Biblio::Citation::Parser::Standard</a></h1>
+<p>Adding new templates to the Standard parser is relatively easy:</p>
+<ul>
+<li></li>
+Locate where your Templates.pm file has been installed.
+<p>On Linux systems this should just involve doing 'locate Templates.pm', otherwise 'find / -name Templates.pm' should work. 
+Alternatively, you can edit the Templates.pm in the Biblio/Citation/Parser/ directory of an unpacked distribution, and install it once you have finished.</p>
+<p></p>
+<li></li>
+Add the template to the list.
+<p>If you are editing an already installed Templates.pm file you will probably have to be root to do this. If you are editing the Templates.pm inside an unpacked distribution, you will have to reinstall the modules once you are finished (see the Installation section).</p>
+<p></p></ul>
+<p>The Templates.pm file should contain a structure similar to this:</p>
+<pre>
+ $Biblio::Citation::Parser::Templates::templates = [
+        '_AUTHORS_, _PUBLICATION_, _YEAR_, _ISSUE_, _SPAGE_-_EPAGE_',
+ ...
+        ];</pre>
+<p>Each template is a string containing a set of placeholders. For example, '_AUTHORS_ (_YEAR_) _TITLE_' can match 'Jewell, M (2002) Title'. The following are valid field names:</p>
+<dl>
+<dt><strong><a name="item__any_">_ANY_</a></strong><br />
+</dt>
+<dd>
+Matches anything.
+</dd>
+<p></p>
+<dt><strong><a name="item__aufirst_">_AUFIRST_</a></strong><br />
+</dt>
+<dd>
+Matches the first name of an author.
+</dd>
+<p></p>
+<dt><strong><a name="item__aulast_">_AULAST_</a></strong><br />
+</dt>
+<dd>
+Matches the last name of an author.
+</dd>
+<p></p>
+<dt><strong><a name="item__authors_">_AUTHORS_</a></strong><br />
+</dt>
+<dd>
+Matches a list of authors.
+</dd>
+<p></p>
+<dt><strong><a name="item__cappublication_">_CAPPUBLICATION_</a></strong><br />
+</dt>
+<dd>
+Matches a capitalised publication title (e.g. ``Journal of Lemurs'').
+</dd>
+<p></p>
+<dt><strong><a name="item__captitle_">_CAPTITLE_</a></strong><br />
+</dt>
+<dd>
+Matches a capitalised title.
+</dd>
+<p></p>
+<dt><strong><a name="item__chapter_">_CHAPTER_</a></strong><br />
+</dt>
+<dd>
+Matches a chapter number.
+</dd>
+<p></p>
+<dt><strong><a name="item__date_">_DATE_</a></strong><br />
+</dt>
+<dd>
+Matches a date in nn/nn/nn form.
+</dd>
+<p></p>
+<dt><strong><a name="item__editor_">_EDITOR_</a></strong><br />
+</dt>
+<dd>
+Matches an editor's name.
+</dd>
+<p></p>
+<dt><strong><a name="item__epage_">_EPAGE_</a></strong><br />
+</dt>
+<dd>
+Matches the last page in a page range.
+</dd>
+<p></p>
+<dt><strong><a name="item__isbn_">_ISBN_</a></strong><br />
+</dt>
+<dd>
+Matches an ISBN number.
+</dd>
+<p></p>
+<dt><strong><a name="item__issn_">_ISSN_</a></strong><br />
+</dt>
+<dd>
+Matches an ISSN number.
+</dd>
+<p></p>
+<dt><strong><a name="item__issue_">_ISSUE_</a></strong><br />
+</dt>
+<dd>
+Matches an issue number.
+</dd>
+<p></p>
+<dt><strong><a name="item__pages_">_PAGES_</a></strong><br />
+</dt>
+<dd>
+Matches a page range in nn-nn form.
+</dd>
+<p></p>
+<dt><strong><a name="item__publication_">_PUBLICATION_</a></strong><br />
+</dt>
+<dd>
+Matches a publication name.
+</dd>
+<p></p>
+<dt><strong><a name="item__publisher_">_PUBLISHER_</a></strong><br />
+</dt>
+<dd>
+Matches a publisher name.
+</dd>
+<p></p>
+<dt><strong><a name="item__publoc_">_PUBLOC_</a></strong><br />
+</dt>
+<dd>
+Matches the location of a publisher.
+</dd>
+<p></p>
+<dt><strong><a name="item__spage_">_SPAGE_</a></strong><br />
+</dt>
+<dd>
+Matches the start page.
+</dd>
+<p></p>
+<dt><strong><a name="item__subtitle_">_SUBTITLE_</a></strong><br />
+</dt>
+<dd>
+Matches a subtitle.
+</dd>
+<p></p>
+<dt><strong><a name="item__title_">_TITLE_</a></strong><br />
+</dt>
+<dd>
+Matches an article title.
+</dd>
+<p></p>
+<dt><strong><a name="item__ucpublication_">_UCPUBLICATION_</a></strong><br />
+</dt>
+<dd>
+Matches a publication in entirely upper-case (e.g. JOURNAL OF LEMURS).
+</dd>
+<p></p>
+<dt><strong><a name="item__uctitle_">_UCTITLE_</a></strong><br />
+</dt>
+<dd>
+Matches a title in entirely upper-case.
+</dd>
+<p></p>
+<dt><strong><a name="item__url_">_URL_</a></strong><br />
+</dt>
+<dd>
+Matches a URL.
+</dd>
+<p></p>
+<dt><strong><a name="item__volume_">_VOLUME_</a></strong><br />
+</dt>
+<dd>
+Matches a volume.
+</dd>
+<p></p>
+<dt><strong><a name="item__year_">_YEAR_</a></strong><br />
+</dt>
+<dd>
+Matches a year (4 digits).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="how_to__integrate_paratools_with_eprints_2">HOW TO: Integrate ParaTools with EPrints 2</a></h1>
+<p>EPrints already contains ParaCite support, but using a specially built version of the module before it was part of ParaTools. To alter your cgi/paracite script to use ParaTools, you need to do the following:</p>
+<p>First replace</p>
+<pre>
+ use Citation::Parser::Simple;</pre>
+<p>with</p>
+<pre>
+ use Biblio::Citation::Parser::Standard;</pre>
+<p>Next, replace this line:</p>
+<pre>
+ my $parser = new Citation::Parser::Simple();</pre>
+<p>with this line:</p>
+<pre>
+ my $parser = new Biblio::Citation::Parser::Standard();</pre>
+<p>This should work fine, although you can obviously integrate ParaCite more if you wish.</p>
+<p>
+</p>
+<hr />
+<h1><a name="how_to__create_a_new_parser">HOW TO: Create a New Parser</a></h1>
+<p>
+</p>
+<h2><a name="creating_a_citation_parser">Creating a Citation Parser</a></h2>
+<p>All new citation parsers should be named Biblio::Citation::Parser::SomeName, where SomeName is replaced with a unique name (ideally the author's surname). The parser should extend the Biblio::Citation::Parser module like so:</p>
+<pre>
+ package Biblio::Citation::Parser::SomeName;
+ require Exporter;
+ @ISA = (&quot;Exporter&quot;, &quot;Biblio::Citation::Parser&quot;);
+ our @EXPORT_OK = ( 'new', 'parse' );</pre>
+<p>You should then override the 'new' and 'parse' methods:</p>
+<p>e.g.</p>
+<pre>
+ sub new
+ {
+         my($class) = @_;
+         my $self = {};
+         return bless($self, $class);
+ }</pre>
+<pre>
+ sub parse
+ {
+         my($self, $ref) = @_;
+         my $hashout = $self-&gt;extract_metadata($ref);
+         return $hashout;
+ }</pre>
+<p>This makes it easy for users to swap out one reference parser for another.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - How-To Guides</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

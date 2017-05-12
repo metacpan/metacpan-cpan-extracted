@@ -1,0 +1,58 @@
+{
+   "abstract" : "A bundle to install external CPAN modules used by the",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bundle-Zavitan",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Crypt::Blowfish" : "0",
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "Date::DayOfWeek" : "0",
+            "Date::Parse" : "0",
+            "MIME::Base64" : "0",
+            "Math::BigInt" : "0",
+            "Net::SMTP" : "0",
+            "Time::DaysInMonth" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bundle::Zavitan" : {
+         "file" : "lib/Bundle/Zavitan.pm",
+         "version" : "v0.2.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/zavitan-a-seminars-manager"
+      }
+   },
+   "version" : "v0.2.2"
+}

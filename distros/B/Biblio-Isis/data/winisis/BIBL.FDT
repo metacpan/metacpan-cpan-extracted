@@ -1,0 +1,55 @@
+W:BIBL  
+F:BIBL  SER   NO    
+S:BIBL  
+***
+Identifikator zapisa                              1 10 0 0
+ISBN                          abz                 10 10 0 1
+ISSN                          abdyz               11 10 0 1
+ISMN                          abdz                13 10 0 1
+Identifikator Ÿlanka          az2                 14 20 0 1
+Op†i podaci za procesiranje   a                   100 30 0 1
+Jezik predloçka               a                   101 10 0 0
+Zemlja izdavanja              ab                  102 10 0 0
+Polje kodiranih podataka      a                   105 30 0 0
+Naslov i odgovornost          abcdefghivz5kvwxy   200 50 0 0
+Izdanje                       ab                  205 50 0 1
+Izdavanje, raspaŸavanje       abcdefgh            210 50 0 0
+Materijalni opis              acde                215 100 0 1
+NakladniŸka cjelina           adefhivxw           225 100 0 1
+Karakteristike elektr. izvora a                   230 100 0 1
+Op†a napomena                 a                   300 1000 0 1
+Napomena o bibliografiji      a                   320 1000 0 1
+Napomena o sadržaju           a                   327 1000 0 1
+Sažetak                       a                   330 1000 0 1
+Napomena o elektr. izvoru     a                   336 1000 0 1
+Zahtjevi sistema za e-izvore  a                   337 500 0 1
+NakladniŸka cjelina (Serija)  1a                  410 100 0 1
+Prištampani, prikriv. radovi  1a                  423 100 0 1
+Skup                          1a                  461 100 0 1
+Podskup                       1a                  462 100 0 1
+Dio                           1a                  463 100 0 1
+Analitika                     1a                  464 100 0 1
+Uniformni naslov              a                   500 100 0 1
+Formalna odrednica            abd                 503 100 0 1
+Proçireni naslov              az                  532 100 0 1
+Osobno ime kao predmet        ab                  600 1000 0 1
+Geograsko ime kao predmet     ajxyz23             607 100 0 1
+Slobodno oblikovane predm,    a                   610 1000 0 1
+UDK                           abcvz               675 100 0 1
+Druga klasifikacija           abc2                686 100 0 1
+Osobno ime - prim.odgovornost abd34               700 100 0 0
+Osobno ime - alt.odgovornost  abd34               701 100 0 1
+Osobno ime - sek.odgovornost  abd345              702 100 0 1
+Korporativno t. - prim.odgov. abcdefghp34         710 1000 0 0
+Korporativno t. - alt.odgov.  abcdefghp34         711 100 0 1
+Korporativno t. - sek.odgov.  abcdefghp345        712 100 0 1
+Izvor podataka                abcg2               801 100 0 1
+ElektoniŸki izvori            u                   856 100 0 1
+Signatura                                         990 10 0 1
+Inventarni broj                                   991 10 0 1
+Mjesni podaci                 abc                 994 10 0 0
+Status zapisa                                     995 1 0 0
+Odgvorna osoba                ab                  996 50 0 0 
+Datum zadnje promjene                             997 20 0 0 
+Prijeslov, transliteracija    ab                  998 100 0 0
+

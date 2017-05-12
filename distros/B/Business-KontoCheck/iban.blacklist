@@ -1,0 +1,82 @@
+' Durch die IBAN-Regeln wird die Datei CONFIG.INI aus dem SEPA Account Converter
+' unnötig. Der zugehörige Block wird jetzt (falls die IBAN-Regeln in der
+' LUT-Datei vorhanden sind) für die Ausschlußliste des IBAN-Service-Portals
+' benutzt. Alle hier angegebenen Banken haben momentan in der BLZ-Tabelle die
+' IBAN-Regel 0 (Standardregel) Durch die Ausschlußliste wird für diese Banken,
+' falls noch keine IBAN-Regel definiert ist, keine IBAN-Berechnung mehr gemacht.
+' Indem der BLZ ein @ vorgestellt wird, wird diese Ausschlußliste für die
+' entsprechende BLZ ignoriert.
+'
+' Zur Unterscheidung, ob der Block aus dem Sepa Account Converter oder vom
+' IBAN-Service-Portal stammt, wird bei letzterem eine "BLZ" 2718281 eingefügt;
+' diese kann als normale BLZ nicht auftreten, da sie nur sieben Stellen hat und
+' ist insofern als Marker für konto_check gut geeignet.
+'
+' Der Block wird doppelt verwendet, sowohl für die Blacklist des SEPA Account
+' Converters, als auch für diese Liste. Die Liste des SAC ist mittlerweile
+' obsolet und wird, falls IBAN-Regeln vorhanden sind ignoriert. Falls die BLZ
+' 2718281 enthalten ist (kann sonst nicht vorkommen, da sie nur siebenstellig
+' ist), weiß KC, daß der Block die Liste des Iban-Service-Portals enthält und
+' aktiviert die Liste entsprechend.
+'
+' ====================================================================================
+'
+' Hier einige Seiten aus dem Anhang des Benutzerhandbuchs des IBAN-Service-Portals
+' (abgerufen 13.7.13 unter https://www.iban-service-portal.de/Benutzerhandbuch_IBAN_Service_Portal.pdf)
+'
+' 2 IBAN-Berechnungsregeln
+' Seit dem 03.06.2013 hält sich das IBAN-Service-Portal an die über die Deutsche
+' Bundesbank veröffentlichten IBAN-Berechnungsregeln. Konsultieren Sie bitte bei
+' Detailfagen zur Konvertierung die offziellen Dokumente der Deutschen Bundesbank
+' für die IBAN-Berechnung (Spezifikation und erweitertes
+' Bankleitzahlenverzeichnis).
+' 
+' Bei IBAN-Berechnungen für die nachfolgenden Institute weicht das
+' IBAN-Service-Portal von den offiziell veröffentlichten IBAN-Berechnungsregeln ab:
+' 
+' Nationalbank, BLZ 36020030
+' BHW Bausparkasse AG, BLZen 25410200, 25410300 und 44010200.
+' Walser Privatbank, BLZ 73361592
+' Fürst Fugger, BLZ 70030014
+' Volksbank Vorarlberg, BLZ 73391600
+' Sparkasse Schwarzwald-Baar Donaueschingen, BLZ 69451070
+' European Bank for Fund Services, BLZ 70013010
+' Donner & Reuschel, BLZ 70030300
+' Intercard, BLZen 70011900, 70011910 und 70011920
+' Bankhaus Jungholz, BLZ 73362421
+' 
+' Die obigen Abweichungen sind im Auftrag der o. g. Institute implementiert
+' worden. Wir gehen davon aus, dass diese Änderungen in dem nächsten erweiterten
+' Bankleitzahlenverzeichnis mit Gültigkeit ab September 2013 eingearbeitet
+' werden.
+' 
+' Gründe dafür sind u.a.:
+' 
+'  * Der Zahlungsverkehr wird über eine andere Geschäftsbank abgewickelt, deren
+'    IBAN-Berechnungsregeln im IBAN-Service-Portal hinterlegt sind.
+'  * Das Institut führt keine Konten für Dritte.
+'  * Die BLZ wird nur für Meldezwecke bei der Bundesbank benutzt.
+'  * Die deutsche BLZ des Instituts nimmt nicht am SEPA-Zahlungsverkehr teil.
+'    Der SEPA-Zahlungsverkehr wird über den Hauptsitz im Ausland abgewickelt.
+'  * Aufgrund einer Fusion wird eine alte BLZ, die zukünftig gelöscht werden soll,
+'    nicht mehr SEPA-fähig gemacht.
+
+'Marker für KC.
+02718281=0
+
+'Stand der Liste: 03.06.2013
+
+25410200=0
+25410300=0
+36020030=0
+44010200=0
+69451070=0
+70011900=0
+70011910=0
+70011920=0
+70013010=0
+70030014=0
+70030300=0
+73361592=0
+73362421=0
+73391600=0

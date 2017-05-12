@@ -1,0 +1,44 @@
+{
+   "abstract" : "Extensible array implemented as a binary heap in 100% Pure Perl",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Binary-Heap-Array",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "Data::Table::Text" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Binary::Heap::Array" : {
+         "file" : "lib/Binary/Heap/Array.pm",
+         "version" : "2017.121"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2017.121"
+}

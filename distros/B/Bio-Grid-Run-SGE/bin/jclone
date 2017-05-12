@@ -1,0 +1,95 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.010;
+use POSIX qw/strftime/;
+
+use Getopt::Std;
+use Pod::Usage;
+use File::Copy;
+use File::Spec;
+
+our $VERSION = '0.042'; # VERSION
+my %opt;
+
+# sections needed: NAME, SYNOPSIS, DESCRIPTION
+getopts('') or pod2usage( -exitstatus => 1, -verbose => 0 );
+
+my $dir    = shift;
+my $prefix = shift;
+
+die "no prefix" unless ($prefix);
+pod2usage( -exitstatus => 1, -verbose => 0, -message => "$dir is not a directory" ) unless ( -d $dir );
+
+my $date = strftime( "%Y-%m-%d", localtime );
+$prefix = $date . "_" . $prefix unless ( $prefix eq '.' );
+say STDERR "prefix is > $prefix <";
+
+for my $sd ( '', 'bin', 'conf' ) {
+  clone_dir( File::Spec->catdir( $dir, $sd ), File::Spec->catdir( $prefix, $sd ) );
+}
+
+sub HELP_MESSAGE { pod2usage( -exitstatus => 0, -verbose => 2 ) }
+
+sub clone_dir {
+  my $dir    = shift;
+  my $prefix = shift;
+
+  return unless ( -d $dir );
+  mkdir $prefix unless ( -d $prefix );
+
+  my @files = glob("$dir/*.yml");
+  push @files, glob("$dir/*.pl");
+  push @files, glob("$dir/*.py");
+  push @files, glob("$dir/*.R");
+  push @files, glob("$dir/*.sh");
+  push @files, "$dir/Makefile";
+
+  for my $f (@files) {
+    next unless ( -f $f );
+    my ( undef, $rd, $rf ) = File::Spec->splitpath($f);
+    say STDERR "$f -> $prefix/$rf";
+    copy( $f, $prefix ) or die "Copy failed: $!";
+  }
+
+}
+
+__END__
+
+=head1 NAME
+
+  jclone - clone job directory
+
+=head1 SYNOPSIS
+
+  jclone [options] <directory_to_clone> [<prefix>]
+
+
+  Options:
+
+   --help      detailed help message
+   --version   show script version
+   <prefix>    (see detailed help)
+
+=head1 DESCRIPTION
+
+If <prefix> is omitted, the current directory is the destination. Otherwise, a new directory with the current date and the prefix is created. Directory format: C<YYYY-MM-DD_$prefix>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<< --help >>
+
+Show this text.
+
+=back
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+jw bargsten, C<< <jw at bargsten dot org> >>
+
+=cut

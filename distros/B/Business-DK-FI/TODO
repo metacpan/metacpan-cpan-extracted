@@ -1,0 +1,13 @@
+TODO file for Business-DK-FI
+
+$Id$
+
+The project roadmap is available at:
+
+http://logiclab.jira.com/browse/BDKFI#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel
+
+- Include example of using PL/Perl for PostgreSQL [BDKFI-12]
+  http://logiclab.jira.com/browse/BDKFI-12
+
+- Investigate support for 04 series of FI numbers [DBKFI-13]
+  http://logiclab.jira.com/browse/BDKFI-13

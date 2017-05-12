@@ -1,0 +1,173 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+
+enum b2BodyType
+{
+	b2_staticBody = 0,
+	b2_kinematicBody,
+	b2_dynamicBody,
+};
+
+%name{Box2D::b2BodyDef} class b2BodyDef 
+{ 
+
+%{
+
+b2BodyDef*
+b2BodyDef::new( )
+	CODE:
+		RETVAL = new b2BodyDef();
+	OUTPUT:
+		RETVAL
+
+int
+b2BodyDef::type( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->type = (b2BodyType)SvUV( ST(1) );
+		}	
+		RETVAL = (int)THIS->type;
+	OUTPUT:
+		RETVAL
+
+
+b2Vec2* 
+b2BodyDef::position()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = &(THIS->position);	
+	OUTPUT:
+		RETVAL
+
+float32
+b2BodyDef::angle( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->angle = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->angle;
+	OUTPUT:
+		RETVAL
+
+b2Vec2* 
+b2BodyDef::linearVelocity()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = &(THIS->linearVelocity);	
+	OUTPUT:
+		RETVAL
+
+float32
+b2BodyDef::angularVelocity( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->angularVelocity = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->angularVelocity;
+	OUTPUT:
+		RETVAL
+
+float32
+b2BodyDef::linearDamping( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->linearDamping = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->linearDamping;
+	OUTPUT:
+		RETVAL
+
+float32
+b2BodyDef::angularDamping( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->angularDamping = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->angularDamping;
+	OUTPUT:
+		RETVAL
+
+bool
+b2BodyDef::allowSleep( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->allowSleep = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->allowSleep;
+	OUTPUT:
+		RETVAL
+
+bool
+b2BodyDef::awake( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->awake = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->awake;
+	OUTPUT:
+		RETVAL
+
+bool
+b2BodyDef::fixedRotation( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->fixedRotation = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->fixedRotation;
+	OUTPUT:
+		RETVAL
+
+bool
+b2BodyDef::bullet( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->bullet = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->bullet;
+	OUTPUT:
+		RETVAL
+
+bool
+b2BodyDef::active( ... )
+	CODE:
+		if( items > 1 )
+		{
+			THIS->active = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->active;
+	OUTPUT:
+		RETVAL
+
+SV*
+b2BodyDef::userData ( ... )
+	PPCODE: 
+		if ( items > 1)
+			THIS->userData = (void *)new_data( ST(1) ); 
+		 if (!THIS->userData)
+		  XSRETURN_EMPTY;
+		  ST(0) = (SV *)THIS->userData;
+		  XSRETURN(1);
+
+
+%}
+	
+};
+

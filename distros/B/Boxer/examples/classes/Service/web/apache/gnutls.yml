@@ -1,0 +1,7 @@
+classes:
+  - Service.web.apache
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - install Apache2 plugin GnuTLS

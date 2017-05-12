@@ -1,0 +1,89 @@
+
+%{
+
+#include <PerlContactListener.h>
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+
+%}
+
+
+%module{Box2D};
+
+%name{Box2D::PerlContactListener} class PerlContactListener 
+{
+
+    PerlContactListener( );
+              
+    // standard DESTROY method
+        ~PerlContactListener();
+
+
+    %{
+    
+void
+PerlContactListener::SetBeginContactSub( name )
+    SV *    name
+    CODE:
+        /* fprintf(stderr,"XS Code Begin Set!\n");*/
+        THIS->SetBeginContactSub( name );
+
+
+void
+PerlContactListener::SetEndContactSub(name)
+    SV *    name
+    CODE:
+        THIS->SetEndContactSub( name );
+
+void
+PerlContactListener::SetPreSolveSub(name)
+    SV *    name
+    CODE:
+        THIS->SetPreSolveSub( name );
+
+void
+PerlContactListener::SetPostSolveSub(name)
+    SV *    name
+    CODE:
+        THIS->SetPostSolveSub( name );
+
+
+
+
+
+b2Contact *
+PerlContactListener::ourContact( c )
+        b2Contact * c
+	PREINIT:
+		const char* CLASS = "Box2D::b2Contact";
+	CODE:
+		RETVAL = c;
+	OUTPUT:
+		RETVAL
+
+b2Manifold *
+PerlContactListener::ourManifold( c )
+        b2Manifold * c
+	PREINIT:
+		const char* CLASS = "Box2D::b2Manifold";
+	CODE:
+		RETVAL = c;
+	OUTPUT:
+		RETVAL
+
+b2ContactImpulse *
+PerlContactListener::ourContactImpulse( c )
+        b2ContactImpulse * c
+	PREINIT:
+		const char* CLASS = "Box2D::b2ContactImpulse";
+	CODE:
+		RETVAL = c;
+	OUTPUT:
+		RETVAL
+
+
+          %}
+
+
+};

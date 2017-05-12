@@ -1,0 +1,69 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::Role::Source - Telegram Source Role
+
+=head1 SYNOPSIS
+
+   package Some::Thing;
+   use Moo;
+   with 'Bot::ChatBots::Telegram::Role::Source';
+   ...
+
+=head1 DESCRIPTION
+
+This role is meant to be consumed by L<Bot::ChatBots::Telegram::WebHook>
+and L<Bot::ChatBots::Telegram::LongPoll>.
+
+=head1 ACCESSORS
+
+This role defines the accessors in the following subsections.
+
+=head2 B<< token >>
+
+   my $token = $obj->token;
+   $obj->token($ENV{TOKEN});
+
+Accessor for the token, used to access the Telegram service remotely. This
+also has an associated predicate function L</has_token>.
+
+=head1 METHODS
+
+This method defines the methods in the following subsections.
+
+=head2 B<< has_token >>
+
+   say 'yes!' if $obj->has_token;
+
+Predicate function to assess whether a L</token> is present or not.
+
+=head2 B<< normalize_record >>
+
+   my $record = $self->normlize_record($input_record);
+
+Perform some normalization on the record to give it a more "general"
+shape. Which is still in a state of flux.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

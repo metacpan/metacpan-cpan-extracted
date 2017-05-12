@@ -1,0 +1,25 @@
+package Bio::Chado::Schema::Result::Contact;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Contact - model persons, institutes, groups, organizations, etc
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Contact module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Contact::Contact>
+
+L<Bio::Chado::Schema::Result::Contact::ContactRelationship>
+
+=cut
+
+1;

@@ -1,0 +1,22 @@
+Changes
+lib/Business/OnlinePayment/IPayment.pm
+lib/Business/OnlinePayment/IPayment/Response.pm
+lib/Business/OnlinePayment/IPayment/Return.pm
+lib/Business/OnlinePayment/IPayment/Transaction.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/auth-refund.t
+t/capture-reverse.t
+t/ipayment.wsdl
+t/manifest.t
+t/options.t
+t/payment.t
+t/pod-coverage.t
+t/pod.t
+t/refund_cap.t
+t/storage.t
+t/url-validation.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

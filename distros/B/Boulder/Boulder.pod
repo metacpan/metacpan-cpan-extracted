@@ -1,0 +1,227 @@
+=head1 NAME
+
+Boulder - An API for hierarchical tag/value structures
+
+=head1 SYNOPSIS
+
+   # Read a series of People records from STDIN.
+   # Add an "Eligibility" attribute to all those whose
+   # Age >= 35 and Friends list includes "Fred"
+   
+   use Boulder::Stream;
+   
+   my $stream = Boulder::Stream->newFh;
+   
+   while ( my $record = <$stream> ) {
+      next unless $record->Age >= 35;
+      my @friends = $record->Friends;
+      next unless grep {$_ eq 'Fred'} @friends;
+
+      $record->insert(Eligibility => 'yes');
+      print $stream $record;
+    }
+
+Related manual pages:
+
+  basics
+  ------
+  Stone            hierarchical tag/value records
+  Stone::Cursor    Traverse a hierarchy
+
+  Boulder::Stream  stream-oriented storage for Stones
+  Boulder::Store   record-oriented storage for Stones
+  Boulder::XML     XML conversion for Stones
+  Boulder::String  conversion to strings
+
+  genome-related
+  ---------------
+
+  Boulder::Genbank   parse Genbank (DNA sequence) records
+  Boulder::Blast     parse BLAST (basic local alignment search tool) reports
+  Boulder::Medline   parse Medline (pubmed) records
+  Boulder::Omim      parse OMIM (online Mendelian inheritance in man) records
+  Boulder::Swissprot parse Swissprot records
+  Boulder::Unigene   parse Unigene records
+
+=head1 DESCRIPTION
+
+=head2 Boulder IO
+
+Boulder IO is a simple TAG=VALUE data format designed for sharing data
+between programs connected via a pipe.  It is also simple enough to use
+as a common data exchange format between databases, Web pages, and other
+data representations.
+
+The basic data format is very simple.  It consists of a series of TAG=VALUE
+pairs separated by newlines.  It is record-oriented.  The end of a record is
+indicated by an empty delimiter alone on a line.  The delimiter is "=" by
+default, but can be adjusted by the user.
+
+An example boulder stream looks like this:
+
+	Name=Lincoln Stein
+	Home=/u/bush202/lds32
+	Organization=Cold Spring Harbor Laboratory
+	Login=lds32
+	Password_age=20
+	Password_expires=60
+	=
+	Name=Leigh Deacon
+	Home=/u/bush202/tanager
+	Organization=Cold Spring Harbor Laboratory
+	Login=tanager
+	Password_age=2
+	Password_expires=60
+	=
+
+Notes:
+
+=over 4
+
+=item (1) 
+
+There is no need for all tags to appear in all records, or
+indeed for all the records to be homogeneous.
+
+=item (2)
+
+Multiple values are allowed, as with the ALIAS tag in the 
+second record.
+
+=item (3) 
+
+Lines can be any length, as in a potential 40 Kbp DNA sequence entry.
+
+=item (4)
+
+Tags can be any alphanumeric character (upper or lower case) and may
+contain embedded spaces.  Conventionally we use the characters
+A-Z0-9_, because they can be used without single quoting as keys in
+Perl associative arrays, but this is merely stylistic.  Values can be
+any character at all except for the reserved characters {}=% and
+newline.  You can incorporate binary data into the data stream by
+escaping these characters in the URL manner, using a % sign followed
+by the (capitalized) hexadecimal code for the character.  The module
+makes this automatic.
+
+=back
+
+=head2 Hierarchical Records
+
+The simple boulder format can be extended to accomodate nested
+relations and other intresting structures.  Nested records can be
+created in this way:
+
+ Name=Lincoln Stein
+ Home=/u/bush202/lds32
+ Organization=Cold Spring Harbor Laboratory
+ Login=lds32
+ Password_age=20
+ Password_expires=60
+ Privileges={
+   ChangePasswd=yes
+   CronJobs=yes
+   Reboot=yes
+   Shutdown=no
+ }
+ =
+ Name=Leigh Deacon
+ Home=/u/bush202/tanager
+ Organization=Cold Spring Harbor Laboratory
+ Login=tanager
+ Password_age=2
+ Password_expires=60
+ Privileges={
+   ChangePasswd=yes
+   CronJobs=no
+   Reboot=no
+   Shutdown=no
+ }
+ =
+
+As in the original format, tags may be multivalued.  For example,
+there might be several Privilege record assigned to a login account.
+Each subrecord may contain further subrecords.
+
+Within the program, a hierarchical record is encapsulated within a
+"Stone", an opaque structure that implements methods for fetching and
+settings its various tags.  
+
+=head2 Using Boulder for I/O
+
+The Boulder API was designed to make reading and writing of complex
+hierarchical records almost as easy as reading and writing single
+lines of text.
+
+=over 4
+
+=item Boulder::Stream
+
+The main component of the Boulder modules is Boulder::Stream, which
+provides a stream-oriented view of the data.  You can read and write
+to Boulder::Streams via tied filehandles, or via method calls.  Data
+records are flattened into a simple format called "boulderio" format.
+
+=item Boulder::XML
+
+Boulder::XML acts like Boulder::Stream, but the serialization format
+is XML.  You need XML::Parser installed to use this module.
+
+=item Boulder::Store
+
+This is a simple persistent storage class which allows you to store
+several (thousand) Stone's into a DB_File database.  You must have
+libdb and the Perl DB_File extensions installed in order to take
+advantage of this class.
+
+=item Boulder::Genbank
+
+=item Boulder::Unigene
+
+=item Boulder::OMIM
+
+=item Boulder::Blast
+
+=item Boulder::Medline
+
+=item Boulder::SwissProt
+
+These are parsers and accessors for various biological data sources.
+They act like Boulder::Stream, but return a set of Stone objects that
+have certain prescribed tags and values.  Many of these modules were
+written by Luca I.G. Toldo <luca.toldo@merck.de>.
+
+=back
+
+=head2 Stone Objects
+
+The Stone object encapsulates a set of tags and values.  Any tag can
+be single- or multivalued, and tags are allowed to contain subtags to
+any depth.  A simple set of methods named tags(), get(), put(),
+insert(), replace() and so forth, allows you to examine the tags that
+are available, get and set their values, and search for particular
+tags.  In addition, an autoload mechanism allows you to use method
+calls to access tags, for example:
+
+   my @friends = $record->Friends;
+
+is equivalent to:
+
+   my @friends = $record->get('Friends');
+
+A Stone::Cursor class allows you to traverse Stones systematically.
+
+A full explanation of the Stone class can be found in its manual page.
+
+=head1 AUTHOR
+
+Lincoln D. Stein <lstein@cshl.org>, Cold Spring Harbor Laboratory,
+Cold Spring Harbor, NY.  This module can be used and distributed on
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Boulder::Blast>, L<Boulder::Genbank>, L<Boulder::Medline>, L<Boulder::Unigene>,
+L<Boulder::Omim>, L<Boulder::SwissProt>
+
+=cut

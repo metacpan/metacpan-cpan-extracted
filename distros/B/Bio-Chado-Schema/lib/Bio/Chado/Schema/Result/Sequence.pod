@@ -1,0 +1,65 @@
+package Bio::Chado::Schema::Result::Sequence;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Sequence - Sequence and sequence features, their localization and properties
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Sequence module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Sequence::Feature>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureCvterm>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureCvtermDbxref>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureCvtermPub>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureCvtermprop>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureDbxref>
+
+L<Bio::Chado::Schema::Result::Sequence::FeaturePub>
+
+L<Bio::Chado::Schema::Result::Sequence::FeaturePubprop>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureRelationship>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureRelationshipPub>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureRelationshipprop>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureRelationshippropPub>
+
+L<Bio::Chado::Schema::Result::Sequence::FeatureSynonym>
+
+L<Bio::Chado::Schema::Result::Sequence::Featureloc>
+
+L<Bio::Chado::Schema::Result::Sequence::FeaturelocPub>
+
+L<Bio::Chado::Schema::Result::Sequence::Featureprop>
+
+L<Bio::Chado::Schema::Result::Sequence::FeaturepropPub>
+
+L<Bio::Chado::Schema::Result::Sequence::IntronCombinedView>
+
+L<Bio::Chado::Schema::Result::Sequence::IntronlocView>
+
+L<Bio::Chado::Schema::Result::Sequence::ProteinCodingGene>
+
+L<Bio::Chado::Schema::Result::Sequence::Synonym>
+
+L<Bio::Chado::Schema::Result::Sequence::TypeFeatureCount>
+
+=cut
+
+1;

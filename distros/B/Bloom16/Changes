@@ -1,0 +1,6 @@
+Revision history for Perl extension Bloom16.
+
+0.01  Fri Apr 20 07:02:58 2001
+	- original version; created by h2xs 1.20 with options
+		-XA -n Bloom16
+

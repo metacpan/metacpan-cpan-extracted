@@ -1,0 +1,83 @@
+NAME
+    Business::TW::TSIB::CStorePayment - Module for Taishin Bank Convenient
+    Store Payment Management
+
+SYNOPSIS
+        use Business::TW::TSIB::CStorePayment;
+        my $csp = Business::TW::TSIB::CStorePayment->new({ corp_code => 'CPCU' });
+        my @bar = $csp->generate( { due    => DateTime->new( year => 2007, month => 4, day => 2 ),
+                                    collect_until => DateTime->new( year => 2007, month => 4, day => 2 ),
+                                    amount => 3900,
+                                    ar_id  => '20892' } );
+
+        # render the code39 barcode with GD::Barcode
+        my @png = map { GD::Barcode::Code39->new("*$_*")->plot->png } @bar;
+
+        # not yet
+        my $entries = Business::TW::TSIB::CStorePayment->parse_summary($fh);
+
+        # entries is arrayref of Business::TW::TSIB::CStorePayment::Entry objects,
+
+DESCRIPTION
+    This module provides utility functions for the convenient store payment
+    collection service by TSIB (Taishin International Bank, Taiwan).
+
+METHODS
+  new( { corp_code => $corp_code} )
+    Initialize the payment collection context with "corp_code" provided by
+    TSIB.
+
+  $csp->generate( $args )
+    Generate bar codes for the given arguments. Returns a list of 3 strings
+    that are to be printed as barcode. $args is a hash ref and must contain:
+
+    due A DateTime object for due day of the payment.
+
+    collect_until
+        A DateTime object for last collection date, default to "due".
+
+    amount
+        The expected amount of the transaction.
+
+    ar_id
+        The arbitary account receivable identifier.
+
+  $self->parse_summary($fh)
+AUTHOR
+    Chia-liang Kao, "<clkao AT aiink.com>" ,
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-business-tw-taishinbank-cstorepayment at rt.cpan.org", or through
+    the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-TW-TSIB-CStoreP
+    ayment>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::TW::TSIB::CStorePayment
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Business-TW-TSIB-CStorePayment>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Business-TW-TSIB-CStorePayment>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-TW-TSIB-CStorePay
+        ment>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Business-TW-TSIB-CStorePayment>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 AIINK co., ltd, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

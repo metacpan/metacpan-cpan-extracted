@@ -1,0 +1,65 @@
+Revision history for Brannigan
+
+1.100001  2017-02-06 22:53:45+02:00 Asia/Jerusalem
+    - Re-release under the terms of the Apache License 2.0
+
+1.1       2013-05-02 21:41:45 Asia/Jerusalem
+	- Sorting keys when dealing with hashes to prevent unexpected errors
+	  and test failures due to Perl's new hash key randomization
+	  introduced in version 5.17.
+
+1.0       2013-01-15 21:51:38 Asia/Jerusalem
+	- Added the ability to add a new scheme after the Brannigan object
+	  has been created (with the add_scheme() method).
+	- Added the ability to use Brannigan functionally, by directly
+	  giving the process() method a scheme hash-ref.
+	- Shortened the synopsis section, moved the example from it
+	  to a manual (still in the main pod document)
+
+0.9       2011-07-04 22:35:57 Asia/Jerusalem
+	- Added the matches() validation for regular expression matching
+	- Added several validation methods geared toward passphrase validation
+	- Added a test file that tests Brannigan::Validations
+
+0.8       2010-07-26 21:38:19 Asia/Jerusalem
+	- Added support for cross-scheme custom validation methods defined
+	  in the Brannigan object
+	- Updated the complex test to use the new custom validation feature
+
+0.7       2010-07-23 20:02:18 Asia/Jerusalem
+	- Added some info about the required() validation method
+	- Added a new validation method: is_true()
+
+0.6       2010-07-23 11:48:14 Asia/Jerusalem
+	- Fixed bug where the required() validation failed erroneously when value was false
+
+0.5       2010-07-16 16:23:32 Asia/Jerusalem
+	- Fixed bug where an empty hash-ref was returned in the rejects hashref
+	  for array type parameters
+	- Some more documentation restructures
+
+0.4       2010-07-14 19:00:25 Asia/Jerusalem
+	- Small bug fixes
+	- Restructured and expanded modules documentation
+	- Completed the examples POD page
+
+0.3       2010-07-06 19:33:16 Asia/Jerusalem
+	- Added support for complex data structures (hash-refs and array-refs with nesting support)
+	- Added support for default values/methods
+	- Added support for creating rules for parameters based on regular expressions (both in 'params' and in 'groups')
+	- Added support for the '_all' meta-parameter
+	- Created a test for complex data schemes
+	- Removed the datetime() validation, it didn't work
+	- Fixed bug where required parameters that weren't provided weren't added to the rejects list
+	- Fixed bug where the forbidden rule didn't tramp on inherited required rules (and vica versa)
+	- Heavily modified and updated the documentation of the modules
+	- Added an examples POD page
+	- Various bug fixes
+	- Added the one_of validation method
+	- Modified every length related validation methods to support array references
+
+0.2       2010-06-26 04:00:53 Asia/Jerusalem
+	- Fixed some stupid documentation mistakes.
+
+0.1       2010-06-26 03:56:58 Asia/Jerusalem
+	- Initial release

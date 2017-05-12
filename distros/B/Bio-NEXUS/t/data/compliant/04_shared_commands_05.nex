@@ -1,0 +1,20 @@
+#NEXUS
+BEGIN TAXA;
+    DIMENSIONS ntax=3;
+    TAXLABELS taxon_1, taxon_2, taxon_3;
+END;
+BEGIN CHARACTERS;
+	dimensions nchar=3;
+    format
+        NoTokens;
+    charlabels r g b;
+    matrix
+        taxon_1 rgg
+        taxon_2 rbg
+        taxon_3 bbg;
+
+END;
+BEGIN ASSUMPTIONS;
+	WTSET CORE_column_scores (VECTOR NoTokens) = 
+	241;
+END;

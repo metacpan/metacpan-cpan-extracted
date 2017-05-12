@@ -1,0 +1,362 @@
+<html>
+		<head>
+				<title>The list of supported NEXUS commands,  subcommands,  etc.</title>
+				
+				<style type = "text/css">
+						body {
+								background-color: #f4f5ff;
+								margin-top: 22pt;
+								margin-left: 80pt;
+								margin-right: 80pt;
+								
+								font-family: "Trebuchet MS", Verdana, Arial, Sans-serif;
+								font-size: 11pt;
+						}
+						h1 {
+								margin-bottom: 50pt;
+								font-family: Georgia,  Century;
+								color: #004080;
+						}
+						h2 {
+						}
+						p {
+								color: #3e3e3e;
+						}
+						table {
+								margin-top: 40pt;
+								margin-left: -30;
+								margin-right: -30;
+								border-width: 2px;
+								border-spacing: 1px;
+								border-style: solid;
+								border-color: black;
+								border-collapse: collapse;
+								
+								font-family: "courier",  "courier new";
+								font-size: 9pt;
+						}
+						table th {
+								border-width: 1px;
+								border-style: solid;
+								border-color: gray;
+								padding: 3px;
+
+								color: #473100;
+								background: #fefbdb;
+								font-size: 10pt;
+						}
+						table td {
+								border-width: 1px;
+								border-style: solid;
+								border-color: lightgray;
+								padding-left: 5px;
+								padding-right: 5px;
+																															
+								background: white;
+						}
+						p.smallnote {
+								font-size: 8pt;
+						}
+						p.bottom {
+								margin-bottom: 50pt;
+						}
+						abbr {
+								border-bottom-width: 1px;
+								border-bottom-style: dotted;
+								border-color: blue;
+						}
+				</style>
+				
+		</head>
+
+		
+		<body>
+				<h1>NEXUS commands</h1>
+				<h2>About this document</h2>
+				This document provides a <b>very crude</b> basis to quantify the degree of support for NEXUS provided by Bio::NEXUS.  Of the various ways we might choose to quantify support (e.g., fraction of fully supported blocks), we decided to break it down to the level of commands and subcommands, but not to the level of controlled vocabularies of command arguments (e.g., DNA, RNA, protein are part of a controlled vocabulary for the datatype subcommand of the format command).  If a command occurs in N blocks, we count it N times, because the implementation may differ between blocks (e.g., dimensions is different in taxa vs. characters blocks).  <b>N.B.</b>, quantifying support precisely and accurately is not a high priority for us right now, so we have done a quick-and-dirty job of it.  Therefore, expect to find mistakes and inconsistencies in this document. 
+                <h2>References and notes</h2>
+				<p>Maddison,  D.R.,  Swofford D.L.,  and Maddison W.P. (1997) NEXUS: An extensible file format for systematic information. Systematic Biology,  46,  590-621. </p>
+				<p>"p.594: Programs that read NEXUS files do not have to be able to understand all aspects of the file format; In fact,  no program at this time can understand more than about 60% of elements described in this document.</p>
+				<p>object definition command : see page 619 of standards.</p>
+				
+				<table width = "100%">
+						<tr>
+						<th>Key words</th>
+						<th>Blocks</th> 
+						<th>Is Command</th> 
+						<th><abbr title="Is Object Definition">Is Obj. Def.</abbr></th> 
+						<th>Modifies command</th> 
+						<th>Arguments</th> 
+						<th># of blocks using command</th> 
+						<th># in Bio:: NEXUS</th> 
+						<th>Comment</th> 
+						</tr>
+						
+						<!-- table data -->
+						<tr>
+								<td>#NEXUS</td> <td>-</td> <td>FALSE</td> <td>FALSE</td> <td>-</td> <td></td> <td>1</td> <td>1</td> <td></td> 						</tr>
+						<tr>
+								<td>begin</td> <td>all</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td></td> <td>10</td> <td>10</td> <td></td> 
+						</tr>
+						<tr>
+								<td>taxa</td> <td>taxa</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td> <td></td> 
+						</tr>
+						<tr>
+								<td>dimensions</td> <td>"taxa,  characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td></td> <td>4</td> <td>4</td> <td>"In taxa block,  must appear before taxlabels; in characters block must proceed charlabels,  charstatelabels,  statelabels,  ,  matrix"</td> 
+						</tr>
+						<tr>
+								<td>ntax</td> <td>"taxa,  distances"</td> <td>FALSE</td> <td>FALSE</td> <td>"dimensions,  newtaxa"</td> <td>number-of-taxa</td> <td>3</td> <td>3</td> <td>use only in taxa block or with newtaxa command</td> 
+						</tr>
+												<tr>
+								<td>taxlabels</td> <td>"taxa,  characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td>taxon-name ..</td> <td>4</td> <td>4</td> <td>"taxon names- ""must not correspond to another taxon name or number"""</td> 
+						</tr>
+						<tr>
+								<td>end</td> <td>all</td> <td>TRUE</td> <td>FALSE</td> <td></td> <td></td> <td>10</td> <td>10</td> <td>the synonym "endblock" also is supported</td> 
+						</tr>
+						
+						<tr>
+								<td>characters</td> <td>characters</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>newtaxa</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>dimensions</td> <td>ntax</td> <td>3</td> <td>0</td> <td>Must appear before ntax. deprecated.</td> 
+						</tr>
+						
+						<tr>
+								<td>nchar</td> <td>"characters,  distances"</td> <td>FALSE</td> <td>FALSE</td> <td>dimensions</td> <td>number-of-characters</td> <td>2</td> <td>2</td>  <td></td>
+						</tr>
+						<tr>
+								<td>format</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td></td> <td>3</td> <td>3</td> <td>"in characters block must proceed charlabels,  charstatelabels,  statelabels,  matrix"</td> 
+						</tr>
+												<tr>
+								<td>datatype</td> <td>"characters,  unaligned"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>{standard  |  DNA  |  RNA  |  nucleotide  |  protein  |  continous}</td> <td>2</td> <td>2</td>  <td></td>
+						</tr>
+						<tr>
+								<td>respectcase</td> <td>"characters,  unaligned"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>2</td> <td>0</td>  <td></td>
+						</tr>
+												
+						<tr>
+								<td>missing</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>symbol</td> <td>3</td> <td>3</td>  <td></td>
+						</tr>
+						<tr>
+								<td>gap</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>symbol</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+												
+						<tr>
+								<td>symbols</td> <td>"characters,  unaligned"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>"symbol .."</td> <td>2</td> <td>2</td>  <td></td>
+						</tr>
+						<tr>
+								<td>equate</td> <td>"characters,  unaligned"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>"symbol = entry .."</td> <td>2</td> <td>0</td>  <td></td>
+						</tr>
+						
+						<tr>
+								<td>matchchar</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>symbol</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>labels</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>3</td> <td>3</td> <td>mutually exclusive with nolabels</td> 
+						</tr>
+						<tr>
+								<td>nolabels</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>3</td> <td>3</td> <td>mutually exclusive with labels</td> 
+						</tr>
+						
+						<tr>
+								<td>transpose</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>interleave</td> <td>"characters,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>2</td> <td>2</td>  <td></td>
+						</tr>
+						
+						<tr>
+								<td>items</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>(items ..) items =  {min  |  max  |  median  |  average  |  variance  |  stderror  |  samplesize  |  states}</td> <td>1</td> <td>1</td> <td>no checking of values (makes no sense to do so without dependent methods)</td> 
+						</tr>
+						<tr>
+								<td>statesformat</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>{statespresent  |  individuals  |  count  |  frequency}</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>tokens</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>1</td> <td>1</td> <td>mutually exclusive with notokens</td> 
+						</tr>
+						<tr>
+								<td>notokens</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>none</td> <td>1</td> <td>1</td> <td>mutually exclusive with tokens</td> 
+						</tr>
+						<tr>
+								<td>eliminate</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td>character-set</td> <td>1</td> <td>0</td> <td>"in characters block must proceed charlabels,  charstatelabels,  statelabels, matrix"</td> 
+						</tr>
+						<tr>
+								<td>charstatelabels</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td>character-number character-name/ state-name ..</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>charlabels</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td>character-name ..</td> <td>1</td> <td>1</td>   <td></td>
+						</tr>
+						
+						<tr>
+								<td>statelabels</td> <td>characters</td> <td>TRUE</td> <td>FALSE</td> <td></td> <td>character-number state-name ..</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>matrix</td> <td>"characters,  unaligned,  distances"</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td>data-matrix</td> <td>3</td> <td>3</td>  <td></td>
+						</tr>
+						<tr>
+								<td>unaligned</td> <td>unaligned</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td>-</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>distances</td> <td>distances</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td>-</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>triangle</td> <td>distances</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td>{lower  |  upper  |  both}</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>diagonal</td> <td>distances</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td></td> <td>1</td> <td>1</td> <td>mutually exclusive with nodiagonal</td> 
+						</tr>
+						<tr>
+								<td>nodiagonal</td> <td>distances</td> <td>TRUE</td> <td>FALSE</td> <td>format</td> <td></td> <td>1</td> <td>1</td> <td>mutually exclusive with diagonal</td> 
+						</tr>
+						
+						<tr>
+								<td>data</td> <td>data</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td> <td>Equivalent to characters block where the newtaxa subcommand is included in the dimensions command. Deprecated</td> 
+						</tr>
+						<tr>
+								<td>codons</td> <td>codons</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td>-</td> <td>1</td> <td>1</td> <td>currently, block is read but no commands supported</td> 
+						</tr>
+						<tr>
+								<td>codonposset</td> <td>codons</td> <td>TRUE</td> <td>TRUE</td> <td></td> <td>"codonposset [*] name [({standard |  vector})  =  N: character-set,  1: character-set,  2: character-set,  3: character-set;"</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>geneticcode</td> <td>codons</td> <td>TRUE</td> <td>TRUE</td> <td></td> <td>geneticcode code-name  =  genetic-code-description</td> <td>1</td> <td>0</td> <td>"predefined code-names  =  "universal,  universtal.ext,  mtdna.dros,  mtdna.dros.ext,  mtdna.mam,  mtdna.mam.ext,  mtdna.yeast"</td> 
+						</tr>
+						<tr>
+								<td>codeorder</td> <td>codons</td> <td>TRUE</td> <td>FALSE</td> <td>geneticcode</td> <td>132 or other</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>nucorder</td> <td>codons</td> <td>TRUE</td> <td>FALSE</td> <td>geneticcode</td> <td>TCAG or other</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>tokens</td> <td>codons</td> <td>TRUE</td> <td>FALSE</td> <td>geneticcode</td> <td></td> <td>1</td> <td>0</td> <td>mutually exclusive with notokens</td> 
+						</tr>
+						<tr>
+								<td>notokens</td> <td>codons</td> <td>TRUE</td> <td>FALSE</td> <td>geneticcode</td> <td></td> <td>1</td> <td>0</td> <td>mutually exclusive with tokens</td> 
+						</tr>
+												
+
+												<tr>
+								<td>extensions</td> <td>codons</td> <td>TRUE</td> <td>FALSE</td> <td>geneticcode</td> <td>symbol ..</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>codeset</td> <td>codons</td> <td>TRUE</td> <td>TRUE</td> <td></td> <td>codeset [*] code-set-name [({characters | unaligned |  taxa})]  =  code-name: character-set or taxon-set .. or all</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>sets</td> <td>sets</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>charset</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>charset charset-name [( {standard  |  vector})]  =  character-set</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>stateset</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>stateset stateset-name [({standard  |  vector})]  =  state-set</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>changeset</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>changeset changeset-name  =  state-set &lt;-&gt; state-set ..</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>taxset</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>taxset taxset-name [({standard  |  vector})]  =  taxon-set</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>treeset</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>"treeset charset-name [({standard,   vector})]  =  character-set"</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>charpartition</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>charpartition partition-name  [({standard |  vector}) {tokens  |  notokens}]  =  subset-name : character-set</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>tokens</td> <td>sets</td> <td>TRUE</td> <td>FALSE</td> <td>"charpartition,  taxpartition,   treepartition"</td> <td>none</td> <td>1</td> <td>0</td> <td>mutually exclusive with notokens</td> 
+						</tr>
+						<tr>
+								<td>notokens</td> <td>sets</td> <td>TRUE</td> <td>FALSE</td> <td>"charpartition,  taxpartition,   treepartition"</td> <td>none</td> <td>1</td> <td>0</td> <td>mutually exclusive with tokens</td> 
+						</tr>
+						<tr>
+								<td>taxpartition</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>taxpartition partition-name  [({standard |  vector}) {tokens  |  notokens}]  =  subset-name : taxon -set</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>treepartition</td> <td>sets</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>treepartition partition-name [({standard |  vector}) {tokens  |  notokens}]  =  subset-name : tree-set</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>assumptions</td> <td>assumptions</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>options</td> <td>assumptions</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>deftype</td> <td>assumptions</td> <td>TRUE</td> <td>FALSE</td> <td>options</td> <td>deftype  =  type-name</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>polytcount</td> <td>assumptions</td> <td>TRUE</td> <td>FALSE</td> <td>options</td> <td>{minstep | maxsteps}</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>gapmode</td> <td>assumptions</td> <td>TRUE</td> <td>FALSE</td> <td>options</td> <td>{missing | newstate}</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>usertype</td> <td>assumptions</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>usertype type-name [({stepmatrix | cstree})]  =  usertype-description</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>typeset</td> <td>assumptions</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>"typeset [*] typeset-name [(standard,   vector)]  =  type-set-definition"</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>wtset</td> <td>assumptions</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>wtset [*] wtset-name  [({standard |  vector})]  =  wtset-definition</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>exset</td> <td>assumptions</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>exset [*] exset-name  [({standard |  vector})]  =  exset-definition</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>ancstates</td> <td>assumptions</td> <td>TRUE</td> <td>TRUE</td> <td>-</td> <td>ancstates [*] ancstates-name  [({standard |  vector})]  =  ancstates-definition</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>trees</td> <td>Trees</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>translate</td> <td>Trees</td> <td>TRUE</td> <td>FALSE</td> <td>-</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>tree</td> <td>Trees</td> <td>TRUE</td> <td>TRUE</td> <td></td> <td>tree [*] tree-name  =  tree-specification</td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>[&amp;R]</td> <td>Trees</td> <td>FALSE</td> <td>FALSE</td> <td>tree</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>[&amp;U]</td> <td>Trees</td> <td>FALSE</td> <td>FALSE</td> <td>tree</td> <td></td> <td>1</td> <td>1</td>  <td></td>
+						</tr>
+						<tr>
+								<td>notes</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>begin</td> <td></td> <td>1</td> <td>1</td> <td>currently, block is read but no commands supported</td> 
+						</tr>
+						<tr>
+								<td>text</td> <td>notes</td> <td>TRUE</td> <td>FALSE</td> <td></td> <td>text [ taxon = taxon-set] [character  =  character-set] [state = state-set][ tree  =  tree-set] source  =  {inline | file | resource} text  =  text-or-source descriptor</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>picture</td> <td>notes</td> <td>TRUE</td> <td>FALSE</td> <td></td> <td>picture [ taxon = taxon-set] [character  =  character-set] [state = state-set][ tree  =  tree-set] [format = {PICT | TIFF | EPS | JPEG | GIF}] source  =  {inline | file | resource} picture  =  picture-or-source descriptor</td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>taxon</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>"text,  picture"</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>character</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>"text,  picture"</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>state</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>"text,  picture"</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>tree</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>"text,  picture"</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>source</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>"text,  picture"</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>text</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>text</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>encode</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>picture</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+						<tr>
+								<td>picture</td> <td>notes</td> <td>FALSE</td> <td>FALSE</td> <td>picture</td> <td></td> <td>1</td> <td>0</td>  <td></td>
+						</tr>
+
+						<!-- table data -->
+						
+				</table>
+						<p class=smallnote>(Made by Vivek and Arlin,  August 8th 2006)</p>
+						<p class=bottom></p>
+		</body>
+</html>	

@@ -1,0 +1,7 @@
+classes:
+  - Desktop.base
+parameters:
+  doc:
+    desktop-web:
+      headline:
+        - Desktop web

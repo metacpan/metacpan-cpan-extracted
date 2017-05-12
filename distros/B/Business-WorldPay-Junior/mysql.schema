@@ -1,0 +1,58 @@
+-- MySQL dump 8.21
+--
+-- Host: localhost    Database: test
+---------------------------------------------------------
+-- Server version	3.23.49
+
+--
+-- Table structure for table 'worldpay'
+--
+
+CREATE TABLE worldpay (
+  cartId int(11) NOT NULL auto_increment,
+  instId int(11) NOT NULL default '0',
+  description tinyblob NOT NULL,
+  amount decimal(10,2) NOT NULL default '0.00',
+  currency enum('GBP','EUR','USD') NOT NULL default 'GBP',
+  testMode enum('0','100','101') NOT NULL default '0',
+  name varchar(40) default NULL,
+  address tinyblob,
+  postcode varchar(12) default NULL,
+  country char(2) default NULL,
+  tel varchar(30) default NULL,
+  fax varchar(30) default NULL,
+  email varchar(80) default NULL,
+  transId varchar(16) default NULL,
+  futurePayId varchar(16) default NULL,
+  transStatus enum('Y','C') default NULL,
+  transTime bigint(20) default NULL,
+  authAmount decimal(10,2) default NULL,
+  authCurrency enum('GBP','EUR','USD') default NULL,
+  cardType varchar(20) default NULL,
+  AVS varchar(4) default NULL,
+  PRIMARY KEY  (cartId)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'worldpay'
+--
+
+
+
+--
+-- Table structure for table 'wprates'
+--
+
+CREATE TABLE wprates (
+  date date NOT NULL default '0000-00-00',
+  base char(3) NOT NULL default '',
+  cur char(3) NOT NULL default '',
+  rate decimal(30,25) NOT NULL default '0.0000000000000000000000000'
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table 'wprates'
+--
+
+
+

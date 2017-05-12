@@ -1,0 +1,41 @@
+---
+abstract: 'Yet Another Duplicity Wrapper'
+author:
+  - 'John Gravatt <john@gravatt.org>'
+build_requires:
+  Cwd: 0
+  File::Copy: 0
+  File::RandomGenerator: 0
+  File::Which: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Backup-Duplicity-YADW
+requires:
+  Carp: 0
+  Config::ApacheFormat: 0
+  Data::Dumper: 0
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  IPC::Run3: 0
+  Modern::Perl: 0
+  Moose: 0
+  PID::File: 0
+  Smart::Args: 0
+  String::Util: 0
+  Sys::Syslog: 0
+  constant: 0
+  namespace::autoclean: 0
+  vars: 0
+  warnings: 0
+version: 0.12

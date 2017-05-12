@@ -1,0 +1,56 @@
+#! /usr/local/bin/perl -w
+#
+# benchmark to compare the performance of BSD::Sysctl compared to
+# shelling out and running sysctl(8).
+#
+# Copyright (C) 2006 David Landgren, all rights reservedc.
+
+use strict;
+use lib qw( blib/lib blib/arch );
+
+use BSD::Sysctl 'sysctl';
+use Benchmark 'cmpthese';
+
+my $iter = shift || -1;
+
+sub cp_time_perl {
+    return sysctl('kern.cp_time');
+}
+
+sub cp_time_system {
+    return [`sysctl -n kern.cp_time`];
+}
+
+my $p = cp_time_perl();
+my $s = cp_time_system();
+
+print "  perl: @$p\nsystem: @$s\n";
+
+cmpthese( $iter,
+    {
+        'perl'   => \&cp_time_perl,
+        'system' => \&cp_time_system,
+    },
+);
+
+sub sysctl_perl {
+    return sysctl($_[0]);
+}
+
+sub sysctl_system {
+    return `sysctl -n $_[0]`;
+}
+
+cmpthese( $iter,
+    {
+        'perl'   => sub { sysctl_perl('kern.maxproc') },
+        'system' => sub { sysctl_system('kern.maxproc') },
+    },
+);
+
+cmpthese( $iter,
+    {
+        'perl'   => sub { sysctl_perl('net.inet.tcp.syncache.rexmtlimit') },
+        'system' => sub { sysctl_system('net.inet.tcp.syncache.rexmtlimit') },
+    },
+);

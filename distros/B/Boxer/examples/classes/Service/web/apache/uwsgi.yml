@@ -1,0 +1,9 @@
+classes:
+  - Service.web.apache
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - install Apache2 plugin for uWSGI
+  pkg:
+    - libapache2-mod-uwsgi

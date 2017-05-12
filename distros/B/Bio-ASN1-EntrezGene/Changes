@@ -1,0 +1,76 @@
+Revision history for Bio-ASN1-Entrezgene
+
+1.72      2016-09-02 06:50:53-05:00 America/Chicago
+  * Full release (no changes from 1.71 beyond version)
+
+1.71      2016-09-01 22:57:25-05:00 America/Chicago (TRIAL RELEASE)
+  * Minor bump for impending BioPerl 1.7 release.
+  * #2 : 'Unescaped left brace in regex is deprecated' with newer versions of perl
+    fixed [fjossandon]
+
+1.70      2013-09-14 14:39:54 America/Chicago
+  * Bio::ASN1::EntrezGene is now able to parse EntrezGene-set in which case
+    next_seq() will return the next set of sequences with each sequence as
+    an element in the array ref instead of an array ref with a single element.
+
+version 1.10: Important update if you see segmentation fault when running the
+              parser - so far I only saw it happen on Perl 5.8 (Perl 5.10 is 
+              fine) due to an exceedingly long (and invalid) URL in one 
+              Arabidopsis entry. It's due to Perl regex engine core dumps when
+              matching the long string exhausted the stack. I changed the 
+              particular regex in EntrezGene.pm and Sequence.pm to solve the 
+              issue. The overall parsing runs 2-3% faster after the change.
+
+version 1.09: Added parser/indexer for NCBI's ASN.1-formatted
+                sequence files (like Genbank records).
+              Updated test, example scripts and documentation
+              Minor fix on parse_entrez_gene_example.pl
+              Added code to deal with CCDS xref and Hugo symbol (under
+                gene properties! unlike before) in parse_entrez_gene_example.pl
+              Updated parser & indexer file handle code to work with perl version 
+                5.005_03 (previous code since 1.07 only works with 5.6 or higher).
+              Commented out count_records call in testindex.t to allow successful
+                test on 5.005_03-compatible bioperl versions.
+
+version 1.08: Split test script into two for better testing
+              Minor change in documentation and test scripts
+              NO change in parser/indexer code!
+
+version 1.07: Added indexing capability through a new module
+              Added testing script for make test
+              Added example script for indexing, reorganized examples scripts
+              Fixed a bug in next_seq
+              Reset line number after input_file() or fh() calls
+              Added rawdata(), fh() functions and -file, -fh, fh to new()
+              Updated documentation to reflect all changes
+
+version 1.06: integrated code from Util.pm into EntrezGene.pm.
+              changed packaging to Perl standard
+              changed next_seq() default option to 2, so now the call
+                $parser->next_seq() is equivalent to the call
+                $parser->next_seq(2) in version 1.05
+              updated documentation to reflect all changes
+
+version 1.05: added support to parse the NCBI 4/5/2005 download, which
+              inexplicably added a useless space before ',' on all lines, broke
+              some lines into two yet condensed others (brackets) to one line.
+              This unfortunately slows down my parser because I have to use
+              lookahead regexes to fix the parser for this weird new format.
+              I also fixed a minor mistake in error reporting function
+
+version 1.04: added attempt at opening large file (2 GB) on Perl that does
+              not support it; added 'file' option to new(); added file
+              name in error reporting message; updated documentation
+
+version 1.03: added validating capability such that anything that does not
+              conform to the current NCBI Entrez Gene ASN.1 format would
+              raise error and stops program. Position of the offending
+              data item would be reported.
+
+version 1.02: added input_file function that accepts filename input, and
+              next_seq function that returns the next record
+
+version 1.01: unescaped double quote escapes in double quoted strings
+
+version 1.0: released
+

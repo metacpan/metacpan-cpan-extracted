@@ -1,0 +1,41 @@
+Revision history for Barcode-DataMatrix
+
+0.09    Wed May 18 09:35:43 CDT 2016
+        - Added `size` attribute. Thanks Stuart Henderson
+          via https://github.com/mstratman/Barcode-DataMatrix/pull/29
+
+0.08    Thu Mar 24 15:23:34 CDT 2016
+        - Removed type dependencies
+
+0.07    Fri Jan  1 13:20:21 CST 2016
+        - Added missing 'use warnings' pragmas
+        - Removed commented-out code
+        - Removed now unnecessary "no critic" statement
+        - Removed unused constants and duplication
+        - Ignore Devel::Cover's cover_db dir
+        - Update outdated URLs to new locations
+
+0.06    Wed Dec 30 19:00:10 CST 2015
+        - Switched from Any::Moose to Moo
+        - Documentation added to the engine
+        - Many things cleaned up (see git history)
+
+0.05    Thu Apr 16 09:56:07 CDT 2015
+        - Updated the various enums to use an array reference rather
+          than an array to avoid deprecation warnings when using Moose 2.1200
+          or newer
+
+0.04    Thu Jun 21 09:01:05 CDT 2012
+        - Use Module::Install::Repository because metacpan doesn't
+          display the repository correctly as set by GithubMeta.
+        - Do not auto_include(), and do not include Test::More.
+
+0.03    Mon Jul  4 01:41:08 CDT 2011
+        - Move author tests to xt to avoid failed tests.
+
+0.02    Sun Jul  3 02:28:24 CDT 2011
+        - Fixed SEE ALSO link
+
+0.01    Sun Jul  3
+        - First version, released on an unsuspecting world.
+

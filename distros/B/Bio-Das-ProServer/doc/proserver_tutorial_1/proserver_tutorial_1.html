@@ -1,0 +1,302 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>DAS Workshop 2010: ProServer Tutorial Part 1</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <style type="text/css">
+body {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 0.9em;
+}
+th {
+  font-weight: normal;
+  font-style: italic;
+}
+table {
+  text-align: left;
+}
+div.code {
+  background-color: rgb(220, 220, 220);
+  border: 1px dotted;
+  padding: 5px;
+}
+  </style>
+</head>
+
+<body>
+<script type="text/javascript">
+  function reveal(id) {
+    var el = document.getElementById(id);
+    if (el.style.display == "none") {
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+</script>
+
+<h1 style="text-align: center;">DAS Workshop 2010 ProServer Tutorial</h1>
+
+<h2 style="text-align: center;">Part 1</h2>
+
+<p>Andy Jenkinson, EMBL-EBI, 7th April 2010</p>
+
+<h2>Overview</h2>
+
+<p>
+  This tutorial is intended to help you understand how ProServer, a DAS server
+  for Perl, is structured. It will also guide you in setting up ProServer on
+  your machine, and exploring the examples that come with the distribution.
+</p>
+
+<p>
+  The tutorial assumes you are familiar with Perl and are operating on a Linux
+  platform.
+</p>
+
+<h2><a name="architecture">Basic Architecture</a></h2>
+
+<p>
+  ProServer is a standalone server, meaning you do not need to run a separate
+  web server such as Apache. It handles all of the communications, query parsing
+  and XML output functions in a set of "core" modules, and uses plugins to
+  run actual data sources. Plugins are responsible for adapting actual data to
+  the DAS protocol. The server and its plugins are configured using an INI file.
+
+<p>
+  Each data source is represented in ProServer by an instance of a plugin module,
+  called a <em>SourceAdaptor</em>.
+  Simple data sources, especially those based on files, can sometimes  be set up
+  without requiring any code at all by using a pre-existing SourceAdaptor. More often,
+  running a custom data source will require you to write your own. This
+  will be covered in <a href="../proserver_tutorial_2/proserver_tutorial_2.html">Part 2</a>.
+</p>
+
+<h3>Procedure</h3>
+
+<p>
+  The lifecycle of a typical DAS <em>features</em> request is as follows:
+</p>
+
+<ol>
+  <li>Client issues request.</li>
+  <li>Core parses and checks request content.</li>
+  <li>Core obtains the data source's SourceAdaptor object.</li>
+  <li>Core passes the extracted query parameters to the SourceAdaptor object via the <em>das_features</em> method.</li>
+  <li>SourceAdaptor handles basic logic/iteration and delegates to the the <em>build_features</em> method (implemented in subclass).</li>
+  <li>SourceAdaptor subclass extracts the relevant data from storage and returns a uniform Perl data structure.</li>
+  <li>SourceAdaptor constructs an XML response and passes it back to the core.</li>
+  <li>Core sends the response back to the client.</li>
+</ol>
+
+<h2><a name="building">Downloading and Building ProServer</a></h2>
+
+<p>
+  The best way to get ProServer is via the <em>Subversion</em> repository. The
+  <code>trunk</code> typically contains the latest stable version, so includes
+  the latest bugfixes. To download it to your home directory, open a terminal
+  and type the following:
+</p>
+
+<div class="code">
+<pre>
+cd ~
+svn checkout http://proserver.svn.sf.net/svnroot/proserver/trunk Bio-Das-ProServer
+</pre>
+</div>
+
+<p>
+  When the download is complete, enter the <code>Bio-Das-ProServer</code>
+  directory that was created:
+</p>
+
+<div class="code">
+<pre>
+cd Bio-Das-ProServer
+</pre>
+</div>
+
+<p>
+  Take a moment to read the installation section of the README file. Proceed to
+  build ProServer as per the instructions:
+</p>
+
+<div class="code">
+<pre>
+perl Build.PL
+./Build
+</pre>
+</div>
+
+<h2><a name="running">Running ProServer</a></h2>
+
+<p>
+  The distribution contains a Perl script called <code>proserver</code> that you
+  should use to run proserver. It is in the <code>eg</code> directory. <strong>During development,
+  you should run this script with the <code>-x</code> option</strong>. This prevents the process
+  from forking and directs log output to your terminal rather than to file. Try
+  running the script in your terminal:
+</p>
+
+<div class="code">
+<pre>
+eg/proserver -x
+</pre>
+</div>
+
+<p>
+  If all is well, the server will start and output some information about its
+  (default) configuration. If not, you should be able to diagnose the problem.
+  Commonly errors arise from:
+</p>
+<ul>
+  <li>
+    The Perl interpreter being installed somewhere other than
+    /usr/local/bin/perl. Edit the script with the correct location (try "which perl" on the command line).
+  </li>
+  <li>
+    The ProServer libraries cannot be found. Make sure you are running the <code>proserver</code>
+    script from a location where it can find the modules. It is looking in
+    <code>./blib/lib</code> (where the modules reside when ProServer is built),
+    so make sure you run the script from the root Bio-Das-Proserver directory.
+  </li>
+</ul>
+
+<h2><a name="exploring">Exploring the Examples</a></h2>
+
+<p>
+  With ProServer still running, point your browser to the URL and port where it
+  is listening:
+</p>
+
+<div class="code">
+<a href="http://localhost:9000">http://localhost:9000</a>
+</div>
+
+<p>
+  You should see the ProServer homepage. From this page you can click the "SOURCES"
+  link. This will execute the DAS <em>sources</em> command, via the URL:
+</p>
+
+<div class="code">
+<a href="http://localhost:9000/das/sources">http://localhost:9000/das/sources</a>
+</div>
+
+<p>
+  You should see a table listing the DAS sources being hosted from your server.
+  There are two examples configured by default: "mysimple" and "mygff". The
+  <em>sources</em> command provides some metadata about each source that is useful for
+  client software. In particular, the "coordinates" and "capabilities"
+  properties help a client to know whether a source contains data that is relevant
+  to it.
+</p>
+
+<p>
+  The <em>sources</em> command, like all DAS commands, has an XML output. The
+  browser converts this XML to the coloured human readable output you see via
+  an <em>XSL stylesheet</em>. To see the DAS XML output, use the "view source"
+  option of your browser. (NOTE: If you see no output at all at this point, make
+  sure you are running the server from the <code>Bio-Das-ProServer</code>
+  directory so that ProServer can find its XSL stylesheets.)
+</p>
+
+<p>
+  Take some time to explore the capabilities of the example DAS sources:
+</p>
+
+<h3>mygff</h3>
+
+<ul>
+  <li>Features command: retrieving annotations of a segment of chromosome Y - <a href="http://localhost:9000/das/mygff/features?segment=Y:1,100">http://localhost:9000/das/mygff/features?segment=Y:1,100</a></li>
+  <li>Types command: listing the types of annotation contained in the source - <a href="http://localhost:9000/das/mygff/types">http://localhost:9000/das/mygff/types</a></li>
+</ul>
+
+<h3>mysimple</h3>
+
+<ul>
+  <li>Features command: retrieving annotations of a segment of chromosome X - <a href="http://localhost:9000/das/mysimple/features?segment=X:1,100">http://localhost:9000/das/mysimple/features?segment=X:1,100</a></li>
+  <li>The "feature-by-id" capability: using an annotation ID instead of a sequence segment - <a href="http://localhost:9000/das/mysimple/features?feature_id=EXON002">http://localhost:9000/das/mysimple/features?feature_id=EXON002</a></li>
+  <li>Stylesheet command: instructions for a client on how each type of feature might be rendered - <a href="http://localhost:9000/das/mysimple/stylesheet">http://localhost:9000/das/mysimple/stylesheet</a></li>
+</ul>
+
+<h2><a name="modifying">Modifying the Examples</a></h2>
+
+<p>
+  ProServer uses an INI file to configure itself, which you can specify using the
+  '-c' command-line option. This INI file defines lots of things such as the
+  port number the server should listen on, the root directory to look for static
+  content, and details of the DAS sources it is serving. In <a href="proserver_tutorial_2.html">Part 2</a>
+  you will write your own
+  INI file, but for now take a quick look at the default one. It is located at
+  <code>eg/proserver.ini</code>.
+</p>
+
+<p>
+  Each section of the INI file is denoted by square brackets. Server options
+  such as port number are in the [general] section. All other sections are
+  treated as DAS sources that the server hosts, each representing an individual
+  source of data.
+</p>
+
+<p>
+  Find the [mygff] section in the INI file to see how the "mygff" DAS source is
+  configured.
+</p>
+
+<div class="code">
+<pre>
+[mygff]
+adaptor       = file
+state         = on
+description   = An example source using a GFF file
+doc_href      = http://another.homepage.com
+; Properties for the 'file' SourceAdaptor to allow it to read GFF2 files
+filename      = eg/data/example.gff
+cols          = segment,method,type,start,end,score,ori,phase,note,note
+feature_query = field0 lceq %segment AND field4 >= %start AND field3 <= %end
+comment       = ^#
+separator     = \t|\s*;\s*
+; Coordinate system and test range:
+coordinates   = NCBIM_37,Chromosome,Mus musculus -> Y:1,100
+</pre>
+</div>
+
+<p>
+  Do not worry about the specifics of each property, though hopefully you will
+  have a vague idea what they do. This exercise is merely to familiarise you
+  with where some of the metadata comes from. From here you can see that the
+  actual data is coming from a file, <code>eg/data/example.gff</code> - so have
+  a look inside using a text editor.
+</p>
+
+<p>
+  Now download another GFF file and save it:
+</p>
+
+<div class="code">
+<pre>
+curl 'ftp://ftp.sanger.ac.uk/pub/wormbase/live_release/genomes/c_elegans/genome_feature_tables/GFF2/CHROMOSOME_MtDNA.gff' > CHROMOSOME_MtDNA.gff
+</pre>
+</div>
+
+<p>
+  [Alternative download: <a href="CHROMOSOME_MtDNA.gff">CHROMOSOME_MtDNA.gff</a>]
+</p>
+
+<p>
+  Edit the <em>mygff</em> source section in <code>proserver.ini</code> to point
+  to this new file and update the <em>coordinates</em> accordingly:
+</p>
+
+<div class="code">
+<pre>
+filename      = CHROMOSOME_MtDNA.gff
+coordinates   = WS_200,Chromosome,Caenorhabditis elegans -> CHROMOSOME_MtDNA:1,100
+</pre>
+</div>
+
+<p>
+  Stop and re-start your server (Ctrl-C to stop your interactive session on the terminal)
+  and take another look at your modified DAS source. If it doesn't work, keep
+  an eye out for errors in the terminal output.
+</p>

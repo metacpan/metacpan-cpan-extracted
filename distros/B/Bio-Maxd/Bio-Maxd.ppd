@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Bio-Maxd" VERSION="0,02,0,0">
+	<TITLE>Bio-Maxd</TITLE>
+	<ABSTRACT>methods for uploading and retrieving data to/from a maxd (MySQL) database</ABSTRACT>
+	<AUTHOR>Jaime Prilusky &lt;Jaime.Prilusky@weizmann.ac.il&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="DBD-mysql" VERSION="2,1,0,0" />
+		<DEPENDENCY NAME="DBI" VERSION="1,29,0,0" />
+		<DEPENDENCY NAME="HTML-Template" VERSION="2,5,0,0" />
+		<OS NAME="darwin" />
+		<ARCHITECTURE NAME="darwin" />
+		<CODEBASE HREF="" />
+	</IMPLEMENTATION>
+</SOFTPKG>

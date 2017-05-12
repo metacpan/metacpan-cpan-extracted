@@ -1,0 +1,10 @@
+classes:
+  - Service.mail.mda
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - include Dovecot Sieve filter and Managesieve service
+  pkg:
+    - dovecot-sieve
+    - dovecot-managesieve

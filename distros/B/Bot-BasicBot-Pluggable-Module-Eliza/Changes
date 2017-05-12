@@ -1,0 +1,15 @@
+Revision history for Bot-BasicBot-Pluggable-Module-Eliza
+
+0.05	27.04.2009 19:26
+	We need at least Bot::BasicBot::Pluggable 0.60 for our testscripts
+	Minor cosmetic changes
+
+0.04	22.04.2009 9:24
+	Forget to add the testscripts to MANIFEST
+
+0.03	19.04.2009 22:41
+	Failing tests due wrong paths in t/01basic.t
+
+0.02    16.04.2009 16:54
+        First version, released on an unsuspecting world.
+

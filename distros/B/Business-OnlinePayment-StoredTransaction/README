@@ -1,0 +1,44 @@
+Business-OnlinePayment-StoredTransaction version 0.01
+=====================================================
+
+This module uses the Business::OnlinePayment interface to safely (I hope) store
+creditcard information.  This information can be later retrieved using the
+Business::OnlinePayment::StoredTransaction::Unstore module and batch processed,
+manually processed, etc.
+
+Note: I am not a cryptographer.  I believe my implementation is ok, but I
+could be doing something really stupid.  You should probably have a real
+crypto expert look at this if you need to use it for something important.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Business::OnlinePayment
+Crypt::OpenSSL::RSA
+Crypt::CBC
+Crypt::Blowfish
+MIME::Base64
+Storable
+Test::More
+Digest::MD5
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by mock <mock@obscurity.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

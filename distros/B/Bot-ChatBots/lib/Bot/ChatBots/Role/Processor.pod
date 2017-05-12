@@ -1,0 +1,96 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::Sender - Bot::ChatBots Role for Senders
+
+=head1 SYNOPSIS
+
+   package Something;
+   use Moo;
+   with 'Bot::ChatBots::Role::Processor';
+
+   sub process {
+      my ($self, $record) = @_;
+      $record->{foo} = 'bar';
+      return $record;
+   }
+
+   1;
+
+   # later that night...
+   my $something = Something->new;
+   my $sub_ref = $something->processor;
+
+   my $output_record = $sub_ref->($input_record);
+
+=head1 DESCRIPTION
+
+This is a sender role for bots.
+
+If L<process> behaves correctly, L</processor> is L<Data::Tubes>-compliant.
+
+=head2 What Should You Provide/Override
+
+This is what you should provide and probably override in the general case:
+
+=over
+
+=item *
+
+L</process> is mandatory and it is where you actually process records. You
+are strongly suggested to use the L<Data::Tubes> interface (it's simple).
+
+=back
+
+=head1 METHODS
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< processor >>
+
+   my $sub_ref = $obj->processor;
+
+Return a sub wrapping L</process>, like this:
+
+   sub processor {
+      my $self = shift;
+      return sub { return $self->process(@_);
+   }
+
+=head1 REQUIRED METHODS
+
+This class defines a L<Moo::Role>, so it's not a standalone thing by
+itself. The following methods are I<required> to exist in the class that
+composes this role.
+
+=head2 B<< process >>
+
+   my $output = $obj->process($input);
+
+Do actual processing of a record. You are strongly suggested to adhere to
+the L<Data::Tubes> interface.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,16 @@
+=head1 USE
+
+C<GantryLocation> literals dump output into a GantryLocation block
+in generated Config::General files if you use the Conf Gantry or
+Conf General backends.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Look for C<rides_short_bus> in docs/Kids.gantry.conf.
+
+See how the example so cleverly controls indentation so readers never
+have to know the output was generated?

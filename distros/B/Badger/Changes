@@ -1,0 +1,313 @@
+NAME
+    Badger::Changes - Summary of changes in the Badger toolkit
+
+CHANGES
+    This document contains a brief overview of what has changed between
+    successive version of the Badger toolkit.
+
+    Badger is now considered to be mature, stable, reliable, and unlikely to
+    change significantly in future versions.
+
+  Version 0.12 - 12th December 2016
+    Added some tests for YAML modules in 3 test scripts that were failing.
+
+  Version 0.11 - 11th December 2016
+    Fix for missing file in distribution.
+
+  Version 0.10 - 11th December 2016
+    Added Badger::Comparable, Badger::Date, Badger::Duration,
+    Badger::Filter, Badger::Progress, Badger::Workplace, Badger::Workspace
+    and Badger::Config::Filesystem.
+
+    Refactored parts of Badger::Config.
+
+    Changed Badger::Base message() method to allow message formats to be
+    defined in "$self-"{ messages }> when $self is a blessed hash object.
+
+    Added no_config() method to Badger::Hub.
+
+    Fixed a bug in the auto_can feature of Badger::Class::Methods which
+    prevented it from working with subclasses.
+
+    Fixed a bug in Badger::Debug dump_ref() to make it directly call other
+    "dump_XXX()" functions instead of relying on inheritance of those
+    methods through $self.
+
+    Added plurality(), inflect(), list_each(), hash_each(), extend(),
+    merge(), split_to_list(), join_uri() and resolve_uri(), to
+    Badger::Utils.
+
+    Added additional delegate hooks to Badger::Utils to load utility
+    functions in Badger::Filesystem, Badger::Timestamp, Badger::Duration,
+    Badger::Logic and Badger::URL.
+
+    Squashed a non-numerical warning in Badger::Timestamp.
+
+    Added the UTF8, JSON and YAML constants to Badger::Constants.
+
+    Fixed Badger::Codec::YAML to work better with YAML::XS and
+    Badger::Codec::JSON to work better with JSON::XS.
+
+    Fixed a typo/bug in the "type_args()" in Badger::Factory method which
+    was returning the wrong argument list.
+
+    Fixed a parser bug in Badger::Logic.
+
+    Fixes to silence warnings in perl 5.22.
+
+  Version 0.09 - 8th February 2012
+    Added Badger::Codec::Timestamp. Changed Badger::Timestamp to numify
+    values to remove leading zeroes (e.g. 2012/04/20 now yields a month of 4
+    instead of 04).
+
+    Fixed some obscure bugs in the module loading code in Badger::Class and
+    related modules that could potentially cause unpredictable results on
+    case insensitive file systems (e.g. Apple's HFS with default settings).
+
+    Added the restat() method to Badger::Filesystem::Path.
+
+    Added documentation for various methods that was missing. Temporary
+    disabled the Pod::Coverage tests on AUTOMATED_TESTING systems. We know
+    there's still stuff to do.
+
+    Added SLASH to Badger::Constants
+
+  Version 0.08 - 13th January 2012
+    Restored the $VERSION variable to Badger.pm rather than using the
+    "version" import hook in Badger::Class which confused PAUSE.
+
+    Changed Badger::Test::Manager to detect undefined results.
+
+    Merged Michael Grubb's bug fix for Badger::Base:
+    <https://github.com/abw/Badger/pull/1>
+
+    Fixed some minor documentation issues.
+
+  Version 0.07 - 2nd January 2012
+    Added Badger::Storage, Badger::Storage::Memory. and
+    Badger::Storage::Filesystem.
+
+    Added Badger::Codec::TT.
+
+    Added the permissions() method to Badger::Filesystem::Path. Added
+    temp_directory() and temp_file() methods to Badger::Filesystem. Also
+    changed the Path(), File() and Dir() functions to short-circuit and
+    return if passed a single object that is already of the expected type.
+
+    Added some extra comparison methods to Badger::Timestamp (not_equal(),
+    (not_before() and not_after()) and overloaded these and other methods
+    onto the "==", "!=", "<", ">", "<=" and ">=" operators.
+
+    Added the export_before() and export_after() methods to
+    Badger::Exporter.
+
+    Added the if_env import hook and "-a|Badger::Test/all()" option to
+    Badger::Test to make it easier to define tests that don't get run unless
+    a particular environment variable is set (e.g. for Pod coverage/kwalitee
+    tests that you only want to run if either of the "RELEASE_TESTING" or
+    "AUTOMATED_TESTING" environment variables is set).
+
+    Added the random_name(), camel_case() and permute_fragments() functions
+    to Badger::Utils. Also add some extra debugging code to params() and
+    self_params() to catch any attempt to pass an odd number of arguments.
+
+    Changed the Badger::Factory module to use permute_fragments() on the
+    module path when specified as a single string. Also added the default()
+    and names() methods along with their corresponding package variable
+    magic.
+
+    Added the debug_callers(), debugf() and debug_at() methods to
+    Badger::Debug.
+
+    Added the alias() method to Badger::Class.
+
+    Added the auto_can() method to Badger::Class::Methods.
+
+    Changed the Badger::Class::Config module to store the configuration
+    scheme in $CONFIG_SCHEMA instead of $CONFIG.
+
+    Added the Badger::Codec::HTML module which defines the "html" codec.
+
+    Changed the throw() method in Badger::Base to pass the exception type to
+    exception().
+
+    Changed the try() method in Badger::Base to preserve the list/scalar
+    calling context and to handle false but defined values.
+
+    Cleaned up and generalised the Badger::Hub module. The Badger-specific
+    data has now been moved into Badger::Hub::Badger. The "configure()"
+    method is now called construct().
+
+  Version 0.06
+    Added copy_file() and move_file() to Badger::Filesystem and copy() and
+    move() methods to Badger::Filesystem::File.
+
+    Added chmod_path() to Badger::Filesystem and chmod() to
+    Badger::Filesystem::Path.
+
+    Added Bin() to Badger::Filesystem.
+
+    Added the encoding() method to Badger::Filesystem::File for specifying
+    the encoding of a file, along with the utf8(), bytes(), crlf() and raw()
+    methods for enabling different encoding layers.
+
+    Added the codec() method to Badger::Filesystem::File for specifying a
+    serialisation codec to use in conjunction with the new data() method.
+
+    Added Badger::Timestamp. This is returned by the new created(),
+    accessed() and modified() methods in Badger::Filesystem::Path.
+
+    Added Badger::Logic.
+
+    Added Badger::Log and Badger::Log::File.
+
+    Added numlike() to Badger::Utils as an alias for "looks_like_number".
+    It's the numerical counterpart to textlike() and is significantly easier
+    to type.
+
+    Added debug_msg() to Badger::Base. Also added the "Badger::Base::Trial"
+    class definition for use with the try() method.
+
+    Added lib import hook to Badger.
+
+    Added bclass as an alias for class in Badger::Class.
+
+    Changed Badger::Class::Config to maintain the order of configuration
+    parameters where possible (i.e. when expressed as a list ref rather than
+    a hash ref). Also added "target:var" fallback which looks in the target
+    object or hash ref for the variable. This allows options to default to
+    the values set by preceeding options.
+
+    Changed Badger::Codec::JSON to use JSON::XS if available.
+
+    Mr T is now using Badger 0.06 in production code and is happy to report
+    that everything seems to be working rather well. Anyone for a game of
+    tennis?
+
+  Version 0.05 - 23rd December 2008
+    Refactored Badger::Factory.
+
+    Added support to Badger::Exporter for the "=" pseudo-sigil which can be
+    used to create constants on the fly.
+
+        package Badger::Example;
+        use Badger::Class
+            exports => {
+                tags => {
+                    math => {
+                        e   => '=2.718',
+                        pi  => '=3.142',
+                        phi => '=1.618',
+                    },
+                }
+            };
+
+        package main;
+        use Badger::Example ':math';
+
+        print e;            # 2.718
+        print pi;           # 3.142
+        print phi;          # 1.618
+
+    Mr T is starting to feel rather confident about building a production
+    system based on Badger v0.05.
+
+  Version 0.04 - 2nd December 2008
+    Added the throw_msg() method to Badger::Base.
+
+    Added init_method hook to Badger::Class and initialiaser() to
+    Badger::Class::Methods.
+
+    Changed Badger::Exception match_type() method to accept a list or hash
+    reference, or a string of whitespace delimited exception types.
+
+    Changed Badger::Factory to pass $name as an argument to various methods.
+    Also passes arguments to load() (required for Template::TT2::Plugins)
+    Also modified item() to accept a non-textlike type argument which
+    bypasses the module lookup.
+
+    Moved a whole bunch of stuff out of Badger::Class into
+    "Badger::Class::*" modules.
+
+    Added Badger::Class::Config for simple configuration.
+
+    Added hash() method to Badger::Methods and hash_methods hook to
+    Badger::Class.
+
+    Added trace() hook and related paraphernalia to Badger::Exception. Added
+    the "-t" / "--trace" command line options to Badger::Test to enable it
+    when running tests. Also added "-h" / "--help" options.
+
+    Added Codec() exportable subroutine to Badger::Codecs.
+
+    Added Badger::Codec::URL. It's similar to Badger::Codec::URI, but
+    slightly different. See the TT uri/url filters for the reason.
+
+    Changed the prototype() method in Badger::Prototype to accept a single
+    "undef" value to clear any current prototype. Also added the
+    has_prototype() method.
+
+    Mr T is looking on the bright side about the possibility of building a
+    production system based on Badger v0.04, but still advises caution.
+
+  Version 0.03 - 7th October 2008
+    Added delegate loaders to Badger. This provides some semantic sugar for
+    loading a bunch of different "Badger::*" modules in one go.
+
+        use Badger
+            Filesystem  => 'FS $Bin',
+            Codecs      => 'storable base64',
+            Debug       => {
+                modules => 'My::Module',
+            };
+
+    Added different() to Badger::Test::Manager.
+
+    Added textlike() to Badger::Utils
+
+    Added the overload as_text and is_true import hooks and related method
+    to Badger::Class. These delegate to the "overload" module.
+
+    Added the print method to Badger::Filesystem::File.
+
+    Added support for dynamic root directories to
+    Badger::Filesystem::Virtual.
+
+    Added the defaults and aliases hooks to Badger::Class, implemented by
+    Badger::Class::Defaults and Badger::Class::Aliases, respectively. There
+    are still experimental.
+
+    Fixed up some stat handling in Badger::Filesystem to help with
+    subclassing in Badger::Filesystem::Virtual
+
+    Mr T pities the fool that attempts to builds a production system based
+    on Badger version 0.03 without first evaluating it carefully and reading
+    the documentation.
+
+  Version 0.02 - 6th September 2008
+    Badger::Class got the vars method and hook for declaring and defining
+    variables.
+
+    Badger::Utils gained the ability to load and export functions from
+    Scalar::Util, List::Util, List::MoreUtils, Hash::Util and Digest::MD5.
+
+    Various documentation updates.
+
+    Mr T admires the tenacity of anyone attempting to build a production
+    system based on Badger v0.02 and hopes they have a thorough test suite.
+
+  Version 0.01 - 27th August 2008
+    This was the first release version.
+
+    Mr T pities the fool who builds a production system based on Badger
+    v0.01.
+
+AUTHOR
+    Andy Wardley <abw@wardley.org>
+
+COPYRIGHT
+    Copyright (C) 2008-2013 Andy Wardley. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

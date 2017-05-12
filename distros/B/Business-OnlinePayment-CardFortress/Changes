@@ -1,0 +1,19 @@
+Revision history for Business-OnlinePayment-CardFortress
+
+0.04    Tue Dec 20 15:57:53 PST 2016
+        - Pass-through gateway introspection for CC_void_requires_card
+          and ECHECK_void_requires_account
+
+0.03    Tue Aug  9 05:33:46 PDT 2016
+        - Declare support for "Tokenize"-only action in introspection
+        - Correct introspection: info_compat, not info_version
+        - Pass bop_options to gateway
+        - Return txn_date
+        - Fix test suite expired card
+
+0.02    Mon Dec 13 22:49:44 PST 2010
+        - Declare dependency on File::Slurp, closes: rt.cpan.org #63891
+
+0.01    Thu Dec  9 18:09:54 PST 2010
+        First version, released on an unsuspecting world.
+

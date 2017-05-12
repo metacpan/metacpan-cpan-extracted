@@ -1,0 +1,135 @@
+Revision history for Perl extension Blosxom::Plugin.
+
+0.02004  Nov 27th, 2012
+  - component_base_class() defaults to 'Blosxom::Plugin'
+  - mk_accessors() takes the same argument
+    as Class::Accessors::mk_accessors() does:
+
+      __PACKAGE__->mk_accessors(qw/foo bar car/);
+
+    When you specify the default value of the field,
+    you must pass a hash reference explicitly:
+
+      __PACKAGE__->mk_accessors( 'foo' => \&default );
+      # become
+      __PACKAGE__->mk_accessors({ 'foo' => \&default });
+
+  - Add add_component() which can be used to load additional components
+    while loading components. If the added component has been loaded
+    already, that component will not be loaded again to avoid loading
+    components recursively.
+  - Blosxom::Plugin::Web* will be removed in 0.03
+    because you can "use CGI;" simply in your plugins ;)
+
+0.02003  Nov 24th, 2012
+  - Requires CGI.pm 3.51 or higher. Thanks to CPAN testers :)
+  - Components don't need to inherit from Blosxom::Component any more.
+    Blosxom::Plugin exports init(), requires() and mk_accessors():
+
+      package MyComponent;
+      use Blosxom::Plugin;
+      # init(), requires() and mk_accessors() are available
+
+    and so Blosxom::Component is obsolete and will be removed in 0.03.
+  - In addition, Blosxom::Component::DataSection will be renamed to
+    Blosxom::Plugin::DataSection again. Sorry for confusing changes :(
+
+0.02002  Nov 3rd, 2012
+  - [Component] add requires()
+
+0.02001  Oct 31st, 2012
+  - Must pass a code reference to add_method
+  - [Blosxom::Component] add mk_accessors()
+
+0.02000  Oct 27th, 2012
+  - Rename Blosxom::Plugin::DataSection to Blosxom::Component::DataSection
+    (sorry for the incovenience)
+    Components doesn't need to call add_method() explicitly
+    if they inherit from Blosxom::Component
+  - Add component_base_class()
+
+0.01004  Oct 23rd, 2012
+  - initial release
+  - [DataSection] add data_section_names()
+
+0.01003  Oct 22nd, 2012
+  - add add_attribute()
+  - [Web::Response] removed
+
+0.01002  Oct 19th, 2012
+  - add mk_accessors()
+
+0.01001  Oct 17th, 2012
+  - [DataSection] add merge_data_section_into()
+
+0.01000  Oct 14th, 2012
+  - load_components() doesn't add_method() when the named method is defined
+    by the context class, and also throws an exception
+    when a method name conflicts with each other
+  - [DataSection] rename data_section() to get_data_section()
+  - [Core] renamed to Web.pm
+  - [Util] removed
+
+0.00010  Aug 27th, 2012
+  - Blosxom::Plugin should be orthogonal to blosxom.cgi.
+    Methods which depend on $blosxom::* will be removed gradually
+  - Localize add_method()
+  - load_components() calls init() instead of begin()
+    when loads components
+  - [DataSection] Doesn't merge __DATA__ into Blosxom default templates
+    any more
+  - [Request] Remove date() and flavour(). path_info() and base() haven't
+    been implemented yet
+  - [Core] render() and get_template() are deprecated
+
+0.00009  Aug 18th, 2012
+  - Remove load_plugin(). Rename load_plugins() to load_components()
+  - Add Blosxom::Plugin::Core and Blosxom::Plugin::DataSection
+  - render() receives basename, not raw template
+
+0.00008  Aug 13th, 2012
+  - Add file() to Fh (See CGI.pm)
+  - Rename interpolate() to render() because 'interpolate'
+    is one of reserved methods 
+  - [Response] Capture cgi_error()
+
+0.00007  Aug 8th, 2012
+  - Add interpolate() and get_template()
+  - [Request]
+        * Add date()
+        * path_info() returns a value of $blosxom::path_info
+  - [Request::Upload]
+        * fh() returns a raw file handle
+        * Add header()
+
+0.00006  Aug 6th, 2012
+  - [Response]
+        * Rename cookies() to cookie()
+  - [Request]
+        * Rename server_protocol() to protocol()
+        * Rename cookies() to cookie()
+        * Add base(), is_secure(), header()
+  - [Request::Upload]
+        * fh() returns an IO::File object
+  - [Util] Add encode_html()
+
+0.00005  Jul 14th, 2012
+  - Add Blosxom::Plugin::Request::Upload
+
+0.00004  Jul 14th, 2012
+  - [Request] Add user(), server_protocol() and uploads()
+  - [Response] body() become mutable
+  - tests requires Data::Section::Simple
+
+0.00002  Jul 11th, 2012
+  - Add load_plugin(), load_plugins() and add_method().
+    load_plugin() calls begin() method of each plugin
+  - Add Blosxom::Plugin::Response, Request and Util.
+    Blosxom::Plugin loads them when loaded
+  - A namespace Blosxom::Plugin::* will be open to those who want to
+    register Blosxom metaplugins, though I'm not sure about
+    what a metaplugin is :-) At least, metaplugins will abstract
+    routines from ordinary plugins
+
+0.00001  Jul 8th, 2012
+  - First version

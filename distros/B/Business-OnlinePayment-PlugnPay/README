@@ -1,0 +1,18 @@
+Copyright (c) 2007 Jeff Finucane
+Copyright (c) 2007 Freeside Internet Services, Inc.
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::PlugnPay, a Business::OnlinePayment
+back end module for plugnpay. http://www.plugnplay.com/
+
+Based on Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+Currently maintained by Jeff Finucane <plugnpay@weasellips.com>.
+
+Business::OnlinePayment is a generic interface for processing payments
+through online credit card processors, online check acceptance houses,
+etc.  (If you like buzzwords, call it an "multiplatform
+ecommerce-enabling middleware solution").
+
+Check support is in "developer mode" because I have no test facilities.
+A developer should easily be able to get check support functioning.

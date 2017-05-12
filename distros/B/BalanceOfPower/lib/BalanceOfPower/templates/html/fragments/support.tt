@@ -1,0 +1,1 @@
+[% INCLUDE fragments/linked_nation.tt n = s.node1 %] -->  [% INCLUDE fragments/linked_nation.tt n = s.node2 %] [[% s.army %]]

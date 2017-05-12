@@ -1,0 +1,159 @@
+Revision history for Perl extension BZ::Client.
+
+4.4001 Monday January 30 17:49 2016
+    - No changes, just release
+
+4.4001_003 Sundary January 29 16:44 2016
+    - Adjustments to test suite per RT119718
+
+4.4001_002 Friday January 1 13:42 2017
+    - Add IO::Socket::SSL to the test requirements, as this is why most of cpantesters is failing
+
+4.4001_001 Friday January 1 12:17 2017
+    - Mention exception handling in pod, closes RT #91405
+    - Add an example nagios script
+    - Set all server tests to author_tests for now
+    - Bug.pm: Lots of pod improvements/Comment. Notably for update(), create() and what tags are
+    - Bug/Comment.pm: Improve the behaviour of get() so that you can just give it a #bugid
+    - t/200bug.t: fix for RT #119718
+    - t/300classification.t: fix for RT #119718
+
+4.4 Thursday December 29 23:13 2016
+    - Client.pm: logout() now returns 1 (true) if logout is successful
+    - User.pm: offer_account_by_email returns 1 (true) if successful
+    - t/300component.t: added, but doesnt do anything
+    - All tests now use diag() rather than printing to STDERR
+    - t/700user.t: added, does as much as it can without admin privileges
+    - Added README.md file for github etc.
+    - t/500group.t: added, doesnt do much
+    - Release as 4.4, as all Bugzilla 4.4 functionality is implemented and at least partially tested
+
+2.0_13 Wednesday July 13 14:30 2016
+    - Ensure TZ is UTC in DateTime objects
+    - More pod added
+
+2.0_12 Wednesday March 23 21:18 2016
+    - Disable tests against 4.2 on landfill for BZ#113288
+
+2.0_11 Sunday December 13 17:07 2015
+    - Move Test.pm into t/lib/
+    - Replace Test with Test::More everywhere
+    - Start using Test::RequiresInternet in t/
+    - Proof read and update pod
+    - Bug.pm: minor but important fix
+    - Add OS and perl version to agent
+
+2.0_10 Tuesday Oct 14 18:28 2015
+    - Lots of minor fixes, including API.pm working
+    - FlagType.pm: added
+    - API.pm: mmake _create a little more flexible
+    - BugUserLastVisit.pm: added
+
+2.0_9 Saturday Oct 10 00:24:00 2015
+    - API.pm: moved create() functions in
+    - API.pm: moved update() like functions in
+    - Group.pm: added
+
+2.0_8 Thursday Oct 1 00:02:00 2015
+    - Component.pm: added.
+    - Comment.pm: removed duplicate sub text()
+
+2.0_7 Wednesday Sep 30 00:39::00 2015
+    - Classification.pm: added.
+
+2.0_6 Tuesday Sep 29 23:56:00 2015
+    - XMLRPC.pm: pass through options to HTTP::Tiny
+    - Client.pm: facilitate pass through options to HTTP::Tiny
+    - Product.pm: changes to the methods and pod
+    - Product.pm: add create() and update() functions
+
+2.0_5 Friday Sep 25 01:11:00 2015
+    - Bug.pm: minor changes
+    - Bugzilla.pm: add last_audit_time()
+    - Bugzilla.pm: add parameters()
+    - Bugzilla.pm: adjust version()
+    - Bugzilla.pm: overhaul extensions()
+    - Bugzilla.pm: adjust time()
+
+2.0_4 Thursday Sep 24 01:35:00 2015
+    - Attachment.pm: update() method and pod
+    - Comment.pm: lots of pod and render() function
+
+2.0_3 Tuesday Sep 22 09:47:00 2015
+    - Implement the api_key properly
+    - Bug.pm: handle alias() better (i.e. properly)
+    - Replace use+@ISA with 'use parent'
+    - Bug.pm: added history() and possible_duplicates()
+    - Initial commit of Bugs/Attachment.pm
+    - Initial commit of Bugs/Comment.pm
+    - API.pm: move new() in here to be reused
+    - Use __PACKAGE__ all around the place
+
+2.0_001 Thursday Sep 17 10:42:00 2015
+    - let's make this thing sane....
+    - lots and lots of pod improvements
+    - wantarray sensitivity all around the place
+    - Bug.pm: add fields() function
+    - XMLRPC.pm: dispatch table used rather than by if/elsif/else
+    - XMLRPC.pm: replace 'use constants' and make singleton-ish
+    - XMLRPC.pm: 'use' rather than 'require'
+    - XMLRPC.pm: use HTTP::Tiny instead of LWP
+    - Client.pm: use HTTP::CookieJar instead of HTTP::Cookies
+    - Client.pm: make logout() work better
+    - Bug.pm: add update_see_also() and update_tags() functions
+
+1.072 Wednesday Sep 09 23:44:00 2015
+    - Add Users.pm
+    - Pod in various places
+
+1.071 Monday Sep 07 13:21:00 2015
+    - Improve/fix logout() and login() functions
+    - t/write-config.pl will help you write a config file to run tests against a real bugzilla server
+
+1.07 Friday Sep 04 15:58:00 2015
+    - BZ::Client::logger protects its input
+    - Add pod for more methods in BZ/Client.pm
+    - Add autologin option for RT91184
+    - Add support for token based logins used in bz4.4.3+ (bugzilla 5.0 now works)
+    - Expose control of the restrict_login option via new()
+    - Tweak some tests
+
+1.064 Fri Sep 04 11:57 2015
+    - BZ::Client::Test if it cant find a config file, it blesses a hash-ref rather than trying (and failing) to bless a scalar
+
+1.063 Thu Sep 03 21:48:00 2015
+    - Make PodWeaver do stuff
+    - Strip out subroutine prototypes
+    - Strip out $VERSION's so dzil can do it
+    - Whitespace fixes all over
+    - Use dist::zilla
+    - Lots and lots of pod and tiny code style tweaks
+
+1.061 Wed Apr 22 13:43:00 2015
+
+    - Fix for RT103873
+    - BZ::Client::Bugs - now uses wantarray
+
+1.06 Thu Dec 12 14:06:00 2013
+    - Applied patch from https://rt.cpan.org/Public/Bug/Display.html?id=78467, needs a test.
+    - Applied patch from https://rt.cpan.org/Ticket/Display.html?id=78694, needs a test.
+
+1.05 Fri Nov 29 14:11:00 2013
+    - Applied patch from http://hg.mozilla.org/webtools/bzapi/raw-file/24eba717cf5b/patches/xmlrpc-fix.diff
+
+1.04 Mon Aug 22 19:23:00 2011
+    - Added support for dateTime via instances of DateTime
+
+1.03 Wed Feb 03 13:22:00 2010
+    - Added URI as a prerequisite to Makefile.PL.
+    - Fixed missing $client in Bug.pm (RT ticket 54227)
+
+1.02 Sat Aug 15 15:31:00 2009
+    - Added LICENSE file to the distribution.
+
+1.01 Mon Aug 10 17:31:00 2009
+    - XML::Parser and XML::Writer now declared as dependencies.
+
+1.0  Tue Jun 23 07:18:25 2009
+    - Created
+

@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<SOURCES xmlns="http://biodas.org/documents/das2">
+<SOURCE uri="DS_360" title="msdstructure" description="A reference server for protein structure
+annotations. Serves 3D coordinates of
+protein structures. The data comes from
+the sanger installation of the MSD database.">
+    <MAINTAINER email="dasmaster@example.com" />
+    <VERSION uri="latest" created="2007-02-13">
+      <COORDINATES uri="http://www.dasregistry.org/dasregistry/coordsys/CS_DS7" source="Protein Structure" authority="PDBresnum" test_range="5pti">PDBresnum,Protein Structure</COORDINATES>
+      <CAPABILITY type="das1:structure" query_uri="http://das.sanger.ac.uk/das/msdstructure/structure" />
+      <PROPERTY name="label" value="BioSapiens" />
+      <PROP name="label" value="BioSapiens" />
+      <PROPERTY name="label" value="eFamily" />
+      <PROP name="label" value="eFamily" />
+      <PROP name="leaseTime" value="2007-02-16" />
+    </VERSION>
+  </SOURCE>
+</SOURCES>

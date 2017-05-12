@@ -1,0 +1,89 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2AABB} class b2AABB : public %name{Box2D::b2Joint} b2Joint
+{
+
+b2AABB();
+
+bool IsValid();
+
+%{
+
+b2Vec2*
+b2AABB::GetCenter( )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetCenter());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2AABB::GetExtents( )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetExtents());
+	OUTPUT:
+		RETVAL
+
+void
+b2AABB::Combine( aabb1, aabb2 )
+	b2AABB* aabb1
+	b2AABB* aabb2
+	CODE:
+		THIS->Combine( *aabb1, *aabb2 );
+
+bool
+b2AABB::Contains( aabb )
+	b2AABB* aabb
+	CODE:
+		RETVAL = THIS->Contains( *aabb );
+	OUTPUT:
+		RETVAL
+
+bool
+b2AABB::RayCast( output, input )
+	b2RayCastOutput* output
+	b2RayCastInput* input
+	CODE:
+		RETVAL = THIS->RayCast( output, *input );
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2AABB::lowerBound( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->lowerBound = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->lowerBound);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2AABB::upperBound( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->upperBound = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->upperBound);
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

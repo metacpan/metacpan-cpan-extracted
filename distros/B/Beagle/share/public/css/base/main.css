@@ -1,0 +1,415 @@
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a.toggle-hide {
+    margin-left: .5em;
+    float: right;
+}
+
+.hidden {
+    display: none;
+}
+
+#container {
+    height: auto !important;
+}
+
+#content {
+    margin-top: 0.5%;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
+}
+
+h3.title { 
+    padding: 0.25em;
+    padding-left: 1em;
+    border-radius: 0.5em;
+}
+
+h3.title a {
+    text-decoration: none;
+}
+
+h5 { 
+    padding-left: 2em;
+    border-radius: 0.25em;
+}
+
+#content p, #content ul {
+    margin-right: 1%;
+    margin-left: 1%;
+}
+
+pre { 
+    margin-left: 2%;
+    margin-right: 3%;
+}
+
+div.meta {
+    font-size: smaller;
+}
+
+div.meta > div {
+    margin-right: .5%;
+    display: inline;
+}
+
+div.meta span {
+    margin-right: .5%;
+    display: inline;
+}
+
+div.utility {
+    display: inline;
+    text-align: right;
+}
+
+div.utility a.right-most {
+    margin-right: 2%;
+}
+
+div.utility a {
+    float: right;
+    margin-left: 1%;
+}
+
+div.body div.cover {
+    float: right;
+    margin-top: 1em;
+    margin-left: .5em;
+    width: 8em;
+}
+
+div.body div.image img {
+    max-width: 98%;
+    margin-top: 1em;
+}
+
+div.body {
+    display: block;
+}
+
+div.review div.body {
+    min-height: 20ex;
+}
+
+div.review div.cover img {
+    height: 20ex;
+    width: auto;
+    margin-right: 1%;
+}
+
+div.bark div.body:first-child {
+    font-size: 200%;
+}
+
+div.message-wrapper {
+    height: 1ex;
+}
+
+div.message {
+    text-align: center;
+    border: 1px solid;
+    float: right;
+    width: 100%;
+}
+
+div.warnings {
+    margin-top: 2%;
+    text-align: center;
+    border: #a00 0.25em solid;
+    font-size: 200%;
+}
+
+h3.menu {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+    border-radius: 0.25em;
+    padding: 0.25em;
+    padding-left: 2em;
+    text-align: center;
+}
+
+.annotation {
+    margin-left: 3%;
+}
+
+a.image img {
+    width: 10%;
+}
+
+
+div.attachments {
+    display: block;
+    margin-left: 5%;
+}
+
+img {
+    float: none;
+}
+
+hr.attachments {
+    width: 80%;
+}
+
+#footer {
+    float: left;
+    width: 75%;
+    text-align: center;
+    margin-top: 1%;
+    margin-bottom: 3%;
+    margin-right: 25%;
+    bottom: 0;
+}
+
+#footer div.sites {
+    display: inline;
+}
+
+#footer div.updated {
+    float: right;
+    margin-right: 1%;
+    margin-left: 1%;
+}
+
+#footer div.magical-number {
+    float: left;
+    margin-left: 3%;
+}
+
+pre.pod, pre.shell {
+    border: 1px solid;
+    padding: 1%;
+    margin-right: 3%;
+}
+
+pre.shell {
+    -moz-opacity: 0.7;
+    opacity: 0.7;
+    border-radius: 0.5em;
+}
+
+pre.prettyprint {
+    border-radius: 0.5em;
+}
+
+div.comment {
+    margin-left: 4%;
+    min-height: 2ex;
+    margin-bottom: 1%;
+    padding-bottom: 1%;
+}
+
+div.comment p {
+    padding-left: 3%;
+    margin-top: 0.25em;
+    margin-bottom: 0.3em;
+}
+
+body > div.names  {
+    text-align: right;
+    font-size: smaller;
+}
+
+body > div.names a {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+div.body {
+    word-wrap: break-word;
+}
+
+div.search {
+    margin-left: 25%;
+    margin-right: 25%;
+    padding-top: 3%; 
+}
+
+div.search input[name=query] {
+    width: 100%;
+    height: 3ex;
+    font-size: large;
+    margin-top: 1ex;
+}
+
+div.no-results {
+    margin-left: 40%;
+}
+
+textarea {
+    font-size: 120% !important;
+}
+
+div.attachment {
+    display: inline;
+}
+
+div.page {
+    margin-top: 3em;
+    text-align: center;
+}
+
+div.direction {
+    margin-top: 3em;
+}
+
+#content > div.archives {
+    margin: 2%;
+}
+
+#content > div.archives a {
+    margin-right: 3%;
+}
+
+#content > div.tags {
+    padding-top: 5%;
+}
+
+#content div.tags {
+    padding: 2%;
+}
+
+#content div.meta div.tags {
+    padding: 0;
+}
+
+#content > div.tags a {
+    margin-right: 3%;
+}
+
+pre {
+    white-space: pre-wrap;       /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+}
+
+pre.body {
+    font-size: large;
+}
+
+div.previous, div.next {
+    display: inline;
+    width: 50%;
+    overflow: hidden;
+}
+
+div.next a {
+    float: right;
+}
+
+table.tags, table.archives {
+    margin: 0 5% 0% 5%;
+    width: 90%;
+}
+
+table.tags td, table.archives td {
+    width: 18%;
+}
+
+div.attachments div.preview {
+    margin: 2em;
+}
+
+div.attachments div.preview > * {
+    margin: 1em;
+}
+
+div.attachments div.preview img {
+    width: 10%;
+}
+
+.hover > div.glance {
+    position: absolute;
+    background-color: #ccc;
+    padding: 1%;
+    padding-top: 0.5%;
+    margin-left: -0.5em;
+    display: none;
+    z-index: 9999;
+    font-size: smaller;
+    border-radius: 0.5em !important;
+    max-height: 60%;
+    overflow: auto;
+}
+
+li.hover > ul li {
+    font-size: smaller;
+    padding-left: 2%;
+}
+
+li.hover ul {
+    border-radius: 0.5em !important;
+}
+
+.hover > ul > li > a {
+    margin-top: 0.25em;
+}
+
+div.archives > div.hover.archive {
+    width: 0;
+}
+
+div.hover > ul {
+    list-style-type: none;
+    position: absolute;
+    margin: 0 !important;
+    padding: 0.25em;
+    margin-left: -0.25em !important;
+    border-radius: 0.25em !important;
+    z-index: 9999;
+}
+
+div.hover.names, div.hover.set-width {
+    position: fixed;
+    top: 0.5em;
+}
+
+div.hover.names {
+    left: 4em;
+}
+
+div.hover.set-width {
+    left: 0.25em;
+}
+
+div.hover.set-width a, div.hover.names a {
+    opacity: 0.7;
+}
+
+div.hover.set-width > a, div.hover.names > a {
+    opacity: 0.3;
+}
+
+div.hover.set-width a:hover, div.hover.names a:hover {
+    opacity: 1 !important;
+}
+
+div.hover ul {
+    text-align: center;
+}
+
+div.hover ul a.selected {
+    font-weight: bold;
+}
+
+body {
+    margin: auto;
+}
+
+div.even, a.even, li.even {
+    background-color: #eee;
+}
+
+h1, h2, h3, h4 {
+    font-family: Verdana, Arial, Helvetica, sans-serif; 
+}
+

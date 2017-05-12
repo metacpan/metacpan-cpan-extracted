@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+   <classes>
+      <parameter>
+         <bookmark>BabelObjects::Component::Directory::Bookmark</bookmark>
+      </parameter>
+      <parameter>
+         <test>BabelObjects::Component::Test::BabelObjects::Test</test>
+         <!-- <test>org.babelo.module.test.bo.Test</test> -->
+      </parameter>
+      <parameter>
+         <ud>org.babelo.component.crm.data.UserData</ud>
+      </parameter>
+      <parameter>
+         <msg>org.babelo.component.mail.webmail.WebMailMessage</msg>
+      </parameter>
+      <parameter>
+         <folder>org.babelo.component.mail.webmail.WebMailFolder</folder>
+      </parameter>
+      <parameter>
+         <server>org.babelo.component.mail.webmail.WebMailConnexionManager</server>
+      </parameter>
+      <parameter>
+         <forum>org.babelo.component.mail.webforum.WebForumFolder</forum>
+      </parameter>
+      <parameter>
+         <contrib>org.babelo.component.mail.webforum.WebForumMessage</contrib>
+      </parameter>
+      <parameter>
+         <agenda>org.babelo.component.time.webcalendar.WebCalendarAgenda</agenda>
+      </parameter>
+      <parameter>
+         <event>org.babelo.component.time.webcalendar.db.WebEvent</event>
+      </parameter>
+      <parameter>
+         <file>org.babelo.component.facility.FileFacility</file>
+      </parameter>
+   </classes>

@@ -1,0 +1,106 @@
+#!/usr/bin/env perl
+package Bio::MLST::Bin::Download;
+$Bio::MLST::Bin::Download::VERSION = '2.1.1706216';
+# ABSTRACT: Downloads all the MLST databases to disk. It requires access to the Internet.
+# PODNAME: download_mlst_databases
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use Bio::MLST::CDC::Convert;
+
+my ($config_file, $base_directory,$url, $species,$gene_name, $help, $version);
+
+GetOptions ('u|url=s'            => \$url,
+            'b|base_directory=s' => \$base_directory,
+            's|species=s',       => \$species,
+            'g|gene_name=s',     => \$gene_name,
+            'h|help'             => \$help,
+            'v|version'          => \$version,
+);
+
+(! $version ) or die "$0 version " . Bio::MLST::Bin::Download->VERSION . "\n";
+
+(! $help)or die <<USAGE;
+Usage: $0 [options]
+Downloads all the MLST databases to disk
+
+# download everything with defaults
+download_mlst_databases
+
+# print version information
+download_mlst_databases -v
+
+# XML file containing details of the MLST databases (from pubmlst)
+download_mlst_databases -c my_config_file.json
+
+# Pass in a different url to download
+download_mlst_databases -u http://example.com/myfasta.fa
+
+# destination base directory defaults to the environment variable \$MLST_DATABASES
+download_mlst_databases -b /path/to/destination
+
+USAGE
+;
+
+$base_directory ||= $ENV{MLST_DATABASES};
+$base_directory ||= '/lustre/scratch108/pathogen/pathpipe/mlst';
+$url  ||= 'ftp://ftp.cdc.gov/pub/infectious_diseases/biotech/tsemm/tofasta.tfa';
+$species     ||= 'Streptococcus pyogenes emm';
+$gene_name   ||= 'emm';
+
+my $convert_fasta = Bio::MLST::CDC::Convert->new(
+  species        => $species,
+  input_file     => $url,
+  gene_name      => $gene_name,
+  base_directory => $base_directory
+  );
+$convert_fasta->create_mlst_files();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+download_mlst_databases - Downloads all the MLST databases to disk. It requires access to the Internet.
+
+=head1 VERSION
+
+version 2.1.1706216
+
+=head1 SYNOPSIS
+
+Downloads all the MLST databases to disk. It requires access to the Internet.
+
+    # download everything with defaults
+    download_mlst_databases
+
+    # print version information
+    download_mlst_databases -v
+
+    # XML file containing details of the MLST databases (from pubmlst)
+    download_mlst_databases -c my_config_file.json
+ 
+    # Pass in a different url to download
+    download_mlst_databases -u http://example.com/myfasta.fa
+
+    # destination base directory defaults to the environment variable \$MLST_DATABASES
+    download_mlst_databases -b /path/to/destination
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

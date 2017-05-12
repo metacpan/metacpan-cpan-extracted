@@ -1,0 +1,24 @@
+SYNOPSIS
+
+        use Business::ID::NIK qw(parse_nik);
+    
+        my $res = parse_nik(nik => "3273010119800002");
+
+DESCRIPTION
+
+    This module can be used to validate Indonesian citizenship registration
+    number, Nomor Induk Kependudukan (NIK), or more popularly known as
+    Nomor Kartu Tanda Penduduk (Nomor KTP), because NIK is displayed on the
+    KTP (citizen identity card).
+
+    NIK is composed of 16 digits as follow:
+
+     pp.DDSS.ddmmyy.ssss
+
+    pp.DDSS is a 6-digit area code where the NIK was registered (it used to
+    be but nowadays not always [citation needed] composed as: pp 2-digit
+    province code, DD 2-digit city/district [kota/kabupaten] code, SS
+    2-digit subdistrict [kecamatan] code), ddmmyy is date of birth of the
+    citizen (dd will be added by 40 for female), ssss is 4-digit serial
+    starting from 1.
+

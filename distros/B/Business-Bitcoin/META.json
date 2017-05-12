@@ -1,0 +1,51 @@
+{
+   "abstract" : "Easy and secure way to accept Bitcoin payments online",
+   "author" : [
+      "Ashish Gulhati <biz-btc at hash dot neomailbox.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-Bitcoin",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::RIPEMD160" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Digest::SHA" : "0",
+            "Encode::Base58::BigInt" : "0",
+            "LWP" : "0",
+            "LWP::Protocol::https" : "0",
+            "Math::EllipticCurve::Prime" : "0",
+            "Mozilla::CA" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.038",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

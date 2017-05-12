@@ -1,0 +1,46 @@
+NAME
+    Bundle::Devel - A bundle to install the main set of Devel:: modules
+
+SYNOPSIS
+    "perl -MCPAN -e 'install Bundle::Devel'"
+
+CONTENTS
+    Devel::DProf - Profiling tool
+
+    Devel::Profile - Another profiler
+
+    Devel::Cover - Currently the prefered coverage tool
+
+    Devel::Coverage - Newer, but somewhat imature coverage tool
+
+DESCRIPTION
+    Let's just say I'm sick of installing the Devel:: modules on at a time.
+    This bundle installs most of the common Devel:: modules in one go.
+
+    That's the basics for me, but if you want something added, just let me
+    know, or better file a bug against the package.
+
+SUPPORT
+    For general comments, contact the author.
+
+    To file a bug against this module, in a way you can keep track of, see
+    the CPAN bug tracking system.
+
+    http://rt.cpan.org/
+
+AUTHOR
+        Adam Kennedy
+        cpan@ali.as
+        http//ali.as/
+
+SEE ALSO
+    Devel::DProf, Devel::Cover, Devel::Coverage
+
+COPYRIGHT
+    Copyright (c) 2003 Adam Kennedy. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

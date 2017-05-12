@@ -1,0 +1,58 @@
+---
+abstract: 'Packing Algorithm'
+author:
+  - 'JT Smith <jt@plainblack.com>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Box-Calc
+provides:
+  Box::Calc:
+    file: lib/Box/Calc.pm
+    version: '1.0200'
+  Box::Calc::Box:
+    file: lib/Box/Calc/Box.pm
+    version: '1.0200'
+  Box::Calc::BoxType:
+    file: lib/Box/Calc/BoxType.pm
+    version: '1.0200'
+  Box::Calc::Item:
+    file: lib/Box/Calc/Item.pm
+    version: '1.0200'
+  Box::Calc::Layer:
+    file: lib/Box/Calc/Layer.pm
+    version: '1.0200'
+  Box::Calc::Role::Container:
+    file: lib/Box/Calc/Role/Container.pm
+    version: '1.0200'
+  Box::Calc::Role::Dimensional:
+    file: lib/Box/Calc/Role/Dimensional.pm
+    version: '1.0200'
+  Box::Calc::Role::Mailable:
+    file: lib/Box/Calc/Role/Mailable.pm
+    version: '1.0200'
+  Box::Calc::Row:
+    file: lib/Box/Calc/Row.pm
+    version: '1.0200'
+requires:
+  Data::GUID: '0'
+  List::MoreUtils: '0'
+  Log::Any: '0'
+  Moose: '0'
+  Ouch: '0.0400'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/rizen/Box-Calc/issues
+  repository: git://github.com/rizen/Box-Calc.git
+version: '1.0200'

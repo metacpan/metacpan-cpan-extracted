@@ -1,0 +1,1051 @@
+##gff-version 3
+CHROMOSOME_III	test	chromosome	1	13783700	.	+	.	ID=CHROMOSOME_III;Name=CHROMOSOME_III
+CHROMOSOME_II	test	chromosome	1	15279345	.	+	.	ID=CHROMOSOME_II;Name=CHROMOSOME_II
+CHROMOSOME_I	test	chromosome	1	15072423	.	+	.	ID=CHROMOSOME_I;Name=CHROMOSOME_I
+CHROMOSOME_IV	test	chromosome	1	17493793	.	+	.	ID=CHROMOSOME_IV;Name=CHROMOSOME_IV
+CHROMOSOME_MtDNA	test	chromosome	1	13794	.	+	.	ID=CHROMOSOME_MtDNA;Name=CHROMOSOME_MtDNA
+CHROMOSOME_V	test	chromosome	1	20924149	.	+	.	ID=CHROMOSOME_V;Name=CHROMOSOME_V
+CHROMOSOME_X	test	chromosome	1	17718866	.	+	.	ID=CHROMOSOME_X;Name=CHROMOSOME_X
+CHROMOSOME_II	test	gene	10156478	10169472	.	-	.	ID=Gene:F33H1.1;Name=ceDAF-19;Note=DAF-19 DNA binding transcription factor
+CHROMOSOME_II	test	xbox	10169358	10169371	.	-	.	ID=Gene:F33H1.1:xbox_1659;Note=GTTTCCATGGAAAC-Length:14-Score:5.23;Parent=Gene:F33H1.1
+CHROMOSOME_II	test	xbox	10162008	10162021	.	-	.	ID=Gene:F33H1.1:xbox_1661;Note=GTTACCAAGACGAT-Length:14-Score:0.86;Parent=Gene:F33H1.1
+CHROMOSOME_II	test	xbox	10162028	10162041	.	-	.	ID=Gene:F33H1.1:xbox_1660;Note=GTTACCAAGACAAT-Length:14-Score:1.15;Parent=Gene:F33H1.1
+CHROMOSOME_II	test	xbox	10164267	10164280	.	+	.	ID=Gene:F33H1.1:xbox_1354;Note=TCTCCATAGGCAAC-Length:14-Score:1.47;Parent=Gene:F33H1.1
+CHROMOSOME_II	test	mRNA	10157478	10161614	.	-	.	ID=Transcript:F33H1.1c;Parent=Gene:F33H1.1;cds=F33H1.1c;wormpep=CE:CE01567;Name=DAF-19-c;protein_decorations=hmmer3:BCD-domain:277:578:3e-115,hmmer3:D-domain:424:573:1.2e-64,hmmer3:DBD:80:150:1.1e-33,hmmer3:RFX_DNA_binding:74:141:5.1e-31,hmmer3:C-domain:364:404:8.5e-21,hmmer3:B-domain:299:333:2.2e-16
+CHROMOSOME_II	test	mRNA	10157478	10164319	.	-	.	ID=Transcript:F33H1.1d;Parent=Gene:F33H1.1;cds=F33H1.1d;wormpep=CE:CE43609;Name=DAF-19-d;protein_decorations=hmmer3:BCD-domain:316:617:3e-115,hmmer3:D-domain:463:612:1.1e-64,hmmer3:DBD:119:189:1.1e-33,hmmer3:RFX_DNA_binding:113:180:4.9e-31,hmmer3:C-domain:403:443:8e-21,hmmer3:B-domain:338:372:2.1e-16
+CHROMOSOME_II	test	mRNA	10157478	10169262	.	-	.	ID=Transcript:F33H1.1a;Parent=Gene:F33H1.1;cds=F33H1.1a;wormpep=CE:CE17763;Name=DAF-19-a;protein_decorations=hmmer3:BCD-domain:435:736:3.8e-115,hmmer3:D-domain:582:731:1.3e-64,hmmer3:DBD:238:308:1.2e-33,hmmer3:RFX_DNA_binding:232:299:5.2e-31,hmmer3:C-domain:522:562:8.4e-21,hmmer3:B-domain:457:491:2.2e-16
+CHROMOSOME_II	test	mRNA	10157478	10169262	.	-	.	ID=Transcript:F33H1.1b;Parent=Gene:F33H1.1;cds=F33H1.1b;wormpep=CE:CE28019;Name=DAF-19-b;protein_decorations=hmmer3:BCD-domain:460:761:4.1e-115,hmmer3:D-domain:607:756:1.4e-64,hmmer3:DBD:263:333:1.2e-33,hmmer3:RFX_DNA_binding:257:324:5.4e-31,hmmer3:C-domain:547:587:8.7e-21,hmmer3:B-domain:482:516:2.3e-16
+CHROMOSOME_II	test	three_prime_UTR	10157478	10157893	.	-	.	ID=UTR:F33H1.1a-1;Parent=Transcript:F33H1.1a
+CHROMOSOME_II	test	three_prime_UTR	10157478	10157893	.	-	.	ID=UTR:F33H1.1b-1;Parent=Transcript:F33H1.1b
+CHROMOSOME_II	test	three_prime_UTR	10157478	10157893	.	-	.	ID=UTR:F33H1.1c-1;Parent=Transcript:F33H1.1c
+CHROMOSOME_II	test	three_prime_UTR	10157478	10157893	.	-	.	ID=UTR:F33H1.1d-1;Parent=Transcript:F33H1.1d
+CHROMOSOME_II	test	CDS	10157894	10158028	.	-	.	ID=CDS:F33H1.1b-1;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10157894	10158028	.	-	.	ID=CDS:F33H1.1c-1;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10157894	10158028	.	-	.	ID=CDS:F33H1.1d-1;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10157894	10158028	.	-	.	ID=CDS:F33H1.1a-1;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10158079	10158949	.	-	.	ID=CDS:F33H1.1a-2;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10158079	10158949	.	-	.	ID=CDS:F33H1.1b-2;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10158079	10158949	.	-	.	ID=CDS:F33H1.1c-2;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10158079	10158949	.	-	.	ID=CDS:F33H1.1d-2;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10159006	10159218	.	-	.	ID=CDS:F33H1.1a-3;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10159006	10159218	.	-	.	ID=CDS:F33H1.1b-3;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10159006	10159218	.	-	.	ID=CDS:F33H1.1c-3;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10159006	10159218	.	-	.	ID=CDS:F33H1.1d-3;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10159267	10159608	.	-	.	ID=CDS:F33H1.1a-4;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10159267	10159608	.	-	.	ID=CDS:F33H1.1b-4;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10159267	10159608	.	-	.	ID=CDS:F33H1.1c-4;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10159267	10159608	.	-	.	ID=CDS:F33H1.1d-4;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10159686	10159762	.	-	.	ID=CDS:F33H1.1a-5;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10159686	10159762	.	-	.	ID=CDS:F33H1.1b-5;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10159686	10159762	.	-	.	ID=CDS:F33H1.1c-5;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10159686	10159762	.	-	.	ID=CDS:F33H1.1d-5;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10160738	10160869	.	-	.	ID=CDS:F33H1.1a-6;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10160738	10160869	.	-	.	ID=CDS:F33H1.1b-6;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10160738	10160869	.	-	.	ID=CDS:F33H1.1c-6;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10160738	10160869	.	-	.	ID=CDS:F33H1.1d-6;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10160918	10160984	.	-	.	ID=CDS:F33H1.1a-7;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10160918	10160984	.	-	.	ID=CDS:F33H1.1b-7;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10160918	10160984	.	-	.	ID=CDS:F33H1.1c-7;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	CDS	10160918	10160984	.	-	.	ID=CDS:F33H1.1d-7;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10161417	10161448	.	-	.	ID=CDS:F33H1.1c-8;Note=DAF-19 M (male specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1c;locus=daf-19;status=Confirmed;wormpep=CE:CE01567
+CHROMOSOME_II	test	five_prime_UTR	10161449	10161614	.	-	.	ID=UTR:F33H1.1c-2;Parent=Transcript:F33H1.1c
+CHROMOSOME_II	test	CDS	10163438	10163519	.	-	.	ID=CDS:F33H1.1a-8;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10163438	10163519	.	-	.	ID=CDS:F33H1.1b-8;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10163438	10163519	.	-	.	ID=CDS:F33H1.1d-8;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10164253	10164319	.	-	.	ID=CDS:F33H1.1d-9;Note=DAF-19 C (cilia specific) variant DNA binding transcription factor;Parent=Transcript:F33H1.1d;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE43609
+CHROMOSOME_II	test	CDS	10164253	10164327	.	-	.	ID=CDS:F33H1.1b-9;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10166082	10166248	.	-	.	ID=CDS:F33H1.1a-9;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10166082	10166248	.	-	.	ID=CDS:F33H1.1b-10;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10168015	10168203	.	-	.	ID=CDS:F33H1.1a-10;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10168015	10168203	.	-	.	ID=CDS:F33H1.1b-11;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_II	test	CDS	10169195	10169262	.	-	.	ID=CDS:F33H1.1a-11;Note=DAF-19 short variant DNA binding transcription factor;Parent=Transcript:F33H1.1a;locus=daf-19;status=Confirmed;wormpep=CE:CE17763
+CHROMOSOME_II	test	CDS	10169195	10169262	.	-	.	ID=CDS:F33H1.1b-12;Note=DAF-19 long variant DNA binding transcription factor;Parent=Transcript:F33H1.1b;locus=daf-19;status=Partially_confirmed;wormpep=CE:CE28019
+CHROMOSOME_I	test	gene	10506989	10515495	.	-	.	ID=Gene:F59C6.7;locus=che-13;Name=che-13
+CHROMOSOME_I	test	xbox	10515556	10515569	.	-	.	ID=Gene:F59C6.7:xbox_245;Note=GTTGCTATAGCAAC-Length:14-Score:3.24;Parent=Gene:F59C6.7
+CHROMOSOME_I	test	mRNA	10506989	10509835	.	-	.	ID=Transcript:F59C6.7b;Parent=Gene:F59C6.7;cds=F59C6.7b;wormpep=CE:CE11472;protein_decorations=PfamA26:IFT57:33:306:7.8e-91:Intra-flagellar transport protein 57;Name=che-13
+CHROMOSOME_I	test	mRNA	10506989	10515495	.	-	.	ID=Transcript:F59C6.7a;Parent=Gene:F59C6.7;cds=F59C6.7a;wormpep=CE:CE31704;protein_decorations=PfamA26:IFT57:37:393:1.5e-130:Intra-flagellar transport protein 57;Name=che-13
+CHROMOSOME_I	test	three_prime_UTR	10506989	10507081	.	-	.	Parent=Transcript:F59C6.7a
+CHROMOSOME_I	test	three_prime_UTR	10506989	10507081	.	-	.	Parent=Transcript:F59C6.7b
+CHROMOSOME_I	test	CDS	10507082	10507346	.	-	.	ID=CDS:F59C6.7a:1;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10507082	10507346	.	-	.	ID=CDS:F59C6.7b:1;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	CDS	10507419	10507552	.	-	.	ID=CDS:F59C6.7a:2;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10507419	10507552	.	-	.	ID=CDS:F59C6.7b:2;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	CDS	10507694	10507891	.	-	.	ID=CDS:F59C6.7a:3;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10507694	10507891	.	-	.	ID=CDS:F59C6.7b:3;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	CDS	10507937	10508102	.	-	.	ID=CDS:F59C6.7a:4;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10507937	10508102	.	-	.	ID=CDS:F59C6.7b:4;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	CDS	10508152	10508270	.	-	.	ID=CDS:F59C6.7a:5;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10508152	10508270	.	-	.	ID=CDS:F59C6.7b:5;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	CDS	10509709	10509804	.	-	.	ID=CDS:F59C6.7b:6;Parent=Transcript:F59C6.7b;locus=che-13;status=Confirmed;wormpep=CE:CE11472
+CHROMOSOME_I	test	five_prime_UTR	10509805	10509835	.	-	.	Parent=Transcript:F59C6.7b
+CHROMOSOME_I	test	CDS	10514778	10514831	.	-	.	ID=CDS:F59C6.7a:6;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10515091	10515202	.	-	.	ID=CDS:F59C6.7a:7;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10515250	10515335	.	-	.	ID=CDS:F59C6.7a:8;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_I	test	CDS	10515391	10515495	.	-	.	ID=CDS:F59C6.7a:9;Parent=Transcript:F59C6.7a;locus=che-13;status=Confirmed;wormpep=CE:CE31704
+CHROMOSOME_V	test	CDS	14980337	14980445	.	+	.	ID=CDS:F02D8.3:1;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	gene	14980337	14982609	.	+	.	ID=Gene:F02D8.3;locus=xbx-1;Name=xbx-1
+CHROMOSOME_V	test	xbox	14980258	14980271	.	-	.	ID=Gene:F02D8.3:xbox_1966;Note=GTTTCCATGGTAAC-Length:14-Score:5.23;Parent=Gene:F02D8.3
+CHROMOSOME_V	test	mRNA	14980337	14982609	.	+	.	ID=Transcript:F02D8.3;Parent=Gene:F02D8.3;cds=F02D8.3;wormpep=CE:CE39142;Name=xbx-1
+CHROMOSOME_V	test	CDS	14980800	14980858	.	+	.	ID=CDS:F02D8.3:2;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	CDS	14980910	14981008	.	+	.	ID=CDS:F02D8.3:3;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	CDS	14981059	14981147	.	+	.	ID=CDS:F02D8.3:4;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	CDS	14981560	14982028	.	+	.	ID=CDS:F02D8.3:5;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	CDS	14982220	14982315	.	+	.	ID=CDS:F02D8.3:6;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_V	test	CDS	14982418	14982609	.	+	.	ID=CDS:F02D8.3:7;Parent=Transcript:F02D8.3;locus=xbx-1;status=Partially_confirmed;wormpep=CE:CE39142
+CHROMOSOME_X	test	CDS	8939335	8939382	.	-	.	ID=CDS:D1009.5:1;Parent=Transcript:D1009.5;locus=dylt-2;status=Partially_confirmed;wormpep=CE:CE04289
+CHROMOSOME_X	test	gene	8939335	8940089	.	-	.	ID=Gene:D1009.5;locus=dylt-2;Name=dylt-2
+CHROMOSOME_X	test	xbox	8940153	8940166	.	-	.	ID=Gene:D1009.5:xbox_2522;Note=GTTGTCATGGCAAC-Length:14-Score:4.89;Parent=Gene:D1009.5
+CHROMOSOME_X	test	mRNA	8939335	8940089	.	-	.	ID=Transcript:D1009.5;Parent=Gene:D1009.5;cds=D1009.5;wormpep=CE:CE04289;protein_decorations=PfamA26:Tctex-1:22:121:1.6e-29:Tctex-1 family;Name=dylt-2
+CHROMOSOME_X	test	CDS	8939625	8939688	.	-	.	ID=CDS:D1009.5:2;Parent=Transcript:D1009.5;locus=dylt-2;status=Partially_confirmed;wormpep=CE:CE04289
+CHROMOSOME_X	test	CDS	8939734	8939803	.	-	.	ID=CDS:D1009.5:3;Parent=Transcript:D1009.5;locus=dylt-2;status=Partially_confirmed;wormpep=CE:CE04289
+CHROMOSOME_X	test	CDS	8939853	8939989	.	-	.	ID=CDS:D1009.5:4;Parent=Transcript:D1009.5;locus=dylt-2;status=Partially_confirmed;wormpep=CE:CE04289
+CHROMOSOME_X	test	CDS	8940037	8940089	.	-	.	ID=CDS:D1009.5:5;Parent=Transcript:D1009.5;locus=dylt-2;status=Partially_confirmed;wormpep=CE:CE04289
+CHROMOSOME_III	test	five_prime_UTR	10035913	10035955	.	+	.	Parent=Transcript:M04D8.6
+CHROMOSOME_III	test	gene	10035913	10036705	.	+	.	ID=Gene:M04D8.6;locus=xbx-3;Name=xbx-3
+CHROMOSOME_III	test	xbox	10035859	10035872	.	-	.	ID=Gene:M04D8.6:xbox_981;Note=GTTGTCTTGGCAAC-Length:14-Score:2.24;Parent=Gene:M04D8.6
+CHROMOSOME_III	test	mRNA	10035913	10036705	.	+	.	ID=Transcript:M04D8.6;Parent=Gene:M04D8.6;cds=M04D8.6;wormpep=CE:CE00579;protein_decorations=TMHMM:TM:30:52,TMHMM:TM:56:78,TMHMM:TM:91:113,TMHMM:TM:133:155;Name=xbx-3
+CHROMOSOME_III	test	CDS	10035956	10036018	.	+	.	ID=CDS:M04D8.6:1;Parent=Transcript:M04D8.6;locus=xbx-3;status=Partially_confirmed;wormpep=CE:CE00579
+CHROMOSOME_III	test	CDS	10036070	10036282	.	+	.	ID=CDS:M04D8.6:2;Parent=Transcript:M04D8.6;locus=xbx-3;status=Partially_confirmed;wormpep=CE:CE00579
+CHROMOSOME_III	test	CDS	10036332	10036521	.	+	.	ID=CDS:M04D8.6:3;Parent=Transcript:M04D8.6;locus=xbx-3;status=Partially_confirmed;wormpep=CE:CE00579
+CHROMOSOME_III	test	CDS	10036569	10036705	.	+	.	ID=CDS:M04D8.6:4;Parent=Transcript:M04D8.6;locus=xbx-3;status=Partially_confirmed;wormpep=CE:CE00579
+CHROMOSOME_IV	test	five_prime_UTR	2114626	2114672	.	+	.	Parent=Transcript:C23H5.3
+CHROMOSOME_IV	test	gene	2114626	2115625	.	+	.	ID=Gene:C23H5.3;locus=xbx-4;Name=xbx-4
+CHROMOSOME_IV	test	xbox	2114591	2114604	.	-	.	ID=Gene:C23H5.3:xbox_1582;Note=GTTGCCATGACAAC-Length:14-Score:6.08;Parent=Gene:C23H5.3
+CHROMOSOME_IV	test	mRNA	2114626	2115625	.	+	.	ID=Transcript:C23H5.3;Parent=Gene:C23H5.3;cds=C23H5.3;wormpep=CE:CE17438;protein_decorations=PfamA26:DUF3719:36:96:9.2e-21:Protein of unknown function (DUF3719);Name=xbx-4
+CHROMOSOME_IV	test	CDS	2114673	2114802	.	+	.	ID=CDS:C23H5.3:1;Parent=Transcript:C23H5.3;locus=xbx-4;status=Partially_confirmed;wormpep=CE:CE17438
+CHROMOSOME_IV	test	CDS	2115376	2115467	.	+	.	ID=CDS:C23H5.3:2;Parent=Transcript:C23H5.3;locus=xbx-4;status=Partially_confirmed;wormpep=CE:CE17438
+CHROMOSOME_IV	test	CDS	2115512	2115625	.	+	.	ID=CDS:C23H5.3:3;Parent=Transcript:C23H5.3;locus=xbx-4;status=Partially_confirmed;wormpep=CE:CE17438
+CHROMOSOME_III	test	CDS	3802558	3802698	.	-	.	ID=CDS:T24A11.2:1;Parent=Transcript:T24A11.2;locus=xbx-5;status=Partially_confirmed;wormpep=CE:CE34097
+CHROMOSOME_III	test	gene	3802558	3804349	.	-	.	ID=Gene:T24A11.2;locus=xbx-5;Name=xbx-5
+CHROMOSOME_III	test	xbox	3804457	3804470	.	-	.	ID=Gene:T24A11.2:xbox_1099;Note=GTTGTCATGGAGAC-Length:14-Score:4.60;Parent=Gene:T24A11.2
+CHROMOSOME_III	test	mRNA	3802558	3804349	.	-	.	ID=Transcript:T24A11.2;Parent=Gene:T24A11.2;cds=T24A11.2;wormpep=CE:CE34097;protein_decorations=SignalP:SP:1:24:0.475,TMHMM:TM:35:57,TMHMM:TM:87:109,TMHMM:TM:122:144,TMHMM:TM:154:176,TMHMM:TM:197:219,TMHMM:TM:234:253;Name=xbx-5
+CHROMOSOME_III	test	CDS	3802744	3802952	.	-	.	ID=CDS:T24A11.2:2;Parent=Transcript:T24A11.2;locus=xbx-5;status=Partially_confirmed;wormpep=CE:CE34097
+CHROMOSOME_III	test	CDS	3802994	3803271	.	-	.	ID=CDS:T24A11.2:3;Parent=Transcript:T24A11.2;locus=xbx-5;status=Partially_confirmed;wormpep=CE:CE34097
+CHROMOSOME_III	test	CDS	3803313	3803453	.	-	.	ID=CDS:T24A11.2:4;Parent=Transcript:T24A11.2;locus=xbx-5;status=Partially_confirmed;wormpep=CE:CE34097
+CHROMOSOME_III	test	CDS	3804123	3804349	.	-	.	ID=CDS:T24A11.2:5;Parent=Transcript:T24A11.2;locus=xbx-5;status=Partially_confirmed;wormpep=CE:CE34097
+CHROMOSOME_V	test	five_prime_UTR	9703030	9703093	.	+	.	Parent=Transcript:F40F9.1a.2
+CHROMOSOME_V	test	five_prime_UTR	9703030	9703093	.	+	.	Parent=Transcript:F40F9.1b.2
+CHROMOSOME_V	test	gene	9703030	9707797	.	+	.	ID=Gene:F40F9.1;Note=N-methyl-D-aspartate receptor associated protein;locus=xbx-6;Name=xbx-6
+CHROMOSOME_V	test	xbox	9705184	9705197	.	-	.	ID=Gene:F40F9.1:xbox_2054;Note=GTTTCCATGGAAAC-Length:14-Score:5.23;Parent=Gene:F40F9.1
+CHROMOSOME_V	test	mRNA	9703030	9707771	.	+	.	ID=Transcript:F40F9.1a.2;Parent=Gene:F40F9.1;cds=F40F9.1a;wormpep=CE:CE31343;Name=xbx-6
+CHROMOSOME_V	test	mRNA	9703030	9707797	.	+	.	ID=Transcript:F40F9.1b.2;Parent=Gene:F40F9.1;cds=F40F9.1b;wormpep=CE:CE31344;Name=xbx-6
+CHROMOSOME_V	test	five_prime_UTR	9703136	9703198	.	+	.	Parent=Transcript:F40F9.1a.3
+CHROMOSOME_V	test	five_prime_UTR	9703136	9703198	.	+	.	Parent=Transcript:F40F9.1b.3
+CHROMOSOME_V	test	mRNA	9703136	9707771	.	+	.	ID=Transcript:F40F9.1a.3;Parent=Gene:F40F9.1;cds=F40F9.1a;wormpep=CE:CE31343;Name=xbx-6
+CHROMOSOME_V	test	mRNA	9703136	9707797	.	+	.	ID=Transcript:F40F9.1b.3;Parent=Gene:F40F9.1;cds=F40F9.1b;wormpep=CE:CE31344;Name=xbx-6
+CHROMOSOME_V	test	five_prime_UTR	9703139	9703198	.	+	.	Parent=Transcript:F40F9.1a.2
+CHROMOSOME_V	test	five_prime_UTR	9703139	9703198	.	+	.	Parent=Transcript:F40F9.1b.2
+CHROMOSOME_V	test	five_prime_UTR	9705331	9705334	.	+	.	Parent=Transcript:F40F9.1a.1
+CHROMOSOME_V	test	five_prime_UTR	9705331	9705334	.	+	.	Parent=Transcript:F40F9.1b.1
+CHROMOSOME_V	test	mRNA	9705331	9707771	.	+	.	ID=Transcript:F40F9.1a.1;Parent=Gene:F40F9.1;cds=F40F9.1a;wormpep=CE:CE31343;Name=xbx-6
+CHROMOSOME_V	test	mRNA	9705331	9707797	.	+	.	ID=Transcript:F40F9.1b.1;Parent=Gene:F40F9.1;cds=F40F9.1b;wormpep=CE:CE31344;Name=xbx-6
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1a.2
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1a.3
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1a.4
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1b.2
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1b.3
+CHROMOSOME_V	test	five_prime_UTR	9705333	9705334	.	+	.	Parent=Transcript:F40F9.1b.4
+CHROMOSOME_V	test	mRNA	9705333	9707771	.	+	.	ID=Transcript:F40F9.1a.4;Parent=Gene:F40F9.1;cds=F40F9.1a;wormpep=CE:CE31343;Name=xbx-6
+CHROMOSOME_V	test	mRNA	9705333	9707797	.	+	.	ID=Transcript:F40F9.1b.4;Parent=Gene:F40F9.1;cds=F40F9.1b;wormpep=CE:CE31344;Name=xbx-6
+CHROMOSOME_V	test	CDS	9705335	9705443	.	+	.	ID=CDS:F40F9.1a:1;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9705335	9705443	.	+	.	ID=CDS:F40F9.1b:1;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9705776	9705948	.	+	.	ID=CDS:F40F9.1a:2;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9705776	9705948	.	+	.	ID=CDS:F40F9.1b:2;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9705998	9706092	.	+	.	ID=CDS:F40F9.1a:3;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9705998	9706092	.	+	.	ID=CDS:F40F9.1b:3;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706138	9706228	.	+	.	ID=CDS:F40F9.1a:4;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706138	9706228	.	+	.	ID=CDS:F40F9.1b:4;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706285	9706424	.	+	.	ID=CDS:F40F9.1a:5;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706285	9706424	.	+	.	ID=CDS:F40F9.1b:5;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706718	9706993	.	+	.	ID=CDS:F40F9.1a:6;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9706718	9706993	.	+	.	ID=CDS:F40F9.1b:6;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	9707063	9707069	.	+	.	ID=CDS:F40F9.1b:7;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1b.3,Transcript:F40F9.1b.4,Transcript:F40F9.1b.1,Transcript:F40F9.1b.2;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	three_prime_UTR	9707070	9707131	.	+	.	Parent=Transcript:F40F9.1b.1
+CHROMOSOME_V	test	three_prime_UTR	9707070	9707131	.	+	.	Parent=Transcript:F40F9.1b.2
+CHROMOSOME_V	test	three_prime_UTR	9707070	9707131	.	+	.	Parent=Transcript:F40F9.1b.3
+CHROMOSOME_V	test	three_prime_UTR	9707070	9707131	.	+	.	Parent=Transcript:F40F9.1b.4
+CHROMOSOME_V	test	CDS	9707508	9707514	.	+	.	ID=CDS:F40F9.1a:7;Note=N-methyl-D-aspartate receptor associated protein;Parent=Transcript:F40F9.1a.4,Transcript:F40F9.1a.1,Transcript:F40F9.1a.2,Transcript:F40F9.1a.3;locus=xbx-6;status=Confirmed;
+CHROMOSOME_V	test	three_prime_UTR	9707508	9707797	.	+	.	Parent=Transcript:F40F9.1b.1
+CHROMOSOME_V	test	three_prime_UTR	9707508	9707797	.	+	.	Parent=Transcript:F40F9.1b.2
+CHROMOSOME_V	test	three_prime_UTR	9707508	9707797	.	+	.	Parent=Transcript:F40F9.1b.3
+CHROMOSOME_V	test	three_prime_UTR	9707508	9707797	.	+	.	Parent=Transcript:F40F9.1b.4
+CHROMOSOME_V	test	three_prime_UTR	9707515	9707771	.	+	.	Parent=Transcript:F40F9.1a.1
+CHROMOSOME_V	test	three_prime_UTR	9707515	9707771	.	+	.	Parent=Transcript:F40F9.1a.2
+CHROMOSOME_V	test	three_prime_UTR	9707515	9707771	.	+	.	Parent=Transcript:F40F9.1a.3
+CHROMOSOME_V	test	three_prime_UTR	9707515	9707771	.	+	.	Parent=Transcript:F40F9.1a.4
+CHROMOSOME_III	test	CDS	3186691	3186749	.	+	.	ID=CDS:R148.1a:1;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3186691	3186749	.	+	.	ID=CDS:R148.1b:1;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	gene	3186691	3192197	.	+	.	ID=Gene:R148.1;locus=mks-1;Name=mks-1
+CHROMOSOME_III	test	xbox	3186622	3186635	.	+	.	ID=Gene:R148.1:xbox_804;Note=GTCACCATAGGAAC-Length:14-Score:3.62;Parent=Gene:R148.1
+CHROMOSOME_III	test	mRNA	3186691	3191298	.	+	.	ID=Transcript:R148.1b;Parent=Gene:R148.1;cds=R148.1b;wormpep=CE:CE41329;protein_decorations=PfamA26:B9-C2:223:382:4.5e-30:Ciliary basal body-associated  B9 protein;Name=mks-1
+CHROMOSOME_III	test	mRNA	3186691	3192197	.	+	.	ID=Transcript:R148.1a;Parent=Gene:R148.1;cds=R148.1a;wormpep=CE:CE40712;protein_decorations=PfamA26:B9-C2:223:382:5.4e-30:Ciliary basal body-associated  B9 protein;Name=mks-1
+CHROMOSOME_III	test	CDS	3187079	3187225	.	+	.	ID=CDS:R148.1a:2;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3187079	3187225	.	+	.	ID=CDS:R148.1b:2;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3187287	3187394	.	+	.	ID=CDS:R148.1a:3;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3187287	3187394	.	+	.	ID=CDS:R148.1b:3;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3187449	3187556	.	+	.	ID=CDS:R148.1a:4;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3187449	3187556	.	+	.	ID=CDS:R148.1b:4;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3188414	3188597	.	+	.	ID=CDS:R148.1a:5;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3188414	3188597	.	+	.	ID=CDS:R148.1b:5;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3189172	3189247	.	+	.	ID=CDS:R148.1a:6;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3189172	3189247	.	+	.	ID=CDS:R148.1b:6;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3189298	3189589	.	+	.	ID=CDS:R148.1a:7;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3189298	3189589	.	+	.	ID=CDS:R148.1b:7;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3190142	3190244	.	+	.	ID=CDS:R148.1a:8;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3190142	3190244	.	+	.	ID=CDS:R148.1b:8;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3190298	3190440	.	+	.	ID=CDS:R148.1a:9;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3190298	3190440	.	+	.	ID=CDS:R148.1b:9;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	CDS	3191099	3191206	.	+	.	ID=CDS:R148.1a:10;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	CDS	3191099	3191210	.	+	.	ID=CDS:R148.1b:10;Parent=Transcript:R148.1b;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE41329
+CHROMOSOME_III	test	three_prime_UTR	3191211	3191298	.	+	.	Parent=Transcript:R148.1b
+CHROMOSOME_III	test	CDS	3192018	3192147	.	+	.	ID=CDS:R148.1a:11;Parent=Transcript:R148.1a;locus=mks-1;status=Partially_confirmed;wormpep=CE:CE40712
+CHROMOSOME_III	test	three_prime_UTR	3192148	3192197	.	+	.	Parent=Transcript:R148.1a
+CHROMOSOME_III	test	gene	6032647	6039425	.	-	.	ID=Gene:ZK328.7;Note=stress-inducible protein STI1;Name=ZK328.7
+CHROMOSOME_III	test	xbox	6039459	6039472	.	-	.	ID=Gene:ZK328.7:xbox_1058;Note=ATTGCCATGGTAAC-Length:14-Score:2.16;Parent=Gene:ZK328.7
+CHROMOSOME_III	test	mRNA	6032647	6039425	.	-	.	ID=Transcript:ZK328.7a;Parent=Gene:ZK328.7;cds=ZK328.7a;wormpep=CE:CE44936;Name=ZK328.7
+CHROMOSOME_III	test	three_prime_UTR	6032647	6032693	.	-	.	Parent=Transcript:ZK328.7a
+CHROMOSOME_III	test	CDS	6032694	6032839	.	-	.	ID=CDS:ZK328.7a:1;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6032898	6033433	.	-	.	ID=CDS:ZK328.7a:2;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6033756	6033993	.	-	.	ID=CDS:ZK328.7b:1;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	mRNA	6033756	6039425	.	-	.	ID=Transcript:ZK328.7b;Parent=Gene:ZK328.7;cds=ZK328.7b;wormpep=CE:CE34449;Name=ZK328.7
+CHROMOSOME_III	test	CDS	6033760	6033993	.	-	.	ID=CDS:ZK328.7a:3;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6034046	6034124	.	-	.	ID=CDS:ZK328.7a:4;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6034046	6034124	.	-	.	ID=CDS:ZK328.7b:2;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6034173	6034254	.	-	.	ID=CDS:ZK328.7a:5;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6034173	6034254	.	-	.	ID=CDS:ZK328.7b:3;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6034299	6034581	.	-	.	ID=CDS:ZK328.7a:6;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6034299	6034581	.	-	.	ID=CDS:ZK328.7b:4;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6034629	6035060	.	-	.	ID=CDS:ZK328.7a:7;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6034629	6035060	.	-	.	ID=CDS:ZK328.7b:5;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6035110	6035348	.	-	.	ID=CDS:ZK328.7a:8;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6035110	6035348	.	-	.	ID=CDS:ZK328.7b:6;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6035403	6036101	.	-	.	ID=CDS:ZK328.7a:9;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6035403	6036101	.	-	.	ID=CDS:ZK328.7b:7;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6036220	6036472	.	-	.	ID=CDS:ZK328.7a:10;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6036220	6036472	.	-	.	ID=CDS:ZK328.7b:8;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6036521	6036910	.	-	.	ID=CDS:ZK328.7a:11;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6036521	6036910	.	-	.	ID=CDS:ZK328.7b:9;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6038402	6038586	.	-	.	ID=CDS:ZK328.7a:12;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6038402	6038586	.	-	.	ID=CDS:ZK328.7b:10;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6038631	6038722	.	-	.	ID=CDS:ZK328.7a:13;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6038631	6038722	.	-	.	ID=CDS:ZK328.7b:11;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6038780	6038994	.	-	.	ID=CDS:ZK328.7a:14;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6038780	6038994	.	-	.	ID=CDS:ZK328.7b:12;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	CDS	6039274	6039383	.	-	.	ID=CDS:ZK328.7a:15;Note=stress-inducible protein STI1;Parent=Transcript:ZK328.7a;status=Partially_confirmed;wormpep=CE:CE44936
+CHROMOSOME_III	test	CDS	6039274	6039383	.	-	.	ID=CDS:ZK328.7b:13;Parent=Transcript:ZK328.7b;status=Partially_confirmed;wormpep=CE:CE34449
+CHROMOSOME_III	test	five_prime_UTR	6039384	6039425	.	-	.	Parent=Transcript:ZK328.7a
+CHROMOSOME_III	test	five_prime_UTR	6039384	6039425	.	-	.	Parent=Transcript:ZK328.7b
+CHROMOSOME_I	test	CDS	6917749	6917895	.	-	.	ID=CDS:C48B6.8:1;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	gene	6917749	6922954	.	-	.	ID=Gene:C48B6.8;locus=bbs-9;Name=bbs-9
+CHROMOSOME_I	test	xbox	6923022	6923035	.	-	.	ID=Gene:C48B6.8:xbox_298;Note=GTTGTCATGGAAAC-Length:14-Score:4.89;Parent=Gene:C48B6.8
+CHROMOSOME_I	test	mRNA	6917749	6922954	.	-	.	ID=Transcript:C48B6.8;Parent=Gene:C48B6.8;cds=C48B6.8;wormpep=CE:CE46977;Name=bbs-9
+CHROMOSOME_I	test	CDS	6918241	6918329	.	-	.	ID=CDS:C48B6.8:2;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6918378	6918444	.	-	.	ID=CDS:C48B6.8:3;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6918494	6918646	.	-	.	ID=CDS:C48B6.8:4;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6918703	6918854	.	-	.	ID=CDS:C48B6.8:5;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6919037	6919123	.	-	.	ID=CDS:C48B6.8:6;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6919404	6919535	.	-	.	ID=CDS:C48B6.8:7;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6919588	6919686	.	-	.	ID=CDS:C48B6.8:8;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6919967	6920114	.	-	.	ID=CDS:C48B6.8:9;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6920156	6920314	.	-	.	ID=CDS:C48B6.8:10;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6920703	6920790	.	-	.	ID=CDS:C48B6.8:11;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6920840	6920969	.	-	.	ID=CDS:C48B6.8:12;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6921020	6921206	.	-	.	ID=CDS:C48B6.8:13;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6921380	6921687	.	-	.	ID=CDS:C48B6.8:14;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6922152	6922284	.	-	.	ID=CDS:C48B6.8:15;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6922331	6922398	.	-	.	ID=CDS:C48B6.8:16;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_I	test	CDS	6922867	6922954	.	-	.	ID=CDS:C48B6.8:17;Parent=Transcript:C48B6.8;locus=bbs-9;status=Partially_confirmed;wormpep=CE:CE46977
+CHROMOSOME_V	test	CDS	12144276	12144615	.	-	.	ID=CDS:C27A7.4:1;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	gene	12144276	12150670	.	-	.	ID=Gene:C27A7.4;locus=che-11;Name=che-11
+CHROMOSOME_V	test	xbox	12150742	12150755	.	-	.	ID=Gene:C27A7.4:xbox_2017;Note=GTTGCCATGGAGAT-Length:14-Score:4.90;Parent=Gene:C27A7.4
+CHROMOSOME_V	test	mRNA	12144276	12150670	.	-	.	ID=Transcript:C27A7.4;Parent=Gene:C27A7.4;cds=C27A7.4;wormpep=CE:CE42072;Name=che-11
+CHROMOSOME_V	test	CDS	12144658	12144830	.	-	.	ID=CDS:C27A7.4:2;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12144875	12145087	.	-	.	ID=CDS:C27A7.4:3;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12145130	12145251	.	-	.	ID=CDS:C27A7.4:4;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12145299	12145969	.	-	.	ID=CDS:C27A7.4:5;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12146018	12146113	.	-	.	ID=CDS:C27A7.4:6;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12146161	12146541	.	-	.	ID=CDS:C27A7.4:7;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12146589	12146697	.	-	.	ID=CDS:C27A7.4:8;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12146744	12146957	.	-	.	ID=CDS:C27A7.4:9;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12147066	12147347	.	-	.	ID=CDS:C27A7.4:10;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12147393	12147510	.	-	.	ID=CDS:C27A7.4:11;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12147560	12147825	.	-	.	ID=CDS:C27A7.4:12;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12147872	12148123	.	-	.	ID=CDS:C27A7.4:13;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12148614	12148729	.	-	.	ID=CDS:C27A7.4:14;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12148775	12149096	.	-	.	ID=CDS:C27A7.4:15;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12149700	12149892	.	-	.	ID=CDS:C27A7.4:16;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12149942	12150063	.	-	.	ID=CDS:C27A7.4:17;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12150111	12150196	.	-	.	ID=CDS:C27A7.4:18;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12150282	12150414	.	-	.	ID=CDS:C27A7.4:19;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_V	test	CDS	12150566	12150670	.	-	.	ID=CDS:C27A7.4:20;Parent=Transcript:C27A7.4;locus=che-11;status=Partially_confirmed;wormpep=CE:CE42072
+CHROMOSOME_III	test	five_prime_UTR	6730726	6730874	.	+	.	Parent=Transcript:Y102E9.1b
+CHROMOSOME_III	test	gene	6730726	6733881	.	+	.	ID=Gene:Y102E9.1;locus=odr-4;Name=odr-4
+CHROMOSOME_III	test	xbox	6731919	6731932	.	+	.	ID=Gene:Y102E9.1:xbox_849;Note=ATCGTCATGGTAAC-Length:14-Score:3.31;Parent=Gene:Y102E9.1
+CHROMOSOME_III	test	mRNA	6730726	6733881	.	+	.	ID=Transcript:Y102E9.1b;Parent=Gene:Y102E9.1;cds=Y102E9.1b;wormpep=CE:CE32953;protein_decorations=TMHMM:TM:452:474;Name=odr-4
+CHROMOSOME_III	test	five_prime_UTR	6731165	6731178	.	+	.	Parent=Transcript:Y102E9.1b
+CHROMOSOME_III	test	five_prime_UTR	6731165	6731178	.	+	.	Parent=Transcript:Y102E9.1c
+CHROMOSOME_III	test	mRNA	6731165	6733881	.	+	.	ID=Transcript:Y102E9.1c;Parent=Gene:Y102E9.1;cds=Y102E9.1c;wormpep=CE:CE32954;protein_decorations=TMHMM:TM:450:472;Name=odr-4
+CHROMOSOME_III	test	CDS	6731179	6731263	.	+	.	ID=CDS:Y102E9.1b:1;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6731179	6731263	.	+	.	ID=CDS:Y102E9.1c:1;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	five_prime_UTR	6731599	6731693	.	+	.	Parent=Transcript:Y102E9.1a.1
+CHROMOSOME_III	test	mRNA	6731599	6733881	.	+	.	ID=Transcript:Y102E9.1a.1;Parent=Gene:Y102E9.1;cds=Y102E9.1a;wormpep=CE:CE28101;Name=odr-4
+CHROMOSOME_III	test	five_prime_UTR	6731982	6732118	.	+	.	Parent=Transcript:Y102E9.1a.2
+CHROMOSOME_III	test	mRNA	6731982	6733881	.	+	.	ID=Transcript:Y102E9.1a.2;Parent=Gene:Y102E9.1;cds=Y102E9.1a;wormpep=CE:CE28101;Name=odr-4
+CHROMOSOME_III	test	CDS	6732108	6732304	.	+	.	ID=CDS:Y102E9.1b:2;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	five_prime_UTR	6732108	6732118	.	+	.	Parent=Transcript:Y102E9.1a.1
+CHROMOSOME_III	test	five_prime_UTR	6732108	6732118	.	+	.	Parent=Transcript:Y102E9.1a.4
+CHROMOSOME_III	test	mRNA	6732108	6733881	.	+	.	ID=Transcript:Y102E9.1a.4;Parent=Gene:Y102E9.1;cds=Y102E9.1a;wormpep=CE:CE28101;Name=odr-4
+CHROMOSOME_III	test	CDS	6732114	6732304	.	+	.	ID=CDS:Y102E9.1c:2;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	five_prime_UTR	6732114	6732118	.	+	.	Parent=Transcript:Y102E9.1a.3
+CHROMOSOME_III	test	mRNA	6732114	6733881	.	+	.	ID=Transcript:Y102E9.1a.3;Parent=Gene:Y102E9.1;cds=Y102E9.1a;wormpep=CE:CE28101;Name=odr-4
+CHROMOSOME_III	test	CDS	6732119	6732304	.	+	.	ID=CDS:Y102E9.1a:1;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6732354	6732584	.	+	.	ID=CDS:Y102E9.1a:2;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6732354	6732584	.	+	.	ID=CDS:Y102E9.1b:3;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6732354	6732584	.	+	.	ID=CDS:Y102E9.1c:3;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	CDS	6732724	6733075	.	+	.	ID=CDS:Y102E9.1a:3;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6732724	6733075	.	+	.	ID=CDS:Y102E9.1b:4;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6732724	6733075	.	+	.	ID=CDS:Y102E9.1c:4;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	CDS	6733124	6733288	.	+	.	ID=CDS:Y102E9.1a:4;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6733130	6733288	.	+	.	ID=CDS:Y102E9.1b:5;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6733130	6733288	.	+	.	ID=CDS:Y102E9.1c:5;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	CDS	6733342	6733545	.	+	.	ID=CDS:Y102E9.1a:5;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6733342	6733545	.	+	.	ID=CDS:Y102E9.1b:6;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6733342	6733545	.	+	.	ID=CDS:Y102E9.1c:6;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	CDS	6733592	6733791	.	+	.	ID=CDS:Y102E9.1a:6;Parent=Transcript:Y102E9.1a.3,Transcript:Y102E9.1a.4,Transcript:Y102E9.1a.1,Transcript:Y102E9.1a.2;locus=odr-4;status=Confirmed;wormpep=CE:CE28101
+CHROMOSOME_III	test	CDS	6733592	6733791	.	+	.	ID=CDS:Y102E9.1b:7;Parent=Transcript:Y102E9.1b;locus=odr-4;status=Confirmed;wormpep=CE:CE32953
+CHROMOSOME_III	test	CDS	6733592	6733791	.	+	.	ID=CDS:Y102E9.1c:7;Parent=Transcript:Y102E9.1c;locus=odr-4;status=Confirmed;wormpep=CE:CE32954
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1a.1
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1a.2
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1a.3
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1a.4
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1b
+CHROMOSOME_III	test	three_prime_UTR	6733792	6733881	.	+	.	Parent=Transcript:Y102E9.1c
+CHROMOSOME_X	test	CDS	2984268	2984348	.	+	.	ID=CDS:Y41G9A.1:1;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	gene	2984268	2991440	.	+	.	ID=Gene:Y41G9A.1;locus=osm-5;Name=osm-5
+CHROMOSOME_X	test	xbox	2984153	2984166	.	-	.	ID=Gene:Y41G9A.1:xbox_2614;Note=GTTACTATGGCAAC-Length:14-Score:5.45;Parent=Gene:Y41G9A.1
+CHROMOSOME_X	test	mRNA	2984268	2991440	.	+	.	ID=Transcript:Y41G9A.1;Parent=Gene:Y41G9A.1;cds=Y41G9A.1;wormpep=CE:CE28361;protein_decorations=PfamA26:TPR_11:227:292:1.8e-11:TPR repeat,PfamA26:TPR_11:472:532:2.4e-12:TPR repeat,PfamA26:TPR_12:226:287:5.5e-11:Tetratricopeptide repeat;Name=osm-5
+CHROMOSOME_X	test	CDS	2984942	2985004	.	+	.	ID=CDS:Y41G9A.1:2;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2985353	2985422	.	+	.	ID=CDS:Y41G9A.1:3;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2985474	2985578	.	+	.	ID=CDS:Y41G9A.1:4;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2985629	2985674	.	+	.	ID=CDS:Y41G9A.1:5;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2985725	2986034	.	+	.	ID=CDS:Y41G9A.1:6;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2986444	2986669	.	+	.	ID=CDS:Y41G9A.1:7;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2986716	2986953	.	+	.	ID=CDS:Y41G9A.1:8;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2987376	2987583	.	+	.	ID=CDS:Y41G9A.1:9;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2987905	2988206	.	+	.	ID=CDS:Y41G9A.1:10;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2988253	2988403	.	+	.	ID=CDS:Y41G9A.1:11;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2989309	2989424	.	+	.	ID=CDS:Y41G9A.1:12;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2989504	2989707	.	+	.	ID=CDS:Y41G9A.1:13;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2989757	2989968	.	+	.	ID=CDS:Y41G9A.1:14;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	CDS	2991211	2991341	.	+	.	ID=CDS:Y41G9A.1:15;Parent=Transcript:Y41G9A.1;locus=osm-5;status=Confirmed;wormpep=CE:CE28361
+CHROMOSOME_X	test	three_prime_UTR	2991342	2991440	.	+	.	Parent=Transcript:Y41G9A.1
+CHROMOSOME_V	test	gene	8961880	8964077	.	-	.	ID=Gene:T19A5.4;Note=zinc finger protein;locus=nhr-44;Name=nhr-44
+CHROMOSOME_V	test	xbox	8964140	8964153	.	-	.	ID=Gene:T19A5.4:xbox_2068;Note=GTTGCCATGAAGAC-Length:14-Score:5.79;Parent=Gene:T19A5.4
+CHROMOSOME_V	test	mRNA	8961880	8964077	.	-	.	ID=Transcript:T19A5.4;Parent=Gene:T19A5.4;cds=T19A5.4;wormpep=CE:CE13732;protein_decorations=PfamA26:Hormone_recep:194:409:1.2e-47:Ligand-binding domain of nuclear hormone receptor,PfamA26:zf-C4:23:92:4.3e-19:Zinc finger  C4 type (two domains);Name=nhr-44
+CHROMOSOME_V	test	three_prime_UTR	8961880	8961937	.	-	.	Parent=Transcript:T19A5.4
+CHROMOSOME_V	test	CDS	8961938	8962039	.	-	.	ID=CDS:T19A5.4:1;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8962096	8962366	.	-	.	ID=CDS:T19A5.4:2;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8962413	8962507	.	-	.	ID=CDS:T19A5.4:3;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8962700	8962795	.	-	.	ID=CDS:T19A5.4:4;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8962844	8963062	.	-	.	ID=CDS:T19A5.4:5;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8963337	8963468	.	-	.	ID=CDS:T19A5.4:6;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8963559	8963647	.	-	.	ID=CDS:T19A5.4:7;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8963700	8963758	.	-	.	ID=CDS:T19A5.4:8;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8963805	8963882	.	-	.	ID=CDS:T19A5.4:9;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_V	test	CDS	8963932	8964077	.	-	.	ID=CDS:T19A5.4:10;Note=zinc finger protein;Parent=Transcript:T19A5.4;locus=nhr-44;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10648879	10649007	.	-	.	ID=CDS:M28.7:1;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	gene	10648879	10652197	.	-	.	ID=Gene:M28.7;Note=SH3 domain;locus=nphp-1;Name=nphp-1
+CHROMOSOME_II	test	xbox	10652233	10652247	.	-	.	ID=Gene:M28.7:xbox_624;Note=GTTGCCCCTGGCAAC-Length:15-Score:5.17;Parent=Gene:M28.7
+CHROMOSOME_II	test	mRNA	10648879	10652197	.	-	.	ID=Transcript:M28.7;Parent=Gene:M28.7;cds=M28.7;wormpep=CE:CE16278;Name=nphp-1
+CHROMOSOME_II	test	CDS	10649069	10649304	.	-	.	ID=CDS:M28.7:2;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10649350	10649462	.	-	.	ID=CDS:M28.7:3;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10649541	10650040	.	-	.	ID=CDS:M28.7:4;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10650219	10650449	.	-	.	ID=CDS:M28.7:5;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10650500	10651028	.	-	.	ID=CDS:M28.7:6;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10651085	10651227	.	-	.	ID=CDS:M28.7:7;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10651481	10651579	.	-	.	ID=CDS:M28.7:8;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	CDS	10652102	10652170	.	-	.	ID=CDS:M28.7:9;Note=SH3 domain;Parent=Transcript:M28.7;locus=nphp-1;status=Partially_confirmed;
+CHROMOSOME_II	test	five_prime_UTR	10652171	10652197	.	-	.	Parent=Transcript:M28.7
+CHROMOSOME_V	test	gene	11831184	11843606	.	-	.	ID=Gene:R13H4.1;locus=nphp-4;Name=nphp-4
+CHROMOSOME_V	test	xbox	11843761	11843774	.	-	.	ID=Gene:R13H4.1:xbox_2022;Note=GTTGTCATGGAAAT-Length:14-Score:3.12;Parent=Gene:R13H4.1
+CHROMOSOME_V	test	mRNA	11831184	11843606	.	-	.	ID=Transcript:R13H4.1;Parent=Gene:R13H4.1;cds=R13H4.1;wormpep=CE:CE38409;Name=nphp-4
+CHROMOSOME_V	test	three_prime_UTR	11831184	11831258	.	-	.	Parent=Transcript:R13H4.1
+CHROMOSOME_V	test	CDS	11831259	11831339	.	-	.	ID=CDS:R13H4.1:1;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11831383	11831550	.	-	.	ID=CDS:R13H4.1:2;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11832395	11832540	.	-	.	ID=CDS:R13H4.1:3;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11835939	11836066	.	-	.	ID=CDS:R13H4.1:4;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11838008	11838112	.	-	.	ID=CDS:R13H4.1:5;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11838158	11838791	.	-	.	ID=CDS:R13H4.1:6;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11838971	11839366	.	-	.	ID=CDS:R13H4.1:7;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11840293	11840569	.	-	.	ID=CDS:R13H4.1:8;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11840612	11840792	.	-	.	ID=CDS:R13H4.1:9;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11840991	11841863	.	-	.	ID=CDS:R13H4.1:10;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11841925	11842061	.	-	.	ID=CDS:R13H4.1:11;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11842231	11842418	.	-	.	ID=CDS:R13H4.1:12;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11842468	11842658	.	-	.	ID=CDS:R13H4.1:13;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11842708	11842783	.	-	.	ID=CDS:R13H4.1:14;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11843178	11843259	.	-	.	ID=CDS:R13H4.1:15;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11843304	11843432	.	-	.	ID=CDS:R13H4.1:16;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_V	test	CDS	11843481	11843606	.	-	.	ID=CDS:R13H4.1:17;Parent=Transcript:R13H4.1;locus=nphp-4;status=Confirmed;wormpep=CE:CE38409
+CHROMOSOME_III	test	five_prime_UTR	13341424	13341428	.	+	.	Parent=Transcript:F53A2.4.2
+CHROMOSOME_III	test	gene	13341424	13342507	.	+	.	ID=Gene:F53A2.4;locus=nud-1;Name=nud-1
+CHROMOSOME_III	test	xbox	13341166	13341179	.	+	.	ID=Gene:F53A2.4:xbox_922;Note=GTATCCATGGGAAC-Length:14-Score:1.87;Parent=Gene:F53A2.4
+CHROMOSOME_III	test	mRNA	13341424	13342507	.	+	.	ID=Transcript:F53A2.4.2;Parent=Gene:F53A2.4;cds=F53A2.4;wormpep=CE:CE16096;Name=nud-1
+CHROMOSOME_III	test	five_prime_UTR	13341426	13341428	.	+	.	Parent=Transcript:F53A2.4.1
+CHROMOSOME_III	test	mRNA	13341426	13342507	.	+	.	ID=Transcript:F53A2.4.1;Parent=Gene:F53A2.4;cds=F53A2.4;wormpep=CE:CE16096;Name=nud-1
+CHROMOSOME_III	test	CDS	13341429	13341532	.	+	.	ID=CDS:F53A2.4:1;Parent=Transcript:F53A2.4.2,Transcript:F53A2.4.1;locus=nud-1;status=Confirmed;wormpep=CE:CE16096
+CHROMOSOME_III	test	CDS	13341580	13342438	.	+	.	ID=CDS:F53A2.4:2;Parent=Transcript:F53A2.4.2,Transcript:F53A2.4.1;locus=nud-1;status=Confirmed;wormpep=CE:CE16096
+CHROMOSOME_III	test	three_prime_UTR	13342439	13342507	.	+	.	Parent=Transcript:F53A2.4.1
+CHROMOSOME_III	test	three_prime_UTR	13342439	13342507	.	+	.	Parent=Transcript:F53A2.4.2
+CHROMOSOME_III	test	gene	13674780	13686344	.	-	.	ID=Gene:ZK520.3;locus=dyf-2;Name=dyf-2
+CHROMOSOME_III	test	xbox	13686484	13686497	.	-	.	ID=Gene:ZK520.3:xbox_928;Note=GTTGCCTTGGTAAC-Length:14-Score:3.29;Parent=Gene:ZK520.3
+CHROMOSOME_III	test	mRNA	13674780	13678456	.	-	.	ID=Transcript:ZK520.3b.1;Parent=Gene:ZK520.3;cds=ZK520.3b;wormpep=CE:CE40490;Name=dyf-2
+CHROMOSOME_III	test	mRNA	13674780	13679252	.	-	.	ID=Transcript:ZK520.3b.2;Parent=Gene:ZK520.3;cds=ZK520.3b;wormpep=CE:CE40490;Name=dyf-2
+CHROMOSOME_III	test	mRNA	13674780	13686344	.	-	.	ID=Transcript:ZK520.3a;Parent=Gene:ZK520.3;cds=ZK520.3a;wormpep=CE:CE40489;Name=dyf-2
+CHROMOSOME_III	test	three_prime_UTR	13674780	13674815	.	-	.	Parent=Transcript:ZK520.3a
+CHROMOSOME_III	test	three_prime_UTR	13674780	13674815	.	-	.	Parent=Transcript:ZK520.3b.1
+CHROMOSOME_III	test	three_prime_UTR	13674780	13674815	.	-	.	Parent=Transcript:ZK520.3b.2
+CHROMOSOME_III	test	CDS	13674816	13675001	.	-	.	ID=CDS:ZK520.3a:1;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13674816	13675001	.	-	.	ID=CDS:ZK520.3b:1;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13675626	13675903	.	-	.	ID=CDS:ZK520.3a:2;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13675626	13675903	.	-	.	ID=CDS:ZK520.3b:2;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13676152	13676956	.	-	.	ID=CDS:ZK520.3a:3;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13676152	13676956	.	-	.	ID=CDS:ZK520.3b:3;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13677582	13677767	.	-	.	ID=CDS:ZK520.3a:4;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13677582	13677767	.	-	.	ID=CDS:ZK520.3b:4;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13677977	13678193	.	-	.	ID=CDS:ZK520.3a:5;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13677977	13678193	.	-	.	ID=CDS:ZK520.3b:5;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13678347	13678405	.	-	.	ID=CDS:ZK520.3b:6;Parent=Transcript:ZK520.3b.2,Transcript:ZK520.3b.1;locus=dyf-2;status=Confirmed;wormpep=CE:CE40490
+CHROMOSOME_III	test	CDS	13678347	13678456	.	-	.	ID=CDS:ZK520.3a:6;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	five_prime_UTR	13678406	13678456	.	-	.	Parent=Transcript:ZK520.3b.1
+CHROMOSOME_III	test	five_prime_UTR	13678406	13678456	.	-	.	Parent=Transcript:ZK520.3b.2
+CHROMOSOME_III	test	CDS	13678559	13678731	.	-	.	ID=CDS:ZK520.3a:7;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	five_prime_UTR	13678559	13678731	.	-	.	Parent=Transcript:ZK520.3b.2
+CHROMOSOME_III	test	CDS	13679102	13679199	.	-	.	ID=CDS:ZK520.3a:8;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	five_prime_UTR	13679102	13679252	.	-	.	Parent=Transcript:ZK520.3b.2
+CHROMOSOME_III	test	CDS	13682323	13682633	.	-	.	ID=CDS:ZK520.3a:9;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13682893	13682944	.	-	.	ID=CDS:ZK520.3a:10;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13683023	13683168	.	-	.	ID=CDS:ZK520.3a:11;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13683511	13683737	.	-	.	ID=CDS:ZK520.3a:12;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13684000	13684341	.	-	.	ID=CDS:ZK520.3a:13;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13684395	13684462	.	-	.	ID=CDS:ZK520.3a:14;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13684506	13684899	.	-	.	ID=CDS:ZK520.3a:15;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13685156	13685355	.	-	.	ID=CDS:ZK520.3a:16;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13685522	13685656	.	-	.	ID=CDS:ZK520.3a:17;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13685729	13685794	.	-	.	ID=CDS:ZK520.3a:18;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_III	test	CDS	13686187	13686344	.	-	.	ID=CDS:ZK520.3a:19;Parent=Transcript:ZK520.3a;locus=dyf-2;status=Confirmed;wormpep=CE:CE40489
+CHROMOSOME_V	test	gene	11924613	11927387	.	-	.	ID=Gene:R31.3;Note=N-acetyllactosamine synthase;locus=osm-6;Name=osm-6
+CHROMOSOME_V	test	xbox	11927474	11927487	.	-	.	ID=Gene:R31.3:xbox_2021;Note=GTTACTATGGTAAC-Length:14-Score:5.45;Parent=Gene:R31.3
+CHROMOSOME_V	test	mRNA	11924613	11927387	.	-	.	ID=Transcript:R31.3;Parent=Gene:R31.3;cds=R31.3;wormpep=CE:CE27774;Name=osm-6
+CHROMOSOME_V	test	three_prime_UTR	11924613	11924650	.	-	.	Parent=Transcript:R31.3
+CHROMOSOME_V	test	CDS	11924651	11924925	.	-	.	ID=CDS:R31.3:1;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11924971	11925167	.	-	.	ID=CDS:R31.3:2;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11925592	11925701	.	-	.	ID=CDS:R31.3:3;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11925747	11925866	.	-	.	ID=CDS:R31.3:4;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11925979	11926065	.	-	.	ID=CDS:R31.3:5;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11926113	11926254	.	-	.	ID=CDS:R31.3:6;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11926343	11926475	.	-	.	ID=CDS:R31.3:7;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11926525	11926645	.	-	.	ID=CDS:R31.3:8;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11926724	11926811	.	-	.	ID=CDS:R31.3:9;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11927194	11927309	.	-	.	ID=CDS:R31.3:10;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_V	test	CDS	11927358	11927387	.	-	.	ID=CDS:R31.3:11;Note=N-acetyllactosamine synthase;Parent=Transcript:R31.3;locus=osm-6;status=Confirmed;
+CHROMOSOME_IV	test	gene	3396578	3399120	.	-	.	ID=Gene:C04C3.5;locus=dyf-3;Name=dyf-3
+CHROMOSOME_IV	test	xbox	3399195	3399208	.	-	.	ID=Gene:C04C3.5:xbox_1575;Note=GTTCCCATAGAAAC-Length:14-Score:1.78;Parent=Gene:C04C3.5
+CHROMOSOME_IV	test	mRNA	3396578	3398610	.	-	.	ID=Transcript:C04C3.5a;Parent=Gene:C04C3.5;cds=C04C3.5a;wormpep=CE:CE16811;protein_decorations=PfamA26:Cluap1:1:210:1.8e-53:Clusterin-associated protein-1;Name=dyf-3
+CHROMOSOME_IV	test	mRNA	3396578	3398887	.	-	.	ID=Transcript:C04C3.5c;Parent=Gene:C04C3.5;cds=C04C3.5c;wormpep=CE:CE38265;protein_decorations=PfamA26:Cluap1:3:272:1.6e-79:Clusterin-associated protein-1;Name=dyf-3
+CHROMOSOME_IV	test	mRNA	3396578	3399120	.	-	.	ID=Transcript:C04C3.5b;Parent=Gene:C04C3.5;cds=C04C3.5b;wormpep=CE:CE38264;protein_decorations=PfamA26:Cluap1:14:283:2e-79:Clusterin-associated protein-1;Name=dyf-3
+CHROMOSOME_IV	test	three_prime_UTR	3396578	3396647	.	-	.	Parent=Transcript:C04C3.5a
+CHROMOSOME_IV	test	three_prime_UTR	3396578	3396647	.	-	.	Parent=Transcript:C04C3.5b
+CHROMOSOME_IV	test	three_prime_UTR	3396578	3396647	.	-	.	Parent=Transcript:C04C3.5c
+CHROMOSOME_IV	test	CDS	3396648	3396710	.	-	.	ID=CDS:C04C3.5a:1;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3396648	3396710	.	-	.	ID=CDS:C04C3.5b:1;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3396648	3396710	.	-	.	ID=CDS:C04C3.5c:1;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3397034	3397215	.	-	.	ID=CDS:C04C3.5a:2;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3397034	3397215	.	-	.	ID=CDS:C04C3.5b:2;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3397034	3397215	.	-	.	ID=CDS:C04C3.5c:2;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3397264	3397319	.	-	.	ID=CDS:C04C3.5a:3;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3397264	3397319	.	-	.	ID=CDS:C04C3.5b:3;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3397264	3397319	.	-	.	ID=CDS:C04C3.5c:3;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3397369	3397517	.	-	.	ID=CDS:C04C3.5a:4;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3397369	3397517	.	-	.	ID=CDS:C04C3.5b:4;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3397369	3397517	.	-	.	ID=CDS:C04C3.5c:4;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3397564	3397734	.	-	.	ID=CDS:C04C3.5a:5;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3397564	3397734	.	-	.	ID=CDS:C04C3.5b:5;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3397564	3397734	.	-	.	ID=CDS:C04C3.5c:5;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3398180	3398380	.	-	.	ID=CDS:C04C3.5a:6;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3398180	3398380	.	-	.	ID=CDS:C04C3.5b:6;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3398180	3398380	.	-	.	ID=CDS:C04C3.5c:6;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3398437	3398610	.	-	.	ID=CDS:C04C3.5a:7;Parent=Transcript:C04C3.5a;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE16811
+CHROMOSOME_IV	test	CDS	3398437	3398695	.	-	.	ID=CDS:C04C3.5b:7;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3398437	3398695	.	-	.	ID=CDS:C04C3.5c:7;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3398787	3398887	.	-	.	ID=CDS:C04C3.5c:8;Parent=Transcript:C04C3.5c;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38265
+CHROMOSOME_IV	test	CDS	3398787	3398898	.	-	.	ID=CDS:C04C3.5b:8;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_IV	test	CDS	3399099	3399120	.	-	.	ID=CDS:C04C3.5b:9;Parent=Transcript:C04C3.5b;locus=dyf-3;status=Partially_confirmed;wormpep=CE:CE38264
+CHROMOSOME_I	test	CDS	5100769	5100841	.	+	.	ID=CDS:Y110A7A.20:1;Parent=Transcript:Y110A7A.20;locus=ift-20;status=Partially_confirmed;wormpep=CE:CE23246
+CHROMOSOME_I	test	gene	5100769	5101677	.	+	.	ID=Gene:Y110A7A.20;locus=ift-20;Name=ift-20
+CHROMOSOME_I	test	xbox	5100709	5100722	.	+	.	ID=Gene:Y110A7A.20:xbox_40;Note=GTCTCTATAGCAAC-Length:14-Score:2.95;Parent=Gene:Y110A7A.20
+CHROMOSOME_I	test	mRNA	5100769	5101677	.	+	.	ID=Transcript:Y110A7A.20;Parent=Gene:Y110A7A.20;cds=Y110A7A.20;wormpep=CE:CE23246;Name=ift-20
+CHROMOSOME_I	test	CDS	5101317	5101423	.	+	.	ID=CDS:Y110A7A.20:2;Parent=Transcript:Y110A7A.20;locus=ift-20;status=Partially_confirmed;wormpep=CE:CE23246
+CHROMOSOME_I	test	CDS	5101468	5101677	.	+	.	ID=CDS:Y110A7A.20:3;Parent=Transcript:Y110A7A.20;locus=ift-20;status=Partially_confirmed;wormpep=CE:CE23246
+CHROMOSOME_X	test	five_prime_UTR	481379	481451	.	+	.	Parent=Transcript:F38G1.1.2
+CHROMOSOME_X	test	gene	481379	486505	.	+	.	ID=Gene:F38G1.1;Note=G-beta-repeats;locus=che-2;Name=che-2
+CHROMOSOME_X	test	xbox	481322	481335	.	-	.	ID=Gene:F38G1.1:xbox_2638;Note=GTTGTCATGGTGAC-Length:14-Score:4.60;Parent=Gene:F38G1.1
+CHROMOSOME_X	test	mRNA	481379	486505	.	+	.	ID=Transcript:F38G1.1.2;Parent=Gene:F38G1.1;cds=F38G1.1;wormpep=CE:CE25876;Name=che-2
+CHROMOSOME_X	test	five_prime_UTR	481451	481451	.	+	.	Parent=Transcript:F38G1.1.1
+CHROMOSOME_X	test	mRNA	481451	486505	.	+	.	ID=Transcript:F38G1.1.1;Parent=Gene:F38G1.1;cds=F38G1.1;wormpep=CE:CE25876;Name=che-2
+CHROMOSOME_X	test	CDS	481452	481615	.	+	.	ID=CDS:F38G1.1:1;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	482566	482654	.	+	.	ID=CDS:F38G1.1:2;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	482750	482860	.	+	.	ID=CDS:F38G1.1:3;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	482913	483181	.	+	.	ID=CDS:F38G1.1:4;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	483229	483366	.	+	.	ID=CDS:F38G1.1:5;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	483587	483711	.	+	.	ID=CDS:F38G1.1:6;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	483759	483935	.	+	.	ID=CDS:F38G1.1:7;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	483979	484053	.	+	.	ID=CDS:F38G1.1:8;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	484533	484758	.	+	.	ID=CDS:F38G1.1:9;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	484811	485018	.	+	.	ID=CDS:F38G1.1:10;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	485062	485309	.	+	.	ID=CDS:F38G1.1:11;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	485824	486086	.	+	.	ID=CDS:F38G1.1:12;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	486132	486255	.	+	.	ID=CDS:F38G1.1:13;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	CDS	486369	486434	.	+	.	ID=CDS:F38G1.1:14;Note=G-beta-repeats;Parent=Transcript:F38G1.1.1,Transcript:F38G1.1.2;locus=che-2;status=Confirmed;
+CHROMOSOME_X	test	three_prime_UTR	486435	486505	.	+	.	Parent=Transcript:F38G1.1.1
+CHROMOSOME_X	test	three_prime_UTR	486435	486505	.	+	.	Parent=Transcript:F38G1.1.2
+CHROMOSOME_X	test	five_prime_UTR	16541257	16541345	.	+	.	Parent=Transcript:T27B1.1
+CHROMOSOME_X	test	gene	16541257	16551140	.	+	.	ID=Gene:T27B1.1;Note=leucine zipper transcription factor(weak);locus=osm-1;Name=osm-1
+CHROMOSOME_X	test	xbox	16541260	16541273	.	+	.	ID=Gene:T27B1.1:xbox_2392;Note=GCTACCATGGCAAC-Length:14-Score:2.43;Parent=Gene:T27B1.1
+CHROMOSOME_X	test	mRNA	16541257	16551140	.	+	.	ID=Transcript:T27B1.1;Parent=Gene:T27B1.1;cds=T27B1.1;wormpep=CE:CE41845;Name=osm-1
+CHROMOSOME_X	test	CDS	16541346	16541384	.	+	.	ID=CDS:T27B1.1:1;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16541740	16541883	.	+	.	ID=CDS:T27B1.1:2;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16541937	16542049	.	+	.	ID=CDS:T27B1.1:3;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16542105	16542210	.	+	.	ID=CDS:T27B1.1:4;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16542816	16542895	.	+	.	ID=CDS:T27B1.1:5;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16542942	16543017	.	+	.	ID=CDS:T27B1.1:6;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16543061	16543272	.	+	.	ID=CDS:T27B1.1:7;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16543499	16543622	.	+	.	ID=CDS:T27B1.1:8;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16543670	16544168	.	+	.	ID=CDS:T27B1.1:9;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16544531	16544865	.	+	.	ID=CDS:T27B1.1:10;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16544910	16545146	.	+	.	ID=CDS:T27B1.1:11;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16545195	16545485	.	+	.	ID=CDS:T27B1.1:12;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16546049	16546303	.	+	.	ID=CDS:T27B1.1:13;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16546351	16546456	.	+	.	ID=CDS:T27B1.1:14;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16546538	16546605	.	+	.	ID=CDS:T27B1.1:15;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16546657	16546743	.	+	.	ID=CDS:T27B1.1:16;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16546797	16547096	.	+	.	ID=CDS:T27B1.1:17;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16547258	16547437	.	+	.	ID=CDS:T27B1.1:18;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16547485	16547719	.	+	.	ID=CDS:T27B1.1:19;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16548036	16548234	.	+	.	ID=CDS:T27B1.1:20;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16548283	16548580	.	+	.	ID=CDS:T27B1.1:21;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16548629	16548943	.	+	.	ID=CDS:T27B1.1:22;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16548998	16549597	.	+	.	ID=CDS:T27B1.1:23;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16550679	16550893	.	+	.	ID=CDS:T27B1.1:24;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	CDS	16550974	16551073	.	+	.	ID=CDS:T27B1.1:25;Note=leucine zipper transcription factor(weak);Parent=Transcript:T27B1.1;locus=osm-1;status=Confirmed;
+CHROMOSOME_X	test	three_prime_UTR	16551074	16551140	.	+	.	Parent=Transcript:T27B1.1
+CHROMOSOME_I	test	gene	14371129	14376005	.	-	.	ID=Gene:Y105E8A.5;locus=bbs-1;Name=bbs-1
+CHROMOSOME_I	test	xbox	14376091	14376104	.	-	.	ID=Gene:Y105E8A.5:xbox_199;Note=GTTGCTATGGGAAC-Length:14-Score:6.16;Parent=Gene:Y105E8A.5
+CHROMOSOME_I	test	mRNA	14371129	14376005	.	-	.	ID=Transcript:Y105E8A.5;Parent=Gene:Y105E8A.5;cds=Y105E8A.5;wormpep=CE:CE25181;Name=bbs-1
+CHROMOSOME_I	test	three_prime_UTR	14371129	14371309	.	-	.	Parent=Transcript:Y105E8A.5
+CHROMOSOME_I	test	CDS	14371310	14371562	.	-	.	ID=CDS:Y105E8A.5:1;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14372311	14372486	.	-	.	ID=CDS:Y105E8A.5:2;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14372537	14372896	.	-	.	ID=CDS:Y105E8A.5:3;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14373399	14373482	.	-	.	ID=CDS:Y105E8A.5:4;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14373637	14373776	.	-	.	ID=CDS:Y105E8A.5:5;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14373957	14374122	.	-	.	ID=CDS:Y105E8A.5:6;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14374173	14374394	.	-	.	ID=CDS:Y105E8A.5:7;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14374532	14374606	.	-	.	ID=CDS:Y105E8A.5:8;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_I	test	CDS	14375751	14376005	.	-	.	ID=CDS:Y105E8A.5:9;Parent=Transcript:Y105E8A.5;locus=bbs-1;status=Partially_confirmed;wormpep=CE:CE25181
+CHROMOSOME_IV	test	five_prime_UTR	7934085	7934115	.	+	.	Parent=Transcript:F20D12.3
+CHROMOSOME_IV	test	gene	7934085	7937734	.	+	.	ID=Gene:F20D12.3;locus=bbs-2;Name=bbs-2
+CHROMOSOME_IV	test	xbox	7934022	7934035	.	+	.	ID=Gene:F20D12.3:xbox_1232;Note=GTATCCATGGCAAC-Length:14-Score:4.12;Parent=Gene:F20D12.3
+CHROMOSOME_IV	test	mRNA	7934085	7937734	.	+	.	ID=Transcript:F20D12.3;Parent=Gene:F20D12.3;cds=F20D12.3;wormpep=CE:CE04433;Name=bbs-2
+CHROMOSOME_IV	test	CDS	7934116	7934326	.	+	.	ID=CDS:F20D12.3:1;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7934381	7934556	.	+	.	ID=CDS:F20D12.3:2;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7934612	7935253	.	+	.	ID=CDS:F20D12.3:3;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7935615	7935829	.	+	.	ID=CDS:F20D12.3:4;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7935880	7935990	.	+	.	ID=CDS:F20D12.3:5;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7936037	7936175	.	+	.	ID=CDS:F20D12.3:6;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7936277	7936481	.	+	.	ID=CDS:F20D12.3:7;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7936527	7936561	.	+	.	ID=CDS:F20D12.3:8;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7937115	7937227	.	+	.	ID=CDS:F20D12.3:9;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7937281	7937352	.	+	.	ID=CDS:F20D12.3:10;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7937420	7937496	.	+	.	ID=CDS:F20D12.3:11;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	CDS	7937544	7937647	.	+	.	ID=CDS:F20D12.3:12;Parent=Transcript:F20D12.3;locus=bbs-2;status=Partially_confirmed;wormpep=CE:CE04433
+CHROMOSOME_IV	test	three_prime_UTR	7937648	7937734	.	+	.	Parent=Transcript:F20D12.3
+CHROMOSOME_III	test	CDS	10258781	10259017	.	-	.	ID=CDS:R01H10.6:1;Parent=Transcript:R01H10.6;locus=bbs-5;status=Partially_confirmed;wormpep=CE:CE01042
+CHROMOSOME_III	test	gene	10258781	10261567	.	-	.	ID=Gene:R01H10.6;locus=bbs-5;Name=bbs-5
+CHROMOSOME_III	test	xbox	10261619	10261632	.	-	.	ID=Gene:R01H10.6:xbox_975;Note=GTTGCCATGGAGAC-Length:14-Score:6.67;Parent=Gene:R01H10.6
+CHROMOSOME_III	test	mRNA	10258781	10261567	.	-	.	ID=Transcript:R01H10.6;Parent=Gene:R01H10.6;cds=R01H10.6;wormpep=CE:CE01042;protein_decorations=PfamA26:DUF1448:9:357:1.5e-139:Protein of unknown function (DUF1448);Name=bbs-5
+CHROMOSOME_III	test	CDS	10259403	10259987	.	-	.	ID=CDS:R01H10.6:2;Parent=Transcript:R01H10.6;locus=bbs-5;status=Partially_confirmed;wormpep=CE:CE01042
+CHROMOSOME_III	test	CDS	10260099	10260214	.	-	.	ID=CDS:R01H10.6:3;Parent=Transcript:R01H10.6;locus=bbs-5;status=Partially_confirmed;wormpep=CE:CE01042
+CHROMOSOME_III	test	CDS	10261371	10261453	.	-	.	ID=CDS:R01H10.6:4;Parent=Transcript:R01H10.6;locus=bbs-5;status=Partially_confirmed;wormpep=CE:CE01042
+CHROMOSOME_III	test	CDS	10261503	10261567	.	-	.	ID=CDS:R01H10.6:5;Parent=Transcript:R01H10.6;locus=bbs-5;status=Partially_confirmed;wormpep=CE:CE01042
+CHROMOSOME_III	test	CDS	12190955	12191227	.	-	.	ID=CDS:Y75B8A.12:1;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	gene	12190955	12202349	.	-	.	ID=Gene:Y75B8A.12;locus=osm-12;Name=osm-12
+CHROMOSOME_III	test	xbox	12202443	12202456	.	-	.	ID=Gene:Y75B8A.12:xbox_948;Note=GTTACTATGGCAAC-Length:14-Score:5.45;Parent=Gene:Y75B8A.12
+CHROMOSOME_III	test	mRNA	12190955	12202349	.	-	.	ID=Transcript:Y75B8A.12;Parent=Gene:Y75B8A.12;cds=Y75B8A.12;wormpep=CE:CE23024;Name=osm-12
+CHROMOSOME_III	test	CDS	12192334	12192437	.	-	.	ID=CDS:Y75B8A.12:2;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12192483	12192592	.	-	.	ID=CDS:Y75B8A.12:3;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12193100	12193241	.	-	.	ID=CDS:Y75B8A.12:4;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12193311	12193401	.	-	.	ID=CDS:Y75B8A.12:5;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12197625	12198039	.	-	.	ID=CDS:Y75B8A.12:6;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12198190	12198280	.	-	.	ID=CDS:Y75B8A.12:7;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12199158	12199242	.	-	.	ID=CDS:Y75B8A.12:8;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12199295	12199732	.	-	.	ID=CDS:Y75B8A.12:9;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12200966	12201220	.	-	.	ID=CDS:Y75B8A.12:10;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12201901	12201963	.	-	.	ID=CDS:Y75B8A.12:11;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_III	test	CDS	12202251	12202349	.	-	.	ID=CDS:Y75B8A.12:12;Parent=Transcript:Y75B8A.12;locus=osm-12;status=Partially_confirmed;wormpep=CE:CE23024
+CHROMOSOME_V	test	gene	6762459	6765055	.	-	.	ID=Gene:T25F10.5;locus=bbs-8;Name=bbs-8
+CHROMOSOME_V	test	xbox	6765071	6765084	.	-	.	ID=Gene:T25F10.5:xbox_2098;Note=GTTGCCATGGGTAC-Length:14-Score:4.12;Parent=Gene:T25F10.5
+CHROMOSOME_V	test	mRNA	6762459	6765055	.	-	.	ID=Transcript:T25F10.5;Parent=Gene:T25F10.5;cds=T25F10.5;wormpep=CE:CE31071;Name=bbs-8
+CHROMOSOME_V	test	three_prime_UTR	6762459	6762592	.	-	.	Parent=Transcript:T25F10.5
+CHROMOSOME_V	test	CDS	6762593	6762807	.	-	.	ID=CDS:T25F10.5:1;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6762864	6763039	.	-	.	ID=CDS:T25F10.5:2;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6763273	6763445	.	-	.	ID=CDS:T25F10.5:3;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6763489	6763671	.	-	.	ID=CDS:T25F10.5:4;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6763726	6763813	.	-	.	ID=CDS:T25F10.5:5;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6763930	6764150	.	-	.	ID=CDS:T25F10.5:6;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6764195	6764351	.	-	.	ID=CDS:T25F10.5:7;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6764471	6764652	.	-	.	ID=CDS:T25F10.5:8;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	CDS	6764875	6765000	.	-	.	ID=CDS:T25F10.5:9;Parent=Transcript:T25F10.5;locus=bbs-8;status=Partially_confirmed;wormpep=CE:CE31071
+CHROMOSOME_V	test	five_prime_UTR	6765001	6765055	.	-	.	Parent=Transcript:T25F10.5
+CHROMOSOME_II	test	gene	8154044	8156885	.	-	.	ID=Gene:F10B5.4;Note=Tub family protein tub-1;locus=tub-1;Name=tub-1
+CHROMOSOME_II	test	xbox	8157055	8157068	.	-	.	ID=Gene:F10B5.4:xbox_664;Note=GTTGTCATGGAGAT-Length:14-Score:2.83;Parent=Gene:F10B5.4
+CHROMOSOME_II	test	mRNA	8154044	8156885	.	-	.	ID=Transcript:F10B5.4;Parent=Gene:F10B5.4;cds=F10B5.4;wormpep=CE:CE29091;protein_decorations=PfamA26:Tub:174:420:3.1e-113:Tub family;Name=tub-1
+CHROMOSOME_II	test	three_prime_UTR	8154044	8154718	.	-	.	Parent=Transcript:F10B5.4
+CHROMOSOME_II	test	CDS	8154719	8154936	.	-	.	ID=CDS:F10B5.4:1;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_II	test	CDS	8154982	8155183	.	-	.	ID=CDS:F10B5.4:2;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_II	test	CDS	8155227	8155581	.	-	.	ID=CDS:F10B5.4:3;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_II	test	CDS	8155630	8155827	.	-	.	ID=CDS:F10B5.4:4;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_II	test	CDS	8155964	8156134	.	-	.	ID=CDS:F10B5.4:5;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_II	test	CDS	8156749	8156885	.	-	.	ID=CDS:F10B5.4:6;Note=Tub family protein tub-1;Parent=Transcript:F10B5.4;locus=tub-1;status=Confirmed;
+CHROMOSOME_V	test	gene	10299448	10307329	.	-	.	ID=Gene:B0024.8;locus=che-12;Name=che-12
+CHROMOSOME_V	test	mRNA	10299448	10302856	.	-	.	ID=Transcript:B0024.8c;Parent=Gene:B0024.8;cds=B0024.8c;wormpep=CE:CE45743;protein_decorations=PfamA26:CLASP_N:148:307:7.6e-19:CLASP N terminal;Name=che-12
+CHROMOSOME_V	test	mRNA	10299448	10303565	.	-	.	ID=Transcript:B0024.8b;Parent=Gene:B0024.8;cds=B0024.8b;wormpep=CE:CE45799;protein_decorations=PfamA26:CLASP_N:237:396:7.1e-19:CLASP N terminal;Name=che-12
+CHROMOSOME_V	test	mRNA	10299448	10307329	.	-	.	ID=Transcript:B0024.8a;Parent=Gene:B0024.8;cds=B0024.8a;wormpep=CE:CE42903;protein_decorations=PfamA26:CLASP_N:829:988:1.7e-18:CLASP N terminal;Name=che-12
+CHROMOSOME_V	test	three_prime_UTR	10299448	10299537	.	-	.	Parent=Transcript:B0024.8a
+CHROMOSOME_V	test	three_prime_UTR	10299448	10299537	.	-	.	Parent=Transcript:B0024.8b
+CHROMOSOME_V	test	three_prime_UTR	10299448	10299537	.	-	.	Parent=Transcript:B0024.8c
+CHROMOSOME_V	test	CDS	10299538	10299621	.	-	.	ID=CDS:B0024.8a:1;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10299538	10299621	.	-	.	ID=CDS:B0024.8b:1;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10299538	10299621	.	-	.	ID=CDS:B0024.8c:1;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10299672	10299817	.	-	.	ID=CDS:B0024.8a:2;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10299672	10299817	.	-	.	ID=CDS:B0024.8b:2;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10299672	10299817	.	-	.	ID=CDS:B0024.8c:2;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10299864	10300087	.	-	.	ID=CDS:B0024.8a:3;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10299864	10300087	.	-	.	ID=CDS:B0024.8b:3;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10299864	10300087	.	-	.	ID=CDS:B0024.8c:3;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10300136	10300458	.	-	.	ID=CDS:B0024.8a:4;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10300136	10300458	.	-	.	ID=CDS:B0024.8b:4;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10300136	10300458	.	-	.	ID=CDS:B0024.8c:4;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10300544	10300633	.	-	.	ID=CDS:B0024.8a:5;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10300544	10300633	.	-	.	ID=CDS:B0024.8b:5;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10300544	10300633	.	-	.	ID=CDS:B0024.8c:5;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10300680	10300872	.	-	.	ID=CDS:B0024.8a:6;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10300680	10300872	.	-	.	ID=CDS:B0024.8b:6;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10300680	10300872	.	-	.	ID=CDS:B0024.8c:6;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10300953	10301092	.	-	.	ID=CDS:B0024.8a:7;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10300953	10301092	.	-	.	ID=CDS:B0024.8b:7;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10300953	10301092	.	-	.	ID=CDS:B0024.8c:7;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10301134	10301256	.	-	.	ID=CDS:B0024.8a:8;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10301134	10301256	.	-	.	ID=CDS:B0024.8b:8;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10301134	10301256	.	-	.	ID=CDS:B0024.8c:8;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10301303	10301485	.	-	.	ID=CDS:B0024.8a:9;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10301303	10301485	.	-	.	ID=CDS:B0024.8b:9;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10301303	10301485	.	-	.	ID=CDS:B0024.8c:9;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10301529	10301612	.	-	.	ID=CDS:B0024.8a:10;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10301529	10301612	.	-	.	ID=CDS:B0024.8b:10;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10301529	10301612	.	-	.	ID=CDS:B0024.8c:10;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10301677	10301771	.	-	.	ID=CDS:B0024.8a:11;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10301677	10301771	.	-	.	ID=CDS:B0024.8b:11;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10301677	10301771	.	-	.	ID=CDS:B0024.8c:11;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10302694	10302811	.	-	.	ID=CDS:B0024.8a:12;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10302694	10302811	.	-	.	ID=CDS:B0024.8b:12;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10302694	10302811	.	-	.	ID=CDS:B0024.8c:12;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10302854	10302856	.	-	.	ID=CDS:B0024.8c:13;Parent=Transcript:B0024.8c;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45743
+CHROMOSOME_V	test	CDS	10302854	10302999	.	-	.	ID=CDS:B0024.8a:13;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10302854	10302999	.	-	.	ID=CDS:B0024.8b:13;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10303442	10303565	.	-	.	ID=CDS:B0024.8b:14;Parent=Transcript:B0024.8b;locus=che-12;status=Partially_confirmed;wormpep=CE:CE45799
+CHROMOSOME_V	test	CDS	10304520	10304958	.	-	.	ID=CDS:B0024.8a:14;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10305006	10305132	.	-	.	ID=CDS:B0024.8a:15;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10305217	10305404	.	-	.	ID=CDS:B0024.8a:16;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10305534	10305698	.	-	.	ID=CDS:B0024.8a:17;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10305748	10306115	.	-	.	ID=CDS:B0024.8a:18;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10306231	10306333	.	-	.	ID=CDS:B0024.8a:19;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10306383	10306463	.	-	.	ID=CDS:B0024.8a:20;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10306516	10306656	.	-	.	ID=CDS:B0024.8a:21;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10306810	10306980	.	-	.	ID=CDS:B0024.8a:22;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_V	test	CDS	10307213	10307329	.	-	.	ID=CDS:B0024.8a:23;Parent=Transcript:B0024.8a;locus=che-12;status=Partially_confirmed;wormpep=CE:CE42903
+CHROMOSOME_I	test	five_prime_UTR	9359065	9359144	.	+	.	Parent=Transcript:M04C9.5a
+CHROMOSOME_I	test	five_prime_UTR	9359065	9359144	.	+	.	Parent=Transcript:M04C9.5b
+CHROMOSOME_I	test	gene	9359065	9364172	.	+	.	ID=Gene:M04C9.5;Note=serine/threonine kinase (CDC2/CDKX subfamily);locus=dyf-5;Name=dyf-5
+CHROMOSOME_I	test	xbox	9358860	9358873	.	-	.	ID=Gene:M04C9.5:xbox_255;Note=GTTACCATAGAAAC-Length:14-Score:3.32;Parent=Gene:M04C9.5
+CHROMOSOME_I	test	mRNA	9359065	9362918	.	+	.	ID=Transcript:M04C9.5a;Parent=Gene:M04C9.5;cds=M04C9.5a;wormpep=CE:CE40815;protein_decorations=PfamA26:Pkinase:13:291:1.1e-75:Protein kinase domain,PfamA26:Pkinase_Tyr:14:281:1.8e-40:Protein tyrosine kinase;Name=dyf-5
+CHROMOSOME_I	test	mRNA	9359065	9364172	.	+	.	ID=Transcript:M04C9.5b;Parent=Gene:M04C9.5;cds=M04C9.5b;wormpep=CE:CE46107;protein_decorations=PfamA26:Pkinase:13:291:1.2e-75:Protein kinase domain,PfamA26:Pkinase_Tyr:14:281:1.9e-40:Protein tyrosine kinase;Name=dyf-5
+CHROMOSOME_I	test	CDS	9359145	9359173	.	+	.	ID=CDS:M04C9.5a:1;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9359145	9359173	.	+	.	ID=CDS:M04C9.5b:1;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9359970	9360062	.	+	.	ID=CDS:M04C9.5a:2;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9359970	9360062	.	+	.	ID=CDS:M04C9.5b:2;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9360186	9360285	.	+	.	ID=CDS:M04C9.5a:3;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9360186	9360285	.	+	.	ID=CDS:M04C9.5b:3;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9360896	9361357	.	+	.	ID=CDS:M04C9.5a:4;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9360896	9361357	.	+	.	ID=CDS:M04C9.5b:4;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9361508	9361588	.	+	.	ID=CDS:M04C9.5a:5;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9361508	9361588	.	+	.	ID=CDS:M04C9.5b:5;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9361658	9361885	.	+	.	ID=CDS:M04C9.5a:6;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9361658	9361885	.	+	.	ID=CDS:M04C9.5b:6;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9362048	9362154	.	+	.	ID=CDS:M04C9.5a:7;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9362048	9362154	.	+	.	ID=CDS:M04C9.5b:7;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9362284	9362375	.	+	.	ID=CDS:M04C9.5a:8;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9362284	9362375	.	+	.	ID=CDS:M04C9.5b:8;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9362695	9362829	.	+	.	ID=CDS:M04C9.5b:9;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9362695	9362918	.	+	.	ID=CDS:M04C9.5a:9;Note=serine/threonine kinase (CDC2/CDKX subfamily);Parent=Transcript:M04C9.5a;locus=dyf-5;status=Confirmed;
+CHROMOSOME_I	test	CDS	9363812	9363941	.	+	.	ID=CDS:M04C9.5b:10;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	CDS	9363985	9363997	.	+	.	ID=CDS:M04C9.5b:11;Parent=Transcript:M04C9.5b;locus=dyf-5;status=Confirmed;wormpep=CE:CE46107
+CHROMOSOME_I	test	three_prime_UTR	9363998	9364172	.	+	.	Parent=Transcript:M04C9.5b
+chrIII	test	chromosome	1	14578851	.	+	.	ID=chrIII;Name=chrIII
+chrIII_random	test	chromosome	1	105344	.	+	.	ID=chrIII_random;Name=chrIII_random
+chrII	test	chromosome	1	16627154	.	+	.	ID=chrII;Name=chrII
+chrI	test	chromosome	1	15455979	.	+	.	ID=chrI;Name=chrI
+chrI_random	test	chromosome	1	43675	.	+	.	ID=chrI_random;Name=chrI_random
+chrIV	test	chromosome	1	17485439	.	+	.	ID=chrIV;Name=chrIV
+chrIV_random	test	chromosome	1	25117	.	+	.	ID=chrIV_random;Name=chrIV_random
+chrun	test	chromosome	1	2948414	.	+	.	ID=chrun;Name=chrun
+chrV	test	chromosome	1	19495157	.	+	.	ID=chrV;Name=chrV
+chrV_random	test	chromosome	1	85292	.	+	.	ID=chrV_random;Name=chrV_random
+chrX	test	chromosome	1	21540570	.	+	.	ID=chrX;Name=chrX
+chrX_random	test	chromosome	1	28673	.	+	.	ID=chrX_random;Name=chrX_random
+chrII	test	gene	902894	927498	.	+	.	ID=gene:CBG00885;Name=Cbr-daf-19;WormPep=CBP:CBP37490;Status=Predicted;Gene=WBGene00024204;Locus=Cbr-daf-19
+chrII	test	mRNA	902894	927498	.	+	.	ID=mRNA:CBG00885;Name=cbDAF-19;Parent=gene:CBG00885;protein_decorations=hmmer3:BCD-domain:547:594:4.1e-10,hmmer3:BCD-domain:604:814:1.3e-82,hmmer3:D-domain:661:809:2.2e-60,hmmer3:DBD:324:395:3.5e-35,hmmer3:RFX_DNA_binding:319:386:1.7e-32,hmmer3:C-domain:604:641:2.8e-15,hmmer3:B-domain:557:592:6.8e-10
+chrII	test	CDS	902894	902913	.	+	0	ID=CDS:CBG00885-1;Parent=mRNA:CBG00885
+chrII	test	CDS	903882	904106	.	+	1	ID=CDS:CBG00885-2;Parent=mRNA:CBG00885
+chrII	test	CDS	907340	907521	.	+	1	ID=CDS:CBG00885-3;Parent=mRNA:CBG00885
+chrII	test	CDS	910793	910912	.	+	2	ID=CDS:CBG00885-4;Parent=mRNA:CBG00885
+chrII	test	CDS	912022	912153	.	+	2	ID=CDS:CBG00885-5;Parent=mRNA:CBG00885
+chrII	test	CDS	915189	915264	.	+	2	ID=CDS:CBG00885-6;Parent=mRNA:CBG00885
+chrII	test	CDS	919338	919407	.	+	1	ID=CDS:CBG00885-7;Parent=mRNA:CBG00885
+chrII	test	CDS	919627	919764	.	+	0	ID=CDS:CBG00885-8;Parent=mRNA:CBG00885
+chrII	test	CDS	922251	922330	.	+	0	ID=CDS:CBG00885-9;Parent=mRNA:CBG00885
+chrII	test	CDS	922412	922789	.	+	1	ID=CDS:CBG00885-10;Parent=mRNA:CBG00885
+chrII	test	CDS	923645	923863	.	+	1	ID=CDS:CBG00885-11;Parent=mRNA:CBG00885
+chrII	test	CDS	925648	925816	.	+	1	ID=CDS:CBG00885-12;Parent=mRNA:CBG00885
+chrII	test	CDS	925882	926517	.	+	0	ID=CDS:CBG00885-13;Parent=mRNA:CBG00885
+chrII	test	CDS	927376	927498	.	+	0	ID=CDS:CBG00885-14;Parent=mRNA:CBG00885
+3R	test	gene	6188233	6203790	.	-	.	ID=FBgn0020379;Name=dRFX;
+3R	test	mRNA	6188233	6203790	.	-	.	ID=FBtr0305997;Protein=FBpp0297139;Name=dmRFX ;Parent=FBgn0020379;protein_decorations=hmmer3:BCD-domain:737:1043:6.1e-131,hmmer3:D-domain:890:1038:2.5e-70,hmmer3:DBD:578:649:8e-35,hmmer3:RFX_DNA_binding:574:640:7.8e-32,hmmer3:C-domain:834:873:1.5e-23,hmmer3:A-domain:393:444:2.4e-22,hmmer3:B-domain:757:792:2e-19
+3R	test	five_prime_UTR	6203413	6203790	.	-	.	ID=five_prime_UTR:FBtr0305997:1;Parent=FBtr0305997;
+3R	test	five_prime_UTR	6198709	6198927	.	-	.	ID=five_prime_UTR:FBtr0305997:2;Parent=FBtr0305997;
+3R	test	CDS	6198463	6198708	.	-	0	ID=CDS:FBtr0305997:1;Parent=FBtr0305997;
+3R	test	CDS	6197871	6198255	.	-	0	ID=CDS:FBtr0305997:2;Parent=FBtr0305997;
+3R	test	CDS	6192405	6192950	.	-	2	ID=CDS:FBtr0305997:3;Parent=FBtr0305997;
+3R	test	CDS	6191771	6191849	.	-	2	ID=CDS:FBtr0305997:4;Parent=FBtr0305997;
+3R	test	CDS	6191227	6191695	.	-	1	ID=CDS:FBtr0305997:5;Parent=FBtr0305997;
+3R	test	CDS	6190689	6191147	.	-	0	ID=CDS:FBtr0305997:6;Parent=FBtr0305997;
+3R	test	CDS	6190201	6190503	.	-	0	ID=CDS:FBtr0305997:7;Parent=FBtr0305997;
+3R	test	CDS	6189668	6189982	.	-	0	ID=CDS:FBtr0305997:8;Parent=FBtr0305997;
+3R	test	CDS	6189089	6189457	.	-	0	ID=CDS:FBtr0305997:9;Parent=FBtr0305997;
+3R	test	CDS	6188885	6189019	.	-	0	ID=CDS:FBtr0305997:10;Parent=FBtr0305997;
+3R	test	three_prime_UTR	6188233	6188884	.	-	.	ID=three_prime_UTR:FBtr0305997:1;Parent=FBtr0305997;
+3R	test	gene	2277275	2282165	.	-	.	ID=FBgn0037445;Name=dRFX1;
+3R	test	mRNA	2277275	2282165	.	-	.	ID=FBtr0081730;Protein=FBpp0081227;Name=dmRFX1 ;Parent=FBgn0037445;protein_decorations=hmmer3:RFX_DNA_binding:304:375:1.8e-30,hmmer3:DBD:313:384:4.1e-30,hmmer3:Pox_D5:323:361:1.8e-06
+3R	test	five_prime_UTR	2281744	2282165	.	-	.	ID=five_prime_UTR:FBtr0081730:1;Parent=FBtr0081730;
+3R	test	CDS	2280980	2281743	.	-	0	ID=CDS:FBtr0081730:1;Parent=FBtr0081730;
+3R	test	CDS	2280674	2280916	.	-	1	ID=CDS:FBtr0081730:2;Parent=FBtr0081730;
+3R	test	CDS	2280026	2280461	.	-	1	ID=CDS:FBtr0081730:3;Parent=FBtr0081730;
+3R	test	CDS	2277571	2279970	.	-	0	ID=CDS:FBtr0081730:4;Parent=FBtr0081730;
+3R	test	three_prime_UTR	2277275	2277570	.	-	.	ID=three_prime_UTR:FBtr0081730:1;Parent=FBtr0081730;
+19	test	gene	14072343	14117134	.	-	.	ID=ENSG00000132005;Name=RFX1;
+19	test	mRNA	14072343	14117134	.	-	.	ID=ENST00000254325;Protein=ENSP00000254325;Name=hsRFX1;Parent=ENSG00000132005;protein_decorations=hmmer3:BCD-domain:583:896:1.2e-138,hmmer3:D-domain:743:891:6.6e-72,hmmer3:RFX1_trans_act:216:375:1.2e-52,hmmer3:DBD:441:512:1.5e-34,hmmer3:RFX_DNA_binding:434:503:9.4e-32,hmmer3:A-domain:285:338:4.6e-27,hmmer3:C-domain:687:726:6.4e-25,hmmer3:B-domain:604:639:4.6e-21,SEG:LCR:9:52:0,SEG:LCR:366:411:0
+19	test	five_prime_UTR	14116915	14117134	.	-	.	ID=five_prime_UTR:ENST00000254325:1;Parent=ENST00000254325;
+19	test	five_prime_UTR	14104656	14104707	.	-	.	ID=five_prime_UTR:ENST00000254325:2;Parent=ENST00000254325;
+19	test	CDS	14104337	14104655	.	-	0	ID=CDS:ENST00000254325:1;Parent=ENST00000254325;
+19	test	CDS	14094298	14094407	.	-	2	ID=CDS:ENST00000254325:2;Parent=ENST00000254325;
+19	test	CDS	14093999	14094082	.	-	0	ID=CDS:ENST00000254325:3;Parent=ENST00000254325;
+19	test	CDS	14092933	14093040	.	-	0	ID=CDS:ENST00000254325:4;Parent=ENST00000254325;
+19	test	CDS	14091385	14091501	.	-	0	ID=CDS:ENST00000254325:5;Parent=ENST00000254325;
+19	test	CDS	14090259	14090354	.	-	0	ID=CDS:ENST00000254325:6;Parent=ENST00000254325;
+19	test	CDS	14088804	14088898	.	-	0	ID=CDS:ENST00000254325:7;Parent=ENST00000254325;
+19	test	CDS	14083555	14083939	.	-	1	ID=CDS:ENST00000254325:8;Parent=ENST00000254325;
+19	test	CDS	14080806	14080987	.	-	0	ID=CDS:ENST00000254325:9;Parent=ENST00000254325;
+19	test	CDS	14079587	14079706	.	-	1	ID=CDS:ENST00000254325:10;Parent=ENST00000254325;
+19	test	CDS	14079377	14079492	.	-	1	ID=CDS:ENST00000254325:11;Parent=ENST00000254325;
+19	test	CDS	14077445	14077563	.	-	2	ID=CDS:ENST00000254325:12;Parent=ENST00000254325;
+19	test	CDS	14077233	14077342	.	-	0	ID=CDS:ENST00000254325:13;Parent=ENST00000254325;
+19	test	CDS	14076438	14076589	.	-	1	ID=CDS:ENST00000254325:14;Parent=ENST00000254325;
+19	test	CDS	14076261	14076358	.	-	2	ID=CDS:ENST00000254325:15;Parent=ENST00000254325;
+19	test	CDS	14074670	14074819	.	-	0	ID=CDS:ENST00000254325:16;Parent=ENST00000254325;
+19	test	CDS	14074350	14074558	.	-	0	ID=CDS:ENST00000254325:17;Parent=ENST00000254325;
+19	test	CDS	14073934	14074087	.	-	1	ID=CDS:ENST00000254325:18;Parent=ENST00000254325;
+19	test	CDS	14073806	14073851	.	-	0	ID=CDS:ENST00000254325:19;Parent=ENST00000254325;
+19	test	CDS	14073507	14073676	.	-	2	ID=CDS:ENST00000254325:20;Parent=ENST00000254325;
+19	test	three_prime_UTR	14072343	14073506	.	-	.	ID=three_prime_UTR:ENST00000254325:1;Parent=ENST00000254325;
+19	test	gene	5993175	6110664	.	-	.	ID=ENSG00000087903;Name=RFX2;
+19	test	mRNA	5993175	6110664	.	-	.	ID=ENST00000303657;Protein=ENSP00000306335;Name=hsRFX2;Parent=ENSG00000087903;protein_decorations=hmmer3:BCD-domain:344:659:1.5e-140,hmmer3:D-domain:506:654:2.8e-73,hmmer3:RFX1_trans_act:1:156:3e-67,hmmer3:DBD:202:273:1.5e-35,hmmer3:RFX_DNA_binding:200:264:3e-32,hmmer3:A-domain:62:114:7.4e-28,hmmer3:C-domain:450:489:7.2e-25,hmmer3:B-domain:365:400:5.2e-20
+19	test	five_prime_UTR	6110404	6110664	.	-	.	ID=five_prime_UTR:ENST00000303657:1;Parent=ENST00000303657;
+19	test	five_prime_UTR	6047508	6047515	.	-	.	ID=five_prime_UTR:ENST00000303657:2;Parent=ENST00000303657;
+19	test	CDS	6047418	6047507	.	-	0	ID=CDS:ENST00000303657:1;Parent=ENST00000303657;
+19	test	CDS	6044204	6044293	.	-	0	ID=CDS:ENST00000303657:2;Parent=ENST00000303657;
+19	test	CDS	6042055	6042134	.	-	0	ID=CDS:ENST00000303657:3;Parent=ENST00000303657;
+19	test	CDS	6039991	6040252	.	-	1	ID=CDS:ENST00000303657:4;Parent=ENST00000303657;
+19	test	CDS	6026174	6026248	.	-	0	ID=CDS:ENST00000303657:5;Parent=ENST00000303657;
+19	test	CDS	6016101	6016282	.	-	0	ID=CDS:ENST00000303657:6;Parent=ENST00000303657;
+19	test	CDS	6012997	6013116	.	-	1	ID=CDS:ENST00000303657:7;Parent=ENST00000303657;
+19	test	CDS	6010147	6010262	.	-	1	ID=CDS:ENST00000303657:8;Parent=ENST00000303657;
+19	test	CDS	6008117	6008235	.	-	2	ID=CDS:ENST00000303657:9;Parent=ENST00000303657;
+19	test	CDS	6007701	6007813	.	-	0	ID=CDS:ENST00000303657:10;Parent=ENST00000303657;
+19	test	CDS	6007023	6007177	.	-	1	ID=CDS:ENST00000303657:11;Parent=ENST00000303657;
+19	test	CDS	6004212	6004309	.	-	2	ID=CDS:ENST00000303657:12;Parent=ENST00000303657;
+19	test	CDS	6002732	6002881	.	-	0	ID=CDS:ENST00000303657:13;Parent=ENST00000303657;
+19	test	CDS	6001826	6002034	.	-	0	ID=CDS:ENST00000303657:14;Parent=ENST00000303657;
+19	test	CDS	5997071	5997224	.	-	1	ID=CDS:ENST00000303657:15;Parent=ENST00000303657;
+19	test	CDS	5995612	5995654	.	-	0	ID=CDS:ENST00000303657:16;Parent=ENST00000303657;
+19	test	CDS	5994846	5994961	.	-	2	ID=CDS:ENST00000303657:17;Parent=ENST00000303657;
+19	test	three_prime_UTR	5993175	5994845	.	-	.	ID=three_prime_UTR:ENST00000303657:1;Parent=ENST00000303657;
+9	test	gene	3218297	3526004	.	-	.	ID=ENSG00000080298;Name=RFX3;
+9	test	mRNA	3218297	3525983	.	-	.	ID=ENST00000382004;Protein=ENSP00000371434;Name=hsRFX3;Parent=ENSG00000080298;protein_decorations=hmmer3:BCD-domain:330:644:1.1e-141,hmmer3:D-domain:491:639:9.2e-73,hmmer3:RFX1_trans_act:1:139:4.2e-58,hmmer3:DBD:186:257:2.8e-35,hmmer3:RFX_DNA_binding:183:248:3e-32,hmmer3:A-domain:47:99:1.4e-28,hmmer3:C-domain:435:474:1.2e-24,hmmer3:B-domain:349:384:2.8e-22
+9	test	five_prime_UTR	3525747	3525983	.	-	.	ID=five_prime_UTR:ENST00000382004:1;Parent=ENST00000382004;
+9	test	five_prime_UTR	3490279	3490345	.	-	.	ID=five_prime_UTR:ENST00000382004:2;Parent=ENST00000382004;
+9	test	five_prime_UTR	3395589	3395596	.	-	.	ID=five_prime_UTR:ENST00000382004:3;Parent=ENST00000382004;
+9	test	CDS	3395472	3395588	.	-	0	ID=CDS:ENST00000382004:1;Parent=ENST00000382004;
+9	test	CDS	3346667	3346764	.	-	0	ID=CDS:ENST00000382004:2;Parent=ENST00000382004;
+9	test	CDS	3330259	3330517	.	-	1	ID=CDS:ENST00000382004:3;Parent=ENST00000382004;
+9	test	CDS	3301546	3301620	.	-	0	ID=CDS:ENST00000382004:4;Parent=ENST00000382004;
+9	test	CDS	3293077	3293258	.	-	0	ID=CDS:ENST00000382004:5;Parent=ENST00000382004;
+9	test	CDS	3288131	3288250	.	-	1	ID=CDS:ENST00000382004:6;Parent=ENST00000382004;
+9	test	CDS	3277340	3277461	.	-	1	ID=CDS:ENST00000382004:7;Parent=ENST00000382004;
+9	test	CDS	3275500	3275612	.	-	2	ID=CDS:ENST00000382004:8;Parent=ENST00000382004;
+9	test	CDS	3271003	3271118	.	-	0	ID=CDS:ENST00000382004:9;Parent=ENST00000382004;
+9	test	CDS	3270371	3270525	.	-	1	ID=CDS:ENST00000382004:10;Parent=ENST00000382004;
+9	test	CDS	3266208	3266305	.	-	2	ID=CDS:ENST00000382004:11;Parent=ENST00000382004;
+9	test	CDS	3262935	3263084	.	-	0	ID=CDS:ENST00000382004:12;Parent=ENST00000382004;
+9	test	CDS	3256991	3257199	.	-	0	ID=CDS:ENST00000382004:13;Parent=ENST00000382004;
+9	test	CDS	3248032	3248185	.	-	1	ID=CDS:ENST00000382004:14;Parent=ENST00000382004;
+9	test	CDS	3228847	3228889	.	-	0	ID=CDS:ENST00000382004:15;Parent=ENST00000382004;
+9	test	CDS	3225042	3225280	.	-	2	ID=CDS:ENST00000382004:16;Parent=ENST00000382004;
+9	test	three_prime_UTR	3218297	3225041	.	-	.	ID=three_prime_UTR:ENST00000382004:1;Parent=ENST00000382004;
+12	test	gene	106994915	107156581	.	+	.	ID=ENSG00000111783;Name=RFX4;
+12	test	mRNA	106994915	107155437	.	+	.	ID=ENST00000357881;Protein=ENSP00000350552;Name=hsRFX4;Parent=ENSG00000111783;protein_decorations=hmmer3:BCD-domain:187:483:1.1e-121,hmmer3:D-domain:324:478:3.7e-63,hmmer3:DBD:74:145:3.5e-36,hmmer3:RFX_DNA_binding:69:135:1.8e-31,hmmer3:C-domain:268:307:3.8e-21,hmmer3:B-domain:206:241:6.8e-21,hmmer3:Pox_D5:79:122:1.3e-07
+12	test	five_prime_UTR	106994915	106995054	.	+	.	ID=five_prime_UTR:ENST00000357881:1;Parent=ENST00000357881;
+12	test	CDS	106995055	106995124	.	+	0	ID=CDS:ENST00000357881:1;Parent=ENST00000357881;
+12	test	CDS	107002575	107002661	.	+	2	ID=CDS:ENST00000357881:2;Parent=ENST00000357881;
+12	test	CDS	107033110	107033170	.	+	2	ID=CDS:ENST00000357881:3;Parent=ENST00000357881;
+12	test	CDS	107048006	107048129	.	+	1	ID=CDS:ENST00000357881:4;Parent=ENST00000357881;
+12	test	CDS	107075771	107075832	.	+	0	ID=CDS:ENST00000357881:5;Parent=ENST00000357881;
+12	test	CDS	107080662	107080875	.	+	1	ID=CDS:ENST00000357881:6;Parent=ENST00000357881;
+12	test	CDS	107083065	107083142	.	+	0	ID=CDS:ENST00000357881:7;Parent=ENST00000357881;
+12	test	CDS	107090061	107090224	.	+	0	ID=CDS:ENST00000357881:8;Parent=ENST00000357881;
+12	test	CDS	107103108	107103208	.	+	1	ID=CDS:ENST00000357881:9;Parent=ENST00000357881;
+12	test	CDS	107105231	107105289	.	+	2	ID=CDS:ENST00000357881:10;Parent=ENST00000357881;
+12	test	CDS	107109178	107109322	.	+	0	ID=CDS:ENST00000357881:11;Parent=ENST00000357881;
+12	test	CDS	107113738	107113832	.	+	2	ID=CDS:ENST00000357881:12;Parent=ENST00000357881;
+12	test	CDS	107114537	107114654	.	+	0	ID=CDS:ENST00000357881:13;Parent=ENST00000357881;
+12	test	CDS	107125908	107126027	.	+	2	ID=CDS:ENST00000357881:14;Parent=ENST00000357881;
+12	test	CDS	107126702	107126863	.	+	2	ID=CDS:ENST00000357881:15;Parent=ENST00000357881;
+12	test	CDS	107141215	107141377	.	+	2	ID=CDS:ENST00000357881:16;Parent=ENST00000357881;
+12	test	CDS	107144433	107144571	.	+	1	ID=CDS:ENST00000357881:17;Parent=ENST00000357881;
+12	test	CDS	107154975	107155247	.	+	0	ID=CDS:ENST00000357881:18;Parent=ENST00000357881;
+12	test	three_prime_UTR	107155248	107155437	.	+	.	ID=three_prime_UTR:ENST00000357881:1;Parent=ENST00000357881;
+1	test	gene	151313116	151319833	.	-	.	ID=ENSG00000143390;Name=RFX5;
+1	test	mRNA	151314436	151319833	.	-	.	ID=ENST00000452671;Protein=ENSP00000389130;Name=hsRFX5;Parent=ENSG00000143390;protein_decorations=hmmer3:RFX_DNA_binding:86:158:7.8e-32,hmmer3:DBD:95:167:1.1e-31,hmmer3:Pox_D5:100:145:1.6e-07
+1	test	five_prime_UTR	151319687	151319833	.	-	.	ID=five_prime_UTR:ENST00000452671:1;Parent=ENST00000452671;
+1	test	five_prime_UTR	151318965	151319082	.	-	.	ID=five_prime_UTR:ENST00000452671:2;Parent=ENST00000452671;
+1	test	five_prime_UTR	151318797	151318809	.	-	.	ID=five_prime_UTR:ENST00000452671:3;Parent=ENST00000452671;
+1	test	CDS	151318681	151318796	.	-	0	ID=CDS:ENST00000452671:1;Parent=ENST00000452671;
+1	test	CDS	151318404	151318437	.	-	1	ID=CDS:ENST00000452671:2;Parent=ENST00000452671;
+1	test	CDS	151317582	151317664	.	-	0	ID=CDS:ENST00000452671:3;Parent=ENST00000452671;
+1	test	CDS	151317204	151317323	.	-	1	ID=CDS:ENST00000452671:4;Parent=ENST00000452671;
+1	test	CDS	151316893	151317012	.	-	1	ID=CDS:ENST00000452671:5;Parent=ENST00000452671;
+1	test	CDS	151316673	151316754	.	-	1	ID=CDS:ENST00000452671:6;Parent=ENST00000452671;
+1	test	CDS	151316157	151316358	.	-	0	ID=CDS:ENST00000452671:7;Parent=ENST00000452671;
+1	test	CDS	151315818	151315918	.	-	2	ID=CDS:ENST00000452671:8;Parent=ENST00000452671;
+1	test	CDS	151314662	151315654	.	-	0	ID=CDS:ENST00000452671:9;Parent=ENST00000452671;
+1	test	three_prime_UTR	151314436	151314661	.	-	.	ID=three_prime_UTR:ENST00000452671:1;Parent=ENST00000452671;
+6	test	gene	117198375	117253326	.	+	.	ID=ENSG00000185002;Name=RFX6;
+6	test	mRNA	117198423	117253326	.	+	.	ID=ENST00000332958;Protein=ENSP00000332208;Name=hsRFX6;Parent=ENSG00000185002;protein_decorations=hmmer3:BCD-domain:241:542:6e-118,hmmer3:D-domain:378:537:1.5e-58,hmmer3:DBD:128:198:4.9e-32,hmmer3:RFX_DNA_binding:118:189:2.2e-28,hmmer3:C-domain:322:361:2.2e-21,hmmer3:B-domain:260:295:5.2e-21
+6	test	five_prime_UTR	117198423	117198438	.	+	.	ID=five_prime_UTR:ENST00000332958:1;Parent=ENST00000332958;
+6	test	CDS	117198439	117198661	.	+	0	ID=CDS:ENST00000332958:1;Parent=ENST00000332958;
+6	test	CDS	117198959	117199115	.	+	2	ID=CDS:ENST00000332958:2;Parent=ENST00000332958;
+6	test	CDS	117201707	117201830	.	+	1	ID=CDS:ENST00000332958:3;Parent=ENST00000332958;
+6	test	CDS	117203530	117203591	.	+	0	ID=CDS:ENST00000332958:4;Parent=ENST00000332958;
+6	test	CDS	117215150	117215227	.	+	1	ID=CDS:ENST00000332958:5;Parent=ENST00000332958;
+6	test	CDS	117216343	117216370	.	+	1	ID=CDS:ENST00000332958:6;Parent=ENST00000332958;
+6	test	CDS	117232098	117232205	.	+	0	ID=CDS:ENST00000332958:7;Parent=ENST00000332958;
+6	test	CDS	117237171	117237248	.	+	0	ID=CDS:ENST00000332958:8;Parent=ENST00000332958;
+6	test	CDS	117237364	117237477	.	+	0	ID=CDS:ENST00000332958:9;Parent=ENST00000332958;
+6	test	CDS	117239200	117239249	.	+	0	ID=CDS:ENST00000332958:10;Parent=ENST00000332958;
+6	test	CDS	117240300	117240459	.	+	1	ID=CDS:ENST00000332958:11;Parent=ENST00000332958;
+6	test	CDS	117241473	117241617	.	+	0	ID=CDS:ENST00000332958:12;Parent=ENST00000332958;
+6	test	CDS	117243205	117243314	.	+	2	ID=CDS:ENST00000332958:13;Parent=ENST00000332958;
+6	test	CDS	117244270	117244387	.	+	0	ID=CDS:ENST00000332958:14;Parent=ENST00000332958;
+6	test	CDS	117245832	117245954	.	+	2	ID=CDS:ENST00000332958:15;Parent=ENST00000332958;
+6	test	CDS	117246616	117246822	.	+	2	ID=CDS:ENST00000332958:16;Parent=ENST00000332958;
+6	test	CDS	117248190	117248702	.	+	2	ID=CDS:ENST00000332958:17;Parent=ENST00000332958;
+6	test	CDS	117249922	117250134	.	+	2	ID=CDS:ENST00000332958:18;Parent=ENST00000332958;
+6	test	CDS	117252494	117252669	.	+	2	ID=CDS:ENST00000332958:19;Parent=ENST00000332958;
+6	test	three_prime_UTR	117252670	117253326	.	+	.	ID=three_prime_UTR:ENST00000332958:1;Parent=ENST00000332958;
+15	test	gene	56379478	56535483	.	-	.	ID=ENSG00000181827;Name=RFX7;
+15	test	mRNA	56382732	56535483	.	-	.	ID=ENST00000423270;Protein=ENSP00000397644;Name=hsRFX7;Parent=ENSG00000181827;protein_decorations=hmmer3:RFX_DNA_binding:101:173:1e-36,hmmer3:DBD:111:182:9e-33,hmmer3:Pox_D5:121:160:1.3e-07
+15	test	CDS	56535323	56535483	.	-	0	ID=CDS:ENST00000423270:1;Parent=ENST00000423270;
+15	test	CDS	56471468	56471501	.	-	1	ID=CDS:ENST00000423270:2;Parent=ENST00000423270;
+15	test	CDS	56436599	56436681	.	-	0	ID=CDS:ENST00000423270:3;Parent=ENST00000423270;
+15	test	CDS	56434976	56435098	.	-	1	ID=CDS:ENST00000423270:4;Parent=ENST00000423270;
+15	test	CDS	56395750	56395868	.	-	1	ID=CDS:ENST00000423270:5;Parent=ENST00000423270;
+15	test	CDS	56394367	56394449	.	-	2	ID=CDS:ENST00000423270:6;Parent=ENST00000423270;
+15	test	CDS	56393557	56393764	.	-	0	ID=CDS:ENST00000423270:7;Parent=ENST00000423270;
+15	test	CDS	56390279	56390574	.	-	2	ID=CDS:ENST00000423270:8;Parent=ENST00000423270;
+15	test	CDS	56385543	56388818	.	-	0	ID=CDS:ENST00000423270:9;Parent=ENST00000423270;
+15	test	three_prime_UTR	56382732	56385542	.	-	.	ID=three_prime_UTR:ENST00000423270:1;Parent=ENST00000423270;
+2	test	gene	102013823	102091165	.	-	.	ID=ENSG00000196460;Name=RFX8;
+2	test	mRNA	102013823	102090737	.	-	.	ID=ENST00000376826;Protein=ENSP00000366022;Name=hsRFX8;Parent=ENSG00000196460;protein_decorations=hmmer3:BCD-domain:153:446:6e-91,hmmer3:D-domain:285:441:1.6e-48,hmmer3:DBD:26:97:2.6e-28,hmmer3:RFX_DNA_binding:23:86:4.2e-23,hmmer3:C-domain:228:267:7.6e-18
+2	test	CDS	102090664	102090737	.	-	0	ID=CDS:ENST00000376826:1;Parent=ENST00000376826;
+2	test	CDS	102083239	102083362	.	-	1	ID=CDS:ENST00000376826:2;Parent=ENST00000376826;
+2	test	CDS	102068847	102068908	.	-	0	ID=CDS:ENST00000376826:3;Parent=ENST00000376826;
+2	test	CDS	102067056	102067142	.	-	1	ID=CDS:ENST00000376826:4;Parent=ENST00000376826;
+2	test	CDS	102045418	102045481	.	-	1	ID=CDS:ENST00000376826:5;Parent=ENST00000376826;
+2	test	CDS	102038824	102038934	.	-	0	ID=CDS:ENST00000376826:6;Parent=ENST00000376826;
+2	test	CDS	102038186	102038239	.	-	0	ID=CDS:ENST00000376826:7;Parent=ENST00000376826;
+2	test	CDS	102035313	102035426	.	-	0	ID=CDS:ENST00000376826:8;Parent=ENST00000376826;
+2	test	CDS	102033996	102034146	.	-	0	ID=CDS:ENST00000376826:9;Parent=ENST00000376826;
+2	test	CDS	102031316	102031374	.	-	2	ID=CDS:ENST00000376826:10;Parent=ENST00000376826;
+2	test	CDS	102029377	102029533	.	-	0	ID=CDS:ENST00000376826:11;Parent=ENST00000376826;
+2	test	CDS	102027081	102027175	.	-	2	ID=CDS:ENST00000376826:12;Parent=ENST00000376826;
+2	test	CDS	102022405	102022519	.	-	0	ID=CDS:ENST00000376826:13;Parent=ENST00000376826;
+2	test	CDS	102018898	102019214	.	-	2	ID=CDS:ENST00000376826:14;Parent=ENST00000376826;
+2	test	CDS	102014010	102014186	.	-	0	ID=CDS:ENST00000376826:15;Parent=ENST00000376826;
+2	test	three_prime_UTR	102013823	102014009	.	-	.	ID=three_prime_UTR:ENST00000376826:1;Parent=ENST00000376826;
+chrI	test	chromosome	1	230218	.	.	.	ID=chrI;dbxref=NCBI:NC_001133;Name=chrI
+chrII	test	chromosome	1	813184	.	.	.	ID=chrII;dbxref=NCBI:NC_001134;Name=chrII
+chrIII	test	chromosome	1	316620	.	.	.	ID=chrIII;dbxref=NCBI:NC_001135;Name=chrIII
+chrIV	test	chromosome	1	1531933	.	.	.	ID=chrIV;dbxref=NCBI:NC_001136;Name=chrIV
+chrV	test	chromosome	1	576874	.	.	.	ID=chrV;dbxref=NCBI:NC_001137;Name=chrV
+chrVI	test	chromosome	1	270161	.	.	.	ID=chrVI;dbxref=NCBI:NC_001138;Name=chrVI
+chrVII	test	chromosome	1	1090940	.	.	.	ID=chrVII;dbxref=NCBI:NC_001139;Name=chrVII
+chrVIII	test	chromosome	1	562643	.	.	.	ID=chrVIII;dbxref=NCBI:NC_001140;Name=chrVIII
+chrIX	test	chromosome	1	439888	.	.	.	ID=chrIX;dbxref=NCBI:NC_001141;Name=chrIX
+chrX	test	chromosome	1	745751	.	.	.	ID=chrX;dbxref=NCBI:NC_001142;Name=chrX
+chrXI	test	chromosome	1	666816	.	.	.	ID=chrXI;dbxref=NCBI:NC_001143;Name=chrXI
+chrXII	test	chromosome	1	1078177	.	.	.	ID=chrXII;dbxref=NCBI:NC_001144;Name=chrXII
+chrXIII	test	chromosome	1	924431	.	.	.	ID=chrXIII;dbxref=NCBI:NC_001145;Name=chrXIII
+chrXIV	test	chromosome	1	784333	.	.	.	ID=chrXIV;dbxref=NCBI:NC_001146;Name=chrXIV
+chrXV	test	chromosome	1	1091291	.	.	.	ID=chrXV;dbxref=NCBI:NC_001147;Name=chrXV
+chrXVI	test	chromosome	1	948066	.	.	.	ID=chrXVI;dbxref=NCBI:NC_001148;Name=chrXVI
+chrmt	test	chromosome	1	85779	.	.	.	ID=chrmt;dbxref=NCBI:NC_001224;Name=chrmt
+chrXII	test	gene	507797	510232	.	-	.	ID=YLR176C;Name=YLR176C;gene=RFX1;Alias=CRT1;Ontology_term=GO:0000122,GO:0000978,GO:0005634,GO:0005737,GO:0043565,GO:0045944;Note=Major%20transcriptional%20repressor%20of%20DNA-damage-regulated%20genes%2C%20recruits%20repressors%20Tup1p%20and%20Cyc8p%20to%20their%20promoters%3B%20involved%20in%20DNA%20damage%20and%20replication%20checkpoint%20pathway%3B%20similar%20to%20a%20family%20of%20mammalian%20DNA%20binding%20RFX1-4%20proteins;display=Major%20transcriptional%20repressor%20of%20DNA-damage-regulated%20genes;dbxref=SGD:S000004166;orf_classification=Verified
+chrXII	test	mRNA	507797	510232	.	-	.	ID=YLR176C_mRNA;Name=scRFX;Parent=YLR176C;protein_decorations=hmmer3:RFX_DNA_binding:278:350:1.4e-34,hmmer3:DBD:288:358:4.2e-29,hmmer3:BCD-domain:505:685:5.3e-16,hmmer3:Pox_D5:298:337:5e-06
+chrXII	test	CDS	507797	510232	.	-	0	ID=YLR176C_CDS;Parent=YLR176C_mRNA;Name=YLR176C_CDS;orf_classification=Verified
+1762	test	gene	508416	512658	.	+	.	ID=1762.t000749;Name=ACA1_270030;Alias=ACA1_270030,1762.m000526;Note=RFX DNA binding domain-containing protein
+1762	test	mRNA	508416	512658	.	+	.	ID=1762.m001676;Name=acACA1_270030;Protein=ACA1_270030;Parent=1762.t000749;protein_decorations=hmmer3:BCD-domain:301:595:8.6e-73,hmmer3:DBD:133:203:1.3e-33,hmmer3:D-domain:440:590:3.1e-31,hmmer3:RFX_DNA_binding:129:194:8.8e-30,hmmer3:C-domain:384:422:5.6e-12,hmmer3:B-domain:324:356:4.6e-11,SEG:LCR:725:805:0
+1762	test	CDS	508416	508810	.	+	0	ID=cds_of_1762.m001676:1;Parent=1762.m001676
+1762	test	CDS	508916	509034	.	+	2	ID=cds_of_1762.m001676:2;Parent=1762.m001676
+1762	test	CDS	509123	509388	.	+	1	ID=cds_of_1762.m001676:3;Parent=1762.m001676
+1762	test	CDS	509465	509544	.	+	0	ID=cds_of_1762.m001676:4;Parent=1762.m001676
+1762	test	CDS	509611	509678	.	+	2	ID=cds_of_1762.m001676:5;Parent=1762.m001676
+1762	test	CDS	509750	509790	.	+	1	ID=cds_of_1762.m001676:6;Parent=1762.m001676
+1762	test	CDS	509814	509999	.	+	0	ID=cds_of_1762.m001676:7;Parent=1762.m001676
+1762	test	CDS	510095	510245	.	+	0	ID=cds_of_1762.m001676:8;Parent=1762.m001676
+1762	test	CDS	510316	510522	.	+	1	ID=cds_of_1762.m001676:9;Parent=1762.m001676
+1762	test	CDS	510627	510718	.	+	1	ID=cds_of_1762.m001676:10;Parent=1762.m001676
+1762	test	CDS	510807	510918	.	+	0	ID=cds_of_1762.m001676:11;Parent=1762.m001676
+1762	test	CDS	511001	511181	.	+	1	ID=cds_of_1762.m001676:12;Parent=1762.m001676
+1762	test	CDS	511274	511366	.	+	2	ID=cds_of_1762.m001676:13;Parent=1762.m001676
+1762	test	CDS	511458	512058	.	+	2	ID=cds_of_1762.m001676:14;Parent=1762.m001676
+1762	test	CDS	512125	512234	.	+	0	ID=cds_of_1762.m001676:15;Parent=1762.m001676
+1762	test	CDS	512358	512658	.	+	2	ID=cds_of_1762.m001676:16;Parent=1762.m001676
+Supercontig_3.20	test	gene	346620	349516	.	+	.	ID=AMAG_10999;Name=AMAG_10999
+Supercontig_3.20	test	mRNA	346620	349516	.	+	.	ID=AMAG_10999T0;Name=AMAG_10999;Parent=AMAG_10999;protein_decorations=hmmer3:BCD-domain:327:618:3e-117,hmmer3:D-domain:464:613:2.4e-60,hmmer3:DBD:211:282:9.9e-31,hmmer3:RFX_DNA_binding:203:273:3.5e-25,hmmer3:C-domain:408:447:2.8e-22,hmmer3:B-domain:347:381:4.9e-18
+Supercontig_3.20	test	five_prime_UTR	346620	346771	.	+	.	ID=five_prime_UTR:AMAG_10999T0:1;Parent=AMAG_10999T0;
+Supercontig_3.20	test	CDS	346772	347268	.	+	0	ID=CDS:AMAG_10999T0:1;Parent=AMAG_10999T0;
+Supercontig_3.20	test	CDS	347338	347551	.	+	1	ID=CDS:AMAG_10999T0:2;Parent=AMAG_10999T0;
+Supercontig_3.20	test	CDS	347625	347692	.	+	0	ID=CDS:AMAG_10999T0:3;Parent=AMAG_10999T0;
+Supercontig_3.20	test	CDS	347761	348517	.	+	1	ID=CDS:AMAG_10999T0:4;Parent=AMAG_10999T0;
+Supercontig_3.20	test	CDS	348600	349319	.	+	0	ID=CDS:AMAG_10999T0:5;Parent=AMAG_10999T0;
+Supercontig_3.20	test	three_prime_UTR	349320	349516	.	+	.	ID=three_prime_UTR:AMAG_10999T0:1;Parent=AMAG_10999T0;
+Supercontig_3.23	test	gene	342493	345253	.	+	.	ID=AMAG_11601;Name=AMAG_11601
+Supercontig_3.23	test	mRNA	342493	345253	.	+	.	ID=AMAG_11601T0;Name=amAMAG_11601 ;Protein=AMAG_11601;Parent=AMAG_11601;protein_decorations=hmmer3:BCD-domain:330:621:3.1e-117,hmmer3:D-domain:467:616:2.4e-60,hmmer3:DBD:214:285:1.4e-31,hmmer3:RFX_DNA_binding:206:276:1.2e-26,hmmer3:C-domain:411:450:2.9e-22,hmmer3:B-domain:350:384:5e-18,SEG:LCR:81:139:0
+Supercontig_3.23	test	five_prime_UTR	342493	342662	.	+	.	ID=five_prime_UTR:AMAG_11601T0:1;Parent=AMAG_11601T0;
+Supercontig_3.23	test	CDS	342663	343162	.	+	0	ID=CDS:AMAG_11601T0:1;Parent=AMAG_11601T0;
+Supercontig_3.23	test	CDS	343226	343439	.	+	1	ID=CDS:AMAG_11601T0:2;Parent=AMAG_11601T0;
+Supercontig_3.23	test	CDS	343514	343581	.	+	0	ID=CDS:AMAG_11601T0:3;Parent=AMAG_11601T0;
+Supercontig_3.23	test	CDS	343653	344409	.	+	1	ID=CDS:AMAG_11601T0:4;Parent=AMAG_11601T0;
+Supercontig_3.23	test	CDS	344496	345212	.	+	0	ID=CDS:AMAG_11601T0:5;Parent=AMAG_11601T0;
+Supercontig_3.23	test	three_prime_UTR	345213	345253	.	+	.	ID=three_prime_UTR:AMAG_11601T0:1;Parent=AMAG_11601T0;
+scaffold_3	test	gene	1262536	1267190	.	-	.	ID=MonBrl|gn22947;Name=cRFX2;
+scaffold_3	test	mRNA	1262536	1267190	.	-	.	ID=MonBrl|tr22947;Name=mbRFX2 ;Protein=cRFX2;Parent=MonBrl|gn22947;protein_decorations=hmmer3:BCD-domain:486:775:9.3e-102,hmmer3:D-domain:623:771:4.2e-53,hmmer3:DBD:395:465:1.6e-33,hmmer3:RFX_DNA_binding:392:456:2.4e-27,hmmer3:C-domain:567:606:1.3e-17,hmmer3:B-domain:505:540:2.1e-16
+scaffold_3	test	CDS	1262536	1262694	.	-	0	ID=CDS:MonBrl|tr22947:1;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1262819	1262951	.	-	0	ID=CDS:MonBrl|tr22947:2;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1263085	1263520	.	-	1	ID=CDS:MonBrl|tr22947:3;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1263636	1263741	.	-	2	ID=CDS:MonBrl|tr22947:4;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1263842	1263939	.	-	0	ID=CDS:MonBrl|tr22947:5;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1264055	1264113	.	-	2	ID=CDS:MonBrl|tr22947:6;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1264227	1264303	.	-	1	ID=CDS:MonBrl|tr22947:7;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1264421	1264525	.	-	0	ID=CDS:MonBrl|tr22947:8;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1264664	1264755	.	-	0	ID=CDS:MonBrl|tr22947:9;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1264852	1264978	.	-	2	ID=CDS:MonBrl|tr22947:10;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1265056	1265133	.	-	0	ID=CDS:MonBrl|tr22947:11;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1265286	1265366	.	-	0	ID=CDS:MonBrl|tr22947:12;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1265481	1265552	.	-	0	ID=CDS:MonBrl|tr22947:13;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1265648	1265828	.	-	0	ID=CDS:MonBrl|tr22947:14;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1265912	1266446	.	-	1	ID=CDS:MonBrl|tr22947:15;Parent=MonBrl|tr22947;
+scaffold_3	test	CDS	1266545	1267190	.	-	2	ID=CDS:MonBrl|tr22947:16;Parent=MonBrl|tr22947;
+scaffold_39	test	gene	61843	67196	.	-	.	ID=MonBrl|gn34511;Name=cRFX1;
+scaffold_39	test	mRNA	61843	67196	.	-	.	ID=MonBrl|tr34511;Name=mbRFX1 ;Protein=cRFX1;Parent=MonBrl|gn34511;protein_decorations=hmmer3:BCD-domain:417:696:2.2e-100,hmmer3:D-domain:549:693:3.1e-52,hmmer3:DBD:261:333:2.7e-33,hmmer3:RFX_DNA_binding:258:323:6.3e-30,hmmer3:C-domain:492:531:1.5e-19,hmmer3:B-domain:431:465:2.1e-18,SEG:LCR:72:147:0
+scaffold_39	test	CDS	61843	62115	.	-	0	ID=CDS:MonBrl|tr34511:1;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	62221	62373	.	-	0	ID=CDS:MonBrl|tr34511:2;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	62488	62568	.	-	0	ID=CDS:MonBrl|tr34511:3;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	62719	62802	.	-	0	ID=CDS:MonBrl|tr34511:4;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	62938	62988	.	-	0	ID=CDS:MonBrl|tr34511:5;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	63090	63122	.	-	0	ID=CDS:MonBrl|tr34511:6;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	63333	63440	.	-	0	ID=CDS:MonBrl|tr34511:7;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	63549	63638	.	-	0	ID=CDS:MonBrl|tr34511:8;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	63730	63944	.	-	0	ID=CDS:MonBrl|tr34511:9;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	64088	64301	.	-	2	ID=CDS:MonBrl|tr34511:10;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	64448	64576	.	-	0	ID=CDS:MonBrl|tr34511:11;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	64669	64737	.	-	0	ID=CDS:MonBrl|tr34511:12;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	64890	65027	.	-	0	ID=CDS:MonBrl|tr34511:13;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	65194	65458	.	-	0	ID=CDS:MonBrl|tr34511:14;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	66373	66742	.	-	1	ID=CDS:MonBrl|tr34511:15;Parent=MonBrl|tr34511;
+scaffold_39	test	CDS	67103	67196	.	-	2	ID=CDS:MonBrl|tr34511:16;Parent=MonBrl|tr34511;
+MAL1	test	gene	554362	555519	.	+	.	ID=PFA0690w;Name=PFA0690w;Note=Plasmodium exported protein%2C unknown function%2C pseudogene;size=1158;web_id=PFA0690w;locus_tag=PFA0690w;size=1158;Alias=MAL1P4.16;gene_type=protein;gene_type=protein;pseudogene=1
+MAL1	test	mRNA	554362	555519	.	+	.	ID=rna_PFA0690w-1;Name=PFA0690w-1;Note=Plasmodium exported protein%2C unknown function%2C pseudogene;size=1158;Parent=PFA0690w;Dbxref=ApiDB_PlasmoDB:PFA0690w,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:45:67:0,TMHMM:TM:292:314:0,TMHMM:TM:319:336:0,TMHMM:TM:340:359:0,SignalP4:SP:1:27:0.643,PfamA25:DUF2667:225:275:0.00021,PfamA25:Yip1:271:359:2.8e-05;pseudogene=1
+MAL1	test	CDS	554362	555519	.	+	0	ID=cds_PFA0690w-1;Name=cds_PFA0690w-1;Note=.;size=1158;Parent=rna_PFA0690w-1;gene_type=protein;pseudogene=1
+MAL11	test	gene	80306	81424	.	-	.	ID=PF11_0023;Name=PF11_0023;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1119;web_id=PF11_0023;locus_tag=PF11_0023;size=1119;gene_type=protein;gene_type=protein
+MAL11	test	mRNA	80306	81424	.	-	.	ID=rna_PF11_0023-1;Name=PF11_0023-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1119;Parent=PF11_0023;Ontology_term=GO:0016020;Dbxref=ApiDB_PlasmoDB:PF11_0023,NCBI_gi:254832583,NCBI_gi:258597180,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:223:245:0,TMHMM:TM:265:287:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31852,PfamA25:Hid1:13:60:1.5e-06,PfamA25:RNA_pol_Rpb1_5:96:219:0.00071
+MAL11	test	CDS	81356	81424	.	-	0	ID=cds_PF11_0023-1;Name=cds_PF11_0023-1;Note=.;size=69;Parent=rna_PF11_0023-1;gene_type=protein
+MAL11	test	CDS	80306	81163	.	-	0	ID=cds_PF11_0023-2;Name=cds_PF11_0023-2;Note=.;size=858;Parent=rna_PF11_0023-1;gene_type=protein
+MAL10	test	gene	1596486	1597604	.	+	.	ID=PF10_0392;Name=PF10_0392;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1119;web_id=PF10_0392;locus_tag=PF10_0392;size=1119;gene_type=protein;gene_type=protein
+MAL10	test	mRNA	1596486	1597604	.	+	.	ID=rna_PF10_0392-1;Name=PF10_0392-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1119;Parent=PF10_0392;Ontology_term=GO:0016020;Dbxref=ApiDB_PlasmoDB:PF10_0392,NCBI_gi:124803040,NCBI_gi:23495260,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:223:245:0,TMHMM:TM:265:287:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31852
+MAL10	test	CDS	1596486	1596554	.	+	0	ID=cds_PF10_0392-1;Name=cds_PF10_0392-1;Note=.;size=69;Parent=rna_PF10_0392-1;gene_type=protein
+MAL10	test	CDS	1596747	1597604	.	+	0	ID=cds_PF10_0392-2;Name=cds_PF10_0392-2;Note=.;size=858;Parent=rna_PF10_0392-1;gene_type=protein
+MAL1	test	gene	69537	70650	.	-	.	ID=PFA0055c;Name=PFA0055c;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1114;web_id=PFA0055c;locus_tag=PFA0055c;size=1114;Alias=MAL1P1.2;gene_type=protein;gene_type=protein
+MAL1	test	mRNA	69537	70650	.	-	.	ID=rna_PFA0055c-1;Name=PFA0055c-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1114;Parent=PFA0055c;Dbxref=ApiDB_PlasmoDB:PFA0055c,NCBI_gi:124505143,NCBI_gi:124505665,NCBI_gi:23510589,NCBI_gi:4493997,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:224:246:0,TMHMM:TM:266:288:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31568
+MAL1	test	CDS	70582	70650	.	-	0	ID=cds_PFA0055c-1;Name=cds_PFA0055c-1;Note=.;size=69;Parent=rna_PFA0055c-1;gene_type=protein
+MAL1	test	CDS	69537	70397	.	-	0	ID=cds_PFA0055c-2;Name=cds_PFA0055c-2;Note=.;size=861;Parent=rna_PFA0055c-1;gene_type=protein
+MAL3	test	gene	1009025	1010134	.	+	.	ID=PFC1090w;Name=PFC1090w;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1110;web_id=PFC1090w;locus_tag=PFC1090w;size=1110;Alias=MAL3P7.49;gene_type=protein;gene_type=protein
+MAL3	test	mRNA	1009025	1010134	.	+	.	ID=rna_PFC1090w-1;Name=PFC1090w-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1110;Parent=PFC1090w;Ontology_term=GO:0016020,GO:0020011;Dbxref=ApiDB_PlasmoDB:PFC1090w,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:224:246:0,TMHMM:TM:266:288:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31568
+MAL3	test	CDS	1009025	1009093	.	+	0	ID=cds_PFC1090w-1;Name=cds_PFC1090w-1;Note=.;size=69;Parent=rna_PFC1090w-1;gene_type=protein
+MAL3	test	CDS	1009274	1010134	.	+	0	ID=cds_PFC1090w-2;Name=cds_PFC1090w-2;Note=.;size=861;Parent=rna_PFC1090w-1;gene_type=protein
+MAL6	test	gene	42097	43218	.	-	.	ID=PFF0050c;Name=PFF0050c;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1122;web_id=PFF0050c;locus_tag=PFF0050c;size=1122;gene_type=protein;gene_type=protein
+MAL6	test	mRNA	42097	43218	.	-	.	ID=rna_PFF0050c-1;Name=PFF0050c-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1122;Parent=PFF0050c;Dbxref=ApiDB_PlasmoDB:PFF0050c,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:224:246:0,TMHMM:TM:266:288:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31568
+MAL6	test	CDS	43150	43218	.	-	0	ID=cds_PFF0050c-1;Name=cds_PFF0050c-1;Note=.;size=69;Parent=rna_PFF0050c-1;gene_type=protein
+MAL6	test	CDS	42097	42957	.	-	0	ID=cds_PFF0050c-2;Name=cds_PFF0050c-2;Note=.;size=861;Parent=rna_PFF0050c-1;gene_type=protein
+MAL6	test	gene	1323297	1324438	.	+	.	ID=PFF1535w;Name=PFF1535w;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1142;web_id=PFF1535w;locus_tag=PFF1535w;size=1142;Alias=2270.t00311,MAL6P1.13;gene_type=protein;gene_type=protein
+MAL6	test	mRNA	1323297	1324438	.	+	.	ID=rna_PFF1535w-1;Name=PFF1535w-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=1142;Parent=PFF1535w;Ontology_term=GO:0016020;Dbxref=ApiDB_PlasmoDB:PFF1535w,NCBI_gi:46361266,NCBI_gi:46362244,NCBI_gi:86170368,NCBI_gi:86171876,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:224:246:0,TMHMM:TM:266:288:0,SignalP4:SP:1:17:0.606,exportpred:VTS:46:52:7.31568
+MAL6	test	CDS	1323297	1323365	.	+	0	ID=cds_PFF1535w-1;Name=cds_PFF1535w-1;Note=.;size=69;Parent=rna_PFF1535w-1;gene_type=protein
+MAL6	test	CDS	1323578	1324438	.	+	0	ID=cds_PFF1535w-2;Name=cds_PFF1535w-2;Note=.;size=861;Parent=rna_PFF1535w-1;gene_type=protein
+MAL9	test	gene	82002	82998	.	-	.	ID=PFI0085c;Name=PFI0085c;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=997;web_id=PFI0085c;locus_tag=PFI0085c;size=997;gene_type=protein;gene_type=protein
+MAL9	test	mRNA	82002	82998	.	-	.	ID=rna_PFI0085c-1;Name=PFI0085c-1;Note=Plasmodium exported protein %28hyp5%29%2C unknown function;size=997;Parent=PFI0085c;Ontology_term=GO:0016020,GO:0016021;Dbxref=ApiDB_PlasmoDB:PFI0085c,NCBI_gi:225631790,NCBI_gi:296005145,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:151:173:0,TMHMM:TM:188:210:0,SignalP4:SP:1:27:0.616,exportpred:VTS:45:51:9.12827
+MAL9	test	CDS	82930	82998	.	-	0	ID=cds_PFI0085c-1;Name=cds_PFI0085c-1;Note=.;size=69;Parent=rna_PFI0085c-1;gene_type=protein
+MAL9	test	CDS	82002	82616	.	-	0	ID=cds_PFI0085c-2;Name=cds_PFI0085c-2;Note=.;size=615;Parent=rna_PFI0085c-1;gene_type=protein
+MAL14	test	gene	3175476	3176393	.	+	.	ID=PF14_0743;Name=PF14_0743;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=918;web_id=PF14_0743;locus_tag=PF14_0743;size=918;gene_type=protein;gene_type=protein
+MAL14	test	mRNA	3175476	3176393	.	+	.	ID=rna_PF14_0743-1;Name=PF14_0743-1;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=918;Parent=PF14_0743;Ontology_term=GO:0005737,GO:0016020,GO:0005524;Dbxref=ApiDB_PlasmoDB:PF14_0743,NCBI_gi:255528952,NCBI_gi:258597969,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:171:193:0,TMHMM:TM:198:220:0,SignalP4:SP:1:27:0.638,exportpred:VTS:46:52:8.06896
+MAL14	test	CDS	3175476	3175547	.	+	0	ID=cds_PF14_0743-1;Name=cds_PF14_0743-1;Note=.;size=72;Parent=rna_PF14_0743-1;gene_type=protein
+MAL14	test	CDS	3175764	3176393	.	+	0	ID=cds_PF14_0743-2;Name=cds_PF14_0743-2;Note=.;size=630;Parent=rna_PF14_0743-1;gene_type=protein
+MAL4	test	gene	1140213	1141012	.	+	.	ID=PFD1205w;Name=PFD1205w;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=800;web_id=PFD1205w;locus_tag=PFD1205w;size=800;Alias=MAL4P1.236;gene_type=protein;gene_type=protein
+MAL4	test	mRNA	1140213	1141012	.	+	.	ID=rna_PFD1205w-1;Name=PFD1205w-1;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=800;Parent=PFD1205w;Dbxref=ApiDB_PlasmoDB:PFD1205w,NCBI_gi:124505629,NCBI_gi:23498315,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:152:174:0,TMHMM:TM:195:217:0,SignalP4:SP:1:20:0.824
+MAL4	test	CDS	1140213	1140278	.	+	0	ID=cds_PFD1205w-1;Name=cds_PFD1205w-1;Note=.;size=66;Parent=rna_PFD1205w-1;gene_type=protein
+MAL4	test	CDS	1140386	1141012	.	+	0	ID=cds_PFD1205w-2;Name=cds_PFD1205w-2;Note=.;size=627;Parent=rna_PFD1205w-1;gene_type=protein
+MAL2	test	gene	847487	849117	.	+	.	ID=PFB0950w;Name=PFB0950w;Note=conserved Plasmodium+falciparum protein family;size=1631;web_id=PFB0950w;locus_tag=PFB0950w;size=1631;Alias=PF02_0197;gene_type=protein;gene_type=protein
+MAL2	test	mRNA	847487	849117	.	+	.	ID=rna_PFB0950w-1;Name=PFB0950w-1;Note=conserved Plasmodium+falciparum protein family;size=1631;Parent=PFB0950w;Ontology_term=GO:0016020;Dbxref=ApiDB_PlasmoDB:PFB0950w,NCBI_gi:124801495,NCBI_gi:23503445,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:163:185:0,TMHMM:TM:247:269:0,TMHMM:TM:273:295:0,SEG:LCR:191:256:0,PfamA25:DUF2078:272:299:4.4e-05,PfamA25:HemY_N:265:301:2.1e-05
+MAL2	test	CDS	847487	847563	.	+	0	ID=cds_PFB0950w-1;Name=cds_PFB0950w-1;Note=.;size=77;Parent=rna_PFB0950w-1;gene_type=protein
+MAL2	test	CDS	848271	849117	.	+	1	ID=cds_PFB0950w-2;Name=cds_PFB0950w-2;Note=.;size=847;Parent=rna_PFB0950w-1;gene_type=protein
+MAL2	test	gene	854964	855736	.	+	.	ID=PFB0953w;Name=PFB0953w;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=773;web_id=PFB0953w;locus_tag=PFB0953w;size=773;Alias=PF02_0198;gene_type=protein;gene_type=protein
+MAL2	test	mRNA	854964	855736	.	+	.	ID=rna_PFB0953w-1;Name=PFB0953w-1;Note=Plasmodium exported protein %28hyp15%29%2C unknown function;size=773;Parent=PFB0953w;Ontology_term=GO:0016021;Dbxref=ApiDB_PlasmoDB:PFB0953w,NCBI_gi:254688495,NCBI_gi:258596943,taxon:36329;gene_type=protein;protein_decorations=TMHMM:TM:157:179:0,TMHMM:TM:183:205:0,SignalP4:SP:1:50:0.619,exportpred:VTS:45:51:10.9462,PfamA25:DUF2207:102:205:2.4e-05
+MAL2	test	CDS	854964	855032	.	+	0	ID=cds_PFB0953w-1;Name=cds_PFB0953w-1;Note=.;size=69;Parent=rna_PFB0953w-1;gene_type=protein
+MAL2	test	CDS	855185	855736	.	+	0	ID=cds_PFB0953w-2;Name=cds_PFB0953w-2;Note=.;size=552;Parent=rna_PFB0953w-1;gene_type=protein

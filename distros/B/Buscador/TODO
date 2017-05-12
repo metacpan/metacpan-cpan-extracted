@@ -1,0 +1,42 @@
+* Browsing by other kinds of named entity                     -  X
+* Sort by date/person/subject - Delay until version 2         -  X
+
+* Rejig Email::Store::Date and date stuff                     - DONE
+* Create non braindead version of SQL::Translator             - DONE
+* Create Bundle                                               -  X
+* Use email addresses in the body to find NamedEntities       - DONE
+* Atom feed for entities                                      - DONE
+* Atom feed for threads                                       - DONE
+* Split into plugins with munging of parse_path - M:P:O       - DONE
+* Plugins should be able to affect setup of Email::Store::*   -  X
+* Central install and config file                             - DONE
+* Docs                                                        - half
+* Tests                                                       -  X
+
+
+
+* make sure that all attchments are clickable                 - DONE
+* show scrubbed html where appropriate                        - DONE
+* fix troublesome.mail                                        - DONE
+* make a good test suite of mails                             - DONE
+* make text/plain default body if no other available          - DONE
+
+
+* Voting                                                      - 
+* Download raw mbox                                           -
+* Arc threads                                                 - DONE (need to append ?filename=.svg)
+* Import LTJakes clean templates                              - DONE
+* Sort out images                                             -
+* Sort out ignore stuff                                       - DONE
+* Fix entities                                                -
+* Move content decoding into ::Attachment                     -
+* Add content disposition to ::Attachment                     -
+* Do something about inline html                              -
+* Make unicode bodies show up in Recent properly              - 
+* Make braindead browsers pick up filename properly           - DONE
+* have a good long think about HTML mails                     -
+  (inline images etc etc)
+
+
+
+

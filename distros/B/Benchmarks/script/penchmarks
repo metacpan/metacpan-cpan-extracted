@@ -1,0 +1,40 @@
+#!perl
+use strict;
+use warnings;
+
+my $file_path = shift or die 'require FILE_PATH arg.';
+
+{
+    if (-e $file_path) {
+        die "Already exists $file_path\n";
+    }
+
+    open my $fh, '>', $file_path or die $!;
+
+    print $fh <<'_BENCHMARK_';
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Benchmarks sub {
+
+    my $x = 2;
+
+    return +{
+        foo => sub {
+            $x*$x*$x*$x*$x;
+        },
+        bar => sub {
+            $x**5;
+        },
+    };
+};
+
+_BENCHMARK_
+
+    my $perm = (stat $fh)[2] & 07777;
+    chmod($perm | 0700, $fh) or die $!;
+
+    close $fh;
+
+    print "OK. Generated $file_path.";
+}

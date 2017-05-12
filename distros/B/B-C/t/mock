@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+# for p in perl$perlall; do perl$p t/mock --logdir=t/reports/1.28/r584 t/*.t; done
+#
+# Replay results from stored log files to test the result of the
+# current TODO status.
+#
+# Currently perl compiler tests are stored in two formats:
+#
+# 1. log.test-$arch-$perlversion
+#
+# 2. log.modules-$perlversion
+#
+# When running the Mock tests the actual tests are not executed,
+# instead the results from log file are used instead for the result of ok. 
+# A typical perl-compiler testrun lasts several hours, with Mock
+# several seconds.
+
+use strict;
+BEGIN {
+  unshift @INC, 't';
+}
+use Mock;
+use modules;
+
+my $X = $^X =~ m/\s/ ? qq{"$^X"} : $^X;
+unless (eval "require Test::Harness::Straps;") {
+  print "Installing Test::Harness::Straps via cpan...\n";
+  system("$X -S cpan Test::Harness::Straps");
+}
+
+my ($logdir) = grep /--logdir=(.+)/, @ARGV;
+my ($arch) = grep /--arch=(.+)/, @ARGV;
+$logdir = "." unless $logdir;
+my @mod = find_modules_report($logdir);
+my @tst = find_test_report($logdir, $arch);
+
+my @tests = @ARGV ? @ARGV : glob "t/*.t";
+for my $test (@tests) {
+  my $version = perlversion;
+  my @files = $test =~ /modules\.t/ ? @mod : @tst;
+  @files = () if $test =~ /issue34\.t/;  # ignore handmade test
+  @files = () if $test =~ /bytecode\.t/; # XXX make it into a sub from test.pl
+  for my $log (@files) {
+    #my $rpt = parse_report($_);
+    # XXX run mock test and use result
+    mock_harness($log, $test);
+  }
+}

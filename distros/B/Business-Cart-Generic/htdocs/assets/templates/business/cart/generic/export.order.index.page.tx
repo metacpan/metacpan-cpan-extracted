@@ -1,0 +1,19 @@
+<html>
+
+<head>
+
+<title>Orders</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="<: $css_url :>/web.page.css">
+
+</head>
+
+<body>
+
+<h3 class="blue_center">Orders</h3>
+
+: include "basic.table.tx" {border => $border, row => $row};
+
+</body>
+
+</html>

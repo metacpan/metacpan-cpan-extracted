@@ -1,0 +1,48 @@
+int16				T_IV
+uint16				T_IV
+int32				T_IV
+uint32				T_IV
+float32				T_NV
+b2Vec2 *			O_OBJECT
+b2Mat22 *			O_OBJECT
+b2World *			O_OBJECT
+b2Body *			O_OBJECT
+b2BodyDef *			O_OBJECT
+b2Shape	*			O_OBJECT
+b2PolygonShape *		O_OBJECT
+b2CircleShape *			O_OBJECT
+b2Filter *			O_OBJECT
+b2FixtureDef *			O_OBJECT
+b2Fixture *			O_OBJECT
+b2Transform *			O_OBJECT
+b2Joint *			O_OBJECT
+b2JointDef *			O_OBJECT
+b2DistanceJoint *		O_OBJECT
+b2DistanceJointDef *		O_OBJECT
+b2RevoluteJoint *		O_OBJECT
+b2RevoluteJointDef *		O_OBJECT
+b2PrismaticJoint *		O_OBJECT
+b2PrismaticJointDef *		O_OBJECT
+b2PulleyJoint *			O_OBJECT
+b2PulleyJointDef *		O_OBJECT
+b2GearJoint *			O_OBJECT
+b2GearJointDef *		O_OBJECT
+b2MouseJoint *			O_OBJECT
+b2MouseJointDef *		O_OBJECT
+b2LineJoint *			O_OBJECT
+b2LineJointDef *		O_OBJECT
+b2WeldJoint *			O_OBJECT
+b2WeldJointDef *		O_OBJECT
+b2FrictionJoint *		O_OBJECT
+b2FrictionJointDef *		O_OBJECT
+b2Manifold *			O_OBJECT
+PerlContactListener *		O_OBJECT
+b2ContactListener *		O_OBJECT
+b2Contact *			O_OBJECT
+b2ContactImpulse *		O_OBJECT
+b2RayCastInput *		O_OBJECT
+b2RayCastOutput *		O_OBJECT
+b2AABB *			O_OBJECT
+b2MassData *			O_OBJECT
+PerlRayCastCallback *		O_OBJECT
+b2RayCastCallback *		O_OBJECT

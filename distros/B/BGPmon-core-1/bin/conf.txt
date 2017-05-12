@@ -1,0 +1,6 @@
+debug = 1
+server = 129.82.138.26
+port = 50001
+log_file = log.log
+prefix_file = prefixes.txt
+output_file = output.txt

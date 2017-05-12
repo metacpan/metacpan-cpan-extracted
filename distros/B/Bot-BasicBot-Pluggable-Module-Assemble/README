@@ -1,0 +1,38 @@
+Bot::BasicBot::Pluggable::Module::Assemble - IRC frontend to Regexp::Assemble
+
+DESCRIPTION
+
+This module is a frontend to the excellent C<Regexp::Assemble> module
+which will let you get optimised regular expressions while chatting
+over IRC.
+
+
+    < you> bot: assemble ab+c ab+- a\w\d+ a\d+
+    < bot> a(?:\w?\d+|b+[-c])
+
+
+INSTALL
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Philippe 'BooK' Bruhat
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

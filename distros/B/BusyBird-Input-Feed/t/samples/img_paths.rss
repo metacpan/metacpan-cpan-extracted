@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0">
+<channel>
+ <title>Feed for testing img paths</title>
+ <link>http://example.com/</link>
+ <description></description>
+ <language>en</language>
+<item>
+ <title>link ends with non-slash</title>
+ <link>http://example.com/foo/bar/buzz.html</link>
+ <description>&lt;img src=&quot;relative/path.png&quot; /&gt; &lt; img src=&quot;/absolute/path.png&quot; /&gt;</description>
+ <pubDate>Sun, 14 Sep 2014 10:00:00 +0000</pubDate>
+ <guid isPermaLink="false">img_paths:02</guid>
+</item>
+<item>
+  <title>link ends with slash</title>
+  <link>http://example.com/foo/bar/</link>
+  <description>&lt;img src=&quot;relative/path.png&quot; /&gt; &lt; img src=&quot;/absolute/path.png&quot; /&gt;</description>
+  <pubDate>Sun, 14 Sep 2014 09:00:00 +0000</pubDate>
+  <guid isPermalink="false">img_paths:01</guid>
+</item>
+</channel>
+</rss>

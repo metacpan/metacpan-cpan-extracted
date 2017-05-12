@@ -1,0 +1,14 @@
+v0.2.2
+    - Add a LICENSE section - Kwalitee.
+    - Minimal version of perl (5.008) - Kwalitee.
+    - Move under lib/Bundle/GimpTest.pm .
+    - Convert to Build.PL.
+
+v0.2.1  2013-12-23
+    - Fix compilation problems.
+    - add t/00-load.t .
+    - add t/pod.t .
+
+v0.2.0  2005-02-21
+    - First release.
+

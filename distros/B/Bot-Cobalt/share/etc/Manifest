@@ -1,0 +1,14 @@
+auth.conf ^ 4d9ab9705de53ae4c83392837f321983
+channels.conf ^ 15960084e4337e8779efeba3defa6862
+langs ^ DIR
+cobalt.conf ^ 18191c17d044bfbf0a7471d9edad24ef
+plugins.conf ^ 69c3e0024652c379852469bfba3acd2b
+plugins ^ DIR
+multiserv.conf ^ 88009eb03debb08713386b64603b1d0b
+langs/english.yml ^ b7d3b3f3f5cb7b974884086f9b6ca4e2
+langs/ebonics.yml ^ f7d622a3032e6bf4ad59a1b4fe62fdaf
+plugins/relay.conf ^ fa3631e1341cc8e4dc6e8eeda61a06b4
+plugins/info3.conf ^ 61e38fc3e703f5ce079af6e09c7d1245
+plugins/www.conf ^ 0384db815f5a06d1d007ee9e1bf3798c
+plugins/games.conf ^ 09fdd21605da7740ec9014023f5566d1
+plugins/rdb.conf ^ 5ba4f8a8972c14b3208c20119becad0e

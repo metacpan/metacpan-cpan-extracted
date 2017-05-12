@@ -1,0 +1,46 @@
+---
+abstract: 'A simple wrapper around the python Gemini library for annotating VCF files.'
+author:
+  - 'Jillian Rowe <jillian.e.rowe@gmail.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BioX-Wrapper-Gemini
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  BioX::Wrapper: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::FindLib: '0'
+  File::Path: '0'
+  List::Compare: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  MooseX::Getopt::Meta::Attribute::NoGetopt: '0'
+  MooseX::Getopt::Usage: '0'
+  MooseX::Getopt::Usage::Role::Man: '0'
+resources:
+  bugtracker: https://bitbucket.org/jir2004/biox-wrapper-gemini/issues
+  homepage: https://bitbucket.org/jir2004/biox-wrapper-gemini
+  repository: git://git@bitbucket.org:jir2004/biox-wrapper-gemini.git
+version: '0.05'
+x_contributors:
+  - 'Jillian Rowe <jir2004@qatar-med.cornell.edu>'

@@ -1,0 +1,14 @@
+Revision history for Perl module PBib and the PBib distribution.
+
+(I fear this file won't contain much usefull information until
+I set up a issue tracking tool for PBib ... --Peter)
+
+2.08.01
+	Some bugfixes, minor improvements, a wee bit more documentation
+
+2.08
+	first version deployed at CPAN
+
+1.0
+	Initial version
+	

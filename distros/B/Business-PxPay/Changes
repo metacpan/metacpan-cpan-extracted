@@ -1,0 +1,14 @@
+Revision history for Business-PxPay
+
+0.04    2011.07.19
+        API URL changed to https://sec.paymentexpress.com/pxpay/pxaccess.aspx
+
+0.03    2010.01.29
+        use www.paymentexpress.com by default
+
+0.02    2009.11.18
+        bug fix
+
+0.01    2009.11.17
+        First version, released on an unsuspecting world.
+

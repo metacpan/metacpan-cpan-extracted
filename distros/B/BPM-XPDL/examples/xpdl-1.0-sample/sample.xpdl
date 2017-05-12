@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<Package xmlns="http://www.wfmc.org/2002/XPDL1.0" xmlns:xpdl="http://www.wfmc.org/2002/XPDL1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xyz="http://www.xyzeorder.com/workflow" xsi:schemaLocation="http://www.wfmc.org/2002/XPDL1.0 http://wfmc.org/standards/docs/TC-1025_schema_10_xpdl.xsd" Id="0" Name="sample workflow process">
+   <PackageHeader>
+      <XPDLVersion>0.09</XPDLVersion>
+      <Vendor>XYZ, Inc</Vendor>
+      <Created>6/18/2002 5:27:17 PM</Created>
+   </PackageHeader>
+   <ConformanceClass GraphConformance="NON_BLOCKED"/>
+   <Script Type="text/javascript"/>
+   <TypeDeclarations>
+      <TypeDeclaration Id="Order" Name="Order">
+         <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd"/>
+      </TypeDeclaration>
+      <TypeDeclaration Id="CreditInfo" Name="CreditInfo">
+         <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="CreditInfo"/>
+      </TypeDeclaration>
+      <TypeDeclaration Id="CardType" Name="CardType">
+         <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd" xref="cardType" namespace="orderschema/Order"/>
+      </TypeDeclaration>
+      <TypeDeclaration Id="OrderStatus" Name="OrderStatus">
+         <SchemaType>
+            <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+               <xsd:element name="Status">
+                  <xsd:simpleType>
+                     <xsd:restriction base="xsd:NMTOKEN">
+                        <xsd:enumeration value="ValidData"/>
+                        <xsd:enumeration value="InvalidData"/>
+                        <xsd:enumeration value="Accept"/>
+                        <xsd:enumeration value="BadCredit"/>
+                        <xsd:enumeration value="OverLimit"/>
+                        <xsd:enumeration value="BadDataFormat"/>
+                     </xsd:restriction>
+                  </xsd:simpleType>
+               </xsd:element>
+            </xsd:schema>
+         </SchemaType>
+      </TypeDeclaration>
+   </TypeDeclarations>
+   <Participants>
+      <Participant Id="DBConnection">
+         <ParticipantType Type="SYSTEM"/>
+         <Description>Reference to Database Resource</Description>
+      </Participant>
+   </Participants>
+   <Applications/>
+   <DataFields/>
+   <WorkflowProcesses>
+      <WorkflowProcess Id="1" Name="EOrder" AccessLevel="PUBLIC">
+         <ProcessHeader/>
+         <FormalParameters>
+            <FormalParameter Id="orderString" Index="1" Mode="IN">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+            </FormalParameter>
+            <FormalParameter Id="returnMessage" Index="2" Mode="OUT">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+            </FormalParameter>
+         </FormalParameters>
+         <DataFields>
+            <DataField Id="orderNumber" IsArray="FALSE">
+               <DataType>
+                  <BasicType Type="INTEGER"/>
+               </DataType>
+               <InitialValue>0</InitialValue>
+               <Length>0</Length>
+            </DataField>
+            <DataField Id="status" IsArray="FALSE">
+               <DataType>
+                  <DeclaredType Id="OrderStatus"/>
+               </DataType>
+            </DataField>
+            <DataField Id="orderInfo" IsArray="FALSE">
+               <DataType>
+                  <DeclaredType Id="Order"/>
+               </DataType>
+            </DataField>
+         </DataFields>
+         <Participants/>
+         <Applications>
+            <Application Id="transformData">
+               <FormalParameters>
+                  <FormalParameter Id="orderStringIn" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="STRING"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="orderInfo" Index="2" Mode="OUT">
+                     <DataType>
+                        <DeclaredType Id="Order"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="checkData">
+               <FormalParameters>
+                  <FormalParameter Id="orderInfo" Index="1" Mode="IN">
+                     <DataType>
+                        <DeclaredType Id="Order"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="statusOut" Index="2" Mode="OUT">
+                     <DataType>
+                        <DeclaredType Id="OrderStatus"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="checkVendor">
+               <FormalParameters>
+                  <FormalParameter Id="accountNumberIn" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="amountIn" Index="2" Mode="IN">
+                     <DataType>
+                        <BasicType Type="FLOAT"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="statusOut" Index="3" Mode="OUT">
+                     <DataType>
+                        <DeclaredType Id="OrderStatus"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="enterOrder">
+               <FormalParameters>
+                  <FormalParameter Id="orderInfoIn" Index="1" Mode="IN">
+                     <DataType>
+                        <DeclaredType Id="Order"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="orderNumber" Index="2" Mode="OUT">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="composeMessage">
+               <FormalParameters>
+                  <FormalParameter Id="statusIn" Index="1" Mode="IN">
+                     <DataType>
+                        <DeclaredType Id="OrderStatus"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="orderNumber" Index="2" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+         </Applications>
+         <Activities>
+            <Activity Id="1" Name="Check Data">
+               <Implementation>
+                  <Tool Id="checkData" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderInfo</ActualParameter>
+                        <ActualParameter>status</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="22"/>
+                           <TransitionRef Id="23"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="183" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="5">
+               <Route/>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="35" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="6">
+               <Route/>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Join Type="XOR"/>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="755" ypos="315"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="8" Name="Email Confirmation">
+               <Implementation>
+                  <No/>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="657" ypos="312"/>
+                  </ExtendedAttribute>
+                  <ExtendedAttribute Name="SystemActivity" Value="Email"/>
+                  <ExtendedAttribute Name="Email">
+                     <xyz:Email to="%%orderInfo.emailAddress" subject="Order %%orderNumber">
+                        <xyz:MessageText>Order number %%orderNumber is being processed. Thank-you for ordering from PQR Products, Inc</xyz:MessageText>
+                     </xyz:Email>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="9">
+               <Route/>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="AND">
+                        <TransitionRefs>
+                           <TransitionRef Id="1"/>
+                           <TransitionRef Id="38"/>
+                           <TransitionRef Id="2"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="572" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="10" Name="Check Credit Subprocess">
+               <Implementation>
+                  <SubFlow Id="3" Execution="SYNCHR">
+                     <ActualParameters/>
+                  </SubFlow>
+               </Implementation>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="26"/>
+                           <TransitionRef Id="31"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="381" ypos="535"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="11" Name="Fill Order
+Subprocess">
+               <Implementation>
+                  <SubFlow Id="2" Execution="ASYNCHR">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>orderInfo.orderType</ActualParameter>
+                        <ActualParameter>orderInfo.emailAddress</ActualParameter>
+                     </ActualParameters>
+                  </SubFlow>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="653" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="12" Name="Check Order Type">
+               <Route/>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="24"/>
+                           <TransitionRef Id="25"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="293" ypos="460"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="17" Name="Transform Data">
+               <Implementation>
+                  <Tool Id="transformData" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderString</ActualParameter>
+                        <ActualParameter>orderInfo</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="40"/>
+                           <TransitionRef Id="21"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="102" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="32" Name="Enter Order">
+               <Implementation>
+                  <Tool Id="enterOrder" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderInfo</ActualParameter>
+                        <ActualParameter>orderNumber</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Join Type="XOR"/>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="510" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="33">
+               <Route/>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Join Type="AND"/>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="725" ypos="391"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="39" Name="Compose RejectionMessage">
+               <Implementation>
+                  <Tool Id="composeMessage" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>-1</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Join Type="XOR"/>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="655" ypos="245"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="41" Name="Check Vendor Account">
+               <Implementation>
+                  <Tool Id="checkVendor" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderInfo.AccountNumber</ActualParameter>
+                        <ActualParameter>orderInfo.ToltalAmount</ActualParameter>
+                        <ActualParameter>status</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="27"/>
+                           <TransitionRef Id="30"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="381" ypos="316"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="56" Name="Compose Acceptance Message">
+               <Implementation>
+                  <Tool Id="composeMessage" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>status</ActualParameter>
+                        <ActualParameter>orderNumber</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="653" ypos="462"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="58" Name="Raise Alarm">
+               <Implementation>
+                  <No/>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="100" ypos="250"/>
+                  </ExtendedAttribute>
+                  <ExtendedAttribute Name="SystemActivity" Value="Alarm"/>
+               </ExtendedAttributes>
+            </Activity>
+         </Activities>
+         <Transitions>
+            <Transition Id="1" From="9" To="8"/>
+            <Transition Id="2" From="9" To="11"/>
+            <Transition Id="16" From="11" To="33"/>
+            <Transition Id="17" From="8" To="33">
+               <Condition Type="OTHERWISE"/>
+            </Transition>
+            <Transition Id="18" From="33" To="6"/>
+            <Transition Id="20" From="5" To="17"/>
+            <Transition Id="21" From="17" To="1"/>
+            <Transition Id="22" From="1" To="12">
+               <Condition>status == "Valid Data"</Condition>
+            </Transition>
+            <Transition Id="23" From="1" To="39">
+               <Condition>status == "Invalid Data"</Condition>
+            </Transition>
+            <Transition Id="24" From="12" To="10">
+               <Condition>orderType == "Credit"</Condition>
+            </Transition>
+            <Transition Id="25" From="12" To="41">
+               <Condition>orderType == "PO"</Condition>
+            </Transition>
+            <Transition Id="26" From="10" To="32">
+               <Condition>status == "Accept"</Condition>
+            </Transition>
+            <Transition Id="27" From="41" To="32">
+               <Condition>status == "Accept"</Condition>
+            </Transition>
+            <Transition Id="28" From="32" To="9"/>
+            <Transition Id="29" From="39" To="6"/>
+            <Transition Id="30" From="41" To="39">
+               <Condition>status == "OverLimit"</Condition>
+            </Transition>
+            <Transition Id="31" From="10" To="39">
+               <Condition>status == "BadCredit"</Condition>
+            </Transition>
+            <Transition Id="38" From="9" To="56"/>
+            <Transition Id="39" From="56" To="33"/>
+            <Transition Id="40" From="17" To="58">
+               <Condition Type="EXCEPTION"/>
+            </Transition>
+            <Transition Id="42" From="58" To="39"/>
+         </Transitions>
+      </WorkflowProcess>
+      <WorkflowProcess Id="2" Name="FillOrder" AccessLevel="PRIVATE">
+         <ProcessHeader/>
+         <FormalParameters>
+            <FormalParameter Id="orderNumber" Index="1" Mode="IN">
+               <DataType>
+                  <BasicType Type="INTEGER"/>
+               </DataType>
+               <Description>Order number assigned to the order.</Description>
+            </FormalParameter>
+            <FormalParameter Id="orderType" Index="1" Mode="IN">
+               <DataType>
+                  <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd" xref="orderType" namespace="orderschema/Order"/>
+               </DataType>
+            </FormalParameter>
+            <FormalParameter Id="emailAddress" Index="1" Mode="IN">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+            </FormalParameter>
+         </FormalParameters>
+         <DataFields>
+            <DataField Id="docURI" IsArray="FALSE">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+               <Description>URI of receipt or invoice.</Description>
+            </DataField>
+            <DataField Id="orderStatus" IsArray="FALSE">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+            </DataField>
+            <DataField Id="creditInfo" IsArray="FALSE">
+               <DataType>
+                  <DeclaredType Id="CreditInfo"/>
+               </DataType>
+            </DataField>
+            <DataField Id="creditStatus" IsArray="FALSE">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+            </DataField>
+         </DataFields>
+         <Participants>
+            <Participant Id="Shipper">
+               <ParticipantType Type="ROLE"/>
+               <Description>Order shipper</Description>
+            </Participant>
+         </Participants>
+         <Applications>
+            <Application Id="shipOrder">
+               <Description>This application presents a screen that presents order information for the order identified by shipOrder. The user may update the order with any changes such as back order information. It returns a string indicating whether the order is complete or on back order.</Description>
+               <FormalParameters>
+                  <FormalParameter Id="OrderNumberParam" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="Status" Index="2" Mode="OUT">
+                     <DataType>
+                        <BasicType Type="STRING"/>
+                     </DataType>
+                     <Description>The String that describes the status -- either "Complete" or "Backorder"</Description>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="charge">
+               <Description>Charges the credit card and prepares a receipt for a credit order</Description>
+               <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="ChargeCreditAccount"/>
+            </Application>
+            <Application Id="billAccount">
+               <Description>Bills the vendor account</Description>
+               <FormalParameters>
+                  <FormalParameter Id="orderNumberParam" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="createInvoice">
+               <Description>Creates an invoice using the order information and stores it on a server.</Description>
+               <FormalParameters>
+                  <FormalParameter Id="orderNumber" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="docURI" Index="2" Mode="OUT">
+                     <DataType>
+                        <BasicType Type="STRING"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="createReceipt">
+               <Description>Creates a receiptusing the order information and stores it on a server.</Description>
+               <FormalParameters>
+                  <FormalParameter Id="orderNumber" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="docURI" Index="2" Mode="OUT">
+                     <DataType>
+                        <BasicType Type="STRING"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="cancelOrder">
+               <FormalParameters>
+                  <FormalParameter Id="orderNumberIn" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+         </Applications>
+         <Activities>
+            <Activity Id="21">
+               <Route/>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="62" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="22" Name="Billing">
+               <Implementation>
+                  <Tool Id="billAccount" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="347" ypos="435"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="23" Name="Charge Credit Card">
+               <Implementation>
+                  <No/>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="SystemActivity" Value="WebService"/>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="386" ypos="338"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="30">
+               <Route/>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="613" ypos="389"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="31" Name="email Receipt or Invoice">
+               <Implementation>
+                  <No/>
+               </Implementation>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Join Type="XOR"/>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="430" ypos="385"/>
+                  </ExtendedAttribute>
+                  <ExtendedAttribute Name="SystemActivity" Value="Email"/>
+                  <ExtendedAttribute Name="Email">
+                     <xyz:Email to="%%emailAddress" subject="%%orderStatus">
+                        <xyz:Attachments>
+                           <xyz:Attachment>%%docURI</xyz:Attachment>
+                        </xyz:Attachments>
+                        <xyz:MessageText>Order number %%orderNumber is %%orderStatus. Thank-you for ordering from PQR Products, Inc.</xyz:MessageText>
+                     </xyz:Email>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="36" Name="Ship Order">
+               <Description>View order and enter fulfillment info</Description>
+               <Implementation>
+                  <Tool Id="shipOrder" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>orderStatus</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection and Shipper</Performer>
+               <Deadline Execution="ASYNCHR">
+                  <DeadlineCondition>3 days</DeadlineCondition>
+                  <ExceptionName>notifyException</ExceptionName>
+               </Deadline>
+               <Deadline Execution="SYNCHR">
+                  <DeadlineCondition>5 days</DeadlineCondition>
+                  <ExceptionName>timeoutException</ExceptionName>
+               </Deadline>
+               <TransitionRestrictions>
+                  <TransitionRestriction>
+                     <Split Type="XOR">
+                        <TransitionRefs>
+                           <TransitionRef Id="11"/>
+                           <TransitionRef Id="10"/>
+                           <TransitionRef Id="49"/>
+                           <TransitionRef Id="50"/>
+                        </TransitionRefs>
+                     </Split>
+                  </TransitionRestriction>
+               </TransitionRestrictions>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="133" ypos="386"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="59" Name="Get Credit Info">
+               <Implementation>
+                  <Tool Id="getCreditInfo" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>creditInfo</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="311" ypos="338"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="60" Name="Create Invoice">
+               <Implementation>
+                  <Tool Id="createInvoice" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>docUri</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="460" ypos="435"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="61" Name="Create Receipt">
+               <Implementation>
+                  <Tool Id="createReceipt" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                        <ActualParameter>docUri</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="461" ypos="338"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="63" Name="Raise Alarm">
+               <Implementation>
+                  <No/>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="83" ypos="271"/>
+                  </ExtendedAttribute>
+                  <ExtendedAttribute Name="SystemActivity" Value="Alarm"/>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="64" Name="Cancel Order">
+               <Description>View order and enter fulfillment info</Description>
+               <Implementation>
+                  <Tool Id="cancelOrder" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>orderNumber</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="174" ypos="271"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+         </Activities>
+         <Transitions>
+            <Transition Id="8" From="21" To="36"/>
+            <Transition Id="10" From="36" To="22">
+               <Condition>orderType == "PO"</Condition>
+            </Transition>
+            <Transition Id="11" From="36" To="59">
+               <Condition>orderType == "Credit"</Condition>
+            </Transition>
+            <Transition Id="13" From="60" To="31"/>
+            <Transition Id="14" From="61" To="31"/>
+            <Transition Id="15" From="31" To="30"/>
+            <Transition Id="43" From="59" To="23"/>
+            <Transition Id="44" From="23" To="61"/>
+            <Transition Id="45" From="22" To="60"/>
+            <Transition Id="49" From="36" To="63">
+               <Condition>notifyException</Condition>
+            </Transition>
+            <Transition Id="50" From="36" To="64">
+               <Condition>timeoutException</Condition>
+            </Transition>
+            <Transition Id="51" From="64" To="30"/>
+         </Transitions>
+      </WorkflowProcess>
+      <WorkflowProcess Id="3" Name="CreditCheck" AccessLevel="PRIVATE">
+         <ProcessHeader/>
+         <FormalParameters>
+            <FormalParameter Id="accountNumber" Index="1" Mode="IN">
+               <DataType>
+                  <BasicType Type="INTEGER"/>
+               </DataType>
+            </FormalParameter>
+            <FormalParameter Id="amount" Index="2" Mode="IN">
+               <DataType>
+                  <BasicType Type="FLOAT"/>
+               </DataType>
+            </FormalParameter>
+            <FormalParameter Id="cardType" Index="4" Mode="IN">
+               <DataType>
+                  <DeclaredType Id="CardType"/>
+               </DataType>
+            </FormalParameter>
+            <FormalParameter Id="status" Index="3" Mode="OUT">
+               <DataType>
+                  <DeclaredType Id="OrderStatus"/>
+               </DataType>
+            </FormalParameter>
+         </FormalParameters>
+         <DataFields>
+            <DataField Id="creditStatus" IsArray="FALSE">
+               <DataType>
+                  <BasicType Type="STRING"/>
+               </DataType>
+               <Length>0</Length>
+            </DataField>
+         </DataFields>
+         <Participants/>
+         <Applications>
+            <Application Id="setCreditInfo">
+               <Description>Creates and initializes a CreditInfo object.</Description>
+               <FormalParameters>
+                  <FormalParameter Id="accountNumber" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="INTEGER"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="amount" Index="2" Mode="IN">
+                     <DataType>
+                        <BasicType Type="FLOAT"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="cardType" Index="3" Mode="IN">
+                     <DataType>
+                        <DeclaredType Id="CardType"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="creditInfo" Index="4" Mode="OUT">
+                     <DataType>
+                        <DeclaredType Id="CreditInfo"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+            <Application Id="getCreditAuthorization">
+               <Description>Gets credit authorization from a charge card web service.</Description>
+               <ExternalReference location="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xref="GetCreditAuthorization"/>
+            </Application>
+            <Application Id="setOrderStatus">
+               <Description>Converts status returned by credit check to OrderStatus.</Description>
+               <FormalParameters>
+                  <FormalParameter Id="creditStatus" Index="1" Mode="IN">
+                     <DataType>
+                        <BasicType Type="STRING"/>
+                     </DataType>
+                  </FormalParameter>
+                  <FormalParameter Id="orderStatus" Index="2" Mode="OUT">
+                     <DataType>
+                        <DeclaredType Id="OrderStatus"/>
+                     </DataType>
+                  </FormalParameter>
+               </FormalParameters>
+            </Application>
+         </Applications>
+         <Activities>
+            <Activity Id="48">
+               <Route/>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="61" ypos="395"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="49" Name="Set Credit Info">
+               <Implementation>
+                  <Tool Id="setCreditInfo" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>accountNumber</ActualParameter>
+                        <ActualParameter>amount</ActualParameter>
+                        <ActualParameter>cardType</ActualParameter>
+                        <ActualParameter>creditInfo</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <Performer>DBConnection</Performer>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="151" ypos="394"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="50" Name="Get Credit Authorization">
+               <Implementation>
+                  <Tool Id="getCreditAuthorization" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>creditInfo</ActualParameter>
+                        <ActualParameter>creditStatus</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="SystemActivity" Value="WebService"/>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="253" ypos="394"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="52">
+               <Route/>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="444" ypos="397"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+            <Activity Id="62" Name="Set Order Status">
+               <Implementation>
+                  <Tool Id="setOrderStatus" Type="APPLICATION">
+                     <ActualParameters>
+                        <ActualParameter>creditStatus</ActualParameter>
+                        <ActualParameter>status</ActualParameter>
+                     </ActualParameters>
+                  </Tool>
+               </Implementation>
+               <ExtendedAttributes>
+                  <ExtendedAttribute Name="Coordinates">
+                     <xyz:Coordinates xpos="361" ypos="394"/>
+                  </ExtendedAttribute>
+               </ExtendedAttributes>
+            </Activity>
+         </Activities>
+         <Transitions>
+            <Transition Id="35" From="50" To="62"/>
+            <Transition Id="46" From="48" To="49"/>
+            <Transition Id="47" From="49" To="50"/>
+            <Transition Id="48" From="62" To="52"/>
+         </Transitions>
+      </WorkflowProcess>
+   </WorkflowProcesses>
+</Package>

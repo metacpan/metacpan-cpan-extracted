@@ -1,0 +1,36 @@
+# Change log for Perl module Biblio-COUNTER
+
+# This file is in YAML format; see <URL:http://www.yaml.org/>
+# for more information
+
+- date: 2009-02-16
+  version: 0.11
+  changes:
+    - Biblio:COUNTER::Processor::Validate now prints (corrected) report to standard output, as documented
+    - hence counterproc -c works as documented
+
+- date: 2009-02-16
+  version: 0.10
+  changes:
+    - Biblio::COUNTER::Processor::run() now correctly returns the report object
+    - We required Exporter 5.59 without saying so; don't require it at all (RT #42952)
+
+- date: 2009-01-27
+  version: 0.09
+  changes:
+    - more documentation
+
+- date: 2008-11-17
+  changes:
+    - added Biblio::COUNTER::Processor::Atomize
+
+- date: 2008-11-10
+  changes:
+    - counterproc: added documentation and the usual script stuff
+    - added simple processor
+    - added POD coverage tests (many should fail)
+
+- date: 2008-11-06
+  version: 0.08
+  note: first public release
+

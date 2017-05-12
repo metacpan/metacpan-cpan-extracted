@@ -1,0 +1,16 @@
+#NEXUS
+[This file is based on the 'Unaligned Block' example (maddison et al., 1997) on p.605, left column]
+
+BEGIN TAXA;
+  dimensions ntax = 4;
+  taxlabels taxon_1 taxon_2 taxon_3 taxon_4;
+END;
+
+BEGIN UNALIGNED;
+  format datatype=DNA;
+  matrix
+    taxon_1 ACTAGGACTAGATCAAGTT
+    taxon_2 ACCAGGACTAGCGGATCAAG
+    taxon_3 ACCAGGACTAGATCAAG
+    taxon_4 AGCCAGGACTAGTTC;
+END;

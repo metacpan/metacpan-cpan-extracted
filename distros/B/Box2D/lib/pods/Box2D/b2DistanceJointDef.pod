@@ -1,0 +1,155 @@
+
+=head1 NAME
+
+Box2D::b2DistanceJointDef - Distance joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2DistanceJointDef->new();
+  $joint_def->Initialize( $body_a, $body_b, $anchor_a, $anchor_b );
+  $joint_def->length( $length );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Distance joint definition. This requires defining an anchor point on
+both bodies and the non-zero length of the distance joint. The
+definition uses local anchor points so that the initial configuration
+can violate the constraint slightly. This helps when saving and loading
+a game.
+
+Warning: Do not use a zero or short length.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2DistanceJointDef>
+
+=head2 Initialize( $bodyA, $bodyB, $anchorA, $anchorB )
+
+Initialize the bodies, anchors, and length using the world anchors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body> C<$bodyA>
+
+=item * C<Box2D::b2Body> C<$bodyB>
+
+=item * C<Box2D::b2Vec2> C<$anchorA>
+
+=item * C<Box2D::b2Vec2> C<$anchorB>
+
+=back
+
+=head2 dampingRatio()
+
+=head2 dampingRatio( $dampingRatio )
+
+The damping ratio. 0 = no damping, 1 = critical damping.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$dampingRatio> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 frequencyHz()
+
+=head2 frequencyHz( $frequencyHz )
+
+The mass-spring-damper frequency in Hertz.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$frequencyHz> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 length()
+
+=head2 length( $length )
+
+The natural length between the anchor points.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$length> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 localAnchorA()
+
+=head2 localAnchorA( $localAnchorA )
+
+The local anchor point relative to body1's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localAnchorB()
+
+=head2 localAnchorB( $localAnchorB )
+
+The local anchor point relative to body2's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2DistanceJoint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

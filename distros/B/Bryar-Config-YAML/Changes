@@ -1,0 +1,15 @@
+Revision history for Bryar-Config-YAML
+
+0.103   2009-01-16
+        add repo link to metadata
+
+0.102   2007-11-19
+        switch from YAML.pm to YAML::Syck
+        add YAML to prereq
+
+0.101   2006-11-10
+        packaging and formatting changes
+
+0.10    2004-10-22 21:45
+				ready for release, long in use against personal bryar branch
+

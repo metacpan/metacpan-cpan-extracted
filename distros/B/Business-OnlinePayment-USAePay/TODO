@@ -1,0 +1,4 @@
+- http://wiki.usaepay.com/developer/transactionapi
+ver. 2.13.3 -> 2.13.5:
+  UMhash replaces UMmd5Hash and UMmd5key variables. UMmd5Hash & UMmd5key remain under legacy support.
+

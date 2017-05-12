@@ -1,0 +1,37 @@
+Revision history for Bio::GeneDesign
+
+5.52 14.02.18
+	Updated RSCU table names, added compatibility sugar for upcoming GUI release
+
+5.52 13.10.30
+	Fixed a problem where tests fail on systems that have never had GeneDesign installed
+
+5.51 13.10.22
+	Used Module::Build prompt to avoid breaking automated tests
+
+5.50 13.10.21
+	Took out all segmentation (building block and oligo design) and removed to
+	a separate package.
+
+5.00  12.05.12
+  Added an OO interface for GeneDesign
+  updated every library, they are no longer called directly
+  Dropped support (for now) for building block design for USER or restricition
+    enzyme assembly
+
+3.05	12.01.11
+	Added unit tests for many functions, slight rearrangement of locations
+	Started making objects - RestrictionEnzyme object, inherits Bio::Root::Root
+	
+3.04	11.12.28
+	Took out hard coded codon tables and added codon parsing functions in their place
+	Added configure_GeneDesign to create a hashref of GD configuration options
+
+3.03    11.12.02
+	Added POD coverage to naked private functions, cleaned some POD
+
+3.01	11.11.28
+	Corrected RestrictionEnzymes.pm to properly import Basic functions
+
+3.00    11.11.28
+    Third version added to cpan and bitbucket

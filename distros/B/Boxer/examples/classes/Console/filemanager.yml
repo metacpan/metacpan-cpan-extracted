@@ -1,0 +1,8 @@
+classes:
+  - cli.mc
+  - Console
+parameters:
+  doc:
+    console:
+      pkg:
+        - install console file manager Midnight Commander

@@ -1,0 +1,6 @@
+Error messages I've seen and what it turned out to be:
+
+
+Can't store CODE items
+	Somewhere Storable is trying to do something with a code ref. Look
+	for uses of dclone or other Storable functions.

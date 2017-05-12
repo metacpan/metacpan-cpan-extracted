@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+
+<!-- Jean-Christophe Kermagoret (jck@BabelObjects.Org) -->
+
+<!DOCTYPE bo [
+
+<!-- ## Part 1 : Modify the values below to suit your needs -->
+
+  <!ENTITY bo_cache_conf "/var/cache/babelobjects/conf/bo-java-module-mail-ezmail" >
+  <!ENTITY smtphost "smtp.babelobjects.org" >
+  <!ENTITY mailhost "mail.babelobjects.org" >
+  <!ENTITY maildomain "BabelObjects.Org" >
+  <!ENTITY server "www.babelobjects.org" >
+  <!ENTITY serverName "www.babelobjects.org" >
+  <!ENTITY serverAdmin "webmaster@babelobjects.org" >
+  <!ENTITY documentRoot "/opt/www/babelobjects" >
+  <!ENTITY ipAddress "#" >
+
+  <!ENTITY conf_dir "/usr/local/babelobjects/conf" >
+
+<!-- ###################################################### -->
+
+]>
+
+<bo>
+
+  <download>
+    <parameter>
+        <cfg>/var/cache/babelobjects/conf</cfg>
+    </parameter>
+    <parameter>
+        <host>ftp.babelo.org</host>
+    </parameter>
+    <parameter>
+        <login>anonymous</login>
+    </parameter>
+    <parameter>
+        <passwd>''</passwd>
+    </parameter>
+    <parameter>
+        <cache_dir>/var/cache/babelobjects</cache_dir>
+    </parameter>
+    <parameter>
+        <bo_cache_conf>&bo_cache_conf;</bo_cache_conf>
+    </parameter>
+    <parameter>
+        <loglevel>''</loglevel>
+    </parameter>
+  </download>
+
+<!-- ## Do not modify this one !! You have been warned ! -->
+
+  <classes>
+      <parameter>
+         <configurator>BabelObjects::Component::Data::Configurator</configurator>
+      </parameter>
+  </classes>
+
+<!-- ###################################################### -->
+
+  <rpms>
+<!--
+     ## Rpms list needed for EzMail to run.
+     ##
+     ## You can modify this list if you already have some
+     ## packages. Nevertheless, be careful to reproduce the
+     ## same context for EzMail to run : PATH, CLASSPATH, ...
+     ##
+     ## You should use defaults settings the first time you
+     ## run EzMail
+-->
+    <!-- <rpm>java-blackdown-1.3-4.i686.rpm</rpm> -->
+    <rpm>RedHat/kaffe-1.0.6-1.i386.rpm</rpm>
+    <rpm>java-ext-opensource-1.0-3.i686.rpm</rpm>
+    <rpm>java-jakarta-3.1-3.i686.rpm</rpm>
+    <rpm>bo-java-runner-1.0-1.i686.rpm</rpm>
+    <rpm>bo-java-module-mail-ezmail-1.0-1.i686.rpm</rpm>
+    <rpm>bo-html-mail-ezmail-1.0-1.i686.rpm</rpm>
+  </rpms>
+
+<!-- ###################################################### -->
+
+  <services>
+<!--
+     ## BACKUP files specified in conf tags because they will
+     ## be overwritten.
+     ## 
+     ## Browse files specified in default tags and look for 
+     ## $(CONFIGURATOR.PARAMETER). It will be replaced by the
+     ## value of the parameter tag according the service value.
+     ##
+     ## You should use defaults settings the first time you
+     ## run EzMail
+-->
+    <service>ezmail</service>
+    <service>apache</service>
+    <service>jakarta</service>
+  </services>
+
+  <apache>
+    <file>
+        <default>&bo_cache_conf;/apache/httpd.conf.default</default>
+        <conf>/usr/local/apache/conf/httpd.conf</conf>
+    </file>
+<!--
+    <parameter>
+        <loadmodule>
+            LoadModule perl_module        libexec/libperl.so
+            LoadModule php4_module        libexec/libphp4.so
+            LoadModule speling_module     libexec/mod_speling.so
+            PerlModule Apache::DBI
+            CheckSpelling on
+        </loadmodule>
+    </parameter>
+-->
+    <parameter>
+        <loadmodule>#</loadmodule>
+    </parameter>
+    <parameter>
+        <tomcat>Include /usr/local/babelobjects/conf/tomcat-bo.conf</tomcat>
+    </parameter>
+    <parameter>
+        <user>nobody</user>
+    </parameter>
+    <parameter>
+        <group>nobody</group>
+    </parameter>
+    <parameter>
+        <serveradmin>&serverAdmin;</serveradmin>
+    </parameter>
+    <parameter>
+        <servername>&serverName;</servername>
+    </parameter>
+    <parameter>
+        <documentroot>&documentRoot;</documentroot>
+    </parameter>
+    <parameter>
+        <indexlist>index.php index.php3 index.bo index.html Index.php Index.php3 Index.bo Index.html</indexlist>
+    </parameter>
+    <parameter>
+        <addtype>#</addtype>
+    </parameter>
+    <parameter>
+        <namevirtualhost>&ipAddress; #</namevirtualhost>
+    </parameter>
+    <parameter>
+        <virtualhosts>
+         # Configuration d'un serveur web virtuel pour Pleiad
+         &lt;VirtualHost &serverName;&gt;
+             ServerAdmin &serverAdmin;
+             ServerName &serverName;
+             DocumentRoot &documentRoot;
+        </virtualhosts>
+    </parameter>
+  </apache>
+
+  <ezmail>
+<!--
+    <file>
+        <default>&bo_cache_conf;/module/mail/ezmail.xml.default</default>
+        <conf>/usr/local/babelobjects/conf/ezmail.xml</conf>
+    </file>
+-->
+    <file>
+        <default>&bo_cache_conf;/ezmail/ezmail.js.default</default>
+        <conf>&documentRoot;/desktop/ezmail/js/ezmail.js</conf>
+    </file>
+    <parameter>
+        <tmpDir>/tmp</tmpDir>
+    </parameter>
+    <parameter>
+        <fromdomain>BabelObjects.Org</fromdomain>
+    </parameter>
+  </ezmail>
+
+  <jakarta>
+    <file>
+        <default>&bo_cache_conf;/jakarta/web.xml.default</default>
+        <conf>/usr/local/java/jakarta/jakarta-tomcat/conf/web.xml</conf>
+    </file>
+    <file>
+        <default>&bo_cache_conf;/jakarta/tomcat-bo.conf.default</default>
+        <conf>/usr/local/babelobjects/conf/tomcat-bo.conf</conf>
+    </file>
+  <parameter>
+    <suffix>#</suffix>
+  </parameter>
+  <parameter>
+    <tomcatconf>#</tomcatconf>
+  </parameter>
+  <parameter>
+    <servletandmapping>
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;
+              bo
+        &lt;/servlet-name&gt;
+        &lt;servlet-class&gt;
+            org.babelo.runner.Controller
+        &lt;/servlet-class&gt;
+        &lt;init-param&gt;
+            &lt;param-name&gt;cfg&lt;/param-name&gt;
+            &lt;param-value&gt;/usr/local/babelobjects/conf/bo.xml&lt;/param-value&gt;
+        &lt;/init-param&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet&gt;
+      &lt;servlet-name&gt;
+          php
+      &lt;/servlet-name&gt;
+      &lt;servlet-class&gt;
+          net.php.servlet
+      &lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;
+            bo
+        &lt;/servlet-name&gt;
+        &lt;url-pattern&gt;
+            *.bo
+        &lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;
+            php
+        &lt;/servlet-name&gt;
+        &lt;url-pattern&gt;
+            *.php
+        &lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    </servletandmapping>
+  </parameter>
+  </jakarta>
+
+</bo>

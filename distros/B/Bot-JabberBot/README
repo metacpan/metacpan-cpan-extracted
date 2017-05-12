@@ -1,0 +1,37 @@
+Bot::JabberBot version 0.02
+==========================
+
+Bot::JabberBot provides a simple object interface to a jabber bot, 
+very similar to Bot::BasicBot for IRC bots. It will be superseded by
+a larger POE-based bot framework providing support for different IM 
+protocols and other net access protocols, with state in a central bot 
+core.
+
+To use a Bot::JabberBot you must register an account for it with a jabber 
+server through a regular client, and set up transports to other IM accounts
+in this way. i thought of doing this automatically, but decided it would
+be spammy and might lead to bot abuse.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	Jabber::Connection
+	Jabber::NodeFactory
+	Class::MethodMaker
+
+COPYRIGHT AND LICENCE
+
+This module is available under the same terms as perl itself.
+
+Copyright (C) 2002 Jo Walsh (jo@london.pm.org) 
+

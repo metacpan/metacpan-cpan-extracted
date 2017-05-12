@@ -1,0 +1,5 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Error'; %]
+
+<p>Page is under construction. Please come later...</p>
+
+[% INCLUDE footer.html %]

@@ -1,0 +1,12 @@
+Revision history for Perl extension Bio::Graphics::Glyph::decorated_gene.
+
+0.03  Fri Jun 29 13:46:00 2012
+	- less stringent test for correctness of image map in imagemaps.t b/c test failed with older version of Bio::Graphics (<= 2.02)
+
+0.02  Fri Jun 29 07:46:00 2012
+	- skip tests requiring GD::SVG if this module is not installed
+
+0.01  Wed Jun  6 15:25:43 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Bio::Graphics::Glyph::decorated_gene
+

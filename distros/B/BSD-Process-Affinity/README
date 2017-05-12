@@ -1,0 +1,170 @@
+NAME
+    BSD::Process::Affinity - Manipulate CPU affinities on FreeBSD
+
+SYNOPSIS
+            use BSD::Process::Affinity;
+            BSD::Process::Affinity->get_process_mask()->set(0x2)->update();
+
+VERSION INCOMPABILITY
+    Version 0.4 has API partly incompatible with previous releases. Here are
+    differences:
+
+    * Functional interface is removed, only OO is available now
+
+    * Lighten API - no more Bit::Vector object manipulations
+
+    * "from_num" method is renamed to "set", but for one more release is
+      available under it's old name.
+
+DESCRIPTION
+    Ability to manage CPU affinities from userland was a long-awaited
+    feature in FreeBSD, and it is finally available since 7.1 release. This
+    module allows you to programmatically manipulate them from perl level.
+
+    FreeBSD gives you three levels of restricting CPUs for a single
+    process/thread:
+
+    * 'Root' sets - they are set either for a whole system (and containing
+      all processors), or for a jail. You can get root set to see at which
+      processors can your process theoretically run.
+
+    * Effetive process set - each process is a member of some set
+      (otherwise, it wouldnt't be able run at all, heh). Many processes can
+      be members of a single set, so altering such set - you alter many
+      processes. These sets are only for processes, not for threads -
+      threads can only manipulate with anonymous masks, and has effective
+      set of parent process.
+
+    * Per-process and per-thread anonymous masks. Each process can get/set
+      it's own (or not own at all) mask, restricting available processors.
+      Manipulating these masks is recommended way in manpages for
+      application developers, when you want to set affinity just for a
+      single process.
+
+    Beware, when manipulating affinities, you may degrade performance
+    instead of gaining it.
+
+INTERFACE
+    To operate with this module, you should do three steps:
+
+    * Fetch an Affinity object for interesting kernel object (either old or
+      new one)
+
+    * Update it's internal state (or just fetch it)
+
+    * If required, write changes back to the kernel using "update" method.
+
+    Here is an example that makes current thread NOT to run on 2nd processor
+    in system:
+
+            use BSD::Process::Affinity;
+            my $obj = BSD::Process::Affinity->get_thread_mask();
+            $obj->set($obj->get() & ~0x2)->update();
+
+    Note the chainable ability of "update".
+
+    Whenever any error occurs, this module croaks.
+
+Get Affinity object
+    All these methods (except for "clone") expects one parameter - an id of
+    object you want to fetch affinity of. You can just ommit it - this means
+    'give data for the current process/thread/whatever'.
+
+  "clone"
+    Clones current process'es effective set, and makes current process
+    member of just created set.
+
+  "rootof_set"
+    Gets 'root' set for a given set id.
+
+  "rootof_pid"
+    Gets 'root' set for a given process id.
+
+  "current_set"
+    Gets set content by given set id.
+
+  "current_pid"
+    Gets effetive set for a given process id.
+
+  "get_thread_mask"
+    Get anonymous mask for a given thread id (not perl's thread id, but a
+    system thread id).
+
+  "get_process_mask"
+    Get anonymous mask for a given process id.
+
+Processors' mask manipulation
+    Here are existing Affinity object methods.
+
+  "update"
+            $affinity->update();
+
+    Writes back to kernel changes made in set content. Without this call,
+    your changes does not affect anything.
+
+  "assign"
+            $affinity->assign($pid);
+
+    Assigns set specifiyed in $affinity object to be an effective set for
+    process $pid.
+
+    It is an error to apply this method to anonymous masks.
+
+  "get_cpusetid"
+            my $n = $affinity->get_cpusetid();
+
+    Returns cpu set internal id - for usage with rootof_set/current_set.
+    Returns zero for anonymous masks.
+
+  "get"
+            my $value = $affinity->get();
+
+    Returns usigned integer representing current mask. Then you can perform
+    any actions with it, and set it back using "set" method. Lowest
+    (rightmost) bit represents CPU0, and so on.
+
+  "set"
+            $affinity->set(0x5);  #run on CPU0 and CPU2
+
+    Loads mask represented by $mask into object. Note that you have to call
+    "update" to save changes to kernel, that is not done automatically.
+
+    Mask is treated as an unsigned integer, so number of processor it can
+    represent depends on OS arccitecture - 32 or 64 bits.
+
+    This method is chainable with "update".
+
+"SEE ALSO"
+    <http://www.freebsd.org/cgi/man.cgi?query=cpuset_getaffinity>
+
+    <http://www.freebsd.org/cgi/man.cgi?query=cpuset>
+
+AUTHOR
+    Sergey Aleynikov <sergey.aleynikov@gmail.com>
+
+LICENSE
+    Copyright (c) 2009, 2011 by Sergey Aleynikov. All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+    THE POSSIBILITY OF SUCH DAMAGE.
+

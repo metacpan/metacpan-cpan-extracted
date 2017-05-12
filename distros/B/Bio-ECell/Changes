@@ -1,0 +1,14 @@
+Revision history for Perl extension Bio::ECell.
+
+0.10  2009.11.25 01:52
+	- updated for E-Cell 3.1.107
+        - added support for ecell.analysis.emlsupport
+        - added documentations
+
+0.02  2007.05.15 04:57
+	- Bug fix for MacOS X version
+
+0.01  Fri May 11 18:36:36 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Bio::ECell
+

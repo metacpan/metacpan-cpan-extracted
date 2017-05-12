@@ -1,0 +1,25 @@
+	Revision history for Perl extension Bhagavatgita.
+
+
+=2013/09/05
+*changed from just printing the gita lines to passing it to an array
+*added getting entire lines of any prefered chapter
+*getting random consecutive certain number of lines from the gita scripture
+
+
+=2013/29/05
+*changed the Bhagavatgita material to a better one
+
+
+=2013/03/06
+*added glossary
+
+=2013/11/20
+*corrected problem with selecting random verses
+*added gita script to bin
+
+=2013/11/22
+*gita script did not work.Problem corrected with adding changes in Makefile.PL
+
+=2014/07/26
+*corrected POD errors

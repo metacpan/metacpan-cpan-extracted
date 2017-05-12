@@ -1,0 +1,44 @@
+---
+abstract: 'A wrapper around the annovar annotation pipeline'
+author:
+  - 'Jillian Rowe, C<< <jillian.e.rowe at gmail.com> >>'
+build_requires:
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BioX-Wrapper-Annovar
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  BioX::Wrapper: '0'
+  Cwd: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  File::Basename: '0'
+  File::Find::Rule: '0'
+  File::FindLib: '0'
+  File::Path: '0'
+  IO::Uncompress::Gunzip: '0'
+  Moose: '0'
+  MooseX::Getopt: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://bitbucket.org/jir2004/biox-wrapper-annovar/issues
+  homepage: https://bitbucket.org/jir2004/biox-wrapper-annovar
+  repository: git://git@bitbucket.org:jir2004/biox-wrapper-annovar.git
+version: '0.40'
+x_contributors:
+  - 'Jillian Rowe <jir2004@qatar-med.cornell.edu>'

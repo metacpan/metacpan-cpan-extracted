@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+manual-test.pl
+t/Business-WebMoney.t
+t/Business-WebMoney-Exchanger.t
+lib/Business/WebMoney.pm
+lib/Business/WebMoney/WebMoneyCA.crt
+lib/Business/WebMoney/Exchanger.pm
+META.yml                                 Module meta-data (added by MakeMaker)

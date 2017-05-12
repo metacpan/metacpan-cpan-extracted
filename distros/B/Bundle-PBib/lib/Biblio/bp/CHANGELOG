@@ -1,0 +1,159 @@
+
+19 Dec 96:
+  bp-cs-troff	Added a couple more characters
+  bp-p-cs	Changed a s///o to s///
+  bp-bibtex	Completely redid reading and strings
+  count.pl	EndNote types added
+
+18 Dec 96:
+  bp-bibtex	crossrefonly, minor changes to string parsing, crossrefs
+
+17 Dec 96:
+  bp-cs-tex	Converts \v{c}
+  bp-bibtex	Added crossref handling
+
+16 Dec 96:
+  bin/conv	Added usage display when called with '-help'
+  bin/count	No character set conversion
+
+14 Dec 96:
+  bp-s-cacm	New style.  Communications of the ACM
+  bp-bids	New format.  Not finished
+
+11 Dec 96:
+  bp-endnote	Copied from refer.  Uses 8-bit characters instead of troff
+
+--------- version 0.2.3 released ---------
+
+26 Mar 96:
+  bp-refer	Added inbook type field checking
+		Look for proceedings in a book entry
+  bp-procite	More fields defined
+  bp-bibtex	Support ReportType field in inbook and more
+  bp-rfc1807	Replace chop(END) with END =~ s/\s+$//
+
+24 Mar 95:
+  bp-cs-troff	Added meta approx
+  bp-cs-tex	Added meta approx
+  bp-cs-html	Added meta approx
+  bp-cs-8859-1	Added meta approx
+  bp-p-cs	Changed meta approx
+
+23 Mar 96:
+  bp-bibtex	Changed BibTeX to canon name parsing
+		Changed inbook vs. incollection parsing
+		More changes to name parsing
+		Look for {foo} protection in "title-like" fields
+  bp-cs-tex	Forgot to change cs_temp back to \\ when we give up
+
+20 Mar 96:
+  bp		open returns either $fmt or ($fmt, $cset)
+
+17 Mar 96:
+  bp-p-dload	Remove styles from the list of supported formats
+  bp-rfc1807	Only set Month and Year if DATE is defined in tocanon
+		Month and Year were reversed, and were short
+		output_date is now in bp-p-utils
+  bp-p-utils	Added output_date
+		Fixed multiple von prefix parsing in mname_to_canon
+  bp-s-generic	School name in report
+		s/,"$/."/ at ending
+  bp-output	Added style name to trailer
+  bp-canon	New format, used for testing mainly
+  bp-cs-canon	New charset, used for testing
+  bp-refer	Changes to EndNote %E parsing
+  bp-cs-dead	Forgot \\ in front of $charmap{$unicode} in fromcanon
+  bp-procite	Wrote fromcanon routine
+  bp-cs-html	Added support for &U+xxxx; characters
+		Added call to font_noprev
+		Changed some // calls to //o and s/// to s///o.
+  bp-p-cs	Added font_noprev routine
+		changed fontcheck to font_check
+
+--------- version 0.2.2 released ---------
+
+14 Mar 96:
+  bp-bibtex       Changed tocanon CorpAuthor code.
+                  Added some comments to read routine.
+  bp-procite      Made it work with comma delimited files.
+  bp-refer        many fairly minor changes
+  bp-bibtex       many fairly minor changes
+  bp-cs-troff     many non-major changes
+  bp-cs-tex       many non-major changes
+  bp-cs-dead      Added the "dead-key" charset.
+  bp-s-aacf       The American Anthropologist Citation format.  Sort of.
+
+
+13 Mar 96:
+  bp-refer        Automatic recognition of EndNote records.
+  bp-cs-tex       Added greek characters, changed accent loop detection.
+                  Added vc to {\v{w}} section.
+  bp-cs-troff     Changed fromcanon while (/../) to while (/../g).
+  bp-p-dload      Allow "format/option:cset" in load_format.
+
+12 Mar 96:
+  bp              set glb_current_cset everywhere glb_current_fmt was set.
+  bp-output       wrote output module.  Uses genmod created styles.
+  bp-s-generic    generic style created by genmod.
+  bp-cs-html      Moved things in fromcanon.
+                  Added some meta characters.
+                  Handles simple links now.
+
+11 Mar 96:
+  bp-refer        added some "defined $foo" tests.
+  bp-option       fixed option parsing breakage from 18 Jan 96.
+  bp-html         changes to comments.
+
+--------- version 0.2.1 internal ---------
+
+21 Jan 96:
+  bp-p-dload.pl:  Changes to 'unimplemented' and 'unsupported' options.
+  bp-p-stdbib.pl: Changes to 'unimplemented' and 'unsupported' routines.
+                  Comments for second read routine idea.
+  bp-rfc1807.pl:  Added quotes around month names.
+                  Minor cleanup in &fromcanon.
+  bp-auto.pl:     Removed unsupported functions, changed registry.
+
+  bp-cs-tex.pl:   Changed intro comments.  Very minor cleanup.
+  bp-medline.pl:  Minor cleanup.
+  bp-powells.pl:  Minor cleanup.  Comments.
+  bp-procite.pl:  Minor cleanup.
+
+20 Jan 96:
+  bp-refer.pl:    More changes for EndNote support.
+                  Changed fromcanon D field parsing.
+  bp-p-utils.pl:  Changes to &canon_to_name parsing.  Added reverse option.
+
+18 Jan 96:
+  bp-p-option.pl: In &stdargs, make sure format options get called first.
+  bp-bibtex.pl:   in tocanon ReportType for thesis types, added //i for bibclean.
+                  name conversion now handles "Walter {Miller, Jr.}".
+  bp-refer.pl:    Call output_month to convert Month to D field.
+  bp.pl:          Typo in the convert: same format, diff charset code.
+  bp-procite.pl:  Wrote.  Only implodes and explodes -- just a skeleton.
+
+17 Jan 96:
+  bp-cstra.pl:    Wrote CSTRA format.  Read only.
+  bp-refer.pl:    Added preliminary EndNote support.  Only in fromcanon.
+  bp-bibtex.pl:   Added the affiliation tage matched to AuthorAdddress.
+                  Uses \L to lowercase month macros.
+
+16 Jan 96:
+  bp-medline.pl:  Added support for Entrez Medlars to Medline format.
+                  Added support for Entrez HTML output (notitles).
+
+15 Jan 96:
+  bp-inspec4.pl:  Wrote INSPEC format, style 4.
+  bp-inspec.pl:   Wrote INSPEC general format.
+  bp-p-dload.pl:  Added comment about unreg_format function needed.
+
+2 Dec 95:
+  bp.pl:          Bumped version number to 0.2.1.
+  bp-cs-tab.pl:   Added 4 greek characters to unicode approx table.
+
+30 Nov 95:
+  bp-cs-html.pl:  Newline before <BLOCKQUOTE>.
+
+--------- version 0.2.0 released ---------
+
+--------- Changelog started ---------

@@ -1,0 +1,75 @@
+This patch is very incomplete...  All it does is copying of cygwin architecture
+file as os2 architecture file.
+
+Given that Module::Build removed all the portability hooks of MakeMaker, it
+will take a lot of effort to make Module::Build compile XS extensions on OS/2.
+However, with the manpage_separator() of cygwin, at least the build of
+pure-Perl extensions kinda-succeeds.
+
+Yours,
+Ilya
+
+P.S.  I did not try to fix other shortcomings of Module::Build, such as
+      incompatibility of the generated Makefile.PL with builds in
+      subdirectories.  Hmm, I remember I saw two architecture-independent
+      problems; when I remember the other one, I will let you know...
+
+--- ./MANIFEST-pre	Wed Oct 15 17:39:20 2003
++++ ./MANIFEST	Sun Dec 14 18:07:16 2003
+@@ -22,6 +22,7 @@ lib/Module/Build/Platform/VOS.pm
+ lib/Module/Build/Platform/Windows.pm
+ lib/Module/Build/Platform/cygwin.pm
+ lib/Module/Build/Platform/darwin.pm
++lib/Module/Build/Platform/os2.pm
+ t/MANIFEST
+ t/Sample/Build.PL
+ t/Sample/MANIFEST
+--- ./lib/Module/Build/Platform/os2.pm-pre	Sun Dec 14 18:06:42 2003
++++ ./lib/Module/Build/Platform/os2.pm	Sun Dec 14 18:06:16 2003
+@@ -0,0 +1,46 @@
++package Module::Build::Platform::os2;
++
++use strict;
++use Module::Build::Platform::Unix;
++
++use vars qw(@ISA);
++@ISA = qw(Module::Build::Platform::Unix);
++
++sub link_c {
++  my ($self, $to, $file_base) = @_;
++  my ($cf, $p) = ($self->{config}, $self->{properties}); # For convenience
++  my $flags = $p->{extra_linker_flags};
++  local $p->{extra_linker_flags} = ['-L'.File::Spec->catdir($cf->{archlibexp}, 'CORE'),
++				    '-lperl',
++				    ref $flags ? @$flags : $self->split_like_shell($flags)];
++  return $self->SUPER::link_c($to, $file_base);
++}
++
++sub manpage_separator {
++   '.'
++}
++
++1;
++__END__
++
++
++=head1 NAME
++
++Module::Build::Platform::os2 - Builder class for OS/2 EMX platform
++
++=head1 DESCRIPTION
++
++This module provides some routines very specific to the OS/2 EMX
++platform.
++
++Please see the L<Module::Build> for the general docs.
++
++=head1 AUTHOR
++
++Initial stub by Ilya Zakharevich
++
++=head1 SEE ALSO
++
++perl(1), Module::Build(3), ExtUtils::MakeMaker(3)
++
++=cut

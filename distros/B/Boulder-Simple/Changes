@@ -1,0 +1,11 @@
+Revision history for Perl extension Boulder::Simple.
+
+0.021 Mar 26 2005
+    - Added deprecation note. Use Boulder::Util instead.
+
+0.02 Nov 18 2004
+    - Fixed bug in load_as_hash that would generate warnings of an
+      undefined value usage.
+
+0.01 Oct 01 2004
+	- Initial release into CPAN

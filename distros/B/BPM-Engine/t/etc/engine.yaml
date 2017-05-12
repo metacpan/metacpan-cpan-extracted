@@ -1,0 +1,12 @@
+log_dispatch_conf: t/etc/logger_file.conf
+connect_info:
+    dsn: dbi:SQLite:dbname=t/var/bpmengine.db
+    user: testuser
+    password: TestPass
+    AutoCommit: 1
+    sqlite_unicode: 1
+    #mysql_enable_utf8: 1
+    #pg_enable_utf8: 1
+    #on_connect_call: use_foreign_keys
+    #on_connect_do:
+    #  - PRAGMA synchronous = OFF

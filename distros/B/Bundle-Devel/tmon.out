@@ -1,0 +1,16 @@
+#fOrTyTwO
+$hz=100;
+$XS_VERSION='DProf 20000000.00_01';
+# All values are given in HZ
+$over_utime=0; $over_stime=0; $over_rtime=0;
+$over_tests=10000;
+$rrun_utime=4; $rrun_stime=0; $rrun_rtime=6;
+$total_marks=2                                                                                                                                                                                     
+
+PART2
+@ 3 0 5
+& 1 ExtUtils::Liblist::Kid ext
+* 1
+@ 1 0 1
+& 2 POSIX __ANON__
+* 2

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bluepay-Bluepay20Post
+version:      0.10
+version_from: lib/Bluepay/Bluepay20Post.pm
+installdirs:  site
+requires:
+    Digest::MD5 2.36
+	LWP::UserAgent 5.81
+	URI::Escape 1.36
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

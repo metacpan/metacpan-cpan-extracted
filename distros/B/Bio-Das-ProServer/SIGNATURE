@@ -1,0 +1,128 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5c7031df8dcfa3a05415135491bc05a334bffcd2 Build.PL
+SHA1 179016385f28de0a35d372d852fdcca4c3c04746 Changes
+SHA1 0d5a226f8cd0b32db4f63eb1a50eec527154d641 MANIFEST
+SHA1 bea4951a44ca69d4b22113b3c2545cb9168f9775 META.yml
+SHA1 cd9351675c76304eab73b5d3e893fbb879e1e434 Makefile.PL
+SHA1 55feeb0a52b7f0b7e850583eda5887875ccd5e88 README
+SHA1 48c7d392ae92af98374f0ed752a66ba1d482f864 coordinates/registry_coordinates.xml
+SHA1 7c5aec7f045c794b6753dcb77871dd01ebf98527 doc/CHANGES_2.7.txt
+SHA1 d38c8e51c71e8f4ff2ae706c48ac6d2eaa011f71 doc/CHANGES_2.9.txt
+SHA1 485d2316500374f38dcd4057f21b099995b53162 doc/pod2html
+SHA1 da529967d4b877a8d5eedbb653cc59fbfa4e00bf doc/proserver_guide.html
+SHA1 f0cf98225dff865a638050c16ad68066cc4b690b doc/proserver_tutorial_1/CHROMOSOME_MtDNA.gff
+SHA1 e63eb823ed405042a23f515a09b746e6be2bdc19 doc/proserver_tutorial_1/proserver_tutorial_1.html
+SHA1 aa87b6f8762a4755fcda66345fb67d14b3a85192 doc/proserver_tutorial_2/exons.txt
+SHA1 d147517309e0147502d701dc213ecacb7ac85283 doc/proserver_tutorial_2/myplugin.pm
+SHA1 e1f2043d9f030230ff0c28fe982036940bd8afb2 doc/proserver_tutorial_2/mysource.ini
+SHA1 d0b1c6d13edf90ea7c1433c9e4b44f7cc3519ce9 doc/proserver_tutorial_2/proserver_tutorial_2.html
+SHA1 81e61464776edbdffaf3887c770cc299b072fc53 doc/proserver_tutorial_3/myplugin.pm
+SHA1 a57542a6ab11ac515bc5f39a377bb125d5ac9548 doc/proserver_tutorial_3/mysource.ini
+SHA1 50839a3664631d9119202296b0bd4017e2d06abd doc/proserver_tutorial_3/proserver_tutorial_3.html
+SHA1 2a265c465ba8059149b873747cbbac4d45fd523b eg/bed.ini
+SHA1 279aca6447bca52349e7704ed3b08962a51be0d3 eg/data/example.bed
+SHA1 fcbc4ed655c383a9e0f2bb1d53538b85287b7d2d eg/data/example.gff
+SHA1 6a553e69511cdf599b4b7221287f268ffcb146df eg/data/mysimple.txt
+SHA1 b7395bdbadbc61343de3e1499eedadee4d0a8aa8 eg/proserver
+SHA1 b1b533bc8834c25580527917c419955e11de2c11 eg/proserver.cgi
+SHA1 bfcf7b40567f3dd3b97694a95a65e14b9be7375a eg/proserver.ini
+SHA1 86970e4d04405c7eea91a1cf99e2a01f257ea238 lib/Bio/Das/ProServer.pm
+SHA1 4b1185efcf2dd76766d1008c7e37e7f2ef97de15 lib/Bio/Das/ProServer/Authenticator.pm
+SHA1 01aad05126810dc23ed514d1e9f465b4bcfea656 lib/Bio/Das/ProServer/Authenticator/http.pm
+SHA1 f129d9ca310cd5af5f647cd2972179ee92a80c90 lib/Bio/Das/ProServer/Authenticator/ip.pm
+SHA1 7c5300b64f1799d4443e1e6775105d4471949952 lib/Bio/Das/ProServer/Config.pm
+SHA1 774291ba16d747dade7a3d57ea68e85bdb339a3e lib/Bio/Das/ProServer/SourceAdaptor.pm
+SHA1 44c94c1e9505cca2b5f08d797db2132b2b3107a5 lib/Bio/Das/ProServer/SourceAdaptor/Transport/bed12.pm
+SHA1 015c054adacbc3f3bfc3a5f33b8a000090fee980 lib/Bio/Das/ProServer/SourceAdaptor/Transport/bioseqio.pm
+SHA1 33ea0047ad81f97143af00ceaeaaba89f81969b4 lib/Bio/Das/ProServer/SourceAdaptor/Transport/csv.pm
+SHA1 92cbdc3378204e7034618341db84217d249cd95b lib/Bio/Das/ProServer/SourceAdaptor/Transport/dbi.pm
+SHA1 c309beb1fdbbfba534eb785bcac264863836f3db lib/Bio/Das/ProServer/SourceAdaptor/Transport/ensembl.pm
+SHA1 d449076c480be2f4ede899ea95a3db25e398a927 lib/Bio/Das/ProServer/SourceAdaptor/Transport/file.pm
+SHA1 e65fbbb82a963d47c9c1a8268d94b3750e4bd428 lib/Bio/Das/ProServer/SourceAdaptor/Transport/generic.pm
+SHA1 9fd352e81e7bac48a094ee434531b5d0dcebe35c lib/Bio/Das/ProServer/SourceAdaptor/Transport/getz.pm
+SHA1 0a6e1f94d7a8b2200d8cb92a8604f12b324f3668 lib/Bio/Das/ProServer/SourceAdaptor/Transport/martservice.pm
+SHA1 ba53ea8ca2479048f6d5cbd0f9295f3395495d2a lib/Bio/Das/ProServer/SourceAdaptor/Transport/oracle.pm
+SHA1 a67af8e233087e6980dbde6f6368a70837b41940 lib/Bio/Das/ProServer/SourceAdaptor/Transport/sif.pm
+SHA1 d21f4e9dcbf99aba88e8943555c3a9b1269d81c2 lib/Bio/Das/ProServer/SourceAdaptor/Transport/wgetz.pm
+SHA1 b1fede5135489c86b68967d5a8e26122c08b6b66 lib/Bio/Das/ProServer/SourceAdaptor/all_in_group.pm
+SHA1 3a1fc0f5e584f016114af08b61506f452f1072ae lib/Bio/Das/ProServer/SourceAdaptor/bed12.pm
+SHA1 6d72f300bec754013c3ae008044fb4a50a2d4b9c lib/Bio/Das/ProServer/SourceAdaptor/bioseq.pm
+SHA1 9126ea05b3a7c88b408d51d0dabe46163a863938 lib/Bio/Das/ProServer/SourceAdaptor/file.pm
+SHA1 bb9d586231312ebc1e3607a06598cc27ed5cacc6 lib/Bio/Das/ProServer/SourceAdaptor/grouped_db.pm
+SHA1 885c9c00e12f32c96f7d47430fa683c450a85670 lib/Bio/Das/ProServer/SourceAdaptor/proxy.pm
+SHA1 3396b8ee311f3cf35108eef8ae017cb87cb2f297 lib/Bio/Das/ProServer/SourceAdaptor/sif.pm
+SHA1 f594647d96543023d95ddc75f23bad8debb70303 lib/Bio/Das/ProServer/SourceAdaptor/simple.pm
+SHA1 fef9c7073550f5613b4d35581ce4f427413d1bda lib/Bio/Das/ProServer/SourceAdaptor/simple_interaction.pm
+SHA1 3347cfcfd238d81c4403df32c2af896fd596d8a3 lib/Bio/Das/ProServer/SourceAdaptor/simple_volmap.pm
+SHA1 909dcc01d5e42100103d57c65ac3c428ef7297c7 lib/Bio/Das/ProServer/SourceAdaptor/simpledb.pm
+SHA1 41b320e83d37e94877d94af72ea01b0366ca55df lib/Bio/Das/ProServer/SourceAdaptor/styletest.pm
+SHA1 cb628dfb8173c71ac7b7a9a78120af2f63169788 lib/Bio/Das/ProServer/SourceHydra.pm
+SHA1 2f9e37d6d5f458ad504c0c094eacc55bfb898ff2 lib/Bio/Das/ProServer/SourceHydra/dbi.pm
+SHA1 1c161c67eeb81731352f15d60095c69e9abbd822 lib/Bio/Das/ProServer/SourceHydra/sql.pm
+SHA1 4fce851ff36602d313b241be390b7c3306931bc2 stylesheets/xsl_dsn.xsl
+SHA1 c2dcb3dd966514c225569603b61d740ef905eb0e stylesheets/xsl_features.xsl
+SHA1 e3031c4591f1ddb73ee5718b4f2815a730c9b150 stylesheets/xsl_homepage.xsl
+SHA1 9c576ec32df3720c50852f8bfd1b5097b807f4d1 stylesheets/xsl_sequence.xsl
+SHA1 94a01a72e064558aee847d490d64185fb9bf1b78 stylesheets/xsl_sources.xsl
+SHA1 1f57c42d177dd21c594d2c1180a9331697c266ec stylesheets/xsl_types.xsl
+SHA1 8b6d86483f31129f7c64269838d44dfa46cb8bae t/00-pod.t
+SHA1 02872cf966ff1acf75a34fa4332c3f29fca9b0c1 t/05-config.t
+SHA1 10e50fbc4bf7fe2a663bac6c7f455370496eda64 t/10-sourceadaptor.t
+SHA1 1f264087e773c43b62452797b5a132172fa92e7a t/11-transport-dbi.t
+SHA1 498b8b43d784b3c2934e3ac6aceecc1f0043ed0d t/11-transport-file.t
+SHA1 2c2383b7f107486912af53a0c4b18abc80cdf6e8 t/11-transport-generic.t
+SHA1 c00523914f78940429f7b33c43275d5d9e2fe0e9 t/11-transport-oracle.t
+SHA1 24a912d59bc6121be8d6d0c6244106ae255799fa t/11-transport-sif.t
+SHA1 577c7470fe30d0850baf01ca684c1584e94c61ef t/15-escaping.t
+SHA1 72222a6a4c241fdd82c159cd401b9e3b4989a31a t/16-targets.t
+SHA1 a4b6d1e61bb3dd3d4bc530703aac3e4c2779572b t/21-features-parents.t
+SHA1 95ebd10a6df6fc2522bbcb462d111e0dc6dc28bd t/21-features-versions.t
+SHA1 0bc58125752b9858518135346c6316027c2c26aa t/21-features.t
+SHA1 302e87fe7f05c3d010ce04961694dbf25468693c t/25-alignment-columns.t
+SHA1 38db0d2d546305afe4454c5f1452c9783db664e8 t/25-alignment.t
+SHA1 00664d8e218c4bea9271511e6cdac624132d0ff3 t/26-interaction.t
+SHA1 d5724313085cd750f1a05e63db7c96fd8f0530d8 t/27-volmap.t
+SHA1 498461a3101f980f46c47e24ce73083123b06a63 t/32-auth-ip.t
+SHA1 3023e5cf542d9f0e45d2033dca0832a16f158948 t/33-auth-http.t
+SHA1 81f496827ac34453818bd1c4e4f82904e775220d t/critic.t
+SHA1 7ff0aa4b61476ddd69e44fa3e862b1e5c589b648 t/criticrc
+SHA1 d05fb06dedd5541d2f0bf7c6f9b9f3b3d5beb8c2 t/distribution.t
+SHA1 8a5215e10c31cda0b1a0d99258303fd48b8e054d t/dummy/Bio/DB/Flat.pm
+SHA1 7cea210a8cdb7c9af6b893c33a5f4066842c6698 t/dummy/Bio/Das/Lite.pm
+SHA1 f9a47cfce0f1659d3f2bbc230617839cd8fff0de t/dummy/Bio/EnsEMBL/DBSQL/DBAdaptor.pm
+SHA1 c63435b325b75e33ae594156df96b901bd1b6e48 t/dummy/Bio/EnsEMBL/Registry.pm
+SHA1 16968b7ee4e45e4a277af84dd7c45830fec4c821 t/dummy/Bio/SeqIO.pm
+SHA1 52bcf5c8c2e2abd7ed1474053e4e541e6c7f05b9 t/dummy/Cache/FileCache.pm
+SHA1 0cde309e1d3c45630de696be7181b360cbc8219b t/dummy/Net/IP.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQIcBAEBAgAGBQJMz/0DAAoJEPG6pZARLr4Fel8QAKbG0eTGoJsT2edUEpBl03AQ
+cDdTtv4PKhyk0CVfgZMJO7Oy4pKcH52PZvEbi6vqY6mfmc2ywrPpTZ+5m9VoCr0r
+SDANykONSygrX2N4cHInKr/ZqNVk0MEnelGoThQ5U3stMIWQq9t60VuuFF4PiE39
+UXLahItHya/UNN7kDMvxg6pRgS0+rRGnebAPvqpZm/RJfQkA3NDPFqYE+FRlxUPx
+RU0Xln7qgmliXjD7l2xiJo7NRpBxlIPWX45khHNFotWkpuxZlUjfX/4wMo1NAHEv
+b7G8zkc2lsOW3P0hw+2W0VvCxYSLo8qCWZx/sA10r8SrRj5OjFhYX/oJADXUKc/O
+GXF7AYnYK1uRO8EEhkp+ZB590vuFBTDrAPY/Tuv8JgsRLLCGTD+2f86le9ICERAf
+U5ebLRo+OqMUuynjeCZ08Nu8D0k3iqGX6Vv/nB704pkkfQLpAnHp9BVJnsWpsnrr
+jdn3T6M/9GiD2N/D3x4lnB9VDVGCgZdx8JURTd+ZhkaXup0zJVo/kj6AUCirrl4G
+/hQ7rpMJ0hBdvl2rW6UI/BdOQ3wq5ZmWJtASApmvIHaHvhfYIpBXQIIOMXAJqjQo
+zuTbzqa9BaLsLH4ZysAYLiof7YsnL1j4r93rHL7VFL8dlVefjRK5zI7vjJfxu2JQ
+7qZxuI8IXlfWHn083dLA
+=24+u
+-----END PGP SIGNATURE-----

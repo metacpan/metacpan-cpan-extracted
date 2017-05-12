@@ -1,0 +1,41 @@
+---
+abstract: 'A Paser for Baal IDL.'
+author:
+  - 'ohta-nobuyuki <ohta-nobuyuki@kayac.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Baal-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Baal::Parser:
+    file: lib/Baal/Parser.pm
+    version: '0.01'
+requires:
+  Mouse: '0'
+  Parse::RecDescent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/shogo82148/p5-Baal-Parser/issues
+  homepage: https://github.com/shogo82148/p5-Baal-Parser
+  repository: git://github.com/shogo82148/p5-Baal-Parser.git
+version: '0.01'
+x_contributors:
+  - 'Ichinose Shogo <shogo82148@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

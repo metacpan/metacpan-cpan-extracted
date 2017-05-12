@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bio-SDRS.t
+t/OVCAR4_HCS_avg.txt
+t/divzero.txt
+lib/Bio/SDRS.pm
+sdrs.pl
+SDRS_Manuscript.pdf
+generate_tests.sh
+t/ref.sdrs.1.1.05.20.EC50.out.srt
+t/ref.sdrs.1.1.05.20.out.srt
+t/ref.sdrs.1.pval_FDR.out.srt
+t/ref.sdrs.1.sorted_probes.out.srt
+t/ref.sdrs.2.1.05.20.EC50.out.srt
+t/ref.sdrs.2.1.05.20.out.srt
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+Revision history for Perl extension Bundle::Devel
+
+0.2  Tue Nov 25 18:50:41 2003
+	- Fixed the format to avoid an installation bug
+
+0.1  Sat Apr 19 11:31:03 2003
+	- original version

@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::OnlinePayment::MerchantCommerce.
+
+0.01  Sun Feb 23 18:56:24 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Business::OnlinePayment::MerchantCommerce
+

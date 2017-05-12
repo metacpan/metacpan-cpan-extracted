@@ -1,0 +1,14 @@
+Changes
+lib/Business/Hours.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/1-business-hours.t
+t/2-holidays.t
+t/99-pod-coverage.t
+t/99-pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl interface to KEGG API.",
+   "author" : [
+      "Felipe da Veiga Leprevost <leprevost@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-KEGG-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "Net::FTP::Tiny" : "0",
+            "REST::Client" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-KEGG-API"
+      },
+      "homepage" : "https://github.com/Leprevost/Bio-KEGG-API",
+      "repository" : {
+         "url" : "https://github.com/Leprevost/Bio-KEGG-API"
+      }
+   },
+   "version" : "0.02"
+}

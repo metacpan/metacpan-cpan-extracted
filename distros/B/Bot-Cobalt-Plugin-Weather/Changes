@@ -1,0 +1,33 @@
+Revision history for Perl module Bot::Cobalt::Plugin::Weather
+
+0.003002 2015-12-29
+
+  - Missing dependency on Object::RateLimiter
+  
+    (Reported by SREZIC [rt#110754])
+
+  - Explicitly clear remembered locations on unregister
+
+0.003001 2015-12-29
+
+  - Briefly remember last-requested location per-user
+
+  - Enable caching by default and support CacheExpiry/CacheDir config opts
+
+  - Warn more loudly if API_Key is missing
+
+  - Add built-in request rate limiting
+
+  - Skip first hourly forecast item
+
+0.002001 2015-12-28
+
+  - Add hourly forecast support
+
+0.001002 2015-06-19
+
+  - Fix API_Key config (... but OWM doesn't actually care, currently)
+
+0.001001 2015-03-22
+
+  - Initial release

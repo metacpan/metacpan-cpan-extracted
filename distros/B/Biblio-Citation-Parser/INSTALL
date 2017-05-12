@@ -1,0 +1,26 @@
+Installing Biblio::Citation::Parser
+===================================
+
+The easiest way to do this is like so:
+
+perl Build.PL
+./Build
+./Build install
+
+You can also optionally run './Build test', which will run a few checks on
+the modules.
+
+Requirements
+============
+
+The following modules are required for Biblio::Citation::Parser to function correctly:
+
+- URI
+- Text::Unidecode 
+
+The most recent versions of these are located at http://www.cpan.org. 
+
+To use the web service support, you will need the SOAP::Lite module
+(and any dependencies that it requires). Known working versions
+are available at http://paracite.eprints.org/files/perlmods/soap/, while the
+latest versions are at http://www.cpan.org.

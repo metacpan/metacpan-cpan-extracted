@@ -1,0 +1,9 @@
+classes:
+  - Admin.backup
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include Backupninja hook to save to remote host
+  pkg:
+    - rdiff-backup

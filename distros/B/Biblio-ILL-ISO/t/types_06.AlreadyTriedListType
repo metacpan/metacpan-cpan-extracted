@@ -1,0 +1,32 @@
+$VAR1 = bless( {
+                 'SEQUENCE' => [
+                                 bless( {
+                                          'person-or-institution-symbol' => bless( {
+                                                                                     'institution-symbol' => bless( {
+                                                                                                                      'generalstring' => 'BVAS'
+                                                                                                                    }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                   }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                        }, 'Biblio::ILL::ISO::SystemId' ),
+                                 bless( {
+                                          'name-of-person-or-institution' => bless( {
+                                                                                      'name-of-institution' => bless( {
+                                                                                                                        'generalstring' => 'Winnipeg Public Library'
+                                                                                                                      }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                    }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' )
+                                        }, 'Biblio::ILL::ISO::SystemId' ),
+                                 bless( {
+                                          'name-of-person-or-institution' => bless( {
+                                                                                      'name-of-person' => bless( {
+                                                                                                                   'generalstring' => 'Frank Emil Urwald'
+                                                                                                                 }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                    }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' )
+                                        }, 'Biblio::ILL::ISO::SystemId' ),
+                                 bless( {
+                                          'person-or-institution-symbol' => bless( {
+                                                                                     'institution-symbol' => bless( {
+                                                                                                                      'generalstring' => 'MBOM'
+                                                                                                                    }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                   }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                        }, 'Biblio::ILL::ISO::SystemId' )
+                               ]
+               }, 'Biblio::ILL::ISO::AlreadyTriedListType' );

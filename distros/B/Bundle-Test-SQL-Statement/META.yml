@@ -1,0 +1,34 @@
+--- #YAML:1.0
+name:               Bundle-Test-SQL-Statement
+version:            1.33
+abstract:           Requirement Bundle to allow wider tests of SQL::Statement
+author:
+    - Jens Rehsack <rehsack@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::Simple:  0.90
+requires:
+    DBD::AnyData:         0.110
+    DBD::CSV:             0.31
+    DBD::DBM:             0.06
+    DBD::File:            0.40
+    DBD::SQLite:          0
+    DBI::DBD::SqlEngine:  0.03
+    perl:                 5.008
+    SQL::Statement:       1.33
+resources:
+    license:      http://dev.perl.org/licenses/
+    MailingList:  mailto:dbi-dev@perl.org
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+recommends:
+    Bundle::DBD::DBM:  0.06

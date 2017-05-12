@@ -1,0 +1,333 @@
+{
+    "comment": "Sparse biom file with decimal numbers. Also note that the first OTU has a count of 0",
+    "columns": [
+        {
+            "id": "replicate_1", 
+            "metadata": null
+        }, 
+        {
+            "id": "replicate_2", 
+            "metadata": null
+        }, 
+        {
+            "id": "replicate_3", 
+            "metadata": null
+        }
+    ], 
+    "data": [
+        [
+            0, 
+            0, 
+            0
+        ], 
+        [
+            0, 
+            1, 
+            866.5304122294333
+        ], 
+        [
+            0, 
+            2, 
+            837.3253493013972
+        ], 
+        [
+            1, 
+            0, 
+            523.3391122468976
+        ], 
+        [
+            1, 
+            1, 
+            521.6206853111615
+        ], 
+        [
+            1, 
+            2, 
+            516.8650793650794
+        ], 
+        [
+            2, 
+            0, 
+            187.3238985500354
+        ], 
+        [
+            2, 
+            1, 
+            198.01980198019803
+        ], 
+        [
+            2, 
+            2, 
+            203.96039603960395
+        ], 
+        [
+            3, 
+            0, 
+            1804.020365561329
+        ], 
+        [
+            3, 
+            1, 
+            2882.0884350396386
+        ], 
+        [
+            3, 
+            2, 
+            3877.1929824561403
+        ], 
+        [
+            4, 
+            0, 
+            31.33686602303398
+        ], 
+        [
+            4, 
+            1, 
+            37.790417078718804
+        ], 
+        [
+            4, 
+            2, 
+            84.34547908232119
+        ], 
+        [
+            5, 
+            0, 
+            1543.1870395460755
+        ], 
+        [
+            5, 
+            1, 
+            2088.944982616408
+        ], 
+        [
+            5, 
+            2, 
+            2890.6882591093117
+        ], 
+        [
+            6, 
+            0, 
+            2401.5138870175683
+        ], 
+        [
+            6, 
+            1, 
+            3576.2466826026357
+        ], 
+        [
+            6, 
+            2, 
+            5719.783929777178
+        ], 
+        [
+            7, 
+            0, 
+            2967.123975059851
+        ], 
+        [
+            7, 
+            1, 
+            3714.826977426784
+        ], 
+        [
+            7, 
+            2, 
+            5394.204851752022
+        ], 
+        [
+            8, 
+            0, 
+            798.9234504363485
+        ], 
+        [
+            8, 
+            1, 
+            1008.9653518936946
+        ], 
+        [
+            8, 
+            2, 
+            1440.0269541778976
+        ], 
+        [
+            9, 
+            0, 
+            102.4054366528773
+        ], 
+        [
+            9, 
+            1, 
+            145.95626131899903
+        ], 
+        [
+            9, 
+            2, 
+            256.2373567093729
+        ]
+    ], 
+    "date": "2013-03-07T18:01:33.658587", 
+    "format": "Biological Observation Matrix 1.0.0", 
+    "format_url": "http://biom-format.org", 
+    "generated_by": "amplishot 0.3.2", 
+    "id": null, 
+    "matrix_element_type": "float", 
+    "matrix_type": "sparse", 
+    "rows": [
+        {
+            "id": "8", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Proteobacteria", 
+                    "c__Betaproteobacteria", 
+                    "o__Ellin6067", 
+                    "f__", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "87", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Proteobacteria", 
+                    "c__Alphaproteobacteria", 
+                    "o__Rhodobacterales", 
+                    "f__Rhodobacteraceae", 
+                    "g__Rhodobacter", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "120", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Chlorobi", 
+                    "c__SJA-28", 
+                    "o__", 
+                    "f__", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "80", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Cyanobacteria", 
+                    "c__Synechococcophycideae", 
+                    "o__Pseudanabaenales", 
+                    "f__Pseudanabaenaceae", 
+                    "g__Arthronema", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "81", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Proteobacteria", 
+                    "c__Deltaproteobacteria", 
+                    "o__Syntrophobacterales", 
+                    "f__Syntrophaceae", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "119", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Cyanobacteria", 
+                    "c__Synechococcophycideae", 
+                    "o__Pseudanabaenales", 
+                    "f__Pseudanabaenaceae", 
+                    "g__Leptolyngbya", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "118", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Verrucomicrobia", 
+                    "c__Opitutae", 
+                    "o__Opitutales", 
+                    "f__Opitutaceae", 
+                    "g__Opitutus", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "84", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Proteobacteria", 
+                    "c__Deltaproteobacteria", 
+                    "o__Myxococcales", 
+                    "f__", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "85", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__NKB19", 
+                    "c__", 
+                    "o__", 
+                    "f__", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }, 
+        {
+            "id": "3", 
+            "metadata": {
+                "evalue": 0.0, 
+                "taxonomy": [
+                    "k__Bacteria", 
+                    "p__Proteobacteria", 
+                    "c__Gammaproteobacteria", 
+                    "o__Xanthomonadales", 
+                    "f__", 
+                    "g__", 
+                    "s__"
+                ]
+            }
+        }
+    ], 
+    "shape": [
+        10, 
+        3
+    ], 
+    "type": "OTU table"
+}

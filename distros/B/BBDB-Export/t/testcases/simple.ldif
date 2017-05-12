@@ -1,0 +1,13 @@
+dn: cn=simple testcase, ou=addressbook, dc=geekfarm, dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: simple testcase
+givenName: simple
+sn: testcase
+ou: addressbook
+mail: simple@domain.com
+mobile: (555) 444-3333
+title: acme
+description: some dude

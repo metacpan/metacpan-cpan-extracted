@@ -1,0 +1,11 @@
+: if $names {
+<div class="hover names">
+<a href="#"><: $name :></a>
+<ul class="hidden">
+: for $names -> $x {
+  <li><a name="<: $x :>" href="<: $prefix :><: $x :>"><: $x :></a></li>
+: }
+</ul>
+</div>
+: }
+

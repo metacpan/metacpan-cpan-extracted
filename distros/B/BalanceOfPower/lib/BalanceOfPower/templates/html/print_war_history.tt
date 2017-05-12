@@ -1,0 +1,10 @@
+[% FOREACH wn IN war_names %][% wnname = wn.name %]
+<h4>### WAR [% wnname %]</h4>
+[% FOREACH w IN wars.$wnname %]
+<p>
+<strong>[% INCLUDE fragments/linked_nation.tt n = w.node1 %] => [% INCLUDE fragments/linked_nation.tt n = w.node2 %]</strong><br />
+*** War started in [% w.start_date %] ***<br />
+[% FOREACH t IN w.get_turn_tags %][% FOREACH ev IN w.events.$t %] [% IF t != 'START' %][% t %]: [% END %][% ev.text %]<br />
+[% END %][% END %]*** War ended in [% w.end_date %] ***
+</p>
+[% END %][% END %]

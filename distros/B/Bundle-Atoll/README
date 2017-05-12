@@ -1,0 +1,57 @@
+Bundle-Atoll version 0.03
+=========================
+
+Bundle-ATOLL regroups all Perl modules needed to install and run
+ALPAGE Linguistic Processing chain (formerly ATOLL).
+
+It will install all the following modules:
+
+AppConfig          - Reading configuration files and parsing command line arguments 
+CGI                - Simple Common Gateway Interface Class 
+DBI                - Database independent interface for Perl 
+Data::Compare      - Compare perl data structures 
+Data::Dumper       - Convert data structure into perl code 
+Data::Grove        - Support for deeply nested structures 
+Event              - Fast, generic event loop 
+File::Temp         - Create temporary files safely 
+IO::All
+IO::Socket         - Methods for socket input/output handles 
+IPC::Open2         - Open a process for both reading and writing 
+IPC::Open3         - Like IPC::Open2 but with error handling 
+IPC::Run           - Child procs w/ piping, redir and psuedo-ttys 
+List::Compare      - Compare elements of two or more lists 
+Net::Server        - Extensible (class) oriented internet server 
+Net::Telnet        - Interact with TELNET port or other TCP ports 
+Parse::RecDescent  - Recursive descent parser generator 
+Parse::Yapp        - Generates OO LALR parser modules 
+Regexp::Assemble   - Combine patterns into single pattern 
+Term::Report       - Easy way to create dynamic 'reports' from within scripts 
+Tie::IxHash        - Indexed hash (ordered array/hash composite) 
+Time::HiRes        - High resolution time, sleep, and alarm 
+XML::Generator     - Generates XML documents 
+XML::LibXML        - Interface to the libxml library 
+XML::Parser        - Flexible fast parser with plug-in styles 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2008, INRIA
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+AUTHOR
+
+Isabelle Cabrera <Isabelle.Cabrera@inria.fr>

@@ -1,0 +1,29 @@
+Bundle-WWW-Scraper-ISBN-Drivers
+================================
+
+This bundle collects together all the known WWW::Scraper::ISBN type drivers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+For optional testing the module would like these other modules:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2010-2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic Licence v2.

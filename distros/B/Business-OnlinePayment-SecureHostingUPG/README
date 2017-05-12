@@ -1,0 +1,13 @@
+Copyright (c) 2004 Ivan Kohler
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the  same terms as Perl itself.
+
+This is Business::OnlinePayment::SecureHostingUPG, an Business::OnlinePayment
+backend module for the SecureHosting Universal Payment Gateway.  It is only
+useful if you have a merchant account with SecureHosting:
+http://www.securehosting.com/sh2/upg_payment_service_provider_uk.htm
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").

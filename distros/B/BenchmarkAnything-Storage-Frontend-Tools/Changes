@@ -1,0 +1,79 @@
+Revision history for BenchmarkAnything-Storage-Frontend-Tools
+
+0.019     2017-02-08
+        - pass through 'verbose' option
+
+0.018     2017-02-07
+        - require latest ::Backend::SQL
+
+0.017     2017-02-07
+        - INCOMPATIBLE OPTION CHANGE:
+          option -d no longer means --debug but is now --data (similar to curl)
+        - new option: -d|--data STRING
+
+0.016     2017-01-31
+        - Elasticsearch support
+
+0.015     2017-01-17
+        - fix tests to work with more default entries from backend
+
+0.014     2016-03-04
+        - new command 'stats' - counters of points and metrics
+
+0.013     2016-03-02
+        - explicitely versioned dependencies declared
+
+0.012     2016-03-01
+        - more detailed MySQL setup instructions
+
+0.011     2016-02-26
+        - always 'gc' after 'processqueue'
+
+0.010     2015-09-28
+        - replace File::Slurp with File::Slurper
+
+0.009     2015-09-20
+        - declare dependency version to avoid incompatible config structure
+
+0.008     2015-09-17
+        - adapt to renamed DB backend
+          (Tapper::Benchmark -> BenchmarkAnything::Storage::Backend::SQL)
+
+0.007     2015-09-10
+        - INCOMPATIBLE CHANGE: Config keys completely restructure
+
+0.006     2015-09-09
+        - new option: add --skipvalidation - for higher throughput
+        - new option: add --queuemode - for higher throughput, queues
+          results for later processing
+        - new command: processqueue - to process a batch from that queue
+          (batchsize currently fixed to 100)
+        - new command: gc - garbage collect the processed entries
+          (yet mostly for safety reasons, until the queue transaction
+          handling is waterproof)
+        - new command: init - initializes config files for an easy
+          start
+        - internal refactoring, eg., connect/disconnect handling
+        - more tests
+
+0.005     2015-08-26
+        - refactoring to use common library
+          use BenchmarkAnything::Storage::Frontend::Lib
+        - new command: getpoint --id
+        - command 'add' now preserves order of points
+
+0.004     2015-08-20
+        - new command: listnames --pattern, to get list of benchmark NAMEs
+
+0.003     2015-08-18
+        - define config file in env var BENCHMARKANYTHING_CONFIGFILE
+        - tests for handling of duplicates
+
+0.002     2015-08-17
+        - more tests
+
+0.001     2015-08-16
+        - Initial release - CPAN DAY - 2015-08-16
+        - Cmdline tool to handle BenchmarkAnything data on a backend store
+        - the only currently supported backend store is Tapper::Benchmark
+        - see http://benchmarkanything.org

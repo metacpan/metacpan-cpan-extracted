@@ -1,0 +1,5 @@
+theme    = core
+severity = 3
+verbose  = 9
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+    private_name_regex = \b_(?!build_)\w+\b

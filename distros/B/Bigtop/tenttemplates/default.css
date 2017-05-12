@@ -1,0 +1,287 @@
+#save_file {
+    margin-left:   25px;
+    margin-bottom: 8px;
+}
+
+#tab-backends table {
+background: #d6d6d6;
+}
+
+#tab-app-config table {
+background: #d6d6d6;
+}
+
+#tab-app-statements table {
+background: #d6d6d6;
+}
+
+#tab-bigtop-config {
+    background: #d6d6d6;
+    border: 1px solid #777;
+}
+
+div.app_block_table div.app_block_element {
+    background: #d6d6d6;
+}
+
+div.app_block_controller div.app_block_element {
+    background: #d6d6d6;
+}
+
+div.app_block_element fieldset {
+    background: #aa5;
+}
+
+div.app_block_element fieldset table {
+    background: #aa5;
+}
+
+.app_block_controller fieldset {
+    background: #d6d6d6;
+}
+
+.app_block_controller fieldset {
+    background: #d6d6d6;
+}
+
+.app_block_controller fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px;
+    font-size: 1.1em;
+
+}
+.app_block_schema fieldset {
+    background: #d6d6d6;
+}
+.app_block_schema fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px;
+    font-size: 1.1em;
+
+}
+.app_block_sequence fieldset {
+    background: #d6d6d6;
+}
+.app_block_sequence fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px;
+    font-size: 1.1em;
+
+}
+.app_block_table fieldset {
+    background: #d6d6d6;
+}
+.app_block_table fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px;
+    font-size: 1.1em;
+
+}
+
+.app_block_new fieldset {
+    background: #ee6;
+}
+
+.app_block_new fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px 4px 2px 4px;
+    font-size: 1.1em;
+}
+
+.app_block_new {
+    width: 450px;
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid #777;
+}
+.app_block_table_new fieldset {
+    background: #ee6;
+}
+
+.app_block_table_new fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px 4px 2px 4px;
+    font-size: 1.1em;
+}
+
+
+.app_block_table_new {
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid #777;
+    background: #d6d6d6;
+}
+
+.app_block_controller div {
+    background: #b4b1c2;
+}
+.app_block_controller div table {
+    background: #b4b1c2;
+}
+
+.app_block_table div {
+    background: #b4b1c2;
+}
+.app_block_table div table {
+    background: #b4b1c2;
+}
+
+div.app_block_controller_element table {
+    background: #ee6;
+}
+
+div.app_block_controller_element {
+    background: #d6d6d6;
+    padding: 0 0 10px 0;
+    border-bottom: 1px solid;
+}
+
+.app_block_controller_element fieldset {
+    background: #ee6;
+}
+
+
+.app_block_controller_element fieldset legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px 4px 2px 4px;
+    font-size: 1.1em;
+}
+
+fieldset {
+    background: #b4b1c2;
+}
+    
+
+legend {
+    background: #fff;
+    border: 1px solid #777;
+    padding: 2px 4px 2px 4px;
+    font-size: 1.1em;
+}
+
+#create_field_box {
+    background: #d7d7d7;
+}
+
+#create_field_box table {
+    background: #ee6;
+}
+button {
+    border: 1px solid #777;
+}
+input {
+    border: 1px solid #777;
+}
+
+input {
+    border: 1px solid #777;
+}
+select {
+    border: 1px solid #777;
+}
+
+#tabs {
+    background: #eee;
+    width:     95%;
+    clear:     both;
+    border:    1px solid #99d;
+    overflow:  auto;
+    padding:   5px;
+    margin:    0px auto 20px auto;
+    font-size: .8em;
+}
+
+#tabs_header {
+    width:  95%;
+    margin: 0px auto 20px auto;
+}
+
+#tabs_header ul {
+    list-style: none;
+    margin:     0px;
+    padding:    0px;
+}
+
+#tabs_header ul li {
+    display:     block;
+    float:       left;
+    text-align:  center;
+    padding:     0;
+    margin:      0;
+    border-left: 1px solid #99d;
+}
+
+#tabs_header ul li + li {
+    border-left: none;
+    display:     block;
+    float:       left;
+    text-align:  center;
+    padding:     0;
+    margin:      0;
+}
+
+#tabs_header ul li a {
+    background:      #fff;
+    border-top:      1px solid #99d;
+    border-right:    1px solid #99d;
+    border-left:     none;
+    border-bottom:   none;
+    padding:         0 10px 0 10px;
+    margin:          0px;
+    color:           #9a9a9a;
+    text-decoration: none;
+    display:         block;
+    text-align:      center;
+    font:            normal 12px/20px sans-serif;
+}
+
+#tabs_header ul li a:hover {
+    color: #000;
+    background: #bbe;
+}
+
+#tabs_header li a.active {
+    background: #eee;
+    font-weight: normal;
+    color: #000;
+border-bottom: 0;
+}
+
+div.tab {
+    display: none;
+    margin:  0px;
+    padding: 3px;
+}
+
+div.tab_content {
+    border:  1px solid grey;
+}
+
+table.bordered {
+    border:          1px solid grey;
+    border-collapse: collapse;
+}
+
+table.bordered td, table.bordered th {
+    border-right:  1px solid grey;
+    border-bottom: 1px solid grey;
+    padding:       4px;
+}
+
+table.bordered td table td, table.bordered td table th {
+    border: none;
+}
+
+div.quick_edit_div {
+    background: #d6d6d6;
+}
+
+input.urgency_10, select.urgency_10 { background: #F00; }
+input.urgency_5,  select.urgency_5  { background: #FF0; }
+input.urgency_3,  select.urgency_3  { background: #0F0; }
+input.urgency_1,  select.urgency_1  { background: #0FF; }

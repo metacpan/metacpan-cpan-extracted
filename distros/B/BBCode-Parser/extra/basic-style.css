@@ -1,0 +1,57 @@
+.bbcode-body {
+	border: thin solid black;
+	padding: 1ex;
+	background-color: #eee;
+	color: #000;
+}
+
+.bbcode-u { text-decoration: underline; }
+.bbcode-s { text-decoration: line-through; }
+
+.bbcode-body a img { border: none; }
+
+.bbcode-body :link		{ color: #00f; }
+.bbcode-body :visited	{ color: #00f; }
+.bbcode-body :link, .bbcode-body :visited {
+	text-decoration: none;
+	border-bottom: thin dotted #000;
+}
+.bbcode-body :link:hover, .bbcode-body :visited:hover {
+	border-bottom: thin solid #f00;
+	color: #f00;
+}
+.bbcode-body :link:active, .bbcode-body :visited:active {
+	color: #f00;
+}
+
+.bbcode-quote {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+.bbcode-quote-head {
+	color: #555;
+}
+.bbcode-quote-body {
+	margin: 0em;
+	margin-left: 2em;
+	padding: 1ex;
+	border: thin solid #999;
+	background-color: #ffd;
+}
+.bbcode-quote-body .bbcode-quote-body {
+	background-color: #ffb;
+}
+
+.bbcode-code {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+.bbcode-code-head {
+	color: #555;
+}
+.bbcode-code-body {
+	margin-left: 2em;
+	padding: 1ex;
+	border: thin solid #999;
+	background-color: #cfc;
+}

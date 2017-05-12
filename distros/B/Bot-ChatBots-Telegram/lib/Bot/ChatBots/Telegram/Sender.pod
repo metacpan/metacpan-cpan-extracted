@@ -1,0 +1,195 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::Sender - Convenience class for sending Telegram calls
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Telegram::Sender;
+   my $sender = Bot::ChatBots::Telegram::Sender->new(token => $ENV{TOKEN});
+
+   $sender->send_message({text => 'hey', chat_id => $chat_id});
+
+=head1 DESCRIPTION
+
+This is a class wrapping L<WWW::Telegram::BotAPI> for convenient usage within
+the Bot::ChatBots system.
+
+The L</send> method allows you to send a message. It provides a few DWIM
+features but it's basically a thin wrapper around
+L<WWW::Telegram::BotAPI/api_request>, which you are encouraged to see.
+
+=head1 ATTRIBUTES
+
+This class composes L<Bot::ChatBots::Role::Sender> and inherits all of its
+accessors.
+
+=head2 B<< start_loop >>
+
+   say 'loop starts automatically' if $obj->start_loop;
+   $obj->start_loop(0); # don't start automatically
+   $obj->start_loop(1); # start loop automatically
+
+Accessor for boolean attribute that instructs L</send_message> to start
+the L<Mojo::IOLoop> automatically. This can still be overridden by
+anything passed with key C<start_loop> in L</send_message>.
+
+Defaults to C<0> (I<false>).
+
+=head2 B<< telegram >>
+
+   my $telegram = $obj->telegram;
+   $obj->token(WWW::Telegram::BotAPI->new(...));
+
+Accessor for the L<WWW::Telegram::BotAPI> object, if you want to use it or set
+a new one.
+
+By default, when needed one is instantiated lazily based on the available
+C<token> and with the current L</async> setting. This lazy initialization also
+takes care to start L<Mojo::IOLoop> if it's not already running.
+
+=head2 B<< token >>
+
+   my $token = $obj->token;
+   $obj->token($new_token);
+
+Accessor for the Telegram token.
+
+
+=head1 METHODS
+
+This class composes L<Bot::ChatBots::Role::Sender> and inherits all of its
+methods.
+
+=head2 B<< may_start_loop >>
+
+   $self->may_start_loop(%args);
+   $self->may_start_loop(\%args);
+
+Evaluates conditions for starting L<Mojo::IOLoop>. These conditions are:
+
+=over
+
+=item *
+
+if the provided C<%args> contains a key C<start_loop>, it is used to
+establish whether to start the loop or not, OTHERWISE
+
+=item *
+
+if L</start_loop> is I<false>, the loop is not started, OTHERWISE
+
+=item *
+
+the loop is started if it's not already running.
+
+=back
+
+This method is used by L</send_message>.
+
+=head2 B<< send_message >>
+
+   $obj->send_message($message); # OR
+   $obj->send_message($message, %args);
+   $obj->send_message($message, \%args);
+
+Do actual sending of a message. This method leverages on L</telegram> to
+do the actual network traffic.
+
+A Telegram message is required to have the following structure:
+
+   {
+      chat_id => $id_of_recipient_chat,
+      text => $your_message,
+   }
+
+If the input C<$message> is a hash reference, the C<text> part is supposed
+to be OK, otherwise the input C<$message> is considered to be the text of
+the message.
+
+As an extension, you can also pass the method to be called on the
+L</telegram> object, in two ways:
+
+=over
+
+=item *
+
+via option C<telegram_method>, which assumes you will use the right method
+name;
+
+=item *
+
+via option C<method>, which supports some aliases. To date the only alias
+supported is C<send> in lieu of C<sendMessage>.
+
+=back
+
+The argument C<%args> supports the following keys:
+
+=over
+
+=item C<callback>
+
+A sub reference to be used as a callback for a non-blocking call to the
+L</telegram> client.
+
+=item C<record>
+
+The input record, e.g. coming from a webhook, useful for getting the
+recipient of the message.
+
+If the C<chat_id> key in the incoming C<$message> is missing, it is
+possibly auto-filled based on the following algorithm:
+
+=over
+
+=item *
+
+if a C<$args{record}> is provided, then the C<< $args{record}{channel}{id}
+>> is taken from it;
+
+=item *
+
+otherwise, if the L<Bot::ChatBots::Role::Sender/has_recipient> method
+returns a true value, then L<Bot::ChatBots::Role::Sender/recipient> is
+used;
+
+=item *
+
+otherwise an exception is thrown (L<Ouch> with code 500).
+
+=back
+
+=item C<start_loop>
+
+Boolean value to signal if you want the L<Mojo::IOLoop> to be started
+automatically (otherwise L<Bot::ChatBots::Role::Sender/start_loop> is
+used).
+
+=back
+
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Telegram::LongPoll>.
+L<Bot::ChatBots::Telegram::WebHooks>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

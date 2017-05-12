@@ -1,0 +1,59 @@
+Revision history for Perl extension Bundle::CVSMonitor
+
+1.07 Tue Oct  4 2004
+   - Added Class::Handle to the Bundle file
+
+1.06 Fri Jun  4 2004
+   - Added File::Which to detect installed programs
+
+1.05 Sat Mar 20 2004
+   - Incrementing Chart::Math::Axis to 0.3 to chase a Math::BigInt bug
+
+1.04 Thu Feb 12 2004
+   - Adding Scalar::Util 1.09
+
+1.03 Thu Feb 12 2004
+   - Added XML::Generator and Date::Format for the RSS upgrade
+
+1.01 Sun Sep 21 2003
+   - For some reason, a comment in the content POD section is being parsed
+     as modules that need to be installed. WRONG!
+   - Upgraded to Class::Autouse 1.0 because of a bug in 0.9
+
+1.0  Sat Aug 20 2003
+   - Updating to require Class::Autouse 0.8
+
+0.9  Sun Aug 24 2003 16:22:31
+   - Math::BigFloat changed, which meant a new version of Chart::Math::Axis.
+     Updating to require the new version of it.
+
+0.8 Missing
+
+0.7  Thu Aug 14 15:10:14 2003
+   - Updated to cover CVSMonitor 0.6.3
+   - Manually specified some additional modules, rather than
+     assuming other modules will add them.
+
+0.6  Thu Dec 05 20:01:32 2002
+   - Updated File::Flat requirement to 0.6
+   - Added URI::Escape
+   - Added Array::Window
+   - Added Clone
+
+0.5  Wed Dec 04 20:14:32 2002
+   - Added Net::Telnet
+
+0.4  Thu Nov 28 15:22:34 2002
+    - Updating File::Flat -> 0.5
+
+0.3  Sat Nov 23 02:57:54 2002
+	- Added Config::Tiny
+	- Added CGI::Carp
+	- Added File::Flat
+	- Added Class::Inspector
+
+0.2  Sun Nov 03 11:21:54 2002
+	- Added Proc::ProcessTable
+
+0.1  Fri Nov 01 15:37:03 2002
+	- original version

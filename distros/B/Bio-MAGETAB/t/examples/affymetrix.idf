@@ -1,0 +1,49 @@
+"Investigation Title"	"University of Heidelberg H sapiens TK6"							
+"Experimental Design"	"genetic_modification_design"							
+"Experimental Factor Name"	"EF1"	"EF2"						
+"Experimental Factor Type"	"genetic_modification"	"compound"						
+"Experimental Factor Term Source REF"	"MO"							
+								
+"Person Last Name"	"Maier"	"Fleckenstein"	"Li"	"Laufs"	"Zeller"	"Freuhauf"	"Herskind"	"Wenz"
+"Person First Name"	"Patrick"	"Katharina"	"Li"	"Stephanie"	"Jens"	"Stephan"	"Carsten"	"Frederik"
+"Person Mid Initials"					"W"			
+"Person Email"	"patrick.maier@radonk.ma.uni-heidelberg.de"							
+"Person Phone"	491334787822							
+"Person Fax"	123							
+"Person Address"	"Theodor-Kutzer-Ufer 1-3"							
+"Person Affiliation"	"Department of Radiation Oncology, University of Heidelberg"	"Department of Radiation Oncology, University of Heidelberg"	"University of Heidelberg, ZMF"	"DKFZ, Heidelberg"	"DKFZ, Heidelberg"	"University of Heidelberg, Department of Int Med V"	"Department of Radiation Oncology, University of Heidelberg"	"Department of Radiation Oncology, University of Heidelberg"
+"Person Roles"	"submitter;investigator"	"investigator"	"investigator"	"investigator"	"investigator"	"investigator"	"investigator"	"investigator"
+"Person Roles Term Source REF"	"MO"							
+								
+"Quality Control Type"	"biological_replicate"							
+"Quality Control Term Source REF"	"MO"							
+"Replicate Type"	"biological_replicate"							
+"Replicate Term Source REF"	"MO"							
+"Normalization Type"	"whatever"							
+"Normalization Term Source REF"	"MO"							
+"Date of Experiment"	"2005-01-04"							
+"Public Release Date"	"2005-04-01"							
+								
+"PubMed ID"	16953664							
+"Publication DOI"	"doi: some number here"							
+"Publication Author List"	"Me, him and her"							
+"Publication Title"	"What I did on my holidays"							
+"Publication Status"	"Universally panned"							
+"Publication Status Term Source REF"	"MO"							
+								
+"Experiment Description"	"Gene expression of TK6 cells transduced with an oncoretrovirus expressing MDR1 (TK6MDR1) was compared to untransduced TK6 cells and to TK6 cell transduced with an oncoretrovirus expressing the Neomycin resistance gene (TK6neo). Two biological replicates of each were generated and the expression profiles were determined using Affymetrix Human Genome U133 Plus2.0 GeneChip microarrays. Comparisons between the sample groups allow the identification of genes with expression dependent on the MDR1 overexpression."							
+								
+"Protocol Name"	"GROWTHPRTCL10653"	"EXTPRTCL10654"	"TRANPRTCL10656"					
+"Protocol Type"	"grow"	"nucleic_acid_extraction"	"bioassay_data_transformation"					
+"Protocol Description"	"TK6 cells were grown in suspension cultures in RPMI 1640 medium supplemented with 10% horse serum (Invitrogen, Karlsruhe, Germany). The cells were routinely maintained at 37 C and 5% CO2."	"Approximately 10^6 cells were lysed in RLT buffer (Qiagen).Total RNA was extracted from the cell lysate using an RNeasy kit (Qiagen)."	"Mixed Model Normalization with SAS Micro Array Solutions (version 1.3)."					
+"Protocol Parameters"	"media"	"Extracted Product; Amplification; Input RNA"						
+"Protocol Term Source REF"	"MO"							
+"Protocol Hardware"		"MyHardware"						
+"Protocol Software"		"MySoftware"						
+"Protocol Contact"		"MyContact"						
+								
+"SDRF File"	"affy_sdrf.txt"							
+								
+"Term Source Name"	"CTO"	"MO"	"ncbitax"	"ArrayExpress"				
+"Term Source File"	"http://obo.sourceforge.net/cgi-bin/detail.cgi?cell"	"http://mged.sourceforge.net/ontologies/MGEDontology.php"	"http://www.ncbi.nlm.nih.gov/Taxonomy/taxonomyhome.html/"	"http://www.ebi.ac.uk/arrayexpress/"				
+"Term Source Version"		"1.3.0.1"						

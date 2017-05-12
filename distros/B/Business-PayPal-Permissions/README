@@ -1,0 +1,85 @@
+NAME
+    Business::PayPal::Permissions - PayPal Permissions
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        use Business::PayPal::Permissions;
+        use Data::Dumper;
+
+        my $ppp = Business::PayPal::Permissions->new(
+            username => $cfg{username}, password => $cfg{password},
+            signature => $cfg{signature}, sandbox => 1,
+        );
+
+DESCRIPTION
+    PayPal Permissions
+    <https://www.x.com/developers/paypal/documentation-tools/permissions/per
+    missions-service>
+
+  METHODS
+   CONSTRUCTION
+        my $ppp = Business::PayPal::Permissions->new(
+            username => $cfg{username}, password => $cfg{password},
+            signature => $cfg{signature},
+            app_id  => 'APP-80W284485P519543T',
+            sandbox => 1,
+        );
+
+    *   username
+
+    *   password
+
+    *   signature
+
+        credentials from paypal.com
+
+    *   app_id
+
+        app id from x.com, use 'APP-80W284485P519543T' for sandbox
+
+    *   debug
+
+    *   sandbox
+
+        using sandbox urls
+
+    *   ua_args
+
+        passed to LWP::UserAgent
+
+    *   ua
+
+        LWP::UserAgent or WWW::Mechanize instance
+
+   RequestPermissions($scope, $callback)
+        my $data = $ppp->RequestPermissions(
+            ['TRANSACTION_SEARCH', 'TRANSACTION_DETAILS', 'ACCESS_BASIC_PERSONAL_DATA'],
+            'http://localhost:5000/cgi-bin/test.pl'
+        );
+
+        print redirect($data->{redirect_url}) if exists $data->{redirect_url};
+        die $data->{error}->[0]->{message} . "\n" if exists $data->{error};
+
+   GetAccessToken($request_token, $verification_code)
+        my $data = $ppp->GetAccessToken( param('request_token'), param('verification_code') );
+        die $data->{error}->[0]->{message} . "\n" if exists $data->{error};
+
+        my $token = $data->{token};
+        my $tokenSecret = $data->{tokenSecret};
+
+   GetBasicPersonalData
+        my $user = $ppp->GetBasicPersonalData(['http://axschema.org/contact/email', 'http://schema.openid.net/contact/fullname', 'https://www.paypal.com/webapps/auth/schema/payerID', 'http://axschema.org/namePerson/first', 'http://axschema.org/namePerson/last', 'http://openid.net/schema/company/name', 'http://axschema.org/contact/country/home']);
+
+AUTHORS
+    *   Fayland Lam <fayland@gmail.com>
+
+    *   Mc Cheung
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Fayland Lam.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

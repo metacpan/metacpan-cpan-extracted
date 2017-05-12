@@ -1,0 +1,12 @@
+
+0.04      2014-01-14 22:02:39 Europe/Berlin
+	- Fix compatibility with Moo <= 1.000008 which did not allow simple
+		scalars as default values
+
+0.03      2014-01-12 17:00:16 Europe/Berlin
+	- Get rid of File::Find::Rule dependency;
+		use in-core File::Find
+
+0.01      2014-01-11 21:09:48 Europe/Berlin
+	- Initial release
+

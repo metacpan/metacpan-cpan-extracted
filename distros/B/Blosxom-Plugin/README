@@ -1,0 +1,28 @@
+This is Perl module Blosxom::Plugin.
+
+INSTALLATION
+
+Blosxom::Plugin installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Blosxom::Plugin
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Blosxom::Plugin documentation is available as in POD.
+So you can do:
+
+    % perldoc Blosxom::Plugin
+
+to read the documentation online with your favorite pager.
+
+Ryo Anazawa

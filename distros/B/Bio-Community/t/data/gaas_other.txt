@@ -1,0 +1,9 @@
+# taxon_name	taxon_id	relative_abundance_%
+k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rickettsiales; f__Pelagibacteraceae; g__; s__	61205	37.7193501585844
+k__Bacteria; p__Cyanobacteria; c__Synechococcophycideae; o__Synechococcales; f__Synechococcaceae; g__Prochlorococcus; s__marinus	2137711	6.00435867198401
+k__Bacteria; p__Cyanobacteria; c__Synechococcophycideae; o__Synechococcales; f__Synechococcaceae; g__Prochlorococcus; s__marinus	3822178	5.29011101189013
+k__Bacteria; p__Cyanobacteria; c__Synechococcophycideae; o__Synechococcales; f__Synechococcaceae; g__Prochlorococcus; s__marinus	59293	4.80465001824202
+k__Bacteria; p__Proteobacteria; c__Gammaproteobacteria; o__Alteromonadales; f__Alteromonadaceae; g__; s__	3348571	1.93905342560661
+k__Archaea; p__Euryarchaeota; c__Thermoplasmata; o__E2; f__Marine group II; g__; s__	1002067	1.79875687527565
+k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodospirillales; f__Rhodospirillaceae; g__; s__	106944	1.28160154758718
+k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rickettsiales; f__Pelagibacteraceae; g__; s__	61204	1.25260787169998

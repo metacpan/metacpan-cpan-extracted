@@ -1,0 +1,15 @@
+config {
+    engine CGI;
+    template_engine TT;
+    Init Std {  }
+}
+app Addresses {
+    sequence address_seq {}
+    table address {
+        sequence new_seq;
+        foreign_display `%name`;
+    }
+    join_table fox_sock {
+        joins fox => stocking;
+    }
+}

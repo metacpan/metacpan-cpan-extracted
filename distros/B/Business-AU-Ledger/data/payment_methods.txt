@@ -1,0 +1,13 @@
+ATM, ATM withdrawl
+Bank, Other bank debits
+CR card, Credit card
+Cash, Cash
+Charge, Bank charge
+Cheque, Cheque
+Counter, Bank withdrawl
+DR card, Debit card
+Direct, Direct debit
+EFT, EFT
+EFTPOS, EFTPOS
+Other, Other
+Petty cash, Petty cash

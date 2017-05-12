@@ -1,0 +1,28 @@
+---
+abstract: 'Poll woot.com during a woot-off and notify via IRC'
+author:
+  - 'Mike Schilli <cpan@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-WootOff
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bot::BasicBot: 0.81
+  HTTP::Request::Common: 0
+  Log::Log4perl: 1
+  POE: 0.99
+  POE::Component::Client::HTTP: 0
+resources:
+  repository: http://github.com/mschilli/bot-wootoff
+version: 0.09

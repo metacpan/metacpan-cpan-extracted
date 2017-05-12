@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% "BORDERS ANALYSIS FOR $nation" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% FOREACH b IN borders.keys %]
+[% FILTER color 'yellow' %]# [% b %][% END %]
+   Relations: [% borders.$b.relation.colored_status %]
+[% IF borders.$b.support %]   Military support in the country: [% borders.$b.support.nation %] [% borders.$b.support.relation.colored_status %][% END %]
+[% END %]

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e04b044e329182543de0c374d521cb8710631f53 Changes
+SHA1 bcd46588ae3bff03fc946ca9b26d290347b52bbb EWP.xs
+SHA1 57b0d3395ab13fbe4981bd2a35dcb4a9c694dc9f MANIFEST
+SHA1 0d2704f2525a3fb191f92f871417cad6ddeb1edf MANIFEST.SKIP
+SHA1 97328c03bf427caefd53d73df25d25da83f787f2 META.yml
+SHA1 f0b73b220a267558d8248605859c7dfef707aadf Makefile.PL
+SHA1 c361f1d2466b8ca18977b290eec8505e940ac133 README
+SHA1 42cb1fb29b1a148ecc83aebcc8f5e08136b90cd4 lib/Business/PayPal/EWP.pm
+SHA1 f500ea0379977ddc525c5d50d4177909b64c7549 paypal.pem
+SHA1 eb1cb38990773cd4d5b368909b8da3f79cbf2657 ppport.h
+SHA1 ad7d30f2b8e7f62006bd64a64759049af0cd97bb t/00signature.t
+SHA1 0a1ade79f60f7be7f5099762343428903bfd799d t/01load.t
+SHA1 9fab73a18740678f1890669f7b3406b606671b18 test.crt
+SHA1 f79fc0d9ff99468d5d5fd32536e63af88a423e4c test.key
+SHA1 f2aaa9da3b3e74fef8b3db57f9ec0516c2c7ba31 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iQIVAwUBUDe+5+2kAdlF+QyeAQKvOw//XgZBCsGcODDHop0tB+Oc6xmOE6ftINMC
+wqORQGTGDFAeNdnd7cogSyy1oXN201NKcPyEq/+HfK6fhEHNvB90Km/nS60xtnDc
+H4g1cOIb8+bfTvzgw/y+fAoRJ/Wgvf8V+N22VbQ0bqZjSyG328LuGqi6jJYt7Ou4
+aydVohs2H65/lS8xJvo31cCPmJbwCFMVXFAaU8qpUtcRz+3gQ4SaA6SMecjN80Qx
+vlCIrXf3i4WaHaa3XPr1Bz1IAHDY5zLs+D3t24ThWNXuGipmarBFP3sOiRxSFSa8
+OsDb2FNsP14GuPfvjBoVoMshmv8vA8se1MaGsRSQmxGIso/3ekCzL9rbet4vlQXI
+Ha8LdYjDLr7wXWYS3R3OPlkZoXcvloDqbFhGlhya9W35cmcAICZWSR7StRvb2ZdB
+r2J4r/YhwG4VyLCGTQlLhRwwAdJzzDtfxx+WhcP1Q21WA0lqPTZEYityoMnbFOLx
+39syG+isbR3efjkZEuvP6bj/zMPM73Uo0dS6XiLiMXoZKU9FhyGRbcSlPT4t0kOE
+EP6/EWSbeKraYPlfaiCrrbjm3LtGdeilVPSpM56QTw7i3Rm+UuQR9bmjssxD6DR9
+IL4EgWAtS74qzVV4foQRs3qoJGGN6AUB5/3x0xIw0+l08SYdFTFasom+X3aqRP03
+Muvp6fE/Xuo=
+=SoUp
+-----END PGP SIGNATURE-----

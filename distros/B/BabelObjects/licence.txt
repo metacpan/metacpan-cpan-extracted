@@ -1,0 +1,44 @@
+#/*====================================================================
+# * Babel Objects, Version 1.0
+# * ====================================================================
+# *
+# * Copyright (c) 2000 The Babel Objects Network. All rights reserved.
+# *
+# * This source file is subject to version 1.1 of The Babel Objects
+# * License, that is bundled with this package in the file LICENSE,
+# * and is available through the world wide web at :
+# *
+# *          http://www.BabelObjects.Org/law/license/1.1.txt
+# *
+# * If you did not receive a copy of the Babel Objects license and are
+# * unable to obtain it through the world wide web, please send a note
+# * to license@BabelObjects.Org so we can mail you a copy immediately.
+# *
+# * --------------------------------------------------------------------
+# *
+# * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+# * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# * DISCLAIMED.  IN NO EVENT SHALL THE BABEL OBJECTS NETWORK OR
+# * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+# * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# * SUCH DAMAGE.
+# *
+# * ====================================================================
+# *
+# * This software consists of voluntary contributions made by many
+# * individuals on behalf of The Babel Objects Network.  For more
+# * information on The Babel Objects Network, please see
+# * <http://www.BabelObjects.org/>.
+# *
+# */
+
+#
+# author Jean-Christophe Kermagoret (jck@BabelObjects.Org)
+#
+

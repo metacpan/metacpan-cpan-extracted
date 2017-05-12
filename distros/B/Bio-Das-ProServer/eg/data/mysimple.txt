@@ -1,0 +1,10 @@
+X	15	39	exon	This is exon 1 of transcript 1	EXON001	TRAN001	
+X	50	56	exon	This is exon 2 of transcript 1	EXON002	TRAN001	
+X	15	56	transcript	This is transcript 1	TRAN001		EXON001,EXON002
+X	35	67	exon	This is exon 1 of transcript 2	EXON003	TRAN002	
+X	85	94	exon	This is exon 2 of transcript 2	EXON004	TRAN002	
+X	35	94	transcript	This is transcript 2	TRAN002		EXON003,EXON004
+Y	01	19	exon	This is exon 1 of transcript 3	EXON005	TRAN003	
+Y	30	33	exon	This is exon 2 of transcript 3	EXON006	TRAN003	
+Y	50	89	exon	This is exon 3 of transcript 3	EXON007	TRAN003	
+Y	01	89	transcript	This is transcript 3	TRAN003		EXON005,EXON006,EXON007

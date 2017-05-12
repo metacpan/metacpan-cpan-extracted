@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Benchmark-Stopwatch-Pause
+version:      0.04
+version_from: lib/Benchmark/Stopwatch/Pause.pm
+installdirs:  site
+requires:
+    Benchmark::Stopwatch:          0.03
+    Clone:                         0
+    Test::More:                    0
+    Time::HiRes:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

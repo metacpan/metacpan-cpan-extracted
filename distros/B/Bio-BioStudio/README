@@ -1,0 +1,115 @@
+Bio::BioStudio
+
+SEE ALSO
+	
+	Bio::GeneDesign
+
+DEPENDENCIES
+
+The Perl libraries not in the Perl core that BioStudio requires are Text::Diff, 
+Time::Format, Exception::Class, Digest::MD5, URI::Escape, Readonly, and 
+YAML::Tiny. All of these perl libraries can be installed by BioStudio at install 
+time or beforehand with cpan.
+
+You need BioPerl-live, from github and not from cpan.
+  git clone https://github.com/bioperl/bioperl-live.git
+  cd bioperl-live/
+  sudo perl Build.PL
+  sudo ./Build installdeps
+  sudo ./Build test
+  sudo ./Build install
+  cd ../
+  git clone https://github.com/bioperl/bioperl-run.git
+  cd bioperl-run/
+  sudo perl Build.PL
+  sudo ./Build installdeps
+  sudo ./Build install
+
+OPTIONAL PACKAGES
+
+If a graphical user interface is desired, the excellent GBrowse2 is available 
+and easily installed from https://github.com/GMOD/GBrowse.
+
+For static graphic representations of chromosomes BioStudio requires the Cairo 
+library and FreeType2 as well as the associated perl bindings Cairo and 
+Font::FreeType.
+
+BLAST+ is required for sequence comparison and for PCRTag generation. Make sure 
+you are using BLAST+ and not any older set of BLAST scripts. The package is 
+available from ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/.
+
+BioStudio's performance on large genomes is drastically improved by the indexing 
+annotations in a relational database. MySQL 5.6 or Postgres 9.3 are supported. 
+Make sure to install the perl libraries DBI and either DBD::mysql or DBD::Pg.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::BioStudio
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio::BioStudio
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio::BioStudio
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio::BioStudio
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio::BioStudio/
+
+FUTURE WORK
+
+  •Revamp the custom feature system so that they are described in individual
+	files and stored as Bio::Root::Root objects (in concert with BioStudio)
+	
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Sarah Richardson
+
+This program is distributed under the (Revised) BSD License:
+L<http://www.opensource.org/licenses/bsd-license.php>
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+
+* Neither the name of Sarah Richardson's Organization
+nor the names of its contributors may be used to endorse or promote
+products derived from this software without specific prior written
+permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

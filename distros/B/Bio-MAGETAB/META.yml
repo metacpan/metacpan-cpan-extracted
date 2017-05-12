@@ -1,0 +1,44 @@
+---
+abstract: 'A data model and utility API for the MAGE-TAB format.'
+author:
+  - 'Tim F. Rayner <tfrayner@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0.26
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Bio::MAGETAB
+name: Bio-MAGETAB
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  DBD::SQLite: 0
+  DBI: 0
+  GraphViz: 2.03
+  LWP::UserAgent: 5.819
+  Tangram: 2.10
+requires:
+  Date::Manip: 5.44
+  DateTime: 0.4302
+  DateTime::Format::Flexible: 0.21
+  Email::Valid: 0.179
+  Moose: 0.43
+  MooseX::FollowPBP: 0.04
+  MooseX::Types: 0.10
+  Params::Coerce: 0.14
+  Parse::RecDescent: 1.965001
+  Text::CSV_XS: 0.32
+  URI: 1.35
+  perl: 5.8.1
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 1.31

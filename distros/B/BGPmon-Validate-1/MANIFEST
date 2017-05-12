@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+etc/bgp_monitor_2_00.xsd
+etc/network_elements_2_00.xsd
+etc/xfb_2_00.xsd
+lib/BGPmon/Validate.pm
+t/00-bgpmon-validate.t

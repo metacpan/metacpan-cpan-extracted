@@ -1,0 +1,8 @@
+--- 
+alias: AtoZ
+channels: 
+  - "#TestNet"
+spoofing:
+  nick: AtoZ
+  ircname: AtoZ
+state_file: var/bot/AtoZ.db

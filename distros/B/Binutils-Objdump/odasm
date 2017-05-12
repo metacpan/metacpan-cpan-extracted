@@ -1,0 +1,200 @@
+#!/usr/bin/perl
+#
+# Copyright (c) 2009, 2011 Slade Maurer, Alexander Sviridenko. All rights reserved.
+# (see the pod text in Binutils::Objdump module for use and distribution rights)
+#
+
+our $VERSION = '0.1.2';
+
+use Getopt::Long;
+use Binutils::Objdump qw(:ALL);
+
+GetOptions(
+    'h|help' => \&print_usage,
+    'V|version' => \&print_version,
+);
+
+$input = shift @ARGV || 'a.out';
+
+if (!-e $input || !-f $input) {
+    die "$input cannot be found. Exit.\n";
+}
+
+objdumpopt("-dTx --prefix-addresses");
+objdump($input);
+
+# Reading strings ...
+
+foreach (objdump_section_headers()) {
+    if (/.rodata/) {
+        ($rubbish, $rest) = split /.rodata/, $_, 2;
+        ($rubbish, $rest) = split /0/, $rest, 2;
+        @numbers = split /  /, $rest, 5;
+        $size = hex($numbers[0]);
+        $starting_address = hex($numbers[1]);
+        $end_address = $starting_address + $size;
+        $offset = hex($numbers[3]);
+        open  INPUT, '<', $input;
+        seek  INPUT, $offset, 0;
+        read  INPUT, $cadena, $size;
+        close INPUT;
+    }
+}
+
+# Processing symbol table ...
+
+foreach (objdump_symtab()) {
+    last if /^\n/;
+    @st_element = split(/ /, $_);
+    $_ = $st_element[$#st_element];
+#    chop;
+    $st_element[0] =~ s/^[0]+([1-9])/$1/;
+    $symbol_table{$st_element[0]} = $_;
+}
+
+# Analysis ...
+
+foreach (objdump_sec_disasm('.text')) {
+    s/0x//g;
+    s/<.*?>//g;
+    s/  / /g;
+
+    if (/j/) {
+        ($direccion,$inst,$destino) = split / /, $_, 3;
+        $destino = ~s/ //g;
+        chomp $destino;
+        $salto{$destino} .= ($direccion." \; ");
+    }
+    elsif (/call/) {
+        ($direccion, $inst, $destino) = split / /, $_, 3;
+        $destino =~ s/ //g;
+        chomp $destino;
+        $call{$destino} .= ($direccion." \; ");
+    }
+}
+
+# Writting references ...
+
+$char=".";
+$counter=0;
+$i=0;
+foreach (objdump_sec_disasm('.text')) {
+    $counter++;
+    $copia = $_;
+
+    s/0x//g;
+    s/\<.*?\>//ge;
+    s/  / /g;
+
+    ($direccion, $inst, $destino) = split / /, $_, 3;
+    $destino =~ s/^[0]+([1-9])/$1/;
+    $direccion =~ s/^[0]+([1-9])/$1/;
+
+    if (defined $symbol_table{$direccion}) {
+        print "\nFunction : ".$symbol_table{$direccion};
+        print "\n\n";
+    }
+
+    if (/call/) {
+        $destino =~ s/ //g;
+        chomp $destino;
+
+        if (defined $symbol_table{$destino}) {
+            print "\n  Reference to function : ".$symbol_table{$destino}."\n\n";
+        }
+    }
+
+    if (defined $salto{$direccion}) {
+        print "\n  Referenced from jump at ".$salto{$direccion}."\n\n";
+    }
+
+    if (defined($call{$direccion})) {
+        print "\n  Referenced from call at ".$call{$direccion}."\n\n";
+    }
+
+    if (/\$/){
+        ($instruccion, $operand) = split /\$/, $_, 2;
+
+        if (!/push/) {
+            ($operand, undef) = split /\,/, $operand, 2;
+        }
+        chomp $operand;
+        $offset = hex $operand;
+        if (($offset <= $end_address)
+             && ($offset >= $starting_address))
+        {
+            $auxiliar = substr($cadena, $offset-$starting_address);
+            $length = index($auxiliar, pack("x"));
+            $auxiliar=substr($auxiliar, 0, $length);       
+            $auxiliar =~ s/\n//g;
+            print "\n  Possible reference to string :\n";
+            print "\"$auxiliar\"\n\n"
+        }       
+
+        if ($symbol_table{$operand}) {
+            print "\n  Appeared : ". $symbol_table{$operand} ."\n\n";
+        }
+    }
+
+    print "$copia\n";
+}
+
+exit(0);
+
+sub print_usage
+{
+    print "odasm $VERSION\n";
+    print "Usage: odasm [OPTION]... exe_file\n\n";
+    print "  -V, --version    display the version of odasm and exit.\n";
+    print "  -h, --help       print this help.\n";
+    exit(0);
+}
+
+sub print_version
+{
+    print "odasm $VERSION\n";
+    print "Binutils::Objdump $Binutils::Objdump::VERSION\n\n";
+    print "Copyright (c) 2009, 2011 Slade Maurer, Alexander Sviridenko. All rights reserved.\n";
+    print "(see the pod text in Binutils::Objdump module for use and distribution rights)\n";
+    exit(0);
+}
+
+__END__
+
+=head1 NAME
+
+odasm - A disassembler written on Perl and based on Bintuils::Objdump module
+
+=head1 SYNOPSIS
+
+    odasm [OPTIONS] exe_file
+
+    odasm -V
+
+    odasm -h
+
+=head1 DESCRIPTION
+
+This disassembler based on linux disassembler 2.0799 by SiuL+Hacky, and 
+written with help of L<Binutils::Objdump> module.
+
+This script allows to show you: appeared functions and symbols, possible 
+references to strings, references from C<jump>s and C<call>s.
+
+=head1 AUTHORS
+
+Alexander Sviridenko <oleks.sviridenko@gmail.com>
+
+Slade Maurer <slade@computer.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009, 2011 Slade Maurer, Alexander Sviridenko. All rights reserved.
+(see the pod text in L<Binutils::Objdump> module for use and distribution rights)
+
+=head1 SEE ALSO
+
+Binutils::Objdump(1)
+
+=cut
+

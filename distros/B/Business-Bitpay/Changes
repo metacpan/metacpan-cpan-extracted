@@ -1,0 +1,21 @@
+Revision history for perl module Business::Bitpay
+
+0.05 2014-04-10
+
+    - Added new HTTP header for version tracking (ionux)
+
+0.04 2014-01-09
+    
+    - LWP::Protocol::https added to dependencies
+
+0.03 2013-08-18
+    
+    - Don't add ContentType field on GET queries
+
+0.02 2013-01-15
+    
+    - Fixed dependencies
+
+0.01 2013-01-15
+
+    - Initial release

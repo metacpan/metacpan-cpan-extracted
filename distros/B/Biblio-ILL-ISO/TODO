@@ -1,0 +1,5 @@
+TODO list for Biblio::ILL::ISO
+
+- properly handle ASN.1 extensions (like 1.0.10161.13.3)
+- more tests!  (always more tests....)
+

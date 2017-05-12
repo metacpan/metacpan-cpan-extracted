@@ -1,0 +1,13 @@
+2003-10-02  Brian Moseley  <bcm@maz.org>
+
+	* lib/Bot/ICB.pm: moved from Bot/ICB.pm to conform to MakeMaker's
+	expectations.
+
+	* MANIFEST.SKIP: add this and other files and tiny docs to at
+	least attempt some sort of release preparations.
+
+1999-11-28  Brian Moseley  <bcm@maz.org>
+
+	* Bot/ICB.pm: provides a Net::IRC-like interface to ICB. only one
+	server tho.
+

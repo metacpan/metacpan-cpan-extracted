@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <rule source file> <thesaurus source file>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $code = <<"EOF";
+$ARGV[0] \$r \$t => sub{{ print "  <tr align=center><td bgcolor=FF9900>$ARGV[0]</td><td bgcolor=FFCC00>\$r</td><td bgcolor=FFCC00>\$t</td></tr>\\n"; }}.
+\$t \$r $ARGV[0] => sub{{ print "  <tr align=center><td bgcolor=FFCC00>\$t</td><td bgcolor=FFCC00>\$r</td><td bgcolor=FF9900>$ARGV[0]</td></tr>\\n"; }}.
+EOF
+
+my $obj = thesaurusLoad($ARGV[1]);
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+
+print "<center><h2>Relations for term <div style=\"color: FF9900\">$ARGV[0]</div></h2><table><tr style=\"color: white\" bgcolor=000000 align=center><td>Term</td><td>Relation</td><td>Term</td></tr>\n";
+$t->process($code);
+print "</table></center>\n";

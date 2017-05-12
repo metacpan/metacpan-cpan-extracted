@@ -1,0 +1,49 @@
+
+# $Id$
+
+severity = 1
+verbose = 8
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+script_sections = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|COPYRIGHT|LICENSE
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-InputOutput::RequireCheckedSyscalls]
+functions = print
+
+#REF: L<http://logicLAB.jira.com/wiki/display/OPEN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitConstantPragma>
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+#deprecated [-NamingConventions::ProhibitMixedCaseSubs]
+[-NamingConventions::Capitalization] 
+
+[-Miscellanea::ProhibitTies]
+
+[-Bangs::ProhibitNumberedNames]
+
+[-Subroutines::RequireArgUnpacking]
+
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+[-Bangs::ProhibitNumberedNames]
+
+[-Bangs::ProhibitFlagComments]
+
+#TODO
+
+[-Documentation::RequirePodLinksIncludeText]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-RegularExpressions::RequireDotMatchAnything]

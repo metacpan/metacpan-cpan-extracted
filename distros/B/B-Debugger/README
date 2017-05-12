@@ -1,0 +1,121 @@
+NAME
+
+    B::Debugger - optree debugger
+
+    Od          - Source level debugger, debug a Perl Compiler backend
+    Od_o        - Debug a Perl Compiler backend option handling
+
+SYNOPSIS
+
+B::Debugger
+
+      perl -MB::Debugger programm.pl
+      B::Debugger 0.01 - optree debugger. h for help
+      op 0 enter
+      > n
+      op 1 nextstate
+      > h
+      Usage:
+      n [n] next op                       l [n|x-y]     list ops
+      c [n] continue (until)              d|Debug       op
+      b <n> break at op                   o|Concise     op
+      s     step into kids                f|Flags       op
+      sib   step to next sibling          x|eval expr
+      u [n] up                            [sahpicg]v<n> n-th global var: sv1,
+      g <n> goto                          pad <n>       n-th pad variable (my)
+      h     help
+      q     quit debugger, execute        exit           quit with no execution
+      op 0 enter
+      > b 5
+      breakpoint 5 added
+      > b const
+      breakpoint const added
+      > n
+      op 2 pushmark
+      > l
+      -  <0> enter ->-
+      -  <;> nextstate(main 111 test.pl:5) v:{ ->-
+      -  <0> pushmark sM ->-  > c
+      > q
+      quit
+      executing...
+
+Od
+
+	perl -d -MOd=C,-DcOACMSGpu,-v foo.pl
+
+	Od::CODE(0x154c5a0)((eval 9)[lib/Od.pm:33]:25):
+	25:                 &$compile();
+	DB<1> s
+	B::C::CODE(0x12c0aa0)(lib/B/C.pm:3163):
+	3163:       return sub { save_main() };
+	DB<1> s
+	B::C::save_main(lib/B/C.pm:2881):
+	2881:     my $warner = $SIG{__WARN__};
+
+Od_o
+	perl -d -MOd_o=C,-DcOACMSGpu,-v foo.pl
+
+	Od_o::CODE(0x14d5e00)((eval 9)[lib/Od_o.pm:12]:8):
+	8:                  &{"B::${backend}::compile"}(@options);
+  	DB<1> s
+	B::C::compile(lib/B/C.pm:3159):
+	3159:     my @options = @_;
+
+
+DESCRIPTION
+      There are three B debuggers, first B::Debugger is a simple optree inspector.
+      Second Od lets you debug you through your B compiler backend with the Perl 
+      native debugger. Third Od_o steps through the option handling.
+ 
+      B::Debugger starts an optree inspector before the runtime execution
+      begins, similar to the perl debugger, but only at the internal optree
+      level, not the source level. Kind of interactive B::Concise.
+
+      The ops are numbered and in basic (=parsed) order, starting from 0.
+      Breakpoints can be defined as number or by opname.
+
+B::Debugger COMMANDS
+      n [n]   goto the next op, or step the next n ops
+      s       step into kid if not next
+      sib     step to next sibling
+      u [n]   go one or n steps back or up
+      g <n>   goto op 0-opmax
+      c [n]   continue. Optionally until op n
+      l [n|x-y] list n ops or from x to y.
+      x <x>   eval perl expression
+      f       list B::Flags op
+      o/C     list B::Concise op
+      d/D     list B::Debug op
+      [sahpicg]v<n> inspect n-th global variable. eg. sv1
+      h       help
+      q       quit debugger, start execution
+      exit    quit perl, no execution
+
+      The source level debugger to step through a compiler is Od,
+      perl -d -MOd=Backend[,OPTIONS] foo.pl	
+
+TODO for B::Debugger
+
+    How to manage direct opidx access?
+
+      Such as: Concise 10, list 5-10, up, sib
+      Do a first sweep in desired basic or exec order recording the ops?
+
+    set curcv in Concise
+
+    Commandline options 
+
+    exit
+
+    de-recursify and simplify the loop, cont is broken.
+
+BUGS
+    B::Debuger is alpha and for interested compiler developers only.
+
+    l => coderef CODE(0x1553f40) has no START (set curcv in Concise)
+
+    cont, goto broken
+
+AUTHOR
+    Reini Urban <rurban@cpan.org> 2009

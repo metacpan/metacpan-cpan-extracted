@@ -1,0 +1,58 @@
+Revision history for GestPayCrypt and GestPayCryptHS.
+
+0.41 (2004-05-25)
+=================
+
+- Now the distribution unpack into a single directory
+- Add README
+- Add MANIFEST
+- Add META.yml
+
+0.40 (2004-05-13)
+=================
+
+- Renamed module to Business::GestPayCrypt for CPAN pubblication
+- Add function DESTROY
+- Changed license from GPL to Perl (GPL/Artistic)
+- Translated to english this revision history
+
+0.30 (2003-06-09)
+=================
+Add compatibility for version 2.0 ( with Verified by Visa )
+
+- Add method GetCountry
+- Add method GetVBV
+- Add method GetVBVrisp
+- Add method SetCVV
+- Add method SetEncryption
+- Add method SetMIN
+- Add method SetPasswordEncrypt
+- Add method SetWithoutEncryption
+- SetShopTransactionID executes a "trim" and html form encoding
+- SetBuyerName executes a "trim" and html form encoding
+- SetBuyerEmail executes a "trim"
+- SetLanguage executes a "trim"
+- SetCustomInfo execuets a "trim" and html form encoding
+- GetShopTransactionID executes html form encoding
+- GetBuyerName execuets html form encoding
+- GetCustomInfo executes html form encoding
+- Add PAY1_CVV and PAY1_MIN at the string to cypher
+- Removed s/ /§/g from the string to cypher
+- Removed s/§/ /g from the string to cypher
+- If the decrypted string contains only spaces return error "Void String"
+- Gets from the decrypted string the fields PAY1_COUNTRY, PAY1_VBV and PAY1_VBVRISP
+- Add the parameter "c=2.0" at the url path of the server request
+- Add the private methods trim, url_encode and url_decode
+- Fix an error in an exaple with ASP:
+    - replaced <script language="PerlScript" runat="Server">...</script>
+      with <% ... %>
+- In the example sample1ris.asp is not required the module CGI
+
+0.20 (2002-01-19)
+=================
+- Add GestPayCryptHS
+- Add pod documentations
+- Add some examples in Cgi and Asp
+- Fix bug: s/ /§/ con s/ /§/g
+- Tested on Linux and e Windows with Back Office version Base
+

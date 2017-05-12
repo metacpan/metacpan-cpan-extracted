@@ -1,0 +1,15 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Bio-Homology-InterologWalk.t
+t/testdata/mmus.txt
+lib/Bio/Homology/InterologWalk.pm
+scripts/Code/doInterologWalk.pl
+scripts/Code/doNets.pl
+scripts/Code/doScores.pl
+scripts/Code/getDirectInteractions.pl
+scripts/Data/mmus_test.txt
+scripts/Data/psi-mi.obo
+META.yml                                 Module meta-data (added by MakeMaker)

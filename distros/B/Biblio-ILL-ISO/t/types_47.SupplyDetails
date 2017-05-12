@@ -1,0 +1,67 @@
+$VAR1 = bless( {
+                 'shipped-via' => bless( {
+                                           'physical-delivery' => bless( {
+                                                                           'generalstring' => 'Canada Post'
+                                                                         }, 'Biblio::ILL::ISO::TransportationMode' )
+                                         }, 'Biblio::ILL::ISO::ShippedVia' ),
+                 'date-due' => bless( {
+                                        'renewable' => bless( {
+                                                                'ENUMERATED' => 1,
+                                                                'ENUM_LIST' => {
+                                                                                 'true' => 1,
+                                                                                 'false' => 0
+                                                                               }
+                                                              }, 'Biblio::ILL::ISO::Flag' ),
+                                        'date-due-field' => bless( {
+                                                                     'generalstring' => '20030920'
+                                                                   }, 'Biblio::ILL::ISO::ISODate' )
+                                      }, 'Biblio::ILL::ISO::DateDue' ),
+                 'cost' => bless( {
+                                    'monetary-value' => bless( {
+                                                                 'PrintableString' => '45.67'
+                                                               }, 'Biblio::ILL::ISO::AmountString' )
+                                  }, 'Biblio::ILL::ISO::Amount' ),
+                 'return-insurance-require' => bless( {
+                                                        'monetary-value' => bless( {
+                                                                                     'PrintableString' => '50.00'
+                                                                                   }, 'Biblio::ILL::ISO::AmountString' )
+                                                      }, 'Biblio::ILL::ISO::Amount' ),
+                 'shipped-conditions' => bless( {
+                                                  'ENUMERATED' => 23,
+                                                  'ENUM_LIST' => {
+                                                                   'special-collections-supervision-required' => 25,
+                                                                   'library-use-only' => 22,
+                                                                   'client-signature-required' => 24,
+                                                                   'other' => 27,
+                                                                   'no-reproduction' => 23
+                                                                 }
+                                                }, 'Biblio::ILL::ISO::ShippedConditions' ),
+                 'insured_for' => bless( {
+                                           'monetary-value' => bless( {
+                                                                        'PrintableString' => '50.00'
+                                                                      }, 'Biblio::ILL::ISO::AmountString' )
+                                         }, 'Biblio::ILL::ISO::Amount' ),
+                 'no-of-units-per-medium' => bless( {
+                                                      'SEQUENCE' => [
+                                                                      bless( {
+                                                                               'medium' => bless( {
+                                                                                                    'ENUMERATED' => 5,
+                                                                                                    'ENUM_LIST' => {
+                                                                                                                     'machine-readable' => 6,
+                                                                                                                     'photocopy' => 2,
+                                                                                                                     'printed' => 1,
+                                                                                                                     'audio-recording' => 5,
+                                                                                                                     'microform' => 3,
+                                                                                                                     'film-or-video-recording' => 4,
+                                                                                                                     'other' => 7
+                                                                                                                   }
+                                                                                                  }, 'Biblio::ILL::ISO::SupplyMediumType' ),
+                                                                               'no-of-units' => 3
+                                                                             }, 'Biblio::ILL::ISO::UnitsPerMediumType' )
+                                                                    ]
+                                                    }, 'Biblio::ILL::ISO::UnitsPerMediumTypeSequence' ),
+                 'chargeable-units' => 123,
+                 'date-shipped' => bless( {
+                                            'generalstring' => '20030813'
+                                          }, 'Biblio::ILL::ISO::ISODate' )
+               }, 'Biblio::ILL::ISO::SupplyDetails' );

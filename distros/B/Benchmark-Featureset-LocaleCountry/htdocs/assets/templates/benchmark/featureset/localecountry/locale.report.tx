@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Perl Modules for Country Data</title>
+<link rel="stylesheet" type="text/css" href="<: $default_css :>">
+<link rel="stylesheet" type="text/css" href="<: $fancy_table_css :>">
+</head>
+<body>
+
+<h3 class="global_toc_text">Purpose</h3>
+
+<p align="center">To cross-check a personal selection of modules which offer:</p>
+
+: include "fancy.table.tx" { data => $purpose };
+
+<p align="center">Note: Only modules offering world-wide data have been considered, so modules such as Locale::BR are ignored.</p>
+
+<p align="center">I've just released <a href="http://search.cpan.org/perldoc?Business::Cart::Generic">Business::Cart::Generic</a>,
+which contains country and subcountry data gleaned from osCommerce. My plan is to replace this latter data with one of the modules assessed below.</p>
+<hr />
+
+<h3 class="global_toc_text">Modules</h3>
+
+: include "basic.table.tx" { row => $module_data };
+
+<hr />
+
+<h3 class="global_toc_text">Country names</h3>
+
+: include "fancy.table.tx" { data => $country_name_count };
+
+<p align="center">Note: The number of countries modules have in common (if any) is <: $common_country_count :>, going by names of countries.</p>
+
+<p align="center">Where the count is 0, this means the module design is so poor its not worth trying to figure out how to obtain the information.</p>
+
+<hr />
+
+<h3 class="global_toc_text">Country name mismatches</h3>
+
+: include "basic.table.tx" { row => $country_name_mismatch };
+
+<hr />
+
+<h3 class="global_toc_text">Division name mismatches</h3>
+
+: include "basic.table.tx" { row => $division_name_mismatch };
+
+<p align="center">Note: None detected.</p>
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+: include "fancy.table.tx" { data => $environment };
+
+<hr />
+
+</body>
+</html>

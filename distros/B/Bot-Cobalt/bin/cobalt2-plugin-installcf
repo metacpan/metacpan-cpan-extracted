@@ -1,0 +1,133 @@
+#!perl
+
+use 5.10.1;
+use strictures 2;
+
+use Path::Tiny;
+
+use Bot::Cobalt::Frontend::RC   'rc_read';
+use Bot::Cobalt::Frontend::Utils 'ask_yesno', 'ask_question';
+
+my($path_dest, $this_plugin);
+my $path_rcfile = $ENV{HOME} ?
+  File::Spec->catfile( $ENV{HOME}, ".cobalt2rc" )
+  : ".cobalt2rc";
+
+use Getopt::Long;
+GetOptions(
+  help => sub {
+    print(
+      "cobalt2-plugin-installcf\n\n",
+      "  --plugin=DIST\n\n",
+      "  --dest=PATH\n",
+      "   OR:\n",
+      "  --rcfile=FILE\n",
+    );
+    
+    exit 0
+  },
+  
+  'plugin=s'   => \$this_plugin,
+  'rcfile=s'   => \$path_rcfile,
+  'dest=s'     => \$path_dest,
+);
+
+unless ($this_plugin) {
+  $this_plugin = $ARGV[0] || die "No plugin specified.\n"
+}
+
+unless ($path_dest) {
+  my ($base, $etc) = rc_read($path_rcfile);
+
+  print "Current etcdir: $etc\n",
+        "No path was specified\n",
+        "Attempting to write one under etcdir\n";
+  
+  $path_dest = ask_question(
+    prompt => "Write file (under \$etcdir/plugins/)",
+  );
+}
+
+$path_dest = path($path_dest);
+write_conf( try_load_cf($this_plugin) );
+print(
+  "Config for $this_plugin\n",
+  "Written to: $path_dest\n",
+);
+
+
+sub try_load_cf {
+  my ($plugin) = @_;
+  my $plugincf = $plugin . '::Conf' ;
+
+  { local $@;
+    eval "require $plugincf";
+    die "Could not load Conf module: $@\n" if $@;
+  }
+
+  die "No conf() method found for $plugincf\n"
+    unless $plugincf->can('conf');
+
+  $plugincf->conf
+    or die "'conf' method for $plugincf did not return a true value"
+}
+
+sub write_conf {
+  my ($thiscf) = @_;
+  
+  die "write_conf not passed a conf, is the plugin name valid?" 
+    unless $thiscf;
+
+  if (-e $path_dest) {
+    print "Warning! The destination file appears to exist.\n";
+    print "Path: $path_dest\n";
+    my $overwrite = ask_yesno(
+      prompt  => "Overwrite destination path?",
+      default => "n",
+    );
+    
+    die "Exiting, destination exists.\n"
+      unless $overwrite;
+  }
+
+  $path_dest->spew_utf8($thiscf);
+  1
+}
+
+
+## FIXME offer to try appending to plugins.conf ?
+##  -> copy to .bak
+
+__END__
+
+=pod
+
+=head1 NAME
+
+cobalt2-plugin-installcf - Install example plugin confs
+
+=head1 SYNOPSIS
+
+  $ cobalt2-plugin-installcf --plugin=<distname> --dest=<filename>
+  
+=head1 DESCRIPTION
+
+This is a simple tool for installing example plugin configuration files 
+packaged with a plugin distribution.
+
+For example:
+
+  $ cpan Bot::Cobalt::Plugin::RSS
+  $ cobalt2-plugin-installcf --plugin="Bot::Cobalt::Plugin::RSS" \
+      --dest="cobalt2/etc/plugins/rss.conf"
+
+Plugin authors should see L<Bot::Cobalt::Manual::Plugins::Dist> for 
+details on including an example plugin configuration file.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

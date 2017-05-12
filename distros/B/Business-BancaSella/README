@@ -1,0 +1,78 @@
+Business::BancaSella README File
+================================
+
+Introduction
+------------
+Banca Sella is an italian banking istitute which offers an online payment system
+with credit card based on a SSL server.
+
+This system may call a form on which will be acquired all informations needed
+to a correct credit card transaction or may be used only for checking credit 
+card and executing transaction.
+
+In both cases, the merchant redirects purchaser on Banca Sella's server and 
+receives then, from Banca Sella, confirmation or not about correct payment 
+through the construction fo a determinate internet address (url) well formatted
+to send purchased data to Banca Sella and to receive from it confirmation or not 
+about payment.
+
+This module helps in the construction of the sending url and in the decoding of 
+the reply url from Banca Sella hiddening url complexity using classes that 
+encapsulate comunication parameters from and to Banca Sella.
+
+During data sending phase to Banca Sella's server it will be inizialized an 
+object of type Business::BancaSella::Encode using the purchased parameters 
+(amount, internal purchased id, currency) and the istance will automatically
+build url for calling Banca Sella's web system.
+
+During replying phase it will be inizialized an object of type 
+Business::BancaSella::Decode with the query string passed in the url from Banca
+Sella and, automatically, the opportune parameters will be set with values
+relative to result's transaction, optional error code, purchased id to which
+transaction is related and so on.
+
+Actually this library implements Banca Sella online system payment called 
+"compatibility gateway" and "gestpay". 
+
+Indeed, given that the autentication of comunication between purchaser to Banca
+Sella and back uses keys called "One-Time-Password" sending from Banca Sella
+to merchant when he opens an account, this module implements two parent classes
+Business::BancaSella::Ric and Business::BancaSella::Ris. The first used for
+recovering keys need during comunications with Banca Sella and the other for 
+checking the autentication of keys sending from Banca Sella in the reply.
+
+Actually these keys could be stored in a file, in a table in a Mysql database
+or in an improved ascii file well formatted to increase passwords 
+search speed. Thanks to Marco Gazerro <gazerro@open2b.com> for this 
+modules.
+
+For more information about this payment system or its functionality and for 
+opening an account for using it you can visit the Banca Sella home page 
+present at http://www.sellanet.it/.
+
+For more information and updates about this module you can point your browser 
+to http://www.ebruni.it/en/software/perl/cpan/business/bancasella/index.htm
+or to whatever CPAN mirror site.
+
+Installation
+------------
+0.  Prerequisites:
+	- Perl version 5.005_03 or more recent.
+	- CPAN URI module.
+	- CPAN HTML::Entities module.
+	- CPAN URI::Escape module.
+
+1.  Installation steps:
+	- from the directory where this file is located, type:
+		perl Makefile.PL
+		make
+		make test
+		make install
+		
+Disclaimer
+----------
+*** This is beta software -- use at your own risks ***
+
+--
+Bruni Emiliano <info@ebruni.it>
+2002-01-16

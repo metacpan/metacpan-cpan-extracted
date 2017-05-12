@@ -1,0 +1,10 @@
+Changes
+HDF5.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/BIE-Data-HDF5.t
+lib/BIE/Data/HDF5.pm
+bieH5.h
+typemap

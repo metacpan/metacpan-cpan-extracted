@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blog xmlns="http://www.blogml.com/2006/01/BlogML" xmlns:xs="http://www.w3.org/2001/XMLSchema" root-url="http://blog.wcs.org/" date-created="2005-12-08T00:16:28">
+	<title>Animal News</title>
+	<sub-title type="text">The wild side of the news.</sub-title>
+	<author name="Tex McNabbit" email="tex@wcs.org"/>
+	<categories>
+		<category id="10" date-created="2006-01-29T09:16:57" date-modified="2006-01-29T09:16:57" approved="true">
+			<title type="text">Rescue</title>
+		</category>
+		<category id="101" date-created="2006-01-29T09:16:57" date-modified="2006-01-29T09:16:57" approved="true" parentref="100">
+			<title type="text">Cats</title>
+		</category>
+		<category id="100" date-created="2006-01-29T09:16:57" date-modified="2006-01-29T09:16:57" approved="true">
+			<title type="text">Pets</title>
+		</category>
+		<category id="200" date-created="2006-01-29T09:16:57" date-modified="2006-01-29T09:16:57" approved="true">
+			<title type="text">Reptiles</title>
+		</category>
+		<category id="201" date-created="2006-01-29T09:16:57" date-modified="2006-01-29T09:16:57" approved="true" parentref="200">
+			<title type="text">Snakes</title>
+		</category>
+	</categories>
+	<posts>
+		<post id="199" date-created="2010-01-01T09:00:00" date-modified="2010-01-01T09:00:00" approved="false" post-url="http://blog.wcs.org/post?id=199">
+			<title>NYC Cat Finally Rescued After 14 Days</title>
+			<content type="html"><![CDATA[
+			<p>
+			As a crowd of reporters and onlookers jostled for a glance, the 
+			11-month-old black cat appeared docile and unscathed despite her 
+			ordeal, which came to a happy end on Friday after a volunteer pulled 
+			her to safety from a crawl space.
+			</p>
+			<p>
+			"I think you'll all agree that she is in great shape," said a proud 
+			Peter Myers, a delicatessen owner in the building who kept Molly in 
+			his store to catch mice.
+			</p>
+			<p>
+			Molly's distressed meows &mdash; audible from the sidewalk outside 
+			the building &mdash; became international news, and rescuers worked 
+			almost around the clock for her safe retrieval.
+			</p>
+			<p>
+			The activity began after the cat wandered into a narrow space 
+			between walls and got lost in the building's complex network of 
+			beams and pipes.
+			</p>
+			<p>
+			Those involved in the rescue effort drilled and hammered out bricks 
+			in the cellar of the 157-year-old edifice, trying everything from 
+			special cameras to traps to locate her and get her out. Kittens were 
+			used as bait to appeal to Molly's maternal side. A pet psychic and 
+			self-described "cat therapist" even stopped by to offer a hand.
+			</p>
+			<p>
+			But in the end, it was good old-fashioned elbow grease that got the 
+			job done.
+			</p>
+			]]></content>
+			<categories>
+				<category ref="10"/>
+				<category ref="101"/>
+			</categories>
+		</post>
+		<post id="120" date-created="2006-05-06T00:02:09" date-modified="2006-05-06T00:02:09" approved="true" post-url="http://blog.wcs.org/post?id=120">
+			<title>Missing dog found nearly a week after plane crash</title>
+			<content type="html"><![CDATA[
+			<p>Six days after a small plane crash that killed two members of a family four, the family's missing dog was found alive by the same pair of teenage brothers who first helped the survivors.</p>
+
+				<p>Family friends had been searching for Lindsey, a 9-year-old Dalmation who had been on the plane but was not found at the crash site.</p>
+
+				<p>"We were called loonies," said Bob Jansen, who along with his wife Shirley had spent much of the week looking for Lindsey. "They told us we were searching for a dead dog."</p>
+
+				<p>"The family's gone through hell on earth, and this is one tiny bright spot," Jansen said. "We can give the family a 55-pound piece of good news."</p>
+			]]></content>
+		</post>
+		<post id="121" date-created="2006-04-16T10:27:40" date-modified="2006-04-16T10:27:00" approved="true" post-url="http://blog.wcs.org/post?id=121">
+			<title>Cat saves baby's life</title>
+			<content type="html"><![CDATA[
+			<p>
+			A cat saved the life of a newborn baby abandoned on the doorstep of 
+			a Cologne house in the middle of the night by meowing loudly until 
+			someone woke up, a police spokesman said Saturday.
+			</p>
+			<p>
+			"The cat is a hero," Cologne police spokesman Uwe Beier said. "Its 
+			loud meowing got the attention of the homeowner and saved the baby 
+			from suffering life-threatening hypothermia. The homeowner opened 
+			door to see why the cat was making so much noise and discovered the 
+			newborn."
+			</p>
+			]]></content>
+			<categories>
+				<category ref="10"/>
+				<category ref="101"/>
+				<category ref="100"/>
+			</categories>
+		</post>
+		<post id="122" date-created="2006-04-12T13:18:08" date-modified="2006-04-12T09:12:58" approved="true" post-url="http://blog.wcs.org/post?id=122">
+			<title>Florida Island Residents Besieged by Iguanas</title>
+			<content type="html"><![CDATA[
+			<p>
+			Kevin Enge, an exotic species expert with the Florida Fish and 
+			Wildlife Conservation Commission, said he believes the iguana was 
+			introduced to Boca Grande in the 1970s by a boat captain who brought 
+			a few from Mexico for his kids but released them when they grew too 
+			large. Their population exploded because each female iguana can lay 
+			up to 75 eggs a year.
+			</p>
+			<p>
+			The reptiles are found in a few other places in Florida, but nowhere 
+			in the numbers seen on Gasparilla Island, home to television 
+			renovator Bob Vila and a vacation spot for the Bush clan.
+			</p>
+			<p>
+			"There's no way you'll get rid of them all. Once they're established 
+			to that extent, it's a lost cause," Enge said.
+			</p>
+			]]></content>
+			<categories>
+				<category ref="200"/>
+			</categories>
+		</post>
+		<post id="105" date-created="2006-04-10T19:11:00" date-modified="2006-04-10T19:11:00" approved="false" post-url="http://blog.wcs.org/post?id=105">
+			<title>Fire Crew Save Cow Stuck in Mud</title>
+			<content type="html"><![CDATA[
+			<p>
+			A team from Durham Fire and Rescue Service were called to Bishop 
+			Auckland Rugby Club on Saturday morning to perform the unusual 
+			rescue mission.
+			</p>
+			<p>
+			It took two hours for officers to free the animal from the playing 
+			field at Westmills, Bridge Road, using a winch and a heavy rescue 
+			vehicle.
+			</p>
+			<p>
+			The cow is being examined by an RSPCA vet while its owner is being 
+			traced.
+			</p>
+			]]></content>
+		</post>
+		<post id="115" date-created="2006-01-01T11:00:49" date-modified="2006-01-01T11:00:49" approved="true" post-url="http://blog.wcs.org/post?id=115">
+			<title>Biologist Battles Killer Pythons in US Park</title>
+			<content type="html"><![CDATA[
+			<p>
+			"People buy them when they're small," he said. "I've seen them as 
+			cheap as 20 bucks in flea markets."
+			</p>
+			<p>
+			The inch-long hatchlings start off cute. Then they hit puberty.
+			</p>
+			<p>
+			"By the end of the year, they're seven feet long," Snow said. "By 
+			the end of two years, they're 10 feet long. And that's more snake 
+			than anyone can handle."
+			</p>
+			<p>
+			Overwhelmed with pets that eat more than they do, python owners 
+			decide to release their snakes into the wild. It's so common in the 
+			Everglades, Snow's had to start a python hot line.
+			</p>
+			<p>
+			And there the Asian natives breed and find a comfortable home in the 
+			Everglades' water, heat and vegetation. They have no predators.
+			</p>
+			<p>
+			Pythons have also discovered suburbia, said Capt. Ernie Jillson, who 
+			helps run the Miami-Dade County fire department's snake squad. They 
+			catch around 20 pythons a year.
+			</p>
+			<p>
+			Three years ago, a 15-footer stopped traffic when he spread himself 
+			across a four-lane road. Last year, another 15-footer gave a 
+			60-year-old woman quite the jolt when she walked outside to find the 
+			snake sunbathing on her patio. And rescue workers had to save a cat 
+			from the 10-foot python that was chasing it around the backyard pool.
+			</p>
+			<p>
+			Lawmaker Poppell says he's no snake lover and doesn't understand 
+			people's fascination with the slithery creatures.
+			</p>
+			]]></content>
+			<categories>
+				<category ref="201"/>
+			</categories>
+		</post>
+		<post id="93" date-created="2005-12-21T09:01:22" date-modified="2005-12-21T09:01:22" approved="true" post-url="http://blog.wcs.org/post?id=93">
+			<title>"Veggie Dog Diet" Fights Weight Gain</title>
+			<content type="html"><![CDATA[
+			<p>
+			By adding string beans to your pet's diet, you add fiber to 
+			their diet, thus helping resolve constipation and anal sac problems; 
+			with the added fiber and reduced amount of dog food, you have 
+			reduced the daily caloric intake, resulting in weight loss; with 
+			green beans, you have given your pet a wonderful treat that happens 
+			to be full of vitamins and minerals; and finally dogs, being plant 
+			and meat eaters, crave the oral sensation derived from the texture 
+			of string beans (some believe this is why some dogs eat grass 
+			periodically). Other vegetables besides string beans can be used, 
+			such as broccoli, carrots or lettuce.
+			</p>
+			]]></content>
+			<categories>
+				<category ref="100"/>
+			</categories>
+		</post>
+	</posts>
+</blog>

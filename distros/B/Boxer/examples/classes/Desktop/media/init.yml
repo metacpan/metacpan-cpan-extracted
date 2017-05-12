@@ -1,0 +1,7 @@
+classes:
+  - Desktop
+parameters:
+  doc:
+    desktop-media:
+      headline:
+        - Desktop media

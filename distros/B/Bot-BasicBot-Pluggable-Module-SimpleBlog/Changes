@@ -1,0 +1,7 @@
+0.02    19 March 2003
+        Added a couple of tests; nothing spectacular though.
+        Fixed a thinko in one of the column names in the SQLite store.
+        Added the README to the MANIFEST.  Oops.
+
+0.01    18 March 2003
+        Initial release.

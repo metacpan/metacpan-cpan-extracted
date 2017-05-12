@@ -1,0 +1,32 @@
+
+  Here are some times for converting alldec.ref (2608 records) from refer
+to bibtex.  This used bp-0.1.1 and Perl5.001.  bp-0.2.0 is about 20% faster.
+
+Assuming alldec.ref is in the ref directory:
+
+  time ../bin/tconv.pl -convert alldec.ref -to foo.bib -format=refer,bibtex
+
+(139 warnings, 802524 bytes)
+
+Dell Pentium Pro 150MHz		 28.8
+Pentium Pro 133MHz BETA		 32.6
+HyperSPARC/125			 45.7
+Pentium 180 MHz			 46.0
+Sun SparcStation 20/61		 46.1
+Pentium 133 MHz			 47.3
+Pentium 100 MHz			 61.0
+HP 9000/735			 83.0  (??  This number seems too slow)
+Sun SparcStation 5/85		 88.8
+Gateway 2000 PentOD/83		 96.2
+Gateway 2000 486/66		137.2
+Sun IPX				155.6
+HP 9000/710			224.4  (??  also way too slow)
+
+
+
+  It is interesting to note that there was almost no gain from overclocking
+the 133 MHz Pentium machine to 180 MHz.  This same machine benefits greatly
+from overclocking on many other tests, so we're guessing it's memory bound.
+The SPARC machines do quite well, and the HP's do very poorly.  This may
+be caused by a bad compilation of Perl on the HPs.  The Pentium Pro machines
+do extremely well.

@@ -1,0 +1,35 @@
+I'm constantly concerned about small modules or p5p adding more and more bloat, especially "innocent" dependencies. The authors obviously do not care about memory on small devices or vmware hosting with 256MB, and since Moose is so popular obviously also do not care about serious run-time penalties loading all this cruft for almost no gain.
+
+My top concerns are:
+
+1) use warnings
+
+which depends on warnings::register and Carp, which loads a whole bunch of big generally unnecessary warnings category hashes. And XSLoader. And B if compiled.
+With B::C I introduced -fno-warnings for 5.13.5 to save 68KB executable size on 32-bit.
+Uncompiled the number are of course obscenely higher.
+
+2) use Carp
+
+This requires XSLoader and also includes the huge B, at least when compiled.
+The biggest hit is the Carp warning when AUTOLOAD a XS module fails. Then Carp is dynaloaded to print the callstack. Printing the callstack in case of dynaloader errors should seriously not be dependent on DynaLoader, it should be provided by the static libperl, e.g. pp_caller() alone.
+
+3) swash_init utf8
+
+utf8_heavy is autoloaded whenever perl needs upper-case/lower-case folding tables. These tables include all unicode tables because we are not ASCII anymore, which are loaded as fat perl tables, not as fast c arrays as e.g. Encode or icu does. Perl might have the most unicode features but is seriously not yet unicode ready enough.
+There is no heuristic to check the string for possible non-ascii strings, there is no ascii pragma (no utf8 would be the correct name) to prevent from loading these tables.
+With B::C I introduced -fno-fold for 5.13.9 to save 1.6MB executable size on 32-bit 
+when utf8 folding is not required.
+
+Anyway, I'm now measuring the size of the optree at certain stages with my new module B::Stats. It unfortunately requires B, which itself includes 14 files, 3821 lines and ca. 4883 ops. I have to subtract this constant overhead, similar to a profiler. I tried but it makes no sense to reimplement B for B::Stats. I could write everything as XS to get rid of the B overhead.
+
+
+B::Stats counts all ops statically at compile-time and end-time, to see which run-time loaded modules are added, and also counts the actually performed ops dynamically at run-time.
+
+The B::Stats output also give you exact size and performance numbers independent of the CPU and machine load, contrary to heavy benchmarks. Of course certain ops are more costly than others, I haven't averaged yet the typical op costs to output better numbers.
+B::Stats is still in its early stage. The options -l<logfile> and -f<filter> and -C fragmentation are not yet implemented.
+
+It is roughly comparable to Devel::Size. Devel::Size does more, this also includes the size of the data, B::Stats just counts the ops, no data.
+
+The primary need for B::Stats was to come up with fair numbers of op distributions for benchmarks. A benchmark should not be too slow but should cover the typical run-time cost of the to-be-tested program. So the static and run-time distribution of the ops should be comparable.
+
+Running a single benchmark function 10.000 times is a waste of time if the cost stabilizes after 5-15 runs and is measurable and if the benchmark does not compare to the actual usage. Hence B::Stats.

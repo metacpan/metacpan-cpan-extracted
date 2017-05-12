@@ -1,0 +1,30 @@
+BerkeleyDB/Locks version 0.04
+=============================
+
+INSTALLATION
+
+   BerkeleyDB::Locks uses application functions that are not part of
+   Berkeley's published API.  In order to install this module, you must
+   download the BerkeleyDB::Locks source code.  For more information,
+   type:
+
+   perl Makefile.PL --help
+
+To install this module type the following:
+
+   perl Makefile.PL path-to-db_config.h
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  BerkeleyDB source code available from http://www.sleepycat.com/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Jim Schueler, <jschueler@tqis.com>
+
+

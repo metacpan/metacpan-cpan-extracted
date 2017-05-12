@@ -1,0 +1,11 @@
+#FIXME: tweak to add kernel boot arg maxcpus=1
+classes:
+  - hw.mac.laptop
+  - Hardware.motherboard.intel.core2duo
+  - Hardware.nic.broadcom.sta
+  - Hardware.laptop
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include support for Apple MacBook5,1 laptop

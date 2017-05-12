@@ -1,0 +1,154 @@
+Beam::Emitter
+
+This role is used by classes that want to add callback hooks to allow
+users to add new behaviors to their objects. These hooks are called
+"events". A subscriber registers a callback for an event using the
+"subscribe" or "on" methods. Then, the class can call those callbacks by
+emitting an event with the emit() method.
+
+Using the Beam::Event class, subscribers can stop an event from being
+processed, or prevent the default action from happening.
+
+  Using Beam::Event
+
+Beam::Event is an event object with some simple methods to allow
+subscribers to influence the handling of the event. By calling the stop
+method, subscribers can stop all futher handling of the event. By
+calling the the stop_default method, subscribers can allow other
+subscribers to be notified about the event, but let the emitter know
+that it shouldn't continue with what it was going to do.
+
+For example, let's build a door that notifies when someone tries to open
+it. Different instances of a door should allow different checks before
+the door opens, so we'll emit an event before we decide to open.
+
+    package Door;
+    use Moo;
+    with 'Beam::Emitter';
+
+    sub open {
+        my ( $self, $who ) = @_;
+        my $event = $self->emit( 'before_open' );
+        return if $event->is_default_stopped;
+        $self->open_the_door;
+    }
+
+    package main;
+    my $door = Door->new;
+    $door->open;
+
+Currently, our door will open for anybody. But let's build a door that
+only open opens after noon (to keep us from having to wake up in the
+morning).
+
+    use Time::Piece;
+    my $restful_door = Door->new;
+
+    $restful_door->on( before_open => sub {
+        my ( $event ) = @_;
+
+        my $time = Time::Piece->now;
+        if ( $time->hour < 12 ) {
+            $event->stop_default;
+        }
+
+    } );
+
+    $restful_door->open;
+
+By calling stop_default, we set the is_default_stopped flag, which the
+door sees and decides not to open.
+
+  Using Custom Events
+
+The default "Beam::Event" is really only useful for notifications. If
+you want to give your subscribers some data, you need to create a custom
+event class. This allows you to add attributes and methods to your
+events (with all the type constraints and coersions you want).
+
+Let's build a door that can keep certain people out. Right now, our door
+doesn't care who is trying to open it, and our subscribers do not get
+enough information to deny entry to certain people.
+
+So first we need to build an event object that can let our subscribers
+know who is knocking on the door.
+
+    package Door::Knock;
+    use Moo;
+    extends 'Beam::Event';
+
+    has who => (
+        is => 'ro',
+        required => 1,
+    );
+
+Now that we can represent who is knocking, let's notify our subscribers.
+
+    package Door;
+    use Moo;
+    use Door::Knock; # Our emitter must load the class, Beam::Emitter will not
+    with 'Beam::Emitter';
+
+    sub open {
+        my ( $self, $who ) = @_;
+        my $event = $self->emit( 'before_open', class => 'Door::Knock', who => $who );
+        return if $event->is_default_stopped;
+        $self->open_the_door;
+    }
+
+Finally, let's build a listener that knows who is allowed in the door.
+
+    my $private_door = Door->new;
+    $private_door->on( before_open => sub {
+        my ( $event ) = @_;
+
+        if ( $event->who ne 'preaction' ) {
+            $event->stop_default;
+        }
+
+    } );
+
+    $private_door->open;
+
+  Without Beam::Event
+
+Although checking "is_default_stopped" is completely optional, if you do
+not wish to use the "Beam::Event" object, you can instead call emit_args
+instead of emit to give arbitrary arguments to your listeners.
+
+    package Door;
+    use Moo;
+    with 'Beam::Emitter';
+
+    sub open {
+        my ( $self, $who ) = @_;
+        $self->emit_args( 'open', $who );
+        $self->open_the_door;
+    }
+
+There's no way to stop the door being opened, but you can at least
+notify someone before it does.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

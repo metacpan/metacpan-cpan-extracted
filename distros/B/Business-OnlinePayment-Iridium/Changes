@@ -1,0 +1,45 @@
+Revision history for Business-OnlinePayment-Iridium
+
+0.11    Thu Nov 27 21:30:00 2010 GMT
+        - Add cross_reference in returned data
+
+0.10    Wed Oct 27 22:02:00 2010 GMT
+        - PassOutData was not getting sent with ThreeDSecure
+
+0.09    Sat Feb 06 21:00:00 GMT
+        - CV2 is now getting passed to gateway 
+
+0.08    Fri Feb 05 23:00:00 GMT
+        - Extended field map, set error messages correctly 
+
+0.07    Thu Feb 04 17:00:00 GMT
+        - Added lots of missing attributes to CardDetailsTransaction
+
+0.06    Sat Nov 28 13:40:00 GMT
+        - fixed use of Class::MOP::Class' API
+        - updated SYNOPSIS 
+
+0.05    Mon Nov 09 19:15:00 GMT
+        - added cv2 and issue_number support
+        - included CrossReferenceTransaction action class
+
+0.04    Sat Oct 31 19:30:00 GMT
+        - added pareq attr
+        - get rid of constant pragma
+        - sanity check on 'expiration' param
+        - added support for CrossReferenceTransaction message
+
+0.03    Tue Jul 15 23:59:00 GMT
+        - takes order description into account
+        - nuked unused CARD_TYPE_MAP
+        - fixed Action->request (related to SERVERS)
+        - not die if $self->test_transaction, just not complete submission
+          and set ->is_success(0)
+
+0.02    Mon Jun 30 18:48:20 2008 GMT
+        - added META.yml
+        - use constant pragma in BOP::Iridium::Action
+        - fixed BOP::Iridium::Action->request
+
+0.01    Thu May 29 17:57:29 2008 GMT
+        Initial release.

@@ -1,0 +1,22 @@
+Revision history for Perl extension Business::OnlinePayment::TransFirsteLink.
+
+0.05  Sat Feb  8 19:02:32 PST 2014
+        - strip non-digits from phone numbers
+
+0.04  Thu Jun 21 15:25:50 EDT 2007
+        - don't die when we don't know how to perform the transaction
+          just fail instead
+
+0.03  Thu May 31 20:04:17 EDT 2007
+        - cope with discrepancy in second array element from B:OP:HTTPS
+          between Net::SSLeay and Crypt::SSLeay/LWP::UserAgent
+
+0.02  Wed May 17 19:19:10 EDT 2007
+	- more tests
+        - make echeck conform to behavior rather than documentation
+        - hush warnings where appropriate
+        - transfirst indicates query order is significant, so order
+          hashes with Tie::IxHash (testing seems to indicate order unimportant)
+
+0.01  Wed Apr 29 07:55:25 EDT 2007
+	- original version; created by jeff

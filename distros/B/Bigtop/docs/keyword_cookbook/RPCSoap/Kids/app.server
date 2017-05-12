@@ -1,0 +1,186 @@
+#!/usr/bin/perl
+use strict;
+
+
+use lib qw( lib );
+
+use Kids qw{
+    -Engine=CGI
+    -TemplateEngine=TT
+    Static
+};
+
+use Getopt::Long;
+use Gantry::Server;
+use Gantry::Engine::CGI;
+
+use Gantry::Conf;
+
+my $dbd;
+my $dbuser;
+my $dbpass;
+my $dbname;
+
+my $conf_instance = 'kids';
+my $conf_type;
+my $conf_file     = 'docs/app.gantry.conf';
+
+GetOptions(
+    'dbd|d=s'      => \$dbd,
+    'dbuser|u=s'   => \$dbuser,
+    'dbpass|p=s'   => \$dbpass,
+    'dbname|n=s'   => \$dbname,
+    'instance|i=s' => \$conf_instance,
+    'type|t=s'     => \$conf_type,
+    'file|f=s'     => \$conf_file,
+    'help|h'       => \&usage,
+);
+
+if ( $conf_type and $conf_type ne 'base' ) {
+    $conf_instance = "kids_$conf_type";
+}
+
+my $config = Gantry::Conf->retrieve(
+    {
+        instance    => $conf_instance,
+        config_file => $conf_file,
+    }
+);
+
+if ( $dbd or $dbname ) {
+    $dbd ||= 'SQLite';
+    $config->{ dbconn } = "dbi:$dbd:dbname=$dbname";
+}
+
+$config->{ dbuser } = $dbuser if $dbuser;
+$config->{ dbpass } = $dbpass if $dbpass;
+
+my $cgi = Gantry::Engine::CGI->new( {
+    config => $config,
+    locations => {
+        '/' => 'Kids',
+        '/little/rascals' => 'Kids::Child',
+        '/soap' => 'Kids::Soap',
+    },
+} );
+
+my $port = shift || 8080;
+
+my $server = Gantry::Server->new( $port );
+$server->set_engine_object( $cgi );
+
+print STDERR "Available urls:\n";
+foreach my $url ( sort keys %{ $cgi->{ locations } } ) {
+    print STDERR "  http://localhost:${port}$url\n";
+}
+print STDERR "\n";
+
+$server->run();
+
+sub usage {
+    print << 'EO_HELP';
+usage: app.server [options] [port]
+    port defaults to 8080
+
+    options:
+    -h  --help     prints this message and quits
+    -i  --instance name of a Gantry::Conf instance
+                   defaults to kids
+    -t  --type     type of one Bigtop config block
+                   defaults to the unnamed block
+    -f  --file     master Gantry::Conf file
+                   defaults to docs/app.gantry.conf
+
+    options which override Gantry::Conf values:
+    -d  --dbd      DBD module name (e.g. Pg, mysql, etc)
+    -n  --dbname   name of database
+    -u  --dbuser   database user name
+    -p  --dbpass   dbuser's database password
+
+Note that -i and -t are incompatible.  The former fully specifies an
+instance name for Gantry::Conf.  The later specifies the config type
+suffix of an instance name.  If you use both, -t takes precedence.
+
+-d defaults to SQLite.
+
+EO_HELP
+
+    exit 0;
+}
+
+=head1 NAME
+
+app.server - A generated server for the Kids app
+
+=head1 SYNOPSIS
+
+    usage: app.server [options] [port]
+
+port defaults to 8080
+
+=head1 DESCRIPTION
+
+This is a Gantry::Server based stand alone server for the Kids
+app.  It was built to use the kids Gantry::Conf instance in the
+docs directory.
+
+To override the database connection information in your conf file,
+see L<Changing Databases without Changing Conf> below.
+
+To change instances or master conf files, use these
+flags (they all require values):
+
+=over 4
+
+=item --instance (or -i)
+
+(Incompatible with --type)
+
+The full name of your conf instance, defaults to kids.
+
+=item --type (or -t)
+
+(Incompatible with --instance)
+
+Use this if you use named config blocks in your Bigtop file.  Use the
+name of the config block as the value for --type.  This will build the
+corresponding instance name as kids_TYPE, where TYPE is the value
+of this flag.
+
+If you don't neither --instance nor --type, the instance you get will
+be kids.
+
+=item --file (or -f)
+
+The name of your master Gantry::Conf file, defaults to docs/app.gantry.conf.
+
+=back
+
+=head1 Changing Databases without Changing Conf
+
+You may use the following flags to control database connections.  If you
+supply these flags, they will take precedence over your Gantry::Conf instance.
+All of them require values.
+
+=over 4
+
+=item --dbd (or -d)
+
+The name of your DBD module (like SQLite, Pg, or mysql).  If you use
+dbname, this defaults to SQLite.
+
+=item --dbname (or -n)
+
+The name of your database.
+
+=item --dbuser (or -u)
+
+Your database user name.
+
+=item --dbpass (or -p)
+
+Your database password.
+
+=back
+
+=cut

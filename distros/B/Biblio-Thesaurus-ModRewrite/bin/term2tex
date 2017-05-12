@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <rule source file> <thesaurus source file>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $code = <<"EOF";
+$ARGV[0] \$r \$t => sub{{ print "\$r & \$t \\\\\\\\ \\n \\\\hline \\n "; }}.
+EOF
+
+my $obj = thesaurusLoad($ARGV[1]);
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+
+print<<"TEX";
+\\documentclass{article}
+\\usepackage{colortbl}
+\\begin{document}
+\\section{Relations for term $ARGV[0]}
+\\begin{tabular}{|l|l|}
+\\hline
+TEX
+
+print "\\multicolumn{2}{|>{\\columncolor[rgb]{0.82,0.82,0.82} }p{6cm}|}{\\bf{$ARGV[0]}} \\\\ \n\\hline \n\\hline \n";
+$t->process($code);
+
+print<<"TEX";
+\\end{tabular}
+\\section{Terms related with $ARGV[0]}
+TEX
+
+my $code = <<"EOF";
+\$t \$r $ARGV[0] => sub{{ print "\\\\begin{tabular}{|l|l|}\\n\\\\hline\\n\\\\multicolumn{2}{|>{\\\\columncolor[rgb]{0.82,0.82,0.82} }p{6cm}|}{\\\\bf{\$t} } \\\\\\\\ \\n\\\\hline \\n\\\\hline \\n \$r & $ARGV[0] \\\\\\\\ \\n\\\\hline \\n\\\\end{tabular} \\n\\\\\\\\\\n"; }}.
+EOF
+
+$t->process($code);
+
+print<<'TEX';
+\end{document}
+TEX
+

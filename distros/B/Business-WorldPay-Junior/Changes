@@ -1,0 +1,46 @@
+Revision history for Perl extension Business::WorldPay::Junior.
+
+1.07  Thu Oct 30 17:30:00 2003
+	- Worldpay have a new range of callback servers IPs
+
+1.06  Fri Mar 14 15:30:00 2003
+	- Updated documentation to reflect name change properly.
+
+1.05  Fri Mar 14 10:35:00 2003
+	- add check to ensure testMode isn't hacked to avoid actual payment
+	- Rename to avoid clash with Business::OnlinePayment API
+
+1.04  Tue Oct 22 11:05:00 2002
+	- typo in callback routine
+
+1.03  Mon Sep 23 10:30:00 2002
+	- fixed missing # from comment
+
+1.02  Mon Sep 23 07:45:00 2002
+	- made cheque for transId required only if transStatus eq 'Y'
+		thanks for Jon Morby for pointing this out
+
+1.01  Sun Sep 22 18:30:00 2002
+	- change within callback method to only require some transaction fields
+		if the transaction was authorised.
+
+1.00  Wed Sep 18 09:40:00 2002
+	- documentation complete - release time.
+
+0.99  Tue Sep 17 17:20:00 2002
+	- exchange_rates method complete
+	- get-rates.pl script done
+	- mysql-schema complete
+
+0.03  Mon Aug 19 10:00:00 2002
+	- altered new method to allow specification of database connection
+	  	details
+	- Write README file detailing how to use the module.
+
+0.02  Mon Aug 12 16:35:00 2002
+	- new, register, valid_callback_host, callback, authorised methods
+		complete
+
+0.01  Wed Aug 7 15:16:47 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n WorldPay::Junior

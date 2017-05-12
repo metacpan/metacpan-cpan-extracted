@@ -1,0 +1,17 @@
+.shipit
+Changes
+Changes.original
+lib/B/Size2.pm
+lib/B/Size2/Terse.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+patches/b_clearsym_60.pat
+Size2.xs
+t/001.basic.t
+t/002.terse.t
+t/003.size.t
+t/004.issue3.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

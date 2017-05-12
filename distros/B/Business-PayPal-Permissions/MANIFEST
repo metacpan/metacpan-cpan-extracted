@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+examples/test.pl
+lib/Business/PayPal/Permissions.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

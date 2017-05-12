@@ -1,0 +1,85 @@
+
+BEGIN {
+  unless ($ENV{RELEASE_TESTING}) {
+    print "1..0 # SKIP these tests are for release candidate testing\n";
+    exit
+  }
+}
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::EOLTests 0.19
+
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'bin/bp_einfo',
+    'bin/bp_genbank_ref_extractor',
+    'lib/Bio/DB/EUtilities.pm',
+    'lib/Bio/Tools/EUtilities.pm',
+    'lib/Bio/Tools/EUtilities/EUtilDataI.pm',
+    'lib/Bio/Tools/EUtilities/EUtilParameters.pm',
+    'lib/Bio/Tools/EUtilities/History.pm',
+    'lib/Bio/Tools/EUtilities/HistoryI.pm',
+    'lib/Bio/Tools/EUtilities/Info.pm',
+    'lib/Bio/Tools/EUtilities/Info/FieldInfo.pm',
+    'lib/Bio/Tools/EUtilities/Info/LinkInfo.pm',
+    'lib/Bio/Tools/EUtilities/Link.pm',
+    'lib/Bio/Tools/EUtilities/Link/LinkSet.pm',
+    'lib/Bio/Tools/EUtilities/Link/UrlLink.pm',
+    'lib/Bio/Tools/EUtilities/Query.pm',
+    'lib/Bio/Tools/EUtilities/Query/GlobalQuery.pm',
+    'lib/Bio/Tools/EUtilities/Summary.pm',
+    'lib/Bio/Tools/EUtilities/Summary/DocSum.pm',
+    'lib/Bio/Tools/EUtilities/Summary/Item.pm',
+    'lib/Bio/Tools/EUtilities/Summary/ItemContainerI.pm',
+    't/00-compile.t',
+    't/EUtilParameters.t',
+    't/author-mojibake.t',
+    't/author-pod-syntax.t',
+    't/data/eutils/egquery.xml',
+    't/data/eutils/einfo.xml',
+    't/data/eutils/einfo_dbs.xml',
+    't/data/eutils/elink_acheck.xml',
+    't/data/eutils/elink_acheck_corr.xml',
+    't/data/eutils/elink_dball.xml',
+    't/data/eutils/elink_lcheck.xml',
+    't/data/eutils/elink_lcheck_corr.xml',
+    't/data/eutils/elink_llinks.xml',
+    't/data/eutils/elink_llinks_corr.xml',
+    't/data/eutils/elink_multidb.xml',
+    't/data/eutils/elink_multidb_corr.xml',
+    't/data/eutils/elink_ncheck.xml',
+    't/data/eutils/elink_ncheck_corr.xml',
+    't/data/eutils/elink_neighbor.xml',
+    't/data/eutils/elink_neighbor_corr.xml',
+    't/data/eutils/elink_nhist.xml',
+    't/data/eutils/elink_nhist_corr.xml',
+    't/data/eutils/elink_scores.xml',
+    't/data/eutils/epost.xml',
+    't/data/eutils/esearch1.xml',
+    't/data/eutils/esearch2.xml',
+    't/data/eutils/espell.xml',
+    't/data/eutils/esummary1.xml',
+    't/data/eutils/esummary2.xml',
+    't/egquery.t',
+    't/einfo.t',
+    't/elink_acheck.t',
+    't/elink_lcheck.t',
+    't/elink_llinks.t',
+    't/elink_ncheck.t',
+    't/elink_neighbor.t',
+    't/elink_neighbor_history.t',
+    't/elink_scores.t',
+    't/epost.t',
+    't/esearch.t',
+    't/espell.t',
+    't/esummary.t',
+    't/release-EUtilities.t',
+    't/release-eol.t'
+);
+
+eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;
+done_testing;

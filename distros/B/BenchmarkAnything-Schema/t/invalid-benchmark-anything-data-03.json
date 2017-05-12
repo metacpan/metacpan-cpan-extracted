@@ -1,0 +1,10 @@
+{
+    "comment": "Example for missing NAME",
+    "BenchmarkAnythingData" : [
+        {
+            "VALUE"    : 27.34,
+            "compiler" : "gcc",
+            "keyword"  : "affe"
+        }
+    ]
+}

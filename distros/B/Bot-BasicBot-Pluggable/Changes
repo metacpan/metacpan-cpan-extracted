@@ -1,0 +1,445 @@
+Revision history for Perl extension Bot::BasicBot::Pluggable.
+
+1.20 - 2017-04-06
+ - Support irc_raw and irc_raw_out (new events added in Bot::BasicBot 0.91 in
+   order to provide raw IRC traffic)
+
+1.11 - 2017-03-31
+ - Fix deps list (MooseX::GetOpt -> ::Getopt)
+
+1.10 - 2017-03-30
+ - Support "private" channels, which still show up in seen responses,
+   but without leaking the contents of messages in that channel to other
+   channels
+
+ - Handle "seen" on one's self better
+
+ - Various contributions from ailin-nemui in PR-7, including:
+  - IPv6 support
+  - Setting module priorities 
+  - Bugfixes for using the DBM::Deep store
+  - Ability to protect infobot factoids
+  - Ability to send other users factoids in public
+
+1.00 - 2016-06-13
+ - Match only one "word" in seen responses
+   Avoid silly mis-triggers.  GH PR-3 (bigpresh)
+
+ - Ignore links in messages from ourselves, so we avoid turtle
+   situations.  GH PR-2 (bigpresh)
+
+ - Karma plugin - match nicks with \S+, not \w+, so nicks with
+   hyphens in can have karma.  GH PR-1 (bigpresh)
+
+ - Better-document how said() resturn value is handled, to avoid
+   potential confusion.  GH PR-4 (bigpresh)
+
+
+*********************************************************************
+David Precious (BIGPRESH) taking over maintainership at this point,
+kind thanks to Mike Eldridge (DIZ) for kindly handing over
+maintainership to me.
+
+I still make active use of this bot framework, and want to see it
+continue to be loved and supported, so bug reports and pull requests
+are welcome!
+*********************************************************************
+
+0.97 - Thu Jun 14 10:39:29 CDT 2012
+ - more fixes from bigpresh
+    - fix regression in ChanOp->isop() introduced in 0.95 (thanks to ambs for finding it)
+
+0.96 - Wed Feb 29 21:05:58 CST 2012
+ - more fixes from bigpresh:
+    - fix tests busted by karma changes
+    - fix regression in the seen module
+
+0.95 - Tue Nov 15 20:58:25 CST 2011
+ - a number of fixes and enhancements from bigpresh:
+    - new feature: ability to hide channels from being "seen" by the Seen module
+    - new feature: ability for the Karma module to report karma upon change
+    - cleanup in the Karma module (plus an easter egg)
+    - eliminate warnings in ChanOp module
+    - typo fixes
+ - allow the configfile to be undef from adamtaylor
+ - handle interrogatives in the Karma module
+
+0.94 - Tue Nov 15 20:45:32 CST 2011
+ - botched release (forgot to pull before releasing - *sigh*)
+
+0.93 - Mon Jun 27 10:40:24 CDT 2011
+ - when creating temporary files for Store::Storable->save, make sure
+   they are created in the same directory that the final file will be
+   moved to.  if not, the rename may fail if the source and destination
+   are on separate filesystems.  (RT #68886)
+ - correctly parse relative paths from *.storable file globbing in the
+   Storable backend store.  this was preventing the store from restoring
+   data for modules.  (RT #68887)
+
+0.92 - Thu May  5 08:39:08 CDT 2011
+ - added ability to load modules of arbitrary depth, courtesy of david
+   precious (bigpresh)
+ - refactor Auth module so that it doesn't step on other modules by
+   eating all bang commands, also courtesy of bigpresh.
+ - added Crypt::SaltedHash to the prereqs list
+
+0.91 - Tue Dec  7 00:05:51 CST 2010
+ - added transparent support for salted password hashes (RT #63232),
+   courtesy of david precious (bigpresh)
+ - fix busted flood protection (RT #62864), courtesy of david precious
+   (bigpresh)
+ - fix minor warning-producing exception in ChanOp->isop, also courtesy
+   of the B.P.
+
+0.90 - Fri Nov  5 17:14:30 CDT 2010
+
+ - bumped dependency on Log::Log4perl from 0 to 1.11 due to dependency
+   on the trace log level (RT #56540)
+
+0.89 - Thu Oct 28 18:09:18 CDT 2010
+
+  - Added DBD::SQLite and YAML::XS to the test dependency list
+  - Quote table identifiers in Bot::BasicBot::Pluggable::Store::DBI
+  - Bot::BasicBot::Pluggable is under new maintenance \o/
+
+0.88 2010/08/29
+
+  Removing build dependencies for Test::Perl::Critic and Test::Tidy.
+
+  Bot::BasicBot::Pluggable is looking for a new maintainer  (again...)
+  as the current maintainer is not using it anymore. Please mail
+  to <mdom@cpan.org> if you are interested in taking over this fine
+  module.
+
+0.87 2010/05/09
+
+  Remove all recommends due some failing tests. In a future release,
+  some of the modules with long dependencies will be removed from
+  this distribution and form their own on CPAN. I look at you DBI...
+
+  Switched to Dist::Zilla
+
+0.86 2010/03/28
+
+  Thanks to Jacob Helwig for the follwoing changes:
+
+    Join: Check for auth after checking whether we should handle
+    the message at
+
+    Add a new check to Bot::BasicBot::Pluggable::Module::Join to see whether
+    the module should handle the message at all, and move the "is the user
+    authed" after this check.
+
+    By doing this we no longer send out "Sorry, ..." messages if someone
+    happens to say "botname: Hi there!" without being authorized.
+
+0.85 2010/02/13
+
+  This is the David-Precious-aka-bigpresh-release, who commited all
+  changes via Github. Thanks!
+
+  - Join: Don't accept commands to join/part channels unless the
+    user asking us to do so is auth'd to the bot
+  - ChanOp: Make the ChanOp module actually work (uhm...)
+
+0.84 2009/12/11
+
+  - Log4Perl: Instead of just printing error messages to stdout,
+    the bot now uses Log4perl to emit warnings and debugging information.
+    For now i just added this new capability to Bot::BasicBot::Pluggable
+    but this will be expanded to all the modules in one of the next
+    releases.
+
+    The bot's old log() function will now emit a message with
+    priority warning to mimic the old behaviour.
+
+    The command line bots now have two new options: --loglevel and
+    --logconfig.
+
+  - Commandline Bot: A simple command line bot was part of the
+    github repository for quite some time now, but it was never
+    shipped with a release before. To close #46875 and as it's a
+    really neat way to test some modules, i'll reworked
+    bot-basicbot-pluggable-cli, added
+    App::Bot::BasicBot::Pluggable::Console and
+    Bot::BasicBot::Pluggable::Console and use
+    Test::Bot::BasicBot::Pluggable as its basis. You can call it
+    with the same arguments as its irc cousin, but some options
+    like --server or even --channel does not (yet?) make any sense
+    in this context.
+
+  - Auth: Added allow_anonymous as requested and implemented by
+    Toni Spets. Setting this value to true, does basically disable
+    authentication for all modules, that are not explicitly checking
+    for the users authentication level.
+
+    You only ever want to set this value to true, if you want to
+    develop modules that need to prefix commands with ! for
+    unauthenticated users. You've been warned.
+
+  - Loader, Vars: As direct consequence Loader.pm and Vars.pm do
+    now check explicitly.
+
+  - Loader: !list does now also return all available but not loaded
+    modules (thanks to Manuel Hachtkemper for the hint). I can see
+    that the old behaviour might be a little bit confusing for some
+    users.
+
+  - available_modules() returns really all available modules ...
+    till this release the bot just returned modules in PERL5LIB and
+    ignored modules in ./modules and ./
+
+  - Store: DBI, DBM::Deep and DBD::SQLite are no langer hard
+    requirements of this module. Bot::BasicBot::Pluggable now tries
+    to load all storage types in a predefined order until one returns
+    successfully. Normally you should just select one explicitly.
+
+  - Base.pm: Removed Base.pm from the list of available modules und
+    depracate its usage
+
+  - Try::Tiny: Error handling is now performed by try::tiny instead
+    of writing all the eval boilerplate. Although it does lack some
+    convenience, i selected it as we'll get it through moose in any
+    case.
+
+  - ChanOp.pm: New core module to handle channel managment operations
+    like oping, deoping, kicking and flood control. Please take a
+    closer look at this module, it definitly needs some testing!
+
+0.83 2009/11/08
+
+  - added four missing dispatch events from Bot::Basicbot: nick_change,
+    kicked, topic and userquit. All four can now be handled by modules.
+  - converted some evaled expressions to code blocks
+  - documented a problem with hash signs in yaml configuration files
+
+0.82 2009/08/31
+
+  - Failing tests on cpantesters as two tests are creating intermediate
+    files.
+
+    I'm just using the memory backend again.
+
+0.81 2009/08/30
+
+  - redfined logic of --store option
+
+    Although i added a store option in the last version of the
+    command line bot, it wasn't really helpful as you just could
+    load storage backend without any options. The --store option
+    is now a hashref, with the only drawback that you have to
+    specify a storage type even if you just want load a backend
+    without any options.
+
+  - moved store_from_hashref from B::BB::P to B::BB::P::Store and
+    renamed it to new_from_hashref. This could possibly *break*
+    code, but i didn't expect it to. *hrhr*
+
+0.80 2009/08/15
+
+  - new command line bot
+
+    big rewrite of the command line bot with the help of MooseX::Getopt
+    and MooseX::SimpleConfig. It should be possible to call a lot of
+    aspects of the pluggable infrastructure without writing perl code.
+
+0.79 2009/07/12
+  - the need-more-sleep-release ... sorry, that's the last for today
+  - replied was never called ... now we put it back in front again
+    but shallow copy the message first
+
+0.78 2009/07/12
+  - replied is now called after reply so that modules really can't change the message
+
+0.77 2009/07/12
+  - added a new event 'replied' to give any module the chance to act on that
+  - Join:
+    - corrected missing command in help
+  - Seen:
+    - now also reckognize joins and parts
+  - Infobot:
+    - there's an user defineable http_timeout variabe that defaults to ten
+      seconds (fixes #3239)
+    - settable limit on how many RSS items to return
+    - just shorten entries when @entries is bigger than user_max_entries
+  - Vars:
+    - checking the definedness of $value so you can set a variable to 0 for example
+
+0.76 2009/06/28
+  - the store paramter to B:BB:P->new() can now also be a string
+  - new config interface for modules
+  - search for keywords in Infobot.pm now returns the right number of factoids
+  - when deleting factoids return the right answer
+  - total rewrite of the join module (old database format will be converted on the fly)
+  - a lot of new tests
+  - new module Bot::BasicBot::Pluggable::Store::Memory (kind of)
+  - new module Test::Bot::BasicBot::Pluggable::Store
+  - testbot now intercepts the help call
+
+0.74 2009/06/20
+
+  - added additional slash to fix #46928 (t/05infobot.t)
+  - added t/03store_storable.t
+  - closes #3258: instead of just overwriting the storable file it creates a tempfile and the move it
+  - Moved FakeBot to Test::Bot::BasicBot::Pluggable so that it's accessable for other Modules
+  - renamed infobot.t and title.t
+  - only create a new table if it doesn't exists yet in Store::DBI
+
+0.72 2009/06/04
+
+  - Fixed absolute path in t/infobot.t ... stupid!
+  - Added me (Mario) to the author list
+  - Added the git repository to the meta resources
+
+0.71 2009/06/01
+
+  - Add a test for unparsable rss feeds to Infobot
+  - Better error message for unparsable rss feeds in Infobot
+  - Added ignore_re option to Title (by osfameron)
+  - Adjusting documentation for Load to refer to the real behaviour
+
+0.7 2009/03/10
+  - Missing t/FakeBot.pm added to MANIFEST
+  - Adjusted number of tests for Test::More
+  - Karma:
+    - Testsuide added
+    - Listing of explainations works again (settable by num_comments)
+    - New variable random_reasons
+    - Documentation updated
+
+0.6 2009/03/04
+
+It's been.. uh.. 4 years. There are tickets in RT that simply don't apply to
+the current codebase. Personally, I never work on this module, use it for one
+small thing that never changes, and have started to really dislike programming
+in perl recently. Thus I'm just going to release trunk as-is. It's got a lot
+of changes. Things might break. Sorry. I dislike other people doing this,
+and I dislike _me_ doing this, but I see very few other options at this point.
+
+I'm putting all the code in a github repository at
+
+http://github.com/jerakeen/bot-basicbot-pluggable
+
+if people want to actually track what goes on. Anyone want to take B::B::P
+over?
+
+--
+
+This is the "Morbus release". Why the "Morbus release"?
+Quite simply because he did everything you see below.
+You can chastise him for his ego at http://disobey.com/.
+
+  - Revised documentation for Pluggable.pm and Module.pm.
+  - Auth: Revised documentation, switched to admin() not said().
+  - DNS: Revised documentation, switched to told() not said().
+  - Google:
+    - Revised documentation, switched to told() not said().
+    - Removed deprecated Net::Google ie() and oe() methods.
+    - Default language restriction set to just 'en'; removed 'fr'.
+    - Removed explicit starts_at of 0, which is the default.
+    - New option added: num_results (default: 3).
+    - New option added: languages (default: en).
+    - New option added: require_addressing (default: 1).
+  - Join: Revised documentation, switched to told() not said().
+  - Karma:
+    - Revised documentation, switched to told() and seen().
+    - Replaced fisher_yates with newer version from Perl 5.8.
+    - Fixed a bunch of little nigglies here and there.
+    - New option added: num_comments (default: 3).
+    - New option added: show_givers (default: 1).
+    - New option added: ignore_selfkarma (default: 1).
+    - If only "karma", we assume $mess->{who} now.
+    - Now understands "<botname>++" and "<botname>--";
+  - Loader: Revised documentation, switched to told() not said().
+  - Seen:
+    - Revised documentation, switched to seen() and told().
+    - Echoed $who is now what the user typed, not lc'd version.
+    - New option added: allow_hiding (default: 1).
+  - Title: Revised documentation, switched to admin() not said().
+  - Vars:
+    - Revised documentation, switched to told() not said().
+    - Removed the check for the existence of $value on a !set. This
+      check would fail whenever anyone tried to set the $value to 0,
+      which makes perfect sense when you're trying to turn off a boolean'd
+      feature. !unset doesn't work because that entirely deletes the
+      $variable, which means it'll be reset to the default the next
+      time the module is reloaded or the bot is restarted.
+  - Revised documentation for Store.pm and Store/* modules.
+  - Infobot:
+    - Revised all the documentation, added more examples.
+    - Removed the 'ask' option; it was never actually used.
+    - Renamed option 'passive_ask' to 'passive_answer'. More sense.
+    - Added a small but decent list of common stopwords.
+    - New option: num_results (for "search for <term>"; default 20).
+    - New option: require_question ("water?" or "water"; default 1).
+    - Entirely removed the "literal $object" feature.
+    - New option: min_length (minimum $object length; default 3).
+    - New option: max_length (maximum $object length; default 25).
+    - New option: unknown_responses (random list of "No clue." responses).
+    - You can now replace facts with "no, $bot, $object is..." too.
+    - $who in a factoid is now replaced by $mess->{who}.
+    - Stopwords were NOT being stopped on word boundaries. Fixed.
+    - "no, $bot, $object is also $fact" now works for appending.
+    - Added handling of "my" as in "my cat is named chloe".
+
+0.50 2004/01/18
+  - Moved Bot::BasicBot::Pluggble::Module::Base to B::B::P::Module.pm,
+    and added Base.pm as an empty subclass, for neatness.
+  - Documented the object store methods better.
+  - Changed all core modules to use the proget get/set store methods.
+  - Loader now uses the standard store system.
+  - Installed shell script to run B::B::P.
+  - The Infobot module can now passively learn and passively answer questions
+    (without direct addressing) and you can set these options seperately.
+  - The storage system is decently abstracted out, and has a
+    default that does the same thing as the last one.
+  - Gave the bot a default charset of utf8, because I'm a fan of utf8.
+  - Utterly changed the Infobot back-end store system. Updating it will be
+    a pain, I'm sorry, but the last one really sucked. Re-wrote the Infobot
+    module to be _readable_, or at least slightly less nasty than before.
+
+0.30
+  - Improved docs.
+  - Synced version number with Bot::BasicBot again.
+  - Added NINJA support.
+  - Moved to Module::Build-based module layout.
+  - Huge docs improvement, based on feedback from people who
+    clearly had no idea what I was smoking at the time.
+  - Decent examples in examples/, and web page copies for people who use CPAN.
+  - Removed Blog and Shout modules - Blog to be spun off
+    into a seperate module, Shout was just stupid.
+  - Support for loading modules from 'Modules' in cwd as well as main lib path.
+  - The bot is a lot less case-sensitive. Still sensitive for loading
+    modules, but all the help, etc commands are more friendly.
+  - Removed 'reply' method (now in Bot::BasicBot).
+  - Slight module API changes, nothing significant:
+    - Added a 'tick' callback that happens every 5 seconds.
+    - Added a 'reply' local method that mirrors the Bot::BasicBot reply.
+    - Added a 'say' method that calls the Bot::BasicBot say.
+    - Added a very simple 'tell' method for simple statements.
+    - Added an 'emoted' callback that works identically to 'said'.
+    - Added a 'chanjoin' callback, called when someone joins a channel.
+    - Added a 'chanpart' callback, called when someone leaves a channel.
+  - Module changes (other than doc improvements):
+    - Auth:
+      - Fixed silly bug that meant you didn't actually need to auth.
+      - Smarter about ignoring things that aren't admin commands.
+      - Now requires direct addressing.
+    - Blog: removed. Look for Bot::BasicBot::Pluggable::Module::Blog.
+    - Spell: Fixed a spelling mistake.
+    - Infobot: Fixed annoying parser bugs. Needs to re-write whole thing soon.
+    - Karma: Removed case-sensitivity in karma objects.
+
+0.05 2003/06/09
+  - Better documentation.
+  - Vars changable through better interface.
+
+0.04 2003/03/05
+  - Release coincides with Simon's release of Bot::Basicbot, version matched.
+  - Therefore the first release that actually Worked out the box.
+
+0.011 2003/02/24
+  - oops.
+
+0.01 2003/02/24
+  - original version; created by h2xs 1.22.

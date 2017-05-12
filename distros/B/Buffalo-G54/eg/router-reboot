@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Log::Log4perl qw(:easy);
+use Buffalo::G54;
+
+my $b = Buffalo::G54->new();
+$b->password();
+$b->connect();
+$b->reboot();
+
+__END__
+
+=head1 NAME
+
+    router-reboot - Reboot the router
+
+=head1 DESCRIPTION
+
+C<router-reboot> logs into the routers HTTP interface and reboots it.
+
+=head1 LEGALESE
+
+Copyright 2006 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2006, Mike Schilli <cpan@perlmeister.com>

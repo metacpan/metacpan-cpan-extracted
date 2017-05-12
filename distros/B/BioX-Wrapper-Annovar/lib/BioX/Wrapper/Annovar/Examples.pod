@@ -1,0 +1,231 @@
+=head1 Name
+
+BioX::Wrapper::Annovar::Examples - Documentation describing the use of the BioX::Wrapper::Annovar module
+
+=cut
+
+=head2 Full Workflow Example
+
+The full example requires an installation of annovar, tabix, bgzip, and vcftools as well as general bash commands.
+
+annovar_wrapper.pl is an executable perl script included with the BioX::Wrappper::Annovar module. You can use that, or of course write your own that extends any and all methods.
+
+    annovar-wrapper.pl --vcfs file1.vcf,file2.vcf
+
+=head3 Generate example vcf
+
+The 1000 Genomes project supplies VCF files.
+
+    tabix -h ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20130502/ALL.chr2.phase3_shapeit2_mvncall_integrated_v5.20130502.genotypes.vcf.gz 2:39967768-40000000 > test.vcf
+    bgzip test.vcf
+    tabix test.vcf.gz
+    #Get the first 5 samples
+    vcf-subset -c HG00096,HG00097,HG00099,HG00100,HG00101 test.vcf.gz | bgzip -c > 5samples.vcf.gz
+    tabix 5samples.vcf.gz
+    rm test.vcf.gz
+    rm test.vcf.gz.tbi
+
+    annovar-wrapper.pl --vcfs 5samples.vcf.gz --annovar_dbs refGene --annovar_fun g --outdir annovar_out --annovardb_path /data/apps/software/annovar/hg19 > testcommands.out
+
+=head3 Note
+
+    This examples used to refer to the old vcf file located here:
+
+    tabix -h ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/release/20100804/ALL.2of4intersection.20100804.genotypes.vcf.gz 2:39967768-40000000 > test.vcf
+
+=head3 A closer look at the generated commands
+
+The first section of commands takes the multisample vcf file and converts it to annovar input, one file per sample. Output goes where the --outdir is specified. Annovar generates one interim file per database, which are placed in outdir/annovar_interim. The final file is in outdir/annovar_final
+
+The second section takes each of those inputs and runs the table_annovar command with the supplied databases. 
+
+The third section takes each of the annotation files and reannotates a vcf file, ending with one reannotated file per sample. Each file per sample is placed in vcf-annotate/interim. The original VCF file is never overwritten.
+
+The fourth section gets a list of all the single sample vcf file and combines them using vcf-merge. The final annotated vcf file is placed in outdir/vcf-annotate_final
+
+If you are using the example above your script should look like this.
+
+    ## This file was generated with the options
+    #   --vcfs  5samples.vcf.gz
+    #   --annovar_dbs   refGene
+    #   --annovar_fun   g
+    #   --outdir    annovar_out
+    #   --annovardb_path    /data/apps/software/annovar/hg19
+
+    #Converting to annovar input
+
+    #Processing file 5samples.vcf.gz
+
+    convert2annovar.pl -format vcf4 --allsample 5samples.vcf.gz \
+    --outfile annovar_out/5samples.vcf.gz.annovar
+
+    #Wait for all convert commands to complete
+    wait
+
+    #Generating annotations
+
+    ##Processing sample HG00098
+    table_annovar.pl annovar_out/5samples.vcf.gz.annovar.HG00098.avinput \
+    /data/apps/software/annovar/hg19 --buildver hg19 \
+    -protocol refGene \
+    -operation g \
+    -nastring NA --outfile annovar_out/5samples.vcf.gz.annovar.HG00098 \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00098 | grep -v "multianno" | xargs -i -t mv {} annovar_out/annovar_interim \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00098 | grep "multianno" | xargs -i -t mv {} annovar_out/annovar_final
+
+    ##Processing sample HG00100
+    table_annovar.pl annovar_out/5samples.vcf.gz.annovar.HG00100.avinput \
+    /data/apps/software/annovar/hg19 --buildver hg19 \
+    -protocol refGene \
+    -operation g \
+    -nastring NA --outfile annovar_out/5samples.vcf.gz.annovar.HG00100 \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00100 | grep -v "multianno" | xargs -i -t mv {} annovar_out/annovar_interim \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00100 | grep "multianno" | xargs -i -t mv {} annovar_out/annovar_final
+
+    ##Processing sample HG00106
+    table_annovar.pl annovar_out/5samples.vcf.gz.annovar.HG00106.avinput \
+    /data/apps/software/annovar/hg19 --buildver hg19 \
+    -protocol refGene \
+    -operation g \
+    -nastring NA --outfile annovar_out/5samples.vcf.gz.annovar.HG00106 \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00106 | grep -v "multianno" | xargs -i -t mv {} annovar_out/annovar_interim \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00106 | grep "multianno" | xargs -i -t mv {} annovar_out/annovar_final
+
+    ##Processing sample HG00112
+    table_annovar.pl annovar_out/5samples.vcf.gz.annovar.HG00112.avinput \
+    /data/apps/software/annovar/hg19 --buildver hg19 \
+    -protocol refGene \
+    -operation g \
+    -nastring NA --outfile annovar_out/5samples.vcf.gz.annovar.HG00112 \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00112 | grep -v "multianno" | xargs -i -t mv {} annovar_out/annovar_interim \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00112 | grep "multianno" | xargs -i -t mv {} annovar_out/annovar_final
+
+    ##Processing sample HG00114
+    table_annovar.pl annovar_out/5samples.vcf.gz.annovar.HG00114.avinput \
+    /data/apps/software/annovar/hg19 --buildver hg19 \
+    -protocol refGene \
+    -operation g \
+    -nastring NA --outfile annovar_out/5samples.vcf.gz.annovar.HG00114 \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00114 | grep -v "multianno" | xargs -i -t mv {} annovar_out/annovar_interim \
+    && find annovar_out/ |grep annovar_out/5samples.vcf.gz.annovar.HG00114 | grep "multianno" | xargs -i -t mv {} annovar_out/annovar_final
+
+    ##Wait for all table commands to complete
+    wait
+
+    ##Starting to reannotate VCF files
+
+    cp annovar_out/annovar_final/5samples.vcf.gz.annovar.HG00098.hg19_multianno.txt \
+    annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00098.hg19_multianno.txt \
+    && sort -n -k1,1 -k2,2 annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00098.hg19_multianno.txt > annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00098.hg19_multianno.txt \
+    && bgzip -f annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00098.hg19_multianno.txt \
+    && tabix -s 1 -b 2 -e 3 annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00098.hg19_multianno.txt.gz 
+
+    cp annovar_out/annovar_final/5samples.vcf.gz.annovar.HG00100.hg19_multianno.txt \
+    annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00100.hg19_multianno.txt \
+    && sort -n -k1,1 -k2,2 annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00100.hg19_multianno.txt > annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00100.hg19_multianno.txt \
+    && bgzip -f annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00100.hg19_multianno.txt \
+    && tabix -s 1 -b 2 -e 3 annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00100.hg19_multianno.txt.gz 
+
+    cp annovar_out/annovar_final/5samples.vcf.gz.annovar.HG00106.hg19_multianno.txt \
+    annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00106.hg19_multianno.txt \
+    && sort -n -k1,1 -k2,2 annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00106.hg19_multianno.txt > annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00106.hg19_multianno.txt \
+    && bgzip -f annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00106.hg19_multianno.txt \
+    && tabix -s 1 -b 2 -e 3 annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00106.hg19_multianno.txt.gz 
+
+    cp annovar_out/annovar_final/5samples.vcf.gz.annovar.HG00112.hg19_multianno.txt \
+    annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00112.hg19_multianno.txt \
+    && sort -n -k1,1 -k2,2 annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00112.hg19_multianno.txt > annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00112.hg19_multianno.txt \
+    && bgzip -f annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00112.hg19_multianno.txt \
+    && tabix -s 1 -b 2 -e 3 annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00112.hg19_multianno.txt.gz 
+
+    cp annovar_out/annovar_final/5samples.vcf.gz.annovar.HG00114.hg19_multianno.txt \
+    annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00114.hg19_multianno.txt \
+    && sort -n -k1,1 -k2,2 annovar_out/vcf-annotate_interim/5samples.vcf.gz.annovar.HG00114.hg19_multianno.txt > annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00114.hg19_multianno.txt \
+    && bgzip -f annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00114.hg19_multianno.txt \
+    && tabix -s 1 -b 2 -e 3 annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00114.hg19_multianno.txt.gz 
+
+    ##Wait for file copying bgzip and tabix to finish...
+    wait
+
+    zcat 5samples.vcf.gz | vcf-annotate -a annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00098.hg19_multianno.txt.gz \
+                    -d key=INFO,ID=HG00098.annovar.refGene.Func.refGene,Number=0,Type=String,Description='Annovar HG00098 refGene Func.refGene' \
+                    -d key=INFO,ID=HG00098.annovar.refGene.Gene.refGene,Number=0,Type=String,Description='Annovar HG00098 refGene Gene.refGene' \
+                    -d key=INFO,ID=HG00098.annovar.refGene.ExonicFunc.refGene,Number=0,Type=String,Description='Annovar HG00098 refGene ExonicFunc.refGene' \
+                    -d key=INFO,ID=HG00098.annovar.refGene.AAChange.refGene,Number=0,Type=String,Description='Annovar HG00098 refGene AAChange.refGene' \
+    -c CHROM,FROM,TO,-,-,INFO/HG00098.annovar.refGene.Func.refGene,INFO/HG00098.annovar.refGene.Gene.refGene,INFO/HG00098.annovar.refGene.ExonicFunc.refGene,INFO/HG00098.annovar.refGene.AAChange.refGene | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00098.annovar.vcf.gz && \
+    tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00098.annovar.vcf.gz
+
+    zcat 5samples.vcf.gz | vcf-annotate -a annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00100.hg19_multianno.txt.gz \
+                    -d key=INFO,ID=HG00100.annovar.refGene.Func.refGene,Number=0,Type=String,Description='Annovar HG00100 refGene Func.refGene' \
+                    -d key=INFO,ID=HG00100.annovar.refGene.Gene.refGene,Number=0,Type=String,Description='Annovar HG00100 refGene Gene.refGene' \
+                    -d key=INFO,ID=HG00100.annovar.refGene.ExonicFunc.refGene,Number=0,Type=String,Description='Annovar HG00100 refGene ExonicFunc.refGene' \
+                    -d key=INFO,ID=HG00100.annovar.refGene.AAChange.refGene,Number=0,Type=String,Description='Annovar HG00100 refGene AAChange.refGene' \
+    -c CHROM,FROM,TO,-,-,INFO/HG00100.annovar.refGene.Func.refGene,INFO/HG00100.annovar.refGene.Gene.refGene,INFO/HG00100.annovar.refGene.ExonicFunc.refGene,INFO/HG00100.annovar.refGene.AAChange.refGene | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00100.annovar.vcf.gz && \
+    tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00100.annovar.vcf.gz
+
+    zcat 5samples.vcf.gz | vcf-annotate -a annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00106.hg19_multianno.txt.gz \
+                    -d key=INFO,ID=HG00106.annovar.refGene.Func.refGene,Number=0,Type=String,Description='Annovar HG00106 refGene Func.refGene' \
+                    -d key=INFO,ID=HG00106.annovar.refGene.Gene.refGene,Number=0,Type=String,Description='Annovar HG00106 refGene Gene.refGene' \
+                    -d key=INFO,ID=HG00106.annovar.refGene.ExonicFunc.refGene,Number=0,Type=String,Description='Annovar HG00106 refGene ExonicFunc.refGene' \
+                    -d key=INFO,ID=HG00106.annovar.refGene.AAChange.refGene,Number=0,Type=String,Description='Annovar HG00106 refGene AAChange.refGene' \
+    -c CHROM,FROM,TO,-,-,INFO/HG00106.annovar.refGene.Func.refGene,INFO/HG00106.annovar.refGene.Gene.refGene,INFO/HG00106.annovar.refGene.ExonicFunc.refGene,INFO/HG00106.annovar.refGene.AAChange.refGene | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00106.annovar.vcf.gz && \
+    tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00106.annovar.vcf.gz
+
+    zcat 5samples.vcf.gz | vcf-annotate -a annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00112.hg19_multianno.txt.gz \
+                    -d key=INFO,ID=HG00112.annovar.refGene.Func.refGene,Number=0,Type=String,Description='Annovar HG00112 refGene Func.refGene' \
+                    -d key=INFO,ID=HG00112.annovar.refGene.Gene.refGene,Number=0,Type=String,Description='Annovar HG00112 refGene Gene.refGene' \
+                    -d key=INFO,ID=HG00112.annovar.refGene.ExonicFunc.refGene,Number=0,Type=String,Description='Annovar HG00112 refGene ExonicFunc.refGene' \
+                    -d key=INFO,ID=HG00112.annovar.refGene.AAChange.refGene,Number=0,Type=String,Description='Annovar HG00112 refGene AAChange.refGene' \
+    -c CHROM,FROM,TO,-,-,INFO/HG00112.annovar.refGene.Func.refGene,INFO/HG00112.annovar.refGene.Gene.refGene,INFO/HG00112.annovar.refGene.ExonicFunc.refGene,INFO/HG00112.annovar.refGene.AAChange.refGene | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00112.annovar.vcf.gz && \
+    tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00112.annovar.vcf.gz
+
+    zcat 5samples.vcf.gz | vcf-annotate -a annovar_out/vcf-annotate_interim/5samples.vcf.gz.sorted.annovar.HG00114.hg19_multianno.txt.gz \
+                    -d key=INFO,ID=HG00114.annovar.refGene.Func.refGene,Number=0,Type=String,Description='Annovar HG00114 refGene Func.refGene' \
+                    -d key=INFO,ID=HG00114.annovar.refGene.Gene.refGene,Number=0,Type=String,Description='Annovar HG00114 refGene Gene.refGene' \
+                    -d key=INFO,ID=HG00114.annovar.refGene.ExonicFunc.refGene,Number=0,Type=String,Description='Annovar HG00114 refGene ExonicFunc.refGene' \
+                    -d key=INFO,ID=HG00114.annovar.refGene.AAChange.refGene,Number=0,Type=String,Description='Annovar HG00114 refGene AAChange.refGene' \
+    -c CHROM,FROM,TO,-,-,INFO/HG00114.annovar.refGene.Func.refGene,INFO/HG00114.annovar.refGene.Gene.refGene,INFO/HG00114.annovar.refGene.ExonicFunc.refGene,INFO/HG00114.annovar.refGene.AAChange.refGene | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00114.annovar.vcf.gz && \
+    tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00114.annovar.vcf.gz
+
+    #Wait for all vcf-annotate commands to complete
+    wait
+
+    #Merge vcf files
+    vcf-merge \
+    annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00098.annovar.vcf.gz \
+    annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00100.annovar.vcf.gz \
+    annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00106.annovar.vcf.gz \
+    annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00112.annovar.vcf.gz \
+    annovar_out/vcf-annotate_final/5samples.vcf.gz.HG00114.annovar.vcf.gz \
+    | bgzip -f -c > annovar_out/vcf-annotate_final/5samples.vcf.gz.allsamples.annovar.vcf.gz \
+    && tabix -p vcf annovar_out/vcf-annotate_final/5samples.vcf.gz.allsamples.annovar.vcf.gz
+
+
+=head2 Some notes on databases
+
+I had trouble running the ljb23 databases. I contacted Kai (developer of annovar) who helped me out with ljb23_all, but I am still unsure about the other ljb23 databases. Just use the ljb23_all db and get rid of what you don't want. ;)
+
+=head2 Running the commands
+
+All the commands above are usual unix commands. You can always add a #!/bin/bash and run the commands in serial. 
+
+Another option is to use the Runner::MCE or Runner::Threads, that will run your jobs in parallel with appropriate job flow.
+
+=head2 Some notes on reannotating the vcf file
+
+Getting the vcf-annotate script working with the annovar took some serious fiddling. I hope it is working, and it has been tested rather extensively with the default databases, but still very carefully check your files. There are a few changes that need to be make to the multianno file for downward analysis, but your original multianno file is still kept. Any fields containing an equal sign, such as "Score=3" are changed to ->, "Score->3" and ";" are changed to commas. This is done with a sed command. This is to ensure correct parsing if later down the line you are using vcf-tools and/or Vcf.pm to parse the files, the INFO field will not parse correctly without these changes. The other change is changing the annotation header *_GERP++ to *_GERPPP, if using any of the ljb databases. The vcf-validate function uses a regexp that cuts the line out at +, so that needs to be changed as well.
+
+=head2 Other scripts included in this module
+
+
+=head3 bychrmpil.sh
+
+Uses samtools mpileup to generate variant files. This method comes from a blog post here: http://www.research.janahang.com/efficient-way-to-generate-vcf-files-using-samtools/
+This method takes as its input the fasta file and recursively searches for all bam files, greps the sequence names out, and prints out the command to run mpileup per chromosome on all bam files, does variant calling, outputs all bcf files by chromosome, and then concatenates them back together.
+
+=head3 vcf-to-table.pl
+
+Uses Vcf.pm to parse through the file and output all info in a tab deliminated fashion. This is different from the vcf-tsv because it gets all fields from INFO, FIELD, and does a genotype call on diploid genotypes.
+
+
+

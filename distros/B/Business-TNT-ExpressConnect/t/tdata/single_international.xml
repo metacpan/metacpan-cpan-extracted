@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><priceRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <appId>PC</appId>
+  <appVersion>3.0</appVersion>
+  <priceCheck>
+    <rateId>rate2</rateId>
+    <sender>
+      <country>IT</country>
+      <town/>
+      <postcode/>
+    </sender>
+    <delivery>
+      <country>NL</country>
+      <town>Amsterdam</town>
+      <postcode>1100 KG</postcode>
+    </delivery>
+    <collectionDateTime>2016-10-11T12:48:00</collectionDateTime>
+    <product>
+      <type>N</type>
+    </product>
+    <insurance>
+      <insuranceValue>110.00</insuranceValue>
+      <goodsValue>100.00</goodsValue>
+    </insurance>
+    <currency>EUR</currency>
+    <priceBreakDown>true</priceBreakDown>
+    <consignmentDetails>
+      <totalWeight>1.25</totalWeight>
+      <totalVolume>0.1</totalVolume>
+      <totalNumberOfPieces>1</totalNumberOfPieces>
+    </consignmentDetails>
+    <pieceLine>
+      <numberOfPieces>1</numberOfPieces>
+      <pieceMeasurements>
+        <length>1</length>
+        <width>2</width>
+        <height>3</height>
+        <weight>1.25</weight>
+      </pieceMeasurements>
+      <pallet>1</pallet>
+    </pieceLine>
+  </priceCheck>
+</priceRequest>

@@ -1,0 +1,9 @@
+classes:
+  - Console.mail
+parameters:
+  doc:
+    console-mail:
+      pkg:
+        - Install console mail client Mutt
+  pkg:
+    - mutt

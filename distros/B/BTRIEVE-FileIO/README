@@ -1,0 +1,31 @@
+NAME
+
+  BTRIEVE::FileIO - Btrieve file I/O operations
+
+DESCRIPTION
+
+  This module provides methods for common Btrieve operations.
+
+INSTALLATION
+
+  To install this module type the following:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+PREREQUISITES
+
+  BTRIEVE::Native
+
+AUTHOR
+
+  Steffen Goeldner <sgoeldner@cpan.org>
+
+COPYRIGHT
+
+  Copyright (c) 2004 Steffen Goeldner. All rights reserved.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

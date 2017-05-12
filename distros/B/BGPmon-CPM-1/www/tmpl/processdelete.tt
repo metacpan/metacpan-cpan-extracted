@@ -1,0 +1,15 @@
+
+[% INCLUDE header.html title = 'Critical Prefix Management: Delete List'; %]
+
+<p><h2>Remove prefixes</h2></p>
+<p>"[% LIST %]" critical prefix list successfully updated!</p>
+
+<form action="cpm_workflow.cgi" method="GET">
+<input type="hidden" name="action" value="view" /> 
+  <input type="hidden" name="list" value="[% LIST %]"/>
+  <p>
+    <input type="submit" value = "Continue"/>
+  </p>
+</form>    
+
+[% INCLUDE footer.html %]

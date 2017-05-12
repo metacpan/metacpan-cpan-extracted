@@ -1,0 +1,97 @@
+Revision history for Perl extension Business::CreditCard.
+
+0.36  Tue Jun 14 11:36:05 PDT 2016
+        - Allow (and doc) import of receipt_cardtype
+        - validate_card() is a new synonym for validate(), starting a long-term
+          plan to stop exporting validate() or anything else by default.
+        - Best-effort cardtype() when only the first two digits are available
+          (identify masked 60xx as Discover)
+
+0.35  Tue Feb  9 14:43:38 PST 2016
+        - Fix bug identifying 49* Visa cards introduced in 0.34, patch from
+          Ed J, thanks!
+        - doc: Clarify processing agreements don't apply to Canada
+
+0.34  Fri Feb  5 07:24:00 PST 2016
+        - 19 digit Visa and Discover cards
+        - MasterCard 222100-272099 range
+        - Canada does not process JCB 3529-3589 as Discover, but Puerto Rico,
+          US Virgin Islans, Northern Mariana Islands, Palau and Guam do
+        - China Union Pay only processed as Discover in the US, Mexico and
+          the Caribbean, not elsewhere outside China
+        - 14 digit Discover remain only in 36*
+        - receipt_cardtype subroutine supporting Discover's new receipt
+          requirements
+
+0.33  Sat Sep 13 16:13:15 PDT 2014
+        - With $Country explicity to CA, fix identification of JCB 3529-3589
+          as Discover
+        - Allow use of our subroutines as class methods, patch from Adam
+          Kennedy, thanks!
+        - Add tests for processing agreement / country functionality
+
+0.32  Thu Feb 21 16:02:42 PST 2013
+        - Add Israeli Isracard (no checksum yet)
+        - Add LICENSE=>perl to Makefile.PL; add license to META.yml,
+          closes: cpan #27735
+        - Documentation: Add link to Neil Bowers' review of CC check modules
+        - Rearrange cardtype() for performance
+        - Fix Discover identification of 39 and 3529-3589 prefixes, patch from
+          Jason Terry, thanks!
+
+0.31  Mon Oct 19 18:51:35 PDT 2009
+        - Add LICENSE section to POD documentation
+        - Add META.yml to MANIFEST
+        - Add Irish Laser card, thanks to Eoin Redmond for the heads-up.
+        - Add documentation on what this module *is* and *is NOT* about.
+        - Spelling fix in docs
+        - correct misdocumentation of $Business::CreditCard::Country
+        - Move test.pl to test/t and change to using Test::More, modify
+          MANIFEST and Makefile.PL accordingly (thanks to Alexander Ciornii)
+        - Silence unwanted warnings (thanks to Alexander Ciornii)
+        - Discover cards starting with 644-649 are now recognized
+        - Most Diner's Club cards (300-305, 3095 and 36) now processed as
+          Discover
+        - China Union pay now includes 624-626 and 628 in addition to 622 (and
+          still identified as Discover outside China)
+        - JCB identified as Discover in the US
+
+0.30  Mon Dec 18 23:24:25 PST 2006
+        - back after two and a half years; happy hanukkah!
+	- added note about B:CC:Object
+	- added new Discover 65 prefix
+	- check for Switch before Visa as Switch has some BINs in ^4
+        - accept masked numbers in cardtype()
+        - add handling of card network peering arrangements, controllable via
+          $Business::CreditCard::Country
+	- identify Diner's club ^36 cards as MasterCard in US and Canada
+        - identify China Union Pay cards as Discover cards outside China
+        - identify China Union Pay cards
+
+0.28  Thu Jul  1 01:17:32 PDT 2004
+	- added Switch and Solo cards, patch from Max Becker
+	- added proper Changes file
+	- added documentation on cardtype() return values from
+          tmurray@agronomy.org (closes: cpan #3330)
+
+0.27  20 Jan 2002
+	- small typo for amex cards
+
+0.26  10 Jul 2001
+0.25  10 Jul 2001
+	- *sigh*
+
+0.24  11 Jun 2001
+	- added enRoute, JCB, BankCard, rewrote with regexes
+
+0.23  3 May 2001
+	- silly bug in test.pl
+
+0.22  1 Feb 2001
+	- new maintainer, MakeMaker installation
+
+0.21  17 Jan 97
+	- short numbers and numbers with letters are no longer kosher.
+
+12 Jul 96 - created
+

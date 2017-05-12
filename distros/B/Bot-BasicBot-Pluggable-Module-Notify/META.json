@@ -1,0 +1,66 @@
+{
+    "name" : "Bot-BasicBot-Pluggable-Module-Notify",
+    "version": "0.04",
+    "abstract": "Notify users via email, when they are away from IRC",
+    "author": [
+      "Barbie <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "bot",
+        "notification",
+        "irc"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Bot::BasicBot::Pluggable" : "0",
+                "Bot::BasicBot::Pluggable::Module::Seen" : "0",
+                "IO::File" : "0",
+                "MIME::Lite" : "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Bot::BasicBot::Pluggable::Module::Notify": {
+            "file": "lib/Bot/BasicBot/Pluggable/Module/Notify.pm",
+            "version": "0.04"
+        }
+    },
+    "no_index": {
+        "directory": ["t"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Bot-BasicBot-Pluggable-Module-Notify" },
+        "repository": {
+            "url": "git://github.com/barbie/bot-basicbot-pluggable-module-notify.git",
+            "web": "https://github.com/barbie/bot-basicbot-pluggable-module-notify",
+            "type": "git"
+        }
+    }
+}

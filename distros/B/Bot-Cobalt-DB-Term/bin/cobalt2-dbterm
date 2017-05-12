@@ -1,0 +1,53 @@
+#!perl
+
+use 5.12.1;
+use strict;
+use warnings;
+
+use Bot::Cobalt::DB::Term;
+my $t;
+
+$SIG{'INT'}  = 'SIG_h';
+$SIG{'TERM'} = 'SIG_h';
+
+if ($ARGV[0]) {
+  $t = Bot::Cobalt::DB::Term->new(
+    Open => $ARGV[0],
+  );
+} else {
+  $t = Bot::Cobalt::DB::Term->new;
+}
+$t->interactive;
+
+sub SIG_h {
+  undef $t;
+  print "Exit due to signal.\n";
+  exit(1);
+}
+
+__END__
+=pod
+
+=head1 NAME
+
+cobalt2-dbterm - Interactive interface to a Bot::Cobalt::DB
+
+=head1 SYNOPSIS
+
+  cobalt2-dbterm
+  cobalt2-dbterm /path/to/db
+
+=head1 DESCRIPTION
+
+A simple interactive interface to L<Bot::Cobalt::DB> databases.
+
+See C<help> within the interactive shell for assistance, or try 
+the perldoc for L<Bot::Cobalt::DB::Term>.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

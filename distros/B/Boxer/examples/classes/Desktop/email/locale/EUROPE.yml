@@ -1,0 +1,25 @@
+classes:
+  - Desktop.email.locale.EU
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include Icedove locales for Europe (UN M.49 definition)
+  pkg:
+    - icedove-l10n-ast
+    - icedove-l10n-be
+    - icedove-l10n-br
+    - icedove-l10n-ca
+    - icedove-l10n-eu
+    - icedove-l10n-fy-nl
+    - icedove-l10n-gd
+    - icedove-l10n-gl
+    - icedove-l10n-is
+    - icedove-l10n-nb-no
+    - icedove-l10n-nn-no
+    - icedove-l10n-rm
+    - icedove-l10n-ru
+    - icedove-l10n-sq
+    - icedove-l10n-sr
+    - icedove-l10n-tr
+    - icedove-l10n-uk

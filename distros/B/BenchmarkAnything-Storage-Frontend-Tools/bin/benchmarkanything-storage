@@ -1,0 +1,621 @@
+#! /usr/bin/perl
+# PODNAME: benchmarkanything-storage
+# ABSTRACT: BenchmarkAnything storage cmdline tool
+
+use 5.008;
+use strict;
+use warnings;
+
+use App::Rad;
+
+######################################################################
+#
+# App::Rad interface
+#
+######################################################################
+
+App::Rad->run();
+
+sub setup
+{
+        my $c = shift;
+        $c->unregister_command("help");
+        $c->register_commands("help", "search", "add", "createdb", "listnames", "listkeys", "stats", "processqueue", "initsearch", "syncsearch", "gc", "init");
+        $c->register('search-sync' => \&syncsearch);
+        $c->register('search-init' => \&initsearch);
+}
+
+sub teardown
+{
+        my $c = shift;
+
+        _disconnect($c) unless $c->cmd =~ /^init|help$/;
+}
+
+sub help
+{
+        my ($c) = @_;
+
+        return qq{benchmarkanything-storage
+    [-i|--intype <TYPE>]
+    [-o|--outtype <TYPE>]
+    [-s|--separator <SEPARATOR>]
+    [--fb]
+    [--fi]
+    [-c|--cfgfile <FILE>]
+    [--debug]
+    [-d|--data]
+    [-f|--force]
+    [-v|--verbose]
+    [--skipvalidation]
+    [--queuemode]
+    [--startid <VALUE_ID>]
+    [--bulkcount <COUNT>]
+    [-p|--pattern <PATTERN>]
+    [--id <VALUE_ID>]
+    [--really <DSN>]
+    [init|search|add|createdb|listnames|listkeys|stats|processqueue|search-init|search-sync|gc]
+    <DATAFILE>
+
+  Sub commands:
+
+    init            - Initialize a local BenchmarkAnything setup.
+
+    search          - Search BenchmarkAnything data.
+
+    add             - Add one or more BenchmarkAnything entries.
+
+    createdb        - Drop and create tables in the backend store.
+
+    listnames       - List existing metric names.
+
+    listkeys        - List existing additional key names.
+
+    stats           - Show counts of data points, metrics, keys, etc.
+
+    processqueue    - Works on the result queue created by add --queuemode.
+
+    search-init     - Initializes the configured search engine (Elasticsearch).
+
+    search-sync     - Syncs the DB with the configured search engine (Elasticsearch).
+
+    gc              - Garbage collects artefacts in the backend store.
+
+
+  Options:
+
+    -i
+    --intype         - input format
+                       [json(default), yaml, dumper]
+    -o
+    --outtype        - output format
+                       [json(default), yaml, dumper]
+
+    -s
+    --separator      - sub entry separator for output format 'flat'
+                       (default=;)
+
+    --fb             - on output format 'flat' use [brackets] around
+                       outer arrays
+
+    --fi             - on output format 'flat' prefix outer array lines
+                       with index
+
+    -c
+    --cfgfile        - config file for storage backend
+
+    -p
+    --pattern        - pattern for 'listnames'/'listkeys' commands (using LIKE)
+
+    --id             - search id for 'search' command. When given,
+                       other queries are ignored and the result point
+                       is returned with all additional key/value fields.
+
+    --queuemode      - used for 'add' command; values are just enqueued
+                       for later actual processing. This lets
+                       'add' return quicker, gives higher throughput.
+
+    -b
+    --backend        - backend ['sql' (default)]
+
+    --debug          - Pass through 'debug' option to used modules
+
+    --verbose        - print what's going on
+
+    --force          - Force the respective command
+                       + for 'search-init' it means to delete and re-create the index
+                       + for 'search-sync' it means to (re-)index all
+
+    --startid        - Starting VALUE_ID for 'search-sync' (default 1).
+
+    --bulkcount      - Chunk size for 'search-sync' (default 10000).
+
+    --skipvalidation - Disables schema validation checking,
+                       usually for 'add' command.
+
+    --really         - used for 'createdb' command.
+                       Avoids the 'Are you sure?' question. You need to
+                       provide the DSN from config that createdb would use,
+                       to avoid painful mistakes.
+
+    -d
+    --data           - Data [instead of DATAFILE].
+
+    <DATAFILE>       - input data file ("-" for STDIN) unless --data is given
+                       Content depends on the sub command:
+                       + for 'search' it is a search query
+                       + for 'add' it is BenchmarkAnything data
+                       + for 'createdb' no input data is used
+};
+}
+
+sub _connect
+{
+        my ($c) = @_;
+
+        require BenchmarkAnything::Storage::Frontend::Lib;
+
+        my $opt = $c->options;
+        $c->{_balib}    = BenchmarkAnything::Storage::Frontend::Lib->new
+         (cfgfile         => $opt->{cfgfile},
+          really          => $opt->{really},
+          debug           => $opt->{debug},
+          verbose         => $opt->{verbose},
+          skipvalidation  => $opt->{skipvalidation},
+          queuemode       => $opt->{queuemode},
+          ($c->cmd =~ /^(init|help)$/ ?
+           ( noconnect    => 1,
+             noconfig     => 1,
+           ) : ()),
+         );
+}
+
+sub _disconnect
+{
+        my ($c) = @_;
+
+        $c->{_balib}->disconnect if $c->{_balib}; # balib is undef on getopt errors
+}
+
+sub _getopt
+{
+        my ($c) = @_;
+
+        $c->getopt( "cfgfile|c=s",
+                    "backend|b=s",
+                    "intype|i=s",
+                    "outtype|o=s",
+                    "separator|s=s",
+                    "fb",
+                    "fi",
+                    "pattern|p=s",
+                    "id=s",
+                    "debug",
+                    "data|d=s",
+                    "force|f",
+                    "verbose|v",
+                    "startid=i",
+                    "bulkcount=i",
+                    "skipvalidation",
+                    "queuemode",
+                    "really=s",
+                  )
+         or help() and return undef;
+
+        _connect($c);
+        _set_defaults($c);
+}
+
+
+sub _set_defaults
+{
+        my ($c) = @_;
+
+        $c->{_file}                = $c->argv->[0] || '-';
+        $c->options->{outtype}   ||= 'json';
+        $c->options->{separator} ||= ';';
+        $c->options->{fb}        ||= 0;
+        $c->options->{fi}        ||= 0;
+
+}
+
+sub init :Help(Initialize a local BenchmarkAnything setup)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _init($c);
+}
+
+sub search :Help(search BenchmarkAnything data)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _search($c);
+}
+
+sub add :Help(add one or more BenchmarkAnything entries)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _add($c);
+}
+
+sub createdb :Help(drop and create tables in the backend store)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _createdb($c);
+}
+
+sub listnames :Help(list existing metric names)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _listnames($c);
+}
+
+sub listkeys :Help(list existing additional key names)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _listkeys($c);
+}
+
+sub stats :Help(show backend storage usage counts)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _stats($c);
+}
+
+sub processqueue :Help(Works on the result queue created by add --queuemode)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _processqueue($c);
+        _gc($c);
+}
+
+sub initsearch :Help(Initializes the configured search engine (Elasticsearch))
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _init_search_engine($c);
+        _gc($c);
+}
+
+sub syncsearch :Help(Syncs the DB with the configured search engine (Elasticsearch))
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _sync_search_engine($c);
+        _gc($c);
+}
+
+sub gc :Help(Garbage collects artefacts in the backend store)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+        _gc($c);
+}
+
+######################################################################
+#
+# Implementation
+#
+######################################################################
+
+
+sub _read_in
+{
+        my ($c) = @_;
+
+        my $opt = $c->options;
+
+        my $file = $c->{_file};
+        my $intype  = $opt->{intype}  || 'json';
+        my $data;
+        my $filecontent;
+        {
+                local $/;
+                if (defined $opt->{data}) {
+                        $filecontent = $opt->{data};
+                }
+                elsif ($file eq '-') {
+                        $filecontent = <STDIN>;
+                }
+                else
+                {
+                        open (my $FH, "<", $file) or die "benchmarkanything-storage: cannot open input file $file.\n";
+                        $filecontent = <$FH>;
+                        close $FH;
+                }
+        }
+
+        if (not defined $filecontent or $filecontent !~ /[^\s\t\r\n]/ms) {
+                die "benchmarkanything-storage: no meaningful input to read.\n";
+        }
+
+        if ($intype eq "yaml") {
+                require YAML::Any;
+                $data = [YAML::Any::Load($filecontent)];
+        }
+        elsif ($intype eq "json") {
+                require JSON;
+                $data = JSON::decode_json($filecontent);
+        }
+        elsif ($intype eq "dumper") {
+                eval '$data = my '.$filecontent;
+        }
+        else
+        {
+                die "benchmarkanything-storage: unrecognized input format: $intype.\n";
+        }
+        return $data;
+}
+
+
+sub _write_out
+{
+        my ($c, $data) = @_;
+
+        return $c->{_balib}->_output_format($data, $c->options);
+}
+
+sub _listnames
+{
+        my ($c) = @_;
+
+        my $result = $c->{_balib}->listnames ($c->options->{pattern});
+        _write_out($c, $result);
+}
+
+sub _listkeys
+{
+        my ($c) = @_;
+
+        my $result = $c->{_balib}->listkeys ($c->options->{pattern});
+        _write_out($c, $result);
+}
+
+sub _stats
+{
+        my ($c) = @_;
+
+        my $result = $c->{_balib}->stats;
+        _write_out($c, $result);
+}
+
+sub _processqueue
+{
+        my ($c) = @_;
+
+        $c->{_balib}->process_raw_result_queue(100);
+        return;
+}
+
+sub _init_search_engine
+{
+        my ($c) = @_;
+
+        $c->{_balib}->init_search_engine($c->options->{force});
+        return;
+}
+
+sub _sync_search_engine
+{
+        my ($c) = @_;
+
+        my $force     = $c->options->{force}     || 0;
+        my $startid   = $c->options->{startid}   || 1;
+        my $bulkcount = $c->options->{bulkcount} || 10_000;
+        $c->{_balib}->sync_search_engine($force, $startid, $bulkcount);
+        return;
+}
+
+sub _gc
+{
+        my ($c) = @_;
+
+        $c->{_balib}->gc;
+        return;
+}
+
+sub _search
+{
+        my ($c) = @_;
+
+        my $result;
+        my $value_id = $c->options->{id};
+
+        # special case: search --id gets a full point with all details
+        if ($value_id) {
+                $result = $c->{_balib}->search(undef, $value_id);
+        }
+        else
+        {
+                my $query = _read_in($c);
+                $result = $c->{_balib}->search($query);
+        }
+        _write_out($c, $result);
+}
+
+sub _add
+{
+        my ($c) = @_;
+
+        my $data = _read_in($c);
+        $c->{_balib}->add ($data);
+        return;
+}
+
+sub _createdb
+{
+        my ($c) = @_;
+
+        $c->{_balib}->createdb;
+        return;
+}
+
+sub _init
+{
+        my ($c) = @_;
+
+        my $old_verbose = $c->{_balib}{verbose};
+        $c->{_balib}{verbose} = 1;
+
+        $c->{_balib}->init_workdir;
+
+        $c->{_balib}{verbose} = $old_verbose;
+
+        return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+benchmarkanything-storage - BenchmarkAnything storage cmdline tool
+
+=head1 SYNOPSIS
+
+Default data format (in and out) is JSON, other formats can be
+specified.
+
+=over 4
+
+=item * Initialize BenchmarkAnything:
+
+  $ benchmarkanything-storage init
+
+=item * OPTIONAL: Configure MySQL
+
+Iff you want to use MySQL instead of the default SQLite, then edit the
+just created C<~/.benchmarkanything/default.cfg> and in the section
+
+ benchmarkanything:
+  backend: local
+  storage:
+    backend:
+      sql:
+        dsn: dbi:SQLite:...
+        #dsn: DBI:mysql:database=benchmarkanything
+        #user: benchmarker
+        #password: secret
+        ...
+
+comment out the I<dsn:dbi:SQLite...> line and uncomment the
+I<dsn:DBI:mysql...> and corresponding I<user:> and I<password:>
+lines, so it now looks like:
+
+ benchmarkanything:
+  backend: local
+  storage:
+    backend:
+      sql:
+        #dsn: dbi:SQLite:...
+        dsn: DBI:mysql:database=benchmarkanything
+        user: benchmarker
+        password: secret
+        ...
+
+And yes, choose a better password!
+
+Then initialize you MySQL like this:
+
+ $ sudo apt-get install mysql-server-5.6 mysql-client-5.6
+ $ mysql -u root -p
+   mysql> create database if not exists benchmarkanything;
+   mysql> create user 'benchmarker'@'localhost' identified by 'secret';
+   mysql> grant all privileges on benchmarkanything.* to 'benchmarker'@'localhost';
+   mysql> flush privileges;
+   mysql> quit;
+
+=item * Create BenchmarkAnything storage database:
+
+  $ benchmarkanything-storage createdb
+
+This will ask if you are sure before it creates the actual db with
+tables.
+
+=item * Add data to backend storage:
+
+  $ benchmarkanything-storage add         data.json
+  $ benchmarkanything-storage add -i yaml data.yaml
+
+=item * Query backend storage for data:
+
+  $ echo 'json_search_query' | benchmarkanything-storage search -
+
+=back
+
+=head2 Input formats
+
+The following B<input formats> are allowed, with their according
+modules used to convert the input into a data structure:
+
+ yaml   - YAML::Any (default)
+ json   - JSON
+ dumper - Data::Dumper (including the leading $VAR1 variable assignment)
+
+=head2 Output formats
+
+The following B<output formats> are allowed:
+
+ yaml   - YAML::Any
+ json   - JSON (default)
+ xml    - XML::Simple
+ ini    - Config::INI::Serializer
+ dumper - Data::Dumper (including the leading $VAR1 variable assignment)
+ flat   - pragmatic flat output for typical unixish cmdline usage
+
+See L<BenchmarkAnything::Storage::Frontend::Lib/Output formats> for
+more details, especially about the I<flat> output format.
+
+=head2 _read_in
+
+This function reads in a data structure. The meaning of the data
+depends on the sub command: for C<search> it is a search query, for
+C<add> it is an array of BenchmarkAnything data points.
+
+=head2 _write_out
+
+This function writes a data structure in requested output format.
+
+=head1 ABOUT
+
+Cmdline tool to handle BenchmarkAnything data, see
+L<http://benchmarkanything.org|http://benchmarkanything.org>
+
+=head1 SEE ALSO
+
+For more information about the BenchmarkAnything schema, see
+L<http://www.benchmarkanything.org/|http://www.benchmarkanything.org/>.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

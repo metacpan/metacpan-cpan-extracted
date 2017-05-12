@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+
+use threads;
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Carp;
+
+use 5.010;
+
+use Bio::Gonzales::Util::Text qw/ccount_iter/;
+
+use Bio::Gonzales::Seq::IO qw/faiterate/;
+
+use Getopt::Long::Descriptive;
+use Thread::Task::Concurrent qw(tmsg);
+
+my ( $opt, $usage ) = describe_options(
+  '%c %o <file>', [],
+  [ 'threads|t=i', "use threads", { default => 1 } ],
+  [ 'help',        "print usage message and exit" ],
+);
+
+print( $usage->text ), exit if $opt->help;
+
+my $file = shift;
+
+confess "no file" unless ( $file && -f $file );
+
+my $tq = Thread::Task::Concurrent->new( task => \&task, max_instances => $opt->threads, verbose => 0 )->start;
+
+my $iterator = faiterate($file);
+
+while ( my $s = $iterator->() ) {
+  $tq->enqueue( $s->seq );
+}
+my $res = $tq->join->result;
+
+my %counts;
+for my $counts_by_seq (@$res) {
+  while ( my ( $c, $count ) = each %$counts_by_seq ) {
+    $counts{$c} += $count;
+  }
+}
+my @chars = sort keys %counts;
+my $total;
+for my $k (@chars) {
+  say "    $k => $counts{$k}";
+  $total += $counts{$k};
+}
+say "    _total_ => $total";
+
+sub task {
+  my $counter = ccount_iter();
+  my $seq     = shift;
+  return ccount_iter()->($seq);
+}
+

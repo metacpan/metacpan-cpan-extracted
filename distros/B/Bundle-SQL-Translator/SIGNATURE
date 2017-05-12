@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.27.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1adcd25e8be40a3d228f13067e2d17f44f306eeb Changes
+SHA1 4683a6415d0a7c05e2592d376c068fc848871f09 MANIFEST
+SHA1 5b662aa37d4dc77e37257eb5565a89bf7cde03cf MANIFEST.SKIP
+SHA1 a27e5fab21a1952c32a452cd638aa5767fa50c9a META.yml
+SHA1 2e425b99b2d14e5934d21498f8102b983af4db13 Makefile.PL
+SHA1 51e4b6bbd726dd8f9ffc24cae71d41781d2b79f8 README
+SHA1 9048e135eec68ff8888c6261a9fb347c5e747e8b lib/Bundle/SQL/Translator.pm
+SHA1 e39b4fe7f9d89e5be7097580a1dcbdfe59463bf5 t/00load.t
+SHA1 13cad91846a2fe9ebb6b1b86bc8aaded7b7a1751 t/01pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.2 (GNU/Linux)
+Comment: This message is digitally signed and can be verified for authenticity.
+
+iD8DBQE/VJRlzsinjrVhZaoRAmB3AJ4qA+DIpJVUO66Ia3QhTt9S02M2CQCgktIu
+ssBgrWGplxYdUjchPMQfj/w=
+=t/vU
+-----END PGP SIGNATURE-----

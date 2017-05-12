@@ -1,0 +1,74 @@
+
+
+                    Business::OnlinePayment::TCLink v1.03
+                       copyright (C) TrustCommerce 2002
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+                         http://www.trustcommerce.com
+                         developer@trustcommerce.com
+
+                               January 10, 2003
+
+I. DESCRIPTION
+
+  This is Business::OnlinePayment::TCLink, a Business::OnlinePayment
+backend module for TrustCommerce. It is only useful if you have an
+account with TrustCommerce: http://www.trustcommerce.com
+
+  Dan Helfman <dan@trustcommerce.com> is the author. The module is
+derived from code by Jason Kohles and Ivan Kohler. Email
+developer@trustcommerce.com for help with using this module.
+
+  Business::OnlinePayment is a generic interface for processing payments
+through online credit card processors, online check acceptance houses,
+etc. (If you like buzzwords, call it an "multiplatform
+ecommerce-enabling middleware solution").
+
+II. BUILD
+
+  First, follow the instructions in the Net::TCLink Perl package
+(distributed separately) to install it as root. The package is availble at:
+
+  http://trustcommerce.com/tclink.html
+
+  To build Business::OnlinePayment::TCLink, you need only execute the
+following two commands:
+
+  $ perl Makefile.PL
+  $ make
+
+III. INSTALLATION
+
+  If you wish to install globally (recommended), execute the following
+command as root:
+
+  # make install
+
+  If you do not have root priviledges on the machine, or do not wish to
+install Business::OnlinePayment::TCLink globally, you may still load the
+module manually from the blib directory where it is built. Assuming the
+name of your test script is test.pl, use the following command line:
+
+  $ perl -Iblib/arch -Iblib/lib test.pl
+
+  You may wish to change "blib/arch" and "blib/lib" to be the full path
+to those locations, so that you may execute the command anywhere.
+
+  Or, you may insert the following code at the top of your script:
+
+use lib "blib/lib";
+use lib "blib/arch";
+
+   Again, you may prefer to use the full path name here.
+
+IV. USAGE
+
+  The perldoc documentation contains usage information and some example
+code. Access it as follows:
+
+  $ perldoc Business::OnlinePayment::TCLink
+
+  Information on integrating this module with the Freeside billing and
+account administration package is available in README.freeside.

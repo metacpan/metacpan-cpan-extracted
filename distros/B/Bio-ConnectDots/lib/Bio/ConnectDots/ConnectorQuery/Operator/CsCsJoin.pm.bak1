@@ -1,0 +1,49 @@
+package Bio::ConnectDots::ConnectorQuery::Operator::CsCsJoin;
+use vars qw(@ISA @AUTO_ATTRIBUTES @OTHER_ATTRIBUTES %SYNONYMS %DEFAULTS);
+use strict;
+use Bio::Root::AutoClass;
+use Bio::ConnectDots::ConnectorQuery::Operator::Join;
+@ISA = qw(Bio::ConnectDots::ConnectorQuery::Operator::Join);
+
+@AUTO_ATTRIBUTES=qw();
+%SYNONYMS=();
+@OTHER_ATTRIBUTES=qw();
+%DEFAULTS=();
+Bio::Root::AutoClass::declare(__PACKAGE__);
+
+# What we used to call a 'rod join'
+
+sub generate {
+  my($self)=@_;
+  my $join=$self->join;
+  my @inputs=@{$self->inputs};
+  my @input_names=map {$_->is_cs? 'connectdot': $_->name} @inputs;
+  my @cs_aliases=$join->cs_aliases;
+  my @alias_names=map {$_->alias_name} @cs_aliases;
+  my $term_where0=$self->cs_term_where($join->term0,0);
+  my $term_where1=$self->cs_term_where($join->term1,1);
+  my @cs_sql_aliases=@{$self->cs_sql_aliases};
+  my $from0=qq($input_names[0] AS $cs_sql_aliases[0]);
+  my $from1=qq($input_names[1] AS $cs_sql_aliases[1]);
+  
+  # left and right queries have same targets and dot join
+  my @targets=(qq($cs_sql_aliases[0].connector_id AS ).$self->column_name($cs_aliases[0]),
+	       qq($cs_sql_aliases[1].connector_id AS ).$self->column_name($cs_aliases[1]));
+  my $targets=join(', ',@targets);
+  my $dot_where=qq($cs_sql_aliases[0].dot_id=$cs_sql_aliases[1].dot_id);
+
+  # left query: SELECT targets FROM input0 LJ input1 ON term1 AND dots WHERE term0
+  my $on=join(' AND ',@$term_where1,$dot_where);
+  my $where=join(' AND ',@$term_where0);
+  my $left_join=qq(SELECT $targets FROM $from0 LEFT JOIN $from1 ON $on WHERE $where);
+
+  # right query: SELECT targets FROM input1 LJ input0 ON term0 AND dots WHERE term1
+  my $on=join(' AND ',@$term_where0,$dot_where);
+  my $where=join(' AND ',@$term_where1);
+  my $right_join=qq(SELECT $targets FROM $from1 LEFT JOIN $from0 ON $on WHERE $where);
+
+  my $sql="($left_join) UNION ($right_join)";
+  $self->sql($sql);
+}
+
+1;

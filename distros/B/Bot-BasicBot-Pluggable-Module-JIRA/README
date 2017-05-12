@@ -1,0 +1,174 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::JIRA - Access JIRA via IRC!
+
+VERSION
+    This POD describes version 0.02
+
+SYNOPSIS
+    You will need to load the module into your instance:
+
+        $bot->load('JIRA');
+
+    Then feel free to interrogate the shit out of her:
+
+        <diz> purl: what's going on with PRJ-284?
+        <purl> diz: PRJ-284 (add jira support to bot) is unresolved - http://jira.domain.com/issue/284
+        <diz> purl: who fixed PRJ-284?
+        <purl> diz: gphat marked PRJ-284 as fixed in changeset bbb6a0f9
+
+CONFIGURATION
+  uri
+    The location of the JIRA instance. (Ex, http://jira.domain.com)
+
+  username
+    User to authenticate against JIRA with. This is configured in JIRA. Note
+    that the user will need permissions to view issues in order to send
+    getIssue requests over the SOAP interface.
+
+  password
+    The password to use for the user during authentication. Also setup in
+    JIRA (or LDAP if you're using the LDAP linkage).
+
+  db_dsn (optional)
+  db_user (optional)
+  db_pass (optional)
+    The SOAP API in JIRA is hit or miss. It exposes functionality that I'll
+    never use while omitting other functionality that makes the API seem
+    downright useless.
+
+    One of the particular egregious omissions happens to be the lack of a
+    remote interface for retrieving the ChangeHistory for an issue. If,
+    however, you configure db_dsn, db_user, and db_pass, this module will
+    attempt to extract that information directly from the database. This
+    isn't recommended and has only been tested with 4.1.2.
+
+  status_verbs
+    The default inquiry format reports issue status by referring to the last
+    status change in the past tense. By default, the reply uses "changed to"
+    prepended to the status name. Instead of this, you may want the bot to
+    respond using more colloquial language. You may do this by setting
+    status_verbs to a hashref mapping status names to status verb phrases.
+    (ie, { Open => 'opened' }) Any missing pairs default to "changed to".
+
+  status_colors
+    This one is fun. You may map issue status names to individual IRC colors
+    by setting status_colors to a hashref containing the map. The following
+    colors are understood:
+
+    * bold
+
+    * white
+
+    * black
+
+    * blue
+
+    * green
+
+    * red
+
+    * brown
+
+    * purple
+
+    * orange
+
+    * yellow
+
+    * light_green
+
+    * teal
+
+    * cyan
+
+    * light_blue
+
+    * pink
+
+    * gray
+
+  formats
+    Inquiry responses may be custom formatted. The formats configuration
+    item is expected to be a hashref containing key/value pairs for each
+    class of inquiry. The format is rendered using Text::Xslate. Several
+    convienient xslate functions have also been provided. In addition to a
+    function for each of the individual color names above, the following
+    functions are available:
+
+    * colorize
+
+      colors the given text according to the configured status_colors
+
+    The RemoteIssue object returned by JIRA::CLient is the root context of
+    the template rendering, with the following keys added to the hashref:
+
+    * issue (shortcut for key)
+
+    * version (shortcut for the first fixVersion listed)
+
+    * status_name (the issue's current status)
+
+    * status_verb (the issue's current status in the past tense)
+
+    If you've enabled the DBI options above, these are also available to
+    you:
+
+    * status_last_changed_user (user that most recently changed the issue
+      status)
+
+    * status_last_changed_datetime (DateTime object for the most recent
+      status change)
+
+    More details on the RemoteIssue object may be found in the JIRA docs:
+
+    http://docs.atlassian.com/rpc-jira-plugin/4.1-1/com/atlassian/jira/rpc/s
+    oap/beans/RemoteIssue.html
+
+    Most all accessors methods on the RemoteIssue object are available in
+    the stash as keys of the hashref. For example, getAssignee may be
+    accessed in xslate like:
+
+        <: $assignee :>
+
+    The getComponents method, which returns a list of components, may be
+    accessed using similar perl/xslate idioms:
+
+        <: $components.0 :>
+
+    The default inquiry format is:
+
+        <: colorize($issue) :> [<: $version :>] <: bold($summary) :> for <: $assignee :>
+
+    which produces replies such as:
+
+        <purl> PRJ-284 [Unscheduled] add jira to bot for diz
+
+    The default status format is:
+
+        <: $issue :> [<: $version :>] was <: $status_verb :> by <: $status_last_changed_user :> on <: $status_last_changed_datetime.strftime("%Y %b %d (%a) at %l:%M %P") :>
+
+    which produces replies such as:
+
+        <purl> PRJ-284 [Unscheduled] was closed by diz on 2010 Sep 13 (Mon) at  1:26 pm
+
+BUGS
+    Probably a lot of them. The test suite does nothing beyond what
+    Module::Starter already provides.
+
+AUTHOR
+    Mike Eldridge, "<diz at cpan.org>"
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Mike Eldridge
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+    * Bot::BasicBot::Pluggable
+
+    * JIRA::Client
+

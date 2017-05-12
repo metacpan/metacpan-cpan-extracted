@@ -1,0 +1,4 @@
+: include "header.tx";
+: include "entry_loop.tx";
+: include "footer.tx";
+

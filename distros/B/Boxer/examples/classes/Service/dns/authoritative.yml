@@ -1,0 +1,9 @@
+classes:
+  - Service.base
+parameters:
+  doc:
+    service:
+      pkg:
+        - include authoritative domain name service BIND
+  pkg:
+    - bind9

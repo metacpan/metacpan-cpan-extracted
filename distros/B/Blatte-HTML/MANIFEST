@@ -1,0 +1,12 @@
+ChangeLog
+LICENSE
+MANIFEST
+Makefile.PL
+README
+TODO
+bin/blatte-html.PL
+lib/Blatte/HTML.pm
+t/BlatteTestHarness.pm
+t/encode.t
+t/par.t
+t/tags.t

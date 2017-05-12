@@ -1,0 +1,523 @@
+NAME
+    BPM::Engine - Business Process Execution Engine
+
+VERSION
+    0.01
+
+SYNOPSIS
+    Create a new BPM engine
+
+      use BPM::Engine;
+
+      my $callback = sub {
+          my($runner, $entity, $event, $node, $instance) = @_;
+          ...
+          };
+
+      my $engine = BPM::Engine->new(
+          log_dispatch_conf => 'log.conf',
+          connect_info      => { dsn => $dsn, user => $user, password => $password },
+          callback          => $callback
+          );
+
+    Save an XPDL file with workflow process definitions, and retrieve the
+    process definitions
+
+      my $package = $engine->create_package('/path/to/model.xpdl');
+
+      my @processes = $engine->get_process_definitions->all;
+
+    Create and run a process instance
+
+      my $instance = $engine->create_process_instance(
+          $process, { instance_name => 'My first process run' }
+          );
+
+      $engine->start_process_instance($instance, { param1 => 'value1' });
+
+DISCLAIMER
+    This is ALPHA SOFTWARE. Use at your own risk. Features may change.
+
+DESCRIPTION
+    BPM::Engine is an embeddable workflow process engine with persistence.
+    It handles saving and loading XPDL packages in a database, and running
+    workflow processes.
+
+INTERFACE
+  CONSTRUCTORS
+   BPM::Engine->new(%options)
+    Creates a new bpm engine.
+
+        $engine = BPM::Engine->new(
+          connect_info => {
+            dsn      => $dsn,
+            user     => $user,
+            password => $pass,
+            %dbi_attributes,
+            %extra_attributes,
+            });
+
+    Possible options are:
+
+    "schema => $schema // BpmEngineStore"
+        BPM::Engine::Store connected schema object. If not provided, one
+        will be created using the "connect_info" option.
+
+        Either "schema" or "connect_info" is required on object
+        construction.
+
+    "connect_info => $dsn // ConnectInfo"
+        DBIx::Class::Schema connection arguments that get passed to the
+        "connect()" call to BPM::Engine::Store, as specified by the
+        "ConnectInfo" type in BPM::Engine::Types::Internal.
+
+        Usually a single hashref with dsn/user/password and attributes.
+
+        This attribute is only used to build the "schema" attribute if not
+        provided already.
+
+    "logger => $logger // BpmEngineLogger"
+        A logger object that implements the MooseX::LogDispatch::Interface
+        role, defaults to a BPM::Engine::Logger instance constructed with
+        "log_dispatch_conf".
+
+    "log_dispatch_conf => $file | $hashref"
+        Optional constructor argument for BPM::Engine::Logger to build the
+        default "logger", if a logger was not provided.
+
+    "callback => \&cb"
+        Optional callback *&cb* which is called on all process instance
+        events. This option is passed to any "BPM::Engine::ProcessRunner"
+        constructor.
+
+    "runner_traits => [qw/TraitA TraitB/] // []"
+        Optional traits to be supplied to all "BPM::Engine::ProcessRunner"
+        objects used.
+
+   BPM::Engine->new_with_config(%options)
+        $engine = BPM::Engine->new_with_config(
+          configfile => "/etc/bpmengine/engine.conf"
+          );
+
+    Provided by the base role MooseX::SimpleConfig. Acts just like regular
+    "new()", but also accepts an argument "configfile" to specify the
+    configfile from which to load other attributes.
+
+    "configfile => $file // $ENV{HOME}/bpmengine/engine.conf"
+        A file that, when passed to "new_with_config", is parsed using
+        Config::Any to support any of a variety of different config formats,
+        detected by the file extension. See Config::Any for more details
+        about supported formats.
+
+    Explicit arguments to "new_with_config" will override anything loaded
+    from the configfile.
+
+   BPM::Engine->new_with_traits(%options)
+    Just like "new()", but also accepts a "traits" argument with a list of
+    trait names to apply to the engine object.
+
+        $engine = BPM::Engine->new_with_traits(
+            traits => [qw/Foo Bar/],
+            schema => $schema
+            );
+
+    Options, in addition to those to "new()":
+
+    "traits => \@traitnames // []"
+        Traits live under the "BPM::Engine::Trait" namespace by default,
+        prefix full class names with a "+".
+
+   BPM::Engine->with_traits(@traits)->new(%options)
+    You can use the "with_traits" class method to use traits in combination
+    with a configuration file. Example:
+
+        $engine = BPM::Engine->with_traits(qw/Foo Bar/)->new_with_config(
+          configfile => '/home/user/bpmengine.conf'
+          );
+
+  PROCESS DEFINITION METHODS
+   get_packages
+        $rs = $engine->get_packages();
+
+    *   Arguments: $cond?, \%attrs?
+
+    *   Returns: $resultset
+
+    Get a DBIx::Class::ResultSet of BPM::Engine::Store::Result::Package
+    rows. Takes the same arguments as the DBIx::Class::ResultSet "search()"
+    method.
+
+   get_package
+        $package = $engine->get_package($package_uuid);
+
+    *   Arguments: \%columns_values | $uuid, \%attrs?
+
+    *   Returns: PackageRow
+
+    Takes a package UUID or a hashref and optional standard DBIC resultset
+    attributes and returns the BPM::Engine::Store::Result::Package row.
+    Delegates to DBIx::Class::ResultSet's "find()" method.
+
+    Throws an exception if the package is not found.
+
+   create_package
+        $package = $engine->create_package($file);
+
+    *   Arguments: $xpdl_file | \$string | IO::Handle
+
+    *   Returns: PackageRow
+
+    Takes XPDL xml input and returns a newly created Package row. Input can
+    be a file path, URL, reference to a string or io stream.
+
+    Throws an exception if inconsistencies were found in the xml.
+
+   delete_package
+        $deleted_package = $engine->delete_package($package_uuid);
+
+    *   Arguments: \%columns_values | $uuid
+
+    *   Returns: PackageRow
+
+    Delete a package from the data store. Warning: this will also delete all
+    processes and process instances related to the package.
+
+    An exception is thrown if the package is not in the database.
+
+   get_process_definitions
+        $rs = $engine->get_process_definitions();
+
+    *   Arguments: $cond?, \%attrs?
+
+    *   Returns: $resultset
+
+    Get a DBIx::Class::ResultSet of BPM::Engine::Store::Result::Process
+    rows. Takes the same arguments as the DBIx::Class::ResultSet "search()"
+    method.
+
+   get_process_definition
+        $process = $engine->get_process_definition($uuid);
+
+    *   Arguments: \%columns_values | $uuid, \%attrs?
+
+    *   Returns: ProcessRow
+
+    Takes a package UUID or a hashref and optional standard DBIC resultset
+    attributes and returns the corresponding
+    BPM::Engine::Store::Result::Process row. Delegates to
+    DBIx::Class::ResultSet's "find()" method.
+
+    Throws an exception if the process is not found.
+
+  PROCESS INSTANCE METHODS
+   get_process_instances
+        $rs = $engine->get_process_instances();
+
+    *   Arguments: $cond?, \%attrs?
+
+    *   Returns: $resultset
+
+    Get a DBIx::Class::ResultSet of
+    BPM::Engine::Store::Result::ProcessInstance rows. Takes the same
+    arguments as the DBIx::Class::ResultSet "search()" method.
+
+   get_process_instance
+        $process_instance = $engine->get_process_instance($pi_id);
+
+    *   Arguments: \%columns_values | $uuid, \%attrs?
+
+    *   Returns: ProcessInstanceRow
+
+    Takes a package UUID or a hashref and optional standard DBIC resultset
+    attributes and returns the corresponding
+    BPM::Engine::Store::Result::ProcessInstance row. Delegates to
+    DBIx::Class::ResultSet's "find()" method.
+
+   create_process_instance
+        $process_instance = $engine->create_process_instance($process_id);
+
+    *   Arguments: $uuid | ProcessRow, \%attrs?
+
+    *   Returns: ProcessInstanceRow
+
+    Creates a new process instance, given a process id or
+    BPM::Engine::Store::Result::Process row object and an optional hash of
+    process instance properties.
+
+    Of these process instance properties, "instance_name" is useful to
+    specify a name for the instance. A name will be auto-generated if not
+    specified.
+
+    Returns the BPM::Engine::Store::Result::ProcessInstance that was
+    created.
+
+   start_process_instance
+        $engine->start_process_instance($pi_id);
+
+    *   Arguments: $process_instance_id | ProcessInstanceRow, \%attrs?
+
+    *   Returns: void
+
+    Starts to run a process instance given a process instance object or id,
+    and an optional hash of process instance attributes.
+
+   delete_process_instance
+        $engine->delete_process_instance($pi_id);
+
+    *   Arguments: $process_instance_id | ProcessInstanceRow |
+        \%columns_values
+
+    *   Returns: ProcessInstanceRow
+
+    Takes a process instance id or a process instance object, and deletes
+    the process instance from the data store.
+
+    An exception is thrown if the process instance is not found in the data
+    store.
+
+   process_instance_attribute
+        $attr = $engine->process_instance_attribute($pi_id, 'some_var');
+        $attr = $engine->process_instance_attribute($pi_id, 'some_var', 'new_value');
+
+    *   Arguments: $process_instance_id | ProcessInstanceRow |
+        \%columns_values, $attribute_name, $attribute_value?
+
+    *   Returns: ProcessInstanceAttributeRow
+
+    Gets or sets a process instance attribute.
+
+   change_process_instance_state
+        $engine->change_process_instance_state($pi_id, 'abort');
+
+    *   Arguments: $process_instance_id | ProcessInstanceRow |
+        \%columns_values, $state_transition
+
+    *   Returns: ProcessInstanceRow
+
+    Sets the new state of the process instance given a process instance id
+    or a process instance object and a state transition name.
+
+    The following state transitions are possible:
+
+    start
+        Changes the process instance state from "open.not_running.ready" to
+        "open.running".
+
+    suspend
+        Changes the process instance state from "open.running" to
+        "open.not_running.suspended".
+
+    resume
+        Changes the process instance state from "open.not_running.suspended"
+        to "open.running".
+
+    terminate
+        Changes the process instance state from "open.not_running.ready",
+        "open.running" or "open.not_running.suspended" to
+        "closed.cancelled.terminated". This is an end state (no more state
+        transitions possible).
+
+    abort
+        Changes the process instance state from "open.not_running.ready",
+        "open.running" or "open.not_running.suspended" to
+        "closed.cancelled.aborted". This is an end state (no more state
+        transitions possible).
+
+    finish
+        Changes the process instance state from "open.running" to
+        "closed.completed". This is an end state (no more state transitions
+        possible).
+
+    An exception will be thrown for invalid state transitions, for example
+    when the process instance is not in the right state to allow the
+    transition.
+
+  ACTIVITY INSTANCE METHODS
+   get_activity_instances
+        $rs = $engine->get_activity_instances();
+
+    *   Arguments: $cond?, \%attrs?
+
+    *   Returns: $resultset
+
+    Get a DBIx::Class::ResultSet of
+    BPM::Engine::Store::Result::ActivityInstance rows. Takes the same
+    arguments as the DBIx::Class::ResultSet "search()" method.
+
+   get_activity_instance
+        $ai = $engine->get_activity_instance($aid);
+
+    *   Arguments: \%columns_values | $activity_instance_id, \%attrs?
+
+    *   Returns: ActivityInstanceRow
+
+        Takes an activity instance id or a hashref and optional standard
+        DBIC resultset attributes and returns the corresponding
+        BPM::Engine::Store::Result::ActivityInstance row. Delegates to
+        DBIx::Class::ResultSet's "find()" method.
+
+   change_activity_instance_state
+        $engine->change_activity_instance_state($aid, 'finish');
+
+    *   Arguments: $activity_instance_id | ActivityInstanceRow |
+        \%columns_values, $state_transition
+
+    *   Returns: ActivityInstanceRow
+
+    Sets the new state of the activity instance given a activity instance id
+    or a activity instance object and a state transition name.
+
+    The following state transitions are possible:
+
+    start
+        Changes the activity instance state from "open.not_running.ready" to
+        "open.running.not_assigned".
+
+    assign
+        Changes the activity instance state from "open.not_running.ready" or
+        "open.running.not_assigned" to "open.running.assigned".
+
+    reassign
+        Valid state transition when the activity instance state is
+        "open.running.assigned". Does not actually change the state.
+
+    unassign
+        Changes the activity instance state from "open.running.assigned" to
+        "open.running.not_assigned".
+
+    suspend
+        Changes the activity instance state from "open.running.assigned" to
+        "open.not_running.suspended".
+
+    resume
+        Changes the activity instance state from
+        "open.not_running.suspended" to "open.running.assigned".
+
+    abort
+        Changes the activity instance state from "open.not_running.ready" or
+        "open.running.assigned" to "closed.cancelled.aborted". This is an
+        end state (no more state transitions possible).
+
+    finish
+        Changes the activity instance state from "open.not_running.ready" or
+        "open.running.assigned" to "closed.completed". This is an end state
+        (no more state transitions possible).
+
+   activity_instance_attribute
+        $attr = $engine->activity_instance_attribute($ai_id, 'some_var');
+        $attr = $engine->activity_instance_attribute($ai_id, 'some_var', 'new_value');
+
+    *   Arguments: $activity_instance_id | ActivityInstanceRow |
+        \%columns_values, $attribute_name, $attribute_value?
+
+    *   Returns: ActivityInstanceAttributeRow
+
+    Gets or sets an activity instance attribute, and returns the
+    corresponding ActivityInstanceAttribute row.
+
+  LOGGING METHODS
+        $engine->debug('Some thing did a thing');
+
+    The following methods of the attached logger object are available to the
+    engine: log, debug, info, notice, warning, error, critical, alert,
+    emergency
+
+  INTERNAL METHODS
+   runner
+        $runner = $engine->runner($process_instance);
+
+    Returns a new BPM::Engine::ProcessRunner instance with the
+    "runner_traits" and "callback" attribute applied for the specified
+    process instance. Internal method, used by "start_process_instance()"
+    and "change_activity_instance_state()" to advance a process instance.
+
+DIAGNOSTICS
+  Exception Handling
+    When "BPM::Engine" encounters an API error, it throws a
+    "BPM::Engine::Exception" object. You can catch and process these
+    exceptions, see BPM::Engine::Exception for more information.
+
+CONFIGURATION AND ENVIRONMENT
+    BPM::Engine may optionally be configured with a configuration file when
+    constructed using the "new_with_config" method. See etc/engine.yaml for
+    an example.
+
+MAJOR DEPENDENCIES
+    *   Moose
+
+    *   Class::Workflow
+
+    *   BPM::XPDL
+
+    *   DBIx::Class
+
+    *   Template Toolkit
+
+    *   Text::Xslate
+
+    *   XML::LibXML
+
+    *   Graph
+
+    See the included Makefile.PL for a list of all dependencies.
+
+INCOMPATIBILITIES
+    None reported.
+
+AUTHOR
+    Peter de Vos, "<sitetech@cpan.org>"
+
+SOURCE
+    You can contribute or fork this project via GitHub:
+
+      git clone git://github.com/sitetechie/BPM-Engine.git
+
+BUGS
+    Probably. Along with error conditions not being handled gracefully etc.
+
+    They will be fixed in due course as I start using this more seriously,
+    however in the meantime, patches are welcome :)
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc BPM::Engine
+
+    You can also look for information at:
+
+    *   Homepage
+
+        <http://bpmengine.org/>
+
+    *   Github Repository
+
+        <http://github.com/sitetechie/BPM-Engine>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2010, 2011 Peter de Vos.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

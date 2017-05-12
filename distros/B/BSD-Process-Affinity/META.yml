@@ -1,0 +1,21 @@
+---
+abstract: 'Manipulate CPU affinities on FreeBSD'
+author:
+  - 'Sergey Aleynikov <sergey.aleynikov@gmail.com>'
+distribution_type: module
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BSD-Process-Affinity
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  XSLoader: 0
+  Exporter: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

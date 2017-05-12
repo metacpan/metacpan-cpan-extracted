@@ -1,0 +1,11 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head id="top">
+    <title>[% (title || "Buscador") | html %]</title>
+    <meta http-equiv="Content-Language" content="en" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" title="myStyle" href="[% config.img_base %]/buscador.css" type="text/css" />
+</head>
+<body>
+<div class="logo"><a href="[% base %]"><img src="[% config.img_base | replace('/$') %]/buscador.gif" style="border: 0;" width="216" height="78" alt="Buscador" /></a></div>
+<div class="content">

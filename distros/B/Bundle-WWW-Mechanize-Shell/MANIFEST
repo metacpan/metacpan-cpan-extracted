@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+lib/Bundle/WWW/Mechanize/Shell.pm
+t/99-pod.t
+t/99-todo.t
+t/99-unix-text.t

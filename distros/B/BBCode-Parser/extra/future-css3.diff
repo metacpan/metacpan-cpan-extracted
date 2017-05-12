@@ -1,0 +1,626 @@
+Index: lib/BBCode/Util.pm
+===================================================================
+--- lib/BBCode/Util.pm	(revision 92)
++++ lib/BBCode/Util.pm	(working copy)
+@@ -7,8 +7,10 @@
+ use URI ();
+ use strict;
+ use warnings;
++use utf8;
++use v5.8.0;
+ 
+-our $VERSION = '0.20';
++our $VERSION = '0.30';
+ our @EXPORT;
+ our @EXPORT_OK;
+ our %EXPORT_TAGS;
+@@ -183,22 +185,40 @@
+ 	return $_ ? 1 : 0;
+ }
+ 
++BEGIN { _export qw(parseInt parse) }
++sub parseInt($) {
++	my $num = shift;
++	return undef if not defined $num;
++	$num =~ s/[\s,_]+//g;
++	$num =~ s/^\+//;
++	return 0	if $num =~ /^-?$/;
++	return 0+$1	if $num =~ /^ ( -? \d+ ) $/x;
++	return undef;
++}
++
+ BEGIN { _export qw(parseNum parse) }
+ sub parseNum($);
+ sub parseNum($) {
+-	local $_ = $_[0];
+-	return undef if not defined $_;
+-	s/^\s+|\s+$//g;
+-	s/(?<=\d),(?=\d)//g;
+-	s/(?<=\d)_+(?=\d)//g;
+-	return 0 if /^ \. $/x;
+-	return 0+$1 if /^ ( [+-]? \d+ ) \.? $/x;
+-	return 0+$1 if /^ ( [+-]? \d* \. \d+ ) $/x;
+-	if(/^ ( [+-]? [\d.]* ) e ( [+-]? [\d.]* ) $/xi) {
+-		my($m,$e) = map parseNum($_), $1, $2;
++	my $num = shift;
++	return undef if not defined $num;
++	$num =~ s/[\s,_]+//g;
++	if($num =~ /^ (.*) e (.*) $/ix) {
++		my($m,$e) = ($1,$2);
++		$m = parseNum $m;
++		$e = parseNum $e;
+ 		return $m * (10 ** $e) if defined $m and defined $e;
++		return undef;
+ 	}
+-	return 0;
++	if($num =~ /^ ([^.]*) \. ([^.]*) $/x) {
++		my($i,$f) = ($1,$2);
++		$i = parseInt $i;
++		return undef unless defined $i;
++		return undef unless $f =~ /^(\d*)$/;
++		$num = "$i.$f";
++		$num =~ s/\.$//;
++		return 0+$num;
++	}
++	return parseInt($num);
+ }
+ 
+ BEGIN { _export qw(parseEntity parse) }
+@@ -240,12 +260,17 @@
+ 	'a'		=> [ qw(ol lower-latin) ],
+ 	'I'		=> [ qw(ol upper-roman) ],
+ 	'i'		=> [ qw(ol lower-roman) ],
+-	"\x{3B1}"	=> [ qw(ol lower-greek) ],
+-	"\x{5D0}"	=> [ qw(ol hebrew) ],
+-	"\x{3042}"	=> [ qw(ol hiragana) ],
+-	"\x{3044}"	=> [ qw(ol hiragana-iroha) ],
+-	"\x{30A2}"	=> [ qw(ol katakana) ],
+-	"\x{30A4}"	=> [ qw(ol katakana-iroha) ],
++	'Α'		=> [ qw(ol upper-greek) ],
++	'α'		=> [ qw(ol lower-greek) ],
++	'א'		=> [ qw(ol hebrew) ],
++	'Ⴀ'		=> [ qw(ol georgian) ],
++	'ა'		=> [ qw(ol georgian) ],
++	'Ա'		=> [ qw(ol armenian) ],
++	'ա'		=> [ qw(ol armenian) ],
++	'あ'	=> [ qw(ol hiragana) ],
++	'い'	=> [ qw(ol hiragana-iroha) ],
++	'ア'	=> [ qw(ol katakana) ],
++	'イ'	=> [ qw(ol katakana-iroha) ],
+ );
+ sub parseListType($) {
+ 	local $_ = $_[0];
+@@ -255,8 +280,7 @@
+ 			@ret = ('ul', lc $1);
+ 		} elsif(/^(
+ 			decimal(?:-leading-zero)? |
+-			(?:upper|lower)-(?:roman|latin|alpha) |
+-			lower-greek |
++			(?:upper|lower)-(?:roman|latin|alpha|greek) |
+ 			hebrew |
+ 			georgian |
+ 			armenian |
+@@ -271,75 +295,134 @@
+ 	return @ret;
+ }
+ 
++# Conversion factors from CSS units to points
+ my %conv = (
+-	px	=> 0.75,
+-
++	# Integer conversions within English units
+ 	pt	=> 1,
+ 	pc	=> 12,
+ 	in	=> 72,
+ 
++	# Floating-point conversions from Metric units
+ 	mm	=> 72/25.4,
+ 	cm	=> 72/2.54,
+ 
+-	ex	=> 8,
+-	em	=> 12,
++	# Somewhat approximate, but the CSS standard is actually rather
++	# picky about how many pixels a 'pixel' is at different resolutions,
++	# so this is actually relatively reliable.
++	px	=> 0.75,
+ );
+ 
+-# See <URL:http://www.w3.org/TR/CSS21/fonts.html#font-size-props>
+-# Tweaked slightly to be more logical
++# Emulation of <font size="num">...</font> from HTML 3.2;
++# See <URL:http://www.w3.org/TR/CSS21/fonts.html#font-size-props>.
++# Tweaked slightly to be more logical.
+ my @compat = qw(xx-small x-small small medium large x-large xx-large 300%);
+ 
+ BEGIN { _export qw(parseFontSize parse) }
+-sub parseFontSize($);
+-sub parseFontSize($) {
+-	local $_ = $_[0];
++sub parseFontSize($;$$$);
++sub parseFontSize($;$$$) {
++	local $_ = shift;
+ 	return undef unless defined $_;
++	my($base,$lo,$hi) = @_;
++	$base = 12 if not defined $base;
++	$lo = 8 if not defined $lo;
++	$hi = 72 if not defined $hi;
+ 	s/\s+/ /g;
+ 	s/^\s|\s$//g;
+ 
+-	if(/^ (\d+ (?: \. \d+ )? ) \s? ([a-z]{2}) $/ix) {
+-		my($n,$unit) = (0+$1,lc $2);
+-		if(exists $conv{$unit}) {
+-			my $n2 = $n / $conv{$unit};
+-			if($n2 < 8) {
+-				$n = POSIX::floor(0.5 + 8 * $conv{$unit});
+-			} elsif($n2 > 72) {
+-				$n = POSIX::floor(0.5 + 72 * $conv{$unit});
+-			}
+-			return "$n$unit";
+-		}
+-	}
+-
++	# CSS 2.1 15.7 <absolute-size>
+ 	if(/^( (?:xx?-)? (?:large|small) | medium )$/ix) {
+ 		return lc $1;
+ 	}
+ 
++	# CSS 2.1 15.7 <relative-size>
++	# Note: Since [FONT] is nestable and not readily computable before HTML
++	#		rendering, this can allow a malicious user to escape the
++	#		admin-defined font size limits
+ 	if(/^ ( larger | smaller ) $/ix) {
+ 		return lc $1;
+ 	}
+ 
++	# CSS 2.1 4.3.2 <length>
++	if(/^ ( [\s\d._+-]+ ) ( [a-z]+ ) $/ix) {
++		my($n,$unit) = ($1,lc $2);
++		$n = parseNum $n;
++		if(defined $n and $n > 0) {
++			my $conv;
++			if(exists $conv{$unit}) {
++				$conv = $conv{$unit};
++			} elsif($unit =~ /^em$/i) {
++				$conv = $base;
++			} elsif($unit =~ /^ex$/i) {
++				$conv = $base * 0.5;
++			} else {
++				return undef;
++			}
++			my $n2 = $n * $conv;
++			if(defined $lo and $n2 < $lo) {
++				$n = $lo / $conv;
++			} elsif(defined $hi and $n2 > $hi) {
++				$n = $hi / $conv;
++			}
++			$n = sprintf "%.3f", $n;
++			$n =~ s/0+$//;
++			$n =~ s/\.$//;
++			return "$n$unit";
++		} else {
++			return undef;
++		}
++	}
++
++	# CSS 2.1 4.3.3 <percentage>
++	# Note: The same concerns apply as for <relative-size>
++	if(/^ ( [\s\d._+-]+ ) % $/x) {
++		my $n = parseNum $1;
++		if(defined $n and $n > 0) {
++			$n *= 0.01;
++			my $n2 = $n * $base;
++			if(defined $lo and $n2 < $lo) {
++				$n = $lo / $base;
++			} elsif(defined $hi and $n2 > $hi) {
++				$n = $hi / $base;
++			}
++			$n *= 100;
++			$n = sprintf "%.3f", $n;
++			$n =~ s/0+$//;
++			$n =~ s/\.$//;
++			return "$n%";
++		} else {
++			return undef;
++		}
++	}
++
++	# HTML 3.2 <font size="number">
++	# See <URL:http://www.w3.org/TR/REC-html32#font>
+ 	if(/^ (\d+) $/x) {
+ 		my $n = 0+$1;
+ 		if($n >= 0 and $n < @compat) {
+ 			return $compat[$n];
+ 		} else {
+-			return parseFontSize("$n pt");
++			return parseFontSize("$n pt",$base,$lo,$hi);
+ 		}
+ 	}
+ 
++	# HTML 3.2 <font size="+number">
+ 	if(/^ \+ (\d+) $/x) {
+-		# Roughly equivalent to CSS 2.1 "larger"
+-		return parseFontSize sprintf "%d%%", 100 * (1.25 ** $1);
++		# "+1" is roughly equivalent to CSS 2.1 "larger"
++		my $n = sprintf "%f%%", 100 * (1.25 ** $1);
++		return parseFontSize($n,$base,$lo,$hi);
+ 	}
+ 
++	# HTML 3.2 <font size="-number">
+ 	if(/^ - (\d+) $/x) {
+-		# Roughly equivalent to CSS 2.1 "smaller"
+-		return parseFontSize sprintf "%d%%", 100 * (0.85 ** $1);
++		# "-1" is roughly equivalent to CSS 2.1 "smaller"
++		my $n = sprintf "%f%%", 100 * (0.85 ** $1);
++		return parseFontSize($n,$base,$lo,$hi);
+ 	}
+ 
+ 	return undef;
+ }
+ 
++# Official CSS 2.1 colors are passed through as-is
+ my %cssColor = map { $_ => 1 } qw(
+ 	maroon red orange yellow olive
+ 	purple fuchsia white lime green
+@@ -347,6 +430,12 @@
+ 	black silver gray
+ );
+ 
++# Other named colors must map to an official named color or an #RRGGBB color
++my %extraColor = (
++	darkred		=> 'maroon',
++	darkblue	=> 'navy',
++);
++
+ BEGIN { _export qw(parseColor parse) }
+ sub parseColor($) {
+ 	local $_ = $_[0];
+@@ -355,6 +444,7 @@
+ 	$_ = lc $_;
+ 
+ 	return $1 if /^(\w+)$/ and exists $cssColor{$1};
++	return $extraColor{$_} if exists $extraColor{$_};
+ 
+ 	if(s/^#//) {
+ 		s/^ ( [0-9a-f]{1,2} ) $/$1$1$1/x;
+@@ -589,6 +679,340 @@
+ 	return "[$path]";
+ }
+ 
++sub _c($) {
++	require charnames;
++	my $x = shift;
++	return sprintf("%c(U+%04X %s)", $x, $x, charnames::viacode($x));
++}
++
++BEGIN { _export qw(textOrder text) }
++sub textOrder(\@$) {
++	my $ALPHA = shift;
++	my $n = 0+shift;
++	return $n if $n < 1;
++
++	my $str = "";
++	while($n > 0) {
++		my $digit = ($n % @$ALPHA);
++		$n = int($n / @$ALPHA);
++		if($digit == 0) {
++			$digit = @$ALPHA;
++			$n--;
++		}
++		$str .= $ALPHA->[$digit-1];
++	}
++	return reverse $str;
++}
++
++BEGIN { _export qw(textOrderAlpha text) }
++my @ALPHA = ('A'..'Z');
++sub textOrderAlpha($) {
++	return textOrder(@ALPHA,shift);
++}
++
++BEGIN { _export qw(textOrderGreek text) }
++my @GREEK = qw(Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω);
++sub textOrderGreek($) {
++	return textOrder(@GREEK,shift);
++}
++
++BEGIN { _export qw(textOrderHiragana text) }
++my @HIRAGANA = qw(
++	あ い う え お か
++	き く け こ さ し
++	す せ そ た ち つ
++	て と な に ぬ ね
++	の は ひ ふ へ ほ
++	ま み む め も や
++	ゆ よ ら り る れ
++	ろ わ ゐ ゑ を ん
++);
++sub textOrderHiragana($) {
++	return textOrder(@HIRAGANA,shift);
++}
++
++BEGIN { _export qw(textOrderKatakana text) }
++my @KATAKANA = map { chr(ord($_)+0x60) } @HIRAGANA;
++sub textOrderKatakana($) {
++	return textOrder(@KATAKANA,shift);
++}
++
++BEGIN { _export qw(textOrderHiraganaIROHA text) }
++my @HIRAGANA_IROHA = qw(
++	い ろ は に ほ へ
++	と ち り ぬ る を
++	わ か よ た れ そ
++	つ ね な ら む う
++	ゐ の お く や ま
++	け ふ こ え て あ
++	さ き ゆ め み し
++	ゑ ひ も せ す
++);
++sub textOrderHiraganaIROHA($) {
++	return textOrder(@HIRAGANA_IROHA,shift);
++}
++
++BEGIN { _export qw(textOrderKatakanaIROHA text) }
++my @KATAKANA_IROHA = map { chr(ord($_)+0x60) } @HIRAGANA_IROHA;
++sub textOrderKatakanaIROHA($) {
++	return textOrder(@KATAKANA_IROHA,shift);
++}
++
++BEGIN { _export qw(textOrderCJK text) }
++my $CJK_NEG = '負';
++my @CJK_DIG = qw(零 一 二 三 四 五 六 七 八 九 十);
++my @CJK_ORD = qw(. 十 百 千);
++my @CJK_MAG = qw(.
++	萬 億 兆 京 垓 秭 穰 溝 澗 正 載 極
++	恆河沙 阿僧祇 那由他 不可思議 無量大數
++);
++sub textOrderCJK($) {
++	my $num = shift;
++	$num =~ s/\..*$//;	# Fractions not handled
++	my $neg = ($num =~ s/^\s*-//) ? 1 : 0;
++	$num =~ s/\D+//g;
++
++	my @groups;
++	push @groups, $1 while $num =~ s/(\d{1,4})$//;
++
++	local $_;
++	my @out;
++	push @out, $CJK_NEG if $neg;
++	for(my $mag=$#groups; $mag>=0; $mag--) {
++		my @digits;
++		$num = $groups[$mag];
++		push @digits, $1 while $num =~ s/(\d)$//;
++
++		$_ = '';
++		for(my $ord=$#digits; $ord>=0; $ord--) {
++			my $dig = 0+$digits[$ord];
++			if($dig) {
++				$_ .= $CJK_DIG[$dig];
++				$_ .= $CJK_ORD[$ord];
++			} else {
++				s/(?<!\Q$CJK_DIG[0]\E)$/$CJK_DIG[0]/o;
++			}
++		}
++		s/\Q$CJK_DIG[0]\E$//o;
++		s/^(\Q$CJK_DIG[0]\E*)\Q$CJK_DIG[1]$CJK_ORD[1]\E/$1$CJK_ORD[1]/o;
++		if(/^$/) {
++			$_ = $CJK_DIG[0];
++		} else {
++			$_ .= $CJK_MAG[$mag];
++		}
++		push @out, $_;
++	}
++	$_ = join '', @out;
++	s/\.//g;
++	s/\Q$CJK_DIG[0]\E+/$CJK_DIG[0]/go;
++	s/\Q$CJK_DIG[0]\E$//o;
++	s/^$/$CJK_DIG[0]/;
++	s/^\Q$CJK_NEG\E$/$CJK_DIG[0]/o;
++	return $_;
++}
++
++BEGIN { _export qw(textOrderHebrew text) }
++my @HEBREW_1 = ('', qw(א ב ג ד ה ו ז ח ט י));
++my @HEBREW_10 = qw(כ ל מ נ ס ע פ צ);
++my @HEBREW_100 = qw(ק ר ש ת);
++sub textOrderHebrew($);
++sub textOrderHebrew($) {
++	my $num = 0+shift;
++	return $num if $num < 0;
++
++	if($num == 0) {
++		return 'אפס';
++	} elsif($num < 11) {
++		return $HEBREW_1[$num];
++	} elsif($num < 20) {
++		my($a,$b) = (10,$num-10);
++		if($b == 5 or $b == 6) {
++			$a--;
++			$b++;
++		}
++		return $HEBREW_1[$a].$HEBREW_1[$b];
++	} elsif($num < 100) {
++		my $ten = int($num / 10);
++		$num %= 10;
++		return $HEBREW_10[$ten - 2].$HEBREW_1[$num];
++	} elsif($num < 500) {
++		my $hnd = int($num / 100);
++		$num %= 100;
++		return $HEBREW_100[$hnd - 1].($num > 0 ? textOrderHebrew($num) : '');
++	} elsif($num < 1000) {
++		return $HEBREW_100[3].textOrderHebrew($num - 400);
++	} else {
++		my @ret;
++		while($num > 0) {
++			my $mod = ($num % 1000);
++			$num = int($num / 1000);
++			push @ret, textOrderHebrew($mod);
++		}
++		return join(' ', @ret);
++	}
++	return '*';
++}
++
++BEGIN { _export qw(textOrderGeorgian text) }
++my @GEORGIAN_1		= ('', qw(Ⴀ Ⴁ Ⴂ Ⴃ Ⴄ Ⴅ Ⴆ Ⴡ Ⴇ));
++my @GEORGIAN_10		= ('', qw(Ⴈ Ⴉ Ⴊ Ⴋ Ⴌ Ⴢ Ⴍ Ⴎ Ⴏ));
++my @GEORGIAN_100	= ('', qw(Ⴐ Ⴑ Ⴒ Ⴓ Ⴣ Ⴔ Ⴕ Ⴖ Ⴗ));
++my @GEORGIAN_1000	= ('', qw(Ⴘ Ⴙ Ⴚ Ⴛ Ⴜ Ⴝ Ⴞ Ⴤ Ⴥ));
++sub textOrderGeorgian($) {
++	my $num = 0+shift;
++	return $num if $num < 1 or $num >= 20000;
++
++	my $ret = '';
++	if($num >= 10000) {
++		$num -= 10000;
++		$ret .= 'Ⴟ';
++	}
++	if($num >= 1000) {
++		my $digit = int($num / 1000);
++		$num %= 1000;
++		$ret .= $GEORGIAN_1000[$digit];
++	}
++	if($num >= 100) {
++		my $digit = int($num / 100);
++		$num %= 100;
++		$ret .= $GEORGIAN_100[$digit];
++	}
++	if($num >= 10) {
++		my $digit = int($num / 10);
++		$num %= 10;
++		$ret .= $GEORGIAN_10[$digit];
++	}
++	if($num >= 1) {
++		$ret .= $GEORGIAN_1[$num];
++	}
++	return $ret;
++}
++
++BEGIN { _export qw(textOrderArmenian text) }
++my @ARMENIAN_1		= ('', qw(Ա Բ Գ Դ Ե Զ Է Ը Թ));
++my @ARMENIAN_10		= ('', qw(Ժ Ի Լ Խ Ծ Կ Հ Ձ Ղ));
++my @ARMENIAN_100	= ('', qw(Ճ Մ Յ Ն Շ Ո Չ Պ Ջ));
++my @ARMENIAN_1000	= ('', qw(Ռ Ս Վ Տ Ր Ց Ւ Փ Ք));
++sub textOrderArmenian($) {
++	my $num = 0+shift;
++	return $num if $num < 1 or $num >= 10000;
++
++	my $ret = '';
++	if($num >= 1000) {
++		my $digit = int($num / 1000);
++		$num %= 1000;
++		$ret .= $ARMENIAN_1000[$digit];
++	}
++	if($num >= 100) {
++		my $digit = int($num / 100);
++		$num %= 100;
++		$ret .= $ARMENIAN_100[$digit];
++	}
++	if($num >= 10) {
++		my $digit = int($num / 10);
++		$num %= 10;
++		$ret .= $ARMENIAN_10[$digit];
++	}
++	if($num >= 1) {
++		$ret .= $ARMENIAN_1[$num];
++	}
++	return $ret;
++}
++
++BEGIN { _export qw(textOrderRoman text) }
++my @ROMAN = map { [ split /:/ ] } qw(1000:M:C 500:D:C 100:C:X 50:L:X 10:X:I 5:V:I 1:I);
++my %ROMAN = map { $_->[1] => $_ } @ROMAN;
++sub textOrderRoman($) {
++	my $num = 0+shift;
++	return $num if $num < 1;
++
++	my $str = "";
++	foreach my $i (@ROMAN) {
++		while($num >= $i->[0]) {
++			$num -= $i->[0];
++			$str .= $i->[1];
++		}
++		if(@$i > 2) {
++			my $j = $ROMAN{$i->[2]};
++			if($num >= ($i->[0] - $j->[0])) {
++				$num -= ($i->[0] - $j->[0]);
++				$str .= $j->[1].$i->[1];
++			}
++		}
++	}
++	return $str;
++}
++
++sub _b10_len($) {
++	my $n = shift;
++	if($n > 0) {
++		return 1+POSIX::floor(log($n)/log(10));
++	}
++	if($n < 0) {
++		return 2+POSIX::floor(log(-$n)/log(10));
++	}
++	return 1;
++}
++
++sub _max($$) {
++	return $_[0] > $_[1] ? $_[0] : $_[1];
++}
++
++BEGIN { _export qw(createListSequence) }
++sub createListSequence($;$$) {
++	my($type,$total,$start) = @_;
++	my @list = parseListType($type);
++	$start = 1 unless defined $start;
++
++	if(@list and $list[0] eq 'ol') {
++		my $type = (@list > 1) ? $list[1] : 'decimal';
++		if($type =~ /^(upper|lower)-(alpha|latin|roman|greek)$/i) {
++			my $func = 'textOrder'.ucfirst(lc($2));
++			my $uc = $1 =~ /^upper$/i;
++			$func =~ s/Latin$/Alpha/;
++			{
++				no strict 'refs';
++				$func = \&{$func};
++			}
++			if($uc) {
++				return sub { $func->($start++).'.' };
++			} else {
++				return sub { lc $func->($start++).'.' };
++			}
++		}
++		if($type =~ /^(hiragana|katakana)(?:-(iroha))?$/i) {
++			my $func = 'textOrder'.ucfirst(lc($1)).(defined $2 ? uc($2) : '');
++			{
++				no strict 'refs';
++				$func = \&{$func};
++			}
++			return sub { $func->($start++).'.' };
++		}
++		if($type =~ /^cjk-ideographic$/i) {
++			return sub { textOrderCJK($start++).'.' };
++		}
++		if($type =~ /^hebrew$/i) {
++			return sub { textOrderHebrew($start++).'.' };
++		}
++		if($type =~ /^georgian$/i) {
++			return sub { textOrderGeorgian($start++).'.' };
++		}
++		if($type =~ /^armenian$/i) {
++			return sub { textOrderArmenian($start++).'.' };
++		}
++		if(defined $total) {
++			my $end = $total + $start - 1;
++			my $len = _max _b10_len $start, _b10_len $end;
++			my $fmt = sprintf '%%%dd.', $len;
++			$fmt =~ s/^%/%0/ if $type =~ /^decimal-leading-zero$/i;
++			return sub { sprintf($fmt,$start++) };
++		} else {
++			return sub { sprintf("%d.",$start++) };
++		}
++	}
++	return sub { '*' };
++}
++
+ BEGIN {
+ 	push @EXPORT_OK, @{$EXPORT_TAGS{ALL}} if exists $EXPORT_TAGS{ALL};
+ 	push @EXPORT, @{$EXPORT_TAGS{DEFAULT}} if exists $EXPORT_TAGS{DEFAULT};

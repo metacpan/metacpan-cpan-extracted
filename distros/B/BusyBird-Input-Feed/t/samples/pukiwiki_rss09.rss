@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
+<rss version="0.91">
+ <channel>
+  <title>DebugIto's</title>
+  <link>http://debugitos.main.jp/index.php?RecentChanges</link>
+  <description>PukiWiki RecentChanges</description>
+  <language>ja</language>
+
+<item>
+ <title>Ubuntu/Trustyインストールメモ</title>
+ <link>http://debugitos.main.jp/index.php?Ubuntu%2FTrusty%A5%A4%A5%F3%A5%B9%A5%C8%A1%BC%A5%EB%A5%E1%A5%E2</link>
+ <description>Tue, 01 Jul 2014 08:04:16 JST</description>
+</item>
+<item>
+ <title>Ubuntu/.emacs</title>
+ <link>http://debugitos.main.jp/index.php?Ubuntu%2F.emacs</link>
+ <description>Fri, 02 May 2014 19:16:21 JST</description>
+</item>
+<item>
+ <title>DebugIto's</title>
+ <link>http://debugitos.main.jp/index.php?DebugIto%27s</link>
+ <description>Fri, 02 May 2014 19:15:36 JST</description>
+</item>
+<item>
+ <title>Ubuntu/Preciseインストールメモ</title>
+ <link>http://debugitos.main.jp/index.php?Ubuntu%2FPrecise%A5%A4%A5%F3%A5%B9%A5%C8%A1%BC%A5%EB%A5%E1%A5%E2</link>
+ <description>Sat, 22 Mar 2014 18:48:13 JST</description>
+</item>
+<item>
+ <title>簡易掲示板</title>
+ <link>http://debugitos.main.jp/index.php?%B4%CA%B0%D7%B7%C7%BC%A8%C8%C4</link>
+ <description>Sun, 26 Jan 2014 11:01:53 JST</description>
+</item>
+<item>
+ <title>Perl/my modules</title>
+ <link>http://debugitos.main.jp/index.php?Perl%2Fmy%20modules</link>
+ <description>Sat, 26 Oct 2013 18:36:48 JST</description>
+</item>
+<item>
+ <title>InterWikiName</title>
+ <link>http://debugitos.main.jp/index.php?InterWikiName</link>
+ <description>Sat, 26 Oct 2013 18:35:25 JST</description>
+</item>
+<item>
+ <title>Ubuntu/gnuplot</title>
+ <link>http://debugitos.main.jp/index.php?Ubuntu%2Fgnuplot</link>
+ <description>Sun, 17 Feb 2013 11:52:47 JST</description>
+</item>
+<item>
+ <title>Perl/Tips</title>
+ <link>http://debugitos.main.jp/index.php?Perl%2FTips</link>
+ <description>Sun, 10 Feb 2013 22:18:20 JST</description>
+</item>
+<item>
+ <title>Perl/モジュールメモ</title>
+ <link>http://debugitos.main.jp/index.php?Perl%2F%A5%E2%A5%B8%A5%E5%A1%BC%A5%EB%A5%E1%A5%E2</link>
+ <description>Sun, 16 Dec 2012 17:05:43 JST</description>
+</item>
+<item>
+ <title>Perl/モジュールメモ/イベント駆動</title>
+ <link>http://debugitos.main.jp/index.php?Perl%2F%A5%E2%A5%B8%A5%E5%A1%BC%A5%EB%A5%E1%A5%E2%2F%A5%A4%A5%D9%A5%F3%A5%C8%B6%EE%C6%B0</link>
+ <description>Fri, 23 Nov 2012 11:27:11 JST</description>
+</item>
+<item>
+ <title>About</title>
+ <link>http://debugitos.main.jp/index.php?About</link>
+ <description>Fri, 23 Nov 2012 11:26:44 JST</description>
+</item>
+<item>
+ <title>Tips/others</title>
+ <link>http://debugitos.main.jp/index.php?Tips%2Fothers</link>
+ <description>Sun, 14 Oct 2012 13:43:38 JST</description>
+</item>
+<item>
+ <title>Ubuntu/Wanderlust</title>
+ <link>http://debugitos.main.jp/index.php?Ubuntu%2FWanderlust</link>
+ <description>Sun, 30 Sep 2012 17:49:30 JST</description>
+</item>
+<item>
+ <title>Perl/Tips/サブルーチンの入れ子</title>
+ <link>http://debugitos.main.jp/index.php?Perl%2FTips%2F%A5%B5%A5%D6%A5%EB%A1%BC%A5%C1%A5%F3%A4%CE%C6%FE%A4%EC%BB%D2</link>
+ <description>Fri, 21 Sep 2012 12:01:32 JST</description>
+</item>
+
+ </channel>
+</rss>

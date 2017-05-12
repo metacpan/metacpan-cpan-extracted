@@ -1,0 +1,106 @@
+
+=head1 NAME
+
+Box2D::b2GearJointDef - Gear joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2GearJointDef->new();
+  $joint_def->bodyA( $body_a );
+  $joint_def->bodyB( $body_b );
+  $joint_def->joint1( $joint1 );
+  $joint_def->joint2( $joint2 );
+  $joint_def->ratio( $ratio );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Gear joint definition. This definition requires two existing revolute
+or prismatic joints (any combination will work). The provided joints
+must attach a dynamic body to a static body.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2GearJointDef>
+
+=head2 joint1()
+
+=head2 joint1( $joint1 )
+
+The first revolute/prismatic joint attached to the gear joint.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Joint*> C<$joint1> (optional)
+
+=back
+
+Returns a C<Box2D::b2Joint*>
+
+=head2 joint2()
+
+=head2 joint2( $joint2 )
+
+The second revolute/prismatic joint attached to the gear joint.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Joint*> C<$joint2> (optional)
+
+=back
+
+Returns a C<Box2D::b2Joint*>
+
+=head2 ratio()
+
+=head2 ratio( $ratio )
+
+The gear ratio.
+
+See also: L<Box2D::b2GearJoint> for explanation.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$ratio> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2GearJoint>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

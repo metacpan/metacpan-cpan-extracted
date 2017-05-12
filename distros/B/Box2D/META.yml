@@ -1,0 +1,38 @@
+---
+abstract: '2D Physics Library'
+author:
+  - 'Kartik Thakore <kthakore@CPAN.org>'
+build_requires:
+  Alien::Box2D: 0.103
+  ExtUtils::Typemap::Basic: 0.04
+  ExtUtils::Typemap::ObjectMap: 0
+  ExtUtils::Typemap::STL::String: 0.04
+  ExtUtils::XSpp: 0.16
+  Test::More: 0
+configure_requires:
+  Alien::Box2D: 0.103
+  ExtUtils::CppGuess: 0.07
+  Module::Build: 0.38
+  Module::Build::WithXSpp: 0.11
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Box2D
+provides:
+  Box2D:
+    file: lib/Box2D.pm
+    version: 0.07
+  Box2D::b2ContactListener:
+    file: lib/Box2D/b2ContactListener.pm
+    version: 0
+  Box2D::b2RayCastCallback:
+    file: lib/Box2D/b2RayCastCallback.pm
+    version: 0
+resources:
+  bugtracker: https://github.com/PerlGameDev/Box2D-perl/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PerlGameDev/Box2D-perl
+version: 0.07

@@ -1,0 +1,97 @@
+{
+   "abstract" : "Role for event emitting classes",
+   "author" : [
+      "Doug Bell <preaction@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Beam-Emitter",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "Types::Standard" : "0.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900",
+            "Test::LeakTrace" : "0",
+            "curry" : "0"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::API" : "0",
+            "Test::Fatal" : "0",
+            "Test::Lib" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Beam::Emitter" : {
+         "file" : "lib/Beam/Emitter.pm",
+         "version" : "1.007"
+      },
+      "Beam::Event" : {
+         "file" : "lib/Beam/Event.pm",
+         "version" : "1.007"
+      },
+      "Beam::Listener" : {
+         "file" : "lib/Beam/Listener.pm",
+         "version" : "1.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/preaction/Beam-Emitter/issues"
+      },
+      "homepage" : "https://github.com/preaction/Beam-Emitter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/preaction/Beam-Emitter.git",
+         "web" : "https://github.com/preaction/Beam-Emitter"
+      },
+      "x_IRC" : "irc://irc.perl.org/#beam"
+   },
+   "version" : "1.007",
+   "x_authority" : "cpan:PREACTION",
+   "x_contributors" : [
+      "Diab Jerius <djerius@cfa.harvard.edu>",
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0216"
+}
+

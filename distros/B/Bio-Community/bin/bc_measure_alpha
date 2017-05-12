@@ -1,0 +1,191 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_measure_alpha
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Bio::Community::Alpha;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_measure_alpha - Measure alpha diversity of communities
+
+=head1 SYNOPSIS
+
+  bc_measure_alpha -input_files   communities.generic      \
+                   -alpha_type    chao1                    \
+                   -output_prefix community_alpha
+
+=head1 DESCRIPTION
+
+This script reads files containing biological communities and calculates their
+alpha diversity. The output is a tab-delimited file containing the alpha
+diversity for each community, with the community names in the first column, and
+their alpha diversity in the second. Note that some alpha diversity metrics are
+based on relative abundances, and may thus be affected by the weights you provide.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to manipulate. When providing communities
+in a format that supports only one community per file (e.g. gaas), you can
+provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -at <alpha_types>... | -alpha_types <alpha_types>...
+
+The types of alpha diversity metric to calculate:
+
+* Richness metrics: observed, menhinick, margalef, chao1, ace
+
+* Evenness (equitability) metrics: buzas, heip, shannon_e, simpson_e,
+brillouin_e, hill_e, mcintosh_e, camargo
+
+* Indices metrics: shannon, simpson, simpson_r, brillouin, hill, mcintosh
+
+* Dominance metrics: simpson_d, berger
+
+See L<Bio::Community::Alpha> for details about these metrics. Default: alpha_types.default
+
+=for Euclid:
+   alpha_types.type: string
+   alpha_types.default: ['observed']
+
+=item -wf <weight_files>... | -weight_files <weight_files>...
+
+Tab-delimited files containing weights to assign to the community members.
+
+=for Euclid:
+   weight_files.type: readable
+
+=item -wa <weight_assign> | -weight_assign <weight_assign>
+
+When using a files of weights, define what to do for community members whose
+weight is not specified in the weight file (default: weight_assign.default):
+
+* $num : assign to the member the arbitrary weight $num provided
+
+* average : assign to the member the average weight in this file.
+
+* ancestor: go up the taxonomic lineage of the member and assign to it the weight
+of the first ancestor that has a weight in the weights file. Fall back to the
+'average' method if no taxonomic information is available for this member
+(for example a member with no BLAST hit).
+
+=for Euclid:
+   weight_assign.type: string
+   weight_assign.default: 'ancestor'
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_alpha'
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+calc_alpha( $ARGV{'input_files'}  , $ARGV{'alpha_types'}  , $ARGV{'weight_files'},
+            $ARGV{'weight_assign'}, $ARGV{'output_prefix'},                       );
+exit;
+
+
+
+func calc_alpha ($input_files, $alpha_types, $weight_files, $weight_assign,
+   $output_prefix) {
+
+   # Read input communities
+   my $meta = Bio::Community::Meta->new;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new(
+         -file          => $input_file,
+         -weight_assign => $weight_assign,
+      );
+      if ($weight_files) {
+         $in->weight_files($weight_files);
+      }
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+
+   # Calculate alpha diversity
+   my $out_file = $output_prefix.'.txt';
+   print "Writing alpha diversity to file '$out_file'\n";
+   open my $out, '>', $out_file or die "Error: Could not write file $out_file\n";
+   print $out join("\t", '# community', @$alpha_types)."\n";
+   while (my $community = $meta->next_community) {
+      my $alpha = Bio::Community::Alpha->new(
+         -community => $community,
+      );
+      my @alpha_vals = map {$alpha->type($_); $alpha->get_alpha || '-'} @$alpha_types;
+      print $out join("\t", $community->name, @alpha_vals)."\n";
+   }
+
+   return 1;
+}

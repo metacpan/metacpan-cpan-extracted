@@ -1,0 +1,15 @@
+NAME
+    Business::BR::Boleto - A system to generate Brazilian Boletos
+
+VERSION
+    version 0.000002
+
+AUTHOR
+    Blabos de Blebe <blabos@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Blabos de Blebe.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

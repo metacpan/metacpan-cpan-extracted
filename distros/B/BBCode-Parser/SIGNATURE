@@ -1,0 +1,85 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8f32d9e4e1ab05f15bf63144e1aeb42b3edd46da Build.PL
+SHA1 dd72a5bf8bc88b1fe93dd462ca10c24dcb2bcf7d Changes
+SHA1 8c73bef555141b7b85c9521814a08ed8ad165896 LICENSE
+SHA1 9b4a8a672c359b64247897ada96c01fc9243b11b MANIFEST
+SHA1 dcc603ab23b594ef0f7719e3f530072d11a49d54 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 0311d13ea97743d833b0cc6722b107031d0c0087 README
+SHA1 7f51260481250cf4ba7cda19f9391ee500d5ee3e bbtest
+SHA1 f6db9aa2cc98a4f48db9b9730a536a3e813b93e5 extra/basic-style.css
+SHA1 5730a5893e389c91cde00e00e5a2ba59995b1ac5 extra/find-project-files.pl
+SHA1 52f4b01104069b23f9af6036d1cbc7e873bd6cb8 extra/future-css3.diff
+SHA1 8da52547a3eff4ecf6f1154cbf753b3a234265c4 extra/greek-list.bbc
+SHA1 f372f8e06cd91398d1c9cb927f6867f808e065fb extra/show-pod-cover.pl
+SHA1 c2533995042fac683392aa7b5f238e05d6a4a083 lib/BBCode/Body.pm
+SHA1 72c52b499c8a3ca0e21a1b25dc1cc66fd5fabea6 lib/BBCode/Parser.pm
+SHA1 38a574bbf87aba666b6d9629a7e680e016817303 lib/BBCode/Tag.pm
+SHA1 21cf6d921d1536017e3ff7f986482705e4a1dca2 lib/BBCode/Tag/ABBR.pm
+SHA1 dad59ca346753a3ad49c47819c65e6777bc8517f lib/BBCode/Tag/ACRONYM.pm
+SHA1 9d3e9cc0530cde2d6d5748f70726ff9fb73fdd57 lib/BBCode/Tag/B.pm
+SHA1 872556ed80baeb412cb073541c32bc7abc8b357b lib/BBCode/Tag/BR.pm
+SHA1 a53aaf1a38abe0bae27a702cae9f6a7ce3c439e3 lib/BBCode/Tag/Block.pm
+SHA1 3e47cf793b4838e09a8c0f4f7f791ebf4eaea917 lib/BBCode/Tag/CODE.pm
+SHA1 bbb8f7919b820b3dad4518fa9613295a7e43d6ce lib/BBCode/Tag/COLOR.pm
+SHA1 44a22d63dc21b78767b06acd2d4493998e9fd994 lib/BBCode/Tag/EMAIL.pm
+SHA1 355a1dee32fc18b00c930f79057bb946e856c276 lib/BBCode/Tag/ENT.pm
+SHA1 366b0389959d8ed0616934300486d32a2925ce44 lib/BBCode/Tag/FONT.pm
+SHA1 8b910f9bf342ac7762fefd2d40be6728fba5c604 lib/BBCode/Tag/HIDDEN.pm
+SHA1 25d7b116531690361ae4bece0a2cee993e419fc6 lib/BBCode/Tag/HR.pm
+SHA1 517676f3d385e4b95953ff026fe7e04fd67e60d8 lib/BBCode/Tag/HTML.pm
+SHA1 d13c613ff2f802537485bec031a2eed784dfcc5c lib/BBCode/Tag/I.pm
+SHA1 c5ef685d274ebb94d8c0f577a1bb52c6aee39b3a lib/BBCode/Tag/IMG.pm
+SHA1 98d2f31ede41131c6e7713bbb2566475033914af lib/BBCode/Tag/Inline.pm
+SHA1 b847e4ed2c37943648e641f12e210ac2a1da266d lib/BBCode/Tag/LI.pm
+SHA1 f47719d0da27b9d89c9ccf7b5b78261160b0dd78 lib/BBCode/Tag/LIST.pm
+SHA1 38c6f524296843b884076231b0d7759e5a37b66c lib/BBCode/Tag/OL.pm
+SHA1 e4077f2adbde728613aa38c69ccef411307e3c7b lib/BBCode/Tag/Q.pm
+SHA1 01f02d8cf8a6274067fbbe42254b301580d195a6 lib/BBCode/Tag/QUOTE.pm
+SHA1 ce4003e3acec0a82f9cc68d273dd0afe53449fea lib/BBCode/Tag/S.pm
+SHA1 4376ce3097df1e6ce34e03d62df86aedaf11367b lib/BBCode/Tag/SIZE.pm
+SHA1 82f61a659d015ce3af5bfb6d485faefe4c26bfde lib/BBCode/Tag/SUB.pm
+SHA1 aee256a8b8ae3633d1dfcce910bb257efb94c2eb lib/BBCode/Tag/SUP.pm
+SHA1 40dda569b7884e837bfbd7dbf050f27f63a6ed03 lib/BBCode/Tag/Simple.pm
+SHA1 66864013ab3604253262e6939737e48f3a3888a7 lib/BBCode/Tag/TEXT.pm
+SHA1 5818d6b4dff853d9196491e6112ffc0ac6dc126d lib/BBCode/Tag/TT.pm
+SHA1 3963806563fc8d1787b10ce628e33331ba0df95d lib/BBCode/Tag/U.pm
+SHA1 b87d9d15489174fa585db75d9f2966c398a2c2e9 lib/BBCode/Tag/UL.pm
+SHA1 dc745437eb320a5d180f8882eccdedbfc1ce7cea lib/BBCode/Tag/URL.pm
+SHA1 ef3cb4a8b91c677ceaa633afe9989e68ef93840a lib/BBCode/Tag/xEMAIL.pm
+SHA1 3936bccce090064926ed42ba2df7b729c4a3d3b4 lib/BBCode/Tag/xIMG.pm
+SHA1 406c4ff7496f095b0b149234a6e8a519099b6c83 lib/BBCode/Tag/xURL.pm
+SHA1 95d5bae84613d7beb2240b7b92a839190a7bbcb1 lib/BBCode/TagSet.pm
+SHA1 7e713e8edce2cbbe4c431d1f08a855ffd3645205 lib/BBCode/Util.pm
+SHA1 14e4cce69d553b54fa1b23afedafdb659e118e78 t/00-util.t
+SHA1 d67e33baf848dafcf8765774d4195eaf7ceceea8 t/05-basic.t
+SHA1 2b43c9f2e7cf7cbf372ac741ab4b097da8fb0815 t/10-inline.t
+SHA1 2c0bdce8bfd1a49b56b82271d14b0fecca6f4376 t/20-block.t
+SHA1 89ba47d954e690374d3d5d4b81a5f20f32f84eb6 t/30-raw.t
+SHA1 9127d21f5c1cc396870082ff6fafc85acc6e549b t/35-link.t
+SHA1 436151f23384b910b48894c3872de0f3a2a171ca t/40-stress.t
+SHA1 9856915292e55d4a507fcf163a083a439d4af6df t/common.ph
+SHA1 4f0eeda5a4928e3ef7d4e4e7c4373d8fece2f3d0 t/xx-pod-coverage.t
+SHA1 e8236b606228425bbde78c53353ba4916b1dcab1 t/xx-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.5 (GNU/Linux)
+
+iD8DBQFFb98itI+z6Ps/jz8RAq4aAJ4pVTg/L1C8+ePmLTId7n6bScax8ACdHNOr
+TI+wBbC/6DNB/H1OQ4Kx6Fo=
+=9fJh
+-----END PGP SIGNATURE-----

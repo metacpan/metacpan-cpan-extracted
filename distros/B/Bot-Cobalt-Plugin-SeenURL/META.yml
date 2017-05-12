@@ -1,0 +1,28 @@
+---
+abstract: 'Bot::Cobalt plugin for detecting re-linked URLs'
+author:
+  - 'Scott Miller <scott.j.miller@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Cobalt-Plugin-SeenURL
+requires:
+  Bot::Cobalt: '0'
+  Bot::Cobalt::Common: '0'
+  Bot::Cobalt::DB: '0'
+  DateTime::Tiny: '0'
+  File::Spec: '0'
+  URI::Find::Simple: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sjmiller/bot-cobalt-plugin-seenurl/issues
+  repository: git://github.com/sjmiller/bot-cobalt-plugin-seenurl.git
+version: '0.003'

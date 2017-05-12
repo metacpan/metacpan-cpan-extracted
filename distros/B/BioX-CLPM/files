@@ -1,0 +1,12 @@
+lib/BioX/CLPM.pm
+lib/BioX/CLPM/Amino.pm
+lib/BioX/CLPM/Base.pm
+lib/BioX/CLPM/Engine.pm
+lib/BioX/CLPM/Enzyme.pm
+lib/BioX/CLPM/Fragments.pm
+lib/BioX/CLPM/Fragments/Simple.pm
+lib/BioX/CLPM/Fragments/Linked.pm
+lib/BioX/CLPM/Linker.pm
+lib/BioX/CLPM/Matches.pm
+lib/BioX/CLPM/Peaks.pm
+lib/BioX/CLPM/Sequence.pm

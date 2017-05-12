@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c0ec28fc23051a069c68dc372811801f50db53b4 Build.PL
+SHA1 a96e7f666dac2c8a75a7a65b7851a8b6b891fea5 ChangeLog
+SHA1 af531d645e03eb61e9d7a83321eeabfc72e2ce78 GNUmakefile
+SHA1 9b68f24bfdca9bb3a23f2e77cad72f98b032a3a3 MANIFEST
+SHA1 3513e031b2c8cab587b6a28ba2c3ca7516f4f42d META.json
+SHA1 03ca7cd2a63364006adc065a349c911ddd32bc8b META.yml
+SHA1 a306765a010702845e45dc0e031b7e0c1e96927f Makefile.PL
+SHA1 bcfe8bc3c22cfae733ba9934c2b5548f1276e229 NEWS
+SHA1 8ad8a4c24c9bcdd85de98a9b4e4616221bc455b8 README.md
+SHA1 84ac0838050be76f8603f5bb53c9607f832d7ffe TODO
+SHA1 2338297f6496897d7f7cc30f2ae5f9af3331557d example/fib.pl
+SHA1 a6b82a88e68d9e0bd337c784051000007c78b974 example/multiline.pl
+SHA1 5a78e45651fcd4f8a22a33efcde1c4df6da5bf9f lib/B/DeparseTree.pm
+SHA1 703e498c7fa82fe31befd482adf61b2c4c8c4521 lib/B/DeparseTree.pod
+SHA1 38de87da1dae0bd0b86ae06dae5ac7a58fb38c41 lib/B/DeparseTree/Common.pm
+SHA1 1640efdd2d224ed69c8cffaa817a21da55f02eb8 lib/B/DeparseTree/P520.pm
+SHA1 6847b70900f091b1e6f944c3336bd04069564bac lib/B/DeparseTree/P522.pm
+SHA1 a3557ddee3bc971062f35aff6225ca510a457545 lib/B/DeparseTree/P524.pm
+SHA1 d41e39868c7949a8bab72a65e8888a3cbd7474f3 lib/B/DeparseTree/PP.pm
+SHA1 41f78769670b0cad1f28f4ff3488d805539c63b2 lib/B/DeparseTree/Printer.pm
+SHA1 f3f0f22ea5210d37d9f01ad108b9dc210590df54 t/10subclass.t
+SHA1 348917f8580c318f934e2876dc2a2087217532fa t/20-core-520.t
+SHA1 734e6fd175460b3444159eec4707342d541ab837 t/20-core-522.t
+SHA1 015e11460e5375986acc6418d0bce4ed667c89db t/20-deparse-520-small.t
+SHA1 e6651c30010f014f6b615d3b87841f53d6874d11 t/20-deparse-522-small.t
+SHA1 b65d450d530e571622db7897114277507650838e t/20-deparse-524-small.t
+SHA1 ea65bdf23e169973a040a42e8aec6342afe55217 testdata/base/cond.t
+SHA1 d8c83a4759d79455cee13326bd4671516fd39dc0 testdata/base/if.t
+SHA1 ab1ebc344bf7d8d909fa831c2bf3e34fdc66883e testdata/base/lex.t
+SHA1 2e2bd19639a19e61c959f58913cd3508da382980 testdata/base/num.t
+SHA1 8586bae9ee20938c1d428686f2e890b48b76be65 testdata/base/pat.t
+SHA1 65438c862af7284436fa00c0832bbd07e0dc860c testdata/base/rs.t
+SHA1 af2d74a37b3de02258e31b356e71002194a766ed testdata/base/term.t
+SHA1 7a0440c46d40fefecfab9e73fe19ba5e3c5fd799 testdata/base/while.t
+SHA1 aa39a9798cec0f2db4ab28c490b0dfbc2b1148ca testdata/fib.pl
+SHA1 b4c925d49ff3fc400349e3dd51b76c63682ff295 testdata/opbasic/arith.t
+SHA1 01b147fe90e8a63262f2d4d23d642c2af1480838 testdata/opbasic/magic_phase.t
+SHA1 9070e008aab7ae1a036a3e7992241830c486dd31 testdata/opbasic/qq.t
+SHA1 451bc0e3d41684d129bc72d7202e9bc972d48779 testdata/runtests.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAldXRlUACgkQGo3lAIJ17CEBywCfZBSjoLPklIsNTnt9gl/xomeF
+YSYAnRK2V003sXA2iWWLUCQi6eKTlkcu
+=L2p2
+-----END PGP SIGNATURE-----

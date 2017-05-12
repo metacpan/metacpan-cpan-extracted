@@ -1,0 +1,15 @@
+TYPEMAP
+HV *		T_HvRV
+
+OUTPUT
+T_HvRV
+	$arg = newRV((SV*)$var);
+
+INPUT
+T_HvRV
+	if( SvROK($arg) && (SvTYPE(SvRV($arg)) == SVt_PVHV) )
+		$var = (HV*)SvRV( $arg );
+	else {
+		warn( \"${Package}::$func_name() -- $var is not an HV reference\" );
+		XSRETURN_UNDEF;
+	}

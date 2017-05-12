@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Bot/Cobalt/Plugin/RSS.pm
+lib/Bot/Cobalt/Plugin/RSS/Conf.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/01_loadable.t

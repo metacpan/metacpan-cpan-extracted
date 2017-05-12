@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               B-Hooks-OP-Annotation
+version:            0.44
+abstract:           annotate and delegate hooked OPs
+author:
+    - chocolateboy <chocolate@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::Depends:    0.304
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    ExtUtils::Depends:  0.304
+resources:
+    repository:  http://github.com/chocolateboy/B-Hooks-OP-Annotation
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

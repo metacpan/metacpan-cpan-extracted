@@ -1,0 +1,117 @@
+        <WorkflowProcess Id="unstructured-inclusive-tasks" Name="unstructured-inclusive-tasks">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="splitA" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitB" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitB2" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'C'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>You have option to change the value of variable splitA. If you don't set it, both B and B1 transitions will be taken. Set it to B to follow activity B, if you set it to B1 it will proceed to activity B1.</Description>
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B1"/>
+                                    <TransitionRef Id="A-B"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>You have option to change the value of variable splitB. If you don't set it, transitions to both B1 and C will be taken. Set it to B1 to follow only activity B, if you set it to B1 it will proceed to only activity C.</Description>
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B-B1"/>
+                                    <TransitionRef Id="B-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B1" Name="B1">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B2" Name="B2">
+                    <Description>You have option to change the value of variable splitB2. If you don't set it, transitions to both C and D will be taken. Set it to C to follow only activity C, if you set it to D it will proceed to only activity D.</Description>
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B2-C"/>
+                                    <TransitionRef Id="B2-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B1" From="A" To="B1">
+                    <Condition Type="CONDITION">!attribute('splitA') || attribute('splitA') == 'B1'</Condition>
+                </Transition>
+                <Transition Id="A-B" From="A" To="B">
+                    <Condition Type="CONDITION">!attribute('splitA') || attribute('splitA') == 'B'</Condition>
+                </Transition>
+                <Transition Id="B-B1" From="B" To="B1">
+                    <Condition Type="CONDITION"><Expression>!attribute('splitB') OR attribute('splitB').search('B1')</Expression></Condition>
+                </Transition>
+                <Transition Id="B-C" From="B" To="C">
+                    <Condition Type="CONDITION"><Expression>!attribute('splitB') OR attribute('splitB').search('C')</Expression></Condition>
+                </Transition>
+                <Transition Id="B1-B2" From="B1" To="B2"/>
+                <Transition Id="B2-C" From="B2" To="C">
+                    <Condition Type="CONDITION">1</Condition>
+                </Transition>
+                <Transition Id="B2-D" From="B2" To="D"/>
+                <Transition Id="C-D" From="C" To="D"/>
+            </Transitions>
+        </WorkflowProcess>
+

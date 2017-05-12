@@ -1,0 +1,92 @@
+bioperl-network README
+
+1. Installation
+2. PSI Formats
+3. Overview
+4. Status
+5. History
+
+
+1. Installation
+
+See the accompanying INSTALL file for details on installing
+bioperl-network.
+
+
+2. PSI Formats
+
+Different databases offer different variants of the PSI 2.5
+format. Some of these files cannot be parsed by this package. Please see:
+
+http://www.bioperl.org/wiki/Module:Bio::Graph::IO::psi_xml
+
+
+3. Overview
+
+A ProteinNet is a representation of a protein-protein interaction network.
+Its functionality derives from the Graph module of Perl and from BioPerl.
+These sorts of networks, or graphs, can be modeled as nodes, or
+vertices, connected by edges.
+
+A node is one or more BioPerl sequence objects, a Bio::Seq or 
+Bio::Seq::RichSeq object. Since a node can contain more than one
+Sequence object it can represent protein complexes as well as proteins.
+Essentially the node can be any Bioperl object that implements the
+Bio::AnnotatableI and Bio::IdentifiableI interfaces. This is relevant since the 
+identities of nodes are determined by their identifiers.
+
+The bioperl-network modules use Perl's Graph::Undirected 
+module and inherit its formal model as well. An edge corresponds to a 
+pair of nodes, and there is only one edge per pair. An interaction is an 
+attribute of an edge, and there can be 1 or more interactions per edge.
+An interaction can be thought of as one experiment or one experimental 
+observation. 
+
+The formats that can be parsed are DIP (tab-delimited) and PSI MI
+(XML), either version 1 or version 2.5. Capabilities include the
+ability to merge networks, select nodes and interactions by
+identifier, add and delete components (nodes, interactions, and
+edges), count all components of a certain type, get all components of
+a certain type, and get subgraphs. Then you have all the functionality
+of Perl's Graph in addition such as traversal using different
+algorithms, getting interior and exterior nodes, and getting all  
+connected subgraphs. Graph is quite rich in functionality, this list
+is only a small subset of available methods, see the documentation 
+for Graph for more detail (http://search.cpan.org/~jhi/Graph/lib/Graph.pod).
+
+For more detailed documentation also see the
+Bio::Network::ProteinNet module.
+
+
+4. Status
+
+This package should be considered a preliminary piece of
+work. Although the code is tested and stable it lacks functionality. Not
+all fields in the PSI MI standard are parsed into a network, for example.
+The BioPAX format is not parsed, arguably as important a format as
+PSI MI. In addition useful functions such as searching by sequence or 
+ontology term aren't yet implemented. If you are interested in contributing
+please contact Brian Osborne at bioperl-l@bioperl.org.
+
+
+5. History
+
+Modules similar to these were first released as part of the core BioPerl package
+and were called Bio::Graph*. Bio::Graph was copied to a separate package,
+bioperl-network, and renamed Bio::Network. All of the modules were
+revised and a new module, Interaction.pm, was added. The
+functionality of the PSI MI 1.0 parser was enhanced and a version
+2.5 parser was added.
+
+Graph manipulation in the predecessor Bio::Graph was based on the 
+Bio::Graph::SimpleGraph module by Nat Goodman. The first release as a
+separate package, bioperl-network, replaced SimpleGraph with the Perl
+Graph package. Other API changes were also made, partly to keep
+nomenclature consistent with BioPerl, partly to use the terms used by
+the public protein interaction databases, and partly to accommodate the
+differences between Graph and Bio::Graph::SimpleGraph.
+
+The advantages to using Graph are that Bioperl developers are not
+responsible for maintaining the code that actually handles graph
+manipulation and there is more functionality in Graph than in SimpleGraph.
+You must install version .86 of Graph, or greater.

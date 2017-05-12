@@ -1,0 +1,41 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: Badge-Depot-Plugin-Coverage
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - namespace::autoclean
+      - MooseX::AttributeShortcuts
+      - Types::Standard
+      - Types::URI
+      - JSON::MaybeXS
+      - Path::Tiny
+      - DateTime
+      - DateTime::Format::RFC3339
+      - Badge::Depot
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    badges: 0
+
+---
+doctype: cpanfile

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: libwin32
+abstract: A bundle of popular Win32 modules
+version: 0.31
+author:
+  - Jan Dubois <jand@activestate.com>
+license: perl
+requires: 
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/jandubois/libwin32
+meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: Jan Dubois

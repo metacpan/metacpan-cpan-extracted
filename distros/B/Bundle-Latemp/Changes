@@ -1,0 +1,17 @@
+0.2.4   2014-01-26
+    - Add the LICENSE file.
+    - Add t/pod.t and t/00-load.t .
+    - Convert to Build.PL.
+
+0.2.3   2005-05-06
+    - Unknown.
+
+0.2.2   2005-04-29
+    - Added HTML-Latemp-NavLinks-GenHtml
+
+0.2.1   2005-04-28
+    - Fixed a remaining Bundle::Sites::BetterScm name reference.
+
+0.2.0   2005-04-28
+    - Converted Bundle from Bundle-Sites-BetterScm
+

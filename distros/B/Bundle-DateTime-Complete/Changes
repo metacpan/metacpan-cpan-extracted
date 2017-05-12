@@ -1,0 +1,80 @@
+Revision history for Perl module Bundle::DateTime::Complete
+
+0.15  2006-10-06
+    - added DateTime::Format::WindowsFileTime, ::RSS, ::DB2, ::DateParse
+
+    - added DateTime::Util::DayOfWeek
+
+    - added license (public domain)
+
+0.14  2004-10-17
+    - added DateTime::Calendar::Discordian
+
+    - added DateTime::Format::Human
+
+0.13  2004-07-28
+    - name changed to Bundle::DateTime::Complete
+
+    - added DateTime::Functions
+
+    - added DateTime::Util::Calc and DT::Util::Astro::*
+
+    - added DateTime::Calendar::Japanese::Era, DT::Cal::Japanese, and
+      DT::Cal::Chinese
+
+    - added DateTime::Event::Lunar, DT::Ev::SolarTerm, DT::Ev::Random
+
+    - added DateTime::Format::Japanese and DT::F::Duration
+
+    - added DateTime::TimeZone::LMT
+
+
+======= The following versions were called Bundle::DateTime
+
+0.12  2003-10-03
+    - added DateTime::Calendar::Hebrew
+
+0.11  2003-09-10
+    - added DateTime::HiRes and DateTime::Fiscal::Year
+
+0.10  2003-09-02
+    - added DateTime::Calendar::Hijri
+
+    - smoother installation because of a reordering of the module list
+
+0.09  2003-08-23
+    - added DateTime prerequisites to the list. This should make the
+      first installation of Bundle::DT easier.
+
+    - removed DateTime::LeapSecond. Now included in DateTime.
+
+0.08  2003-07-28
+    - added DateTime::Format::DateManip, DateTime::Locale and
+      DateTime::Calendar::Coptic
+
+0.07  2003-07-04
+    - added DateTime::Format::Bork, DateTime::Format::HTTP and
+      DateTime::Format::ISO8601
+
+0.06  2003-06-15
+    - added DateTime::TimeZone::Alias and DateTime::Format::DBI
+
+0.05  2003-06-02
+    - added DateTime::Format::Pg, DateTime::Event::NameDay and
+      DateTime::Format::Roman
+
+0.04  2003-05-05
+    - added DateTime::Event::Cron and DateTime::Format::Epoch
+
+0.03  2003-04-30
+    - added DateTime::Event::Recurrence, DateTime::Event::Sunrise,
+      DateTime::Format::Strptime, and
+      DateTime::Calendar::FrenchRevolutionary
+
+0.02  2003-04-21
+    - added DateTime::LeapSecond
+
+    - removed DateTime::Astro::Sunrise (development release)
+
+0.01  2003-04-05
+    - original version

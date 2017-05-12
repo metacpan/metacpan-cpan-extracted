@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BuzzSaw - Database</title>
+  </head>
+
+  <body>
+    <h1>BuzzSaw - Database</h1>
+
+    <h2>Schema</h2>
+    <p>At the heart of the design of the BuzzSaw database schema is a
+    representation of a log message as an <em>event</em>, associated
+    with each event are zero or more <em>tags</em> and zero or more
+    pieces of <em>extra_info</em>.</p>
+
+    <p>The database schema also contains tables which are used for
+    tracking data sources to help avoid parsing the sources multiple
+    times. There are also tables available which can be used to
+    provide locking facilities so that multiple importer processes can
+    be run concurrently without risk of conflicts.</p>
+
+    <h3>Events</h3>
+
+    <p>Each log message is modelled as an <em>event</em> and is stored
+    in the table of that name. The attributes for the <em>event</em>
+    table are as follows:</p>
+
+    <table border="1">
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Nullable</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>Integer. Must be unique.</td>
+        <td>No</td>
+        <td>Primary Key</td>
+      </tr>
+      <tr>
+        <td>raw</td>
+        <td>String (max length 1000 chars).</td>
+        <td>Yes</td>
+        <td>The full original log message.</td>
+      </tr>
+      <tr>
+        <td>digest</td>
+        <td>Base64 encoded string (max length 200 chars). Must be unique.</td>
+        <td>No</td>
+        <td>The Base64 encoded digest of the full original log message.</td>
+      </tr>
+      <tr>
+        <td>logtime</td>
+        <td>Timestamp.</td>
+        <td>No</td>
+        <td>The full timestamp (date and time) with timezone for the log message. Must not be null.</td>
+      </tr>
+      <tr>
+        <td>logdate</td>
+        <td>Date</td>
+        <td>No</td>
+        <td>The date part of the timestamp, automatically extracted by a database trigger.</td>
+      </tr>
+      <tr>
+        <td>hostname</td>
+        <td>String (max length 100 chars).</td>
+        <td>No</td>
+        <td>The name of the host from which the log message originated.</td>
+      </tr>
+      <tr>
+        <td>message</td>
+        <td>String (max length 1000 chars).</td>
+        <td>Yes</td>
+        <td>The extracted log message (timestamp, hostname, program, etc. have been removed).</td>
+      </tr>
+      <tr>
+        <td>program</td>
+        <td>String (max length 100 chars).</td>
+        <td>Yes</td>
+        <td>The name of the program (e.g. sshd) which generated the log message. Not always recorded in the log message.</td>
+      </tr>
+      <tr>
+        <td>pid</td>
+        <td>Integer</td>
+        <td>Yes</td>
+        <td>The process ID of the program which generated the log message. Not always recorded in the log message.</td>
+      </tr>
+      <tr>
+        <td>userid</td>
+        <td>String (max length 20 chars).</td>
+        <td>Yes</td>
+        <td>The ID of the user associated with this log message. Often this is not recorded in the log message. It might be a string username or an integer UID.</td>
+      </tr>
+    </table>
+
+    <p>If you need to do queries based on dates and you are not interested in the times then you definitely want to use the <code>logdate</code> column, it is much faster.</p>
+
+    <h3>Tags</h3>
+
+    <p>Associated with each <em>event</em> are zero or more tags. A
+    tag is a simple label
+    (e.g. <em>auth_failure</em>, <em>segfault</em>) which describes
+    some aspect of the log message. The attributes for
+    the <em>tag</em> table are as follows:</p>
+
+    <table border="1">
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Nullable</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>Integer. Must be unique.</td>
+        <td>No</td>
+        <td>Primary Key</td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>String (max length 20 chars).</td>
+        <td>No</td>
+        <td>The name of the label.</td>
+      </tr>
+      <tr>
+        <td>event</td>
+        <td>Integer.</td>
+        <td>No</td>
+        <td>Foreign key reference to the event table</td>
+      </tr>
+    </table>
+
+    <h3>Extra Information</h3>
+
+    <p>Associated with each <em>event</em> are zero or more pieces of
+    extra information. Extra information has both an arbitrary name
+    and a value which describes some aspect of the log message
+    (e.g. the source_address of an SSH login). The attributes for
+    the <em>extra_info</em> table are as follows:</p>
+
+    <table border="1">
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Nullable</th>
+        <th>Purpose</th>
+      </tr>
+      <tr>
+        <td>id</td>
+        <td>Integer. Must be unique.</td>
+        <td>No</td>
+        <td>Primary Key</td>
+      </tr>
+      <tr>
+        <td>name</td>
+        <td>String (max length 20 chars).</td>
+        <td>No</td>
+        <td>The name of the extra information.</td>
+      </tr>
+      <tr>
+        <td>val</td>
+        <td>String (max length 100 chars).</td>
+        <td>No</td>
+        <td>The value of the extra information.</td>
+      </tr>
+      <tr>
+        <td>event</td>
+        <td>Integer.</td>
+        <td>No</td>
+        <td>Foreign key reference to the event table</td>
+      </tr>
+    </table>
+
+    <p>Note that when old entries in the events table are anonymised
+    that all extra information associated with an event is
+    deleted. Contrast this with the tags table where they are all
+    kept, it is assumed that all tags are &quot;safe&quot;.</p>
+
+    <h2>The BuzzSaw::DB API</h2>
+
+    <p>When you need to make arbitrary buzzsaw database queries you
+    could just use SQL (with or without the perl DBI interface) and
+    that will give you everything you need. However there is a handy
+    API based on the excellent Perl <code>DBIx::Class</code> module
+    which can make creating complex queries much simpler. This API is
+    exposed via the <code>BuzzSaw::DB</code> module. It can be used
+    like this:</p>
+
+<pre>
+   use BuzzSaw::DB;
+
+   my $db = BuzzSaw::DB->new( name => 'logdb',
+                              user => 'fred',
+                              pass => 'letmein' );
+
+   my $schema = $db->schema;
+
+   my @events = $schema->resultset('Event')->search( { hostname => 'foo' } );
+</pre>
+
+    <p>More typically you will not want to specify the user
+    credentials in the script itself so the better approach is to use
+    a configuration file. That can be done like this:</p>
+
+<pre>
+   use BuzzSaw::DB;
+
+   my $db = BuzzSaw::DB->new_with_config();
+
+   my $schema = $db->schema;
+</pre>
+
+<p>The default configuration file is <code>/etc/buzzsaw/db.yaml</code>
+but it can be overridden like so:</p>
+
+<pre>
+   use BuzzSaw::DB;
+
+   my $db = BuzzSaw::DB->new_with_config( configfile => 'buzzsaw_db.yaml' );
+
+   my $schema = $db->schema;
+</pre>
+
+<p>The format of the configuration file must be YAML. It is a simple
+hash of key-value pairs which map to the various attributes in
+the <code>BuzzSaw::DB</code> module (e.g. user, pass, name, host,
+port).</p>
+
+<p>As shown above, to get access to the <code>DBIx::Class</code>
+schema object you need to use the <code>schema</code> accessor. There
+are result set classes available for all DB tables (named <code>Event</code>, <code>Tag</code>,
+<code>ExtraInfo</code>, <code>Log</code>
+and <code>CurrentProcessing</code>). These result sets are used for
+querying the entries in the table. The parameters of an entry in the
+result set can be easily queried through the accessors. Here's an
+example:</p>
+
+<pre>
+   my $schema = $db->schema;
+
+   my @events = $schema->resultset('Event')->search( { hostname => 'foo' } );
+
+   for my $event (@events) {
+      my $time = $event->logtime;
+      my $program = $event->program;
+
+      print "$time $program\n";
+   }
+</pre>
+
+<p>The full details for each result set can be found by looking at the
+perl docs for the modules, they are in
+the <code>BuzzSaw::DB::Schema::Result</code> namespace
+(e.g. <code>BuzzSaw::DB::Schema::Result::Event</code>).</p>
+
+<p>Thanks to <code>DBIx::Class</code> it is possible to easily
+retrieve the data associated with an event which is stored in a
+foreign table (e.g. <em>tags</em> and <em>extra_info</em>). Here is an
+example of retrieving the tags for an event:</p>
+
+<pre>
+  for my $event (@events) {
+
+    my @tags = $event->search_related('tags')->all;
+
+  }
+</pre>
+
+  </body>
+
+</html>

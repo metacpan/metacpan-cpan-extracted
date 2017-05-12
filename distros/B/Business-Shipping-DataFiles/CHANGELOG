@@ -1,0 +1,34 @@
+Revision history for Business::Shipping::DataFiles
+=================================================
+
+1.02
+
+ * Add tier 3 pricing for ground hundredweight.
+ 
+ * Update to 2006 data.
+
+1.01  Aug 14 2005
+
+ * Fix xarea table, which was being truncated due to table length limit.
+
+1.00  Aug 03 2005
+
+ * Testing warrants a stable designation.
+ 
+ * Installation bug fixed: data/data directory created, thanks to a report by
+   Mike Heins <mike@perusion.com>
+   
+ * [Fixed] The maximum values for many records are off by one.  
+   - Zip codes such as 970*, for example, were miscalculated.
+   
+ * Add Delivery Area Surcharge (xarea)
+
+0.90  May 26 2005
+
+ * Converted to new data format (Storable), which is much faster and allows much
+   cleaner code.
+
+0.01  Sep 14 2004
+
+ * Initial revision
+

@@ -1,0 +1,158 @@
+NAME
+    Business::AU::ABN - Validate and format Australian Business Numbers
+
+SYNOPSIS
+      # Create a new validated ABN object
+      use Business::AU::ABN;
+      my $ABN = new Business::AU::ABN( '12 004 044 937' );
+      
+  # Validate in a single method call
+      Business::AU::ABN->validate_abn( '12 004 044 937' );
+      
+  # Validate in a single function call
+      Business::AU::ABN::validate_abn( '12 004 044 937' );
+      
+  # The validate_abn function is also importable
+      use Business::AU::ABN 'validate_abn';
+      validate_abn( '12 004 044 937' );
+
+DESCRIPTION
+    The Australian Business Number ( ABN ) is a government allocated number
+    required by all businesses in order to trade in Australia. It is
+    intented to provide a central, universal, and unique identifier for all
+    businesses.
+
+    It's also rather neat, in that it is capable of self-validating. Much
+    like a credit card number does, a simple algorithm applied to the digits
+    can confirm that the number is valid. ( Although the business may not
+    actually exist ). The checksum algorithm was specifically designed to
+    catch situations in which you get two digits the wrong way around, or
+    something of that nature.
+
+    "Business::AU::ABN" provides a validation/formatting mechanism, and an
+    object form of an ABN number. ABNs are reformatted into the most
+    preferred format, '01 234 567 890'.
+
+    The object itself automatically stringifies to the formatted number, so
+    with an object, you can safely do "print "Your ABN $ABN looks OK"" and
+    other things of that nature.
+
+  Highly flexible validation
+    Apart from the algorithm itself, most of this module is aimed at making
+    the validation mechanism as flexible and easy to use as possible.
+
+    With this in mind, the "validate_abn" sub can be accessed in ANY form,
+    and will just "do what you mean". See the method details for more
+    information.
+
+    Also, all validation will take just about any crap as an argument, and
+    not die or throw a warning. It will just return false.
+
+  "Group" ABNs
+    The ABN supports the concept of "Groups", that is, a group of companies
+    sharing a common ABN, but being seperated within it. In fact, ALL
+    companies that have a regular 11 digit ABN are actually also allocated a
+    group number. This group number is a 3 digit number, and are allocated
+    incrementally, starting with 001. So the ABN '01 234 567 890' is
+    actually also capable of being represented as '01 234 567 890 001'.
+
+    By convention, when only a single company exists, the 001 is dropped.
+    However, in common situations where an ABN value is expected, you accept
+    both the 11 digit regular version, and the 14 digit group version. The
+    14 digit case will also be reformatted to show the group identifier as
+    an additional 3 digits group.
+
+    Except for not allowing 000, there are no restrictions, and group
+    identifiers are not included in the checksum calculation.
+
+METHODS
+  new $string
+    The "new" method creates a new "Business::AU::ABN" object. Takes as
+    argument a value, and validates that it is correct before creating the
+    object. As such if an object is provided that passes
+    "$ABN->isa('Business::AU::ABN')", it IS a valid ABN and does not need to
+    be checked.
+
+    Returns a new "Business::AU::ABN" on success, or sets the error string
+    and returns false if the string is not an ABN.
+
+  $ABN->validate_abn
+    When called as a method on an object, "validate_abn" isn't really that
+    useful, as ABN objects are already assumed to be correct, but the method
+    is included for completeness sake.
+
+    Returns the correctly formatted ABN (which is also 'true' in boolean
+    context) if the ABN is valid, or false if not.
+
+  Business::AU::ABN->validate_abn $string
+    When called as a static method, "validate_abn" takes a string as an
+    argument and attempts to validate it as an ABN.
+
+    Returns the correctly formatted ABN (which is also 'true' in boolean
+    context) if the ABN is valid. Returns false otherwise.
+
+  Business::AU::ABN::validate_abn $string
+    When called directly as a fully referenced function, "validate_abn"
+    responds in exactly the same was as for the static method above.
+
+    Returns the correctly formatted ABN (which is also 'true' in boolean
+    context) if the ABN is valid. Returns false otherwise.
+
+  validate_abn $string
+    The "validate_abn" function can also be imported to your package and
+    used directly, as in the following example.
+
+      use Business::AU::ABN 'validate_abn';
+      my $abn = '01 234 567 890';
+      print "Your ABN is " . validate_abn($abn) ? 'valid' : 'invalid';
+
+    The imported function reponds identically to the fully referenced
+    function and the static method.
+
+    Returns the correctly formatted ABN (which is also 'true' in boolean
+    context) if the ABN is valid. Returns false otherwise.
+
+  to_string
+    The "to_string" method returns the ABN as a string. This is also the
+    method called by the stringification overload.
+
+  errstr
+    When "validate_abn" or "new" return false, a message describing the
+    problem can be accessed via any of the following.
+
+      # Global variable
+      $Business::AU::ABN::errstr
+      
+  # Class method
+      Business::AU::ABN->errstr
+      
+  # Function
+      Business::AU::ABN::errstr()
+
+TO DO
+    Add the method "ACN" to get the older Australian Company Number from the
+    ABN, which is a superset of it.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-AU-ABN>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2003 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,63 @@
+=head1 NAME
+
+Business::BancaSella::Ris::Mysql - Check the existance of One-Time-Password 
+from a mysql database
+
+=head1 SYNOPSIS
+
+  use Business::BancaSella::Ris;
+  
+  my $ric = new Business::BancaSella::Ris::Mysql(
+  				dbh		=> $DBI_handle,
+				tableName	=> $table_with_otp,
+				fieldName	=> $field_with_otp
+				);
+  my $ok = $ris->check($otp);
+  if ($ok) {$ris->remove($otp));
+
+=head1 DESCRIPTION
+
+This module check if One-Time-Password is present in a mysql database 
+and it could remove it. 
+
+=head1 METHODS
+
+=head2 dbh()
+
+Set or get and active DBI handle to Mysql database where OTP are stored.
+
+=head2 fieldName()
+
+Set or get the field name of the table where OTP are stored.
+
+=head2 tableName()
+
+Set or get the table name where OTP are stored
+
+=head2 extract(otp)
+
+Check password and return false if not found, else remove password 
+from table.
+
+=head2 check(otp)
+
+Return TRUE or FALSE if the OTP is present in mysql database.
+
+=head2 remove(otp)
+
+Remove the OTP if present in the mysql database. Raise an error if not present.
+
+=head2 prepare(source_file)
+
+Insert into database passwords from $source_file that have one password on each
+row.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+Business::BancaSella::Ric::File
+
+=cut

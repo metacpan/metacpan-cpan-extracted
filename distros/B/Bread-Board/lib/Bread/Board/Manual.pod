@@ -1,0 +1,111 @@
+# PODNAME: Bread::Board::Manual
+# ABSTRACT: A manual for Bread::Board
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bread::Board::Manual - A manual for Bread::Board
+
+=head1 VERSION
+
+version 0.34
+
+=head1 INTRODUCTION
+
+As we have said, Bread::Board is an inversion of control
+framework with a focus on dependency injection and lifecycle
+management. The goal that Bread::Board strives towards is
+to promote more decoupled designs. It does this by removing
+the need for your objects to be concerned with resolving
+and/or creating their dependencies as well as knowing (or
+caring) what their lifecycle is.
+
+=head2 Why should I use Bread::Board
+
+First, it should be noted that Bread::Board and IoC are not
+universally useful. Smaller applications and one-off scripts would
+be overburdened by the abstractions of Bread::Board. But the larger
+your application becomes, the more something like Bread::Board
+can help.
+
+As applications grow so the management of resources and their
+dependencies becomes more of a burden. Making sure all your
+components are properly initialized, in the right order and at all
+times that you need them, can become a twisty maze. Bread::Board
+is intended to help you manage this twisty maze and remove the need
+for you to manage this manually.
+
+Take your typical Catalyst application, the Catalyst framework
+itself contains its own mini IoC framework through the
+component subsystem. Catalyst will manage your models and views
+making sure that they will be available when you need them in
+the controllers. Catalyst makes all this easy to manage through
+its configuration system. This is great inside your Catalyst
+application, but what about outside of it? Any sufficiently
+complex web application will have a set of scripts and/or
+command-line applications to help support it. At this point
+you are left to your own devices and must manage these
+components and their dependency chains on your own.
+
+By decoupling IoC into its own stand-alone subsystem it
+becomes possible to get that same ease-of-use you get inside
+something like a Catalyst application, outside of it.
+
+This, in a nutshell, is what Bread::Board aims to provide.
+
+=head1 SECTIONS
+
+=over 4
+
+=item L<Bread::Board::Manual::Concepts>
+
+This is perhaps the best place to start, it will introduce you to
+the basic concepts that make up Bread::Board.
+
+=item L<Bread::Board::Manual::Concepts::Typemap>
+
+With Bread::Board you provide names for your service so that you
+can find them later. This document explores the new (read: experimental)
+typemap feature which allows you to map services to types as well.
+
+=item L<Bread::Board::Manual::Concepts::Advanced>
+
+Bread::Board is an extensible and open system, this document will
+explore how you can extend Bread::Board and get greater re-use of
+your components.
+
+=item L<Bread::Board::Manual::Example>
+
+This is a set of examples meant to show how Bread::Board can be
+used in real-world scenarios. It is recommended that you read the
+above documentation first as many of these examples use the concepts
+discussed in them.
+
+=back
+
+=head1 AUTHOR
+
+Stevan Little <stevan@iinteractive.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/stevan/BreadBoard/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

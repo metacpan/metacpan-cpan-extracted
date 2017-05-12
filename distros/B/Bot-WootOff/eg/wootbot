@@ -1,0 +1,79 @@
+#!/usr/local/bin/perl
+###########################################
+# wootbot 
+# 2009, Mike Schilli <cpan@perlmeister.com>
+###########################################
+use strict;
+use warnings;
+use Getopt::Std;
+use Bot::WootOff;
+use Log::Log4perl qw(:easy);
+
+getopts("hvs:c:n:u:", \my %opts);
+
+Log::Log4perl->easy_init({
+    level => ($opts{v} ? $DEBUG : $ERROR),
+    file  => "STDOUT",
+});
+
+my $bot = Bot::WootOff->new(
+    $opts{s} ? (irc_server  => $opts{s}) : (),
+    $opts{c} ? (irc_channel => $opts{c}) : (),
+    $opts{n} ? (irc_nick    => $opts{n}) : (),
+    $opts{u} ? (http_url    => $opts{u}) : (),
+);
+
+$bot->run();
+
+__END__
+
+=head1 NAME
+
+    wootbot - Poll woot.com send updates to IRC
+
+=head1 SYNOPSIS
+
+    wootbot -s irc_server -c irc_channel 
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-s>
+
+IRC server to connect to.
+
+=item B<-c>
+
+IRC channel to post messages to.
+
+=item B<-n>
+
+Nick name of the bot, defaults to "wootbot"
+
+=item B<-u>
+
+Woot URL to use. Defaults to "http://woot.com", but in case you want to 
+trail the happy hour, use "-u http://woot.com/happyhour" instead.
+
+=back
+
+=head1 DESCRIPTION
+
+c<wootbot> periocally polls woot.com (especially useful during a woot-off)
+and sends messages to a channel on an IRC server if the next item is 
+up for grabs. Check the Bot::WootOff documentation for details.
+
+=head1 EXAMPLES
+
+  $ wootbot -s irc.freenode.net -c '#wootoff'
+
+=head1 LEGALESE
+
+Copyright 2009 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2009, Mike Schilli <cpan@perlmeister.com>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Bundle::HollyKing.
+
+0.01  Tue May  8 22:03:07 2007
+	- original version; created by h2xs 1.23 with options
+		-AXcfn Bundle::HollyKing
+

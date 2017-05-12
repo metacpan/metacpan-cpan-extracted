@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+
+# TODO: skip-if-exists (and ignore zero byte files)
+# TODO: continue-on-errors
+# Error doing restore: File restore/.brackup-digest.db (.brackup-digest.db) already exists.  Aborting. at /raid/bradfitz/proj/brackup/trunk/lib/Brackup/Restore.pm line 157, <$fh> line 20.
+
+=head1 NAME
+
+brackup-restore - The brackup restore tool.
+
+=head1 SYNOPSIS
+
+ $ brackup-restore [-v] --from=foo.brackup --to=<base_directory> --all
+ $ brackup-restore [-v] --from=foo.brackup --to=<base_directory> --just=<file>
+ $ brackup-restore [-v] --from=foo.brackup --to=<base_directory> --just=<dir>
+
+=head2 OPTIONS
+
+=over 4
+
+=item --from=NAME
+
+Required.  The backup metafile, describing the tree you want to restore.  
+Probably named like "source-target-YYYYMMDD.brackup".  If you lost it, 
+it's also stored on your backup target, and you can fetch it with
+L<brackup-target>.
+
+=item --to=NAME
+
+Required.  The destination root directory for your restored files.
+Will be created if it doesn't exist.
+
+=item --all
+
+Restore all files.
+
+=item --just="DIRECTORY"
+
+Restore just the directory named (and all its contents). 
+
+=item --just="FILE"
+
+Restore just the file named.
+
+=item --config=NAME
+
+Brackup config file to use instead of default.
+
+=item --verbose|-v
+
+Show more info during restore.
+
+=back
+
+=head1 WARRANTY
+
+Brackup is distributed as-is and comes without warranty of any kind,
+expressed or implied.  We aren't responsible for your data loss.
+
+=head1 AUTHOR
+
+Brad Fitzpatrick E<lt>brad@danga.comE<gt>
+
+Copyright (c) 2006-2007 Six Apart, Ltd. All rights reserved.
+
+This module is free software. You may use, modify, and/or redistribute this
+software under the terms of same terms as perl itself.
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Path;
+
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+
+use Brackup;
+use Brackup::Util qw(tempfile);
+
+my ($opt_verbose, $meta_file, $opt_help, $restore_dir, $opt_all, $prefix, $config_file);
+
+usage() unless
+    GetOptions(
+               'from=s'    => \$meta_file,
+               'to=s'      => \$restore_dir,
+               'verbose'   => \$opt_verbose,
+               'help'      => \$opt_help,
+               'all'       => \$opt_all,
+               'just=s'    => \$prefix,
+               'config=s'  => \$config_file,
+               );
+
+if ($opt_help) {
+    eval "use Pod::Usage;";
+    Pod::Usage::pod2usage( -verbose => 1, -exitval => 0 );
+    exit 0;
+}
+
+usage() unless $meta_file && $restore_dir && ($prefix || $opt_all);
+usage("Backup metafile '$meta_file' doesn't exist")  unless -e $meta_file;
+usage("Backup metafile '$meta_file' isn't a file")   unless -f $meta_file;
+usage("Restore directory '$restore_dir' isn't a directory") if -e $restore_dir && ! -d $restore_dir;
+usage("Config file '$config_file' doesn't exist")    if $config_file && ! -f $config_file;
+$prefix ||= "";  # with -all, "", which means everything
+
+if (! -e $restore_dir) {
+    mkpath($restore_dir, 0, 0700) or die "Cannot create restore directory: $!";
+}
+
+$config_file ||= Brackup::Config->default_config_file_name;
+my $config = Brackup::Config->load($config_file) if -f $config_file;
+
+my $restore = Brackup::Restore->new(
+                                    to     => $restore_dir,
+                                    prefix => $prefix,
+                                    file   => $meta_file,
+                                    config => $config,
+                                    verbose => $opt_verbose,
+                                    );
+
+if (eval { $restore->restore }){
+    warn "Restore complete.\n" if $opt_verbose;
+    exit 0;
+} else {
+    chomp $@;
+    warn "Error doing restore: $@\n";
+    exit 1;
+}
+
+
+sub usage {
+    my $why = shift || "";
+    if ($why) {
+        $why =~ s/\s+$//;
+        $why = "Error: $why\n\n";
+    }
+    die "${why}brackup-restore [-v] --from=[metafile.brackup] --to=[restore_dir] <--all|--just=[what]>\nbrackup-restore --help\n";
+
+}

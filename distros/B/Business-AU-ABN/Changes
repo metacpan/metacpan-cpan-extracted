@@ -1,0 +1,37 @@
+Revision history for Perl extension Business-AU-ABN
+
+1.09 Fri 27 Jan 2012
+	- Upgraded to Module::Install 1.04
+	- Fixed bug preventing use of 14 digit ABNs (DDICK)
+
+1.08 Sat 10 May 2008
+	- Removing the use of "use base 'Exporter';"
+	- Upgraded to Module::Install 0.76
+
+1.07 Thu 29 Jun 2007
+	- No functional changes
+	- Upgraded to Module::Install 0.65
+
+1.06 Tue  6 Jun 2006
+	- Moving from old CVS to new SVN repository
+	- Converted to Params::Util
+	- Upgraded to Module::Install 0.62
+
+1.05 Sat Jul  9 2005
+	- Working well for at least a year with no bug report.
+	  Switching to a "stable" version number.
+
+0.4  Wed Jan  7 2004
+	- Fixed some documentation bugs, and made some other minor tweaks
+
+0.3  Thu Dec 25 2003
+	- Changed a lot of the way that objects work and are used
+	- Added an error message whenever an ABN validation fails
+	- Santa leased me an office! Yay!
+
+0.2  Thu Dec 25 2003
+	- Errr... we actually allow you to import validate this time
+
+0.1  Thu Dec 25 2003
+	- original version
+	- Merry Christmas!

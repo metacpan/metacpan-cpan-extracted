@@ -1,0 +1,94 @@
+[%#
+    Template for controller level config blocks.
+
+    Expects these indirect parameters:
+        config_block - from app_block_hashes
+%]
+<div class='app_block_element'
+     id='div_[% config_block.ident %]'>
+<fieldset>
+<legend> Config
+(
+  <a href='javascript:show_or_hide( "[% "hideable_$config_block.ident" %]" );'>
+    edit or hide
+  </a> | [%- INCLUDE delete_link.ttc
+                name  = "app_body_delete::$config_block.ident" %]
+)
+</legend>
+<table>
+    <tr>
+        <td> Name: </td>
+        <td>[% IF config_block.name == 'base' %] base [% ELSE %]
+            <input type='text' id='app_block::[% config_block.ident %]'
+                   value='[% config_block.name %]'
+                   onblur='javascript:update_tree(
+                       "name",
+                       "controller_config::[% config_block.ident %]",
+                       this.value
+                   )'
+            />
+            [% END %]
+        </td>
+    </tr>
+    <tr>
+        <td colspan='2'>
+            [% WRAPPER show_or_hide.ttc
+                clickable_id          = "cont_conf_$block.ident"
+                element_under_control = "hideable_$config_block.ident"
+                label                 = ''
+                heading_level         = 'none'
+                expanded              = 0
+            %]
+              [% INCLUDE controller_config_table %]
+            [% END %]
+        </td>
+    </tr>
+</table>
+</fieldset>
+</div>
+
+[% BLOCK controller_config_table %]
+<table id='app_config_table_[% config_block.ident %]' class='bordered'>
+  <tr><th> Keyword </th>
+      <th> Value </th>
+<!--      <th> Skip Accessor? </th> -->
+      <th> Delete Buttons </th>
+  </tr>
+  [% FOREACH statement IN config_block.statements %]
+  <tr id='app_config::row::[% config_block.ident %]::[% statement.keyword %]'>
+    <td> [% statement.keyword %] </td>
+    <td>
+      <input type='text'
+      name='cont_conf_value::[% config_block.ident %]::[% statement.keyword %]'
+      value='[% statement.value %]'
+      onblur='javascript:update_tree(
+        "app_conf_statement",
+        "[% config_block.ident %]::[% statement.keyword %]",
+        this.value
+      )'
+      />
+    </td>
+    <td>
+      <button type='button'
+name='app_config_delete::[% config_block.ident %]::[% statement.keyword %]'
+        onclick='javascript:delete_app_config( this )' >
+        Delete
+      </button>
+    </td>
+  </tr>
+  [% END %][%# end of existing statements %]
+  <tr>
+    <td> <button type='button' name='app_config_[% config_block.ident %]'
+            onclick='javascript:add_cont_config( "[% config_block.ident %]" )'
+         >
+           New Config Statement:
+         </button>
+    </td>
+    <td>
+        <input type='text' id='app_config_new_[% config_block.ident %]'
+            value ='' />
+    </td>
+    <td> <!-- to keep the proper number of columns --> </td>
+  </tr>
+</table>
+[% END %][%# end of controller_config_table %]

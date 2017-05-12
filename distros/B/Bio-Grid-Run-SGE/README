@@ -1,0 +1,4 @@
+Bio::Grid::Run::SGE - Distribute (biological) analyses on the local SGE grid
+
+
+Documentation is at https://metacpan.org/pod/Bio::Grid::Run::SGE

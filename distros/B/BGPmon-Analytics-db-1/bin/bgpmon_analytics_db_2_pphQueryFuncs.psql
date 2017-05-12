@@ -1,0 +1,165 @@
+/*Script to redefine the functions used for the 6watch database
+run like so: " > psql -f 1_import_functions dbname dbuser"*/
+
+/*Helper function to dynamically generate a peer's table name*/
+
+DROP FUNCTION IF EXISTS pph.find_most_active_prefix();
+DROP FUNCTION IF EXISTS pph.get_prefixes_per_as(INTEGER);
+DROP FUNCTION IF EXISTS pph.get_as_per_prefix(CIDR);
+DROP FUNCTION IF EXISTS pph.get_table_growth(INET,VARCHAR,TIMESTAMP,TIMESTAMP,
+                                         INTERVAL);
+DROP FUNCTION IF EXISTS pph.get_table_at_time(INET,VARCHAR,TIMESTAMP);
+DROP FUNCTION IF EXISTS pph.get_unique_prefix_growth(INET,VARCHAR,TIMESTAMP,
+                                                 TIMESTAMP,INTERVAL);
+DROP FUNCTION IF EXISTS pph.get_unique_prefixes_at_time(INET,VARCHAR,TIMESTAMP);
+
+
+
+/******************************************************************************
+ * find_most_active_prefix
+ * input: 
+ * output: returns prefix
+ * effects: find the prefix withthe most timerange entries (across all peers)
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.find_most_active_prefix() RETURNS CIDR AS $$
+DECLARE
+  p CURSOR FOR SELECT * FROM pph.prefixes;
+  top_pref CIDR;
+  top_count INTEGER = 0;
+  curr_count INTEGER = 0;
+BEGIN
+  FOR prefix IN p LOOP
+    EXECUTE 'SELECT COUNT(1) 
+    FROM pph.timeranges AS t, pph.ppms AS p1, pph.prefixes AS p2
+    WHERE p2.pref = '''||prefix.pref||''' AND
+        p2.dbid = p1.prefix_dbid AND
+        t.ppm_dbid = p1.dbid' INTO curr_count;
+    IF curr_count > top_count THEN
+        top_count = curr_count;
+        top_pref = prefix.pref;
+    END IF;
+  END LOOP;
+  RETURN top_pref;
+END;
+$$ LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_prefixes_per_as
+ * input: ASN
+ * output: set of prefixes
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_prefixes_per_as(INTEGER) RETURNS SETOF CIDR AS $$
+BEGIN
+	RETURN QUERY
+	SELECT DISTINCT pref
+	FROM pph.prefixes AS p1,pph.ppms AS p2,pph.timeranges AS t
+	WHERE origin_as = $1 AND
+		t.ppm_dbid = p2.dbid AND
+		p2.prefix_dbid = p1.dbid;
+END;
+$$	LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_as_per_prefix
+ * input: prefix
+ * output: set of ASNs
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_as_per_prefix(CIDR) RETURNS SETOF INTEGER AS $$
+BEGIN
+	RETURN QUERY
+	SELECT DISTINCT origin_as
+	FROM pph.prefixes AS p1,pph.ppms AS p2,pph.timeranges AS t
+	WHERE pref = $1 AND
+		t.ppm_dbid = p2.dbid AND
+		p2.prefix_dbid = p1.dbid;
+END;
+$$	LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_table_growth
+ * input: peer address, collector, start, end, timestep
+ * output: set of ASNs
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_table_growth(INET,VARCHAR,TIMESTAMP,TIMESTAMP,INTERVAL) RETURNS SETOF INTEGER AS $$
+DECLARE
+	i TIMESTAMP;
+BEGIN
+	i := $3;
+	WHILE i <= $4 LOOP
+		RETURN NEXT COUNT(1) FROM pph.get_table_at_time($1,$2,i);
+		i := i + $5;
+	END LOOP;
+END;
+$$	LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_unique_prefix_growth
+ * input: peer address, collector, start, end, timestep
+ * output: series of integers, each is the number of unique prefixes ata  point
+ * in time
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_unique_prefix_growth(INET,VARCHAR,TIMESTAMP,TIMESTAMP,INTERVAL) RETURNS SETOF INTEGER AS $$
+DECLARE
+	i TIMESTAMP;
+BEGIN
+	i := $3;
+	WHILE i <= $4 LOOP
+		RETURN NEXT COUNT(1) FROM pph.get_unique_prefixes_at_time($1,$2,i);
+		i := i + $5;
+	END LOOP;
+END;
+$$	LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_table_at_time
+ * input: peer address, collector, time
+ * output: table size
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_table_at_time(INET,VARCHAR,TIMESTAMP) RETURNS SETOF CIDR AS $$
+DECLARE
+    peer_table VARCHAR;
+BEGIN
+    peer_table := generate_peer_table_name($1,$2);
+    RETURN QUERY EXECUTE
+    'SELECT DISTINCT pref
+    FROM pph.prefixes AS p1,pph.ppms AS p2,pph.peers AS p3,'||quote_ident(peer_table)||' AS t
+    WHERE (p3.addr,p3.collector) = (''' || $1 || ''', ''' || $2 || ''') AND
+    p2.peer_dbid = p3.dbid AND
+    p2.prefix_dbid = p1.dbid AND
+    t.ppm_dbid = p2.dbid AND
+    t.start_time <= '''|| $3 ||''' AND
+    (t.end_time > '''|| $3 ||''' OR t.end_time IS NULL)';
+END;
+$$ LANGUAGE plpgsql;
+
+/******************************************************************************
+ * get_unique_prefixes_at_time
+ * input: peer address, collector, time
+ * output: unique prefixes at that time
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.get_unique_prefixes_at_time(INET,VARCHAR,TIMESTAMP) RETURNS SETOF CIDR AS $$
+DECLARE
+    peer_table VARCHAR;
+BEGIN
+    peer_table := generate_peer_table_name($1,$2);
+    RETURN QUERY EXECUTE
+    'SELECT DISTINCT pref
+    FROM pph.prefixes AS p1,pph.ppms AS p2,pph.peers AS p3,'||quote_ident(peer_table)||' AS t
+    WHERE (p3.addr,p3.collector) = (''' || $1 || ''', ''' || $2 || ''') AND
+    p2.peer_dbid = p3.dbid AND
+    p2.prefix_dbid = p1.dbid AND
+    t.ppm_dbid = p2.dbid AND
+    t.start_time <= '''|| $3 ||''' ';
+END;
+$$	LANGUAGE plpgsql;
+
+/**** this is a cross-schmea query -- need to figure out where to put it.
+select p2.prefix,l.name,sp.path,p3.prefix from pph.prefixes as p1, cpm.prefixes as p2,cpm.prefixes as p3, cpm.lists as l, cpm.search_using as u, cpm.search_paths as sp where p1.pref = p2.prefix and l.dbid = p2.list_dbid and u.search_path_dbid = sp.dbid and u.prefix_dbid = p2.dbid and p3.dbid = sp.param_prefix_dbid ;
+
+******/

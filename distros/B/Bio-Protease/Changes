@@ -1,0 +1,79 @@
+Revision history for Bio-Protease
+
+1.112980  2011-10-25 09:17:28 America/Argentina/Buenos_Aires
+
+1.112900  2011-10-16 22:39:00 America/Argentina/Buenos_Aires
+      - Require Moose >= 1.23 explicitly
+
+1.102690  2010-09-26 10:35:17 America/Argentina/Buenos_Aires
+
+      - Replace misuse of dies_ok for throws_ok in t/proteasei, was throwing
+        fatal exception when user had Test::Builder2.
+
+1.102680  2010-09-25 18:34:03 America/Argentina/Buenos_Aires
+
+      - Implement optional, per-instance caching with Cache::Ref. No longer
+        using Memoize.
+      - Abstract the regex-specificity logic away in the
+        Bio::Protease::Role::Specificity::Regex role.
+
+1.102670  2010-09-24 12:19:06 America/Argentina/Buenos_Aires
+
+      - Better code example in ProteaseI.pm
+      - Add cache flushing at DESTROY time. Fixes test failures on perl-5.12
+
+1.102660  2010-09-23 11:05:59 America/Argentina/Buenos_Aires
+
+      - Use workaround in
+      http://www.nntp.perl.org/group/perl.moose/2009/05/msg795.html to solve
+      the memoization of role methods. Now there's caching again.
+
+1.102650  2010-09-22 19:59:59 America/Argentina/Buenos_Aires
+
+     - Remove memoization via Memoize, was failing tests with new versions of
+       Moose.
+
+1.100640  2010-03-05 02:13:12 America/Argentina/Buenos_Aires
+
+     - tidy up test file specificities.yaml due to some failing tests on darwin
+     - Several minor doc fixes
+
+1.100620  2010-03-03 12:11:29 America/Argentina/Buenos_Aires
+
+    - Added specificity: alcalase
+    - Fix bug were passing a regexp to specificity wouldn't work
+    - Methods now die when given no/senseless arguments
+    - Test corner cases more thoroughly: 100% coverage reached \o/
+
+1.100470  2010-02-16 12:04:34 America/Argentina/Buenos_Aires
+
+    - Some internal refactorings, no functional changes.
+    - Remove alpha warning.
+
+1.100420  2010-02-10 23:39:36 America/Argentina/Buenos_Aires
+
+    - Rely on YAML instead of YAML::Any
+    - bump Moose and ClassAttribute prerequisites
+    - improve kwalitee
+
+1.093151     Wed Nov 11 11:57:55 2009
+
+    - Interface is now implemented as a role instead of a base class.
+    - Instead of a scalar reference, _cuts is passed a plain scalar.
+    - Various doc improvements.
+    - Use PodWeaver instead of PodPurler.
+
+1.092670     Mon Sep 14 10:16:12 2009
+
+    - remove three final stops in the specificities.yaml file that made
+      Load fail when YAML.pm was used.
+    - Use autodie. This is 2009.
+    - Doc fix: _cuts() is a method rather than a subroutine.
+    - Fixed broken link in docs.
+    - Factual mistkae in the is_substrate() docs: it's boolean, not
+      scalar context.
+
+1.092560     Sun Sep 13 11:39:41 2009
+    - Documentation improvements.
+    - Substitute "use ok" by "use_ok()" in test suite due to test
+      failures on Solaris.

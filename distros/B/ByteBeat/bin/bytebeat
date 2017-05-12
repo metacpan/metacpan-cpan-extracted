@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use ByteBeat;
+
+ByteBeat->new(args => \@ARGV)->run;

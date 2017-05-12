@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Biblio-Thesaurus-SQLite
+version:      0.10
+version_from: lib/Biblio/Thesaurus/SQLite.pm
+installdirs:  site
+requires:
+    Biblio::Thesaurus:             0
+    DBD::SQLite:                   0
+    DBIx::Simple:                  0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

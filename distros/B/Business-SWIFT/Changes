@@ -1,0 +1,9 @@
+Revision history for Business-SWIFT
+
+0.02    16 May 2009
+
+        Changed to use the new Locales module. See rt #68235
+
+0.01    01 June 2009
+        First version with BIC validation
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Fast, flexible connector for the BitPay API'
+author:
+  - 'Paul Daigle'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-BitPay-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment::BitPay::KeyUtils: '0'
+  Carp: '0'
+  HTTP::Request: '0'
+  IO::Socket::SSL: '0'
+  JSON: '0'
+  JSON::Parse: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '0'
+  String::Interpolate: '0'
+  Test::BDD::Cucumber::Loader: '0'
+  Test::BDD::Cucumber::StepFile: '0'
+  Test::Exception: '0'
+  Test::Fake::HTTPD: '0'
+version: v2.3.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

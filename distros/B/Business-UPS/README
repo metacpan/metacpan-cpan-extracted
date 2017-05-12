@@ -1,0 +1,56 @@
+$Id: README,v 2.1 2003/06/20 13:34:35 jwheeler Exp $
+
+Business::UPS - UPS Shipping Interface Module
+
+Justin Wheeler <upsmodule@datademons.com> 2003/06/10
+
+Originally written by:
+Mark Solomon <msolomon@seva.net> 12/20/1997
+http://www.seva.net/~msolomon/
+
+---------------------------------------------------------------------------
+NOTE: Please read "LICENCE.ups" for United Parcel Service license!
+---------------------------------------------------------------------------
+
+Description:
+
+ * FOR SHIPPING COST INFO:
+    This module requires input of the shipping method, origin zip code, 
+      destination zip code, and weight of the package. It then connects to
+      the UPS calculation server and outputs the total shipping charges and
+      the UPS zone.
+
+    It's a very simplified way of finding shipping costs based on the "Quick
+    Cost Calculator" document found on the UPS Website at
+      http://www.ups.com/tools/tools.html
+
+ * FOR TRACKING PACKAGES:
+    It's an interface to submit a tracking number to the UPS web site
+      and parse the output and return a hash with the appropriate values.
+
+	-----------------------------------------------------------------
+	NOTICE: U.P.S. _REQUIRES_ the display of the "Notice" key if the
+		hash returned when displaying UPS tracking information.
+		It is as follows:
+	-------------------------
+	"UPS authorizes you to use UPS tracking systems solely to track
+	shipments tendered by or for you to UPS for delivery and for
+	no other purpose. Any other use of UPS tracking systems and
+	information is strictly prohibited."
+	-----------------------------------------------------------------
+
+
+TO INSTALL:
+
+  1. Unpack to Dist file:
+	tar xzvf Business-UPS-x.xx.tar.gz
+
+  2. Change to the dist dir and make the Makefile, make then install:
+	cd Business-UPS-x.xx
+	perl Makefile.PL
+	make
+	make install
+
+Included in archive:
+	- Tab delineated country-code list
+	- Tab delineated product-code list

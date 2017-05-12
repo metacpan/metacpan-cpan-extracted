@@ -1,0 +1,8 @@
+Revision history for Perl extension Bundle::Math::Statistics.
+
+1.00  Sun Jun 13 17:36:51 2004
+	- original version as uploaded to CPAN
+
+1.01  Sat Jul 10 08:52:13 2004
+	- Fixed type in a module name
+

@@ -1,0 +1,38 @@
+bad-isbn13s.txt
+bad-isbns.txt
+Changes
+examples/private_group_code.pl
+examples/README
+INSTALL.SKIP
+isbn13s.txt
+isbns.txt
+lib/Business/ISBN.pm
+lib/Business/ISBN10.pm
+lib/Business/ISBN13.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+scripts/get_isbn_data.pl
+t/albania.t
+t/constants.t
+t/errors.t
+t/github/3.t
+t/interface.t
+t/isbn10.t
+t/isbn13.t
+t/load.t
+t/png_barcode.t
+t/pod.t
+t/pod_coverage.t
+t/rt/27107.t
+t/rt/28843.t
+t/rt/29089.t
+t/rt/29292.t
+t/step.t
+t/test_manifest
+t/valid_isbn_checksum.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

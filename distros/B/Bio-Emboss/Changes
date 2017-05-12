@@ -1,0 +1,62 @@
+Revision history for Perl extension Bio::Emboss.
+
+5.0.0.1 Wed Sep  5 18:41:09 CEST 2007
+	- bug fix: not all pointers in parameters were properly
+          updated
+
+5.0.0 Wed Aug  8 17:46:01 CEST 2007
+	- update to EMBOSS-5.0.0
+
+4.1.0  Wed Apr 25 15:12:47 CEST 2007
+	- version numbering: use the Emboss version number that has
+          been used/tested for a particular release of this module
+	  (.i.e. Bio::Emboss 4.1.0.x has been build on and tested with
+	  EMBOSS-4.1.0)
+
+        - update to EMBOSS-4.0.1
+ 	  for	 EMBOSS-4.0.0: use 2.0.0
+	  for    EMBOSS-3.0.0: use 1.0.1
+	  before EMBOSS-3.0.0: use 0.7
+
+2.0.0  Wed Dec 27 15:54:10 CET 2006
+        - update to EMBOSS-4.0.0
+	  for    EMBOSS-3.0.0: use 1.0.1
+	  before EMBOSS-3.0.0: use 0.7
+
+1.0.1  Wed Feb  8 16:21:57 CET 2006
+	- small fix: removed functions with missing implementation
+          in EMBOSS, in order to fix a dynamic linking problem on
+          MacOSX
+
+1.0  Thu Dec  8 15:10:32 CET 2005
+	- support for EMBOSS-3.0.0;
+          for older EMBOSS versions use Bio::Emboss-0.7
+
+0.7  Mon Feb 21 16:36:34 CET 2005
+	- support for EMBOSS-2.10.0
+
+0.6  Tue Jul 20 15:18:03 CEST 2004
+	- support for EMBOSS-2.9.0
+
+0.5  Tue Dec  2 17:55:11 CET 2003
+        - added OP_NOT, OP_REF and OP_REVERSE to emboss_redefs 
+          (because of pcre_internal.h in EMBOSS-2.8.0)
+
+0.4  Mon Jun 30 16:10:31 CEST 2003
+	- removed non-implemented function prototypes to support
+          static building and building under Mac OS X
+
+0.3  Tue Jun  3 12:39:27 CEST 2003
+	- support for EMBOSS-2.7.0 and EMBOSS-2.7.1
+
+0.2  Tue Jan 28 17:38:16 CET 2003
+	- support for EMBOSS-2.6.0
+	- modified build process to support more C compilers
+	- new constant: Bio::Emboss::EMBOSS_VERSION()
+
+0.1  Tue Jan 14 11:42:35 CET 2003
+	- first release version prepared
+
+0.01  Sat Jan  4 16:59:35 CET 2003
+	- original version; created by h2xs 1.22 with options
+		-n Bio::Emboss -b 5.0.0

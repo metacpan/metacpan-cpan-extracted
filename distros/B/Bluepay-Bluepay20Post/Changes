@@ -1,0 +1,9 @@
+Revision history for Perl extension Bluepay::Bluepay20Post.
+
+0.01  Mon Apr 28 2008
+	- original version;
+
+0.10  Tue Apr 29 2008
+	- name revision;
+	- updated hash references to future-proof module;
+	

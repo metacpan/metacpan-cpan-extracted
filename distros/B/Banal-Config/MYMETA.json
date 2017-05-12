@@ -1,0 +1,50 @@
+{
+   "abstract" : "A convenient wrapper around Config::General ",
+   "author" : [
+      "\"aulusoy\" <\"dev (at) ulusoy.name\">"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Banal-Config",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Banal::DateTime" : "0.02",
+            "Banal::Utils" : "0.05",
+            "Carp" : "1.25",
+            "Carp::Heavy" : "0",
+            "Config::General" : "2.56",
+            "Data::Dumper" : "2",
+            "File::Spec" : "0",
+            "Moose" : "2",
+            "Scalar::Util" : "1.35",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.11"
+}

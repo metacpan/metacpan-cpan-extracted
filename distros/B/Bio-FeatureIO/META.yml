@@ -1,0 +1,286 @@
+---
+abstract: 'Modules for reading, writing, and manipulating sequence features'
+author:
+  - 'BioPerl Team <bioperl-l@bioperl.org>'
+build_requires:
+  Bio::Root::Test: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-FeatureIO
+requires:
+  Bio::AnnotatableI: '0'
+  Bio::Annotation::Collection: '0'
+  Bio::Annotation::Comment: '0'
+  Bio::Annotation::DBLink: '0'
+  Bio::Annotation::OntologyTerm: '0'
+  Bio::Annotation::SimpleValue: '0'
+  Bio::Annotation::Target: '0'
+  Bio::FeatureHolderI: '0'
+  Bio::LocatableSeq: '0'
+  Bio::Location::Simple: '0'
+  Bio::Ontology::OntologyStore: '0'
+  Bio::OntologyIO: '0'
+  Bio::Root::IO: '0'
+  Bio::Root::Root: '0'
+  Bio::SeqFeature::AnnotationAdaptor: '0'
+  Bio::SeqFeature::Generic: '0'
+  Bio::SeqFeature::TypedSeqFeatureI: '0'
+  Bio::SeqIO: '0'
+  Bio::Tools::GFF: '0'
+  Data::Dumper: '0'
+  Scalar::Util: '0'
+  Symbol: '0'
+  Tree::DAG_Node: '0'
+  URI::Escape: '0'
+  XML::DOM: '0'
+  XML::DOM::XPath: '0'
+  base: '0'
+  constant: '0'
+  strict: '0'
+resources:
+  bugtracker: http://github.com/bioperl/Bio-FeatureIO/issues
+  homepage: https://metacpan.org/release/Bio-FeatureIO
+  repository: git://github.com/bioperl/bio-featureio.git
+version: 1.6.905
+x_Dist_Zilla:
+  perl:
+    version: '5.018001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@BioPerl/@Filter/GatherDir'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@BioPerl/@Filter/PruneCruft'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@BioPerl/@Filter/ManifestSkip'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@BioPerl/@Filter/MetaYAML'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@BioPerl/@Filter/License'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@BioPerl/@Filter/ExtraTests'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@BioPerl/@Filter/ExecDir'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@BioPerl/@Filter/ShareDir'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@BioPerl/@Filter/MakeMaker'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@BioPerl/@Filter/Manifest'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@BioPerl/@Filter/TestRelease'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@BioPerl/@Filter/ConfirmRelease'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@BioPerl/@Filter/UploadToCPAN'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@BioPerl/MetaConfig'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@BioPerl/MetaJSON'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@BioPerl/PkgVersion'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@BioPerl/PodSyntaxTests'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@BioPerl/RunExtraTests'
+      version: '0.022'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@BioPerl/NextRelease'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: '0'
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: '0'
+          phase: test
+          script_finder:
+            - ':ExecFiles'
+          skips: []
+      name: '@BioPerl/Test::Compile'
+      version: '2.046'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@BioPerl/PodCoverageTests'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@BioPerl/MojibakeTests'
+      version: '0.7'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@BioPerl/AutoPrereqs'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@BioPerl/AutoMetaResources'
+      version: '1.20'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@BioPerl/MetaResources'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@BioPerl/Authority'
+      version: '1.006'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@BioPerl/Git::Check'
+      version: '2.023'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: v%v%n%n%c
+          time_zone: local
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - Changes
+            - dist.ini
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@BioPerl/Git::Commit'
+      version: '2.023'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          signed: 0
+          tag: Bio-FeatureIO-v1.6.905
+          tag_format: '%N-v%v'
+          tag_message: '%N-v%v'
+          time_zone: local
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@BioPerl/Git::Tag'
+      version: '2.023'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: RunExtraTests
+      version: '0.022'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.019'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.019'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.019'
+x_authority: cpan:BIOPERLML

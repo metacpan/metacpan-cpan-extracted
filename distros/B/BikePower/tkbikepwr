@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+#
+# $Id: tkbikepwr,v 1.4 1999/02/05 22:47:21 eserte Exp $
+# Author: Slaven Rezic
+#
+# Copyright: see at bottom of file
+#
+# Mail: eserte@cs.tu-berlin.de
+# WWW:  http://user.cs.tu-berlin.de/~eserte/
+#
+
+use Tk;
+use Tk::CmdLine;
+use BikePower;
+
+my $top = new MainWindow;
+$top->withdraw;
+my $bp = new BikePower;
+my %args;
+if ($ENV{LANG} =~ /^de/) {
+    $args{-lang} = 'de';
+}
+my $bp_w = $bp->tk_interface($top, %args);
+bp_destroy($bp_w, $top);
+MainLoop;
+
+sub bp_destroy {
+    my($w, $top) = @_;
+    $w->OnDestroy(sub {
+ 		      foreach (@BikePower::Tk::interfaces) {
+			  # Falls noch ein aktives Widget existiert,
+			  # wird das Programm noch nicht beendet.
+ 			  if (Tk::Exists($_) && $w ne $_) {
+ 			      bp_destroy($_, $top);
+ 			      return;
+ 			  }
+ 		      }
+		      $top->destroy;
+		  });
+}
+
+__END__
+
+=head1 NAME
+
+tkbikepwr - Tk interface for bicycle power-output calculator
+
+=head1 SYNOPSIS
+
+    tkbikepwr
+
+=head1 DESCRIPTION
+
+XXX
+
+=head1 AUTHOR
+
+Slaven Rezic (eserte@cs.tu-berlin.de)
+
+Copyright (c) 1997 Slaven Rezic. All rights reserved.
+This package is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,101 @@
+NAME
+    Benchmark::Forking - About the forking benchmarks distribution
+
+MOTIVATION
+    The standard Benchmark module can sometimes report inaccurate or
+    misleading results, in part because it doesn't isolate its test cases
+    from one another. This means that the order that cases are run in can
+    influence the results, because side effects, either obvious or obscure,
+    can accumulate and affect later tests.
+
+    Data in global variables is an obvious source of side effects; in the
+    below example, the grep takes longer as more items are pushed onto the
+    array, so the test functions that run later will be reported by
+    Benchmark as being slower, despite their code being identical:
+
+      cmpthese( 1000, {
+        "test_1" => sub { push @global, scalar grep 1, @global },
+        "test_2" => sub { push @global, scalar grep 1, @global },
+        "test_3" => sub { push @global, scalar grep 1, @global },
+      } );
+
+    More cryptic sources of side effects can include cache priming,
+    idiosyncrasies of the underlying Perl implementation, or the state of
+    the operating system and environment. For example, if the code to be
+    benchmarked require a lot of in-process RAM, earlier tests may be slowed
+    down by having to allocate the memory the first time, or later tests may
+    be slowed down by having to pick through the heap looking for free
+    space. These effects are difficult to predict and can be laborious to
+    identify and compensate for.
+
+    This module provides a solution to most aspects of this problem. Once
+    you use Benchmark::Forking, the example benchmark above will report the
+    correct conclusion that the three identical tests run at approximately
+    the same speed.
+
+VERSION
+    This is version 1.00 of Benchmark::Forking.
+
+INSTALLATION
+    This module should work with any version of Perl 5, without platform
+    dependencies or additional modules beyond the core distribution.
+
+    You should be able to install this module using the CPAN shell
+    interface:
+
+      perl −MCPAN −e 'install Benchmark::Forking'
+
+    Alternately, you may retrieve this package from CPAN
+    ("http://search.cpan.org/~evo/") and follow the normal procedure to
+    unpack and install it, using the commands shown below or their local
+    equivalents on your system:
+
+      tar xzf Benchmark−Forking−*.tar.gz
+      cd Benchmark−Forking−*
+      perl Makefile.PL
+      make test && sudo make install
+
+SUPPORT
+    Once installed, this module’s documentation is available as a manual
+    page via "perldoc Benchmark::Forking" or on CPAN sites such as
+    "http://search.cpan.org/dist/Benchmark−Forking".
+
+    If you have questions or feedback about this module, please feel free
+    to contact the author at the below address. Although there is no formal
+    support program, I do attempt to answer email promptly.
+
+    Bug reports that contain a failing test case are greatly appreciated,
+    and suggested patches will be promptly considered for inclusion in
+    future releases.
+
+    To report bugs via the CPAN web tracking system, go to
+    "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Benchmark−Forking" or send
+    mail to "Dist=Benchmark−Forking#rt.cpan.org", replacing "#" with "@".
+
+    If you’ve found this module useful or have feedback about your
+    experience with it, consider sharing your opinion with other Perl users
+    by posting your comment to CPAN’s ratings system
+    ("http://cpanratings.perl.org/rate/?distribution=Benchmark−Forking").
+
+    For more general discussion, you may wish to post a message on
+    PerlMonks ("http://perlmonks.org/?node=Seekers%20of%20Perl%20Wisdom")
+    or on the comp.lang.perl.misc newsgroup
+    ("http://groups.google.com/group/comp.lang.perl.misc/topics").
+
+AUTHOR
+    Developed by Matthew Simon Cavalletto.  You may contact the author
+    directly at "evo@cpan.org" or "simonm@cavalletto.org".
+
+    Inspired by a discussion with Jim Keenan in the Perl Monks community.
+
+    My thanks also to other members of the Perl Monks community for
+    feedback on this module, including graff, tachyon, Aristotle,
+    pbeckingham, and others. http://perlmonks.org/?node_id=388481
+
+LICENSE
+    Copyright 2010, 2004 Matthew Simon Cavalletto.
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
+
+    See http://dev.perl.org/licenses/ for more information.

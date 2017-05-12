@@ -1,0 +1,63 @@
+MANIFEST			This list of files
+META.yml			Machine-readable package information
+LICENSE				Copyright terms
+README				Introduction
+Changes				Revision history
+Build.PL			Build script
+Makefile.PL			Backward compatible build script
+bbtest
+lib/BBCode/Util.pm
+lib/BBCode/TagSet.pm
+lib/BBCode/Parser.pm
+lib/BBCode/Tag.pm
+lib/BBCode/Body.pm
+lib/BBCode/Tag/ABBR.pm
+lib/BBCode/Tag/ACRONYM.pm
+lib/BBCode/Tag/Block.pm
+lib/BBCode/Tag/B.pm
+lib/BBCode/Tag/BR.pm
+lib/BBCode/Tag/CODE.pm
+lib/BBCode/Tag/COLOR.pm
+lib/BBCode/Tag/EMAIL.pm
+lib/BBCode/Tag/ENT.pm
+lib/BBCode/Tag/FONT.pm
+lib/BBCode/Tag/HIDDEN.pm
+lib/BBCode/Tag/HR.pm
+lib/BBCode/Tag/HTML.pm
+lib/BBCode/Tag/IMG.pm
+lib/BBCode/Tag/Inline.pm
+lib/BBCode/Tag/I.pm
+lib/BBCode/Tag/LI.pm
+lib/BBCode/Tag/LIST.pm
+lib/BBCode/Tag/OL.pm
+lib/BBCode/Tag/Q.pm
+lib/BBCode/Tag/QUOTE.pm
+lib/BBCode/Tag/Simple.pm
+lib/BBCode/Tag/SIZE.pm
+lib/BBCode/Tag/S.pm
+lib/BBCode/Tag/SUB.pm
+lib/BBCode/Tag/SUP.pm
+lib/BBCode/Tag/TEXT.pm
+lib/BBCode/Tag/TT.pm
+lib/BBCode/Tag/UL.pm
+lib/BBCode/Tag/U.pm
+lib/BBCode/Tag/URL.pm
+lib/BBCode/Tag/xEMAIL.pm
+lib/BBCode/Tag/xIMG.pm
+lib/BBCode/Tag/xURL.pm
+t/common.ph
+t/00-util.t
+t/05-basic.t
+t/10-inline.t
+t/20-block.t
+t/30-raw.t
+t/35-link.t
+t/40-stress.t
+extra/find-project-files.pl
+extra/future-css3.diff
+extra/greek-list.bbc
+extra/basic-style.css
+extra/show-pod-cover.pl
+t/xx-pod-coverage.t
+t/xx-pod.t
+SIGNATURE    Added here by Module::Build

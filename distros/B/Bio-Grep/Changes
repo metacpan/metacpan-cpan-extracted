@@ -1,0 +1,237 @@
+Revision history for Perl extension Bio::Grep.
+
+0.10.6  Thu Nov  12 18:00:00 2009
+    - Perl::Tidy 20090616 passes
+    - Added Test::NoWarnings to tests
+    - Build dist benchmarks more automated, support for new Sys::Info
+    - Agrep back-end: check if agrep is TRE in search(), not new()
+    - use autodie instead of Fatal
+    - Bugfixes: Fix Warning with Bioperl 1.6.1 (thanks Jeremy)
+
+0.10.5  Sat Jul  26 13:00:00 2008
+    - META.yml broken 
+    - small cleanup in Vmatch back-end
+    - RE backend: switched to $+ and $- to retrieve the positions. 
+
+0.10.4  Fri Jul  25 17:53:00 2008
+    - New Perl::Critic passes
+    - added Bio:Perl dependencies
+    - Bugfix: -blanks in dirnames allowed (thanks Jamie)
+
+0.10.3  Sun Apr  17 12:01:00 2008
+    - code cleanup:
+        * perlcritic severity 1
+    - Bugfix: RNA databases allowed
+        
+0.10.2  Sun Sep  23 16:08:00 2007
+    - code cleanup:
+        * renamed test data files
+        * perlcritic
+        * renamed FilterI->reset to FilterI->reset_filter
+          because reset is a buildin function
+        * renamed SearchSettings->set to SearchSettings->set_attributes
+          cause set is an ambigious name
+    - more tests:
+        * features.updownstream (more or less moved from guugle/RE specific
+          tests)
+    - New Features:
+        * upstream / downstream in SearchResult
+        * reverse_complement in SearchResult
+    - Bugfixes:
+        * Vmatch: $res->sequence undef when available downstream region
+                  to small
+
+0.10.1  Mon Sep  10 11:54:00 2007
+    - Minor POD improvements
+    - Benchmarks: 
+       * generated with Template::Toolkit
+       * added vmatch -online
+       * ./Build dist asks whether benchmarks should be created
+
+0.10.0  Tue Aug  21 17:00:00 2007
+    - POD improvements:
+        * methods now grouped in CONSTRUCTOR, ACCESSORS/MUTATORS, PACKAGE
+          METHODS, INTERNAL METHODS, ABSTRACT METHODS
+        * notes now under IMPORTANT NOTES, not DESCRIPTION  
+    - code cleanup:
+        * standard testfile "header" now in BioGrepTest, requires ToolSet
+    - more tests:
+        * features.alignments
+    - New Features:
+        * Bio::Seq objects as query 
+    - Bugfixes:
+        - bgrep not installed witch Build.PL
+        - Added Bioperl dependency (ticket #28881, thanks siddhartha)
+        - $res->query, $res->alignments not equal in back-ends
+          now, '(reverse complement)' is added to $query->desc  
+
+0.9.2  Fri Aug  17 12:33:00 2007
+    - POD improvements
+    - huge performance improvements (RE, Agrep)
+    - support for TRE agrep
+    - skip EMBOSS alignment calculation when hits can't have gaps
+    - idsonly option in bgrep
+    - better exception texts
+    - sequence description in RE results
+    - benchmarks
+    
+0.9.1  Tue Aug  15 16:10:00 2007
+    - POD improvements
+    - current directory default datapath (thanks Rick)
+    - removed index from *.map files
+      (you need to rebuild Agrep/RE dbs!)
+    - add -pl option in generate_database (prefix_length)
+    - skipping databases generation when database with that
+      name already exists 
+    - code cleanup: 
+         - SearchResult->new wants a hashref as argument
+         - RE.pm
+         - perltidy
+    - tests check warnings
+    - more tests (especially GUUGle and RE)
+    - maxhits for RE
+    - Bugfixes
+        - RE pretended to have mismatches feature
+    
+0.9.0  Mon Aug  08 18:05:00 2007
+    - POD improvements
+    - generate_database now wants a hashref as argument,
+      symlinks fasta file per default, not copies (closes ticket #28691,
+      thanks Rick),
+      in theory, not only fasta files supported
+      Vmatch: non-verbose call of mkvtree. Closes ticket #28720 (thanks Rick)   
+    - $sbe->results now throws an deprecated warning 
+    - removed HyPa back-end. seems to be a dead project and vmatch covered
+      most features
+    - Bugfixes
+        - tests did not rm temporary directories
+
+0.8.5  Mon Aug  06 13:41:00 2007
+    - POD improvements 
+    - Bugfixes:
+       - SYNOPSIS test failed when Vmatch binary not in path. Closes ticket
+         #28656 (thanks Malcolm)
+       - arrays not possible with SearchSettings->set (and therefore also not in
+         $sbe->search)
+
+0.8.4  Fri Aug  03 14:37:00 2007
+    - POD improvements 
+    - code cleanup
+    - RE back-end much faster
+
+0.8.3  Thu Aug  02 20:00:00 2007
+    - POD improvements 
+    - dynamically loaded back-ends
+    - check arguments of $sbe->get_sequences
+    - more tests
+    - Bio::Grep now returns a back-end object.
+    - Bugfixes:
+        - GUUGle back-end confused when sequence description missing
+          with up-/downstream regions
+
+0.8.2  Tue Jul  31 16:11:00 2007
+    - POD improvements 
+    - more tests
+    - code cleanup (Bio::Grep::Root)
+    
+0.8.1  Tue Jul  31 16:11:00 2007
+    - POD improvements 
+    - code cleanup
+    - Cookbook
+    - removed directory Container (unnecessary and confusing)
+    - Error messages more consistent
+    - more tests
+    
+0.8.0  Mon Jul  30 19:20:00 2007
+    - POD improvements
+    - direct_and_rev_com
+    - RE back-end
+    - use Fatal qw(open close), removed own exception handling
+    - replaced global dirhandle in BackendI with local dirhandle
+    - more tests
+    - renamed generate_database_out_of_fastafile() to
+      generate_database()
+    - renamed Backends/ to Backend  
+    - Bugfixes:
+        - GUUGle back-end confused when sequence description missing
+
+0.7.0  Tue Jul  24 16:55:00 2007
+    - POD improvements:
+       * added section exception handling in Bio::Grep
+       * removed exception handling in the back-ends
+         SYNOPSIS
+       * polishing 
+    - Bugfixes:
+       * Agrep back-end: called two times 
+
+0.6.0  Tue Mar  27 14:09:10 2007
+    - POD improvements
+    - BackendI code cleanups 
+    - renamed feature QUERYFILE to QUERY_FILE
+    - did not throw an exception when query and query_file
+      are set
+    - more tests
+    - removed $res->get_gene_id and $res->alignment_to_csv
+    
+0.5.0  Sat Mar  23 17:34:20 2007
+    - POD improvements
+    - different values for upstream and downstream in GUUGle
+    - did not throw an exception when alphabet file was missing
+    - database generation in bgrep broken
+    - more tests
+
+0.4.0  Fri Mar  23 15:59:00 2007
+    - hxdrop, exdrop flags for vmatch
+    - more tests
+    - POD improvements
+    - long queries in vmatch broken
+
+0.3.0  Thu Mar  12 15:49:19 2007
+    - POD improvements
+    - Filter broken with GUUGle
+    - more tests
+
+0.2.0  Thu Mar  11 15:16:39 2007
+    - POD improvements
+    - small bgrep improvements
+    - more tests
+    - GUUGle: upstream/downstream with query_file broken
+
+0.1.0  Thu Mar  09 18:58:09 2007
+    - POD improvements
+    - more tests
+    - small bgrep improvements
+    - upstream and downstream in GUUGle broken
+    - maxhits in GUUGle broken
+    - test searches for EMBOSS
+
+0.0.4  Thu Mar  08 21:34:17 2007
+    - forgot to include perlcritic test and 00.checkprereq
+    - POD improvements
+    - Cleanup: removed unnecessary use lines
+    - switched to Data::Dumper for settings->to_string()
+    - more tests
+    - Vmatch did not calculate query_length if complete(0)
+    - GUUGle: reverse_complement was switched (revcom(1) was revcom(0)
+      and vice versa).
+    - Agrep: did not store $res->query  
+    
+0.0.3  Wed Mar  07 15:13:26 2007
+    - POD improvements
+    - more tests (Devel::Cover)
+    - Vmatch now throws an exception if showdesc + upstream instead of
+      just a warning
+    - skip tests if bioperl and/or bioperl-run is not found  
+    
+0.0.2  Thu Mar  06 01:03:43 2007
+   - POD improvements
+   - bgrep did not accept -man and -help
+   
+0.0.1  Thu Mar  05 15:26:11 2007
+   first public release on cpan
+   - renamed to Bio::Grep (from Weigel::Search)
+   - added backend GUUGle
+   - added bgrep
+   - POD improvements
+   - renamed querylength to query_length
+   - added feature to specify settings in search call

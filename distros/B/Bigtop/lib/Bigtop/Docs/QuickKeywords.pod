@@ -1,0 +1,184 @@
+=head1 NAME
+
+Bigtop::Docs::QuickKeywords - Short descriptions of all Bigtop keywords
+
+=head1 Intro
+
+This document is generated from C<Bigtop::Docs::Keywords>.  It is designed
+to be compact.  See C<Bigtop::Docs::FullKeywords> for more details.
+See C<Bigtop::Docs::TOC> for an annotated list of all doc files.
+
+ config {}
+    engine - mod_perl 1.3, mod_perl 2.0, CGI, etc.
+    template_engine - Template Toolkit, Mason, etc.
+    plugins - List of Plugins i.e. AuthCookie Static
+    Example Backend Block:
+        SQL SQLite {}
+    See Bigtop::Docs::Backends for the backends whose blocks can go here.
+
+ app name {}
+    no_gen - Skip this app completely
+    location - Base Location of the app [defaults to /]
+               Do not use if you have a Base Controller.
+    authors - Who to blame for the app
+    contact_us - How to send complaints or join the project
+    copyright_holder - Who owns the app [defaults to 1st author]
+    license_text - Restrictions [defaults to Perl license]
+    uses - List of modules used by base module
+           Do not use if you have a Base Controller.
+    label - Documentation label for app
+
+    config {}
+        any_keyword its_value;    - creates:
+            (1) config variable value pair in Gantry::Conf (or moral equiv.)
+            (2) a statement to retrieve the set var in the base init method,
+            (3) an accessor in the base module
+        OR
+        key value => no_accessor; - just does #1 from above
+
+    literal Conf `...`; - top level of Gantry::Conf file
+    literal PerlTop `...`; - immediately after shebang line in httpd.conf
+                             <Perl> block and in the CGI scripts
+    literal PerlBlock `...`; - in the httpd.conf <Perl> block (in order
+                               with controllers)
+    literal HttpdConf `...`; - between location directives in httpd.conf
+    literal Location `...`; - in the base Location directive for the app
+    literal SQL `...`; - dumped directly into all schemas
+
+  table name {}
+    no_gen - Skip this table completely
+    not_for - Tell Model and/or SQL to skip this table
+    foreign_display - Pattern string for other tables: %last, %first
+    refered_to_by - Table has many rows from this other table
+    model_base_class - Models inherit from this [has good default]
+    sequence - Which sequence to take default keys from
+    label - Documentation label for table
+    data - What to INSERT INTO table upon initial creation
+    field name {}
+      no_gen - Skip this field completely
+      not_for - Tell Model and/or SQL to skip this field
+      is - SQL type clause phrases, e.g.:int4, varchar, primary_key, auto
+      accessor - DBIx::Class alternate accessor name for this column
+      add_columns - DBIx::Class alternate column addition
+      refers_to - Where this foreign key points
+      quasi_refers_to - Where this column usually points
+      on_delete - What to do when foreign key column's row dies
+      on_update - What to do when foreign key column's row changes
+      label - Default on-screen label for field
+      searchable - Include this field in searches?
+      html_form_type - form type: text, textarea, select
+      html_form_optional - May user skip this field?
+      html_form_constraint - Data::FormValidator constraint, e.g.: qr{^\d$}
+      html_form_default_value - Form element value when no other is available
+      html_form_cols - cols attribute of text area
+      html_form_rows - rows attribute of text area
+      html_form_display_size - width attribute if type is text
+      html_form_class - class attribute for the form field
+      html_form_hint - form field hint
+      html_form_options - Choices for fields of type select 
+                          [ignored for refers_to fields]
+      html_form_foreign - Display field is a foreign key
+      html_form_onchange - Name of Javascript function to call on change
+      html_form_fieldset - Name of fieldset to group this field into
+      date_select_text - link text for date popup window
+      html_form_raw_html - appears before this field's table row
+      non_essential - Tells modeler: retrieve only when accessed
+      pseudo_value - This is the definition for a pseudo field. By defining it, you're declaring the field as a pseudo field
+      unique_name - Declare this field as unique, and use the value for the constraint name
+
+  join_table name {}
+    joins - Which tables does this one join?
+    names - What should I call each has many?
+    data - What to INSERT INTO table upon initial creation
+    fields as for regular tables
+
+  controller name is [type] {}  type defaults to stub
+    no_gen - Skip this controller completely
+    location - Absolute Location of this controller [non-base controllers
+               must have either a location or a rel_location.]
+    rel_location - Location of this controller relative to app location
+                   [non-base controllers must have location or rel_location.]
+    controls_table - Table this controller manages
+    gen_uses - List of modules used in gen module
+               use list ex: qw( :default )
+    stub_uses - List of modules used in stub module
+    uses - List of modules used by gen and stub modules
+    plugins - List of plugins used by gen module
+    text_description - Required for Gantry's AutoCRUD
+    page_link_label - Link text in navigation bar
+                      [use only for navigable controllers]
+    autocrud_helper - Gantry::Plugins::AutoCRUDHelper for your ORM
+    skip_test - Skip default page hit test of this controller
+    soap_name - Base of all WSDL names
+    namespace_base - Base URL of WSDL namespace including domain
+    config [name] {} same as at app level, but overrides it for one controller
+    literal Location `...`; - in Location block for this controller
+    literal GantryLocation `...`; - in GantryLocation block for this controller
+
+    There are three types with meaning (saying 'is stub' does nothing):
+        AutoCRUD - adds Gantry::Plugins::AutoCRUD to your uses list
+        CRUD     - adds Gantry::Plugins::CRUD to your uses list
+                   generates various helper code for using CRUD in the stub
+        base_controller - governs the app's main module (and its GEN partner)
+
+    method name is type {}
+    Types:
+      all
+        no_gen - Skip this method completely
+      all but SOAP
+        extra_args - Extra args for any method
+      main listing
+        order_by - Exact text of SQL order by
+        rows - How many rows should appear per listing page?
+        paged_conf - Take rows per page from this (conf var) accessor
+        cols - Fields to include in main_listing
+        col_labels - Labels for fields on main_listing
+                     [optional default uses field labels]
+        pseudo_cols - Pseudo Fields to include in main_listing
+        livesearch - Places a search box on results page
+        header_options - User actions affecting the table [like Add]
+        header_option_perms - The table permission which controls options
+                              Pick from create, retrieve, update, or delete
+        row_options - User actions affecting rows [like Edit]
+                      Locations should not end with / or 
+                      include $id
+        row_option_perms - The table permission which controls options
+                           Pick from create, retrieve, update, or delete
+        limit_by - If an arg is supplied, show only matching rows
+        where_terms - Where clause will include these equality tests
+      main listing and links
+        title - Browser title bar title for main_listing
+        html_template - Template to use for main_listing
+                        [defaults to results.tt or main.tt]
+      hashref
+        authed_methods - Controller methods that require auth
+        permissions - Set table permissions e.g. crudcr--cr--
+        literal - Supply a custom perl hashref
+      form
+        all_fields_but - Fields to exclude from a form
+                         [either all_fields_but or fields is REQUIRED]
+        fields - Fields to include on a form
+                 [either all_fields_but or fields is REQUIRED]
+        extra_keys - Extra keys to put in the form method hash
+        form_name - Form name [used with date selections]
+      SOAP
+        expects - Things your SOAP method receives
+        returns - Things your SOAP method returns
+
+=head1 AUTHOR
+
+The skip/keywords script generated this file Sat Jul 10 17:04:08 2010.
+The script was written by Phil Crow E<lt>crow.phil@gmail.comE<gt>.
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2007 by Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+But keep in mind that it was generated.  Make modifications to the
+generting script.
+
+=cut

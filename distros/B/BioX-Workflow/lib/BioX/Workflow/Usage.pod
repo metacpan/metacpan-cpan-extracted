@@ -1,0 +1,541 @@
+=head1 Name
+
+BioX::Workflow::Usage
+
+=head1 BioX::Workflow::Usage
+
+    biox-workflow.pl --workflow /path/to/workflow.yml
+
+=encoding utf8
+
+=head1 Introduction
+
+Most bioinformatics workflows involve starting with a set of samples, and
+processing those samples in one or more steps. Also, most bioinformatics
+workflows are bash based, and no one wants to reinvent the wheel to rewrite
+their code in perl/python/whatever.
+
+These docs are also available at L<http://jerowe.github.io/BioX-Workflow-Docs/showcase.html>
+
+Once you have your configuration all set, to process your entire workflow run
+
+ biox-workflow.pl --workflow workflow.yml > workflow.sh
+
+Alternately, to select an exact rule
+
+ biox-workflow.pl --workflow workflow.yml --select_rules bowtie2 > rule1.sh
+
+To match a set of rules using a regexp
+
+    #Matches all rules that contain 'gatk', including 'gatk_realign_indels', or 'rule_gatk'
+    biox-workflow.pl --workflow workflow.yml --match_rules gatk > gatk.sh
+
+    #Match only those rules beginning with gatk
+    biox-workflow.pl --workflow workflow.yml --match_rules "^gatk" > gatk.sh
+
+
+=head1 InDepth
+
+
+=head2 Samples
+
+For example with our samples test1.vcf and test2.vcf, we want to bgzip and
+annotate using snpeff, and then parse the output using vcf-to-table.pl
+(shameless plug for L<BioX::Wrapper::Annovar>).
+
+L<BioX::Workflow> assumes your have a set of inputs, known as samples,
+and these inputs will carry on through your pipeline. There are some exceptions
+to this, which we will explore with the resample option.
+
+BioX::Workflow also assumes your samples are files or directories. B<They may also
+be people, frogs, or cells, but first and foremost they are files.>
+
+
+=head2 Structure
+
+It also makes several assumptions about your output structure. It assumes you
+have each of your processes/rules outputting to a distinct directory. Each of
+the assumptions BioX::Workflow makes can be overridden either globally or
+locally. These directories will be created and automatically named based on your process
+name.
+
+It also assumes the indir of each rule is the outdir of the previous rule.
+
+
+=head2 All the things can be modified!
+
+All the variables can be modified from their defaults in order to enable custom
+control of your workflow.
+
+=head1 Let's Find Some Samples
+
+Possibly the most important part of your workflow is finding samples.
+
+Samples, like variables, come in two flavors. They are files, or they are
+directories. The first shows files, and the second directories.
+
+
+=head1 Examples!
+
+
+=head2 Samples are Files
+
+
+=head3 Directory Structure
+
+Samples are files with the sample name and a .csv extension.
+
+ bash
+     /home/user/workflow/
+         /data
+             /raw
+                 sample1.csv
+                 sample2.csv
+
+
+
+=head3 Workflow Configuration
+
+ yaml
+     ---
+     global:
+         - indir: /home/user/workflow/data/raw
+         - outdir: /home/user/workflow/data/analysis
+         - file_rule: (sample.*).csv$
+
+
+
+=head2 Samples are Directories
+
+This time the sample names come from a directory, with stuff inside.
+
+
+=head3 Directory Structure
+
+ yaml
+     /path/to/indir
+         /sample1
+             billions_of_small_files
+             from_the_Sequencer
+         /sample2
+             billions_of_small_files
+             from_the_Sequencer
+
+
+
+=head3 Workflow Configuration
+
+ yaml
+     ---
+     global:
+         - indir: /home/user/workflow/data/raw
+         - outdir: /home/user/workflow/data/analysis
+         - file_rule: (sample.*)
+         - find_by_dir: 1
+         - by_sample_outdir: 1
+
+=encoding utf8
+
+
+=head1 Workflow
+
+Your workflow is a set of rules and conditions. Conditions come in two flavors,
+local and global. Local variables are local to a rule, and go away after that
+rule has been processed, while global live throughout each rule iteration.
+
+=head2 Local and Global Variables
+
+Global variables will always be available, but can be overwritten by local
+variables contained in your rules.
+
+    ---
+    global:
+        - indir: /home/user/example-workflow
+        - outdir: /home/user/example-workflow/gemini-wrapper
+        - file_rule: (.vcf)$|(.vcf.gz)$
+        - some_variable: {$self->indir}/file_to_keep_handy
+        - ext: txt
+    rules:
+        - backup:
+            local:
+                - ext: "backup"
+            process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.{$self->ext}.csv
+        - rule2:
+            process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.{$self->ext}.csv
+
+=head2 Rules
+
+Rules are processed in the order they appear.
+
+Before any rules are processed, first the samples are found. These are grepped using File::Basename, the indir, and the file_rule variable. The
+default is to get rid of the everything after the final '.' .
+
+=cut
+
+=head2 Overriding Processes
+
+By default your process is evaluated as
+
+    foreach my $sample (@{$self->samples}){
+        #Get the value from the process key.
+    }
+
+If instead you would like to use the infiles, or some other random process that has nothing to do with your samples, you can override the process
+template. Make sure to use the previously defined $OUT. For more information see the L<Text::Template> man page.
+
+    rules:
+        - backup:
+            outdir: {$self->ROOT}/datafiles
+            override_process: 1
+            process: |
+                $OUT .= wget {$self->some_globally_defined_parameter}
+                {
+                foreach my $infile (@{$self->infiles}){
+                    $OUT .= "dostuff $infile";
+                }
+                }
+
+
+
+=encoding utf8
+
+
+=head1 Customizing your output and special variables
+
+BioX::Workflow uses a few conventions and special variables. As you
+probably noticed these are indir, outdir, infiles, and file_rule. In addition
+sample is the currently scoped sample. Infiles is not used by default, but is
+simply a store of all the original samples found when the script is first run,
+before any processes. In the above example the $self->infiles would evaluate as
+['test1.csv', 'test2.csv'].
+
+Variables are interpolated using L<Interpolation|https://metacpan.org/pod/Interpolation> and L<Text::Template|https://metacpan.org/pod/Text::Template>. All
+variables, unless explictly defined with "$my variable = "stuff"" in your
+process key, must be referenced with $self, and surrounded with brackets {}.
+Instead of $self->outdir, it should be {$self->outdir}. It is also possible to
+define variables with other variables in this way. Everything is referenced
+with $self in order to dynamically pass variables to Text::Template. The sample
+variable, $sample, is the exception because it is defined in the loop. In
+addition you can create INPUT/OUTPUT variables to clean up your process
+code. These are special variables that are also used in Drake. Please see L<BioX::Workflow::Plugin::Drake|https://metacpan.org/pod/BioX::Workflow::Plugin::Drake>
+for more details.
+
+ yaml
+     ---
+     global:
+         - ROOT: /home/user/workflow
+         - indir: {$self->ROOT}
+         - outdir: {$self->indir}/output
+     rules:
+         - backup:
+             local:
+                 - INPUT: {$self->indir}/{$sample}.in
+                 - OUTPUT: {$self->outdir}/{$sample}.out
+
+=encoding utf8
+
+
+=head1 Example001
+
+Here is a very simple example that searches a directory for *.csv files and creates an outdir /home/user/workflow/output if one doesn't exist.
+
+Create the /home/user/workflow/workflow.yml
+
+
+=head3 workflow.yml
+
+ yaml
+     ---
+     global:
+         - indir: /home/user/workflow
+         - outdir: /home/user/workflow/output
+         - file_rule: (.*).csv
+     rules:
+         - rule1:
+             process: |
+             Rule1
+             INDIR: {$self->indir}
+             OUTDIR: {$self->outdir}
+         - rule2:
+             process: |
+             Rule2
+             INDIR: {$self->indir}
+             OUTDIR: {$self->outdir}
+         - rule3:
+             process: |
+             Rule3
+             INDIR: {$self->indir}
+             OUTDIR: {$self->outdir}
+
+
+Run the script to create out directory structure and workflow bash script
+
+ bash
+     biox-workflow.pl --workflow workflow.yml > workflow.sh
+
+
+
+=head3 The Structure
+
+    /home/user/workflow/
+        test1.csv
+        test2.csv
+        /output
+            /rule1
+            /rule2
+            /rule3
+
+=encoding utf8
+
+
+=head1 Example002
+
+Here is a very simple example that searches a directory for *.csv files and creates an outdir /home/user/workflow/output if one doesn't exist.
+
+Create the /home/user/workflow/workflow.yml
+
+ yaml
+     ---
+     global:
+         - indir: /home/user/workflow/workflow
+         - outdir: /home/user/workflow/workflow/output
+         - file_rule: (.*).csv$
+     rules:
+         - backup:
+             process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.csv
+         - grep_VARA:
+             process: |
+                 echo "Working on {$self->{indir}}/{$sample.csv}"
+                 grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv
+         - grep_VARB:
+             process: |
+                 grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv
+
+
+Make some test data
+
+```yaml
+    cd /home/user/workflow
+
+    #Create test1.csv with some lines
+    echo "This is VARA" >> test1.csv
+    echo "This is VARB" >> test1.csv
+    echo "This is VARC" >> test1.csv
+    
+    #Create test2.csv with some lines
+    echo "This is VARA" >> test2.csv
+    echo "This is VARB" >> test2.csv
+    echo "This is VARC" >> test2.csv
+    echo "This is some data I don't want" >> test2.csv
+
+```
+
+Run the script to create out directory structure and workflow bash script
+
+ bash
+     biox-workflow.pl --workflow workflow.yml > workflow.sh
+
+
+
+=head2 Look at the directory structure
+
+    /home/user/workflow/
+        test1.csv
+        test2.csv
+        /output
+            /backup
+            /grep_vara
+            /grep_varb
+
+
+=head2 Run the workflow
+
+Assuming you saved your output to workflow.sh if you run ./workflow.sh you will get the following.
+
+ yaml
+     /home/user/workflow/
+         test1.csv
+         test2.csv
+         /output
+             /backup
+                 test1.csv
+                 test2.csv
+             /grep_vara
+                 test1.grep_VARA.csv
+                 test2.grep_VARA.csv
+             /grep_varb
+                 test1.grep_VARA.grep_VARB.csv
+                 test2.grep_VARA.grep_VARB.csv
+
+
+
+=head2 A closer look at workflow.sh
+
+This top part here is the metadata. It tells you the options used to run the script.
+
+ bash
+     #
+     # This file was generated with the following options
+     #   --workflow      workflow.yml
+     #
+
+
+If --verbose is enabled, and it is by default, you'll see some variables printed out for your benefit
+
+ bash
+     #
+     # Variables
+     # Indir: /home/user/workflow
+     # Outdir: /home/user/workflow/output/backup
+     # Samples: test1    test2
+     #
+
+
+Here is out first rule, named backup. As you can see our $self->outdir is automatically named 'backup', relative to the globally defined outdir.
+
+```bash
+    #
+    # Starting backup
+    #
+
+    cp /home/user/workflow/test1.csv /home/user/workflow/output/backup/test1.csv
+    cp /home/user/workflow/test2.csv /home/user/workflow/output/backup/test2.csv
+    
+    wait
+    
+    #
+    # Ending backup
+    #
+
+```
+
+Notice the 'wait' command. If running your outputted workflow through any of the HPC::Runner scripts, the wait signals to wait until all previous processes have ended before beginning the next one.
+
+Basically, wait builds a linear dependency tree.
+
+For instance, if running this as
+
+    slurmrunner.pl --infile workflow.sh
+    #OR
+    mcerunner.pl --infile workflow.sh
+
+The "cp blahblahblah" commands would run in parallel, and the next rule would not begin until those processes have finished.
+
+=encoding utf8
+
+
+=head1 Example003
+
+Here is a very simple example that searches a directory for *.csv files and creates an outdir /home/user/workflow/output if one doesn't exist.
+
+In addition, it searches for samples by directory, and each outdir as
+{$sample}/rule
+
+Create the /home/user/workflow/workflow.yml
+
+ yaml
+     ---
+     global:
+         - indir: /home/user/workflow/workflow/input
+         - outdir: /home/user/workflow/workflow/output
+         - file_rule: (.*)
+         - find_by_dir: 1
+         - by_sample_outdir: 1
+     rules:
+         - backup:
+             process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.csv
+         - grep_VARA:
+             process: |
+                 echo "Working on {$self->{indir}}/{$sample.csv}"
+                 grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv
+         - grep_VARB:
+             process: |
+                 grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv
+
+
+Make some test data
+
+```yaml
+    cd /home/user/workflow/input
+    mkdir test1
+    mkdir test2
+
+    #Create test1.csv with some lines
+    echo "This is VARA" >> test1/test1.csv
+    echo "This is VARB" >> test1/test1.csv
+    echo "This is VARC" >> test1/test1.csv
+    
+    #Create test2.csv with some lines
+    echo "This is VARA" >> test2/test2.csv
+    echo "This is VARB" >> test2/test2.csv
+    echo "This is VARC" >> test2/test2.csv
+    echo "This is some data I don't want" >> test2/test2.csv
+
+```
+
+Run the script to create out directory structure and workflow bash script
+
+ bash
+     biox-workflow.pl --workflow workflow.yml > workflow.sh
+
+
+
+=head2 Look at the directory structure
+
+ bash
+     /home/user/workflow/input
+         test1/test1.csv
+         test2/test2.csv
+         /output
+             /test1
+                 /backup
+                 /grep_vara
+                 /grep_varb
+             /test2
+                 /backup
+                 /grep_vara
+                 /grep_varb
+
+
+
+=head2 Run the workflow
+
+Assuming you saved your output to workflow.sh if you run ./workflow.sh you will get the following.
+
+ yaml
+     /home/user/workflow/input
+         test1/test1.csv
+         test2/test2.csv
+         /output
+             /test1
+                 /backup
+                     test1.csv
+                 /grep_vara
+                     test1.grep_VARA.csv
+                 /grep_varb
+                     test1.grep_VARA.grep_VARB.csv
+             /test2
+                 /backup
+                     test2.csv
+                 /grep_vara
+                     test2.grep_VARA.csv
+                 /grep_varb
+                     test2.grep_VARA.grep_VARB.csv
+
+
+=head1 Acknowledgements
+
+Before version 0.03
+
+This module was originally developed at and for Weill Cornell Medical
+College in Qatar within ITS Advanced Computing Team. With approval from
+WCMC-Q, this information was generalized and put on github, for which
+the authors would like to express their gratitude.
+
+As of version 0.03:
+
+This modules continuing development is supported by NYU Abu Dhabi in the Center for Genomics and Systems Biology.
+With approval from NYUAD, this information was generalized and put on github, for which
+the authors would like to express their gratitude.
+
+=cut

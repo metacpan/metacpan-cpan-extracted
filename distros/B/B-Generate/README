@@ -1,0 +1,167 @@
+NAME
+    B::Generate - Create your own op trees.
+
+SYNOPSIS
+        use B::Generate;
+        # Do nothing, slowly.
+        CHECK {
+            my $null = new B::OP("null",0);
+            my $enter = new B::OP("enter",0);
+            my $cop = new B::COP(0, "hiya", 0);
+            my $leave = new B::LISTOP("leave", 0, $enter, $null);
+            $leave->children(3);
+            $enter->sibling($cop);
+            $enter->next($cop);
+            $cop->sibling($null);
+            $null->next($leave);
+            $cop->next($leave);
+
+            # Tell Perl where to find our tree.
+            B::main_root($leave);
+            B::main_start($enter);
+        }
+
+WARNING
+    This module will create segmentation faults if you don't know how to use
+    it properly. Further warning: sometimes I don't know how to use it
+    properly.
+
+    There are lots of other methods and utility functions, but they are not
+    documented here. This is deliberate, rather than just through laziness.
+    You are expected to have read the Perl and XS sources to this module
+    before attempting to do anything with it.
+
+DESCRIPTION
+    The "B" module allows you to examine the Perl op tree at runtime, in
+    Perl space; it's the basis of the Perl compiler. But what it doesn't let
+    you do is manipulate that op tree: it won't let you create new ops, or
+    modify old ones. Now you can.
+
+    Well, if you're intimately familiar with Perl's internals, you can.
+
+    "B::Generate" turns "B"'s accessor methods into get-set methods. Hence,
+    instead of merely saying
+
+        $op2 = $op->next;
+
+    you can now say
+
+        $op->next($op2);
+
+    to set the next op in the chain. It also adds constructor methods to
+    create new ops. This is where it gets really hairy.
+
+        new B::OP     ( type, flags )
+        new B::UNOP   ( type, flags, first )
+        new B::BINOP  ( type, flags, first, last )
+        new B::LOGOP  ( type, flags, first, other )
+        new B::LISTOP ( type, flags, first, last )
+        new B::SVOP   ( type, flags, sv )
+        new B::COP    ( flags, name, first )
+
+    In all of the above constructors, "type" is either a numeric value
+    representing the op type (62 is the addition operator in certain perl
+    versions, for instance) or the name of the op. ("add")
+
+    Incidentally, if you know about custom ops and have registed them
+    properly with the interpreter, you can create custom ops by name: "new
+    B::OP("mycustomop",0)", or whatever.
+
+    "first", "last" and "other" are ops to be attached to the current op;
+    these should be "B::OP" objects. If you haven't created the ops yet,
+    don't worry; give a false value, and fill them in later:
+
+        $x = new B::UNOP("negate", 0, undef);
+        # ... create some more ops ...
+        $x->first($y);
+
+    In addition, one may create a new "nextstate" operator with
+
+        newstate B::op ( flags, label, op)
+
+    in the same manner as "B::COP::new" - this will also, however, add the
+    "lineseq" op.
+
+    Finally, you can set the main root and the starting op by passing ops to
+    the "B::main_root" and "B::main_start" functions.
+
+    This module can obviously be used for all sorts of fun and
+    optimizational purposes. One example will be in conjuction with source
+    filters; have your source filter parse an input file in a foreign
+    language, create an op tree for it and get Perl to execute it. Then
+    email me and tell me how you did it. And why.
+
+  OTHER METHODS
+    B::SVOP->sv()
+       Returns the SV value instead of the "B::SV" object. For instance:
+
+           $b_sv = $svop->sv;
+           if ($b_sv->sv == 3) {
+               print "SVOP's SV has an IV of 3\n"
+           }
+
+       But to set the SV you need a proper B::SV object.
+
+    $op->dump
+       Runs "Perl_op_dump" on an op; this is roughly equivalent to
+       "B::Debug", but not quite.
+
+    $b_sv->dump
+       Runs "Perl_sv_dump" on an SV; this is exactly equivalent to
+       "Devel::Peek::dump($b_sv->sv)"
+
+    $b_op->linklist
+       Sets the "op_next" pointers in the tree in correct execution order,
+       overwriting the old "next" pointers. You need to do this once you've
+       created an op tree for execution, unless you've carefully threaded it
+       together yourself.
+
+    $b_op->scope
+       Create a surrounding scope for the b_op, "parenthesize" it.
+
+       Creates on OPf_PARENS (already parenthesized by the parser) a full
+       lineseq, enter, b_op, leave sequence.
+
+       Otherwise just scope, b_op.
+
+    B::SVOP->new_svrv ( type, flags, sv )
+       Similar to B::SVOP->new ( type, flags, sv ), it just creates a new
+       SVOP with an attached sv as SvRV to the given sv.
+
+    $cv->NEW_with_start (root, start)
+       Clone the "cv" with new root and start ops. Note that contrary to
+       "cv_clone", the PADLIST and pad index is kept, but the index might
+       point to a different lexical, because the PADLIST indices will be
+       different. See t/new_cv.t.
+
+       Warning: "$cv-"NEW_with_start> is disabled on some strict platforms,
+       like MSWin32. See CPAN RT#28912.
+
+    $b_op->targ ( [ targ] )
+       Get or set the PADOFFSET.
+
+  EXPORT
+    None.
+
+AUTHOR
+    Simon Cozens, "simon@cpan.org" Reini Urban, "rurban@cpan.org"
+
+MAINTAINERS
+    Maintained by Reini Urban.
+
+    This is just a list of people who have submitted patches to the module:
+
+    Josh Jore, Michael Schwern, Jim Cromie, Scott Walters, Reini Urban,
+    Anton Berezin, Dmitry Karasik.
+
+    Maintainership permissions do have: Artur Bergman, Chia-liang Kao, Anton
+    Berezin, Jim Cromie, Joshua ben Jore, Michael G Schwern, Matt S Trout,
+    Reini Urban, Scott Walters.
+
+LICENSE
+    This module is available under the same licences as perl, the Artistic
+    license and the GPL.
+
+SEE ALSO
+    B, perlguts, op.c, perloptree with B::C
+

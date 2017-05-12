@@ -1,0 +1,21 @@
+[% BLOCK display_thread_rec; %]
+<li class="thread" id="m_[% thread.message.id | replace('@','_') %]">
+
+[%- IF thread.message -%]
+        [%- summary_link(thread.message) %] <i>
+        <a href="[% base | remove('/$') %]/date/list/[% thread.message.date.strftime("%Y/%m/%d/") %]">[% thread.message.date.cdate %]</a>
+        </i><br />
+        [%- thread.message.original %]
+[%- ELSE -%]
+        (no message)
+[%- END -%]
+[%- IF thread.child %]
+        <ul class="thread">
+                [%- INCLUDE display_thread_rec thread=thread.child depth=depth+1 -%]
+        </ul>
+[%- END -%]
+</li>
+[%- IF thread.next -%]
+        [% INCLUDE display_thread_rec thread=thread.next %]
+[%- END -%]
+[% END %]

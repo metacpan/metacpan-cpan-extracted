@@ -1,0 +1,10 @@
+[% USE ANSIColor 'color' %]
+[% "CIVIL WAR HISTORY" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% FOREACH wn IN civil_war_names %][% wnname = wn.name %]
+[% "### $wnname" | color 'yellow' %]
+[% w = civil_wars.$wnname %]
+*** Civil War started in [% w.start_date %] ***
+[% FOREACH t IN w.get_turn_tags %][% FOREACH ev IN w.events.$t %] [% IF t != 'START' %][% t %]: [% END %][% ev.text %]
+[% END %][% END %]*** Civil war ended in [% w.end_date %] ***
+[% END %]

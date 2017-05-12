@@ -1,0 +1,56 @@
+Revision history for Perl extension WormBase.
+
+0.027 Mon Jun 20 13:00:00 2005
+  - Maintenance release. Fixed a problem with the WormBase
+    update script that was blocking creation of temporary 
+    directories
+  - Changed the order of steps such that software syncing occurs LAST
+    to avoid breaking the site
+
+0.026 Tues Jun 7 10:38:18 2005
+  - Fixed a long-standing bug with aggressive cache clearing
+  - cleaned up the output during updates	
+
+0.025 Tues Jun 7 08:01:42 2005
+  - Removed dependence on Bio::GMOD::Admin::Monitor
+
+0.024 Sat Jun 4 13:11:15 2005
+  - Fixed a small glitch that was requiring a module not yet built!
+
+0.023 Tues May 31 20:20:02 2005
+  - Added purging of WormBase cache to Update::WormBase and update script
+  - Added Monitor::*: httpd.pm, acedb.pm, blat.pm, mysqld.pm
+  - Added Monitor::WormBase.pm, wrapper around server monitoring for WormBase
+  - Overhauled gmod_update_installation-wormbase.PLS to use an external config
+    file instead of hundreds of options.
+  - Moved the Update, Monitor, and Archive classes to Bio::GMOD::Admin::*
+  - version CGI now uses XML instead of plain text
+  - added some DTDs for version and defaults
+  - New module to interface with the GMOD StandardURLs protocol
+
+0.022 Thur March 16 07:41:02 2005
+  - Added install_util dir to manifest!
+
+0.021 Wed March 16 22:07:12 2005
+  - Adaptor::* objects can now only be initialized online (failures were occuring
+    when Adaptor defaults were out-of-sync with those originating from the CGI.
+  - Added code for monitoring a MOD installation: Monitor.pm, 
+    acedb.pm, mysql.pm, httpd.pm, etc
+  - Added Email.pm for more sophistacated notifications.
+    Can be used for monitoring, updates, etc for more sophisticated 
+    or conditional reporting than just relying on STDOUT from cron.
+  - Update.pm - added method that checks for sufficient disk space 
+    for installs
+  - No longer croaks when trying to download a file that has
+    already been downloaded
+  - Fixed output formatting
+  - Fixed problem in reading installation date of local database
+  - Overhauled Makefile.PL - now installs scripts and CGIs if requested
+
+0.02  Wed Feb 23 07:04:12 2005
+  - Fixed problems when calling subclassed CheckVersions 
+    from within Update.pm
+
+0.01  Wed Aug 11 17:10:40 2004
+  - original version; created by h2xs 1.22 with options -X -n Bio::GMOD
+

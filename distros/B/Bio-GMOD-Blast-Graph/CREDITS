@@ -1,0 +1,14 @@
+The following is a list of people I would like to thank for their help
+in writing the code.
+
+*   Amos Bairoch, SwissProt:  Original idea of a Perl BLAST search page (April 1995)
+*   Mike Cherry, SGD:  Originally setup the BLAST search page in SGD (July 1995)
+*   Christian Rees, SGD: modified BLAST search page to use CGI.pm (July 1999)
+*   John Slenk, SGD:  Originally created the BLAST graphic modules (November 1999)
+*   All SGD staff, SGD: Helped with testing data and made suggestions
+
+-Shuai Weng, September 2003
+
+----------------------
+
+Maintenance taken over by Robert Buels, April 2011.

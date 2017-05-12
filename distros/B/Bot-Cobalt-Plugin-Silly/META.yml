@@ -1,0 +1,32 @@
+---
+abstract: 'Silly Bot::Cobalt plugins'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Cobalt-Plugin-Silly
+requires:
+  Acme::Daily::Fail: '0'
+  Acme::LeetSpeak: '0'
+  Acme::MakeMoneyAtHome: '0'
+  Bone::Easy: '0'
+  Bot::Cobalt: '0'
+  Carp: '0'
+  IRC::Utils: '0'
+  Object::Pluggable::Constants: '0'
+  POE::Filter::LOLCAT: '0'
+  POE::Filter::Line: '0'
+  POE::Filter::Stackable: '0'
+  perl: v5.12.1
+  strictures: '2'
+resources:
+  repository: git://github.com/avenj/bot-cobalt-plugin-silly.git
+version: '0.031002'

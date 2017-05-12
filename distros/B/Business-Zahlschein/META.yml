@@ -1,0 +1,23 @@
+---
+name: Business-Zahlschein
+version: 0.02
+author:
+  - 'Gernot Havranek <havi@cpan.org>'
+abstract: a module for check digit computation
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Business::Zahlschein:
+    file: lib/Business/Zahlschein.pm
+    version: 0.02
+generated_by: Module::Build version 0.350001
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

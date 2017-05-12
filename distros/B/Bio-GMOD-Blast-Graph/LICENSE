@@ -1,0 +1,42 @@
+The BLAST Graphic Viewer package and all associated files are
+
+Copyright (C) 2003 The Board of Trustees of Leland Stanford Junior University
+
+The software is provided under the Artistic License. In particular,
+
+1) If you modify a source file, make a comment in it containing your
+   name and the date.
+2) If you distribute a modified version, you must do it under the
+   Artistic License.
+3) Developers are encouraged but not required to notify the package
+   maintainers at shuai@genome.stanford.edu when they make a useful
+   addition.  It would be nice if significant contributions could be
+   merged into the main distribution.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as perl itself.  See the Artistic License file
+in the main Perl distribution for specific terms and conditions of
+use.  In addition, the following disclaimers apply:
+
+The Board of Trustees of Leland Stanford Junior University makes no
+representations whatsoever as to the SOFTWARE contained herein. It is
+provided "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+By downloading this SOFTWARE, your Institution hereby indemnifies The
+Board of Trustees of Leland Stanford Junior University against any
+loss, claim, damage or liability, of whatsoever kind, which may arise
+from your Institution's respective use, handling or storage of the
+SOFTWARE.
+
+If publications resulting from research using this SOFTWARE, we ask
+that the Saccharomyces Genome Database (SGD), Stanford University be
+acknowledged and/or credit be given to SGD Team, as scientifically
+appropriate.
+
+

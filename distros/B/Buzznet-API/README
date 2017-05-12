@@ -1,0 +1,51 @@
+Buzznet-API version 0.01
+========================
+
+Buzznet.com is a vibrant photo-sharing community. The site features an 
+easy-to-use interface and powerful tools to create your own photoblog and start
+sharing your photos with your friends and meet friends from around the world
+
+The Buzznet social network runs on Buzznet's Photocommunication (tm) platform. 
+For more information on Photocommunication visit our corporate site at 
+http://www.buzznetinc.com/.
+
+Buzznet is privately funded and was founded in 2002 by Marc Brown and 
+Anthony Batt who are experts in software development, design and managing major
+content distribution networks.
+
+CONTACT
+
+Buzznet, Inc.
+2404 Wilshire Blvd. #11b
+Los Angeles, CA 90057
+(213) 252-8999 phone
+(213) 252-8955 fax
+email: contact@buzznet.com
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  RPC::XML
+  RPC::XML::Client
+  MIME::Base64
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Kevin Woolery
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

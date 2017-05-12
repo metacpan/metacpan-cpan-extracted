@@ -1,0 +1,10 @@
+$got_data = {
+          'timestamp' => '2005-03-05T10:41:26-0600',
+          'group' => 'watch squad',
+          'full' => 'title testcase',
+          'last' => 'testcase',
+          'company' => 'Big Brother',
+          'first' => 'title',
+          'title' => 'watcher',
+          'creation-date' => '2005-03-05T10:40:41-0600'
+        };

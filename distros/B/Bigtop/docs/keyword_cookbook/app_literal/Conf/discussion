@@ -1,0 +1,13 @@
+=head1 USE
+
+C<Conf> literals dump output into generated Gantry::Conf files at the
+top level of the app's instance.  Their output comes after the base
+config block output.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+then look for C<sure> in C<docs/Kids.gantry.conf>.

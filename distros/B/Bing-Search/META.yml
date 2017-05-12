@@ -1,0 +1,31 @@
+---
+abstract: 'Implements the Bing AJAX Search API'
+author:
+  - 'Dave Houston <dhouston@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bing-Search
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  DateTime::Duration: 0
+  DateTime::Format::DateParse: 0
+  JSON: 2.21
+  LWP::UserAgent: 5.835
+  Moose: 1.00
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  URI: 1.54
+  URI::QueryParam: 0
+  vars: 0
+version: 1.121210

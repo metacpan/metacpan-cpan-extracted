@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/B/XPath.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/base.t
+t/find_global_name.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+SIGNATURE    Added here by Module::Build

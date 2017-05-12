@@ -1,0 +1,41 @@
+* {
+    float: none;
+    position: static;
+}
+
+body {
+    margin: 1em;
+    font-size: 14pt;
+    background: white;
+}
+
+#content {
+    margin: 5%;
+}
+
+pre.shell {
+    background: transparent !important;
+    color: black !important;
+}
+
+#footer,
+#menu,
+div.meta > div.utility,
+#content > div.page,
+#content > div.previous,
+#content > div.next
+{
+    display: none;
+}
+
+a:link, a:visited {
+    background: transparent;
+    font-weight: bold !important;
+    text-decoration: underline !important;
+    color: #333 !important;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    background: transparent !important;
+}
+

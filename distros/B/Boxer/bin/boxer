@@ -1,0 +1,154 @@
+#!/usr/bin/env perl
+
+=encoding UTF-8
+
+=head1 NAME
+
+boxer - boxer command line utils
+
+=cut
+
+use v5.14;
+use utf8;
+use strictures 2;
+use version;
+use Role::Commons -all;
+
+use Boxer::CLI;
+Boxer::CLI->run;
+
+=head1 VERSION
+
+Version v1.1.5
+
+=cut
+
+our $VERSION = version->declare("v1.1.5");
+
+=head1 SYNOPSIS
+
+    $ boxer compose parl-greens
+    Done: composed preseed.cfg and script.sh for a DebianParl system
+
+    # TODO: below command are not yet implemented
+
+    $ boxer install
+    [...]
+    Done: Installed "Debian GNU/Linux 7.0 (wheezy)" to /media/boxer
+
+    $ boxer install --arch armhf --classes swedish kde webdesign
+    [...]
+    Done: Installed "Debian GNU/Linux 7.0 (wheezy)" to /media/boxer
+
+    $ boxer detect
+    Analyzing current system...
+    Report and custom class saved below directory /tmp/boxer.wcJxHnql6f
+
+    $ boxer refresh --script ~/refresh.sh
+    Shell script (to be executed by root) saved as ~/refresh.sh
+
+=head1 DESCRIPTION
+
+boxer is a single front-end to various "boxing" tasks - i.e. structured
+system-wide tasks commonly applied in batch to larger deployments.
+
+Unlike tools like Puppet, CFEngine and Chef which operates on top of an
+installed system, boxer preferrably interacts with the packaging system
+of the system.  Boxer is inspired by Fully Automated Installer (FAI) and
+the classes are modelled after that tool, but goal of boxer is to become
+obsolete: boxer can include custom tweaks but encourages avoiding them
+and instead pass upstream to distro designers the needed customizations.
+
+The core distribution includes commands to analyze, initialize and
+refresh a Debian(-based) operating system.
+
+However, boxer is pluggable and it is anticipated that plugins on CPAN
+will cover other related tasks.
+
+=head1 COMMANDS
+
+This section describes the commands included with the core Boxer::CLI
+distribution. Others are available as plugins. Run C<< boxer commands >>
+to see a list of locally installed commands.
+
+=head2 Meta Commands
+
+=head3 C<< boxer about >>
+
+Shows the version numbers of all installed boxer commands, plus the CPAN
+ID of each command's author.
+
+=head3 C<< boxer aliases >>
+
+Many commands have aliases or shortcuts. For example, the following two are
+equivalent:
+
+   $ boxer install --arch armhf --classes swedish
+   $ boxer deploy --arch armhf --classes swedish
+
+C<< boxer aliases >> shows a list of available aliases.
+
+=head3 C<< boxer commands >>
+
+Shows a list of installed boxer commands, along with a brief extract.
+
+=head3 C<< boxer help >>
+
+Running the C<< boxer help >> command on its own shows a list of commands
+with their abstracts. Detailed help for a particular command can be shown
+by providing that as an argument. For example, for help on the
+C<< boxer detect >> command, run:
+
+   $ boxer help detect
+
+=head2 System creation/manipulation
+
+=head3 C<< boxer install >>
+
+=head3 C<< boxer update >>
+
+=head2 Class handling
+
+=head3 C<< boxer enable >>
+
+=head3 C<< boxer disable >>
+
+=head3 C<< boxer analyze >>
+
+=head2 Class exchange
+
+=head3 C<< boxer pull >>
+
+=head3 C<< boxer push >>
+
+=head3 C<< boxer publish >>
+
+=head1 SEE ALSO
+
+Find Boxer::CLI plugins on MetaCPAN:
+L<https://metacpan.org/search?q=Boxer::CLI::Command>.
+
+=head1 AUTHOR
+
+Jonas Smedegaard C<< <dr@jones.dk> >>.
+
+=cut
+
+our $AUTHORITY = 'cpan:JONASS';
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright © 2013-2016 Jonas Smedegaard
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut
+
+1;

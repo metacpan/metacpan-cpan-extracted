@@ -1,0 +1,9 @@
+Biblio::Citation::Parser README
+
+Biblio::Citation::Parser is a set of modules for citation parsing. Documentation
+for the API is available in the docs/ directory in HTML, plain text,
+and PDF flavours.
+
+There is also a ParaTools Developers area on the http://paracite.eprints.org 
+website at http://paracite.eprints.org/developers/ which includes an FAQ and 
+the docs in this distribution.

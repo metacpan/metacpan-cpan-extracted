@@ -1,0 +1,72 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Mat22} class b2Mat22
+{
+
+b2Mat22(float32 a11 = 0.0, float32 a12 = 0.0, float32 a21 = 0.0, float32 a22 = 0.0);
+
+%name{SetAngle} void Set(float32 angle);
+
+void SetIdentity();
+
+void SetZero();
+
+float32 GetAngle();
+
+%{
+
+void
+b2Mat22::Set( col1, col2 )
+	b2Vec2* col1
+	b2Vec2* col2
+	CODE:
+		THIS->Set( *col1, *col2 );
+
+b2Mat22*
+b2Mat22::GetInverse()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Mat22";
+	CODE:
+		b2Mat22 bm = THIS->GetInverse();
+		RETVAL = new b2Mat22(bm);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2Mat22::col1( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if( items > 1 )
+		{
+			b2Vec2* v = (b2Vec2 *)stack_to_object( ST(1) );
+			THIS->col1 = *v;
+		}
+		RETVAL = &(THIS->col1);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2Mat22::col2( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if( items > 1 )
+		{
+			b2Vec2* v = (b2Vec2 *)stack_to_object( ST(1) );
+			THIS->col2 = *v;
+		}
+		RETVAL = &(THIS->col2);
+	OUTPUT:
+		RETVAL
+
+%}
+
+};

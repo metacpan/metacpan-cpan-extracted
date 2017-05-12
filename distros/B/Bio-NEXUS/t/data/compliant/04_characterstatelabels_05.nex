@@ -1,0 +1,34 @@
+#NEXUS
+
+begin taxa;
+	dimensions ntax=3;
+	taxlabels taxon_1 taxon_2 taxon_3;
+end;
+
+['Characters' block from Maddison et al. 1997, p. 601 right column]
+
+begin characters;
+	dimensions nchar=3;
+	charstatelabels 
+	  1  DTC_migration_pattern / 'out,_dorsal,_back' 'out,_dorsal,_back,_ventral' 'out,_dorsal,_back,_ventral,_second_turn',
+	3  P6.p_requirement_for_late_induction / not_required required '(not_applicable)',
+  	2  Dependence_on_gonadal_induction_before_VPCs_divide / no_gonad_requirement dependent_on_gonad,
+  	4  Source_of_first_induction_signal / gonad AC gonad_independent,
+  	8  'B: P5.pap/P7.ppa division' / U L T O,
+  	9  'C: P5.ppa/P7.pap division' / U L T,
+  	10  'D: P5.ppp/P7.paa division' / U L T,
+  	11  P4.p_lineage_pattern / 'S_(no_division)' 'SS_(1_division)' 'Sss_(2_divisions;_inner_daughter_divides_again)' 'SSSS_(3_divisions)' '(SSLL)_(5_divisions;_inner_granddaughters_divide_L)' 'LLLL_(7_divisions;_8_cells)',
+  	12  P8.p_lineage_pattern / 'S_(no_division)' 'SS_(1_division)' 'ssS_(2_divisions)' 'SSSS_(3_divisions)' 'LLSS_(5_divisions)' 'LLLL_(7_divisions)',
+  	20  P3.p_division_frequency / in_less_than_20%_of_cells more_than_20%_of_cells 
+  	5  P6.p_lineage_pattern / TTTT TUUT UTTU UUTT UTTT,
+  	6  'P (5,7).p lineage pattern' / UUUU LUUU LLUU LLLU LLTU LULU LOTU sUUU UULL,
+  	7  'A: P5.paa/P7.ppp division' / U L T O,
+  ;
+  
+  format
+		datatype=standard;
+	matrix
+		taxon_1 00000000000000000000
+		taxon_2 00000000000000000000
+		taxon_3 00000000000000000000;
+end;

@@ -1,0 +1,15 @@
+Revision history for Perl extension Bio::Maxd.
+
+0.03 received as optional parameters: 
+     | Image name or ID
+     | Hybridisation name or ID
+
+0.02 database handle moved into maxd object.
+     dbconnect now part of the new object creation.
+     enabled 'verbose' option
+     added ppd generation to Makefile.PL and MANIFEST
+
+0.01  Wed Aug  7 11:07:22 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-c -X -n Bio::Maxd
+

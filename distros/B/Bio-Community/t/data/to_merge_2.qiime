@@ -1,0 +1,6 @@
+#QIIME v1.3.0 OTU table
+#OTU ID	m6	Consensus Lineage
+0	87	k__Archaea
+1	241	k__Bacteria;p__Firmicutes
+2	69	k__Bacteria;p__Actinobacteria
+3	205	k__Bacteria;p__Firmicutes

@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% IF title %][% title | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %][% END %]
+[% FOREACH t IN turns %]
+[% t | color 'yellow' %]
+[% "---" | color 'yellow' %]
+[% FOREACH e IN events.$t %]  [% e %]
+[% END %][% END %]

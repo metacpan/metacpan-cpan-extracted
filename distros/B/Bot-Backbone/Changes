@@ -1,0 +1,144 @@
+0.161950  2016-07-13 13:40:36-05:00 America/Chicago
+
+    * Added the initialize_services method to Bot::Backbone::Bot.
+    * Adjust the order services are constructed to account for dependencies.
+
+0.160630  2016-03-03 16:48:52-06:00 America/Chicago
+
+    * Bot::Backbone::Service::JabberChat has been moved to a separate release
+      for installation.
+    * Bot::Backbone::Service::IRChat has been moved to a separate release for
+      installation.
+    * To make effective use of this bot framework, you probably want to install
+      one of the chat engine services: JabberChat, IRChat, or SlackChat. If you
+      just want to play with a command-line bot, then you can just install this
+      module by itself and use ConsoleChat.
+    * Removed the examples in eg... they were red herrings.
+
+0.142820  2014-10-09 08:53:20CDT-0500 America/Chicago
+
+    * Added Bot::Backbone::Service::IRChat which enables bots using the service
+      to connect to IRC servers.
+    * Tweaked the "is_to_me" method of Bot::Backbone::Service::JabberChat to
+      allow the bot to identify messages sent to it that end in an exclamation
+      point ("!") or ("?") as well as a period (".").
+    * Added an IRC link to the #backbone channel on irc.perl.org where I have a
+      bot demoing the features of the framework.
+
+0.142220  2014-08-09 22:47:33-05:00 America/Chicago
+
+    * Added Bot::Backbone::Service::Role::Storage to make it easier to build
+      storage-based add-on modules distributed on CPAN.
+    * Added the ability to rewrite commands easily through the new commands
+      attribute on dispatched services.
+    * Added the predicate_iterator method to the dispatcher to allow classes to
+      iterate over predicates and tweak them.
+    * API Change: This is mostly in undocumented internals, but just anyone that
+      added custom predicates will now be broken.
+    * Bot::Backbone::Dispatcher::Predicate is now a role instead of a base
+      class. Done to facilitate predicate iteration.
+    * Added the respond_by_bot_method, respond_by_service_method,
+      run_this_bot_method, and run_this_service_method dispatch sugar
+      directives.
+
+0.141180  2014-04-27 22:06:19 America/Chicago
+
+    * Added new client debugging settings to XMPP
+    * Bugfix: It's possible to receive an IM from someone we do not have on
+      roster and we do not have a presence reported for. Make sure that doesn't
+      cause us to choke.
+
+0.140590  2014-02-28 10:20:15 America/Chicago
+
+    * Bugfix: The code that detects whether the message "is_to_me" is supposed
+      to strip the nick from the message if it is. The previous release stopped
+      doing that correctly.
+
+0.140490  2014-02-17 21:20:26 America/Chicago
+
+    * Made it so that the notion of is_to_me on Jabber messages is easier to
+      override.
+    * Updated the default notion of is_to_me to cover a few more cases, such as
+      infix and suffix mentions of the bot by name.
+    * XMPP MUC chats (group chats) use the volume level to specify whether a
+      message is a PM (whisper) or a channel message (spoken).
+    * Added a new volume attribute to messages and a set of volume-related
+      predicates for use in dispatchers.
+    * Bugfix: Corrects [rt.cpan.org #78211] reported by IRONCAMEL. This was a
+      known problem from the beginning that POE::Loop::EV has problems during
+      testing. However, it proved itself to be the only stable event loop that
+      cooperated with AnyEvent on RedHat, which was where my bot first ran. I've
+      now replaced it with POE::Loop::AnyEvent, which works well on the Centos
+      machines I am using in production now.
+    * Bugfix: Corrects [rt.cpan.org #90695] reported by Upasana Shukla and
+      patched by Zoffix Znet. The usage of enum in one instance was deprecated
+      and has now been fixed.
+
+0.140280  2014-01-28 07:05:02 America/Chicago
+
+    * Bugfix: Corrects [rt.cpan.org #90955] reported by Upasana Shukla and
+      patched by Zoffix Znet. The use of Class::MOP::load_class is now
+      deprecated. Use Class::Load::load_class instead.
+
+0.112500  2011-09-06 23:08:32 America/Chicago
+    
+    * API Change: The join_group() method of the GroupJoiner role now accepts a
+      reference to a hash as the one and only argument rather than a string.
+      This allows it to be more flexible so that the nickname or other group
+      options may be passed when joining a chat.
+    * The JabberChat now allows you to specify the nickname the bot should have
+      in a chat room.
+    * The GroupChat service now provides a nickname attribute to set a custom
+      nickname within that group.
+    * Bugfix: Some of the dependencies in the Makefile.PL file were wrong.
+      Namely, some internal packages were incorrectly being included as
+      dependencies and POE::Loop::EV was missing.
+
+0.112400  2011-08-27 22:47:18 America/Chicago
+
+    * API Change: The send_message method expects a hash ref rather than plain
+      named parameters.
+    * API Change: The send_reply method no longer allows a string to be passed,
+      but requires a hash ref of named parameters.
+    * API Change: The reply method of Bot::Backbone::Message now takes two
+      arguments rather than just one. The first argument should be the service
+      or bot object sending the message so that the send policies of that sender
+      may be applied to the outgoing message. This may be something else
+      entirely or undef, but a warning will be issued in that case.
+    * There's a new extensible send policy framework for helping authors build
+      bots that are prevented from doing really annoying things like being too
+      chatty, repeating themselves too often, etc.
+    * Send policies will be applied in all cases to chats, chat consumers, and
+      dispatched responders automatically.
+    * A new send_policy sugar method is available via Bot::Backbone to configure
+      send policies.
+    * Two send policy models are provided: (1) MinimumInterval to prevent
+      general flooding and (2) MinimumRepeatInterval to prevent the bot from
+      repeating itself.
+    * Added a Responder service role to help in the process of building
+      dispatched responders (i.e., most services a bot author is going to write
+      up), which provides reasonable defaults for send_message/send_reply that
+      will be subject to a send policy, if set.
+    * ConsoleChat now has get_line and put_line methods to allow easier
+      interaction with the terminal.
+    * Bugfix: The respond sugar subroutine was completely unusable.
+    * Bugfix: Previously, JabberChat would fail if a message was sent through it
+      before the session was completely ready. Now a warning is issued instead.
+    * Bugfix: JabberChat is no longer XMPP spewing debug output to STDOUT.
+    * Bugfix: Group chats that start with the bots nick were being incorrectly
+      picked up by the DirectChat service.
+    * Bugfix: Sometimes Jabber servers send messages with no message.
+      AnyEvent::XMPP passes these on for some reason. We ignore them now because
+      they were causing the Bot::Backbone::Message constructor to craok.
+    * Bugfix: A few documentation tweaks and other small fixes.
+
+0.112320  2011-08-19 23:17:37 America/Chicago
+
+	* Moose-based tools for building chat bot dispatchers and organizing chat
+	  bot services.
+	* Moose-based tools for building chat services, which are submodules
+	  (minibots) that can be combined in flexible ways.
+	* Chat service for Jabber
+	* Chat service for working with a running bot at the console
+	* Helper chat service for direct chat features.
+	* Helper chat service for group chat features.

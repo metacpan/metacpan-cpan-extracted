@@ -1,0 +1,34 @@
+Revision history for BigIP-ParseConfig
+
+1.1.9
+* Wed Apr 16 2008 Scott Schneider <sschneid@gmail.com>
+- Ill-formatted (eg: blank) objects no longer ignored during parse/write
+
+1.1.8
+* Wed Apr 02 2008 Scott Schneider <sschneid@gmail.com>
+- Added _object method - returns object hash for monitor, node, partition, pool, profile, route, rule, user, and virtual methods
+- Support for older-syntaxed (9.2 & below) pool definitions (thanks to Rick Stanback)
+- Fixed typo in POD members method example
+
+1.1.7
+* Wed Mar 12 2008 Scott Schneider <sschneid@gmail.com>
+- Fixed CPAN test (re: Test::Pod::Coverage) errors
+
+1.1.6
+* Mon Mar 10 2008 Scott Schneider <sschneid@gmail.com>
+- Initial _xtra (pool member priority, etc) support
+- Added (very basic) tests for CPAN
+
+1.1.5
+* Thu Feb 28 2008 Scott Schneider <sschneid@gmail.com>
+- Added _order method - modified object attributes now written in correct order
+
+1.1.2 - 1.1.4
+* Tue Feb 26 2008 Scott Schneider <sschneid@gmail.com>
+- (Completely) reworked parser
+- POD clean-up
+
+1.1.1
+* Mon Feb 25 2008 Scott Schneider <sschneid@gmail.com>
+- initial version
+

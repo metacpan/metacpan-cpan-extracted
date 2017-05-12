@@ -1,0 +1,15 @@
+Revision history for Perl extension Barcode::Cuecat.
+
+1.00  Sun Oct 15 21:10:40 2000
+	- original version; created by h2xs 1.20 with options
+		-OXfn Barcode::Cuecat -v 1.00
+
+1.10  Sun Oct 21 14:35:45 2000
+	- Added support of :CueCat's proprietary barcodes
+
+1.20  Web Nov  2 10:33:00 2000
+	- Fixed bug pointed out by Brian Blakley
+	- Fixed cut&paste typo in ->new()
+
+
+

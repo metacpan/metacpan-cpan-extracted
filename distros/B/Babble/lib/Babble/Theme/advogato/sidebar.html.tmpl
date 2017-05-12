@@ -1,0 +1,54 @@
+<div id="sidebar">
+
+<div id="about">
+ [% IF meta_about_text %]
+   [% meta_about_text %]
+ [% ELSE %]
+ <p>This collection is powered by
+ <a href="http://bonehunter.rulez.org/Babble.phtml">Babble</a>,
+ run by <a href="mailto:[% meta_owner_email %]">[% meta_owner %]</a>.</p>
+ [% END %]
+
+ [% IF meta_feed_text %]
+   [% meta_feed_text %]
+ [% ELSE %]
+   [% IF meta_feed_linkx %]
+     <p>Feed is available <a href="[% meta_feed_link %]">here</a>.</p>
+   [% END %]
+ [% END %]
+</div>
+
+<div id="freshness">
+Last update: [% last_update %]
+</div>
+
+[% UNLESS template_knob_no_sources %]
+ <div id="blogroll">
+ <h1>Subscriptions:</h1>
+ <ul>
+
+ [% FOREACH doc IN collection.documents %]
+  <li> <a href="[% doc.id %]">[% doc.name %]</a>
+  <small>(<a href="[% doc.link %]">feed</a>)</small></li>
+ [% END %]
+
+ </ul>
+ </div>
+[% END %]
+
+[% IF template_knob_planetarium %]
+ <div id="blogroll">
+ <h1>Planetarium:</h1>
+ <ul>
+
+ [% FOREACH planet IN planetarium %]
+  <li> <a href="[% planet.url %]">[% planet.name %]</a></li>
+ [% END %]
+ </ul>
+ </div>
+[% END %]
+</div>
+
+[%#
+arch-tag: 6cefe9b5-3953-44b6-becf-aefac09e3660
+%]

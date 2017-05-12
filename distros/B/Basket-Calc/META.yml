@@ -1,0 +1,27 @@
+---
+abstract: 'Basket/Cart calculation library with support for currency conversion, discounts and tax'
+author:
+  - 'Tobias Kirschstein <lev@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.130880'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Basket-Calc
+requires:
+  Carp: 0
+  Finance::Currency::Convert::Yahoo: 0
+  Mouse: 0
+  Scalar::Util: 0
+  experimental: 0
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/nupfel/Basket-Calc/issues
+  homepage: https://github.com/nupfel/Basket-Calc/wiki
+  repository: git://github.com/nupfel/Basket-Calc.git
+version: 0.5

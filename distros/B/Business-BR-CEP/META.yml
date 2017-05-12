@@ -1,0 +1,24 @@
+---
+abstract: 'Test for correct CEP numbers (Brazilian ZIP Code)'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4002, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-BR-CEP
+provides:
+  Business::BR::CEP:
+    file: lib/Business/BR/CEP.pm
+    version: 0.01
+requires:
+  Test::More: 0.88
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

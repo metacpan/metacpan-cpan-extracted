@@ -1,0 +1,17 @@
+name=GSEplatform
+module=gse_platform
+version=20041124
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=PlatformID, dotset=PlatformID
+label=Status, dotset=Status
+label=Title, dotset=PlatformTitle
+label=Type, dotset=PlatformType
+label=Description, dotset=Description
+label=Keyword, dotset=Keyword
+label=Organism, dotset=Organism

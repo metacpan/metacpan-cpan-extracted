@@ -1,0 +1,140 @@
+# NAME
+
+Bot::Cobalt - IRC darkbot-alike plus plugin authoring sugar
+
+# SYNOPSIS
+
+    ## Set up example confs and a simple ~/.cobalt2rc :
+    sh$ cobalt2-installer
+
+    ## Get some assistance:
+    sh$ cobalt2 --help
+    
+    ## Launch in foreground:
+    sh$ cobalt2 --nodetach
+    
+    ## Launch in background:
+    sh$ cobalt2
+
+# DESCRIPTION
+
+**Bot::Cobalt** is the second generation of the `cobalt` IRC bot, which was
+originally a Perl remiplementation of Jason Hamilton's 90s-era `darkbot`.
+
+Bot::Cobalt provides a pluggable IRC bot framework coupled with a core set of plugins 
+replicating classic `darkbot` and `cobalt` behavior.
+
+The included plugin set provides a wide range of functionality; see 
+["Included plugins"](#included-plugins) below.
+
+IRC connectivity and protocol details are handled via 
+[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC); the bot can 
+comfortably manage multiple servers/networks (referred to as 
+"contexts").
+
+Bot::Cobalt tries to be friendly to developers. The bridge to 
+[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC) exists as a plugin and can be easily subclassed 
+or replaced entirely; see [Bot::Cobalt::IRC](https://metacpan.org/pod/Bot::Cobalt::IRC).
+
+Plugin authoring is intended to be as easy as possible. Modules are 
+included to provide simple frontends to IRC-related 
+utilities, logging, plugin configuration, asynchronous HTTP 
+sessions, data serialization and on-disk databases, and more. See 
+[Bot::Cobalt::Manual::Plugins](https://metacpan.org/pod/Bot::Cobalt::Manual::Plugins) for more about plugin authoring.
+
+## Initializing a new instance
+
+A Bot::Cobalt instance needs its own _etc/_ and _var/_ directories. With 
+the default frontend (`cobalt2`), these are specified in a simple 
+'rcfile' for each particular instance.
+
+    sh$ cobalt2-installer
+
+`cobalt2-installer` will ask some questions, initialize a new rcfile 
+for an instance and try to create the relevant directory layout with 
+some example configuration files.
+
+You can, of course, run multiple instances with the default frontend; 
+each just needs its own rcfile:
+
+    sh$ cobalt2-installer --rcfile=${HOME}/cobalts/mycobalt.rc
+    sh$ cobalt2 --rcfile=${HOME}/cobalts/mycobalt.rc
+
+After reviewing/editing the example configuration files, you should be 
+ready to try starting your Cobalt instance:
+
+    ## Launch in foreground with verbose debug output:
+    sh$ cobalt2 --nodetach --debug
+    
+    ## Launch in background with configured log options:
+    sh$ cobalt2
+
+## Included plugins
+
+The example `etc/plugins.conf` installed by `cobalt2-installer` has 
+most of these:
+
+[Bot::Cobalt::Plugin::Alarmclock](https://metacpan.org/pod/Bot::Cobalt::Plugin::Alarmclock) -- IRC highlight timers
+
+[Bot::Cobalt::Plugin::Auth](https://metacpan.org/pod/Bot::Cobalt::Plugin::Auth) -- User authentication
+
+[Bot::Cobalt::Plugin::Games](https://metacpan.org/pod/Bot::Cobalt::Plugin::Games) -- Simple IRC games
+
+[Bot::Cobalt::Plugin::Info3](https://metacpan.org/pod/Bot::Cobalt::Plugin::Info3) -- Flexible text-triggered responses
+
+[Bot::Cobalt::Plugin::Master](https://metacpan.org/pod/Bot::Cobalt::Plugin::Master) -- Simple bot control from IRC
+
+[Bot::Cobalt::Plugin::PluginMgr](https://metacpan.org/pod/Bot::Cobalt::Plugin::PluginMgr) -- Load/unload plugins from IRC
+
+[Bot::Cobalt::Plugin::RDB](https://metacpan.org/pod/Bot::Cobalt::Plugin::RDB) -- "Random stuff" databases for quotebots 
+or randomized chatter on a timer
+
+[Bot::Cobalt::Plugin::Extras::CPAN](https://metacpan.org/pod/Bot::Cobalt::Plugin::Extras::CPAN) -- Query MetaCPAN and 
+[Module::CoreList](https://metacpan.org/pod/Module::CoreList)
+
+[Bot::Cobalt::Plugin::Extras::DNS](https://metacpan.org/pod/Bot::Cobalt::Plugin::Extras::DNS) -- DNS lookups
+
+[Bot::Cobalt::Plugin::Extras::Karma](https://metacpan.org/pod/Bot::Cobalt::Plugin::Extras::Karma) -- Karma bot
+
+[Bot::Cobalt::Plugin::Extras::Relay](https://metacpan.org/pod/Bot::Cobalt::Plugin::Extras::Relay) -- Cross-network relay
+
+[Bot::Cobalt::Plugin::Extras::TempConv](https://metacpan.org/pod/Bot::Cobalt::Plugin::Extras::TempConv) -- Temperature units conversion 
+
+## Extensions on CPAN
+
+There are a few externally-distributed plugin sets available 
+via CPAN:
+
+[Bot::Cobalt::Plugin::Calc](https://metacpan.org/pod/Bot::Cobalt::Plugin::Calc) -- Simple calculator
+
+[Bot::Cobalt::Plugin::RSS](https://metacpan.org/pod/Bot::Cobalt::Plugin::RSS) -- RSS feed aggregator
+
+[Bot::Cobalt::Plugin::Silly](https://metacpan.org/pod/Bot::Cobalt::Plugin::Silly) -- Very silly plugin set
+
+For debugging or playing with [Bot::Cobalt::DB](https://metacpan.org/pod/Bot::Cobalt::DB) databases, you may want 
+to have a look at [Bot::Cobalt::DB::Term](https://metacpan.org/pod/Bot::Cobalt::DB::Term).
+
+# SEE ALSO
+
+[Bot::Cobalt::Manual::Plugins](https://metacpan.org/pod/Bot::Cobalt::Manual::Plugins)
+
+[Bot::Cobalt::Core](https://metacpan.org/pod/Bot::Cobalt::Core)
+
+[Bot::Cobalt::IRC](https://metacpan.org/pod/Bot::Cobalt::IRC)
+
+The core pieces of Bot::Cobalt are essentially sugar over these two 
+[POE](https://metacpan.org/pod/POE) Components:
+
+[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC)
+
+[POE::Component::Syndicator](https://metacpan.org/pod/POE::Component::Syndicator) (and [Object::Pluggable](https://metacpan.org/pod/Object::Pluggable))
+
+Consult their documentation for all the gory details.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+[http://www.cobaltirc.org](http://www.cobaltirc.org)
+
+Licensed under the same terms as Perl.

@@ -1,0 +1,49 @@
+config {
+    engine          CGI;
+    template_engine TT;
+    Init            Std             {}
+    SQL             SQLite          {}
+    CGI             Gantry          { with_server 1; flex_db 1; gen_root 1; }
+    Control         Gantry          { dbix 1; }
+    Model           GantryDBIxClass {}
+    SiteLook        GantryDefault   {}
+}
+app Apps::Phone {
+    authors `Phil Crow` =>   `crow.phil@gmail.com`;
+    config {
+        dbconn           `dbi:Pg:dbname=phone`     => no_accessor;
+        dbuser            apache                   => no_accessor;
+        template_wrapper `genwrapper.tt`           => no_accessor;
+    }
+    table    numbers      {
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field number {
+            is             varchar;
+            label          Number;
+            html_form_type text;
+        }
+    }
+    controller Numbers is AutoCRUD {
+        controls_table   numbers;
+        rel_location     numbers;
+        text_description `phone number`;
+        page_link_label  `Phone Numbers`;
+        method do_main is main_listing {
+            title            `Phone Numbers`;
+            cols             name, number;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        numbers;
+            fields           name, number;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+}

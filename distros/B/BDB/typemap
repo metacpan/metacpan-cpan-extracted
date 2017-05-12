@@ -1,0 +1,107 @@
+DB_ENV *		DB_ENV
+DB_ENV_ornull *		DB_ENV_ornull
+DB_ENV_ornuked *	DB_ENV_ornuked
+DB_TXN *		DB_TXN
+DB_TXN_ornull *		DB_TXN_ornull
+DB_TXN_ornuked *	DB_TXN_ornuked
+DB *			DB
+DB_ornull *		DB_ornull
+DB_ornuked *		DB_ornuked
+DBC *			DBC
+DBC_ornull *		DBC_ornull
+DBC_ornuked *		DBC_ornuked
+DB_SEQUENCE *  		DB_SEQUENCE
+DB_SEQUENCE_ornull *	DB_SEQUENCE_ornull
+DB_SEQUENCE_ornuked *	DB_SEQUENCE_ornuked
+
+bdb_filename		BDB_FILENAME
+db_seq_t		DB_SEQ
+
+const char *		T_PV
+
+SV_mutable *		T_SV_MUTABLE
+
+INPUT
+
+T_SV_MUTABLE
+	($var) = $arg;
+        if (SvREADONLY ($var))
+          croak (\"argument \\\"%s\\\" is read-only/constant, but %s needs to write results into it\",
+                 \"$var\",
+                 \"${Package}::$func_name\");
+        if (SvPOKp ($var) && !sv_utf8_downgrade ($var, 1))
+          croak (\"argument \\\"%s\\\" must be byte/octet-encoded in %s\",
+                 \"$var\",
+                 \"${Package}::$func_name\")
+
+BDB_FILENAME
+        ($var) = get_bdb_filename ($arg);
+
+DB_SEQ
+	$var = sizeof (IV) > 4 ? SvIV ($arg) : SvNV ($arg);
+
+DB_ENV
+        SvPTR ($var, $arg, DB_ENV *, bdb_env_stash, BDB::Env, 0);
+
+DB_TXN
+        SvPTR ($var, $arg, DB_TXN *, bdb_txn_stash, BDB::Txn, 0);
+
+DBC
+        SvPTR ($var, $arg, DBC *, bdb_cursor_stash, BDB::Cursor, 0);
+
+DB
+        SvPTR ($var, $arg, DB *, bdb_db_stash, BDB::Db, 0);
+
+DB_SEQUENCE
+        SvPTR ($var, $arg, DB_SEQUENCE *, bdb_sequence_stash, BDB::Sequence, 0);
+
+
+DB_ENV_ornull
+        SvPTR ($var, $arg, DB_ENV *, bdb_env_stash, BDB::Env, 1);
+
+DB_TXN_ornull
+        SvPTR ($var, $arg, DB_TXN *, bdb_txn_stash, BDB::Txn, 1);
+
+DBC_ornull
+        SvPTR ($var, $arg, DBC *, bdb_cursor_stash, BDB::Cursor, 1);
+
+DB_ornull
+        SvPTR ($var, $arg, DB *, bdb_db_stash, BDB::Db, 1);
+
+DB_SEQUENCE_ornull
+        SvPTR ($var, $arg, DB_SEQUENCE *, bdb_sequence_stash, BDB::Sequence, 1);
+
+
+DB_ENV_ornuked
+        SvPTR ($var, $arg, DB_ENV *, bdb_env_stash, BDB::Env, 2);
+
+DB_TXN_ornuked
+        SvPTR ($var, $arg, DB_TXN *, bdb_txn_stash, BDB::Txn, 2);
+
+DBC_ornuked
+        SvPTR ($var, $arg, DBC *, bdb_cursor_stash, BDB::Cursor, 2);
+
+DB_ornuked
+        SvPTR ($var, $arg, DB *, bdb_db_stash, BDB::Db, 2);
+
+DB_SEQUENCE_ornuked
+        SvPTR ($var, $arg, DB_SEQUENCE *, bdb_sequence_stash, BDB::Sequence, 2);
+
+
+OUTPUT
+
+DB_ENV
+	$arg = newSVptr ($var, bdb_env_stash);
+
+DB_TXN
+	$arg = newSVptr ($var, bdb_txn_stash);
+
+DBC
+	$arg = newSVptr ($var, bdb_cursor_stash);
+
+DB
+	$arg = newSVptr ($var, bdb_db_stash);
+
+DB_SEQUENCE
+	$arg = newSVptr ($var, bdb_sequence_stash);
+

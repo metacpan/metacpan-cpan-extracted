@@ -1,0 +1,134 @@
+Revision history for BioX::Wrapper::Annovar
+
+0.40  2015-06-18 08:28:53 AST
+    - Update to copyright
+
+0.39  2015-02-18 10:44:22 AST
+    - Updated example directory and documentation for new version of 1K genomes VCF files. 
+
+0.38  2015-02-18 10:01:01 AST
+    - I think I got all of them
+
+0.37  2015-02-18 09:52:56 AST
+    - Had to replace some names in tests and scripts dir.
+
+0.36  2015-02-18 09:50:46 AST
+    - Missed a module in Build.PL
+
+0.35  2015-02-18 09:14:13 AST
+    - Moving over to a new name space. Annovar::Wrapper is now BioX::Wrapper::Annovar
+    - Added a few new scripts for samtools wrappers.
+
+0.34  2015-02-11 14:17:47 AST
+    - Full path directories in bychrmpil! 
+
+0.33  2015-02-09 13:38:57 AST
+    - Fixing a mistake in bash script. Stupid variables.
+
+0.32  2015-02-09 10:55:28 AST
+    - More changes to script/bychrmpil.sh for speed
+
+0.31  2015-02-09 09:53:28 AST
+    - Made a change to script/bychrmpil.sh to shuffle the coordinate input so the big chromosomes aren't together
+
+0.30  2015-02-08 13:38:59 AST
+    - Created a change in the script/bychrmpil.sh using xargs instead of -f option
+
+0.29  2015-01-21 14:45:44 AST
+    - Added in a bin script for doing samtools mpileup by chromosome and merging them back to vcf
+
+0.28  2015-01-11 14:42:35 AST
+    Made a few changes to the order of commands to make it faster for slurmrunner/mcerunner
+<<<<<<< HEAD
+    - Moving to bitbucket
+=======
+>>>>>>> 1d2c80e23da99b50ef0891f85a1ba827efa6a3dd
+
+0.27  2014-12-22 08:41:40 AST
+    Made a change to the default annovar_fun. The gwas database was listed as a filter (f), but should have been a region (r).
+    Thanks to Kai Wang from Annovar for pointing this out.
+
+0.26  2014-12-21 15:23:55 AST
+    Change for default databases and functions
+
+0.25  2014-12-21 15:16:46 AST
+    Another change for refGene
+
+0.24  2014-12-21 14:42:41 AST
+    Making changes to make this compatible with new convert2annovar from annovar dist
+
+0.23  2014-12-21 07:44:26 AST
+    Made a change to outdirectory structure
+
+0.22  2014-08-21 10:38:36 AST
+    - Hopefully last fix for vcf-subset
+
+0.21  2014-08-21 10:25:06 AST
+
+    - Adding in some acknowledgements
+
+0.20  2014-08-21 10:16:07 AST
+    - Hopefully last fix for vcf-subset
+
+0.19  2014-08-20 10:21:25 AST
+
+    - Need to keep sample names consistent with the way convert_to_annovar has them...
+
+0.18  2014-08-19 12:02:36 AST
+
+    - One more fix to sample names for vcf-subset
+
+0.17  2014-08-19 11:49:22 AST
+    - Made a change to vcf-subset for when sample names are changed
+
+0.16  2014-08-18 15:26:10 AST
+    - Tabix command in vcf-subset had incorrect path
+
+0.15  2014-08-18 12:44:01 AST
+
+    - Run vcf-subset on multisample files
+
+0.14  2014-08-18 11:47:09 AST
+    - Removed die at 500 in the vcf-to-table script
+
+0.13  2014-08-17 14:08:14 AST
+    - Added a vcf-to-table script that parses out info and format columns and appends them in a table
+
+0.12  2014-08-17 14:03:56 AST
+
+    - Fixed bug to annovar_cols
+
+0.11  2014-08-17 13:49:53 AST
+
+    - Fixed indir options with no vcfs
+
+0.10  2014-08-17 13:47:47 AST
+    - Removed home dir from annovar-wrapper
+
+0.09  2014-08-07 16:03:41 AST
+    - Made some changes for reannotation of vcf files. There are now sed commands to remove illegal characters.
+
+0.08  2014-08-06 09:53:35 AST
+    - Moving over to Module::Build
+
+0.07  2014-08-06 09:40:17 AST
+    - Trying to get executable scripts to install
+    
+0.06  2014-08-05 15:51:35 AST
+   - Made some changes to the annotation dbs and headers
+
+0.05  2014-07-21 14:19:24 AST
+        - Changed name in Annovar/Example.pod to Annovar::Example
+    
+0.04  2014-07-16 15:55:50 AST
+        - Still trying to get the documentation right
+
+0.03  2014-07-16 15:11:49 AST
+        - Updating some documentation
+
+0.02  2014-07-16 13:58:25 AST
+          - Change log entry for the next version
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

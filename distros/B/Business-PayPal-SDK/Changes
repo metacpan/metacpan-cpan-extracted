@@ -1,0 +1,20 @@
+Revision history for Perl extension Business::PayPal::SDK.
+
+0.14 Fri Dec 9
+  - fixed not returning RefundTransactionID in RefundTransaction
+
+0.13 Wed Dec 7
+  - Added RefundTransaction
+  - Standardized all responses. Previously some functions returned undef when they should have returned a hash of paypals response.
+  - All functions now return a hashref with $ret->{ack} set to whatever paypal returns. Also the hashref should contain an "ErrorCodes" element which should be just an empty hash ref on ack 'Success'
+  - Beter protected java calls with eval. If there is in error with most java calls now, functions will return undef and set the $self->error method.
+  - Fixed various other bugs.
+
+0.11 Mon Nov 14
+  - Fixed version to be 3 digits.
+  - Added DoDirectPayment.
+  - Changed the response from functions when there is an error.
+  - Added test script, its just a compile test as anything beyond that would require knowing where the paypal_java_sdk is.
+
+0.1  Thu Nov 10 11:14:40 2005
+	- Created

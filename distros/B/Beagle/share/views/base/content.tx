@@ -1,0 +1,11 @@
+<div id="content">
+
+: include '_wedge.tx' { template => 'content_start.tx' };
+
+<div class="message-wrapper">
+: if $message {
+<div class="message">
+<: _($message) :>
+</div>
+: }
+</div>

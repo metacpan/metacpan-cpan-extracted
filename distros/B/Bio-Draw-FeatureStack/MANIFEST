@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/alt_feature.t
+t/basecase.t
+t/feature_offset.t
+t/figures_manuscript.t
+t/flip_minus.t
+t/genbank.t
+t/ignore_utr.t
+t/intron_size.t
+t/ruler.t
+t/seperator.t
+t/skip_transcript.t
+t/span.t
+lib/Bio/Draw/FeatureStack.pm

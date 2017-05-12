@@ -1,0 +1,40 @@
+Revision history for Business-OnlinePayment-IPayment
+
+0.08 Thu Nov 19 18:20:10 2015 CET
+
+    [BUG FIXES]
+
+    * Update error messages in reverse capture tests
+      (GH #3, Marco Pessotto).
+
+    [TESTS]
+
+    * Add tests for refund with auth / without preauth + capture
+      (Marco Pessotto).
+
+0.07 Mon Oct 20 21:01:24 2014 CEST
+
+    [TESTS]
+
+    * Remove boilerplate test (Marco Pessotto).
+    * Adjust capture reverse test to corrected error message (Marco Pessotto).
+    * Fix hardcoded expiration year in capture reverse test (Marco Pessotto).
+
+0.06 Sun Oct  5 08:48:07 2014 EDT
+
+    [BUG FIXES]
+
+    * Add missing prerequisite on XML::Compile::WSDL11 (Marco Pessotto).
+    * Execute POD pod tests only during release testing (Marco Pessotto).
+
+    [DOCUMENTATION]
+
+    * Add link to test credit card numbers to documentation (Stefan Hornburg).
+    * Add missing link wrapper for Business::OnlinePayment::IPayment::Transaction
+      and fix a typo (Stefan Hornburg).
+    * Add encoding utf8 to POD files to prevent test errors (Stefan Hornburg).
+    * Add module description (Marco Pessotto).
+
+0.05    2013-10-09
+        First release on CPAN
+

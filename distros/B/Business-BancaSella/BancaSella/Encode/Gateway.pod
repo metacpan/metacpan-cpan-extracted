@@ -1,0 +1,59 @@
+=head1 NAME
+
+Business::BancaSella::Encode::Gateway - Uri creator for Gateway compatibility online system payment.
+
+=head1 SYNOPSIS
+
+  use CGI;
+  use Business::BancaSella::Encode;
+  
+  my $cgi 	= new CGI();
+
+  my $bs	= new Business::BancaSella::Encode::GestPay( 
+                    shopping	=> $cgi->param('shopping'),
+                    tid		=> $tid_number,
+                    amount	=> $cgi->param('amount'),
+                    otp		=> 'another_otp',
+                    id		=> 'internal_id'
+                    );
+  
+  my $bsUrl	= $bs->uri;
+  print $cgi->redirect($bsUrl);
+
+=head1 DESCRIPTION
+
+Extending Business::BancaSella::Gateway abstract class it creates uri that passed to Banca Sella online payment site
+permit to open credit cards checker page with correct language, currency and amount.
+It can manage also locally the request of credit card information using Banca Sella only for check if
+the credit card infos are valid and the transaction can be committed.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new istance of Business::BancaSella::Encode::Gateway object. 
+
+The required parameter needed to initialized the object are: 
+amount,shopping,otp,id,tid.
+
+See Business::BancaSella::Gateway for more information about this properties.
+
+=head2 uri()
+
+Return the formatted uri to call the Banca Sella's page passing it all value needed
+to complete the payment process.
+
+=head2 form(frmName)
+
+Return a form html code named "frmName" ready, with a submitted button, to call
+a Banca Sella's page for completing the payment process.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Gateway
+
+=cut

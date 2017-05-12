@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <rule source file> <thesaurus source file>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $code = <<"EOF";
+$ARGV[0] \$r \$t => sub{ print "  Portugal -> \$t [ label = \\"\$r\\" ] ;\\n"; }.
+\$t \$r $ARGV[0] => sub{ print "  \$t -> Portugal [ label = \\"\$r\\" ] ;\\n"; }.
+EOF
+
+my $obj = thesaurusLoad($ARGV[1]);
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+
+print "digraph $ARGV[0] {\n  rankdir=LR\n";
+$t->process($code);
+print "}\n";

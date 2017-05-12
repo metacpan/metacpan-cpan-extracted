@@ -1,0 +1,33 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp1" Name="WCP1: Sequence">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>Several tasks of a process are executed after each other. A task is enabled after the preceding task has finished and before the proceeding task has been started [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" Name="Transition" From="A" To="B"/>
+                <Transition Id="B-C" Name="Transition" From="B" To="C"/>
+            </Transitions>
+        </WorkflowProcess>

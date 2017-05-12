@@ -1,0 +1,75 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2FrictionJointDef} class b2FrictionJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2FrictionJointDef();
+
+%{
+
+void
+b2FrictionJointDef::Initialize( bodyA, bodyB, anchor )
+	b2Body* bodyA
+	b2Body* bodyB
+	b2Vec2* anchor
+	CODE:
+		THIS->Initialize( bodyA, bodyB, *anchor );
+
+b2Vec2*
+b2FrictionJointDef::localAnchorA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorA = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorA);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2FrictionJointDef::localAnchorB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->localAnchorB = *(b2Vec2*)SvUV( ST(1) );
+		}
+		RETVAL = &(THIS->localAnchorB);
+	OUTPUT:
+		RETVAL
+
+float32
+b2FrictionJointDef::maxForce( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxForce = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxForce;
+	OUTPUT:
+		RETVAL
+
+float32
+b2FrictionJointDef::maxTorque( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxTorque = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxTorque;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

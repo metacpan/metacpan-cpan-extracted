@@ -1,0 +1,33 @@
+Revision history for BioX-Workflow-Plugin-FileDetails
+
+0.11  2016-08-31 20:09:59 GST
+    - Bugfix for filedetails - no basename was causing it to crash
+
+0.10  2016-06-17 08:53:13 GST
+
+    - Made more changes to formatting for easy upload to JIRA
+
+0.09  2016-06-17 08:49:31 GST
+    - Bugfix in filedetails.pl added predicate has_line_count
+    - Changed format of output
+
+0.08  2016-06-06 14:50:23 GST
+    - Moving to github
+
+0.07  2016-06-06 13:52:18 GST
+    - Added travis build
+
+0.06  2015-12-07 10:06:38 GST
+    - Prettyified the table
+
+0.05  2015-12-06 11:12:52 GST
+    - Added in line count
+
+0.04  2015-12-01 11:08:42 GST
+    - Added List::Uniq to cpanfile
+
+0.03  2015-11-23 10:16:34 GST
+    Changing to ModuleBuild
+
+0.02  2015-11-19 12:46:29 GST
+        - Initial release

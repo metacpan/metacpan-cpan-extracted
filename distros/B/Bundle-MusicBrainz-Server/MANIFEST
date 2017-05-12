@@ -1,0 +1,4 @@
+MANIFEST
+Makefile.PL
+lib/Bundle/MusicBrainz/Server.pm
+README

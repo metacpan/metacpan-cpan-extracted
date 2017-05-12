@@ -1,0 +1,109 @@
+Bio-Tools-CodonOptTable
+
+A codon quality check tool, it produces a Codon Optimization table to see the quality of each codon.
+
+The simplest way of depiction is to plot the codon usage frequency that can be found in common codon usage tables. A more elaborate way to depict the codon quality is to convert the codon usage frequency into relative adaptiveness values. In contrast to the codon usage frequency the relative adaptiveness takes into account the number of codons which code for the respective amino acid.
+
+We produces each codon frequency, Relative Synonymous Codons Uses and Relative Adaptiveness of a Codon that can help to calculate the Codon Adaptation Index (CAI) of a gene.
+
+We generate a Graph between RSCU & RAC for better analysis.
+
+Reference:
+http://www.pubmedcentral.nih.gov/articlerender.fcgi?tool=pubmed&pubmedid=3547335
+
+USES or Examples
+
+You can use this module in the following ways
+
+    use Bio::Tools::CodonOptTable;
+
+    my $seqobj = Bio::Tools::CodonOptTable->new(
+        -seq              => 'ATGGGGTGGGCACCATGCTGCTGTCGTGAATTTGGGCACGATGGTGTACGTGCTCGTAGCTAGGGTGGGTGGTTTG',
+        -id               => 'GeneFragment-12',
+        -accession_number => 'Myseq1',
+        -alphabet         => 'dna',
+        -is_circular      => 1,
+        -genetic_code     => 1,
+    );
+    
+    #If you wanna read from file
+    my $seqobj = Bio::Tools::CodonOptTable->new(
+        -file         => "contig.fasta",
+        -format       => 'Fasta',
+        -genetic_code => 1,
+    );
+    
+    #If you have Accession number and want to get file from NCBI
+    my $seqobj = Bio::Tools::CodonOptTable->new(
+        -ncbi_id      => "J00522",
+        -genetic_code => 1,
+    );
+    
+    my $myCodons = $seqobj->rscu_rac_table();
+    
+    if ($myCodons) {
+        foreach my $each_aa (@$myCodons) {
+            print "Codon      : ", $each_aa->{'codon'},     "\t";
+            print "Frequency  : ", $each_aa->{'frequency'}, "\t";
+            print "AminoAcid  : ", $each_aa->{'aa_name'},   "\t";
+            print "RSCU Value : ", $each_aa->{'rscu'},      "\t";    #Relative Synonymous Codons Uses
+            print "RAC Value  : ", $each_aa->{'rac'},       "\t";    #Relative Adaptiveness of a Codon
+            print "\n";
+        }
+    }
+    
+    # To get the prefered codon list based on RSCU & RAC Values
+    my $prefered_codons = $seqobj->prefered_codon($myCodons);
+    while ( my ( $amino_acid, $codon ) = each(%$prefered_codons) ) {
+        print "AminoAcid : $amino_acid \t Codon : $codon\n";
+    }
+    
+    # To produce a graph between RSCU & RAC
+    # Graph output file extension should be GIF, we support GIF only
+    $seqobj->generate_graph( $myCodons, $outfile_name );
+    
+    # To Calculate Codon Adaptation Index (CAI)    
+    my $gene_cai = $seqobj->calculate_cai($myCodons);
+
+    # To Produce HTML report
+    # This function will generate HTML report, outfile extension should be .html
+    $seqobj->generate_report($outfile_name);
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::Tools::CodonOptTable
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-Tools-CodonOptTable
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-Tools-CodonOptTable
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-Tools-CodonOptTable
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-Tools-CodonOptTable
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Rakesh Kumar Shardiwal
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

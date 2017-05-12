@@ -1,0 +1,439 @@
+$VAR1 = [
+          {
+            'value' => '3',
+            'directive' => 'gff-version'
+          },
+          {
+            'comment' => '.	UCSC	protein	.	.	.	.	.	ID=BAA19055;Parent=AB000114'
+          },
+          [
+            {
+              'source' => 'UCSC',
+              'seq_id' => 'chr17',
+              'child_features' => [
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62468236',
+                                        'derived_features' => [],
+                                        'phase' => '1',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62468039'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '500',
+                                        'derived_features' => [],
+                                        'phase' => '2',
+                                        'strand' => '-',
+                                        'type' => 'fakething',
+                                        'attributes' => {
+                                                          'Note' => [
+                                                                      'crazy multi-parent out-of-order thing',
+                                                                      ' also including a Derives_from'
+                                                                    ],
+                                                          'Parent' => [
+                                                                        'AB000114',
+                                                                        'A00469'
+                                                                      ],
+                                                          'Derives_from' => [
+                                                                              'A00469'
+                                                                            ]
+                                                        },
+                                        'start' => '1'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62468654',
+                                        'derived_features' => [],
+                                        'phase' => '2',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62468490'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62468038',
+                                        'derived_features' => [],
+                                        'phase' => undef,
+                                        'strand' => '-',
+                                        'type' => 'three_prime_UTR',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62467934'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62468866',
+                                        'derived_features' => [],
+                                        'phase' => '1',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62468747'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62469236',
+                                        'derived_features' => [],
+                                        'phase' => '1',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62469076'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62469506',
+                                        'derived_features' => [],
+                                        'phase' => '0',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62469497'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '62469545',
+                                        'derived_features' => [],
+                                        'phase' => undef,
+                                        'strand' => '-',
+                                        'type' => 'five_prime_UTR',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'A00469'
+                                                                      ]
+                                                        },
+                                        'start' => '62469507'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr17',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '500',
+                                        'derived_features' => [],
+                                        'phase' => '2',
+                                        'strand' => '-',
+                                        'type' => 'otherfakething',
+                                        'attributes' => {
+                                                          'Note' => [
+                                                                      'crazy multi-parent thing',
+                                                                      ' but this time coming after its parents'
+                                                                    ],
+                                                          'Parent' => [
+                                                                        'AB000114',
+                                                                        'A00469'
+                                                                      ],
+                                                          'Derives_from' => [
+                                                                              'A00469'
+                                                                            ]
+                                                        },
+                                        'start' => '1'
+                                      }
+                                    ]
+                                  ],
+              'score' => undef,
+              'end' => '62469545',
+              'derived_features' => [
+                                      [],
+                                      []
+                                    ],
+              'phase' => undef,
+              'strand' => '-',
+              'type' => 'mRNA',
+              'attributes' => {
+                                'Alias' => [
+                                             'GH1'
+                                           ],
+                                'ID' => [
+                                          'A00469'
+                                        ],
+                                'Note' => [
+                                            'growth hormone 1'
+                                          ],
+                                'Dbxref' => [
+                                              'AFFX-U133:205840_x_at',
+                                              'Locuslink:2688',
+                                              'Genbank-mRNA:A00469',
+                                              'Swissprot:P01241',
+                                              'PFAM:PF00103',
+                                              'AFFX-U95:1332_f_at',
+                                              'Swissprot:SOMA_HUMAN'
+                                            ]
+                              },
+              'start' => '62467934'
+            }
+          ],
+          [
+            {
+              'source' => 'UCSC',
+              'seq_id' => 'chr9',
+              'child_features' => [
+                                    [],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr9',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '90518841',
+                                        'derived_features' => [],
+                                        'phase' => undef,
+                                        'strand' => '-',
+                                        'type' => 'three_prime_UTR',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'AB000114'
+                                                                      ]
+                                                        },
+                                        'start' => '90517946'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr9',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '90519167',
+                                        'derived_features' => [],
+                                        'phase' => '1',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'AB000114'
+                                                                      ]
+                                                        },
+                                        'start' => '90518842'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr9',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '90521248',
+                                        'derived_features' => [],
+                                        'phase' => '0',
+                                        'strand' => '-',
+                                        'type' => 'CDS',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'AB000114'
+                                                                      ]
+                                                        },
+                                        'start' => '90520309'
+                                      }
+                                    ],
+                                    [],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr9',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '90521264',
+                                        'derived_features' => [],
+                                        'phase' => undef,
+                                        'strand' => '-',
+                                        'type' => 'five_prime_UTR',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'AB000114'
+                                                                      ]
+                                                        },
+                                        'start' => '90521249'
+                                      }
+                                    ],
+                                    [
+                                      {
+                                        'source' => 'UCSC',
+                                        'seq_id' => 'chr9',
+                                        'child_features' => [],
+                                        'score' => undef,
+                                        'end' => '90527968',
+                                        'derived_features' => [],
+                                        'phase' => undef,
+                                        'strand' => '-',
+                                        'type' => 'five_prime_UTR',
+                                        'attributes' => {
+                                                          'Parent' => [
+                                                                        'AB000114'
+                                                                      ]
+                                                        },
+                                        'start' => '90527892'
+                                      }
+                                    ]
+                                  ],
+              'score' => undef,
+              'end' => '90527968',
+              'derived_features' => [],
+              'phase' => undef,
+              'strand' => '-',
+              'type' => 'mRNA',
+              'attributes' => {
+                                'Alias' => [
+                                             'OMD'
+                                           ],
+                                'ID' => [
+                                          'AB000114'
+                                        ],
+                                'Ontology_term' => [
+                                                     'GO:0007155',
+                                                     'GO:0005194',
+                                                     'GO:0005578'
+                                                   ],
+                                'Note' => [
+                                            'osteomodulin'
+                                          ],
+                                'Dbxref' => [
+                                              'AFFX-U95:41031_at',
+                                              'Genbank-protein:BAA19055',
+                                              'Unigene:Hs.94070',
+                                              'AFFX-U133:205907_s_at',
+                                              'Genbank-mRNA:AB000114',
+                                              'Locuslink:4958',
+                                              'Swissprot:Q99983',
+                                              'Swissprot:OMD_HUMAN',
+                                              'Refseq-mRNA:NM_005014',
+                                              'Refseq-protein:NP_005005',
+                                              'PFAM:PF01462',
+                                              'PFAM:00560'
+                                            ]
+                              },
+              'start' => '90517946'
+            },
+            {
+              'source' => 'UCSC',
+              'seq_id' => 'chr30',
+              'child_features' => [
+                                    [],
+                                    [],
+                                    [],
+                                    [],
+                                    [],
+                                    []
+                                  ],
+              'score' => undef,
+              'end' => '45664',
+              'derived_features' => [],
+              'phase' => undef,
+              'strand' => '-',
+              'type' => 'mRNA',
+              'attributes' => {
+                                'ID' => [
+                                          'AB000114'
+                                        ],
+                                'Note' => [
+                                            'guess what this thing has another location'
+                                          ]
+                              },
+              'start' => '11234'
+            }
+          ],
+          [
+            {
+              'source' => 'BLASTN',
+              'seq_id' => 'chr9',
+              'child_features' => [],
+              'score' => '0.0',
+              'end' => '90521248',
+              'derived_features' => [],
+              'phase' => undef,
+              'strand' => '+',
+              'type' => 'match',
+              'attributes' => {
+                                'ID' => [
+                                          'blastresult.1'
+                                        ],
+                                'Target' => [
+                                              'BC046356.1 178 1828'
+                                            ],
+                                'Gap' => [
+                                           'M78 I759 M1561'
+                                         ]
+                              },
+              'start' => '90518850'
+            }
+          ],
+        ];
+$VAR1->[2][0]{'derived_features'}[0] = $VAR1->[2][0]{'child_features'}[1];
+$VAR1->[2][0]{'derived_features'}[1] = $VAR1->[2][0]{'child_features'}[8];
+$VAR1->[3][0]{'child_features'}[0] = $VAR1->[2][0]{'child_features'}[1];
+$VAR1->[3][0]{'child_features'}[4] = $VAR1->[2][0]{'child_features'}[8];
+$VAR1->[3][1]{'child_features'}[0] = $VAR1->[3][0]{'child_features'}[1];
+$VAR1->[3][1]{'child_features'}[1] = $VAR1->[3][0]{'child_features'}[2];
+$VAR1->[3][1]{'child_features'}[2] = $VAR1->[3][0]{'child_features'}[3];
+$VAR1->[3][1]{'child_features'}[3] = $VAR1->[2][0]{'child_features'}[8];
+$VAR1->[3][1]{'child_features'}[4] = $VAR1->[3][0]{'child_features'}[5];
+$VAR1->[3][1]{'child_features'}[5] = $VAR1->[3][0]{'child_features'}[6];
+$VAR1;

@@ -1,0 +1,1060 @@
+ID   A0A171_PYRHR            Unreviewed;       472 AA.
+AC   A0A171;
+DT   05-APR-2011, integrated into UniProtKB/TrEMBL.
+DT   05-APR-2011, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Glutamate synthase small subunit-like protein 1;
+GN   Name=gltY;
+OS   Pyrococcus horikoshii.
+OC   Archaea; Euryarchaeota; Thermococci; Thermococcales; Thermococcaceae;
+OC   Pyrococcus.
+OX   NCBI_TaxID=53953;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RX   PubMed=20630732; DOI=10.1016/j.micres.2010.03.006;
+RA   Dincturk H.B., Cunin R., Akce H.;
+RT   "Expression and functional analysis of glutamate synthase small
+RT   subunit-like proteins from archaeon Pyrococcus horikoshii.";
+RL   Microbiol. Res. 166:294-303(2011).
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ991102; ABJ90457.1; -; Genomic_DNA.
+DR   PIR; D71076; D71076.
+DR   ProteinModelPortal; A0A171; -.
+DR   GO; GO:0050660; F:flavin adenine dinucleotide binding; IEA:InterPro.
+DR   GO; GO:0051536; F:iron-sulfur cluster binding; IEA:InterPro.
+DR   GO; GO:0016491; F:oxidoreductase activity; IEA:InterPro.
+DR   Gene3D; 1.10.1060.10; -; 1.
+DR   InterPro; IPR013027; FAD_pyr_nucl-diS_OxRdtase.
+DR   InterPro; IPR012285; Fum_reductase_C.
+DR   InterPro; IPR006004; Glut_synth_NADPH.
+DR   InterPro; IPR009051; Helical_ferredxn.
+DR   InterPro; IPR023753; Pyr_nucl-diS_OxRdtase_FAD/NAD.
+DR   InterPro; IPR001327; Pyr_OxRdtase_NAD-bd_dom.
+DR   Pfam; PF00070; Pyr_redox; 2.
+DR   Pfam; PF07992; Pyr_redox_2; 2.
+DR   PRINTS; PR00368; FADPNR.
+DR   SUPFAM; SSF46548; Helical_ferredxn; 1.
+DR   TIGRFAMs; TIGR01316; gltA; 1.
+PE   4: Predicted;
+SQ   SEQUENCE   472 AA;  51932 MW;  C444BEF5DB69F2CD CRC64;
+     MPKLIKERVP TPERPVEERI KDFKEVNLGY TFELAKKEAE RCLQCPPEYA PCIKGCPVHI
+     NIPAFIAKIK EGDIKGALRI IWNDNTLPAI TGRVCPQEDQ CEGACVVGKV GDPVNIGKLE
+     RFVADYAREH GIEEELLREF TEKCDGSKGK VAVVGAGPAG LTCAGELAKM GYKVTIFEAL
+     HKPGGVLAYG IPEFRLPKEI LDHELKKLKM LGVEIRTDHV VGKTVTLDEL LQEYDAVFIG
+     TGAGTPKLLN IPGILLDRIY SANEFLTRIN LMKAYEFPEY DTPIAVGKKV IVIGAGNTAM
+     DAARSALRLG AEVTIAYRRG REDMTAREEE IKHAEEEGVK FEFFLQPVEF IGDENGRVKA
+     VKFERTKPLE ERDSKGKRKI VGTGEYVTLE ADTVIIAIGL EPNKIITEDG RLKTNPDGTI
+     VVDENLMTSI PGVFAGGDAI RGEATVILAM GDGKRAAKAI DEYIRRKRGQ NS
+//
+ID   A0AQI4_9ARCH            Unreviewed;       206 AA.
+AC   A0AQI4;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   29-MAY-2013, entry version 14.
+DE   SubName: Full=Putative ammonia monooxygenase;
+DE   Flags: Fragment;
+GN   Name=amoA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Krieger B.U.;
+RL   Submitted (JUL-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE.
+RX   PubMed=18093145; DOI=10.1111/j.1574-6941.2007.00418.x;
+RA   Foesel B.U., Gieseke A., Schwermer C., Stief P., Koch L., Cytryn E.,
+RA   de la Torre J.T., van Rijn J., Minz D., Drake H.L., Schramm A.;
+RT   "Nitrosomonas Nm143-like ammonia oxidizers and Nitrospira marina-like
+RT   nitrite oxidizers dominate the nitrifier community in a marine
+RT   aquaculture biofilm.";
+RL   FEMS Microbiol. Ecol. 63:192-204(2008).
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; AM295170; CAL29415.1; -; Genomic_DNA.
+DR   GO; GO:0004497; F:monooxygenase activity; IEA:UniProtKB-KW.
+DR   Gene3D; 1.20.1450.10; -; 1.
+DR   InterPro; IPR024656; AmoA_arc.
+DR   InterPro; IPR003393; NH3_CH4_mOase_A.
+DR   Pfam; PF12942; Archaeal_AmoA; 1.
+PE   4: Predicted;
+KW   Monooxygenase; Oxidoreductase.
+FT   NON_TER       1      1
+FT   NON_TER     206    206
+SQ   SEQUENCE   206 AA;  22937 MW;  B05A5FD7E5B70D8F CRC64;
+     VWLRRCTHYL FIVVVAVNST LLTINAGDYI FYTDWAWTSY TVFSISQTLM LIVGATYYLT
+     FTGVPGTATY YALIMTVYTW IAKAAWFSLG YPYDFIVTPV WLPSAMLLDL VYWATKKNKH
+     SLILFGGVLV GMSLPLSNMV NLITVADPLE TAFKYPRPTL PPYMTPIEPQ VGKFYNSPVA
+     LGAGAGAVLG CTFAALGCKL NTWTYR
+//
+ID   A0AQI5_9ARCH            Unreviewed;       206 AA.
+AC   A0AQI5;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   29-MAY-2013, entry version 14.
+DE   SubName: Full=Putative ammonia monooxygenase;
+DE   Flags: Fragment;
+GN   Name=amoA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Krieger B.U.;
+RL   Submitted (JUL-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE.
+RX   PubMed=18093145; DOI=10.1111/j.1574-6941.2007.00418.x;
+RA   Foesel B.U., Gieseke A., Schwermer C., Stief P., Koch L., Cytryn E.,
+RA   de la Torre J.T., van Rijn J., Minz D., Drake H.L., Schramm A.;
+RT   "Nitrosomonas Nm143-like ammonia oxidizers and Nitrospira marina-like
+RT   nitrite oxidizers dominate the nitrifier community in a marine
+RT   aquaculture biofilm.";
+RL   FEMS Microbiol. Ecol. 63:192-204(2008).
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; AM295171; CAL29416.1; -; Genomic_DNA.
+DR   EMBL; AM295172; CAL29417.1; -; Genomic_DNA.
+DR   GO; GO:0004497; F:monooxygenase activity; IEA:UniProtKB-KW.
+DR   Gene3D; 1.20.1450.10; -; 1.
+DR   InterPro; IPR024656; AmoA_arc.
+DR   InterPro; IPR003393; NH3_CH4_mOase_A.
+DR   Pfam; PF12942; Archaeal_AmoA; 1.
+PE   4: Predicted;
+KW   Monooxygenase; Oxidoreductase.
+FT   NON_TER       1      1
+FT   NON_TER     206    206
+SQ   SEQUENCE   206 AA;  22997 MW;  A04B5ED7E5AB61FF CRC64;
+     VWLRRCTHYL FIVVVAVNST LLTINAGDYI FYTDWAWTSY TVFSISQTLM LIVGATYYLT
+     FTGVPGTATY YALIMTVYTW IAKAAWFSLG YPYDFIVTPV WLPSAMLLDL VYWATKKNKH
+     SLILFGGVLV GMSLPLFNMV NLITVADPLE TAFKYPRPTL PPYMTPIEPQ VGKFYNSPVA
+     LGAGAGAVLG CTFAALGCKL NTWTYR
+//
+ID   A0AQI7_9ARCH            Unreviewed;       206 AA.
+AC   A0AQI7;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   29-MAY-2013, entry version 14.
+DE   SubName: Full=Putative ammonia monooxygenase;
+DE   Flags: Fragment;
+GN   Name=amoA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Krieger B.U.;
+RL   Submitted (JUL-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE.
+RX   PubMed=18093145; DOI=10.1111/j.1574-6941.2007.00418.x;
+RA   Foesel B.U., Gieseke A., Schwermer C., Stief P., Koch L., Cytryn E.,
+RA   de la Torre J.T., van Rijn J., Minz D., Drake H.L., Schramm A.;
+RT   "Nitrosomonas Nm143-like ammonia oxidizers and Nitrospira marina-like
+RT   nitrite oxidizers dominate the nitrifier community in a marine
+RT   aquaculture biofilm.";
+RL   FEMS Microbiol. Ecol. 63:192-204(2008).
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; AM295173; CAL29418.1; -; Genomic_DNA.
+DR   GO; GO:0004497; F:monooxygenase activity; IEA:UniProtKB-KW.
+DR   Gene3D; 1.20.1450.10; -; 1.
+DR   InterPro; IPR024656; AmoA_arc.
+DR   InterPro; IPR003393; NH3_CH4_mOase_A.
+DR   Pfam; PF12942; Archaeal_AmoA; 1.
+PE   4: Predicted;
+KW   Monooxygenase; Oxidoreductase.
+FT   NON_TER       1      1
+FT   NON_TER     206    206
+SQ   SEQUENCE   206 AA;  22969 MW;  224B5ADB17A273EA CRC64;
+     VWLRRCTHYL FIVVVAVNST LLTINAGDYI FYTDWAWTSY TVFSISQTLM LIVGATYYLT
+     FTGVPGTATY YAVIMTVYTW IAKAAWFSLG YPYDFIVTPV WLPSAMLLDL VYWATKKNKH
+     SLILFGGVLV GMSLPLFNMV NLITVADPLE TAFKYPRPTL PPYMTPIEPQ VGKFYNSPVA
+     LGAGAGAVLG CTFAALGCKL NTWSYR
+//
+ID   A0AQI8_9ARCH            Unreviewed;       206 AA.
+AC   A0AQI8;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   29-MAY-2013, entry version 14.
+DE   SubName: Full=Putative ammonia monooxygenase;
+DE   Flags: Fragment;
+GN   Name=amoA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Krieger B.U.;
+RL   Submitted (JUL-2006) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE.
+RX   PubMed=18093145; DOI=10.1111/j.1574-6941.2007.00418.x;
+RA   Foesel B.U., Gieseke A., Schwermer C., Stief P., Koch L., Cytryn E.,
+RA   de la Torre J.T., van Rijn J., Minz D., Drake H.L., Schramm A.;
+RT   "Nitrosomonas Nm143-like ammonia oxidizers and Nitrospira marina-like
+RT   nitrite oxidizers dominate the nitrifier community in a marine
+RT   aquaculture biofilm.";
+RL   FEMS Microbiol. Ecol. 63:192-204(2008).
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; AM295174; CAL29419.1; -; Genomic_DNA.
+DR   GO; GO:0004497; F:monooxygenase activity; IEA:UniProtKB-KW.
+DR   Gene3D; 1.20.1450.10; -; 1.
+DR   InterPro; IPR024656; AmoA_arc.
+DR   InterPro; IPR003393; NH3_CH4_mOase_A.
+DR   Pfam; PF12942; Archaeal_AmoA; 1.
+PE   4: Predicted;
+KW   Monooxygenase; Oxidoreductase.
+FT   NON_TER       1      1
+FT   NON_TER     206    206
+SQ   SEQUENCE   206 AA;  23009 MW;  A04B4F27E5AB61FF CRC64;
+     VWLRRCTHYL FIVVVAVNST LLTINAGDYI FYTDWAWTSY TVFSISQTLM LIVGATYYLT
+     FTGVPGTATY YALIMTVYTW IAKAAWFSLG YPYDFIVTPV WLPSAMLLDL VYWATKKNKH
+     SLILFGGVLV GMSLPLFNMV NLITVADPLE TAFKYPRPTL PPYMTPIEPQ VGKFYNSPVA
+     LGAGAGAVLG CTFAALGCKL NTWIYR
+//
+ID   A0EQA2_9EURY            Unreviewed;       159 AA.
+AC   A0EQA2;
+DT   03-OCT-2012, integrated into UniProtKB/TrEMBL.
+DT   03-OCT-2012, sequence version 1.
+DT   06-MAR-2013, entry version 4.
+DE   SubName: Full=Methyl-coenzyme M reductase alpha subunit;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured methanogenic archaeon.
+OC   Archaea; Euryarchaeota; environmental samples.
+OX   NCBI_TaxID=198240;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Rastogi G., Shouche Y.S.;
+RT   "Molecular Phylogenetic Analysis of Methanogens from Cattle Manure.";
+RL   Submitted (NOV-2005) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ275097; ABG23152.1; -; Genomic_DNA.
+DR   EMBL; DQ275098; ABG23153.1; -; Genomic_DNA.
+DR   EMBL; DQ275099; ABG23154.1; -; Genomic_DNA.
+DR   EMBL; DQ275100; ABG23155.1; -; Genomic_DNA.
+DR   EMBL; DQ275102; ABG23157.1; -; Genomic_DNA.
+DR   EMBL; DQ275104; ABG23159.1; -; Genomic_DNA.
+DR   EMBL; DQ275105; ABG23160.1; -; Genomic_DNA.
+DR   EMBL; DQ275106; ABG23161.1; -; Genomic_DNA.
+DR   EMBL; DQ275112; ABG23166.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     159    159
+SQ   SEQUENCE   159 AA;  17630 MW;  2B133791DC959BEA CRC64;
+     VGFTQYATAA YTDNVLDDFT YYGMDYIHDK YKIDVKNPTP KDKVKATQDI VNDIATEVNL
+     YGMEQYEQFP TMMEDHFGGS QRAAVLAAAS GISTSIATGN SNAGLNGWYL SMLLHKDGWS
+     RLGFFGYDLQ DQCGSANSLS IRPDEGCIGE FRGPNYPNY
+//
+ID   A0FGX9_9ARCH            Unreviewed;       144 AA.
+AC   A0FGX9;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994833; ABJ97467.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15566 MW;  F8802E164C671E44 CRC64;
+     AYTDDILDDN VYYDVDYIND KYNGAATIGK DNKVKATLEV VKDIATESTI YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVACALGTAN ANAGLSGWYL SMYVHKEAWG RLGFFGYDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGY0_9ARCH            Unreviewed;       136 AA.
+AC   A0FGY0;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994834; ABJ97468.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     136    136
+SQ   SEQUENCE   136 AA;  14775 MW;  63B4A0156B0E9E24 CRC64;
+     AYADDILDDF VYYGMEYVDD KYGICGTKAS TEVVHDISAE VTMYGLEQYE YPALLEDHFG
+     GSQRAAVVSA AAGCSVAFAT GNSNAGINGW YLSQILHKEA HSRLGFYGYD LQDQCGASNS
+     LSIRSDEGLI HELRGP
+//
+ID   A0FGY1_9ARCH            Unreviewed;       144 AA.
+AC   A0FGY1;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994835; ABJ97469.1; -; Genomic_DNA.
+DR   EMBL; DQ994839; ABJ97473.1; -; Genomic_DNA.
+DR   EMBL; DQ994873; ABJ97507.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15549 MW;  97E88C08BD80BC42 CRC64;
+     AYTDDILDNN VYYDVDYIND KYNGAATIGK DNKVKATLEV VKDIATESTI YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVACALGTAN ANAGLSGWYL SMYVHKEAWG RLGFFGFDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGY2_9ARCH            Unreviewed;       144 AA.
+AC   A0FGY2;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994836; ABJ97470.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15621 MW;  E67F16E89ABB0B94 CRC64;
+     AYTDDILDNN VYYNIDYIND KYNGAANVGK DNKVKATLDV VKDIATESTL YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVCTAIATAN ANAGLSGWYL SMYLHKEAWG RLGFFGYDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGY3_9ARCH            Unreviewed;       138 AA.
+AC   A0FGY3;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 15.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994837; ABJ97471.1; -; Genomic_DNA.
+DR   EMBL; DQ994849; ABJ97483.1; -; Genomic_DNA.
+DR   EMBL; DQ994855; ABJ97489.1; -; Genomic_DNA.
+DR   EMBL; DQ994862; ABJ97496.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  14954 MW;  2268A0C82946535C CRC64;
+     AYTNDVLDDF CYYGVDFAND KFGGFAKAPK LLDTAKELAT EVNAYGMEQY EAYPTLLEDH
+     FGGSQRASVL AAASGITSAI ASGHSQVGLA GWYLSMLLHK EGWGRLGFFG YDLQDQCGPT
+     NVFSYQSDEG NPLELRGA
+//
+ID   A0FGY4_9ARCH            Unreviewed;       144 AA.
+AC   A0FGY4;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994838; ABJ97472.1; -; Genomic_DNA.
+DR   EMBL; DQ994883; ABJ97517.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15606 MW;  2DBA03DB557E0A83 CRC64;
+     AYTDDILDNN VYYDVDYIND KYNGAANVGK DNKVKATLEV VKDIATESTI YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVSTAIATAN ANAGLSGWYL SMYLHKEAWG RLGFFGYDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGY6_9ARCH            Unreviewed;       136 AA.
+AC   A0FGY6;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994840; ABJ97474.1; -; Genomic_DNA.
+DR   EMBL; DQ994841; ABJ97475.1; -; Genomic_DNA.
+DR   EMBL; DQ994843; ABJ97477.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     136    136
+SQ   SEQUENCE   136 AA;  14847 MW;  469BEF5E83EA9146 CRC64;
+     AYTDDILDDF LYYGMEYVDD KYGICGTKAT TEVVHDIAAE VTMYGLEQYE YPALLEDHFG
+     GSQRAAVVSA AAGCSVAFAT GNSNAGINGW YLSQILHKET HSRLGFYGYD LQDQCGASNS
+     LSIRSDEGLI HELRGP
+//
+ID   A0FGY8_9ARCH            Unreviewed;       144 AA.
+AC   A0FGY8;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994842; ABJ97476.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15505 MW;  96A52FCBBC90A812 CRC64;
+     AYTDDILDNN VYYDVDYIND KYNGAATIGK DNKVKATLDV VKDIATESTI YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVACALGTAN ANAGLSGWYL SMYLHKEAWG RLGFFGCDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGZ0_9ARCH            Unreviewed;       144 AA.
+AC   A0FGZ0;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 15.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994844; ABJ97478.1; -; Genomic_DNA.
+DR   EMBL; DQ994850; ABJ97484.1; -; Genomic_DNA.
+DR   EMBL; DQ994851; ABJ97485.1; -; Genomic_DNA.
+DR   EMBL; DQ994869; ABJ97503.1; -; Genomic_DNA.
+DR   EMBL; DQ994872; ABJ97506.1; -; Genomic_DNA.
+DR   EMBL; DQ994877; ABJ97511.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15619 MW;  E612368BCB9E0A91 CRC64;
+     AYTDDILDNN VYYNIDYIND KYNGAANVGK DNKVKATLEV VKDIATESTI YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVSTAIATAN ANAGLSGWYL SMYLHKEAWG RLGFFGYDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGZ1_9ARCH            Unreviewed;       136 AA.
+AC   A0FGZ1;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994845; ABJ97479.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     136    136
+SQ   SEQUENCE   136 AA;  14683 MW;  D756F0828E1D086A CRC64;
+     AYTDDILDDF LYYGMEYVDG KYGICGTKAT TEVVHDIAAE VTMYGLEQYD TPALLEDHFG
+     GSQRAAVVSA AAGCSVAFAT GNSNAGINGW YLSQILHKEA HSRLGFYGYD LQDQCGASNS
+     LSIRSDEGLI HELRGP
+//
+ID   A0FGZ2_9ARCH            Unreviewed;       136 AA.
+AC   A0FGZ2;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 12.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994846; ABJ97480.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     136    136
+SQ   SEQUENCE   136 AA;  14890 MW;  4682E840CF17D0B6 CRC64;
+     AYTDDILDDF LYYGMEYVDD KYGICGTKAT TEVVHDIAAE VTMYGLEQYE YPALLEDHFG
+     GSQRAAVVSA AAGCSVAXXT GNSNXGINGW YLXQILHKET XSRLGFYGYD LQDQCGASNS
+     LSIRSDEGLI HELRGP
+//
+ID   A0FGZ3_9ARCH            Unreviewed;       144 AA.
+AC   A0FGZ3;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994847; ABJ97481.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     144    144
+SQ   SEQUENCE   144 AA;  15565 MW;  91A25FA71D5AAD47 CRC64;
+     AYTDDILDNN VYYDVDYIND KYNGAATIGK DNKVKATLDV VKDIATESTL YGIETYEKFP
+     TALEDHFGGS QRATVLAAAA GVACALGTAN ANAGLSGWYL SMYLHKEAWG RLGFFGYDLQ
+     DQCGATNVLS YQGDEGLPDE LRGP
+//
+ID   A0FGZ4_9ARCH            Unreviewed;       138 AA.
+AC   A0FGZ4;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 15.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994848; ABJ97482.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  15197 MW;  B85D6DE85ED1F7B8 CRC64;
+     AYTDNVLDDF TYYGKDYVED KYGGLTEAPN NMDTVLDVGT EVAFYALEQY EEYPALLETH
+     FGGSQRASVI SAAAGCSTAF ATGNAQTGLS AWYLSMYLHK EQHSRLGFYG FDLQDQCGAA
+     NVFSIRNDEG LPLEMRGP
+//
+ID   A0FGZ8_9ARCH            Unreviewed;       137 AA.
+AC   A0FGZ8;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994852; ABJ97486.1; -; Genomic_DNA.
+DR   EMBL; DQ994859; ABJ97493.1; -; Genomic_DNA.
+DR   EMBL; DQ994867; ABJ97501.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     137    137
+SQ   SEQUENCE   137 AA;  15057 MW;  A15C10D5FB7437C4 CRC64;
+     AYTDNVLDDF TYFGKEYVED KFGITEAPNT MDTVLDVASE VTFYALEQFE DYPALLETIF
+     GGSQRASIVA AAAGCSTAFA TGNAQTGLSG WYLSMYLHKE QHSRLGFYGY DLQDQCGASN
+     VFSIRNDEGL PTELRGP
+//
+ID   A0FGZ9_9ARCH            Unreviewed;       138 AA.
+AC   A0FGZ9;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 14.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994853; ABJ97487.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  15068 MW;  185E0F812B03A02D CRC64;
+     AYTDNVLDDF TYYGKDYVED KXGGLTEAPN NMDTVLDVGT EVAFYALEQY EEYPALLETH
+     FGGSQRASVI SAAAGASTAF ATGNAQTGLS AWYLXMYLHK EXHSRLGFXG FDLQDQCGAA
+     NVFSIRNDEG LPLEMRGP
+//
+ID   A0FH00_9ARCH            Unreviewed;       138 AA.
+AC   A0FH00;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994854; ABJ97488.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  15185 MW;  2D4C3CB6DC4B8ABC CRC64;
+     AYTDNVLDDF TYYGKDYVED KYGDLCSAPN NMDTVLDVGT EVAFYALEQY EEYPALLETH
+     FGGSQRASVV SAAAGCSTAF ATGNAQTGLS AWYLAMYLHK EQHSRLGFYG FDLQDQCGAA
+     NVFSIRNDEG LPLEMRGP
+//
+ID   A0FH02_9ARCH            Unreviewed;       138 AA.
+AC   A0FH02;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 13.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994856; ABJ97490.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  15067 MW;  4124701AAC579BF8 CRC64;
+     AYTDNVLDDF TYYGKDYVED KYGDLCSAPN NMDTVPDVGT EVAFYALEQY EEYPALLEAH
+     FGGSQRASVV SAAAGCSTAF ATGNAQTGLS AWYLAMYLHK EQHSRLGFYG FDLQDQCGAA
+     NVFSIRNDGG LPLEMRGP
+//
+ID   A0FH03_9ARCH            Unreviewed;       138 AA.
+AC   A0FH03;
+DT   28-NOV-2006, integrated into UniProtKB/TrEMBL.
+DT   28-NOV-2006, sequence version 1.
+DT   06-MAR-2013, entry version 15.
+DE   SubName: Full=Methyl coenzyme M reductase;
+DE   Flags: Fragment;
+GN   Name=mcrA;
+OS   uncultured archaeon.
+OC   Archaea; environmental samples.
+OX   NCBI_TaxID=115547;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RA   Gattinger A., Radl V., Chronakova A., Nemcova A., Cuhel J., Simek M.,
+RA   Schloter M., Elthova D.;
+RT   "Outdoor cattle husbandry influences abundance and activity of
+RT   methanogenic archaea in an upland pasture soil.";
+RL   Submitted (SEP-2006) to the EMBL/GenBank/DDBJ databases.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; DQ994857; ABJ97491.1; -; Genomic_DNA.
+DR   GO; GO:0050524; F:coenzyme-B sulfoethylthiotransferase activity; IEA:InterPro.
+DR   GO; GO:0015948; P:methanogenesis; IEA:InterPro.
+DR   Gene3D; 1.20.840.10; -; 1.
+DR   InterPro; IPR022681; MCR_a/b_chain_a-bundle.
+DR   InterPro; IPR008924; Me_CoM_Rdtase_asu/bsu_C.
+DR   InterPro; IPR009047; Me_CoM_Rdtase_asu_C.
+DR   Pfam; PF02249; MCR_alpha; 1.
+DR   SUPFAM; SSF48081; MCR_alpha_beta_C; 1.
+PE   4: Predicted;
+FT   NON_TER       1      1
+FT   NON_TER     138    138
+SQ   SEQUENCE   138 AA;  15196 MW;  042414924BD9EBCB CRC64;
+     PYTDNVLDDF TYYGKDYVED TYGGLTEAPN NMDTVLDVGT EVAFYALEQY EEYPALLETH
+     FGGSQRASVI SAAAGCSTAF ATGNAQTGLS AWYLSMYLHK EQHSRLGFYG FDLQDQCGAA
+     NVFSIRNDEG LPLEMRGP
+//
+ID   F8VC58_9EURY            Unreviewed;       609 AA.
+AC   F8VC58; G1FJV2;
+DT   21-SEP-2011, integrated into UniProtKB/TrEMBL.
+DT   21-SEP-2011, sequence version 1.
+DT   06-MAR-2013, entry version 9.
+DE   RecName: Full=DNA-directed RNA polymerase;
+DE            EC=2.7.7.6;
+OS   Salinarchaeum laminariae.
+OC   Archaea; Euryarchaeota; Halobacteria; Halobacteriales;
+OC   Halobacteriaceae; Salinarchaeum.
+OX   NCBI_TaxID=869888;
+RN   [1]
+RP   NUCLEOTIDE SEQUENCE.
+RC   STRAIN=R26;
+RA   Cui H.-L.;
+RT   "Halophilic archaea isolated from salted kelp.";
+RL   Submitted (JUN-2011) to the EMBL/GenBank/DDBJ databases.
+RN   [2]
+RP   NUCLEOTIDE SEQUENCE.
+RC   STRAIN=R22;
+RA   Cui H.-L.;
+RT   "Alophilic archaea isolated from salted kelp.";
+RL   Submitted (JUL-2011) to the EMBL/GenBank/DDBJ databases.
+CC   -!- CATALYTIC ACTIVITY: Nucleoside triphosphate + RNA(n) = diphosphate
+CC       + RNA(n+1).
+CC   -!- SIMILARITY: Belongs to the RNA polymerase beta chain family.
+CC   -----------------------------------------------------------------------
+CC   Copyrighted by the UniProt Consortium, see http://www.uniprot.org/terms
+CC   Distributed under the Creative Commons Attribution-NoDerivs License
+CC   -----------------------------------------------------------------------
+DR   EMBL; JN164655; AEJ33658.1; -; Genomic_DNA.
+DR   EMBL; JN206649; AEM24819.1; -; Genomic_DNA.
+DR   GO; GO:0003677; F:DNA binding; IEA:InterPro.
+DR   GO; GO:0003899; F:DNA-directed RNA polymerase activity; IEA:UniProtKB-KW.
+DR   GO; GO:0032549; F:ribonucleoside binding; IEA:InterPro.
+DR   GO; GO:0008270; F:zinc ion binding; IEA:InterPro.
+DR   GO; GO:0006351; P:transcription, DNA-dependent; IEA:InterPro.
+DR   Gene3D; 2.40.270.10; -; 2.
+DR   Gene3D; 2.40.50.150; -; 1.
+DR   InterPro; IPR015712; DNA-dir_RNA_pol_su2.
+DR   InterPro; IPR007120; DNA-dir_RNA_pol_su2_6.
+DR   InterPro; IPR007121; RNA_pol_bsu_CS.
+DR   InterPro; IPR007646; RNA_pol_Rpb2_4.
+DR   InterPro; IPR007647; RNA_pol_Rpb2_5.
+DR   InterPro; IPR007641; RNA_pol_Rpb2_7.
+DR   InterPro; IPR014724; RNA_pol_RPB2_OB-fold.
+DR   InterPro; IPR019969; RNAP_B.
+DR   PANTHER; PTHR20856; PTHR20856; 1.
+DR   Pfam; PF04566; RNA_pol_Rpb2_4; 1.
+DR   Pfam; PF04567; RNA_pol_Rpb2_5; 1.
+DR   Pfam; PF00562; RNA_pol_Rpb2_6; 1.
+DR   Pfam; PF04560; RNA_pol_Rpb2_7; 1.
+DR   TIGRFAMs; TIGR03670; rpoB_arch; 1.
+DR   PROSITE; PS01166; RNA_POL_BETA; 1.
+PE   3: Inferred from homology;
+KW   DNA-directed RNA polymerase; Nucleotidyltransferase; Transcription;
+KW   Transferase.
+SQ   SEQUENCE   609 AA;  67720 MW;  92014A2DDB3435E9 CRC64;
+     MASQQREAKV YVNGSLVGTH PDPERLAAQV REARRRGEVS EMVNVSVKDR TQEVIINADA
+     GRARRPLIVV DEGEPLLDDD ELDALEDGDI SFEDLVEAGY VEFIDAEEEE DIFVAVDEEE
+     LTEDHTHLEI DPQLMFGIGA GMIPYPEHNA SPRITMGAGM IKQSLGLPAA NYRIRPDTRQ
+     HLLHYPQLSM VKTQTTEQIG YDDRPAAQNF TVAVMSYEGF NIEDALILNQ GSVDRALARS
+     HFFRTYEGEE RRYPGGQEDH FEIPDQDVRG ARGEEAYTHL DDDGLVNPET QVGENDVLLG
+     KTSPPRFLEE PDDMGGLSPQ KRRETSVTMR SGESGVVDTV TLMEGEDGSK LSKVSVRDER
+     IPEMGDKFAS RHGQKGVVGH IAPQEDMPFT EDGVVPDLIV NPHALPSRMT VGHILEMIGG
+     KVGALEGRRV DGTPFLGEDE DELRGSLEDH GFKSSGKEVM YSGVTGEKID AEIFVGCIFY
+     QKLYHMVSNK IHARSRGPVQ VLTRQPTEGR AREGGLRIGE MERDVFIGHG AAMTLKERLL
+     DESDREFIPI CAQCGMAAVE NVEQRRVYCP NCDEETDIHD IEMSYAFKLL LDEMKALGIA
+     PRLELEDAV
+//

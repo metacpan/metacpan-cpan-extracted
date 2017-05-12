@@ -1,0 +1,86 @@
+The file is the README for BSD::Process version 0.07
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+Building this module requires a FreeBSD system and a C compiler.
+Support for OpenBSD and NetBSD will appear in future releases.
+
+TESTING
+
+This module requires the following module for thorough testing:
+
+    Test::More
+
+This module will use the following modules if they are available:
+(their absence is not a problem).
+
+    Test::Pod
+    Test::Pod::Coverage
+
+It can also make use of Devel::Cover if available.
+
+UNINSTALLATION
+
+This Perl module has components which will be found in the following
+directories:
+
+  .../perl5/site_perl/5.x.x/mach/auto/BSD/Process/*
+  .../perl5/site_perl/5.x.x/mach/BSD/Process.pm
+  .../perl5/5.x.x/man/man3/BSD::Process.3
+
+USAGE
+
+    use BSD::Process;
+
+    my $proc = BSD::Process->new;
+    print $proc->rssize, " resident set size\n";
+    print "This process has made $proc->{minflt}  page reclaims\n";
+
+    print $proc->user_time, " seconds spent on the CPU\n";
+    $proc->refresh;
+    print "And now $proc->{utime} seconds\n";
+
+There are a few useful programs bundled with the distribution that
+won't be installed. If you can't find them on your system, have a
+look at the online versions, available at http://search.cpan.org
+and/or http://kobesearch.cpan.org .
+
+HELPING
+
+Patches welcome!
+
+If you would like to see this module work on other operating systems,
+but don't particularly wish to hack on the source yourself, and you
+have a publically accessible machine on the net, and you are fine
+with the idea of giving me an account on said machine, then drop
+me a line.
+
+I will send you my public key for connecting via ssh. All I need
+is a shell and a C compiler, and I give you my word that I will not
+do anything evil. I will connect only from a fixed address or
+addresses (which would allow you to set up an AllowUsers USER@HOST
+rule in your sshd_config file).
+
+STATUS
+
+This module is under active development. Contributions welcome via
+github. See https://github.com/dland/BSD-Process
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2006-2013.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

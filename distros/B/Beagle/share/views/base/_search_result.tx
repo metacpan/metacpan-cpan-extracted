@@ -1,0 +1,17 @@
+: if $entries.size() {
+<div class="list">
+: for $entries -> $entry {
+    <div class="summary">
+    <h4><a target="_blank" id="<: $entry.id :>" href="<: $prefix :>entry/<: $entry.id :>"><: $entry.summary :></a></h4>
+    </div>
+: }
+</div>
+
+: if ( !$static && !$disable_page) {
+: include "page.tx";
+: }
+</div>
+
+: } else {
+    <div class="no-results"><: _('No results found.') :></div>
+: }

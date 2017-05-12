@@ -1,0 +1,93 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Biblio::Citation::Parser 1.10 Documentation - Reference Parsing</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Reference Parsing</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#parsing_references">Parsing References</a></li>
+	<li><a href="#creating_an_openurl">Creating an OpenURL</a></li>
+	<li><a href="#metadata_structure">Metadata Structure</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="parsing_references">Parsing References</a></h1>
+<p>Biblio::Citation::Parser is designed for parsing citations, and this can be done very simply:</p>
+<pre>
+ use Biblio::Citation::Parser::Standard;
+ my $parser = new Biblio::Citation::Parser::Standard();
+ my $metadata = $parser-&gt;parse(&quot;Jewell, M (2002) Parsing Examples&quot;);</pre>
+<p>The <code>$metadata</code> variable is a hash containing the information extracted from the reference.</p>
+<p>If you'd prefer to use another parser, simply substitute the 'Standard' for the appropriate module. Biblio::Citation::Parser is distributed with the Jiao module, which is a slightly modified version of a module created by Zhuoan Jiao. To use this instead of the Standard module, you would do the following:</p>
+<pre>
+ use Biblio::Citation::Parser::Jiao;
+ my $parser = new Biblio::Citation::Parser::Jiao();
+ my $metadata = $parser-&gt;parse(&quot;Jewell, M (2002) Parsing Examples&quot;);</pre>
+<p>The Standard module provides slightly richer metadata than the Jiao module, but it does rely on templates (see Biblio::Citation::Parser::Templates) so requires updating as new citation formats are found.</p>
+<p>
+</p>
+<hr />
+<h1><a name="creating_an_openurl">Creating an OpenURL</a></h1>
+<p>Once you have the metadata from the reference, it is easy to create an OpenURL from it:</p>
+<pre>
+ use Biblio::Citation::Parser::Standard;
+ use Biblio::Citation::Parser::Utils;
+ my $parser = new Biblio::Citation::Parser::Standard();
+ my $metadata = $parser-&gt;parse(&quot;Jewell, M (2002) Parsing Examples&quot;);
+ my $openurl = create_openurl($metadata);</pre>
+<p>The OpenURLs created by Biblio::Citation::Parser do not have a Base URL prefixed, so this should be carried out before they are used (the ParaCite base URL is <a href="http://paracite.eprints.org/cgi-bin/openurl.cgi).">http://paracite.eprints.org/cgi-bin/openurl.cgi).</a></p>
+<p>If you would like to try to extract more information from the metadata, you can use the <code>decompose_openurl</code> function:</p>
+<pre>
+ my ($enriched_metadata, @errors) = decompose_openurl($metadata);
+ 
+This tries to extract information from SICIs, page ranges, etc, and also checks the fields for validity (the C&lt;@errors&gt; array contains any mistakes).</pre>
+<p>Note that the create_openurl has been superceded by URI::OpenURL, but the metadata returned by <code>trim_openurl</code> is in the correct format to be passed to this module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="metadata_structure">Metadata Structure</a></h1>
+<p>Biblio::Citation::Parser supports all of the fields specified in Table 1 of the OpenURL specification (http://www.sfxit.com/openurl/openurl.html). Specific parsers can add their own fields, but these are not exported when OpenURLs are created. Biblio::Citation::Parser::Standard provides the following extra fields:</p>
+<dl>
+<dt><strong><a name="item_marked"><strong>marked</strong></a></strong><br />
+</dt>
+<dd>
+A marked-up version of the reference. e.g. &lt;author&gt;Jewell, M&lt;/author&gt; (&lt;year&gt;2002&lt;/year&gt;) &lt;title&gt;A title&lt;/title&gt;.
+</dd>
+<p></p>
+<dt><strong><a name="item_match"><strong>match</strong></a></strong><br />
+</dt>
+<dd>
+The template matched by Biblio::Citation::Parser::Standard
+</dd>
+<p></p>
+<dt><strong><a name="item_ref"><strong>ref</strong></a></strong><br />
+</dt>
+<dd>
+The original reference
+</dd>
+<p></p></dl>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Reference Parsing</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

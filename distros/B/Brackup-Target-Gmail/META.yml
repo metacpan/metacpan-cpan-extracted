@@ -1,0 +1,16 @@
+---
+name: Brackup-Target-Gmail
+version: 0.1
+author:
+  - Simon Wistow <simon@thegestalt.org>
+abstract: a GMail target to Brackup
+license: perl
+requires:
+  File::Temp: 0
+  Net::FS::Gmail: 0
+  Test::More: 0
+provides:
+  Brackup::Target::Gmail:
+    file: lib/Brackup/Target/Gmail.pm
+    version: 0.1
+generated_by: Module::Build version 0.2611

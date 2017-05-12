@@ -1,0 +1,13 @@
+Revision history for Bio-RNA-SpliceSites-Scoring-MaxEntScan
+
+0.01    2014-08-17 14:59:00
+        First version, splice models as submodules, two splice scoring functions, integration testing, basic POD docs.
+
+0.02    2014-08-18 12:04:00
+	Added comprehensive subroutine documentation to pass POD coverage tests.
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+foo: bar
+
+baz:
+    - 1
+    - 2
+    - 3
+
+obj:
+    $class: 'Beam::Wire'
+    $args:
+        services:
+            foo: bar

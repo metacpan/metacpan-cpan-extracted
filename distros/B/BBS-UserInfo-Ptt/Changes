@@ -1,0 +1,24 @@
+Revision history for BBS-UserInfo-Ptt
+
+0.06	2006-08-20
+	- Fix typo.
+
+0.05	2006-08-20
+	- If timeout, then return undef.
+
+0.04	2006-08-20
+	- Use '-re'.
+	- Introduce timeout & debug.
+	- Fix regular expression to parse nickname, lastlogintime, and
+	  lastloginip.
+
+0.03	2006-08-20
+	- Turn off Expect output.
+	- Not use quotemeta to hostname.
+
+0.02	2006-08-20
+	- Bug fix about initial problem.
+
+0.01    2006-08-19
+        - First version.
+

@@ -1,0 +1,79 @@
+Revision history for Perl extension Business::DPD
+
+0.22  2014-01-21 16:15:45
+    all done by Jozef Kutej:
+    - using TTF-File again because utf8 characters don't work the other way
+      closing file descriptors that remains open due to bug in PDF::Reuse
+      (http://rt.cpan.org/Ticket/Display.html?id=41287)
+    - add Business::DPD::DataExchange::mpsexpdata (for MPSEXDATA file generation and parsing)
+    - add Business::DPD::Address (for DPD addresses handling)
+    - add Business::DPD country_alpha2() and routing_meta() functions
+    - add Business::DPD::Parcel get status of a parcel
+
+0.21   2009-02-13 12:10:26
+    - Improve rendering to stick closer to official UPS-Label spec
+    - Smaller pdf template filesize
+
+0.20   2009-02-13 12:10:26
+    - potential fix for wrong route calculation if the ROUTE.db 
+      defines service codes (see DE zip 70734)
+
+
+0.19   2009-01-08 09:49:09
+    - removed full route DB and replaced it with a small testing DB
+
+
+0.18	2008-12-01 10:54:10
+    - Due to a bug in PDF::Reuse (http://rt.cpan.org/Ticket/Display.html?id=41287)
+      using an external TTF-File can lead to problems with to many open filehandles
+      Therefore SlimA6 now uses the plain Times font.
+
+
+0.17   2008-11-11 12:14:52
+    - added dependency on Text::Autoformat
+    - wrap text that might be to long
+    - nicer test data (ACME++)
+
+
+0.16	2008-11-04 21:26:18
+    - Smaller pdf template made in AI (Maros Kollar)
+
+
+0.15	2008-11-03 11:27:11
+    - squash a undefined-value warning (Thomas Klausner)
+    - Fixed 'lable' typos in pod (Maros Kollar)
+
+
+0.14   2008-10-27 15:10:33
+    - fix problem with postcodes that are included in other postcodes 
+      (eg DE-51643) - thanks to maros for spotting this 
+    - fix end_postcode in embedded sqlite DB 
+
+
+0.13   2008-10-26 20:27:45
+    - split up render into several methods for easier subclassing
+    - add y_offset
+    - fix encoding issue
+    -_multiline can now handle a string and an arrayref
+
+
+0.12   2008-10-25 16:00:13
+    - use plain barcode for filename
+    - do not autogenerate city line for recipient
+    - import: set end_postcode to begin_postcode if its not defined 
+    - added missing dependency on DBIx::Class (thanks to cpan testers 
+      again..)
+    - more tests
+
+
+0.11   2008-10-23 10:40:55
+    - added deps to Build.PL (thanks to CPAN testers for the hints, 
+      but I blame spinne because she pressed me into a hastly release on #Austria.pm
+
+
+0.10   2008-10-22 22:32:11
+    - first proper (local) release
+
+
+0.01    Tue Oct 14 15:44:13 2008
+    - original version

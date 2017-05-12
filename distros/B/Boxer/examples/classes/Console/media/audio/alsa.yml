@@ -1,0 +1,9 @@
+classes:
+  - Console.media
+parameters:
+  doc:
+    console-media:
+      pkg:
+        - include core ALSA audio tools
+  pkg:
+    - alsa-utils

@@ -1,0 +1,30 @@
+---
+abstract: 'Validate russian business-related numbers'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-RU
+provides:
+  Business::RU:
+    file: lib/Business/RU.pm
+    version: 0.2
+  Business::RU::BankAccount:
+    file: lib/Business/RU/BankAccount.pm
+    version: 0
+  Business::RU::INN:
+    file: lib/Business/RU/INN.pm
+    version: 0
+  Business::RU::OKPO:
+    file: lib/Business/RU/OKPO.pm
+    version: 0
+requires:
+  Moose: 0
+version: 0.2

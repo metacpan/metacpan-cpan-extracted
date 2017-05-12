@@ -1,0 +1,20 @@
+#! /usr/bin/perl -w
+
+# $Id: endnote-format,v 1.2 2007/02/16 01:16:48 mike Exp $
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Biblio::EndnoteStyle;
+
+my %opts;
+if (!getopts('d', \%opts) || @ARGV < 1 || @ARGV % 2 != 1) {
+    print STDERR "Usage: $0 [options] 'template' key1 val1 [keyN valN] ...
+	-d	Dump compiled recipe to standard error\n";
+    exit 1;
+}
+
+my($template, %data) = @ARGV;
+my $style = new Biblio::EndnoteStyle();
+$style->debug(1) if $opts{d};
+print $style->format($template, \%data);

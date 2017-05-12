@@ -1,0 +1,30 @@
+---
+abstract: 'access the xISBN service'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-xISBN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::ISBN: '2'
+  Mojo::DOM: '0'
+  Mojo::UserAgent: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/business-xisbn/issues
+  homepage: https://github.com/briandfoy/business-xisbn
+  repository: https://github.com/briandfoy/business-xisbn.git
+version: '1.002'

@@ -1,0 +1,6 @@
+#FIXME: check if antiword catdoc html2text and/or others are needed
+classes:
+  - cli.web
+parameters:
+  pkg:
+    - mc

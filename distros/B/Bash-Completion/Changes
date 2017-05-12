@@ -1,0 +1,36 @@
+# Changes for Bash-Completion
+
+0.008     2011-10-22 17:52:11 Europe/Lisbon
+     * Switch deprecated dzil plugin BumpVersionFromGit to
+       Git::NextVersion
+
+0.007     2011-10-22 16:21:03 Europe/Lisbon
+     * Fix dependencies to be able to use Plugin::Perldoc
+     * Load modules with latest version of Module::Load instead of
+       require string (see http://bit.ly/qrCjvZ for further discussion)
+     * Refactor and reuse the logic to create test filesystem commands
+
+0.006 Wed Oct 19 10:13:07 UTC 2011
+     * Make sure our fake files have the proper permissions (Rob
+       Hoelz++, via pull request #3)
+
+0.005 Sun Aug  7 13:21:11 UTC 2011
+     * Make some tests more robust, should work on Windows now
+     * Bump Getopt::Long required version to make sure we have
+       GetOptionsFromArray
+
+0.004 Sun Aug  7 12:54:44 UTC 2011
+     * Attemp to fix CPANTesters test failures regarding plugin setup
+     * Fixed one place where we missed \h => \s in 0.002
+
+0.003 Mon Aug  1 14:04:58 UTC 2011
+     * Fixed extra POD in the setup-bash-complete (RT# 69936)
+
+0.002 Mon Aug  1 11:19:16 UTC 2011
+     * Fixed failed test reports with namespace prefixes
+     * Made command_in_path() cross platform (@consttype++)
+     * Replace too recent \h with \s
+     * Fixed some Pod::Weaver issues with setup-bash-complete
+
+0.001 Mon Jun 14 10:10:18 UTC 2010
+     * Initial release

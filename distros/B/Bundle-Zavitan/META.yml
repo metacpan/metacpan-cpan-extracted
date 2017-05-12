@@ -1,0 +1,38 @@
+---
+abstract: 'A bundle to install external CPAN modules used by the'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bundle-Zavitan
+provides:
+  Bundle::Zavitan:
+    file: lib/Bundle/Zavitan.pm
+    version: v0.2.2
+requires:
+  CGI: 0
+  Crypt::Blowfish: 0
+  DBD::mysql: 0
+  DBI: 0
+  Data::Dumper: 0
+  Date::DayOfWeek: 0
+  Date::Parse: 0
+  MIME::Base64: 0
+  Math::BigInt: 0
+  Net::SMTP: 0
+  Time::DaysInMonth: 0
+  perl: 5.008
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/zavitan-a-seminars-manager
+version: v0.2.2

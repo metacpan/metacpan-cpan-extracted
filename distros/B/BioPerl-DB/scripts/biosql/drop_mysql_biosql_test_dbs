@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict;
+use DBI;
+my $dns="DBI:mysql:host=localhost";
+my $dbh=DBI->connect($dns, 'root', '') or die "Connect error: $DBI::error";
+
+my $table_pattern='_test_db_%';
+my $sql="SHOW DATABASES LIKE '$table_pattern'";
+my $sth=$dbh->prepare($sql);
+$sth->execute;
+my $arrayref=$sth->fetchall_arrayref;
+
+print join("\n", map{$_->[0]} @$arrayref), "\n";
+
+for my $db_name (map{$_->[0]} @$arrayref){
+    $sql="DROP DATABASE $db_name";
+    $dbh->do($sql);
+}
+
+__END__
+
+=head1 NAME
+
+drop_mysql_biosql_test_dbs
+
+=head1 SYNOPSIS
+
+In shell command line,
+
+    drop_mysql_biosql_test_dbs 
+
+
+=head1 DESCRIPTION
+
+THIS script is for bioperl-db developers to drop all test databases,
+which may be generated during runing 'make test'.
+
+NOTE: This script is only for mysql database, since within my knowledge on 
+DBI, I do not know how to connect to Oracle host without specific database.
+As well, I do not have Oracle installed. You are welcome to adapt it into
+Oracle and other RDBMS! :-)
+
+=head1 AUTHOR
+
+Juguang XIAO, juguang at tll.org.sg
+
+=cut

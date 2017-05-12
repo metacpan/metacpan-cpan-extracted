@@ -1,0 +1,512 @@
+BLASTN 2.2.18 [Mar-02-2008]
+
+
+Reference: Altschul, Stephen F., Thomas L. Madden, Alejandro A. Schaffer, 
+Jinghui Zhang, Zheng Zhang, Webb Miller, and David J. Lipman (1997), 
+"Gapped BLAST and PSI-BLAST: a new generation of protein database search
+programs",  Nucleic Acids Res. 25:3389-3402.
+
+Query= SGN-U234234
+         (820 letters)
+
+Database: SGN Tomato Combined - WGS, BAC, and unigene sequences 
+           626,541 sequences; 1,350,414,477 total letters
+
+Searching..................................................done
+
+
+
+                                                                 Score    E
+Sequences producing significant alignments:                      (bits) Value
+
+SGN-U578206 Tomato 200607#2 [6 ESTs aligned] (*GB) gi|27884018|g...  1602   0.0  
+SL2.40ch06                                                            961   0.0  
+SGN-U580132 Tomato 200607#2 [61 ESTs aligned] (*GB) gi|27883932|...   511   e-143
+SGN-U578259 Tomato 200607#2 [2 ESTs aligned] (*GB) gi|27883932|g...   367   3e-99
+LE_HBa0209K10_T7_371815                                               186   6e-45
+SL2.40ch12                                                            149   1e-33
+
+>SGN-U578206 Tomato 200607#2 [6 ESTs aligned] (*GB) gi|27884018|gb|AAO23981.1|
+            (e_value=0) vacuolar H+-ATPase A2 subunit isoform;
+            V-ATPase A2 subunit isoform [Lycopersicon esculentum];
+            (*ATH) AT1G78900.1 (e_value=0)  Symbol: VHA-A | Encodes
+            catalytic subunit A of the vacuolar ATP synthase.
+            Mutants are devoid of vacuolar ATPase activity as subunit
+            A is encoded only by this gene and show strong defects in
+            male gametophyte development and in Golgi stack
+            morphology... ; (*SWP) sp|P09469|VATA_DAUCA (e_value=0)
+            Vacuolar ATP synthase catalytic subunit A OS=Daucus
+            carota;
+          Length = 2361
+
+ Score = 1602 bits (808), Expect = 0.0
+ Identities = 811/812 (99%)
+ Strand = Plus / Minus
+
+                                                                        
+Query: 1    ccagaaacatgtattatagacctttattacaaagttattgcacatctgataacaacaaaa 60
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2361 ccagaaacatgtattatagacctttattacaaagttattgcacatctgataacaacaaaa 2302
+
+                                                                        
+Query: 61   cgaaaaccagtgcaatacatacccaagtgatcataatgcttaggtacactttgctgtcac 120
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2301 cgaaaaccagtgcaatacatacccaagtgatcataatgcttaggtacactttgctgtcac 2242
+
+                                                                        
+Query: 121  ctttaattttcaagtctgatgataaagagaggattgaaactgaataaattcacctaaacg 180
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2241 ctttaattttcaagtctgatgataaagagaggattgaaactgaataaattcacctaaacg 2182
+
+                                                                        
+Query: 181  accccttgcctaaccgtgttacaaaaataaattgagttacaccaactaaacaacaaattt 240
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2181 accccttgcctaaccgtgttacaaaaataaattgagttacaccaactaaacaacaaattt 2122
+
+                                                                        
+Query: 241  aaggcaccatcccatttttacttatccagctctagcatccaaacgaccatttcagtgtgg 300
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2121 aaggcaccatcccatttttacttatccagctctagcatccaaacgaccatttcagtgtgg 2062
+
+                                                                        
+Query: 301  acaacagcacataactgattcaatggttggacccgtccaagaactggaatacatctactg 360
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2061 acaacagcacataactgattcaatggttggacccgtccaagaactggaatacatctactg 2002
+
+                                                                        
+Query: 361  aagtgaggacttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcat 420
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 2001 aagtgaggacttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcat 1942
+
+                                                                        
+Query: 421  gaagcttcttaaacttggctaccaaagcatcctctccttcggctggatcctcaaattttt 480
+            |||||||||||||||||||||||||||||||||||||||||| |||||||||||||||||
+Sbjct: 1941 gaagcttcttaaacttggctaccaaagcatcctctccttcgggtggatcctcaaattttt 1882
+
+                                                                        
+Query: 481  gggacaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatct 540
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 1881 gggacaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatct 1822
+
+                                                                        
+Query: 541  tctggccatccataccagctcctcgttcaacggcctggttggctaagttatagaaatgga 600
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 1821 tctggccatccataccagctcctcgttcaacggcctggttggctaagttatagaaatgga 1762
+
+                                                                        
+Query: 601  taatattccgtaacatccaaacagacttgtagaaaggacagaatttgtcgtacggagtaa 660
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 1761 taatattccgtaacatccaaacagacttgtagaaaggacagaatttgtcgtacggagtaa 1702
+
+                                                                        
+Query: 661  atgcattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaagtgattttat 720
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 1701 atgcattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaagtgattttat 1642
+
+                                                                        
+Query: 721  ctgtttcagctagagcatctttaccaacaagttgcacaatttcatttaggtcatcctccc 780
+            ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 1641 ctgtttcagctagagcatctttaccaacaagttgcacaatttcatttaggtcatcctccc 1582
+
+                                            
+Query: 781  tttgcagaacctcacgggcttttgtccttatg 812
+            ||||||||||||||||||||||||||||||||
+Sbjct: 1581 tttgcagaacctcacgggcttttgtccttatg 1550
+
+
+>SL2.40ch06 
+          Length = 46041636
+
+ Score =  961 bits (485), Expect = 0.0
+ Identities = 485/485 (100%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 1        ccagaaacatgtattatagacctttattacaaagttattgcacatctgataacaacaaaa 60
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408670 ccagaaacatgtattatagacctttattacaaagttattgcacatctgataacaacaaaa 36408729
+
+                                                                            
+Query: 61       cgaaaaccagtgcaatacatacccaagtgatcataatgcttaggtacactttgctgtcac 120
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408730 cgaaaaccagtgcaatacatacccaagtgatcataatgcttaggtacactttgctgtcac 36408789
+
+                                                                            
+Query: 121      ctttaattttcaagtctgatgataaagagaggattgaaactgaataaattcacctaaacg 180
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408790 ctttaattttcaagtctgatgataaagagaggattgaaactgaataaattcacctaaacg 36408849
+
+                                                                            
+Query: 181      accccttgcctaaccgtgttacaaaaataaattgagttacaccaactaaacaacaaattt 240
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408850 accccttgcctaaccgtgttacaaaaataaattgagttacaccaactaaacaacaaattt 36408909
+
+                                                                            
+Query: 241      aaggcaccatcccatttttacttatccagctctagcatccaaacgaccatttcagtgtgg 300
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408910 aaggcaccatcccatttttacttatccagctctagcatccaaacgaccatttcagtgtgg 36408969
+
+                                                                            
+Query: 301      acaacagcacataactgattcaatggttggacccgtccaagaactggaatacatctactg 360
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36408970 acaacagcacataactgattcaatggttggacccgtccaagaactggaatacatctactg 36409029
+
+                                                                            
+Query: 361      aagtgaggacttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcat 420
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36409030 aagtgaggacttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcat 36409089
+
+                                                                            
+Query: 421      gaagcttcttaaacttggctaccaaagcatcctctccttcggctggatcctcaaattttt 480
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36409090 gaagcttcttaaacttggctaccaaagcatcctctccttcggctggatcctcaaattttt 36409149
+
+                     
+Query: 481      gggac 485
+                |||||
+Sbjct: 36409150 gggac 36409154
+
+
+
+ Score =  202 bits (102), Expect = 1e-49
+ Identities = 105/106 (99%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 651      tacggagtaaatgcattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaa 710
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36409850 tacggagtaaatgcattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaa 36409909
+
+                                                              
+Query: 711      gtgattttatctgtttcagctagagcatctttaccaacaagttgca 756
+                ||||||||||||||||||||||||||||||||||||||||| ||||
+Sbjct: 36409910 gtgattttatctgtttcagctagagcatctttaccaacaagctgca 36409955
+
+
+
+ Score =  186 bits (94), Expect = 6e-45
+ Identities = 94/94 (100%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 484      acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 543
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36409298 acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 36409357
+
+                                                  
+Query: 544      ggccatccataccagctcctcgttcaacggcctg 577
+                ||||||||||||||||||||||||||||||||||
+Sbjct: 36409358 ggccatccataccagctcctcgttcaacggcctg 36409391
+
+
+
+ Score =  159 bits (80), Expect = 1e-36
+ Identities = 80/80 (100%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 574      cctggttggctaagttatagaaatggataatattccgtaacatccaaacagacttgtaga 633
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36409692 cctggttggctaagttatagaaatggataatattccgtaacatccaaacagacttgtaga 36409751
+
+                                    
+Query: 634      aaggacagaatttgtcgtac 653
+                ||||||||||||||||||||
+Sbjct: 36409752 aaggacagaatttgtcgtac 36409771
+
+
+
+ Score =  121 bits (61), Expect = 3e-25
+ Identities = 61/61 (100%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 752      ttgcacaatttcatttaggtcatcctccctttgcagaacctcacgggcttttgtccttat 811
+                ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 36410852 ttgcacaatttcatttaggtcatcctccctttgcagaacctcacgggcttttgtccttat 36410911
+
+                 
+Query: 812      g 812
+                |
+Sbjct: 36410912 g 36410912
+
+
+>SGN-U580132 Tomato 200607#2 [61 ESTs aligned] (*GB) gi|27883932|gb|AAO23980.1|
+            (e_value=0) vacuolar H+-ATPase A1 subunit isoform;
+            V-ATPase A1 subunit isoform [Lycopersicon esculentum];
+            (*ATH) AT1G78900.1 (e_value=0)  Symbol: VHA-A | Encodes
+            catalytic subunit A of the vacuolar ATP synthase.
+            Mutants are devoid of vacuolar ATPase activity as subunit
+            A is encoded only by this gene and show strong defects in
+            male gametophyte development and in Golgi stack
+            morphology... ; (*SWP) sp|P09469|VATA_DAUCA (e_value=0)
+            Vacuolar ATP synthase catalytic subunit A OS=Daucus
+            carota;
+          Length = 2454
+
+ Score =  511 bits (258), Expect = e-143
+ Identities = 396/442 (89%)
+ Strand = Plus / Minus
+
+                                                                        
+Query: 371  ttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcatgaagcttctt 430
+            ||||||||| |||||||||||||||||||||||||||  |||||||||||||||||||| 
+Sbjct: 2038 ttatcgagtctcatcctcaaggttgcggaaaccagcaaccaaatcatcatgaagcttctg 1979
+
+                                                                        
+Query: 431  aaacttggctaccaaagcatcctctccttcggctggatcctcaaatttttgggacaccaa 490
+            ||||||| | |||| | ||||||||||||| |||||||||||||| ||||||||||||||
+Sbjct: 1978 aaacttgcccaccagaacatcctctccttcagctggatcctcaaacttttgggacaccaa 1919
+
+                                                                        
+Query: 491  acggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttctggccatc 550
+            ||||||||| ||||| ||||| || ||||||||||||||||| || || || || |||||
+Sbjct: 1918 acggtagaacaaatctcctagacggtgcttaatgagagtgtaagtgattttttgtccatc 1859
+
+                                                                        
+Query: 551  cataccagctcctcgttcaacggcctggttggctaagttatagaaatggataatattccg 610
+            ||||||||||||||| ||||||||||||||||| ||||||||||| ||||| || || ||
+Sbjct: 1858 cataccagctcctcgctcaacggcctggttggccaagttatagaagtggatgatgttgcg 1799
+
+                                                                        
+Query: 611  taacatccaaacagacttgtagaaaggacagaatttgtcgtacggagtaaatgcattttg 670
+             |||||||||||||| ||||||||||| ||||| || || || || ||||| ||||||||
+Sbjct: 1798 caacatccaaacagatttgtagaaagggcagaacttatcatatggcgtaaaagcattttg 1739
+
+                                                                        
+Query: 671  tgcaaggtagtcctccctcaaaagctttgcagtttccaaagtgattttatctgtttcagc 730
+            |||||||||||||||||| ||||| |||||||||||||| || || ||||||||||||||
+Sbjct: 1738 tgcaaggtagtcctcccttaaaagttttgcagtttccaaggtaatcttatctgtttcagc 1679
+
+                                                                        
+Query: 731  tagagcatctttaccaacaagttgcacaatttcatttaggtcatcctccctttgcagaac 790
+             |||||||| || || |||||||| |||||||||||||||||||||||||| ||||| ||
+Sbjct: 1678 cagagcatcctttccgacaagttgaacaatttcatttaggtcatcctccctctgcagcac 1619
+
+                                  
+Query: 791  ctcacgggcttttgtccttatg 812
+            ||||||||||||||||||||||
+Sbjct: 1618 ctcacgggcttttgtccttatg 1597
+
+
+>SGN-U578259 Tomato 200607#2 [2 ESTs aligned] (*GB) gi|27883932|gb|AAO23980.1|
+           (e_value=1e-98) vacuolar H+-ATPase A1 subunit isoform;
+           V-ATPase A1 subunit isoform [Lycopersicon esculentum];
+           (*ATH) AT1G78900.1 (e_value=2e-97)  Symbol: VHA-A |
+           Encodes catalytic subunit A of the vacuolar ATP
+           synthase.  Mutants are devoid of vacuolar ATPase
+           activity as subunit A is encoded only by this gene and
+           show strong defects in male gametophyte development and
+           in Golgi stack morphology... ; (*SWP)
+           sp|O23654|VATA_ARATH (e_value=2e-96) Vacuolar ATP
+           synthase catalytic subunit A OS=Arabidopsis thaliana
+           GN=At1g78900;
+          Length = 851
+
+ Score =  367 bits (185), Expect = 3e-99
+ Identities = 293/329 (89%)
+ Strand = Plus / Minus
+
+                                                                       
+Query: 484 acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 543
+           |||||||||||||||| ||||| ||||| || ||||||||||||||||| || || || |
+Sbjct: 541 acaccaaacggtagaacaaatctcctagacggtgcttaatgagagtgtaagtgatttttt 482
+
+                                                                       
+Query: 544 ggccatccataccagctcctcgttcaacggcctggttggctaagttatagaaatggataa 603
+           | |||||||||||||||||||| ||||||||||||||||| ||||||||||| ||||| |
+Sbjct: 481 gtccatccataccagctcctcgctcaacggcctggttggccaagttatagaagtggatga 422
+
+                                                                       
+Query: 604 tattccgtaacatccaaacagacttgtagaaaggacagaatttgtcgtacggagtaaatg 663
+           | || || |||||||||||||| ||||||||||| ||||| || || || || ||||| |
+Sbjct: 421 tgttgcgcaacatccaaacagatttgtagaaagggcagaacttatcatatggcgtaaaag 362
+
+                                                                       
+Query: 664 cattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaagtgattttatctg 723
+           ||||||||||||||||||||||||| ||||| |||||||||||||| || || |||||||
+Sbjct: 361 cattttgtgcaaggtagtcctcccttaaaagttttgcagtttccaaggtaatcttatctg 302
+
+                                                                       
+Query: 724 tttcagctagagcatctttaccaacaagttgcacaatttcatttaggtcatcctcccttt 783
+           ||||||| |||||||| || || |||||||| |||||||||||||||||||||||||| |
+Sbjct: 301 tttcagccagagcatcctttccgacaagttgaacaatttcatttaggtcatcctccctct 242
+
+                                        
+Query: 784 gcagaacctcacgggcttttgtccttatg 812
+           |||| ||||||||||||||||||||||||
+Sbjct: 241 gcagcacctcacgggcttttgtccttatg 213
+
+
+
+ Score =  149 bits (75), Expect = 1e-33
+ Identities = 105/115 (91%)
+ Strand = Plus / Minus
+
+                                                                       
+Query: 371 ttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcatgaagcttctt 430
+           ||||||||| |||||||||||||||||||||||||||  |||||||||||||||||||| 
+Sbjct: 826 ttatcgagtctcatcctcaaggttgcggaaaccagcaaccaaatcatcatgaagcttctg 767
+
+                                                                  
+Query: 431 aaacttggctaccaaagcatcctctccttcggctggatcctcaaatttttgggac 485
+           ||||||| | |||| | ||||||||||||| |||||||||||||| |||||||||
+Sbjct: 766 aaacttgcccaccagaacatcctctccttcagctggatcctcaaacttttgggac 712
+
+
+>LE_HBa0209K10_T7_371815 
+          Length = 667
+
+ Score =  186 bits (94), Expect = 6e-45
+ Identities = 94/94 (100%)
+ Strand = Plus / Plus
+
+                                                                       
+Query: 484 acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 543
+           ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 214 acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 273
+
+                                             
+Query: 544 ggccatccataccagctcctcgttcaacggcctg 577
+           ||||||||||||||||||||||||||||||||||
+Sbjct: 274 ggccatccataccagctcctcgttcaacggcctg 307
+
+
+
+ Score =  127 bits (64), Expect = 5e-27
+ Identities = 64/64 (100%)
+ Strand = Plus / Plus
+
+                                                                       
+Query: 422 aagcttcttaaacttggctaccaaagcatcctctccttcggctggatcctcaaatttttg 481
+           ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 7   aagcttcttaaacttggctaccaaagcatcctctccttcggctggatcctcaaatttttg 66
+
+               
+Query: 482 ggac 485
+           ||||
+Sbjct: 67  ggac 70
+
+
+
+ Score =  119 bits (60), Expect = 1e-24
+ Identities = 60/60 (100%)
+ Strand = Plus / Plus
+
+                                                                       
+Query: 574 cctggttggctaagttatagaaatggataatattccgtaacatccaaacagacttgtaga 633
+           ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Sbjct: 608 cctggttggctaagttatagaaatggataatattccgtaacatccaaacagacttgtaga 667
+
+
+>SL2.40ch12 
+          Length = 65486253
+
+ Score =  149 bits (75), Expect = 1e-33
+ Identities = 105/115 (91%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 371      ttatcgagtttcatcctcaaggttgcggaaaccagcagtcaaatcatcatgaagcttctt 430
+                ||||||||| |||||||||||||||||||||||||||  |||||||||||||||||||| 
+Sbjct: 47132031 ttatcgagtctcatcctcaaggttgcggaaaccagcaaccaaatcatcatgaagcttctg 47132090
+
+                                                                       
+Query: 431      aaacttggctaccaaagcatcctctccttcggctggatcctcaaatttttgggac 485
+                ||||||| | |||| | ||||||||||||| |||||||||||||| |||||||||
+Sbjct: 47132091 aaacttgcccaccagaacatcctctccttcagctggatcctcaaacttttgggac 47132145
+
+
+
+ Score =  115 bits (58), Expect = 2e-23
+ Identities = 94/106 (88%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 651      tacggagtaaatgcattttgtgcaaggtagtcctccctcaaaagctttgcagtttccaaa 710
+                ||||| ||||| |||||||||||||||||||||||||| ||||| |||||||||||||| 
+Sbjct: 47132820 tacggcgtaaaagcattttgtgcaaggtagtcctcccttaaaagttttgcagtttccaag 47132879
+
+                                                              
+Query: 711      gtgattttatctgtttcagctagagcatctttaccaacaagttgca 756
+                || || |||||||||||||| |||||||| || || ||||| ||||
+Sbjct: 47132880 gtaatcttatctgtttcagccagagcatcctttccgacaagctgca 47132925
+
+
+
+ Score =  107 bits (54), Expect = 5e-21
+ Identities = 84/94 (89%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 484      acaccaaacggtagaataaatcccctaggcgatgcttaatgagagtgtaggtcatcttct 543
+                |||||||||||||||| ||||| ||||| || ||||||||||||||||| || || || |
+Sbjct: 47132316 acaccaaacggtagaacaaatctcctagacggtgcttaatgagagtgtaagtgatttttt 47132375
+
+                                                  
+Query: 544      ggccatccataccagctcctcgttcaacggcctg 577
+                | |||||||||||||||||||| |||||||||||
+Sbjct: 47132376 gtccatccataccagctcctcgctcaacggcctg 47132409
+
+
+
+ Score = 97.6 bits (49), Expect = 4e-18
+ Identities = 55/57 (96%)
+ Strand = Plus / Plus
+
+                                                                         
+Query: 756      acaatttcatttaggtcatcctccctttgcagaacctcacgggcttttgtccttatg 812
+                |||||||||||||||||||||||||| ||||| ||||||||||||||||||||||||
+Sbjct: 47134819 acaatttcatttaggtcatcctccctctgcagcacctcacgggcttttgtccttatg 47134875
+
+
+
+ Score = 75.8 bits (38), Expect = 2e-11
+ Identities = 62/70 (88%)
+ Strand = Plus / Plus
+
+                                                                            
+Query: 574      cctggttggctaagttatagaaatggataatattccgtaacatccaaacagacttgtaga 633
+                |||||||||| ||||||||||| ||||| || || || |||||||||||||| |||||||
+Sbjct: 47132657 cctggttggccaagttatagaagtggatgatgttgcgcaacatccaaacagatttgtaga 47132716
+
+                          
+Query: 634      aaggacagaa 643
+                |||| |||||
+Sbjct: 47132717 aagggcagaa 47132726
+
+
+  Database: SGN Tomato Combined - WGS, BAC, and unigene sequences
+    Posted date:  Apr 10, 2011 11:25 PM
+  Number of letters in database: 1,350,414,477
+  Number of sequences in database:  626,541
+  
+Lambda     K      H
+    1.37    0.711     1.31 
+
+Gapped
+Lambda     K      H
+    1.37    0.711     1.31 
+
+
+Matrix: blastn matrix:1 -3
+Gap Penalties: Existence: 5, Extension: 2
+Number of Sequences: 626541
+Number of Hits to DB: 14,278,823
+Number of extensions: 811714
+Number of successful extensions: 57709
+Number of sequences better than 1.0e-10: 6
+Number of HSP's gapped: 57709
+Number of HSP's successfully gapped: 17
+Length of query: 820
+Length of database: 1,350,414,477
+Length adjustment: 20
+Effective length of query: 800
+Effective length of database: 1,337,883,657
+Effective search space: 1070306925600
+Effective search space used: 1070306925600
+X1: 11 (21.8 bits)
+X2: 15 (29.7 bits)
+X3: 50 (99.1 bits)
+S1: 13 (26.3 bits)
+S2: 37 (73.8 bits)

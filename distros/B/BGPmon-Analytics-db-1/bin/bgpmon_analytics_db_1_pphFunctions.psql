@@ -1,0 +1,254 @@
+/*Script to redefine the functions used for the 6watch database
+run like so: " > psql -f 1_import_functions dbname dbuser"*/
+
+/*Helper function to dynamically generate a peer's table name*/
+DROP FUNCTION IF EXISTS pph.generate_peer_table_name(INET,VARCHAR);
+DROP FUNCTION IF EXISTS pph.add_or_lookup_peer(INET,VARCHAR);
+DROP FUNCTION IF EXISTS pph.add_or_lookup_prefix(CIDR);
+DROP FUNCTION IF EXISTS pph.add_or_lookup_ppm(INET,VARCHAR,CIDR);
+DROP FUNCTION IF EXISTS pph.add_new_timerange(INET,VARCHAR,CIDR,BOOL,TIMESTAMP,
+                                              VARCHAR,VARCHAR,VARCHAR ARRAY);
+
+/****************************************************************************** 
+ * generate_peer_table_name
+ * input: peer and collector
+ * output: the name of an individual peer's timerange 
+ * effects: 
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.generate_peer_table_name(INET,VARCHAR) 
+  RETURNS VARCHAR AS $$
+BEGIN
+  RETURN 'pph.' || $2 || '_' || host($1);
+END;
+$$	LANGUAGE plpgsql;
+
+/****************************************************************************** 
+ * add_or_lookup_peer
+ * This function takes as input a peer's address (single-quoted strings are fine
+ * as Postgres will implicitly convert it to INET), checks to see if the peer 
+ * is already
+ * in the database, adds it if it is not, and returns the dbid of the peer.
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.add_or_lookup_peer(INET,VARCHAR) 
+  RETURNS INTEGER AS $$
+DECLARE
+  peer_id INTEGER;
+  peer_table VARCHAR;
+BEGIN
+  SELECT dbid INTO peer_id FROM pph.peers WHERE addr = $1 AND collector = $2;
+  IF NOT FOUND THEN
+    INSERT INTO pph.peers (addr,collector) VALUES ($1,$2) 
+      RETURNING dbid INTO peer_id;
+    peer_table := pph.generate_peer_table_name($1,$2);
+    EXECUTE 'CREATE TABLE '||quote_ident(peer_table)||
+            ' () INHERITS (pph.timeranges)';
+    EXECUTE 'CREATE INDEX "'||peer_table||'_start_time_index" ON '||
+            quote_ident(peer_table)||' (start_time)';
+    EXECUTE 'CREATE INDEX "'||peer_table||'_end_time_index" ON '||
+            quote_ident(peer_table)||' (end_time)';
+    EXECUTE 'CREATE INDEX "'||peer_table||'_ppm_dbid_index" ON '||
+            quote_ident(peer_table)||' (ppm_dbid)';
+    EXECUTE 'CREATE INDEX "'||peer_table||'_dbid_index" ON '||
+            quote_ident(peer_table)||' (dbid)';
+  END IF;
+  RETURN peer_id;
+END;
+$$	LANGUAGE plpgsql;
+
+/****************************************************************************** 
+ * add_or_lookup_prefix
+ * This function takes as input a network prefix (single-quoted strings are fine
+ * as Postgres will implicitly convert it to CIDR), checks to see if the 
+ * prefix is already in the database, adds it if it is not, and returns the 
+ * dbid of the prefix.
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.add_or_lookup_prefix(CIDR) RETURNS INTEGER AS $$
+DECLARE
+  prefix_id INTEGER;
+BEGIN
+  SELECT dbid INTO prefix_id FROM pph.prefixes WHERE pref = $1;
+  IF NOT FOUND THEN
+    INSERT INTO pph.prefixes (pref) VALUES ($1) RETURNING dbid INTO prefix_id;
+  END IF;
+  RETURN prefix_id;
+END;
+$$	LANGUAGE plpgsql;
+
+/****************************************************************************** 
+ * add_or_lookup_ppm
+ * input: peers address, network prefix
+ * output: dbid of ppm record
+ * effects: will add the ppm if it is not found
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.add_or_lookup_ppm(INET,VARCHAR,CIDR) 
+RETURNS INTEGER AS $$
+DECLARE
+  peer_id INTEGER;
+  prefix_id INTEGER;
+  ppm_id INTEGER;
+BEGIN
+  peer_id := pph.add_or_lookup_peer($1,$2);
+  prefix_id := pph.add_or_lookup_prefix($3);
+  SELECT dbid INTO ppm_id FROM pph.ppms WHERE (peer_dbid,prefix_dbid) = 
+                                          (peer_id,prefix_id);
+  IF NOT FOUND THEN
+  INSERT INTO pph.ppms (peer_dbid,prefix_dbid) VALUES (peer_id,prefix_id) 
+    RETURNING dbid INTO ppm_id;
+  END IF;
+  RETURN ppm_id;
+END;
+$$	LANGUAGE plpgsql;
+
+/****************************************************************************** 
+ * add_new_timerange
+ * input: peer address, collector name, prefix, ann=true|with=false, timestamp
+ *        origin ASN, second to last hop ASN
+ * output: dbid of timerange record
+ * effects: will add the peer, prefix and ppm if it is not found
+$1 INET peer addr
+$2 VARHAR peer collector
+$3 CIDR prefix
+$4 BOOL announce (true) withdraw (false)
+$5 TIMESTAMP
+$6 INTEGER origin ASN
+$7 INTEGER last hop
+$8 INTEGER ARRAY as path
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.add_new_timerange(INET,VARCHAR,CIDR,BOOL,
+                                             TIMESTAMP, VARCHAR,VARCHAR,
+                                             VARCHAR ARRAY) 
+RETURNS VOID AS $$
+DECLARE
+  ppm_id INTEGER;
+  peer_table VARCHAR;
+  current_timerange INTEGER;
+  current_origin_as VARCHAR;
+  current_start_time TIMESTAMP;
+  current_end_time TIMESTAMP;
+  current_last_hop VARCHAR;
+  current_as_path VARCHAR ARRAY;
+BEGIN
+  /*First, check/add the peer, prefix, and ppm into the database*/
+  ppm_id := pph.add_or_lookup_ppm($1,$2,$3);
+
+  /*Since the ppm is now guaranteed to be there, check if there are any 
+    existing timerange records for the ppm and get the peer table's name.*/
+  SELECT last_timerange_dbid INTO current_timerange FROM pph.ppms WHERE dbid=ppm_id;
+  peer_table := pph.generate_peer_table_name($1,$2);
+
+  /* If there are no existing timeranges,
+     then add a new one with slightly different
+     information depending on whether the message is an annoucement or 
+     withdrawl*/
+  IF current_timerange IS NULL THEN
+    IF $4 = 'TRUE' THEN
+      EXECUTE 'INSERT INTO '||quote_ident(peer_table)||
+              ' (ppm_dbid,start_time,origin_as,last_hop,as_path) VALUES ('
+              ||ppm_id||','''||$5||''','''||$6||''','''||$7||''','||
+              quote_literal($8)||') 
+      RETURNING dbid' INTO current_timerange;
+      UPDATE pph.ppms SET last_timerange_dbid = current_timerange WHERE dbid=ppm_id;
+      RETURN;
+    ELSE
+      RAISE WARNING 
+      'Prefix withdrawn without prior announcement: collector:% peer:% prefix:%'
+      , $2,$1,$3;
+      EXECUTE 'INSERT INTO '||quote_ident(peer_table)||
+              ' (ppm_dbid,end_time) VALUES ('||ppm_id||','''||$5||''') 
+      RETURNING dbid' INTO current_timerange;
+      UPDATE pph.ppms SET last_timerange_dbid = current_timerange WHERE dbid=ppm_id;
+      RETURN;
+    END IF;
+  ELSE
+    /* Otherwise, check the end_time of the most recent timerange record.*/
+    EXECUTE 'SELECT end_time FROM '||quote_ident(peer_table)||
+            ' WHERE dbid = '||current_timerange||'' INTO current_end_time;
+    EXECUTE 'SELECT start_time FROM '||quote_ident(peer_table)||
+            ' WHERE dbid = '||current_timerange||'' INTO current_start_time;
+
+    /*If the end_time is not populated, then the prefix is still active and so 
+      either the prefix is being withdrawn, the origin AS is changing, 
+      or the announcement is a duplicate.*/
+
+    /* check for time travelers*/
+    IF $5 < current_end_time OR (current_end_time IS NULL AND 
+       $5 < current_start_time) THEN
+      IF current_end_time IS NULL THEN
+        RAISE WARNING 'Update received out of order: collector:% peer:% prefix:% old_time:% new_time:%',
+         $2, $1, $3, current_start_time, $5;
+      ELSE
+        RAISE WARNING 'Update received out of order: collector:% peer:% prefix:% old_time:% new_time:%',
+        $2, $1, $3, current_end_time, $5;
+      END IF;
+      RETURN;
+    END IF;
+
+
+    IF current_end_time IS NULL THEN
+      /*If the prefix is being withdrawn, then  set the end_time and return.*/
+      IF $4 = 'FALSE' THEN
+        EXECUTE 'UPDATE '||quote_ident(peer_table)||' SET end_time = '''||$5||
+                ''' WHERE dbid = '||current_timerange||'';
+        RETURN;
+      ELSE
+      /*If the message is an announcement, then we have to check the origin 
+        ASN and next hop.  If either changes, then we have to close out the old 
+        timerange and create a new one.*/
+      /*If the ASN and Next Hop are the same, then this is a duplicate 
+        announcement, and we can ignore it.*/
+        EXECUTE 'SELECT as_path FROM '||quote_ident(peer_table)||
+                ' WHERE dbid = ' ||current_timerange||'' INTO current_as_path;
+        IF $8 = current_as_path THEN
+          RETURN;
+        ELSE
+          EXECUTE 'UPDATE '||quote_ident(peer_table)||' SET end_time = '''||$5||
+                  ''' WHERE dbid = '||current_timerange||'';
+          EXECUTE 'INSERT INTO '||quote_ident(peer_table)||
+                  ' (ppm_dbid,start_time,origin_as,last_hop,as_path) VALUES ('
+                  ||ppm_id||','''||$5||''','''||$6||''','''||$7||''','||
+                  quote_literal($8)||') RETURNING dbid' INTO current_timerange;
+          UPDATE pph.ppms SET last_timerange_dbid = current_timerange 
+                      WHERE dbid=ppm_id;
+          RETURN;
+        END IF;
+      END IF;
+    ELSE
+    /* If the end-time field IS filled, then either the prefix is being 
+       re-announced or this message is a duplicate withdrawal.*/
+      IF $4 = 'TRUE' THEN
+        EXECUTE 'INSERT INTO '||quote_ident(peer_table)||
+                ' (ppm_dbid,start_time,origin_as,last_hop,as_path) VALUES ('
+                ||ppm_id||','''||$5||''','''||$6||''','''||$7||''','||
+                quote_literal($8)||') RETURNING dbid' INTO current_timerange;
+        UPDATE pph.ppms SET last_timerange_dbid = current_timerange 
+                    WHERE dbid = ppm_id;
+        RETURN;
+      ELSE
+        RETURN;
+      END IF;
+    END IF;
+  END IF;
+END;
+$$	LANGUAGE plpgsql;
+
+/****************************************************************************** 
+ * inject_updates
+ * input: 
+ * output: dbid 
+ * effects: will add the peer, prefix and ppm if it is not found
+ ******************************************************************************/
+CREATE OR REPLACE FUNCTION pph.inject_updates() RETURNS INTEGER AS $$
+DECLARE
+  c_updates CURSOR FOR SELECT * FROM pph.update_import;
+
+BEGIN
+  FOR update_rec IN c_updates LOOP 
+        PERFORM pph.add_new_timerange(update_rec.peer,update_rec.collector,
+                update_rec.prefix,update_rec.update,update_rec.ts,
+                update_rec.origin,update_rec.lasthop,update_rec.aspath);
+  END LOOP;
+  truncate pph.update_import;
+  RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+

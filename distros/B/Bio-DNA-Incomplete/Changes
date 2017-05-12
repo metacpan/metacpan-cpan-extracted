@@ -1,0 +1,16 @@
+Revision history for Bio-DNA-Incomplete
+
+0.004     2013-10-01 14:22:26 Europe/Amsterdam
+          Switch to Sub::Exporter::Progressive
+
+0.003     2011-11-03 16:29:57 Europe/Amsterdam
+          Optimize all_possibilities
+          Added tests for all_possibilities
+          Added some explanation of what the module does
+
+0.002     2011-10-19 16:00:04 Europe/Amsterdam
+          Added all_possibilities
+          Improved case-insensitivity
+
+0.001     2011-10-19 01:18:37 Europe/Amsterdam
+          Initial release

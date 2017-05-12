@@ -1,0 +1,384 @@
+# NAME
+
+Business::CanadaPost - Fetch shipping costs for Canada Post
+
+# VERSION
+
+version 1.06
+
+# SYNOPSIS
+
+	use Business::CanadaPost;
+	
+
+	#initialise object - specifying from postal code, and canada post merchant id
+	my $shiprequest = Business::CanadaPost->new(	merchantid => 'CPC_DEMO_XML',
+							frompostal => 'M1P1C0',
+							testing	   => 1			);
+
+	# add an item to be shipped
+	$shiprequest->additem(quantity 		=> 1,
+				height 		=> 60,
+				width  		=> 15,
+				length 		=> 60,
+				weight 		=> 7,
+				description 	=> 'box o stuff',
+				readytoship 	=> 1);
+
+	# set more parameters on the item being shipped
+	$shiprequest->setcountry('United States');
+	$shiprequest->setprovstate('New York');
+	$shiprequest->settopostalzip('11726');
+	$shiprequest->settocity('New York');
+	$shiprequest->getrequest() || print "Failed sending request: " . $shiprequest->geterror() . "\n"; 
+	print "There are " . $shiprequest->getoptioncount() . " available shipping methods.\n";
+
+# DESCRIPTION
+
+Business::CanadaPost is a Perl library created to allow users to fetch real-time options and pricing quotes
+on shipments sent from Canada using Canada Post.
+
+To get off of the development server, you'll need to get an account from Canada Post's "Sell Online" service.
+While testing, use user id CPC_DEMO_XML and specify a parameter of 'testing' with a value of 1 to the new()
+constructor, so it knows to use Canada Post's devel server.  If you don't, and don't have an account, you'll
+only receive errors.
+
+# PREREQUISITES
+
+This module requires `strict`, `Exporter`, and `LWP`.
+
+# EXPORT
+
+None.
+
+# CONSTRUCTOR
+
+## `new(options)`
+
+Creates a new Business::CanadaPost object.  Different objects available are:
+
+- language
+
+'en' for English, and 'fr' for French. (Default: en)
+
+- frompostalcode
+
+This is used to override the setting in our sell online profile for the from
+address you would be shipping from.  Format is A1A1A1 (A being any upper-case
+character between A-Z, and 1 being any digit 0-9)
+
+If not specified, it will default to your setting in your Canada Post Sell
+Online(tm) profile.
+
+- turnaroundtime
+
+Your turnaround time in hours.  This is the amount of time between receiving
+the order and shipping it out.  It is used to create a shipping and delivery
+date for the item.  If none is specified, it will default to what you have set
+in your profile.
+
+If you have nothing set in your profile, it will assume you are shipping next-day.
+
+(Default: none)
+
+- merchantid
+
+This is your merchant ID assigned to you by Canada Post.  It usually begins with
+CPC_.  You can use CPC_DEMO_XML if you're testing and using Canada Post's test
+servers. (Default: none.  You need to set this or the module will return a fatal
+error.)
+
+- totalprice
+
+Total value of the shipment you're mailing.  This is used to calculate whether or
+not a signature will be required, and whether it will need to include more insurance
+to cover the item (beyond the $100 included in the original shipment.) (Default: 0.00)
+
+- units
+
+Possible values are 'metric' and 'imperial'.
+
+If set to metric, you will be specifying height, length, and width in cm, and
+weight in kg.
+
+If set to imperial, you will be specifying height, length, and width in in, and
+weight in lb.
+
+(Default: metric)
+
+- testing
+
+Possible values: 1 or 0.
+
+Specifies whether you're using a production account, or a testing account.  If you're
+in testing mode, you'll be connecting to Canada Post's test servers, which run on
+less stable hardware, on a slower link to the Internet, and are rate-throttled.
+
+(Default: 0)
+
+- items
+
+An array containing the items in your shipment.  Array elements are:
+
+(quantity, weight, length, width, height, description, readytoship [1 or 0])
+
+readytoship specifies that you have the item already boxed or prepared for shipment.
+
+If this is set to 0, then Canada Post server's will calculate the most appropriate box
+listed in your account profile, and use it for its dimensions and shipping cost.
+
+# OBJECT METHODS
+
+Most errors are fatal.  The tool tries to guess for you if a value seems
+out of whack.
+
+## `geterror`
+
+Used to fetch the error set when a function return 0 for failure.
+
+Example:
+
+	$object->getrequest or print "Error: " . $object->geterror() . "\n";
+
+## `setlanguage`
+
+Used to change the language.
+
+Example:
+
+	$object->setlanguage('fr'); # changes messages to french.
+
+## `settocity`
+
+Specifies city being shipped to.
+
+Example:
+
+	$object->settocity('New York');
+
+## `settesting`
+
+Specifies whether account is in testing.
+
+Example:
+
+	$object->settesting(1);
+
+## `setcountry`
+
+Specifies country being mailed to.
+
+Example:
+
+	$object->setcountry('United States');
+
+## `setmerchantid`
+
+Specifies Canada Post merchant ID.
+
+Example:
+
+	$object->setmerchantid('CPC_DEMO_XML');
+
+## `setunits`
+
+Specifies imperial or metric measurements.
+
+Example:
+
+	$object->setunits('imperial');
+
+## `setfrompostalcode`
+
+Specifies postal code item is being shipped from.
+
+Example:
+
+	$object->setfrompostalcode(''); # will reset postal code back to default set in canada post profile
+
+## `settopostalcode`
+
+Specifies postal code/zip code item is being shipped to.
+
+Example:
+
+	$object->settopostalcode('N2G5M4');
+
+## `setprovstate`
+
+Specifies province/state being shipped to.
+
+Example:
+
+	$object->settopostalcode('Ontario');
+
+## `setturnaroundtime`
+
+Specifies turnaround time in hours.
+
+Example:
+
+	$object->setturnaroundtime(24);
+
+## `settotalprice`
+
+Specifies total value of items being shipped.
+
+Example:
+
+	$object->settotalprice(5.50);
+
+## `additem`
+
+Adds an item to be shipped to the request.
+
+Example:
+
+	$object->additem(length => 5,
+			 height => 3,
+			 width  => 2,
+			 weight => 5,
+			 description => "box of cookies",
+			 readytoship => 1,
+			 quantity => 1);
+
+Weight, length, height, and width are the only requirements.
+
+If not specified, quantity will default to 1, readytoship will
+default to 0, and description will default to an empty string.
+
+## `getrequest`
+
+Builds request, sends it to Canada Post, and parses the results.
+
+Example:
+
+	$object->getrequest();
+
+returns 1 on success.
+
+## `getoptioncount`
+
+Returns number of available shipping options.
+
+Example:
+
+	my $available_options = $object->getoptioncount();
+
+## `getsignature`
+
+Returns 1 or 0 based on whether or not a signature would be required for these deliveries.
+
+Example:
+
+	my $signature_required = $object->getsignature();
+
+## `getinsurance`
+
+Returns 1 or 0 based on whether or not extra insurance coverage is required (and included) in prices.
+
+Example:
+
+	my $insurance_included = $object->getinsurance();
+
+## `getshipname`
+
+Receives an option number between 1 and $object->getoptioncount() and returns that
+option's name.
+
+Example:
+
+	print "First option available is: " . $object->getshipname(1) . "\n";
+
+## `getshiprate`
+
+Operates the same as `getshipname`, but returns cost of that shipping method.
+
+Example:
+
+	print "First option would cost: " . $object->getshiprate(1) . " to ship.\n";
+
+returns 1 on success.
+
+## `getshipdate`
+
+Operates the same as `getshipname`, but returns assumed shipment date.
+
+Example:
+
+	print "Item would be shipped out on " . $object->getshipdate(1) . "\n";
+
+## `getdelvdate`
+
+Operates the same as `getshipname`, but returns when the approximate
+delivery date would be based on a shipping date of $object->getshipdate();
+
+Example:
+
+	print "Assuming a delivery date of " . $object->getshipdate(1) .
+		", this item would arrive on: " . $object->getdelvdate(1) . "\n";
+
+## `getdayofweek`
+
+Operates the same as `getshipname`, but returns which day of the week
+$object->getdelvdate() lands on numerically. (1 .. 6; 1 == Sunday,
+6 == Saturday)
+
+Example:
+
+	print "Your item would likely be delivered on the " .
+		$object->getdayofweek(1) . " day of the week.\n";
+
+## `getnextdayam`
+
+Operates the same as `getshipname`, but returns whether or not
+the current option provides for next day AM delivery service.
+
+Example:
+
+	printf("This item is %savailable for next day delivery\n",
+			$object->getnextdayam(1) == 1 ? '' : 'NOT ');
+
+## `getestshipdays`
+
+Operates the same as `getshipname`, but returns estimated
+number of days required to ship the item.
+
+Example:
+
+	print "This shipping method would take approximately: " . $object->getestshipdays() .
+		" days to arrive.\n";
+
+## `getconfirmation`
+
+Returns whether or not delivery confirmation is included in price quotes.
+
+Example:
+
+	my $confirmation_included = $object->getconfirmation();
+
+## `getcomments`
+
+Returns any extra comments Canada Post might include with your quote.
+
+Example:
+
+	my $extra_info = $object->getcomments();
+
+# SEE ALSO
+
+For more information on how Canada Post's XML shipping system works, please
+see http://206.191.4.228/DevelopersResources
+
+# AUTHORS
+
+- Justin Wheeler
+- Yanick Champoux <yanick@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2005 by Justin Wheeler.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 2, June 1991

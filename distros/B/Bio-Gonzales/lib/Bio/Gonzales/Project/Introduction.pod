@@ -1,0 +1,315 @@
+=encoding utf8
+
+=head1 NAME
+
+Bio::Gonzales::Project::Functions - organize your computational experiments
+
+=head1 SYNOPSIS
+
+Inspired by L<A Quick Guide to Organizing Computational Biology
+Projects|http://www.ploscompbiol.org/article/info%3Adoi%2F10.1371%2Fjournal.pcbi.1000424>
+this module makes it easy to organise computational biology projects.
+
+    $ gonzp init human_genome
+    $ cd human_genome/analysis
+
+    $ gonzp analysis genome_assembly
+    $ cd genome_assembly
+
+    # set up scripts, Makefile, etc.
+    # ...
+
+    $ make human_genome_assembly
+
+
+    $ gonzp analysis genome_annotation # finds the project directory automatically
+    $ cd ../genome_annotation
+
+    # set up scripts, Makefile, etc.
+    # ...
+
+    $ make human_genome_annotation
+
+
+=head1 DESCRIPTION
+
+=head2 Project Layout
+
+Create it with C<< gonzp init <project_name> >>
+
+A project consists of a root directory, containing everything, the paper-draft,
+analyses, 3rd-party documentation (and perhaps literature), scripts, etc. The
+whole system is based on Makefiles (to start the different analysis steps) and
+perl modules (surprise, surprise!!).
+
+The documentation goes into the C<README> file, in whatever format (plain text,
+markdown, textile, ...) you prefer.
+
+Thus, the basic layout is of an C<example> project is:
+
+    example/Makefile  (a Makefile to start single analyses)
+    example/README    (a overview documentation of the computational experiment)
+
+    example/analysis/ (all analyses go in here)
+
+    example/data/     (3rd-party data, such as the uniprot database or 
+                       experimental results, common to the whole computational
+                       experiment go in here)
+
+    example/paper/    (the paper draft goes in here)
+
+    example/doc/      (3rd-party documentation)
+
+    example/lib/      (if some scripts or analyses have a lot in common,
+                       creating a module/library might be helpful)
+
+=head3 analysis
+
+Create it with C<< gonzp analysis <analysis_name> >>
+
+The analysis directory contains all analyses that have been done. One directory
+per analysis. The layout in C<example/analysis> is therefore:
+
+    ./important_computational_experiment/Makefile     (the Makefile to start single analysis steps)
+    ./important_computational_experiment/av           (the analysis version)
+    ./important_computational_experiment/README       (some analysis-specific documentation)
+    ./important_computational_experiment/gonz.conf.yml (configuration stuff, e.g. file locations or parameters)
+    ./important_computational_experiment/2014-01-28/  (the analysis directory derived from the version stored in "av")
+    ./important_computational_experiment/data/        (analysis-specific data)
+    ./important_computational_experiment/playground/  (here you can try stuff)
+    ./important_computational_experiment/bin/         (a directory to store the scripts)
+
+=head2 the analysis version
+
+The analysis version is just a single string and defaults to the day the
+analysis was created. The contents of the C<av> file are e.g.:
+
+
+    $ cat important_computational_experiment/av
+    2014-01-28
+
+Cange it to whatever you want. A common use case is to change input data or
+parameters without clobbering the previous results. Therefore, change the
+analysis version to a different date and rerun the whole analysis.
+
+The analysis version is integral part of L<Bio::Gonzales::Project::Functions> and therefore accessible via
+
+=over 4
+
+=item The Makefile
+
+as C< $(AV) > variable.
+
+=item Via an exported function of L<Bio::Gonzales::Project::Functions>, B<< nfi($filename) >>
+
+For example you want to calculate the average number of leaves for 4 plant
+accessions. You have 3 replicates, so 12 records:
+
+Input data C<data/leaves.txt>:
+
+    accession num_leaves
+    ACC_001 3
+    ACC_001 4
+    ACC_001 6
+    ACC_002 8
+    ACC_002 14
+    ACC_002 12
+    ACC_003 18
+    ACC_003 10
+    ACC_003 12
+    ACC_004 10
+    ACC_004 4
+    ACC_004 7
+
+
+Script C<bin/calc_number_of_avg_leaves.pl>
+
+    #!/usr/bin/env perl
+    # created on 2014-01-28
+    
+    use warnings;
+    use strict;
+    use 5.010;
+    
+    use Bio::Gonzales::Project::Functions;
+    use List::Util qw(sum);
+    
+    # read in some raw data
+    open my $fh, '<', 'data/leaves.txt' or die "Can't open filehandle: $!";
+    
+    my %num_leaves;
+    
+    <$fh>;    # get rid of the header
+    while ( my $line = <$fh> ) {
+      chomp $line;
+      my ( $acc, $num_leaves ) = split /\t/, $line;
+    
+      push @{ $num_leaves{$acc} }, $num_leaves;
+    }
+    
+    close $fh;
+    
+    # nfi = new file in the current analysis version directory
+    # here the result file will be e.g. "2014-01-28/avg_num_leaves.tsv", depending on the analysis version
+    my $result_file = nfi("avg_num_leaves.tsv");
+    
+    # open the result file
+    open my $result_fh, '>', $result_file or die "Can't open filehandle: $!";
+    
+    # calculate the result and write it
+    while ( my ( $acc, $leaves ) = each %num_leaves ) {
+      my $sum   = sum @$leaves;
+      my $count = scalar @$leaves;
+      my $avg   = $sum / $count;
+    
+      say $result_fh join( "\t", $acc, $avg );
+    }
+    
+    close $result_fh;
+ 
+=back
+
+=item Via an exported variable of L<Bio::Gonzales::Project::Functions>, B<< $ANALYSIS_VERSION >>
+
+The script changes slightly, see here the changed lines:
+
+original:
+
+    use Bio::Gonzales::Project::Functions;
+
+    ...
+
+    # nfi = new file in the current analysis version directory
+    # here the result file will be e.g. "2014-01-28/avg_num_leaves.tsv", depending on the analysis version
+    my $result_file = nfi("avg_num_leaves.tsv");
+
+changed:
+
+    use Bio::Gonzales::Project::Functions qw(:DEFAULT $ANALYSIS_VERSION);  # CHANGED
+
+    ...
+
+    # here the result file will be e.g. "2014-01-28/avg_num_leaves.tsv", depending on the analysis version
+    my $result_file = "$ANALYSIS_VERSION/avg_num_leaves.tsv";  # CHANGED
+    
+=head2 Configuration
+
+The configuration is stored in C<gonz.conf.yml> and accessible via commandline
+and perl functions. The format of the configuration is
+L<YAML|http://www.yaml.org>. You can therefore freely store any configuration
+in various data formats, such as lists or dictionaries.
+
+=head3 Access via commandline
+
+The access via commandline is intended to be used in the C<Makefile>. The
+commandline script is called C<gonzconf>. See
+
+    gonzconf --help
+
+for help. C<gonzconf> looks for the C<gonzconf.yml> and extracts parts of the
+configuration. Example:
+
+C<gonz.conf.yml>
+
+    ---
+    genotypes:
+      - genotype_1
+      - genotype_2
+      - genotype_3
+
+Make target:
+
+    GENOTYPES=$(shell gonzconf --flat genotypes)
+    analysis:
+      for g in $(GENOTYPES); do \
+        echo "analysing $$g"; \
+      done
+
+=head3 Access in perl
+
+In perl scripts the configuration can be accessed via the C<gonzconf> function.
+
+=over 4
+
+=item B<< my $config = gonzconf() >>
+
+Calling the function without arguments returns the complete configuration. It
+can be accessed as normal perl array or hash (depending on the configuration).
+
+Example:
+
+    #!/usr/bin/env perl
+    
+    use warnings;
+    use strict;
+    use 5.010;
+    
+    use Bio::Gonzales::Project::Functions;
+    
+    my $config = gonzconf();
+    my @genotypes = @{$config->{genotypes}};
+    
+    for my $genotype (@genotypes) {
+      say "analysing genotype $genotype";
+    }
+
+=item B<< my $config_entry = gonzconf($entry) >>
+
+C<gonzconf> can take one argument to access entries of the top layer directly.
+By "top layer", gonzconf assumes that the structure of the configuration is
+organised as hash/dictionary.
+
+Example:
+
+    #!/usr/bin/env perl
+    
+    use warnings;
+    use strict;
+    use 5.010;
+    
+    use Bio::Gonzales::Project::Functions;
+    
+    my @genotypes = @{gonzconf("genotypes")};
+    
+    for my $genotype (@genotypes) {
+      say "analysing genotype $genotype";
+    }
+
+
+=back
+
+=head2 Logging
+
+L<Bio::Gonzales::Project::Functions> comes with logging included. The logged info is
+stored in C<$ANALYSIS_VERSION/gonzlog>. Therefore every analysis has a
+different log file. 5 log levels are available: debug, info, warn, error, fatal 
+
+=head3 Access via commandline
+
+Run
+
+    gonzlog <namespace> <message>
+
+to log something. The log level is hardcoded to "info".
+
+=head3 Access via perl
+
+
+L<Bio::Gonzales::Project::Functions> exports the function C<gonzlog> by default. To log stuff you run
+
+    gonzlog->info("message");
+
+    # or
+    
+    my $log = gonzlog();
+    $log->info("message");
+
+The namespace is the filename of the invoking script.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+jw bargsten, C<< <joachim.bargsten at wur.nl> >>
+
+=cut

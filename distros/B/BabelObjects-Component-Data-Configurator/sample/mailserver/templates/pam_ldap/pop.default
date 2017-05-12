@@ -1,0 +1,3 @@
+#%PAM-1.0
+auth       required	/lib/security/$(CONFIGURATOR.AUTH_PAM_MODULE)
+account    required	/lib/security/$(CONFIGURATOR.ACCOUNT_PAM_MODULE)

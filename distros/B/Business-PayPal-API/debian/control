@@ -1,0 +1,31 @@
+Source: libbusiness-paypal-api-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5.0.0)
+Build-Depends-Indep: perl (>= 5.8.8-12), libsoap-lite-perl
+Maintainer: Dave Lambley <davel@state51.co.uk>
+Standards-Version: 3.7.2
+Homepage: http://search.cpan.org/dist/Business-PayPal-API/
+
+Package: libbusiness-paypal-api-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libsoap-lite-perl
+Description: PayPal API
+ Business::PayPal::API supports both certificate authentication and
+ the new 3-token "Signature" authentication.
+ .
+ It also support PayPal's development sandbox for testing. See the
+ sandbox parameter to new() below for details.
+ .
+ Business::PayPal::API can import other API derived classes:
+ .
+ use Business::PayPal::API qw( RefundTransaction );
+ .
+ This allows for much more concise and intuitive usage. For example,
+ these two statements are equivalent:
+ .
+ use Business::PayPal::API::RefundTransaction;
+ my $pp = new Business::PayPal::API::RefundTransaction( ... );
+ $pp->RefundTransaction( ... );
+ .
+ This description was automagically extracted from the module by dh-make-perl.

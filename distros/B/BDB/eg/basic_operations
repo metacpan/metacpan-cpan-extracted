@@ -1,0 +1,59 @@
+#! perl
+
+use strict;
+
+use AnyEvent;
+use BDB;
+
+our $FH; open $FH, "<&=" . BDB::poll_fileno;
+our $WATCHER = AnyEvent->io (fh => $FH, poll => 'r', cb => \&BDB::poll_cb);
+
+my $env = db_env_create;
+my $db;
+
+warn "i3\n";#d#
+
+mkdir "bdtest", 0700;
+
+BDB::min_parallel 8;
+
+db_env_open
+   $env,
+   "bdtest",
+   BDB::INIT_LOCK | BDB::INIT_LOG | BDB::INIT_MPOOL | BDB::INIT_TXN | BDB::RECOVER | BDB::USE_ENVIRON | BDB::CREATE,
+   0600;
+
+$env->set_flags (BDB::AUTO_COMMIT | BDB::TXN_NOSYNC, 1);
+
+$db = db_create $env;
+db_open $db, undef, "table", undef, BDB::BTREE, BDB::AUTO_COMMIT | BDB::CREATE | BDB::READ_UNCOMMITTED, 0600;
+
+for (1..1000) {
+   db_put $db, undef, "key[$_]", "data[$_]";
+   db_key_range $db, undef, "key[$_]", my $keyrange; my ($lt, $eq, $gt) = @$keyrange;
+}
+
+my $c = $db->cursor;
+my @del;
+
+for (;;) {
+   db_c_get $c, my $key, my $data, BDB::NEXT;
+   warn "<$!,$key,$data>";
+   last if $!;
+   push @del, $key if rand > 0.9;
+}
+
+{
+   my $seq = $db->sequence;
+
+   db_sequence_open $seq, undef, "seq", BDB::CREATE;
+   db_sequence_get $seq, undef, 1, my $value;
+   warn "next sequence value: $value\n";
+}
+
+db_c_close $c, sub { };
+undef $c;
+db_del $db, undef, $_ for @del;
+
+db_sync $db;
+

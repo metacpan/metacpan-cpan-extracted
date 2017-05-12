@@ -1,0 +1,99 @@
+NAME
+    Bench - Benchmark running times of Perl code
+
+VERSION
+    This document describes version 0.10 of Bench (from Perl distribution
+    Bench), released on 2014-05-14.
+
+SYNOPSIS
+     # time the whole program
+     % perl -MBench -e'...'
+     0.0123s
+
+     # basic usage of bench()
+     % perl -MBench -e'bench sub { ... }'
+     100 calls (58548/s), 0.0017s (0.0171ms/call)
+
+     # get bench result in a variable
+     % perl -MBench -E'my $res = bench sub { ... }'
+
+     # specify bench options
+     % perl -MBench -E'bench sub { ... }, 100'
+     % perl -MBench -E'bench sub { ... }, {n=>-5}'
+     304347 calls (60665/s), 5.017s (0.0165ms/call)
+
+     # use Dumbbench as the backend
+     % perl -MDumbbench -MBench -E'bench sub { ... }'
+     % perl -MBench -E'bench sub { ... }, {dumbbench=>1, dumbbench_options=>{...}}'
+     Ran 26 iterations (6 outliers).
+     Rounded run time per iteration: 2.9029e-02 +/- 4.8e-05 (0.2%)
+
+     # bench multiple codes
+     % perl -MBench -E'bench {a=>sub{...}, b=>sub{...}}, {n=>-2}'
+     % perl -MBench -E'bench [sub{...}, sub{...}]'; # automatically named a, b, ...
+     b: 100 calls (5357/s), 0.0187s (0.1870ms/call)
+     a: 100 calls (12120/s), 0.0083s (0.0825ms/call)
+     Fastest is a (2.267x b)
+
+DESCRIPTION
+    This module is an alternative interface for Benchmark. It provides some
+    nice defaults and a simpler interface. There is only one function,
+    bench(), and it is exported by default. If bench() is never called, the
+    whole program will be timed.
+
+    This module can utilize Dumbbench as the backend instead of Benchmark.
+
+FUNCTIONS
+  bench SUB(S)[, OPTS]
+    Run Perl code(s) and time it (them). Exported by default. SUB can be a
+    coderef for specifying a single sub, or hashref/arrayref for specifying
+    multiple subs.
+
+    Options are specified in hashref OPTS. Available options:
+
+    *   n => INT (default: 100)
+
+        Run the code "n" times, or if negative, until at least "n" CPU
+        seconds.
+
+    *   dumbbench => BOOL
+
+        If 0, do not use Dumbbench even if it is available. If 1, require
+        and use Dumbbench. If left undef, will use Dumbbench if it is
+        already loaded.
+
+    *   dumbbench_options => HASHREF
+
+        Options that will be passed to Dumbbench constructor, e.g.
+        {target_rel_precision=>0.005, initial_runs=>20}.
+
+SEE ALSO
+    bench, command-line interface for this module
+
+    Benchmark
+
+    Dumbbench
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Bench>.
+
+SOURCE
+    Source repository is at <https://github.com/sharyanto/perl-Bench>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Bench>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

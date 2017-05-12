@@ -1,0 +1,15 @@
+Revision history for Perl extension Business::OnlinePayment::PayPal.
+
+0.11  Thu Feb 15 23:24:35 EST 2007
+	- BUG: normalize_creditcardtype() incorrectly normalizes MasterCard
+	  thanks to Marcus Watkins at topperswithglitz.com
+	- removed Switch and Solo from normalize_creditcardtype()
+	- parse_expiration() no longer croaks on unrecognized date formats
+0.10  Mon Aug 28 12:45:18 EDT 2006
+	- change cardnumber to card_number in example.
+	- Update documentation
+	- first release intended for CPAN
+0.01  Sun Aug 27 00:08:52 EDT 2006
+	- original version; created by h2xs 1.23 with options
+	    -AX --skip-exporter --use-new-tests -n Business::OnlinePayment::PayPal
+	- checkin of initial code on sourceforge

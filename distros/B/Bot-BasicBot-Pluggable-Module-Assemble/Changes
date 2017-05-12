@@ -1,0 +1,15 @@
+Revision history for Bot-BasicBot-Pluggable-Module-Assemble
+
+0.03 Sat Mar  6 10:02:42 CET 2010
+        [ENHANCEMENTS]
+        - fix a bug when the delimiter is a regexp metacharacter
+
+0.02 Wed Aug  9 08:33:15 CEST 2006
+        [ENHANCEMENTS]
+        - the bot will not answer to a request to assemble a single regex
+
+0.01 Sun Jul 23 01:54:15 CEST 2006
+        - First version, to satisfy the urge of producing an optimised
+          regexp while fooling around on #perlfr
+        - 100% test coverage
+

@@ -1,0 +1,383 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Minion - Minion-based pipeline breaker for Bot::ChatBots
+
+=head1 VERSION
+
+This document describes Bot::ChatBots::Minion version 0.004.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Bot-ChatBots-Minion">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Bot-ChatBots-Minion.svg?branch=master">
+</a>
+
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.10+-brightgreen.svg">
+</a>
+
+<a href="https://badge.fury.io/pl/Bot-ChatBots-Minion">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Bot-ChatBots-Minion.svg">
+</a>
+
+<a href="http://cpants.cpanauthors.org/dist/Bot-ChatBots-Minion">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Bot-ChatBots-Minion.png">
+</a>
+
+<a href="http://www.cpantesters.org/distro/B/Bot-ChatBots-Minion.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+
+<a href="http://matrix.cpantesters.org/?dist=Bot-ChatBots-Minion">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   # Just send received records straight to a Minion worker
+   use Mojolicious::Lite;
+   plugin 'Bot::ChatBots::Minion' => Minion => [...];
+   plugin 'Bot::ChatBots::Telegram' => sources => [
+      'WebHook',
+      processor => app->chatbots->minion->wrapper($processor_in_worker),
+      ...
+   ];
+   ...
+   app->start;
+   # now you will have to both start the Mojolicious::Lite app and the
+   # Minion worker!
+
+=head1 DESCRIPTION
+
+(Note: you are supposed to be familiar with L<Data::Tubes> terminology).
+
+This module allows you to break a potentially blocking long pipeline of
+operations into two parts, shifting the second part for execution in
+a Mojolicious Minion.
+
+For example, suppose you are using both L<Data::Tubes> and
+L<Bot::ChatBots::Telegram::WebHook> in a L<Mojolicious::Lite> app like
+this:
+
+   use Mojolicious::Lite;
+   use Data::Tubes qw< pipeline >;
+
+   my $pipeline = pipeline(
+      \&simple_operation_1,
+      \&simple_operation_2,
+      \&long_running_operation,
+      \&simple_operation_3,
+      {tap => sink},
+   );
+
+   plugin Bot::ChatBots::Telegram => sources => [
+      'Bot::ChatBots::Telegram::WebHook',
+      processor => $pipeline,
+      ...
+   ];
+
+   app->start;
+
+When a new update comes, it will eventually hit C<long_running_operation>
+and block your frontend process. Ouch! This is what you can do instead:
+
+   use Mojolicious::Lite;
+   use Data::Tubes qw< pipeline >;
+
+   # configure Minion before calling Bot::ChatBots::Minion
+   plugin Minion => ...;
+   plugin 'Bot::ChatBots::Minion';
+
+   my $pipeline = pipeline(
+      \&simple_operation_1,
+      \&simple_operation_2,
+      app->chatbots->minion->wrapper(
+         downstream => pipeline(
+            \&long_running_operation,
+            \&simple_operation_3,
+            {tap => sink},
+         )
+      ),
+      {tap => sink},
+   );
+
+   # the rest is as before
+   plugin Bot::ChatBots::Telegram => sources => [
+      'Bot::ChatBots::Telegram::WebHook',
+      processor => $pipeline,
+      ...
+   ];
+
+   app->start;
+
+So the trick is to divide the long-running pipeline into two separate
+pipelines, one to be executed in the main process with the first two
+simple operations and ending with a wrapper for the second pipeline, which
+includes the long operation. The wrapping mechanism takes care to send the
+received record along to the Minion worker, where the second pipeline will
+be executed.
+
+You don't actually have to call C<pipeline> inside the wrapper invocation,
+because it will be called for you if the parameter is an array reference:
+
+   use Mojolicious::Lite;
+   use Data::Tubes qw< pipeline >;
+
+   # configure Minion before calling Bot::ChatBots::Minion
+   plugin Minion => ...;
+   plugin 'Bot::ChatBots::Minion';
+
+   my $pipeline = pipeline(
+      \&simple_operation_1,
+      \&simple_operation_2,
+      app->chatbots->minion->wrapper(
+         downstream => [
+            \&long_running_operation,
+            \&simple_operation_3,
+            {tap => sink},
+         ],
+      ),
+      {tap => sink},
+   );
+
+   # the rest is as before
+   plugin Bot::ChatBots::Telegram => sources => [
+      'Bot::ChatBots::Telegram::WebHook',
+      processor => $pipeline,
+      ...
+   ];
+
+   app->start;
+
+The only difference in this case is that if you do not pass ready-made
+tubes (i.e. sub references) but expressions that can be turned into tubes,
+they will be transformed using prefix C<Bot::ChatBots> instead of the
+default C<Data::Tubes> (and the transformation will be subject to the
+rules set for L<Bot::ChatBots::Utils/resolve_module>.
+
+
+=head1 METHODS
+
+=head2 B<< dequeuer >>
+
+   my $sub_reference = $obj->dequeuer(%args); # OR
+      $sub_reference = $obj->dequeuer(\%args);
+
+Generate a dequeuer sub reference, which is suitable to be used in
+a Minion worker process for receiving records and sending them to
+a C<downstream> pipeline.
+
+The C<%args> MUST contain a C<downstream> parameter (or its
+lower-precedence alias C<processor>) with a tube-compliant sub reference
+or anything that can be transformed into one via
+L<Bot::ChatBots::Utils/pipeline>, which will be invoked inside the Minion
+worker.
+
+The following keys are recognised in C<%args>:
+
+=over
+
+=item C<downstream>
+
+mandatory parameter (unless C<processor> is provided) carrying a tube or
+I<tubifiable> definition via C<Bot::ChatBots::Utils/pipeline> (the latter
+case assumes that you also have L<Data::Tubes> installed);
+
+=item C<name>
+
+set an alternative name for enqueuing/dequeuing stuff via Minion, defaults
+to L</name>;
+
+=item C<prefix>
+
+set a prefix for automatic transformation of module names via
+C<Bot::ChatBots::Utils/pipeline>, defaults to what set for L</prefix>
+(i.e. C<Bot::ChatBots>);
+
+=item C<processor>
+
+low-priority alias for C<downstream>, see above.
+
+=back
+
+This method just returns the sub reference, so you will want it if you
+want to manage the Minion worker by yourself (e.g. explicitly calling
+L<Minion::Worker/process_commands>). If you just want to install a task,
+you might want to consider the convenience function L</install_dequeuer>
+described below.
+
+
+=head2 B<< enqueue >>
+
+   $obj->enqueue($record); # OR
+   $obj->enqueue($record, $name);
+
+Send a C<$record> to the Minion, optionally specifing the C<$name> of the
+task (which defaults to L</name>). It's actually just a convenience
+wrapper around L</enqueuer>.
+
+=head2 B<< enqueuer >>
+
+   my $sub_reference = $obj->enqueuer();         # OR
+      $sub_reference = $obj->enqueuer($name);
+
+Generate an enqueuer tube, most probably to be used as the last tube in a
+pipeline.
+
+You can optionally pass a C<$name> that will be used for enqueuing tasks
+towards the Minion; by default it takes the value from L</name>.
+
+It is not mandatory that L</minion> is defined at the time this method is
+called, but it MUST be defined when the C<$sub_reference> is called.
+
+=head2 B<< helper_name >>
+
+   my $helper_name = $self->helper_name;
+
+Default helper name. This is used by L</register> in case C<$conf> does not
+contain a C<helper_name> itself.
+
+=head2 B<< install_dequeuer >>
+
+   $obj->install_dequeuer(%args); # OR
+   $obj->install_dequeuer(\%args);
+
+Generate a dequeuer subroutine via L</dequeuer> and set it as a task in
+Minion (via L<Minion/add_task>). If you are defining a custom Minion
+worker process that relies on L<Mojolicious::Lite>, you can e.g. do this:
+
+   use Mojolicious::Lite;
+   plugin 'Bot::ChatBots::Minion' ...;
+   app->chatbots->minion->install_dequeuer(downstream => sub { ... });
+   app->start;
+
+=head2 B<< minion >>
+
+   my $minion = $obj->minion;
+   $obj->minion($new_minion_ref);
+
+Accessor for the minion object. If you pass an array reference, it will be
+used for instantiating a new L<Minion> object passing its contents as the
+list provided to the Minion's C<new> method.
+
+=head2 B<< name >>
+
+   my $name = $obj->name;
+   $obj->name('new name');
+
+Accessor for the name of the object, also used as topic for queuing tasks.
+Defaults to the value of L</typename>.
+
+=head2 B<< register >>
+
+   $obj->register($app, $conf);
+
+   # implicitly called when you load the class as a Mojolicious::Plugin
+   plugin 'Bot::ChatBots::Minion' => %conf;
+
+Plugin registration method, consumed by Mojolicious when loading this
+class as a plugin. The Mojolicious composite helper C<chatbots.minion> is
+set to a subroutine reference that returns an instance of the
+C<Bot::ChatBots::Minion> object, for possible further manipulation.
+
+The argument C<$conf> is a hash reference, the following keys are
+supported:
+
+=over
+
+=item C<minion>
+
+set L</minion>. Do not confuse this with C<Minion> below!
+
+=item C<Minion>
+
+load the L<Minion> plugin in the C<$app> and use it for setting L</minion>.
+This option points to an array reference that contains the configuration for
+instantiating the Minion plugin
+
+=item C<name>
+
+set L</name>
+
+=item C<prefix>
+
+set L</prefix>
+
+=item C<typename>
+
+set L</typename>
+
+=back
+
+=head2 B<< wrapper >>
+
+   my $sub_reference = $obj->wrapper(%args); # OR
+      $sub_reference = $obj->wrapper(\%args);
+
+Wrap a tube (or a sequence that can be transformed into a tube) in
+a delayed execution via Minion. It returns a sub reference that is a valid
+tube where records can be sent to a Minion worker.
+
+The C<%args> MUST contain a C<downstream> parameter (or its
+lower-precedence alias C<processor>) with a tube-compliant sub reference
+or anything that can be transformed into one via
+L<Bot::ChatBots::Utils/pipeline>, which will be invoked inside the Minion
+worker.
+
+The following keys are recognised in C<%args>:
+
+=over
+
+=item C<downstream>
+
+mandatory parameter (unless C<processor> is provided) carrying a tube or
+I<tubifiable> definition via C<Bot::ChatBots::Utils/pipeline> (the latter
+case assumes that you also have L<Data::Tubes> installed);
+
+=item C<name>
+
+set an alternative name for enqueuing/dequeuing stuff via Minion, defaults
+to L</name>
+
+=item C<prefix>
+
+set a prefix for automatic transformation of module names via
+C<Bot::ChatBots::Utils/pipeline>, defaults to what set for L</prefix>
+(i.e. C<Bot::ChatBots>);
+
+=item C<processor>
+
+low-priority alias for C<downstream>, see above.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs through GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Telegram>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

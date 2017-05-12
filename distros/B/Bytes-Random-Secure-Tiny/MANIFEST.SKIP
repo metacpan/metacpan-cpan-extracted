@@ -1,0 +1,30 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+^.git/\b
+^.gitignore$
+^.perltidyrc
+
+# Makemaker generated files and dirs.
+^MANIFEST\.
+^Makefile$
+^blib/
+^MakeMaker-\d
+
+# Temp, old and emacs backup files.
+~$
+\.old$
+^#.*#$
+^\.#
+
+# Custom skips.
+^pm_to_blib
+\.gz$
+MYMETA\b
+^cover_db/
+^nytprof/
+^nytprof\.out
+^Bytes-Random-Secure-Tiny-.+/
+^Bytes-Random-Secure-Tiny-.+\.gz

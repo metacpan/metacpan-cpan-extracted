@@ -1,0 +1,32 @@
+package Bio::Chado::Schema::Result::Project;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Project - The project table has been moved from general to its own module and has been
+expanded to provide properties, publications and contacts.
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Project module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Project::Project>
+
+L<Bio::Chado::Schema::Result::Project::ProjectContact>
+
+L<Bio::Chado::Schema::Result::Project::ProjectPub>
+
+L<Bio::Chado::Schema::Result::Project::ProjectRelationship>
+
+L<Bio::Chado::Schema::Result::Project::Projectprop>
+
+=cut
+
+1;

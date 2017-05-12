@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+lib/Business/FR/RIB.pm
+LICENSE
+Makefile.PL
+README
+t/001_load.t
+t/002_rib_test.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

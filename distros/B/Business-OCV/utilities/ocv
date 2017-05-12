@@ -1,0 +1,281 @@
+#!/usr/bin/perl -w
+# this is a 'command-line' interface to the OCV server
+#
+# NOTE: this interface optionally writes its own transaction and debug
+# logs, which should be merged into the relevant logs for the target 
+# account, if required. i.e. if you do a transaction using the ocv on a 
+# given account, make sure the transaction ends up in the account's 
+# transaction log. If you don't do this, then the totals reconciliation 
+# will be out as these manual transactions will be unaccounted for.
+
+use strict;
+
+use Term::ReadLine;
+
+#BEGIN {$OCV::debug = 1;}	# turn on/off module debugging at 'use' time
+
+use OCV;
+
+my $reminder = sub { };
+END { $reminder->(); }
+
+use constant CLIENTID => 'ocv'; # up to 8 chars
+
+use constant TIMEOUT	=> 60;		# OCV send/recv timeout (seconds)
+
+use constant LOGDIR		=> './var';	# link to OCV txn log dir
+use constant TXNLOG		=> 'ocv.txnlog';
+use constant DEBUGLOG	=> 'ocv.debug';
+
+use constant HISTFILE	=> LOGDIR . '/.ocv.hist';
+
+my $server = shift;
+my $accountnum = shift;
+
+die "usage: $0 <server<:port>> <account number>\n" unless 
+	($server and $accountnum);
+
+# print a 'merge' reminder at exit
+$reminder = sub
+{
+	$_ =<<"	."; s/^\t//mg;
+	###############################################################
+	If you've completed any transactions, make sure to merge
+	${\LOGDIR}/${\TXNLOG}
+	into the main transaction logs for this account!
+	###############################################################
+	.
+	warn $_;
+};
+
+
+# set the Transaction Reference number generator
+# - the OCV allows a 16 character field for the transaction reference
+# - basically a client identifier string, a hex-encoded, offset time, and 
+#   a sequence number. The time offset is simply to reduce the number of 
+#   characters in the resulting string.
+#   938700000 = 99/10/01 00:00:00 in TZ=Australia/NSW
+my $sn = 0;
+sub txnref { $sn %= 100; sprintf("%s%X%02d", "$$-", time()-938700000, $sn++) }
+
+# required parameters are: server address, client ID, account number
+my $ocv = new OCV (
+		Server		=> $server, 
+		ClientId	=> CLIENTID, 
+		AccountNum	=> $accountnum, 
+		TxnRef		=> \&txnref, 
+		Timeout		=> TIMEOUT, 
+		LogDir		=> LOGDIR,
+		TxnLog		=> TXNLOG,
+		DebugLog	=> DEBUGLOG,
+		Debug		=> 1, 
+	)
+	or die "Could not create OCV object: $@\n";
+
+my $statistics = $ocv->statistics(SubCode => STATS_CURRENT) 
+	or warn "Statistics: $@\n";
+
+print "Server up since $statistics->[14]\n";
+
+my $term;
+
+{
+	local $^W = 0;	# (try to) suppress ReadLine warnings
+
+	$term = new Term::ReadLine ("OCV Console");
+	$term->ornaments(0);
+
+	if (open(HISTORY, '<' . HISTFILE))
+	{
+		while (<HISTORY>)
+			{ chomp($_); next unless ($_ and /\S/); $term->addhistory($_); }
+	}
+}
+
+open(HISTORY, '>>'.HISTFILE) or 
+	warn ("couldn't append to history file [$0.hist]: $!\n"), 
+	open(HISTORY, ">/dev/null");
+
+help();
+
+my $indent = 0;
+sub printmsg
+{
+	my $s = shift;	# ref to message object
+	my @o = @_;		# orientation: () = list, list = table (values are widths)
+
+	my %m = $s->hash;
+	if (@o)	# table format:just print rows of data
+	{
+		my $i = 0;
+		for my $f ($s->fields)
+		{
+			my $v = $m{$f};
+			if (!defined($v))		{ printf '%*s ', $o[$i++], '-'; }
+			elsif ($v =~ /^\d+$/)	{ printf '%*d ', $o[$i++], $v;  }
+			else 					{ printf '%*s ', $o[$i++], $v;  }
+		}
+		print "\n";
+	}
+	else
+	{
+		$indent++;
+		for my $f ($s->fields)	# fields => hash keys, sorted
+		{
+			print "\t" x $indent;
+			if (ref($m{$f}))	# sub-message or list of sub-messages
+			{
+				printf "%16s =>\n", $f;
+				if (UNIVERSAL::isa($m{$f}, 'OCV::Message'))
+				{
+					printmsg($m{$f});
+				}
+				elsif (ref($m{$f}) eq 'ARRAY')	# list of messages
+				{
+					# assume messages are all the same type, print as table
+
+					my $s = $m{$f}[0];
+					# print header (fieldnames)
+					my @w = $s->fieldwidths;
+					my $i = 0;
+					for my $f ($s->fields)
+					{
+						printf '%*s ', $w[$i++], $f;
+					}
+					print "\n";
+
+					for my $d (@{$m{$f}})
+					{
+						printmsg($d, @w);
+					}
+				}
+				else
+				{
+					print "\t" x $indent+1, "[unknown sub-type]\n";
+				}
+			}
+			else	# plain message
+			{
+				printf "%16s => %s\n", $f, defined($m{$f}) ? $m{$f} : "-";
+			}
+		}
+		$indent--;
+	}
+}
+
+while (defined(my $c = $term->readline("> ")))
+{
+	chomp($c);
+	next unless ($c and $c =~ /\S/);	# no command
+
+	help(), next if ($c =~ /^help/i);
+
+	$term->addhistory($c);
+
+	my $s;
+	my $w;
+	eval	# try
+	{
+		unless ($ocv->ping)
+		{
+			warn "not connected, attempting to reconnect...\n";
+			die "$@\n" unless $ocv->reset;
+		}
+
+		if ($c =~ /^([^\(]+)/ and $ocv->can($1))	# calling a method?
+		{
+			# eval command string as OCV method
+			# - need "double die" to propagate $@ error string
+			# - save $@ warnings through eval
+			eval 'die "$@\n" unless $s=$ocv->' . $c . '; $w = $@';
+			die "$@\n" unless $s;
+		}
+		elsif ($c =~ /{.*}/)		# setting a hash key?
+		{
+			eval '$s=$ocv->' . $c;
+			$s = '<undef>' unless defined $s;
+		}
+		else
+		{
+			die "don't know how to handle [$c]\n";
+		}
+
+		print "Warning: $w\n" if $w;
+
+		print HISTORY "$c\n";	# successful command, save it
+
+		if (ref($s) eq 'OCV::Message')
+		{
+			#print "s is a " . ref($s) . "\n";
+			#print "$_:\n", map{"\t$_\n"} @{$s};
+
+			# my $v;
+			# $v = $s->ClientID;
+			# print defined($v)?$v:"<undef>", "\n";
+			# $v = $s->StartTime;
+			# print defined($v)?$v:"<undef>", "\n";
+
+			#print "[" . join(", ", map {defined($_)?$_:"-"} $s->array) . "]\n";
+			printmsg($s);
+		}
+		else
+		{
+			print $s, "\n";
+		}
+
+		1;	# eval ok
+	}
+	or do	# catch
+	{
+		$@ =~ s/\n*$//;
+		$@ ||= 'unknown error';
+		print "Error: $@\n";
+	};
+}
+print "\n";
+
+close(HISTORY);
+
+$ocv->close() or warn "Close: $@\n";
+
+
+sub help
+{
+	print <<EOM;
+
+Commands:
+	help	print this message
+
+General form of commands is as an OCV method call with named arguments, e.g.:
+	status(TxnRef => "txnid")
+Arguments in brackets [] are optional.
+
+Object data may also be set/modified as for a hash key:
+    {timeout}             get
+    {timeout}=20          set
+
+TRANSACTION
+	purchase    CardData, CardExpiry, Amount
+	refund      CardData, CardExpiry, Amount
+	preauth     CardData, CardExpiry, Amount
+	completion  CardData, CardExpiry, Amount, AuthNum
+	status
+
+  Arguments Common To All Transactions
+	[TxnRef]    	(default = automatically generated serial number)
+	[PolledMode]	(0 = blocking, 1 = polled, (default = 0))
+	[ClientType]	(0 = internet, 1 = telephone, 2 = mail order, (default = 0))
+
+  Example
+	purchase(carddata=>"5424000000000015", cardexpiry=>"1205", amount=>1000)
+
+MISCELLANOUS
+	vppconfig	VPPNum, NetworkType, NetworkID, MerchantID, TerminalID, 
+	         	AccountNum, Enable, [PinPadID]
+	vppstatus	VPPNum, [PinPadID]
+	statistics	[Reset], [SubCode]
+	totals		[Day (latest == 0)]
+	accountlist
+
+EOM
+}

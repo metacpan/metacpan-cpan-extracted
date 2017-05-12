@@ -1,0 +1,29 @@
+Revision history for Bot::Cobalt::Plugin::Silly
+
+0.031002 2016-04-07
+
+  - Various cleanups
+
+0.031001 2015-06-21
+
+  - Add Bot::Cobalt::Plugin::Silly::MakeMoneyAtHome
+
+0.030001 2015-05-23
+
+  - 'use strictures 2' for saner fatal warnings behavior
+
+  - Switch to Dist::Zilla packaging
+
+  - Various cleanups
+
+0.02 2013-02-02
+
+  - Kill ThreatLevel, webservice seems to be gone.
+
+  - Add Bone::Easy
+
+  - Cleanups
+
+0.001 2012-05-23
+
+  - Initial release

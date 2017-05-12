@@ -1,0 +1,33 @@
+---
+abstract: 'a port of the Backbone.js event API'
+author:
+  - 'Mark Flickinger'
+build_requires:
+  Exporter: '0'
+  FindBin::libs: '0'
+  Moo: '0'
+  Test::Fatal: '0'
+  Test::LeakTrace: '0'
+  Test::More: '0'
+  Test::Strict: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Backbone-Events
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  namespace::autoclean: '0.16'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/mark-5/p5-backbone-events/issues
+  repository: git://github.com/mark-5/p5-backbone-events.git
+version: 0.0.3

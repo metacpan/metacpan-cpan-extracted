@@ -1,0 +1,242 @@
+0.400115
+===
+
+__Tue 07 Dec 2016__
+
+ * Foreign army on nation soil added to nation meta
+ * Better garbage collection of rebel supports
+ * More constants for web
+
+0.400110
+===
+
+__Thu 08 Sep 2016__
+
+ * Mission generation (for online game only)
+
+0.400105
+===
+
+__Sun 21 Aug 2016__
+
+ * Events dump is now limitated at ten years
+ * refresh-nosrv command now allow refresh not involving server
+ * Refactoring
+
+0.400100
+===
+
+__Sat 20 Aug 2016__
+
+ * Black Market
+ * Travel and Shop turned off in CLI game
+
+
+0.400020
+===
+
+__Thu 11 Aug 2016__
+
+ * More data dumped in the metadata wallet
+ * HTML stocks layout updated
+
+0.400010
+===
+
+__Tue 09 Aug 2016__
+
+ * Manual updated
+
+0.400000
+===
+
+__Mon 08 Aug 2016__
+
+ * New influence web page layout
+ * Elite-like game
+ * Shop
+ * Travel
+
+0.300100
+===
+
+__Thu 27 Apr 2016__
+
+ * Missions introduced
+ * Values of bonds changed
+
+0.300051
+===
+
+__Wen 20 Apr 2016__
+
+ * Bugfix about interaction between war and civil war
+
+0.300050
+===
+
+__Sun 17 Apr 2016__
+
+ * Logging changed
+ * Civil war refactoring
+ * Civil war history
+ * Bugfix and refactoring about military range
+
+0.300040
+===
+
+__Fri 08 Apr 2016__
+
+ * Player statistics
+ * Bugfix on war history
+
+0.300030
+===
+
+__Wen 02 Apr 2016__
+
+ * Graphs
+
+0.300020
+===
+
+__Wen 30 Mar 2016__
+
+ * Bugfix on supports visualization
+ * Events redesign
+ * Newspaper
+ * Better stocks report
+
+0.300012
+===
+
+__Wen 16 Mar 2016__
+
+ * Constants about military support tuned to avoid schizophrenic behaviuor
+ * Bugfix on stock commands at first turn of a player
+
+0.300011
+===
+
+__Tue 15 Mar 2016__
+
+ * Bugfix about war history
+
+0.300010
+===
+
+__Sun 13 Mar 2016__
+
+ * Linked nations in near analysis
+ * Bugfix about requirements
+ * Basic parameters for web are taken from environment
+ * Players are refreshed on refresh
+ * Clean procedure
+
+0.300000
+===
+
+__Thu 10 Mar 2016__
+
+ * Web engine
+
+0.200000
+===
+
+__Sun 31 Jan 2016__
+
+ * Stock exchange game
+ * Abbreviations for nation names
+ * Manual
+
+0.150000
+===
+
+__Sat 09 Jan 2016__
+
+ * influences command
+ * treaties command
+ * save/load
+ * progress
+
+0.140000
+===
+
+__Sat 26 Dec 2015__
+
+ * Relations are no more calculated considering influence
+ * Conquered nation has diplomacy copied from conqueror
+ * It's now impossible to start military support with a nation that hates you
+ * RECALL REBEL MILITARY SUPPORT command
+ * MILITARY AID command
+ * plot command to plot a single attribute of a nation as a graph
+ * Better war history
+ * Bugfix
+
+0.131000
+===
+
+__Mon 7 Dec 2015__
+
+ * Diplomatic pressure
+ * War history command
+ * Bugfix
+
+0.130000
+===
+
+__Sat 5 Dec 2015__
+
+ * Economic aid command
+ * Rebel military support command
+ * Army is now built using domestic resources
+ * hotspots report and other interface improvements
+ * An hate at 10 or less leads to a permanent crisis
+
+0.120000
+===
+
+__Mon 9 Nov 2015__
+
+ * Tuning for boost production
+ * Situation can be ordered
+ * Treaties: commercial and no aggression
+ * Alliance is now a treaty too
+ * Different moment for user intervention in game flow
+ * Bugfix
+
+0.115000
+===
+
+__Thu 29 Oct 2015__
+
+ * Aid insurgents command (and strategy for IA)
+ * Bugfix
+
+0.110000
+===
+
+__Sun 18 Oct 2015__
+
+ * Player nation evidenced on turn debriefing
+ * reports with nation use player's when no nation is selected 
+ * Bugfix: better management of commands with no arguments
+ * Command line case unsensitive
+ * Better near summary
+ * Crises always written next to hate relationships
+ * Bugfix
+ * Refactoring
+
+0.100001
+===
+
+__Wen 14 Oct 2015__
+
+Fix on an assignment that break test
+
+0.100000
+===
+
+__Tue 13 Oct 2015__
+
+First CPAN release

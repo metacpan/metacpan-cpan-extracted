@@ -1,0 +1,273 @@
+NAME
+
+    Backblaze::B2 - interface to the Backblaze B2 API
+
+SYNOPSIS
+
+METHODS
+
+ Backblaze::B2->new %options
+
+    version
+
+      Allows you to specify the API version. The current default is v1,
+      which corresponds to the Backblaze B2 API version 1 as documented at
+      https://www.backblaze.com/b2/docs/.
+
+SETUP
+
+    0. Have a telephone / mobile phone number you're willing to share with
+    Backblaze
+
+    1. Register at for Backblaze B2 Cloud Storage at
+
+      https://secure.backblaze.com/account_settings.htm?showPhone=true
+
+    2. Add the phone number to your account at
+
+      https://secure.backblaze.com/account_settings.htm?showPhone=true
+
+    3. Enable Two-Factor verification through your phone at
+
+      https://secure.backblaze.com/account_settings.htm?showPhone=true
+
+    4. Create a JSON file named B2.credentials
+
+      This file should live in your home directory with the application key
+      and the account key:
+
+          { "accountId":      "...",
+            "applicationKey": ".............."
+          }
+
+NAME
+
+    Backblaze::B2::v1 - Backblaze B2 API account
+
+METHODS
+
+ ->new %options
+
+        my $b2 = Backblaze::B2::v1->new(
+            api => 'Backblaze::B2::v1::Synchronous', # the default
+        );
+
+    Creates a new instance. Depending on whether you pass in
+    <Backblaze::B2::v1::Synchronous> or <Backblaze::B2::v1::AnyEvent>, you
+    will get a synchronous or asynchronous API.
+
+    The synchronous API is what is documented here, as this is the most
+    likely use case.
+
+        my @buckets = $b2->buckets();
+        for( @buckets ) {
+            ...
+        }
+
+    The asynchronous API is identical to the synchronous API in spirit, but
+    will return Promises . These condvars usually return two or more
+    parameters upon completion:
+
+        my $results = $b2->buckets();
+        $results->then( sub{ 
+            my( @buckets ) = @_;
+            for( @buckets ) {
+                ...
+            }
+        }
+
+    The asynchronous API puts the burden of error handling into your code.
+
+ ->buckets
+
+        my @buckets = $b2->buckets();
+
+    Returns a list of Backblaze::B2::Bucket objects associated with the B2
+    account.
+
+ ->bucket_from_id
+
+        my @buckets = $b2->bucket_from_id(
+            'deadbeef'
+        );
+
+    Returns a Backblaze::B2::Bucket object that has the given ID. It does
+    not make an HTTP request to fetch the name and status of that bucket.
+
+ ->create_bucket
+
+        my $new_bucket = $b2->create_bucket(
+            name => 'my-new-bucket', # only /[A-Za-z0-9-]/i are allowed as bucket names
+            type => 'allPrivate', # or allPublic
+        );
+        
+        print sprintf "Created new bucket %s\n", $new_bucket->id;
+
+    Creates a new bucket and returns it.
+
+ ->api
+
+    Returns the underlying API object
+
+ ->files( %options )
+
+    Lists the files contained in this bucket
+
+        my @files = $bucket->files(
+            startFileName => undef,
+        );
+
+    By default it returns only the first 1000 files, but see the allFiles
+    parameter.
+
+    allFiles
+
+          allFiles => 1
+
+      Passing in a true value for this parameter will make as many API
+      calls as necessary to fetch all files.
+
+ ->upload_file( %options )
+
+    Uploads a file into this bucket, potentially creating a new file
+    version.
+
+        my $new_file = $bucket->upload_file(
+            file => 'some/local/file.txt',
+            target_file => 'the/public/name.txt',
+        );
+
+    file
+
+      Local name of the source file. This file will be loaded into memory
+      in one go.
+
+    target_file
+
+      Name of the file on the B2 API. Defaults to the local name.
+
+      The target file name will have backslashes replaced by forward
+      slashes to comply with the B2 API.
+
+    mime_type
+
+      Content-type of the stored file. Defaults to autodetection by the B2
+      API.
+
+    content
+
+      If you don't have the local content in a file on disk, you can pass
+      the content in as a string.
+
+    mtime
+
+      Time in miliseconds since the epoch to when the content was created.
+      Defaults to the current time.
+
+    sha1
+
+      Hexdigest of the SHA1 of the content. If this is missing, the SHA1
+      will be calculated upon upload.
+
+ ->download_file_by_name( %options )
+
+    Downloads a file from this bucket by name:
+
+        my $content = $bucket->download_file_by_name(
+            fileName => 'the/public/name.txt',
+        );
+
+    This saves you searching through the list of existing files if you
+    already know the filename.
+
+ ->get_download_authorization( %options )
+
+    Downloads a file from this bucket by name:
+
+        my $authToken = $bucket->get_download_authorization(
+            fileNamePrefix => '/members/downloads/',
+            validDurationInSeconds => 300, # five minutes
+        );
+
+    This returns an authorization token that can download files with the
+    given prefix.
+
+ ->api
+
+    Returns the underlying API object
+
+ ->files( %options )
+
+    Lists the files contained in this bucket
+
+        my @files = $bucket->files(
+            startFileName => undef,
+        );
+
+    By default it returns only the first 1000 files, but see the allFiles
+    parameter.
+
+    allFiles
+
+          allFiles => 1
+
+      Passing in a true value for this parameter will make as many API
+      calls as necessary to fetch all files.
+
+ ->upload_file( %options )
+
+    Uploads a file into this bucket, potentially creating a new file
+    version.
+
+        my $new_file = $bucket->upload_file(
+            file => 'some/local/file.txt',
+            target_file => 'the/public/name.txt',
+        );
+
+    file
+
+      Local name of the source file. This file will be loaded into memory
+      in one go.
+
+    target_file
+
+      Name of the file on the B2 API. Defaults to the local name.
+
+      The target file name will have backslashes replaced by forward
+      slashes to comply with the B2 API.
+
+    mime_type
+
+      Content-type of the stored file. Defaults to autodetection by the B2
+      API.
+
+    content
+
+      If you don't have the local content in a file on disk, you can pass
+      the content in as a string.
+
+    mtime
+
+      Time in miliseconds since the epoch to when the content was created.
+      Defaults to the current time.
+
+    sha1
+
+      Hexdigest of the SHA1 of the content. If this is missing, the SHA1
+      will be calculated upon upload.
+
+ ->download_file_by_name( %options )
+
+    Downloads a file from this bucket by name:
+
+        my $content = $bucket->download_file_by_name(
+            file => 'the/public/name.txt',
+        );
+
+    This saves you searching through the list of existing files if you
+    already know the filename.
+
+ ->api
+
+    Returns the underlying API object
+

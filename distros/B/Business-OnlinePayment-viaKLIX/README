@@ -1,0 +1,24 @@
+Copyright (c) 2007 Jeff Finucane
+Copyright (c) 2007 Freeside Internet Services, Inc.
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::viaKLIX, a Business::OnlinePayment
+back end module for viaKLIX. http://www.viaklix.com/
+
+Based on Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+Currently maintained by Jeff Finucane <viaklix@weasellips.com>.
+
+Business::OnlinePayment is a generic interface for processing payments
+through online credit card processors, online check acceptance houses,
+etc.  (If you like buzzwords, call it an "multiplatform
+ecommerce-enabling middleware solution").
+
+You should be aware that portions of "make test" which interact with
+viaKLIX will fail if you configure your virtual terminal to require
+fields the tester does not expect to be required.  The documentation
+specifies that ssl_merchant_id, ssl_pin, ssl_transaction_type, and
+ssl_amount are required.  All others are optional.  You will probably
+need to set ssl_user_id via the environment as well, since viaKLIX
+recommends not using the administrative login.
+

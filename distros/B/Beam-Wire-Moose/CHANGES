@@ -1,0 +1,29 @@
+Changelog for Beam-Wire-Moose
+
+0.005 2015-10-20T05:28:15
+ - fix missing abstract
+
+0.004 2015-10-20T05:18:37Z
+ - add new release files
+ - update copyright year
+ - add missing core prereqs
+ - remove Test::Most dependency
+ - remove auto-generated test file
+ - update dist.ini to new default
+ - remove ModuleBuild to prevent toolchain confusion
+ - update weaver.ini from new default skeleton
+ - add Build.PL to base repo directory
+ - SurgicalPodWeaver -> PodWeaver
+
+0.003 2014-04-27T02:36:08Z
+ - add contributing information
+ - update build artifacts
+ - correct the sub signature for create_service
+
+0.002 2013-04-18T01:09:28Z
+ - update dist to be of higher kwalitee
+
+0.001 2013-03-26T00:29:12Z
+ - add README from POD
+ - create Beam::Wire::Moose for class composition at runtime
+

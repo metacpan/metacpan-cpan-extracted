@@ -1,0 +1,39 @@
+Revision history for Bash-Completion-Plugins-perlbrew
+
+0.10 June 02 2013
+     - Sync up with perlbrew 0.64.
+     - Remove install-ack completion.
+     - Add install-multiple completion.
+     - Add new install flags.
+     - Move away from given/when
+
+0.09 February 22 2013
+     - Tell perlbrew's completion to fall back to filenames if no completions are generated
+       (for install)
+     - Add missing completion for install ('blead')
+     - Offer 'stable' and 'perl-stable' as completions for perl install
+     - Add completion for new '--switch' option
+
+0.08 October 25 2012
+     - Add upgrade-perl command
+
+0.07 October 15 2012
+     - Add info and download commands (perlbrew 0.53)
+
+0.06 July 15 2012
+     - Add support for install-ack, list-modules, and exec --with (perlbrew 0.45)
+
+0.05 March 29 2012
+     - Add support for new commands (exec, switch-off, install-patchperl, lib)
+     - Add 'perl-blead' completion for perlbrew install
+     - Enhance support for 'alias' command
+
+0.04 July 31 2011
+     - Fix version mixup.
+
+0.02 June 03 2011
+     - Convert to Dist::Zilla
+     - Add support for new commands
+
+0.01 April 20, 2011
+     Initial release; provides basic functionality.

@@ -1,0 +1,86 @@
+NAME
+	Bluepay::Bluepay20Post
+
+VERSION
+	Version: 0.10
+	April 2008
+
+SYNOPSIS
+	Bluepay::Bluepay20Post - The BluePay 2.0 Post interface
+
+DESCRIPTION
+	Bluepay::Bluepay20Post is a Perl based implementation for interaction with the 
+	Bluepay 2.0 Post interface.  Bluepay20Post accepts the parameters needed for the 
+	Bluepay20Post and sends the Post request to Bluepay via HTTPS.  Bluepay20Post 
+	has been developed on Windows XP, but should work on any OS where Perl is installed.
+
+RUNNING Bluepay::Bluepay20Post
+	use Bluepay::Bluepay20Post;
+
+	# Create object
+	my $bp20obj = Bluepay::Bluepay20Post->new();
+
+	# Assign values
+	$bp20Obj->{ACCOUNT_ID} = "myaccountid";
+	$bp20Obj->{SECRET_KEY} = 'mysecretkey';
+	$bp20Obj->{TRANS_TYPE} = 'SALE';
+	$bp20Obj->{MODE} = 'TEST';		# Default is TEST --> Set to LIVE for live tx
+	$bp20Obj->{AMOUNT} = '3.01';	# ODD returns Approved, EVEN returns Declined in TEST mode
+	$bp20Obj->{PAYMENT_ACCOUNT} = '4111111111111111';	# VISA Test Card
+	$bp20Obj->{CARD_EXPIRE} = '0808';
+	## PLEASE REVIEW THE BP20 POST DOCUMENTATION TO SEE ALL REQUIRED/POSSIBLE VALUES
+	## REFERENCE THEM BY NAME DIRECTLY
+	
+	# Post --> Results contains the name value pair string of the response
+	#  In this format: TRANS_ID=&STATUS=&AVS=&CVV2=&MESSAGE=&REBID=
+	my $results = $bp20Obj->Post();
+
+	# Can also retrieve the results directly from the object
+	print $bp20Obj->{TRANS_ID} . "\n";
+	print $bp20Obj->{STATUS} . "\n";
+	print $bp20Obj->{AVS} . "\n";
+	print $bp20Obj->{CVV2} . "\n";
+	print $bp20Obj->{AVS} . "\n";
+	print $bp20Obj->{AUTH_CODE} . "\n";
+	print $bp20Obj->{MESSAGE} . "\n";
+	print $bp20Obj->{REBID} . "\n";
+	
+METHODS
+  new
+	Creates a new instance of a Bluepay::Bluepay20Post object
+  Post
+	Posts the data to the Bluepay::Bluepay20Post interface
+
+MODULES
+	This script has some dependencies that need to be installed before it
+	can run.  You can use cpan to install the modules.  They are:
+	 - Digest::MD5
+	 - LWP::UserAgent
+	 - URI::Escape
+
+AUTHOR
+	The Bluepay::Bluepay20Post perl module was written by Christopher Kois <ckois@bluepay.com>.
+
+COPYRIGHTS
+	The Bluepay::Bluepay20Post package is Copyright (c) April, 2008 by BluePay, Inc. 
+	http://www.bluepay.com All rights reserved.  You may distribute this module under the terms 
+	of GNU General Public License (GPL). 
+	
+	Module Copyrights:
+	 - The Digest::MD5 module is Copyright (c) 1998-2003 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/Digest-MD5-2.36/MD5.pm
+	 - The LWP::UserAgent module is Copyright (c) 1995-2008 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/libwww-perl-5.812/lib/LWP/UserAgent.pm
+	 - The URI::Escape module is Copyright (c) 1995-2004 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/URI-1.36/URI/Escape.pm
+				
+	NOTE: Each of these modules may have other dependencies.  The modules listed here are
+	the modules that Bluepay::Bluepay20Post specifically references.
+
+SUPPORT/WARRANTY
+	Bluepay::Bluepay20Post is free Open Source software.  This code is Free.  You may use it, modify it, 
+	redistribute it, Post it on the bathroom wall, or whatever.  If you do make modifications that are 
+	useful, Bluepay would love it if you donated them back to us!
+
+KNOWN BUGS
+	This is version 0.10 of Bluepay::Bluepay20Post.  There are currently no known bugs.

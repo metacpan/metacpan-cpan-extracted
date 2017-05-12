@@ -1,0 +1,446 @@
+2007-05-14  Jason E. Stewart <jason_e_stewart@users.sf.net>
+
+	* All classes regenerated using new Mason template engine
+	* MAGE-Utils hand-written classes are split into their own module
+	* new version (20030502.3)
+
+2004-05-25  Eric W. Deutsch <edeutsch@systemsbiology.org>	
+
+	All classes updated to MAGE-OM 1.1
+
+2003-01-11  Jason E. Stewart  <jason@openinformatics.com>
+
+	* MAGE.pm (Repository): 
+	new version (20020902.3)
+
+2003-03-07  Jason E. Stewart  <jason@openinformatics.com>
+
+	* MAGE/XML/Writer.pm (Repository): 
+	to decide whether to only write a _ref element, the code delays
+	   writing the start tag until after:
+	   1) it's seen attributes other than identifier
+	   2) it's seen an association with an object
+	needed to add check for writing end tag as well
+	write_start_tag() now buffers itself. It is flushed in
+	   obj2mageml() when an association is seen, or when an empty
+	   element is written
+
+2002-12-08  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	moved setAssociation() from start_element to end_element
+
+2002-11-25  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm: 
+	reomoved XMLReader packages() and package_stack(). Package objects
+	   are now just pushed onto the object stack.
+	Fixed silliness that objects w/o parents were pushed onto a queue
+	   - this can't happen now that packages are put on the stack
+
+2002-11-23  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	typo: get/set_attribute => get/set_slot
+	removed many attributes of Bio::MAGE::Handler that were simply
+	   copies of the Reader's attributes, instead it now can access
+	   the Reader directly
+	removed many uses of Handler hash keys directly, made them
+	   attributes, two cases remain: 
+	   __PRIVATE: won't change
+	   classes: will change by adding factory interface
+	all attribute hash keys begin with '__' except class names which
+	   will go away soon
+
+2002-11-20  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	added resolve_identifiers to XMLReader
+	added reader to Bio::MAGE::Handler
+
+2002-11-19  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Message): 
+	added count attribute to XMLReader
+
+2002-11-16  Jason E. Stewart  <jason@openinformatics.com>
+
+	* Association/Association.pm (Repository): 
+	added new package, Bio::MAGE::Association::End
+	Bio::MAGE::Association now has two end's 'self' and 'other'
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	added better POD
+	fixed attr_indent usage
+	fixed default values for attributes
+	added external_data_dir attribute
+	added cube_holds_path attribute
+	associations now have both ends as objects
+	no longer writes out objects from bi-navigable associations in
+	  which self is owned by aggregate from other end 
+
+	* Makefile.PL (Repository): 
+	new version and scheme (20020902.1)
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	added fix to prevent writing of empty elements that were intended
+	   to only be written as <*_ref> elements
+
+2002-10-08  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Must check that a reference to an array has any elements before
+	   attempting to access the last element with $ref->[-1] notation
+	writer should export the VALUE of the datum not the stringified
+	   object 
+	Added dir() to Bio::MAGE::Handler
+	set dir() in read() if called with path
+	reader can now handle data cube in any order
+
+2002-10-07  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	needed to init $HANDLER inside read()
+	modification to POD Synopsis
+	Added support for BioDataTuples
+	fix identifier bug in write_bio_data_tuples
+	fix typo in write_bio_data_tuples
+	added container tags around objects
+	Added BioDataTuples support to XMLReader
+
+2002-09-10  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Fixed bug in XMLWriter in which cube attribute got written out
+	added more POD to XMLReader
+	made XMLReader handle .gz files
+	created an init() subroutine to localize parser creation
+
+	* MAGE.pm (Repository): 
+	added an error check to add_objects() to ensure that an array ref
+	   was used
+
+2002-08-25  Jason E. Stewart  <jason@openinformatics.com>
+
+	* MAGE.pm (Repository): 
+	using croak instead of die to get proper caller in error message
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	removed extra copy of indent_level() found with -w
+	eliminated warning by checking definedness of $attribute_val
+	ensured that tags were created properly by using ucfirst()
+
+2002-08-24  Jason E. Stewart  <jason@openinformatics.com>
+
+	* Makefile.PL (Repository): 
+	New version (0.08)
+
+	* XMLUtils/XMLUtils.pm: 
+	moved the reader from a standalone app to Bio::MAGE::XMLReader
+
+2002-08-19  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Writer now creates empty tags when an object has no associations 
+	Fixed bug in empty tag creation
+	More fixes for new namespace
+	fixed obj2mageml_ref() for new namespaces
+	fixed error with empty tags
+	fixed DataInternal and DataExternal for BioDataCube
+
+	* Base/Base.pm (Repository): 
+	modified set_slots() to find slot methods as well
+
+2002-05-21  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	subclasses from Bio::MAGE::Base instead of Class::ObjectTemplate
+
+2002-01-17  Jason E. Stewart  <jason@openinformatics.com>
+
+	* MAGE.pm (Repository): 
+	Added NodeValue to import_all
+
+	* scripts/mageml_reader.pl (Repository): 
+	* XMLUtils/XMLUtils.pm (Repository): 
+	removed some bogus attributes
+	fixed handling of <InternalData> and  <ExternalData>
+
+	* MAGE.pm (Repository): 
+	Fixed a bogus directory
+
+2001-12-19  Jason E. Stewart  <jason@openinformatics.com>
+
+	* scripts/mageml_reader-sax1.pl (Repository): 
+	obsolete
+
+	* scripts/mageml_reader.pl (Repository): 
+	Now supports --sax1 options to use a SAX1 parser instead of the
+	   default SAX2 parser.
+
+	* scripts/test-bio-data-cube.pl (Repository): 
+	Added support for storing cube as 3D matrix
+	Added support for storing cube in external file
+
+	* scripts/mageml_reader.pl (Repository): 
+	removed bad command line options
+	added --dir option
+	converted back to SAX2
+	Added methods for storing cube as 3D matrix
+	Added support for storing cube in external file
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Added external_data() method for storing whether the cube should
+	   be internal or external
+	Added external_file_id() method	for generating a unique file id
+	Added flatten() method for coverting cube to list
+	Added support for cube as 3D matrix
+	Added support for external data
+
+2001-12-11  Jason E. Stewart  <jason@openinformatics.com>
+
+	* scripts/test-bio-data-cube.pl (Repository): 
+	Example script for creating a BioDataCube
+
+	* MAGE.pm (Repository): 
+	identifier is required for <MAGE-ML>
+	packages now printed in proper order
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	substitute quotation marks into &quot;
+
+2001-12-10  Jason E. Stewart  <jason@openinformatics.com>
+
+	* MAGE.pm (Repository): 
+	Added error checking for import_all()
+
+2001-12-09  Jason E. Stewart  <jason@openinformatics.com>
+
+	* scripts/mageml_reader.pl (Repository): 
+	removed all the 'use ...' statements and added the ':ALL' key to
+	   the 'use Bio::MAGE'
+
+2001-12-08  Jason E. Stewart  <jason@openinformatics.com>
+
+	* scripts/mageml_reader.pl (Repository): 
+	Fixed the handling of unresolved identifiers
+
+2001-09-20  Jason E. Stewart  <jason@openinformatics.com>
+
+	* t/*.t (Repository): 
+	Added tests for class_name() and package() class methods
+
+	* *.pm (Repository): 
+	now have package() method
+
+	* MAGE.pm (Repository): 
+	now 'requires' all packages because of new()
+
+	* Pkg/*/*.pm (Repository): 
+	Added xml writer code
+	can now create instances of packages
+	added code for registration of identifiable objects
+
+	* scripts/mageml2obj_v2.pl: 
+	Added test of XMLWriter
+
+	* t/MAGE_package.t: 
+	Added tests for the packages method
+	Added tests for the identifiers method	
+	Added tests for the objects method		
+
+	* t/*_package.t: 
+	Added tests for the *_list methods
+	Added tests for the mageml_list method
+	Added tests for the class2list method
+	Added tests for the tagname method
+	test creation of an instance
+
+	* t/Person.t: 
+	* Person/Person.pm (Repository): 
+	Fixed 'affiliation' associtation
+
+	* MAGE.pm (Repository): 
+	All Package modules now have $VERSION
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	needs to return a true value
+
+2001-09-19  Jason E. Stewart  <jason@openinformatics.com>
+
+	* Pkg (Repository): 
+	All other package modules now have mageml_lists() method
+
+	* MAGE.pm (Repository): 
+	Now has mageml_packages() method.
+
+2001-09-18  Jason E. Stewart  <jason@openinformatics.com>
+
+	* XMLUtils/XMLUtils.pm: 
+	XMLWriter has unified register() and obj2mageml()
+	Wrote rudimentary identifier generator.
+
+	* Association/Association.pm (Repository): 
+	New Class for association meta-data
+
+2001-09-11  Jason E. Stewart  <jason@openinformatics.com>
+
+	* scripts/mageml2obj.pl (Repository): 
+	now handles <Affiliation_refcon> and setting state
+	creates an Bio::MAGE::XMLWriter to create the output
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Now has Bio::MAGE::XMLWriter for handling MAGE-ML export
+	first step in export is register(), then obj2mageml()
+
+2001-09-07  Jason E. Stewart  <jasons@openinformatics.com>
+
+	* Makefile.PL (Repository): 
+	New version (0.03)
+
+	* scripts/mageml2obj.pl (Repository): 
+	Test script for reading MAGEML. Currently only handles <Person>,
+	   <Organization>, and <Organization_ref> in a <Person> context. 
+
+	* XMLUtils/XMLUtils.pm (Repository): 
+	Module for obj2mageml() methods
+
+2001-09-01  Jason E. Stewart  <jason@openinformatics.com>
+
+	* classes/create-mage-classes.pl (Repository): 
+	{association,attribute}_methods() needed the class name argument
+	   in order to invoke another class method (superclasses).
+
+	* classes/xmi2class.pl (Repository): 
+	update USAGE
+	fixed --onefile to work again
+
+2001-08-31  Jason E. Stewart  <jason@openinformatics.com>
+
+	* classes/create-mage-classes.pl (Repository): 
+	fixed the nomenclature for $*_qw variables
+	Added class methods: class_name(), subclasses(), superclasses(),
+	  attribute_methods(), and association_methods().
+	@subclasses now uses full class names
+
+2001-08-30  Jason E. Stewart  <jasons@openinformatics.com>
+
+	* classes/xmi2class.pl (Repository): 
+	Now correctly creates XML files with the 'standalone' attribute
+	   set in the XMLDecl when in package mode.
+
+2001-08-29  Jason E. Stewart  <jasons@openinformatics.com>
+
+	* classes/create-mage-classes.pl (Repository): 
+	Supports creation of *only* package modules
+	Supports creation of helper package modules together with
+	   individual class modules
+	Removed all globals, each print_* method is passed in params
+
+	* classes/xmi2class.pl (Repository): 
+	Added --cache option to control using cached data structure
+	   instead of reparsing XMI file
+	added --packages option to control outputin *only* package modules
+	added --dump-only option to not create *.xml output
+	data dump now has package list as well. It needed to second call
+	   to Dump() or class methods came out empty???
+	Can now output as: one file, individual class files, or package
+	   files
+	Type nodes now handle new <type_list> and <type> structure
+	<method_list> and <method> supported
+
+	* classes/XMI.pm (Repository): 
+	Added $F_C as abbreviation for 'Foundation.Core'
+	new() now accepts 'TOP-LEVEL'=>'class_name' as arg
+	fixed debug output to be hierarchical
+	now handles parsing of *_package.xml files into packages
+	All files not included in a package wind up in the TOP-LEVEL
+	   package unless new() was instructed otherwise
+	Each class records: all super classes, methods, abstract attr
+	new method, get_type() returns a type structure
+	
+
+	* classes/QuantitationType_package.xml (Repository): 
+	* classes/Protocol_package.xml (Repository): 
+	* classes/Measurement_package.xml (Repository): 
+	* classes/MAGE_package.xml (Repository): 
+	* classes/HigherLevelAnalysis_package.xml (Repository): 
+	* classes/Experiment_package.xml (Repository): 
+	* classes/DesignElement_package.xml (Repository): 
+	* classes/Description_package.xml (Repository): 
+	* classes/BioSequence_package.xml (Repository): 
+	* classes/BioMaterial_package.xml (Repository): 
+	* classes/BioEvent_package.xml (Repository): 
+	* classes/BioAssay_package.xml (Repository): 
+	* classes/BioAssayData_package.xml (Repository): 
+	* classes/BQS_package.xml (Repository): 
+	* classes/AuditAndSecurity_package.xml (Repository): 
+	* classes/Array_package.xml (Repository): 
+	* classes/ArrayDesign_package.xml (Repository): 
+	wrapper files with external entities to the classes contained
+	   within the package
+
+	* MAGE.pm (Repository): 
+	Supports the export tag :ALL, that triggers loading every
+	   Bio::MAGE::* module, e.g 'use Bio::MAGE qw(:ALL);'
+
+	* Makefile.PL (Repository): 
+	Contains $VERSION, since MAGE.pm is auto-generated
+
+	* Pkg (Repository): 
+	New modules that encapsulate use'ing all the classes of a given
+	   package. e.g. 'use Bio::MAGE::Pkg::BioAssay;' is the same as
+	   listing 'use *' for each class in the package
+
+	* */*.pm (Repository): All modules now include:
+	'use *;' pragma for each superclass (so @ISA can work)
+	@ISA now includes superclasses (duh)
+	class DESCRIPTION now has MAGE-OM documentation
+	INHERITANCE section showing all super-/sub-classes
+	CLASS METHODS now documents parameters to new()
+	abstract base classes are marked as such
+	ATTRIBUTES and ASSOCIATIONS have cardinality indicated (either
+	   scalar return type or array return type
+	METHODS section, that also has stub code for methods
+
+	* classes/classes.dtd: 
+	added %boolean
+	<class> now has optional <method_list> and <type_list>, as well as
+	   new attributes: package, abstract, and subclasses
+	removed type info from <attribute> and added IDREF to <type> 
+	added <method_list>, <parameter_list>, and <type_list> with
+	   <method>, <parameter>, and <type>	
+
+	* t: 
+	All tests now test: subclasses, superclass, attributes, associations
+
+2001-08-25  Jason E. Stewart  <jasons@openinformatics.com>
+
+	* classes/xmi2class.pl (Repository): 
+	script for creating XML class files from XMI
+
+	* classes/XMI.pm (Repository): 
+	Module for manipulating UniSys XMI files
+
+	* classes/classes.xml (Repository): 
+	* classes/classes.dtd: 
+	* classes/VolumeUnit.xml: 
+	* classes/TimeUnit.xml: 
+	* classes/TemperatureUnit.xml: 
+	* classes/SeqFeature.xml: 
+	* classes/QuantityUnit.xml: 
+	* classes/Measurement.xml: 
+	* classes/MassUnit.xml: 
+	* classes/DistanceUnit.xml: 
+	* classes/ConcentrationUnit.xml: 
+	* classes/BioDataCube.xml: 
+	* classes/Audit.xml: 
+	* classes/ArrayPackage.xml: 
+	Changed any[][][] to plain 'any' so that type could be NMTOKEN
+	Changed enum attribute back to enumeration
+
+2001-08-23  Jason E. Stewart  <jasons@openinformatics.com>
+
+	* Makefile.PL (Repository): 
+	Added version attribute on Class::ObjectTemplate
+

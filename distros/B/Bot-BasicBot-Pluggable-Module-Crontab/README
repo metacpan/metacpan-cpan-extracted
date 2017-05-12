@@ -1,0 +1,36 @@
+Bot-BasicBot-Pluggable-Module-Crontab
+=====================================
+
+This module implements a crontab-like feature to send messages to a nominated
+IRC channel at specific periods in time.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Bot::BasicBot::Pluggable
+    IO::File
+
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+COPYRIGHT AND LICENSE
+
+Copyright © 2015 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

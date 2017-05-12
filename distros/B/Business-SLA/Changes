@@ -1,0 +1,25 @@
+Revision history for Perl module Business::Hours
+
+0.05 May 11 2007
+    - allow to use options in the constructor
+    - new option StartImmediately
+    - Business::Hours can be replaced with other
+      implementations
+    - docs update
+    - get rid of Test::Inline
+    - tests update
+
+0.04 November 28 2004
+    - Test fixes
+    - perltidy 
+
+0.03 April 1 2003
+    - fixed a bug in between
+
+0.02 Feb 20 2003
+    - added "between" as a method, as well as a testsuite
+
+0.01 Tue Feb 11 14:58:20 2003
+	- original version; created by ExtUtils::ModuleMaker 0.31229
+
+

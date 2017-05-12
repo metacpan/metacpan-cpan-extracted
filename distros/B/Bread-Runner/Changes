@@ -1,0 +1,11 @@
+Revision history for Bread::Runner
+
+0.901  2016-12-09T12:35:01
+    - add a default startup logmessage, and an opt to disable it (Thomas Klausner)
+    - readme to make github happy (Thomas Klausner
+
+
+0.900   2016-10-23T17:37:00+0200
+    - added tests & documentation
+    - extracted from Validad::Tools
+

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile
+Makefile.PL
+README
+README.mkdn
+SIGNATURE
+lib/Business/CanadaPost.pm
+t/000-report-versions.t
+t/Business-CanadaPost.t

@@ -1,0 +1,7 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service-mail:
+      headline:
+        - Mail service

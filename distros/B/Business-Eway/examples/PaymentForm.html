@@ -1,0 +1,331 @@
+<HTML>
+<HEAD>
+	<Title>PaymentForm.html</Title>
+	<META http-equiv="Content-Type" content="text/html; charset=Windows-1252">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+        .style1
+        {
+            width: 593px;
+        }
+        .style2
+        {
+            width: 198px;
+        }
+        .style3
+        {
+            width: 128px;
+        }
+        .style4
+        {
+            width: 121px;
+        }
+    </style>
+</HEAD>
+
+<BODY>
+
+<p style='color:red'>$ERROR</p>
+
+    <form id="form1" name="form1" method="post" action="request.pl">
+    <div>
+        <table class="style1">
+            <tr>
+                <th colspan="2" style="background-color: Blue; color: White;">
+                    Merchant Details
+                </th>
+            </tr>
+            <tr>
+                <th class="style2">
+                    MerchID
+                </th>
+                <td class="style3">
+						  <input type="label" name="lblMerchID"   value="87654321" readonly="true" />
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    UserName
+                </th>
+                <td class="style3">
+						<input type="label" name="lblUserName"  value="TestAccount" readonly="true" />
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Company Name
+                </th>
+                <td class="style3">
+                <input type="text" name="txtCompanyName"  value="Merchant Company Name"/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Currency
+                </th>
+                <td class="style3">
+                <input type="text" name="txtCurrency" value="GBP"/>
+                   
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    PageTitle
+                </th>
+                <td class="style3">
+                
+                <input type="text" name="txtPageTitle"  value="Webpage Title"/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    PageDescription
+                </th>
+                <td class="style3">
+                <input type="text" name="txtPageDescription" value="Customised Page Description - Add a unique custom message for the customer here."/>
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    PageFooter
+                </th>
+                <td class="style3">
+                <input type="text" name="txtPageFooter" value="Customised Page Footer - Add a unique footer useful for contact information." />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Return Address
+                </th>
+                <td class="style3">
+                <input type="text" name="txtReturnUrl" value="$ReturnUrl" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Cancel Address
+                </th>
+                <td class="style3">
+                <input type="text" name="txtCancelUrl" value="$CancelUrl" />
+                   
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Lanaguage
+                </th>
+                <td class="style3">
+                <select name="ddlLanguage" >
+                
+               
+          <option value="EN" selected>English</option>
+          <option value="FR">French</option>
+          <option value="DE">German</option>
+          <option value="ES">Spanish</option>
+          <option value="NL">Dutch</option>
+          
+                
+                </select>
+                    
+                </td>
+            </tr>
+            <tr>
+                <th colspan="4" style="background-color: Blue; color: White;">
+                    Customer Details
+                </th>
+            </tr>
+            <tr>
+                <th class="style2">
+                    First Name
+                </th>
+                <td class="style3">
+                <input type="Text" name="txtFirstName" value="John" />
+                   
+                </td>
+                <th class="style4">
+                    Last Name
+                </th>
+                <td class="style3">
+                <input type="Text" name="txtLastName" value="Doe" />
+                   
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Address
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtAddress" value="123 ABC Street" />
+                   
+                </td>
+                <th class="style4">
+                    City
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtCity" value="London" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    State
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtState" value="London" />
+                   
+                </td>
+                <th class="style4">
+                    Country
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtCountry" value="England" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Postcode
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtPostcode" value="W1B 3HH" />
+                   
+                </td>
+                <th class="style4">
+                    Email
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtEmail" value="sample@eway.co.uk" />
+                  
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Customer Phone
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtCustomerPhone" value="0800 007 3550" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" style="background-color: Blue; color: White;">
+                    Invoice Details
+                </th>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Merchant Reference Number
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtRefNum" value="513456" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Merchant Invoice
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtInvoice" value="Inv 21540" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Amount
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtAmount" value="1.00" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Invoice Description
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtInvoiceDescription" value="Individual Invoice Description" />
+                   
+                </td>
+            </tr>
+            <tr>
+                <th colspan="4" style="background-color: Blue; color: White;">
+                    Optional Details
+                </th>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Option 1
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtOption1" value="Option1" />
+                   
+                </td>
+                <th class="style4">
+                    Company Logo
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtCompanyLogo" value="" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Option 2
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtOption2" value="Option2" />
+                    
+                </td>
+                <th class="style4">
+                    Page Banner
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtPageBanner" value="" />
+                   
+                </td>
+            </tr>
+            <tr>
+                <th class="style2">
+                    Option 3
+                </th>
+                <td class="style3">
+                 <input type="Text" name="txtOption3" value="Option3" />
+                   
+                </td>
+                <th class="style4">
+                    ModifiableDetails
+                </th>
+                <td class="style3">
+                <select name="ddlModDetails">
+                
+                <option value="False" selected>Readonly</option>
+          <option value="True">Changable</option>
+                  
+                </select>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="style2">
+                <input type="submit" value="Checkout" name="GO" id="btnCheckout" />
+                    
+                </td>
+            </tr>
+            <tr>
+                <td class="style2">
+                <label name="lblResult" Text="Request results here..."  > 
+                </label>
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+    </form>
+</BODY>
+</HTML>

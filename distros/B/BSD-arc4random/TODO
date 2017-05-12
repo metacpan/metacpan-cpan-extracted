@@ -1,0 +1,13 @@
+$MirOS: contrib/hosted/tg/code/BSD::arc4random/TODO,v 1.4 2010/09/21 21:24:04 tg Exp $
+
+• write an improved arc4random(3) et al. implementation, which can
+  talk to an EGD/PRNGD as well as have more system interfaces
+• integrate seedfile support from the randex.pl irssi plugin
+  ‣ 600 bytes, for gcrypt/GnuPG compatibility
+• reduce amount of data drawn from /dev/urandom on e.g. Linux
+• try /proc/sys/kernel/random/uuid (Linux), something kFreeBSD
+• expose some more APIs
+• move have_kintf to the arc4random implementation
+• write an entropy pool dæmon, use it
+• add arc4random_buf and deprecate arc4random_bytes
+• internally use, and maybe expose, oaat hash

@@ -1,0 +1,42 @@
+---
+name: BatchSystem-SBS
+version: 0.41
+author:
+  - 'Alexandre Masselot <alexandre.masselot@genebio.com>'
+abstract: a Simple Batch System
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Cwd: 0
+  Data::Serializer: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Flock: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  IO::All: 0
+  JSON: 0
+  List::Util: 0
+  LockFile::Simple: 0
+  Log::StdLog: 0
+  Object::InsideOut: 0
+  Test::More: 0
+  Util::Properties: 0
+  XML::Twig: 3.14
+provides:
+  BatchSystem::SBS:
+    file: lib/BatchSystem/SBS.pm
+    version: 0.41
+  BatchSystem::SBS::Common:
+    file: lib/BatchSystem/SBS/Common.pm
+  BatchSystem::SBS::DefaultScheduler:
+    file: lib/BatchSystem/SBS/DefaultScheduler.pm
+  BatchSystem::SBS::ScriptsCommon:
+    file: lib/BatchSystem/SBS/ScriptsCommon.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

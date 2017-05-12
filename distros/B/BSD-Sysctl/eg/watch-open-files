@@ -1,0 +1,28 @@
+#! /usr/bin/perl -w
+
+use strict;
+use BSD::Sysctl 'sysctl';
+
+my $max = sysctl('kern.maxfiles');
+my $open = BSD::Sysctl->new('kern.openfiles');
+
+my $max_open = $open->get();
+
+while (1) {
+    my $nr = $open->get();
+    printf "%04d-%02d-%02d %02d:%02d:%02d %5d %5.1f%% %s\n",
+        sub {$_[5]+1900, $_[4]+1, reverse(@_[0..3])}->(localtime),
+        $nr,
+        ($nr/$max)*100,
+        do {
+            if ($max_open < $nr) {
+                $max_open = $nr;
+                '***';
+            }
+            else {
+                '';
+            }
+        },
+    ;
+    sleep 60;
+}

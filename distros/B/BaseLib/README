@@ -1,0 +1,105 @@
+BaseLib - manipulate @INC dynamically for independent installation path
+=======================================================================
+
+SYNOPSIS
+      use BaseLib qw(BASEDIR LIBDIR);
+
+    or just,
+
+      use BaseLib;
+
+DESCRIPTION
+	If you have a set of application with certain file structure under a
+	base directory, e.g. `pim', and it has a private modules directory
+	called `lib-perl', and it's intalled under `/usr/local'. For the
+	application to work, the scripts may need to say:
+
+       use lib '/usr/local/pim/lib-perl';
+
+	Someday, you need to move the application to, say,
+	`/vhost/www.some.host.com', so you need to change the use statement all
+	over the scripts to:
+
+       use lib '/vhost/www.some.host.com/pim/lib-perl';
+
+	If you do this a lot and get tired of changing the line for every
+	different installation path, or, you don't want to bother people using
+	your application to cange the line to meet their conditions, then you
+	might need this module.
+
+    Now your scripts can say:
+
+       use BaseLib qw(pim lib-perl);
+
+    where `pim' and `lib-perl' are the BASEDIR and LIBDIR arguments
+    respectively.
+
+	So there's no need to worry about different installation layout,
+	wherever the `pim' base directory is put under. The BASEDIR argument is
+	mandatory while LIBDIR is optional (defaults to `lib/perl').
+
+	As addition, you can use BaseLib's global package variable, $BaseDir to
+	refer to the full path to `pim'. For example, assuming the application
+	is installed under `/usr/local', then
+
+       print "Data dir: $BaseLib::BaseDir/data\n";
+
+    will print,
+
+       Data dir: /usr/local/pim/data
+
+	Yes, you must qualify it with the package name since the variable is
+	not exportable. This may change in the future.
+
+NOTES
+    I only tested it in the following environment:
+
+       * Perl 5.005_03
+       * Linux
+
+	I rewrote the implementation to make this module more reusable in
+	different environment. No path resolving is hardcoded.  Unfortunately,
+	I have no any chance to test it.
+
+	BaseLib will find the last occurence of *BASEDIR* string. If you mean
+	the base directory as `/usr/local/myapp', while the script uses the
+	module locates in `/usr/local/myapp/bin/sample/myapp/test/script.pl',
+	then the full path to the application base directory ends in
+	`/usr/local/myapp/bin/sample/myapp'.
+
+	Any improvements/suggestions for wider support are welcome. A simple
+	comment on this module will do as well.
+
+TODO
+	-	Added regresion test to simulate mod_perl environment
+	-	More convenient way for users to access $BaseDir global
+		variable
+
+SEE ALSO
+
+    lib, FindBin
+
+
+INSTALLATION
+
+    Follow the standard mechanism,
+
+        perl Makefile.pl
+        make
+        make test (optional)
+        make install
+
+
+AVAILABILITY
+
+    http://202.159.35.69/~san/perl/modules/
+
+
+AUTHOR
+
+    This module is written by Hasanuddin Tamir <hasant@trabas.com>.
+
+    Copyright (C) 2000 Trabas.  All rights reserved.
+
+    This program is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.

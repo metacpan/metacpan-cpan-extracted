@@ -1,0 +1,21 @@
+use strict;
+use Bread::Board;
+
+sub {
+    my $c = shift;
+
+    # modifiying second level
+    my $orig_tag = $c->fetch('First/Second/tag');
+    $orig_tag->parent->add_service(
+        service tag => (
+            block => sub {
+                $orig_tag->get . ' sandboxed';
+            }
+        )
+    );
+
+    # returns the original, modified container
+    $c;
+};
+
+# vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=0:textwidth=78:syntax=perl

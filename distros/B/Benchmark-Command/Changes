@@ -1,0 +1,64 @@
+Revision history for Benchmark-Command
+
+0.08    2015-06-14 (PERLANCAR)
+
+	- Introduce BENCHMARK_COMMAND_COUNT env.
+
+
+0.07    2015-06-13 (PERLANCAR)
+
+	- Tweak/fix regex to strip program's output.
+
+
+0.06    2015-06-13 (PERLANCAR)
+
+	- Introduce BENCHMARK_COMMAND_QUIET &
+	  BENCHMARK_COMMAND_SKIP_NOT_FOUND envs.
+
+
+0.05    2015-06-13 (PERLANCAR)
+
+	[INCOMPATIBLE CHANGES]
+
+        - Replace option 'debug' with 'quiet' and reverse the default behavior.
+          Previously it was all too easy to lose program's output. If the
+          command was erroneous, prints an error message, and exits early, this
+          can ruin the benchmark result. Previously this was not displayed by
+          default because by default program's output is stripped. Now the
+          default behavior is to *not* strip program's output, unless the
+          'quiet' option is set to true.
+
+        [ENHANCEMENTS]
+
+        - Add option: ignore_exit_code. Now a non-zero exit code will cause the
+          benchmark to die, unless we set this option to true.
+
+        - Add per-command options: ignore_exit_code, skip_not_found.
+
+        - Tweak examples and other minor fixes.
+
+
+0.04    2015-04-10 (PERLANCAR)
+
+	- Add option: debug; by default strip programs' output unless in
+	  debug mode.
+
+
+0.03    2015-04-09 (PERLANCAR)
+
+        - Allow specifying per-command option (first element of command
+          arrayref). Known per-command options: env.
+
+        - Allow specifying coderef command, which will be used as-is.
+
+
+0.02    2015-04-09 (PERLANCAR)
+
+	- Add option: skip_not_found.
+
+	- Change wording in Description.
+
+
+0.01    2015-04-09 (PERLANCAR)
+
+        - First release.

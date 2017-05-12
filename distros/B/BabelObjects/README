@@ -1,0 +1,54 @@
+$Id: README,v 1.69 2001/04/20 19:04:34 Exp $
+
+--------------------
+What BabelObjects Is
+--------------------
+
+BabelObjects is a template engine that separates presentation from logic.
+
+BabelObjects provides a framework to write components you can reuse in
+different context (web, text, ...). These components can then be used through
+DreamWeaver with extensions, without programming skills.
+
+Thanks to the framework, you will be able to call components in different
+languages through SOAP, .NET, ... to avoid to create the wheel again.
+
+----
+Demo
+----
+
+You can see a demo at : http://www.BabelObjects.Org/html/common/demo/bo
+
+---------------------
+Documentation roadmap
+---------------------
+
+  * INSTALL : how to install this package
+  * CONFIGURATION : how to configure BabelObjects to suit your system
+  * TODO : what will be done next
+  * BUGS : no bugs, just features :-) Tell me.
+
+--------------------
+Distribution Details
+--------------------
+
+This distribution comes with one sample and tutorial programs in
+the BabelObjects/Component directory.
+
+  * Test/BabelObjects/Test.pm
+        a test component that prints the famous 'hello world' you can use
+        to develop components of your own
+
+Other components can be downloaded from CPAN. For example :
+
+  * BabelObjects-Component-Data-Configurator.pm :
+        a one shot installation and configuration program for
+        complex applications installation
+
+  * BabelObjects-Component-Directory-Bookmark.pm :
+        an open directory web application to view bookmarks ala Yahoo.
+
+
+Thanks for reading!
+
+-- Jean-Christophe Kermagoret / jck@BabelObjects.Org / www.BabelObjects.Org

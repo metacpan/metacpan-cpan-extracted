@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+dist.ini~
+lib/B/Lint/StrictOO.pm
+t/class_exists.pl
+t/class_exists.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

@@ -1,0 +1,38 @@
+Revision history for Bb-Collaborate-Ultra
+
+0.01.02 27th February 2017
+
+        Rename methods:
+	  -- $session->enrollments => $session->get_enrolments
+	  -- $session->logs        => $session->get_logs
+	  -- $log->attendee        => $log->get_attendees
+	This makes 'get' calls more explicit, and avoids occlusion
+	of the 'attendee' attribute.
+
+        Support the $session->get_logs({expand => 'all'}) query option.
+	This instructs the sever to attendees as part of the session log
+	(instance) records and obviates the need to then call 'get_attendees'
+	on each session instance.
+
+        Remove extraneous class:
+	    --  Bb::Collaborate::Ultra::Log::Attendees
+
+        Unbreak on Perl 5.8.9
+
+0.01.01 24th February 2017
+        - Fixed MANIFEST
+        - Added sample script: bb-collab-session-log.pl
+
+0.01.00 24th February 2017
+        Added session logging classes:
+        - Bb::Collaborate::Ultra::Log
+        - Bb::Collaborate::Ultra::Log::Attendees > Attendee > Attendance
+	Rename class Bb::Collaborate::Ultra::SessionEnrollment
+	=-> Bb::Collaborate::Ultra::Session::Enrollment
+	Rename Bb::Collaborate::Ultra::DAO method del -> delete
+
+0.00.02 20th December 2016
+        Fixed thawing of data under Perl 5.10.1-
+
+0.00.01	12th December 2016
+        Initial release

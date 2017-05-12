@@ -1,0 +1,96 @@
+#!/bin/env perl
+
+use strict;
+use warnings;
+use Bio::SSRTool qw( find_ssr );
+use Getopt::Long;
+use Pod::Usage;
+
+my $out_file     = '';
+my $min_repeats  = 4;
+my $motif_length = 5;
+my ( $help, $man_page );
+GetOptions(
+    'r|min-repeats:i'  => \$min_repeats,
+    'l|motif-length:i' => \$motif_length,
+    'o|out-file:s'     => \$out_file,
+    'help'             => \$help,
+    'man'              => \$man_page,
+) or pod2usage(2);
+
+if ( $help || $man_page ) {
+    pod2usage({
+        -exitval => 0,
+        -verbose => $man_page ? 2 : 1
+    });
+};
+
+my @files = @ARGV or pod2usage('No files');
+my @flds  = qw( sequence motif start end seq_length num_repeats );
+my $args  = { min_repeats => $min_repeats, motif_lenfth => $motif_length };
+
+my $out;
+if ( $out_file ) {
+    open $out, '>', $out_file or die "Can't write '$out_file': $!\n";;
+}
+else {
+    $out = \*STDOUT;
+}
+
+for my $file ( @files ) {
+    if ( my @ssrs = find_ssr( $file, $args ) ) {
+        print $out join("\t", @flds), "\n";
+        for my $ssr ( @ssrs ) {
+            print $out join("\t", map { $ssr->{ $_ } } @flds), "\n";
+        }
+    }
+}
+
+close $out;
+
+__END__
+
+# ----------------------------------------------------
+
+=pod
+
+=head1 NAME
+
+ssrtool - Find SSRs
+
+=head1 SYNOPSIS
+
+  ssrtool [options] file1 [file2 ...]
+
+Options:
+
+  -r|--min-repeats  A postive integer defining the minimum number of repeats
+  -l|--motif-length A postive integer defining the length of the repeat
+  -o|--out-file     A file to write the output (default is STDOUT)
+  --help            Show brief help and exit
+  --man             Show full documentation
+
+=head1 DESCRIPTION
+
+Finds the simple sequence repeats (SSRs) in the files containing sequence
+data in FASTA format.
+
+=head1 SEE ALSO
+
+Bio::SSRTool.
+
+=head1 AUTHOR
+
+Ken Youens-Clark E<lt>kclark@cshl.eduE<gt>.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012 Cold Spring Harbor Laboratory
+
+This module is free software; you can redistribute it and/or
+modify it under the terms of the GPL (either version 1, or at
+your option, any later version) or the Artistic License 2.0.
+Refer to LICENSE for the full license text and to DISCLAIMER for
+additional warranty disclaimers.
+
+=cut

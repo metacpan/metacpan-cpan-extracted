@@ -1,0 +1,252 @@
+Revision history for Perl module Business::ISBN
+
+3.004 2017-04-24T20:02:52Z
+	* Remove Mojo dependencies after splitting out Business::xISBN
+	(Michiel Beijen)
+	* Remove unneeded code from the checksumming stuff (Mike O'Regan)
+	* We now test on Windows through AppVeyor
+
+3.003 2016-09-19T22:03:24Z
+	* Clarify everywhere that I'm using Artistic License 2.0
+
+3.002 2016-08-10T09:30:21Z
+	* Bump to stable versions
+
+3.001_01 2016-08-06T08:14:59Z
+	* Remove xisbn stuffâit's due to be turned off. 
+	* Bump the major version for the API change
+
+2.011_01 2016-07-29T20:50:01Z
+	* Remove the URI prereq
+
+2.011 2016-06-07T18:20:50Z
+	* bump to stable release
+
+2.010_01 2016-03-28T03:45:17Z
+	* Had error_* methods to get the error text and check the error
+	conditions so you don't have to use %ERROR_TEXT or the constants.
+	* Deprecate the xisbn stuff. It's still there, but it should have
+	disappeared about two weeks ago.
+	* Add an example of inserting an unofficial group code for the
+	Blake and Taylor shenanigans.
+
+2.010 2015-12-15T07:35:57Z
+	* Sync latest dependencies in build and module files
+	* Promote to a stable release
+
+2.09_02 - Mon Aug 31 02:24:10 2015
+	* Have a simple fallback for parsing XML if Mojo::DOM isn't there
+
+2.09_01 2015-08-31T05:59:56Z
+	* Fix for new xISBN responses that have whitespace inside the
+	opening tag.
+	* Use Mojo::DOM to parse XML and Mojo::UserAgent to fetch xISBN.
+	* You can still use LWP::UserAgent to fetch data.
+
+2.09 - 2014-09-20
+	* Break circular dependency on Test::ISBN
+
+2.08 - 2014-09-19
+	* Add increment and decrement to create new article numbers
+	(Markus Spann)
+
+2.07 - 2014-01-03
+	* Get rid of MYMETA
+
+2.06 - 2013-05-31
+	* Bump to a stable user release. There are no code changes.
+
+2.05_03 - 2012-08-05
+	* Fix test with now-valid group code (RT 78671)
+
+2.05_01 - 2011-07-19
+	* Update the URL for the Worldcat stuff so xisbn works.
+	* Various distro cleanups.
+
+2.05 - 2009-01-25
+	* Updated for latest data in Business::ISBN::Data
+
+2.04_01 - 2008-10-27
+	* Revert the GD prereq. A lot of testers have borked GD
+	installs.
+	* Require 5.8. Some of the new stuff isn't playing well with
+	5.6
+
+2.04 - 2008-10-26
+	* Fix tests that used 99902 as a bad prefix. That now
+	belongs to Gabon.
+
+2.03 - 2007-10-27
+	* adjustments to make png_barcode.t actually work (RT #30291)
+
+2.03 - 2007-10-02
+	* Fixed minor distro problems and bumped to release version 2.03
+
+2.02_05 - 2007-09-12
+	* Explore RT #29292. I don't seem to have the problem with
+	hyphens for ISBN-13, but let's see what CPAN Testers has to
+	say
+
+2.02_04 - 2007-09-01
+	* [BUGFIX] ISBN13 was returning "Bookland" for all groups, but
+	it shouldn't do that. Now it returns the same thing you'd
+	get from ISBN10 (e.g. "English", "German", ... ).
+
+2.02_03 - 2007-09-01
+	* [BUGFIX] RT 29089 - I had the wrong _max_length for ISBN13. That 13
+	is the hint that it should be 13. :)
+
+2.02_02 - 2007-08-25
+	* [FEATURE] added exportable function valid_isbn_checksum that
+	takes care of all of the object stuff for you and just gives
+	you the answer. In previous docs, this was called is_valid_checksum
+	even though that conflicted with an object method. It was
+	documented but never implemented. Now it's there. :)
+	* [BUGFIX] now should pass tests under 5.6.2, after a bit of
+	backporting. Upgrade already people! :)
+
+2.02_01 - 2007-08-17
+	* Don't import import() from Exporter. There are a lot of people
+	(apparently) using very old perls, not just CPAN Testers.
+
+2.02 - 2007-08-15
+	* fixes RT #28843: an ISBN-13 with a bad prefix shouldn't croak,
+	but return an object that explains the error.
+
+2.01 - 2007-08-12
+	* Official release of Business::ISBN to handle ISBN-13
+	* Does not handle 979- numbers yet (need publisher data for that)
+	* Does handle 978-numbers, which is the 10 digit ISBN with a
+	different "country code", so it uses the same publisher data
+	* There are significant API changes to handle the new stuff. It's
+	not so bad, but test it before you rip out the old Business::ISBN
+	stuff.
+
+2.00_01 - 2007-03-14
+	* DEVELOPER RELEASE
+	* Completely redone internals to handle ISBN-10 and ISBN-13
+	* Some interface changes to Business::ISBN 1.x
+	* Removed exportable functions.
+
+1.84 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.82 - 2005-08-14
+	* fixed up publisher code validation, since 0 can be a valid
+	code. I hadn't run into one of those before, and now I know
+	I wasn't doing that right.
+	* This is an important code change. Everyone should upgrade.
+
+1.81 - 2005-08-13
+	* exposed the country group name as the country() method
+
+1.80 - 2005-03-08
+	* added POD coverage tests and documented the uncovered methods
+	it found
+
+1.79 - 2004-12-14
+	* Updated tests for new ISBN data: previously invalid ISBNs are now
+	valid.  The latest data is in Business::ISBN::Data 1.09 and is current
+	as of November 2004.
+	* You don't need this version of Business::ISBN if you already have it,
+	although you should get the latest Business::ISBN::Data.
+
+1.78 - 2004-11-21
+	* Require the latest version on Business::ISBN::Data, which was
+	unbundled in the last version.  You need Business::ISBN::Data 1.08
+	to pass the latest tests that check for the new ranges the ISBN
+	folks assigned a couple of years ago.
+
+1.77 - 2004-10-27
+	* removed Business::ISBN::Data, which is now a separate module so
+	you can update the data without updating the rest of the stuff.
+	Previously, CPAN.pm would install Business::ISBN::Data as a
+	prerequisite, and this distribution would come along and overwrite
+	it with old data.  That was a bad thing.
+
+1.76 - 2004-10-08
+	* somehow this module went missing from CPAN, so here it is again
+	* no need to upgrade if you have the previous version
+
+1.74 - 2004-09-02
+	* another distro fix: some documentation cleanups, and the README
+	is now in MANIFEST.  You do not need to upgrade if you already
+	have installed this module.
+
+1.73 - 2004-09-02
+	* this is a distro fix only.  if you already have Business::ISBN,
+	you don't need this
+
+1.72 - 2004-02-11
+	* removed errant File::Find::Rule use
+	* Check for modules in png_barcode before require-ing them
+
+1.71 - 2004-01-28
+	* added xISBN support
+	* removed File::Find::Rule, Test::Pod, Test::Prereq dependencies
+
+1.69 - 2002-09-05
+	* documentation fixes - that's it
+
+1.68 - 2002-09-04
+	* converted to Test::More
+	* fixed ean_to_isbn to handle new EAN prefix 979
+
+1.60 - 2001-04-01
+	* fixed some POD problems
+	* no changes to the actual code
+
+1.59 - 2001-03-27
+	* fixed some -w dirty internals
+	* clarified documentation for as_string method
+
+1.58 - 2001-03-26
+	* there was an error in test.pl that failed to
+	identify a bug. Andy Lester <andy@petdance.com>
+	found it though.  the constructor was always
+	setting $obj->is_valid to BAD_CHECKSUM.  that
+	is fixed.
+	* version 1.57 should not be used at all.  it
+	is severely broken due to that bug.
+
+1.57 - 2001-03-21
+	* fixed -w dirty line in is_valid_checksum
+	(identified by Andy Lester <andy@petdance.com>)
+
+1.56 - 2001-03-12
+	EVERYONE SHOULD UPGRADE TO THIS VERSION
+	* fixed problem parsing ISBNs without valid
+	country codes which would cause an infinite
+	loop. (identified by Andy Lester <andy@petdance.com>)
+	* this module is now kept in a local CVS repository
+	* added symbolic constants to replace magic return
+	values.  see the docs for details.
+	* fixed is_valid_checksum which would issue warnings
+	if the string was less than ten characters
+	(identified by Adam Thompson <athompso@athompso.net>)
+	* added a test.pl which still needs more tests to
+	reach all of the code.
+
+1.51 - 2001-01-24
+	* version 1.5 fixed some bugs with checksums
+	* version 1.51 has a few minor doc fixes
+	* now we have sane version numbers. :)
+
+20001010 - 2000-09-09
+	* fixed some missing arguments to _is_valid.
+	* updated contact information
+	* added some real tests to test.pl
+	* everyone should update their installations
+
+19990112 - 1999-01-11
+	* added "use Exporter" which was missing.
+
+19980901 - 1998-09-01
+	* added support for EAN-13 (isbn -> ean, ean -> isbn )
+	* cleaned up other nagging problems
+	* if you don't want EAN13, then you don't need this update
+
+19980329 - 1998-03-29
+	* original version; created by h2xs 1.18
+	* gutsy enough to actually release it for testing and comments

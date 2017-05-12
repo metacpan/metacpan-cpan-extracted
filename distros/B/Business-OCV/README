@@ -1,0 +1,85 @@
+
+README for the Perl module Business::OCV
+
+	Copyright (c) 1999/2000 University of New South Wales 
+	Benjamin Low <b.d.low@unsw.edu.au>. All rights reserved.
+
+	This program is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	Artistic License for more details.
+
+
+DESCRIPTION
+-----------
+
+This module provides an interface to the Ingenico Online Credit Verification 
+Server (OCV) (see http://www.ingenico.com.au). The OCV server provides an 
+interface into the bank network and allows credit card transactions to be
+processed in real-time.
+
+Usage:
+
+# create a connection to the OCV server
+$ocv = new OCV
+(
+	Server   => '192.1.2.3:53005', 
+	ClientID => 'MyClient', 
+	Account  => '1',
+);
+
+# process a purchase transaction (amount is in cents)
+if ($m = $ocv->purchase(CardNum=>'4...3' CardExpiry=>'0202', Amount=>'1000'))
+{
+  warn "Warning: $@" if $@;
+  print "Purchase result: " . $m->Result . "\n";
+}
+else
+{
+  warn "Error: $@";
+}
+
+The interface is complete, including
+ - full logging
+ - internal totals support
+ - polled mode support
+ - all transaction types (purchase, refund, pre-auth, completion, status)
+ - statistics
+ - VPP configuration and status
+ - account list
+ - server totals
+
+The only thing missing is complete support for 'logons', as Ingenico state 
+this is deprecated as a client request.
+
+TODO
+----
+
+- update and convert documentation to pod form
+
+FUTURE WORK
+-----------
+
+- Add support for shared server connections
+- Implement a Business::OnlinePayment interface
+- Add support for logging to a DBI backend
+
+
+INSTALLATION
+------------
+
+To install, unpack the archive and in the newly created directory type:
+
+        perl Makefile.PL
+        make
+        make install
+
+Use
+        perl Makefile.PL PREFIX=<location>
+
+to install somewhere other than the default.
+
+

@@ -1,0 +1,13 @@
+$VAR1 = bless( {
+                 'payment-provided' => 0,
+                 'maximum-cost' => bless( {
+                                            'monetary-value' => bless( {
+                                                                         'PrintableString' => '$40.00'
+                                                                       }, 'Biblio::ILL::ISO::AmountString' )
+                                          }, 'Biblio::ILL::ISO::Amount' ),
+                 'account-number' => bless( {
+                                              'generalstring' => 'PLS001'
+                                            }, 'Biblio::ILL::ISO::AccountNumber' ),
+                 'will-pay-fee' => 0,
+                 'reciprocal-agreement' => 0
+               }, 'Biblio::ILL::ISO::CostInfoType' );

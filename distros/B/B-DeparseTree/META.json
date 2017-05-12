@@ -1,0 +1,70 @@
+{
+   "abstract" : "Like B::Deparse, but keeps tree structure indexable by OP address.",
+   "author" : [
+      "Rocky Bernstein <rocky@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "B-DeparseTree",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4214"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.018000",
+            "rlib" : "0.02",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "0.81",
+            "Text::Diff" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "B::DeparseTree" : {
+         "file" : "lib/B/DeparseTree.pm",
+         "version" : "v2.1.3"
+      },
+      "B::DeparseTree::Common" : {
+         "file" : "lib/B/DeparseTree/Common.pm",
+         "version" : "v1.1.0"
+      },
+      "B::DeparseTree::P520" : {
+         "file" : "lib/B/DeparseTree/P520.pm",
+         "version" : "2.0"
+      },
+      "B::DeparseTree::P522" : {
+         "file" : "lib/B/DeparseTree/P522.pm",
+         "version" : "2.0"
+      },
+      "B::DeparseTree::PP" : {
+         "file" : "lib/B/DeparseTree/PP.pm",
+         "version" : "v1.0.0"
+      },
+      "B::DeparseTree::Printer" : {
+         "file" : "lib/B/DeparseTree/Printer.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ]
+   },
+   "version" : "v2.1.3",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

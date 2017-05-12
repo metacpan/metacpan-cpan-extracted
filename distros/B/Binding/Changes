@@ -1,0 +1,21 @@
+# -*- yaml -*-
+# Revision history for Binding
+
+0.06:
+  - fix dependency
+
+0.05:
+  - fix the 'var' method where the requested variable is an blessed object.
+
+0.04:
+  - add my_vars and our_vars methods
+
+0.03:
+  - fix dependency
+
+0.02:
+  - add a ->var method
+
+0.01:
+  - Initial release.
+  - Implement Binding->of_caller

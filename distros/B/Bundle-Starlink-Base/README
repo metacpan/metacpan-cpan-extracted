@@ -1,0 +1,7 @@
+This module can be used to install a base set of modules required to
+install the Starlink Perl modules.
+
+Information about Starlink can be found at http://www.starlink.rl.ac.uk
+
+The Astro::SLA module requires that the SLA library be installed. For further
+information, see http://search.cpan.org/~tjenness/Astro-SLA-0.99/

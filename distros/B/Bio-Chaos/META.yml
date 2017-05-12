@@ -1,0 +1,12 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bio-Chaos
+version:      0.02
+version_from: lib/Bio/Chaos/Root.pm
+installdirs:  site
+requires:
+    Graph:                         0
+    Bio::Seq:                      1.5
+    Data::Stag:                    0.07
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

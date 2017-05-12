@@ -1,0 +1,28 @@
+Revision history for Business-OnlinePayment-WesternACH
+
+0.08    Thu Oct  1 15:16:05 PDT 2009
+        - Fix "Use of uninitialized value in string eq at /usr/lib/perl5/site_perl/5.8.5/Business/OnlinePayment/WesternACH.pm" warning when running returns
+
+0.07    Tue Aug 18 22:45:10 PDT 2009
+        - Handle format change to transret.php results.
+
+0.06    Thu Aug 13 14:56:12 PDT 2009
+        - Make transret.php the default returns method.
+        - Old method is still available via returns_method => 'requester'.
+
+0.05    Fri Aug  7 14:25:01 PDT 2009
+        - Correctly handle get_returns when there is only one transaction
+        - Add support for alternate returns interface (transret.php)
+
+0.04    Fri Jul 10 19:58:55 PDT 2009
+        - Send the customer's email address as UserDefinedID.
+
+0.03    Wed Jul  8 14:57:43 PDT 2009
+        - Default sec_code to PPD instead of WEB
+
+0.02    Tue Jun 23 08:49:07 PDT 2009
+        - Don't require unnecessary fields (esp. invoice_number for refunds)
+
+0.01    Tue Jun  9 17:34:16 PDT 2009
+        First version, released on an unsuspecting world.
+

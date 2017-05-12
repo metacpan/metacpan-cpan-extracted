@@ -1,0 +1,22 @@
+Revision history for Perl extension BitTorrent.
+
+0.10 Apr 26 03:54:07 2007
+	- extraction of important information from tracker including filenames, filesize, hash string, announce url
+
+
+0.01  Thu Mar 15 17:54:07 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n BitTorrent
+	- extraction of seeder leecher infos from given torrent url file with the help of extern application ( included in release )
+
+
+todos in next minor versions:
+	
+	+ migrate away from extern application to pure perl 
+	+ enhanced content / appilities of module
+
+
+todos in next major versions:
+
+	+ simple generell torrent indexer
+

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Helper functions for op tree manipulation",
+   "author" : [
+      "Josh Jore <jjore@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "B-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::Depends" : "0.301"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Task::Weaken" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-B-Utils@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=B-Utils"
+      },
+      "homepage" : "http://search.cpan.org/dist/B-Utils",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jbenjore/b-utils.git",
+         "web" : "https://github.com/jbenjore/b-utils"
+      }
+   },
+   "version" : "0.27",
+   "x_authority" : "cpan:ABERGMAN"
+}
+

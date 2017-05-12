@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name: Biblio-Citation-Parser
+version: 1.10
+license: gpl
+distribution_type: module
+requires:
+  Text::Unidecode: 0
+  URI: 0
+recommends:
+  SOAP::Lite: 0
+  URI::OpenURL: 0
+build_requires: {}
+conflicts: {}
+provides:
+  Biblio::Citation::Parser:
+    file: lib/Biblio/Citation/Parser.pm
+    version: 1.10
+  Biblio::Citation::Parser::Citebase:
+    file: lib/Biblio/Citation/Parser/Citebase.pm
+  Biblio::Citation::Parser::Jiao:
+    file: lib/Biblio/Citation/Parser/Jiao.pm
+  Biblio::Citation::Parser::Jiao::Utility:
+    file: lib/Biblio/Citation/Parser/Jiao/Utility.pm
+    version: 0.01
+  Biblio::Citation::Parser::Standard:
+    file: lib/Biblio/Citation/Parser/Standard.pm
+  Biblio::Citation::Parser::Templates:
+    file: lib/Biblio/Citation/Parser/Templates.pm
+  Biblio::Citation::Parser::Utils:
+    file: lib/Biblio/Citation/Parser/Utils.pm
+generated_by: Module::Build version 0.19

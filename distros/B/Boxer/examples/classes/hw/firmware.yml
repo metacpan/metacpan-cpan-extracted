@@ -1,0 +1,7 @@
+parameters:
+  pkg:
+    - firmware-linux-free
+  pkg-nonfree:
+    - firmware-linux
+  pkg-nonfree-auto:
+    - firmware-linux-free

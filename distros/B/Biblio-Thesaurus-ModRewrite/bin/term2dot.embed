@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "./lib";
+
+if (@ARGV < 2) {
+    print "Usage: term2dot <thesaurus source file> <term>\n";
+    exit 1;
+}
+
+use Biblio::Thesaurus::ModRewrite::Embed;
+
+OML proc(term)
+begin => sub { print "digraph term {\n  rankdir=LR\n\"term\" [style=\"filled\",color=\"red\"]\n#}\n"; }.
+term $r $t => sub { print "  \"$t\" [style=\"filled\",color=\"orange\"] term -> $t [ label = \"$r\" ] ;\n"; }.
+$t $r term => sub { print "  \"$t\" [style=\"filled\",color=\"greenyellow\"] $t -> term [ label = \"$r\" ] ;\n"; }.
+end => sub { print "#{\n}\n"; }.
+ENDOML
+
+proc("$ARGV[0]",$ARGV[1]);

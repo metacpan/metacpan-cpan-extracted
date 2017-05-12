@@ -1,0 +1,31 @@
+Blog-BlogML-Reader version 1.0
+===============================
+
+BlogML is a standard for XML to define and store an entire blog. This module 
+allows you to easily read most data in a BlogML file.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+XML::Parser::Expat
+This module uses XML::Parser::Expat to parse the XML in the BlogML source file.
+Check the docs for XML::Parser::Expat for further dependencies.
+
+HTTP::Date
+This module uses HTTP::Date to transform date strings into sortable timestamps.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Michael Mathews
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

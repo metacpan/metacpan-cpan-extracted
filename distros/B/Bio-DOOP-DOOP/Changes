@@ -1,0 +1,100 @@
+Revision history for Bio-DOOP-DOOP
+1.04	2009/08/17
+	Purge Proc:Processtable from module & deps.
+	Remove Bio::DOOP::Util::Run::Admin module.
+	Other minor corrections.
+1.03    2009/05/20
+	Moar documentation and some minor corrections.
+1.02    2009/04/23
+        Fuzznuc and Mofext wrapper changed.
+        Documentation extended with useful informations about
+        connecting to our database.
+1.01    2008/08/29
+        Help messages corrections.
+1.00    2008/08/05
+        GeneMerge module added. Some minor changes to optimize the MySQL queries.
+0.29    2008/06/22
+        Modifying the draw_fuzz_result.
+0.28    2007/09/18
+        Grammatical corrections. Thanx for Endre.
+0.27    2007/07/06
+        The Mofext object and the Fuzznuc object now have the same easy to use methods. Corrected some
+        documentation errors.
+0.26    2007/06/24
+        New methods in the Graphics::Feature (draw_fuzz_result), Util::Run::Fuzznuc (new_by_tmp).
+        Changed Util::Run::Mofext. Now it returns the subquery because the alignment creating script
+	needs it.
+0.25    2007/06/15
+        The Mofext results now return the full hit sequence and the positions for the alignment.
+0.24    2007/06/11
+        Modified the Sequence module to return -1 in the get_xref_value method.
+        The Sort and Filt modules are finished.
+        Modified the help messages in the Cluster module.
+        Added new method to the Search module to return just ids, not objects. (This
+        takes lower load on our webserver.)
+0.23    2007/05/29
+        Started coding the Sort and Filt modules. The Mofext module writes out
+	the score and extended score.
+0.22    2007/05/22
+        New method in the Mofext.pm. Now you can use a previously defined
+        tmp file for the mofext search. Time saving option.
+0.21    2007/05/21
+        Fix the Mofext.pm, now the installer won't give error messages.
+0.20    2007/05/14
+        Fix a Makefile.pm error. Now no problem at the installation.
+0.19    2007/05/10
+        Tha database has been changed, so the modules also changed. New
+        methods not added, but some old stuff have been removed.
+0.18    2007/05/09
+        Modification in the Motif module. Correct the get_seqfeature_ids method.
+0.17    2007/04/24
+        Changes in the Sequence objects.
+0.16    2007/04/12
+        The Graphics::Feature module fixed, but Endre found some new bugs. :-(
+0.15    2007/04/12
+        The ClusterSubset class can manage the chordata database.
+0.14    2007/04/01
+        New module Util::Run::Fuzznuc.
+	New modification in Graphics::Feature, because the png is not correct.
+0.13    2007/03/28
+        The motifs in the Graphics::Feature module were drawn incorrectly. Now fixed. Maybe.
+0.12    2007/03/19
+        The motifs in the Graphics::Feature module drawn correctly.
+        The ClusterSubset module get_all_seqs method returns sorted sequences.
+0.11    2007/03/14
+        The motifs is the Graphics::Feature module were drawn in reverse order. Fixed.
+        The first sequence in the graphics is the reference species.
+        The UTR doesn't hide the species name.
+        If we don't have motifs, the Graphics::Feature module still creates the picture.
+0.10    2007/02/15
+        Added new object (Util::Run::Admin) to handle the running processes.
+0.09    2007/02/10
+        Added new methods to Cluster.pm (get_subset_by_type, get_availables_types).
+        Added new methods to Util::Run::Mofext object (run_background, get_results_from_file).
+        Now you can run mofext in the background.
+0.08    2007/01/31
+        Added new method for Sequence.pm (get_raw_seq).
+        Fixed the motif drawing in Graphics::Feature module.
+        Fixed the get_fasta method (add a new line to the end :-)).
+        Added new method for SequenceFeature.pm (length).
+        Added new object (Util::Run::Mofext).
+        Fixed the get_subset_id methods in Bio::DOOP::Motif.
+        Added more warning messages to the Cluster and ClusterSubset objects.
+0.07    2007/01/12
+        Added more comments for the documentation.
+        Removed hungarian comments.
+0.06    2007/01/05
+        New method in Cluster class: get_ref_seq.
+        Carp for module warnings.
+        Some methods throw warning messages, if they have problems with the MySQL database.
+0.05    2007/01/03
+	Search module recoding. The get_cluster_by_* methods do not give back redundant elements.
+0.04    2006/12/20
+	Bug fixes. New method in Cluster class: get_orig_subset.
+0.03    2006/12/13
+        Advanced color handling in the Graphics::Feature module.
+        Full access to the TSS annotation.
+0.02    2006/12/06
+        First version with correct CPAN install.
+0.01    2006/12/04
+        First version, released on an unsuspecting world.

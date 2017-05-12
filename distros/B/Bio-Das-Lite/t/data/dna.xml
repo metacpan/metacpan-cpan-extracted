@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE DASDNA SYSTEM "http://www.biodas.org/dtd/dasdna.dtd">
+<DASDNA>
+  <SEQUENCE id="XYZ123" start="2435345" stop="2436345" version="2.45">
+    <DNA length="1000">
+      atttcttggcgtaaataagagtctcaatgagactctcagaagaaaattgataaatattat
+      taatgatataataataatcttgttgatccgttctatctccagacgattttcctagtctcc
+      agtcgattttgcgctgaaaatgggatatttaatggaattgtttttgtttttattaataaa
+      taggaataaatttacgaaaatcacaaaattttcaataaaaaacaccaaaaaaaagagaaa
+      aaatgagaaaaatcgacgaaaatcggtataaaatcaaataaaaatagaaggaaaatattc
+      agctcgtaaacccacacgtgcggcacggtttcgtgggcggggcgtctctgccgggaaaat
+      tttgcgtttaaaaactcacatataggcatccaatggattttcggattttaaaaattaata
+      taaaatcagggaaatttttttaaattttttcacatcgatattcggtatcaggggcaaaat
+      tagagtcagaaacatatatttccccacaaactctactccccctttaaacaaagcaaagag
+      cgatactcattgcctgtagcctctatattatgccttatgggaatgcatttgattgtttcc
+      gcatattgtttacaaccatttatacaacatgtgacgtagacgcactgggcggttgtaaaa
+      cctgacagaaagaattggtcccgtcatctactttctgattttttggaaaatatgtacaat
+      gtcgtccagtattctattccttctcggcgatttggccaagttattcaaacacgtataaat
+      aaaaatcaataaagctaggaaaatattttcagccatcacaaagtttcgtcagccttgtta
+      tgtcaaccactttttatacaaattatataaccagaaatactattaaataagtatttgtat
+      gaaacaatgaacactattataacattttcagaaaatgtagtatttaagcgaaggtagtgc
+      acatcaaggccgtcaaacggaaaaatttttgcaagaatca
+    </DNA>
+  </SEQUENCE>
+</DASDNA>

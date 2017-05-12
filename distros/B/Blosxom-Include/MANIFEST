@@ -1,0 +1,27 @@
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+Include.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/01_compile.t
+t/02_include_config_dir.t
+t/03_include_config_file.t
+t/config/testplugin
+t/config/testplugin2
+t/config/testplugin3
+t/config/testplugin4
+t/plugins/testplugin
+t/plugins/testplugin2
+t/plugins/testplugin3
+t/plugins/testplugin4

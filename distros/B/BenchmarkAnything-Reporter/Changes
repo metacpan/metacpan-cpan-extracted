@@ -1,0 +1,11 @@
+Revision history for BenchmarkAnything-Reporter
+
+0.003     2015-09-29
+        - re-upload due to META/provides freakup
+
+0.002     2015-09-28
+        - adapt tests to new BenchmarkAnything::Config behavior
+
+0.001     2015-09-24
+        - initial release
+        - handle reporting to a BenchmarkAnything HTTP/REST API

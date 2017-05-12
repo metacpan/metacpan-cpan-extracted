@@ -1,0 +1,27 @@
+restriction_enzyme_recognition_site: 000000
+Marker: FFFFFF
+PCR_product: 208141
+centromere: 000000
+site_specific_recombination_target_region: 168142
+ARS: EFDEB8
+repeat_family: FEED8B
+stop_retained_variant: C13CA5
+intron: FFFFFF
+universal_telomere_cap: 000000
+silenced_gene: 1A72AA
+deletion: 000000
+gene:
+  Uncharacterized: 8FD5F2
+  transposable_element: 
+  pseudogene: 
+  Essential: E89A4A
+  fast_growth: 4D89D0
+  Nonessential: 
+  Dubious: FFFFFF
+  Hypothetical: 
+  RNA:
+  Verified: 
+  default: 8FD5F2
+UTR: 000000
+transposable_element: 228b22
+

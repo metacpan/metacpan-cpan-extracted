@@ -1,0 +1,12 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Build.PL
+lib/Bio/GMOD/GenericGenePage.pm
+lib/Bio/GMOD/GenericGenePage/Chado.pm
+#lib/CXGN/Phenome/GenericGenePage.pm
+t/001_load.t
+MYMETA.yml
+META.yml

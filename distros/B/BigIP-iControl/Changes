@@ -1,0 +1,26 @@
+Revision history for BigIP-iControl
+
+0.098	Mon Nov  2 2015 ltp@cpan.org
+	- Resolved ticket 99728 - add pool member status methods (thanks TEX).
+	- Resolved ticket 108156 - remove MYMETA from distribution (thanks CHORNY).
+
+0.097	Fri Apr 26 2013 ltp@cpan.org
+	- Added get_ltm_string_class_list method
+
+0.096   Wed Apr 24 2013 ltp@cpan.org
+	- Fixed long64 conversion in statistical routines.
+	- Added methods: 
+		- set_ltm_string_class_member
+		- get_ltm_vs_rules
+		- get_ltm_string_class_members
+	  	- get_ltm_string_class
+		- get_ltm_snat_type
+		- get_ltm_address_class_list
+		- delete_ltm_string_class_member
+		- add_ltm_string_class_member
+
+0.095   Thu Jun 21 2012 ltp@cpan.org
+	- Added two new methods; get_self_ip_list and get_self_ip_vlan.
+
+0.094	Wed Jun 20 2012 ltp@cpan.org
+	- Added download_file method.

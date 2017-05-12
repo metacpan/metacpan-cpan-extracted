@@ -1,0 +1,41 @@
+Bio::DB::USeq Change Log
+
+0.23    * Include script, USeqInfo.pl, for quick information about useq files.
+        * Bug fixes to avoid division by zero errors.
+        * Bug fix to parse sequence names with periods.
+        * Documentation improvements.
+        * Update license.
+
+0.22    * Added missing POD documentation
+
+0.21    * Set requirement for Perl 5.10.0. Will not compile on lower versions.
+        * Fixed some POD formatting.
+
+0.20    * Added support for text strings (name field) in USeq files.
+        * Some documentation changes.
+
+0.19    * Additional minor fixes
+        * Added more complete documentation
+
+0.18    * Improved support for GBrowse feature dumping by adding get_seq_stream 
+        methods to wiggle and summary objects
+
+0.17    * Added chromosome and global statistical methods to all objects
+        * Added support for autoscale methods in wiggle_* glyphs
+
+0.16    * Added support for statistical_summary feature type
+        * Added support for the wiggle_whiskers glyph
+
+0.15    * Added support for wiggle feature type by adding array of scores to 
+        SeqFeature coverage attribute
+        * Increased GBrowse support through wiggle_xyplot glyph and wiggle features
+        * Flesh out documentation
+
+0.12    * Collect scores from useq files
+        * Very primitive support for GBrowse using xyplot glyph
+
+0.1     * Initial development
+        * Open and parse useq archive member names
+        * Parse and load binary members
+
+0.0     * Conception!

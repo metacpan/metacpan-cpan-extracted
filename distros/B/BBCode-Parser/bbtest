@@ -1,0 +1,144 @@
+#!/usr/bin/perl -w
+
+use strict;
+use lib 'lib';
+use BBCode::Util qw(parseBool);
+use BBCode::Parser;
+use Getopt::Long qw(:config gnu_getopt bundling_override auto_abbrev);
+use Encode;
+our $VERSION = '0.30';
+
+BEGIN { binmode(STDOUT); }
+
+my %FORMATS = (
+	bbcode => sub {
+		return shift->toBBCode;
+	},
+	html => sub {
+		return shift->toHTML;
+	},
+	text => sub {
+		return shift->toText;
+	},
+	linklist => sub {
+		my $list = shift->toLinkList;
+		my $ret = '';
+		foreach my $item (@$list) {
+			my($follow,$tag,$url,$text) = @$item;
+			$ret .= sprintf "[%s]%s %s %s\n", $tag, ($follow ? '' : '*'), $url, $text;
+		}
+		return $ret;
+	},
+);
+
+my $p = BBCode::Parser->new();
+my @output;
+my @last = qw(html);
+my $enc = undef;
+
+sub doString($) {
+	my $str = shift;
+	$str = decode($enc, $str, 1) if defined $enc;
+
+	my @o = @output;
+	if(@o) {
+		@last = @o;
+	} else {
+		@o = @last;
+	}
+	@output = ();
+
+	my $tree = $p->parse($str);
+	foreach my $format (@o) {
+		my $code = $FORMATS{$format};
+		my $out = $code->($tree);
+		$out .= "\n" unless $out =~ /\n$/;
+		$out = encode($enc, $out, 1) if defined $enc;
+		print $out;
+	}
+}
+
+sub doFile($) {
+	my $fn = shift;
+
+	open(FILE, '<', $fn) or die qq(Failed to open "$fn": $!);
+	binmode(FILE);
+	my $text = join "", <FILE>;
+	close(FILE);
+
+	$text =~ tr/\x0D\x0A/\r\n/;
+	$text =~ s/(?:\r\n|\r|\n)/\n/g;
+	doString($text);
+}
+
+sub doUsage {
+	print <<"EOF";
+Usage: bbtest [options] <code> [ [options] <code> ... ]
+Options:
+  -?    --help          Display this usage information
+  -V    --version       Display version information
+
+  -v    --verbose       Turn on noisy error reporting
+
+  -o    --output fmt    Output <code> in format <fmt>
+  -B    --bbcode        Print <code> as BBCode
+  -H    --html          Print <code> as HTML
+  -T    --text          Print <code> as plain text
+  -L    --link-list     Print <code> as a list of hyperlinks
+
+  -O    --option k=v    Set option <k> to value <v>
+  -P    --permit tag    Mark BBCode <tag> as permitted
+  -F    --forbid tag    Mark BBCode <tag> as forbidden
+
+  -f    --file fn       Use the contents of <fn> instead of <code>
+  -e    --encoding enc  Use <enc> as the encoding for all input and output
+  -8    --utf-8         Equivalent to "--encoding UTF-8"
+
+EOF
+}
+
+sub doVersion {
+	print "BBTest, version $VERSION\n";
+	print "Using BBCode::Parser version $BBCode::Parser::VERSION\n";
+	print "Copyright (C)2005-2006 by Donald King <dlking\@cpan.org>\n";
+	print "See LICENSE for copyright information\n";
+}
+
+GetOptions(
+	'help|usage|h|?'	=> \&doUsage,
+	'version|V'			=> \&doVersion,
+
+	'verbose|v'			=> sub { $Carp::Verbose = 1; },
+
+	'option|O:s%'		=> sub { $p->set($_[1] => $_[2]); },
+	'permit|P=s'		=> sub { $p->permit($_[1]); },
+	'forbid|F=s'		=> sub { $p->forbid($_[1]); },
+
+	'bbcode|B'			=> sub { push @output, 'bbcode'; },
+	'html|H'			=> sub { push @output, 'html'; },
+	'text|T'			=> sub { push @output, 'text'; },
+	'link-list|linklist|L'	=> sub { push @output, 'linklist'; },
+
+	'output|o=s' => sub {
+		foreach(split /,/, lc $_[1]) {
+			if(exists $FORMATS{$_}) {
+				push @output, $_;
+			} else {
+				die qq(Unknown output format "$_");
+			}
+		}
+	},
+
+	'utf-8|utf8|8' => sub {
+		$enc = 'UTF-8';
+	},
+	'character-set|charset|encoding|e=s' => sub {
+		$enc = $_[1];
+	},
+
+	'file|f=s'	=> sub { doFile $_[1] },
+	'<>'		=> sub { doString $_[0] },
+) or exit(1);
+
+doString(shift) while @ARGV;
+

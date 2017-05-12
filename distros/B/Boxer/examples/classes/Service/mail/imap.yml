@@ -1,0 +1,11 @@
+classes:
+  - Service.mail.mda
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - include IMAP mail access service using Dovecot
+  pkg:
+    - dovecot-imapd
+  pkg-auto:
+    - dovecot-core

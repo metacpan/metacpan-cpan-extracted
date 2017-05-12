@@ -1,0 +1,37 @@
+B::Deobfuscate version 0.19
+==========================
+
+B::Deobfuscate is a backend module for the Perl compiler that
+generates perl source code, based on the internal compiled structure
+that perl itself creates after parsing a program. It adds symbol
+renaming functions to the B::Deparse module. An obfuscated program is
+already parsed and interpreted correctly by the B::Deparse
+program. Unfortunately, if the obfuscation involved variable renaming
+then the resulting program also has obfuscated symbols.
+
+This module takes the last step and fixes names like $z5223ed336 to be
+a word from a dictionary. While the name still isn't meaningful it is
+at least easier to distinguish and read. Here are two examples - one
+from B::Deparse and one from B::Deobfuscate.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ B::Keywords
+ YAML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Joshua ben Jore. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; version 2.

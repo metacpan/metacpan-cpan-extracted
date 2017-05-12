@@ -1,0 +1,29 @@
+---
+name: Bot-BasicBot-Pluggable-Module-WWWShorten
+version: 0.03
+author:
+  - 'Mario Domgoergen <mdom@cpan.org>'
+abstract: Shorten all urls
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mdom/bot-basicbot-pluggable-module-wwwshorten
+build_requires:
+  Test::More: 0
+requires:
+  Bot::BasicBot::Pluggable: 0.81
+  LWP::UserAgent: 0
+  Module::Load: 0
+  Try::Tiny: 0
+  URI::Find::Rule: 0
+  parent: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Bot::BasicBot::Pluggable::Module::WWWShorten:
+    file: lib/Bot/BasicBot/Pluggable/Module/WWWShorten.pm
+    version: 0.03
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

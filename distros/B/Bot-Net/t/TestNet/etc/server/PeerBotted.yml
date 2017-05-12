@@ -1,0 +1,18 @@
+--- 
+ircd_config: 
+  network: TestNet
+  nicklen: 15
+  servername: peerbotted.irc
+listeners: 
+  - 
+    port: 6668
+state_file: var/server/PeerBotted.db
+
+peers:
+ - name: testnet.irc
+   pass: test123
+   rpass: test123
+   type: r
+   raddress: 127.0.0.1
+   rport: 6667
+   auto: 1

@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               Biblio-Refbase
+version:            0.04
+abstract:           Perl interface to refbase bibliographic manager
+author:
+    - Henning Manske <hma@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.17
+build_requires:
+    HTTP::Status:    0
+    LWP::UserAgent:  0
+    Test::More:      0.62
+requires:
+    HTTP::Request::Common:  0
+    HTTP::Response:       0
+    HTTP::Status:         0
+    LWP::UserAgent:       0
+    perl:                 5.006
+    URI:                  0
+    URI::QueryParam:      0
+resources:
+    bugtracker:  http://github.com/hma/Biblio-Refbase/issues
+    homepage:    http://search.cpan.org/dist/Biblio-Refbase/
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/hma/Biblio-Refbase
+no_index:
+    directory:
+        - t
+        - inc
+        - xt
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

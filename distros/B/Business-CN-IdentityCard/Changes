@@ -1,0 +1,17 @@
+Revision history for Perl extension Business::CN::IdentityCard.
+
+0.01  Tue Mar 15 17:30:36 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Business::CN::IdentityCard
+	- I changed 'China::IdentityCard::Validate' to 'Business::CN::IdentityCard'. 
+	- Thanks for Adam Kennedy's advice.
+
+0.02 Thurs Mar 17 11:21:44 2005
+	- Add the $errstr(error string)
+
+0.03 Fri Mar 18 10:37:44 2005
+	- fix a regex bug, thanks for joe's help
+
+0.04 Wed Jun 1 21:50:44
+	- totally new rewrite of this module
+	- see Chinese document http://www.fayland.org/IDCard/Validate.html for details

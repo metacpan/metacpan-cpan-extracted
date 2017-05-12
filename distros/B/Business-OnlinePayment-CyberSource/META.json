@@ -1,0 +1,120 @@
+{
+   "abstract" : "CyberSource backend for Business::OnlinePayment",
+   "author" : [
+      "Jad Wauthier <Jadrien dot Wauthier at GMail dot com>",
+      "Caleb Cushing <xenoterracide@gmail.com>",
+      "Peter Bowen <peter@bowenfamily.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-OnlinePayment-CyberSource",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::CyberSource" : "0.009000",
+            "Business::CyberSource::Client" : "0.007006",
+            "Business::OnlinePayment" : "3",
+            "DateTime" : "0",
+            "Exception::Base" : "0",
+            "Module::Runtime" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Aliases" : "0",
+            "MooseX::NonMoose" : "0",
+            "MooseX::StrictConstructor" : "0",
+            "MooseX::Types::Common::String" : "0",
+            "MooseX::Types::CyberSource" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "Crypt::SSLeay" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Business::OnlinePayment::CyberSource" : {
+         "file" : "lib/Business/OnlinePayment/CyberSource.pm",
+         "version" : "3.000016"
+      },
+      "Business::OnlinePayment::CyberSource::Client" : {
+         "file" : "lib/Business/OnlinePayment/CyberSource/Client.pm",
+         "version" : "3.000016"
+      },
+      "Business::OnlinePayment::CyberSource::Role::ErrorReporting" : {
+         "file" : "lib/Business/OnlinePayment/CyberSource/Role/ErrorReporting.pm",
+         "version" : "3.000016"
+      },
+      "Business::OnlinePayment::CyberSource::Role::InputHandling" : {
+         "file" : "lib/Business/OnlinePayment/CyberSource/Role/InputHandling.pm",
+         "version" : "3.000016"
+      },
+      "Business::OnlinePayment::CyberSource::Role::TransactionHandling" : {
+         "file" : "lib/Business/OnlinePayment/CyberSource/Role/TransactionHandling.pm",
+         "version" : "3.000016"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xenoterracide/business-onlinepayment-cybersource/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Business-OnlinePayment-CyberSource",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xenoterracide/business-onlinepayment-cybersource.git",
+         "web" : "https://github.com/xenoterracide/business-onlinepayment-cybersource"
+      }
+   },
+   "version" : "3.000016",
+   "x_contributors" : [
+      "Jad Wauthier <jadrien.wauthier@gmail.com>",
+      "Jad Wauthier <jwauthier@cpan.org>",
+      "Jad Wauthier <jwauthier@hostgator.com>",
+      "Peter A. Bowen <peter@bowenfamily.org>"
+   ]
+}
+

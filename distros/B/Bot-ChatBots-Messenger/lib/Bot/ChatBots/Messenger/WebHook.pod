@@ -1,0 +1,110 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Messenger::WebHook - WebHook for Bot::ChatBots::Messenger
+
+=head1 SYNOPSIS
+
+   use Mojolicious::Lite;
+   plugin 'Bot::ChatBots::Messenger',
+      helper_name => 'messenger', # default is chatbots.messenger
+      instances => [
+         [
+            WebHook => path => '/messenger/yadda-yadda-yadda',
+            processor => \&process,
+            verify_token => 'yadda-yadda-yadda',
+         ]
+      ];
+   app->start;
+
+   sub process {
+      my $record = shift;
+      # ...
+      return $record;
+   }
+
+=head1 DESCRIPTION
+
+This module allows you to load a L<Mojolicious> plugin for dealing with
+Facebook Messenger webhooks for a chatbot.
+
+=head1 ACCESSORS
+
+This module consumes role L<Bot::ChatBots::Role::WebHook>, inheriting all
+the accessors. The accessors in the following subsections are added.
+
+=head2 B<< no_routes >>
+
+boolean flag to avoid routes generation upon plugin import. Used during
+the L</BUILD> process. Defaults to C<0>, meaning that the routes will be
+generated (both L<Bot::ChatBots::WebHook/install_route> and
+L</install_get_route>).
+
+=head2 B<< verify_token >>
+
+the I<verification token> required by FaceBook to make sure your settings
+are accepted by your bot. You MUST set this or it will complain loudly
+upon calling L</install_get_route>.
+
+=head1 METHODS
+
+This module consumes role L<Bot::ChatBots::Role::WebHook> and implements
+or overrides the methods in the following subsections.
+
+=head2 B<< BUILD >>
+
+Called by L<Moo> construction process. It uses L</no_routes> to establish
+whether to call L<Bot::ChatBots::WebHook/install_route> and
+L</install_get_route> or not.
+
+
+=head2 B<< install_get_route >>
+
+   $obj->install_get_route(%args); # OR
+   $obj->install_get_route(\%args);
+
+Install the additional GET route for Facebook verification process. See
+L</validation_token>, which MUST be available for this method to work.
+
+=head2 B<< normalize_record >>
+
+   my $r = $obj->normalize_record($input_record);
+
+Modify C<$input_record> in-place and return it, trying to put it in some
+I<standard> shape. Which has not been standardized yet.
+
+See L<Bot::ChatBots::Role::WebHook/normalize_record>.
+
+=head2 B<< parse_request >>
+
+   my @updates = $obj->parse_request($c->req);
+
+See L<Bot::ChatBots::Role::WebHook/parse_request>.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+Foo::Bar.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

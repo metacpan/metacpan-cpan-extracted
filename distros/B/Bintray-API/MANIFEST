@@ -1,0 +1,17 @@
+Build.PL
+Changes
+INSTALL
+lib/Bintray/API.pm
+lib/Bintray/API/Package.pm
+lib/Bintray/API/Repo.pm
+lib/Bintray/API/Search.pm
+lib/Bintray/API/Session.pm
+lib/Bintray/API/Subject.pm
+lib/Bintray/API/Version.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t

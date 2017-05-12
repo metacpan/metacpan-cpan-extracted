@@ -1,0 +1,73 @@
+From hasant@trabas.com Tue Feb 27 20:08:25 2001
+Date: Thu, 24 Aug 2000 10:21:45 +0700 (JAVT)
+From: Hasanuddin Tamir <hasant@trabas.com>
+To: bandung-pm-list@happyfunball.pm.org
+Subject: Re: [Bandung.pm] Modifying @INC: my problem and solution (any  
+    comment?)
+Organization: TRABAS
+
+>> No wonder Steven Haryanto on Aug 24 said that,
+
+[snipped]
+
+SH] from the last two examples i can see why BaseLib might
+SH] prove to be useful/convenient: it deals nicely with
+SH] different versions of an application which a single user
+SH] might run, where as it would be cumbersome to set
+SH] different environment variables everytime one needs to
+SH] switch versions. in addition it works with -T because it
+SH] doesn't rely on the environment.
+
+That's what I avoid. But there's still a tainted data, that's
+the full path to script directory from FindBin. That's why
+the data needs to be untainted first.
+
+
+SH] so BaseLib-based scripts basically first uses FindBin to
+SH] find itself, but then, instead of using relative path to
+SH] connect to its LIBDIR, it looks for LIBDIR in its own
+SH] path, because it must be there! (well, as long as LIBDIR
+SH] is specified correctly). simple, but clever. now why
+SH] hadn't the rest of us thought of that before? :-)
+
+Yes, there must be some convention here. Both BASEDIR and
+LIBDIR must be rather static. That's why I said (in my
+answer in clp.misc), when those variable change, that's
+a different level of decision. It of course affects the
+usage of BaseLib.
+
+I first implemented this mechanism in the last project I
+was involved in. I realized that I was not the only who
+worked on this project and everyone worked in their own
+environment.
+
+So I put the mechanism in every script using BEGIN block
+so everyone didn't need to change anything just because
+they had different environment from mine. Later I thought,
+hey why I didn't put it on a module. So my very first posting
+was actually some kind of a module proposal. But folks at
+clp.misc seemed misunderstanding what I meant.
+
+[snipped]
+SH] >SH]   # contente of Includer
+SH] >SH]   use lib "$ENV{PROJLIBDIR}/lib/perl5/site_perl/5.005";
+SH] >SH]   use lib "$ENV{PROJLIBDIR}/lib/perl5/site_perl/5.005/i386-linux";
+SH] >
+SH] >This will be handled by BaseLib to include the standard hierarchy
+SH] >like lib module does.
+SH] 
+SH] sorry. lib.pm does already include the architecture-dependent
+SH] directory.
+
+I think I said incorrectly. What I wanted to say is that I want
+to provide the same facility in BaseLib like what lib.pm does. So
+BaseLib will accommodate the standard hierarchy under BASEDIR/LIBDIR
+should the hierarchy exists.
+
+SH] you're most welcome.
+
+Thank you very much :-)
+
+
+san
+-- 

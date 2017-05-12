@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::OnlinePayment::Cardcom
+
+0.02  Mon Aug 15 18:32:59 PDT 2011
+        - POD updates (maintainer, clarify terminal number usage in example)
+        - CPAN upload
+
+0.01  Wed Jun  1 01:24:40 EDT 2011
+	- original version

@@ -1,0 +1,103 @@
+#
+# $Id: Changes,v 1.35 2014/01/06 16:36:48 dankogai Exp dankogai $
+#
+# Revision history for Perl extension BSD::stat.
+$Revision: 1.35 $ $Date: 2014/01/06 16:36:48 $
+! stat.pm
+  Minor fix for the stat cache handling of Perl 5.18.1 and newer
+
+1.34 2012/10/23 03:36:24
+! stat.xs t/utimes.t
+  Addressed: BSD::stat support for OpenBSD  
+  https://rt.cpan.org/Ticket/Display.html?id=80325
+
+1.33 2012/08/21 10:06:12
+! stat.pm
+  * POD Fixes
+! t/chflags.t
+  skips where chflags() is not supported, like ZFS
+
+1.32 2012/08/21 09:34:47
+! stat.pm
+  * added atimespec, mtimespec, and ctimespec
+  * POD fixes
+
+1.31 2012/08/19 15:46:15
+! stat.pm README
+  Document fixes
+
+1.30 2012/08/19 15:36:31
+! stat.pm stat.xs
++ t/utimes.t
+  utimes() and lutimes() added
+! Makefile.PL
+  LICENSE => 'perl', # explicitly stated
+
+1.21 2001.01.29
+     ! stat.xs
+       * newSVuv() that prevented perl prior to 5.6.0 from compiling
+         was fixed.  For perl prior to 5.6.0 newSViv() is used
+	 (That's how Perl's internal stat() behaves).
+1.20 2001.01.26
+     ! stat.xs
+       * stat()->size returns negative value for files larger
+       than 2**31 bytes.  Now fixed. (newSViv -> newSVnv)
+       * following the changes above, types of other members
+       was also changed to match CORE::stat (newSViv -> newSVuv)
+1.11 2001.01.12
+     ! backward compatible to 5.00503 (<miyagawa@edge.co.jp>);
+       "use warnings" pragma is post-5.6.
+       another side effect for starting module w/ h2xs which
+       version is "too new." sigh...
+1.10 2001.01.12
+     + $st_* variable exported with :FILED tag.  BSD::stat is now
+       fully upper-compatible with File::stat (but with performance
+       penalty.  See pod for details)
+     ! pod revised
+1.00 2001.01.11
+     ! t/filehandle.t	misteriously commented out #use FileHandle
+			uncommented (<miyagawa@edge.co.jp>)
+     ! pod revised
+     ! version raised to 1.00
+0.43 2001.01.10
+     ! possible memory leaks fixed this time
+     ! prototype added as l?stat(;$);
+0.42 2001.01.08
+     ! possible memory leaks fixed
+     ! OP_STAT and OP_LSTAT is set when and only when the
+       operation is successful
+0.41 2001.01.08
+     ! stat.xs is more compliant with perlxs guidelines
+     ! further code optimization
+0.40 2001.12.30
+     BSD::stat is now as much like CORE::stat as a module can get!
+     + now supports _ special filehandle
+       (or stat cache now works).
+     ! too much perlgut--wrenching?
+     * so version is now 0.40, not just 0.31
+0.30 2001.12.28
+     BSD::stat is now more like CORE::stat
+     + Now accepts filehandle as an argument
+     + Now uses $_ when an argument is omitted
+     + More performance gain
+     - AUTOLOAD() no longer used.
+     ! README is now more dist-safe
+0.25 2001.12.19
+     optimized: anystat()
+     safer:     AUTOLOAD()
+     added:	t/benchmark.pl
+     changed:	test.pl -> t/*.t
+0.24 2001.12.18
+     fixed: lstat() and stat() behaved the same.
+0.23 2001.12.17
+     fixed: $scalar = lstat("nonexistent") wrongly got a reference
+     which always evaluates true.  Now it returns undef when stat
+     fails.
+0.22 2001.12.17
+     Debris in stat.pm removed; duplicate occurance of $VERSION
+0.21 2001.12.17
+     First preview release
+0.01 2001.12.17
+	- original version; created by h2xs 1.21 with options
+		-n BSD::stat -f
+

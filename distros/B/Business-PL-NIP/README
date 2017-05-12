@@ -1,0 +1,46 @@
+Business-PL-NIP version 0.03
+============================
+
+NAME
+
+Business::PL::NIP
+
+SYNOPSIS
+
+    # functional interface
+    use Business::PL::NIP qw(is_valid_nip);
+
+    my $is_valid = is_valid_nip(1234567890);
+
+
+DESCRIPTION
+
+NIP is a Polish tax identification number. 
+
+This module provides a method for checking whether the given number is a valid NIP.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    List::Util
+    Exporter::Easy
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 by Tomasz Czepiel <tjmc@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

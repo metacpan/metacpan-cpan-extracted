@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.010;
+
+use lib '/home/bargs001/dev/bio-gonzales/lib';
+use lib '/home/bargs001/dev/gonzales-util/lib';
+
+use Bio::Gonzales::Seq::IO qw(faslurp faspew);
+$Bio::Gonzales::Seq::IO::SEQ_FORMAT = 'all_pretty';
+
+my $seqs = faslurp(\*STDIN);
+map { $_->rm_gaps } @$seqs;
+
+faspew(\*STDOUT, $seqs);

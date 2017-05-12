@@ -1,0 +1,88 @@
+Business-OnlinePayment-WorldPay version 1.00
+============================================
+
+This module subclasses Business::OnlinePayment to provide a basic merchant
+processing interface for submitting transactions as XML requests in the
+direct model provided by RBS WorldPay.
+
+    http://www.rbsworldpay.com
+    http://www.rbsworldpay.com/support/bg/xml/kb/submittingtransactionsdirect/dxml.html
+
+Orders submitted to the RBS WorldPay system are required to be valid XML
+files as specified in their Document Type Definition (DTD):
+
+    http://dtd.wp3.rbsworldpay.com/paymentService_v1.dtd
+
+
+OVERVIEW
+
+General procedure for use of the Business::OnlinePayment::WorldPay module:
+
+1) create a Business::OnlinePayment object with "WorldPay" as parameter to contructor.
+   This returns a Business::OnlinePayment::WorldPay object.
+
+2) invoke the content method with one of the following actions:
+    * payment
+    * status
+    * cancel
+    * refund
+    * cancel_or_refund (undocumented)
+    Additional parameters are required; varies depending on the action.
+
+3) invoke the submit method, in which most of the action occurs:
+    * initializes object
+    * creates variables for filling in to a template of an XML request
+    * selects the appropriate XML template and processes it to fill in needed values
+    * uses post_https to submit the request and obtain the response
+    * examines response headers to verify request was successful
+    * uses XML::TreeBuilder to parse the body of the response
+      (XML response varies in structure depending on the type of request)
+    * extracts needed status and/or error information from the TreeBuilder object
+      and stores in the Business::OnlinePayment::WorldPay object
+
+4) query the Business::OnlinePayment::WorldPay object to determine whether
+   the request was successful and to retrieve other status information
+   and/or error messages.
+
+See the test programs in the t/ directory of this distribution for examples.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+To fully run the test suite, supply your RBS WorldPay account information via
+three environment variables:
+    WORLDPAY_INSTALLATION_ID
+    WORLDPAY_MERCHANT_CODE
+    WORLDPAY_XML_PASSWORD
+Otherwise, most of the tests will be skipped.  A verbose trace can be produced
+with an additional environment variable:
+    WORLDPAY_DEBUG=1
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    * Business::OnlinePayment
+    * Template -- to construct XML requests
+    * MIME::Base64 -- encode used to create header for basic HTTP authentication
+    * Net::SSLeay -- post_https & make_headers used to submit requests
+    * XML::TreeBuilder -- to parse XML responses
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Paul Grassie, Ardis Health, http://www.ardishealth.com. All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

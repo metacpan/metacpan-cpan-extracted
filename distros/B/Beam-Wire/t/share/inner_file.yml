@@ -1,0 +1,4 @@
+container:
+    class: Beam::Wire
+    args:
+        file: file.yml

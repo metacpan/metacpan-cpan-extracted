@@ -1,0 +1,26 @@
+Bundle::Melody::Test is a bundle containing the
+prerequisite CPAN modules for testing and other diagnostic 
+features in Melody [http://openmelody.org/]. 
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make 
+    make test 
+    make install
+
+DEPENDENCIES
+
+By definition a Bundle is a list of dependencies. See the
+POD documentation in the extlib.pm module for a list of
+packages.
+
+COPYRIGHT AND LICENCE
+
+The software is released under the Artistic License. The
+terms of the Artistic License are described at
+http://www.perl.com/language/misc/Artistic.html. Except
+where otherwise noted, Bundle::Melody::Test is Copyright
+2009, Timothy Appnel, tima@cpan.org. All rights reserved.

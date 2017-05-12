@@ -1,0 +1,590 @@
+=pod
+
+Ten Modules I Wouldn't Go
+
+Anywhere Without
+
+Simon Cozens
+
+NetThink Open Source Consultancy
+
+=head1 Why?
+
+=over
+
+=item * "Repetitive Programming"
+
+=back
+
+=over
+
+=item * But that's OK, we have CPAN!...
+
+=back
+
+=over
+
+=item * CPAN is BIG.
+
+=back
+
+=over
+
+=item * How do I know it's any good?
+
+=back
+
+=over
+
+=item * Personal recommendations
+
+=back
+
+(page 2)
+
+----
+
+Here's my personal Top 10...
+
+=over
+
+=item * 10. Bundle::CPAN
+
+=item * 9. Bundle::LWP
+
+=item * 8. Mail::Send
+
+=item * 7. MLDBM
+
+=item * 6. Date::Calc
+
+=item * 5. DBI
+
+=item * 4. Data::Dumper
+
+=item * 3. POE
+
+=item * 2. File::Spec
+
+=item * 1. XML::Simple
+
+=back
+
+(page 3)
+
+----
+
+Bundle::CPAN
+
+=over
+
+=item * Cheating, really...
+
+=back
+
+=over
+
+=item * File::Spec is in core (and is top module #2!)
+
+=item * MD5 for validating downloads
+
+=item * Compress::Zlib
+
+=item * Archive::Tar
+
+=item * Bundle::libnet
+
+=item * Term::ReadLine
+
+=item * Term::ReadKey
+
+=item * And, of course...
+
+=item * CPAN.pm!
+
+=back
+
+(page 4)
+
+----
+
+Bundle::CPAN
+
+MD5
+
+=over
+
+=item * Simple, really
+
+=back
+
+use Digest::MD5 qw(md5_hex);
+
+print md5_hex($data);
+
+(page 5)
+
+----
+
+Bundle::CPAN
+
+Compress::Zlib
+
+=over
+
+=item * Allows both in-memory compression and file access
+
+=back
+
+=over
+
+=item * File access is much more useful
+
+=back
+
+use Compress::Zlib;
+
+$fh = gzopen($filename, $mode);
+
+$bytesread = $fh-E<gt>gzreadline($line);
+
+$byteswritten = $fh-E<gt>gzwrite($buffer);
+
+=over
+
+=item * (PerlIO in 5.8.0 should make this transparent anyway)
+
+=back
+
+(page 6)
+
+----
+
+Bundle::CPAN
+
+Archive::Tar
+
+=over
+
+=item * Portable .tar(.gz) file creation and reading
+
+=back
+
+use Archive::Tar;
+
+Archive::Tar-E<gt>create_archive ("my.tar.gz", 9,
+
+"/this/file", "/that/file");
+
+$tar = Archive::Tar-E<gt>new();
+
+$tar-E<gt>add_files("file/foo.c", "file/bar.c");
+
+$tar-E<gt>write("files.tar");
+
+(page 7)
+
+----
+
+Bundle::CPAN
+
+Bundle::libnet
+
+=over
+
+=item * Now in core!
+
+=back
+
+Net::FTP RFC959 File Transfer Protocol
+
+Net::SMTP RFC821 Simple Mail Transfer Protocol
+
+Net::Time RFC867 Daytime Protocol
+
+Net::Time RFC868 Time Protocol
+
+Net::NNTP RFC977 Network News Transfer Protocol
+
+Net::POP3 RFC1939 Post Office Protocol 3
+
+Net::SNPP RFC1861 Simple Network Pager Protocol
+
+=over
+
+=item * Should be regarded as building blocks.
+
+=back
+
+(page 8)
+
+----
+
+Bundle::CPAN
+
+Term::Read*
+
+=over
+
+=item * Allow history, editing and navigation
+
+=back
+
+=over
+
+=item * Allows turning off echo, etc.
+
+=back
+
+use Term::ReadLine;
+
+$term = new Term::ReadLine 'Simple Perl calc';
+
+$prompt = "Enter your arithmetic expression: ";
+
+$OUT = $term-E<gt>OUT || STDOUT;
+
+while ( defined ($_ = $term-E<gt>readline($prompt)) ) {
+
+$res = eval($_), "\n";
+
+warn $@ if $@;
+
+print $OUT $res, "\n" unless $@;
+
+$term-E<gt>addhistory($_) if /\S/;
+
+}
+
+(page 9)
+
+----
+
+Bundle::CPAN
+
+CPAN
+
+=over
+
+=item * Makes downloading and installing modules trivial
+
+=back
+
+=over
+
+=item * Though you probably still want PPM on Win32
+
+=back
+
+riot-act:/home/simon# perl -MCPAN -e shell
+
+cpan shell -- CPAN exploration and modules installation (v1.59_54)
+
+ReadLine support available (try 'install Bundle::CPAN')
+
+cpanE<gt> install Some::Module
+
+perl -MCPAN -e 'install Some::Module'
+
+(page 10)
+
+----
+
+Bundle::LWP
+
+=over
+
+=item * It's really LWP::Simple
+
+=back
+
+$page = get("http://www.netthink.co.uk");
+
+=over
+
+=item * getprint($url);
+
+=back
+
+getstore($url, $file);
+
+head($url)
+
+mirror($url, $file);
+
+(page 11)
+
+----
+
+Mail::Send
+
+=over
+
+=item * Abstraction layer for mail sending
+
+=back
+
+use Mail::Send;
+
+$msg = new Mail::Send
+
+Subject=E<gt> "Some subject",
+
+To =E<gt> "simon@netthink.co.uk";
+
+$msg-E<gt>add("X-Mailer:", "Mail::Send");
+
+$fh = $msg-E<gt>open;
+
+print $fh "Hello!\n";
+
+$fh-E<gt>close; # Sent!
+
+(page 12)
+
+----
+
+MLDBM
+
+=over
+
+=item * Allows multi-level DBMs
+
+=back
+
+=over
+
+=item * Best way to dump data structures to disk
+
+=back
+
+use MLDBM qw(DB_File);
+
+tie %hash, "MLDBM", "persistent" or die $!;
+
+$hash{"foo"} = [1, 2, 3, 4];
+
+(page 13)
+
+----
+
+Date::Calc
+
+=over
+
+=item * ALL your date manipulation needs!
+
+=back
+
+=over
+
+=item * Delta_Days for calculating days between X and Y
+
+=back
+
+=over
+
+=item * Decode_Date_* for parsing a user-specified date
+
+=back
+
+=over
+
+=item * Date_to_Text(_Long) for printing a date appropriately
+
+=back
+
+=over
+
+=item * Multilingual support
+
+=back
+
+=over
+
+=item * Lots, *lots* more.
+
+=back
+
+(page 14)
+
+----
+
+DBI
+
+=over
+
+=item * Abstracted RDBMS access
+
+=back
+
+=over
+
+=item * DBD:: drivers for pretty much everything
+
+=back
+
+use DBI; use DBD::Mysql;
+
+my $dbh = DBI-E<gt>connect(":dbi:mysql:somedatabase", $user, $pw) ||
+...;
+
+my $sth = $dbh-E<gt>prepare("SELECT * FROM foo WHERE name IS NOT
+NULL");
+
+$sth-E<gt>execute;
+
+my $matches = $sth-E<gt>rows();
+
+print "$matches matches found\n";
+
+print "@row\n" while @row = $sth-E<gt>fetchrow_array;
+
+(page 15)
+
+----
+
+Data::Dumper
+
+=over
+
+=item * Core module
+
+=back
+
+=over
+
+=item * REALLY useful for debugging
+
+=back
+
+use Data::Dumper;
+
+print "State of hash:\n", Dumper($href);
+
+(page 16)
+
+----
+
+POE
+
+=over
+
+=item * Award winning module!
+
+=back
+
+"POE is an application kernel that uses event driven state machines as
+
+threads. It includes a high-level I/O library that hides most of the
+
+usual client/server tediosity."
+
+=over
+
+=item * It's a thing for making servers and clients.
+
+=back
+
+=over
+
+=item * It lets you do threads without threads.
+
+=back
+
+=over
+
+=item * It's growing into a small operating system.
+
+=back
+
+(page 17)
+
+----
+
+File::Spec
+
+=over
+
+=item * Core module
+
+=back
+
+=over
+
+=item * Portable file handling
+
+=back
+
+=over
+
+=item * WHY OH WHY DON'T MORE PEOPLE USE THIS?
+
+=back
+
+use File::Spec::Functions;
+
+sub which {
+
+my $program = shift;
+
+for (path()) {
+
+my $test = catfile($_, $program);
+
+return $test if -e $test and -x $test;
+
+}
+
+}
+
+(page 18)
+
+----
+
+XML::Simple
+
+=over
+
+=item * Sort of like Data::Dumper
+
+=back
+
+=over
+
+=item * But much, much cooler
+
+=back
+
+use XML::Simple;
+
+$hashref = XMLin($filename);
+
+print FILE XMLout($filename);
+
+(page 19)
+
+----
+
+And more...
+
+Parse::RecDescent
+
+Mail::Internet
+
+Mail::Audit
+
+File::Temp (core)
+
+...
+
+(page 20)
+
+=cut
+
+#Pod::HTML2Pod conversion notes:
+#From file modules.html
+# 7412 bytes of input
+#Sun Sep  1 17:19:25 2002 simon
+# No a_name switch not specified, so will not try to render <a name='...'>
+# No a_href switch not specified, so will not try to render <a href='...'>

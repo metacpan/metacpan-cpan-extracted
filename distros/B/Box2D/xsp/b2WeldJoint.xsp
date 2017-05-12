@@ -1,0 +1,47 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2WeldJoint} class b2WeldJoint : public %name{Box2D::b2Joint} b2Joint
+{
+
+float32 GetReactionTorque(float32 inv_dt);
+
+%{
+
+b2Vec2*
+b2WeldJoint::GetAnchorA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorA());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2WeldJoint::GetAnchorB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorB());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2WeldJoint::GetReactionForce(inv_dt)
+	float32 inv_dt
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetReactionForce(inv_dt));
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

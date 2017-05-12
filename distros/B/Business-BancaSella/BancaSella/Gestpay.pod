@@ -1,0 +1,137 @@
+=head1 NAME
+
+Business::BancaSella::Gestpay - Abstract class for Gestpay parameter info
+
+=head1 SYNOPSIS
+
+  Abstract Class...you shouldn't use it directly. 
+  See Business::BancaSella::Encode::Gestpay for encoding or
+  Business::BancaSella::Encode::Gestpay for dencoding.
+
+=head1 DESCRIPTION
+
+This is an abstract class for Gestpay payment system implementing all property passed
+and received during payment transaction with the international credit card 
+circuits between Banca Sella gateway.
+
+=head2 PROPERTY
+
+=over 2
+
+=item shopping
+
+Unique identification number assigned from Banca Sella to trader.
+Using during: Encode, Decode
+
+=item currency
+
+The currency in witch the amount property is expressed. Can be one of these:
+"eur" or "itl".
+Using during: Encode,Decode
+
+=item amount
+
+The amount of the transaction expressed in the currency showed by homonym 
+property.
+Using during: Encode,Decode
+
+=item id
+
+An identification attributed to the transaction by trader. It will be returned
+in the reply response of payment system.
+Using during: Encode, Decode
+
+=item otp
+
+During Encode should be one of the "one time password" present in the ric file.
+During Decode must be one of the "one time password" present in the ris file.
+Using during: Encode, Decode
+
+=item cardnumber
+
+Credit card number. It should be passed from trader's site to Banca Sella for
+checking if you wish to acquire credit card number inside you site and using
+Banca Sella system only for commit transaction.
+Using during: Encode
+
+=item expmonth
+
+If cardnumber is given, you must set this property to expired month of credit 
+card.
+Using during: Encode
+
+=item expyear
+
+If cardnumber is given, you must set this property to expired year of credit 
+card.
+Using during: Encode
+
+=item name
+
+First and second name of the purchaser 
+Using during: Encode,Decode
+
+=item mail
+
+Mail of the purchaser
+Using during: Encode,Decode
+
+=item language
+
+Language in which will show the Banca Sella's page used for having credit card
+information. Can be one of these: 'italian','english','spanish','french'.
+Using during: Encode
+
+=item result 
+
+Transaction result. It can be "OK" or "KO"
+Using during: Decode
+
+=item authcode 
+
+Authorization transaction Code
+Using during: Decode
+
+=item bankid 
+
+Transaction identification number assigned to the transaction by Gestpay.
+Using during: Decode
+
+=item errcode 
+
+If result is "KO" this is the error code.
+Using during: Decode
+
+=item errstr 
+
+If result is "KO" here you can find the error string description
+Using during: Decode
+
+=back
+
+=head2 METHOD
+
+=over 2
+
+=item uri
+
+Using during Encode, return the formatted uri to pass all prepared value to 
+Banca Sella online payment system
+
+=item form(frmName)
+
+Using during Encode, return a form html code named "frmName" ready for passing
+all prepared value to Banca Sella online payment system
+
+=back
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Encode::Gestpay
+  Business::BancaSella::Decode::Gestpay
+
+=cut

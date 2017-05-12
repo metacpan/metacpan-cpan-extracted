@@ -1,0 +1,9 @@
+Changes
+lib/Bundle/Devel.pm
+LICENSE
+Makefile.PL
+Makefile.PL.cvp
+MANIFEST			This list of files
+README
+tmon.out
+META.yml                                Module meta-data (added by MakeMaker)

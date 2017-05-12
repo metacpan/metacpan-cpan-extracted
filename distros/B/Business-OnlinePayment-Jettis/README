@@ -1,0 +1,19 @@
+Copyright (c) 2002 Ivan Kohler
+Copyright (c) 2009 Freeside Internet Services, Inc.
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::Jettis, an Business::OnlinePayment backend
+module for the Jettis payment gateway.  It is only useful if you have a
+merchant account with Jettis: http://www.jettis.com/
+
+At this time, only ACH (electronic check) transactions are supported.
+
+Ivan Kohler <ivan-jettis@420.am>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+

@@ -1,0 +1,34 @@
+Benchmark-Perl-CoreHashes version 0.01
+=================================
+
+This module benchmarks the various hash algorithms in >= 5.17.10 perl. It
+installs nothing. This module was created to generate cpantesters reports.
+It is not an API or library.
+
+INSTALLATION
+
+To run this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+
+It won't install anything though since this module is just for benchmarking.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    -List::Util
+    -Test::More
+    -Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Daniel Dragan bulkdd@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.19.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

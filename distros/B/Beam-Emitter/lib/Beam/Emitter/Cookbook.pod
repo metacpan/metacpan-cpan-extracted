@@ -1,0 +1,95 @@
+#PODNAME: Beam::Emitter::Cookbook
+#ABSTRACT: Recipes for simple Beam::Emitter patterns
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Beam::Emitter::Cookbook - Recipes for simple Beam::Emitter patterns
+
+=head1 VERSION
+
+version 1.007
+
+=head1 DESCRIPTION
+
+This document contains recipes for things that Beam::Emitter does not do
+by default, but that you can add to your project with only a few lines
+of code.
+
+=head1 RECIPES
+
+=head2 Allow a single listener to catch all events
+
+Sometimes you might want to be able to listen for every single event
+that comes from an event emitter. To do this, we can create an extension
+of the Beam::Emitter that also forwards the event on to a special event
+called C<*>:
+
+    package My::Emitter;
+    use Moo;
+    with 'Beam::Emitter';
+    after emit => sub {
+        my ( $self, $event_name, @args ) = @_;
+        return if $event_name eq '*';
+        $self->emit( '*', name => $event_name, @args );
+    };
+
+Because we pass in the C<name> key to C<emit()>, the original name of
+the event will be available to our listener as C<< $event->name >>.
+
+=head2 Use an object method as an event handler
+
+Often you might want to use an object method as an event handler so that
+your event handler has access to your object's data and methods. You
+could manually create a subroutine that calls your method, like so:
+
+    $emitter->on( 'event', sub { $object->method( @_ ) } );
+
+But this has a couple drawbacks: It's a bunch of typing, and it closes
+over a reference to your object which means your object lives as long as
+the event emitter does. This can even cause circular references, which
+are a common cause of memory problems in Perl.
+
+To fix these problems, you could again do it manually:
+
+    use Scalar::Util qw( weaken );
+    weaken $object; # Reduce our object's reference count
+    $emitter->on( 'event', sub {
+        return unless $object; # We might have been cleaned up
+        $object->method( @_ );
+    } );
+
+Or you could use the L<curry> module:
+
+    $emitter->on( 'event', $object->curry::weak::method );
+
+The "curry" module creates new subroutine references from existing ones,
+passing in any arguments. There's a corresponding "curry::weak" module
+which does the same thing, but weakens any references used as arguments.
+This is the easiest way to use object methods as event handlers.
+
+=head2 Add custom data to an event handler
+
+To add additional data to an event handler when it's created, you can
+simply "close over" the variable in your new subroutine, like so:
+
+    my $name = "Doug";
+    $emitter->on( introduce => sub {
+        print "Hello, my name is $name";
+    } );
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

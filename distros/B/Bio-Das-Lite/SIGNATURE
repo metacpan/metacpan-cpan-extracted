@@ -1,0 +1,88 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.67.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1  Bio-Das-Lite-2.11.tar.gz
+SHA1 35a92c14aeddba3a2eec662c27c8b68a74b572e3 Build.PL
+SHA1 b0afc2132ffbde00906fda894e54316dd5dcbcab Changes
+SHA1 d4f2d42e8ffbae1643b7867d72d091ac4def03a3 MANIFEST
+SHA1 30445378f588bb172f13558add0c32310fb97431 MANIFEST.SKIP
+SHA1 60a5075baa831f2e74a019cfc1e1f001e704ff2a META.yml
+SHA1 4c221f1014f3ff65139642b90e00c038133f7233 Makefile
+SHA1 fb0572452526121a14fdf1c7d4fde03b40e2f0b5 README
+SHA1 80d7fcbb94dcf9103a6494e4101d41c671af0aa9 build.tap
+SHA1 e97ee145ca4b0bba71e36f45279cdbc886b8f4ad eg/comparison
+SHA1 0e383524b2fe8a5c88c441e924439227f69530cf eg/empty_segment
+SHA1 9a36670573637cc07f752c28fea1df80c825492d eg/new_from_registry
+SHA1 9d021e0f8f97a301909e59847e6ee7c14c517935 eg/regtest
+SHA1 2b5cddc9bb424060c8bbf92f1596ee78a87d7d5f eg/stylesheet_test
+SHA1 bf05d4d43a89a8448c37b10d4e8b4abeb1a601bf eg/uniprot-test
+SHA1 341898af1a5fa6e617f11ca7a857ae217a6c3d3a lib/Bio/Das/Lite.pm
+SHA1 ac238b655644d7bca113006844d0e3555656c661 t/00-critic.t
+SHA1 4f35a0b06f28fb4c13347dc398e354afe048a987 t/00-distribution.t
+SHA1 8b6d86483f31129f7c64269838d44dfa46cb8bae t/00-pod.t
+SHA1 d27d6c01dee353ae57e633eb20679804432bbbfc t/00-podcoverage.t
+SHA1 14128b21a4e57ff9dfa874ba53427dd24147baee t/01-general.t
+SHA1 f0f12a3084c4899e140cc51bf3ebebb32388a9ec t/02-statuscodes.t
+SHA1 2a44b7bccf5eabbc8030372ef7f6c76ddc35f667 t/05-singledsn.t
+SHA1 571b87792008ad26d4006194fc69b8d5a596fcf9 t/06-singledsn-singleseg.t
+SHA1 d17fadc687f08f3dadf264bb447e695af810500e t/07-singledsn-multiseg.t
+SHA1 268b8af1294929eada5a2eeacc520b2bc742155e t/10-multidsn.t
+SHA1 41dc679648237ab3b8182fdf1824bee8a69bf57e t/20-authentication.t
+SHA1 0b90803d53dd26b893701fe4a4a63cde051c31f4 t/21-proxy.t
+SHA1 7bf952c248f21733d7de28412018bf941573da93 t/40-dna.t
+SHA1 6d7fa243c91c9b039f4e21be1a90c558c50162d6 t/45-sequence.t
+SHA1 224eb19d08279343ce9be726110acee195a9b447 t/50-entry_points.t
+SHA1 015ae2e9486c1770986d7aee7d0c9e868d3ff1c9 t/60-features.t
+SHA1 ee81eb3808e8886e33cbba11a702f8cc7c9033aa t/60-features_chunked.t
+SHA1 3bf6851c772fd2b375732d7ef55b9634caafa98f t/60-features_empty.t
+SHA1 959cf1bb336f6a79c94ddb4430fe578e04261c07 t/61-features_group.t
+SHA1 0a8a928c608b369af4bfa19098ad48e2e5d70ab7 t/70-alignment.t
+SHA1 b3b4c28b156d9251c97630f7cbcd096f1d2aa3d4 t/80-structure.t
+SHA1 78c0d25a1e7352c948bb4717a4660c093a47c0a7 t/90-sources.t
+SHA1 e029a59df52ab4eccfa23134766050d3cb98ec8d t/FileStub.pm
+SHA1 55b335e242af353bc1ca10f4c6546112251237a5 t/FileStubChunked.pm
+SHA1 e28cb4b2abce00f1be26e3f486863766e199e45c t/FileStubCompat.pm
+SHA1 b8ce1fb7c27e657c734bd93c7446b75659ce3428 t/data/alignment.xml
+SHA1 bcc696cc5f93712cf4dc53f4d482fb104f022542 t/data/dna.xml
+SHA1 48b1de5d21eef8ac2df0256e38ae1bbdc337970b t/data/entry_points-ensembl1834.xml
+SHA1 3b33ba4da52c32fe4c7aa5cb31c43076a65a3875 t/data/entry_points.xml
+SHA1 2d78e0b81b0f3134a9659da277d335aec5005779 t/data/feature-type-nl.xml
+SHA1 e25a2efe3429872e35227a143681e73c366b6736 t/data/features-empty.xml
+SHA1 c885de7b1b27a7ef87abe113a1532cf9844c4564 t/data/features-ensembl1834.xml
+SHA1 593765a2a243c2d63374422f3d9094983ef9cc4d t/data/features-group.xml
+SHA1 ddc8f9b21613a45940a38654ca8e7f93b3f971fa t/data/features.xml
+SHA1 ca5b4e2fe6c2d04db55702a1f755596f4f0a0a1d t/data/sequence-ensembl1834.xml
+SHA1 fd7f4c8cd09f86c71a2e33854a02c9a426a57ec2 t/data/sequence.xml
+SHA1 f4c02d7b9af1d019a4626e8676c7dc57e96662eb t/data/source.xml
+SHA1 4f44a6a90253e89e8fc12c211e7759cbb911b297 t/data/structure.xml
+SHA1 e186ead2aab9cf6628921a3c65d467f15f0f913b t/data/types-ensembl1834.xml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJNw8xDAAoJEPG6pZARLr4FzIwP/2z+CBE2mt6/t9cNddezzO+K
+lYtoydHYTtsdq6u6mEFCC2mJPp+Vp5fD39AII1d6zvHJ+NOuySbFiRyBv8T58GFz
+kfn2dSid2XrFD2ZfPeFDIjsohveqXkKBVljiMLpeDJmppQ2wlDCvxobMzWL9BHHJ
+ej22pz+dKlN+guVeQ3OMpBnBGiMU5kuupRD0ivm76W6EcjdOd6cuyxnRTZT7RoPH
+eFHK0auKeigo1QDjt2Aluh4UsH958tgq9iFmJNGw4VKmqlsmJvZdc2KFpoWs5G1G
+T1/DpJRyW8u/Y4rvYv1h6FxupBxb3wGuG2jC1wPP1K+7MFzDQE7N0hCIficPhHv8
+Te1R+77fXI5VExBY1YzV/Iobyprw4Ag2keFzsR8YlX9M4x88st0LlF6FH2Y7L3hO
+z52tRLtm1VI7vLNaKHNKeA9SPVBIvnU47E28fMNQbHCh3LIfdExaONJ1GGuu7TM3
+vieAsQX+ZTZgwCXTt/xXRNpeW6UB764Cye51lBi8FrSV3gJeNK/Xfmhqu/LhVAci
+8V3CNfz/gMg+28u7MUiZhxWJGcE0uTE7fh9Y7HLX4ujhlhzwEQqp8iZdhKq7pQDI
+sTIz/livdh+uEph+JyPoD0h4iUAl08/TxAkaLmrNGNGcI/2TisrVBSWLR7lnaBDr
+qtFkGW1vdwz0iuLmolcv
+=RCeZ
+-----END PGP SIGNATURE-----

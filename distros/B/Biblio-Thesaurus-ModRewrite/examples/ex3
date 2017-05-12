@@ -1,0 +1,19 @@
+definir-funcoes...
+
+PP={
+   inv(B, NT).
+   $a capital $b ==> add($b temComoCapital $a) add($a isa cidade) add($b isa país ).
+
+   $a isa $a     ==> sub{ warn( "isa reclexia para $a\n"); }
+
+# esquece...####  sub{ my($a)=@_; warn( "isa reclexia para $a\n"); }
+#  $a $b $a      ==> sub{ warn( "$b reclexia para $a\n"); }
+}
+
+t1 = Thesaurusload("x").
+
+## booleano = verficase(t1 , PP);
+
+aplica(t1,PP); 
+
+ThesurusSave(t1,"y");

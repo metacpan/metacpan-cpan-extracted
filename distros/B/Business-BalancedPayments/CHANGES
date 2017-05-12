@@ -1,0 +1,1018 @@
+==================================================
+Changes from 2005-01-22 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 1.0600 at 2015-01-20 06:08:34 +0000
+-------------------------------------------
+
+  Change: a694ef3925898990b99c5fcfaf4033c2447c15db
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-01-20 01:07:02 +0000
+
+    v1.0600 
+
+  Change: ef83e6444f02eff852af239f2e3d3448384b3533
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-20 00:49:50 +0000
+
+    Merge pull request #49 from ironcamel/debit-bank
+
+    added support for bank debits 
+
+  Change: f3cb9549eae918be7a767329d9a82439d7a9eb3b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-19 04:46:07 +0000
+
+    added support for bank debits 
+
+  Change: ca5ad3ebe57b944363a2fd9f0d859cc06188369e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 17:21:48 +0000
+
+    Merge pull request #51 from ironcamel/next
+
+    added next method 
+
+  Change: 57ebb03a2ac2829e44313fdb7690604ef4895f3c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 17:21:29 +0000
+
+    Merge pull request #52 from ironcamel/better-auth
+
+    better auth 
+
+  Change: bc90a9d8bd61a2b7a53b5796439322982d1d273d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-12 17:20:43 +0000
+
+    better auth 
+
+  Change: 2f0acdc5d28e90e0245eecefe9cb4c443d1a879b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-28 18:41:25 +0000
+
+    added next method 
+
+  Change: 7b5432dcefdb9fce33d4a391297ee290e7850845
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-28 17:50:46 +0000
+
+    Merge pull request #50 from aanari/master
+
+    Added autopagination helper with callback support 
+
+  Change: df7f605d560e63efa79f08f0d9af763c27d34bec
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-28 17:45:31 +0000
+
+    Added autopagination helper with callback support 
+
+  Change: 36b2df2d5bc0ad5c6fe360c9f7851ba7eac30e0a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-23 15:50:12 +0000
+
+    Merge pull request #48 from ironcamel/paging
+
+    added get_all method to get all paged results 
+
+  Change: 75c5a6dc75113c8a4eca7b3f399f3998180256a8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-23 15:38:25 +0000
+
+    added get_all method to get all paged results 
+
+  Change: 5a506a86eff15330c198f252b57bcaf6a9ef7aae
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-23 13:33:47 +0000
+
+    Merge pull request #47 from aanari/master
+
+    v1.0402 improved pagination on get_disputes method 
+
+  Change: d84e1bc73e00e7565fbdc4725826227589f67424
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-23 13:07:02 +0000
+
+    v1.0402 improved pagination on get_disputes method 
+
+-------------------------------------------
+version 1.0401 at 2014-10-22 19:20:04 +0000
+-------------------------------------------
+
+  Change: 366ea027cda1f236124e49ce62e54b4ce4f42bee
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-22 15:20:04 +0000
+
+    v1.0401 
+
+  Change: 6746f01a46b171b3d3bd7f21ae02bdf0e5ec09d2
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-22 12:28:37 +0000
+
+    Merge pull request #46 from aanari/master
+
+    v1.0400 
+
+  Change: 5894e4fa3022cd7eeec718aae5bd7d03f428556e
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-22 12:21:30 +0000
+
+    v1.0400 
+
+  Change: c0d7c60fdfe2914375140e44026036b045f08aab
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-22 12:11:08 +0000
+
+    Merge pull request #45 from aanari/master
+
+    Implement date range support to get_disputes 
+
+  Change: ac1bdd3c0887e8942918561d4e74aa75f0e59c14
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-22 12:07:05 +0000
+
+    Implement date range support to get_disputes 
+
+  Change: 85a6236bab525ab9cd41c1bad1c8c6a736d2da50
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-15 17:25:16 +0000
+
+    Merge pull request #44 from aanari/master
+
+    Added get_dispute and get_disputes to v1.1 
+
+  Change: 1afa460cb7dda79939ab463675f8cc531d4e38b6
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-10-15 17:19:43 +0000
+
+    Added get_dispute and get_disputes to v1.1 
+
+  Change: 2d2d8f62629acc0df4d5071d89475d0604e1850c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-13 15:19:22 +0000
+
+    Merge pull request #43 from ironcamel/fix-update-customers
+
+    v1.0301 fixed update_customer method 
+
+  Change: 83d68bd25a9f443cf1e615ed6c1e5073b1bdb760
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-13 14:49:19 +0000
+
+    v1.0301 fixed update_customer method 
+
+-------------------------------------------
+version 1.0300 at 2014-10-13 17:23:41 +0000
+-------------------------------------------
+
+  Change: ae88d87bdd3cafbbdcf6f5b38140933db1c45d6e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-13 13:23:41 +0000
+
+    Merge pull request #42 from ironcamel/update-customer-v11
+
+    added update_customer to v1.1 
+
+  Change: d797d80f96e779ee35b1d621110d3eeb915a5e4f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-13 13:17:10 +0000
+
+    v1.0300 added update_customer to v1.1 
+
+-------------------------------------------
+version 1.0200 at 2014-10-10 23:26:38 +0000
+-------------------------------------------
+
+  Change: bbf429aff4394aa70ace2bb3b32b4f7dc7aaf79c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-10 19:26:38 +0000
+
+    releasing v1.0200 
+
+  Change: 8fdc63b44d4ef966fb99b429b7b944ca3fb834f7
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-10 19:23:45 +0000
+
+    moved the v1.1 documentation to the main module 
+
+  Change: 48586ec3b33de9f91728796be0023567a07432ae
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-10 19:15:41 +0000
+
+    Merge pull request #41 from ironcamel/add-bank-v11
+
+    Added add_bank_account method to v1.1 
+
+  Change: 2c0abd7218a9f760389b971a9459eaa7c18ac824
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-10 19:15:05 +0000
+
+    Added add_bank_account method to v1.1 
+
+-------------------------------------------
+version 1.0100 at 2014-10-06 22:27:20 +0000
+-------------------------------------------
+
+  Change: e53af6c1cb98e22dce2349601ed0c27b38c63e92
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 18:27:20 +0000
+
+    releasing v1.0100 
+
+  Change: f5932f10f9a94d23c74e595743823c53f666b40d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 14:58:02 +0000
+
+    Merge pull request #40 from ironcamel/v11-debits
+
+    added the rest of the v1.1 methods 
+
+  Change: 9c5518e0b910280ec8c9b9e9c98d7da083f3b08d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 14:55:03 +0000
+
+    renamed _wrapper to _unpack_response 
+
+  Change: aeafae0815133fb806fda3fd5b054a84bd457baa
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 13:29:46 +0000
+
+    added bank verification stuffs to v1.1 
+
+  Change: 28435dbb58ab619faec462d13cf3dd6f88a73cc5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 13:29:46 +0000
+
+    added get_credit and create_credit to v1.1 
+
+  Change: a5855ec03d6f87d12ea89da8c5fd0fdca340abbe
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 13:29:46 +0000
+
+    added get_bank_account and create_bank_account to v1.1 
+
+  Change: 80c096948c968b81599ca99aac6d79a60fed5683
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 13:29:46 +0000
+
+    added get_debit, create_debit, and refund_debit to v1.1 
+
+  Change: aea5e72d08d328a2c5054e67dcc0e38a74437a6b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-06 12:58:44 +0000
+
+    Merge pull request #39 from ironcamel/method-signatures
+
+    used Method::Signatures to remove boilerplate param validation code 
+
+  Change: ef949c972fe93640804128cdeab3f27232a9a3d9
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-04 05:10:35 +0000
+
+    used Method::Signatures to remove boilerplate param validation code 
+
+  Change: 276a5d155a10d1c7cbe99604cb3c81fd867c16c1
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-03 14:20:07 +0000
+
+    Merge pull request #38 from ironcamel/more-v1.1
+
+    added get_hold, create_hold, capture_hold, and void_hold to v1.1 
+
+  Change: b7bd49fa5fd14b0ab3ea482e8b5a7e0681d6e029
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-03 13:25:34 +0000
+
+    added get_hold, create_hold, capture_hold, and void_hold to v1.1 
+
+  Change: 946ca346b13162b2e60cee16f71e9283fc06327d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-02 16:35:47 +0000
+
+    Merge pull request #37 from ironcamel/more-v1.1
+
+    More v1.1 stuffs 
+
+  Change: 975d3bf007bfb01b82a6d05466bea8b5918fecec
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-02 05:33:09 +0000
+
+    moved the version specific pod to corresponding V10 and V11 modules 
+
+  Change: cfcac37c5ce176aa071e3fed34691baafbdeb3ea
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-02 05:33:00 +0000
+
+    added add_card to v1.1 
+
+  Change: 780da8675e3e7190c711bb61544956a794570d6f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-10-02 04:10:30 +0000
+
+    added get_customer and create_customer to v1.1 
+
+-------------------------------------------
+version 1.0000 at 2014-09-30 06:19:02 +0000
+-------------------------------------------
+
+  Change: 39bb709ce00bdf8ed85a3a0b309cf07b35f63dda
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-30 02:19:02 +0000
+
+    forgot to add t/lib/Common.pm 
+
+  Change: ca6039bb67c0ee11f635f899f21364aed2e9d41d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-30 02:13:23 +0000
+
+    Merge pull request #36 from ironcamel/v1.1
+
+    started adding proper support for v1.1 of the Balanced API 
+
+  Change: 7cf9cc9b024eed1ae83de0352682c96723d8d324
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-30 02:11:05 +0000
+
+    v1.0000 added support for v1.1 of the Balanced API
+
+    This is a backwards incompatible change, hence the major version
+    increase. This was necessary to add proper support for v1.1 of the
+    Balanced API. 
+
+  Change: dc1befe74b039e1f0415f415aa59c02235356187
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-22 13:05:59 +0000
+
+    v0.1502 
+
+  Change: 2bf60863d24edc588172826b718150052076e616
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-22 11:20:50 +0000
+
+    Merge pull request #35 from ironcamel/base-client-role
+
+    use WebService::BaseClientRole to remove boilerplate http code 
+
+  Change: 33cd847b4123c9240c404170ed43af605f6fc791
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-09-20 11:21:03 +0000
+
+    use WebService::BaseClientRole to remove boilerplate http code 
+
+  Change: b1252201284991c361d6f4b3fa39bd1321e84969
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-06-25 01:26:26 +0000
+
+    releasing v0.1501 
+
+  Change: 186bffc7ea638040fe9fe176c333bb90e5ce0a52
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-06-25 00:44:11 +0000
+
+    releasing v0.1500 
+
+  Change: 54e7c14cf27a4dd29cff0a993fee29aea7b53a19
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-06-24 21:30:08 +0000
+
+    Merge pull request #33 from aanari/master
+
+    Added v1.1 get_card support 
+
+  Change: 8a5b101778aa0c13ea19998ad39249f676b8f218
+  Author: Ali Anari <ali@anari.me>
+  Date : 2014-06-24 21:24:16 +0000
+
+    Added v1.1 get_card support 
+
+  Change: c9aca6308f4f0bb2ec9db71fa2dbd49e272d044c
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-04-07 14:22:01 +0000
+
+    Merge pull request #32 from Crowdtilt/checks
+
+    Check Recipients Support 
+
+  Change: fcdd5894b6ea54c473fe7610365a50837ebc28c4
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-04-07 14:11:37 +0000
+
+    Bump Version number 
+
+  Change: 8abc868c698f4445554f59f0420706e6babc904e
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-04-07 13:50:18 +0000
+
+    Initial v1.1 checks support 
+
+-------------------------------------------
+version 0.1300 at 2014-02-12 21:47:23 +0000
+-------------------------------------------
+
+  Change: 959e8f79355c69335fd2902a012fdc37f7fcfee6
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-02-12 16:47:23 +0000
+
+    releasing v0.1300 
+
+  Change: f66bced3bc503a5b43b762d8c0907a7bfc8c8ca8
+  Author: Al Newkirk <anewkirk@ana.io>
+  Date : 2014-02-12 16:33:45 +0000
+
+    Added methods for bank account verification/confirmation. 
+
+  Change: 1fa40f014d3b782e23c9bf047640707763351945
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-01-24 15:28:46 +0000
+
+    releasing v0.1201 
+
+  Change: c18b71c64a0ac74dff8acb57093a87c70676f181
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-01-24 12:21:17 +0000
+
+    Merge pull request #28 from Crowdtilt/unicode
+
+    Use encode/decode json instead of to/from to fix unicode issues 
+
+  Change: 438f37e567425123827dd6aafc48dbb1f53bcdc0
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-01-24 12:20:11 +0000
+
+    Bump Version 
+
+  Change: 8dd7b3a992b868805fd9f8f015dc4851804ec0cb
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2014-01-23 12:10:01 +0000
+
+    Use encode/decode json instead of to/from to fix unicode issues 
+
+  Change: eadc9bef54e90c2299f69ef739a1ff1ab13c2764
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-12-27 14:25:49 +0000
+
+    Merge pull request #27 from ironcamel/release-0.1200
+
+    Releasing v0.1200 
+
+  Change: 22b594f23a79d6c422a0a662a2b3a2061637d4f0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-12-27 17:23:10 +0000
+
+    Releasing v0.1200 
+
+  Change: 2abfc81ea15794a4ea0a5ffee880207af1b93723
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-12-27 14:10:11 +0000
+
+    Merge pull request #26 from Crowdtilt/customers
+
+    Add get_customer and create_customer support 
+
+  Change: f43be898e532d4efbdc9b45942c3a4161ee829d1
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-12-27 14:06:17 +0000
+
+    Add get_customer and create_customer support 
+
+  Change: f1ee43c4959cf7d977782e503db0c103af48c712
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-12-19 08:37:01 +0000
+
+    Merge pull request #25 from ironcamel/stringy
+
+    Made HTTP::Response exceptions stringable. Also replaced Moose with
+    Moo. 
+
+  Change: 4918fb7f8845e43935cb0a9829a133cb81c5c8b0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-12-19 02:39:41 +0000
+
+    Made HTTP::Response exceptions stringable. Also replaced Moose with
+    Moo. 
+
+  Change: 78d61b2a47795cecd76c52f085e111f874e8e123
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-10-01 15:22:26 +0000
+
+    Merge pull request #24 from ironcamel/timeout
+
+    Added support for custom LWP::UserAgent timeout 
+
+  Change: da9a20110347ac42c25c4aa5c88498b7eaa7626f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-10-01 17:37:49 +0000
+
+    v0.1100 Added support for setting the LWP::UserAgent timeout 
+
+  Change: 643cd2029f8ef445196ec2c47ed9885c024671b4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-06-12 12:07:56 +0000
+
+    Merge pull request #23 from ironcamel/uris-or-ids
+
+    Support retrieving resources by their uri. 
+
+  Change: 3db938c38d37bf6039ab7939a34f1dd8fcde64da
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-06-11 23:03:20 +0000
+
+    Support retrieving resources by their uri. 
+
+  Change: e0e9cdced223e68742e57f2c2e5cc5d39b239fbf
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-06-10 15:17:45 +0000
+
+    Merge pull request #22 from ironcamel/validate-account-hash
+
+    Validate the account is a hashref if it was passed in. 
+
+  Change: df7953bd56e8353d4a776e9bc6ade5542c71dd1b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-06-10 18:16:09 +0000
+
+    Validate the account is a hashref if it is passed in. 
+
+  Change: 447d502e35724fb01f0482262e5a12c0583e9c0c
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-06-10 15:03:56 +0000
+
+    Merge pull request #21 from Crowdtilt/email
+
+    Remove email_address requirement for creating accounts 
+
+  Change: 1cee7d303b109b1a1b3634d1575fc44971530fff
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-06-10 14:37:44 +0000
+
+    Remove email_address requirement for creating accounts 
+
+-------------------------------------------
+version 0.0800 at 2013-05-11 04:45:54 +0000
+-------------------------------------------
+
+  Change: afa5498df1633fe69ada21ba1653847baaeefb1d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-05-11 00:45:54 +0000
+
+    Updated README.md and Makefile.PL for release 0.0800 
+
+  Change: 2c76b590e2f387259677955697f91a5026d3257b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-05-10 21:32:51 +0000
+
+    Merge pull request #20 from ironcamel/create_debit
+
+    Added create_debit method. 
+
+  Change: 5fec7692c60aab4b2a1245ef350813212d2b030b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-05-11 00:30:01 +0000
+
+    Added create_debit method. Updated version to 0.0800. 
+
+  Change: 2cb21bb9f48d413ab89c239626ca9b0f9d398144
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-18 14:17:24 +0000
+
+    Merge pull request #19 from Crowdtilt/better-logging
+
+    Better logging 
+
+  Change: 72c724004fb5cd21274db840199d47ce186fee16
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-17 02:45:53 +0000
+
+    Better logging 
+
+  Change: 45e3a49380d47041ee6c14cff3d79ff7cc253110
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-04 22:41:34 +0000
+
+    Merge pull request #18 from Crowdtilt/on_behalf_of_uri
+
+    Added support for on_behalf_of_uri and other params for
+    capture_hold() 
+
+  Change: 67d33024a261824349baf43bfdb1c988f8ce4de2
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-02-05 01:40:03 +0000
+
+    Added support for on_behalf_of_uri and other params for
+    capture_hold()
+
+    Up version number to 0.0600 
+
+  Change: acbcdd83d2384dfe239699ae9bae31de31fd8c4e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-20 19:53:07 +0000
+
+    Merge pull request #17 from Crowdtilt/update-authors
+
+    Adding Will to authors 
+
+  Change: 9990ff0f0f6d0e5f17d832d1ef0843501ea4155c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-14 05:55:19 +0000
+
+    Adding Will to authors 
+
+  Change: 4049c1412a612eea585af6063d82435eb3439cfa
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-01-14 01:00:06 +0000
+
+    Merge pull request #16 from Crowdtilt/version-bump
+
+    Up version number to 0.0500 
+
+  Change: d57b9ef12ebe0a5968bfd07bb2a2fbb0f7dacf47
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2013-01-14 00:56:47 +0000
+
+    Up version number to 0.0500 
+
+  Change: 34fce79e1e3d7b2f94d6a141523c46d40338d896
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-13 22:49:26 +0000
+
+    Merge pull request #15 from Crowdtilt/remove-log_path
+
+    Tightened up the interface - removed the log_path constructor param. 
+
+  Change: 2a90d168a889bc4fffcc5b99a2c670ea4e390f4e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-14 01:14:16 +0000
+
+    Tightened up the interface - removed the log_path constructor param.
+
+    Having both a log_path and logger param is confusing. If a log_path
+    and a logger param were provided, it was ambiguous as to which would
+    have been honored. Allowing a logger to be injected is sufficent and
+    makes for a simpler interface. 
+
+  Change: 5676b5f948cb27b2d688dcccc1399384beeee0ec
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2013-01-10 16:22:01 +0000
+
+    Merge pull request #14 from Crowdtilt/logging
+
+    Added logging 
+
+  Change: 8da7b51824685f693297058deb65d647c29339b8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-10 15:48:18 +0000
+
+    Log the requests as well 
+
+  Change: f182e3fc23c9c346fa6ed9e8be735781eb9d7c52
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-10 15:25:07 +0000
+
+    Added logging 
+
+  Change: cd63d0f802f274ecb4df1c75bf9a7597f5ea09c1
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-11-19 14:46:26 +0000
+
+    Merge pull request #13 from Crowdtilt/refund
+
+    Add get_refund() function. 
+
+  Change: 3eb5e4774975e5a2dde02f7c326b04070824cf45
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-11-06 22:45:01 +0000
+
+    Add get_refund() function. 
+
+  Change: f29956ed4a5ef58376e25168184211dc6666bf6f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-10-25 18:01:54 +0000
+
+    Merge pull request #12 from Crowdtilt/debits
+
+    Debits 
+
+  Change: f8b64cfe597a5fe23bb5795d27685e7b6860abeb
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-10-25 20:59:48 +0000
+
+    Removed query param stuff from get_transactions for now. 
+
+  Change: fcfeff918eb5cfd67c53450bfc5312d06c0be55f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-10-25 17:48:14 +0000
+
+    Docs cleanup 
+
+  Change: 4216d96808638f793c1256461e88779c9a317bbd
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-10-25 16:53:53 +0000
+
+    implements get_transactions 
+
+  Change: 47e0f2fd6008e188236728ef0e94acf4f6e4409e
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-10-25 16:53:37 +0000
+
+    implements get_debit and get_refunds 
+
+  Change: a9f0da8caec7bce8dfdd58ffd28b25810905e051
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-10-17 15:32:31 +0000
+
+    Merge pull request #11 from Crowdtilt/credits
+
+    Implements get_credit 
+
+  Change: 6e51957ceada81cc4b6710b1ad50ffad799ec6de
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-10-17 15:31:11 +0000
+
+    Bump the version number 
+
+  Change: 985359ed12b1ea1fed25de822590e964a9146665
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-10-17 15:31:07 +0000
+
+    Add get_credit call. 
+
+  Change: 0356165be1fe14c6db02d06729ee2a30ceb0bf0b
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-09-16 10:31:58 +0000
+
+    Merge pull request #10 from ironcamel/retries
+
+    Added support for automatic retries 
+
+  Change: 9fc3953b3acc50092a90541375e4af4e28b9ee79
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-09-14 23:44:04 +0000
+
+    More retry tests 
+
+  Change: 0ccce4b2dbd13987fc76ffa3409525b7794fc4e9
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-09-14 22:16:39 +0000
+
+    Added support for automatic retries 
+
+  Change: a89e46dad62011395a79d2feb39c69802787c78f
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-07-20 12:14:04 +0000
+
+    Released a new version with better tests 
+
+  Change: ea6402a9ecf46a2b5a70f9bc64ac1947af964c08
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-07-20 12:11:52 +0000
+
+    Merge pull request #8 from ironcamel/master
+
+    Added update_bank_account and invalidate_bank_account methods. 
+
+  Change: 647f4d8d8ff48991fca237b905b2e142119b1864
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-07-20 03:25:59 +0000
+
+    Added update_bank_account and invalidate_bank_account methods. 
+
+  Change: 83bb0624370c86f69d3b101ae51c77f862ba5e9e
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-07-19 11:20:14 +0000
+
+    Adds more documentation 
+
+  Change: 63ffd707a02292154b4f9bd4d87afc5edf637655
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-07-19 09:25:29 +0000
+
+    Merge pull request #7 from ironcamel/master
+
+    Throw an object so we can support Balanced Payments redirects. 
+
+  Change: 00bb38487f634214b0ed0027e99113fb1223fb16
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-07-19 04:18:27 +0000
+
+    Throw an object so we can support Balanced Payments redirects. 
+
+  Change: 4d01eb9cefec5b42d702a9351cf1abcccf5ca6bb
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-07-18 19:23:03 +0000
+
+    Implements updating an account 
+
+  Change: 4e6612c55833df1a7be6fc032b23bf047b62830a
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-06-27 11:10:13 +0000
+
+    Merge pull request #6 from ironcamel/master
+
+    Added add_bank_account method. 
+
+  Change: 694ff2528cd35704a02e528b990c047a30f540f4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-27 02:13:54 +0000
+
+    Added add_bank_account method. 
+
+  Change: 01f1197ea87cd05e8741f13f6bbca0aae80fddb2
+  Author: Khaled Hussein <khaled@crowdtilt.com>
+  Date : 2012-06-26 15:45:48 +0000
+
+    Merge pull request #5 from ironcamel/master
+
+    Made create_account more robust 
+
+  Change: 536abb97bc4aa6ef90c3b29a23d898cf60700fd4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-26 16:28:28 +0000
+
+    create_account now returns an account if it exists.
+
+    Also added get_account_by_email method. 
+
+  Change: adc90d1187acfe686b0d6392ce1b189df1270539
+  Author: Khaled Hussein <khaled.hussein@gmail.com>
+  Date : 2012-06-25 12:36:44 +0000
+
+    Fixes Makefile.PL 
+
+  Change: f052ad0b7aaea582870e226daa409abe3cd9c704
+  Author: Khaled Hussein - KnightHacker <khaled@crowdtilt.com>
+  Date : 2012-06-21 19:42:38 +0000
+
+    Merge pull request #3 from ironcamel/master
+
+    misc stuff 
+
+  Change: 88ba6b7389358a27c42d58e39d64fc82ca42c33e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 15:09:52 +0000
+
+    Merge pull request #3 from throughnothing/business-balancedpayments
+
+    Business::BalancedPayments 
+
+  Change: 9effd57f7582e8b6f9607573f9f134edb1086baa
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-06-12 18:00:52 +0000
+
+    BalancedPaymetns -> Business::BalancedPayments 
+
+  Change: 3539443cc60ef7ca82161c3c5a814a8bc0370096
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 14:46:37 +0000
+
+    Merge pull request #2 from throughnothing/dzil
+
+    Add Dist::Zilla stuff. 
+
+  Change: 516395a552f0b1736a24098c473c8b8488e23ba5
+  Author: William Wolf <throughnothing@gmail.com>
+  Date : 2012-06-12 17:45:19 +0000
+
+    Add Dist::Zilla stuff. 
+
+  Change: 6208d7cc7036dd985394244ad937b3fdca0bf01a
+  Author: Khaled Hussein - KnightHacker <khaled@crowdtilt.com>
+  Date : 2012-06-12 14:27:00 +0000
+
+    Merge pull request #2 from ironcamel/sandbox
+
+    Removed uri attributes 
+
+  Change: 507a04d243a3b075d1947776bc8f4a7a79dfad68
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 17:26:07 +0000
+
+    Removed uri attributes 
+
+  Change: c65e67d540b0a5e6317fe9fca17c6726e31849bc
+  Author: Khaled Hussein - KnightHacker <khaled@crowdtilt.com>
+  Date : 2012-06-12 13:47:46 +0000
+
+    Merge pull request #1 from ironcamel/sandbox
+
+    Initial Implementation 
+
+  Change: 1cc60d893946095c1963896650a3ffd5cd538afb
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 16:45:06 +0000
+
+    Allow passing in a bank account to create_credit() 
+
+  Change: dedd6f4e7b3f42e94475c6090e07623f608cd577
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 15:26:45 +0000
+
+    Added create_credit() method 
+
+  Change: e694798e8c3f5446cea7e8b5828b7c8f338c4779
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 12:05:39 +0000
+
+    Added get_bank_account() method 
+
+  Change: a07d9f7ba62636dc08d04e93f96626906c7d6075
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-12 11:18:18 +0000
+
+    Added create_bank_account() method 
+
+  Change: 25e4de78df8645148e69706eab1fe98698b533c1
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-11 08:04:43 +0000
+
+    Added some tests. 
+
+  Change: 7a98eea7ba8372b90afebe57c3b38d268c163c8e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-11 08:01:54 +0000
+
+    Added void_hold() method 
+
+  Change: ea902e9d2a6f81e17cb8f04817ed9bdc4142afa8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-11 07:49:30 +0000
+
+    Added refund_debit() method 
+
+  Change: 28d88a322409cb5ec389a4a0c37f31a9630ad6c5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-10 22:08:28 +0000
+
+    Renamed create_debit to capture_hold.
+
+    Also simplified its interface. Also add get_hold method. 
+
+  Change: 7cc8bbef4b04db84008eaabc0643e9306d0ea130
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-10 17:43:53 +0000
+
+    Changed arguments to keyword arguments. 
+
+  Change: b3e924d6ef1ce916cf0777af8c111ab43124e219
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-10 17:00:02 +0000
+
+    Fixing when card is passed to create_hold 
+
+  Change: 757377ee0281193978372aae13adf8b9fe252309
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-10 03:29:42 +0000
+
+    Refactoring the HTTP role. 
+
+  Change: e74aba8c60412f04d654a7d97b4db928cb4ac2a3
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-10 03:05:23 +0000
+
+    Support for creating a hold with a specific card. 
+
+  Change: 1c7d242414db70ee134d4787d9b13e2243ca768c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-08 06:35:49 +0000
+
+    Pushing base_url attribute into the HTTP role. 
+
+  Change: 1290b601f64c1eba883fef62b92ed99954afa89d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-08 06:29:22 +0000
+
+    Added create_hold and create_debit methods. 
+
+  Change: 67074a1472e74fb665469489aaafaa40fe974f76
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-08 05:16:28 +0000
+
+    Refactoring http related things into a HTTP role. 
+
+  Change: 50aea9820afe77be08cd73d415e268d8a8d737ce
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-08 04:16:17 +0000
+
+    Added get_account, create_account, and add_card methods 
+
+  Change: 893277d18a0cdee7026b1ff15552922f632a5133
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-06-07 07:31:09 +0000
+
+    Fresh start 
+
+  Change: cb0e3887e3c3682d601f103da91cb70125064c38
+  Author: KnightHacker <khaled.hussein@gmail.com>
+  Date : 2012-04-11 23:00:47 +0000
+
+    Documenting how to use the module 
+
+  Change: a6ceb1fd200e8ada7f20cde8fe3540e64687ca0f
+  Author: KnightHacker <khaled.hussein@gmail.com>
+  Date : 2012-04-11 22:57:10 +0000
+
+    Initial Commit 
+
+================
+End of releases.
+================

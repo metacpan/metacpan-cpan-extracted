@@ -1,0 +1,32 @@
+# bg hr cs da nl en-gb et fi fr de el hu ga it lv lt pl pt ro sk sl es sv
+classes:
+  - Desktop.office
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice locales for European Union (except Maltese)
+  pkg:
+    - libreoffice-l10n-bg
+    - libreoffice-l10n-hr
+    - libreoffice-l10n-cs
+    - libreoffice-l10n-da
+    - libreoffice-l10n-nl
+    - libreoffice-l10n-en-gb
+    - libreoffice-l10n-et
+    - libreoffice-l10n-fi
+    - libreoffice-l10n-fr
+    - libreoffice-l10n-de
+    - libreoffice-l10n-el
+    - libreoffice-l10n-hu
+    - libreoffice-l10n-ga
+    - libreoffice-l10n-it
+    - libreoffice-l10n-lv
+    - libreoffice-l10n-lt
+    - libreoffice-l10n-pl
+    - libreoffice-l10n-pt
+    - libreoffice-l10n-ro
+    - libreoffice-l10n-sk
+    - libreoffice-l10n-sl
+    - libreoffice-l10n-es
+    - libreoffice-l10n-sv

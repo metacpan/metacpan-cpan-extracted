@@ -1,0 +1,284 @@
+%module{Boost::Geometry::Utils};
+%package{Boost::Geometry::Utils};
+
+%{
+#include <myinit.h>
+
+PROTOTYPES: DISABLE
+
+opolygon*
+_polygon(my_polygon)
+    polygon* my_polygon
+  CODE:
+    RETVAL = my_polygon;
+  OUTPUT:
+    RETVAL
+
+omultipolygon*
+_multi_polygon(my_multi_polygon)
+    multi_polygon* my_multi_polygon
+  CODE:
+    RETVAL = my_multi_polygon;
+  OUTPUT:
+    RETVAL
+
+polygon*
+_polygon_arrayref(my_polygon)
+    opolygon* my_polygon
+  CODE:
+    RETVAL = my_polygon;
+  OUTPUT:
+    RETVAL
+
+multi_polygon*
+_multi_polygon_arrayref(my_multi_polygon)
+    omultipolygon* my_multi_polygon
+  CODE:
+    RETVAL = my_multi_polygon;
+  OUTPUT:
+    RETVAL
+
+omultilinestring*
+_multi_linestring(my_multi_linestring)
+    multi_linestring* my_multi_linestring
+  CODE:
+    RETVAL = my_multi_linestring;
+  OUTPUT:
+    RETVAL
+
+opolygon*
+_read_wkt_polygon(wkt)
+    std::string& wkt
+  CODE:
+    RETVAL = new polygon ();
+    boost::geometry::read_wkt(wkt, *RETVAL);
+  OUTPUT:
+    RETVAL
+
+omultilinestring*
+_read_wkt_linestring(wkt)
+    std::string& wkt
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::read_wkt(wkt, *RETVAL);
+  OUTPUT:
+    RETVAL
+
+multi_linestring*
+polygon_linestring_intersection(my_polygon, my_linestring)
+    opolygon* my_polygon
+    omultilinestring* my_linestring
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::intersection(*my_polygon, *my_linestring, *RETVAL);
+    // no delete?
+  OUTPUT:
+    RETVAL
+
+std::string
+_polygon_to_wkt(my_polygon)
+    opolygon* my_polygon
+  CODE:
+    std::ostringstream output;
+    output << boost::geometry::wkt(*my_polygon);
+    RETVAL = output.str();
+    // no delete?
+  OUTPUT:
+    RETVAL
+
+std::string
+_multilinestring_to_wkt(mls)
+    omultilinestring* mls
+  CODE:
+    std::ostringstream output;
+    output << boost::geometry::wkt(*mls);
+    RETVAL = output.str();
+    // no delete?
+  OUTPUT:
+    RETVAL
+
+multi_linestring*
+polygon_multi_linestring_intersection(my_polygon, my_multi_linestring)
+    polygon* my_polygon
+    multi_linestring* my_multi_linestring
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::intersection(*my_polygon, *my_multi_linestring, *RETVAL);
+    delete my_polygon;
+    delete my_multi_linestring;
+  OUTPUT:
+    RETVAL
+
+multi_linestring*
+multi_polygon_multi_linestring_intersection(my_multi_polygon, my_multi_linestring)
+    multi_polygon* my_multi_polygon
+    multi_linestring* my_multi_linestring
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::intersection(*my_multi_polygon, *my_multi_linestring, *RETVAL);
+    delete my_multi_polygon;
+    delete my_multi_linestring;
+  OUTPUT:
+    RETVAL
+
+multi_linestring*
+multi_linestring_multi_polygon_difference(my_multi_linestring, my_multi_polygon)
+    multi_linestring* my_multi_linestring
+    multi_polygon* my_multi_polygon
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::difference(*my_multi_linestring, *my_multi_polygon, *RETVAL);
+    delete my_multi_linestring;
+    delete my_multi_polygon;
+  OUTPUT:
+    RETVAL
+
+int
+point_within_polygon(my_point_xy, my_polygon)
+    point_xy* my_point_xy
+    polygon* my_polygon
+  CODE:
+    RETVAL = boost::geometry::within(*my_point_xy, *my_polygon);
+    delete my_polygon;
+    delete my_point_xy;
+  OUTPUT:
+    RETVAL
+
+int
+point_within_multi_polygon(my_point_xy, my_multi_polygon)
+    point_xy* my_point_xy
+    multi_polygon* my_multi_polygon
+  CODE:
+    RETVAL = boost::geometry::within(*my_point_xy, *my_multi_polygon);
+    delete my_multi_polygon;
+    delete my_point_xy;
+  OUTPUT:
+    RETVAL
+
+int
+point_covered_by_polygon(my_point_xy, my_polygon)
+    point_xy* my_point_xy
+    polygon* my_polygon
+  CODE:
+    RETVAL = boost::geometry::covered_by(*my_point_xy, *my_polygon);
+    delete my_polygon;
+    delete my_point_xy;
+  OUTPUT:
+    RETVAL
+
+int
+point_covered_by_multi_polygon(my_point_xy, my_multi_polygon)
+    point_xy* my_point_xy
+    multi_polygon* my_multi_polygon
+  CODE:
+    RETVAL = boost::geometry::covered_by(*my_point_xy, *my_multi_polygon);
+    delete my_multi_polygon;
+    delete my_point_xy;
+  OUTPUT:
+    RETVAL
+
+linestring*
+linestring_simplify(my_linestring, tolerance)
+    linestring* my_linestring
+    const double tolerance
+  CODE:
+    RETVAL = new linestring ();
+    boost::geometry::simplify(*my_linestring, *RETVAL, tolerance);
+    delete my_linestring;
+  OUTPUT:
+    RETVAL
+
+multi_linestring*
+multi_linestring_simplify(my_multi_linestring, tolerance)
+    multi_linestring* my_multi_linestring
+    const double tolerance
+  CODE:
+    RETVAL = new multi_linestring ();
+    boost::geometry::simplify(*my_multi_linestring, *RETVAL, tolerance);
+    delete my_multi_linestring;
+  OUTPUT:
+    RETVAL
+
+double
+linestring_length(my_linestring)
+    linestring* my_linestring
+  CODE:
+    RETVAL = boost::geometry::length(*my_linestring);
+    delete my_linestring;
+  OUTPUT:
+    RETVAL
+
+point_xy*
+polygon_centroid(my_polygon)
+    polygon* my_polygon
+  CODE:
+    RETVAL = new point_xy ();
+    boost::geometry::centroid(*my_polygon, *RETVAL);
+    delete my_polygon;
+  OUTPUT:
+    RETVAL
+
+point_xy*
+linestring_centroid(my_linestring)
+    linestring* my_linestring
+  CODE:
+    RETVAL = new point_xy ();
+    boost::geometry::centroid(*my_linestring, *RETVAL);
+    delete my_linestring;
+  OUTPUT:
+    RETVAL
+
+point_xy*
+multi_linestring_centroid(my_multi_linestring)
+    multi_linestring* my_multi_linestring
+  CODE:
+    RETVAL = new point_xy ();
+    boost::geometry::centroid(*my_multi_linestring, *RETVAL);
+    delete my_multi_linestring;
+  OUTPUT:
+    RETVAL
+
+polygon*
+correct_polygon(my_polygon)
+    polygon* my_polygon
+  CODE:
+    boost::geometry::correct(*my_polygon);
+    RETVAL = my_polygon;
+  OUTPUT:
+    RETVAL
+
+multi_polygon*
+correct_multi_polygon(my_multi_polygon)
+    multi_polygon* my_multi_polygon
+  CODE:
+    boost::geometry::correct(*my_multi_polygon);
+    RETVAL = my_multi_polygon;
+  OUTPUT:
+    RETVAL
+
+double
+polygon_area(my_polygon)
+    polygon* my_polygon
+  CODE:
+    RETVAL = boost::geometry::area(*my_polygon);
+    delete my_polygon;
+  OUTPUT:
+    RETVAL
+
+SV*
+polygon_medial_axis(my_polygon)
+    polygon* my_polygon
+  CODE:
+    boost::polygon::default_voronoi_builder builder;
+    boost::polygon::medial_axis<double> ma;
+    // TODO: a direct perl2segments typemap with 32 bit int bounds checking
+    builder_segments_from_ring(my_polygon->outer(), builder);
+    BOOST_FOREACH(ring r, my_polygon->inners()) { 
+      builder_segments_from_ring(r, builder);
+    }
+    delete my_polygon;
+    builder.construct(&ma);
+    RETVAL = medial_axis2perl(ma);
+  OUTPUT:
+    RETVAL
+%}

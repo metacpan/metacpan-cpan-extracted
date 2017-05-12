@@ -1,0 +1,2 @@
+INSERT INTO osc_languages VALUES (1,'English','en_US','en_US.UTF-8,en_US,english','utf-8','%m/%d/%Y','%A %d %B, %Y','%H:%M:%S','ltr',1,'.',',',0,1);
+INSERT INTO osc_languages VALUES (2,'English','en_AU','en_AU.UTF-8,en_AU,english','utf-8','%d/%m/%Y','%A %d %B, %Y','%H:%M:%S','ltr',4,'.',',',0,1);

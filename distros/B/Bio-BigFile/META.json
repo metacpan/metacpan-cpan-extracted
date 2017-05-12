@@ -1,0 +1,160 @@
+{
+   "abstract" : "Manipulate Jim Kent's BigWig and BigBed index files for genomic features.",
+   "author" : [
+      "Lincoln Stein <lincoln.stein@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-BigFile",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "LWP" : 0,
+            "URI::URL" : 0
+         },
+         "requires" : {
+            "Bio::Root::Version" : "1.005009001",
+            "IO::String" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::DB::BigBed" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigBed::BinIterator" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigBed::Feature" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigBed::FeatureIterator" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigBed::Summary" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigBed::SummaryIterator" : {
+         "file" : "lib/Bio/DB/BigBed.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile" : {
+         "file" : "lib/Bio/DB/BigFile.pm",
+         "version" : "1.07"
+      },
+      "Bio::DB::BigFile::BinIterator" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::Constants" : {
+         "file" : "lib/Bio/DB/BigFile/Constants.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::EmptyIterator" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::GlobalIterator" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::IntervalIterator" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::Iterators" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::Segment" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigFile::SummaryIterator" : {
+         "file" : "lib/Bio/DB/BigFile/Iterators.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::Bin" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::BinIterator" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::Feature" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::IntervalIterator" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::Summary" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::SummaryIterator" : {
+         "file" : "lib/Bio/DB/BigWig.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::binStatElement" : {
+         "file" : "lib/Bio/DB/BigFile.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWig::binStats" : {
+         "file" : "lib/Bio/DB/BigFile.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWigSet" : {
+         "file" : "lib/Bio/DB/BigWigSet.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWigSet::Iterator" : {
+         "file" : "lib/Bio/DB/BigWigSet.pm",
+         "version" : 0
+      },
+      "Bio::DB::BigWigSet::Segment" : {
+         "file" : "lib/Bio/DB/BigWigSet.pm",
+         "version" : 0
+      },
+      "Bio::DB::bbiFile" : {
+         "file" : "lib/Bio/DB/BigFile.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.07"
+}

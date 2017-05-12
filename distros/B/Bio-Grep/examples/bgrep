@@ -1,0 +1,341 @@
+#!/usr/bin/perl        
+
+#############################################################################
+#   $Author: markus $
+#     $Date: 2009-11-12 12:28:21 +0100 (Thu, 12 Nov 2009) $
+# $Revision: 487 $
+#############################################################################
+
+use strict;
+use warnings;
+
+use version; our $VERSION = qv(0.10.6);
+
+use Carp;
+
+use Bio::Grep;
+use Getopt::Long qw(:config auto_version);
+use Pod::Usage;
+use File::Basename;
+use Data::Dumper;
+use Readonly;
+
+Readonly my $PREFIX_LENGTH => 4;
+
+# parse command line arguments
+##############################################################################
+
+my $man   = 0;
+my $help  = 0;
+my $start = time;
+my %h     = ( 'help|?' => \$help, man => \$man );
+
+my $result = GetOptions(
+    \%h,                  'backend=s',
+    'mismatches=i',       'editdistance=i',
+    'gumismatches=i',     'insertions=i',
+    'deletions=i',        'upstream=i',
+    'downstream=i',       'maxhits=i',
+    'query=s',            'query_length=i',
+    'showdesc=i',         'hxdrop=i',
+    'exdrop=i',           'reverse_complement',
+    'direct_and_rev_com', 'query_file=s',
+    'sort=s',             'database=s',
+    'datapath=s',         'createdb',
+    'complete',           'online',
+    'no_alignments',      'idsonly',
+    'man',                'help|?',
+) or pod2usage(2);
+
+if ($help) {
+    pod2usage(1);
+}
+if ($man) {
+    pod2usage( -exitstatus => 0, -verbose => 2 );
+}
+
+if (!(  (      defined $h{query_file}
+            || defined $h{query}
+            || defined $h{createdb}
+        )
+        && defined $h{database}
+    )
+    )
+{
+    pod2usage(1);
+}
+
+# now start configuring Bio::Grep
+##############################################################################
+my $sbe = Bio::Grep->new( $h{backend} );
+
+if ( !defined $h{datapath} ) {
+    $h{datapath} = 'data';
+}
+
+mkdir $h{datapath};
+$sbe->settings->datapath( $h{datapath} );
+
+# generate a suffix array. you have to do this only once.
+if ( $h{createdb} ) {
+    $h{database} = $sbe->generate_database(
+        {   file          => $h{database},
+            description   => 'Description for the test Fastafile',
+            prefix_length => $PREFIX_LENGTH,
+        }
+    );
+}
+
+# now try to search.
+##############################################################################
+
+delete $h{'help|?'};
+delete $h{man};
+delete $h{backend};
+my $idsonly = $h{idsonly};
+delete $h{idsonly};
+
+if ( !defined $h{createdb} ) {
+    $sbe->search( \%h );
+
+    my $hits = 0;
+
+    #  finally, output the results
+    ##############################################################################
+    while ( my $res = $sbe->next_res ) {
+        if ($idsonly) {
+            _say( $res->sequence->id );
+        }
+        else {
+            if ( !defined $res->sequence->desc ) {
+                _say( $res->sequence->id );
+            }
+            else {
+                _say( $res->sequence->id . q{ } . $res->sequence->desc );
+            }
+            if ( !defined $res->query->desc ) {
+                _say( $res->query->id );
+            }
+            else {
+                _say( $res->query->id . q{ } . $res->query->desc );
+            }
+            _say( $res->mark_subject_uppercase() );
+
+            #print Dumper $res->alignment;
+            _say( $res->alignment_string() . "\n" );
+        }
+        $hits++;
+    }
+    _say(     "$hits search results. Search took "
+            . ( time - $start )
+            . " seconds.\n" );
+}
+else {
+    _say( 'Database generation took ' . ( time - $start ) . " seconds.\n" );
+}
+
+# make Perl::Critic happy
+sub _say {
+    my ($msg) = @_;
+    print "$msg\n" or croak q{Can't write to Terminal};
+    return;
+}
+__END__
+
+=head1 NAME
+
+bgrep - Wrapper for several suffix array tools
+
+=head1 USAGE
+
+  # to create a database
+  bgrep --backend Vmatch --database Data.fa --datapath data --createdb
+
+  # to search
+  bgrep [ Options ] --query_file Query.fa --database Data.fa  --datapath data
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item C<database>
+
+The name of the database. 
+
+=item C<query_file>
+
+A Fasta file with query sequences.
+
+=back
+
+=head1 OPTIONS
+
+=head2 GENERAL OPTIONS
+
+=over
+
+=item C<--help>
+
+Brief help message.
+
+=item C<--man>
+
+Full documentation
+
+=item C<--idsonly>
+
+Display only sequence ids. 
+
+=back
+
+=head2 SEARCH OPTIONS
+
+=over
+
+=item C<--backend b>
+
+The back-end tool. C<Agrep>, C<GUUGle>, C<RE> and C<Vmatch> are supported.
+
+=item C<--mismatches n>
+
+The number of mismatches.
+
+=item C<--editdistance n>
+
+The allowed edit distance.
+
+=item C<--insertions n>
+
+The number of insertions.
+
+=item C<--deletions n>
+
+The number of deletions.
+
+=item C<--query_length n>
+
+Report all matches of length of at least n.
+
+=item C<--reverse_complement>
+
+Searches for the reverse complement.
+
+=item C<--direct_and_rev_com>
+
+Searches for direct matches and the reverse complement.
+
+=item C<--upstream n>
+
+Display n nucleotides/AAs upstream the match.
+
+=item C<--downstream n>
+
+Display n nucleotides/AAs downstream the match.
+
+=item C<--sort s>
+
+Sets sort mode to s.
+
+=item C<--maxhits n>
+
+Display only the n (best) hits.
+
+=item C<--datapath p>,
+
+Generate suffix arrays in path p. Default is 'data'
+
+
+=item C<--showdesc n>,
+
+Vmatch only (see manual). Is faster because it extracts all data
+directly out of the vmatch output. Otherwise, vsubseqselect is called
+for every hit.
+
+=item C<--online>
+
+Vmatch only (see manual). Run algorithms online without using the index.
+
+=item C<--hxdrop n>
+
+Vmatch only (see manual). Specifies the xdrop value for hamming distance extension.
+
+=item C<--exdrop n>
+
+Vmatch only (see manual). Specifies the xdrop value for edit distance extension.
+
+=item C<--no_alignments>
+
+Don't calculate alignments with EMBOSS.
+
+=back  
+
+=head1 DESCRIPTION
+
+Bio-Grep is a collection of Perl modules for searching in 
+Fasta files. It is programmed in a modular way. There are different 
+back-ends available. You can filter search results.
+
+bgrep is an example of how to use this library.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+C<bgrep> does not support configuration files (but it is on my TODO list).
+
+The environment variable C<BIOGREPDEBUG> is supported. When this variable is
+set to a true value, then C<bgrep> will output A LOT OF debug text.
+
+=head1 DEPENDENCIES
+
+L<Bio::Grep>, L<Getopt::Long>, L<Pod::Usage>, L<File::Basename>
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported. 
+
+Please report any bugs or feature requests to
+C<bug-bio-grep@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+=head1 SEE ALSO
+
+perldoc L<Bio::Grep>
+
+=head1 AUTHOR
+
+Markus Riester, E<lt>mriester@gmx.deE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

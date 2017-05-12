@@ -1,0 +1,61 @@
+{
+   "abstract" : "yet another italian bot",
+   "author" : [
+      "G. Casati <fibo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bot-targa",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1.001009",
+            "Test::Pod" : "1.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::BasicBot" : "0.89",
+            "Config::IniFiles" : "2.88",
+            "JSON::XS" : "3.01",
+            "LWP" : "6.15",
+            "List::Util" : "1.27",
+            "perl" : "5.012000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/fibo/Bot-targa-pm/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Bot::targa",
+      "license" : [
+         "http://g14n.info/artistic-license"
+      ],
+      "repository" : {
+         "url" : "https://github.com/fibo/Bot-targa-pm"
+      }
+   },
+   "version" : "0.01"
+}

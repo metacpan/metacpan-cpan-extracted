@@ -1,0 +1,269 @@
+#!/usr/bin/perl
+
+#/*====================================================================
+# * Babel Objects, Version 1.0
+# * ====================================================================
+# *
+# * Copyright (c) 2000 The Babel Objects Network. All rights reserved.
+# *
+# * This source file is subject to version 1.1 of The Babel Objects
+# * License, that is bundled with this package in the file LICENSE,
+# * and is available through the world wide web at :
+# *
+# *          http://www.BabelObjects.Org/law/license/1.1.txt
+# *
+# * If you did not receive a copy of the Babel Objects license and are
+# * unable to obtain it through the world wide web, please send a note
+# * to license@BabelObjects.Org so we can mail you a copy immediately.
+# *
+# * --------------------------------------------------------------------
+# *
+# * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+# * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# * DISCLAIMED.  IN NO EVENT SHALL THE BABEL OBJECTS NETWORK OR
+# * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+# * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+# * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# * SUCH DAMAGE.
+# *
+# * ====================================================================
+# *
+# * This software consists of voluntary contributions made by many
+# * individuals on behalf of The Babel Objects Network.  For more
+# * information on The Babel Objects Network, please see
+# * <http://www.BabelObjects.org/>.
+# *
+# */
+
+#
+# author Jean-Christophe Kermagoret (jck@BabelObjects.Org)
+# date   2000.11.30
+
+
+use Mozilla::LDAP::Conn;
+use Mozilla::LDAP::Entry;
+
+use Cyrus::IMAP::Admin;
+
+my $CYRUS_HOST = "$(CONFIGURATOR.CYRUS_HOST)";
+my $POSTADM_LOGIN = "$(CONFIGURATOR.POSTADM_LOGIN)";
+my $POSTADM_PW = "$(CONFIGURATOR.POSTADM_PW)";
+
+my $LDAP_VERSION = "$(CONFIGURATOR.LDAP_VERSION)";
+my $LDAP_HOST = "$(CONFIGURATOR.LDAP_HOST)";
+my $LDAP_PORT = "$(CONFIGURATOR.LDAP_PORT)";
+my $LDAP_BINDDN = "$(CONFIGURATOR.LDAP_BINDDN)";
+my $LDAP_BINDPW = "$(CONFIGURATOR.LDAP_BINDPW)";
+
+my $LOGDIR = "/var/log/babelobjects";
+my $LOGFILE = $LOGDIR."/ldap2cyrus.log"; 
+
+my $base = "$(CONFIGURATOR.LDAP_BASE)";
+my $scope = "subtree";
+
+$conn = new Mozilla::LDAP::Conn($LDAP_HOST,
+				$LDAP_PORT,
+				$LDAP_BINDDN,
+				$LDAP_BINDPW)
+          || die "Couldn't connect to LDAP server ldap" unless  $conn;
+
+my $client = Cyrus::IMAP::Admin->new('localhost');
+$client->authenticate(-mechanism => "login",
+                        -user => $POSTADM_LOGIN,
+                        -password => $POSTADM_PW);
+
+# Définition des flags
+# 1 : à créer                  -> -1 (actif, mdp crypté)
+# 2 : à désactiver             -> -2 (désactivé)
+# 3 : à supprimer              -> rien (supprimé) 
+# 4 : à réactiver              -> -1 (actif, mdp crypté)
+
+# On récupère tous les comptes à créer et les informations nécessaires
+print "Mise à jour des comptes LDAP\n";
+print "\n";
+logs("**** Script Ldap2Cyrus", 'DEBUT');
+
+print "Créations de compte :\n";
+print "---------------------\n";
+CreateAccount($conn->search($base, $scope, "(flag=1)"));
+print "\n";
+
+print "Désactivations de compte :\n";
+print "--------------------------\n";
+DeactivateAccount($conn->search($base, $scope, "(flag=2)"));
+print "\n";
+
+print "Suppressions de compte :\n";
+print "------------------------\n";
+DeleteAccount($conn->search($base, $scope, "(flag=3)"));
+print "\n";
+
+print "Réactivations de compte :\n";
+print "-------------------------\n";
+ReactivateAccount($conn->search($base, $scope, "(flag=4)"));
+print "\n";
+
+print "Fin de la mise à jour des comptes LDAP\n";
+logs("**** Script Ldap2Cyrus", 'FIN');
+print "\n";
+
+#####
+#
+# Flag à 1 Création des comptes
+#
+sub CreateAccount {
+    local ($account) = @_;
+    $i = 0;
+    while ($account) {
+        $i = $i + 1;
+        $login = $account->{uid}[0];
+        print "Création n° $i ($login)\n";
+        $rc = $client->create("user.".$login);
+        $rc = 1;
+        if ($rc == 1) {
+            # Mise à jour de l'annuaire
+            print $account->getDN(), "\n";
+            $passwdToEncrypt = $account->{userpassword}[0];
+            if ( ! ($passwdToEncrypt =~ /\{crypt\}/) ) {
+                # passwd is clear. We crypt it
+                $account->remove("userPassword");
+                $account->addValue("userPassword",
+                                "{crypt}".crypt($passwdToEncrypt, 'mS'));
+            } else {
+                # passwd is already crypted. We do nothing.
+            }                                                                                                                                                           
+	    $account->remove("flag");
+            $account->addValue("flag", -1);
+	    print $account->printLDIF();
+            $conn->update($account);
+
+            # envoi de mail
+            `echo "Bienvenue" |mail -s "Pleiad : votre premier message" $login`;
+            print "-- Ok\n";
+            logs("Création",$login);
+        } else {
+	    print "-- Echec ($login)";
+            logs("XXXX Echec de création : ",$login);
+        }
+	$account = $conn->nextEntry();
+    }
+    print "Terminé\n";
+}
+
+#####
+#
+# Flag à 2 Désactivation des comptes
+#
+sub DeactivateAccount {
+    local ($account) = @_;
+    $i = 0;
+    while ($account) {
+        $login = $account->{uid}[0];
+	$i = $i + 1;
+        if ( $login ne "" ) {
+            print "Désactivation n° $i ($login)\n";
+            print $account->getDN(), "\n";
+            $passwdToDeactivate = $account->{userpassword}[0];
+            $account->remove("userPassword");
+            $account->addValue("userPassword","*".$passwdToDeactivate);
+	    $account->remove("flag");
+            $account->addValue("flag", -2);
+            $conn->update($account);
+            logs("Désactivation",$login);
+        }
+	$account = $conn->nextEntry();
+    }
+    print "Terminé\n";
+}
+
+#####
+#
+# Flag à 3 Suppression des comptes
+#
+sub DeleteAccount {
+    local ($account) = @_;
+    $i = 0;
+    while ($account) {
+        $login = $account->{uid}[0];
+        $i = $i + 1;
+        print "Suppression n° $i ($login)\n";
+        print $account->getDN(), "\n";
+        # On donne d'abord les droits à l'administrateur du serveru cyrus
+        $rc = $client->setacl("user.".$login, $POSTADM_LOGIN, "all");
+        $rc = $client->delete("user.".$login);
+        if ($rc == 1) {
+	    # Mise à jour de l'annuaire
+	    print $account->getDN();
+	    $conn->delete($account);
+            print "-- Ok";
+            logs("Suppression",$login);
+        } else {
+            print "-- Echec ($login)";
+            logs("XXXX Echec de suppression : ",$login);
+        }
+	$account = $conn->nextEntry();
+    }
+    print "Terminé\n";
+}
+
+#####
+#
+# Flag à 4 Réactivation des comptes
+#
+sub ReactivateAccount {
+    local ($account) = @_;
+    $i=0;
+    while ($account) {
+        $i = $i + 1;
+        $login = $account->{uid}[0];
+        if ($login ne null) {
+	    # we drop the * at the beginning of the password
+            print "Réactivation n° $i ($login)\n";
+            print $account->getDN(), "\n";
+	    $_ = $account->{userPassword}[0];
+	    ($passwdToReactivate) = /\*(.*)/;
+	    $account->remove("userPassword");
+            $account->addValue("userPassword", $passwdToReactivate);
+	    $account->remove("flag");
+            $account->addValue("flag", -1);
+	    $conn->update($account);
+            logs("Réactivation",$login);
+	}
+	$account = $conn->nextEntry();
+    }
+    print "Terminé\n";
+}
+
+sub RemoveIfExist {
+	local ($login) = @_;
+#        print "/opt/var/spool/imap/user/$login existe ?\n";
+#        if ( ($login ne "")
+#                && ($login !=~ /\*/)
+#                && (-d "/opt/var/spool/imap/user/$login")) {
+#          print "On supprime le compte $login\n";
+#	   $rc = $client->setacl("user.".$login, $POSTADM_LOGIN, "all");
+#	   $rc = $client->delete("user.".$login);
+#	   print "Résultat de la suppression : $resultat\n";
+#	}
+}
+
+## Gestion des logs
+sub logs {
+    local ($operation,$login) = @_;
+
+    if ( ! -d $LOGDIR ) {
+        system("mkdir -p $LOGDIR");
+    }
+
+    # gestion du fichier de log
+    $date = `date`;
+    system("echo \"$login : $operation $date\""
+		." >> $LOGFILE");
+}
+
+

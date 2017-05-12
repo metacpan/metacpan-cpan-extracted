@@ -1,0 +1,46 @@
+BSD-Jail-Object
+
+DESCRIPTION
+-----------
+
+This is an object oriented environment for FreeBSD jails.
+
+
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries:
+
+    The FreeBSD operating system, version 5.x or above
+
+
+
+INSTALLATION
+------------
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+SUPPORT AND DOCUMENTATION
+-------------------------
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc BSD::Jail::Object
+
+
+
+COPYRIGHT AND LICENCE
+---------------------
+
+Copyright (C) 2006 Mahlon E. Smith
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,6 @@
+url: <: $url |raw :>
+from: <: $from |raw :>
+
+<: $subject :>
+
+<: $entry.body_html |raw :>

@@ -1,0 +1,14 @@
+pod2html/
+.svn/
+data/.svn/
+data/isismarc/.svn/
+data/isismarc/isismarc/.svn/
+data/winisis/.svn/
+lib/.svn/
+lib/Biblio/.svn/
+lib/Biblio/Isis/.svn/
+Makefile
+Makefile.old
+scripts/.svn/
+t/.svn/
+blib

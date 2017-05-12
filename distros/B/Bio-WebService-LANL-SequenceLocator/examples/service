@@ -1,0 +1,66 @@
+#!/bin/bash
+home=`dirname $0`/..
+var=$home/var
+pidfile=$var/run/server-starter.pid
+statusfile=$var/run/server-starter.status
+logfile=$var/log/server.log
+
+[[ -d $var/run ]] || mkdir -p $var/run
+[[ -d $var/log ]] || mkdir -p $var/log
+
+perlbrew=~/perl5/perlbrew/etc/bashrc
+[[ -e $perlbrew ]] && source $perlbrew
+
+cd $home
+
+function restart() {
+    if test -s $pidfile && kill -0 `cat $pidfile` 2>/dev/null; then
+        echo -n "Re-starting server... "
+        start_server \
+            --restart \
+            --pid-file=$pidfile \
+            --status-file=$statusfile \
+            && echo "done" || echo "FAILED ($?)"
+    else
+        echo -n "Starting server... "
+        start_server \
+            --port=localhost:5001 \
+            --pid-file=$pidfile \
+            --status-file=$statusfile \
+            -- \
+            plackup -s Starlet -E deployment \
+                -e 'enable_if { $_[0]->{REMOTE_ADDR} eq "127.0.0.1" } "ReverseProxy";' \
+                -e 'enable "CrossOrigin", origins => "*", methods => [qw(GET POST)];' \
+                --max-workers=10 \
+                --timeout=300 \
+                -I lib \
+                app.psgi \
+            >>$logfile 2>&1 &
+        ret=$?
+        [[ $ret == 0 ]] && echo "done" || echo "FAILED ($ret)"
+        echo "Logging to $logfile"
+    fi
+}
+
+function stop() {
+    if [[ -s $pidfile ]]; then
+        echo -n "Stopping server... "
+        xargs kill < $pidfile \
+        && echo "done" || echo "FAILED ($?)"
+    else
+        echo "No server running (no pid file: $pidfile)"
+    fi
+}
+
+case "$1" in
+    start|restart)
+        restart
+        ;;
+    stop)
+        stop
+        ;;
+    *)
+        echo "unknown action"
+        echo "usage: $0 [start|stop|restart]"
+        exit 1
+esac

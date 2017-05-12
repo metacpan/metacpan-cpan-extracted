@@ -1,0 +1,1 @@
+[% INCLUDE fragments/linked_nation.tt n = c.node1 %] -->  [% INCLUDE fragments/linked_nation.tt n = c.node2 %] [% c.print_grey_crisis_bar %]

@@ -1,0 +1,15 @@
+B::OP		T_OP_OBJ
+B::PMOP		T_OP_OBJ
+
+INPUT
+T_OP_OBJ
+	if (SvROK($arg)) {
+	    IV tmp = SvIV((SV*)SvRV($arg));
+	    $var = INT2PTR($type, tmp);
+	}
+	else
+	    croak(\"$var is not a reference\")
+
+OUTPUT
+T_OP_OBJ
+	sv_setiv(newSVrv($arg, cc_opclassname(aTHX_ (OP*)$var)), (IV)$var);

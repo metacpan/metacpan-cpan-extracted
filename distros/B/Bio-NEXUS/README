@@ -1,0 +1,78 @@
+###########################################################################
+#
+# README file for NEXPL package include Bio::NEXUS library and tools.
+#
+# $Id: README,v 1.14 2012/02/03 21:55:51 astoltzfus Exp $
+#
+###########################################################################
+INDEX
+     1. ABOUT
+     2. AVAILABIILITY, LICENSING, AND CITATION OF Bio::NEXUS
+     3. INSTALLATION AND TESTING
+     4. DOCUMENTATION
+     5. ACKNOWLEDGEMENTS
+     6. FEEDBACK
+
+
+1. ABOUT
+
+Bio::NEXUS is an object-oriented Perl API (applications programming interface) to the NEXUS file format of Maddison, et al., 1997 (Syst. Biol. 46:590-621).  NEXUS is a powerful and extensible format designed for use in evolutionary analysis, including the analysis of molecular sequence data as well as classical morphological and life-history data. NEXUS is the input or output format for PAUP*, MacClade, Mesquite, SIMMAP, MrBayes, Nexplorer, and other end-user apps, and is the input for the TreeBASE repository.
+
+The Bio::NEXUS package also contains the demonstration applications nexplot.pl (plot character data with a tree) and nextool.pl (allowing programmatic editing, e.g., selecting particular clades or subsets of data).  Run nexplot.pl or nextool.pl with the --help option to see the many options provided by these useful tools. 
+
+
+2. AVAILABIILITY, LICENSING, AND CITATION OF Bio::NEXUS
+
+Bio::NEXUS is an open-source project (see included LICENSE file) on SourceForge and is available from CPAN.  If you use this software, please acknowledge the following open-access publication:
+
+Hladish T, Gopalan V, Liang C, Qiu W, Yang P, Stoltzfus A: Bio::NEXUS: a Perl API for the NEXUS format for comparative biological data. BMC Bioinformatics 2007, 8:191-201. (http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&db=PubMed&dopt=Citation&list_uids=17559666)
+
+
+3. INSTALLATION AND TESTING
+
+Note that before installing Bio::NEXUS, you need the following
+modules installed on your system:
+
+Clone::PP (1.02 or higher)
+Test::More
+Test::Deep
+
+This software has been tested under Linux as well as Mac OS X 10.2 and higher, 
+and even a few Windows installations. The package installs using the standard 
+procedure, and runs several hundred tests:
+
+perl Makefile.PL
+make
+make test
+make install
+
+For more information, or to customize, see doc/Installation.pod. 
+
+
+4. DOCUMENTATION
+
+All of the modules are documented internally with POD, and the doc
+directory has Tutorial, Installation, User Manual documents.  You can
+read these online at CPAN, or access your local copies with a command
+like these:
+
+perldoc NEXUS.pm  # give path to file
+perldoc Bio::NEXUS  # installed module
+perldoc nexplot.pl # installed executable in your exec path
+perldoc doc/UserManual.pod 
+
+
+5. ACKNOWLEDGEMENTS
+
+We thank the original development team of Tom Hladish, Vivek Gopalan, Weigang Qiu, Chengzhi Liang, Peter Yang and Arlin Stoltzfus.  Contributing authors also include Eugene Melamud, Rutger Vos, Mikhail Bezruchko, and Brendan O'Brien. 
+
+This work has been supported by the Computational Biology Program of the National Library of Medicine (NIH grant R01-LM07218 to A.S), the Biological Sciences Department of Hunter College, the Howard Hughes Medical Institute Undergraduate Science Education Program in Biology, and a Research Centers in Minority Institutions award (NIH RR03037 to W.Q.).
+
+
+
+6. FEEDBACK 
+
+We welcome feedback from end-users and developers.  Please write to 
+Arlin Stoltzfus by email at <myfirstname><at>umd.edu.  You also can submit a bug report or feature request via CPAN or SourceForge. 
+
+

@@ -1,0 +1,42 @@
+0.015 Sat Oct 24, 2009  6:08 pm
+    - just dusting off this module a bit, no major changes
+
+0.010  Sun Mar  6 19:26:16 CST 2005
+    - now creates vCards
+
+0.009  Sat Mar  5 20:11:00 CST 2005
+    - remove FreezeThaw from test cases - no longer used
+
+0.008  Sat Mar  5 15:14:00 CST 2005
+    - added README
+
+0.007  Sat Mar  5 14:25:17 CST 2005
+    - moved record field mapping into get_record_hash
+    - refactored LDIF module
+    - rebuilt test case .bbdb files and added several new ones
+    - built vCard test cases using bbdb-vcard-export.el
+        - in preparation for wrting vCard exporter
+    - doc updates
+
+0.005  Wed Mar  2 17:54:25 CST 2005
+    - doc updates to script
+
+0.004  Wed Mar  2 17:30:28 CST 2005
+    - updated todo list
+    - updated Makefile with prereqs and script install
+
+0.003  Wed Mar  2 16:53:13 CST 2005
+    - refactored code from bbdb2ldap.pl
+    - implement export types in subclasses
+        - ldif - taken from bbdb2ldap.pl
+        - ldap - uses ldif, with code from bbdb2ldap.pl
+        - mail_aliases - wrote this just to demonstrate how easy it is
+    - included script to do the conversions
+    - some useful automated test cases
+    - directly access bbdb data structure - much cleaner
+    - lost a few cool features that will need to be re-implemented here
+
+0.001  Wed Mar  2 08:35:46 2005
+	- original version; created by h2xs 1.22 with options
+		-X -n BBDB::Export
+

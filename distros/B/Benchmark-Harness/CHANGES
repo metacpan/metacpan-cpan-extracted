@@ -1,0 +1,11 @@
+
+v1.11   - Added new Harnesses: Values, ValuesHighRes
+          EXPORT constants for blessed [] elements from Benchmark::Harness::Constants,
+                prepend "HRNSS_" or "HNDLR_" to all of their names
+          Changed 'reportProcessInfo' to 'reportTraceInfo' everywhere
+          More POD.
+v1.08   - Layered architecture
+          Better code harnessing
+          TraceHighRes
+          Graph and profile added as Benchmark::Harness::Graph (CPAN)
+v1.07   - Initial contribution to CPAN, 2004-09-29

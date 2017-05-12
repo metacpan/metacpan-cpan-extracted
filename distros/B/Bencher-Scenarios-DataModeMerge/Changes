@@ -1,0 +1,18 @@
+0.003   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.002   2016-07-22 (PERLANCAR)
+
+        - [build] Exclude archive/ from build, this is only useful for producing
+          sample benchmark during building [RT#116386].
+
+
+0.001   2016-07-19 (PERLANCAR)
+
+        - First release.

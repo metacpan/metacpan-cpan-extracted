@@ -1,0 +1,36 @@
+Revision history for Business::Barcode::EAN13.
+
+2.00  jan Willamowius, Sun Sep 8 2013
+    - fix country codes fro Germany and Russia (bug #37800)
+
+1.01  Tony Bowden, Sat Sep 3 2005
+	- Make build_prefix private
+
+1.00  Tony Bowden, Wed Oct 27 2004
+	- Upped to major version number
+	- Tiny tweaks
+
+0.06  Tony Bowden, Sat Sep 1 2001
+	- Renamed to Business::Barcode::EAN13
+	- tests moved to Test::More
+	- First CPAN version
+
+0.05  Colm Dougan, Tue Oct 17, 2000
+	- Much faster checksum code
+          (idea stolen from brian d foy's Business::ISBN. Found
+           bug in his algorithm).
+
+0.04  Tony Bowden, Fri Oct 6, 2000
+        - added issuer_ccode
+	- Minor code tweaks suggested by CD
+
+0.03  Tony Bowden, Thu Oct 5, 2000
+	- Rewrite of best_barcode to allow a preferences list
+
+0.02  Tony Bowden, Thu Oct 4, 2000
+	- Added exporting code, changed some logic, added comments,
+          prepared for CPAN
+
+0.01  Colm Dougan, Thu Sep 19, 2000
+        - wrote validate, check_digit and best_barcode subs
+

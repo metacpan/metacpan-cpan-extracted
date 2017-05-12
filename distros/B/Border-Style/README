@@ -1,0 +1,63 @@
+NAME
+    Border::Style - Border style structure
+
+VERSION
+    This document describes version 0.01 of Border::Style (from Perl
+    distribution Border-Style), released on 2014-12-10.
+
+DESCRIPTION
+    This module specifies a structure for border styles. The distribution
+    also comes with utility routines and roles for managing border styles in
+    applications.
+
+SPECIFICATION
+    Border style is a DefHash containing these keys: "v", "name", "summary",
+    "utf8" (bool, set to true to indicate that characters are Unicode
+    characters in UTF8), "chars" (array). Format for the characters in
+    "chars":
+
+     [
+       [A, b, C, D],  # 0
+       [E, F, G],     # 1
+       [H, i, J, K],  # 2
+       [L, M, N],     # 3
+       [O, p, Q, R],  # 4
+       [S, t, U, V],  # 5
+     ]
+
+     AbbbCbbbD        #0 Top border characters
+     E   F   G        #1 Vertical separators for header row
+     HiiiJiiiK        #2 Separator between header row and first data row
+     L   M   N        #3 Vertical separators for data row
+     OpppQpppR        #4 Separator between data rows
+     L   M   N        #3
+     StttUtttV        #5 Bottom border characters
+
+    A character can also be a coderef that will be called with "($self,
+    %args)". Arguments in %args contains information such as "name", "y",
+    "x", "n" (how many times should character be repeated), etc.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Border-Style>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Border-Style>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Border-Style>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

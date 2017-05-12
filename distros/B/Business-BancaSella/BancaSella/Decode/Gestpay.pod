@@ -1,0 +1,44 @@
+=head1 NAME
+
+Business::BancaSella::Decode::Gestpay - Uri decoding for return transaction info results from 
+GestPay online system payment.
+
+=head1 SYNOPSIS
+
+  use CGI;
+  use Business::BancaSella::Decode;
+ 
+  my $cgi 	= new CGI();
+  my $qs	= $cgi->query_string;
+  my $bs	= new Business::BancaSella::Decode::Gestpay(
+								'query_string' => $qs,
+								'user_params'  => {
+								                    'USER_PARAM1'  => undef,
+								                    'USER_PARAM2'  => undef
+								                  }
+								);
+
+
+=head1 DESCRIPTION
+
+Decode the Banca Sella response url filling information about the payment 
+transaction in Business::BancaSella::Gestpay property.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new istance of Business::BancaSella::Decode::Gestpay object. 
+
+You must inizialize the "query_string" parameter with the query string contained
+in the uri used by Banca Sella response calling.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Gestpay
+
+=cut

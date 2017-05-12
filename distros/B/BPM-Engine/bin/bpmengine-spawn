@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Pod::Usage;
+use Getopt::Long;
+use File::Copy;
+
+use BPM::Engine::Store;
+
+my ($help, $deploy, $ddl, $drop_tables) = (0, 0, 0, 0);
+
+GetOptions(
+    'help|?'   => \$help,
+    'deploy|d' => \$deploy,
+    'ddl'      => \$ddl,
+    'drop'     => \$drop_tables,
+);
+
+pod2usage(1) if $help;
+
+my @connect_info = ('dbi:SQLite:dbname=t/var/bpmengine.db');
+#my @connect_info = ('dbi:mysql:bpmengine', 'root');
+my $schema = BPM::Engine::Store->connect(@connect_info) or die "Failed to connect";
+
+if ($ddl) {
+    $schema->create_ddl_dir(
+        [ 'SQLite', 'MySQL' ],
+        $BPM::Engine::Store::VERSION,
+        "$FindBin::Bin/../var"
+        );
+    print "DDL files created in ./var \n";
+    }
+elsif ($deploy) {
+    $schema->deploy({ add_drop_table => $drop_tables });
+
+    # copy as test db
+    unlink './t/var/bpmengine.test.db' if -f './t/var/bpmengine.test.db';
+    die("Test db locked") if -f './t/var/bpmengine.test.db';
+    File::Copy::copy('./t/var/bpmengine.db', './t/var/bpmengine.test.db');
+
+    print "Schema deployed as ./t/var/bpmengine.db\n";
+    }
+else {
+    pod2usage(1);
+    }
+        
+#$schema->storage->backup('./var') if $connect_info[0] =~ /SQLite/;
+$schema->storage->disconnect if $connect_info[0] =~ /mysql/;
+
+
+1;
+__END__
+
+=pod
+
+=head1 NAME
+
+bpmengine-spawn - Spawn an sqlite database with BPM-Engine tables
+
+=head1 SYNOPSIS
+
+  bpmengine-spawn [OPTION]
+
+ Options:
+   -? -help           display this help and exits
+   -ddl               create DDL files in ./var
+   -deploy            deploy tables into new or existing database at ./t/var/bpmengine.db
+     -drop            drop existing database/tables when deploying
+
+ Examples:
+
+  bpmengine-spawn -ddl
+  bpmengine-spawn -drop -deploy
+
+=head1 DESCRIPTION
+
+Spawn a sqlite database with BPM::Engine tables
+
+=head1 SEE ALSO
+
+L<BPM::Engine|BPM::Engine>
+
+=head1 AUTHOR
+
+Peter de Vos, C<< <sitetech at cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010, 2011 Peter de Vos, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

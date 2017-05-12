@@ -1,0 +1,6 @@
+Changes			List of changes
+Graph.pm		The Module
+MANIFEST		This list
+Makefile.PL		The Makefile maker
+test.pl			The test script
+README			The Instructions

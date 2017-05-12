@@ -1,0 +1,126 @@
+<h3>STATUS</h3>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="col-md-4">
+        <div class="center-block">
+        <img style="height:120px" src="/images/flags/[% nation.code %].png" class="img-thumbnail">
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div>
+                <p>
+                Area: [% nation.area %]<br />
+                Export quote: [% nation.export_quote %]<br />
+                Government strength: [% nation.government_strength %]<br />
+                Internal situation:  [% nation.internal_disorder_status %]<br />
+                <br />
+                [% IF under_influence -%]
+                [% nation.name %] is under influence of [% INCLUDE fragments/linked_nation.tt n = under_influence %]<br />
+                [%- ELSE -%]
+                [%- IF influence.size > 0 -%]
+                [%- FOR i IN influence -%]
+                [% nation.name %] has influence on [% INCLUDE fragments/linked_nation.tt n = i %]<br />
+                [% END -%]
+                [%- ELSE -%]
+                [% nation.name %] is free<br />
+                [%- END -%]
+                [%- END -%]
+                <br />
+                </p>
+        </div>
+    </div>
+  </div>
+</div>
+<table class="table">
+[% INCLUDE 'fragments/nation_attributes_header.tt' %]
+<tr>
+[% INCLUDE 'fragments/nation_attributes.tt' %]
+</tr>
+</table>
+<div class="well">
+<h4>TRADEROUTES</h4>
+<p>
+[%- FOREACH t IN traderoutes -%]
+=> [% INCLUDE fragments/linked_nation.tt n = t.destination(nation.name) %] [x[% t.factor_for_node(nation.name) -%]]<br />
+[% END %]
+</p>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="well">
+          <h4>TREATIES</h4>
+          [% first_row_counter = 0 %]
+          [% WHILE first_row_counter < first_row_height %]
+          [% treaty = treaties.$first_row_counter %]
+          [% IF treaty %][% treaty.short_tag %]: [% INCLUDE fragments/linked_nation.tt n = treaty.destination(nation.name) %][% END -%]<br />
+          [% first_row_counter = first_row_counter + 1 -%]
+          [% END %]
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="well">
+          <h4>SUPPORTS</h4>
+          [% first_row_counter = 0 %]
+          [% first_row_index = 0 %]
+          [% display_sup = 'sup' %]
+          [% WHILE first_row_counter < first_row_height %]
+          [%- IF display_sup == 'sup' && supports.$first_row_index -%]
+          [%- support = supports.$first_row_counter -%]
+          [%- suptag = "" %]
+          [%- ELSE -%]
+          [% first_row_index = 0 %]
+          [% display_sup = 'rebsup' %]
+          [% END %]
+          [% IF display_sup == 'rebsup' %]
+          [%- support = rebel_supports.$first_row_index -%]
+          [%- suptag = "REB: " %]
+          [% END %]
+          [%- IF support %][% suptag %][% INCLUDE fragments/support.tt s = support %][% END %]<br />
+          [% first_row_counter = first_row_counter + 1 -%]
+          [% first_row_index = first_row_index + 1 -%]
+          [%- END -%]
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="well">
+          <h4>CRISES</h4>
+          [%- second_row_counter = 0 -%]
+          [%- WHILE second_row_counter < second_row_height -%]
+          [%- crisis = crises.$second_row_counter -%]
+          [%- IF crisis %][% INCLUDE fragments/linked_nation.tt n = crisis.destination(nation.name) %] [% crisis.print_grey_crisis_bar %][% END -%]<br />
+          [% second_row_counter = second_row_counter + 1 -%]
+          [% END %]
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="well">
+          <h4>WARS</h4>
+          [%- second_row_counter = 0 -%]
+          [%- WHILE second_row_counter < second_row_height -%]
+          [%- war = wars.$second_row_counter -%]
+          [%- IF war %][% INCLUDE fragments/linked_nation.tt n = war.node1 %] -> [% INCLUDE fragments/linked_nation.tt n = war.node2 %][% END %]<br />
+          [% second_row_counter = second_row_counter + 1 -%]
+          [% END %]
+        </div>
+      </div>
+    </div>
+  </div>
+</div>    
+<div>
+<p>
+Latest given order: [% latest_order %]
+</p>
+</div>
+
+
+
+

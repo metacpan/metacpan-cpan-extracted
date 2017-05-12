@@ -1,0 +1,51 @@
+
+-------------
+Configuration
+-------------
+
+  1. Copy the conf directory in the place you want to put configuration files.
+     /usr/local/babelobjects/conf is a good choice.
+
+  2. Update the configuration file bo.xml according your installation. In a 
+     first time, just update webRoot, confDir and webDir to suit your system.
+
+  3. Copy cgi programs in your cgi directory :
+       root# cp ./lib/Controller.* <your cgi-bin directory>
+
+  4. Update the $CFG_DIR variable in Controller.cgi or Controller.fcgi
+     according the directory where you put your configuration files.
+
+  5. The web server must be configured to intercept bo pages
+     (*.bo, *.htm, *.html, ...) and redirect them on the runner. 
+     Add the following lines in your httpd.conf: 
+
+       LoadModule fastcgi_module     libexec/mod_fastcgi.so
+       AddHandler fastcgi-script .fcgi
+       AddHandler bo-runner .bo  # You can add a handler for .html if you want
+
+       #Don't setup the fcgi version in the first time.
+       #Prefer the cgi version to test the system.
+
+       Action bo-runner /cgi-bin/Controller.cgi
+
+       # When everything is OK, try the FastCGI version
+
+       #Action bo-runner /cgi-bin/Controller.fcgi
+       #FastCgiServer /<your cgi-bin directory>/Controller.fcgi -processes 2
+
+-----
+Start
+-----
+
+Start the httpd server. With Apache, type :
+
+  root # apachectl start
+
+----
+Test
+----
+
+To test the installation, copy sample/test.bo in your html space.
+Go and visit it.
+
+Enjoy !

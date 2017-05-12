@@ -1,0 +1,8 @@
+$VAR1 = bless( {
+                 'telecom-service-identifier' => bless( {
+                                                          'generalstring' => 'SMTP'
+                                                        }, 'Biblio::ILL::ISO::ILLString' ),
+                 'telecom-service-address' => bless( {
+                                                       'generalstring' => 'DChristensen@westman.wave.ca'
+                                                     }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::SystemAddress' );

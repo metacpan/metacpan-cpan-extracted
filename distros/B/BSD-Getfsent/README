@@ -1,0 +1,53 @@
+NAME
+    BSD::Getfsent - Get file system descriptor file entry
+
+SYNOPSIS
+     use BSD::Getfsent qw(getfsent);
+
+     while (@entry = getfsent()) {
+        print "@entry\n";
+     }
+
+FUNCTIONS
+  getfsent
+    In list context, each file system entry is returned ("getfsent()"
+    continuously reads the next line of the /etc/fstab file).
+
+    The list returned is structured as follows:
+
+     $entry[0]    # block special device name
+     $entry[1]    # file system path prefix
+     $entry[2]    # type of file system
+     $entry[3]    # comma separated mount options
+     $entry[4]    # rw, ro, sw, or xx
+     $entry[5]    # dump frequency, in days
+     $entry[6]    # pass number on parallel fsck
+
+    In scalar context, total of entries is returned.
+
+FILES
+    /etc/fstab
+
+EXPORT
+    "getfsent()" is exportable.
+
+BUGS & CAVEATS
+    "BSD::Getfsent" was, as it name suggests, developed for BSD-like
+    systems. It may be nevertheless suitable for other UNIX-like systems,
+    including Linux, but remains untested. Bear in mind, that tests will
+    fail if no /etc/fstab can be found (in order that testing on systems
+    like Windows, where no /etc/fstab exists, doesn't result in a false
+    positive).
+
+SEE ALSO
+    fstab(5), getfsent(3)
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

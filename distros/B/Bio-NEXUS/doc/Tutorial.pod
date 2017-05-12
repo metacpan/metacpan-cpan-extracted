@@ -1,0 +1,1000 @@
+=pod
+
+=head1 NAME
+
+Tutorial - Hands-on tutorial for using Bio::NEXUS module.
+
+=head1 DESCRIPTION
+
+Tutorial to get started using Bio::NEXUS module.
+
+=head2 INTRODUCTION
+
+The NEXUS file format standard of Maddison, et al. (1997) is designed to represent sets of data, including character data (e.g., molecular sequence alignments, morphological character sets), trees, assumptions about models and methods, meta-information such as comments, and so on.  L<Bio::NEXUS> is an object-oriented Perl applications programming interface (API) for the NEXUS file format.  Accordingly, Bio::NEXUS provides methods for managing character data, trees, assumptions, meta-information, and so on, via the NEXUS format.  
+
+This tutorial provides a quick introduction to developing applications that carry out basic manipulations with data sets in NEXUS files, as well as importing data sets from (and exporting to) foreign data formats (using BioPerl and L<Bio::NEXUS>).  You may wish to continue reading, and to complete the tutorial exercises, *if*
+
+=over 
+
+=item *
+
+you have a set of data (e.g., a sequence alignment) that you want to manipulate or analyze in some way (the data do not need to be in NEXUS format: we will show you how to import it)
+
+=item *
+
+you want to write your own scripts (applications) in order to achieve automation, flexibility and control
+
+=item *
+
+you know (or are willing to learn) how to program in Perl (one of the easiest computer languages)
+
+=back
+
+=head3 Structure of the tutorial 
+
+This tutorial is organised into seven sections:
+
+=over
+
+=item *
+
+This introduction, explaining the content and requirements
+
+=item *
+
+A quick start to using Perl and L<Bio::NEXUS> on your system
+
+=item *
+
+Exercises involving basic manipulations 
+
+=item *
+
+Examples of converting to and from foreign file formats using BioPerl
+
+=item *
+
+An advanced example
+
+=item *
+
+A brief introduction to using some tools built with L<Bio::NEXUS> (nexplot.pl, nextool.pl, and Nexplorer)
+
+=item *
+
+Information on where to go from here
+
+=back
+
+=head3 Requirements
+
+Bio::NEXUS naturally requires Perl, but it does not require any non-standard Perl modules.  To carry out the tutorial exercises below, you must have a UN*X (or UN*X work-alike or Windoze) shell, an installation of Perl, and an installation of Bio::NEXUS.  For the format conversion exercises, you also need an installation of BioPerl (see www.bioperl.org, or simply run the command "perl -MCPAN -e'install Bundle::Bio'").  For the advanced exercise, there are additional requirements as described below.  If you have tried to install these things and they do not work, the most likely cause is that you do not have permission to do the default system-wide installation, or that you have not issued the correct commands for a custom user-specific installation.  See the L<Bio::NEXUS installation|Installation> guide for further information. 
+
+
+=head3 Notation
+
+The following are the conventions used in this tutorial.
+
+=over
+
+=item *
+
+C<system$> is the command prompt for the shell running in your terminal window. 
+
+=item *
+
+C<Fixed width> is used for Perl codes and outputs produced in the shell. C<Fixed width> is also used for the shell commands 
+shown after the command prompt C<system$>.
+
+=item *
+
+I<Italic> is used for shell commands, when shell commands are NOT shown after the command prompt.
+
+=back
+
+=head2 Getting started with your UN*X shell, Perl, and Bio::NEXUS
+
+Before getting started with Bio::NEXUS methods, begin by opening a terminal window and checking a few things using your shell (i.e., UNIX or UNIX-work-alike shell, or Windoze shell). 
+
+=over 
+
+=item *
+
+Check for Perl.  If it isn't installed, have your system administrator install it.
+
+ system$ perl -e 'print "hello!\n" '
+ hello!
+
+=item *
+
+Check for Bio::NEXUS.  If it isn't installed, read the Bio::NEXUS installation document. 
+
+ system$ perl -MBio::NEXUS -e 'print "hello!\n" '
+ hello!
+
+=item *
+
+Check that nextool.pl and nexplot.pl are in your $PATH (if not, read the installation docs). 
+
+ system$ nextool.pl -h
+ (this should result in a page of command-line options)
+
+ system$ nexplot.pl -h
+ (this should result in a page of command-line options)
+
+=item *
+
+Execute commands saved in a file
+
+ system$ echo ' print "hello!\n"; ' > my_commands.pl
+ system$ perl my_commands.pl 
+ hello!
+
+=item *
+
+Make an executable script (note where the semi-colon and >> symbol are used)
+
+ system$ echo '#!/usr/bin/env perl' > my_script.pl
+ system$ echo 'print "hello!\n"; ' >> my_script.pl
+ system$ echo 'exit;' >> my_script.pl
+ system$ chmod +x my_script.pl
+ system$ cat my_script.pl
+
+ #!/usr/bin/env perl
+ print "hello!\n";
+ exit;
+
+ system$ ./my_script.pl
+ hello!
+
+=back
+
+=head2 Basic manipulations with trees, OTU sets, and characters
+
+=head3 Creating the example1.nex NEXUS file used in several exercises
+
+=over 
+
+=item I<Rationale> 
+
+For the first few exercises, we will use a sample NEXUS file with a taxa block, a characters block and a trees block. For this reason, please create a file named "example1.nex" from the following text:   
+
+=item example1.nex
+
+ #NEXUS
+ BEGIN TAXA;
+       DIMENSIONS ntax=4;
+       TAXLABELS  A B C D;
+ END;
+ BEGIN CHARACTERS;
+       DIMENSIONS ntax=4 nchar=25;
+       FORMAT DATATYPE=protein;
+ MATRIX
+   A     IKKGANLFKTRCAQCHTVEKDGGNI
+   B     LKKGEKLFTTRCAQCHTLKEGEGNL
+   C     STKGAKLFETRCKQCHTVENGGGHV
+   D     LTKGAKLFTTRCAQCHTLEGDGGNI
+ ;
+ END;
+ BEGIN TREES;
+       TREE my_tree = (((A:1,B:1):1,D:0.5):1,C:2)root;
+ END;
+
+Use the "cat" command to check the file (this should reproduce the text given above): 
+
+ system$ cat example1.nex
+
+=item I<Discussion>
+
+NEXUS files can have many different types of blocks.  Each block has commands, e.g., the TAXA block has two possible commands, dimensions and taxlabels.  Some further blocks and commands will be introduced in the examples below.  A complete presentation of the NEXUS standard is given by Maddison, D.R., D.L. Swofford, and W.P. Maddison (1997), "NEXUS: an extendible file format for systematic information" (I<Systematic Biology> 46: 590-621). 
+
+=back
+
+=head3 Renaming some or all OTU names
+
+=over
+
+=item I<Rationale>
+
+We often have the need to rename OTUs systematically for purposes of compatibility. 
+
+=item I<Script>
+
+ #rename_otus.pl
+ use Bio::NEXUS;
+ my %translate = ( 'A' => 'Human_gene', 'C' => 'Chimp_gene');
+ my $nexus_obj=new Bio::NEXUS("example1.nex");
+ $nexus_obj->rename_otus(\%translate);
+ $nexus_obj->write("renamed.nex");
+
+=item I<Commands and Output>
+
+ system$ perl rename_otus.pl
+ system$ cat renamed.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  Human_gene B Chimp_gene D;
+ END;
+ BEGIN CHARACTERS;
+        DIMENSIONS ntax=4 nchar=25;
+        MATRIX
+        Human_gene      IKKGANLFKTRCAQCHTVEKDGGNI
+        D               LTKGAKLFTTRCAQCHTLEGDGGNI
+        Chimp_gene      STKGAKLFETRCKQCHTVENGGGHV
+        B               LKKGEKLFTTRCAQCHTLKEGEGNL
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree = (((Human_gene:1,B:1)inode2:1,D:0.5)inode1:1,Chimp_gene:2)root;
+ END;
+
+=item I<Discussion>
+
+Above, the renaming was done using a hash with the old name as the keys and the new name as the values.  
+With nextool.pl, you can create a file with lines of the form "oldName < space > newName" (e.g. "species1 Homo_sapiens") and then invoke the rename option with this file to change all of the names at once.  
+
+=back
+
+=head3  Removing one or more OTUs
+
+=over
+
+=item I<Rationale>
+
+A common need is to prune a data set by removing an OTU (e.g., an outlier, or a mis-classified sequence).
+
+=item I<Script>
+
+ #exclude_otu.pl
+ use Bio::NEXUS;
+ my $nexus_obj = new Bio::NEXUS('example1.nex');
+ $nexus_obj = $nexus_obj->exclude_otus(['A']);
+ $nexus_obj->write('excluded.nex');
+
+=item I<Commands and Output>
+
+ system$ perl exclude_otu.pl
+ system$ cat excluded.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=3;
+        TAXLABELS  B C D;
+ END;
+ BEGIN CHARACTERS;
+        DIMENSIONS ntax=3 nchar=25;
+        MATRIX
+        D       LTKGAKLFTTRCAQCHTLEGDGGNI
+        C       STKGAKLFETRCKQCHTVENGGGHV
+        B       LKKGEKLFTTRCAQCHTLKEGEGNL
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree = ((B:2,D:0.5)inode1:1,C:2)root;
+ END;
+
+=item I<Discussion>
+
+In the above example, the OTU names for deletion are given as array reference argument to the C<exclude_otus> method of L<Bio::NEXUS> object.
+
+=back
+
+=head3 Rerooting a tree on an outgroup (or a node)   
+
+=over
+
+=item I<Rationale>
+
+An unrooted tree obtained from a tree-building program needs to be rooted based on the most distant OTU in
+the datset in order to identify a common ancestor or evolutionary path. Sometimes the root of a tree is inferred
+wrongly by tree-building programs, and hence has to be changed. 
+
+=item I<Script>
+
+ # reroot.pl
+ use Bio::NEXUS;
+ my $nexus_obj   = new Bio::NEXUS('example1.nex'); 
+ $tree_obj       = $nexus_obj->get_block('trees')->get_tree();
+ $nexus_obj      = $nexus_obj->reroot('A');
+ $rerooted_tree  = $nexus_obj->get_block('trees')->get_tree();
+ # Print the tree in newick format
+ print "Given tree    : ",$tree_obj->as_string,"\n";
+ print "Rerooted tree : ",$rerooted_tree->as_string,"\n";
+ $nexus_obj->write('rerooted.nex');
+
+=item I<Commands and Output>
+
+ system$ perl reroot.pl
+ Given tree    : (((A:1,B:1)inode2:1,D:0.5)inode1:1,C:2)root;
+ Rerooted tree : (A:0.5,(B:1,(D:0.5,C:3)inode1:1)inode2:0.5)root;
+
+=item I<Discussion>
+
+The above script takes a newick tree string and does rerooting on a particular node using C<reroot> method 
+in the tree object. The tree object belongs to L<Bio::NEXUS::Tree> class. The full help for this module can
+be obtained by typing I<perldoc L<Bio::NEXUS::Tree>> command at the command-prompt.
+
+=back
+
+=head3 Selecting OTUs in a particular subtree
+
+=over
+
+=item I<Rationale>
+
+We often need to analyze closely related taxa based on their relation in a tree.
+ 
+=item I<Script>
+
+ # select_subtree.pl  -- select_subtree of 'inode1'
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example1.nex')->select_subtree('inode1');
+ $nexus_obj->write('subtree_data.nex');
+
+=item I<Commands and Output>
+
+ system$ perl select_subtree.pl
+ system$ cat subtree_data.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=3;
+        TAXLABELS  A B D;
+ END;
+ BEGIN CHARACTERS;
+        DIMENSIONS ntax=3 nchar=25;
+        MATRIX
+        A       IKKGANLFKTRCAQCHTVEKDGGNI
+        D       LTKGAKLFTTRCAQCHTLEGDGGNI
+        B       LKKGEKLFTTRCAQCHTLKEGEGNL
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree = ((A:1,B:1)inode2:1,D:0.5)root;
+ END;
+
+=item I<Discussion>
+
+The above script creates a truncated NEXUS file based on the selection of a
+set of OTUs based on the subtree. The internal node (inode) name for selection of the 
+subtree is given as argument for the C<select_subtree> method of the Bio::NEXUS
+object.
+
+=back
+
+=head3 Excluding OTUs in a particular subtree
+
+=over
+
+=item I<Rationale>
+
+In some analyses we need to remove a clade of sequences, to determine the effect their presence had on an evolutionary analysis.
+
+=item I<Script>
+
+ # exclude_subtree.pl  -- exclude all the OTUs for the subtree of internal node 'inode1'
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example1.nex')->exclude_subtree('inode2');
+ $nexus_obj->write('exclude_subtree_data.nex');
+
+=item I<Commands and Output>
+
+ system$ perl exclude_subtree.pl
+ system$ cat exclude_subtree_data.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=2;
+        TAXLABELS  D C;
+ END;
+ BEGIN CHARACTERS;
+        DIMENSIONS ntax=2 nchar=25;
+        MATRIX
+        D       LTKGAKLFTTRCAQCHTLEGDGGNI
+        C       STKGAKLFETRCKQCHTVENGGGHV
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree = (D:1.5,C:2)root;
+ END;
+
+=item I<Discussion>
+
+The above script removes the set of OTUs that are descended from a particular internal node.
+
+=back
+
+=head3 Selecting a subset of OTUs from a NEXUS file
+
+=over
+
+=item I<Rationale>
+
+Sometimes we want to include only specific OTUs in an evolutionary analysis.
+
+=item I<Script>s
+
+ # select_otus.pl  -- select the OTUs A,B,D 
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example1.nex')->select_otus(['A','B','D']);
+ $nexus_obj->write('selected_data.nex');
+
+=item I<Commands and Output>
+
+ system$ perl select_otus.pl
+ system$ cat selected_data.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=3;
+        TAXLABELS  A B D;
+ END;
+ BEGIN CHARACTERS;
+        DIMENSIONS ntax=3 nchar=25;
+        MATRIX
+        A       IKKGANLFKTRCAQCHTVEKDGGNI
+        D       LTKGAKLFTTRCAQCHTLEGDGGNI
+        B       LKKGEKLFTTRCAQCHTLKEGEGNL
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree = ((A:1,B:1)inode2:1,D:0.5)inode1:1;
+ END;
+
+=item I<Discussion>
+
+The above script selects a set of OTUs given as array reference argument to the 
+C<select_otus> method in the Bio::NEXUS object. Refer to I<perldoc L<Bio::NEXUS>>
+for more options.
+
+=back
+
+=head3 Creating a NEXUS file from a NEWICK tree string  
+
+=over
+
+=item I<Rationale>
+
+It is often required to convert NEWICK tree to NEXUS file since many phylogenetics programs take
+NEXUS file format as input.  
+
+=item I<Script>
+
+ # create_nexus.pl
+ use Bio::NEXUS;
+ ## Create an empty Trees Block, and then add a tree to it
+ my $trees_block   = new Bio::NEXUS::TreesBlock('trees');
+ $trees_block->add_tree_from_newick( "((A:1,B:1):1,C:2)", "my_tree");
+ #
+ # Create new Bio::NEXUS object
+ my $nexus_obj = new Bio::NEXUS;
+ $nexus_obj->add_block($trees_block);
+ $nexus_obj->write("my_new_file.nex");
+
+=item I<Commands and Output>
+
+ system$ perl create_nexus.pl
+ system$ cat my_new_file.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=3;
+        TAXLABELS  A B C;
+ END;
+ BEGIN TREES;
+        TREE my_tree = ((A:1,B:1)inode2:1,C:2)root;
+ END;
+
+=item I<Discussion>
+
+The above script is creates a NEXUS file from a newick tree string.
+A new treeblock object, C<$trees_block>, is created and the tree string is loaded into the 
+treesblock using the C<add_tree_from_newick> method. Then, this treesblock is added to
+a new nexus object.  The content of the nexus object then is written to a file using the C<write> method.
+Read details about the methods in L<Bio::NEXUS::TreesBlock> and L<Bio::NEXUS> using the I<perdoc> command.   
+
+=back
+
+=head3 Creating the example2.nex NEXUS file used below
+
+=over
+
+=item I<Rationale>
+
+The following is a very simple NEXUS file with one taxa block and one tree block.The tutorial in the next section uses this file as input.
+
+=item I<Commands and Output>
+
+ system$ cat example2.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  A B C D;
+ END;
+ BEGIN TREES;
+         TREE my_tree1 = (((A,B),D),C);
+ END;
+
+=item I<Discussion>
+
+=back
+
+=head3 Assigning length to some or all branches of a tree
+
+=over
+
+=item I<Rationale>
+
+It is often required to scale the length of branches based on the total length of the tree or assign default 
+length to branches of trees to be parsed correctly by some phylogenetics programs.
+
+=item I<Script> 
+
+ # assign_brlen.pl
+ use Bio::NEXUS;
+ my $nexus_obj = new Bio::NEXUS('example2.nex');
+ my $tree      = $nexus_obj->get_block('Trees')->get_tree; # gets the first tree from the trees block
+ foreach my $node (@{ $tree->get_nodes }) {
+    $node->set_length(1.0);
+ }
+ print $tree->as_string,"\n";
+ $nexus_obj->write('modified.nex');
+
+=item I<Commands and Output>
+
+ system$ perl assign_brlen.pl
+(((A:1,B:1)inode3:1,D:1)inode2:1,C:1)root:1; 
+ system$ cat modified.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  A B C D;
+ END;
+ BEGIN TREES;
+        TREE my_tree1 = (((A:1,B:1)inode3:1,D:1)inode2:1,C:1)root:1;
+ END;
+
+=item I<Discussion>
+
+In the above tutorial, all the branch lengths in the tree are set to a value of 1.0. The C<get_nodes> method called on the tree object is used to get the all the nodes from the tree as an array ref.   As we iterate through the nodes, the length property of each of the node is set using C<set_length> method.
+
+=back
+
+=head3 Creating the example3.nex NEXUS file used below
+
+=over
+
+=item I<Rationale>
+
+The following NEXUS file with 2 blocks (TAXA, TREES) will be used in the section that follows.  The trees block in this NEXUS file contains three trees with the names "my_tree1", "my_tree2", and "my_tree3", and the taxa block contains four taxa -  A, B, C, D.
+
+=item I<Commands and Output>
+
+ system$ cat example3.nex 
+ #NEXUS
+ BEGIN TAXA;
+   DIMENSIONS ntax=4;
+   TAXLABELS  A B C D;
+ END;
+ BEGIN TREES;
+   TREE my_tree1 = (((A:1,B:1)inode1:1,D:5)inode2:1,C:2);
+   TREE my_tree2 = (((A:0.1,B:0.2)inode1:4,D:0.5)inode2:6,C:0.8);
+   TREE my_tree3 = ((A,B,D)inode1,C);
+ END;
+
+=back
+
+=head3 Writing out trees in NEXUS as newick tree string 
+
+=over
+
+=item I<Rationale>
+
+Some programs may require a simple newick string as imput, rather than a NEXUS file.
+
+=item I<Script>
+
+ # get_newick.pl 
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example3.nex');
+ my $trees = $nexus_obj->get_block('Trees')->get_trees();
+ foreach my $tree ( @$trees ) {
+   # printing trees as newick string
+    print "#-------";
+    print $tree->get_name," ",$tree->as_string,"\n";
+    print $tree->get_name," ",$tree->as_string_inodes_nameless,"\n";
+ }
+ ## Note : my $tree = $tree_block->get_tree(); # the first tree in the tree block is obtained.
+
+=item I<Commands and Output>
+
+ system$ perl get_newick.pl
+ #------- 
+ my_tree1: (((A:1,B:1)inode1:1,D:5)inode2:1,C:2)root; 
+ my_tree1: (((A:1,B:1):1,D:5):1,C:2); 
+ #------- 
+ my_tree2: (((A:0.1,B:0.2)inode1:4,D:0.5)inode2:6,C:0.8)root;
+ my_tree2: (((A:0.1,B:0.2):4,D:0.5):6,C:0.8); 
+ #------- 
+ my_tree3: ((A,B,D)inode1,C)root;
+ my_tree3: ((A,B,D),C);
+
+=item I<Discussion>
+
+Bootstrap (or branch support) values, if set, will also be output.  They will appear in square brackets after the length of the associated branch.
+
+=back
+
+=head3 Getting the children or parent or other attributes of an node.
+
+=over
+
+=item I<Rationale>
+
+It is often important to know the attributes of a nodes to know the their properties or links among 
+them (using the childen nodes and parent node of a node).
+
+=item I<Script>
+
+ #get_childen.pl -- get children of 'inode1'
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example3.nex');
+ my $trees       = $nexus_obj->get_block('Trees')->get_trees; # gets all the trees from the trees block
+ foreach my $tree (@{$trees} ) {
+    print $tree->get_name,"\n";
+    foreach my $node (@{$tree->get_nodes}) {
+       if ($node->get_name eq 'inode1') {
+          my @children = @{ $node->get_children };
+          print "Children of inode1 : ";
+          foreach my $child (@children) {
+              print $child->get_name, " ";
+          }
+          print "\n";
+      }
+   }
+ }
+
+=item I<Commands and Output>
+
+ system$ perl get_childen.pl
+ my_tree1
+ Children of inode1 : A B
+ my_tree2_ 
+ Children of inode1 : A B 
+ my_tree3
+ Children of inode1 : A B D 
+
+=item I<Discussion>
+
+Other methods will allow you to get the parent and siblings of a node, the length of the branch leading to it, its associated branch support value, whether it is a terminal node (OTU), and more.  Refer to the documentations of L<Bio::NEXUS::Tree> and L<Bio::NEXUS::Node> modules using the I<perldoc> command.
+
+=back
+
+=head3 Creating the example4.nex NEXUS file used below
+
+=over
+
+=item I<Rationale>
+
+The following NEXUS file contains 4 blocks: a taxa block, 2 characters blocks, and a trees block. The first
+characters block has a datatype of protein and the second one has dna datatype. This file is used as input for the 
+next section of the tutorial. Bio::NEXUS has extensive methods for manipulating multiple characters and trees block. 
+
+=item I<Commands and Output>
+
+ system$ cat example4.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  A B C D;
+ END;
+ BEGIN CHARACTERS;
+        TITLE protein;
+        DIMENSIONS ntax=4 nchar=17
+        FORMAT DATATYPE=protein;
+        MATRIX
+    A     MRELVHIQGGQCGNQIG
+    B     MRELVHIQGGQCGNQIG
+    C     MREIVHVQGGQCGNQIG
+    D     MREIVHVQGGQCGNQIG
+;
+ END;
+ BEGIN CHARACTERS;
+        TITLE dna;
+        DIMENSIONS ntax=4 nchar=51
+        FORMAT DATATYPE=dna;
+        MATRIX
+    A     atgcgagaattggtacatattcaaggtggtcaatgtggtaaccaaattggt
+    B     atgagagagctcgttcacatccagggtggccagtgcggtaaccagatcggc
+    C     atgagagaaatcgttcacgttcagggcggccaatgcggcaaccaaattggc
+    D     atgagagaaatcgtccacgttcagggtggccagtgcggcaaccaaattggc
+;
+ END;
+ BEGIN TREES;
+        TREE my_tree1 = (((A:1,B:1)inode1:1,D:5)inode2:1,C:2);
+ END;
+
+=back
+
+=head3 Selecting a set of columns from the character blocks
+
+=over
+
+=item I<Rationale>
+
+It often required to select or exclude a subset of characters in the characters block, perhaps based on conservation
+or number of missing or gap characters.
+
+=item I<Script>
+
+ # select_columns.pl  -- select specified number of columns from character blocks
+ use Bio::NEXUS;
+ my $nexus_obj  = new Bio::NEXUS('example4.nex');
+ $nexus_obj     = $nexus_obj->select_chars([(5..10)],'protein');
+ $nexus_obj     = $nexus_obj->select_chars([(15..32)],'dna');
+ $nexus_obj->write('column_select.nex');
+
+=item I<Commands and Output>
+
+ system$ perl select_columns.pl
+ system$ cat column_select.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  A B C D;
+ END;
+ BEGIN CHARACTERS;
+        TITLE protein;
+        DIMENSIONS ntax=4 nchar=17;
+        CHARLABELS
+         6 7 8 9 10 11;
+        MATRIX
+        A       HIQGGQ
+        D       HVQGGQ
+        C       HVQGGQ
+        B       HIQGGQ
+        ;
+ END;
+ BEGIN CHARACTERS;
+        TITLE dna;
+        DIMENSIONS ntax=4 nchar=51;
+        CHARLABELS
+         16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33;
+        MATRIX
+        A       catattcaaggtggtcaa
+        D       cacgttcagggtggccag
+        C       cacgttcagggcggccaa
+        B       cacatccagggtggccag
+        ;
+ END;
+ BEGIN TREES;
+        TREE my_tree1 = (((A:1,B:1)inode1:1,D:5)inode2:1,C:2)root;
+ END;
+
+=item I<Discussion>
+
+The above script demonstrates Bio::NEXUS library's capability to manipulate the MATRIX data in
+the CHARACTERS block.  The C<select_columns> is very useful function for selecting only a range
+of columns from the characters block.  The multiple characters blocks can be selected and manupulated
+using the unique TITLE command value.  Please refer to I<perldoc L<Bio::NEXUS::Block>>, I<perldoc L<Bio::NEXUS>> and 
+I<perldoc L<Bio::NEXUS::CharactersBlock>> for more details about the available methods in them.  Note that it is the users responsibility to maintain the integrity of the data in this case, by applying C<select_columns> to both the DNA and protein alignments, whereas when selecting or excluding taxa, data integrity is maintained automatically by altering each block approriately.
+
+=back
+
+=head2 Converting to and from foreign formats using BioPerl
+
+=head3 Converting NEXUS file to various alignment formats. (Requires Bio-Perl). 
+
+=over
+
+=item I<Rationale>
+
+It is often required to convert NEXUS file to other alignment formats to be used as input 
+in other phylogenetics and alignment programs.
+
+=item I<Script>
+
+ #nex2aln.pl
+ use Bio::AlignIO;
+ use Bio::SimpleAlign;
+ use Bio::NEXUS;
+ my $nexus_obj=new Bio::NEXUS("example1.nex");
+ my $aln = new Bio::SimpleAlign;
+ foreach my $otu (@{$nexus_obj->get_block("characters")->get_otuset->get_otus}) {
+   my $seq_str = $otu->get_seq_string;
+   my $seq_id  = $otu->get_name;
+   my $seq = Bio::LocatableSeq->new( -SEQ => $seq_str, -START => 1,
+                         -END => length($seq_str), -ID => $seq_id, -STRAND => 0);
+   $aln->add_seq($seq);
+ }
+ my  $aln_out_phylip   = Bio::AlignIO->new( -file => ">prot_align.phy", -format => "phylip");
+ my  $aln_out_clustalw = Bio::AlignIO->new( -file => ">prot_align.mfa", -format => "clustalw");
+ # Creates the output_filename.mfa file in clustalw
+ $aln_out_phylip->write_aln($aln);
+ $aln_out_clustalw->write_aln($aln);
+
+=item I<Commands and Output>
+
+ system$ perl nex2aln.pl
+ system$ cat prot_align.phy
+  4 25
+ A            IKKGANLFKT RCAQCHTVEK DGGNI 
+ D            LTKGAKLFTT RCAQCHTLEG DGGNI 
+ C            STKGAKLFET RCKQCHTVEN GGGHV 
+ B            LKKGEKLFTT RCAQCHTLKE GEGNL 
+
+ system$ cat prot_align.mfa
+ CLUSTAL W(1.81) multiple sequence alignment
+ A                      IKKGANLFKTRCAQCHTVEKDGGNI
+ D                      LTKGAKLFTTRCAQCHTLEGDGGNI
+ C                      STKGAKLFETRCKQCHTVENGGGHV
+ B                      LKKGEKLFTTRCAQCHTLKEGEGNL
+                         .** :** *** ****:: . *::
+
+=item I<Discussion>
+
+The above scripts uses Bio-Perl's capability to convert the NEXUS file contents to various formats.
+the alingment formats supported by Bio-Perl are bl2seq, clustalw, emboss, fasta, maf,  mase, mega, 
+meme, msf, pfam, phylip, prodom, psi, selex, and stockholm. The NEXUS data handler in Bio-Perl is very
+ basic and does not have much functionality. Refer to L<http://doc.bioperl.org/releases/bioperl-current/bioperl-live/Bio/AlignIO.html>
+for more about the alignment formats supported by Bio-Perl.
+
+=back
+
+=head3 Converting various alignment formats to NEXUS file.(Requires Bio-Perl module)
+
+=over
+
+=item I<Rationale>
+
+The output from various programs has to be converted to NEXUS file format to be used by 
+phylogenetics and alignment programs.
+
+=item I<Script>
+
+ #aln2nex.pl
+ use Bio::AlignIO;
+ use Bio::NEXUS;
+ #
+ # 1. Open a new Bio::NEXUS object
+ my $nexus_obj      = new Bio::NEXUS();
+ #
+ # 2. Assign input file name
+ my $input_filename = 'prot_align.mfa';
+ # 
+ # 3. Create a new CharactersBlock
+ my $char_block     = new Bio::NEXUS::CharactersBlock('characters');
+ my $block_title    = 'Protein';
+ #  
+ # 4. Read alignment file using Bioperl module - Bio::AlignIO 
+ my $in           = new Bio::AlignIO(-file => $input_filename, '-format' => 'clustalw');
+ #
+ my (@otus,$ntax,$nchar);
+ #
+ # 5. The matrix of the Characters block is stored as an otuset (class Bio::NEXUS::TaxUnitSet).
+ # in Bio::NEXUS module otuset is represented as an array of OTU units. 
+ #  
+ while ( my $aln = $in->next_aln() ) {
+    $nchar = $aln->length;
+    $ntax  = $aln->no_sequences;
+    foreach my $seq ($aln->each_seq) {
+        my @seq = split(//,$seq->seq);
+        push @otus, new Bio::NEXUS::TaxUnit($seq->id,\@seq);
+    }
+ }
+ #
+ my $otuset = new Bio::NEXUS::TaxUnitSet();
+ $otuset->set_otus(\@otus);
+ $char_block->set_otuset($otuset);
+ $char_block->set_taxlabels($char_block->get_otuset()->get_otu_names());
+ #
+ # 6. set title and format commands for the characters block
+ $char_block->set_title("$block_title");
+ $char_block->set_dimensions({ntax=>$ntax,nchar=>$nchar});
+ #
+ $nexus_obj->add_block($char_block);
+ $nexus_obj->write('nexus_align.nex');
+
+=item I<Commands and Output>
+
+ system$ perl aln2nex.pl
+ system$ cat nexus_align.nex
+ #NEXUS
+ BEGIN TAXA;
+        DIMENSIONS ntax=4;
+        TAXLABELS  A D C B;
+ END;
+ BEGIN CHARACTERS;
+        TITLE Protein;
+        DIMENSIONS ntax=4 nchar=25;
+        MATRIX
+        A       IKKGANLFKTRCAQCHTVEKDGGNI
+        D       LTKGAKLFTTRCAQCHTLEGDGGNI
+        C       STKGAKLFETRCKQCHTVENGGGHV
+        B       LKKGEKLFTTRCAQCHTLKEGEGNL
+        ;
+ END;
+
+=item I<Discussion>
+
+The content of prot_align.mfa can be obtained from the previous section ( NOTE: There should NOT be any spaces BEFORE the 
+taxon name or sequence id in the CLUSTALW format ).  The above script requires Bio-Perl installation.
+
+=back
+
+=head2 Advanced
+
+=head3 Convert TreeFam database content to NEXUS file [ Modules required: treefam, DBI and Bio-Perl ] - not tested
+
+I<Under Construction>
+
+=over
+
+=item I<Rationale>
+
+=item I<Discussion>
+
+=back
+
+=head2 Using available tools based on Bio::NEXUS (Nexplorer, nextool and nexplot)
+
+Many of the manipulations described above can be carried out using the command-driven program nextool.  The nexplot tool can create 
+sophisticated views of your data for use in presentations and publications. The nexplorer server (L<http://www.molevol.org/nexplorer>) 
+can carry out a limited set of manipulations and views, but has the advantage of a graphical user interface.  
+Thus, the combination of Bio::NEXUS and pre-built tools allows a choice: 
+
+=over
+
+=item *
+
+I<write your own custom scripts with the Bio::NEXUS library> for nearly any task.  This approach is powerful but requires some programming skill and familiarity with Bio::NEXUS.  
+
+=item *
+
+I<use the pre-built, command-driven tools nextool and nexplot> to carry out various editing and viewing operations.  This is easier but less flexible, and still requires some time to learn the interface.  
+
+=item *
+
+I<browse and manipulate data using Nexplorer's graphical user-interface>.  This approach is easy and very useful for exploring a datset but your options are much more limited. 
+
+=back
+
+=head3 Nexplorer
+
+See the user tutorial of Nexplorer here: L<http://www.molevol.org/nexplorer/>
+
+=head3 nexplot
+
+ system$ nexplot.pl -h 
+
+=head3 nextool 
+
+ system$ nextool.pl -h 
+
+=head2 Going further with Bio::NEXUS
+
+=over
+
+=item *
+
+L<Bio::NEXUS Installation|Installation> Guide
+
+=item *
+
+L<Bio::NEXUS> commands reference
+
+=item *
+
+L<Bio::NEXUS::Tree> commands reference
+
+=item *
+
+Nexplorer link - L<http://www.molevol.org/nexplorer>
+
+=item *
+
+Bio-Perl link - L<http://www.bioperl.org>
+
+=item *
+
+L<Bio::Phylo> link 
+
+=back
+
+=cut

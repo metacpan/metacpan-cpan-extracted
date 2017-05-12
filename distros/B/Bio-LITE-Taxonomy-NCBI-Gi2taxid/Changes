@@ -1,0 +1,44 @@
+Revision history for Bio-LITE-Taxonomy-NCBI-Gi2taxid
+
+0.01    Mon Oct 8 12:43:04 2010
+        First version, released to CPAN
+
+0.02	Wed Nov 24 13:55:31 2010
+	Small bug fixes
+
+0.03	Thu Nov 25 10:10:34 2010
+	Bug fixes in test scripts
+
+0.04	Sat May 28 11:21:41 2011
+	Avoided copy of dictionary in final object (used by ref)
+
+0.05    Wed Jul 25 17:09:32 2012
+        The binary db is now more compacted (3/4s). This means that
+        you have to recreate binary files with this version
+
+        The creation of the database is now much more faster.
+
+0.06    Sat Jul 27 22:28:01 2012
+        Fixed a couple of issues with the documentation
+
+0.07    Tue Aug 27 15:52:34 2013
+	Fixed warnings (no -save_mem) with GIs greater than the last GI in the map file.
+
+0.08    Wed Oct 30 11:44:03 2013
+	Fixed "panic: memory wrap problem" -- Reverting to slower but safer way to build the binary data
+
+0.09    Thu Oct 31 12:41:32 2013
+	Added -save_mem option in new_dict
+	Reducing the binary size from 4 bytes per gi to 3 bytes
+
+0.10    Mon Dec 23 11:21:21 2013
+	The -save_mem option of 0.09 is now the only option for creating dicts
+
+0.11    Tue Jun 17 15:25:52 2014
+	Fixed some tests
+
+0.12    Thu Oct 23 11:37:23 2014
+	Reworked creation of dict bin to speed up things
+
+0.13    Wed Dec 3 12:05:42 2014
+        Updated Fail::Tail version dependency

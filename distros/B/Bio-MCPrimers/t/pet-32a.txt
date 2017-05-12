@@ -1,0 +1,19 @@
+# pET-32A (CloningVector format)
+# Tim Wiggin and Steve Lenk (C) 2006
+# Licensed under the Perl Artistic License
+# Note that names (column 1) must not have blanks
+
+# Name  Sequence  Cut position in site  Cut position in plasmid frame
+
+NspV	TTCGAA	2	2
+BglII	AGATCT	1	0
+KpnI	GGTACC	5	2
+NcoI	CCATGG	1	2
+EcoRV	GATATC	3	0
+BamHI	GGATCC	1	1
+EcoRI	GAATTC	1	1
+SacI	GAGCTC	5	2
+SalI	GTCGAC	1	2
+HindIII	AAGCTT	1	2
+NotI-EagI	GCGGCCGC	2	0
+AvaI-XhoI	CTCGAG	1	2

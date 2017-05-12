@@ -1,0 +1,89 @@
+Revision history for Perl extension Business::PayPal.
+
+0.18 2016.08.02
+    - New certs.
+    - Experimental and undocumented check_cert method
+      to allow the user to opt-out from certificate checking.
+      (default is certificate checking is on).
+    - Fix the passing of the certcontent to the correct variable. RT #96521
+      (Viktor Nacht)
+
+0.17 2015.10.02
+    - New certs.
+
+0.16 2015.04.27
+    - New certs.
+
+0.15 2015.04.01
+    - New certs.
+
+0.14 2014.12.07
+    - Allow the user to set 'form_id' that will be inclded as id=" in the <form
+      to make it easier to identify the form using JavaScript.
+    - Documentation and test for changing the address to the sandbox.
+    - Use subtests, require version 1.00 of Test::More.
+
+
+0.13 2014-05-11
+    - Comment out old certificates. Only include the one returned by getppcert.pl
+
+0.12 2014-04-19
+
+    - Fixing the cert and certcontent paramaters of the constructor RT #92367
+    - Adding the addcert and addcertcontent parameters.
+
+    - Add deprecation warning to the global variables
+      $Cert and $Certcontent
+
+    - New cert added
+    - Add License and Repo link to META files.
+      (fixed by David Steinbrunner)
+
+0.11 2013.07.08
+    - Add another possible certificate.
+
+0.10 2013.06.24
+    - Add another case for the recent Cert update.
+
+0.09 2013.06.22
+    - Added new cert as returned by PayPal.
+    - report error when no cert found
+      http://www.cpantesters.org/cpan/report/4f7dbbb4-02e1-11e2-8e23-9a24f233959e
+
+0.08 2012-09-19
+    - Add 2 more cert reported by CPAN Testers
+
+0.07 2012 September 18
+    - Add alternative certificate
+
+0.06 2012 September 04
+    - stop cloning in constructor
+    - eliminate the dependency on CGI by manually creating the button
+
+0.05 2012 July 19
+    - update Certificate
+    - standardize directory layout
+    - modernize tests
+
+0.04  2010 Aug 04
+    - fix incorrect synopsis for new() method with id
+    - update default cert
+    - encapsulate default cert in package variable to prevent bugs with
+      DATA filehandle being re-opened in mod_perl
+    - support multiple currency, default to USD [CHISEL]
+    - Fix to button code to allow sandbox testing [william@knowmad.com]
+
+0.03  2008 Dec 25
+    - fix typo in usage for button_image
+    - new maintainer PHRED
+
+0.02  2002 Aug 25
+    - fixed Makefile.PL so that CPAN.pm will install
+          prerequisite modules.  Thanks to Rick Myers for
+          the patch which prompted me to get off my ass and
+          fix this.
+
+0.01  2002 Mar 30
+    - original version; created by h2xs 1.21 with options
+        -AX -n Business::PayPal
+

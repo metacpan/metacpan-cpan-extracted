@@ -1,0 +1,128 @@
+#!perl
+use strict;
+use warnings;
+use Bisect::Perl::UsingGit;
+
+my $app = Bisect::Perl::UsingGit->new_with_options();
+$app->run;
+
+__END__
+
+
+=head1 NAME
+
+bisect_perl_using_git - Help you to bisect Perl
+
+=head1 DESCRIPTION
+
+L<bisect_perl_using_git> helps you to bisect Perl. This helps you to
+find at what commit a change happened in Perl. You can check for
+file addition and removal - it checks out various commits of Perl and
+finds out which change was involved. You can also check for a difference
+in Perl evalutation, in which case it will check out various commits
+of Perl, compile them and finds out which change was involved - this
+is more CPU intensive and you must install ccache.
+
+First you must download the current Git repository of Perl, so execute
+something like the following:
+
+  mkdir git
+  cd git
+  git clone git://perl5.git.perl.org/perl.git perl-git
+  cd perl-git
+
+Now, I happen to know that the autodie pragma was added sometime in
+December 2008, but I would like to know which commit. Let's find out
+some commits at the beginning and the end of that month, and see
+when lib/autodie.pm was added:
+
+  # git log --before=2008-12-01 -n 1
+  # 1409bc0658469580630ba458c85fe9cc3cb2d78c
+  # git log --before=2008-12-31 -n 1
+  # 675b0f774d374f6951c02c6463c64a746ad46acd
+  git bisect reset
+  git bisect start
+  git bisect good 1409bc0658469580630ba458c85fe9cc3cb2d78c
+  git bisect bad 675b0f774d374f6951c02c6463c64a746ad46acd
+  # Bisecting: 114 revisions left to test after this
+  git bisect run bisect_perl_using_git --action file_added \
+    --filename lib/autodie.pm
+  # ... after checking out 10 trees and about 10 seconds, it says:
+  # 0b09a93a0cec34bc5d1740400c4ed9500d2f1dbe is first bad commit
+  # commit 0b09a93a0cec34bc5d1740400c4ed9500d2f1dbe
+  # Author: Paul Fenwick <pjf@perltraining.com.au>
+  # Date:   Sat Dec 20 22:21:02 2008 +0900
+  #
+  # git-flavoured autodie 1.997 patch
+  # G'day p5p,
+  # ...
+  git bisect reset
+
+Sometime after June 2009, ext/Storable/MANIFEST was removed from Perl.
+Let's find out which commit removed it:
+
+  # git log --before=2009-06-01 -n 1
+  # 20f91e418dfa8bdf6cf78614bfebebc28a7613ee
+  git bisect reset
+  git bisect start
+  git bisect good 20f91e418dfa8bdf6cf78614bfebebc28a7613ee
+  git bisect bad HEAD
+  # Bisecting: 266 revisions left to test after this
+  git bisect run bisect_perl_using_git --action file_removed \
+    --filename ext/Storable/MANIFEST
+  # ... after checking out 11 trees and about 10 seconds, it says:
+  # 2868e48536e3f471e5ba483466cc1bc53caff5a is first bad commit
+  # commit e2868e48536e3f471e5ba483466cc1bc53caff5a
+  # Author: David Mitchell <davem@iabyn.com>
+  # Date:   Fri Jun 12 17:24:43 2009 +0100
+  #
+  #    remove ext/Storable/MANIFEST; its out of date related to CPAN
+  #    and for most dual-life modules we don't bother including it in blead
+  # ...
+  git bisect reset
+
+Now for a real bug report, where some code that works in Perl 5.8.8 and
+should work in Perl 5.10.0 but does not:
+
+  http://rt.perl.org/rt3/Public/Bug/Display.html?id=62056
+
+We create a ~/testcase.pl which contains the following:
+
+  #!perl
+  use strict;
+  use warnings;
+  use charnames ':full';
+  my $x;
+  m/$x\N{START OF HEADING}/
+
+And then run:
+
+  git bisect reset
+  git bisect start
+  git bisect good perl-5.8.8
+  git bisect bad perl-5.10.0
+  # Bisecting: 4041 revisions left to test after this
+  git bisect run bisect_perl_using_git --action perl_fails \
+    --filename ~/testcase.pl
+  # ... after checking out 16 trees and about one hour, it says:
+  # fc8cd66c26827f6c2ee1aa00ab2d3b3c320a4a28 is first bad commit
+  # commit fc8cd66c26827f6c2ee1aa00ab2d3b3c320a4a28
+  # Author: Yves Orton <demerphq@gmail.com>
+  # Date:   Tue Sep 19 03:37:19 2006 +0200
+  #
+  #    Re: \N{...} in regular expression [PATCH]
+  # ...
+  git bisect reset
+
+=head1 AUTHOR
+
+Leon Brocard, C<< <acme@astray.com> >>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2009, Leon Brocard
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it or modify it
+under the same terms as Perl itself.

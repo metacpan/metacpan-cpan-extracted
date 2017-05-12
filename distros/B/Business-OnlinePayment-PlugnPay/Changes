@@ -1,0 +1,6 @@
+0.03  Wed Aug  6  1:37:50 EDT 2008
+        - add handling of 'recurring_billing' content member
+0.02  Wed Nov  2  1:48:42 EDT 2007
+        - correct silly test bug
+0.01  Wed Oct 31 23:24:14 EDT 2007
+        - original version; created by jeff

@@ -1,0 +1,990 @@
+<?xml version='1.0' standalone='no' ?>
+<!DOCTYPE DASGFF SYSTEM 'dasgff.dtd' >
+<DASGFF>
+  <GFF version="1.0" href="http://www.ebi.ac.uk/das-srv/uniprot/das/aristotle/features?segment=P50225">
+    <SEGMENT id="P50225" version="4e24bfab8e5366a47b094fa7169e0351" start="1" stop="295">
+      <FEATURE id="P50225" label="P50225">
+        <TYPE id="description">description</TYPE>
+        <METHOD id="description">description</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Sulfotransferase 1A1 (EC 2.8.2.1) (Aryl sulfotransferase 1) (Phenol sulfotransferase 1) (Phenol-sulfating phenol sulfotransferase 1) (P-PST 1) (Thermostable phenol sulfotransferase) (Ts-PST) (HAST1/HAST2) (ST1A3).</NOTE>
+        <LINK href="http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P50225">http://www.ebi.uniprot.org/uniprot-srv/uniProtView.do?proteinAc=P50225</LINK>
+      </FEATURE>
+      <FEATURE id="PRO_0000085127" label="ST1A1_HUMAN_CHAIN_1_295">
+        <TYPE id="CHAIN">CHAIN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>1</START>
+        <END>295</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Sulfotransferase 1A1/FTId=PRO_0000085127</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_13_15" label="ST1A1_HUMAN_STRAND_13_15">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>13</START>
+        <END>15</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_16_17" label="ST1A1_HUMAN_TURN_16_17">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>16</START>
+        <END>17</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_18_20" label="ST1A1_HUMAN_STRAND_18_20">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>18</START>
+        <END>20</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_22_31" label="ST1A1_HUMAN_HELIX_22_31">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>22</START>
+        <END>31</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_32_33" label="ST1A1_HUMAN_TURN_32_33">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>32</START>
+        <END>33</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="VAR_009302" label="ST1A1_HUMAN_VARIANT_37_37">
+        <TYPE id="VARIANT">VARIANT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>37</START>
+        <END>37</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>R -&#62; Q/FTId=VAR_009302</NOTE>
+        <LINK href="http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_009302">http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_009302</LINK>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_38_39" label="ST1A1_HUMAN_TURN_38_39">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>38</START>
+        <END>39</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_41_46" label="ST1A1_HUMAN_STRAND_41_46">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>41</START>
+        <END>46</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_47_48" label="ST1A1_HUMAN_TURN_47_48">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>47</START>
+        <END>48</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_NP_BIND_48_53" label="ST1A1_HUMAN_NP_BIND_48_53">
+        <TYPE id="NP_BIND">NP_BIND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>48</START>
+        <END>53</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>PAPS</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_49_50" label="ST1A1_HUMAN_STRAND_49_50">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>49</START>
+        <END>50</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_51_62" label="ST1A1_HUMAN_HELIX_51_62">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>51</START>
+        <END>62</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_63_65" label="ST1A1_HUMAN_TURN_63_65">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>63</START>
+        <END>65</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_67_70" label="ST1A1_HUMAN_HELIX_67_70">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>67</START>
+        <END>70</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_MUTAGEN_70_70" label="ST1A1_HUMAN_MUTAGEN_70_70">
+        <TYPE id="MUTAGEN">MUTAGEN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>70</START>
+        <END>70</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>C -&#62; S Increased sensitivity of enzyme activity to heat inactivation</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_71_72" label="ST1A1_HUMAN_TURN_71_72">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>71</START>
+        <END>72</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_73_73" label="ST1A1_HUMAN_STRAND_73_73">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>73</START>
+        <END>73</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_75_78" label="ST1A1_HUMAN_HELIX_75_78">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>75</START>
+        <END>78</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_79_79" label="ST1A1_HUMAN_STRAND_79_79">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>79</START>
+        <END>79</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_81_81" label="ST1A1_HUMAN_STRAND_81_81">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>81</START>
+        <END>81</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_82_83" label="ST1A1_HUMAN_TURN_82_83">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>82</START>
+        <END>83</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_86_86" label="ST1A1_HUMAN_STRAND_86_86">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>86</START>
+        <END>86</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_87_88" label="ST1A1_HUMAN_TURN_87_88">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>87</START>
+        <END>88</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_89_89" label="ST1A1_HUMAN_STRAND_89_89">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>89</START>
+        <END>89</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_CONFLICT_90_90" label="ST1A1_HUMAN_CONFLICT_90_90">
+        <TYPE id="CONFLICT">CONFLICT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>90</START>
+        <END>90</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>P -&#62; L (in Ref. 3)</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_92_97" label="ST1A1_HUMAN_HELIX_92_97">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>92</START>
+        <END>97</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_98_98" label="ST1A1_HUMAN_TURN_98_98">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>98</START>
+        <END>98</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_101_102" label="ST1A1_HUMAN_STRAND_101_102">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>101</START>
+        <END>102</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_104_107" label="ST1A1_HUMAN_STRAND_104_107">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>104</START>
+        <END>107</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_ACT_SITE_108_108" label="ST1A1_HUMAN_ACT_SITE_108_108">
+        <TYPE id="ACT_SITE">ACT_SITE</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>108</START>
+        <END>108</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Proton acceptor</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_111_113" label="ST1A1_HUMAN_TURN_111_113">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>111</START>
+        <END>113</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_114_114" label="ST1A1_HUMAN_STRAND_114_114">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>114</START>
+        <END>114</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_116_120" label="ST1A1_HUMAN_HELIX_116_120">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>116</START>
+        <END>120</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_121_122" label="ST1A1_HUMAN_TURN_121_122">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>121</START>
+        <END>122</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_124_129" label="ST1A1_HUMAN_STRAND_124_129">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>124</START>
+        <END>129</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_NP_BIND_130_138" label="ST1A1_HUMAN_NP_BIND_130_138">
+        <TYPE id="NP_BIND">NP_BIND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>130</START>
+        <END>138</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>PAPS</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_132_145" label="ST1A1_HUMAN_HELIX_132_145">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>132</START>
+        <END>145</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_146_146" label="ST1A1_HUMAN_STRAND_146_146">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>146</START>
+        <END>146</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_147_148" label="ST1A1_HUMAN_TURN_147_148">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>147</START>
+        <END>148</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_149_149" label="ST1A1_HUMAN_STRAND_149_149">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>149</START>
+        <END>149</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_155_164" label="ST1A1_HUMAN_HELIX_155_164">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>155</START>
+        <END>164</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_165_165" label="ST1A1_HUMAN_TURN_165_165">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>165</START>
+        <END>165</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_167_167" label="ST1A1_HUMAN_STRAND_167_167">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>167</START>
+        <END>167</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_168_169" label="ST1A1_HUMAN_TURN_168_169">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>168</START>
+        <END>169</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_172_182" label="ST1A1_HUMAN_HELIX_172_182">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>172</START>
+        <END>182</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_CONFLICT_181_181" label="ST1A1_HUMAN_CONFLICT_181_181">
+        <TYPE id="CONFLICT">CONFLICT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>181</START>
+        <END>181</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&#62; G (in Ref. 5)</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_183_185" label="ST1A1_HUMAN_TURN_183_185">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>183</START>
+        <END>185</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_186_186" label="ST1A1_HUMAN_STRAND_186_186">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>186</START>
+        <END>186</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_188_192" label="ST1A1_HUMAN_STRAND_188_192">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>188</START>
+        <END>192</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_NP_BIND_193_229" label="ST1A1_HUMAN_NP_BIND_193_229">
+        <TYPE id="NP_BIND">NP_BIND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>193</START>
+        <END>229</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>PAPS</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_193_198" label="ST1A1_HUMAN_HELIX_193_198">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>193</START>
+        <END>198</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_200_211" label="ST1A1_HUMAN_HELIX_200_211">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>200</START>
+        <END>211</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_212_212" label="ST1A1_HUMAN_TURN_212_212">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>212</START>
+        <END>212</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="VAR_007425" label="ST1A1_HUMAN_VARIANT_213_213">
+        <TYPE id="VARIANT">VARIANT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>213</START>
+        <END>213</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>R -&#62; H (in allele SULT1A1*2; common polymorphism; has a lower activity; dbSNP:1042028)/FTId=VAR_007425</NOTE>
+        <LINK href="http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_007425">http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_007425</LINK>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_217_226" label="ST1A1_HUMAN_HELIX_217_226">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>217</START>
+        <END>226</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="VAR_009303" label="ST1A1_HUMAN_VARIANT_223_223">
+        <TYPE id="VARIANT">VARIANT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>223</START>
+        <END>223</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>M -&#62; V (in dbSNP:1801030)/FTId=VAR_009303</NOTE>
+        <LINK href="http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_009303">http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_009303</LINK>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_227_227" label="ST1A1_HUMAN_TURN_227_227">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>227</START>
+        <END>227</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_228_228" label="ST1A1_HUMAN_STRAND_228_228">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>228</START>
+        <END>228</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_229_234" label="ST1A1_HUMAN_HELIX_229_234">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>229</START>
+        <END>234</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="VAR_014889" label="ST1A1_HUMAN_VARIANT_235_235">
+        <TYPE id="VARIANT">VARIANT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>235</START>
+        <END>235</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>N -&#62; T (in dbSNP:1059491)/FTId=VAR_014889</NOTE>
+        <LINK href="http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_014889">http://ca.expasy.org/cgi-bin/get-sprot-variant.pl?VAR_014889</LINK>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_236_238" label="ST1A1_HUMAN_TURN_236_238">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>236</START>
+        <END>238</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_239_239" label="ST1A1_HUMAN_STRAND_239_239">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>239</START>
+        <END>239</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_241_242" label="ST1A1_HUMAN_TURN_241_242">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>241</START>
+        <END>242</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_243_243" label="ST1A1_HUMAN_STRAND_243_243">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>243</START>
+        <END>243</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_245_247" label="ST1A1_HUMAN_TURN_245_247">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>245</START>
+        <END>247</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_248_248" label="ST1A1_HUMAN_STRAND_248_248">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>248</START>
+        <END>248</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_250_252" label="ST1A1_HUMAN_TURN_250_252">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>250</START>
+        <END>252</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_255_256" label="ST1A1_HUMAN_STRAND_255_256">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>255</START>
+        <END>256</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_NP_BIND_257_259" label="ST1A1_HUMAN_NP_BIND_257_259">
+        <TYPE id="NP_BIND">NP_BIND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>257</START>
+        <END>259</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>PAPS</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_261_262" label="ST1A1_HUMAN_STRAND_261_262">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>261</START>
+        <END>262</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_263_266" label="ST1A1_HUMAN_HELIX_263_266">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>263</START>
+        <END>266</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_267_267" label="ST1A1_HUMAN_TURN_267_267">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>267</START>
+        <END>267</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_268_268" label="ST1A1_HUMAN_STRAND_268_268">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>268</START>
+        <END>268</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_HELIX_270_283" label="ST1A1_HUMAN_HELIX_270_283">
+        <TYPE id="HELIX">HELIX</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>270</START>
+        <END>283</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_CONFLICT_282_282" label="ST1A1_HUMAN_CONFLICT_282_282">
+        <TYPE id="CONFLICT">CONFLICT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>282</START>
+        <END>282</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>E -&#62; K (in Ref. 4 and 8)</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_TURN_284_286" label="ST1A1_HUMAN_TURN_284_286">
+        <TYPE id="TURN">TURN</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>284</START>
+        <END>286</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_CONFLICT_290_290" label="ST1A1_HUMAN_CONFLICT_290_290">
+        <TYPE id="CONFLICT">CONFLICT</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>290</START>
+        <END>290</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>S -&#62; T (in Ref. 4 and 8)</NOTE>
+      </FEATURE>
+      <FEATURE id="ST1A1_HUMAN_STRAND_293_293" label="ST1A1_HUMAN_STRAND_293_293">
+        <TYPE id="STRAND">STRAND</TYPE>
+        <METHOD id="UniProt">UniProt</METHOD>
+        <START>293</START>
+        <END>293</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+      <FEATURE id="PD001218" label="ST1A1_HUMAN_Sulfotransferase_6_181">
+        <TYPE id="ProDom">ProDom</TYPE>
+        <METHOD id="ProDom">ProDom</METHOD>
+        <START>6</START>
+        <END>181</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Description: Sulfotransferase</NOTE>
+        <NOTE>Status: True Positive</NOTE>
+        <LINK href="http://prodes.toulouse.inra.fr/prodom/current/cgi-bin/request.pl?question=DBEN&#38;query=PD001218">http://prodes.toulouse.inra.fr/prodom/current/cgi-bin/request.pl?question=DBEN&#38;query=PD001218</LINK>
+      </FEATURE>
+      <FEATURE id="PF00685" label="ST1A1_HUMAN_Sulfotransfer_1_38_288">
+        <TYPE id="Pfam">Pfam</TYPE>
+        <METHOD id="Pfam">Pfam</METHOD>
+        <START>38</START>
+        <END>288</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Description: Sulfotransfer_1</NOTE>
+        <NOTE>Status: True Positive</NOTE>
+        <LINK href="http://www.sanger.ac.uk/cgi-bin/Pfam/getacc?PF00685">http://www.sanger.ac.uk/cgi-bin/Pfam/getacc?PF00685</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8484775" label="pubmed:8484775">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zhu X., Veronese M.E., Sansom L.N., McManus M.E. (1993). "Molecular characterisation of a human aryl sulfotransferase cDNA.", Biochem. Biophys. Res. Commun. 192:671-676</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8484775">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8484775</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8363592" label="pubmed:8363592">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Zhu X., Veronese M.E., Bernard C.C., Sansom L.N., McManus M.E. (1993). "Identification of two human brain aryl sulfotransferase cDNAs.", Biochem. Biophys. Res. Commun. 195:120-127</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8363592">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8363592</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7864863" label="pubmed:7864863">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Hwang S.-R., Kohn A.B., Hook V.Y.H. (1995). "Molecular cloning of an isoform of phenol sulfotransferase from human brain hippocampus.", Biochem. Biophys. Res. Commun. 207:701-707</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7864863">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7864863</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8423770" label="pubmed:8423770">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Wilborn T.W., Comer K.A., Dooley T.P., Reardon I.M., Heinrikson R.L., Falany C.N. (1993). "Sequence analysis and expression of the cDNA for the phenol-sulfating form of human liver phenol sulfotransferase.", Mol. Pharmacol. 43:70-77</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8423770">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8423770</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7695643" label="pubmed:7695643">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Jones A.L., Hagen M., Coughtrie M.W.H., Roberts R.C., Glatt H. (1995). "Human platelet phenolsulfotransferases: cDNA cloning, stable expression in V79 cells and identification of a novel allelic variant of the phenol-sulfating form.", Biochem. Biophys. Res. Commun. 208:855-862</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7695643">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7695643</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:7581483" label="pubmed:7581483">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Ozawa S., Nagata K., Shimada M., Ueda M., Tsuzuki T., Yamazoe Y., Kato R. (1995). "Primary structures and properties of two related forms of aryl sulfotransferases in human liver.", Pharmacogenetics 5:S135-S140</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7581483">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=7581483</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8033246" label="pubmed:8033246">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Yamazoe Y., Nagata K., Ozawa S., Kato R. (1994). "Structural similarity and diversity of sulfotransferases.", Chem. Biol. Interact. 92:107-117</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8033246">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8033246</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8924211" label="pubmed:8924211">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Bernier F., Soucy P., Luu-The V. (1996). "Human phenol sulfotransferase gene contains two alternative promoters: structure and expression of the gene.", DNA Cell Biol. 15:367-375</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8924211">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8924211</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8912648" label="pubmed:8912648">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dooley T.P., Huang Z. (1996). "Genomic organization and DNA sequences of two human phenol sulfotransferase genes (STP1 and STP2) on the short arm of chromosome 16.", Biochem. Biophys. Res. Commun. 228:134-140</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8912648">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8912648</LINK>
+      </FEATURE>
+      <FEATURE id="P50225" label="P50225">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Raftogianis R.B., Her C., Weinshilboum R.M. (1997). Submitted to database EMBL/GenBank/DDBJ databases</NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:9855620" label="pubmed:9855620">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dajani R., Hood A.M., Coughtrie M.W. (1998). "A single amino acid, Glu146, governs the substrate specificity of a human dopamine sulfotransferase, SULT1A3.", Mol. Pharmacol. 54:942-948</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=9855620">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=9855620</LINK>
+      </FEATURE>
+      <FEATURE id="P50225" label="P50225">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Shichijo S., Itoh K. (2001). "Identification of immuno-peptidmics that are recognized by tumor-reactive CTL generated from TIL of colon cancer patients.", Submitted to database EMBL/GenBank/DDBJ databases</NOTE>
+      </FEATURE>
+      <FEATURE id="P50225" label="P50225">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Kalnine N., Chen X., Rolfs A., Halleck A., Hines L., Eisenstein S., Koundinya M., Raphael J., Moreira D., Kelley T., LaBaer J., Lin Y., Phelan M., Farmer A. (2003). "Cloning of human full-length CDSs in BD Creator(TM) system donor vector.", Submitted to database EMBL/GenBank/DDBJ databases</NOTE>
+      </FEATURE>
+      <FEATURE id="pubmed:12477932" label="pubmed:12477932">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Strausberg R.L., Feingold E.A., Grouse L.H., Derge J.G., Klausner R.D., Collins F.S., Wagner L., Shenmen C.M., Schuler G.D., Altschul S.F., Zeeberg B., Buetow K.H., Schaefer C.F., Bhat N.K., Hopkins R.F., Jordan H., Moore T., Max S.I., Wang J., Hsieh F., Diatchenko L., Marusina K., Farmer A.A., Rubin G.M., Hong L., Stapleton M., Soares M.B., Bonaldo M.F., Casavant T.L., Scheetz T.E., Brownstein M.J., Usdin T.B., Toshiyuki S., Carninci P., Prange C., Raha S.S., Loquellano N.A., Peters G.J., Abramson R.D., Mullahy S.J., Bosak S.A., McEwan P.J., McKernan K.J., Malek J.A., Gunaratne P.H., Richards S., Worley K.C., Hale S., Garcia A.M., Gay L.J., Hulyk S.W., Villalon D.K., Muzny D.M., Sodergren E.J., Lu X., Gibbs R.A., Fahey J., Helton E., Ketteman M., Madan A., Rodrigues S., Sanchez A., Whiting M., Madan A., Young A.C., Shevchenko Y., Bouffard G.G., Blakesley R.W., Touchman J.W., Green E.D., Dickson M.C., Rodriguez A.C., Grimwood J., Schmutz J., Myers R.M., Butterfield Y.S.N., Krzywinski M.I., Skalska U., Smailus D.E., Schnerch A., Schein J.E., Jones S.J.M., Marra M.A. (2002). "Generation and initial analysis of more than 15,000 full-length human and mouse cDNA sequences.", Proc. Natl. Acad. Sci. U.S.A. 99:16899-16903</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=12477932">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=12477932</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8288252" label="pubmed:8288252">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Dooley T.P., Obermoeller R.D., Leiter E.H., Chapman H.D., Falany C.N., Deng Z., Siciliano M.J. (1993). "Mapping of the phenol sulfotransferase gene (STP) to human chromosome 16p12.1-p11.2 and to mouse chromosome 7.", Genomics 18:440-443</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8288252">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8288252</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8093002" label="pubmed:8093002">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Veronese M.E., Burgess W., Zhu X., McManus M.E. (1994). "Functional characterization of two human sulphotransferase cDNAs that encode monoamine- and phenol-sulphating forms of phenol sulphotransferase: substrate kinetics, thermal-stability and inhibitor-sensitivity studies.", Biochem. J. 302:497-502</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8093002">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8093002</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:8033270" label="pubmed:8033270">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Falany C.N., Zhuang W., Falany J.L. (1994). "Characterization of expressed human phenol-sulfating phenol sulfotransferase: effect of mutating cys70 on activity and thermostability.", Chem. Biol. Interact. 92:57-66</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8033270">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=8033270</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:9345314" label="pubmed:9345314">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Raftogianis R.B., Wood T.C., Otterness D.M., Van Loon J.A., Weinshilboum R.M. (1997). "Phenol sulfotransferase pharmacogenetics in humans: association of common SULT1A1 alleles with TS PST phenotype.", Biochem. Biophys. Res. Commun. 239:298-304</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=9345314">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=9345314</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:10762004" label="pubmed:10762004">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Engelke C.E., Meinl W., Boeing H., Glatt H. (2000). "Association between functional genetic polymorphisms of human sulfotransferases 1A1 and 1A2.", Pharmacogenetics 10:163-169</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=10762004">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=10762004</LINK>
+      </FEATURE>
+      <FEATURE id="pubmed:12471039" label="pubmed:12471039">
+        <TYPE id="reference">reference</TYPE>
+        <METHOD id="reference">reference</METHOD>
+        <START>0</START>
+        <END>0</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+        <NOTE>Gamage N.U., Duggleby R.G., Barnett A.C., Tresillian M., Latham C.F., Liyou N.E., McManus M.E., Martin J.L. (2003). "Structure of a human carcinogen-converting enzyme, SULT1A1. Structural and kinetic implications of substrate inhibition.", J. Biol. Chem. 278:7655-7662</NOTE>
+        <LINK href="http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=12471039">http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?db=PubMed&#38;cmd=Retrieve&#38;dopt=Citation&#38;list_uids=12471039</LINK>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>

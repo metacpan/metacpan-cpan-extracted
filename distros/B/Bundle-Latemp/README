@@ -1,0 +1,15 @@
+Bundle::Latemp - A bundle to install CPAN modules used by the
+Latemp Content Management System.
+
+Version 0.2.0 - 2005-04-17
+
+Bundled by: Shlomi Fish <shlomif@iglu.org.il>
+
+This is not a module that people generally need to download
+and install locally. This Bundle is meant to live on CPAN so
+that people can use CPAN.pm magic to automagically download and
+install modules.
+
+The syntax for doing this would be something like:
+$ perl -MCPAN -e 'install Bundle::Latemp'
+

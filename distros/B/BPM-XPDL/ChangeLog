@@ -1,0 +1,49 @@
+
+======== version history of BPM::XPDL
+
+version 0.93: Tue 24 Nov 08:47:52 CET 2015
+
+	Fixes:
+	- regression test output improved
+	  rt.cpan.org#109096 [cpantesters/Slaven Rezic]
+
+	Improvements:
+	- added XPDL2.2.  Not yet supported in automatic conversions.
+
+version 0.92: Tue Sep  2 09:33:30 CEST 2014
+
+	Fixes:
+	- revert fix of previous release: XML::Compile improved again.
+
+version 0.91: Fri Aug 15 09:51:22 CEST 2014
+	Fixes:
+	- changes in XML::Compile caused a slightly different output
+	  in the tests [cpantesters]
+
+	Improvements:
+	- use ::Cache::addPrefixes()
+	- changed documentation style
+
+version 0.90: Tue Dec  4 09:27:42 CET 2012
+	- fix regression-test, which originates in a fix in XML::Compile
+	  itself.  [cpantesters]
+
+version 0.04: Sat Feb 20 23:52:21 CET 2010
+	- fixed problem due to changes in XML::Compile.
+	  Reported by [Kiffin Gish]
+
+version 0.03: Wed Jul  8 09:20:55 CEST 2009
+	- renamed module from Business::XPDL into BPM::XPDL
+	- copyright statement
+	- format manual-pages with OODoc
+	- release on CPAN
+
+version 0.02: Tue Apr 28 13:08:46 CEST 2009
+	- enabled pod testing in test environment
+	- added tests to t/10minimal.t
+	- added create(), tested in t/11create.t
+	- use XML::Compile::Tester
+	- convert with tests in t/4*
+
+version 0.01: Fri Apr 24 16:26:16 CEST 2009
+	- initial

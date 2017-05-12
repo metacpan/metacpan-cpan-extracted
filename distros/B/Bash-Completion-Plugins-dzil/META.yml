@@ -1,0 +1,26 @@
+---
+abstract: 'Bash::Completion support for Dist::Zilla'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Bash::Completion::Plugin::Test: 0
+  Module::Build: 0.3601
+  Module::Find: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bash-Completion-Plugins-dzil
+requires:
+  Bash::Completion::Plugins::App::Cmd: 0
+  Dist::Zilla: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/hoelzro/bash-completion-plugins-dzil/issues
+  homepage: https://github.com/hoelzro/bash-completion-plugins-dzil
+  repository: https://github.com/hoelzro/bash-completion-plugins-dzil.git
+version: 0.02

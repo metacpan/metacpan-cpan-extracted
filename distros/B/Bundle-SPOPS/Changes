@@ -1,0 +1,48 @@
+Revision history for Perl extension Bundle::SPOPS.
+
+1.11  Mon Sep 16 17:09:22 EDT 2002
+
+   * Added 'Time::Piece'
+
+1.10  Sat Feb 23 14:40:25 EST 2002
+
+   * Added 'Class::Factory'
+
+1.09  Sun Jan 13 22:21:55 EST 2002
+
+   * Added 'Class::Accessor' dependencies and 'Devel::StackTrace'
+
+1.08  Mon Dec 31 00:58:26 EST 2001
+
+   * Added 'Class::Accessor'
+
+1.07  Sat Nov 24 20:13:08 EST 2001
+
+   * Added 'Class::Date' and removed 'Date::Calc' and 'Date::Format'
+
+1.06  Tue Aug 28 16:50:41 EDT 2001
+
+    * Added 'Class::ISA' since we now use this in the ClassFactory
+
+1.05  Fri Jul 20 05:38:14 EDT 2001
+
+    * Added 'Test::More' as a requirement for running tests
+
+1.04  Sun Feb 25 14:02:20 EST 2001
+
+    * Added 'Storable' as a requirement
+
+1.02  Nov 18 2000
+
+    * Added 'Date::Calc' as a prereq
+
+1.01  Nov 10 2000
+
+    * I've heard it said that including the primary file in your
+      Bundle is a good thing...
+
+1.00  Oct 15 2000
+
+    * First version of the Bundlefile (not related to Brundlefly)
+
+

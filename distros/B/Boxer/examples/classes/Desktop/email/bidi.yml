@@ -1,0 +1,9 @@
+classes:
+  - Desktop.email
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include Icedove support for bidirectional text
+  pkg:
+    - icedove-l10n-bidiui

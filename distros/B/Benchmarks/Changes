@@ -1,0 +1,35 @@
+Revision history for Perl extension Benchmarks
+
+0.10    Wed Jun 24 08:13:21 JST 2015
+        - add +x to penchmarks
+
+0.09    Wed Jun 24 08:02:06 JST 2015
+        - new feature: runtime args
+        - fix POD
+
+0.08    Fri Oct 24 12:10:34 JST 2014
+        - actually, 0.07 failed to implement the new feature(:hireswallclock)
+            turn on :hireswallclock above 0.08
+
+0.07    Fri Oct 24 08:33:24 JST 2014
+        - turn on :hireswallclock
+
+0.06    Sat Oct 18 14:06:11 JST 2014
+        - enhanced POD
+        - add 'penchmarks' script
+
+0.05    Mon May  5 18:16:41 JST 2014
+        - fixed dependency
+
+0.04    Sat May  3 18:23:31 JST 2014
+        - fixed test for Travis-CI
+
+0.03    Sat May  3 17:57:10 JST 2014
+        - added new feature: to get a pure benchmark(NOT to compare)
+        - refactor
+
+0.02    Tue Apr 29 16:42:05 JST 2014
+        - misc fixes
+
+0.01    Tue Apr 29 14:42:49 JST 2014
+        - original version

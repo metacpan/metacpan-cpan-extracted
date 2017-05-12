@@ -1,0 +1,25 @@
+=head1 USE
+
+Bigtop and Gantry provide limited support for rpc style SOAP.
+
+There is a small but complete working RPC style SOAP example in the
+RPCSoap subdirectory of the keyword_cookbook directory.  See the
+README in that directory for how to run the working example.
+
+The C<namespace_base> is used by Gantry in WSDL generation.  In
+particular, it is everything after http: or https: in the prefix
+for all sorts of names.  See wsdl.tt in Gantry's root directory
+for which names it affects.
+
+=head1 EXAMPLE
+
+Build the example with
+
+    bigtop -c example.bigtop all
+
+Change to the new Kids directory and look in lib/Kids/GEN/Soap.pm for
+'soapstuff'.
+
+NOTE: the example in this directory lacks the code needed to make a
+SOAP server respond to requests.  For that see the RPCSoap subdirectory
+of the keyword_cookbook directory.

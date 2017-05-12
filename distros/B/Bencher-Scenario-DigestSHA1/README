@@ -1,0 +1,10 @@
+BENCHMARK NOTES
+
+    Digest::SHA is faster than Digest::SHA1, so in general there is no
+    reason to use Digest::SHA1 over Digest::SHA (core module, more
+    up-to-date, support more algorithms).
+
+SEE ALSO
+
+    See Bencher::Scenarios::DigestSHA for more SHA-related benchmarks.
+

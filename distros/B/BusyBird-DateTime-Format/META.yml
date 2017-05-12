@@ -1,0 +1,33 @@
+---
+abstract: 'DateTime::Format for BusyBird'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  DateTime: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BusyBird-DateTime-Format
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+    - share
+  file:
+    - README.pod
+requires:
+  DateTime::Format::Strptime: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/BusyBird-DateTime-Format/issues
+  repository: git://github.com/debug-ito/BusyBird-DateTime-Format.git
+version: '0.05'

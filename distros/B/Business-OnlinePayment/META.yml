@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - 'Ivan Kohler <ivan-business-onlinepayment@420.am>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Net::HTTPS::Any: '0'
+  Tie::IxHash: '0'
+resources:
+  homepage: http://perl.business/onlinepayment
+version: '3.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

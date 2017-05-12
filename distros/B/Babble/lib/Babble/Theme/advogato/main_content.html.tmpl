@@ -1,0 +1,42 @@
+[% FOREACH item IN my_collection %]
+
+<h2 id="title">
+  [% UNLESS template_knob_no_content_links %]
+    <a href="[% item.id %]">
+  [% END %]
+  [% item.title || item.author %]
+  [% UNLESS template_knob_no_content_links %]
+    </a>
+  [% END %]
+</h2>
+
+<div id="postinfo">
+ [% IF item.creator %]Posted [% END %]
+
+ [% UNLESS template_knob_no_date %]
+   [% IF item.date %]
+     [% UNLESS item.creator %]Posted[% END %]
+     on [% item.date_text %]
+   [% END %]
+ [% END %]
+
+ [% IF item.author %]
+   by
+   [% UNLESS template_knob_no_content_links %]
+     <a href="[% item.master %]">
+   [% END %]
+   [% item.author %]
+   [% UNLESS template_knob_no_content_links %]
+     </a>
+   [% END %]
+ [% END %]
+</div>
+
+<div class="entry">
+[% item.content %]
+</div>
+[% END %]
+
+[%#
+arch-tag: 2b548603-dfed-4bd5-98fa-149d7688a3bb
+%]

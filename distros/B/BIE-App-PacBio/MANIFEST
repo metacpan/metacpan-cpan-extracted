@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/BIE-App-PacBio.t
+lib/BIE/App/PacBio.pm
+example.txt
+script/pacbioBas.pl

@@ -1,0 +1,96 @@
+                                 B::JVM::Jasmin
+                      A Perl to Java Virtual Machine Compiler
+                                 Version 0.02
+              Copyright (C) 1999, Bradley M. Kuhn, All rights reserved. 
+
+   You may distribute under the terms of either the GNU General Public License
+   or the Artistic License, as specified in the LICENSE file that was shipped
+                                with this distribution.
+                 See the file named "LICENSE" for more information.
+
+
+This module, B::JVM::Jasmin and the accompanying small program, perljvm
+(which uses B::JVM::Jasmin) implement a Perl to Java Virtual Machine
+compiler.
+
+The key ways that this is done is through (a) use of of B::* modules that
+come with perl and (b) with the Jasmin JVM assembler.
+
+Currently, only a small subset of Perl is support on the JVM.  However, this
+module is under active, full-time development by at least one person.  Thus,
+expect frequent releases and support being added for new features all the
+time.
+
+This module may not be for you.  If you just want to make Perl and Java code
+play together nicely, you probably want JPL.  This software is for you if
+you want to run Perl code directly on the JVM, and is only useful if you can
+tolerate spotty support for a lot of Perl's features.  Or, perhaps if you
+want to hack on it.  See 'Hacking' section below.  :)
+
+Requirements:
+
+   You will need perl 5.005_62, with Sarathy's STOP block patch.
+
+   Before you can use this system, you will need a working Java system on
+   your computer (including a Java-to-JVM compiler and a JVM itself) and the
+   Jasmin assembler.  You can retrieve the latest version of the Jasmin
+   assembler at http://mrl.nyu.edu/meyer/jasmin (note that Jasmin is GPL'ed
+   *only* and thus is under a different license than this software).
+
+   Once you have obtained a working Java system and Jasmin, you can follow
+   the installation procedure.
+
+Installation:
+
+    perl Makefile.PL
+    make
+    make test
+    make install   # (this is probably not something you want to do yet)
+
+
+    Note that the Makefile.PL does its best to try and find your copy of
+    Jasmin and a Java system.  It may need help.  If you have a better way,
+    patches are welcome to make the Makefile.PL work better.  :)
+
+Usage:
+
+    perljvm --run --keep perl-program.plx ClassName
+
+
+    Note that two files, ClassName.jasmin and ClassName.class will be left
+    in the current directory.  When run this way, perljvm will run 'java
+    ClassName' for you, too.
+
+    You may need to set CLASSPATH by hand to get this working.  I don't have
+    a better solution yet.  Do you have one?  :)
+
+Hacking:
+
+    Hacking on this system is encouraged, and patches are welcome.  If you
+    know enough Perl and perl to hack this stuff, chances are you now how to
+    submit good patches.  Use makepatch and all that.  :)
+
+    We are working on getting a CVS server up.
+
+    One note: For now, due to legal issues that are still being worked out
+              between my lawyer and University, my lawyer has asked that I
+              get a copyright assignment statement from *anyone* who
+              contributes patches.  I am sorry that this has to be, and I'd
+              be happy to explain why via private email.
+
+
+Mailing Lists:
+
+    There is an announcement mailing list for this software that is
+    moderated and gets at most one post per week.  New versions of this
+    software and other related issues will be announced there.  You can
+    subscribe by sending a message with body or subject "subscribe" off to:
+    perljvm-announce-request@ebb.org
+
+    If you want to get involved with development, discussion of the
+    development of this software and other Java-related Perl systems (like
+    JPL), takes place on the JPL mailing list.  As Larry said on the list,
+    moving discussion of this stuff away from there would be a premature
+    optimization.
+
+    To subscribe, send a message off to: jpl-subscribe@perl.org

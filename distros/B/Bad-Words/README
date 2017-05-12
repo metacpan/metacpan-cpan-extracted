@@ -1,0 +1,149 @@
+NAME
+    Bad::Words - a list of bad words
+
+KEYWORDS
+    abuse bad dirty words vulgar swear slang drugs sex profane abusive
+    profanity vulgarity swearing sexual slurs
+
+SYNOPSIS
+      require Bad::Words;
+
+      my $wordref = once Bad::Words qw(add words);
+      my $wordref = new Bad::Words qw(add more words);
+      my $wordref = newthrd Bad::Words qw(add words);
+      my $updated = $wordref->remove(qw( words to remove ));
+      my $numberOfWords = $updated->count;
+
+DESCRIPTION
+    This module returns an array REF to an alphabetically sorted list of
+    LOWER CASE bad words. You can add more words during initiliazation with
+    once, new, and newthrd.
+
+    The list contains American dirty words, swear words, etc...
+
+WORD SOURCES
+    The words are taken from the public domain, internet sites and the
+    imagination of contributors.
+
+            =========================================
+
+      http://fffff.at/googles-official-list-of-bad-words/
+
+    The contents of the site are all in the public domain. You may enjoy,
+    use, modify, snipe about and republish all F.A.T. media and technologies
+    as you see fit.
+
+            =========================================
+
+      http://urbanoalvarez.es/blog/2008/04/04/bad-words-list/
+
+    A public forum
+
+            =========================================
+
+      http://wordpress.org/support/topic/plugin-wp-content-filter-list-of-swear-words
+      posted to http://www.ourchangingglobe.com/misc/badwords-comma.txt
+
+      GPL2V2
+
+            =========================================
+
+USAGE
+      my $wordref = new Bad::Words qw( new swear words );
+      my $updated = $wordref->remove(qw( these words ));
+
+      my $badwords = join '|' @$updated;
+
+      my $paragraph= 'a bunch of text...';
+
+      if ($paragraph =~ /($badwords)/oi) {
+          print "paragraph contains badword '$1'\n";
+      }
+
+    The above regex is aggressive and will find "tit" in title. To be less
+    agressive, try:
+
+      if ($paragraph =~ /\b($badwords)\b/oi {
+          print "paragraph contains badword '$1'\n";
+      }
+
+DESCRIPTION
+    WARNING: once and new store the list reference in a lexical variable
+    within the module. newthrd does not do this. once returns this stored
+    variable if it is already initialized. This is suitable for use in web
+    servers where each httpd child has its own non-thread environment. If
+    you intend to use Bad::Words in a threaded environment, do not use once
+    and new, use newthrd instead.
+
+    * $wordref = new Bad::Words qw(optional list of more words);
+        This method converts all words in the combined lists to lower case,
+        make the list unique, sorts it and returns a blessed reference.
+
+          input:        a reference to or a list of
+                        optional additional bad words
+          return:       reference to word list
+
+    * $wordref = once Bad::Words qw(optional list of more words);
+        This method performs the new operation once and on subsequent calls,
+        it just returns the pre-computed reference.
+
+          input:        a reference to or a list of
+                        optional additional bad words
+          return:       reference to word list
+
+    * $wordref = newthrd Bad::Words qw(optional list of words);
+        This method recalculates the bad word list on every call.
+
+          input:        a reference to or a list of
+                        optional additional bad words
+          return:       reference to word list
+
+    * $updated = $wordref->remove list;
+        This method removes words from the bad word list.
+
+          input:        a reference to or a list of
+                        words to remove from bad word list
+          return:       updated reference
+
+    * $updated = $wordref->noregex('regex string');
+        This method removes all words from the list that match the 'regex
+        string'. The regular expression will be used on each word in the
+        list as follows:
+
+                my $regex = shift;
+                foreach(@word) {
+                  remove word if $_ =~ /$regex/;
+                }
+
+          input:        'a regular expression string'
+          return:       updated reference
+
+    * $numberOfWords = $wordref->count;
+        This method returns the number of unique words in the bad word list.
+
+          input:        none
+          return:       number of words
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+
+COPYRIGHT
+        Copyright 2013-2014, Michael Robinton <michael@bizsystems.com>
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2.
+
+    You should also have received a copy of the GNU General Public License
+    along with this program in the file named "GPL". If not, write to the
+
+            Free Software Foundation, Inc.
+            59 Temple Place, Suite 330
+            Boston, MA  02111-1307, USA
+
+    or visit their web page on the internet at:
+
+            http://www.gnu.org/copyleft/gpl.html.
+

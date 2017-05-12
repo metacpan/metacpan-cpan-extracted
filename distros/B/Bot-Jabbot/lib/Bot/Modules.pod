@@ -1,0 +1,269 @@
+#============================================================= -*-perl-*-
+#
+# Bot::Jabbot::Modules
+#
+# DESCRIPTION
+#
+# How to write module for Jabbot
+#
+# AUTHOR
+#   Epifanov Ivan  <isage@aumi.ru>
+#
+# COPYRIGHT
+#
+#   This module copyright (c) 2009 Ivan Epifanov.
+#   All rights reserved. This module is free software; you can redistribute it
+#   and/or modify it under the terms of the Perl Artistic License.
+#   (see http://www.perl.com/perl/misc/Artistic.html)
+#
+#========================================================================
+
+=head1 NAME
+
+Bot::Jabbot::Modules - Jabbot Modules
+
+=head1 Jabbot Modules
+
+This documentation provides an overview of writing new module for Bot::Jabbot.
+
+=head2 Basic example
+
+  package Bot::Jabbot::Module::Replier;
+  use base qw(Bot::Jabbot::Module);
+  use warnings;
+  use strict;
+  
+  use AnyEvent;
+
+  sub help
+  {
+      return "some help text";
+  }
+  
+  sub init
+  {
+      my ($self,$cl,$jid)=@_;
+      $self->{timer} = AnyEvent->timer (after => 5, interval => 10, cb => sub {
+          $self->timer($cl,$jid);
+       });
+      return 0;
+  }
+  
+  sub timer
+  {
+      #do something good
+  }
+  
+  sub message {
+      my ($self,$from,$body) = @_;
+      return unless defined $body;
+      return "wtf?";
+  }
+  
+  sub muc {
+      my ($self,$from,$body) = @_;
+      return unless defined $body;
+      return "wtf?";
+  }
+  1;
+
+
+=head2 Basics
+
+Any Bot::Jabbot module should use Bot::Jabbot::Module as it's base
+
+  package Bot::Jabbot::Module::Replier;
+  use base qw(Bot::Jabbot::Module);
+
+or provide a new() and init() methods.
+
+=head2 Methods to override
+
+=head3 init(self,connection, jid)
+
+Called on bot start, usefull for defining a timers, getting data from db, etc.
+Should return B<0> on success, or error text on error
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<connection>
+
+An AnyEvent::XMPP::Connection assotiated with bot
+
+=item B<jid>
+
+Bot jid
+
+=back
+
+
+=head3 help()
+
+If your module provides any private command, this method should return description on how to use it
+
+=head3 muc_help()
+
+If your module provides any MUC command, this method should return description on how to use it
+
+=head3 muc(self,msg,botnick,bot)
+
+called on MUC message
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<msg>
+
+AnyEvent::XMPP::Ext::MUC::Message object
+
+=item B<botnick>
+
+nick of bot in MUC room
+
+=item B<bot>
+
+reference to bot object
+
+=back
+
+returns: reply text or undef.
+
+=head3 muc_join(self,user,room,connection);
+
+called when user joins room
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<user>
+
+reference to object of joined user
+
+=item B<room>
+
+AnyEvent::XMPP::Ext::MUC::Room object
+
+=item B<connection>
+
+An AnyEvent::XMPP::Connection assotiated with bot
+
+=back
+
+=head3 muc_part(self,user,room,connection);
+
+called when user parts room (or banned, or kicked).
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<user>
+
+reference to object of parted user
+
+=item B<room>
+
+AnyEvent::XMPP::Ext::MUC::Room object
+
+=item B<connection>
+
+An AnyEvent::XMPP::Connection assotiated with bot
+
+=back
+
+=head3 muc_subject_change(self,room,msg,connection);
+
+called when someone changes conference subject.
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<room>
+
+AnyEvent::XMPP::Ext::MUC::Room object
+
+=item B<msg>
+
+AnyEvent::XMPP::Message object
+
+=item B<connection>
+
+An AnyEvent::XMPP::Connection assotiated with bot
+
+=back
+
+=head3 muc_presence(self,user,room,connection);
+
+called when someone changes conference subject.
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<room>
+
+AnyEvent::XMPP::Ext::MUC::Room object
+
+=item B<user>
+
+AnyEvent::XMPP::Ext::MUC::User object
+
+=item B<connection>
+
+An AnyEvent::XMPP::Connection assotiated with bot
+
+=back
+
+=head3 message(self,msg,bot);
+
+called on private message
+
+=over 4
+
+=item B<self>
+
+reference to module object
+
+=item B<msg>
+
+AnyEvent::XMPP::Message object
+
+=item B<bot>
+
+reference to bot object
+
+=back
+
+returns: reply text or undef.
+
+=head2 Localisation
+
+You can (and should) use $self->loc() method for retrieving localized strings
+Translations should be placed into ModuleName/I18N/ subdirectory in the directory that contains module.
+
+=cut
+
+# Local Variables:
+# mode: perl
+# perl-indent-level: 4
+# indent-tabs-mode: nil
+# End:
+#
+# vim: expandtab shiftwidth=4:

@@ -1,0 +1,36 @@
+.travis.yml
+bin/ezbackup
+build.sh
+Changes
+cpan-upload.sh
+ignore.txt
+lib/Backup/EZ.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+share/ezbackup.conf
+share/ezbackup_exclude.rsync
+t/00-load.t
+t/01-module-prereq.t
+t/10-new.t
+t/11-backup.t
+t/12-reldir.t
+t/13-with-user.t
+t/14-whoami.t
+t/15-expire-without-sudo.t
+t/16-expire-with-sudo.t
+t/17-missing-dir.t
+t/boilerplate.t
+t/ezbackup.conf
+t/ezbackup2.conf
+t/ezbackup_min.conf
+t/ezbackup_missing_dir.conf
+t/ezbackup_reldir.conf
+t/ezbackup_user.conf
+t/manifest.t
+t/nuke.pl
+t/pave.pl
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

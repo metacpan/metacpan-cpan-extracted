@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+SIGNATURE
+lib/Bundle/SQL/Translator.pm
+t/00load.t
+t/01pod.t

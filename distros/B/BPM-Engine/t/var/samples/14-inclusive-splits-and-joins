@@ -1,0 +1,129 @@
+        <WorkflowProcess Id="inclusive-splits-and-joins" Name="inclusive-splits-and-joins">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="splitA" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitC" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'D'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <DataFields>
+                <DataField Id="splitA2">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'B'</InitialValue>
+                </DataField>
+                <DataField Id="splitB">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'D'</InitialValue>
+                </DataField>
+            </DataFields>            
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B"/>
+                                    <TransitionRef Id="A-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B-D"/>
+                                    <TransitionRef Id="B-F"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="C-D"/>
+                                    <TransitionRef Id="C-E"/>
+                                    <TransitionRef Id="C-F"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="F" Name="Join">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" From="A" To="B">
+                    <Condition Type="CONDITION">!attribute('splitA') || attribute('splitA') == 'B'</Condition>
+                </Transition>
+                <Transition Id="A-C" From="A" To="C">
+                    <Condition Type="CONDITION">!attribute('splitA') OR attribute('splitA') == 'C'</Condition>
+                </Transition>
+                <Transition Id="B-D" From="B" To="D">
+                    <Condition Type="CONDITION"><Expression>!attribute('splitB') OR attribute('splitB').search('D')</Expression></Condition>
+                </Transition>
+                <Transition Id="B-F" From="B" To="F">
+                    <Condition Type="CONDITION">!attribute('splitB') OR attribute('splitB') == 'C'</Condition>
+                </Transition>
+                <Transition Id="C-D" From="C" To="D">
+                    <Condition Type="CONDITION">!attribute('splitC') OR attribute('splitC').search('D')</Condition>
+                </Transition>
+                <Transition Id="C-E" From="C" To="E">
+                    <Condition Type="CONDITION">!attribute('splitC') OR attribute('splitC').search('E')</Condition>
+                </Transition>
+                <Transition Id="C-F" From="C" To="F">
+                    <Condition Type="CONDITION">!attribute('splitC') OR attribute('splitC').search('F')</Condition>
+                </Transition>
+                <Transition Id="D-E" From="D" To="E"/>
+                <Transition Id="E-F" From="E" To="F"/>
+            </Transitions>
+        </WorkflowProcess>
+

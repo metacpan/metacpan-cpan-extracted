@@ -1,0 +1,42 @@
+--- #YAML:1.0
+name:                Bundle-STBEY-Favourites
+version:             1.2
+abstract:            a Bundle of my favourite modules
+license:             perl
+author:              
+    - Steffen Beyer <STBEY@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Bit::Vector:                   7.1
+    Bundle::CPAN:                  0
+    Bundle::libnet:                0
+    Bundle::libwin32:              0
+    Bundle::LWP:                   0
+    Carp::Clan:                    6.04
+    CPAN::Reporter:                0
+    Data::Locations:               5.5
+    Date::Calc:                    6.2
+    Date::Calc::Util:              1
+    Date::Calc::XS:                6.2
+    Digest::MD5:                   0
+    Digest::SHA1:                  0
+    Getopt::Long:                  0
+    HTML::Parser:                  0
+    IO::Stringy:                   0
+    Math::MatrixBool:              5.8
+    MIME::Base64:                  0
+    MIME::Lite:                    0
+    MIME::Parser:                  0
+    MIME::Tools:                   0
+    Parse::RecDescent:             0
+    Scalar::Util:                  0
+    Set::IntRange:                 5.2
+    Storable:                      2.21
+    Time::HiRes:                   0
+    Unicode::String:               0
+    V:                             0
+    YAML:                          0.7
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

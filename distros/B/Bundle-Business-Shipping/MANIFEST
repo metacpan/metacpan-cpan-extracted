@@ -1,0 +1,10 @@
+lib/Bundle/Business/Shipping.pm
+lib/Bundle/Business/Shipping/Basic.pm
+lib/Bundle/Business/Shipping/DataTools.pm
+lib/Bundle/Business/Shipping/UPS_Offline.pm
+lib/Bundle/Business/Shipping/UPS_Online.pm
+lib/Bundle/Business/Shipping/USPS_Online.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README

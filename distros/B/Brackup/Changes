@@ -1,0 +1,258 @@
+1.10 (2010-10-31)
+
+  - permit 0 as a filename.  https://rt.cpan.org/Ticket/Display.html?id=62004
+
+  - add Riak target, allowing backups to a riak cluster (Gavin Carr)
+
+  - add uid/gid info to metafile, and use in restores (where possible)
+    (Gavin Carr)
+
+  - allow multiple gpg recipients to be specified, any can restore (Alex 
+    Vandiver)
+
+  - if IO::Compress::Gzip is available, write a compressed brackup metafile in
+    unencrypted mode, and handle properly for reads and restores (Gavin Carr)
+
+  - remove orphaned chunks from inventory as part of garbage collection 
+    (Gavin Carr)
+
+  - add simple config section inheritance ('inherit' directive) (Gavin Carr)
+
+  - convert DigestCache from is-a-Dict to has-a-Dict, allow dictionary type
+    to be specified for both DigestCache and InventoryDatabase, add slower/
+    lighter iterator-based Dict::SQLite2, and (test) Dict::Null (Gavin Carr)
+
+  - make encryption and chunk storage use filehandles (where possible)
+    instead of scalar contents (Kostas Chatzikokolakis)
+
+  - update metafile storage to pass filehandle instead of full contents 
+    (Gavin Carr, Kostas Chatzikokolakis)
+
+  - make brackup-restore use brackup.conf target settings, if available 
+    e.g. for passwords (Gavin Carr)
+
+  - sort brackup-restore files to avoid loading composite chunks from
+    target multiple times (Kostas Chatzikokolakis)
+
+  - write metafile as we go, instead of big bang at the end (Gavin Carr)
+
+- add Brackup::BackupStats implementation, brackup stats output, and 
+--save-stats argument (Gavin Carr)
+
+  - fix filename trailing whitespace problems with open (Gavin Carr)
+
+  - add metafile path name escaping using String::Escape (Gavin Carr)
+
+  - add brackup-verify-inventory utility (Gavin Carr)
+
+  - add chunkpath and size methods to Amazon S3 target (Gavin Carr)
+
+1.09 (2009-05-18)
+
+  - move all decryption to one place; support decrypting metafiles.
+    (Stephane Alnet, stephane@shimaore.net, Chris Anderson, cva@pobox.com)
+
+  - added CloudFiles target to enable backups to Rackspace/Mosso's online
+    data storage service. (William Wolf)
+
+1.08 (2009-04-26)
+
+  - make brackup-target --verbose prune and gc more verbose (Gavin Carr)
+
+  - add a --interactive option to brackup-target gc (Gavin Carr) 
+
+  - add a --source option to brackup-target prune, to restrict a prune 
+    run to a particular source (Gavin Carr)
+   
+  - update Amazon target to handle new ISO8601 modify timestamps (Ben 
+    Schumacher)
+
+1.07 (2009-04-04)
+
+  - fix utime warnings on restore (Gavin Carr)
+
+  - actually strip non-ASCII characters (gary.richardson@gmail.com)
+
+  - smarts to filesystem target, noticed when using sshfs (slow filesystem).
+    does .partial files now, is smart about not overwriting existing chunk
+    that's there, etc.
+
+  - bradfitz: optional smart mp3 chunking. (start of file-aware chunking
+    strategies)  with smart mp3 chunking, the ID3 tags are kept in separate
+    chunks, so future re-tagging of your music won't force iterative backups
+    to re-upload all the music bytes again... just the updated
+    metadata (tiny)
+
+  - Add a new option to the Amazon S3 target to force a prefix to be 
+    added to the names of any saved backups.
+    It might be worth moving this up into Brackup itself at some point,
+    since it's probably useful for other network-based targets.
+
+  - Fix Restore.pm to use binmode for operating systems that care about
+    such things.
+
+  - Added a first whack at a FUSE filesystem for mounting a backup
+    as a real filesystem.
+
+  - Added FTP target.
+
+  - added the aws_location option to set the datacenter location for
+    S3 targets. from Alessandro Ranellucci <aar@cpan.org>.
+    The Amazon S3 target now depends on version 0.41 of Net::Amazon::S3.
+
+  - fixed tempfile creation in gc (orphaned files were left in the
+    working directory). from Alessandro Ranellucci <aar@cpan.org>.
+
+  - added the aws_prefix option to configure multiple backup targets
+    on a single Amazon account. from Alessandro Ranellucci <aar@cpan.org>.
+
+1.06 (october 20, 2007)
+
+  - new on-disk layout for the Filesystem target.  fully backwards
+    compatible with the old layout.  also, if max-link count (max
+    files in a directory) is hit, this new version will carefully
+    rearrange the minimum files necessary to the new layout to
+    make room, all automatically.  the new format is xx/xx/*,
+    rather than xxxx/xxxx/xxxx/xxxx/* which was stupid and overkill.
+    stupid because that's 65k of files in the root, twice ext3's
+    limit, and overkill because leaves were always just 1 file.
+    thanks to Max Kanat-Alexander for pointing this out, and
+    part of the patch to use new layout pattern.
+
+  - quieter (no) error messages on death/control-C from gpg child
+    processes who were previously confused by their parent processes
+    going away and cleaning up their shared temp files.
+
+  - actually respect the --just flag on restore
+
+1.05 (2007-08-02)
+
+  - 'prune' and 'gc' commands commands for both Amazon
+     and Filesystem targets.  from Alessandro Ranellucci <aar@cpan.org>.
+
+1.04 (2007-06-30)
+
+  - Amazon list_backups and delete backups (and delete for filesystem
+    target too), from Alessandro Ranellucci <aar@cpan.org>
+
+  - make tests pass on OS X (Jesse Vincent)
+
+1.03 (2007-05-23)
+
+  - brackup-restore's verbose flag is more verbose now, showing files
+    as they're restored.
+
+  - brackup-restore can restore from an encrypted *.brackup file now,
+    firing up gpg for user to decrypt to a tempfile
+
+  - brackup-target tool, to list/get brackup files from a target,
+    and in the future do garbage collection on no-longer-referenced
+    chunks (once a command exists to delete a brackup file from a target)
+
+  - stop leaking temp files
+
+  - doc fixes/additions
+
+1.02 (2007-05-22)
+
+  - support for merging little files together into big chunks
+    on the backup target.  aka "tail packing".  requires no changes
+    to target drivers.  this should speed backups, as less network
+    round-trips.  will also be cheaper, once Amazon starts charging
+    per number of HTTP requests in June.
+
+  - improved docs
+
+1.01 (2007-05-21)
+
+  - lot of new/updated docs
+
+1.00 (2007-05-21)
+
+  RELEASE NOTE: The author/maintainer of Brackup is finally happy now,
+    and has 40 GB of data stored on Amazon, encrypted.  You can
+    trust this now.  And the file formats aren't changing (or aren't
+    changing without being compatible with old *.brackup/Amazon
+    formats...)
+
+  - track in meta header the default (most often occuring) modes for
+    files and directories, then don't list those for each file/dir
+    with those mode.  saves on disk space on *.brackup files
+
+  - support 'noatime = 1' option on a source root, because atimes are
+    often useless, so waste of space in metafile.
+
+  - rename digestdb back to digestcache, now that it's purely a cache
+    again.
+
+  - fix memory leak in case where chunk exists on target, but local
+    digest database was lost, and digest of chunk had to be recomputed.
+    in that case, the raw chunk was kept in memory until the end
+    (which it likely would never reach, accumulating GBs of RAM)
+
+  - make PositionedChunk use the digest cache (which I guess was
+    re-fleshed out in the big refactor but never used...).  so
+    iterative backups are fast again... no re-reading all files
+    in, blowing away all caches.
+
+  - clean up old, dead code in Amazon target (the old inventory db which
+    is now an official part of the core, and in the Target base class)
+
+  - retry PUTs to Amazon on failure, a few times, pausing in-between,
+    in case it was a transient error, as seems to happen occasionally
+
+  - halve number of stats when walking backup root
+
+  - cleanups, strictness
+
+  - don't upload meta files when in dry-run mode
+
+  - update amazon target support to work again, with the new inventory
+    database support (now separated from the old digest database)
+
+  - merge in the refactoring branch, in which a lot of long-standing
+    pet peeves in the design were rethought/redone.
+
+  - make decryption --use-agent and --batch, and help out if env not set
+    and gpg-agent probably not running
+
+  - support putting .meta files besides .chunk files on the Target
+    to enable reconstructing the digest database in the future, should
+    it get lost.  also start to flesh out per-chunk digests, which
+    would enable backing up large databases (say, InnoDB tablespaces) where
+    large chunks of the file never change.
+
+  - new --du-stats to command to act like the du(1) command, but
+    based on a root in brackup.conf, and skipping ignored directories.
+    good to let you know how big a backup will be.
+
+  - walk directories smarter: jump over directories early which ignore
+    patterns show as never matching.
+
+  - deal w/ encryption better:  tell chunks when the backup target
+    will need data, so it can forget cached digest/backlength
+    ahead of time w/o errors/warnings later.
+
+  - start of stats code (to give stats after a backup).  not done.
+
+0.91 (2006-09-29)
+
+  - there's now a restore command (brackup-restore)
+
+  - amazon restore support
+
+  - use gpg --trust-model=always for new gpg that is more paranoid.
+
+  - mostly usable.  some more switches would be nice later.  real
+    1.00 release will come after few weeks/months of testing/tweaks.
+
+0.80
+  - restore works
+
+  - lot more tests
+
+  - notable bug fix with encrypted backups.  metafiles could have wrong sizes.
+
+0.71
+  - first release to CPAN, didn't support restoring yet.
+    also didn't have a Changes file

@@ -1,0 +1,257 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Bio::Phylo::Forest::DBTree;
+use Bio::Phylo::Util::Logger ':levels';
+
+# autoflush STDOUT so writing isn't buffered
+$|++;
+
+# process command line arguments
+my $verbosity = WARN;
+my ( $infile, $dbfile, $tabular, $relabel, $list );
+GetOptions(
+	'verbose+' => \$verbosity,
+	'infile=s' => \$infile,
+	'dbfile=s' => \$dbfile,
+	'list=s'   => \$list,
+	'tabular'  => \$tabular,
+	'relabel'  => \$relabel,
+	'help'     => sub { pod2usage() },
+	'man'      => sub { pod2usage(1) },
+);
+
+=head1 NAME
+
+megatree-pruner - Given a list of taxa, returns subtree from a database
+
+=head1 SYNOPSIS
+
+    megatree-pruner -d <file> -i <file> [-l <list>] [-trvhm]
+
+=head1 OPTIONS
+
+=over
+
+=item B<< -d <file> >> or B<< -dbfile <file> >>
+
+Location of a database file, compatible with sqlite3, that has been produced by one of the
+megatree-*-loader scripts.
+
+=item B<< -i <file> >> or B<< -infile <file> >>
+
+Input file containing a list of taxon names that occur in the tree, one name per line. 
+These are the taxa that are retained in the subtree that is produced. The alternate to 
+this is the C<-l> option, which is a list of names on the command line.
+
+=item B<< -l <list> >> or B<< -list <list> >>
+
+Input list of taxon names that occur in the tree, comma separated. These are the taxa that 
+are retained in the subtree that is produced. The alternate to this is the C<-i> option, 
+which is an input file that contains a list of names on the command line.
+
+=item B<-t> or B<-tabular>
+
+Optional.
+
+With this option, instead of producing a Newick-formatted tree description (which is the
+default), a tab-separated table that describes the tree is produced.
+
+=item B<-r> or B<-relabel>
+
+Optional.
+
+With this option, internal nodes are relabeled in the output such that they become names
+of the format C<nXXX>, where XXX is the primary key (i.e. an integer ID) of the node in
+the database.
+
+=item B<-v> or B<-verbose>
+
+Optional.
+
+With this option, more feedback messages are written during processing. This option can be
+used multiple times, which increases the verbosity further.
+
+=item B<-h> or B<-help>
+
+Optional.
+
+Prints help message / documentation.
+
+=item B<-m> or B<-man>
+
+Optional.
+
+Prints manual page. Additional information is available in the documentation, i.e.
+C<perldoc megatree-pruner>
+
+=back
+
+=head1 DESCRIPTION
+
+This program produces the subtree for the taxa provided as input from a previously 
+produced database. As such, the functionality is roughly similar to extracting the 'common
+tree' from the NCBI taxonomy, which is a common operation in phylogenomics and related
+fields.
+
+The input names can be provided either as a text file (the B<-i> argument) or as a comma-
+separated list on the command line (the B<-l> argument). The names in the file must match
+those in the database exactly, i.e. there is no fussy matching. Any names not found in the
+database are skipped, and a warning message will be emitted.
+
+The output that is produced is either a Newick-formatted tree string, or a tab-separated
+table (which is recognized and readable by L<Bio::Phylo> as the C<adjacency> format).
+
+=cut
+
+# instantiate helper objects
+my $intree   = Bio::Phylo::Forest::DBTree->connect($dbfile);
+my $log      = Bio::Phylo::Util::Logger->new(
+	'-level' => $verbosity,
+	'-class' => 'main',
+	'-style' => 'simple',
+);
+
+# read input list, fetch nodes
+my ( @nodes, %tree );
+{
+	if ( $infile ) {
+		$log->debug("going to read leaves to keep from $infile");
+		open my $fh, '<', $infile or die $!;
+		while(<$fh>) {
+			chomp;
+			my $name = $_;
+		
+			# skip blank lines
+			if ( $name =~ /\S/ ) {
+				if ( my $node = $intree->_rs->single({ 'name' => $name }) ) {
+					push @nodes, $node;
+					my $id = $node->id;
+					$tree{$id} = {
+						'id'     => $id,
+						'parent' => $node->parent,
+						'name'   => $node->name,
+						'length' => $node->length,
+						'node'   => 0,
+					};
+				}
+				else {
+					$log->warn("node '$name' not in tree");
+				}
+			}
+		}
+		$log->info("read ".scalar(@nodes)." leaves from $infile");
+		close $fh;
+	}
+	elsif ( $list ) {
+		for my $name ( split /,/, $list ) {
+			if ( my $node = $intree->_rs->single({ 'name' => $name }) ) {
+				push @nodes, $node;
+				my $id = $node->id;
+				$tree{$id} = {
+					'id'     => $id,
+					'parent' => $node->parent,
+					'name'   => $node->name,
+					'length' => $node->length,
+					'node'   => 0,
+				};
+			}
+			else {
+				$log->warn("node '$name' not in tree");
+			}		
+		}
+		$log->info("read ".scalar(@nodes)." leaves from $list");
+	}
+}
+
+# use a queue to build the tree
+{
+	$log->debug("going to build subtree");
+	while( @nodes ) {
+		$log->debug( scalar(@nodes) . ' nodes to go' ) unless scalar(@nodes) % 1000;
+		my $node = shift @nodes;
+
+		# only continue building if focal node has a parent, i.e. is not the root
+		if ( my $parent = $node->get_parent ) {
+			my $pid = $parent->id;
+			
+			# only add the parent of the focal node once, to the tree (though it
+			# would be clobbered in the hash anyway) and in the queue
+			if ( not $tree{$pid} ) {
+				$tree{$pid} = {
+					'id'     => $pid,
+					'parent' => $parent->parent,
+					'name'   => ( $relabel ? "n$pid" : $parent->name ),
+					'length' => ( $parent->length || 0 ),
+					'node'   => 1,
+				};
+				push @nodes, $parent;
+			}
+		}
+	}
+	my @leaves = grep { !$_->{'node'} } values %tree;
+	$log->debug("built subtree with ".scalar(@leaves)." leaves");
+}
+
+# remove unbranched internals
+{
+	$log->debug("going to remove unbranched internal nodes");
+	my $deleted = 0;
+	for my $node ( sort { $b->{'id'} <=> $a->{'id'} } grep { $_->{'node'} } values %tree ) {
+		my $id = $node->{'id'};
+		my @children = grep { $_->{'parent'} == $id } values %tree;
+	
+		# is unbranched internal
+		if ( @children == 1 ) {
+			$children[0]->{'parent'}  = $node->{'parent'};
+			$children[0]->{'length'} += $node->{'length'};
+			delete $tree{$id};
+			$deleted++;
+		}
+	}
+	$log->info("removed $deleted unbranched internal nodes");
+}
+
+# print the tree
+{
+
+	# print the tree as adjacency table
+	if ( $tabular ) {
+		print "child\tparent\tlength\n";
+		for my $node ( sort { $a->{'id'} <=> $b->{'id'} } values %tree ) {
+			print $node->{'name'}, "\t";
+			if ( my $parent = $tree{ $node->{'parent'} } ) {
+				print $parent->{'name'}, "\t";
+			}
+			else {
+				print "\t"; # root
+			}
+			print $node->{'length'}, "\n";
+		}
+	}
+
+	# print the tree as newick
+	else {
+		no warnings 'recursion';
+		my ($root) = sort { $a->{'id'} <=> $b->{'id'} } grep { $_->{'node'} } values %tree;
+		to_newick($root);
+		print ";\n";
+	}
+}
+
+sub to_newick {
+	my $node = shift;
+	my $id = $node->{'id'};
+	my @children = grep { $_->{'parent'} == $id } values %tree;
+	if ( @children ) {
+		print '(';
+		for my $i ( 0 .. $#children ) {
+			to_newick($children[$i]);
+			print ',' if $i < $#children;
+		}
+		print ')';
+	}
+	print $node->{'name'}, ':', $node->{'length'};
+}

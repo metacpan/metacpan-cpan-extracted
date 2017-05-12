@@ -1,0 +1,4 @@
+INSERT INTO osc_orders_status VALUES ( '1', '4', 'Pending');
+INSERT INTO osc_orders_status VALUES ( '2', '4', 'Processing');
+INSERT INTO osc_orders_status VALUES ( '3', '4', 'Delivered');
+INSERT INTO osc_orders_status VALUES ( '4', '4', 'Preparing');

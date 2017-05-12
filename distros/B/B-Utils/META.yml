@@ -1,0 +1,28 @@
+---
+abstract: 'Helper functions for op tree manipulation'
+author:
+  - 'Josh Jore <jjore@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Depends: '0.301'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: B-Utils
+requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  Task::Weaken: '0'
+  perl: v5.6.0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=B-Utils
+  homepage: http://search.cpan.org/dist/B-Utils
+  repository: git://github.com/jbenjore/b-utils.git
+version: '0.27'
+x_authority: cpan:ABERGMAN

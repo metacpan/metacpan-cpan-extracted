@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BuzzSaw - Overview</title>
+  </head>
+
+  <body>
+    <h1>BuzzSaw - Overview</h1>
+
+    <h2>Introduction</h2>
+
+    <p>The School of Informatics has approximately 1100 managed Linux
+    machines which, since the upgrade to the SL6 platform, send a copy
+    of all syslog messages over the network to a central log
+    server. The central log server is primarily intended as a secure
+    medium-term storage location for all system messages. This avoids
+    the potential for data loss when the security of a system is
+    compromised or a system crashes before all data can be written to
+    local storage. A secondary benefit of this centralised log storage
+    is that it makes it possible to easily search for interesting data
+    across multiple hosts and over long time periods. When system log
+    messages are only held locally on a machine it is typically quite
+    awkward to execute large-scale queries across many hosts. It is
+    also the case that data is often only held for short periods due
+    to disk space constraints.</p>
+
+    <p>The BuzzSaw project was developed to take advantage of the
+    goldmine of data which became available with the introduction of
+    centralised storage. The log messages are stored on disk in
+    separate directories for each machine and rotated daily so clearly
+    it would be possible to do a certain amount of data analysis using
+    basic command-line text processing tools (e.g. awk, grep,
+    sort). This simple approach rapidly breaks down though once you
+    need to do more complex queries based on information which is
+    derived from certain types of messages (e.g. username or source IP
+    address). It is also non-trivial to restrict queries to date and
+    time ranges using this processing method. Using these command-line
+    tools has many advantages, it is easy and quick to filter files
+    for messages which match strings and requires no extra skills or
+    knowledge. Any advanced data-analysis system must be similarly
+    straightforward to use whilst providing the extra features
+    necessary to fully explore the depths of the data.</p>
+
+    <p>There are many system log processing tools available, both
+    open-source and proprietary. Having examined a few of the options
+    it was clear that most are large, complex projects which provide
+    vastly more features than are required by Informatics. This makes
+    them difficult to comprehend or configure. There were also issues
+    related to installation and management which meant we felt they
+    were not a good match to our systems. It was thus decided that we
+    would develop software internally which could parse, filter and
+    store the data of interest from the system logs. We also required
+    a framework for report generation but the intention was that users
+    would not be tied into any particular single solution for report
+    generation. These requirements were developed into the BuzzSaw
+    project.</p>
+
+    <h2><a name="philosophy">Design Philosophy</a></h2>
+
+    <h3>Store only the interesting data</h3>
+
+    <p>The rsyslog daemon running on the central log server is doing a
+    very good job of storing the complete set of system log messages
+    for each machine into files. This is a lightweight and simple
+    approach which guarantees a high degree of reliability. From
+    examining the data it was clear that most of it is of little
+    interest to us on a daily basis. For example, on a busy SSH server
+    the ssh daemon authentication data that we actually wish to
+    analyse only constitutes 10% of the entire daily system logs. With
+    this in mind we decided to develop a data importing pipeline which
+    could process the log messages stored in the files on a regular
+    basis (hourly, daily, weekly, as necessary) and filter out the
+    data of interest for storage in a separate database. The aim was
+    that the design should not prevent the addition, at some later
+    date, of a facility to import log messages &quot;live&quot; from
+    the incoming stream of messages but that this would not be
+    necessary.</p>
+
+    <h3>Avoid unnecessarily parsing messages and files multiple times</h3>
+
+    <p>The log rotation and compression system we have in place means
+    that log files frequently change names. To avoid excessive
+    processing time and minimise computing resource consumption, any
+    log processing system should be intelligent enough to avoid
+    reprocessing files where only the file name has been
+    altered. Similarly, if the file compression level has changed (but
+    not the actual true content) then log messages should not be
+    parsed more than once.</p>
+
+    <h3>Allow reprocessing of the log messages</h3>
+
+    <p>Clearly if the approach is to ignore a large percentage of the
+    log messages and avoid reparsing previously seen messages then
+    occasionally a need to re-process the log files will occur. This
+    is most likely when an administrator has a new requirement to
+    analyse data related to some facility and generate long-term
+    statistics. It should be possible to go back through the system
+    logs and import more log messages where required.</p>
+
+    <h3>A single, straightforward query mechanism</h3>
+
+    <p>It should be possible to query all the data using a single,
+    straightforward query mechanism. The most obvious solution was to
+    import the data of interest into an SQL database. This means that
+    administrators can query the data directly using the SQL language
+    which is relatively simple, well understood and well
+    documented. As well as being a very powerful query language, this
+    has significant advantages over the command-line tool approach in
+    that it is not necessary to know the syntax for multiple different
+    tools (e.g. awk, grep, sed). The additional benefit is that
+    querying SQL databases is extremely well supported in most
+    programming languages (e.g. using DBI in Perl and psycopg2 in
+    Python).</p>
+
+    <h3>Support multiple data sources</h3>
+
+    <p>Currently we only have syslog style logs stored on our central
+    log server but there is no technical reason not to aggregate logs
+    from other services (e.g. apache). Consequently there must be the
+    option to import from multiple different sources. There should
+    also be no restrictions on the storage formats of the raw data. It
+    should be possible to process raw data from any file type, process
+    a live stream or work with an external database if required.</p>
+
+    <h3>Support parsing multiple formats</h3>
+
+    <p>With our current rsyslog configuration the log messages have
+    the date and time formatted as an RFC3339 timestamp. Other logging
+    systems (e.g. apache) use different timestamp formats and at some
+    point in the future we may wish to alter our chosen format. This
+    leads to the requirement that it should be possible to have the
+    log messages from different sources parsed in different ways.</p>
+
+    <h3>Support flexible filtering and processing</h3>
+
+    <p>The way in which filtering is done must be flexible and must
+    allow the administrator to easily configure the stack of filters
+    and the sequence in which they are applied. It must be possible to
+    have as many (or as few) filters as necessary. It must also be
+    possible for the filters to modify and extend the data associated
+    with log messages of interest. It should be possible to use the
+    same filter multiple times in a stack. Filters should be able to
+    see which filters have already been run and process the results
+    from those filters as well as the raw data itself. This would
+    allow, for instance, a user name classifier filter to work on user
+    names discovered by various filters earlier in the stack (e.g. SSH
+    and Cosign).</p>
+
+    <p>It must be straightforward and relatively simple to develop new
+    filters to select the log messages of interest. If possible there
+    should be support for using a generic filter module with a
+    specific set of configuration parameters to avoid the need to
+    write new code in simple situations.</p>
+
+    <h3>Provide a report generation framework</h3>
+
+    <p>Although it should be possible to generate reports in any
+    desirable manner using SQL queries there should also be a standard
+    report generation framework. This would provide an easy to use
+    interface which handles the most common situations.</p>
+
+    <p>The reporting framework must use a standard template system. It
+    should be possible to send the results to stdout or by email to
+    multiple addresses. It should be possible to generate multiple
+    formats, for example html web pages, as well as text.</p>
+
+    <p>Typically an administrator needs to generate reports on a
+    regular basis (hourly, daily, weekly, monthly) so those types of
+    recurring reports must be supported.</p>
+
+    <p>It must be straightforward and relatively simple to develop new
+    reports. If possible there should be support for using a generic
+    report module with a specific set of configuration parameters to
+    avoid the need to write new code in simple situations.</p>
+
+  </body>
+</html>

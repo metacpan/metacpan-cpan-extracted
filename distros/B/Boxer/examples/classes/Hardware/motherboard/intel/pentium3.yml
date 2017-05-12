@@ -1,0 +1,9 @@
+classes:
+  - hw.x86.i486
+  - hw.firmware
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include core support for board with Intel Pentium III (Katmai) CPU

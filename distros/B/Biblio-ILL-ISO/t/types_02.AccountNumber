@@ -1,0 +1,3 @@
+$VAR1 = bless( {
+                 'generalstring' => '1234567890'
+               }, 'Biblio::ILL::ISO::AccountNumber' );

@@ -1,0 +1,80 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::WWWShorten - Shorten all urls
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+    By loading this module your bot will check all messages for an url and
+    will reply with an shortened url and its title if the url links to an
+    html document. The bot will use TinyURL as default to generate a shorter
+    uri but the module supports all services provided by WWW::Shorten.
+
+     user> !load WWWShorten
+     bot > Okay.
+     user> http://www.heise.de
+     bot > http://tinyurl.com/48z [ heise online - Home ]
+
+VARIABLES
+  user_min_length
+    If this variable is set to a true value, only urls that are longer than
+    "user_min_length" are processed by this module. All shorter urls are
+    ignored. Default to zero (aka false).
+
+  user_addressed
+    Ignore all messages that are not directly addressed for the bot.
+    Defaults to false.
+
+  user_service
+    Specifies which service to use to actually shorten all urls. Accepts the
+    last part of the module name of all modules compatible with
+    WWW::Shorten, for example TinyURL, TinyClick or Shorl. Defaults to
+    TinyUrl.
+
+AUTHOR
+    Mario Domgoergen, "<mdom at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-bot-basicbot-pluggable-module-www-shorten at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-M
+    odule-WWWShorten>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Bot::BasicBot::Pluggable::Module::WWWShorten
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Mod
+        ule-WWWShorten>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-WWWShorten>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-WWWShor
+        ten>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-WWWShorte
+        n/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Mario Domgoergen.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

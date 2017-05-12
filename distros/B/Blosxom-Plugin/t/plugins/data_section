@@ -1,0 +1,15 @@
+package data_section;
+use strict;
+use warnings;
+use parent 'Blosxom::Plugin';
+
+__PACKAGE__->load_components( 'DataSection' );
+
+sub start { 1 }
+
+1;
+
+__DATA__
+
+@@ data_section.html
+hello, world

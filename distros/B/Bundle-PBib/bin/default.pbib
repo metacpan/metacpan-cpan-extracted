@@ -1,0 +1,7 @@
+# $Id$
+
+# If a script is started in the main installation folder, 
+# set the path to the default BibTeX database.
+<biblio>
+	file ../docs/intro.bib
+</biblio>

@@ -1,0 +1,13 @@
+Revision history for Perl extension Bundle::Sledge
+
+0.04  Wed Feb 25 20:08:06 JST 2004
+	- Added Encode::compat
+
+0.03  Thu Feb 20 13:47:03 JST 2003
+	- Added Storable
+
+0.02  Sun Feb 16 23:38:30 JST 2003
+	- Added CGI.pm and LWP
+
+0.01  Thu Feb 13 19:17:12 2003
+	- original version

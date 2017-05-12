@@ -1,0 +1,10 @@
+Revision history for BenchmarkAnything-Config
+
+0.003     2015-09-29
+        - re-upload due to META/provides freakup
+
+0.002     2015-09-28
+        - fix reading BENCHMARKANYTHING_CONFIGFILE in tests
+
+0.001     2015-09-24
+        - handle BenchmarkAnything config reading

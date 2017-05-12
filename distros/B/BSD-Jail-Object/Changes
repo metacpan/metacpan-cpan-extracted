@@ -1,0 +1,6 @@
+0.01 Thu Aug  4 2006
+    - Initial release to CPAN.  Yay.
+
+0.02 Thu Aug  7 2006
+    - Check for root on create() and attach()
+

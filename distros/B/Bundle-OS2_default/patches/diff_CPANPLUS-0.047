@@ -1,0 +1,11 @@
+--- ./Makefile.PL-pre	Sun Nov 16 01:21:28 2003
++++ ./Makefile.PL	Thu Dec  4 02:21:36 2003
+@@ -48,6 +48,8 @@ you configure it properly.
+ ###################################################################
+ ");
+ 
++die "Cannot run non-interactively" unless -t;
++
+ my $AutoInstall; # the flag to really perform autoinstallation
+ my $ConfigObj;   # the config object
+ 

@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Business/Tax/Canada.pm
+MANIFEST			This list of files
+t/Business-Tax-Canada.t
+README
+META.yml
+META.json

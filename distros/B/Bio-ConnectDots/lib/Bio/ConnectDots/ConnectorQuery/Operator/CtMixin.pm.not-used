@@ -1,0 +1,38 @@
+package Bio::ConnectDots::ConnectorQuery::Operator::CsMixin;
+use strict;
+
+# generate where clauses for Term assumed to refer to this object
+# return (ARRAY of where clauses, cs_sql_alias)
+sub term_where {
+  my($self,$term)=@_;
+  my $where=[];
+  my $name=$self->name;
+  my $ct_alias=$term->ct_alias;
+  my $column=$term->column;
+  my $cs=$term->cs;
+  my $cs_id=$cs->db_id;
+  my $i=$self->alias_counter;
+  
+  my $ct_sql_alias=$self->ct_alias2sql_alias->{$ct_alias};
+  unless ($ct_sql_alias) {
+    $ct_sql_alias=$name.'_'.$i++;
+    $self->sql_alias2table->{$ct_sql_alias}=$name;
+    $self->ct_alias2sql_alias->{$ct_alias}=$ct_sql_alias;
+  }
+  my $cs_sql_alias=$cs->name.'_'.$i++;
+  $self->sql_alias2table->{$cs_sql_alias}=$cs->name;
+
+  push(@$where,("$ct_sql_alias.$column=$cs_sql_alias.connector_id",
+		"$cs_sql_alias.connectorset_id=$cs_id"));
+  # if $label_ids is empty, the label was '*' -- matches all ids
+  my $label_ids=$term->label_ids;
+  if (@$label_ids==1) {
+    push(@$where,"$cs_sql_alias.label_id=".$label_ids->[0]);
+  } elsif (@$label_ids>1) {
+    push(@$where,"$cs_sql_alias.label_id IN (".join(',',@$label_ids).")");
+  }
+  $self->alias_counter($i);
+  wantarray? ($where,$cs_sql_alias): $where;
+}
+
+1;

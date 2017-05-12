@@ -1,0 +1,104 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::RSS - RSS feed aggregator for your bot
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+        !load RSS
+        rss add http://search.cpan.org/uploads.rdf
+        rss list
+        rss remove http://search.cpan.org/uploads.rdf
+
+DESCRIPTION
+    This module enables your bot to monitor various RSS feeds for new
+    headlines and post these to your channels. Every channel has it's own
+    list of rss feeds, but in case two channels subscribed to the same rss
+    feeds, it's only checked once and the bot posts changes to both
+    channels. Although this module does not block your bot due the
+    non-blocking interface of POE::Component::RSSAggregator, adding a lot of
+    fast changing rss feeds will result in sluggish behaviour.
+
+VARIABLES
+  tmpdir
+    Directory to keep a cached feed (using Storable) to keep persistance
+    between instances. This defaults to the first writable directory from a
+    list of possible temporary directories as provided by File::Spec.
+
+  debug
+    Turn debuging on console on. Off by default
+
+  user_init_headlines_seen
+    Mark all headlines as seen from the intial fetch, and only report new
+    headlines that appear from that point forward. This defaults to true.
+
+    Changing this variable will not modify any existing feeds.
+
+  user_delay
+    Number of seconds between updates (defaults to 600).
+
+    Changing this variable will not modify any existing feeds.
+
+  user_format
+    The string defined by user_format will be formated in a printf like
+    fashion. The actually formatting is done by String::Format. The formats
+    'n', 't', and '%' are defined to be a newline, tab, and '%'. The default
+    format is 'RSS: %h <%u>'.
+
+    %h  The rss headline/title.
+
+    %u  The rss link/url. URI->canonical is called to attempt to normalize
+        the URL
+
+    %d  The description of the RSS headline.
+
+LIMITATIONS
+    In the moment this module is only able to parse rss feeds and will throw
+    a lot of warnings at you when you try to add an atom feed as the
+    underlying wokrhorse of POE::Component::RSSAggregator just support this
+    one format.
+
+TODO
+    The testuite is almost not existing as i'm not yet sure how to reliable
+    test POE code. I'll have to look into that.
+
+AUTHOR
+    Mario Domgoergen, "<dom at math.uni-bonn.de>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-bot-basicbot-pluggable-module-rss at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-M
+    odule-RSS>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Bot::BasicBot::Pluggable::Module::RSS
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Mod
+        ule-RSS>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-RSS>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-RSS>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-RSS>
+
+SEE ALSO
+    Bot::BasicBot::Pluggable, POE::Component::RSSAggregator
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

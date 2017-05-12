@@ -1,0 +1,26 @@
+Changes
+examples/ws.pl
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Baseball/Sabermetrics.pm
+lib/Baseball/Sabermetrics/abstract.pm
+lib/Baseball/Sabermetrics/League/CPB2.pm
+lib/Baseball/Sabermetrics/League/CPBL.pm
+lib/Baseball/Sabermetrics/Player.pm
+lib/Baseball/Sabermetrics/Team.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/basic.t
+t/pod.t

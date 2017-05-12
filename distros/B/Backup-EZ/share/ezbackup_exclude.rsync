@@ -1,0 +1,6 @@
+- *.vdi
+- .cpanm/
+- tmp/
+ *.gvfs
+- Perforce/
+- known_hosts

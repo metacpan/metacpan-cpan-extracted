@@ -1,0 +1,78 @@
+{
+   "abstract" : "A Paser for Baal IDL.",
+   "author" : [
+      "ohta-nobuyuki <ohta-nobuyuki@kayac.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Baal-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mouse" : "0",
+            "Parse::RecDescent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Baal::Parser" : {
+         "file" : "lib/Baal/Parser.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shogo82148/p5-Baal-Parser/issues"
+      },
+      "homepage" : "https://github.com/shogo82148/p5-Baal-Parser",
+      "repository" : {
+         "url" : "git://github.com/shogo82148/p5-Baal-Parser.git",
+         "web" : "https://github.com/shogo82148/p5-Baal-Parser"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Ichinose Shogo <shogo82148@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,169 @@
+[%#
+    Top level template for TentMaker home page.
+    Expects these parameters:
+
+    input                 - text version of the bigtop file (as deparsed)
+                            mostly for debugging
+    engine                - the name of the engine pick from MP13, MP20, or CGI
+    tempate_engine        - the name of the template engine pick from
+                            TT or Default
+    app                   - the application portion of the AST, used to
+                            retrieve various things (like statements)
+    backends              - the backends hash built by
+                            Bigtop::Tentmaker::do_main
+    statements            - hash describing statements built by
+                            Bigtop::Parser::get_keyword_docs
+    app_config_statements - hash for current app level config block built by
+                            Bigtop::TentMaker::compile_app_configs
+    app_blocks            - hash describing these app level constructs:
+                            sequences, tables, controllers, and literals.
+    file_name             - the name of the original input file (optional)
+    tab                   - the name of the tab to activate
+    expanded_divs         - a hash keyed by div's ident true if expanded
+    tab_scroll            - the scrollTop of the tab pane div for repositioning
+    body_scroll           - the scrollTop of the body for repositioning
+%]
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>[% view.title %]</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" media="screen"
+              title="Default" href="/default.css" />
+<style type='text/css'>
+  [% INCLUDE default.css %]
+</style>
+<script type='text/javascript'>
+  [% INCLUDE tenter.js %]
+</script>
+    </head>
+<body>
+    <div id="save_file">
+    <button type='button'
+          onclick='javascript:server_stop()'> Stop tentmaker </button>
+
+    <button type='button'
+          onclick='javascript:saver()'>       Save As: </button>
+
+    <input type='text'
+         value="[% view.data.file_name || '' %]"
+         id='save_file_name'
+         size='35' />
+
+    &nbsp; &nbsp;
+    <span style='font-weight: bold;'>tentmaker - A Bigtop Editor</span>
+
+      <div id="chatter">
+      </div>
+
+    </div>
+
+<!--    **********************************************
+        Begin the Main Table where all the input lives
+        ********************************************** -->
+[% tab = view.data.tab || 'tab-bigtop-config' %]
+<div id='tabs_header'>
+    <ul>
+        <li><a id='tab-bigtop-config-link'
+               [% IF tab == 'tab-bigtop-config' %]class='active'[% END %]
+               href='javascript:changetabs( "tab-bigtop-config" );'
+            >Bigtop Config</a>
+        <li><a id='tab-app-body-link'
+               [% IF tab == 'tab-app-body' %]class='active'[% END %]
+               href='javascript:changetabs( "tab-app-body" );'
+            >App Body</a>
+        <li><a id='tab-backends-link'
+               [% IF tab == 'tab-backends' %]class='active'[% END %]
+               href='javascript:changetabs( "tab-backends");'
+            >Backends</a>
+        <li><a id='tab-app-statements-link'
+               [% IF tab == 'tab-app-statements' %]class='active'[% END %]
+               href='javascript:changetabs( "tab-app-statements" );'
+            >App Level Statements</a>
+    </ul>
+</div>
+
+<div id='tabs'>
+
+  <form method='GET' action='#'>
+  <div
+    [% IF tab == 'tab-bigtop-config' %]
+        class='active'
+    [% ELSE %]
+        class='tab'
+    [% END %]
+    id='tab-bigtop-config'>
+
+    [% INCLUDE bigtop_config.ttc %]
+    <br />
+
+    <br />
+    <fieldset>
+      <legend>
+        <a href='javascript:show_or_hide( "raw_output" );'>
+            Current bigtop file
+        </a>
+      </legend>
+
+    <div id="raw_output"
+         style="white-space: pre; font-family: monospace; display: none;">
+
+        [% view.data.input %]
+
+    </div>
+    </fieldset>
+
+  </div>
+
+  <div
+    [% IF tab == 'tab-app-body' %]
+        class='active'
+    [% ELSE %]
+        class='tab'
+    [% END %]
+    id='tab-app-body'>
+    [% INCLUDE app_body.ttc %]
+  </div>
+
+  <div
+    [% IF tab == 'tab-backends' %]
+        class='active'
+    [% ELSE %]
+        class='tab'
+    [% END %]
+    id='tab-backends'>
+    [% INCLUDE backends.ttc %]
+  </div>
+
+  <div
+    [% IF tab == 'tab-app-statements' %]
+        class='active'
+    [% ELSE %]
+        class='tab'
+    [% END %]
+    id='tab-app-statements'>
+    [% INCLUDE app_statements.ttc %]
+  </div>
+
+</div>
+
+<br style='clear: both' />
+</div>
+</form>
+
+<!-- Set the tab pane's scroll bar. -->
+<!-- I don't this think is used any more.
+     We never refresh, so we don't need it. -->
+<script type='text/javascript'>
+var tabs_div = document.getElementById( 'tabs' );
+tabs_div.scrollTop = [% view.data.tab_scroll %];
+document.body.scrollTop = [% view.data.body_scroll %]
+</script>
+
+<div id="debug_chatter"></div>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+
+=head1 NAME
+
+Box2D::b2Vec2 - A 2D column vector.
+
+=head1 SYNOPSIS
+
+  my $v = Box2D::b2Vec2->new( $x, $y );
+
+=head1 DESCRIPTION
+
+A 2D column vector.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor does nothing.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 new( $x, $y )
+
+Construct using coordinates.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x>
+
+=item * C<float32> C<$y>
+
+=back
+
+=head2 IsValid()
+
+Does this vector contain finite coordinates?
+
+Returns a C<bool>
+
+=head2 Length()
+
+Get the length of this vector (the norm).
+
+Returns a C<float32>
+
+=head2 LengthSquared()
+
+Get the length squared. For performance, use this instead of b2Vec2::Length (if possible).
+
+Returns a C<float32>
+
+=head2 Normalize()
+
+Convert this vector into a unit vector. Returns the length.
+
+Returns a C<float32>
+
+=head2 Set( $x, $y )
+
+Set this vector to some specified coordinates.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x>
+
+=item * C<float32> C<$y>
+
+=back
+
+=head2 SetZero()
+
+Set this vector to all zeros.
+
+=head2 x()
+
+=head2 x( $x )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 y()
+
+=head2 y( $y )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$y> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

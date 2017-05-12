@@ -1,0 +1,50 @@
+=head1 NAME
+
+Business::BancaSella::Ris::File - Check the existance of One-Time-Password 
+in a standard Banca Sella ASCII file.
+
+=head1 SYNOPSIS
+
+  use Business::BancaSella::Ris;
+  
+  my $ris = new Business::BancaSella::Ris::File(file => 'filePath/filename.ric');
+  my $ok = $ris->check($otp);
+  if ($ok) {$ris->remove($otp));
+
+=head1 DESCRIPTION
+
+This module check if One-Time-Password is present in a file and it could remove it.
+
+=head1 METHODS
+
+=head2 file()
+
+Set or get the file path where are stored One-Time passwords.
+
+=head2 extract(otp)
+
+Check password and return false if not found, else remove password from OTP file
+
+=head2 check(otp)
+
+Return TRUE or FALSE if the OTP is present in the file
+
+=head2 remove(otp)
+
+Remove the OTP if present in the file. Raise an error if not present.
+
+=head2 prepare(source_file)
+
+Don't do nothing :-). Here only for interface compatibility.
+
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+
+=head1 SEE ALSO
+
+Business::BancaSella::Ric::Mysql
+
+=cut

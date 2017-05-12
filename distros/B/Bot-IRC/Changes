@@ -1,0 +1,64 @@
+Revision history for Bot::IRC
+
+1.13      2016-12-21 11:02:41-08:00 America/Los_Angeles
+        - Filter IRC color codes and control characters from incoming line text
+
+1.12      2016-12-06 09:15:08-08:00 America/Los_Angeles
+        - Improving a little on best practice by having accesstors for vars() and settings()
+        - Add channels() method to bot via Join plugin
+        - Make help URLs more clickable for some IRC clients
+        - Handle UTF8 output a little better; handle exceptions from plugins better
+
+1.11      2016-12-03 21:18:42-08:00 America/Los_Angeles
+        - History plugin can now be told to filter certain channels
+
+1.10      2016-12-01 14:52:21-08:00 America/Los_Angeles
+        - Bot::IRC::History plugin and integrations
+        - Improved Greeting plugin for a little nice-ness from the bot
+        - Add note() method and warn/die hooks to put date/time in log files
+
+1.09      2016-11-22 13:53:57-08:00 America/Los_Angeles
+        - Basic flood protection for fast-repeated inputs
+
+1.08      2016-11-16 05:38:22-08:00 America/Los_Angeles
+        - Added the "Ping" core plugin
+
+1.07      2016-11-11 09:09:17-08:00 America/Los_Angeles
+        - More gracefully handle IRC server connection throttling
+        - Respond to "to_me" messages that aren't handled by plugins
+
+1.06      2016-11-10 18:14:41-08:00 America/Los_Angeles
+        - Core plugin load order and block/return minor patch
+        - Infobot plugin fix for punctuation
+        - Variety of small bug fixes
+        - Fix for bug in recalling historically joined channels
+
+1.05      2016-11-08 11:39:57-08:00 America/Los_Angeles
+        - Improve error reporting on loading plugins
+        - Don't reply to un-evaluated math expressions
+
+1.04      2016-11-08 10:45:07-08:00 America/Los_Angeles
+        - Added "Infobot" plugin
+        - Added "Greeting" plugin
+        - Added "Functions" plugin
+
+1.03      2016-11-07 17:39:07-08:00 America/Los_Angeles
+        - Removed "priority" concept (because it be dumb and redundant redundant)
+        - Error trapping and clean-up in parent process
+        - Added list() helper
+        - Added reply_to() method to core and used it where appropriate
+        - Stored channels with Join plugin
+        - Added "Seen" plugin
+        - Plugin "Karma" added
+        - Plugin "Math" added
+        - Plugin "Convert" added
+
+1.02      2016-11-04 13:48:17-07:00 America/Los_Angeles
+        - Load all core plugins set with ":core"
+        - Join plugin
+        - Store::SQLite plugin
+        - Change precedence order of loading plugins to favor private and extension overrides
+        - Quick matching of ::X:: and ::Y:: sub-namespace plugins
+
+1.01      2016-11-03 17:08:15-07:00 America/Los_Angeles
+        - First version, released on an unsuspecting world

@@ -1,0 +1,12 @@
+classes:
+  - Admin.harden
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include passive account hardening PAM plugin cracklib
+  pkg:
+  - libpam-cracklib
+  - miscfiles
+  pkg-auto:
+  - miscfiles

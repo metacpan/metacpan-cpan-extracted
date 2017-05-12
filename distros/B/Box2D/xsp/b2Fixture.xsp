@@ -1,0 +1,128 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+
+%name{Box2D::b2Fixture} class b2Fixture 
+{ 
+
+%{
+
+b2Shape *
+b2Fixture::GetShape()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Shape";
+	CODE:
+		RETVAL = (b2Shape*)THIS->GetShape();
+	OUTPUT:
+		RETVAL
+
+void
+b2Fixture::SetSensor( sensor )
+	bool sensor
+	CODE:
+		THIS->SetSensor( sensor ); 
+
+bool
+b2Fixture::IsSensor()
+	CODE:
+		RETVAL = THIS->IsSensor();
+	OUTPUT:
+		RETVAL
+
+
+b2Body *
+b2Fixture::GetBody()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		RETVAL = (b2Body*)THIS->GetBody();
+	OUTPUT:
+		RETVAL
+
+
+b2Fixture *
+b2Fixture::GetNext()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Fixture";
+	CODE:
+		RETVAL = (b2Fixture*)THIS->GetNext();
+	OUTPUT:
+		RETVAL
+
+
+SV*
+b2Fixture::GetUserData ( )
+	PPCODE: 
+		 void* userData = THIS->GetUserData();
+		 if (!userData)
+		  XSRETURN_EMPTY;
+		  ST(0) = (SV *)userData;
+		  XSRETURN(1);
+
+void
+b2Fixture::SetUserData ( ... )
+	PPCODE: 
+		if ( items > 1)
+			THIS->SetUserData( (void *)new_data( ST(1) ) );
+
+bool
+b2Fixture::TestPoint( p )
+	b2Vec2 * p
+	CODE:
+		RETVAL = THIS->TestPoint(*p);
+	OUTPUT:
+		RETVAL
+
+
+float32
+b2Fixture::GetDensity( )
+	CODE:
+		RETVAL = THIS->GetDensity();
+	OUTPUT:
+		RETVAL
+
+void
+b2Fixture::SetDensity( val )
+	float32 val 
+	CODE:
+		THIS->SetDensity( val );
+
+
+float32
+b2Fixture::GetFriction( )
+	CODE:
+		RETVAL = THIS->GetFriction();
+	OUTPUT:
+		RETVAL
+
+void
+b2Fixture::SetFriction( val )
+	float32 val 
+	CODE:
+		THIS->SetFriction( val );
+
+
+float32
+b2Fixture::GetRestitution( )
+	CODE:
+		RETVAL = THIS->GetRestitution();
+	OUTPUT:
+		RETVAL
+
+void
+b2Fixture::SetRestitution( val )
+	float32 val 
+	CODE:
+		THIS->SetRestitution( val );
+
+
+%}
+	
+};
+

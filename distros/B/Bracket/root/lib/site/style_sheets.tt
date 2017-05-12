@@ -1,0 +1,3 @@
+[%- FOREACH style_sheet IN style_sheets -%]
+<link href="[% style_sheet %]" rel="stylesheet" type="text/css" />
+[% END %]

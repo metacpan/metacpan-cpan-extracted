@@ -1,0 +1,31 @@
+Kids version 0.01
+===========================
+
+Place description here.
+
+INSTALLATION
+
+To install this module type:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Gantry
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and license info here.
+
+Copyright (c) 2007 by Phil Crow
+
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+

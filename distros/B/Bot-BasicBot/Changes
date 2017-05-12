@@ -1,0 +1,105 @@
+Revision history Bot::BasicBot
+
+0.91  Thu Apr 6 23:39:21 BST 2017
+
+0.90  Wed Apr 5 23:34:09 CEST 2017
+  - Populate raw_nick for chanjoin (Jeremy Gainsford)
+  - Small documentation improvements
+  - add irc_raw / irc_raw_out for raw IRC events
+  - Maintainership transferred to David Precious
+
+0.89  Mon Nov 21 22:08:39 GMT 2011
+  - Document the use of STDOUT after calling forkit()
+  - Add accessors for PoCo::IRC's 'localaddr' and 'useipv6' options
+  - Allow specifying a coderef callback for forkit()
+
+0.88  Sat Aug 27 15:29:39 GMT 2011
+  - Add a DESTROY method so it won't get AUTOLOADed
+  - Fix incorrect documentation of nick_change() return values
+
+0.87  Sat May 14 18:48:55 GMT 2011
+  - Make charset_decode() use IRC::Utils::decode_irc() internally
+  - Make utf8 the default outgoing message encoding
+
+0.86  Fri Apr 1 20:06:08 GMT 2011
+  - Add noticed(), which is like said() but for notices
+  - Depend on POE::Component::IRC 6.56 for a notice-related fix
+
+0.85  Fri Apr 1 18:49:45 GMT 2011
+  - Document the 'no_run' attribute and add a getter/setter for it
+  - Added a pocoirc() method which returns the underlying pocoirc object
+  - Switched the backend from POE::Component::IRC to P::C::I::State
+  - Print a warning and shut down if our session gets an exception
+  - Document the channel_data() method
+  - Depend on POE::Component::IRC 6.55 for a NAMES-related bugfix
+
+0.84  Mon Nov 15 20:05:09 GMT 2010
+  - Ignore empty strings returned by said()
+  - Adjust the method documentation a bit to avoid confusion
+  - Added the notice() method to send IRC notices.
+    Useful when implementing bots.
+
+0.83  Fri Nov 5 12:40:00 CET 2010
+  - Applied patch from Mario Domgörgen to use log() for warnings (RT #51804)
+  - Only ignore said() when it returns undef/empty list, not false
+  - got_names was never getting called. Fixed that.
+  - Skip connect.t for now. I should rewrite it to use poco-server-irc...
+
+0.82  Wed Nov 3 02:09:36 GMT 2010
+  - Maintainership moved from cpan:TOMI to cpan:HINRIK
+  - Use POE::Component::IRC's Connector plugin to handle reconnects. This
+    fixes the endless reconnect loop when trying to shut down the bot
+  - Kill subprocesses (e.g. those created by forkit()) on shutdown
+  - Migrate distribution to Dist::Zilla
+  - Eliminate bogus "NAMES HASH(0x1234567)" queries the bot was making after
+    joining a channel
+
+0.81 2009/01/26
+  - Implement remove_from_all_channels, you idiot. Sigh.
+
+0.80 2009/01/22
+  - Understand quit messages - https://rt.cpan.org/Ticket/Display.html?id=42625
+  - Fix the ->name method on the bot to actually return something sensible - https://rt.cpan.org/Ticket/Display.html?id=27427
+  - Try to avoid zombie children on forking - https://rt.cpan.org/Public/Bug/Display.html?id=38010
+
+0.70 2006/06/11
+  - Updates for new PoDo::IRC
+  - No longer do 2 server connects on startup
+  - the connect test doesn't break itself by faking a connection first
+
+0.65 2005/08/11
+  - Added raw_nick support and a tiny amount of documentation
+  - Support for SSL, contributed by Bradley M. Kuhn <bkuhn@softwarefreedom.org>
+
+0.61 2005/05/13
+  - Fix for the odd behaviour of freenode - we ask the server for the time
+    periodically to catch servers that don't send pings.
+
+0.60 2005/03/21
+  - Charset support
+  - use Text::Wrap to split up really long responses, instead of a
+    nasty regexp, so we split on spaces properly.
+
+0.50 2004/12/01 (revision 1366)
+  - Real (almost) tests
+  - Nick (and op/voice status) tracking
+  - Quiet some warnings
+
+0.31 2004/03/16 (revision 643)
+  - Fixed 'addressing' typo, thanks Earle
+  - Fixed annoying errors for logging
+  - Fixed stupid bug where the return value of said wasn't getting said.
+    How can I not have noticed?
+  - if you don't return true from init, be more helpful.
+  - if help doesn't return true, don't say anything
+  - Made SYNOPSIS clearer
+
+0.30 2003/01/02
+  - Randomized name so you can run more than one at once in one POE session
+  - Log a lot less.
+  - Be more aggressive about reconnecting to the server
+  - Put reconnect stand-offs into a lot more places, so we get less confused.
+  - Made reconnect timeout changable
+  - Added a NINJA
+
+Changes to 0.25 (released 31st August 2003) not available.

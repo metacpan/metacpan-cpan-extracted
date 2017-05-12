@@ -1,0 +1,1049 @@
+=pod
+
+=head1 NAME
+
+Bugs Report for the NEXPL library
+
+=head1 DESCRIPTION
+
+This document contains the bugs reports for the NEXPL library.
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0001 Node.pm method fails to read distance in scientific notation
+
+=over
+
+=item * Submission Details
+
+ Date: 6/24/03.
+ Submitted by: Arlin.
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description
+
+ Problem is in Bio::NEXUS::Node.pm, though the symptom was that
+ a NEXUS Trees Block produced by span-export.pl is mis-read by
+ plottree.pl.  The problem is due to the presence of a branch length in
+ scientific notation.  Here is the relevant part of the tree:
+
+ ...(otu_3:0.00064,otu_4:4e-05):0.00234[1],...
+
+ 4e-05 is not parsed correctly, but editing the file to read '0.00004'
+ fixed this problem.  The ultimate source of the problem is in Node.pm.
+ Method parse calls method parse_distance to
+ retrieve the branch length after the colon, but parse_distance does
+ not recognize 'e' or 'E' as valid tokens.  However, method tree_string
+ will write out distances in scientific notation if they are sufficiently
+ small.  So the input and the output methods are not compatible with
+ each other.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0002 SPAN DBI connect failure
+
+=over
+
+=item * Submission Details
+
+ Date: 7/16/03
+ Submitted by: Arlin
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description
+
+ Problem involves configuration implemented by current version of SPAN.pm
+ failing to adapt to how DBI makes connections.
+ 
+ I have seen this before, but Chengzhi has sent me his notes so I will
+ use them.  He notes that in span-export.pl:
+
+  DBI->connect("dbi:$dbiDriver:dbname=$dbName; host=$dbHost",
+  "$dbUser","$dbPassword", {RaiseError => 1, AutoCommit => 1})
+ 
+ gives error message :
+  DBI connect('dbname=spanw; host=localhost','liangc',...) failed: could not
+  connect to server: Connection refused at /usr/local/bin/span-export.pl line
+  30
+ 
+ but after removing dbhost from above line, this command:
+   DBI->connect("dbi:$dbiDriver:dbname=$dbName", "$dbUser","$dbPassword",
+   {RaiseError => 1, AutoCommit => 1})
+
+ works correctly.
+ 
+ Also the original version works correctly for a remote host, because
+ Daniel has used it in this way.  However, when the host is local,
+ using host="localhost" raises an error, as above.  I don't know
+ about using an empty hostname.  We should check this.
+ 
+ Possibly the use of localhost causes DBI to request a TCP/IP
+ socket to the local in question was not offering psql services
+ via TCP/IP, but only via UNIX socket.  We should check this.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0003 gv doesn't see multi-page format of nexplot-generated PostScript 
+
+=over
+
+=item * Submission Details
+
+ Date: 07/18/2003
+ Submitted by: Peter Yang
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description: 
+
+ PS files from plottree - multiple pages fail to display
+ unless 'Respect DSC' is unchecked.
+
+ From all reports, it seems as if the PS files conform to postscript;
+ the program gs displays them without error. However, the program 'gv'
+ fails to display anything other than the first page. In order to see
+ the other pages, you either have to click 'Redisplay' (which I imagine
+ is not designed to view other pages) or disengage the 'Respect DSC' option.
+
+ DSC requires that each page be distinctly separate from the other, as
+ far as the code is concerned. However, the way the BigPrint code works is to
+ reproduce the entire graph on a sheet of paper, then clip off appropriately.
+ This is repeated for each sheet, so I am unsure whether this method is DSC-
+ appropriate.
+
+ I should also note that PDF files are generated just fine and contain
+ multiple pages that are recognized by all PDF viewers.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0004 Margin loss in PDF conversion of multi-page nexplot-generated Postscript
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0003
+ Date: 07/18/2003
+ Submitted by: Peter Yang
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description 
+
+ PDFs do not have margins, PS files do (plottree.pl)
+
+ The BigPrint code apparently leaves margins (1/2" at this point in time) all
+ around, so that one can print them without having things cut off. However,
+ when converting to PDF, this doesn't happen. Instead, the margins only apply
+ to the first page and don't apply to everything else. I don't know why this
+ happens, but I'm guessing the fault isn't totally on our side. This should
+ be looked into more deeply.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0005 psresize fails with nexplot-generated PostScript
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0003
+ Date:07/18/2003
+ Submitted by: Peter Yang
+ Submitted to:
+ Status (open/fixed): open
+
+=item Description 
+
+ plottree.pl (now nexplot.pl) - psresize does not work with any
+ plottree-generated PS files. Any time we psresize a plottre-generated PS file, we get
+ a blank page. We need to fix this. This is probably because in some way,
+ the file doesn't follow DSC rules (see bug 0003 for details).
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0006 inconsistent numbering of inodes in SPAN vs. nexplot
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 07/21/03
+ Submitted by: Arlin Stoltzfus
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description
+
+ Weigang noticed 3 weeks ago that plottree's internal node names are 
+ not the same as the ones in SPAN.  They often look the same because 
+ they are generated by a similar algorithm.  However, we need to 
+ implement and test the correct transmission of internal node names 
+ via the TREES block.  
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0007 Bio::NEXUS::CharactersBlock comparison method fails to see character state edits
+
+=over
+
+=item * Submission Details
+
+  Cross-references: 
+ Date: 10/8/2004
+ Submitted by: Chengzhi Liang
+ Submitted to:
+ Status (open/fixed): open
+
+=item * Description
+
+ 
+
+ When compare two NEXUS files, the sequences in alignment are not
+ compared (eg, change a character in one sequence doesn't affect the
+ results when comparing two identical files)
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0008 pipeline NEXUS output with unexpected wtset formats
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Nick has supplied us with NEXUS files containing (within assumptions 
+ blocks) a wtset vector for each sequence (OTU), rather than a single 
+ vector for the entire alignment, which is what fits in the schema.  
+
+ In addition the values in the vector, which are always single digits, 
+ are not separated by whitespace.  
+
+ In his 22 September 04 email, Nick writes 
+
+ "At any rate I am now making the modification to the SPAN translator we
+ discussed yesterday which will be a replacement of the CORE-scores block
+ with the CORE-column-wise scores or "CONS" line of the CORE-score files (see
+ portal/pfam/clustal2/align_aa_score_ascii for the raw data files - these
+ were just copied today from the computer node where they were calculated).
+ Data generation will begin as soon as I am finished, either this evening or
+ tomorrow morning at the latest."
+
+ I confirm that this is true for the new output files generated as of 
+ 26 September, at /Volumes/Portal/pfam/clustal2/SPAN on fu-sol.furman.edu. 
+ The files have assumptions blocks with a single wtset vector.   
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0009 pipeline NEXUS output with non-numerics in wtset vector
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin
+ Submitted to: 
+ Status (open/fixed): open
+
+=item * Description
+
+ There are alphabetical characters in some of the wtset vectors coming 
+ from Nick.  Chengzhi noticed this by accident and mentioned it in an 
+ email 25 August, 2004.  
+
+ Nick traces the problem to behavior of clustalw and tcoffee.  He says 
+ that this only occurs in the first 60 columns of the alignment.  As 
+ of Nick's email of 13 October, this is still unresolved: 
+
+ "Work on the list of program modifications is going well - the major problem
+ is getting clustalw / t-coffee to process the first line of FASTA files.
+ This will necessitate a re-calculation of the CORE scores and Baysian trees.
+ Priority is being given to completing the CORE scores. The CORE score data
+ in your hands is good - it just lacks data for the first 60 columns of the
+ alignment."
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0010 wrong name for trees block in pipeline NEXUS output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin 
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Nick fixed this as of 30 August, changing the name to "trees" as required 
+ by the published format standard. 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0011 blocks in pipeline NEXUS output use inconsistent OTU names
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin 
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Chengzhi identified in his 25 August email that "the taxon names 
+ used in translate aren't the full name as in taxa block" and 
+ that  "in span block, the species names still contain IDB ID".   
+
+ Nick claims to have fixed this.  
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0012  trees not rooted in pipeline NEXUS output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin 
+ Submitted to: 
+ Status (open/fixed): open
+
+=item * Description
+
+ Chengzhi identified in his 25 August email that the trees are not 
+ rooted.   Rooted trees are required for the analysis of intron history. 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0013 extra "endblock" token at end of pipeline NEXUS output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin 
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ 
+
+ Chengzhi identified in his 25 August email that "there is an extra 
+ endblock command after in Trees Block".  This has been fixed. 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0014 
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0011
+ Date: 10/21/04
+ Submitted by: Arlin 
+ Submitted to: 
+ Status (open/fixed): ?
+
+=item * Description
+
+ 
+
+ Chengzhi identified in his 25 August email that unwanted whitespace 
+ appears in some of the metainformation in the SPAN block.  
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0015 loss of first line of alignment in pipeline NEXUS output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 10/21/04
+ Submitted by: Arlin
+ Submitted to: 
+ Status (open/fixed): open
+
+=item * Description
+
+ 
+
+ In his 20 Septmeber email, Nick writes: 
+
+ "I have also identified a bug in the alignment program which results in the
+ apparent deletion of the first line of the alignment in output NEXUS files.
+ This affects the alignment quality scores and the bayesian trees. The
+ alignment data and NJ trees are unaffected by this problem. Since this is
+ not my code, I had to write a new program to deal with the issue. This is
+ almost complete. I expect to have the corrected alignment quality scores for
+ the smaller protein families later this week. Fortunately I have found a way
+ to access the second processor on the Xserves which will double the
+ throughput."
+
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0016 Reference lines printed by nexplot in tree-only mode
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/19/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Reference lines (gray lines aligning OTU labels with their 
+ corresponding sequences in the data matrix) are printed when tree-only mode is
+ used, even though they serve no purpose.  This bug is fixed.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0017 Nextool's exclude command fails to alter all characters blocks
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/19/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Exclude command in nextool causes subsequent errors when a NEXUS
+ file with multiple characters blocks is used.  The OTUs to be excluded are only
+ excluded from the first characters block; this corrupts the file and prevents
+ the other characters blocks from being read correctly because they contain OTUs
+ not present in the taxa block.  This bug is fixed, and exclude OTU appears to
+ handle all blocks of the following types correctly: taxa, characters, trees,
+ sets.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0018 Nexplot plots rootnodes for unrooted trees
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/21/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): open
+
+=item * Description
+
+ A dot representing a node is plotted at the root, even if a tree is
+ designated unrooted using [&U] in the NEXUS file.  If the -i flag is used, the
+ label 'root' also appears next to the dot.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0019 Rerooting in nextool does nothing
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/21/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Rerooting command in nextool does not alter tree structure in
+ written NEXUS file because the return value from the rerooting subroutine was
+ being discarded.  This has been fixed.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0020 Rerooting in nextool creates trees with problems
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/21/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Rerooting does not remove old root, and the parent of the outgroup
+ is selected as the new root, instead of a new node being added between the
+ outgroup and its parent.  At least in some cases (e.g. w/ basicbush.nex) this
+ leads to a tree that undesirably trifurcates from the root.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0021 Too many column labels printed in data matrix in nexplot output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/25/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): fixed
+
+=item * Description
+
+ More labels are printed than there are columns.  This seems to be
+ because the data for the matrix is taken from only one Characters Block, but the
+ column labels comprise the character labels from all blocks.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0022 nexplot creates bogus trees when two nodes have the same name
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 01/27/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): open
+
+=item * Description
+
+ Trees that are in correct Newick format and topologically correct
+ are not represented correctly if any two nodes have the same name.  I think this
+ is because nexplot keeps track of (x,y) positions of nodes using name-keys. 
+ This can be observed using the following tree, where 'D' has been renamed
+ 'root':	TREE bush =
+ (((A:1,B:1)inode3:1,(C:1,root:1)inode4:1)inode2:1,((E:1,F:1)inode6:1,(G:1,H:1)
+ inode7:1)inode5:1)root;
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0023 "walk_OTU() method not found in Node.pm" error
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/01/05
+ Submitted by: Tom
+ Submitted to: 
+ Status (open/fixed): Fixed
+
+=item * Description
+
+ Apparently method was renamed to "walk_OTUs", but two calls to
+ "walk_OTU" were not changed accordingly.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0024 Undocumented rewrite and addtree commands in nextool
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/17/05
+ Submitted by: Tom
+ Severity: Warning
+ Status (open/fixed): Open
+
+=item * Description
+
+ nextool appears to have functionality to rewrite NEXUS files and to
+ add a tree to a NEXUS file, but there is no documentation that mentions these
+ commands.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0025 rename command in nextool does not affect all blocks
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/28/05
+ Submitted by: Tom
+ Severity: Warning, possible error
+ Status (open/fixed): open
+
+=item * Description
+
+ "rename" command, and for that matter rename_otus() in NEXUS.pm as
+ well, only will rename otus in the Taxa, Character, and Trees Blocks.  This would
+ invalidate any sets containing renamed otus in the Sets block, and I suspect
+ would also invalidate the History block (if those blocks exist).
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0026 rename_otus() method in TreesBlock.pm treats scalars as objects
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 06/21/05
+ Submitted by: Tom
+ Severity: error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ rename_otus() calls the method otu_list(), which returns a list of
+ scalars, but the subsequent code is expecting objects, as would have been
+ returned by node_list().
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0027 branch lengths incorrect when otus are removed
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 08/24/05
+ Submitted by: Tom
+ Severity: error
+ Status (open/fixed): fixed, but only briefly tested
+
+=item * Description
+
+ Node::prune(), which is indirectly called by the nextool select and
+ exclude functions, was incorrectly processing branch lengths when an inode was
+ left with only one child.  Instead of adding that inode's length to the child's,
+ the child's length was not changed and the inode and its branch was simply 
+ removed.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0028 Select and Exclude OTU functions do not change all blocks
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/02/06
+ Submitted by: Tom
+ Severity: warning, possible error
+ Status (open/fixed): open
+
+=item * Description
+
+ nextool's select and exclude otu functions and Bio::NEXUS::select_otus()/exclude_otus() methods remove otus only from taxa, charaters, sets, and trees blocks (not span or history blocks).
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0029 Select and Exclude column functions affect first Characters Block only
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/02/06
+ Submitted by: Tom
+ Severity: error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Select and exclude column functions were written assuming that NEXUS files would have only one Characters Block, and therefore the title need not be specified.  I've changed this so that a Characters Block title argument can be specified.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0030 Select and Exclude column functions may corrupt assumptions block
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 02/02/06
+ Submitted by: Tom
+ Severity: error
+ Status (open/fixed): open
+
+=item * Description
+
+ If a Characters Block has an accompanying assumptions block, and columns are removed from the Characters Block, they should also be removed from the assumptions block so that the columns still align.  There is no link, however, going from the characters blocks to assumptions blocks; links only go the other direction.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0031 "interleave" token in CharactersBlock->{Format} not removed for non-interleaved output
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 03/20/06
+ Submitted by: Tom
+ Severity: warning
+ Status (open/fixed): open
+
+=item * Description
+
+ We read in interleaved matrices (alignments) and write then out as non-interleaved, but we're leaving in the "interleaved" formatting token when we write out the new file.  This should not corrupt the new file (whereas not including "interleaved" when the data are would corrupt the file); all the same, it's inaccurate.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0032 NEXPL corrupts all UNKNOWN Blocks
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 03/21/06
+ Submitted by: Tom
+ Severity (warning/error): error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ no semicolon was being written after the BEGIN command starting UNKNOWN blocks, thereby corrupting the file.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0033 "WeightSet" formatting flags not parsed
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0034 0035
+ Date: 05/18/06
+ Submitted by: Tom
+ Severity (warning/error): error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ In assumptions blocks, weight sets may be STANDARD/vector and TOKENS/notokens (defaults UC).  Oddly enough, we were requiring that some kind of flag be there, but not parsing it--and then when we wrote out the weightset, we said that it was a vector (leaving tokens implicit).  Offhand, most of the weightsets we use now are T-COFFEE CORE column scores, which are of type "vector notokens".
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0034 "weightsets" returned as strings rather than arrays
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0033 0035
+ Date: 05/18/06
+ Submitted by: Tom
+ Severity (warning/error): error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Because we never checked the format of the data in a weightset, it was not being stored correctly internally.  When accessed, the entire weightset was being returned as the first (scalar) element of an arrayref.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0035 No histograms in nexplot/histograms with non-normalized heights
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 0033 0034
+ Date: 05/18/06
+ Submitted by: Tom
+ Severity (warning/error): error
+ Status (open/fixed): fixed
+
+=item * Description
+
+ Nexplot output generally didn't include histograms (this was because of the previous two bugs), and when it did, the histograms were not scaled properly, often covering the character labels.  This was because weightsets were assumed to contain data from 0 to 1, rather than the 0-9 we see in T-COFFEE CORE scores.  Now, histograms are normalized to the greatest value in the weightset, unless the weightset has name "CORE_column_scores", in which case they are normalized using a maximum value of 9.  Non-numeric values are given value 0, so that they don't appear in the histogram and they don't mess up numeric comparisons in the code.
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0036 Node::parse() parses taxa in trees differently than other blocks
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 07/07/06 
+ Submitted by: Tom
+ Severity (warning/error): error
+ Status (open/fixed): open
+
+=item * Description
+
+ Description: Newick tree strings are parsed differently from the rest of the file.  Taxonomic names are changed, and warnings are produced stating "taxlabel <OTU_NAME> in trees block not found in taxa block".
+
+=back
+
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0037 
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 04/06/07
+ Submitted by: Mikhail
+ Severity (warning/error): warning
+ Status (open/fixed): open
+
+=item * Description
+
+ When using nextool.pl to exclude a subtree, 'Span' and 'History' blocks are not 
+ updated properly.
+ To replicate the problem, use use PF00034_39.nex - a data set (cyto c) that has
+ tigriopus OTUs, and exclude the subtree defined by inode18:
+
+ $ nextool.pl PF00034_39.nex out.nex exclude subtree inode18
+
+ Open the out.nex file and:
+ - Check the 'Span' block -- you will find that tigriopus OTUs are still present.
+ - Check the 'History' block -- you will find that the node and OTUs are still 
+ present in the tree.
+
+=back
+
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0038
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 04/06/07
+ Submitted by: Mikhail
+ Severity (warning/error): 
+ Status (open/fixed): open
+
+=item * Description
+
+ Many 'get' methods in the Bio::NEXUS library return references to actual sub-structures of the main Bio::NEXUS object, instead of returning a deep copy. For instance, if you call a $char_block->get_otuset()->get_otu('some_OTU_name') method on a Bio::NEXUS::CharactersBlock object, you will get a reference to the actual OTU (Bio::NEXUS::TaxUnit) data structure. This means that when the user modifies the returned reference, this will affect the parent object.
+ While this (returning a reference) may seem convenient, it is not a safe way to return objects. Generally speaking, below are some of the reasons:
+ - When one defines the interface for modifying an object (e.g. 'set' methods), that interface includes certain business rules, which have to be followed, like validation of the parameters. If the user dodges the interface and its business rules, there's a risk that he/she will modify the above-mentioned structure in a way that will break the consistency of the parent object. This can lead to nasty bugs that are difficult to trace and fix.
+ - The user may not realize that he/she is dealing with a reference to the actual struct, and modify it, or add the reference to a different parent object. In the first case, the modifications will reflect on the original parent object, which could lead to some unpredicted results. In the case of adding the reference to a different parent object, changes to any of those parents will, again, lead to unexpected data in the objects. Again, bugs that are hard to trace.
+ 
+ The bottom line is, don't trust the user. Returning copies makes the code a little more reliable and traceable.
+
+=back
+
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0039
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 
+ Submitted by: 
+ Severity (warning/error): 
+ Status (open/fixed): 
+
+=item * Description
+
+ 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0040
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 
+ Submitted by: 
+ Severity (warning/error): 
+ Status (open/fixed): 
+
+=item * Description
+
+ 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 0041
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 
+ Submitted by: 
+ Severity (warning/error): 
+ Status (open/fixed): 
+
+=item * Description
+
+ 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 00 
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 
+ Submitted by: 
+ Severity (warning/error): 
+ Status (open/fixed): 
+
+=item * Description
+
+ 
+
+=back
+
+=for comment ------------------------------- B U G -----------------------------
+
+=head2 ID: 00
+
+=over
+
+=item * Submission Details
+
+ Cross-references: 
+ Date: 
+ Submitted by: 
+ Severity (warning/error): 
+ Status (open/fixed): 
+
+=item * Description
+
+ 

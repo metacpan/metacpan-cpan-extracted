@@ -1,0 +1,68 @@
+Revision history fon Perl module Business::UPS::Tracking
+
+1.12 Sat Apr 2 2016
+    - Fix typos in method names
+
+1.11 Sun Aug 31 2014
+    - Use new Moose exceptions and Moose > 2.0400
+    - Move no warnings behind use Moose (by scrottie)
+    - Use Try::Tiny to catch exceptions
+
+1.10 Wed Sep 11 2013
+    - Maintenance release (M::I, smartmatch, base -> parent, ...)
+
+1.09 Sat Apr 07 2012
+    - Maintenance release
+
+1.08 Thu Sep 08 2011
+    - Fix typos
+    - Update docs
+    - Rename role Business::UPS::Tracking::Role::Serialize -> Business::UPS::Tracking::Role::Print
+    - Fix warnings with latest Moose version
+    - Fix failing tests due to new test data
+
+1.07 Wed Sep 29 2010
+    - Add 'no Moose', 'no Moose::Role' and make all classes immutable
+    - Fix pod
+
+1.06 Mon Jun 14 2010
+    - Fix broken/changed webservice availability tests
+    - Fix metaclass errors with latest Moose version
+    - Dist housekeeping
+
+1.05 Sat Feb 20 2010
+    - Fix failing tests on some cpan testers plattforms
+    - Refactor handling of UPS webservice credentials
+
+1.04 Sat Oct 31 2009
+    - Skip online tests if there is no connection to the UPS webservice
+    - Do not use Moose in B::U::T::Utils
+    - Commandline: Utf8 output
+    - Better reporting on XML exceptions
+    - Fix XML enocding issues
+    - Documentation (podcoverage, typos, extended, style, ..)
+
+1.03 Sat Oct 24 2009
+    - Add checksum check for tracking numbers
+    - Moose exceptions are thrown using Business::UPS::Tracking::X::CLASS
+    - Add Business::UPS::Tracking::Element::Code
+    - Make object serializeable
+    - Fix some bugs
+    - Add commandline interface
+    - Removed overload
+
+1.02 Fri Aug 7 2009
+    - Better detection of HTTPS prerequisites
+    - Fixed errors in doc example
+    - Added message element class
+    - Fix some typos
+    - Make tracking number type checking more strict
+
+1.01 Tue Jul 21 2009
+    - Fixed some typos in documentation
+    - Added change file
+    - Added version to all submodules
+    - Use isa => 'Maybe[Type]' for all accessors that might be undefined
+
+1.00 Sun Jul 05 2009
+    - Initial version

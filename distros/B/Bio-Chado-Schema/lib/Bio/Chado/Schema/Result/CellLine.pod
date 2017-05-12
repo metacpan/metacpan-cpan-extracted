@@ -1,0 +1,43 @@
+package Bio::Chado::Schema::Result::CellLine;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::CellLine - For describing cell lines
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado CellLine module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::CellLine::CellLine>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineCvterm>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineCvtermprop>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineDbxref>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineFeature>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineLibrary>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLinePub>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineRelationship>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineSynonym>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLineprop>
+
+L<Bio::Chado::Schema::Result::CellLine::CellLinepropPub>
+
+=cut
+
+1;

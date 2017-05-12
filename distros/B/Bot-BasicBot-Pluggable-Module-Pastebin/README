@@ -1,0 +1,32 @@
+Bot::BasicBot::Pluggable::Module::PasteBin - IRC frontend to PasteBin
+
+DESCRIPTION
+
+This is a IRC plugin for check Pastebin web site if someone posted on it
+using the same nick as used on irc
+
+INSTALL
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Frederico Recsky
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

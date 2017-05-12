@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>Business::Cart::Generic</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<link rel="stylesheet" type="text/css" href="<: $css_url :>/fancy.table.css">
+<link rel="stylesheet" type="text/css" href="<: $css_url :>/web.page.css">
+
+<link rel="stylesheet" type="text/css" href="<: $validator_css_url :>/validator.css">
+
+<script type="text/javascript" src="<: $yui_url :>/build/yui/yui-min.js" charset="utf-8"></script>
+
+<script type="text/javascript" src="<: $validator_js_url :>/validator.js" charset="utf-8"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+<: $head_js :>
+</script>
+
+</head>
+
+<body class="yui3-skin-sam">
+
+<h3 class="blue_center">Business::Cart::Generic</h3>
+
+<div id="tabview_container"></div>
+
+</body>
+</html>

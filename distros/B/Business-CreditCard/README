@@ -1,0 +1,17 @@
+Business::CreditCard
+
+These subroutines tell you whether a credit card number is self-consistent --
+whether the last digit of the number is a valid checksum for the preceding
+digits.  If you additionally want to process the credit card electronically,
+see Business::OnlinePayment <http://www.420.am/business-onlinepayment/>
+
+Original author is Jon Orwant <orwant@tpj.com>, The Perl Journal and MIT
+Media Lab 
+
+Current maintainer is Ivan Kohler <ivan-business-creditcard@420.am>.
+Please don't bother Jon with emails about this module.
+
+Lee Lawrence <LeeL@aspin.co.uk>, Neale Banks <neale@lowendale.com.au> and
+Max Becker <Max.Becker@firstgate.com> contributed support for additional card
+types.  Lee also contributed a working test.pl.
+

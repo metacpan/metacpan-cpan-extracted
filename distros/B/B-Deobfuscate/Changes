@@ -1,0 +1,74 @@
+--- %YAML:1.2
+0.01:
+  - >-
+    original version; created by h2xs 1.5 with options -X -P -n
+    B::Deobfuscate
+0.02:
+  - Dictionary sort is now predictable
+  - Added config file support
+0.03:
+  - Fixed Build.PL
+0.04:
+  - >-
+    Fixed a bug in gv_should_be_renamed where number variables higher
+    than 9 wouldn't be recognized.
+  - Added sigil detection to rename_gv
+  - Added Makefile.PL wrapper for Build.PL
+  - Use only symbols that are four or more characters
+0.05: ~
+0.06:
+  - Added an overridable *B::Deobfuscate::DATA dictionary
+  - Added an internal dictionary
+  - >-
+    Support 5.6.1, 5.8.0 and bleadperl circa July 5, 2003 (which is nearly
+    5.8.1)
+0.07:
+  - Added some sanity checking so that writing extensions is easier
+0.08:
+  - Removed a v-string
+0.09:
+  - >-
+    Removed a stupid and unrelated test that always failed. I'll create proper
+    tests once I learn how to use Test::Harness.
+0.10:
+  - >-
+    broquaint of perlmonks.org noticed that I forgot to handle
+    the helem opcode. This attempts to handle all the cases I
+    need to (after consulting opcode.pl of the perl source).
+  - Added some real tests.
+0.11:
+  - The dictionary may now have words that are shorter than 3 characters
+  - Fixed for 5.10
+0.12:
+  - >-
+    Updated the signature cuz the previous version forgot to account
+    for the change to META.yml
+  - "*foo{CODE} -> defined( &foo ) per the docs."
+0.13:
+  - uh... broke stuff? The SIGNATURE is bad for META.yml anyway.
+  - I forget what else changed
+0.14:
+  - Shuffled the PGP dictionary around and introduced a floral one
+  - Fussing
+  - autouse more of YAML
+  - autouse Carp
+  - Preliminary work for renaming classes & methods
+0.15:
+  - Removed SIGNATURE
+  - Fixed \ in $^X in t/11deparse.t
+  - Perl::Critic fussing.
+  - Disable broken debugging code.
+  - Require latest B::Keywords. Exports were changed.
+0.16:
+  - Enabled alternate dictionary modules
+  - Added -D parameter to ->new
+0.17:
+  - Removed some dups from Flowers.pm
+  - Made this Changes file into YAML for kicks.
+0.18:
+  - Fixed t/canon.t to be 5.6.x compatible.
+  - Quieter B imports.
+0.19:
+  - Use IPC::Run for tests to hopefully be more cross-platform compatible.
+0.20
+  - fiddling w/ pause.cpan.org

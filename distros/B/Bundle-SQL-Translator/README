@@ -1,0 +1,66 @@
+NAME
+    Bundle::SQL::Translator - a Bundle for SQL::Translator
+
+SYNOPSIS
+        perl -MCPAN -e install Bundle::SQL::Translator
+
+DESCRIPTION
+    "Bundle::SQL::Translator" provides a bundle to install all
+    "SQL::Translator" prerequisites. Note that installing this bundle
+    requires the "gd" library from http://www.boutell.com/gd/.
+
+CONTENTS
+    Class::Base
+
+    File::Basename
+
+    File::Spec
+
+    GD
+
+    GraphViz
+
+    IO::Dir
+
+    IO::File
+
+    IO::Scalar
+
+    Parse::RecDescent 1.94
+
+    Pod::Usage
+
+    Spreadsheet::ParseExcel
+
+    Template 2.10
+
+    Test::More
+
+    Test::Exception
+
+    Text::ParseWords
+
+    Text::RecordParser 0.02
+
+    XML::Writer
+
+    XML::XPath 1.13
+
+SUPPORT
+    "Bundle::SQL::Translator" is supported by the author.
+
+VERSION
+    This is "Bundle::SQL::Translator", revision $Revision$.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+
+COPYRIGHT
+    (C) 2003 darren chamberlain
+
+    This library is free software; you may distribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Perl manpage, the SQL::Translator manpage
+

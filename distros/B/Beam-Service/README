@@ -1,0 +1,31 @@
+Beam::Service
+
+This role adds extra functionality to an object that is going to be used
+as a service in a Beam::Wire container. While any object can be
+configured with Beam::Wire, consuming the Beam::Service role allows an
+object to know its own name and to access the container it was
+configured in to fetch other objects that it needs.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

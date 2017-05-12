@@ -1,0 +1,22 @@
+Revision history for B-LintSubs
+
+0.06    CHANGES:
+         * 'use warnings'
+         * Various updates to keep CPANTS happy
+
+0.05    BUGFIXES:
+         * Work around B.pm non-threaded perls
+
+0.04    CHANGES:
+         * Use IPC::Run for testing
+         * More, and more robust testing
+
+0.03    CHANGES:
+         * Switch to Module::Build
+
+0.02    CHANGES:
+         * Added documentation
+         * Added testing
+
+0.01    First version, released on an unsuspecting world.
+

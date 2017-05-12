@@ -1,0 +1,48 @@
+README_admin -- how to make NEXPL package and update web site
+$Id: README_admin,v 1.6 2012/02/07 21:49:27 astoltzfus Exp $
+
+
+PACKAGE
+
+1.  Make sure the package works before distributing it to the world. To test 
+the package qua package, you have to build the package file and test it.  A 
+common problem is forgetting to add new files to the manifest.  Use the disttest 
+command to run the tests on a fresh distribution.  
+
+cvs update
+perl Makefile.PL
+make disttest
+
+2.  Once you are sure that the package works, change the master version number 
+in lib/Bio/NEXUS.pm (grep on VERSION).  This will change the dist name when 
+the package is built (but the cvs version has to be changed separately-- see #4). 
+
+The initial version was based on the percent completion of NEXUS commands, 
+starting with 0.66 on 8/22/06.  Subsequently we just incremented the minor number 
+by 1 each time.  If you don't change this, you won't get a new version number to 
+upload to CPAN. 
+
+3.  Check everything into CVS so that you can tag the current versions.  If you 
+just changed the master version number in lib/Bio/NEXUS.pm, then check that in.  
+
+4. Tag your outgoing distribution with the master number: 
+
+cvs tag release_xx_xx
+
+where xx_xx is something like 0_66 etc.  
+
+5.  Build the package 
+
+perl Makefile.PL
+make dist
+
+6.   upload the package on CPAN. 
+
+https://pause.perl.org/pause/
+
+SOURCES
+
+Here are some things to read about how to make a Perl package.  
+
+http://www.perlfoundation.org/perl5/index.cgi?cpan_packaging
+

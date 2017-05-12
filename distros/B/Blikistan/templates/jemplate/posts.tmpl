@@ -1,0 +1,6 @@
+[% FOR post IN posts %]
+    <h3><a rel="bookmark" href="[% post.permalink %]">[% post.title %]</a> - [% post.date %]</h3>
+    [% post.content %]
+    <p class="comments_invite"><a href="[% post.permalink %]">Comment here</a> | <a href="[% post.permalink %]">Edit this post here</a></p>
+    <div align="center"><img src="http://awesnob.com/images/1.gif" style="height:1px;width:400px" class="divider" alt="" /></div>
+[% END %]

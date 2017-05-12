@@ -1,0 +1,18 @@
+{
+    "BenchmarkAnythingData" : [
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 34.56789,
+            "comment"  : "float value",
+            "compiler" : "icc",
+            "keyword"  : "zomtec"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : "34.56789",
+            "comment"  : "number as string seems to be, but maybe it's just due to Perl",
+            "compiler" : "icc",
+            "keyword"  : "zomtec"
+        }
+    ]
+}

@@ -1,0 +1,27 @@
+# example cnf file for Mu11KsubB_annot_csv
+
+name=Mu11KsubB_annot_csv
+module=Mu11KsubB_annot_csv
+version=Unknown
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=ProbeSet_ID
+label=Chip
+label=Organism, dotset=Organism_Name
+label=Sequence_Type
+label=Sequence_Source
+label=SequenceDerivedFrom, dotset=Sequence_ID
+label=GeneSymbol, dotset=Gene_Symbol
+label=Location
+label=UniGene, dotset=Sequence_Cluster_ID
+label=LocusLink, dotset=Gene_ID
+label=SwissProt, dotset=Sequence_ID
+label=ECnumber
+label=OMIM, dotset=Omim_ID
+label=Ensembl, dotset=Sequence_ID
+

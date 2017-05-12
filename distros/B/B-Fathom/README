@@ -1,0 +1,17 @@
+This is B::Fathom, a readability grader for Perl code.  Typical usage
+of Fathom is, e.g., `perl -MO=Fathom <somefile>'.  For further
+documentation, type `perldoc B::Fathom'.
+
+This module is a backend for the Perl compiler, and has been tested
+only with versions of Perl >= 5.005.
+
+I'm eager to improve this module by providing more comprehensive
+readability metrics.  Suggestions, bug reports, and patches are welcome;
+please send all comments to kstar@cpan.org.
+
+Copyright
+
+    Copyright (c) 1998, 1999, 2000 Kurt Starsinic.
+    This module is free software; you may redistribute it
+    and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+Revision history for Bio-SSRTool
+
+0.01    31 August 2012
+        First version, released on an unsuspecting world.
+
+0.02    18 September 2012
+        Fixed problems with distribution
+        Added "-o" option for "ssrtool"

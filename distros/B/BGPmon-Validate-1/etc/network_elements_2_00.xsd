@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="urn:ietf:params:xml:ns:network_elements" xmlns:ne="urn:ietf:params:xml:ns:network_elements"
+  elementFormDefault="qualified">
+
+<xsd:element name="ASN2" type="ne:asn2_type" />
+<xsd:element name="ASN4" type="ne:asn4_type" />
+<xsd:element name="IEEE802" type="ne:ieee802_addr"/>
+<xsd:element name="IPV4" type="ne:ipv4_address_type"/>
+<xsd:element name="IPV4_PREFIX" type="ne:ipv4_prefix_type"/>
+<xsd:element name="IPV6" type="ne:ipv6_address_type"/>
+<xsd:element name="IPV6_PREFIX" type="ne:ipv6_prefix_type"/>
+<xsd:element name="PORT" type="ne:port_type"/>
+
+
+
+  <!-- The network_addr type is an abstract type which provides a clean interface 
+    for other schema to use for elements that represent address families. An instance 
+    may not use this type explicitly, but a schema that uses it will validate any instance 
+    of a derived type. -->
+  <xsd:complexType name="network_address_type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="afi" type="xsd:unsignedShort" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+
+  <xsd:complexType name="ipv4_address_type">
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:network_address_type">
+        <xsd:pattern
+          value="((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))" />
+        <xsd:attribute name="afi" type="xsd:unsignedShort" fixed="1"
+          use="required" />
+      </xsd:restriction>
+
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <!-- The ipv6_addr type is derived from the network_addr abstract type above. It 
+    provides validation for any correct canonical representation of an IPv6 address, 
+    and includes the AFI for IPv6 addresses (2). -->
+  <xsd:complexType name="ipv6_address_type">
+    <xsd:annotation>
+      <xsd:documentation>
+        Source: http://blog.markhatton.co.uk/2011/03/15/
+        regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:network_address_type">
+        <xsd:pattern value="(([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){6}([0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))" />
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))" />
+        <!-- ERROR WITH THE FOLLOWING REGEX -->
+        <xsd:pattern 
+          value="(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))" />
+        <xsd:attribute name="afi" type="xsd:unsignedShort" fixed="2"
+          use="required" />
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+
+  <!-- The network_prefix type is an abstract type which provides a clean interface 
+    for other schema to use for elements that represent a prefix for some address family. 
+    An instance may not use this type explicitly, but a schema that uses it will validate 
+    any instance of a derived type. -->
+  <xsd:complexType
+    name="network_prefix_type">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute
+          name="afi"
+          type="xsd:unsignedShort"
+          use="required" />
+        <xsd:anyAttribute />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  
+    <!-- The ipv4_prefix type provides a representation for an IPv4 Classless Inter-Domain 
+    Routing (CIDR) prefix. It provides validation for the content as well as for the 
+    specification of IPv4's AFI. This type also defines an optional attribute for the 
+    length of the prefix. This value is restricted to valid values for an IPv4 prefix, 
+    but is not checked against the content of the element. When the two disagree, the 
+    user SHOULD use the value contained within the element. -->
+  <xsd:complexType name="ipv4_prefix_type">
+    <xsd:annotation>
+      <xsd:documentation>
+        Source: http://blog.markhatton.co.uk/2011/03/15/
+        regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:network_prefix_type">
+        <xsd:pattern
+          value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/([0-8])))" />
+          <!-- value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-8])))" />-->
+        <xsd:pattern
+          value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.)([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/(\d|1[0-6])) " />
+          <!-- value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.)([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(\d|1[0-6])) " /> -->
+        <xsd:pattern
+          value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/(\d|1\d|2[0-4]))" />
+          <!--value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){2}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(\d|1\d|2[0-4]))" />-->
+        <xsd:pattern
+          value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(/(\d|[1-2]\d|3[0-2]))" />
+          <!-- value="(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(\d|[1-2]\d|3[0-2]))" /> -->
+        <xsd:attribute
+          name="afi"
+          type="xsd:unsignedShort"
+          fixed="1"
+          use="required" />
+        <xsd:attribute
+          name="safi"
+          type="xsd:unsignedByte"
+          use="optional" />
+        <xsd:attribute
+          name="prefix_len"
+          use="optional">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:unsignedByte">
+              <xsd:maxInclusive value="32" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <!-- The ipv6_prefix type provides a representation for an IPv6 Classless Inter-Domain 
+    Routing (CIDR) prefix. It provides validation for the content as well as for the 
+    specification of IPv6's AFI. This type also defines an optional attribute for the 
+    length of the prefix. This value is restricted to valid values for an IPv6 prefix, 
+    but is not checked against the content of the element. When the two disagree, the 
+    user SHOULD use the value contained within the element. -->
+  <xsd:complexType name="ipv6_prefix_type">
+    <xsd:annotation>
+      <xsd:documentation>
+        Source: http://blog.markhatton.co.uk/2011/03/15/
+        regular-expressions-for-ip-addresses-cidr-ranges-and-hostnames/
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:network_prefix_type">
+        <xsd:pattern
+          value="((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />-->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+          value="(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|:)(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|:)(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:pattern
+        value="(:((:[0-9A-Fa-f]{1,4}){1,7})(/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" />
+          <!-- value="(:((:[0-9A-Fa-f]{1,4}){1,7})(\/(\d|[1-9]\d|1[0-1]\d|12[0-8])))" /> -->
+        <xsd:attribute
+          name="afi"
+          type="xsd:unsignedShort"
+          fixed="2"
+          use="required" />
+        <xsd:attribute
+          name="safi"
+          type="xsd:unsignedByte"
+          use="optional" />
+        <xsd:attribute
+          name="prefix_len"
+          use="optional">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:unsignedByte">
+              <xsd:maxInclusive value="128" />
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  
+    <!-- The ieee802_mac type contains regular expressions that will provide validation 
+    for IEEE 802-style MAC addresses. It will match any EUI-48, MAC-48, 
+    or EUI-64 address, 
+    as well as an address in the dotted-quad notation used by some network 
+    hardware companies. -->
+  <xsd:complexType name="ieee802_addr">
+    <xsd:annotation>
+      <xsd:documentation>
+        Source:
+        http://stackoverflow.com/questions/4260467/what-is-a-regular-expression-for-a-mac-address
+        Source:
+        http://manoharbhattarai.wordpress.com/2012/02/17/regex-to-match-mac-address/
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:network_address_type">
+        <!-- The following two regular expressions match any EUI-48/MAC-48 address. 
+          There are two expressions here to cover addresses that use either a colon or a dash 
+          as their delimiter, but to avoid matching addresses that incorrectly mix the two. -->
+        <xsd:pattern value="(([0-9A-Fa-f]{2}:){5}([0-9A-Fa-f]{2}))" />
+        <xsd:pattern value="(([0-9A-Fa-f]{2}-){5}([0-9A-Fa-f]{2}))" />
+
+        <!-- The following two regular expressions match any EUI-64 address. Again, 
+          two expressions are needed to avoid matching incorrect mixed-delimiter addresses. -->
+        <xsd:pattern value="(([0-9A-Fa-f]{2}:){7}([0-9A-Fa-f]{2}))" />
+        <xsd:pattern value="(([0-9A-Fa-f]{2}-){7}([0-9A-Fa-f]{2}))" />
+
+        <!-- The following regular expression matches an 802 MAC address that is 
+          represented in dotted-quad notation (ex. 1234.dead.BEEF). -->
+        <xsd:pattern value="(([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4})" />
+
+        <xsd:attribute
+          name="afi"
+          type="xsd:unsignedShort"
+          fixed="6"
+          use="required" />
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+
+
+  <!-- Definitions of the AS types for ASN 2 octet and 4 octet -->
+  <xsd:complexType name="asn_type" abstract="true">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:unsignedInt">
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  
+  <xsd:complexType name="asn4_type">
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:asn_type">
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+
+  
+  <xsd:complexType name="asn2_type">
+    <xsd:simpleContent>
+      <xsd:restriction base="ne:asn_type">
+        <xsd:maxInclusive value="65535" />
+      </xsd:restriction>
+    </xsd:simpleContent>
+  </xsd:complexType>
+  
+  <xsd:simpleType name="port_type">
+    <xsd:restriction base="xsd:unsignedShort" />
+  </xsd:simpleType>
+
+</xsd:schema>

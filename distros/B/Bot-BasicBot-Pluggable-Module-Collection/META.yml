@@ -1,0 +1,35 @@
+---
+abstract: 'some useful IRC modules'
+author:
+  - 'Dann<techmemo {at} gmail.com>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.720'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Bot-BasicBot-Pluggable-Module-Collection
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Bot::BasicBot::Pluggable: 0
+  Bot::BasicBot::Pluggable::WithConfig: 0.03
+  Encode: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  Jcode: 0
+  LWP::UserAgent: 0
+  Readonly: 0
+  URI: 0
+  URI::Escape: 0
+  URI::QueryParam: 0
+  WWW::Alexa::TrafficRank: 0
+  WWW::Google::Calculator: 0
+  WWW::HatenaStar: 0
+  Web::Scraper: 0
+  WebService::Livedoor::Weather: 0
+version: 0.01

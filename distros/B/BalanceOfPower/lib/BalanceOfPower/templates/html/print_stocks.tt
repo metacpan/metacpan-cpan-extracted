@@ -1,0 +1,45 @@
+<h3>WALLET</h3>
+<div class="row">
+<table id="stockdata" class="table table-striped table-bordered" cellspacing="0" width="100%">
+<thead>
+<tr>
+    <th>Nation</th>
+    <th>Q</th>
+    <th>Value</th>
+    <th>
+    <span class="glyphicon glyphicon-stats" aria-hidden="false"></span>
+    </th>
+    <th>Prev. Value</th>
+    <th>Influence</th>
+    <th>War Bonds</th>
+</tr>
+</thead>
+<tbody>
+[% FOREACH n IN market_data.keys %]
+<tr>
+<td>[% INCLUDE fragments/linked_nation.tt %]</span></td>
+<td>[% market_data.$n.stocks %]</td>
+<td>[% market_data.$n.value %]</td>
+<td>
+[% IF market_data.$n.value && market_data.$n.prev_value %]
+[% IF market_data.$n.value > market_data.$n.prev_value %]
+    <span class="text-success glyphicon glyphicon-chevron-up" aria-hidden="false"></span>
+[% ELSE %]
+[% IF market_data.$n.value < market_data.$n.prev_value %]
+    <span class="text-danger glyphicon glyphicon-chevron-down" aria-hidden="false"></span>
+[% ELSE %]
+    <span class="text-info glyphicon glyphicon-resize-horizontal" aria-hidden="false"></span>
+[% END %]
+[% END %]
+[% ELSE %]
+    <span class="text-info glyphicon glyphicon-resize-horizontal" aria-hidden="false"></span>
+[% END %]
+</td>
+<td>[% market_data.$n.prev_value %]</td>
+<td>[% market_data.$n.influence %]</td>
+<td>[% market_data.$n.war_bonds %]</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+</div>

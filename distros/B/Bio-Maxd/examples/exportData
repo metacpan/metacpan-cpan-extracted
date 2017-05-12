@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use DBI;
+use DBD::mysql;
+use Bio::Maxd;
+
+  my $maxd_db = new Bio::Maxd();
+
+  $result = $maxd_db->export(
+     -verbose=>"1",
+     -submitter=>'Project40',
+     -experiment=>'Tissue Profiling',
+     -array_type=>'HG-U95A2',
+     -repository_URL=>'',
+     -format=>'GeneSpring');
+
+  print "Done\n" if ($result);
+
+
+

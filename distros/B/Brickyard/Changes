@@ -1,0 +1,55 @@
+Revision history for Brickyard
+
+2.0.0  2013-08-13 19:34:56 CEST
+    [Improvements]
+        - converted to Dist::Milla
+        - improved test resiliency
+
+1.111750  2011-06-24 19:51:14 Europe/Vienna
+    - In addition to the config file names, you can also pass a reference to
+      the INI contents directly, so renamed init_from_config() to
+      init_from_config_structure() and init_from_config_file() to
+      init_from_confg().
+
+1.111110  2011-04-21 17:21:30 Europe/Vienna
+    - support multiple configuration files
+    - separate init_from_config_file(), calls init_from_config()
+
+1.111080  2011-04-18 13:18:51 Europe/Vienna
+    - better error reporting if the config file can't be opened or parsed
+
+1.111070  2011-04-17 17:50:54 Europe/Vienna
+    - Added plugins_agree()
+    - Dotted INI config keys are now expanded so you can specify
+      complex data structures.
+    - init_from_config() now supports an optional callback that can filter
+      values from INI key-value pairs.
+
+1.110890  2011-03-30 15:23:19 Europe/Vienna
+    - You can add custom package name expansions, either directly on the
+      Brickyard object, or in the config's root section.
+    - Added Brickyard::Role::Plugin->normalize_param()
+
+1.110730  2011-03-14 11:25:28 Europe/Vienna
+    - require Role::Basic 0.11 to fix CPAN tester-reported failures
+
+1.110060  2011-01-06 12:09:05 Europe/Vienna
+    - roles can use Brickyard::Accessor now with Role::Basic 0.06
+
+1.110040  2011-01-04 11:34:50 Europe/Vienna
+    - no more Brickyard::PluginContainer; it's handled by Brickyard.pm itself
+    - better error message if we can't require() a package
+    - plugins can call plugins_with() themselves, will be delegated to the
+      brickyard object
+    - various bug fixes
+    - tests for now-fixed bugs and for new features
+
+1.110020  2011-01-02 21:48:04 Europe/Vienna
+    - added [*@Filter]
+    - in all classes, new() now only takes a hash, not a hashref, to initialize
+      the object
+    - removed dependencies
+    - added custom accessor generator
+
+1.103640  2010-12-30 21:21:14 Europe/Vienna
+    - initial version

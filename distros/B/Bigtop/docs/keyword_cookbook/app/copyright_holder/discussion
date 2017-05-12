@@ -1,0 +1,36 @@
+=head1 USE
+
+Use the C<copyright_holder> keyword to control the copyright attribution
+in generated files.  To control the copyright license test, use
+C<license_text>.
+
+By default the first author listed in the C<authors> statement is
+the copyright holder.  If no authors statement is used, the default
+copyright holder is the current logged in user, whose copyright attribution
+will come from the gcos field of /etc/passwd or its moral equivalent.
+
+To specify the copyright holder, use this statement.  Remember to use
+backticks to quote the copyright holder's name if it wouldn't work as
+a Perl identifer.
+
+Note that you probably want to have a C<.bigtopdef> file in your home
+directory with a C<copyright_holder> statement if you use bigtop -n to
+build your new applications.  If you have that file, it must be a
+valid bigtop file, and it will be the default for bigtop and tentmaker
+when they are invoked with the -n flag.
+
+=head1 THE EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<example> in these files:
+
+ README
+ docs/kids.bigtop
+ lib/GENKids.pm
+ lib/Kids.pm
+ lib/Kids/Child.pm
+ lib/Kids/GENModel.pm
+ lib/Kids/Model.pm

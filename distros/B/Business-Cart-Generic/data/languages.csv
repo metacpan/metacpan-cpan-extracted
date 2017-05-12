@@ -1,0 +1,3 @@
+"name","code","locale","charset","date_format_short","date_format_long","time_format","text_direction","currency_id","numeric_separator_decimal","numeric_separator_thousands"
+"English","en_US","en_US.UTF-8,en_US,english","utf-8","%m/%d/%Y","%A %d %B, %Y","%H:%M:%S","ltr","1",".",","
+"English","en_AU","en_AU.UTF-8,en_AU,english","utf-8","%d/%m/%Y","%A %d %B, %Y","%H:%M:%S","ltr","4",".",","

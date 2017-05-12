@@ -1,0 +1,540 @@
+---
+Aksjeselskap:
+  abbr: AS
+  lang: no
+Aktiebolag:
+  abbr: AB
+  lang: se
+Aktiengesellschaft:
+  abbr: AG
+  lang: de
+Aktieselskab:
+  abbr:
+    - 'A/S'
+    - AS
+  lang: da
+Allmennaksjeselskap:
+  abbr: ASA
+  lang: no
+'Anonim Ortaklık':
+  abbr: A.O.
+  lang: tr
+'Anonim Şirket':
+  abbr: 'A.Ş.'
+  lang: tr
+Anpartsselskab:
+  abbr: ApS
+  lang: da
+association sans but lucratif:
+  abbr: ASBL
+  lang: fr
+Berhad:
+  abbr: Bhd.
+  lang: ms
+Besloten vennootschap:
+  abbr: B.V.
+  lang: nl
+  lead: 1
+'Besloten vennootschap met beperkte aansprakelijkheid':
+  abbr: B.V.B.A.
+  lang: nl
+'Betéti Társasá':
+  abbr: Bt.
+  lang: hu
+Chartered:
+  abbr: Chtd.
+  lang: en
+Commanditaire vennootschap:
+  abbr: C.V.
+  lang: nl
+  lead: 1
+Company:
+  abbr:
+    - Co.
+    - '& Co.'
+    - and Co.
+    - and Company
+  lang: en
+Cooperativa de Responsabilidade Limitada:
+  abbr: CRL
+  lang: pt
+Cooperative:
+  abbr:
+    - Coop.
+    - Co-op.
+  lang: en
+Corporation:
+  abbr: Corp.
+  lang: en
+Cwmni Cyfyngedig Cyhoeddus:
+  abbr: Ccc
+  lang: cy
+Cyfyngedig:
+  abbr: Cyf
+  lang: cy
+'Egyéni Cég':
+  abbr: e.c.
+  lang: hu
+'Egyéni Vállalkozó':
+  abbr: e.v.
+  lang: hu
+eingetragene Genossenschaft:
+  abbr: e.G.
+  lang: de
+eingetragener Kaufmann:
+  abbr: e.K.
+  lang: de
+eingetragenes Einzelunternehmen:
+  abbr: e.U.
+  lang: de
+eingetragene Verein:
+  abbr: e.V.
+  lang: de
+'einkahlutafélag':
+  abbr: ehf.
+  lang: is
+'Eenpersoons besloten vennootschap met beperkte aansprakelijkheid':
+  abbr: E.B.V.B.A.
+  lang: nl
+  lead: 1
+Empresa Social del Estado:
+  abbr: E.S.E.
+  lang: es
+  lead: 1
+'Gesellschaft mit beschränkter Haftung':
+  abbr:
+    - GmbH
+    - Ges.m.b.H.
+    - mbH
+  lang: de
+'Gesellschaft bürgerlichen Rechts':
+  abbr: GbR
+  lang: de
+'Государственное унитарное предприятие':
+  abbr:
+    - ГП
+    - GP
+    - ГУП
+    - GUP
+  lang: ru
+  lead: 1
+Handelsbolag:
+  abbr: HB
+  lang: se
+'hlutafélag':
+  abbr: hf.
+  lang: is
+'Halka Açık Anonim Ortaklık':
+  abbr: HAAO
+  lang: tr
+Incorporated:
+  abbr:
+    - Inc.
+    - Co. Inc.
+    - Company Inc.
+  lang: en
+"Incorporée":
+  abbr: Inc.
+  lang: fr
+'Индивидуальный предприниматель':
+  abbr:
+    - ИП
+    - IP
+  lang: ru
+  lead: 1
+'Julkinen osakeyhtiö':
+  abbr: Oyj
+  lang: fi
+Kabushiki Kaisha:
+  abbr:
+    - K.K.
+    - Corporation K.K.
+  lang: ja
+Kollektivgesellschaft:
+  abbr: KolG
+  lang: de
+'Kolektif Şirket':
+  abbr: 'Koll. Şti.'
+  lang: tr
+'Komandit Şirket':
+  abbr: 'Kom. Şti'
+  lang: tr
+Kommanditbolag:
+  abbr: KB
+  lang: se
+Kommanditaktiengesellschaft:
+  abbr: KomAG
+  lang: de
+Kommanditgesellschaft:
+  abbr:
+    - KG
+    - 'GmbH & Co. KG'
+    - 'GmbH und Co. KG'
+    - 'mbH & Co. KG'
+    - 'mbH und Co. KG'
+    - 'AG & Co. KG'
+    - 'AG und Co. KG'
+    - 'Ltd. & Co. KG'
+  lang: de
+Kommanditgesellschaft auf Aktien:
+  abbr:
+    - KGaA
+    - 'GmbH & Co. KGaA'
+    - 'GmbH und Co. KGaA'
+    - 'AG & Co. KGaA'
+    - 'AG und Co. KGaA'
+  lang: de
+Kommanditselskab:
+  abbr: 'K/S'
+  lang: da
+'Kooperatif Şirket':
+  abbr: Koop.
+  lang: tr
+'Korlátolt Felelősségű Társaság':
+  abbr: Kft.
+  lang: hu
+'Közhasznú Társaság':
+  abbr:
+    - Kht.
+    - Nonprofit Kft.
+  lang: hu
+'Közkereseti Társaság':
+  abbr: Kkt.
+  lang: hu
+'Közös Vállalat':
+  abbr: Kv.
+  lang: hu
+Limitada:
+  abbr: Lda.
+  lang: pt
+Limited:
+  abbr:
+    - Ltd.
+  lang: en
+Limited Company:
+  abbr:
+    - L.C.
+    - Ltd. Co.
+    - Ltd. Company
+    - Co. Ltd.
+    - Co.,Ltd.
+    - Company Ltd.
+    - Company Limited
+  lang: en
+'Limited Ortaklık':
+  abbr: L.O.
+  lang: tr
+'Limited Şirket':
+  abbr:
+    - 'Ltd. Şti.'
+    - 'L.Ş.'
+  lang: tr
+Limited Partnership:
+  abbr:
+    - L.P.
+    - Company L.P.
+  lang: en
+Limited Liability Company:
+  abbr:
+    - L.L.C.
+    - ASC L.L.C.
+  lang: en
+Limited Liability Partnership:
+  abbr: L.L.P.
+  lang: en
+Limited Liability Limited Partnership:
+  abbr: L.L.L.P.
+  lang: en
+'Limitée':
+  abbr: 'Ltée'
+  lang: fr
+Maatschap:
+  abbr: Mts
+  lang: nl
+  lead: 1
+Naamloze vennootschap:
+  abbr:
+    - N.V.
+    - N.V. Nv
+  lang: nl
+  lead: 1
+National Association:
+  abbr:
+    - N.A.
+  lang: en
+No Liability:
+  abbr: NL
+  lang: en
+'Nyilvánosan Működő Részvénytársaság':
+  abbr: Nyrt.
+  lang: hu
+'Общество с ограниченной ответственностью':
+  abbr:
+    - ООО
+    - OOO
+  lang: ru
+  lead: 1
+offene Gesellschaft:
+  abbr: OG
+  lang: de
+offene Handelsgesellschaft:
+  abbr:
+    - OHG
+    - 'GmbH & Co OHG'
+    - 'GmbH und Co OHG'
+  lang: de
+'opinbert hlutafélag':
+  abbr: ohf.
+  lang: is
+'Osakeyhtiö':
+  abbr: Oy
+  lang: fi
+'Открытое акционерное общество':
+  abbr:
+    - ОАО
+    - OAO
+  lang: ru
+  lead: 1
+Partnerschaftsgesellschaft:
+  abbr: PartG
+  lang: de
+Perseroan Terbatas:
+  abbr: PT
+  lang: id
+Perseroan Terbatas Terbuka:
+  abbr: PT Tbk
+  lang: id
+Private Limited Company:
+  abbr:
+    - Pte. Ltd.
+    - Pvt. Ltd.
+  lang: en
+Professional Corporation:
+  abbr: P.C.
+  lang: en
+Professional Limited Liability Company:
+  abbr: PLLC
+  lang: en
+Proprietary Limited:
+  abbr:
+    - Pty. Ltd.
+    - P/L
+    - Pty. Limited.
+    - (Pty.) Ltd.
+    - Co. (Pty.) Ltd.
+  lang: en
+'Przedsiębiorstwo Państwowe':
+  abbr: P.P.
+  lang: pl
+Public Limited Company:
+  abbr:
+    - plc
+    - p.l.c.
+  lang: en
+'Részvénytársaság':
+  abbr: Rt.
+  lang: hu
+'sameignarfélag':
+  abbr: sf.
+  lang: is
+Sendirian Berhad:
+  abbr: Sdn. Bhd.
+  lang: ms
+Shoqeri Aksionere:
+  abbr: Sh.A.
+  lang: sq
+Shoqeri me pergjegjesi te kufizuar:
+  abbr: Sh.p.k.
+  lang: sq
+Single Member Private Limited Company:
+  abbr: SM Pte. Ltd.
+  lang: en
+'sjálfseignarstofnun':
+  abbr: ses.
+  lang: is
+'Sociedad Anónima':
+  abbr:
+    - S.A.
+    - S.A. de C.V.
+  lang: es
+'Sociedad Anónima Deportiva':
+  abbr: S.A.D.
+  lang: es
+'Sociedad Anónima Laboral':
+  abbr: S.A.L.
+  lang: es
+Sociedad Colectiva:
+  abbr:
+    - S.C.
+    - Soc.Col.
+    - Soc. Col.
+  lang: es
+Sociedad Comanditaria:
+  abbr: S.Cra.
+  lang: es
+Sociedad Cooperativa:
+  abbr: S.Coop.
+  lang: es
+Sociedad de Capital e Industria:
+  abbr: S.C.e.I.
+  lang: es
+Sociedad del Estado:
+  abbr: S.E.
+  lang: es
+'Sociedad de Garantía Reciproca':
+  abbr: S.G.R.
+  lang: es
+Sociedad en Comandita Simple:
+  abbr:
+    - S. en C.
+    - S. en C. de C.V.
+  lang: es
+Sociedad en Comandita por Acciones:
+  abbr:
+    - S. en C. por A.
+    - S. en C. por A. de C.V.
+  lang: es
+'Sociedad de Resposabilidad Limitada':
+  abbr:
+    - S.R.L.
+    - S.R.L. de C.V.
+    - S. de R.L.
+    - S. de R.L. de C.V.
+  lang: es
+Sociedad en Nombre Colectivo:
+  abbr:
+    - 'y compañía'
+    - 'y compañía de C.V.'
+    - 'y sucesores'
+    - 'y sucesores de C.V.'
+  lang: es
+Sociedad Limitada:
+  abbr: S.L.
+  lang: es
+Sociedad Limitada Laboral:
+  abbr: S.L.L.
+  lang: es
+Sociedad Limitada Nueva Empresa:
+  abbr: S.L.N.E.
+  lang: es
+Sociedad Limitada Personal:
+  abbr: S.L.P.
+  lang: es
+Sociedad Limitada Unipersonal:
+  abbr: S.L.U.
+  lang: es
+'Sociedade anônima':
+  abbr: S.A.
+  lang: pt
+'Sociedade Fechada':
+  abbr: S.F.
+  lang: pt
+'Sociedade Gestora de Participações Sociais':
+  abbr: SGPS
+  lang: pt
+'Sociedade limitada':
+  abbr: Ltda.
+  lang: pt
+'Società per Azioni':
+  abbr:
+    - S.p.A.
+    - Corporation S.p.A.
+  lang: it
+'Società a responsabilità limitata':
+  abbr: S.r.l.
+  lang: it
+'Società cooperativa a responsabilità limitata':
+  abbr: S.c.r.l.
+  lang: it
+'Société à responsabilité limitée':
+  abbr:
+    - S.A.R.L.
+    - SàRL
+  lang: fr
+'Société anonyme':
+  abbr: SA
+  lang: fr
+'Société commerciale canadienne':
+  abbr: S.C.C.
+  lang: fr
+'Société en commandite':
+  abbr: SC
+  lang: fr
+'Société en commandite simple':
+  abbr: SECS
+  lang: fr
+'Société en nom collectif':
+  abbr: SNC
+  lang: fr
+'Société par actions de régime fédéral':
+  abbr: S.A.R.F.
+  lang: fr
+'Société par actions simplifiée':
+  abbr: SAS
+  lang: fr
+'Société privée à responsabilité limitée':
+  abbr: S.P.R.L.
+  lang: fr
+'Société privée à responsabilité limitée unipersonnelle':
+  abbr: S.P.R.L.U.
+  lang: fr
+'Společnost s ručením omezeným':
+  abbr: s.r.o.
+  lang: cs
+'spółka akcyjna':
+  abbr: S.A.
+  lang: pl
+'spółka cywilna':
+  abbr: s.c.
+  lang: pl
+'spółka jawna':
+  abbr: sp.j.
+  lang: pl
+'spółka komandytowa':
+  abbr: Sp.k.
+  lang: pl
+'spółka komandytowo-akcyjna':
+  abbr: S.K.A.
+  lang: pl
+'spółka partnerska':
+  abbr: sp.p.
+  lang: pl
+'spółka z ograniczoną odpowiedzialnością':
+  abbr:
+    - Sp. z o.o.
+    - Sp. z o.o. Sp.k.
+    - Sp. z o.o. S.K.A.
+  lang: pl
+Unlimited Proprietary:
+  abbr: Pty.
+  lang: en
+Vereniging zonder winstoogmerk:
+  abbr: VZW
+  lang: nl
+  lead: 1
+Vereinigung ohne Gewinnerzielungsabsicht:
+  abbr: VoG
+  lang: de
+Vennootschap:
+  lang: nl
+  lead: 1
+Vennootschap onder firma:
+  abbr:
+    - V.O.F.
+    - De vennootschap onder firma
+  lang: nl
+  lead: 1
+'With Limited Liability':
+  abbr:
+    - W.L.L.
+    - Co. W.L.L.
+  lang: en
+'Закрытое акционерное общество':
+  abbr:
+    - ЗАО
+    - ZAO
+  lang: ru
+  lead: 1
+'Zártkörűen Működő Részvénytársaság':
+  abbr: Zrt.
+  lang: hu

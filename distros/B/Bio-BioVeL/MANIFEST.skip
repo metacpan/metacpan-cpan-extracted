@@ -1,0 +1,12 @@
+blib/*
+pm_to_blib
+.git*
+.DS_Store
+Makefile
+Makefile.old
+MANIFEST.bak
+Itol/*
+Java/*
+Workflow/*
+vm/*
+script/*

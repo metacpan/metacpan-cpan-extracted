@@ -1,0 +1,9 @@
+To Do List
+
+•DOCUMENTATION
+•Add Codon swapping utility
+•ModPerl?
+•PerlDancer?
+•DOCUMENTATION
+#Should look for genes inside seqobjects and reject input that is neither
+		annotated nor an open reading frame

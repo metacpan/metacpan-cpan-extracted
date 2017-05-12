@@ -1,0 +1,18 @@
+[%- SET day   = date.strftime("%A" ); 
+    SET ord   = ordinate(date.strftime("%e"));
+    SET rest  = date.strftime("%B, %Y");
+    SET title = "$day the $ord of $rest"; 
+-%]
+[% INCLUDE header title="Mails for $title" %]
+[% PROCESS macros %]
+<h1>Mails for [% title %]</h1>
+
+[% INCLUDE searchbox %]
+
+<p style="text-align: center"><a href="[% base %]/date/view/[% date.strftime("%Y") %]/[% date.strftime("%m") %]">See the whole of <b>[% date.strftime("%B %Y") %]</b></a></p>
+
+
+[% FOR mail = mails %]
+    [% summary(mail); %]
+[% END %]
+[% INCLUDE footer %]

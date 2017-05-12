@@ -1,0 +1,9 @@
+- do something about state_id / state_id_state (linkpoint, freeside) vs.
+  license_num / license_dob (authorize.net, docs here).  wtf!
+- Use Net::HTTPS::Any
+- hmm... requires HTTP::Headers v1.59
+- move revmap_fields into the base class
+- remap_fields: Not the cleanest thing to mix up our namespace with the
+  processor-specific names.
+- Define a better model of exception handling that doesn't involve dying on
+  some things.

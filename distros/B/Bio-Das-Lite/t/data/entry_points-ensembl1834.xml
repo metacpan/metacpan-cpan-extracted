@@ -1,0 +1,31 @@
+<?xml version='1.0' standalone='no' ?>
+<!DOCTYPE DASEP SYSTEM 'dasep.dtd' >
+<DASEP>
+  <ENTRY_POINTS href="http://servlet.sanger.ac.uk:8080/das/ensembl1834/entry_points" version="18">
+    <SEGMENT id="3" size="199289050" subparts="yes" />
+    <SEGMENT id="17" size="81740266" subparts="yes" />
+    <SEGMENT id="14" size="105261216" subparts="yes" />
+    <SEGMENT id="1" size="246047941" subparts="yes" />
+    <SEGMENT id="6" size="170911576" subparts="yes" />
+    <SEGMENT id="5" size="181014922" subparts="yes" />
+    <SEGMENT id="16" size="90036932" subparts="yes" />
+    <SEGMENT id="15" size="100256656" subparts="yes" />
+    <SEGMENT id="11" size="134482954" subparts="yes" />
+    <SEGMENT id="DR51" size="137374" subparts="yes" />
+    <SEGMENT id="4" size="191721959" subparts="yes" />
+    <SEGMENT id="12" size="132018379" subparts="yes" />
+    <SEGMENT id="X" size="153692391" subparts="yes" />
+    <SEGMENT id="7" size="158545518" subparts="yes" />
+    <SEGMENT id="18" size="76115139" subparts="yes" />
+    <SEGMENT id="2" size="243415958" subparts="yes" />
+    <SEGMENT id="20" size="63691868" subparts="yes" />
+    <SEGMENT id="21" size="46976097" subparts="yes" />
+    <SEGMENT id="10" size="135037215" subparts="yes" />
+    <SEGMENT id="13" size="113027980" subparts="yes" />
+    <SEGMENT id="22" size="49376972" subparts="yes" />
+    <SEGMENT id="Y" size="50286555" subparts="yes" />
+    <SEGMENT id="9" size="136372045" subparts="yes" />
+    <SEGMENT id="19" size="63806651" subparts="yes" />
+    <SEGMENT id="8" size="146308819" subparts="yes" />
+  </ENTRY_POINTS>
+</DASEP>

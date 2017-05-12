@@ -1,0 +1,113 @@
+---
+abstract: 'Common Payment Interface'
+author:
+  - 'André Walker <andre@andrewalker.net>'
+build_requires:
+  Test::Exception: '0.32'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-CPI
+provides:
+  Business::CPI:
+    file: lib/Business/CPI.pm
+    version: '0.924'
+  Business::CPI::Base::Account:
+    file: lib/Business/CPI/Base/Account.pm
+    version: '0.924'
+  Business::CPI::Base::Account::Address:
+    file: lib/Business/CPI/Base/Account/Address.pm
+    version: '0.924'
+  Business::CPI::Base::Account::Business:
+    file: lib/Business/CPI/Base/Account/Business.pm
+    version: '0.924'
+  Business::CPI::Base::Buyer:
+    file: lib/Business/CPI/Base/Buyer.pm
+    version: '0.924'
+  Business::CPI::Base::Cart:
+    file: lib/Business/CPI/Base/Cart.pm
+    version: '0.924'
+  Business::CPI::Base::Exception:
+    file: lib/Business/CPI/Base/Exception.pm
+    version: '0.924'
+  Business::CPI::Base::Item:
+    file: lib/Business/CPI/Base/Item.pm
+    version: '0.924'
+  Business::CPI::Base::Receiver:
+    file: lib/Business/CPI/Base/Receiver.pm
+    version: '0.924'
+  Business::CPI::Base::Status:
+    file: lib/Business/CPI/Base/Status.pm
+    version: '0.924'
+  Business::CPI::Gateway::Base:
+    file: lib/Business/CPI/Gateway/Base.pm
+    version: '0.924'
+  Business::CPI::Gateway::Test:
+    file: lib/Business/CPI/Gateway/Test.pm
+    version: '0.924'
+  Business::CPI::Role::Account:
+    file: lib/Business/CPI/Role/Account.pm
+    version: '0.924'
+  Business::CPI::Role::Account::Address:
+    file: lib/Business/CPI/Role/Account/Address.pm
+    version: '0.924'
+  Business::CPI::Role::Account::Business:
+    file: lib/Business/CPI/Role/Account/Business.pm
+    version: '0.924'
+  Business::CPI::Role::Buyer:
+    file: lib/Business/CPI/Role/Buyer.pm
+    version: '0.924'
+  Business::CPI::Role::Cart:
+    file: lib/Business/CPI/Role/Cart.pm
+    version: '0.924'
+  Business::CPI::Role::Exception:
+    file: lib/Business/CPI/Role/Exception.pm
+    version: '0.924'
+  Business::CPI::Role::Gateway::Base:
+    file: lib/Business/CPI/Role/Gateway/Base.pm
+    version: '0.924'
+  Business::CPI::Role::Gateway::FormCheckout:
+    file: lib/Business/CPI/Role/Gateway/FormCheckout.pm
+    version: '0.924'
+  Business::CPI::Role::Item:
+    file: lib/Business/CPI/Role/Item.pm
+    version: '0.924'
+  Business::CPI::Role::Receiver:
+    file: lib/Business/CPI/Role/Receiver.pm
+    version: '0.924'
+  Business::CPI::Role::Status:
+    file: lib/Business/CPI/Role/Status.pm
+    version: '0.924'
+  Business::CPI::Util:
+    file: lib/Business/CPI/Util.pm
+    version: '0.924'
+  Business::CPI::Util::EmptyLogger:
+    file: lib/Business/CPI/Util/EmptyLogger.pm
+    version: '0.924'
+  Business::CPI::Util::Types:
+    file: lib/Business/CPI/Util/Types.pm
+    version: '0.924'
+requires:
+  Class::Load: '0.20'
+  DateTime: '0'
+  Email::Valid: '0'
+  HTML::Element: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  Locale::Country: '0'
+  Locale::Currency: '0'
+  Moo: '1'
+  Scalar::Util: '0'
+  Throwable: '0'
+  Type::EmailAddress: '0'
+  Type::Tiny: '1'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/andrewalker/p5-business-cpi/issues
+  repository: git://github.com/andrewalker/p5-business-cpi.git
+version: '0.924'

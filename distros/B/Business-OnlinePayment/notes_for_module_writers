@@ -1,0 +1,64 @@
+Information on creating a new processor backend to go with
+Business::OnlinePayment.
+-----------------------------------------------------------
+
+NOTE: 
+
+    These are the old v2 notes.  
+
+    If you're writing a new module, see these first and then read
+    notes_for_module_writers_v3
+
+    If you're updating an existing module for v3, go directly to
+    notes_for_module_writers_v3
+
+
+Create a subclass of Business::OnlinePayment called
+Business::OnlinePayment::(processor name).  You should override at least
+the following functions (look at Business::OnlinePayment::AuthorizeNet as
+an example).
+
+set_defaults: set default information for server/port/path (if your processor
+              is not web based you probably dont need to override these).
+
+submit: This is the only function you _MUST_ override, the superclass function
+        merely dies(), so if you dont override this, your module doesnt do
+        anything.  Some of the things that submit should do:
+
+            * Turn the data into a format usable by the online processor,
+              some convenience functions (remap_fields and get_fields), are
+              provided by the superclass to make this a little easier.
+
+            * Check and make sure that all the required fields have been
+              filled in (the superclass provides the function required_fields()
+              which can do this for you).
+            
+            * IMPORTANT: If the superclass function test_transaction() returns
+              true, the transaction must be submitted to the processor in test
+              mode.  If your processor is unable to easily provide a test mode,
+              your module should die() if test_transaction() returns true,
+              this prevents accidental charges for people who thought they were
+              submitting test transactions.
+
+            * If your processor provides an option of whether or not you want
+              address verification, your module should check to see if the
+              require_avs() function returns true, and turn on AVS checking if
+              it does.
+
+            * Submit the transaction to the processor and collect a response.
+
+            * Do the following with the response:
+              * call server_response() with a copy of the entire unprocessed
+                response, to be stored in case the user needs it in the future.
+              * call is_success() with either a true or false value, indicating
+                if the transaction was successful or not.
+              * call result_code() with the servers result code (this is
+                generally one field from the response indicating that it was
+                successful or a failure, most processors provide many possible
+                result codes to differentiate different types of success and
+                failure).
+              * If the transaction was successful, call authorization() with
+                the authorization code the processor provided.
+              * If the transaction was not successful, call error_message()
+                with either the processor provided error message, or some
+                error message to indicate why it failed.

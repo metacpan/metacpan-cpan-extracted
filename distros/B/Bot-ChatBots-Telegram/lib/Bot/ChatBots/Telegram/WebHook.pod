@@ -1,0 +1,171 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
+
+=head1 SYNOPSIS
+
+   use Log::Any qw< $log >;
+   use Log::Any::Adapter;
+   use Mojolicious::Lite;
+   Log::Any::Adapter->set('Stderr');
+   plugin 'Bot::ChatBots::Telegram' => sources => [
+      [
+         'WebHook',
+         processor  => \&processor,
+         register   => 1,
+         token      => $ENV{TOKEN},
+         unregister => 1,
+         url        => 'https://example.com:8443/mybot',
+      ],
+      # more can follow here...
+   ];
+   app->start;
+   sub processor {
+      my $record = shift;
+      # do whatever you want with $record, e.g. set a quick response
+      $record->{response} = 'your thoughs are important for us!';
+      return $record;
+   }
+
+=head1 DESCRIPTION
+
+This is an updates receiver and dispatcher for the Telegram
+infrastructure. It connects to Telegram's API for I<webhooks> style (i.e.
+waiting for push messages to arrive), so you need a routable address/port
+to get the ball rolling.
+
+Strictly speaking, you MUST only provide a L</processor> and either
+L</url> or L</path>. The latter is used to set a POST route, while the
+former is what is called whenever a new message arrives through that
+route.
+
+Most probably you will also want to automatically register your webhook at
+Telegram. In this case, you MUST also provide a L</token>. You can also
+set automatic registration (and unregistration) when creating the object.
+
+When invoked, the L</processor> tube can return a record with the
+C<response> field set. In this case, this response is passed back as the
+answer to the call from the Telegram server (although Telegram documents
+correctly point out that you don't get any feedback about how successful
+this can be).
+
+=head1 ACCESSORS
+
+This class consumes the following roles, inheriting their accessors:
+
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Telegram::Role::Source>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook>
+
+=back
+
+=head1 METHODS
+
+This class consumes the following roles, inheriting their methods:
+
+=over
+
+=item *
+
+L<Bot::ChatBots::Telegram::Role::Source>
+
+=item *
+
+L<Bot::ChatBots::Role::WebHook>
+
+=back
+
+The following sections describe the addiitonal ones.
+
+=head2 B<< BUILD >>
+
+This method is called upon object construction. It takes care to call
+L</install_route> from L<Bot::ChatBots::Role::WebHook> so that you don't
+have to.
+
+=head2 B<< parse_request >>
+
+   my @updates = $obj->parse_request($req);
+
+Parse the request and extract updates from it. The current Telegram
+WebHook API sends one single update per message. Returns the update.
+
+=head2 B<< process >>
+
+   my $outcome = $obj->process($record);
+
+Process a record. The main workhorse is inherited from
+L<Bot::ChatBots::Role::WebHook>, although this wraps around it to add
+automatic sending of a response in case:
+
+=over
+
+=item *
+
+C<$outcome> is a hash reference with a C<response> key inside, AND
+
+=item *
+
+C<< $record->{source}{flags}{rendered} >> is false (i.e. the response
+hasn't been rendered yet).
+
+=back
+
+When a response is rendered, C<< $record->{source}{flags}{rendered} >> is
+set to C<1> (a I<true> value) to signal that rendering already happened
+(this should prevent the calling function from doing the rendering again).
+
+=head2 B<< register >>
+
+   $obj->register(%args);
+   $obj->register(\%args);
+
+Register the L</url> (possibly derived from L</path> if needed) as the
+webhook in Telegram.
+
+This operation requires a valid token, which can be either passed as one
+of the C<%args> or taken from the object (L</token> in particular).
+
+=head2 B<< token >>
+
+See L<Bot::ChatBots::Telegram::Base/token>.
+
+
+=head2 B<< unregister >>
+
+   $obj->unregister;
+
+De-register webhook from Telegram (after which you can restart using
+long-polling, for example).
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::WebHook>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

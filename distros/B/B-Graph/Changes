@@ -1,0 +1,38 @@
+Revision history for Perl extension B::Graph.
+
+0.01  First public release, as seen on p5p
+
+0.02  Tue Jun 17 21:18:26 1997
+	- Makefile.PL version created by h2xs 1.18
+	- Added README
+	- Minor cleanups, fixed SYNOPSIS
+	- Enhanced realism of pink pointers
+
+0.03  Tue Jan 27 1998
+	- Limited length of string values printed
+	- Limited number of edges from one node for VCG
+	- Made FILEGV links optional
+	- Eliminated `pp_' prefix on OP nodes
+	- Enhanced OP_NULL handling to show op_targ as old type
+	- Shortened private [INP]OK abbreviations
+	- Made special SVs SV-shaped
+	- Cleaned up globals to make multiple calls possible
+
+0.50  Sat Aug 1 1998
+	- Moved to beta-level along with rest of compiler
+	- Increased version number to 0.50 for beta
+	- Cleanups motivated by -w
+	- Fixed dual string/numeric value SVs
+	- Made all SV field labels all-caps
+	- Added edge classes for VCG
+	- Removed PMOP fields gone in recent development versions
+	- Made op_seq and op_type optional
+	- Made run-order actually walk in run-order
+	- Distinguished between op_nexts and other runtime pointers
+	- Removed `op_' prefix on OP fields
+	- Removed bogus `CVOP' class
+
+0.51  Sun Dec 31 2000
+	- Turned off fileGVs in versions that don't have them
+	- Minor doc cleanups
+	- Changed my email address

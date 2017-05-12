@@ -1,0 +1,64 @@
+Release history for Perl module BackPAN::Index::Create
+
+0.13 2014-10-08
+    - Switched to use Module::Loader (see notes for 0.09 below for context).
+
+0.12 2014-08-20
+    - Ignore files with trailing space in filename
+      (one dodgy file in DURIST's directory).
+    - Ignore files with embedded newlines in filename (MERLYN!).
+    - Pod fix from BOOK++
+
+0.11 2014-05-23
+    - Added BARBIE's script for generating indexes for BackPAN,
+      used on the CPAN Testers BackPAN, in examples/.
+
+0.10 2014-05-12
+    - Dropped use of catfile, turns out I don't need to use it with
+      Path::Iterator::Rule.
+
+0.09 2014-05-10
+    - Dropped Mojo::Loader in favour of Module::Find + Module::Runtime,
+      to remove dependency on Mojolicious.
+
+0.08 2014-05-08
+    - Added 'order' argument to create_backpan_index(), which specifies
+      what order the entries should be written to the index. Can take
+      values 'dist', 'author', and 'age'. Defaults to 'dist'.
+    - Added a -order command-line option to the create-backpan-index.
+
+0.07 2014-05-06
+    - Had to install Strawberry perl on a PC to work out what the problem was.
+      Two of the tests were passing the path to the TestPAN as t/testpan
+      but it needed to be catfile('t', 'testpan'). Doh!
+
+0.06 2014-05-05
+    - A regex that's stripping off the leading path needed \Q .. \E
+      wrapped around the path -- was causing test failures on Windows.
+
+0.05 2014-05-05
+    - Make the path separator be / on Windows, so the generated index
+      looks the same everywhere.
+
+0.04 2014-05-04
+    - New tests were failing on Windows, because the line endings in the
+      generated files weren't the same as the exemplars I generated on
+      my mac. Added test utility function for comparing text files
+      ignoring line endings.
+
+0.03 2014-05-03
+    - Got rid of my one use of // so I could drop down to requiring 5.6. Sigh.
+    - The SYNOPSIS made it look like create_backpan_index() is always exported.
+      It isn't, so updated SYNOPSIS to make that clear.
+    - Added some real tests.
+    - Improved the introductory part of the documentation, adding a link
+      to backpan.perl.org
+
+0.02 2014-05-01
+    - Got rid of uses of __SUB__ (which on checking,
+      I had misunderstood anyway), so I could drop the Perl version dependency
+      to 5.010 (from 5.16). Nudged by BARBIE.
+
+0.01 2014-04-13
+    - First release to CPAN
+

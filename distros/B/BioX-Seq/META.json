@@ -1,0 +1,72 @@
+{
+   "abstract" : "a (very) basic biological sequence object",
+   "author" : [
+      "Jeremy Volkening <jdv@base2bio.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BioX-Seq",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::BGZF" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Which" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "BioX::Seq" : {
+         "file" : "lib/BioX/Seq.pm",
+         "version" : "0.006001"
+      },
+      "BioX::Seq::Fetch" : {
+         "file" : "lib/BioX/Seq/Fetch.pm"
+      },
+      "BioX::Seq::Stream" : {
+         "file" : "lib/BioX/Seq/Stream.pm"
+      },
+      "BioX::Seq::Stream::FASTA" : {
+         "file" : "lib/BioX/Seq/Stream/FASTA.pm"
+      },
+      "BioX::Seq::Stream::FASTQ" : {
+         "file" : "lib/BioX/Seq/Stream/FASTQ.pm"
+      },
+      "BioX::Seq::Stream::TwoBit" : {
+         "file" : "lib/BioX/Seq/Stream/TwoBit.pm"
+      },
+      "BioX::Seq::Utils" : {
+         "file" : "lib/BioX/Seq/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jvolkening/p5-BioX-Seq"
+      }
+   },
+   "version" : "0.006001"
+}

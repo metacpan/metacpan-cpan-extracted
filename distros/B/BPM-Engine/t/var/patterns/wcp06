@@ -1,0 +1,91 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp6" Name="WCP6+7: Multiple Choice and Structured Synchronizing Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2004-08-31 22:55:37</Created>
+                <Description>The Multi-Choice pattern describes the splitting of one single branch in two or more parallel branches. As soon as the incoming branch is enabled the thread is immediately passed to one or more of the outgoing branches. Which outgaining branches are selected depends thereby on an internal mechanism or individual decision [Aalst09]. The Structured Synchronizing Merge pattern describes the merger of two or more branches which have been split at a uniquely identifiable point of time earlier in the business process into one single branch. The thread of control is passed to the proceeding branch as soon as all incoming branches have been enabled. This pattern occurs in a structured context so it is essential that there is a Single Multi-Choice (refer to page 8) earlier in the Business Process and the Structured Synchronizing Merge Pattern has to merge all of the branches emanating from the Multi-Choice [Aalst09]. Warning: this process can't contain loops (at least, the branch with synchronizing merge structure mustn't be in a loop)</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="do_B" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="do_C" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will follow to activity B, if you set it to C it will proceed to activity C, and if you set it to BC or CB, it will proceed both to B and C</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="GW1" Name="OR-Split">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="GW1-B"/>
+                                    <TransitionRef Id="GW1-C"/>
+                                    <TransitionRef Id="GW1-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="GW2" Name="OR-Join">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-GW1" Name="Transition" From="A"   To="GW1"/>
+                <Transition Id="GW1-B" Name="Transition" From="GW1" To="B">
+                    <Condition Type="CONDITION">attribute('do_B')</Condition>
+                </Transition>
+                <Transition Id="GW1-C" Name="Transition" From="GW1" To="C">
+                    <Condition Type="CONDITION">attribute('do_C')</Condition>
+                </Transition>
+                <Transition Id="GW1-D" Name="Transition" From="GW1" To="D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="B-GW2" Name="Transition" From="B"   To="GW2"/>
+                <Transition Id="C-GW2" Name="Transition" From="C"   To="GW2"/>
+                <Transition Id="D-GW2" Name="Transition" From="D"   To="GW2"/>
+                <Transition Id="GW2-E" Name="Transition" From="GW2" To="E"/>
+            </Transitions>
+        </WorkflowProcess>

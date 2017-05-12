@@ -1,0 +1,64 @@
+Bit-Vector-Array version 0.01
+=============================
+
+This module allows you to create and manipulate bit
+vector arrays (BVA). A BVA can be store or fetch
+an integer value when using the whole array.
+To store or fetch this value, you must use 
+the $# sigil in front of the array name, 
+rather then the @ sigil normally associated with arrays.
+
+You can also index into the array and this will allow
+you to fetch and store individual bit values in the
+integer.
+
+
+use Bit::Vector::Array;
+
+# bva is an exported sub to create a bit vector array
+
+bva(my @arr1);
+bva(my @arr2);
+bva(my @arr3);
+
+# always use $# sigil rather than the @ sigil when
+# fetching or storing as integer values.
+$#arr1=7;
+$#arr2=11;
+$#arr3 = $#arr1 * $#arr2;
+# $#arr3 is 77
+
+
+# index into the array when fetching or 
+# storing individual bits
+$#arr3=0;
+$arr3[0]=1;	#	$#arr3 == 1
+$arr3[1]=1;	#	$#arr3 == 3
+$arr3[2]=1;	#	$#arr3 == 7
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Greg London
+
+This library is free software; you can redistribute it 
+and/or modify it under the same terms as Perl itself, 
+either Perl version 5.8.2 or, at your option, any later
+version of Perl 5 you may have available.
+
+

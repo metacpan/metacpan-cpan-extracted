@@ -1,0 +1,79 @@
+Benchmark::Timer - Benchmarking with statistical confidence
+
+Perl extension to benchmark code, with or without statistical confidence.
+
+
+MODULE DEPENDENCIES
+
+To use this module, you will need to install:
+
+- Time::HiRes
+
+If you intend on using the statistical features, you will also need to
+install:
+
+- Statistics::PointEstimation.
+
+To test this module, you will need to install:
+
+- Test::More
+
+
+INSTALLATION
+
+To install this package, change to the directory where you unarchived this
+distribution and type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+You can install this package into a non-default location by appending one of
+the following to the "perl Makefile.PL" command:
+
+- "PREFIX=/installation/path" (for installation into a custom location),
+- "INSTALLDIRS=site" (for installation into site-specific Perl directories)
+- "INSTALLDIRS=perl" (for installation into standard Perl directories).
+
+If you make the installation into your own directory, then remember that you
+must tell perl where to search for modules before trying to 'use' them. For
+example:
+
+  use lib '/home/userid/lib';
+  use Benchmark::Timer;
+
+During the 'make test', the statistical test may take some time to run,
+depending on how accurate "sleep(1)" is on your system. The normal time is
+less than 5 seconds.
+
+
+DOCUMENTATION
+
+Just "perldoc Benchmark::Timer". After installation on Unix systems,
+you can also do "man Benchmark::Timer".
+
+
+RESOURCES
+
+The CPAN Page:
+http://search.cpan.org/~dcoppit/Benchmark-Timer/
+
+The GitHub page:
+https://github.com/coppit/benchmark-timer/
+
+Bug and feature tracking:
+http://rt.cpan.org/Public/Dist/Display.html?Name=Benchmark-Timer
+
+
+COPYRIGHT
+
+Copyright (c) 2001-2002 Andrew Ho. Copyright (c) 2004-2015 David Coppit. All rights
+reserved, save those granted by the license. See the file LICENSE for
+licensing terms.
+
+
+AUTHOR
+
+David Coppit <david@coppit.org> (current maintainer)
+Andrew Ho <andrew@zeuscat.com> (original author)

@@ -1,0 +1,88 @@
+New Features
+------------
+
+Sources Command
+  Provides more detailed metadata about a data source than the "dsn" command.
+  The main benefit of this command is the introduction of co-ordinate systems.
+  See http://www.dasregistry.org and the ProServer guide for details.
+
+Interaction Command
+  Provides entity interaction data.
+  See http://www.dasregistry.org, the ProServer guide and the simple_interaction adaptor for details.
+
+Volmap Command
+  Provides for the distribution of volume map data.
+  See http://www.dasregistry.org, the ProServer guide and the simple_volmap adaptor for details.
+
+Multiple Transports
+  An adaptor may have more than one transport, each with its own configuration.
+
+Config Inheritance
+  Sources can now have a 'parent' INI property which identifies another source from which configuration inherits.
+
+Maxbins Parameter
+  The features command now supports the optional 'maxbins' parameter for visual clients such as Ensembl.
+
+Developers' Guide
+  More extensive documentation for ProServer is included in the distrubution, focussing on designing and implementing DAS sources.
+
+Improvements
+------------
+
+Reduced the verbosity of features XML: no longer have default score/orientation/phase elements, or reference/subparts/superparts attributes for the type element.
+
+Improved support for error-segment and unknown-segment: will now automatically check if a query is out of range or a known segment for relevant commands (i.e. not just features). This does not apply to the interaction command (by design).
+
+The 'Ensembl' transport now supports multiple databases (using the registry), but retains backwards compatibility. Also now implements version, last_modified, disconnect etc.
+
+The server can now work with more reverse proxy configurations, through a more relaxed URL structure: <host>/anything/you/want/das/<dsn>/<command>. Unrecognised URLs return the homepage, all others still return appropriate responses.
+
+Now reports ProServer release version in an X-DAS-Server HTTP header.
+
+There is a new 'maintainer' INI property in the [general] section. It is displayed on the ProServer homepage and used as a default for the sources command.
+
+XSL stylesheets are by default read in from disk rather than hard-coded (and so the defaults can be customised without editing core code).
+
+
+Bugs
+----
+
+SourceAdaptor errors would typically cause HTTP requests to hang.
+
+Cigar elements in the alignment command had superfluous quotes.
+
+The 'coordSys' property of the alignment command was mispelt 'coodSys'.
+
+The remove_pidfile method was not working correctly.
+
+When built, hydra and generic source adaptors weren't being given the same response_hostname etc as standard adaptors.
+
+SourceAdaptor->das_dsn was broken for requests of the format "<server>/das/<dsn>/dsn"
+
+The DBI transport was printing query args despite debug being turned off.
+
+The content-length HTTP header was not being set.
+
+Test cases for optional DBI and Oracle transports would run despite dependencies not being installed.
+
+
+Other Changes
+-------------
+
+The X-DAS-Version HTTP header is now "DAS/1.53E".
+
+The 'example_segment' INI property is deprecated (coordinates definition takes preference).
+
+Homepage and DSN requests may be overridden by individual SourceAdaptors if required.
+
+Cleaned up some differences in the way adaptor properties are retrieved. For example, adaptor constructers in Bio::Das::ProServer::Config did not make use of the "response_port" etc methods, but instead duplicated their functions.
+
+Provided defaults for the Bio::Das::SourceAdaptor stub methods. Thus calling methods need not duplicate the logic. For example, the "description" method will return the first of:
+	"description" configuration property
+	the result of the (new) "title" method
+
+Moved 'last_modified' check into SourceAdaptor::dsncreated. Now the HTTP header always includes the 'dsncreated' last modified date (defaults to epoch). Also moved the call into the eval (was capable of causing server hangs).
+
+HTTP response codes are now only set to values other than 200 (OK) if they actually result in an error (for HTTP compliance). DAS response codes remain in the X-DAS-Status header.
+
+The content-type header for XSL responses has been changed from 'text/xml' to 'text/xsl'. Although the W3C standards define text/xml as one of the standard types, the spec states that in future, more specific types will be defined. Most browsers actually support text/xsl, but only one or two support text/xml.

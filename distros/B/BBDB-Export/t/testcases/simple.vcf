@@ -1,0 +1,9 @@
+begin:vcard
+version:3.0
+fn:simple testcase
+n:testcase;simple;;;
+org:acme
+note:some dude
+tel;type=mobile:(555) 444-3333
+email;type=internet:simple@domain.com
+end:vcard

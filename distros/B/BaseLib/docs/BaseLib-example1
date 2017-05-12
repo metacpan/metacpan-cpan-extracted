@@ -1,0 +1,215 @@
+From hasant@trabas.com Tue Feb 27 20:08:03 2001
+Date: Thu, 24 Aug 2000 05:54:29 +0700 (JAVT)
+From: Hasanuddin Tamir <hasant@trabas.com>
+To: bandung-pm-list@happyfunball.pm.org
+Subject: Re: [Bandung.pm] Modifying @INC: my problem and solution (any 
+    comment?)
+Organization: TRABAS
+
+>> No wonder Steven Haryanto on Aug 24 said that,
+
+SH] hi hasan,
+SH] 
+SH] for this kind of problem i've come up with a slightly
+SH] different approach: use the environment variable.
+SH] there are two choices:
+SH] 
+SH] a) use the default PERL5LIB/PERLLIB
+SH]     pros: no script modification needed
+SH] 
+SH] b) invent something like PROJROOTDIR or PROJLIBDIR
+SH]     pros: works with other non-Perl scripts (Python,
+SH]     shell, etc.)
+
+I used this kind of approaches, but I never felt satisfied
+with environment variables, partly the same reason as you
+mentioned nearly at the end of your email: security. Besides,
+the implementor must always set the ENV each time the path
+changes, either in the system (e.g. profile) or in httpd.conf
+(assuming Apache), and then we still need to restart/reload
+the server.
+
+I don't set my scripts setuid either, but for important
+application I always use -T switch, so PERL5LIB/PERLLIB
+certainly don't work for me.
+
+Ok, let's see some comparisons, let's assumme that we don't
+use setuid nor -T.
+
+We have this application: Mail2SMS with the following structure,
+
+    mail2sms/      -> the base dir
+        lib/       -> the modules path
+          perl/    -> perl modules
+          python/  -> python modules
+        web/       -> the document root (and all scripts lie here)
+
+1. It's intalled under /usr/local.
+
+a. using PERL5LIB (or similiar approach)
+    What needs to be done:
+        1. Some where in the system or web server conf
+            export PERL5LIB=/usr/local/mail2sms/lib/perl
+           or
+            SetEnv PERL5LIB /usr/local/mail2sms/lib/perl
+        2. In the scripts: nothing
+
+b. using ordinary lib module
+    What needs to be done:
+        1. Some where in the system or web server conf: nothing
+        2. In the scripts:
+            use lib '/usr/local/mail2sms/lib/perl';
+
+c. using BaseLib;
+    What needs to be done:
+        1. Some where in the system or web server conf: nothing
+        2. In the scripts:
+            use BaseLib qw(mail2sms lib/perl);
+
+2. Now we move the application to /home/hasant/public_html.
+
+a. using PERL5LIB (or similiar approach)
+    What needs to be changed:
+        1. Some where in the system or web server conf
+            export PERL5LIB=/home/hasant/publich_html/mail2sms/lib/perl
+           or
+            export PERL5LIB=/usr/local/mail2sms/lib/perl:\
+                /home/hasant/publich_html/mail2sms/lib/perl
+           or
+            SetEnv PERL5LIB /usr/local/mail2sms/lib/perl
+        2. In the scripts: nothing
+
+b. using ordinary lib module
+    What needs to be changed:
+        1. Some where in the system or web server conf: nothing
+        2. In the scripts:
+            use lib '/home/hasant/public_html/mail2sms/lib/perl';
+
+c. using BaseLib;
+    What needs to be changed:
+        1. Some where in the system or web server conf: nothing
+        2. In the scripts: nothing (automatically refers to
+            the new path)
+
+3. We want to develop three development versions, each in
+   different directory, say
+   a. v2.0-beta-01, /usr/local/mail2sms/beta-01
+   b. v2.1-pre,     /usr/local/mail2sms/pre-release
+   c. v3.0-alpha,   /usr/local/mail2sms/alpha
+
+   So which one PERL5LIB should contains? All with colon separated?
+   Then all versions will refer to the same lib which is not supposed
+   to be. When using lib module, all scripts in beta version will say,
+
+     use lib '/usr/local/mail2sms/beta-01/mail2sms/lib/perl';
+
+   and scripts in alpha version will say,
+
+     use lib '/usr/local/mail2sms/alpha/mail2sms/lib/perl';
+
+   With BaseLib? All scripts in all versions just still need to say,
+
+      use BaseLib qw(mail2sms lib/perl);
+
+   and they all refer to their respective private Perl module paths.
+
+   And when I'm ready to turn the pre-release version into production
+   version, I might need to move/copy the application set to, for example:
+   /vhost/www/hasant.com. The environment variables, the web server
+   conf, and the scripts remain untouched. The use() statement above will
+   switch referring to:
+
+      /vhost/www/hasant.com/mail2sms/lib/perl
+
+
+SH] in the b) case, you will need something like this
+SH] in the beginning of your Perl script:
+SH] 
+SH]   use lib $ENV{PROJLIBDIR};
+SH] 
+SH] or (if your lib dir name is fixed):
+SH] 
+SH]   use lib "$ENV{PROJROOTDIR}/priv_modules";
+SH] 
+SH] and then you can use PROJROOTDIR as a base to search
+SH] for other directories, without defining many other
+SH] environment variables (PROJBINDIR, PROJLOGDIR, etc.)
+SH] 
+SH] if you need to include other directories under
+SH] PROJLIBDIR -- like i usually do because i install
+SH] other CPAN modules under PROJLIBDIR -- you can do
+SH] something like this:
+SH] 
+SH]   use lib $ENV{PROJLIBDIR};
+SH]   use Includer;
+SH] 
+SH] where Includer.pm is located under PROJLIBDIR and
+SH] pulls other directories into the search path:
+SH] 
+SH]   # contente of Includer
+SH]   use lib "$ENV{PROJLIBDIR}/lib/perl5/site_perl/5.005";
+SH]   use lib "$ENV{PROJLIBDIR}/lib/perl5/site_perl/5.005/i386-linux";
+
+This will be handled by BaseLib to include the standard hierarchy
+like lib module does.
+
+SH] 
+SH] or, you can use colon-separated path (like Unix's
+SH] PATH) to let you include several directories:
+SH] 
+SH]   BEGIN {
+SH]     for(split/:/,$ENV{PROJLIBDIR}) { use lib $_; }
+SH]   }
+SH] 
+SH] your scripts can also refuse to run if PROJLIBDIR
+SH] is not defined or looks suspicious.
+SH] 
+SH]   BEGIN {
+SH]     for($ENV{PROJLIBDIR}){
+SH]       croak "PROJLIBDIR is not defined!" unless defined;
+SH]       ($_)=/(.*)/; # untaint like crazy
+SH]       use lib $_;
+SH]   }
+
+Well, that's too much for the script. Besides, you missed
+one bracket :-)
+
+SH] and lastly, you can check to prevent the same
+SH] directory included more than once if you want (as
+SH] lib.pm doesn't do this currently).
+SH] 
+SH] the last two/three pieces of code can be put in the
+SH] Includer module. the part checking the definedness
+SH] of PROJLIBDIR can also be put in Includer should we
+SH] decide to install Includer in the standard search
+SH] path. and then all that is needed in the projects'
+SH] scripts is this single line:
+SH] 
+SH]   use Includer;
+SH] 
+SH] you can also, of course, change the name 'Includer'
+SH] if you hate it. :-)
+SH] 
+SH] among the cons for using environment variables is
+SH] security (esp. for setuid scripts which are to be
+SH] run under other people's environment). but so far
+SH] i've managed to not need setuid scripts in my
+SH] projects.
+SH] 
+SH] this approach is not perfect either, i believe, but
+SH] so far it works for me.
+
+Yes, I can see that. We have different requirement
+and situation :-)
+
+SH] as to your last question, i can't give an answer.
+SH] but, sure, i'd say: go for it. (oops, i gave one
+SH] :-)
+
+Thank you very much for the input, for the discussion,
+and for the support. I really enjoy discussing this :-)
+
+
+Regards,
+san
+-- 

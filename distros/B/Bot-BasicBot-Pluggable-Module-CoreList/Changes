@@ -1,0 +1,24 @@
+Revision history for Bot-BasicBot-Pluggable-Module-CoreList
+
+0.05 Sat Dec  7 2013
+        - fix the test for Switch to pass with Module::CoreList >= 2.77
+
+0.04 Sun Jan 27 2013
+        - fix the test for Data::Dumper to pass with any version of
+          Module::CoreList (thanks to Babar and BinGOs)
+          (closes RT #57290 and RT #68768)
+        - add support for information from removed_from and deprecated_in
+
+0.03 Wed Nov 22 10:24:25 CET 2006
+        - added a new subcommand search, that maps to the find_modules()
+          method of Module::CoreList
+        - do not break for perl version with no patchlevel
+
+0.02 Wed Nov 15 11:58:18 CET 2006
+        - documentation slightly improved
+
+0.01 Tue Nov 14 23:48:27 CET 2006
+        - First version, because the original corelist bot wasn't hanging
+          around on #perl when I needed it
+        - support for Module::CoreList versions before 2.01
+

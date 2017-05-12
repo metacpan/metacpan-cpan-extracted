@@ -1,0 +1,24 @@
+Bio/Tools/DNAGen version 0.01
+=============================
+
+This module is a tool for generating a pool of DNA sequences
+which meet some logical and physical requirements such as
+uniqueness, melting temperature and GC ratio. When you have
+set the parameters, this module will create an array of
+sequences for you.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 xern <xern@cpan.org>
+
+This module is free software; you can redistribute it or modify it under the same terms as Perl itself.

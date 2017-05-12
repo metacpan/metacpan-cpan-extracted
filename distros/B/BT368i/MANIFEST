@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/BT368i.t
+lib/BT368i.pm
+lib/BT368i/Serial.pm
+lib/BT368i/NMEA/GP/GGA.pm
+lib/BT368i/NMEA/GP/GLL.pm
+lib/BT368i/NMEA/GP/GSA.pm
+lib/BT368i/NMEA/GP/GSV.pm
+lib/BT368i/NMEA/GP/RMC.pm
+lib/BT368i/NMEA/GP/VTG.pm
+examples/bt368i.pl
+examples/bt368i-tk.pl

@@ -1,0 +1,31 @@
+=head1 USE
+
+The value for the C<date_select_text> keyword is the link text which will
+popup a rather old fashioned Javascript based date picker.
+
+For it to work, you must use C<Gantry::Plugins::Calendar> (but you don't have
+to use it as a plugin).  Further, you must name your form and add this to its
+C<extra_keys>:
+
+    extra_keys
+        javascript => `$self->calendar_month_js( 'your_form_name' )`;
+
+Those steps are rather tedious, so tentmaker does them for you when
+you enter a value for the C<date_select_text> keyword.
+
+Our current best practice suggestion is to use a Javascript framework like
+Yahoo's UI or JQuery.  Both of those, and many similar frameworks, have
+more modern and usable date pickers along with a wealth of other gadgets.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory, start the app server, and add
+a child.  When you press 'Select Date', a box should popup.  Click on a
+date to fill in the field and close the popup.
+
+To see the code, look in lib/Kids/GEN/Child.pm.  Note the use of the
+Calendar plugin, the naming of the form, and the Javascript.

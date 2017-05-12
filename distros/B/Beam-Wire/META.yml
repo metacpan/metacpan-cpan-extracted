@@ -1,0 +1,84 @@
+---
+abstract: 'Lightweight Dependency Injection Container'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+  - 'Al Newkirk <anewkirk@ana.io>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::Differences: '0.64'
+  Test::Exception: '0'
+  Test::Lib: '0'
+  Test::More: '1.001005'
+configure_requires:
+  CPAN::Meta::Requirements: '2.120620'
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Beam-Wire
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Beam::Wire:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception::Config:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception::Constructor:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception::InvalidConfig:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception::NotFound:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+  Beam::Wire::Exception::Service:
+    file: lib/Beam/Wire.pm
+    version: '1.020'
+recommends:
+  JSON: '0'
+requires:
+  Beam::Emitter: '0'
+  Beam::Service: '0'
+  Config::Any: '0.23'
+  Data::DPath: '0.51'
+  Module::Runtime: '0'
+  Moo: '0'
+  Path::Tiny: '0.055'
+  Throwable: '0'
+  Types::Standard: '0'
+  YAML: '0'
+resources:
+  IRC: irc://irc.perl.org/#beam
+  bugtracker: https://github.com/preaction/Beam-Wire/issues
+  homepage: https://github.com/preaction/Beam-Wire
+  repository: https://github.com/preaction/Beam-Wire.git
+version: '1.020'
+x_authority: cpan:PREACTION
+x_contributors:
+  - 'Ben Moon <guiltydolphin@gmail.com>'
+  - 'Bruce Armstrong <bruce@armstronganchor.net>'
+  - 'Bruce Armstrong <bruce@fortressofgeekdom.org>'
+  - 'Doug Bell <doug@preaction.me>'
+  - 'Doug Bell <preaction@users.noreply.github.com>'
+  - 'Kent Fredric <kentnl@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

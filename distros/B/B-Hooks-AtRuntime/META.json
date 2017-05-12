@@ -1,0 +1,60 @@
+{
+   "abstract" : "Lower blocks from compile time to runtime",
+   "author" : [
+      "Ben Morrow <ben@morrow.me.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "B-Hooks-AtRuntime",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Test::Exception" : "0.31",
+            "Test::Exports" : "1",
+            "Test::More" : "1.001002",
+            "Test::Warn" : "0.22"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Tiny" : "0",
+            "Filter::Util::Call" : "0",
+            "Sub::Name" : "0.05",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "B::Hooks::AtRuntime" : {
+         "file" : "lib/B/Hooks/AtRuntime.pm",
+         "version" : "4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=B-Hooks-AtRuntime"
+      },
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mauzo/B-Hooks-AtRuntime"
+      }
+   },
+   "version" : "4"
+}

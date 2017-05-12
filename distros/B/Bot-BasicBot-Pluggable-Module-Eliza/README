@@ -1,0 +1,79 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::Eliza - Eliza for
+    Bot::BasicBot::Pluggable
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    This module is a simple wrapper around
+    <http://search.cpan.org/dist/Chatbot-Eliza>.
+
+        $bot->load('Eliza');
+
+FUNCTIONS
+  help
+    Prints a helpful message.
+
+  fallback
+    Replies to messages directed to the bot instance. We are using fallback
+    just to make sure that this very talkative module does not interfere
+    with any other module.
+
+  init
+    Initializes the eliza module. Please refer to the documentation section
+    VARIABLES for configuration settings.
+
+  set / unset
+    These functions are subclassed to reload the eliza instance after the
+    scriptfile is changed. The normal beaviour of Chatbot::Eliza is to
+    simply add the rules of the new scriptfile to the current scriptfile
+    rules, which is often not the expected behaviour (at least by the
+    expectations of the author). In case scriptfile is unset, we reload the
+    eliza instance to access it's default Rogerian psychotherapist.
+
+    Both functions reset the phrases remembered by the
+    %reasmblist_for_memory structure.
+
+VARIABLES
+  scriptfile
+    The chatbot uses the tranformation rules in this file to reply. Please
+    refer to <http://search.cpan.org/dist/Chatbot-Eliza> for its syntax.
+
+AUTHOR
+    Mario Domgoergen, "<dom at math.uni-bonn.de>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-bot-basicbot-pluggable-module-eliza at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-M
+    odule-Eliza>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Bot::BasicBot::Pluggable::Module::Eliza
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Mod
+        ule-Eliza>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Eliza>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Eliza>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Eliza>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

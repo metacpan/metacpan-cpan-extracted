@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bread-Board-LifeCycle-Session
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bread::Board: '0'
+  List::Util: '1.33'
+  Module::Runtime: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+version: '0.90'

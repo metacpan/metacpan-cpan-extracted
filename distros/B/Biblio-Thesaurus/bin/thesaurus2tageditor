@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+#undef $/;
+$/='';
+
+print "<html><body><pre>\n";
+while(<>){
+ chomp;
+ if(/^(.*)\n/){
+    print "<!-- $1 -->\nPt: $1\n";
+    my $a = "$'\n";
+    $a =~ s/(.+)\n/<!--        $1       -->\n/g;
+    print "$a\n\n"
+ }
+}
+print "</pre></body></html>\n";
+

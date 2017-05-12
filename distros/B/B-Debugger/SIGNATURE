@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 81d863bfab7251752986d5c07cad8748ba0fe776 Changes
+SHA1 c0bf1a619a3a61a05da7ec8a9845e48fa4511c97 Copying
+SHA1 1aea9e5b5df3fc986bca196b2e6aa06df79071ff Debugger.xs.gz
+SHA1 b2a25fa27f27209dc31adab1fd08b93c7a87eebe MANIFEST
+SHA1 183e08112507447d7cc1733d2b8f3f8180c73f9f META.json
+SHA1 f57dbb4b774df4e63f6bb113f449d55e0cdf001a META.yml
+SHA1 bb9091b19b67f95404a768a1c62eee024f822874 Makefile.PL
+SHA1 c613cf9920ccf6c2b1aea094d5a084de2a6d4f53 README
+SHA1 5131fa8e4bfae54dcb46c4bcaa1db1b377e2e646 lib/B/Debugger.pm
+SHA1 985114fb3c08b0362266de3d0477e1e469a6ef55 lib/Od.pm
+SHA1 c0dc10c40931d4c06deee900cbed551e7c607011 lib/Od_o.pm
+SHA1 ff8c5f29ae39a672ce9dddf406233971e2a4df56 t/interactive.t
+SHA1 a68085c94808f024eb2ed76ce73ea439f0ed6d48 t/z_kwalitee.t
+SHA1 993b3cef8c06a70d99829facf76140864eb57240 t/z_meta.t
+SHA1 ade48e2b6098a0a329312543e1451e7e7fb7bc5f t/z_perl_minimum_version.t
+SHA1 db4c7c6e1b7cf2bd96d86fa303fd2225b8bf8613 t/z_pod-coverage.t
+SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlFfR3EACgkQmm2SYo/9yULoegCdECYfjL3Vlg1U+sjd/zZJfZZz
+aCEAn2TZjzqbvwqEglzR5o6L20VpcGdW
+=37cc
+-----END PGP SIGNATURE-----

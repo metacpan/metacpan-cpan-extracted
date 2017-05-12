@@ -1,0 +1,34 @@
+NAME
+    B::Keywords - Lists of reserved barewords and symbol names
+
+SYNOPSIS
+      use B::Keywords;
+      print join "\n", @B::Keywords::Symbols,
+                       @B::Keywords::Barewords;
+
+DESCRIPTION
+    B::Keywords supplies seven arrays of keywords: @Scalars, @Arrays,
+    @Hashes, @Filehandles, @Symbols, @Functions and @Barewords. The @Symbols
+    array includes the contents of each of @Scalars, @Arrays, @Hashes and
+    @Filehandles. Similarly, @Barewords adds a few non-function keywords
+    (like __DATA__, NULL) to the @Functions array.
+
+    All additions and modifications are welcome.
+
+SEE ALSO
+    keywords.pl from the perl source, perlvar, perlfunc, perldelta.
+
+AUTHOR
+    Joshua ben Jore <jjore@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007, Joshua ben Jore. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either:
+
+    a) the GNU General Public License as published by the Free Software
+    Foundation; version 2, or
+
+    b) the "Artistic License" which comes with Perl.
+

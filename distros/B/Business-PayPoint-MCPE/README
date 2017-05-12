@@ -1,0 +1,135 @@
+NAME
+    Business::PayPoint::MCPE - PayPoint: Merchant Card Payment Engine
+
+SYNOPSIS
+        use Business::PayPoint::MCPE;
+
+        my $bpm = Business::PayPoint::MCPE->new(
+            TestMode => 1,
+            InstID => '123456',
+        );
+
+        my %data = $bpm->payment(
+            CartID => 654321,
+            Desc   => 'description of goods',
+            Amount => '10.00',
+            Currency => 'GBP',
+            CardHolder => 'Joe Bloggs',
+            Postcode   => 'BA12BU',
+            Email      => 'test@paypoint.net',
+            CardNumber => '1234123412341234',
+            CV2        => '707',
+            ExpiryDate => '0616',
+            CardType   => 'VISA',
+            Country    => 'GB',
+        );
+        print Dumper(\%data); use Data::Dumper;
+
+DESCRIPTION
+    Business::PayPoint::MCPE is for
+    <https://www.paypoint.net/assets/guides/MCPE_Freedom+IMA_2.3.pdf>
+
+METHODS
+  new
+    InstID
+        required.
+
+    TestMode
+        1 or 0. default is 0.
+
+  payment
+        my %data = $bpm->payment(
+            CartID => 654321,
+            Desc   => 'description of goods',
+            Amount => '10.00',
+            Currency => 'GBP',
+            CardHolder => 'Joe Bloggs',
+            Postcode   => 'BA12BU',
+            Email      => 'test@paypoint.net',
+            CardNumber => '1234123412341234',
+            CV2        => '707',
+            ExpiryDate => '0616',
+            CardType   => 'VISA',
+            Country    => 'GB',
+        );
+        print Dumper(\%data);
+
+  refund
+        my $TransID = $data{TransID}; # from above payment
+        my $SecurityToken = $data{SecurityToken};
+        my %data = $bpm->refund(
+            TransID => $TransID,
+            SecurityToken => $SecurityToken,
+            Amount => '5.00',
+        );
+
+  repeat
+        my $TransID = $data{TransID}; # from above payment
+        my $SecurityToken = $data{SecurityToken};
+        my %data = $bpm->repeat(
+            TransID => $TransID,
+            SecurityToken => $SecurityToken,
+            Amount => '5.00',
+        );
+
+  capture
+        my %data = $bpm->capture(
+            TransID => $TransID,
+            SecurityToken => $SecurityToken,
+            Amount => '5.00',
+        );
+        print Dumper(\%data);
+
+    PreAuth Capture
+
+  void
+        my %data = $bpm->void(
+            TransID => $TransID,
+            SecurityToken => $SecurityToken,
+            Amount => '5.00',
+        );
+        print Dumper(\%data);
+
+    PreAuth Void
+
+  cancel
+        my %data = $bpm->void(
+            ScheduleID => $ScheduleID
+        );
+        print Dumper(\%data);
+
+    Subscription Cancellation
+
+  confirm
+        my %data = $bpm->confirm(
+            CartID => $CartID
+        );
+        print Dumper(\%data);
+
+    Transaction Confirm
+
+  nonauth
+        my %data = $bpm->nonauth(
+            CartID => $CartID,
+            Desc   => 'description of goods',
+            Amount => '10.00',
+            Currency => 'GBP',
+            PaymentType => 'NETELLER',
+            PaymentDetail => "450000000001",
+            Postcode   => 'BA12BU',
+            Email      => 'test@paypoint.net',
+            Country    => 'GB',
+        );
+        print Dumper(\%data);
+
+AUTHOR
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT
+    Copyright 2014- Fayland Lam
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

@@ -1,0 +1,7 @@
+Bundle::WWW::Scraper::News - A bundle to install all News scraper engines.
+
+There are two steps in installing this Bundle.
+
+cpan> install G/GL/GLENNWOOD/Bundle-WWW-Scraper-News-<ver>.tar.gz
+...
+cpan> install Bundle::WWW::Scraper::News

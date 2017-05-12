@@ -1,0 +1,117 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::Sender - Bot::ChatBots Role for Senders
+
+=head1 SYNOPSIS
+
+   package Bot::ChatBots::Whatever::Sender;
+   use Moo;
+   with 'Bot::ChatBots::Role::Sender';
+   with 'Bot::ChatBots::Role::UserAgent;
+
+   sub send_message {
+      my ($self, $message) = @_;
+      $self->ua_request(
+         GET => 'http://frobozz.example.com/v1/whatever',
+         {Accept => 'application/json'},
+         json => $message
+      );
+   }
+   1;
+
+=head1 DESCRIPTION
+
+This is a sender role for bots.
+
+=head2 What Should You Provide/Override
+
+This is what you should provide and probably override in the general case:
+
+=over
+
+=item *
+
+L</send_message> is mandatory and it is where you actually send messages.
+
+=back
+
+=head1 ACCESSORS
+
+The following methods have a same-named option that can be passed to the
+constructor.
+
+=head2 B<< recipient >>
+
+   my $recipient = $obj->recipient;
+   $obj->recipient($some_id);
+
+Accessor for a possible default recipient of messages sent by this sender.
+
+=head1 METHODS
+
+This module composes role L<Bot::ChatBots::Role::Processor>, inheriting
+all its methods (specifically,
+L<Bot::ChatBots::Role::Processor/processor>).
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< clear_recipient >>
+
+   $obj->clear_recipient;
+
+Remove any default L</recipient> currently set.
+
+=head2 B<< has_recipient >>
+
+   say 'yes' if $obj->has_recipient;
+
+Predicate function to assess whethere a L</recipient> is set or not.
+
+=head2 B<< process >>
+
+   my $output = $obj->process($input);
+
+If C<$input> is a hash reference, look for a C<send_message> key and if it
+exists call L</send_message> with it, recording the outcome in key
+C<sent_message>.
+
+In any case, the C<$input> is the returned as C<$output>.
+
+=head1 REQUIRED METHODS
+
+This class defines a L<Moo::Role>, so it's not a standalone thing by
+itself. The following methods are I<required> to exist in the class that
+composes this role.
+
+=head2 B<< send_message >>
+
+   $obj->send_message($message, %args);
+
+Do actual sending of a message. This method can leverage on L</ua> or
+L</ua_request> to do the actual network traffic.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::UserAgent>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

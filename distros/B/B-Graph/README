@@ -1,0 +1,85 @@
+B::Graph, version 0.51
+
+Copyright (C) 1997, 1998, 2000 Stephen McCamant. All rights reserved.
+This program is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Module list information:
+B::Graph	bdpr	Perl Compiler backend to diagram OP trees
+
+This module is a layer between the perl-internals-examining parts of
+Malcolm Beattie's perl compiler (the B::* classes) and your favorite
+graph layout tool (currently Dot and VGC are supported, but adding
+others would be easy). It examines the internal structures that perl
+builds to represent your code (OPs and SVs), and generates
+specifications for multicolored boxes and arrows to represent them.
+
+New in this version:
+ - Turned off fileGVs in versions that don't have them
+ - Minor doc cleanups
+ - Changed my email address
+
+This version should work with perl 5.6.0.
+
+Other things you need:
+
+* perl 5.005 or later
+
+(Earlier versions of perl will work to various extents with old alpha
+versions of the compiler, but the version in 5.005 has several fixes,
+so it is recommended.)
+
+* Visualization of Compiler Graphs (`the VGC tool')
+http://www.cs.uni-sb.de/RW/users/sander/html/gsvcg1.htm
+     OR
+The graph visualization package from from AT&T (contains Dot)
+http://www.research.att.com/sw/tools/graphviz/
+(VCG has Windows and X11 interfaces, and is good for interactive
+viewing; Dot is a batch program that generates good PostScript, so
+you'll need either a printer or an previewer)
+
+* A basic understanding of how perl's internals work (see perlguts(1))
+     OR
+A willingness to stare at complicated-looking diagrams, most of which
+you don't understand
+(Seriously, this module can be a good tool for learning about how perl
+works inside -- for instance, its output is a lot more intutive that
+`perl -Dx''s, IMHO)
+
+BUILDING
+
+Just like any other module:
+% perl Makefile.PL
+% make
+% make install
+
+(`make test' currently doesn't do anything interesting. Also, with
+5.005 it may fail to find the `Perl_byterun' symbol, but B::Graph will
+still run fine. If you just want to test whether B::Graph works on
+your platform (hello CPAN testers!), just run one of the examples
+below and check that the output doesn't look like an error message.)
+
+EXAMPLE
+
+(Add `-Mblib' if you haven't done `make install')
+
+% perl -MO=Graph,-vcg -e '$a = $b + $c' >graph.vcg
+% xvcg graph.vcg
+    OR
+% perl -MO=Graph,-dot -e '$a = $b + $c' | dot -Tps >graph.ps
+% gv graph.ps (or your favorite PostScript previewer)
+
+(depending on your shell, you might be able to do everyting in one
+line -- in zsh, say 
+% xvcg =(perl -MO=Graph,-vcg -e '...')
+)
+
+You may notice that this is the same example used in perlguts (the
+section titled `code tree'). A comparison to the ASCII art there will
+give you an idea of what `slightly more complicated' means.
+
+For more detailed information, see the POD at the end of Graph.pm.
+
+
+Send questions, bug reports, and feature requests to me, Stephen
+McCamant <smcc@CSUA.Berkeley.EDU>.

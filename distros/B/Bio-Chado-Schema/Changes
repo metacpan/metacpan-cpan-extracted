@@ -1,0 +1,323 @@
+0.20000   2012-07-06 15:04:34 America/New_York
+
+ * added Bio::Chado::NaturalDiversity::Reports, which has some canned
+   reporting functions for working with natural diversity data (nmenda)
+ * added greate_genotypeprops to Genetic::Genotype (nmenda)
+ * added stock_phenotypes_rs, recursive_phenotypes_rs,
+   stock_genotypes_rs, and stock_project_phenotypes to Stock::Stock
+   (nmenda)
+
+0.10010   2011-11-08 16:39:15 America/New_York
+
+ * fix (in cleanup) errors related to schema object DESTROY function
+   on some versions of DBIC
+ * added create_phenotypeprop function (naama)
+ * fix filenames of Chado-module-level POD files.  For instance,
+   Bio::Chado::Schema::Result::Sequence POD is now rightly in
+   lib/Bio/Chado/Schema/Result/Sequence.pod
+
+0.10000   2011-11-07 13:22:41 America/Los_Angeles
+
+ * add support for phenotypeprop table from Chado svn r25232
+
+0.09040   2011-11-04 09:31:11 America/Los_Angeles
+
+ * fix a memory-leak bug present in 0.9010 through 0.9030
+
+0.09030   2011-11-03 14:58:58 America/Los_Angeles
+
+ * fix some issues with repeated sections in the POD
+
+0.09020   2011-11-02 17:30:03 America/Los_Angeles
+
+ * implemented alphabet() function for Feature rows using as a silly
+   heuristic that works in many cases.  alphabet() is needed by things
+   like revcom() in newer versions of BioPerl.
+
+0.09010   2011-10-24 11:25:25 America/Los_Angeles
+
+ * added get_cvterm and get_cvterm_or_die convenience methods directly
+   to the schema object, since cvterms are so pervasive in chado
+ * added to_range to Featureloc class that makes a Bio::Range object
+   for that location.
+
+0.09000   2011-09-22 09:27:36 America/Los_Angeles
+
+ * update for Chado 1.2, including:
+    + add classes for new Chado 1.2 tables chadoprop (Cv::Chadoprop)
+      genotypeprop (Genetic::Genotypeprop)
+    + adds type to nd_protocol (NaturalDiversity::NdProtocol)
+    + adds name column to phenotype table (Phenotype::Phenotype)
+    + corrects misspelled name of stock_relationship_id column
+      accessor for stock_relationship_cvterm
+      (Stock::StockRelationshipCvterm), adds stock_relationship DBIC
+      relation
+
+0.08200   2011-09-19 09:35:03 America/Los_Angeles
+
+ * fix inconsistencies in behavior for features with null residues
+   and/or seqlens
+
+0.08100   2011-03-21 16:01:00 America/Los_Angeles
+
+ * add support for literal sql in property values set using
+   create_*props helper functions
+ * add 'features' many-to-many relation to the Synonym result class.
+ * add 'synonyms' many-to-many relation to the Feature result class.
+ * add new class for stock_cvtermprop table, and new is_not and rank
+   columns for stock_cvterm
+
+0.08002   2011-02-22 11:17:13 America/Los_Angeles
+
+ * Added support for new cvprop table.
+ * Added plugin_add_relationship class method to Bio::Chado::Schema
+   main class, which makes it possible to do BCS plugins: sets of
+   classes in the Bio::Chado::Schema namespace that are loaded as part
+   of BCS.  plugin_add_relationship lets plugins inject relationships
+   into the core BCS classes.
+
+0.07300   2010-11-28 17:19:08 PST8PDT
+
+ * Add convenient featureloc length() method.
+ * Add better support for large sequences: a subseq() method to
+   Feature class with support for checking a 'large_residues'
+   featureprop for sequence, and doing substring calls on that.
+
+0.07100   2010-11-16 12:28:17 PST8PDT
+
+ * Fix bug with Cvterm add_secondary_dbxref, only caught under
+   DBIx::Class >= 0.08124
+ * add convenience methods for creating stock_dbxrefprops,
+   nd_experimentprops, projectprops, and geolocationprops
+ * add methods for working with parent and child terms of cvterms
+ * Convert t/lib/BCSTest.pm to Bio::Chado::Schema::Test so other
+   CPAN modules can have test suites that use an
+   automagically-created SQLite db
+
+0.06400   2010-10-20 20:54:37 PST8PDT
+
+ * added naama's stock_dbxrefprop from upstream chado
+
+0.06302   2010-10-20 09:58:19 PST8PDT
+
+ * corrected homepage url in CPAN upload
+
+0.06301   2010-10-19 17:49:41 PST8PDT
+
+ * corrected missing DBIx::Class::Tree::NestedSet dep
+
+0.06300   2010-10-18 17:38:29 PST8PDT
+
+ * converted build system to Dist::Zilla
+ * applied nmenda's type_id corrections from chado trunk
+ * fix permission denied test failure caused by shipping a
+   t/var/BCS.db file by accident
+
+0.06200
+
+ * removed erroneous duplicate General/Project.pm module
+ * Updated natdiv module from Chado upstream (fixed upstream by nmenda).
+ * Added create_stockprops method to stock module (nmenda).
+
+0.06001
+
+ * Corrected missing stuff in the manifest.
+
+0.06000
+
+ * Added DBIx::Class::Tree::NestedSet support to for Phylonodes.
+ * Added Natural Diversity and Project module support.
+
+0.05801
+
+ * Fix bugs and add tests for child_features and parent_features on
+   Sequence::Feature
+ * Added parent_relationships and child_relationships rels to
+   Sequence::Feature as more intuitive aliases for
+   feature_relationship_*
+
+0.05800
+ 
+ * New aliases on Sequence::Feature
+    child_features  -> featureloc_features
+    parent_features -> featureloc_srcfeatures
+ * Added a function for creating cvtermsynonyms ($cvterm->add_synonym)
+ * Added a function for creating new cvtermprops ($cvterm->create_cvtermprops) 
+ * Test suite can now deploy a Chado schema to a SQLite database
+   if BCS_TEST_DSN is not defined. This means that smokers can
+   now run these tests without setting up any databases.
+        -- leto
+
+0.05703
+
+ * relaxed dependency on Carp 1.08
+
+0.05702
+
+ * that upload was a bit TOO clean, was missing the Build.PL!
+
+0.05701
+
+  * corrected a dirty cpan upload
+
+0.05700
+
+  * re-dumped with latest schema loader devel version
+  * stripped _id suffixes for a number of relationships that still had
+    them.  Hopefully the schema loader patch used for this will make
+    it into schema loader releases.  List of changed relationship names:
+
+     lib/Bio/Chado/Schema/CellLine/CellLine.pm
+      cell_line_relationship_subject_ids -> cell_line_relationship_subjects
+      cell_line_relationship_object_ids  -> cell_line_relationship_objects
+
+     lib/Bio/Chado/Schema/Contact/Contact.pm
+      contact_relationship_object_ids -> contact_relationship_objects
+      contact_relationship_subject_ids -> contact_relationship_subjects
+
+     lib/Bio/Chado/Schema/Cv/Cvterm.pm
+      arraydesign_platformtype_ids -> arraydesign_platformtypes
+      arraydesign_substratetype_ids -> arraydesign_substratetypes
+      cvtermpath_type_ids -> cvtermpath_types
+      cvtermpath_object_ids -> cvtermpath_objects
+      cvtermpath_subject_ids -> cvtermpath_subjects
+      cvtermprop_type_ids -> cvtermprop_types
+      cvtermprop_cvterm_ids -> cvtermprop_cvterms
+      cvterm_relationship_type_ids -> cvterm_relationship_types
+      cvterm_relationship_object_ids -> cvterm_relationship_objects
+      cvterm_relationship_subject_ids -> cvterm_relationship_subjects
+      cvtermsynonym_type_ids -> cvtermsynonym_types
+      cvtermsynonym_cvterm_ids -> cvtermsynonym_cvterms
+      expression_cvterm_cvterm_ids -> expression_cvterm_cvterms
+      expression_cvterm_cvterm_type_ids -> expression_cvterm_cvterm_types
+      phenotype_assay_ids -> phenotype_assays
+      phenotype_attr_ids -> phenotype_attrs
+      phenotype_observable_ids -> phenotype_observables
+      phenotype_cvalue_ids -> phenotype_cvalues
+      protocolparam_unittype_ids -> protocolparam_unittypes
+      protocolparam_datatype_ids -> protocolparam_datatypes
+
+     lib/Bio/Chado/Schema/Genetic/Environment.pm
+      phenotype_comparison_environment2_ids -> phenotype_comparison_environment2s
+      phenotype_comparison_environment1_ids -> phenotype_comparison_environment1s
+
+     lib/Bio/Chado/Schema/Genetic/Genotype.pm
+      phenotype_comparison_genotype1_ids -> phenotype_comparison_genotype1s
+      phenotype_comparison_genotype2_ids -> phenotype_comparison_genotype2s
+
+     lib/Bio/Chado/Schema/Mage/Acquisition.pm
+      acquisition_relationship_subject_ids -> acquisition_relationship_subjects
+      acquisition_relationship_object_ids -> acquisition_relationship_objects
+
+     lib/Bio/Chado/Schema/Mage/Biomaterial.pm
+      biomaterial_relationship_subject_ids -> biomaterial_relationship_subjects
+      biomaterial_relationship_object_ids -> biomaterial_relationship_objects
+
+     lib/Bio/Chado/Schema/Mage/Element.pm
+      element_relationship_object_ids -> element_relationship_objects
+      element_relationship_subject_ids -> element_relationship_subjects
+
+     lib/Bio/Chado/Schema/Mage/Elementresult.pm
+      elementresult_relationship_subject_ids -> elementresult_relationship_subjects
+      elementresult_relationship_object_ids -> elementresult_relationship_objects
+
+     lib/Bio/Chado/Schema/Mage/Quantification.pm
+      quantification_relationship_subject_ids -> quantification_relationship_subjects
+      quantification_relationship_object_ids -> quantification_relationship_objects
+
+     lib/Bio/Chado/Schema/Phenotype/Phenotype.pm
+      phenotype_comparison_phenotype1_ids -> phenotype_comparison_phenotype1s
+      phenotype_comparison_phenotype2_ids -> phenotype_comparison_phenotype2s
+
+     lib/Bio/Chado/Schema/Phylogeny/Phylonode.pm
+      phylonode_relationship_object_ids -> phylonode_relationship_objects
+      phylonode_relationship_subject_ids -> phylonode_relationship_subjects
+
+     lib/Bio/Chado/Schema/Pub/Pub.pm
+      pub_relationship_object_ids -> pub_relationship_objects
+      pub_relationship_subject_ids -> pub_relationship_subjects
+
+     lib/Bio/Chado/Schema/Sequence/Feature.pm
+      feature_genotype_feature_ids -> feature_genotype_features
+      feature_genotype_chromosome_ids -> feature_genotype_chromosomes
+      featureloc_feature_ids -> featureloc_features
+      featureloc_srcfeature_ids -> featureloc_srcfeatures
+      featurepos_feature_ids -> featurepos_features
+      featurepos_map_feature_ids -> featurepos_map_features
+      featurerange_leftendf_ids -> featurerange_leftendfs
+      featurerange_rightstartf_ids -> featurerange_rightstartfs
+      featurerange_rightendf_ids -> featurerange_rightendfs
+      featurerange_leftstartf_ids -> featurerange_leftstartfs
+      featurerange_feature_ids -> featurerange_features
+      feature_relationship_subject_ids -> feature_relationship_subjects
+      feature_relationship_object_ids -> feature_relationship_objects
+
+     lib/Bio/Chado/Schema/Stock/Stock.pm
+      stock_relationship_subject_ids -> stock_relationship_subjects
+      stock_relationship_object_ids -> stock_relationship_objects
+
+  * new create_with() function for creating new cvterms
+  * more POD tweaking to improve CPAN indexing
+
+0.05501
+
+  * tweaked per-chado-module POD for better CPAN indexing
+
+0.05500
+
+  * much better POD, added autogenerated links from Schema.pm to
+    per-chado-module POD files, and links to chado module pod files
+    in Schema.pm
+  * improved slide presentation to the version given at January 2010
+    GMOD meeting
+
+0.05001
+
+  * test count bugfix
+
+0.05000
+
+  * Added DBICSL-generated POD
+  * Turned off DBIC's cascade_delete and cascade_copy on all relations
+    (thanks to Siddhartha Basu for troubleshooting).  Things break if
+    these are on and you don't have every part of the schema installed.
+
+0.04300
+
+  * Corrected a rather dirty CPAN upload, Util.pod file was in the
+    wrong place.
+
+0.04200
+
+  * removed Util.pm, replaced with Util.pod for documentation, moved
+    the actual Util methods into a separate package inside Schema.pm.
+    Thanks to Aure Bombarely.
+
+0.04100
+
+  * added missing dependency on BioPerl
+
+0.04000
+
+  * added new modules and relationships for the newly released
+    cell_line module in Chado
+
+0.03100
+
+  * added $VERSION to Bio::Chado::Schema to support CPAN indexer,
+    bumped version by several numbers to force CPAN reindexing
+
+0.022
+
+  * update to schema dumping script now finds many more inter-module
+    relationships
+  * added the new inter-module relationships found by the dumping
+    script
+
+0.01_03
+
+  * changed namespace to Bio::Chado instead of Chado
+
+0.01_01
+
+  * Initial release.

@@ -1,0 +1,10 @@
+Revision history for Bencher-ScenarioUtil-Completion
+
+0.02    2016-01-07 (PERLANCAR)
+
+	- Set participant's perl_code property.
+
+
+0.01    2016-01-06 (PERLANCAR)
+
+        - First release.

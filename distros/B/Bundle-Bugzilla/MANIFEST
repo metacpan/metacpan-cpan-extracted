@@ -1,0 +1,4 @@
+MANIFEST
+Makefile.PL
+Bugzilla.pm
+META.yml                                Module meta-data (added by MakeMaker)

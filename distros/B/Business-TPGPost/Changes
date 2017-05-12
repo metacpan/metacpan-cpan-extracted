@@ -1,0 +1,14 @@
+Revision history for Perl module Business::TPGPost
+
+0.05 January 31 2006
+   - Module moved to Business::TNTPost::NL.
+     Please update your scripts!
+0.04 June 13 2006
+   - (FIX) updated costs according to the June 2006 booklet
+0.03 March 15 2006
+    - (FIX) ISO3166 reference from UK to GB
+0.02 Feb 9 2006
+    - (FIX) terrible bug ('<=' instead of '<')
+    - (NEW) forgotten receipt option
+0.01 Feb 7 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44

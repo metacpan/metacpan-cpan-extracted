@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 77ba85470a996f240e23f172f8c48c31d79061cd Build.PL
+SHA1 dd7f05bb2d948749c3e18767d71e1c12222cc438 CHANGES
+SHA1 b79fc652318547e1978844f9ddf3008789523df2 LICENSE
+SHA1 5386903a2e65cf878a6ad3251e8445f963d7d840 MANIFEST
+SHA1 411d4b67cc8cbc8b6a00b418d4cbcd9eb8c2d18c MANIFEST.SKIP
+SHA1 aec03551c874274bf8d1da21ae0287b0260409bb META.json
+SHA1 7c0a930e2c78a9ce39be1112222d6b0fe4245ecc META.yml
+SHA1 ff46b51bcaf1032e99fb25638e52ecf176819530 README
+SHA1 2463d9b66c3b8b2b0c53610ed00f62b33d7b9cfd create_backpan_index.pl
+SHA1 5b69ca38217d66bab25b8b4cebcf57de33a4a4dc examples/backpan.pl
+SHA1 2e19ba280d8efc2664b280f66aa2e8965ce42bac inc/MyBuilder.pm
+SHA1 87ba3e652abdada15fd42b66a645e575ea9fb104 lib/BackPAN/Index.pm
+SHA1 3b7abd24aa6a52dc12c2f391761b52bcc5833de4 lib/BackPAN/Index/Database.pm
+SHA1 52f9be3782d80bf71ae31bdac1e3948f0b94791d lib/BackPAN/Index/Dist.pm
+SHA1 27dc2280cfadf58fa62370a51941c5c45193f7e4 lib/BackPAN/Index/File.pm
+SHA1 fb51f9f31379959f27a388398c6f7e049cbe9c32 lib/BackPAN/Index/IndexFile.pm
+SHA1 4b2cb28ae185ddd46e843e86727267a3c92ea636 lib/BackPAN/Index/Release.pm
+SHA1 b0ee8586928fb84ec4e451a30332ed47fdef87ec lib/BackPAN/Index/Role/AsHash.pm
+SHA1 a3e01e790b684a62fbb6bbd16c819ae4a47f57f1 lib/BackPAN/Index/Role/HasCache.pm
+SHA1 24ba1385af8720c651cfcb43e824fe22b9dbd3ed lib/BackPAN/Index/Role/Log.pm
+SHA1 fa70ae7fecaf158f78931e8ba3440f3edef929a8 lib/BackPAN/Index/Schema.pm
+SHA1 cd55088abb81f278a18b69669c342bcf751de478 lib/BackPAN/Index/Types.pm
+SHA1 861b0b0033bf212174fcfc87748c72edcb9711ba lib/Parse/BACKPAN/Packages.pm
+SHA1 64de2488257a5618234b76fe1cfa6bf4b3ef085a t/00compile.t
+SHA1 beebf607ec71c6a0275fd04ed91ed270664488d6 t/00setup.t
+SHA1 7295763ca0b3ab534d4240a0d36d05f0b75611c7 t/Parse-BACKPAN-Packages/args.t
+SHA1 a39401f3157b4e124258a72b921a82275a8b6386 t/Parse-BACKPAN-Packages/simple.t
+SHA1 54ef39b9b78c66de6fbff44e964a21f4a7c247ca t/as_hash.t
+SHA1 eaf8ad7bcba875d5010c4b6e006e98f9fc850f19 t/authors.t
+SHA1 d55bfaa897e20a1e118ba7ff0624b0395f91a429 t/backpan.txt.gz
+SHA1 f6d3e707f6c343cc85a8451a45150c60e745af75 t/cgi.t
+SHA1 9ce483ce15e1fb608027864b24007b63f31ba5b4 t/distributions.t
+SHA1 58599e0171ee32a974e94acfc10371012ae41b50 t/file.t
+SHA1 6ec3e7e22021d5bd57a0b72343b456c163f5b955 t/lib/TestUtils.pm
+SHA1 c67819d6b3068a694e56b5450c9aa9b9bc095fcb t/only_authors.t
+SHA1 5cab71a927fc7deaebb2ccf2f0238f3380bcb938 t/pod.t
+SHA1 90287816163957f230293bda2c22ed6a1b3eca8b t/pod_coverage.t
+SHA1 9cc9a02a0909479f0b0c2a0371bfc13d31145f90 t/stringify.t
+SHA1 bd3078ffe8ea78ba9e6bed83b34a2029a9f07e3c t/types.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.18 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iQEcBAEBAgAGBQJQ4I99AAoJEJxzdbWzfct3aVoH/3gASA7EnLuMdherHuMNlkcg
+NeziZ8Fod/KKRveuPIKMyePWQq6tm2HikM+Cfy9gmzl8AiJibFgRQm9fQMDMjxvu
++OWs4st5vX/Be+FTrsAK0JyCQnCZFt5bl6cjliQzgJofP16zybUXj/2cyw0kR89c
+T0RpW6s/G1LtlRXxiMHydu/cHQMakc7ZKIMdJpLrWIpg90GL+NAMxIlkNITUAtrp
+r5ac6uaBpKFYnAtrJOrkRM8w1ZKuZ+kGsLcGX4inNHt4ouSR3S/4Y/RMh+atBFq2
+83Uklipm+WQl9wkovYzQQ+2iWkm0+ZgSYEFr5iUYhkp2OF4/LRqMugBNNXN5R9s=
+=0Tb+
+-----END PGP SIGNATURE-----

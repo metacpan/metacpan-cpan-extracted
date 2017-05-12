@@ -1,0 +1,6 @@
+Things to do:
+
+- Write some decent test scripts.
+- Write better documentation
+- Handle errors the PERL way (which I don't know how to do with XS modules)
+- Test, Test, Test

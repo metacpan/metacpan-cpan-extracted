@@ -1,0 +1,47 @@
+-- in Restore.pm:
+      # TODO: inefficient!  we don't want to download the chunk from the
+      # target multiple times.  better to cache it locally, or at least
+      # only fetch a region from the target (but that's still kinda inefficient
+      # and pushes complexity into the Target interface)
+
+-- Optionally only use in-memory files when using encryption.
+
+-- <lj user=grahams>: if a file which existed when Brackup was
+  "discovering files" subsequently goes away while Brackup is working
+  it's magic (like a vim .swp file) Brackup tosses an error and bails:
+
+-- don't skip files ending in whitespace.  figure out why GPG barfs.  would
+   the metafile also barf, having a trailing \r or \n?
+
+-- figure out how files with intenal \r or \n in filename get written
+   to metafile.  need to be escaped?
+
+-- FUSE script to mount a *.brackup file
+
+-- tool to clean digestcache, based on prefixes, looking for files that no longer
+   exist or have new mtimes, etc?  or keep track of "last used" date
+   field in the digestcache and just delete things that are too old?
+   but then no longer just a dictionary.  SQLite would work, but we'd ideally
+   like lots of dumber cache mechanisms.  maybe a ->clean method is optional?
+   then a memcached backend/etc doesn't have to use it.
+
+-- Tools to rebuild your inventory database from the target's enumeration
+   of its chunks and the target's *.brackup metafiles isn't yet done, but
+   would be pretty easy.
+
+-- ionice stuff.  network nice stuff.
+
+-- make tests pass without 'noatime' mount option
+
+-- --ignore-debian-files option (if managed by a package management
+   system (and not an unmodified conffile), don't back it up)
+
+-- reuse tempfiles in Chunk.pm as Restore.pm does
+
+-- restoring from existing config file.
+
+-- better test coverage.  currently at 84%.  should ignore
+   test coverage of test modules.  move Brackup::Test to
+   t/lib/ probably
+
+-- should do TODOs in code.  :)

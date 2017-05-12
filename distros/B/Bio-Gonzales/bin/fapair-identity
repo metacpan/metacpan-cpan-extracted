@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use 5.010;
+use Carp;
+
+use Bio::Factory::EMBOSS;
+use Bio::Seq;
+use Bio::AlignIO;
+use Data::Dumper;
+use File::Temp qw/tempfile/;
+use Perl6::Slurp;
+
+use Bio::SeqIO;
+use Bio::Root::IO;
+
+my $file = shift;
+die "$file is no file" unless ( -f $file );
+
+my $seqin = Bio::SeqIO->new(
+    -format => 'fasta',
+    -file   => $file
+);
+
+my @seqs;
+while ( my $so = $seqin->next_seq ) {
+    push @seqs, $so;
+}
+
+for ( my $i = 0; $i < @seqs; $i++ ) {
+    for ( my $j = $i + 1; $j < @seqs; $j++ ) {
+        my $identity = align( $seqs[$i], $seqs[$j] );
+        say join "\t", ( $seqs[$i]->display_id, $seqs[$j]->display_id, $identity );
+    }
+}
+
+sub align {
+    my ( $aseq, $bseq ) = @_;
+
+    my ( $fh, $filename ) = tempfile( UNLINK => 1 );
+
+    my $factory = Bio::Factory::EMBOSS->new;
+    my $needle  = $factory->program("needle");
+    $needle->run(
+        {   -asequence => $aseq,
+            -bsequence => $bseq,
+            -gapopen   => '10.0',
+            -gapextend => '0.5',
+            -outfile   => $filename
+        }
+    );
+
+    my @lines = slurp $filename, { chomp => 1 };
+
+    for (@lines) {
+        return $1 if (/^#.*Identity:.*\(\s*([0-9.]+)%\)/);
+    }
+    say join "\n", grep {/^#/} @lines;
+    $needle->cleanup;
+}

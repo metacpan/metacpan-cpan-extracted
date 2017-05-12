@@ -1,0 +1,39 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Beam::Wire' => '1.019',
+                                      'List::Util' => '1.33',
+                                      'Module::Runtime' => '0',
+                                      'Moo' => '2',
+                                      'Path::Tiny' => '0.072',
+                                      'Pod::Find' => '0',
+                                      'Pod::Simple::SimpleTree' => '0',
+                                      'Term::ANSIColor' => '0',
+                                      'Types::Standard' => '0',
+                                      'perl' => '5.008'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Mock::MonkeyPatch' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::Lib' => '0',
+                                   'Test::More' => '1.001005'
+                                 }
+                 }
+     };
+  $x;
+ }

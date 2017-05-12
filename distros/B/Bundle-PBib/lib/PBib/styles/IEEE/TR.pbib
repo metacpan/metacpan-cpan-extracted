@@ -1,0 +1,25 @@
+/* $Id: TR.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * IEEE Transactions bibliograohy style
+ */
+<bib>
+</bib>
+<item>
+	class IEEETR
+	include-label   0
+	label-separator   {space}
+	includeAnnote   1
+	includeURL   1
+	language English
+	keywordStyle   Abbrev
+</item>
+<label>
+	class Name
+	etal   3
+	forcekey   1
+	unique   1
+</label>
+<ref>
+	class BookmarkLink
+	final   0
+</ref>

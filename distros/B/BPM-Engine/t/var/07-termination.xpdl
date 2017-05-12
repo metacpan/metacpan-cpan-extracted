@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+  xmlns:deprecated="http://www.wfmc.org/2004/XPDL2.0alpha"
+  xmlns:sitecorp="http://schemas.sitecorporation.com/bpm"
+  xmlns:tns="http://schemas.xmlsoap.org/tns/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes"
+  xmlns:fn="http://www.w3.org/2004/07/xpath-functions"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" Id="07-termination.xpdl" Name="Termination Patterns">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <DataFields>
+        <DataField Id="WhereToGo" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+        <DataField Id="pathtaken" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+    </DataFields>
+    <WorkflowProcesses>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp11" Name="WCP11: Implicit Termination">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>terminate if there is nothing to be done. The "Implicit Termination" pattern is essentially what regular end events do: "swallow" a single token and provide for a rule that completes the process instance (and all contained subflows and tasks) when the last token has ceased to exist. Process termination happens implicitly in a sense that the latter semantics is automatically provided by the runtime and does not have to be taken care of by the process modeler. </Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp11.A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will folow to activity B, if you set it to C it will proceed to activity C, otherwise process will be implicitly terminated, because there's nothing else to do</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp11.WfABSP1_Multiple_Choice_Tra1"/>
+                                    <TransitionRef Id="wcp11.WfABSP1_Multiple_Choice_Tra2"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp11.B" Name="B">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to D process will folow to activity D, otherwise it will either finish or wait for activity C and possibly E to finish</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp11.C" Name="C">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to E process will folow to activity E, otherwise it will either finish or wait for activity B and possibly D to finish</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp11.D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp11.E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp11.WfABSP1_Multiple_Choice_Tra1" Name="Transition" From="wcp11.A" To="wcp11.B">
+                    <Condition Type="CONDITION">whereToGo.indexOf('B') != -1</Condition>
+                </Transition>
+                <Transition Id="wcp11.WfABSP1_Multiple_Choice_Tra2" Name="Transition" From="wcp11.A" To="wcp11.C">
+                    <Condition Type="CONDITION">whereToGo.indexOf('C') != -1</Condition>
+                </Transition>
+                <Transition Id="wcp11.WfSP2_Implicit_Termination_Tra3" Name="Transition" From="wcp11.B" To="wcp11.D">
+                    <Condition Type="CONDITION">whereToGo=="D"</Condition>
+                </Transition>
+                <Transition Id="wcp11.WfSP2_Implicit_Termination_Tra4" Name="Transition" From="wcp11.C" To="wcp11.E">
+                    <Condition Type="CONDITION">whereToGo=="E"</Condition>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PRIVATE" Id="WfPIMI_Subflow" Name="WfPIMI Subflow">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-09-07 04:04:45</Created>
+                <Description>not to be instantiated directly, but used only as a subflow process</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="P1" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="P2" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="sbflw_act" Name="Subflow activity">
+                    <Description>This is a subflow</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

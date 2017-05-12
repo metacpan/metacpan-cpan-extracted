@@ -1,0 +1,1119 @@
+2013-04-05  SVN: new release
+
+	* Release: 0.12.0
+
+2013-04-05 12:36  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: throw more indexes at the event table in a bid to
+	  make reports quicker
+
+2013-04-05 12:33  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Report.pm.in,
+	  lib/BuzzSaw/Report/Kernel.pm.in, lib/BuzzSaw/Report/Sleep.pm.in:
+	  Added support for restricting report queries by the value of the
+	  program field. This helps speed things up when the query might
+	  return a lot of results. Also altered the default for the tags
+	  list. This is now empty by default which makes a bit more sense
+	  in most cases where the program field is set to the name of the
+	  report. Reports should define the list of tags they want
+
+2013-04-04 16:08  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.11.3
+
+2013-04-04 16:08  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DB/Schema/Result/Event.pm.in,
+	  lib/BuzzSaw/Report.pm.in, templates/reports/sleep.tt: Completely
+	  reworked how we get the localtime for an event. This will
+	  hopefully be a lot faster and has the added bonus of providing a
+	  more generally useful method
+
+2013-04-04 06:42  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.11.2
+
+2013-04-04 06:42  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Cosign.pm.in, lib/BuzzSaw/Filter/Kernel.pm.in,
+	  lib/BuzzSaw/Filter/SSH.pm.in, lib/BuzzSaw/Filter/Sleep.pm.in,
+	  lib/BuzzSaw/Filter/UserClassifier.pm.in: More variable name fixes
+
+2013-04-04 06:39  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.11.1
+
+2013-04-04 06:36  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Fixed variable name
+
+2013-04-03 19:40  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.11.0
+
+2013-04-03 19:38  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in, lib/BuzzSaw/Types.pm.in: Added support
+	  in reports for moving the event timestamps from UTC into another
+	  timezone
+
+2013-03-29 11:30  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.10.4
+
+2013-03-29 11:29  squinney@INF.ED.AC.UK
+
+	* docs/filters.html: list the named constants for the filter voting
+	  system
+
+2013-03-29 11:28  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter.pm.in, lib/BuzzSaw/Filter/Cosign.pm.in,
+	  lib/BuzzSaw/Filter/Kernel.pm.in, lib/BuzzSaw/Filter/SSH.pm.in,
+	  lib/BuzzSaw/Filter/Sleep.pm.in,
+	  lib/BuzzSaw/Filter/UserClassifier.pm.in,
+	  lib/BuzzSaw/Importer.pm.in: Reworked the voting system so that it
+	  uses named constants. This improves the clarity of the decision
+	  making
+
+2013-03-29 10:58  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Added bulk precedence heder in the
+	  email sending code to avoid vacation auto-responses
+
+2013-03-29 10:38  squinney@INF.ED.AC.UK
+
+	* docs/database.html, lib/BuzzSaw/DB.pm.in: more database docs
+
+2013-03-29 10:03  squinney@INF.ED.AC.UK
+
+	* docs/database.html: Added basic details of the database schema
+
+2013-03-28 18:11  squinney@INF.ED.AC.UK
+
+	* docs/design.html: fixed closing tag
+
+2013-03-28 17:00  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.10.3
+
+2013-03-28 16:59  squinney@INF.ED.AC.UK
+
+	* MANIFEST: Updated list of files in manifest
+
+2013-03-28 16:58  squinney@INF.ED.AC.UK
+
+	* META.yml.in, Makefile.PL, lcfg.yml: updated meta files for cpan
+
+2013-03-28 16:48  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.yml.in: Added missing deps
+
+2013-03-28 15:26  squinney@INF.ED.AC.UK
+
+	* docs/filters.html, docs/reports.html: reports docs
+
+2013-03-28 14:15  squinney@INF.ED.AC.UK
+
+	* docs/filters.html: updated to reflect reality
+
+2013-03-28 12:51  squinney@INF.ED.AC.UK
+
+	* docs/intro.html, lib/BuzzSaw/Parser/RFC3339.pm.in: small tweaks
+	  to docs
+
+2013-03-28 12:51  squinney@INF.ED.AC.UK
+
+	* docs/design.html: Added more high-level design docs
+
+2013-03-28 11:05  squinney@INF.ED.AC.UK
+
+	* docs/intro.html: First pass on intro docs
+
+2013-03-15 14:22  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.10.2
+
+2013-03-15 14:22  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, templates/reports/sleep.tt: Avoid blank lines
+
+2013-03-15 14:09  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.10.1
+
+2013-03-15 14:09  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Report.pm.in,
+	  lib/BuzzSaw/Report/Kernel.pm.in, lib/BuzzSaw/Report/Sleep.pm.in:
+	  Reworked how the default value for the report module tags list is
+	  handled. Now it defaults to containing the lower-cased version of
+	  the name attribute. This avoids the possibility of the module
+	  being given ALL events for the period to be processed when no
+	  specific tag list has been set
+
+2013-03-15 09:57  cc@INF.ED.AC.UK
+
+	* ChangeLog, lib/BuzzSaw/Report/Sleep.pm.in: add default sleep tag
+	  to sleep report module
+
+2013-03-14 16:16  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.10.0
+
+2013-03-14 16:16  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/UserClassifier.pm.in: Added docs
+
+2013-03-14 15:18  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/UserClassifier.pm.in: Set svn:keywords
+
+2013-03-14 15:17  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/UserClassifier.pm.in: Switched
+	  BuzzSaw::UserClassifier to be an attribute, this means we can
+	  lazily build it when required rather than at module load time.
+	  Also added documentation for the module
+
+2013-03-14 15:16  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Cosign.pm.in, lib/BuzzSaw/Filter/SSH.pm.in,
+	  lib/BuzzSaw/Filter/Sleep.pm.in: updated docs
+
+2013-03-14 15:15  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/Sleep.pm.in: Set svn:keywords
+
+2013-03-14 15:15  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter.pm.in: Updated docs
+
+2013-03-14 15:13  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Updated docs
+
+2013-03-14 15:11  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Altered the voting process slightly.
+	  Now anything returning a true value will have the tags retained
+	  but the entry (and tags) will only be stored if one or more
+	  filter returns a positive value. This change helps
+	  post-processing where we need tags to be retained but do not want
+	  to alter the current state of the votes
+
+2013-03-14 14:15  squinney@INF.ED.AC.UK
+
+	* t/00_use.t: Test new modules
+
+2013-03-14 14:09  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec, lcfg.yml, nonpersonal.txt: Added current list of
+	  usernames which are considered to be non-personal
+
+2013-03-14 14:08  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Kernel.pm.in, lib/BuzzSaw/Filter/Sleep.pm.in:
+	  unimport moose once it is not required
+
+2013-03-14 14:08  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Made it much simpler to add new
+	  directories to the template search path. Made it possible to
+	  alter the default sort order
+
+2013-03-14 14:07  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter.pm.in: Added a basic name attribute
+
+2013-03-14 14:07  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Tweaked slightly so that when calling
+	  a filter the current number of votes and the results of the
+	  previous filters are passed in. This makes it much easier to do
+	  post-processing (such as user classification)
+
+2013-03-14 14:06  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/UserClassifier.pm.in,
+	  lib/BuzzSaw/UserClassifier.pm.in: Added new module for
+	  classifying type of user name (root, nonperson, real, others)
+
+2013-03-12 15:28  cc@INF.ED.AC.UK
+
+	* ChangeLog, MANIFEST, META.yml.in, lcfg.yml: added a sleep report
+	  module
+
+2013-03-12 15:24  cc@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/Sleep.pm.in: Sleep report
+
+2013-03-12 14:21  cc@INF.ED.AC.UK
+
+	* templates/reports/sleep.tt: simple sleep report
+
+2013-02-01 11:42  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.9.4
+
+2013-02-01 11:41  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: Added missing build-requirements on perl(Template)
+
+2013-02-01 11:32  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.9.3
+
+2013-02-01 11:32  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.9.2
+
+2013-02-01 11:30  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd/AnonymiseData.pm.in: minor tweak to debugging
+
+2013-02-01 11:24  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.9.1
+
+2013-02-01 11:23  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd/AnonymiseData.pm.in: Fixed default value for db
+	  config file
+
+2013-02-01 11:18  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.9.0
+
+2013-02-01 11:18  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql, lcfg.yml, lib/BuzzSaw/Cmd/AnonymiseData.pm.in: Added
+	  command for anonymising old data
+
+2013-02-01 11:17  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: corrected a bug with the way the
+	  new_with_config method was called for BuzzSaw::DB
+
+2013-01-30 20:38  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB/Schema/Result/Event.pm.in: Added support for new
+	  logdate column
+
+2013-01-25 12:02  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.8.3
+
+2013-01-25 12:02  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DataSource/Files.pm.in: Added support for
+	  controlling the order in which files are parsed. Added the
+	  ability to set a size limit so we do not attempt to parse
+	  enormous files
+
+2013-01-14 14:21  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.8.2
+
+2013-01-14 14:21  squinney@INF.ED.AC.UK
+
+	* t/00_use.t: bumped number of tests
+
+2013-01-14 14:12  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.8.1
+
+2013-01-14 14:11  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Cosign.pm.in, t/00_use.t: Fixed typo. Added
+	  tests for new filter modules so we will spot this quicker next
+	  time
+
+2013-01-14 14:01  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.8.0
+
+2013-01-14 14:01  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: Added an index on the name column of the extra_info
+	  table
+
+2013-01-14 13:57  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql, lcfg.yml, lib/BuzzSaw/Filter/SSH.pm.in: Now stores
+	  the authentication method in the extra_info table
+
+2012-12-17 17:28  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Cosign.pm.in: slightly tweaked the extra
+	  information which is stored
+
+2012-12-17 17:19  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Cosign.pm.in: Added filter for cosign login
+	  events
+
+2012-12-17 16:28  cc@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Sleep.pm.in: first version of a Sleep filter
+
+2012-11-26 14:13  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.7
+
+2012-11-26 14:13  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in, lib/BuzzSaw/Report/AuthFailure.pm.in: Fixed
+	  bug with counting the rows after having called finish()
+
+2012-11-22 14:51  squinney@INF.ED.AC.UK
+
+	* docs/filters.html: Added docs on writing filters
+
+2012-11-21 12:52  squinney@INF.ED.AC.UK
+
+	* docs, docs/filters.html, lib/BuzzSaw/Filter/SSH.pm.in: Started
+	  docs on how to write filters
+
+2012-10-05 14:40  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/AuthFailure.pm.in,
+	  templates/reports/auth_failure.tt: Added target and source host
+	  lists to report
+
+2012-10-05 14:30  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/AuthFailure.pm.in: fixed sort order
+
+2012-10-05 14:27  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec, lib/BuzzSaw/Report/AuthFailure.pm.in,
+	  templates/reports/auth_failure.tt: Working on auth failures
+	  report
+
+2012-10-05 09:55  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.6
+
+2012-10-05 09:55  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DB.pm.in: Truncate some varchar event
+	  fields if the contents is too long, this avoids the DB throwing
+	  an error when we try to do an insert
+
+2012-09-14 14:11  squinney@INF.ED.AC.UK
+
+	* templates/reports/auth_failure.tt: Corrected the retrieval of the
+	  processed data
+
+2012-09-14 14:11  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/AuthFailure.pm.in: hashref not has for search
+
+2012-09-14 14:03  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/AuthFailure.pm.in: Added missing semi-colon
+
+2012-09-14 13:57  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/AuthFailure.pm.in, t/00_use.t,
+	  templates/reports/auth_failure.tt: Added new report for
+	  authentication failures
+
+2012-09-14 10:49  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.5
+
+2012-09-14 10:49  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Fixed the register_log method
+
+2012-09-13 16:25  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.4
+
+2012-09-13 16:24  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/SSH.pm.in: Fixed the program name check,
+	  should be 'sshd' not 'ssh'
+
+2012-09-13 16:03  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.3
+
+2012-09-13 15:44  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.2
+
+2012-09-13 15:44  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Reworked register_log slightly so we can
+	  properly handle the situation where we are deliberately
+	  re-reading logfiles
+
+2012-09-13 15:20  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.1
+
+2012-09-13 15:20  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DB/Schema/Result/ExtraInfo.pm.in,
+	  lib/BuzzSaw/Filter/SSH.pm.in, t/00_use.t: Fixed a couple of minor
+	  typos
+
+2012-09-13 15:13  squinney@INF.ED.AC.UK
+
+	* t/00_use.t: Added basic test for new filter
+
+2012-09-13 15:12  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.7.0
+
+2012-09-13 15:12  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB/Schema/Result/ExtraInfo.pm.in,
+	  lib/BuzzSaw/Filter/SSH.pm.in: Added new filter for finding events
+	  associated with SSH logins
+
+2012-09-13 15:07  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/ExtraInfo.pm.in: Added support for
+	  storing arbitrary key/value pairs as extra information associated
+	  with an event
+
+2012-08-23 15:07  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/Kernel.pm.in, lib/BuzzSaw/ReportLog.pm.in:
+	  Added docs
+
+2012-08-23 13:40  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/Kernel.pm.in: Added docs
+
+2012-08-23 13:25  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Added docs
+
+2012-08-23 07:47  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.5
+
+2012-08-23 07:47  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd/Report.pm.in, lib/BuzzSaw/Reporter.pm.in: Renamed
+	  the report command 'force' option to 'all' which makes the
+	  intended purpose clearer
+
+2012-08-22 14:34  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.4
+
+2012-08-22 14:34  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, BuzzSaw.spec, META.yml.in, Makefile.PL: added
+	  missing dependency
+
+2012-08-22 14:33  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.3
+
+2012-08-22 14:32  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Report.pm.in: Switched to using
+	  MooseX::Types::EmailAddress types for the To and Cc fields when
+	  sending reports by email
+
+2012-08-15 17:44  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: Granted permission to the logfiles_writer user to
+	  delete entries in current_processing table
+
+2012-08-15 17:41  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: Added commands to grant access permissions
+
+2012-08-15 17:40  squinney@INF.ED.AC.UK
+
+	* buzzsaw-dbinit.sh: Added basic database setup script
+
+2012-08-15 15:12  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.2
+
+2012-08-15 15:12  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DataSource/Files.pm.in,
+	  lib/BuzzSaw/Types.pm.in: Reworked file names attribute type to
+	  allow scalar string or regexp values to be coerced into a
+	  single-element list
+
+2012-08-15 11:59  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.1
+
+2012-08-15 11:59  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: Added missing build-dep
+
+2012-08-15 11:42  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.6.0
+
+2012-08-15 11:42  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec, lcfg.yml, lib/BuzzSaw/Cmd/Report.pm.in,
+	  lib/BuzzSaw/Report.pm.in, lib/BuzzSaw/ReportLog.pm.in,
+	  lib/BuzzSaw/Reporter.pm.in, lib/BuzzSaw/Types.pm.in, t/00_use.t:
+	  Completed support for running reports from the command line
+
+2012-08-14 10:43  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.5
+
+2012-08-14 10:41  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Use the new BuzzSawDateTime type.
+	  Tidied various bits of the Moose code
+
+2012-08-14 10:37  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DateTime.pm.in: Added documentation
+
+2012-08-14 10:37  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: Added support for the BuzzSawDateTime
+	  class
+
+2012-08-14 10:36  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Ensure the BuzzSaw::DB module is
+	  always loaded
+
+2012-07-18 09:22  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.4
+
+2012-07-18 09:22  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: Added even more build dependencies
+
+2012-07-18 09:15  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.3
+
+2012-07-18 09:15  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: Added various missing dependencies and
+	  build-dependencies
+
+2012-07-18 08:53  squinney@INF.ED.AC.UK
+
+	* MANIFEST: Updated the MANIFEST
+
+2012-07-18 08:51  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.2
+
+2012-07-18 08:42  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd.pm.in, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DataSource.pm.in, lib/BuzzSaw/DataSource/Files.pm.in,
+	  lib/BuzzSaw/Importer.pm.in, lib/BuzzSaw/Parser/RFC3339.pm.in:
+	  Various small tweaks to make perlcritic happier
+
+2012-07-17 14:00  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: reduced excessive debugging
+
+2012-07-17 13:47  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd.pm.in: Set the levels on the root-level logger
+
+2012-07-17 13:36  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd.pm.in: Added support for controlling the logging
+	  from the applications
+
+2012-07-17 12:50  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.1
+
+2012-07-17 12:50  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: Include new man1 man pages
+
+2012-07-17 12:49  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.5.0
+
+2012-07-17 12:29  squinney@INF.ED.AC.UK
+
+	* bin/buzzsaw.in: Added usage documentation
+
+2012-07-17 11:18  squinney@INF.ED.AC.UK
+
+	* lib/App/BuzzSaw.pm.in, lib/BuzzSaw/Cmd.pm.in,
+	  lib/BuzzSaw/Cmd/Import.pm.in, lib/BuzzSaw/Importer.pm.in: Added
+	  more complete documentation
+
+2012-07-16 15:54  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Cmd/Import.pm.in, t/00_use.t: Updated to
+	  work with configuring the Importer via a file. Added a couple of
+	  useful command line options. Added a basic compilation test
+
+2012-07-16 15:26  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd.pm.in: fixed package name
+
+2012-07-16 14:43  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Allowed the parsing to fail, just log
+	  the error. Added full documentation
+
+2012-07-16 13:49  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.yml.in, Makefile.PL, lcfg.yml: Removed
+	  requirement for List::MoreUtils which is not actually being used
+
+2012-07-16 13:48  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Switched to using logger
+	  methods. Added full documentation for module. Did a bit of code
+	  tidying
+
+2012-07-16 13:48  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Used new checksum_data method to
+	  compute digest
+
+2012-07-16 13:47  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource.pm.in: Added new checksum methods to
+	  return SHA-256 digests for files and data. Added full
+	  documentation for the module
+
+2012-07-16 13:46  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Parser.pm.in: Small docs tweak
+
+2012-07-12 15:28  squinney@INF.ED.AC.UK
+
+	* t/00_use.t: Removed test for Auth filter which was deleted
+
+2012-07-12 15:24  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Switched to using the new
+	  BuzzSawDataSourceList type. Tidied the code a bit more
+
+2012-07-12 15:24  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource.pm.in, lib/BuzzSaw/DataSource/Files.pm.in:
+	  Added support for loading attributes from a configuration files
+
+2012-07-12 14:46  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: added new files to specfile
+
+2012-07-12 14:45  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: Need to include the ArrayRef moose type
+
+2012-07-12 14:43  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: added missing commas
+
+2012-07-12 14:42  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: added missing commas
+
+2012-07-12 14:41  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: added missing semi-colon
+
+2012-07-12 14:40  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Types.pm.in: Add DataSource type and various
+	  coercions. Also added DataSource List type which should make it
+	  possible to load objects using info stored in yaml config files
+
+2012-07-11 16:37  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in, lib/BuzzSaw/Types.pm.in: Converted
+	  the list of filters to the new BuzzSawFilterList type so that we
+	  can easily load them by name
+
+2012-07-11 15:04  squinney@INF.ED.AC.UK
+
+	* lib/App/BuzzSaw.pm.in, lib/BuzzSaw/Catalogue,
+	  lib/BuzzSaw/Catalogue.pm.in, lib/BuzzSaw/Cmd.pm.in,
+	  lib/BuzzSaw/DateTime.pm.in, lib/BuzzSaw/Report/Kernel.pm.in,
+	  lib/BuzzSaw/Reporter.pm.in: Removed usage of Catalogue role
+
+2012-07-11 15:04  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Removed usage of Catalogue role
+
+2012-07-11 15:03  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Cmd/Import.pm.in, lib/BuzzSaw/DataSource.pm.in,
+	  lib/BuzzSaw/DataSource/Files.pm.in, lib/BuzzSaw/Importer.pm.in,
+	  lib/BuzzSaw/Report.pm.in, lib/BuzzSaw/Types.pm.in: Using the new
+	  types system for the BuzzSaw::DB object, this makes it easier to
+	  load a new object using a config file name. Also eradicated the
+	  Catalogue role, it's increasingly pointless as everything is tied
+	  to the database interface
+
+2012-07-11 14:01  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Removed incorrect section of documentation
+
+2012-07-11 14:01  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter.pm.in, lib/BuzzSaw/Filter/Auth.pm.in,
+	  lib/BuzzSaw/Filter/Kernel.pm.in, lib/BuzzSaw/Parser.pm.in,
+	  lib/BuzzSaw/Parser/RFC3339.pm.in: Added documentation
+
+2012-07-11 11:17  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in, lib/BuzzSaw/DB/Schema.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/CurrentProcessing.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Log.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Tag.pm.in: Added documentation for
+	  all the modules related to the database. Added some support for
+	  printing out useful debugging info from the various method in
+	  BuzzSaw::DB
+
+2012-07-09 20:03  squinney@INF.ED.AC.UK
+
+	* bin, bin/buzzsaw.in, lib/App, lib/App/BuzzSaw.pm.in,
+	  lib/BuzzSaw/Cmd, lib/BuzzSaw/Cmd.pm.in,
+	  lib/BuzzSaw/Cmd/Import.pm.in: First pass on adding a commandline
+	  client for various utilities
+
+2012-07-09 16:26  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Importer.pm.in: Store timestamps for events in UTC
+
+2012-07-09 13:21  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.4.0
+
+2012-07-09 13:21  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Reporter.pm.in, t/00_use.t: Added module to
+	  run sets of reports each hour/day/week/month
+
+2012-07-09 13:21  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Added basic support for sending reports
+	  via email
+
+2012-07-09 13:20  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DateTime.pm.in: Added support for seconds since unix
+	  epoch. Reworked general string parsing to use
+	  Date::Parse::strptime which allows us to preserve any timezone
+
+2012-07-09 08:58  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.3.0
+
+2012-07-09 08:58  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, BuzzSaw.spec, lcfg.yml: Added support for installing
+	  the templates into the package
+
+2012-07-09 08:58  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in, lib/BuzzSaw/Report/Kernel.pm.in,
+	  templates, templates/reports, templates/reports/kernel.tt:
+	  Completed the basics of the report generating framework. The
+	  kernel events report now works.
+
+2012-07-06 15:38  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DateTime.pm.in: fixed timezone handling
+
+2012-07-06 15:08  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Do not prefetch tags for each event as
+	  it messes things up at a later stage
+
+2012-07-06 14:49  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report/Kernel.pm.in: process the events into separate
+	  sets based on the tag names
+
+2012-07-06 14:28  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Need to load the BuzzSaw::DB module
+
+2012-07-06 14:23  squinney@INF.ED.AC.UK
+
+	* t/00_use.t: Now 10 tests
+
+2012-07-06 14:22  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in: Need to use references to vars hash
+
+2012-07-06 14:21  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in, t/00_use.t: Fixed typo, added basic
+	  compilation tests for new modules
+
+2012-07-06 14:19  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Report.pm.in, lib/BuzzSaw/Report/Kernel.pm.in:
+	  Further work on the report generation process
+
+2012-07-06 12:05  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Report, lib/BuzzSaw/Report.pm.in,
+	  lib/BuzzSaw/Report/Kernel.pm.in: Made a start on a report
+	  generator framework
+
+2012-07-06 12:05  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DateTime.pm.in: Added new module to handle dates.
+	  This is a sub-class of the DateTime module with one extra method,
+	  named from_date_string, which can parse various extra date
+	  strings which are supported by the Linux audit framework
+
+2012-07-06 12:04  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Added support for setting attributes from a
+	  configuration file using MooseX::SimpleConfig
+
+2012-07-04 15:40  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Removed debug code to make
+	  things quieter
+
+2012-07-04 15:37  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Removed debug code to make things quieter
+
+2012-07-04 15:25  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Added missing schema variable
+
+2012-07-04 15:24  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Reworked check_log_seen to work directly
+	  with the DBI layer. This should make things quicker
+
+2012-07-04 15:18  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Parser/RFC3339.pm.in: Completely reworked
+	  the parser. This should be correct more of the time and it's
+	  better at guessing the name/pid for programs. It should also be
+	  slightly faster as the regular expressions are no longer
+	  recompiled on every call to the subroutine.
+
+2012-07-02 16:32  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Adjusted some debugging so it is clearer
+	  why a file is not going to be processed
+
+2012-07-02 16:25  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DataSource/Files.pm.in: Fixed scoping issue in the
+	  _next_filename method
+
+2012-07-02 16:14  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: changed order in BUILD to
+	  avoid files list being unnecessarily calculated twice
+
+2012-07-02 16:04  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Reworked the way the next
+	  filename in the list is selected so that more work is done in a
+	  single query in the DB. This is cleaner and should be more
+	  efficient
+
+2012-07-02 16:01  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: reworked the start_processing method to use
+	  the new version of the register_current_processing DB function
+
+2012-07-02 15:58  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: altered the register_current_processing function so
+	  that it also does the checking of the previously seen logs table,
+	  this should be safer and more efficient
+
+2012-07-02 15:10  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Randomised the order of the
+	  files found to try and make things slightly more efficient
+
+2012-07-02 14:48  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Allow perl regexps to be used
+	  for matching the file names
+
+2012-07-02 10:20  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.2.1
+
+2012-07-02 10:20  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Parser/RFC3339.pm.in: Handle an empty message string
+
+2012-07-02 10:15  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Auth.pm.in, t, t/00_use.t: Added basic
+	  compilation tests
+
+2012-07-02 09:55  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Filter/Auth.pm.in, lib/BuzzSaw/Filter/Kernel.pm.in:
+	  Added 'o' flag to some regular expressions to hopefully make them
+	  a little bit faster
+
+2012-07-02 09:15  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.2.0
+
+2012-07-02 09:07  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Reworked slightly how we
+	  check if the next filename is already being processed
+
+2012-07-01 20:57  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: First attempt at marking the
+	  beginning and end of processing
+
+2012-06-29 16:20  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in: Fixed function name
+
+2012-06-29 16:17  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/CurrentProcessing.pm.in: Added
+	  support for registering that processing of a file has
+	  started/ended. This will help multiple processors avoid parsing
+	  the same files at the same time
+
+2012-06-29 15:52  squinney@INF.ED.AC.UK
+
+	* buzzsaw.sql: Added new table for tracking the file currently
+	  being processed. Also added a function which will query this
+	  table with locking and timeout support
+
+2012-06-28 15:54  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm.in: Call begin_transaction on the
+	  correct object this time
+
+2012-06-28 15:48  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.1.1
+
+2012-06-28 15:26  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Catalogue.pm.in, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DataSource/Files.pm.in: Added support for using
+	  transactions with the database. Use the new transaction functions
+	  so that we are not committing changes quite so frequently
+
+2012-06-28 15:08  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Catalogue.pm.in, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DB/Schema.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Log.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Tag.pm.in,
+	  lib/BuzzSaw/DataSource.pm.in, lib/BuzzSaw/DataSource/Files.pm.in,
+	  lib/BuzzSaw/Filter.pm.in, lib/BuzzSaw/Filter/Auth.pm.in,
+	  lib/BuzzSaw/Filter/Kernel.pm.in, lib/BuzzSaw/Importer.pm.in,
+	  lib/BuzzSaw/Parser.pm.in, lib/BuzzSaw/Parser/RFC3339.pm.in:
+	  Enabled MooseX::Log::Log4perl for various modules. Also set
+	  svn:keywords on all Perl modules
+
+2012-06-28 14:58  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/Catalogue.pm, lib/BuzzSaw/Catalogue.pm.in,
+	  lib/BuzzSaw/DB.pm, lib/BuzzSaw/DB.pm.in,
+	  lib/BuzzSaw/DB/Schema.pm, lib/BuzzSaw/DB/Schema.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Log.pm,
+	  lib/BuzzSaw/DB/Schema/Result/Log.pm.in,
+	  lib/BuzzSaw/DB/Schema/Result/Tag.pm,
+	  lib/BuzzSaw/DB/Schema/Result/Tag.pm.in,
+	  lib/BuzzSaw/DataSource.pm, lib/BuzzSaw/DataSource.pm.in,
+	  lib/BuzzSaw/DataSource/Files.pm,
+	  lib/BuzzSaw/DataSource/Files.pm.in, lib/BuzzSaw/Filter.pm,
+	  lib/BuzzSaw/Filter.pm.in, lib/BuzzSaw/Filter/Auth.pm,
+	  lib/BuzzSaw/Filter/Auth.pm.in, lib/BuzzSaw/Filter/Kernel.pm,
+	  lib/BuzzSaw/Filter/Kernel.pm.in, lib/BuzzSaw/Importer.pm,
+	  lib/BuzzSaw/Importer.pm.in, lib/BuzzSaw/Parser.pm,
+	  lib/BuzzSaw/Parser.pm.in, lib/BuzzSaw/Parser/RFC3339.pm,
+	  lib/BuzzSaw/Parser/RFC3339.pm.in: Switched to preprocessed perl
+	  module files so we get the version numbers inserted at build time
+
+2012-06-28 14:48  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.1.0
+
+2012-06-28 14:48  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/BuzzSaw/Parser/RFC3339.pm: Output the whole line
+	  when the parsing fails
+
+2012-06-28 14:44  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec: No README right now
+
+2012-06-28 14:41  squinney@INF.ED.AC.UK
+
+	* MANIFEST, MANIFEST.SKIP, META.yml.in, Makefile.PL: Added various
+	  files which are necessary for building the module package
+
+2012-06-28 07:32  squinney@INF.ED.AC.UK
+
+	* lib/BuzzSaw/DataSource/Files.pm: simplified the way the
+	  uncompression of files is done as it was not reliable enough
+
+2012-06-27 17:59  squinney@INF.ED.AC.UK
+
+	* BuzzSaw.spec, lcfg.yml: Added specfile
+
+2012-06-27 17:35  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: Added Module::Build script
+
+2012-06-27 17:23  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: BuzzSaw release: 0.0.2
+
+2012-06-27 17:23  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: Added buildtools project file
+
+2012-06-27 17:19  squinney@INF.ED.AC.UK
+
+	* ., buzzsaw.sql, lib, lib/BuzzSaw, lib/BuzzSaw/Catalogue,
+	  lib/BuzzSaw/Catalogue.pm, lib/BuzzSaw/DB, lib/BuzzSaw/DB.pm,
+	  lib/BuzzSaw/DB/Schema, lib/BuzzSaw/DB/Schema.pm,
+	  lib/BuzzSaw/DB/Schema/Result,
+	  lib/BuzzSaw/DB/Schema/Result/Event.pm,
+	  lib/BuzzSaw/DB/Schema/Result/Log.pm,
+	  lib/BuzzSaw/DB/Schema/Result/Tag.pm, lib/BuzzSaw/DataSource,
+	  lib/BuzzSaw/DataSource.pm, lib/BuzzSaw/DataSource/Files.pm,
+	  lib/BuzzSaw/Filter, lib/BuzzSaw/Filter.pm,
+	  lib/BuzzSaw/Filter/Auth.pm, lib/BuzzSaw/Filter/Kernel.pm,
+	  lib/BuzzSaw/Importer.pm, lib/BuzzSaw/Parser,
+	  lib/BuzzSaw/Parser.pm, lib/BuzzSaw/Parser/RFC3339.pm: Added new
+	  project for parsing and filtering entries in log files
+

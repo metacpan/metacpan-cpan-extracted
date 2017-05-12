@@ -1,0 +1,24 @@
+Copyright (c) 1999/2000 University of New South Wales
+Copyright (c) 2002 Ivan Kohler
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::OCV, an Business::OnlinePayment backend
+module for the Ingenico Online Credit Verification Server (OCV).  It is only
+useful if you have a merchant account with Ingenico:
+http://www.ingenico.com.au
+
+Currently, it is mostly a wrapper around Business::OCV written by Benjamin
+Low <b.d.low@unsw.edu.au>.  Eventually it will be self-contained.
+
+There are tests in t2/ that may be useful to you once you have a test server
+setup.
+
+Ivan Kohler <ivan-ocv@420.am>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+

@@ -1,0 +1,19 @@
+.gitignore
+Changes
+lib/BEGIN/Lift.pm
+Makefile.PL
+Lift.xs
+MANIFEST			This list of files
+MANIFEST.skip
+README.md
+t/000-load.t
+t/001-basic.t
+t/002-basic.t
+t/100-edge-case-non-void-context.t
+t/101-edge-case-expression-context.t
+t/102-edge-case-statement-modifier-context.t
+t/501-error-not-BEGIN-time.t
+t/502-error-non-empty-typeglob.t
+t/503-error-died-within-keyword.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

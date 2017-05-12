@@ -1,0 +1,91 @@
+
+2.7
+   * change BioPerl version required in Build.PL to be 1.6.1
+
+2.6
+   * tabix index files downloaded by default to system tmp directory
+   * bugfix - Specify correct end when calling coverage if none specified
+   * Create a way to Tabix query against chr containing ':', courtesy of Keiran Raine
+
+2.5
+   * added CRAM/BAM writing, courtesy of Dietmar Rieder
+   * CRAM read test reference embedded in CRAM file to allow test to pass when CRAM reference archive is unavailable
+
+2.4
+   * github repo move to https://github.com/Ensembl/Bio-DB-HTS
+   * -Wformat=no removed from build options
+   * check results of archive fetches
+
+2.3
+   * cram tests moved to the scripts directory to allow install when CRAM reference archive is unavailable
+
+2.2
+   * Zip file downloads during install
+   * HTSlib version set to 1.3.1 or specified parameter during install
+   * https for remote file prefix check added, courtesy of Zhicheng-Liu
+
+2.1
+   * add missing test file to manifest
+
+2.0
+   * BCF addition
+   * Kseq addition: courtesy of Andrew Yates and Chris Fields
+   * Tabix bugfixes: see GitHub issue #17
+   * licence updated
+
+1.13
+   * removed file existence Tabix check as it prevents remote access
+   * Tabix bugfix
+   * Build git clone commands use branch and depth options
+
+1.12
+   * Build procedure static option added, courtesy of David Jones
+   * TravisCI tests added
+   * build_options script added to demonstrate build options
+   * cpanfile updates
+
+1.11
+   * FAIDX memory leak fix, courtesy Andy Yates & Keiran Raine
+   * INSTALL.pl to local directory, courtesy Keiran Raine
+   * documentation updates
+
+1.10
+   * Tabix header_array subroutine added
+   * Tabix DEMOLISH routines renamed close for consistency
+
+1.09
+   * Tabix header subroutine, test added
+   * README clarifications
+   * prompt removed from install script
+
+1.08
+   * Added missing test files
+
+1.07
+   * Build.PL updated, courtesy of James Gilbert.
+   * TABIX bindings added, courtesy of Alex Hodgkins, Congenica Ltd.
+
+1.06
+   * htslib directory parameter added for perl Build.PL
+   * faidx include directory bug fix added
+
+1.05
+   * CRAM tests added
+   * cpanfile added
+
+1.04
+   * FAIDX added
+
+1.03
+   * license field corrected in Build.PL
+   * Version numbers added to PM files
+   * Alien::HTSlib module referred to
+
+1.02
+   * Version numbers added to PM files
+
+1.01
+   * Package renaming
+
+1.00
+   * First full release of htslib port from Bio::DB::Sam

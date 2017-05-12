@@ -1,0 +1,12 @@
+# example cnf file for LocusLink
+
+name=rgd
+module=rgd
+version=Unknown
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Business::3DSecure::Cardinal.
+
+0.01  Tue Jul 22 13:57:42 2008
+	- original version; created by h2xs 1.23 with options
+		-AX Business::3DSecure::Cardinal
+
+0.05  Mon Oct 13 2008
+        - First Public Release 
+
+0.06  Sun Oct 19 2008
+        - Added Error as prequisite in Makefile.PL

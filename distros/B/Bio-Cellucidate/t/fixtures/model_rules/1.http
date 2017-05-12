@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Thu, 11 Feb 2010 19:39:19 GMT
+Content-Type: application/xml; charset=utf-8
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<model-rule>
+  <backward-rate nil="true"></backward-rate>
+  <forward-rate>1.0</forward-rate>
+  <id type="integer">1</id>
+</model-rule>

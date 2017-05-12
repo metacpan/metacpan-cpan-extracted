@@ -1,0 +1,4 @@
+0.160630  2016-03-03 16:50:08-06:00 America/Chicago
+
+    * Extracted from Bot::Backbone to install as a separate module.
+    * Initial release.

@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+package Bio::MLST::Bin::Download;
+$Bio::MLST::Bin::Download::VERSION = '2.1.1706216';
+# ABSTRACT: Downloads all the MLST databases to disk. It requires access to the Internet.
+# PODNAME: download_mlst_databases
+
+BEGIN { unshift( @INC, '../lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use Bio::MLST::DatabaseSettings;
+use Bio::MLST::Download::Databases;
+
+my ($config_file, $base_directory, $help, $version);
+
+GetOptions ('c|config=s'         => \$config_file,
+            'b|base_directory=s' => \$base_directory,
+            'h|help'             => \$help,
+            'v|version'          => \$version,
+);
+
+(! $version ) or die "$0 version " . Bio::MLST::Bin::Download->VERSION . "\n";
+
+(! $help)or die <<USAGE;
+Usage: download_mlst_databases [options]
+   -c STR Config file containing details of MLST databases from pubMLST
+   -b STR Directory where MLST databases are stored [\$MLST_DATABASES]
+   -h     Print this message and exit
+   -v     Print version number and exit
+
+USAGE
+;
+
+$base_directory ||= $ENV{MLST_DATABASES};
+$base_directory ||= '/lustre/scratch108/pathogen/pathpipe/mlst';
+
+$config_file    ||= 'https://pubmlst.org/data/dbases.xml';
+
+my $database_settings = Bio::MLST::DatabaseSettings->new(filename => $config_file)->settings;
+my $databases = Bio::MLST::Download::Databases->new(
+  databases_attributes => $database_settings,
+  base_directory  => $base_directory
+);
+$databases->update();
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+download_mlst_databases - Downloads all the MLST databases to disk. It requires access to the Internet.
+
+=head1 VERSION
+
+version 2.1.1706216
+
+=head1 SYNOPSIS
+
+Downloads all the MLST databases to disk. It requires access to the Internet.
+
+    # download everything with defaults
+    download_mlst_databases
+
+    # print version
+    download_mlst_databases -v
+
+    # XML file containing details of the MLST databases (from pubmlst)
+    download_mlst_databases -c my_config_file.json
+
+    # destination base directory defaults to the environment variable \$MLST_DATABASES
+    download_mlst_databases -b /path/to/destination
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

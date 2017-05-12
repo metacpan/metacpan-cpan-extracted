@@ -1,0 +1,171 @@
+
+=head1 NAME
+
+Box2D::b2ContactListener - Implement this class to get contact information.
+
+=head1 SYNOPSIS
+
+  package My::ContactListener;
+  use Box2D;
+
+  use base qw(Box2D::b2ContactListener);
+
+  sub BeginContact {
+      my ( $contact ) = @_;
+
+      # Do something
+  }
+
+  sub EndContact {
+      my ( $contact ) = @_;
+
+      # Do something
+  }
+
+  sub PreSolve {
+      my ( $contact, $manifold ) = @_;
+
+      # Do something
+  }
+
+  sub PostSolve {
+      my ( $contact, $impulse ) = @_;
+
+      # Do something
+  }
+
+  1;
+
+=head1 DESCRIPTION
+
+Implement this class to get contact information. You can use these
+results for things like sounds and game logic. You can also get contact
+results by traversing the contact lists after the time step. However,
+you might miss some contacts because continuous physics leads to
+sub-stepping. Additionally you may receive multiple callbacks for the
+same contact in a single time step. You should strive to make your
+callbacks efficient because there may be many callbacks per time step.
+
+Warning: You cannot create/destroy C<Box2D> entities inside these
+callbacks.
+
+=head1 METHODS
+
+=head2 new()
+
+Creates and returns a new C<Box2D::b2ContactListener>. This is an
+inheritance friendly sub so you're free to leave it as default. Remember
+to call super in your own code, don't forget to call this!
+
+Returns a C<Box2D::b2ContactListener>
+
+=head2 BeginContact( $contact )
+
+Called when two fixtures begin to touch.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Contact> C<$contact>
+
+=back
+
+=head2 EndContact( $contact )
+
+Called when two fixtures cease to touch.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Contact> C<$contact>
+
+=back
+
+=head2 PreSolve( $contact, $manifold )
+
+This is called after a contact is updated. This allows you to inspect a
+contact before it goes to the solver. If you are careful, you can modify
+the contact manifold (e.g. disable contact). A copy of the old manifold
+is provided so that you can detect changes.
+
+Note: this is called only for awake bodies.
+
+Note: this is called even when the number of contact points is zero.
+
+Note: this is not called for sensors.
+
+Note: if you set the number of contact points to zero, you will not get
+an C<EndContact> callback. However, you may get a C<BeginContact>
+callback the next step.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Contact> C<$contact>
+
+=item * C<Box2D::b2Manifold> C<$manifold>
+
+=back
+
+=head2 PostSolve( $contact, $impulse )
+
+This lets you inspect a contact after the solver is finished. This is
+useful for inspecting impulses.
+
+Note: the contact manifold does not include time of impact impulses,
+which can be arbitrarily large if the sub-step is small. Hence the
+impulse is provided explicitly in a separate data structure.
+
+Note: this is only called for contacts that are touching, solid, and
+awake.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Contact> C<$contact>
+
+=item * C<Box2D::b2ContactImpulse> C<$impulse>
+
+=back
+
+=head2 setOurListeners()
+
+This is private don't bother calling it unless you inherit and need to
+initialize.
+
+Note: C<< $self->{_listener} >> needs to be a
+C<Box2D::PerlContactListener>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2World>
+
+=item * L<Box2D::b2Contact>
+
+=item * L<Box2D::b2Manifold>
+
+=item * L<Box2D::b2ContactImpulse>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

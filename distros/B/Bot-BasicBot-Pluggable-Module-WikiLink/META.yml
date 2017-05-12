@@ -1,0 +1,25 @@
+---
+abstract: 'a simple Wikipedia helper plugin for Bot::BasicBot::Pluggable'
+author:
+  - 'James Green <jkg@cpan.org>'
+build_requires:
+  Test::Bot::BasicBot::Pluggable: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-BasicBot-Pluggable-Module-WikiLink
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  URI::Title: '0'
+  WWW::Wikipedia: '0'
+  perl: '5.006'
+version: '0.03'

@@ -1,0 +1,9 @@
+classes:
+  - Admin
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include package usage reporting Popularity-Contest
+  pkg:
+    - popularity-contest

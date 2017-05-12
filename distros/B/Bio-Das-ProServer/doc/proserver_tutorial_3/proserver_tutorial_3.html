@@ -1,0 +1,355 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>DAS Workshop 2010: ProServer Tutorial Part 3</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <style type="text/css">
+body {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 0.9em;
+}
+th {
+  font-weight: normal;
+  font-style: italic;
+}
+table {
+  text-align: left;
+}
+div.code {
+  background-color: rgb(220, 220, 220);
+  border: 1px dotted;
+  padding: 5px;
+}
+  </style>
+</head>
+
+<body>
+<script type="text/javascript">
+  function reveal(id) {
+    var el = document.getElementById(id);
+    if (el.style.display == "none") {
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+</script>
+
+<h1 style="text-align: center;">DAS Workshop 2010 ProServer Tutorial</h1>
+
+<h2 style="text-align: center;">Part 3</h2>
+
+<p>Andy Jenkinson, EMBL-EBI, 7th April 2010</p>
+
+<h2>Overview</h2>
+
+<p>
+  Now that you have completed <a href="../proserver_tutorial_1/proserver_tutorial_1.html">Part 1</a> and
+  <a href="../proserver_tutorial_2/proserver_tutorial_2.html">Part 2</a> of the tutorial,
+  let us imagine that instead of a file, your data are in a relational database
+  -- specifically in our example, the public Ensembl MySQL database. You will
+  now modify your <em>myplugin</em> SourceAdaptor to fetch its data from there.
+</p>
+
+<h2><a name="transports">Transport helpers</a></h2>
+
+<p>
+  ProServer includes various <em>Transport</em> modules. These optional modules exist to
+  make accessing your data easier by reducing the boilerplate code you need to
+  write. There are transport modules for various flat files, SRS and the BioPerl
+  API, for example. Similarly to SourceAdaptor modules, Transports are objects in
+  the <em>Bio::Das::ProServer::SourceAdaptor::Transport</em> namespace
+  (e.g. <em>Bio::Das::ProServer::SourceAdaptor::Transport::file</em>).
+  Transports are configured in each data source's INI
+  section:
+</p>
+
+<div class="code">
+<pre>
+[mysource]
+state        = on
+adaptor      = myplugin
+transport    = file
+</pre>
+</div>
+
+<p>
+  Using the above INI configuration, ProServer will create an object of the
+  <em>Bio::Das::ProServer::SourceAdaptor::Transport::file</em> package at runtime,
+  and make it accessible to a SourceAdaptor object via:
+</p>
+
+<div class="code">
+<pre>
+my $transport = $self->transport();
+</pre>
+</div>
+
+<h2><a name="transport-dbi">The <em>dbi</em> transport</a></h2>
+
+<p>
+  Of particular interest to us in this tutorial is the
+  <em>dbi</em> transport. An object of this package uses the Perl DBI framework
+  to abstract out the creation of database connections, execution of statements
+  and return of results sets. Functionality is exposed to an adaptor object
+  via the <em>query</em> method. The details of
+  the database to connect to (hostname, username etc) are confined to the
+  source's INI configuration, leaving the plugin only to specify the SQL query
+  to execute, and iterate over the results.
+</p>
+
+<p>
+  Connection details may be specified as follows:
+</p>
+
+<div class="code">
+<pre>
+[mysource]
+state        = on
+adaptor      = myplugin
+transport    = dbi
+dbhost       = host.company.com
+dbport       = 3306
+dbname       = mydata
+dbuser       = read_only_user
+dbpass       = secret
+</pre>
+</div>
+
+<p>
+  You can now execute SQL statements against the <em>mydata</em> database
+  and process the results like this:
+</p>
+
+<div class="code">
+<pre>
+my $sql = 'select col2, col3, col4 from table where col1 = ? and col2 >= ? and col3 <= ?';
+my $rows_arrayref = $self->transport()->query($sql, $arg1, $arg2, $arg3);
+for my $row ( @{ $rows_arrayref } ) {
+  my $col2 = $row->{'col2'};
+  my $col3 = $row->{'col3'};
+  my $col4 = $row->{'col4'};
+}
+</pre>
+</div>
+
+<h2><a name="modify">Modify your DAS source</a></h2>
+
+<p>
+  You will now use the <em>dbi</em> transport to
+  help you in your task. Modify your <em>mysource.ini</em> INI file and <em>myplugin.pm</em>
+  SourceAdaptor to connect to the Ensembl database and extract the same data as
+  in your file, and build annotation hashrefs from the rows returned.
+</p>
+
+<p>
+  This is the SQL query you will need to run to extract the same information that
+  is in <em>exons.txt</em>:
+</p>
+
+<div class="code">
+<pre>
+select sr.name AS chromosome,
+       gsi.stable_id AS g_id, g.seq_region_start AS g_start, g.seq_region_end AS g_end,
+       tsi.stable_id AS t_id, t.seq_region_start AS t_start, t.seq_region_end AS t_end,
+       esi.stable_id AS e_id, e.seq_region_start AS e_start, e.seq_region_end AS e_end
+from   seq_region sr,
+       gene_stable_id gsi, gene g,
+       transcript t, transcript_stable_id tsi,
+       exon_transcript et, exon e, exon_stable_id esi
+where  gsi.gene_id = g.gene_id
+and    g.gene_id = t.gene_id
+and    t.transcript_id = tsi.transcript_id
+and    t.transcript_id = et.transcript_id
+and    et.exon_id = e.exon_id
+and    e.exon_id = esi.exon_id
+and    g.seq_region_id = sr.seq_region_id
+and    sr.coord_system_id = 2
+limit  1000
+</pre>
+</div>
+
+<p>
+  Click <a href="javascript: reveal('mod_ini');">here</a> to show/hide the INI file:
+</p>
+
+<div id="mod_ini" class="code" style="display:none">
+<pre>
+[mysource]
+state        = on
+adaptor      = myplugin
+transport    = dbi
+dbhost       = ensembldb.ensembl.org
+dbport       = 5306
+dbname       = homo_sapiens_core_56_37a
+dbuser       = anonymous
+</pre>
+</div>
+
+<p>
+  Click <a href="javascript: reveal('mod_code');">here</a> to show/hide the code:
+</p>
+
+<div id="mod_code" class="code" style="display:none">
+<pre>
+package Bio::Das::ProServer::SourceAdaptor::myplugin;
+
+use strict;
+use base qw(Bio::Das::ProServer::SourceAdaptor);
+
+sub init {
+  my $self = shift;
+  $self->{'capabilities'} = {'features' => '1.1'};
+}
+
+sub build_features {
+  my ($self, $args) = @_;
+
+  # e.g. /das/mysource/features?segment = X:1,100
+  my $segment = $args->{'segment'}; # X
+  my $start   = $args->{'start'};   # 1
+  my $end     = $args->{'end'};     # 100
+  my %features;
+
+
+  my $sql = q(
+select sr.name AS chromosome,
+       gsi.stable_id AS g_id, g.seq_region_start AS g_start, g.seq_region_end AS g_end,
+       tsi.stable_id AS t_id, t.seq_region_start AS t_start, t.seq_region_end AS t_end,
+       esi.stable_id AS e_id, e.seq_region_start AS e_start, e.seq_region_end AS e_end
+from   seq_region sr,
+       gene_stable_id gsi, gene g,
+       transcript t, transcript_stable_id tsi,
+       exon_transcript et, exon e, exon_stable_id esi
+where  gsi.gene_id = g.gene_id
+and    g.gene_id = t.gene_id
+and    t.transcript_id = tsi.transcript_id
+and    t.transcript_id = et.transcript_id
+and    et.exon_id = e.exon_id
+and    e.exon_id = esi.exon_id
+and    g.seq_region_id = sr.seq_region_id
+and    sr.coord_system_id = ?
+limit  1000
+  );
+  my $rows = $self->transport()->query( $sql, 2 );
+  
+  for my $row ( @{ $rows } ) {
+  
+    my $chromosome = $row->{'chromosome'};
+    my $g_id       = $row->{'g_id'};
+    my $g_start    = $row->{'g_start'};
+    my $g_end      = $row->{'g_end'};
+    my $t_id       = $row->{'t_id'};
+    my $t_start    = $row->{'t_start'};
+    my $t_end      = $row->{'t_end'};
+    my $e_id       = $row->{'e_id'};
+    my $e_start    = $row->{'e_start'};
+    my $e_end      = $row->{'e_end'};
+
+    $chromosome eq $segment || next;
+
+    # Check if the gene overlaps the query segment
+    if ($g_start <= $end && $g_end >= $start) {
+      if (!$features{$g_id}) {
+        $features{$g_id} = {
+          'id'     => $g_id,
+          'start'  => $g_start,
+          'end'    => $g_end,
+          'type'   => 'gene',
+          'method' => 'Ensembl',
+          'part'   => [],
+        };
+      }
+    }
+
+    # Check if the transcript overlaps the query segment
+    if ($t_start <= $end && $t_end >= $start) {
+      if (!$features{$t_id}) {
+        $features{$t_id} = {
+          'id'     => $t_id,
+          'start'  => $t_start,
+          'end'    => $t_end,
+          'type'   => 'transcript',
+          'method' => 'Ensembl',
+          'part'   => [],
+          'parent' => [],
+        };
+
+        # Create the parent/part links between the annotations
+        push @{ $features{$g_id}{'part'} }, $t_id;
+        push @{ $features{$t_id}{'parent'} }, $g_id;
+      }
+    }
+
+    # Check if the exon overlaps the query segment
+    if ($e_start <= $end && $e_end >= $start) {
+      if (!$features{$e_id}) {
+        $features{$e_id} = {
+          'id'     => $e_id,
+          'start'  => $e_start,
+          'end'    => $e_end,
+          'type'   => 'exon',
+          'method' => 'Ensembl',
+          'parent' => [],
+        };
+
+        # Create the parent/part links between the annotations
+        push @{ $features{$t_id}{'part'}   }, $e_id;
+        push @{ $features{$e_id}{'parent'} }, $t_id;
+      }
+    }
+  }
+
+  return values %features;
+}
+
+1;
+</pre>
+</div>
+
+<h3>Rebuild and run the server</h3>
+
+<p>
+  Now <strong>rebuild ProServer</strong>, and run it with the new configuration:
+</p>
+
+<div class="code">
+<pre>
+./Build
+eg/proserver -x -c eg/mysource.ini
+</pre>
+</div>
+
+<p>
+  And see if it works:
+</p>
+
+<div class="code">
+<a href="http://localhost:9000/das/mysource/features?segment=5:144942,155558">http://localhost:9000/das/mysource/features?segment=5:144942,155558</a>
+</div>
+
+<h2>Further Tasks</h2>
+
+<p>
+  Although the above SQL query allows you to change the source of the data without
+  changing too much code, it is not particular efficient.
+  It would be far better to use the input segment, start and end parameters to
+  construct dynamic SQL queries to extract only the exons, transcripts and genes.
+  In a real world whole-genome scenario, this would make more sense.
+</p>
+
+<p>
+  You should also provide metadata in the INI file to be included in the DAS
+  <em>sources</em> command. In particular:
+</p>
+
+<div class="code">
+<pre>
+[mysource]
+coordinates = GRCh_37,Chromosome,Homo sapiens -> 5:144942,155558
+title       = Ensembl transcripts
+doc_href    = http://mycompany.com/moreinfo
+description = Some information about the data in the source and where it came from.
+maintainer  = me@mycompany.com
+</pre>
+</div>

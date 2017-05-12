@@ -1,0 +1,59 @@
+{
+   "abstract" : "DAS-style access to a chado database",
+   "author" : [
+      "Scott Cain <scain@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-DB-Das-Chado",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Bio::GMOD::DB::Config" : "1.22"
+         },
+         "requires" : {
+            "Bio::Root::Version" : "1.006",
+            "DBD::Pg" : "0",
+            "DBI" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::DB::Das::Chado" : {
+         "file" : "lib/Bio/DB/Das/Chado.pm",
+         "version" : "0.35"
+      },
+      "Bio::DB::Das::Chado::Segment" : {
+         "file" : "lib/Bio/DB/Das/Chado/Segment.pm",
+         "version" : "0.35"
+      },
+      "Bio::DB::Das::Chado::Segment::Feature" : {
+         "file" : "lib/Bio/DB/Das/Chado/Segment/Feature.pm",
+         "version" : "0.35"
+      },
+      "Bio::DB::Das::ChadoIterator" : {
+         "file" : "lib/Bio/DB/Das/Chado.pm",
+         "version" : "0.35"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.35"
+}

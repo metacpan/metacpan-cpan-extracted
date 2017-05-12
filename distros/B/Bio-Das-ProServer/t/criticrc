@@ -1,0 +1,8 @@
+[Subroutines::RequireArgUnpacking]
+allow_subscripts = 1
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[NamingConventions::Capitalization]
+packages = :no_restriction

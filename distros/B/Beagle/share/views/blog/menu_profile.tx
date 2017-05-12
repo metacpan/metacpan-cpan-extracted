@@ -1,0 +1,14 @@
+<div class="menu profile">
+: if $info.avatar {
+<a href="<: $prefix :>about"> <img alt="avatar" height="80" src="<: $prefix :><: $info.avatar :>" /></a>
+: }
+<ul>
+<li><a href="mailto:<: $info.email :>"><: $info.email :></a></li>
+<li><: $info.location :></li>
+<li><: $info.career :></li>
+: if $info.public_key {
+<li><a href="<: $prefix :><: $info.public_key :>"><: _('public key') :></a></li>
+: }
+</ul>
+</div>
+

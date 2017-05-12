@@ -1,0 +1,94 @@
+{
+   "abstract" : "Perl interface to the Bintray API",
+   "author" : [
+      "Mithun Ayachit <mithun@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bintray-API",
+   "no_index" : {
+      "directory" : [
+         ".author",
+         ".t",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "0"
+         },
+         "requires" : {
+            "Encode" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::Any" : "0",
+            "MIME::Base64" : "0",
+            "Object::Tiny" : "0",
+            "Params::Validate" : "0",
+            "URI::Encode" : "0.08"
+         }
+      }
+   },
+   "provides" : {
+      "Bintray::API" : {
+         "file" : "lib/Bintray/API.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Package" : {
+         "file" : "lib/Bintray/API/Package.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Repo" : {
+         "file" : "lib/Bintray/API/Repo.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Search" : {
+         "file" : "lib/Bintray/API/Search.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Session" : {
+         "file" : "lib/Bintray/API/Session.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Subject" : {
+         "file" : "lib/Bintray/API/Subject.pm",
+         "version" : "v1.0.2"
+      },
+      "Bintray::API::Version" : {
+         "file" : "lib/Bintray/API/Version.pm",
+         "version" : "v1.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mithun/perl-bintray-api/issues"
+      },
+      "homepage" : "https://github.com/mithun/perl-bintray-api",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/mithun/perl-bintray-api.git"
+      }
+   },
+   "version" : "v1.0.2"
+}

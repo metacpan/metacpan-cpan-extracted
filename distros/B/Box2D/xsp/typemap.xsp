@@ -1,0 +1,7 @@
+%typemap{float32}{simple};
+%typemap{int32}{simple};
+%typemap{uint32}{simple};
+%typemap{int16}{simple};
+%typemap{uint16}{simple};
+%typemap{bool}{simple};
+

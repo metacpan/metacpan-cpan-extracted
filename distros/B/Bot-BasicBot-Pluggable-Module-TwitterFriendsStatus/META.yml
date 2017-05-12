@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Bot-BasicBot-Pluggable-Module-TwitterFriendsStatus
+version:             0.2
+abstract:            Echo Twitter comments
+license:             perl
+author:              
+    - Gryphon Shafer <gryphon@cpan.org>, David Precious <davidp@preshweb.co.uk>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Bot::BasicBot::Pluggable::Module: 0
+    LWP::UserAgent:                0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,102 @@
+Business::PT::NIF version 0.04
+==============================
+
+=head1 NAME
+
+Business::PT::NIF - Validate Portuguese NIF (Número Fiscal de Contribuinte)
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+    use Business::PT::NIF;
+
+    if ( valid_nif($nif) ) {
+      # ...
+    }
+
+=head1 FUNCTIONS
+
+=head2 valid_nif
+
+Validates Portuguese NIF's.
+
+Returns a true value if the validation succeeds, a false one otherwise.
+
+Currently, validation is done only by the control digit, as follows:
+
+ 1) NIF is matched with /^\d{9}$/ (nine consecutive digits with nothing more)
+ 2) Control digit (last one, the ninth) is removed and store
+ 3) First digit is multiplied by 9, second by 8, third by 7, fourth by 6, fifth
+    by 5, sixth by 4, seventh by 3, eighth by 2
+ 4) All the results of the multiplication are summed
+ 5) Modulo of the sum by 11 is found
+ 6) Complement of the sum by 11 is found
+ 7) Control digit is compared to said complement
+
+Example for NIF 136695973:
+
+ 1) NIF is matched agains /^\d{9}$/, test passes
+ 2) Control digit is 3 (last digit)
+ 3) Multiplication: 1*9, 3*8, 6*7, 6*6, 9*5, 5*4, 9*3, 7*2
+ 4) Sum: 217
+ 5) 217 % 11 = 8
+ 6) 11 - 8 = 3
+ 7) 3 == 3, test passes
+
+When the complement (the result of step 6) is greater than 9, the
+number is assumed to be 0.
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-business-pt-nif at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-PT-NIF>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Business::PT::NIF
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Business-PT-NIF>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Business-PT-NIF>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-PT-NIF>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Business-PT-NIF>
+
+=back
+
+=head1 SEE ALSO
+
+http://chemeng.p.lodz.pl/zylla/ut/translation.html#PT
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 Jose Castro, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

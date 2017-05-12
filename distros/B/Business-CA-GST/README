@@ -1,0 +1,74 @@
+NAME
+    Business::CA::GST - Look up Canadian Federal Sales Tax rates
+
+VERSION
+    version 1.03
+
+SYNOPSIS
+        use Business::CA::GST
+        my $tax = Business::CA::GST->new;
+        $tax->buyer_region('ON');
+
+        print $tax->rate, "\n";     # gives 0.13
+        print $tax->tax_type, "\n"; # gives 'HST'
+
+DESCRIPTION
+    A tax table for Canadian GST/HST payments. Actual tax calculations are
+    left as an exercise for the reader. Please see
+    <http://en.wikipedia.org/wiki/Sales_taxes_in_Canada> for a more detailed
+    explanation of how GST and HST works (it's not as simple as one might
+    hope).
+
+CONSTRUCTOR AND STARTUP
+  new( buyer_region => $region )
+    Creates and returns a new Business::CA::GST object.
+
+        my $tax = Business::CA::GST->new();
+
+    "buyer_region => $region_code"
+        You may pass this parameter to new(), and/or you may use the
+        buyer_region() method after having created the object. See the
+        buyer_region() documentation below for a list of allowable region
+        codes.
+
+            my $tax = Business::CA::GST->new( buyer_region => $region_code );
+
+SUBROUTINES/METHODS
+  buyer_region( $region )
+    The only required parameter. Must be one of:
+
+    AB, BC, MB, NB, NL, NS, NT, ON, PE, SK, QC, YT, NU
+
+  rate
+    Returns the GST/HST as a floating point number. eg 13% is returned as
+    0.13
+
+  tax_type
+    Returns either 'GST' or 'HST'
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::CA::GST
+
+    You can also look for information at:
+
+    Source code
+        <http://github.com/oalders/business-ca-gst>
+
+    Search CPAN
+        <https://metacpan.org/module/Business::CA::GST>
+
+ACKNOWLEDGEMENTS
+    Thanks to Raybec Communications <http://www.raybec.com> for funding my
+    work on this module and for releasing it to the world.
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Olaf Alders.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

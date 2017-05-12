@@ -1,0 +1,104 @@
+        <WorkflowProcess Id="deadlock" Name="deadlock">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="splitA" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitB" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitB2" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'C'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Implementation><No/></Implementation>
+                </Activity>
+                <Activity Id="Split1" Name="Split1">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split1-A"/>
+                                    <TransitionRef Id="Split1-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Split2" Name="Split2">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split2-End"/>
+                                    <TransitionRef Id="Split2-Join1"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Join1" Name="Join1">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Join2" Name="Join2">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Implementation><No/></Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-Split1" From="Start" To="Split1"/>
+                <Transition Id="Split1-A" From="Split1" To="A"/>
+                <Transition Id="Split1-C" From="Split1" To="C"/>
+                <Transition Id="A-Split2" From="A" To="Split2"/>
+                <Transition Id="Split2-End" From="Split2" To="End"/>
+                <Transition Id="Split2-Join1" From="Split2" To="Join1"/>
+                <Transition Id="Join1-B" From="Join1" To="B"/>
+                <Transition Id="B-Join2" From="B" To="Join2"/>
+                <Transition Id="C-Join2" From="C" To="Join2"/>
+                <Transition Id="Join2-D" From="Join2" To="D"/>
+                <Transition Id="D-Join1" From="D" To="Join1"/>
+            </Transitions>
+        </WorkflowProcess>
+

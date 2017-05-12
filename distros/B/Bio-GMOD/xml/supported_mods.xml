@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- Generic defaults for supported MODs -->
+
+<supported_mods>
+  <mod>
+      <name>WormBase</name>
+      <live_url>www.wormbase.org</live_url>
+      <development_url>dev.wormbase.org</development_url>
+  </mod>
+
+  <mod>
+       <name>SGD</name>
+       <live_url></live_url>
+       <development_url></development_url>
+  </mod>

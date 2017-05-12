@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+use strict;
+use Bot::MetaSyntactic;
+
+Bot::MetaSyntactic->new(
+        nick => 'meta2', 
+        name => 'Acme::MetaSyntactic IRC frontend', 
+        server => 'irc.perl.org', 
+        channels => [qw(#perlfr)],
+        ignore_list => [qw(dipsy purl)],
+    )->run
+
+__END__
+
+=head1 NAME
+
+metabot - IRC frontend to Acme::MetaSyntactic
+
+=head1 SYNOPSIS
+
+Under your favorite shell: 
+
+    $ metabot
+
+On IRC: 
+
+    meta [help|theme] [number]
+
+See L<Bot::MetaSyntactic/"COMMANDS"> for the description of supported 
+commands. 
+
+=head1 DESCRIPTION
+
+This script is an IRC bot that provides an interface to the module 
+C<Acme::MetaSyntactic>.
+
+See also L<Bot::MetaSyntactic> for more information.
+
+=head1 AUTHOR
+
+SE<eacute>bastien Aperghis-Tramoni, C<< <sebastien@aperghis.net> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+L<bug-bot-metasyntactic@rt.cpan.org>, or through the web interface at
+L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-MetaSyntactic>. 
+I will be notified, and then you'll automatically be notified 
+of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005 SE<eacute>bastien Aperghis-Tramoni, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

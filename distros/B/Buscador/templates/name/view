@@ -1,0 +1,30 @@
+[% PROCESS header %]
+[% PROCESS macros %]
+
+    <h1>[% name.name |html %]</h1>
+
+[% INCLUDE searchbox %]
+[% mails_by_addressing(name) %]
+[% SET mentioned = name.mentioned_mails %]
+[% IF mentioned %]
+<h3>Also mentioned in...</h3>
+
+<table class="view">
+[% FOR mail = mentioned %]
+<tr>
+<td> &nbsp; </td><td>
+   [% summary_link(mail); %]
+   ([%mail.date.ymd%])
+   <br />
+   [% show_lists(mail); %]
+       <blockquote>
+       [% IF mentioned.length < 20;
+           mail.contextualize_result(name.name);
+         ELSE; mail.original; END %]
+       </blockquote>
+</td>
+</tr>
+[% END %]
+</table>
+[% END %]
+[% INCLUDE footer %]

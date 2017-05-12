@@ -1,0 +1,55 @@
+Revision history for Business-ID-BCA
+
+0.08    2015-09-15 (PERLANCAR)
+
+	- Update to newer Perinci::Sub::Gen::AccessTable (default_fields
+	  must be array).
+
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-07-10 (PERLANCAR)
+
+	- Move pericmd scripts to App-IndonesianBankingUtils to reduce
+	  dependencies for our dist.
+
+
+0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.04     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.03    2013-07-31 (SHARYANTO)
+
+        - No functional changes. Update data source (data is more
+          complete, GudangData switching to using data from BCA
+          official site).
+
+
+0.02    2013-04-25 (SHARYANTO)
+
+        - No functional changes. Update data source (branch_address is
+          now not provided, replaced by branch_name, data is more
+          complete).
+
+
+0.01    2013-04-25 (SHARYANTO)
+
+        - First release.

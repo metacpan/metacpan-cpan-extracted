@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                B-Lint-Pluggable
+version:             2.0
+abstract:            Adds plugin support to B::Lint
+license:             ~
+author:              
+    - Joshua ben Jore <jjore@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    B::Lint:                       1.09
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

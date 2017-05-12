@@ -1,0 +1,91 @@
+
+This is bp, a Perl Bibliography Package, by Dana Jacobsen (dana@acm.org).
+
+# The bp package is written by Dana Jacobsen (dana@acm.org).
+# Copyright 1992-1996 by Dana Jacobsen.
+#
+# Permission is given to use and distribute this package without charge.
+# The author will not be liable for any damage caused by the package, nor
+# are any warranties implied.
+
+This software is currently in BETA state.  It works for me, and it seems to
+work for the people I've heard from who are using it.  Send me mail if you
+have any problems or find it particularly useful.
+
+  It should work under both Perl 4.036 and Perl 5.00[0123].  I have not tested
+it with other versions.  The package will let you write programs that handle
+bibliography parsing in a generic fashion for multiple bibliography types.
+It comes with some sample programs that do typical sorts of processing.  It
+also allows conversion between formats and character sets.  It is extendable,
+meaning that you can write your own routines, so to recognize your format "foo"
+all you have to do is write your "foo" code that reads, writes, and
+converts to and from the package's canonical format.  You now have a converter
+to and from your format to all other supported formats.  You do not have to
+modify the package in any way -- just add that one module.
+
+  This distribution contains:
+
+bin/		Some sample binaries.  I have these installed with the name
+		"bib" prepended to them.  I then run "bibsort", etc.
+
+lib/		The package.  Either put these files in your @INC (such as
+		/usr/lib/perl, or /usr/lib/perl5), or set your BPHOME
+		environment variable to point to wherever you install them
+		(I just leave them here).
+
+tests/		Some programs to test the package.  You can run all the
+		validation tests with the included tests/Makefile.
+
+ref/		Some standard biblio files in various formats that I'm
+		using to test the software.
+
+gen/		The .gen files and the genmod.pl program used to create
+		output styles.  genmod.pl turns style.gen into bp-s-style.pl.
+
+misc/		Miscellaneous little scripts.  You can ignore these.
+
+examples/	The examples used in the web page tutorial.
+
+
+  Support for the following formats is included:
+
+format  read write description
+------- ---  ---   ------------------------------------------------------------
+bibtex   x    x    BibTeX.
+refer    x    x    Refer, including an EndNote option.
+tib      x    x    Tib.  Few of the real tib extensions are supported.
+rfc1807  x    x    RFC 1807 / 1357 format for Tech Reports.
+procite  x    x    ProCite comma-delimited format
+text     x    x    Text format.  Handles raw lines or paragraphs.
+cstra    x         CS Tech Report format.
+ieee     x         IEEE catalog format.  I believe this is outdated.
+inspec   x         INSPEC.  The "Doc Type" version.
+medline  x         Medline.  The Entrez MEDLARS version.
+melvyl   x         Melvyl.
+powells  x         An old Powells catalog format.  Obsolete.
+output        x    A few styles.  Generic, booklist, aacf.
+html          x    HTML.  This is a synonym for output with the HTML charset.
+auto     x    x    Currently only recognizes file name suffixes.
+
+  Support for the following character sets is included:
+
+8859-1		ISO 8859-1 8 bit characters.
+apple		Apple's mapping of 8bit characters.
+html		Hypertext Markup Language.  Currently this is only 2.0.
+tex		TeX.  Mostly basic stuff.
+troff		UNIX troff.  Basic stuff.
+dead		Dead-key.  Things like \'a, \/o, \-D.
+none		Strips off all accents.  7bit only.
+canon		The format used internally.
+
+  I have some programs that convert some charset descriptions used by
+other packages into a form usable by bp, so other charsets can be supported.
+
+Full documentation is available in HTML form from:
+
+       http://www.ecst.csuchico.edu/~jacobsd/bib/bp/index.html
+
+Send me mail if this is not convenient for you.  I can mail a set out.
+--
+Dana Jacobsen
+dana@acm.org

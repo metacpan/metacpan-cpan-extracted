@@ -1,0 +1,56 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2GearJointDef} class b2GearJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2GearJointDef();
+
+%{
+
+b2Joint*
+b2GearJointDef::joint1( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Joint";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->joint1 = (b2Joint*)stack_to_object( ST(1) );
+		}
+		RETVAL = THIS->joint1;
+	OUTPUT:
+		RETVAL
+
+b2Joint*
+b2GearJointDef::joint2( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Joint";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->joint2 = (b2Joint*)stack_to_object( ST(1) );
+		}
+		RETVAL = THIS->joint2;
+	OUTPUT:
+		RETVAL
+
+float32
+b2GearJointDef::ratio( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->ratio = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->ratio;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

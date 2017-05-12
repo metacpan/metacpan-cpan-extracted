@@ -1,0 +1,10 @@
+
+Revision history for Perl extension Schedule::ByClock.
+
+
+Date        Version  Changes
+08-Dec-1999 V0.90    First public release.
+27-Jan-2000 V0.91    Added the posibility to wait for a minute in the hour.
+17-Jan-2001 V1.00    Removed a bug in the get_control_on_minute() method. (Thanks, Gordon Banner for finding it. :-)
+15-Dec-2002 V1.01    No changes to the module itself, but added the makefile and test script.
+

@@ -1,0 +1,31 @@
+NAME
+    Zahlschein - a module for check digit computation
+
+SYNOPSIS
+      use warnings;
+      use strict;
+      use Business::Zahlschein qw( PzMehrzweckfeld Mehrzweckfeld );
+
+      # fuer Berechnung mit Pruefziffer im Mehrzweckfeld
+      use Business::Zahlschein qw( PzMehrzweckfeld Mehrzweckfeld );
+      my $mehrzweckfeld   = "01234567890";
+      my $kontoNr         = "00000012345";
+      my $blz             = "10"."12000"; # ohne Betrag + BLZ
+      my $belegart        = "42";
+      my $pzMehrzweckfeld = PzMehrzweckfeld($mehrzweckfeld);
+      my $lesezone        = Mehrzweckfeld($mehrzweckfeld, $pzMehrzweckfeld, $kontoNr, $blz, $belegart);
+
+      # fuer Berechnung ohne Pruefziffer im Mehrzweckfeld
+      use Business::Zahlschein qw( Mehrzweckfeld );
+      my $mehrzweckfeld = "012345678901";
+      my $kontoNr       = "00000012345";
+      my $blz           = "10"."12000"; # ohne Betrag + BLZ
+      my $belegart      = "42";
+      my $lesezone      = Mehrzweckfeld($mehrzweckfeld, $pzMehrzweckfeld, $kontoNr, $blz, $belegart);
+
+DESCRIPTION
+    ...
+
+AUTHOR AND LICENSE
+    copyright 2009 (c) Gernot Havranek
+

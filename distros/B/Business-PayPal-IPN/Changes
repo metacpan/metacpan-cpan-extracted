@@ -1,0 +1,41 @@
+Revision history for Perl extension Business::PayPal::IPN.
+
+$Id: Changes,v 1.8 2003/08/19 07:47:08 sherzodr Exp $
+
+1.94, Tuedays, August 19, 2003
+  - $SUPPORTEDV is not 1.5.
+
+1.92, Saturday, May 03, 2003
+  - methods no longer simply return false, but distinguish between
+    0 (zero) and undef
+  - manual updated with notes on subscription transactions as well as
+    method return values
+  - no longer checks for the value of 'notify_version'
+  - included a section on debugging
+  
+1.91, Tuesday, April 22, 2003
+  - POD fix
+
+1.9, Tuesday, March 11, 2003
+  - vars() method introduced
+
+1.8, Tuesday, March 04, 2003
+  - major bugs fixes from previous version
+  - manual updated with the list of previously undocumented methods
+
+1.7, Monday, March 03, 2003
+  - new() supports "query" and "ua" parameters
+  - response() method introduced, which returns respective
+    HTTP::Response object
+  - cgi() and query() methods document.
+  - better AUTOLOADing
+
+1.5, Wednesday, January 22, 2003
+	- minor documentation corrections
+	- User-Agent request header is set to the name/version 
+	  of the library
+
+1.4, Wednesday, January 22, 2003
+	- Initial public release
+
+

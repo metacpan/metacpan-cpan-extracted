@@ -1,0 +1,16 @@
+package Business::EDI::CodeList::InitiatorControlReference;
+
+use base 'Business::EDI::CodeList';
+my $VERSION     = 0.02;
+sub list_number {return "0300";}
+my $usage       = 'B';  # guessed value
+
+# 0300 Initiator control reference                                    []
+# Desc: 
+# Repr: 
+my %code_hash = (
+
+);
+sub get_codes { return \%code_hash; }
+
+1;

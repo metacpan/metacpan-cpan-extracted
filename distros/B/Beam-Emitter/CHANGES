@@ -1,0 +1,173 @@
+Changelog for Beam-Emitter
+
+1.007     2017-01-29 01:43:15-06:00 America/Chicago
+
+    [Fixed]
+
+    - Passing in an overridden emitter when emitting an event no longer
+      uses the emitter's boolean overload. This could cause the wrong
+      emitter to be used in the event. Thanks @djerius (Github #25)
+
+1.006     2016-11-23 22:35:48-06:00 America/Chicago
+
+    [Added]
+
+    - Added a couple more cookbook entries to show Beam::Emitter
+      patterns
+
+    [Fixed]
+
+    - Events with no listeners now correctly return the Event object
+      like they used to. This was a regression starting in v1.004.
+      Thanks @eserte and CPAN Testers for the report (Github #24)
+
+1.005     2016-11-22 12:56:41-06:00 America/Chicago
+
+    [Fixed]
+
+    - Custom listener classes are now loaded automatically. This
+      prevents a very strange error about the unloaded class not
+      inheriting from Beam::Listener, even though it does. Perl doesn't
+      know that it does, because the class isn't loaded, and there's no
+      good way to detect if a class is loaded or if it failed to load.
+      So, to make it easier, Beam::Emitter now simply loads the class
+      for you. Thanks @djerius (Github #23)
+
+1.004     2016-11-17 17:28:01-06:00 America/Chicago
+
+    [Added]
+
+    - Allow the event's name to be overridden when emitting the event.
+      This is a rare thing to want, but it makes some future cookbook
+      items (like a catch-all '*' event) more useful.
+
+    - Allow the event's emitter object to be overridden when emitting
+      the event. This, too, is a rare thing to want, but it allows an
+      object to more easily proxy the event emitter if needed. Thanks
+      @djerius! (Github #19)
+
+    - Added a Cookbook document (Beam::Emitter::Cookbook) to start
+      demonstrating some useful patterns that aren't quite useful or
+      generally-desired enough to be part of the main distribution
+      always. Thanks @yanick for the help! (Github #12)
+
+    - Enhanced how Beam::Emitter tracks listeners by creating
+      Beam::Listener objects with the option of adding additional
+      metadata to the listener by extending the Beam::Listener class.
+      Thanks @djerius! (Github #16)
+
+    - Added a method (`listeners()`) to list the current listeners
+      (Beam::Listener objects) for an event. Thanks @djerius! (Github
+      #16)
+
+    [Fixed]
+
+    - The Beam::Emitter role no longer pollutes the consumer's namespace
+      with things from Types::Standard, Scalar::Util, and Carp. Thanks
+      @kentnl! (Github #13)
+
+      This could result in problems if you accidentally depended on this
+      behavior. To fix these problems, please import the correct subs
+      explicitly.
+
+    - The Beam::Emitter role now allows composing classes to use method
+      modifiers for the `subscribe` and `unsubscribe` methods.
+      Previously, if the composing class overrode either of those
+      methods, those changes would be ignored by the `on` and `un`
+      aliases. Now, the `on` and `un` aliases use proper method
+      resolution. This means that if you want to modify behaviors of
+      your class on subscribe and unsubscribe, you must only modify the
+      `subscribe` and `unsubscribe` methods. (Github #18)
+
+1.003     2016-11-11 21:35:53-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fix the unsubscribe callback (returned from the `subscribe`
+      method) throwing an exception if the emitter object has already
+      been destroyed. Since the unsubscribe callback has a weak
+      reference to the emitter object, we have to make sure the
+      reference still exists before using it to unsubscribe. Thanks
+      @djerius! (Github #14)
+
+    - Fix unsubscribing from an event during an event not firing all the
+      rest of the events properly. When using the unsubscribe callback
+      to create a one-time event handler, the emitter could miss the
+      next event listener (since we were looping over the listeners
+      array and modifying it in the loop). Now we loop over a copy of
+      the listeners array so that the original can be modified to remove
+      the listener we want. Thanks @djerius! (Github #15)
+
+1.002     2016-09-02 18:58:23-05:00 America/Chicago
+
+ - Update distribution settings
+
+1.001 2016-07-19T16:51:49
+ - use a better meta-syntactic variable
+ - fix circular references in unsubscribe callback
+ - return subref that removes the current subscriber
+ - upgrade perl in travis config
+ - remove ModuleBuild to prevent toolchain confusion
+
+1.000 2015-05-08T04:34:31Z
+ - fix typo in documentation
+ - remove private attribute from public documentation
+
+0.009 2015-05-08T04:34:01Z
+ - fix typo in documentation
+ - remove private attribute from public documentation
+
+0.008 2015-03-02T02:33:00Z
+ - add note about loading custom event classes
+ - add dzil plugin for prereqs and compile tests
+ - remove root dotfiles and root ini files from dist
+ - switch to dzil Git::GatherDir
+ - fix contributors dependency
+
+0.007 2015-01-04T14:30:47Z
+ - fix docs to remove return value from emit_args()
+ - fix link text to read more like a paragraph
+ - add tagline for advent article
+
+0.006 2015-01-04T02:55:56Z
+ - release v0.006
+ - fix POD errors and add SEE ALSO sections
+
+0.005 2015-01-04T02:46:14Z
+ - release v0.005
+ - add tutorial-style documentation
+ - add link to #beam on irc.perl.org
+
+0.004 2015-01-04T01:55:02Z
+ - release v0.004
+ - update Types::Standard to 0.008
+ - update copyright year
+ - add contributors dzil plugin for proper attribution
+ - only ignore bundles in the dist root
+ - only remove .ini files from the dist root
+ - add dzil tag annotation with name, date, and changelog
+
+0.003 2014-11-16T01:42:26Z
+ - release v0.003
+ - allow cpanfile to be dirty
+ - add new build artifacts
+ - fix dist.ini after copying from Beam-Wire
+ - interleave and update documentation for weaving
+ - clarify which method uses Beam::Event
+ - add more missing dependencies
+ - switch to Type::Tiny
+ - add missing Test::More dependency
+ - update dist.ini and add travis-ci
+ - add emit_args to give args directly to listeners
+ - update weaver.ini from new default skeleton
+ - add Build.PL to the base repo
+ - SurgicalPodWeaver -> PodWeaver
+
+0.002 2013-04-18T01:08:23Z
+ - update dist details to be higher kwalitee
+ - Update lib/Beam/Emitter.pm
+
+0.001 2013-02-15T07:47:31Z
+ - add README for github
+ - add dist directories to gitignore
+ - basic event class and emitter role

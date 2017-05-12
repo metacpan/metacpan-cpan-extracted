@@ -1,0 +1,159 @@
+
+=head1 NAME
+
+Box2D::b2Joint - Base joint class.
+
+=head1 SYNOPSIS
+
+  # Don't use this class directly, use a subclass.
+
+=head1 DESCRIPTION
+
+The base joint class. Joints are used to constraint two bodies together
+in various fashions. Some joints also feature limits and motors.
+
+=head1 METHODS
+
+=head2 GetAnchorA()
+
+Get the anchor point on bodyA in world coordinates. Implemented in
+C<Box2D::b2DistanceJoint>, C<Box2D::b2FrictionJoint>,
+C<Box2D::b2GearJoint>, C<Box2D::b2LineJoint>, C<Box2D::b2MouseJoint>,
+C<Box2D::b2PrismaticJoint>, C<Box2D::b2PulleyJoint>,
+C<Box2D::b2RevoluteJoint>, and C<Box2D::b2WeldJoint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Get the anchor point on bodyB in world coordinates. Implemented in
+C<Box2D::b2DistanceJoint>, C<Box2D::b2FrictionJoint>,
+C<Box2D::b2GearJoint>, C<Box2D::b2LineJoint>, C<Box2D::b2MouseJoint>,
+C<Box2D::b2PrismaticJoint>, C<Box2D::b2PulleyJoint>,
+C<Box2D::b2RevoluteJoint>, and C<Box2D::b2WeldJoint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetBodyA()
+
+Get the first body attached to this joint.
+
+Returns a C<Box2D::b2Body>
+
+=head2 GetBodyB()
+
+Get the second body attached to this joint.
+
+Returns a C<Box2D::b2Body>
+
+=head2 GetNext()
+
+Get the next joint the world joint list.
+
+Returns a C<Box2D::b2Joint>
+
+=head2 GetReactionForce( $inv_dt )
+
+Get the reaction force on body2 at the joint anchor in Newtons.
+Implemented in C<Box2D::b2DistanceJoint>, C<Box2D::b2FrictionJoint>,
+C<Box2D::b2GearJoint>, C<Box2D::b2LineJoint>, C<Box2D::b2MouseJoint>,
+C<Box2D::b2PrismaticJoint>, C<Box2D::b2PulleyJoint>,
+C<Box2D::b2RevoluteJoint>, and C<Box2D::b2WeldJoint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Get the reaction torque on body2 in N*m. Implemented in
+C<Box2D::b2DistanceJoint>, C<Box2D::b2FrictionJoint>,
+C<Box2D::b2GearJoint>, C<Box2D::b2LineJoint>, C<Box2D::b2MouseJoint>,
+C<Box2D::b2PrismaticJoint>, C<Box2D::b2PulleyJoint>,
+C<Box2D::b2RevoluteJoint>, and C<Box2D::b2WeldJoint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head2 GetType()
+
+Get the type of the concrete joint.
+
+Returns a C<Box2D::b2JointType>
+
+=head2 GetUserData()
+
+Get the user data pointer.
+
+=head2 IsActive()
+
+Short-cut function to determine if either body is inactive.
+
+Returns a C<bool>
+
+=head2 SetUserData( $data )
+
+Set the user data pointer.
+
+Parameters:
+
+=over 4
+
+=item * C<scalar> C<$data>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2DistanceJoint>
+
+=item * L<Box2D::b2FrictionJoint>
+
+=item * L<Box2D::b2GearJoint>
+
+=item * L<Box2D::b2LineJoint>
+
+=item * L<Box2D::b2MouseJoint>
+
+=item * L<Box2D::b2PrismaticJoint>
+
+=item * L<Box2D::b2PulleyJoint>
+
+=item * L<Box2D::b2RevoluteJoint>
+
+=item * L<Box2D::b2WeldJoint>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

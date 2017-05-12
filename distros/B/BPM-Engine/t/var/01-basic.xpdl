@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+  xmlns:deprecated="http://www.wfmc.org/2004/XPDL2.0alpha"
+  xmlns:sitecorp="http://schemas.sitecorporation.com/bpm"
+  xmlns:tns="http://schemas.xmlsoap.org/tns/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes"
+  xmlns:fn="http://www.w3.org/2004/07/xpath-functions"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" Id="01-basic.xpdl" Name="Basic Control Flow Patterns">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <DataFields>
+        <DataField Id="WhereToGo" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+        <DataField Id="pathtaken" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+    </DataFields>
+    <WorkflowProcesses>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp1" Name="WCP1: Sequence">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>Several tasks of a process are executed after each other. A task is enabled after the preceding task has finished and before the proceeding task has been started [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp1.A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp1.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp1.C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp1.A-B" Name="Transition" From="wcp1.A" To="wcp1.B"/>
+                <Transition Id="wcp1.B-C" Name="Transition" From="wcp1.B" To="wcp1.C"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp2" Name="WCP2+3: Parallel Split and Synchronization">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>A Parallel Split is a distinct point in a business process where a single branch is divided into two or more parallel branches which are executed concurrently [Aalst09]. A Synchronization is a distinct point in a business process where two or more different branches are merged into one single branch. It is called Synchronization because it expects all merged branches to be completed before going ahead with the process [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp2.A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp2.A-B"/>
+                                    <TransitionRef Id="wcp2.A-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp2.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp2.C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp2.D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="AND"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp2.A-B" Name="Transition" From="wcp2.A" To="wcp2.B"/>
+                <Transition Id="wcp2.A-C" Name="Transition" From="wcp2.A" To="wcp2.C"/>
+                <Transition Id="wcp2.B-D" Name="Transition" From="wcp2.B" To="wcp2.D"/>
+                <Transition Id="wcp2.C-D" Name="Transition" From="wcp2.C" To="wcp2.D"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp4" Name="WCP4+5: Exclusive Choice and Simple Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>An Exclusive Choice is a distinct point in a business process where a branch is divided into two or more branches enabling just one of these several branches [Aalst09]. A Simple Merge is a distinct point in a business process where two or more branches are merged into one single branch. Each incoming branch then activates the subsequent branch [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="wcp4.A" Name="A">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will follow to activity B, if you set it to C it will proceed to activity C, otherwise activity D will be executed</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <Performer>test</Performer>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="wcp4.A-B"/>
+                                    <TransitionRef Id="wcp4.A-C"/>
+                                    <TransitionRef Id="wcp4.A-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="wcp4.B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp4.C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp4.D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="wcp4.E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="wcp4.A-B" Name="Transition" From="wcp4.A" To="wcp4.B">
+                    <Condition Type="CONDITION">attribute('WhereToGo') == "B"</Condition>
+                </Transition>
+                <Transition Id="wcp4.A-C" Name="Transition" From="wcp4.A" To="wcp4.C">
+                    <Condition Type="CONDITION">attribute('WhereToGo') == "C"</Condition>
+                </Transition>
+                <Transition Id="wcp4.A-D" Name="Transition" From="wcp4.A" To="wcp4.D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="wcp4.B-E" Name="Transition" From="wcp4.B" To="wcp4.E"/>
+                <Transition Id="wcp4.C-E" Name="Transition" From="wcp4.C" To="wcp4.E"/>
+                <Transition Id="wcp4.D-E" Name="Transition" From="wcp4.D" To="wcp4.E"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+        <WorkflowProcess AccessLevel="PRIVATE" Id="WfPIMI_Subflow" Name="WfPIMI Subflow">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-09-07 04:04:45</Created>
+                <Description>not to be instantiated directly, but used only as a subflow process</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="P1" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="P2" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="sbflw_act" Name="Subflow activity">
+                    <Description>This is a subflow</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

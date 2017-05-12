@@ -1,0 +1,119 @@
+Revision history for Business-Fixflo
+
+0.28     2017-10-19
+        - Fix passing through of params when calling pager methods
+
+0.27     2017-10-17
+        - Add total_items and total_pages attributes to the
+          Business::Fixflo::Paginator object
+        - Change the ->next method to return an ARRAY ref to be
+          consistent with other methods
+        - Refactor some private methods in Business::Fixflo::Client
+        - Update fixflo_emulator.pl for recent changes in API
+
+0.26     2016-09-29
+        - Fix setting attributes to be more defensive to catch new
+          attributes that are not defined on objects
+        - Add WorksAuthorisationLimit to Business::Fixflo::Issue
+        - Add Created to Business::Fixflo::Issue
+        - Add UpdateDate to Business::Fixflo::Issue
+        - Add UpdateDate to Business::Fixflo::Agency
+        - Add UpdateDate to Business::Fixflo::Landlord
+        - Add Created to Business::Fixflo::Propery
+        - Add UpdateDate to Business::Fixflo::Propery
+
+0.25     2016-09-06
+        - Add FaultTree to Business::Fixflo::Issue
+        - Add SearchStatus to Business::Fixflo::Issue
+        - Add PropertyId to Business::Fixflo::Issue
+        - Add ExternalPropertyRef to Business::Fixflo::Issue
+        - Fix inconsistency between Firstname and FirstName on
+          Business::Fixflo::IssueDraft by adding around modifier
+          to set Firstname on B::F::IssueDraft
+
+0.24     2016-07-04
+        - Add Job to Business::Fixflo::Issue
+        - Fix bug in setting Address data on IssueDraft
+        - Add third party details to end_to_end_emulated.sh
+        - Update end_to_end_emulated.sh to match live API
+
+0.22     2016-05-12
+        - Transfer repo from G3S to Humanstate
+
+0.21     2016-04-26
+        - Add to KeyReference Property object
+
+0.20     2016-04-05
+        - Add request data to exception when parsing an envelope
+          that has Errors
+
+0.19     2016-03-04
+        - Add request to Business::Fixflo::Exception
+
+0.18     2016-03-03
+        - Add ContactNumberAlt, AdditionalDetails, and
+          ExternalRefTenancyAgreement to Issue object
+
+0.17     2016-02-18
+        - Fix add missing files to MANIFEST
+
+0.16     2016-02-17
+        - Fix paginator when items are objects rather than URLs
+
+0.15     2016-02-17
+        - Fix Firstname to FirstName on Business::Fixflo::IssueDraft
+        - Fix calling of to_hash on Address object if not an object
+        - Add emulator for Fixflo and end_to_end_emulated.sh
+
+0.14     2015-10-21
+        - Move github repo to Humanstate org
+
+0.13     2015-09-24
+        - Add TermsAcceptanceUrl and TermsAcceptanceDate to Agency object
+        - Fix population of object attributes to not die if an unknown
+          attribute is encountered in the data returned from Fixflo
+
+0.12     2015-09-16
+        - Add VulnerableOccupiers attribute to Issue object
+        - Add undelete method to Agency object
+        - Change delete method on Agency object to use POST
+
+0.11     2015-08-07
+        - Add PropertyAddressId attribute to Issue object
+
+0.10     2015-07-03
+        - Fix Property Issues and Addresses attributes to return objects,
+          since calls to this endpoint return a list of json objects and
+          not a list or url strings
+
+0.09     2015-07-02
+        - Fix Authorization header when using api_key
+
+0.08     2015-07-02
+        - Add create_url and search_url to Issue object
+        - Change cluck to carp
+        - Add perldoc for FIXFLO_DEBUG env variable
+
+0.07     2015-07-01
+        - Add Property attribute to Issue object
+        - Add ApiKey and Password attributes to Agency object
+        - Support use of api_key to access API
+
+0.06     2015-06-04
+        - Add Issues attribute to Property object
+
+0.05     2015-06-04
+        - Add get method to QuickViewPanel to make it easy to get at
+          the QuickViewPanel's data
+
+0.04     2015-05-27
+        - Clarify need to call ->get on Paginator objects in docs
+
+0.03     2015-05-27
+        - Fix call to GET Property endpoint
+
+0.02     2015-04-01
+        - Fixflo API updates added: Properties, PropertyAddresses, QVP
+
+0.01     2014-12-16
+        - First release

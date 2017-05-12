@@ -1,0 +1,69 @@
+Revision history for Perl extension Bio-Community.
+
+0.1.8 2016-01-08
+  - Script bc_relative_to_absolute will now round results if requested
+  - IdConverter can now append or prepend in addition to replacing IDs
+  - More robust FormatGuesser
+  - Extended detection of generic file format
+  - Handling of relative abundances in unifrac file format
+  - Much faster Sampler tool, courtesy of the Math::GSL modules
+  - All random number duties relegated to Math::GSL
+  - Speed optimizations in Community module
+
+0.1.7 2014-05-28
+  - Support for QIIME files containing alternative taxonomic header (reported
+    by Brian Kemish and Jason Steen).
+  - Support sampling 0 members and Sampler and Rarefier object re-use
+  - Option to silently drop communities with low member count in Rarefier
+  - New Accumulator module for collector and rarefaction curves
+  - Option names pluralized to -alpha_types and -beta_types in bc_measure_alpha
+    and bc_measure_beta for clarity
+
+0.1.6 2014-04-29
+  - New script, bc_manage_members, to rename and remove given community members
+  - Added new richness estimators to Bio::Community::Gamma: Chao-2 (suggested by
+    Renato Santos), ICE and jackknife (first & second-order)
+  - Added first and second-order jackknife estimators to Bio::Community::Alpha
+  - ACE estimator of richness now falls back to Chao-1 in special case (as
+    advised by Anne Chao and implemented in EstimateS)
+
+0.1.5 2014-03-12
+  - Bio::Community::next_member is faster and now returns identical objects
+  - In generic and unifrac drivers, write member description if available, or
+    ID otherwise
+  - Renamed Bio::Tools::RepresentativeIdConverter to Bio::Tools::IdConverter.
+    Renamed the corresponding script from bc_use_repr_id to bc_convert_ids. In
+    both module and script, added support for BLAST tabular files and conversion
+    from member description.
+  - Added script bc_add_taxonomy that adds a taxonomic lineage when members have
+    a valid taxonomic ID
+  - Rarefaction module and script can now assume an infinite number of bootstrap
+    repetitions
+
+0.1.4 2014-02-10
+  - Changes to script bc_measure_distance:
+    * Renamed to bc_measure_beta
+    * Can now be passed a list of metrics to compute
+  - New script to calculate alpha diversity, bc_measure_alpha
+  - Alpha diversity metrics in Bio::Community::Alpha more robust to special cases
+  - Bio::Community::Gamma can now use the same metrics as Bio::Community::Alpha
+  - bc_manage_samples script now supports wildcards
+  - More accurate arithmetic comparisons in Bio::Community::Tools::Summarizer
+
+0.1.3 2014-01-23
+  - Added new Beta diversity measures: Sorensen, Jaccard and Morisita-Horn
+  - Implemented a Rarefier pseudo-random number generator seed option
+  - Fixed bc_correct_mis_assignments script crash under perl 5.12 (reported
+    by an anonymous reviewer)
+  - Windows compatibility fix in the Table role (patched by Francisco J.
+    Ossandon)
+  - Removed an "undefined value" warning in the Table role
+
+0.1.2 2013-11-28
+  - Fixed code that does not work with released BioPerl version
+
+0.1.1 2013-11-22
+  - Use a released version of BioPerl
+
+0.1.0 2013-10-28
+  - Initial release 

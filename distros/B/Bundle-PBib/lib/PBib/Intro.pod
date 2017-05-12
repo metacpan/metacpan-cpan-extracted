@@ -1,0 +1,234 @@
+=head1 NAME
+
+PBib Intro - The PBib Input Document Format and Styles
+
+=head1 SYNOPSIS
+
+	perl pbib.pl I<filename>
+	pbib I<filename>
+	PBibTk.pl I<filename>
+
+=head1 INTRODUCTION
+
+This is a short introduction to the L</PBib Input Document Format> and provided L</PBib Styles>. You may first want to read L<PBib::PBib/QUICK START> how to get pbib running.
+
+=head1 PBib Input Document Format
+
+=head2 PBib Fields
+
+In your document, there can be three types of fields that are 
+interpreted by PBib.
+
+=over
+
+=item B<[[I<reference>]] or [[I<ref 1>], [I<ref 2>]]>
+
+A reference to some material, paper, document, whatever ... (BibTeX' \cite{...}). You can also cite several references within the 
+same field.
+
+The references are identified with their "CiteKey" which is specified 
+in the bibliography database. It depends on the database type, how 
+the CiteKey is specified. BibTeX places the CiteKey before listing 
+other fields (see also L</PBib Reference Types> below):
+
+	@inproceedings{BEACH-ConnecTables,
+	   author = {Peter Tandler and Thorsten Prante and Christian M{\"u}ller-Tomfelde and Norbert Streitz and Ralf Steinmetz},
+	   title = {ConnecTables: Dynamic Coupling of Displays for the Flexible Creation of Shared Workspaces},
+	   booktitle = {Proceedings of 14th Annual ACM Symposium on User Interface and Software Technology (UIST'01)},
+	   location = {Orlando, Florida, USA},
+	   pages = {11--20},
+	   publisher = {ACM Press, New York, NY},
+	   month = {Nov. 11-14},
+	   year = {2001},
+	   url = {http://ipsi.fraunhofer.de/ambiente/publications/},
+	}
+
+In this example "BEACH-ConnecTables" is the CiteKey (while "@inproceedings" is the CiteType). This paper can be referenced in
+the text as [[BEACH-ConnecTables]].
+
+
+=item B<[{}] or [{“Authors” LIKE ‘%Tandler%’}]>
+
+The list of references, which may include filters. The filters are
+specified as a subset of SQL's "where" clause syntax. Not all bibliography database formats support filters.
+
+
+=item B<[< I<some comment> >] or [# I<some todo marker> #]>
+
+This can be used for placing comments in the input document while
+writing. It is formatted by PBib or removed (if PBib is run in the 
+"final" mode).
+
+=back
+
+=head3 Examples
+
+	One major property of ubiquitous computing environments 
+	is the heterogeneity of the available devices. In order 
+	to provide a “coherent user experience” [[EasyLiving-Technologies], [Roomware-NextGeneration]], 
+	the “system must have a deeper understanding of the 
+	physical space” [[EasyLiving-Technologies], p. 3].
+
+	References
+	[{}]
+
+	Peter’s References
+	[{“Authors” LIKE ‘%Seitz%’ or “Authors” LIKE ‘%Tandler%’}]
+	
+	[< add some more detailed example here >]
+	[## I think I should clarify this! ##]
+
+
+=head2 PBib Field Options
+
+You can add options to PBib fields that control how a L<style|/PBib Styles> 
+formats the field. Options are 
+specified at the beginning of a field, starting with a colon.
+
+I<Please note:> Not all styles support all options. Not all options 
+can be combined.
+
+	[ :I<option1> :I<option2> ... | [I<references>] ]
+
+=over
+
+=item B<:inline>
+
+Styles that use the authors' names to generate the reference, 
+are instructed to inline the author's name in the text. For example, the Label Style "Name" generates "Tandler (2001)" instead of 
+"(Tandler, 2001)" if the inline option is given. This can be used
+if the authors name is used as part of a sentence, e.g. "Tandler (2001) introduced the idea of ..." can be written "[ :inline |
+[BEACH-ConnecTables]] introduced the idea of ...".
+
+	[:inline|[COAST-Model]]
+	[:inline|[COAST-Model], p. 4]
+	[ : inline :   etal  = 5  |  [COAST-Model], p. 3]
+
+=item B<:noauthor>
+
+The author's name is suppressed. The Label Style "Name" only outputs the year, e.g. "[ :noauthor | [BEACH-ConnecTables]]" generates "(2001)". Use this, if you have mentioned the author's name already 
+in the text yourself, e.g. "Tandler [ :noauthor | [BEACH-ConnecTables]] introduced ...".
+
+=item B<:noparens>
+
+The parentheses around the reference are suppressed, e.g. "Tandler, 2001" instead of "(Tandler, 2001)". You can use this if you place the 
+reference inside parentheses yourself.
+
+=back
+
+I<Hint:> You can process this introduction (i.e. the text you are just reading) with pbib to get an idea of 
+how the fields are formatted. (Be sure to change to the F<docs> directory so that PBib finds the right F<local.pbib> configuration file.
+
+
+
+=head1 PBib Styles
+
+To specify which style should be used for a document, the easiest way is to use one of the predefined styles from the F<styles> directory. For a document F<I<filename.ext>> PBib searches for a PBib style file called F<I<filename>.pbib> or F<I<filename.ext>.pbib>. In this file you can include the predefined style with the C<include> statement, e.g. C<include styles/IEEE/TR.pbib>.
+
+
+=head2 Custom Styles
+
+There are two ways of defining custom styles. Adding PBib Style classes (which requires writing perl code) and combining the PBib styles in a custom way. Here, a very brief introduction for the later is given.
+
+PBib styles are combined from four sub-styles, that each is configured by a couple of configuration entries. The sub-styles are:
+
+=over
+
+=item B<Bibliography Style> (C<bib>)
+
+The overall style for the list of references.
+
+=item B<Bibliography Item Style> (C<item>)
+
+The style to format each entry (item) within the list of references.
+
+=item B<Label Style> (C<label>)
+
+The label for references, used both at the citation and the list of references.
+
+=item B<Reference Style> (C<ref>)
+
+The style to format the reference (citation) within the text.
+
+=back
+
+For now, please look at the provided styles in the F<styles> directory and the perl style classes 
+L<PBib::BibliographyStyle|PBib::BibliographyStyle>, 
+L<PBib::BibItemStyle|PBib::BibItemStyle>,
+L<PBib::LabelStyle|PBib::LabelStyle>, and
+L<PBib::ReferenceStyle|PBib::ReferenceStyle>.
+
+
+
+=head1 PBib Reference Types
+
+PBib supports the reference types as BibTeX and bp, with some additions / modifications. 
+
+Please, take a look at F<docs/CiteTypes.sxc> for more information.
+(I<Note:> The reference types are implemented in class L<PBib::BibItemStyle|PBib::BibItemStyle>.)
+
+=over
+
+=item B<article>
+
+[[BEACH-AppModel+FW]]
+
+=item B<book>
+
+[[BuildAppFWs], [Carroll-HCIMillennium]]
+
+=item B<booklet>
+
+=item B<inbook>
+
+=item B<incollection>
+
+[[Roomware-NextGeneration], [Multimodal-UI-Design]]
+
+=item B<inproceedings, conference>
+
+[[COAST-Model], [BEACH-ConnecTables]]
+
+=item B<journal>
+
+[[CACM.CFW], [CACM.OOFW]]
+
+=item B<manual>
+
+[[COAST-Overview], [VisualWorks-UsersGuide]]
+
+=item B<thesis, masterthesis, phdthesis>
+
+[[BEACH-ContextMaker], [Jacobsen-SoftwareModelling], [Nowack-Structures+Interactions], [Schilit-PhDThesis]]
+
+=item B<misc>
+
+=item B<proceedings>
+
+[[UIST01], [HUC00]]
+
+=item B<report>
+
+[[Gaia-AppModel], [Groupware-Architectures]]
+
+with new label (RepType): [[Pebbles-Amulet]]
+
+=item B<unpublished, email>
+
+=item B<url, web>
+
+[[COAST-Homepage], [VisualWorks-Homepage], [SMART-Homepage], [iRoom-Homepage], [Pebbles-Homepage]]
+
+=item B<talk, speech, slides>
+
+[[BEACH-ConnecTables-slides], [BEACH-SyncCollaboration-slides]]
+
+=item B<patent>
+
+[[Cooltown-EmbeddedWebAccess]]
+
+=item B<avmatierial, video, cdrom, poster>
+
+=back
+
+=cut

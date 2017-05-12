@@ -1,0 +1,7 @@
+Bundle::WWW::Scraper::Job - A bundle to install all Job scraper engines.
+
+There are two steps in installing this Bundle.
+
+cpan> install G/GL/GLENNWOOD/Bundle-WWW-Scraper-Job-<ver>.tar.gz
+...
+cpan> install Bundle::WWW::Scraper::Job

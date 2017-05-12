@@ -1,0 +1,124 @@
+--
+-- PostgreSQL database dump
+--
+
+SET client_encoding = 'UTF8';
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+
+--
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON SCHEMA public IS 'Standard public schema';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: child; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE child (
+    id serial NOT NULL,
+    name character varying,
+    birth_day date,
+    created timestamp with time zone,
+    modified timestamp with time zone,
+    parent integer
+);
+
+
+ALTER TABLE public.child OWNER TO postgres;
+
+--
+-- Name: child_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval(pg_catalog.pg_get_serial_sequence('child', 'id'), 1, false);
+
+
+--
+-- Name: parent; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE parent (
+    id serial NOT NULL,
+    "names" character varying,
+    address character varying,
+    created timestamp with time zone,
+    modified timestamp with time zone,
+    city character varying,
+    state character varying DEFAULT 'KS'::character varying,
+    zip character varying,
+    phone character varying
+);
+
+
+ALTER TABLE public.parent OWNER TO postgres;
+
+--
+-- Name: parent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval(pg_catalog.pg_get_serial_sequence('parent', 'id'), 1, false);
+
+
+--
+-- Data for Name: child; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY child (id, name, birth_day, created, modified, parent) FROM stdin;
+\.
+
+
+--
+-- Data for Name: parent; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY parent (id, "names", address, created, modified, city, state, zip, phone) FROM stdin;
+\.
+
+
+--
+-- Name: child_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY child
+    ADD CONSTRAINT child_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: parent_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY parent
+    ADD CONSTRAINT parent_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: child_parent_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY child
+    ADD CONSTRAINT child_parent_fkey FOREIGN KEY (parent) REFERENCES parent(id);
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+

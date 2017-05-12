@@ -1,0 +1,26 @@
+DESCRIPTION
+-----------
+Business::CUSIP - Verify Committee on Uniform Security Identification 
+Procedures Numbers
+
+This module helps verify CUSIPs, which are financial security identifiers 
+issued by the Standard & Poor's Company. This module cannot tell if a CUSIP 
+references a real security, but it can tell you if the given CUSIP is properly
+formatted.
+
+INSTALLATION
+------------
+This is a simple module. The typical installation routine should work fine.
+
+  perl Makefile.PL
+  make test
+  make install
+
+COPYRIGHT
+---------
+Copyright (c) 2001 Tim R. Ayers. All rights reserved. 
+
+LICENSE
+-------
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

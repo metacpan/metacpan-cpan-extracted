@@ -1,0 +1,5 @@
+classes:
+  - hw.acpi
+parameters:
+  pkg:
+    - linux-image-486

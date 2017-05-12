@@ -1,0 +1,37 @@
+Revision history for Perl extension Bundle::CPANReporter2
+
+0.10+0.11  2014-08-25 rurban
+      - HTML::Parser 3.71 gone missing by LWP::Protocol::https
+      - bump all versions to latest
+      - publish to github
+      - auto-generate SIGNATURE
+
+0.09  2014-04-24 rurban
+      - CPAN::Reporter	1.2011
+
+0.08  2014-04-24 rurban (not uploaded)
+	- bump lots of versions for CPAN::Reporter to deal with new CPAN reqs
+        - switch from Crypt::SSLeay to LWP::Protocol::https with IO::Socket::SSL and Net::SSLeay
+          to support hostname verification
+
+0.07  2011-10-24 rurban
+	- Params::Util required by Data::GUID (missing dep)
+
+0.06  2011-09-02 rurban
+	- added Params::Util
+
+0.05  2011-05-23 rurban
+	- added Encode::Locale
+
+0.04  2010-08-28 rurban
+	- added Digest::HMAC_MD5, Net::IP
+
+0.03  2010-08-25 rurban
+	- reordered and added more missing modules
+
+0.02  2010-08-24 rurban
+	- remove duplicate =head1 CONTENTS
+	- added SIGNATURE
+
+0.01  2010-08-24 rurban
+	- original version as uploaded to CPAN

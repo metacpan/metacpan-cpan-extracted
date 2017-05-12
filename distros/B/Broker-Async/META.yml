@@ -1,0 +1,37 @@
+---
+abstract: 'broker tasks for multiple workers'
+author:
+  - 'Mark Flickinger <maf@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Future: '0.26'
+  List::Util: '0'
+  Test::Fatal: '0'
+  Test::LeakTrace: '0'
+  Test::More: '0'
+  parent: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Broker-Async
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Class::Tiny: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/mark-5/p5-broker-async/issues
+  homepage: https://github.com/mark-5/p5-broker-async
+  repository: https://github.com/mark-5/p5-broker-async.git
+version: v0.0.6
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

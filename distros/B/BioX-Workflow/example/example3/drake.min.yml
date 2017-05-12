@@ -1,0 +1,28 @@
+---
+plugins:
+    - Drake
+global:
+    - indir: data/raw
+    - outdir: data/processed
+    - file_rule: (.csv)$
+    - min: 1
+rules:
+    - backup:
+        local:
+            - INPUT: "{$self->indir}/{$sample}.csv"
+            - OUTPUT: "{$self->outdir}/{$sample}.csv"
+            - thing: "other thing"
+        process: |
+            cp $INPUT $OUTPUT
+    - grep_VARA:
+        local:
+            - OUTPUT: "{$self->outdir}/{$sample}.grep_VARA.csv"
+        process: |
+            echo "Working on {$self->{indir}}/{$sample.csv}"
+            grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv \
+            || touch {$self->OUTPUT}
+    - grep_VARB:
+        local:
+            - OUTPUT: "{$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv"
+        process: |
+            grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv || touch {$self->OUTPUT}

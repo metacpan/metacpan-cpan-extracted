@@ -1,0 +1,85 @@
+Revision history for Perl extension Business::BancaSella.
+
+0.12 (2008-04-18)
+=================
+- Add support for US Dollar and others.
+
+0.12 (2003-07-24)
+=================
+- Changed Makefile.PL to check required modules.
+- Correct a problem while encoding Gestpay parameters
+- For Gestpay module we added possibility to define an hash of user personalized
+  key => value that it can be processed by Banca Sella as defined in the control 
+  panel of Banca Sella profile manager.
+
+0.11 (2002-01-17)
+=================
+- Removed library Class::MethodMaker from all classes. Now Class:MethodMaker 
+  is neither required nor optional library.
+- Changes library directory structure sorces to use CPAN standard structure.
+- Added Business::BancaSella::Ric::FileFast and 
+  Business::BancaSella::Ris::FileFast classes to use Ric and Ris ascii file
+  alphabetically sorted to improve key search and extract. This classes are 
+  written by Marco Gazerro, Mauro Fedele. This classes implements
+  a method "prepare" that create sorted ascii files from standand Banca Sella
+  ascii files (those used by Business::BancaSella::Ri*::File).
+- Created test files for Business::BancaSella::Ri*::FileFast.
+- Added prepare method to Business::BancaSella::Ri*::File that...don't do 
+  nothing :). Set it only for interface compatibility
+- Added extract method to Business::BancaSella::Ris::File that check password
+  and return false if not found, else remove password from OTP file.
+- Added prepare method to Business::BancaSella::Ri*::Mysql that appends otp
+  available in an ascii file into mysql table.
+- Added extract method to Business::BancaSella::Ris::Mysql that check password
+  and return false if not found, else remove password from OTP file.
+- Added documentation for Business::BancaSella::Ri*::FileFast.
+- Business::BancaSella::Ris::Mysql don't return an error if trying to remove
+  an unexistent otp. Added raise error.
+- Error calculating boolean method "result" in 
+  Business::BancaSella::Decode::Gateway
+- Business::BancaSella::Ric::File use the same algoritm for extract method than
+  Business::BancaSella::Ric::FileFast.
+- Business::BancaSella::Ris::File now use lock file when deleting ris password.
+
+0.10 (2002-01-08)
+=================
+- First CPAN available module.
+- According to CPAN namespace structure changed module namespace to
+  Business::BancaSella.
+- In the compatibility Gateway system amount must be set in EURO not in italian
+  Lire. Change documentation and testing code.
+- Added and enlarged documentation.
+
+0.09 (2002-01-02)
+=================
+- Business::BancaSella::Ris::Mysql and Business::BancaSella::Ric::Mysql uses 
+  selectrow_arrayref to extract OTP. But this method doesn't exist in older
+  DBI library version. Now uses selectrow_array.
+- Decode_Gestpay.t failed to compile because use an old interface. Resync
+  code with new interface.
+- Added Business::BancaSella::Gateway, Business::BancaSella::Encode::Gateway 
+  Business::BancaSella::Decode::Gateway for the Gateway compatibility online payment
+  system.
+- Added documentation for all modules.
+
+0.08 (2001-12-26)
+=================
+- Added Business::BancaSella::Ric::Mysql and Business::BancaSella::Ris::Mysql modules.
+
+0.07 (2001-12-17)
+=================
+- Make some clean in dir stricture of project.
+- Delete Gateway class because Banca Sella will dismiss support for this payment
+  system owing to the fact that it doesn't support EURO currency.
+  
+0.06 (2001-07-19)
+=================
+- Added optional credit card infos send to Banca Sella in the case webmaster 
+  want to acquire credit card infos in his web site and send this infos to
+  Banca Sella only for check them.
+  
+0.05 (2001-07-18)
+=================
+- Added  Business::BancaSella::Ris::File e Business::BancaSella::Ric::File library
+  and related tests.
+

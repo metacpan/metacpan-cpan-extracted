@@ -1,0 +1,125 @@
+Revision history for Perl extension Bio::Homology::InterologWalk.
+
+0.58	Wed Feb 1 12:28:53 2012
+	-get_forward_orthologies(): fixed bug provoking exception when using 'all' DBs
+        -get_backward_orthologies(): fixed bug provoking exception when using 'all' DBs
+
+0.57	Tue Nov 1 14:41:07 2011
+	-improved documentation
+        -setup_ensembl_adaptor(): added support for set_reconnect_when_lost() - introduced in API v64
+
+
+0.55	Thu Sep 8 15:06:45 2011
+	interface changes:
+        - get_direct_interactions(): introduced flag to allow for retrieval of chimeric (taxonA != taxonB)
+          PPIs if desired
+        - do_attributes(): removed label_type flag. Now only "external name" can be used to populate
+          name attribute file
+        - do_attributes(): introduced 'label_chimeric' to comply with changes in get_direct_interactions().
+          Introduced dynamic retrieval of gene_adaptor to find chimeric species and label gene names by
+          species name
+        bugfixes:
+        - _get_interactor_name(): fixed (gene name) problem due to intact change
+        - _get_ens_id_from_props(): included 'flybase' case due to intact change in properties field
+        - _get_ens_id_from_props(): introduced ensembl ID count: if only 1, accepted, if more, ambiguous case.
+
+0.52    Wed Aug 17 12:09:02 2011
+        - removed hard-coded species hash
+        - updated interface and documentation
+        - added warnings for unsupported usage of non-metazoan Ensemblgenomes species
+        - get_backward_orthologies(): introduced basic support for NCBI taxonomy climb for cases of unrecognised taxon
+          scientific name/taxon id
+
+0.511   Sat Aug 6 10:56:09 2011
+        - updated species hash in main module
+
+0.510   Thu Jul 21 18:06:34 2011
+	- removed no_output flags throughout
+        - documentation update
+        - changed get_forward_orthologies() interface to explicity allow appending data to partial file after
+          remote connection failure
+
+0.505   Fri Jul 1 16:10:52 2011
+	- naming corrections
+        - documentation update
+
+0.501   Sat May 7 14:02:02 2011
+	- compute_confidence_score(): boolean variables restored
+        - corrected version bug
+
+0.5   Fri May 6 12:46:25 2011
+	- First Beta Release
+        - _get_ens_id(): added cygid option to deal with embedded yeast ids
+        - merged get_ensembl_id_from_ensembl() and get_ensembl_id_from_uniprot()
+        - merged all duplicates between the pacakges: Bio::Homology::InterologWalk and
+          Bio::Homology::InterologWalk::Direct
+        - get_direct_interactions(): rewritten and moved to Bio::Homology::InterologWalk
+        - removed Bio:Homology::InterologWalk::Direct package. All unmerged subroutines moved to
+          Bio::Homology::InterologWalk
+        - get_interactions(): rewritted to gather 'properties' field from MITAB data
+        - get_backward_orthologies(): rewritten to use 'properties' field from MITAB data 
+        - _clean_ids(): removed
+
+0.12  Wed Jan 12 12:07:01 2011
+        - Modified Makefile.PL  to avoid failing tests when prerequisite
+          software on testers' machines is missing
+
+0.11  Thu Dec 16 11:45:26 2010
+        - InterologWalk.pm: introduced look-up table for Genomes Taxa
+        - changed db names throughout for better readability
+        - setup_ensembl_adaptor(): fixed pan_homology bug
+        - setup_ensembl_adaptor(): removed 'default' db
+        - get_forward_orthologies(): updated docs
+        - get_forward_orthologies(): introduced genome name check when taxon id fails
+        - get_backward_orthologies(): updated docs
+        - get_backward_orthologies(): introduced genome name check when taxon id fails
+        - process_homologies(): introduced protein adaptor check
+
+0.09  Tue Oct 19 18:45:26 2010
+        - fixed undefined canonical peptide member bug in _process_homologies()
+        - fixed registry timeout bug in compute_multiple_taxa_mean()
+
+0.08  Thu Oct 07 12:12:26 2010
+        - removed commented lines in doScores.pl
+        - fixed empty candidate bug in get_backward_orthologies()
+
+0.07  Tue Oct 05 14:50:26 2010
+        - rewrote _process_homologies() to get rid of "possible_ortholog"
+          paralogy class
+        - fixed extension bug in getDirectInteractions.pl
+
+0.06  Sat Sep 18 19:50:26 2010
+        - introduced new method for computing conservation score for the
+          putative PPI: compute_conservation_score(). Status is experimental.
+        - rewritten doScores.pl to show usage of compute_conservation_score().
+        - rewritten Makefile.PL with new prerequisite checking scheme.
+        - rewritten interface to _build_query_options().
+        
+0.05  Thu Sep 09 18:50:26 2010
+        - do_attributes() now writes two attribute files: name attribute
+          and novel id attribute.
+        - Interface redesigned for do_networks() and do_attributes()
+          to simplify introduction of new node attribute file
+        - sample usage file doNets.pl rewritten to show usage of new interface
+          for the two methods
+
+0.04  Fri Sep 03 01:09:26 2010
+        - removed version bug
+        - removed local library requirement in test script
+
+0.03  Thu Sep 02 15:42:09 2010
+        - Relaxed Perl Version Requirement to 5.8.6
+        - fixed input namefile bug in getDirectInteractions.pl
+        - Removed DBI requirement (implicitly required by DBD::CSV)
+        - included MAC note in README
+        - changed arguments in compute_multiple_taxa_mean() in doScores.pl
+        - included "usage" conditions in doScores.pl and doNets.pl. No "default" filename anymore:
+          ensembl version in filename is dynamic, it would have broken soon.
+
+0.02  Tue Aug 31 09:51:26 2010
+        - POD reformatted
+
+0.01  Sun Aug 29 19:09:26 2010
+	- original version; created by h2xs 1.23 with options
+		-XA -n Bio::Homology::InterologWalk
+

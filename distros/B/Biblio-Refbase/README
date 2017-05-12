@@ -1,0 +1,101 @@
+Biblio::Refbase
+===============
+
+Biblio::Refbase is an object-oriented interface to refbase
+Web Reference Database sites.
+
+refbase (http://www.refbase.net/) is a web-based bibliographic manager
+which can import and export references in various formats (including BibTeX,
+Endnote, MODS and OpenOffice).
+
+
+SYNOPSIS
+
+    use Biblio::Refbase;
+
+    my $refbase = Biblio::Refbase->new(
+      url      => 'http://beta.refbase.net/',
+      user     => 'guest@refbase.net',
+      password => 'guest',
+    );
+    my $response = $refbase->search(
+      keywords => 'baltic sea',    # Search in keywords.
+      style    => 'Chicago',       # Set citation style.
+    );
+    if ($response->is_success) {   # all methods from
+      if ($response->hits) {       # HTTP::Response
+        print $response->content;  # available
+      }
+      else {
+        print 'Nothing found!';
+      }
+    }
+    else {
+      print 'An error occurred: ', $response->status_line;
+    }
+    print "\n\n";
+
+    $response = $refbase->upload(
+      user       => 'user@refbase.net',  # Switch user for
+      password   => 'user',              # this request.
+      show       => 1,                   # Return records
+      format     => 'BibTeX',            # in BibTeX format.
+      source_ids => [                    # Upload records
+        'arXiv:cs/0106057',              # from arXiv.org
+        'arXiv:cond-mat/0210361',        # via source IDs.
+      ],
+    );
+    if ($response->is_success) {
+      print 'Number of records imported: ', $response->rows   , "\n";
+      print 'ID range of records: '       , $response->records, "\n";
+      print "Records:\n\n",  $response->content;
+    }
+
+    # Upload records by supplying a string of content:
+    # $response = $refbase->upload( content => $content );
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+    HTTP::Request::Common
+    HTTP::Response
+    HTTP::Status
+    LWP::UserAgent
+    Test::More 0.62+      (required by "make test")
+    URI
+    URI::QueryParam
+
+
+DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command:
+
+    perldoc Biblio::Refbase
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008-2010 Henning Manske. All rights reserved.
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/
+
+This module is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

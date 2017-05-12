@@ -1,0 +1,35 @@
+Bundle-DBWIZ version 0.01
+=========================
+
+This Bundle will install the key Perl modules required to run DBWIZ
+
+(http://dbwiz.lib.sfu.ca)
+
+Modules intalled:
+
+Class::DBI 
+Class::DBI::mysql 
+Module::Build 
+Exception::Class 
+Exception::Class::DBI 
+SQL::Abstract 
+MIME::Tools 
+SOAP::Lite 
+Parallel::ForkManager 
+Data::Serializer 
+Time::HiRes 
+Apache::Session::File 
+Template 
+YAML 
+Net::IPAddress 
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Calvin Mah, Simon Fraser University
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

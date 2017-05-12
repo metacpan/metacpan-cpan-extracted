@@ -1,0 +1,86 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::Guide - 导读
+
+=head1 DESCRIPTION
+
+=head2 建议
+
+个人浅见
+
+=over 4
+
+=item * 多写代码，多写文章
+
+读一本书仅仅读一次是没有多大用处的。只有亲手编写代码一次，才有一半是你的。当你用自己的理解写出一篇文章，这才说明有 90% 是你的。
+
+=item * 阅读好的代码
+
+代码的好坏在于你阅读下来是不是一切都很顺畅。
+
+=item * 帮助回答问题
+
+谦虚和礼貌
+
+=item * 参与协作，贡献自己的代码
+
+将你所有的代码放到网上。不将代码放到公众处只有两个原因，一是不能，二是不敢。
+
+全程跟踪一个项目的发展对你将有很大的帮助。
+
+想参与一个公众项目时，先提交代码或补丁，显示你的能力和善意。
+
+=back
+
+=head2 全文导读
+
+=over 4
+
+=item * 前言 L<Book::Chinese::MasterPerlToday::Preface>
+
+=item * 导读 Book::Chinese::MasterPerlToday::Guide
+
+=item * L<Book::Chinese::MasterPerlToday::BeACPANTester>
+
+=item * L<Book::Chinese::MasterPerlToday::BeACPANAuthor>
+
+=item * L<Book::Chinese::MasterPerlToday::Moose>
+
+=item * L<Book::Chinese::MasterPerlToday::DBIx-Class>
+
+=item * L<Book::Chinese::MasterPerlToday::Template>
+
+=item * L<Book::Chinese::MasterPerlToday::Catalyst>
+
+=back
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

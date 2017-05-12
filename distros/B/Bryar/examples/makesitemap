@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use Bryar;
+
+my $basedir = '/var/www/blog/';
+
+my $blog = Bryar->new(
+	datadir		=> $basedir . 'data',
+	renderer	=> 'Bryar::Renderer::SiteMap',
+	sitemap_static_files	=> [ qw(blogroll.opml foaf.rdf) ],
+	sitemap_static_basedir	=> $basedir,
+);
+
+my @documents = $blog->config->source->all_documents($blog->config);
+
+my $map = $blog->config->renderer->generate('object', $blog, @documents);
+
+$map->write($basedir . 'sitemap.xml.tmp.gz')
+	or die "cannot create sitemap.xml.tmp.gz: $!";
+rename($basedir . 'sitemap.xml.tmp.gz', $basedir . 'sitemap.xml.gz')
+	or die "cannot rename tmp file to sitemap.xml.gz: $!";
+
+exit 0;
+

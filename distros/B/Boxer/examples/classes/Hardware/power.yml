@@ -1,0 +1,13 @@
+classes:
+  - hw.acpi.full
+  - Admin.etc.functions
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      tweak:
+        - sleep when lid is closed
+  pkg-avoid:
+    - cpufrequtils
+  tweak:
+    - _setvar /target/etc/default/acpi-support LID_SLEEP true

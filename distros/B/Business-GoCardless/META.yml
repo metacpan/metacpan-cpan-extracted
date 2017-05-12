@@ -1,0 +1,43 @@
+---
+abstract: unknown
+author:
+  - 'Lee Johnson <leejo@cpan.org>'
+build_requires:
+  FindBin: '0'
+  LWP::Simple: '6'
+  Test::Deep: '0.112'
+  Test::Exception: '0.32'
+  Test::MockObject: '1.20140408'
+  Test::Most: '0.31'
+  Try::Tiny: '0.22'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-GoCardless
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  JSON: '2.9'
+  LWP::Protocol::https: '6'
+  LWP::UserAgent: '6'
+  MIME::Base64: '0'
+  Moo: '1.006'
+  POSIX: '0'
+  Throwable: '0.200011'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Humanstate/business-gocardless/issues
+  homepage: https://metacpan.org/module/Business::GoCardless
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Humanstate/business-gocardless
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

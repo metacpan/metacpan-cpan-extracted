@@ -1,0 +1,16 @@
+prefix,watch more specifics,watch covering,resolves,authoritative for
+[% FOREACH prefix IN DATA %]
+[% count = 0 %]
+[% FOREACH d IN prefix.domains %]
+[% count = 1 %]
+[% prefix.prefix %],[% prefix.watch_more_specifics %],[% prefix.watch_covering %],[% d.domain %],
+[% END %]
+[% FOREACH af IN prefix.authoritative_for %]
+[% count = 1 %]
+[% prefix.prefix %],[% prefix.watch_more_specifics %],[% prefix.watch_covering %],,[% af.domain %] 
+
+[% END %]
+[% IF count == 0 %]
+[% prefix.prefix %],[% prefix.watch_more_specifics %],[% prefix.watch_covering %],,
+[% END %]
+[% END %]

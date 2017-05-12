@@ -1,0 +1,16 @@
+Revision history for Business-LCCN
+
+1.01    2011-07-05
+        Import Scalar::Util's blessed
+
+1.00    2009-08-10
+        Call ref before using Moose::blessed; tests show some broken blessed
+
+0.12    2008-04-19
+        Put pod coverage test in todo mode
+
+0.11    2008-04-08
+        Documented "original" method, minor internal code cleanliness
+
+0.10    2008-04-06
+        First version

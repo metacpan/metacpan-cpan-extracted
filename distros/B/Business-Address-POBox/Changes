@@ -1,0 +1,60 @@
+Revision history for Perl extension Business-Address-POBox
+
+1.101230  2010-05-03 16:16:44 Europe/Vienna
+    - New rules: an address containing a P.O.Box is still considered ok if it
+      contains other words that might be a street address. So [Au 7, PF 23] is
+      ok, as it [Universitaetsstrasse 23, Post Box 11].
+
+1.100820  2010-03-23 19:35:36 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.10 Mon May  4 16:29:37 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - 'Alte Post' was falsely recognized as a POBox; fixed
+
+0.09  Fri Dec 12 11:51:11 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - 'Am Steinkopf 17' was falsely recognized as a POBox; fixed
+
+0.08  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.07  Thu, 29 May 2008 19:49:25 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.07
+     - .shipit: fixed svk.tagpattern
+     - .shipit: fixed typo in svk.tagpattern
+     - added is_pobox_relaxed()
+
+0.06  Thu, 29 May 2008 12:00:55 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.06
+     - patterns are now interpreted as literal text, not as regexes
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+     - Business::Address::POBox: now uses regexes instead of literal strings
+     - t/01_is_pobox.t: added more tests
+
+0.05  Sun, 25 Nov 2007 10:10:51 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.05
+     - Makefile.PL: Test::Exception now required, not build_required; some CPAN
+       testers didn't pick it up
+
+0.04  Fri, 23 Nov 2007 13:34:56 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - Makefile.PL: build_requires Test::Exception
+
+0.03  Wed, 21 Nov 2007 18:20:47 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Added missing requirement for Class::Accessor::Constructor
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - updated MANIFEST
+     - updated MANIFEST
+     - updated t/perlcriticrc
+     - tags: BUGFIX
+
+0.02  Mon, 12 Nov 2007 12:34:03 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Fixed newlines in pod
+     - tags: DOCFIX
+
+0.01  Mon, 12 Nov 2007 12:28:06 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

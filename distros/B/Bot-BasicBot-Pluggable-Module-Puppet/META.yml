@@ -1,0 +1,27 @@
+---
+abstract: 'Ventriloquy via POE-flavored YAML over TCP'
+author:
+  - 'Mike Eldridge <diz@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-BasicBot-Pluggable-Module-Puppet
+requires:
+  Bot::BasicBot::Pluggable: 0.87
+  Bot::BasicBot::Pluggable::Module: 0
+  POE: 0
+  POE::Component::Server::TCP: 0
+  YAML: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 1.01

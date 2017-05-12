@@ -1,0 +1,25 @@
+---
+name: Bot-Babelfish
+version: 0.04
+author:
+  - 'Sébastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Provides Babelfish translation services via an IRC bot
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bot::BasicBot: 0.5
+  Carp: 0
+  Encode: 0
+  I18N::LangTags: 0
+  Lingua::Translate: 0
+build_requires:
+  Test::More: 0
+provides:
+  Bot::Babelfish:
+    file: lib/Bot/Babelfish.pm
+    version: 0.04
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

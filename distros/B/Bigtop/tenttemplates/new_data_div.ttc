@@ -1,0 +1,8 @@
+[%#
+    Template for generating data divs containing.
+    Pass it the following parameters in view.data:
+
+        block      - the app_block_hashes output for the new block
+%]
+[% INCLUDE data_div.ttc
+           block      = view.data.block %]

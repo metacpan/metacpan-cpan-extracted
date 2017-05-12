@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Benchmark-Harness
+version:      1.12
+version_from: 
+installdirs:  site
+requires:
+    Devel::Peek:                   1.01
+    Devel::Size:                   0.58
+    Time::HiRes:                   1.59
+    Win32::OLE:                    0.1403
+    Win32::Process::Info:          1.002
+    XML::Quote:                    1.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

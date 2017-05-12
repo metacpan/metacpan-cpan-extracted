@@ -1,0 +1,60 @@
+{
+    "name": "Bundle-WWW-Scraper-ISBN-Drivers",
+    "version": "1.11",
+    "abstract": "a Bundle for WWW::Scraper::ISBN drivers",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "isbn",
+        "books",
+        "scraper"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Bundle::WWW::Scraper::ISBN::Drivers": {
+            "file": "lib/Bundle/WWW/Scraper/ISBN/Drivers.pm",
+            "version": "1.11"
+        }
+    },
+    "no_index": {
+        "directory": ["t"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Bundle-WWW-Scraper-ISBN-Drivers" },
+        "repository": {
+            "url": "git://github.com/barbie/bundle-www-scraper-isbn-drivers.git",
+            "web": "http://github.com/barbie/bundle-www-scraper-isbn-drivers",
+            "type": "git"
+        }
+    }
+}

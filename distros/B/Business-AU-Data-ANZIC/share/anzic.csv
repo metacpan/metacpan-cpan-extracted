@@ -1,0 +1,826 @@
+"A","Agriculture, Forestry and Fishing",,,
+,"01","Agriculture",,
+,,"011","Nursery and Floriculture Production",
+,,,"0111","Nursery Production (Under Cover)"
+,,,"0112","Nursery Production (Outdoors)"
+,,,"0113","Turf Growing"
+,,,"0114","Floriculture Production (Under Cover)"
+,,,"0115","Floriculture Production (Outdoors)"
+,,"012","Mushroom and Vegetable Growing",
+,,,"0121","Mushroom Growing"
+,,,"0122","Vegetable Growing (Under Cover)"
+,,,"0123","Vegetable Growing (Outdoors)"
+,,"013","Fruit and Tree Nut Growing",
+,,,"0131","Grape Growing"
+,,,"0132","Kiwifruit Growing"
+,,,"0133","Berry Fruit Growing"
+,,,"0134","Apple and Pear Growing"
+,,,"0135","Stone Fruit Growing"
+,,,"0136","Citrus Fruit Growing"
+,,,"0137","Olive Growing"
+,,,"0139","Other Fruit and Tree Nut Growing"
+,,"014","Sheep, Beef Cattle and Grain Farming",
+,,,"0141","Sheep Farming (Specialised)"
+,,,"0142","Beef Cattle Farming (Specialised)"
+,,,"0143","Beef Cattle Feedlots (Specialised)"
+,,,"0144","Sheep-Beef Cattle Farming"
+,,,"0145","Grain-Sheep or Grain-Beef Cattle Farming"
+,,,"0146","Rice Growing"
+,,,"0149","Other Grain Growing"
+,,"015","Other Crop Growing",
+,,,"0151","Sugar Cane Growing"
+,,,"0152","Cotton Growing"
+,,,"0159","Other Crop Growing n.e.c."
+,,"016","Dairy Cattle Farming",
+,,,"0160","Dairy Cattle Farming"
+,,"017","Poultry Farming",
+,,,"0171","Poultry Farming (Meat)"
+,,,"0172","Poultry Farming (Eggs)"
+,,"018","Deer Farming",
+,,,"0180","Deer Farming"
+,,"019","Other Livestock Farming",
+,,,"0191","Horse Farming"
+,,,"0192","Pig Farming"
+,,,"0193","Beekeeping"
+,,,"0199","Other Livestock Farming n.e.c."
+,"02","Aquaculture",,
+,,"020","Aquaculture",
+,,,"0201","Offshore Longline and Rack Aquaculture"
+,,,"0202","Offshore Caged Aquaculture"
+,,,"0203","Onshore Aquaculture"
+,"03","Forestry and Logging",,
+,,"030","Forestry and Logging",
+,,,"0301","Forestry"
+,,,"0302","Logging"
+,"04","Fishing, Hunting and Trapping",,
+,,"041","Fishing",
+,,,"0411","Rock Lobster and Crab Potting"
+,,,"0412","Prawn Fishing"
+,,,"0413","Line Fishing"
+,,,"0414","Fish Trawling, Seining and Netting"
+,,,"0419","Other Fishing"
+,,"042","Hunting and Trapping",
+,,,"0420","Hunting and Trapping"
+,"05","Agriculture, Forestry and Fishing Support Services",,
+,,"051","Forestry Support Services",
+,,,"0510","Forestry Support Services"
+,,"052","Agriculture and Fishing Support Services",
+,,,"0521","Cotton Ginning"
+,,,"0522","Shearing Services"
+,,,"0529","Other Agriculture and Fishing Support Services"
+"B","Mining",,,
+,"06","Coal Mining",,
+,,"060","Coal Mining",
+,,,"0600","Coal Mining"
+,"07","Oil and Gas Extraction",,
+,,"070","Oil and Gas Extraction",
+,,,"0700","Oil and Gas Extraction"
+,"08","Metal Ore Mining",,
+,,"080","Metal Ore Mining",
+,,,"0801","Iron Ore Mining"
+,,,"0802","Bauxite Mining"
+,,,"0803","Copper Ore Mining"
+,,,"0804","Gold Ore Mining"
+,,,"0805","Mineral Sand Mining"
+,,,"0806","Nickel Ore Mining"
+,,,"0807","Silver-Lead-Zinc Ore Mining"
+,,,"0809","Other Metal Ore Mining"
+,"09","Non-Metallic Mineral Mining and Quarrying",,
+,,"091","Construction Material Mining",
+,,,"0911","Gravel and Sand Quarrying"
+,,,"0919","Other Construction Material Mining"
+,,"099","Other Non-Metallic Mineral Mining and Quarrying",
+,,,"0990","Other Non-Metallic Mineral Mining and Quarrying"
+,"10","Exploration and Other Mining Support Services",,
+,,"101","Exploration",
+,,,"1011","Petroleum Exploration"
+,,,"1012","Mineral Exploration"
+,,"109","Other Mining Support Services",
+,,,"1090","Other Mining Support Services"
+"C","Manufacturing",,,
+,"11","Food Product Manufacturing",,
+,,"111","Meat and Meat Product Manufacturing",
+,,,"1111","Meat Processing"
+,,,"1112","Poultry Processing"
+,,,"1113","Cured Meat and Smallgoods Manufacturing"
+,,"112","Seafood Processing",
+,,,"1120","Seafood Processing"
+,,"113","Dairy Product Manufacturing",
+,,,"1131","Milk and Cream Processing"
+,,,"1132","Ice Cream Manufacturing"
+,,,"1133","Cheese and Other Dairy Product Manufacturing"
+,,"114","Fruit and Vegetable Processing",
+,,,"1140","Fruit and Vegetable Processing"
+,,"115","Oil and Fat Manufacturing",
+,,,"1150","Oil and Fat Manufacturing"
+,,"116","Grain Mill and Cereal Product Manufacturing",
+,,,"1161","Grain Mill Product Manufacturing"
+,,,"1162","Cereal, Pasta and Baking Mix Manufacturing"
+,,"117","Bakery Product Manufacturing",
+,,,"1171","Bread Manufacturing (Factory based)"
+,,,"1172","Cake and Pastry Manufacturing (Factory based)"
+,,,"1173","Biscuit Manufacturing (Factory based)"
+,,,"1174","Bakery Product Manufacturing (Non-factory based)"
+,,"118","Sugar and Confectionery Manufacturing",
+,,,"1181","Sugar Manufacturing"
+,,,"1182","Confectionery Manufacturing"
+,,"119","Other Food Product Manufacturing",
+,,,"1191","Potato, Corn and Other Crisp Manufacturing"
+,,,"1192","Prepared Animal and Bird Feed Manufacturing"
+,,,"1199","Other Food Product Manufacturing n.e.c."
+,"12","Beverage and Tobacco Product Manufacturing",,
+,,"121","Beverage Manufacturing",
+,,,"1211","Soft Drink, Cordial and Syrup Manufacturing"
+,,,"1212","Beer Manufacturing"
+,,,"1213","Spirit Manufacturing"
+,,,"1214","Wine and Other Alcoholic Beverage Manufacturing"
+,,"122","Cigarette and Tobacco Product Manufacturing",
+,,,"1220","Cigarette and Tobacco Product Manufacturing"
+,"13","Textile, Leather, Clothing and Footwear Manufacturing",,
+,,"131","Textile Manufacturing",
+,,,"1311","Wool Scouring"
+,,,"1312","Natural Textile Manufacturing"
+,,,"1313","Synthetic Textile Manufacturing"
+,,"132","Leather Tanning, Fur Dressing and Leather Product Manufacturing",
+,,,"1320","Leather Tanning, Fur Dressing and Leather Product Manufacturing"
+,,"133","Textile Product Manufacturing",
+,,,"1331","Textile Floor Covering Manufacturing"
+,,,"1332","Rope, Cordage and Twine Manufacturing"
+,,,"1333","Cut and Sewn Textile Product Manufacturing"
+,,,"1334","Textile Finishing and Other Textile Product Manufacturing"
+,,"134","Knitted Product Manufacturing",
+,,,"1340","Knitted Product Manufacturing"
+,,"135","Clothing and Footwear Manufacturing",
+,,,"1351","Clothing Manufacturing"
+,,,"1352","Footwear Manufacturing"
+,"14","Wood Product Manufacturing",,
+,,"141","Log Sawmilling and Timber Dressing",
+,,,"1411","Log Sawmilling"
+,,,"1412","Wood Chipping"
+,,,"1413","Timber Resawing and Dressing"
+,,"149","Other Wood Product Manufacturing",
+,,,"1491","Prefabricated Wooden Building Manufacturing"
+,,,"1492","Wooden Structural Fitting and Component Manufacturing"
+,,,"1493","Veneer and Plywood Manufacturing"
+,,,"1494","Reconstituted Wood Product Manufacturing"
+,,,"1499","Other Wood Product Manufacturing n.e.c."
+,"15","Pulp, Paper and Converted Paper Product Manufacturing",,
+,,"151","Pulp, Paper and Paperboard Manufacturing",
+,,,"1510","Pulp, Paper and Paperboard Manufacturing"
+,,"152","Converted Paper Product Manufacturing",
+,,,"1521","Corrugated Paperboard and Paperboard Container Manufacturing"
+,,,"1522","Paper Bag Manufacturing"
+,,,"1523","Paper Stationery Manufacturing"
+,,,"1524","Sanitary Paper Product Manufacturing"
+,,,"1529","Other Converted Paper Product Manufacturing"
+,"16","Printing (including the Reproduction of Recorded Media)",,
+,,"161","Printing and Printing Support Services",
+,,,"1611","Printing"
+,,,"1612","Printing Support Services"
+,,"162","Reproduction of Recorded Media",
+,,,"1620","Reproduction of Recorded Media"
+,"17","Petroleum and Coal Product Manufacturing",,
+,,"170","Petroleum and Coal Product Manufacturing",
+,,,"1701","Petroleum Refining and Petroleum Fuel Manufacturing"
+,,,"1709","Other Petroleum and Coal Product Manufacturing"
+,"18","Basic Chemical and Chemical Product Manufacturing",,
+,,"181","Basic Chemical Manufacturing",
+,,,"1811","Industrial Gas Manufacturing"
+,,,"1812","Basic Organic Chemical Manufacturing"
+,,,"1813","Basic Inorganic Chemical Manufacturing"
+,,"182","Basic Polymer Manufacturing",
+,,,"1821","Synthetic Resin and Synthetic Rubber Manufacturing"
+,,,"1829","Other Basic Polymer Manufacturing"
+,,"183","Fertiliser and Pesticide Manufacturing",
+,,,"1831","Fertiliser Manufacturing"
+,,,"1832","Pesticide Manufacturing"
+,,"184","Pharmaceutical and Medicinal Product Manufacturing",
+,,,"1841","Human Pharmaceutical and Medicinal Product Manufacturing"
+,,,"1842","Veterinary Pharmaceutical and Medicinal Product Manufacturing"
+,,"185","Cleaning Compound and Toiletry Preparation Manufacturing",
+,,,"1851","Cleaning Compound Manufacturing"
+,,,"1852","Cosmetic and Toiletry Preparation Manufacturing"
+,,"189","Other Basic Chemical Product Manufacturing",
+,,,"1891","Photographic Chemical Product Manufacturing"
+,,,"1892","Explosive Manufacturing"
+,,,"1899","Other Basic Chemical Product Manufacturing n.e.c."
+,"19","Polymer Product and Rubber Product Manufacturing",,
+,,"191","Polymer Product Manufacturing",
+,,,"1911","Polymer Film and Sheet Packaging Material Manufacturing"
+,,,"1912","Rigid and Semi-Rigid Polymer Product Manufacturing"
+,,,"1913","Polymer Foam Product Manufacturing"
+,,,"1914","Tyre Manufacturing"
+,,,"1915","Adhesive Manufacturing"
+,,,"1916","Paint and Coatings Manufacturing"
+,,,"1919","Other Polymer Product Manufacturing"
+,,"192","Natural Rubber Product Manufacturing",
+,,,"1920","Natural Rubber Product Manufacturing"
+,"20","Non-Metallic Mineral Product Manufacturing",,
+,,"201","Glass and Glass Product Manufacturing",
+,,,"2010","Glass and Glass Product Manufacturing"
+,,"202","Ceramic Product Manufacturing",
+,,,"2021","Clay Brick Manufacturing"
+,,,"2029","Other Ceramic Product Manufacturing"
+,,"203","Cement, Lime, Plaster and Concrete Product Manufacturing",
+,,,"2031","Cement and Lime Manufacturing"
+,,,"2032","Plaster Product Manufacturing"
+,,,"2033","Ready-Mixed Concrete Manufacturing"
+,,,"2034","Concrete Product Manufacturing"
+,,"209","Other Non-Metallic Mineral Product Manufacturing",
+,,,"2090","Other Non-Metallic Mineral Product Manufacturing"
+,"21","Primary Metal and Metal Product Manufacturing",,
+,,"211","Basic Ferrous Metal Manufacturing",
+,,,"2110","Iron Smelting and Steel Manufacturing"
+,,"212","Basic Ferrous Metal Product Manufacturing",
+,,,"2121","Iron and Steel Casting"
+,,,"2122","Steel Pipe and Tube Manufacturing"
+,,"213","Basic Non-Ferrous Metal Manufacturing",
+,,,"2131","Alumina Production"
+,,,"2132","Aluminium Smelting"
+,,,"2133","Copper, Silver, Lead and Zinc Smelting and Refining"
+,,,"2139","Other Basic Non-Ferrous Metal Manufacturing"
+,,"214","Basic Non-Ferrous Metal Product Manufacturing",
+,,,"2141","Non-Ferrous Metal Casting"
+,,,"2142","Aluminium Rolling, Drawing, Extruding"
+,,,"2149","Other Basic Non-Ferrous Metal Product Manufacturing"
+,"22","Fabricated Metal Product Manufacturing",,
+,,"221","Iron and Steel Forging",
+,,,"2210","Iron and Steel Forging"
+,,"222","Structural Metal Product Manufacturing",
+,,,"2221","Structural Steel Fabricating"
+,,,"2222","Prefabricated Metal Building Manufacturing"
+,,,"2223","Architectural Aluminium Product Manufacturing"
+,,,"2224","Metal Roof and Guttering Manufacturing (except Aluminium)"
+,,,"2229","Other Structural Metal Product Manufacturing"
+,,"223","Metal Container Manufacturing",
+,,,"2231","Boiler, Tank and Other Heavy Gauge Metal Container Manufacturing"
+,,,"2239","Other Metal Container Manufacturing"
+,,"224","Sheet Metal Product Manufacturing (except Metal Structural and Container",
+,,,"Products)",
+,,,"2240","Sheet Metal Product Manufacturing (except Metal Structural and Container"
+,,"229","Other Fabricated Metal Product Manufacturing",
+,,,"2291","Spring and Wire Product Manufacturing"
+,,,"2292","Nut, Bolt, Screw and Rivet Manufacturing"
+,,,"2293","Metal Coating and Finishing"
+,,,"2299","Other Fabricated Metal Product Manufacturing n.e.c."
+,"23","Transport Equipment Manufacturing",,
+,,"231","Motor Vehicle and Motor Vehicle Part Manufacturing",
+,,,"2311","Motor Vehicle Manufacturing"
+,,,"2312","Motor Vehicle Body and Trailer Manufacturing"
+,,,"2313","Automotive Electrical Component Manufacturing"
+,,,"2319","Other Motor Vehicle Parts Manufacturing"
+,,"239","Other Transport Equipment Manufacturing",
+,,,"2391","Shipbuilding and Repair Services"
+,,,"2392","Boatbuilding and Repair Services"
+,,,"2393","Railway Rolling Stock Manufacturing and Repair Services"
+,,,"2394","Aircraft Manufacturing and Repair Services"
+,,,"2399","Other Transport Equipment Manufacturing n.e.c."
+,"24","Machinery and Equipment Manufacturing",,
+,,"241","Professional and Scientific Equipment Manufacturing",
+,,,"2411","Photographic, Optical and Ophthalmic Equipment Manufacturing"
+,,,"2412","Medical and Surgical Equipment Manufacturing"
+,,,"2419","Other Professional and Scientific Equipment Manufacturing"
+,,"242","Computer and Electronic Equipment Manufacturing",
+,,,"2421","Computer and Electronic Office Equipment Manufacturing"
+,,,"2422","Communication Equipment Manufacturing"
+,,,"2429","Other Electronic Equipment Manufacturing"
+,,"243","Electrical Equipment Manufacturing",
+,,,"2431","Electric Cable and Wire Manufacturing"
+,,,"2432","Electric Lighting Equipment Manufacturing"
+,,,"2439","Other Electrical Equipment Manufacturing"
+,,"244","Domestic Appliance Manufacturing",
+,,,"2441","Whiteware Appliance Manufacturing"
+,,,"2449","Other Domestic Appliance Manufacturing"
+,,"245","Pump, Compressor, Heating and Ventilation Equipment Manufacturing",
+,,,"2451","Pump and Compressor Manufacturing"
+,,,"2452","Fixed Space Heating, Cooling and Ventilation Equipment Manufacturing"
+,,"246","Specialised Machinery and Equipment Manufacturing",
+,,,"2461","Agricultural Machinery and Equipment Manufacturing"
+,,,"2462","Mining and Construction Machinery Manufacturing"
+,,,"2463","Machine Tool and Parts Manufacturing"
+,,,"2469","Other Specialised Machinery and Equipment Manufacturing"
+,,"249","Other Machinery and Equipment Manufacturing",
+,,,"2491","Lifting and Material Handling Equipment Manufacturing"
+,,,"2499","Other Machinery and Equipment Manufacturing n.e.c."
+,"25","Furniture and Other Manufacturing",,
+,,"251","Furniture Manufacturing",
+,,,"2511","Wooden Furniture and Upholstered Seat Manufacturing"
+,,,"2512","Metal Furniture Manufacturing"
+,,,"2513","Mattress Manufacturing"
+,,,"2519","Other Furniture Manufacturing"
+,,"259","Other Manufacturing",
+,,,"2591","Jewellery and Silverware Manufacturing"
+,,,"2592","Toy, Sporting and Recreational Product Manufacturing"
+,,,"2599","Other Manufacturing n.e.c."
+"D","Electricity, Gas, Water and Waste Services",,,
+,"26","Electricity Supply",,
+,,"261","Electricity Generation",
+,,,"2611","Fossil Fuel Electricity Generation"
+,,,"2612","Hydro-Electricity Generation"
+,,,"2619","Other Electricity Generation"
+,,"262","Electricity Transmission",
+,,,"2620","Electricity Transmission"
+,,"263","Electricity Distribution",
+,,,"2630","Electricity Distribution"
+,,"264","On Selling Electricity and Electricity Market Operation",
+,,,"2640","On Selling Electricity and Electricity Market Operation"
+,"27","Gas Supply",,
+,,"270","Gas Supply",
+,,,"2700","Gas Supply"
+,"28","Water Supply, Sewerage and Drainage Services",,
+,,"281","Water Supply, Sewerage and Drainage Services",
+,,,"2811","Water Supply"
+,,,"2812","Sewerage and Drainage Services"
+,"29","Waste Collection, Treatment and Disposal Services",,
+,,"291","Waste Collection Services",
+,,,"2911","Solid Waste Collection Services"
+,,,"2919","Other Waste Collection Services"
+,,"292","Waste Treatment, Disposal and Remediation Services",
+,,,"2921","Waste Treatment and Disposal Services"
+,,,"2922","Waste Remediation and Materials Recovery Services"
+"E","Construction",,,
+,"30","Building Construction",,
+,,"301","Residential Building Construction",
+,,,"3011","House Construction"
+,,,"3019","Other Residential Building Construction"
+,,"302","Non-Residential Building Construction",
+,,,"3020","Non-Residential Building Construction"
+,"31","Heavy and Civil Engineering Construction",,
+,,"310","Heavy and Civil Engineering Construction",
+,,,"3101","Road and Bridge Construction"
+,,,"3109","Other Heavy and Civil Engineering Construction"
+,"32","Construction Services",,
+,,"321","Land Development and Site Preparation Services",
+,,,"3211","Land Development and Subdivision"
+,,,"3212","Site Preparation Services"
+,,"322","Building Structure Services",
+,,,"3221","Concreting Services"
+,,,"3222","Bricklaying Services"
+,,,"3223","Roofing Services"
+,,,"3224","Structural Steel Erection Services"
+,,"323","Building Installation Services",
+,,,"3231","Plumbing Services"
+,,,"3232","Electrical Services"
+,,,"3233","Air Conditioning and Heating Services"
+,,,"3234","Fire and Security Alarm Installation Services"
+,,,"3239","Other Building Installation Services"
+,,"324","Building Completion Services",
+,,,"3241","Plastering and Ceiling Services"
+,,,"3242","Carpentry Services"
+,,,"3243","Tiling and Carpeting Services"
+,,,"3244","Painting and Decorating Services"
+,,,"3245","Glazing Services"
+,,"329","Other Construction Services",
+,,,"3291","Landscape Construction Services"
+,,,"3292","Hire of Construction Machinery with Operator"
+,,,"3299","Other Construction Services n.e.c."
+"F","Wholesale Trade",,,
+,"33","Basic Material Wholesaling",,
+,,"331","Agricultural Product Wholesaling",
+,,,"3311","Wool Wholesaling"
+,,,"3312","Cereal Grain Wholesaling"
+,,,"3319","Other Agricultural Product Wholesaling"
+,,"332","Mineral, Metal and Chemical Wholesaling",
+,,,"3321","Petroleum Product Wholesaling"
+,,,"3322","Metal and Mineral Wholesaling"
+,,,"3323","Industrial and Agricultural Chemical Product Wholesaling"
+,,"333","Timber and Hardware Goods Wholesaling",
+,,,"3331","Timber Wholesaling"
+,,,"3332","Plumbing Goods Wholesaling"
+,,,"3339","Other Hardware Goods Wholesaling"
+,"34","Machinery and Equipment Wholesaling",,
+,,"341","Specialised Industrial Machinery and Equipment Wholesaling",
+,,,"3411","Agricultural and Construction Machinery Wholesaling"
+,,,"3419","Other Specialised Industrial Machinery and Equipment Wholesaling"
+,,"349","Other Machinery and Equipment Wholesaling",
+,,,"3491","Professional and Scientific Goods Wholesaling"
+,,,"3492","Computer and Computer Peripheral Wholesaling"
+,,,"3493","Telecommunication Goods Wholesaling"
+,,,"3494","Other Electrical and Electronic Goods Wholesaling"
+,,,"3499","Other Machinery and Equipment Wholesaling n.e.c."
+,"35","Motor Vehicle and Motor Vehicle Parts Wholesaling",,
+,,"350","Motor Vehicle and Motor Vehicle Parts Wholesaling",
+,,,"3501","Car Wholesaling"
+,,,"3502","Commercial Vehicle Wholesaling"
+,,,"3503","Trailer and Other Motor Vehicle Wholesaling"
+,,,"3504","Motor Vehicle New Parts Wholesaling"
+,,,"3505","Motor Vehicle Dismantling and Used Parts Wholesaling"
+,"36","Grocery, Liquor and Tobacco Product Wholesaling",,
+,,"360","Grocery, Liquor and Tobacco Product Wholesaling",
+,,,"3601","General Line Grocery Wholesaling"
+,,,"3602","Meat, Poultry and Smallgoods Wholesaling"
+,,,"3603","Dairy Produce Wholesaling"
+,,,"3604","Fish and Seafood Wholesaling"
+,,,"3605","Fruit and Vegetable Wholesaling"
+,,,"3606","Liquor and Tobacco Product Wholesaling"
+,,,"3609","Other Grocery Wholesaling"
+,"37","Other Goods Wholesaling",,
+,,"371","Textile, Clothing and Footwear Wholesaling",
+,,,"3711","Textile Product Wholesaling"
+,,,"3712","Clothing and Footwear Wholesaling"
+,,"372","Pharmaceutical and Toiletry Goods Wholesaling",
+,,,"3720","Pharmaceutical and Toiletry Goods Wholesaling"
+,,"373","Furniture, Floor Covering and Other Goods Wholesaling",
+,,,"3731","Furniture and Floor Covering Wholesaling"
+,,,"3732","Jewellery and Watch Wholesaling"
+,,,"3733","Kitchen and Diningware Wholesaling"
+,,,"3734","Toy and Sporting Goods Wholesaling"
+,,,"3735","Book and Magazine Wholesaling"
+,,,"3736","Paper Product Wholesaling"
+,,,"3739","Other Goods Wholesaling n.e.c."
+,"38","Commission-Based Wholesaling",,
+,,"380","Commission-Based Wholesaling",
+,,,"3800","Commission-Based Wholesaling"
+"G","Retail Trade",,,
+,"39","Motor Vehicle and Motor Vehicle Parts Retailing",,
+,,"391","Motor Vehicle Retailing",
+,,,"3911","Car Retailing"
+,,,"3912","Motor Cycle Retailing"
+,,,"3913","Trailer and Other Motor Vehicle Retailing"
+,,"392","Motor Vehicle Parts and Tyre Retailing",
+,,,"3921","Motor Vehicle Parts Retailing"
+,,,"3922","Tyre Retailing"
+,"40","Fuel Retailing",,
+,,"400","Fuel Retailing",
+,,,"4000","Fuel Retailing"
+,"41","Food Retailing",,
+,,"411","Supermarket and Grocery Stores",
+,,,"4110","Supermarket and Grocery Stores"
+,,"412","Specialised Food Retailing",
+,,,"4121","Fresh Meat, Fish and Poultry Retailing"
+,,,"4122","Fruit and Vegetable Retailing"
+,,,"4123","Liquor Retailing"
+,,,"4129","Other Specialised Food Retailing"
+,"42","Other Store-Based Retailing",,
+,,"421","Furniture, Floor Coverings, Houseware and Textile Goods Retailing",
+,,,"4211","Furniture Retailing"
+,,,"4212","Floor Coverings Retailing"
+,,,"4213","Houseware Retailing"
+,,,"4214","Manchester and Other Textile Goods Retailing"
+,,"422","Electrical and Electronic Goods Retailing",
+,,,"4221","Electrical, Electronic and Gas Appliance Retailing"
+,,,"4222","Computer and Computer Peripheral Retailing"
+,,,"4229","Other Electrical and Electronic Goods Retailing"
+,,"423","Hardware, Building and Garden Supplies Retailing",
+,,,"4231","Hardware and Building Supplies Retailing"
+,,,"4232","Garden Supplies Retailing"
+,,"424","Recreational Goods Retailing",
+,,,"4241","Sport and Camping Equipment Retailing"
+,,,"4242","Entertainment Media Retailing"
+,,,"4243","Toy and Game Retailing"
+,,,"4244","Newspaper and Book Retailing"
+,,,"4245","Marine Equipment Retailing"
+,,"425","Clothing, Footwear and Personal Accessory Retailing",
+,,,"4251","Clothing Retailing"
+,,,"4252","Footwear Retailing"
+,,,"4253","Watch and Jewellery Retailing"
+,,,"4259","Other Personal Accessory Retailing"
+,,"426","Department Stores",
+,,,"4260","Department Stores"
+,,"427","Pharmaceutical and Other Store-Based Retailing",
+,,,"4271","Pharmaceutical, Cosmetic and Toiletry Goods Retailing"
+,,,"4272","Stationery Goods Retailing"
+,,,"4273","Antique and Used Goods Retailing"
+,,,"4274","Flower Retailing"
+,,,"4279","Other Store-Based Retailing n.e.c."
+,"43","Non-Store Retailing and Retail Commission-Based Buying and/or Selling",,
+,,"431","Non-Store Retailing",
+,,,"4310","Non-Store Retailing"
+,,"432","Retail Commission-Based Buying and/or Selling",
+,,,"4320","Retail Commission-Based Buying and/or Selling"
+"H","Accommodation and Food Services",,,
+,"44","Accommodation",,
+,,"440","Accommodation",
+,,,"4400","Accommodation"
+,"45","Food and Beverage Services",,
+,,"451","Cafes, Restaurants and Takeaway Food Services",
+,,,"4511","Cafes and Restaurants"
+,,,"4512","Takeaway Food Services"
+,,,"4513","Catering Services"
+,,"452","Pubs, Taverns and Bars",
+,,,"4520","Pubs, Taverns and Bars"
+,,"453","Clubs (Hospitality)",
+,,,"4530","Clubs (Hospitality)"
+"I","Transport, Postal and Warehousing",,,
+,"46","Road Transport",,
+,,"461","Road Freight Transport",
+,,,"4610","Road Freight Transport"
+,,"462","Road Passenger Transport",
+,,,"4621","Interurban and Rural Bus Transport"
+,,,"4622","Urban Bus Transport (Including Tramway)"
+,,,"4623","Taxi and Other Road Transport"
+,"47","Rail Transport",,
+,,"471","Rail Freight Transport",
+,,,"4710","Rail Freight Transport"
+,,"472","Rail Passenger Transport",
+,,,"4720","Rail Passenger Transport"
+,"48","Water Transport",,
+,,"481","Water Freight Transport",
+,,,"4810","Water Freight Transport"
+,,"482","Water Passenger Transport",
+,,,"4820","Water Passenger Transport"
+,"49","Air and Space Transport",,
+,,"490","Air and Space Transport",
+,,,"4900","Air and Space Transport"
+,"50","Other Transport",,
+,,"501","Scenic and Sightseeing Transport",
+,,,"5010","Scenic and Sightseeing Transport"
+,,"502","Pipeline and Other Transport",
+,,,"5021","Pipeline Transport"
+,,,"5029","Other Transport n.e.c."
+,"51","Postal and Courier Pick-up and Delivery Services",,
+,,"510","Postal and Courier Pick-up and Delivery Services",
+,,,"5101","Postal Services"
+,,,"5102","Courier Pick-up and Delivery Services"
+,"52","Transport Support Services",,
+,,"521","Water Transport Support Services",
+,,,"5211","Stevedoring Services"
+,,,"5212","Port and Water Transport Terminal Operations"
+,,,"5219","Other Water Transport Support Services"
+,,"522","Airport Operations and Other Air Transport Support Services",
+,,,"5220","Airport Operations and Other Air Transport Support Services"
+,,"529","Other Transport Support Services",
+,,,"5291","Customs Agency Services"
+,,,"5292","Freight Forwarding Services"
+,,,"5299","Other Transport Support Services n.e.c."
+,"53","Warehousing and Storage Services",,
+,,"530","Warehousing and Storage Services",
+,,,"5301","Grain Storage Services"
+,,,"5309","Other Warehousing and Storage Services"
+"J","Information Media and Telecommunications",,,
+,"54","Publishing (except Internet and Music Publishing)",,
+,,"541","Newspaper, Periodical, Book and Directory Publishing",
+,,,"5411","Newspaper Publishing"
+,,,"5412","Magazine and Other Periodical Publishing"
+,,,"5413","Book Publishing"
+,,,"5414","Directory and Mailing List Publishing"
+,,,"5419","Other Publishing (except Software, Music and Internet)"
+,,"542","Software Publishing",
+,,,"5420","Software Publishing"
+,"55","Motion Picture and Sound Recording Activities",,
+,,"551","Motion Picture and Video Activities",
+,,,"5511","Motion Picture and Video Production"
+,,,"5512","Motion Picture and Video Distribution"
+,,,"5513","Motion Picture Exhibition"
+,,,"5514","Post-production Services and Other Motion Picture and Video Activities"
+,,"552","Sound Recording and Music Publishing",
+,,,"5521","Music Publishing"
+,,,"5522","Music and Other Sound Recording Activities"
+,"56","Broadcasting (except Internet)",,
+,,"561","Radio Broadcasting",
+,,,"5610","Radio Broadcasting"
+,,"562","Television Broadcasting",
+,,,"5621","Free-to-Air Television Broadcasting"
+,,,"5622","Cable and Other Subscription Broadcasting"
+,"57","Internet Publishing and Broadcasting",,
+,,"570","Internet Publishing and Broadcasting",
+,,,"5700","Internet Publishing and Broadcasting"
+,"58","Telecommunications Services",,
+,,"580","Telecommunications Services",
+,,,"5801","Wired Telecommunications Network Operation"
+,,,"5802","Other Telecommunications Network Operation"
+,,,"5809","Other Telecommunications Services"
+,"59","Internet Service Providers, Web Search Portals and Data Processing Services",,
+,,"591","Internet Service Providers and Web Search Portals",
+,,,"5910","Internet Service Providers and Web Search Portals"
+,,"592","Data Processing, Web Hosting and Electronic Information Storage Services",
+,,,"5921","Data Processing and Web Hosting Services"
+,,,"5922","Electronic Information Storage Services"
+,"60","Library and Other Information Services",,
+,,"601","Libraries and Archives",
+,,,"6010","Libraries and Archives"
+,,"602","Other Information Services",
+,,,"6020","Other Information Services"
+"K","Financial and Insurance Services",,,
+,"62","Finance",,
+,,"621","Central Banking",
+,,,"6210","Central Banking"
+,,"622","Depository Financial Intermediation",
+,,,"6221","Banking"
+,,,"6222","Building Society Operation"
+,,,"6223","Credit Union Operation"
+,,,"6229","Other Depository Financial Intermediation"
+,,"623","Non-Depository Financing",
+,,,"6230","Non-Depository Financing"
+,,"624","Financial Asset Investing",
+,,,"6240","Financial Asset Investing"
+,"63","Insurance and Superannuation Funds",,
+,,"631","Life Insurance",
+,,,"6310","Life Insurance"
+,,"632","Health and General Insurance",
+,,,"6321","Health Insurance"
+,,,"6322","General Insurance"
+,,"633","Superannuation Funds",
+,,,"6330","Superannuation Funds"
+,"64","Auxiliary Finance and Insurance Services",,
+,,"641","Auxiliary Finance and Investment Services",
+,,,"6411","Financial Asset Broking Services"
+,,,"6419","Other Auxiliary Finance and Investment Services"
+,,"642","Auxiliary Insurance Services",
+,,,"6420","Auxiliary Insurance Services"
+"L","Rental, Hiring and Real Estate Services",,,
+,"66","Rental and Hiring Services (except Real Estate)",,
+,,"661","Motor Vehicle and Transport Equipment Rental and Hiring",
+,,,"6611","Passenger Car Rental and Hiring"
+,,,"6619","Other Motor Vehicle and Transport Equipment Rental and Hiring"
+,,"662","Farm Animal and Bloodstock Leasing",
+,,,"6620","Farm Animal and Bloodstock Leasing"
+,,"663","Other Goods and Equipment Rental and Hiring",
+,,,"6631","Heavy Machinery and Scaffolding Rental and Hiring"
+,,,"6632","Video and Other Electronic Media Rental and Hiring"
+,,,"6639","Other Goods and Equipment Rental and Hiring n.e.c."
+,,"664","Non-Financial Intangible Assets (Except Copyrights) Leasing",
+,,,"6640","Non-Financial Intangible Assets (Except Copyrights) Leasing"
+,"67","Property Operators and Real Estate Services",,
+,,"671","Property Operators",
+,,,"6711","Residential Property Operators"
+,,,"6712","Non-Residential Property Operators"
+,,"672","Real Estate Services",
+,,,"6720","Real Estate Services"
+"M","Professional, Scientific and Technical Services",,,
+,"69","Professional, Scientific and Technical Services (Except Computer System Design and Related Services)",,
+,,"691","Scientific Research Services",
+,,,"6910","Scientific Research Services"
+,,"692","Architectural, Engineering and Technical Services",
+,,,"6921","Architectural Services"
+,,,"6922","Surveying and Mapping Services"
+,,,"6923","Engineering Design and Engineering Consulting Services"
+,,,"6924","Other Specialised Design Services"
+,,,"6925","Scientific Testing and Analysis Services"
+,,"693","Legal and Accounting Services",
+,,,"6931","Legal Services"
+,,,"6932","Accounting Services"
+,,"694","Advertising Services",
+,,,"6940","Advertising Services"
+,,"695","Market Research and Statistical Services",
+,,,"6950","Market Research and Statistical Services"
+,,"696","Management and Related Consulting Services",
+,,,"6961","Corporate Head Office Management Services"
+,,,"6962","Management Advice and Related Consulting Services"
+,,"697","Veterinary Services",
+,,,"6970","Veterinary Services"
+,,"699","Other Professional, Scientific and Technical Services",
+,,,"6991","Professional Photographic Services"
+,,,"6999","Other Professional, Scientific and Technical Services n.e.c."
+,"70","Computer System Design and Related Services",,
+,,"700","Computer System Design and Related Services",
+,,,"7000","Computer System Design and Related Services"
+"N","Administrative and Support Services",,,
+,"72","Administrative Services",,
+,,"721","Employment Services",
+,,,"7211","Employment Placement and Recruitment Services"
+,,,"7212","Labour Supply Services"
+,,"722","Travel Agency and Tour Arrangement Services",
+,,,"7220","Travel Agency and Tour Arrangement Services"
+,,"729","Other Administrative Services",
+,,,"7291","Office Administrative Services"
+,,,"7292","Document Preparation Services"
+,,,"7293","Credit Reporting and Debt Collection Services"
+,,,"7294","Call Centre Operation"
+,,,"7299","Other Administrative Services n.e.c."
+,"73","Building Cleaning, Pest Control and Other Support Services",,
+,,"731","Building Cleaning, Pest Control and Gardening Services",
+,,,"7311","Building and Other Industrial Cleaning Services"
+,,,"7312","Building Pest Control Services"
+,,,"7313","Gardening Services"
+,,"732","Packaging Services",
+,,,"7320","Packaging Services"
+"O","Public Administration and Safety",,,
+,"75","Public Administration",,
+,,"751","Central Government Administration",
+,,,"7510","Central Government Administration"
+,,"752","State Government Administration",
+,,,"7520","State Government Administration"
+,,"753","Local Government Administration",
+,,,"7530","Local Government Administration"
+,,"754","Justice",
+,,,"7540","Justice"
+,,"755","Government Representation",
+,,,"7551","Domestic Government Representation"
+,,,"7552","Foreign Government Representation"
+,"76","Defence",,
+,,"760","Defence",
+,,,"7600","Defence"
+,"77","Public Order, Safety and Regulatory Services",,
+,,"771","Public Order and Safety Services",
+,,,"7711","Police Services"
+,,,"7712","Investigation and Security Services"
+,,,"7713","Fire Protection and Other Emergency Services"
+,,,"7714","Correctional and Detention Services"
+,,,"7719","Other Public Order and Safety Services"
+,,"772","Regulatory Services",
+,,,"7720","Regulatory Services"
+"P","Education and Training",,,
+,"80","Preschool and School Education",,
+,,"801","Preschool Education",
+,,,"8010","Preschool Education"
+,,"802","School Education",
+,,,"8021","Primary Education"
+,,,"8022","Secondary Education"
+,,,"8023","Combined Primary and Secondary Education"
+,,,"8024","Special School Education"
+,"81","Tertiary Education",,
+,,"810","Tertiary Education",
+,,,"8101","Technical and Vocational Education and Training"
+,,,"8102","Higher Education"
+,"82","Adult, Community and Other Education",,
+,,"821","Adult, Community and Other Education",
+,,,"8211","Sports and Physical Recreation Instruction"
+,,,"8212","Arts Education"
+,,,"8219","Adult, Community and Other Education n.e.c."
+,,"822","Educational Support Services",
+,,,"8220","Educational Support Services"
+"Q","Health Care and Social Assistance",,,
+,"84","Hospitals",,
+,,"840","Hospitals",
+,,,"8401","Hospitals (Except Psychiatric Hospitals)"
+,,,"8402","Psychiatric Hospitals"
+,"85","Medical and Other Health Care Services",,
+,,"851","Medical Services",
+,,,"8511","General Practice Medical Services"
+,,,"8512","Specialist Medical Services"
+,,"852","Pathology and Diagnostic Imaging Services",
+,,,"8520","Pathology and Diagnostic Imaging Services"
+,,"853","Allied Health Services",
+,,,"8531","Dental Services"
+,,,"8532","Optometry and Optical Dispensing"
+,,,"8533","Physiotherapy Services"
+,,,"8534","Chiropractic and Osteopathic Services"
+,,,"8539","Other Allied Health Services"
+,,"859","Other Health Care Services",
+,,,"8591","Ambulance Services"
+,,,"8599","Other Health Care Services n.e.c."
+,"86","Residential Care Services",,
+,,"860","Residential Care Services",
+,,,"8601","Aged Care Residential Services"
+,,,"8609","Other Residential Care Services"
+,"87","Social Assistance Services",,
+,,"871","Child Care Services",
+,,,"8710","Child Care Services"
+,,"879","Other Social Assistance Services",
+,,,"8790","Other Social Assistance Services"
+"R","Arts and Recreation Services",,,
+,"89","Heritage Activities",,
+,,"891","Museum Operation",
+,,,"8910","Museum Operation"
+,,"892","Parks and Gardens Operations",
+,,,"8921","Zoological and Botanical Gardens Operation"
+,,,"8922","Nature Reserves and Conservation Parks Operation"
+,"90","Creative and Performing Arts Activities",,
+,,"900","Creative and Performing Arts Activities",
+,,,"9001","Performing Arts Operation"
+,,,"9002","Creative Artists, Musicians, Writers and Performers"
+,,,"9003","Performing Arts Venue Operation"
+,"91","Sports and Recreation Activities",,
+,,"911","Sports and Physical Recreation Activities",
+,,,"9111","Health and Fitness Centres and Gymnasia Operation"
+,,,"9112","Sports and Physical Recreation Clubs and Sports Professionals"
+,,,"9113","Sports and Physical Recreation Venues, Grounds and Facilities Operation"
+,,,"9114","Sports and Physical Recreation Administrative Service"
+,,"912","Horse and Dog Racing Activities",
+,,,"9121","Horse and Dog Racing Administration and Track Operation"
+,,,"9129","Other Horse and Dog Racing Activities"
+,,"913","Amusement and Other Recreation Activities",
+,,,"9131","Amusement Parks and Centres Operation"
+,,,"9139","Amusement and Other Recreational Activities n.e.c."
+,"92","Gambling Activities",,
+,,"920","Gambling Activities",
+,,,"9201","Casino Operation"
+,,,"9202","Lottery Operation"
+,,,"9209","Other Gambling Activities"
+"S","Other Services",,,
+,"94","Repair and Maintenance",,
+,,"941","Automotive Repair and Maintenance",
+,,,"9411","Automotive Electrical Services"
+,,,"9412","Automotive Body, Paint and Interior Repair"
+,,,"9419","Other Automotive Repair and Maintenance"
+,,"942","Machinery and Equipment Repair and Maintenance",
+,,,"9421","Domestic Appliance Repair and Maintenance"
+,,,"9422","Electronic (except Domestic Appliance) and Precision Equipment Repair"
+,,,"9429","Other Machinery and Equipment Repair and Maintenance"
+,,"949","Other Repair and Maintenance",
+,,,"9491","Clothing and Footwear Repair"
+,,,"9499","Other Repair and Maintenance n.e.c."
+,"95","Personal and Other Services",,
+,,"951","Personal Care Services",
+,,,"9511","Hairdressing and Beauty Services"
+,,,"9512","Diet and Weight Reduction Centre Operation"
+,,"952","Funeral, Crematorium and Cemetery Services",
+,,,"9520","Funeral, Crematorium and Cemetery Services"
+,,"953","Other Personal Services",
+,,,"9531","Laundry and Dry-Cleaning Services"
+,,,"9532","Photographic Film Processing"
+,,,"9533","Parking Services"
+,,,"9534","Brothel Keeping and Prostitution Services"
+,,,"9539","Other Personal Services n.e.c."
+,,"954","Religious Services",
+,,,"9540","Religious Services"
+,,"955","Civic, Professional and Other Interest Group Services",
+,,,"9551","Business and Professional Association Services"
+,,,"9552","Labour Association Services"
+,,,"9559","Other Interest Group Services n.e.c."
+,"96","Private Households Employing Staff and Undifferentiated Goods- and Service-Producing Activities of Households for Own Use",,
+,,"960","Private Households Employing Staff and Undifferentiated Goods- and Service-Producing Activities of Households for Own Use",
+,,,"9601","Private Households Employing Staff"
+,,,"9602","Undifferentiated Goods-Producing Activities of Private Households for Own Use"
+,,,"9603","Undifferentiated Service-Producing Activities of Private Households for Own Use"

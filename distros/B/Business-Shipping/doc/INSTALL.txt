@@ -1,0 +1,67 @@
+NAME
+    INSTALL - How to install Business::Shipping
+
+NOTES
+  Getting Started
+    Be sure to read the "GETTING STARTED" section of the README, because
+    some services (e.g. online tracking requests) require that the user
+    signup for a username and password.
+
+  Choosing your bundle
+    If you would like to use UPS and USPS, install
+    "Bundle::Business::Shipping". However, you may opt instead to install
+    the required modules for only one:
+
+    *   "Bundle::Business::Shipping::UPS_Offline"
+
+    *   "Bundle::Business::Shipping::UPS_Online"
+
+    *   "Bundle::Business::Shipping::USPS_Online"
+
+    *   "Bundle::Business::Shipping"
+
+CPAN INSTALLATION
+    Note that the XML::DOM uses XML::Parser, and XML::Parser uses Expat.
+    Therefore, you may need to install Expat before XML::Parser will
+    install.
+
+    All shippers:
+
+     perl -MCPAN -e 'install Bundle::Business::Shipping'
+
+    UPS_Online only:
+
+     perl -MCPAN -e 'install Bundle::Business::Shipping::UPS_Offline'
+
+    UPS_Offline only:
+
+     perl -MCPAN -e 'install Bundle::Business::Shipping::UPS_Offline'
+
+    USPS_Online only:
+
+     perl -MCPAN -e 'install Bundle::Business::Shipping::USPS_Online'
+
+MANUAL INSTALLATION
+    Be sure to install all required modules before installing. After
+    unpacking the tarball, execute the following:
+
+     perl Makefile.PL [--use_defaults=<1|0>]
+     make
+     make test
+     make install
+
+All required modules
+    Each Bundle lists the required modules for each shipper type. Here is
+    the combined list for all shippers:
+
+     Business::Shipping::DataFiles (any)
+     CHI (0.39)
+     Any::Moose (any)
+     Config::IniFiles (any)
+     Crypt::SSLeay (any)
+     Getopt::Mixed (any)
+     Log::Log4perl (any)
+     LWP::UserAgent (any)
+     XML::DOM (any)
+     XML::Simple (2.05)
+

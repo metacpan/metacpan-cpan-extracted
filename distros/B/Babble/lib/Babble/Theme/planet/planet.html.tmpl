@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+[% PROCESS "head.html.tmpl" %]
+</head>
+<body>
+
+[% my_collection = babble_collection || collection.sort %]
+
+[% PROCESS "banner.html.tmpl" %]
+[% PROCESS "main_content.html.tmpl" %]
+[% PROCESS "sidebar.html.tmpl" %]
+
+</body>
+</html>
+
+[%#
+arch-tag: d3440921-8a5b-4174-bf2b-f4ab8f6c656f
+%]

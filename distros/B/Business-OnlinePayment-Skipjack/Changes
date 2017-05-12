@@ -1,0 +1,46 @@
+Revision history for Perl extension Business::OnlinePayment::SkipJack
+
+0.5     Wed Jun 18 14:04:06 PDT 2008
+        - The "I love cpan-testers" release.
+        - We need B:OP v3, thankyouverymuch.
+        - Hopefully the dependency BS is over with.
+
+0.4     Tue Jun  3 16:55:58 PDT 2008
+        - The "I'm on crack" release.
+        - We *do* use B:OP:HTTPS.  Depend on it.
+        - All tests pass again.  Whew.
+
+0.3     Wed May 28 02:03:19 PDT 2008
+        - update missed bad_card_mc.t to new test account
+        - we don't use B:OP:HTTPS yet, no need to depent on B:OP v3
+        - correct Makefile.PL wrt actual dependency s/Text::CSV/Text::CSV_XS/
+
+0.2	Wed Apr 11 14:11:28 PDT 2007
+        - clarify licensing (no original code remains)
+        - fix tests
+        Thu Mar  2 14:27:11 PST 2006
+	- this mostly boring update by Ivan Kohler <ivan-skipjack@420.am>
+	- added this changelog, boilerplate POD and README
+	- added tests
+	- use test_transaction flag
+	- use B:OP:HTTPS (uses either Net::SSLeay or Crypt::SSLeay) instead of
+	  Net::SSLeay directly
+	- add ability to handle void and credit actions
+	- ready for CPAN upload if licensing can be clarified...
+
+0.1.1	Wed Jan 4 23:01:55 2006 UTC
+	- Fixed bug that broke expiration dates >2009 (khoff)
+
+0.1	Mon Sep 9 19:14:45 2002 UTC
+	- 'Adapted' (completely rewritten) for Business::OnlinePayment 
+	  by Fire2Wire Internet Services (http://www.fire2wire.com)
+	  Mark Wells <mark@pc-intouch.com>
+	  Kristian Hoffmann <khoff@pc-intouch.com>
+	  James Switzer <jamess@fire2wire.com>
+
+Modified for GetCareer.com by Slipstream.com
+Troy Davis <troy@slipstream.com>
+
+Original Skipjack.pm developed by New York Connect Net (http://nyct.net)
+Michael Bacarella <mbac@nyct.net>
+

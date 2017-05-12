@@ -1,0 +1,340 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use rlib '../lib';
+use Bio::BPWrapper::SeqManipulations;
+use v5.10;
+use Bio::BPWrapper::GetoptLong qw(:config gnu_getopt);
+use Pod::Usage;
+
+####################### Option parsing ######################
+my %opts;
+GetOptions(
+    \%opts,
+    "help|h",
+    "man",
+    "composition|c",
+    "delete|d=s",
+    "fetch|f=s", # Retrieve sequence by accession number
+    "nogaps|g",
+    "input|i=s",
+    "length|l",
+    "numseq|n",
+    "output|o=s",
+    "pick|p=s",
+    "revcom|r",
+    "subseq|s=s",
+    "translate|t=i", #Needs error checking
+    "restrict|x=s",
+    "anonymize|A:10",    # default 10 char (for phylip) (prefix + num_digits)
+    "break|B",
+    "count-codons|C",
+    "feat2fas|F",
+    "leadgaps|G",
+    "hydroB|H",
+    "linearize|L",
+    "reloop|R=i", # recircularize a genome at "loop_at"
+    "version|V",
+    "removestop|X", # for PAML/codeml
+    "split-cdhit=s",
+ #   "longest-orf|C",
+ #   "extract|e",
+ #   "dotplot|D=s",
+ #   "rename|N=s",
+ #   "slidingwindow|S=i",
+ #   "prefix=s",
+ #   "split|S=i",
+) or pod2usage(2);
+
+pod2usage(1) if $opts{"help"};
+pod2usage(-exitstatus => 0, -verbose => 2) if $opts{"man"};
+&print_version() if $opts{"version"};
+
+
+######################## Main #####################
+
+# This sets all internal variables, and loads Bio::Seq objects
+initialize(\%opts);
+
+for my $option (keys %opts) {
+    # Don't process these options: they are for SeqIO
+    next if $option eq 'input' || $option eq 'output';
+
+    # If there is a function to handle the current option, execute it
+    if (can_handle($option)) { handle_opt($option); exit }
+    else { warn "Missing handler for: $option\n" }
+}
+
+# Let seq-manipulations act as a converter when no other options are given.
+write_out();
+
+################# POD Documentation ##################
+
+__END__
+
+=head1 NAME
+
+bioseq - FASTA sequence utility based on L<Bio::Perl>
+
+=head1 SYNOPSIS
+
+B<bioseq> I<options> [I<file>]
+
+B<bioseq> C<-h> | C<--help>
+
+B<bioseq> C<-v> | C<--version>
+
+B<bioseq> C<--man>
+
+
+=head1 DESCRIPTION
+
+B<bioseq> is a command-line utility for common, routine sequence
+manipulations. Most methods are wrappers for L<Bio::Perl> modules:
+L<Bio::Seq>, L<Bio::SeqIO>, L<Bio::SeqUtils>, and
+L<Bio::Tools::SeqStats>.
+
+By default, B<bioseq> assumes that both the input and the output files
+are in FASTA format, to facilitate the chainning (by UNIX pipes) of
+multiple B<bioseq> runs.
+
+Methods that are currently I<not> wrappers should ideally be factored
+into individual Bio::Perl modules, which are better tested and handle
+exceptions better than stand-alone codes in the Bio::BPWrapper
+package. As a design principle, command-line scripts here should
+consist of I<only> wrapper calls.
+
+=head2 Options
+
+=over 4
+
+=item --help, -h
+
+Print a brief help message and exit.
+
+=item --man (but not "-m")
+
+Print the manual page and exit.
+
+=item --composition, -c <input_file>
+
+Base or AA composition. A wrapper for L<Bio::Tools::SeqStats#count_monomers>
+
+=item --delete, -d 'tag:value' <input_file>
+
+Delete a sequence or a comma-separated list of sequences, e.g.,
+
+   -d 'id:foo'	    # by id
+   -d 'order:2'	    # by order
+   -d 'length:n     # by min length, where 'n' is length
+   -d 'ambig:x'	    # by min % ambiguous base/aa, where 'x' is the %
+   -d 'id:foo,bar'  # list by id
+   -d 're:REGEX'    # using a regular expression (only one regex is expected)
+
+=item --fetch, -f <genbank_accession>
+
+Retrieves a sequence from GenBank using the provided accession
+number. A wrapper for L<Bio::DB::GenBank-#get_Seq_by_acc>.
+
+=item --nogaps, -g <input_file>
+
+Remove gaps
+
+=item --input, -i <input_file>
+
+Input file format. By default, this is 'fasta'. For Genbank format, use 'genbank'. For EMBL format, use 'embl'. Wrap Bio::SeqIO.
+
+=item --length, -l <input_file>
+
+Print all sequence lengths. Wraps L<Bio::Seq#length>.
+
+=item --numseq, -n.
+
+Print number of sequences.
+
+=item --output, -o 'format' <input_file>
+
+Output file format. By default, this is 'fasta'. For Genbank format,
+use 'genbank'. For EMBL format, use 'embl'. Wraps L<Bio::SeqIO>.
+
+=item --pick, -p
+
+Select a single sequence:
+
+   --pick 'id:foo'        by id
+   --pick 'order:2'       by order
+   --pick 're:REGEX'      using a regular expression
+
+Select a list of sequences:
+
+   --pick 'id:foo,bar'    list by id
+   --pick 'order:2,3'     list by order
+   --pick 'order:2-10'    list by range
+
+Usage: bioseq -p 'tag:value' <input_file>
+
+=item --revcom | -r <input_file>
+
+Reverse complement. Wraps L<Bio::Seq#revcom>.
+
+=item --subseq | -s 'beginning_index, ending_index' <input_file>
+
+Select substring (of the 1st sequence). Wraps L<Bio::Seq#subseq>. For example:
+
+   bioseq -s'20,80' <input_file> (or -s='20,80')
+
+=item --translate | -t [1|3|6] <input_file>
+
+Translate in 1, 3, or 6 frames. eg, -t1, -t3, or -t6. Wraps
+L<Bio::Seq#translate>, L<Bio::SeqUtils#translate_3frames>, and
+L<Bio::SeqUtils#translate_6frames>.
+
+=item --restrict | -x 'RE' <dna_fasta_file>
+
+Predicted fragments from digestion by a specified restriction
+enzyme. An input file with a single sequence is expected. A wrapper of
+L<Bio::Restriction::Analysis#>cut>.
+
+=item --anonymize | -A 'number' <input_file>
+
+Replace sequence IDs with serial IDs 'n' characters long, including a
+leading 'S' (e.g., -A'5' gives S0001). Produces a sed script file with
+a '.sed' suffix that may be used with sed's '-f' argument. If the
+filename is '-', the sed file is named C<STDOUT.sed> instead. The sed
+filename is specified on C<STDERR>.
+
+=item --break | -B <input_file>
+
+Break into individual sequences, one sequence per file
+
+=item --count-codons | -C <input_file>
+
+Count codons for coding sequences (e.g., a genome file consisting of
+CDS sequences). A wrapper of C<Bio::Tools::SeqStats->count_codons()>.
+
+=item --feat2fasta | -F
+
+Extract gene sequences in FASTA from a GenBank file of bacterial
+genome. Won't work for a eukaryote genbank file. For example:
+
+   bioseq -i'genbank' -F <genbank_file>
+
+=item --leadgaps | -G <input_file>
+
+Count and return the number of leading gaps in each sequence.
+
+=item --hydroB, -H
+
+Return the mean Kyte-Doolittle hydropathicity for protein sequences. A
+wrapper of L<Bio::Tools::SeqStats#hydrophobicity>.
+
+=item --linearize, -L <input_file>
+
+Linearize FASTA, one sequence per line.
+
+=item --reloop, -R
+
+Re-circularize a bacterial genome by starting at a specified position.
+For example for sequence "ABCDE".  C<bioseq -R'2' ..>
+would generate"'BCDEA".
+
+ bioseq -R 'number' <input_file>
+
+=item --version, -V
+
+Print current release version of this command and Bio::BPWrapper
+
+Usage: bioseq -V
+
+=item --removestop, -X
+
+Remove stop codons (e.g., PAML input)
+
+   bioseq -X <input_file>
+
+=back
+
+=head1 EXAMPLES
+
+=head2 FASTA descriptors
+
+ bioseq -l fasta_file             # [l]engths of sequences
+ bioseq -n fasta_file             # [n]umber of sequences
+ bioseq -c fasta_file             # base or aa [c]omposition of sequences
+
+=head2 FASTA filters
+
+These take a FASTA-format file as input and output one
+or more FASTA-format file.
+
+=head3 Multiple FASTA-file output
+
+ bioseq -r fasta_file             # [r]everse-complement sequences
+ bioseq -p'order:3' fasta_file    # [p]ick the 3rd sequences
+ bioseq -p're:B31' fasta_file     # [p]ick sequences with regex
+ bioseq -d'order:3' fasta_file    # [d]elete the 3rd sequences
+ bioseq -d're:B31' fasta_file     # [d]elete sequences with regex
+ bioseq -t1 dna_fasta             # [t]ranslate in 1st reading frame
+ bioseq -t3 dna_fasta             # [t]ranslate in 3 reading frames
+ bioseq -t6 dna_fasta             # [t]ranslate in 6 reading frames
+ bioseq -g fasta_file             # remove [g]aps
+ bioseq -A fasta_file             # [A]nonymize sequence IDs
+
+=head3 Single FASTA-file output
+
+ bioseq -s'1,10' fasta_file       # [s]ubsequence from positions 1-10
+ bioseq -R'10' bac_genome_fasta   # [R]e-circularize a genome t position 10
+
+ # Retrieve sequence from database
+ bioseq -f 'X83553' -o 'genbank'  # [f]etch a genbank file by accession
+ bioseq -f 'X83553' -o 'fasta'    # [f]etch a genbank file in FASTA
+
+ # Less common usages (options in CAPs)
+ bioseq -L fasta_file             # [L]inearize FASTA: one sequence per line
+ bioseq -B fasta_file             # [B]reak into single-seq files
+ bioseq -C cds_fasta              # [C]odon counts (for coding sequences)
+ bioseq -H pep_fasta              # [H]ydrophobicity score (for protein seq)
+ bioseq -i'genbank' -F file.gb    # extract genbank [F]eatures to FASTA
+ bioseq -x 'EcoRI' dna_fasta      # Fragments from restriction digest
+
+=head3  Examples involving Unix pipes
+
+ bioseq -p'id:B31' dna_fasta | bioseq -g | bioseq -t1          # pick a seq, remove gaps, & translate
+ bioseq -p'order:2' dna_fasta | bioseq -r | bioseq -s'10,20'   # pick the 2nd seq, rev-com it, & subseq
+
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Qui Lab wiki page|http://diverge.hunter.cuny.edu/labwiki/Bioutils>
+
+=item *
+
+L<Github project wiki page|http://https://github.com/rocky/p5-BPWrapper>
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+Yozen Hernandez <yzhernand at gmail dot com>
+
+=item *
+Girish Ramrattan <gramratt at gmail dot com>
+
+=item  *
+Levy Vargas <levy dot vargas at gmail dot com>
+
+=item  *
+L<Weigang Qiu | mailto:weigang@genectr.hunter.cuny.edu> (Maintainer)
+
+=item *
+Rocky Bernstein
+
+=back

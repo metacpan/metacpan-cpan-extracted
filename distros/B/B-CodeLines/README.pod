@@ -1,0 +1,38 @@
+=head1 NAME
+
+B::CodeLines - Lists executable lines of a Perl program
+
+=head1 SYNOPSIS
+
+           perl -MO=CodeLines foo.pl
+           perl -MO=CodeLines,-exec -e '# string exec form
+           $your="Perl code";
+           goes("here");
+           '
+
+=head1 DESCRIPTION
+
+       This compiler backend prints the out the line numbers of the stopping
+       points of a Perl program. It might be used for example for static 
+       analysis to see of all lines have been executed, or in a when debugger
+       breakpoint is requested (and other ways to get stopping points fails).
+
+=head1 EXAMPLE
+
+       For the second example above, the output is:
+
+    2
+    3
+    -e syntax OK
+
+=head1 AUTHOR
+       Rocky Bernstein, <rocky@cpan.org>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2012 Rocky Bernstein.
+
+=head2 LICENSE
+
+Same terms as Perl.
+

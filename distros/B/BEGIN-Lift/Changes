@@ -1,0 +1,14 @@
+Revision history for Perl extension BEGIN::Lift
+
+0.04
+    - better now that the synopsis actually works
+
+0.03 2017-01-13
+    - actually include a Makefile.PL in the release ;)
+
+0.02 2016-12-29
+	- adding some missing POD, this is what I
+	  get for not using Dist::Zilla on this one
+
+0.01 2016-12-29
+    - Initial release to an unsuspecting world

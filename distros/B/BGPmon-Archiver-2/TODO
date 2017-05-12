@@ -1,0 +1,28 @@
+1. Add validator to check if bgpmon data is sane.
+2. Archive per collector.
+3. Output in bgpdump's format.
+
+
+If collector connection fails:
+in XML File
+<ARCHIVER><TIME> </TIME> <EVENT cause="hello"> STOPPED <CAUSE> </CAUSE> </ARCHIVER>
+in BGPdump File
+ARCHIVER|TIMESTAMP|STOPPED|lostconnection
+(would be last line of a file where archiver stopped for any reason)
+
+when collector starts and file is not at start of interval:
+in XML File
+<ARCHIVER><TIME> </TIME> <EVENT> STARTED </EVENT> </ARCHIVER>
+in BGPdump File
+ARCHIVER|TIMESTAMP|STARTED|reconnected/started 
+(would be first line of a file where archiver started/restarted for any reason)
+
+
+STATUS program:
+
+on detecting down,   
+
+1) identify all files open at time of crash
+2) check last line of each file for ARCHIVER|TS|STOPPED
+3) add ARCHIVER|TS|CRASHED
+

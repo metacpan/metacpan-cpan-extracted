@@ -1,0 +1,48 @@
+Bundle/NiceSleep version 0.11
+=============================
+
+INSTALLATION 
+   To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   or if you use the cpan shell, then you can use:
+
+   perl -MCPAN -e 'install Bundle::NiceSleep'
+
+NAME
+    Bundle::NiceSleep - NiceSleep-related functionality.
+
+SYNOPSIS
+     C<perl -MCPAN -e 'install Bundle::NiceSleep'> 
+
+CONTENTS
+    Proc::NiceSleep - sleep nice & smart
+
+    Proc::ProcessTable - get info about the procs
+
+    Proc::Queue - queue up processes, similar to below
+
+    Proc::Swarm - handle a swarm of procs, similar to above
+
+    Sys::CpuLoad - allows simple reading of loads
+
+    Time::HiRes - hi-res time() and sleep()
+
+DESCRIPTION
+    Modules that are useful for controlling a spate of server processes.
+
+AUTHOR
+    Josh Rabinowitz, <joshr-proc-nicesleep@joshr.com>
+
+SEE ALSO
+    Proc::NiceSleep, Time::HiRes, Proc::ProcessInfo, Proc::Swarm,
+    Proc::Queue, Sys::CpuLoad.
+
+LICENSE
+    Copyright (c) 2002 Josh Rabinowitz, All Right Reserved. Licensed the
+    same as Perl itself.
+

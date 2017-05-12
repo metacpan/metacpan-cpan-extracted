@@ -1,0 +1,65 @@
+Bio-Glite version 0.01
+======================
+
+Bio::Glite is an interface to G-language Genome Analysis Environment
+through its REST web service (http://www.g-language.org). This module
+allows almost everything G-language GAE can do, without installing
+all necessary tookits and modules. 
+
+Advantage of this module over the standard installation of G-language 
+GAE package is:
+   1. Easy installation from CPAN
+   2. Extremely light-weight (less than 1000 lines of code)
+   3. Does not require much CPU/RAM (all calculation is done on the cloud)
+Disadvantages includes:
+   1. Slower analysis speed
+   2. Internet connection is required
+   3. No other software interfaces such as the G-language Shell
+
+Quick Example:
+
+      use Bio::Glite;
+
+      my $gb = load('mgen'); # could also be a local GenBank/EMBL/FASTA file, or an accession number
+
+      foreach my $cds ($gb->cds()){
+          say ">" . $gb->{$cds}->{gene};
+          say $gb->{$cds}->{translation};
+      }
+
+      gcskew($gb, -cumulative=>1, -at=>1);
+
+      say $gb->{filename};
+
+      say gcsi($gb);
+
+For details about the >100 features of G-language GAE, please consult 
+the documentations provided at our website (http://www.g-language.org).
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::Dumper
+  LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Kazuharu Arakawa (gaou@sfc.keio.ac.jp)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

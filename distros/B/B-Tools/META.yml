@@ -1,0 +1,38 @@
+---
+abstract: 'Simple B operating library'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: B-Tools
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  B::Tools:
+    file: lib/B/Tools.pm
+    version: 0.01
+requires:
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/B-Tools/issues
+  homepage: https://github.com/tokuhirom/B-Tools
+  repository: git://github.com/tokuhirom/B-Tools.git
+version: 0.01

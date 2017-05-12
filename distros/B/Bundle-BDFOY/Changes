@@ -1,0 +1,20 @@
+Revision history for Perl module Bundle::BDFOY
+
+. 2017-03-31T20:23:39Z
+	* So, this is embarrassing. Let's try that change again.
+
+20170401 - 2017-03-31T19:06:05Z
+	* Fix https://rt.cpan.org/Ticket/Display.html?id=120781, where
+	I broke CPAN.pm by specify this module as its own prereq.
+
+20160101 - 2016-01-26T18:37:37Z
+	* Update for 2016
+
+20150101 - 2015-01-01
+	* Updates, 8 years later
+
+20070101 - 2007-01-10
+	* Updated for the modules I'm maintaining as of Jan 2007
+
+20060527 - 2006-05-27
+	* First release

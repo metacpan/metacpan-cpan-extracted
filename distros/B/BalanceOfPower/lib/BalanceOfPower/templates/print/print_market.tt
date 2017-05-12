@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% "MARKET" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FILTER color 'yellow' %][% FILTER format('%-16s') %]NATION[% END %][% FILTER format('%-10s') %]STOCK[% END %][% FILTER format('%-10s') %]VALUE[% END %][% FILTER format('%-10s') %]STATUS[% END %]
+[% END %]
+[% FOREACH n IN nations %][% FILTER format('%-16s') %][% n %][% END %][% FILTER format('%-10s') %][% market_data.$n.stocks %][% END %][% FILTER format('%-10s') %][% market_data.$n.wd %][% END %][% FILTER format('%-10s') %][% market_data.$n.status %][% END %]
+[% END %]

@@ -1,0 +1,89 @@
+NAME
+    B::Hooks::OP::Check::StashChange - Invoke callbacks when the stash code
+    is being compiled in changes
+
+SYNOPSIS
+  From Perl
+        package Foo;
+
+        use B::Hooks::OP::Check::StashChange;
+
+        our $id = B::Hooks::OP::Check::StashChange::register(sub {
+            my ($new, $old) = @_;
+            warn "${old} -> ${new}";
+        });
+
+        package Bar; # "Foo -> Bar"
+
+        B::Hooks::OP::Check::StashChange::unregister($Foo::id);
+
+        package Moo; # callback not invoked
+
+  From C/XS
+        #include "hooks_op_check_stashchange.h"
+
+        STATIC OP *
+        my_callback (pTHX_ OP *op, char *new_stash, char *old_stash, void *user_data) {
+            /* ... */
+            return op;
+        }
+
+        UV id;
+
+        /* register callback */
+        id = hook_op_check_stashchange (cv, my_callback, NULL);
+
+        /* unregister */
+        hook_op_check_stashchange_remove (id);
+
+DESCRIPTION
+Perl API
+  register
+        B::Hooks::OP::Check::
+
+        # or
+        my $id = B::Hooks::OP::Check::StashChange::register(\&callback);
+
+    Register "callback" when an opcode is being compiled in a different
+    namespace than the previous one.
+
+    An id that can be used for later removal of the handler using
+    "unregister" is returned.
+
+  unregister
+        B::Hooks::OP::Check::StashChange::unregister($id);
+
+    Disable the callback referenced by $id.
+
+C API
+  TYPES
+   OP *(*hook_op_check_stashchange_cb) (pTHX_ OP *op, const char *new_stash, const char *old_stash, void *user_data)
+    The type the callbacks need to implement.
+
+  FUNCTIONS
+   UV hook_op_check_stashchange (hook_op_check_stashchange_cb cb, void *user_data)
+    Register the callback "cb" to be when an opcode is compiled in a
+    different namespace than the previous. "user_data" will be passed to the
+    callback as the last argument.
+
+    Returns an id that can be used to remove the handler using
+    "hook_op_check_stashchange_remove".
+
+   void *hook_op_check_stashchange_remove (UV id)
+    Remove a previously registered handler referred to by "id".
+
+    Returns the user data that was associated with the handler.
+
+SEE ALSO
+    B::Hooks::OP::Check
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 Florian Ragwitz
+
+    This module is free software.
+
+    You may distribute this code under the same terms as Perl itself.
+

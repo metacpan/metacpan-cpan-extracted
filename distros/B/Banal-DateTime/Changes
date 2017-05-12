@@ -1,0 +1,12 @@
+Revision history for Banal-DateTime
+
+0.10    Mon Jul 21 2014
+        Bump up the version number and do an initial release on CPAN.
+        
+0.02    Mon Jul 14 2014
+        Bring in the actual source files, do some clean-up, add some documentation, put the stuff under version control (git) and ready to roll.
+        
+        
+0.01    Mon Jul 14 2014
+        First version, released on an unsuspecting world.
+

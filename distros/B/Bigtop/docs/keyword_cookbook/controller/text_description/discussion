@@ -1,0 +1,17 @@
+=head1 USE
+
+The C<text_description> is used by CRUD schemes in various places, notably
+to fill in the blank in 'Delete ____?'
+
+At present the description is put into the C<text_description> method
+which is generated in the stub.  In particular, this means that changing
+the description in the bigtop file has no affect once the controller is
+generated.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Look for C<wild child> C<lib/Kids/Child.pm>.

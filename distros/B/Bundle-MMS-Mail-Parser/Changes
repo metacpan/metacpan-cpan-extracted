@@ -1,0 +1,10 @@
+Revision history for Bundle-MMS-Mail-Parser
+
+0.03    09-Jan-06 / 16:00
+        Added MMS::Mail::Provider::UKTMobile and MMS::Mail::Provider::UKVirgin to bundle package list.
+        Updated README
+0.02    17-Sep-05 / 17:00
+        Added MMS::Mail::Provider::UKOrange and MMS::Mail::Provider::UK02 to bundle package list.
+0.01    12-Sep-05 / 21:50
+        First version, released on an unsuspecting world.
+

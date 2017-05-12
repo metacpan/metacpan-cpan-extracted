@@ -1,0 +1,15 @@
+
+<p><h2>Other potential organization names</h2></p>
+<p>Please choose all relevant:</p>
+
+<form action="cpm_workflow.cgi" method="GET">
+  <input type="hidden" name="action" value="view" />
+  <input type="hidden" name="list" value="[% LIST %]"/>
+  [% FOREACH var IN COMPANIES %]
+    <input type="checkbox" name="company" value="[% var %]">[% var %]
+    <br>
+  [% END %]
+  <br>
+  <input type="button" value="Back" onClick="history.go(-1);">
+  <input type="submit" value="Continute">
+</form>

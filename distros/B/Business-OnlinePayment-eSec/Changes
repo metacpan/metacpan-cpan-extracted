@@ -1,0 +1,7 @@
+Revision history for Perl extension Business::OnlinePayment::eSec.
+
+0.02  Thu Jun 20 19:57:20 PDT 2002
+	-bad test referenced Authorize.Net
+
+0.01  Thu Jun 20 sometime PDT 2002
+	-original version; created by ivan 1.0

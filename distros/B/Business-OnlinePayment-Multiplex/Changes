@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::OnlinePayment::Multiplex.
+
+0.01  Wed Jan  7 13:41:46 2004
+	- original version; created by h2xs 1.23 with options
+		-AX --use-new-tests -b 5.6.1 -n Business::OnlinePayment::Multiplex
+

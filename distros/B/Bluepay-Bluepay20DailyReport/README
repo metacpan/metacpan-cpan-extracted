@@ -1,0 +1,89 @@
+NAME
+	Bluepay::Bluepay20DailyReport
+
+VERSION
+	Version: 0.15
+	April 2008
+
+SYNOPSIS
+	Bluepay::Bluepay20DailyReport - The BluePay 2.0 Daily Report interface
+
+DESCRIPTION
+	Bluepay::Bluepay20DailyReport is a Perl based implementation for interaction with the 
+	Bluepay 2.0 Daily Report interface.  The Bluepay 2.0 Daily Report interface is intended 
+	to be polled by a merchant on a daily basis, to get updates on VOID/DECLINED/SETTLED 
+	status for transactions on the day prior.  Bluepay20DailyReport interface has been 
+	developed on Windows XP, but should work on any OS where Perl is installed.
+
+RUNNING Bluepay::Bluepay20DailyReport
+	use Bluepay::Bluepay20DailyReport;
+
+	# Create the object
+	my $bp20Obj = Bluepay::Bluepay20DailyReport->new();
+
+	# Populate fields for tx
+	$bp20Obj->{ACCOUNT_ID} = "myaccountid";
+	$bp20Obj->{SECRET_KEY} = 'mysecretkey';
+	$bp20Obj->{REPORT_START_DATE} = "2008-05-01";	# These are the dates within which transactions will be reported.
+	$bp20Obj->{REPORT_END_DATE} = "2008-05-02";
+	$bp20Obj->{PAYMENT_TYPE} = 'ACH';	# ACH or CREDIT
+
+	# Post data to retrieve tx results
+	my $postResults = $bp20Obj->post();
+
+	# If result is array, SUCCESS
+	if(ref($postResults) eq 'ARRAY') {
+		foreach my $result (@$postResults) {
+			print "Tx Info: " . $result->{id} . "\n";
+			while ( my ($key, $value) = each(%$result) ) {
+			    print "$key => $value\n";
+			}
+			print "\n";
+		}
+	}
+	# ELSE, print error
+	else { print "$postResults\n"; }	
+
+METHODS
+	new
+		Creates a new instance of a Bluepay::Bluepay20DailyReport object
+
+	post
+		Posts the data to the Bluepay::Bluepay20post interface
+
+MODULES
+	This script has some dependencies that need to be installed before it
+	can run.  You can use cpan to install the modules.  They are:
+	 - Digest::MD5
+	 - LWP::UserAgent
+	 - URI::Escape
+	 - Text::CSV
+
+AUTHOR
+	The Bluepay::Bluepay20DailyReport perl module was written by Christopher Kois <ckois@bluepay.com>.
+
+COPYRIGHTS
+	The Bluepay::Bluepay20DailyReport package is Copyright (c) April, 2008 by BluePay, Inc. 
+	http://www.bluepay.com All rights reserved.  You may distribute this module under the terms 
+	of GNU General Public License (GPL). 
+	
+	Module Copyrights:
+	 - The Digest::MD5 module is Copyright (c) 1998-2003 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/Digest-MD5-2.36/MD5.pm
+	 - The LWP::UserAgent module is Copyright (c) 1995-2008 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/libwww-perl-5.812/lib/LWP/UserAgent.pm
+	 - The URI::Escape module is Copyright (c) 1995-2004 Gisle Aas.
+		Available at: http://search.cpan.org/~gaas/URI-1.36/URI/Escape.pm
+	 - The Text::CSV module is Copyright (c) 2007-2008 Makamaka Hannyaharamitu.
+		Available at: http://search.cpan.org/~makamaka/Text-CSV-1.04/lib/Text/CSV.pm
+				
+	NOTE: Each of these modules may have other dependencies.  The modules listed here are
+	the modules that Bluepay::Bluepay20DailyReport specifically references.
+
+SUPPORT/WARRANTY
+	Bluepay::Bluepay20DailyReport is free Open Source software.  This code is Free.  You may use it, modify it, 
+	redistribute it, post it on the bathroom wall, or whatever.  If you do make modifications that are 
+	useful, Bluepay would love it if you donated them back to us!
+
+KNOWN BUGS
+	This is version 0.15 of Bluepay::Bluepay20DailyReport.  There are currently no known bugs.

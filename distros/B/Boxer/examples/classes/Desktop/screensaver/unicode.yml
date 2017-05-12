@@ -1,0 +1,9 @@
+classes:
+  - Desktop
+parameters:
+  doc:
+    desktop:
+      pkg:
+        - include screensaver unicode-screensaver
+  pkg:
+    - unicode-screensaver

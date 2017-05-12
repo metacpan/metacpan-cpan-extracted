@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::OnlinePayment::PayConnect.
+
+0.02  Fri Nov 22 04:11:24 PST 2002
+	-trim trailing newline+CR from response
+
+0.01  Sat Nov 17 21:59:37 PST 2002
+	-original version; created by ivan 1.0
+

@@ -1,0 +1,9 @@
+classes:
+  - Console.mail
+parameters:
+  doc:
+    console-mail:
+      pkg:
+        - include console mail helper tools
+  pkg:
+    - mb2md

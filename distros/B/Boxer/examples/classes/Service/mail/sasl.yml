@@ -1,0 +1,12 @@
+#TODO: check if cyrus-sasl is still needed
+classes:
+  - Service.mail.mta
+  - Service.mail.mda
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - install SASL email authentication using Dovecot and Cyrus
+  pkg:
+    - dovecot-core
+    - sasl2-bin

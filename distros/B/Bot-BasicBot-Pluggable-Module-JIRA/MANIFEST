@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Bot/BasicBot/Pluggable/Module/JIRA.pm
+t/00-compile.t
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/release-eol.t
+t/release-pod-syntax.t

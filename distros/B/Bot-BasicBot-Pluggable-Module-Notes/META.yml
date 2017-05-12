@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Bot-BasicBot-Pluggable-Module-Notes
+version:            0.02
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bot::BasicBot::Pluggable:  0.74
+    Carp:                 0
+    DBD::SQLite:          0
+    DBIx::Class:          0.08121
+    File::Spec::Functions:  0
+    JSON:                 0
+    Test::DatabaseRow:    0
+    Test::More:           0
+    Time::Piece:          0
+    Web::Simple:          0.02
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

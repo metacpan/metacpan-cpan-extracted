@@ -1,0 +1,21 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-OnlinePayment-Vanco
+version:      0.02
+version_from: Vanco.pm
+installdirs:  site
+requires:
+    Business::OnlinePayment:       3
+    Crypt::SSLeay:                 0
+    Date::Calc:                    0
+    HTTP::Request:                 0
+    HTTP::Request::Common:         0
+    LWP::UserAgent:                0
+    Test::More:                    0.42
+    Text::CSV_XS:                  0
+    Tie::IxHash:                   0
+    XML::Simple:                   0
+    XML::Writer:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

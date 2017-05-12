@@ -1,0 +1,22 @@
+Revision history for Bible::OBML
+
+1.07      2016-11-28 11:53:46-08:00 America/Los_Angeles
+        - Updated docs to skip mention of non-required ASCII-only requirement
+
+1.06      2016-11-24 09:20:21-08:00 America/Los_Angeles
+        - Change red text markers from <> to **
+
+1.05      2015-01-29 13:08:28-08:00 America/Los_Angeles
+        - Fix POD error that talked about wrong module (resolves issue #1)
+
+1.04      2015-01-28 23:09:25-08:00 America/Los_Angeles
+        - Fixed POD rendering issue.
+
+1.03      2015-01-28 22:36:11-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla.
+
+1.02      Wed Sep 24 16:00:58 PDT 2014
+        - Some OCD cleanup; addition of Travis and Coveralls.
+
+1.01      Mon Aug  4 16:30:15 PDT 2014
+        - First version, released on an unsuspecting world.

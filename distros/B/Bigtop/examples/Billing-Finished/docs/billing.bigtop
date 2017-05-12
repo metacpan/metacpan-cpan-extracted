@@ -1,0 +1,373 @@
+config {
+    engine          CGI;
+    template_engine TT;
+    Init            Std             {}
+    CGI             Gantry          {
+            with_server 1;
+            flex_db 1;
+            gantry_conf 1;
+    }
+    SQL             Postgres        {}
+    SQL             MySQL           {}
+    SQL             SQLite          {}
+    Control         Gantry          { dbix 1; }
+    Model           GantryDBIxClass {}
+    SiteLook        GantryDefault   {}
+    Conf            Gantry          { instance billing; gen_root 1; }
+}
+app Billing {
+    authors `Phil Crow`, `Tim Keefer`;
+    config {
+        dbconn              `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper    `genwrapper.tt`            => no_accessor;
+        show_dev_navigation 1                          => no_accessor;
+    }
+    table    my_company      {
+        foreign_display `%name`;
+
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field address {
+            is             varchar;
+            label          Address;
+            html_form_type text;
+        }
+        field city {
+            is             varchar;
+            label          City;
+            html_form_type text;
+        }
+        field state {
+            is             varchar;
+            label          State;
+            html_form_type text;
+        }
+        field zip {
+            is             varchar;
+            label          Zip;
+            html_form_type text;
+        }
+        field description {
+            is                 varchar;
+            label              Description;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field contact_name  {
+            is                 varchar;
+            label              `Contact Name`;
+            html_form_type     text;
+        }
+        field contact_email {
+            is                 varchar;
+            label              `Contact Email`;
+            html_form_type     text;
+        }
+        field contact_phone {
+            is                 varchar;
+            label              `Contact Phone`;
+            html_form_type     text;
+        }
+        data
+            name => `Crow Motors`,
+            address => `12 E. Main`,
+            city => `Paxton`,
+            state => `NE`,
+            zip => 69155,
+            description => `Car and Implement Sales and Service`,
+            contact_name => `EJ`,
+            contact_email => `ej@example.com`,
+            contact_phone => `1-800-CROW-MOT`;
+    }
+    table    customer         {
+        foreign_display `%name`;
+
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field address {
+            is             varchar;
+            label          Address;
+            html_form_type text;
+        }
+        field city {
+            is             varchar;
+            label          City;
+            html_form_type text;
+        }
+        field state {
+            is             varchar;
+            label          State;
+            html_form_type text;
+        }
+        field zip {
+            is             varchar;
+            label          Zip;
+            html_form_type text;
+        }
+        field description {
+            is                 varchar;
+            label              Description;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field contact_name  {
+            is                 varchar;
+            label              `Contact Name`;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field contact_email {
+            is                 varchar;
+            label              `Contact Email`;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field contact_phone {
+            is                 varchar;
+            label              `Contact Phone`;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        data
+            name => `Groover Nordqvist`,
+            address => `502 E. Third`,
+            city => `Paxton`,
+            state => `NE`,
+            zip => 69155,
+            description => `Prime Customer`,
+            contact_name => `Groover`,
+            contact_email => `gnordqvist@example.com`,
+            contact_phone => `Unlisted`;
+    }
+    table    line_item        {
+        foreign_display `%name`;
+
+        field id { is int4, primary_key, auto; }
+        field due_date {
+            is               date;
+            label            `Due Date`;
+            date_select_text Select;
+            html_form_type   text;
+        }
+        field name {
+            is               varchar;
+            label            Name;
+            html_form_type   text;
+        }
+        field invoice {
+            is                 int4;
+            label              `Invoice Number`;
+            refers_to          invoice;
+            html_form_type     select;
+        }
+        field hours {
+            is                 int4;
+            label              Hours;
+            html_form_type     text;
+        }
+        field charge_per_hour {
+            is                 int4;
+            label              Rate;
+            html_form_type     text;
+        }
+        field notes {
+            is                 text;
+            label              `Notes to Customer`;
+            html_form_type     textarea;
+            html_form_optional 1;
+            html_form_rows     4;
+            html_form_cols     50;
+        }
+        field description {
+            is                 text;
+            label              `Notes to Self`;
+            html_form_type     textarea;
+            html_form_optional 1;
+            html_form_rows     4;
+            html_form_cols     50;
+        }
+    }
+    table    invoice          {
+        foreign_display `%number`;
+
+        field id { is int4, primary_key, auto; }
+        field number {
+            is                 varchar;
+            label              Number;
+            html_form_type     text;
+        }
+        field status {
+            is                 int4;
+            label              Status;
+            refers_to          status;
+            html_form_type     select;
+        }
+        field sent {
+            is                 date;
+            label              `Sent On`;
+            date_select_text   `Popup Calendar`;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field paid {
+            is                 date;
+            label              `Paid On`;
+            date_select_text   `Popup Calendar`;
+            html_form_type     text;
+            html_form_optional 1;
+        }
+        field my_company {
+            is                 int4;
+            label              `My Company`;
+            refers_to          my_company;
+            html_form_type     select;
+        }
+        field customer {
+            is                 int4;
+            label              Customer;
+            refers_to          customer;
+            html_form_type     select;
+        }
+        field notes {
+            is                 text;
+            label              `Notes to Customer`;
+            html_form_type     textarea;
+            html_form_optional 1;
+            html_form_rows     4;
+            html_form_cols     50;
+        }
+        field description {
+            is                 text;
+            label              `Notes to Self`;
+            html_form_type     textarea;
+            html_form_optional 1;
+            html_form_rows     4;
+            html_form_cols     50;
+        }
+    }
+    table    status            {
+        foreign_display `%name: %description`;
+
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field description {
+            is             varchar;
+            label          Description;
+            html_form_type text;
+        }
+
+        data name => `Working`, description => `Work in Progress, NOT Billed`;
+        data name => `Sent`,    description => `Mailed to Customer`;
+        data name => `Paid`,    description => `Payment Received`;
+    }
+    controller Status is AutoCRUD {
+        controls_table   status;
+        rel_location     status;
+        text_description status;
+        page_link_label  Status;
+        method do_main is main_listing {
+            title            `Status`;
+            cols             name;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        status;
+            fields           name, description;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller Company is AutoCRUD {
+        controls_table   my_company;
+        rel_location     company;
+        text_description company;
+        page_link_label  Companies;
+        method do_main is main_listing {
+            title            `My Companies`;
+            cols             name, contact_phone;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        company;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller Customer is AutoCRUD {
+        controls_table   customer;
+        rel_location     customer;
+        text_description customer;
+        page_link_label  Customers;
+        method do_main is main_listing {
+            title            `Customers`;
+            cols             name, contact_name, contact_phone;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        customer;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    controller LineItem is AutoCRUD {
+        controls_table   line_item;
+        rel_location     lineitem;
+        uses             Gantry::Plugins::Calendar;
+        text_description `line item`;
+        page_link_label  `Line Items`;
+        method do_main is main_listing {
+            title            `Line Items`;
+            cols             name, invoice, due_date;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        line_item;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                javascript => `$self->calendar_month_js( 'line_item' )`;
+        }
+    }
+    controller Invoice is AutoCRUD {
+        controls_table   invoice;
+        rel_location     invoice;
+        uses             Gantry::Plugins::Calendar;
+        text_description invoice;
+        page_link_label  Invoices;
+        method do_pdf   is stub {
+            extra_args   `$id`;
+        }
+        method do_main is main_listing {
+            title            `Invoices`;
+            cols             number, customer, status;
+            header_options   Add;
+            row_options
+                Tasks => `"/lineitem/main"`, PDF, Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        invoice;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                javascript => `$self->calendar_month_js( 'invoice' )`;
+        }
+    }
+}

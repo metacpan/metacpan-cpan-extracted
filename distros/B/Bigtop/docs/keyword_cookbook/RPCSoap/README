@@ -1,0 +1,65 @@
+This directory does not explain individual Bigtop statements.  Rather,
+it provides a small, but complete and self-contained, example of how
+to set up an RPC style SOAP server with Bigtop and Gantry.
+
+It also does not show document style SOAP.
+
+To run the example, first change to the Kids directory.  Second, start
+the stand alone server:
+
+    ./app.server
+
+In another shell, again change to the Kids directory and type:
+
+    ./testclient suzy
+
+Supply a child's name on the command line, receive that child's birthday.
+There are two defined children: 'Joey' and 'Suzy', but the server
+upper cases them for lookups.
+
+CLIENT
+
+The client is a straightforward script which relies on here documents,
+LWP, and XML::Simple to communicate with the server.
+
+SERVER
+
+Most of the server is defined in the bigtop file.  Look in docs/example.bigtop
+for the controller called 'Soap'.
+
+The keywords are explained in detail in keyword_cookbook/controller and
+keyword_cookbook/method subdirectories.  Here is a list of the keywords
+involved:
+
+    controller:
+        soap_name
+        namespace_base
+        gen_uses
+        skip_test
+
+    method:
+        expects
+        returns
+
+Note that when you tell Bigtop that a method is SOAP, Bigtop assumes
+its style is RPC.
+
+Once bigtop builds the skeleton of the app, all the work goes into
+lib/Kids/Soap.pm.  Since there is only one method here, all the code is
+is in getBirthDay.  Note that there is no corresponding do_getBirthDay.
+All RPC SOAP requests go through do_main which is exported by
+Gantry::Plugins::SOAP::RPC.
+
+All methods of type 'SOAP' receive two parameters: the invoking site
+object and a hash reference with the SOAP parameters.  The names
+of the parameters are specified with the 'expects' method keyword.
+
+Methods of type 'SOAP' must return a hash reference with a key
+for each variable defined in the 'returns' method statement.
+
+CAVEAT
+
+Note that Gantry's RPC SOAP support does not support complex SOAP types.
+If you need those, you should try to convice your clients to accept
+document style instead.  Otherwise, patches for that support are welcome.
+

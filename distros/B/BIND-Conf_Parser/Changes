@@ -1,0 +1,25 @@
+Revision history for Perl extension BIND::Conf_Parser.
+
+0.01  Wed Jun  2 23:53:11 1999
+	- original version; parsed version 8.1 config files
+
+0.90  Wed Jun  2 23:55:23 1999
+	- Updated to parse version 8.2 config files
+	- Added POD documentation
+	- Created distribution framework
+	- Added README file
+	- Include verify_zones script as a demonstration and tool
+
+0.91  Wed Jul 14 02:33:53 1999
+	- Fixed parsing of logfile sizes
+	- Remove Gustavus specific bits from verify_zones
+
+0.92  Sat Sep  4 13:07:46 1999
+	- The parser would die on an unknown method when attempting to
+	  parse address match lists
+	- Forgot to eat the closing semicolon of 'acl' statements
+	- Choke on unknown statements
+
+0.95  Thu Oct 21 14:31:31 1999
+	- Updated to parse version 8.2.2 config files
+	- Renamed all keys in the object hash to start with an underbar

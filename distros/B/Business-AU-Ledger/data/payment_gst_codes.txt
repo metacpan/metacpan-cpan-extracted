@@ -1,0 +1,7 @@
+EXCL, Excluded from GST
+FREE, GST-free
+INPUT, For making input taxed sales
+MIXED, Mixed (GST-free and taxable)
+NO GST, No GST in price
+NREG, Not registered for GST
+TAXED, GST Taxable

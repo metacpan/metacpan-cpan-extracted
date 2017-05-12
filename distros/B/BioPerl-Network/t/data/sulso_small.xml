@@ -1,0 +1,321 @@
+   <entrySet level="2" minorVersion="3" version="5" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/rel25/src/MIF253.xsd">
+     <entry>
+       <source releaseDate="2007-01-12">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" dbAc="MI:0446" id="14681455" refType="primary-reference" refTypeAc="MI:0358"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0469" refType="primary-reference" refTypeAc="MI:0358"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="2">
+           <names>
+             <shortLabel>knochel-1999-1</shortLabel>
+             <fullName>The crystal structure of anthranilate synthase from Sulfolobus solfataricus: functional implications.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" dbAc="MI:0446" id="10449718" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1028078" secondary="knochel-1999-1"/>
+             <secondaryRef db="newt" dbAc="MI:0247" id="2287" refType="target-species" secondary="sulso"/>
+           </xref>
+           <hostOrganismList>
+             <hostOrganism ncbiTaxId="-1">
+               <names>
+                 <shortLabel>in vitro</shortLabel>
+               </names>
+             </hostOrganism>
+           </hostOrganismList>
+           <interactionDetectionMethod>
+             <names>
+               <shortLabel>x-ray</shortLabel>
+               <fullName>x-ray crystallography</fullName>
+               <alias>X-ray</alias>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0114" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionDetectionMethod>
+           <participantIdentificationMethod>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0396" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="7940758" refType="go-definition-ref" refTypeAc="MI:0242"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </participantIdentificationMethod>
+           <attributeList>
+             <attribute name="author-list">Knochel T., Ivens A., Hester G., Gonzalez A., Bauerle R., Wilmanns M., Kirschner K., Jansonius JN.</attribute>
+             <attribute name="journal">Proc. Natl. Acad. Sci. U.S.A. (0027-8424)</attribute>
+             <attribute name="publication-year">1999</attribute>
+             <attribute name="dataset">MSD - Data obtained from The Macromolecular Structure Database</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <interactor id="4">
+           <names>
+             <shortLabel>trpe_sulso</shortLabel>
+             <fullName>Anthranilate synthase component 1</fullName>
+             <alias type="gene name" typeAc="MI:0301">trpE</alias>
+             <alias type="locus name" typeAc="MI:0305">SSO0893</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q06128" refType="identity" refTypeAc="MI:0356" secondary="trpe_sulso" version="SP_56"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006805" secondary="Anth_synth_I_N"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR005801" secondary="TRPE_1_chor_bd"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR010116" secondary="TrpE_arc_synth"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-1028059" secondary="trpe_sulso"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="2287">
+             <names>
+               <shortLabel>sulso</shortLabel>
+               <fullName>Sulfolobus solfataricus</fullName>
+             </names>
+           </organism>
+           <sequence>MEVHPISEFASPFEVFKCIERDFKVAGLLESIGGPQYKARYSVIAWSTNGYLKIHDDPVNILNGYLKDLKLADIPGLFKGGMIGYISYDAVRFWEKIRDLKPAAEDWPYAEFFTPDNIIIYDHNEGKVYVNADLSSVGGCGDIGEFKVSFYDESLNKNSYERIVSESLEYIRSGYIFQVVLSRFYRYIFSGDPLRIYYNLRRINPSPYMFYLKFDEKYLIGSSPELLFRVQDNIVETYPIAGTRPRGADQEEDLKLELELMNSEKDKAEHLMLVDLARNDLGKVCVPGTVKVPELMYVEKYSHVQHIVSKVIGTLKKKYNALNVLSATFPAGTVSGAPKPMAMNIIETLEEYKRGPYAGAVGFISADGNAEFAIAIRTAFLNKELLRIHAGAGIVYDSNPESEYFETEHKLKALKTAIGVR</sequence>
+         </interactor>
+         <interactor id="7">
+           <names>
+             <shortLabel>trpg_sulso</shortLabel>
+             <fullName>Anthranilate synthase component II</fullName>
+             <alias type="gene name" typeAc="MI:0301">trpG</alias>
+             <alias type="locus name" typeAc="MI:0305">SSO0894</alias>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" dbAc="MI:0486" id="Q06129" refType="identity" refTypeAc="MI:0356" secondary="trpg_sulso" version="SP_52"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006220" secondary="Anth_synthII"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR001317" secondary="CP_synthGATase"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR011702" secondary="GATASE"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR000991" secondary="GATase_1"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR012998" secondary="GATase_1_AS"/>
+             <secondaryRef db="interpro" dbAc="MI:0449" id="IPR006221" secondary="TrpG_papA"/>
+             <secondaryRef db="intact" dbAc="MI:0469" id="EBI-1028067" secondary="trpg_sulso"/>
+           </xref>
+           <interactorType>
+             <names>
+               <shortLabel>protein</shortLabel>
+               <fullName>protein</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0326" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+               <secondaryRef db="so" dbAc="MI:0601" id="SO:0000358" refType="identity" refTypeAc="MI:0356"/>
+             </xref>
+           </interactorType>
+           <organism ncbiTaxId="2287">
+             <names>
+               <shortLabel>sulso</shortLabel>
+               <fullName>Sulfolobus solfataricus</fullName>
+             </names>
+           </organism>
+           <sequence>MDLTLIIDNYDSFVYNIAQIVGELGSYPIVIRNDEISIKGIERIDPDRIIISPGPGTPEKREDIGVSLDVIKYLGKRTPILGVCLGHQAIGYAFGAKIRRARKVFHGKISNIILVNNSPLSLYYGIAKEFKATRYHSLVVDEVHRPLIVDAISAEDNEIMAIHHEEYPIYGVQFHPESVGTSLGYKILYNFLNRV</sequence>
+         </interactor>
+       </interactorList>
+       <interactionList>
+         <interaction id="1">
+           <names>
+             <shortLabel>trpe-trpg-1</shortLabel>
+             <fullName>The crystal structure of anthranilate synthase from
+   sulfolobus solfataricus</fullName>
+           </names>
+           <xref>
+             <primaryRef db="intact" dbAc="MI:0469" id="EBI-1028084" secondary="trpe-trpg-1"/>
+             <secondaryRef db="pdb" dbAc="MI:0460" id="1QDL" refType="identity" refTypeAc="MI:0356"/>
+           </xref>
+           <experimentList>
+             <experimentRef>2</experimentRef>
+           </experimentList>
+           <participantList>
+             <participant id="3">
+               <interactorRef>4</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>neutral component</shortLabel>
+                     <fullName>neutral component</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <featureList>
+                 <feature id="5">
+                   <names>
+                     <shortLabel>region</shortLabel>
+                   </names>
+                   <featureType>
+                     <names>
+                       <shortLabel>sufficient to bind</shortLabel>
+                       <fullName>sufficient binding site</fullName>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureType>
+                   <featureRangeList>
+                     <featureRange>
+                       <startStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </startStatus>
+                       <begin position="1"/>
+                       <endStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </endStatus>
+                       <end position="421"/>
+                     </featureRange>
+                   </featureRangeList>
+                 </feature>
+               </featureList>
+               <hostOrganismList>
+                 <hostOrganism ncbiTaxId="2287">
+                   <names>
+                     <shortLabel>sulso</shortLabel>
+                     <fullName>Sulfolobus solfataricus</fullName>
+                   </names>
+                 </hostOrganism>
+               </hostOrganismList>
+             </participant>
+             <participant id="6">
+               <interactorRef>7</interactorRef>
+               <biologicalRole>
+                 <names>
+                   <shortLabel>unspecified role</shortLabel>
+                   <fullName>unspecified role</fullName>
+                 </names>
+                 <xref>
+                   <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0499" refType="identity" refTypeAc="MI:0356"/>
+                   <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                 </xref>
+               </biologicalRole>
+               <experimentalRoleList>
+                 <experimentalRole>
+                   <names>
+                     <shortLabel>neutral component</shortLabel>
+                     <fullName>neutral component</fullName>
+                   </names>
+                   <xref>
+                     <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0497" refType="identity" refTypeAc="MI:0356"/>
+                     <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                   </xref>
+                 </experimentalRole>
+               </experimentalRoleList>
+               <featureList>
+                 <feature id="8">
+                   <names>
+                     <shortLabel>region</shortLabel>
+                   </names>
+                   <featureType>
+                     <names>
+                       <shortLabel>sufficient to bind</shortLabel>
+                       <fullName>sufficient binding site</fullName>
+                     </names>
+                     <xref>
+                       <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0442" refType="identity" refTypeAc="MI:0356"/>
+                       <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+                     </xref>
+                   </featureType>
+                   <featureRangeList>
+                     <featureRange>
+                       <startStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </startStatus>
+                       <begin position="1"/>
+                       <endStatus>
+                         <names>
+                           <shortLabel>certain</shortLabel>
+                         </names>
+                         <xref>
+                           <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0335" refType="identity" refTypeAc="MI:0356"/>
+                         </xref>
+                       </endStatus>
+                       <end position="195"/>
+                     </featureRange>
+                   </featureRangeList>
+                 </feature>
+               </featureList>
+               <hostOrganismList>
+                 <hostOrganism ncbiTaxId="2287">
+                   <names>
+                     <shortLabel>sulso</shortLabel>
+                     <fullName>Sulfolobus solfataricus</fullName>
+                   </names>
+                 </hostOrganism>
+               </hostOrganismList>
+             </participant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>direct interaction</shortLabel>
+               <fullName>direct interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" dbAc="MI:0488" id="MI:0407" refType="identity" refTypeAc="MI:0356"/>
+               <secondaryRef db="pubmed" dbAc="MI:0446" id="14755292" refType="primary-reference" refTypeAc="MI:0358"/>
+             </xref>
+           </interactionType>
+           <attributeList>
+             <attribute name="assembly">tetrameric, multimeric</attribute>
+             <attribute name="3d-r-factors">working 77.400%, free 74.600%</attribute>
+             <attribute name="3d-resolution">2.5A</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

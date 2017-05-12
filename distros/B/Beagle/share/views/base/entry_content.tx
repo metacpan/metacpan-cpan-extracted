@@ -1,0 +1,20 @@
+: if template_exists( $entry.type ~ '_entry_content.tx' ) {
+:   include $entry.type ~ '_entry_content.tx';
+: } else {
+<div class="content">
+: include '_wedge.tx' { template => 'entry_content_start.tx' };
+
+: my $update = $entry.update;
+: if $update {
+<div class="warnings">
+<: _('newer version is ') :><a href="<: $prefix :>entry/<: $update :>"><: _('here') :></a>
+</div>
+: }
+
+: include 'entry_body.tx';
+: include 'entry_attachments.tx';
+: include 'entry_comments.tx';
+
+: include '_wedge.tx' { template => 'entry_content_end.tx' };
+</div>
+: }

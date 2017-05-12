@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="https://rt.cpan.org/">
+<title>rt.cpan.org: Search Queue = &#x27;future&#x27;</title>
+<link>https://rt.cpan.org/</link>
+<description></description>
+<syn:updateBase>1901-01-01T00:00+00:00</syn:updateBase>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84118" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84187" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84188" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84189" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84312" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=84313" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=85134" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=88967" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=89185" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=91147" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=92525" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=93164" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=94040" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=96409" />
+  <rdf:li rdf:resource="https://rt.cpan.org/Ticket/Display.html?id=96685" />
+ </rdf:Seq>
+</items>
+</channel>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84118">
+<title>I really beg you to take back the exception catching feature in Future 0.11</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84118</link>
+<description>I really beg you to take back the new feature in Future 0.11, in which
+exceptions are caught by Future in followed_by(), and_then() and
+or_else() callbacks.
+
+This is because it can unintensionally hide critical errors and lead
+to hard-to-solve bugs.
+
+Suppose I use a function from someone&#x27;s module.
+
+    package Someones::Module;
+    
+    sub bad_func {
+        die __PACKAGE__ . &#x22;: something bad happened.&#x22;;
+    }
+
+It is often the case that a function throws an exception in some cases.
+And sometimes it is NOT EVEN DOCUMENTED.
+
+Then, when I use it in Future&#x27;s callback,
+
+    package main;
+    my $start = Future-&#x3E;new;
+    $start-&#x3E;and_then(sub {
+        my ($arg) = shift-&#x3E;get;
+        my $result = Someones::Module::bad_func($arg);
+        print &#x22;We get the result: $result&#x22;;
+        return Future-&#x3E;new-&#x3E;done($result);
+    });
+    $start-&#x3E;done(&#x27;a&#x27;);
+
+with Future 0.11, the above code prints nothing. If I didn&#x27;t read
+Future&#x27;s documentation from page to page, I would have no idea what&#x27;s
+going on.
+
+The thrown exception lives in the sense that it makes the resulting
+future fail. However, the failed future can be easily ignored unless
+the user has explicit intension to check errors. I believe errors as
+important as exceptions must be visible regardless of the user&#x27;s
+intension or carefulness.
+
+Therefore, I really beg you to take back the exception catching
+feature in Future 0.11.
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Thu, 21 Mar 2013 12:36:07 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84187">
+<title>needs_all() throws an exception when immediate failed subfutures are given</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84187</link>
+<description>Future-&#x3E;needs_all(@subfutures) method throws an exception when
+immediate failed Futures are included in @subfutures.
+
+Future-&#x3E;needs_all() should accept immediate failed subfutures without
+exceptions.
+
+I ran the following test:
+
+    use strict;
+    use warnings;
+    use Test::More;
+    use Future 0.11;
+    
+    foreach my $method (qw(wait_all wait_any needs_all needs_any)) {
+        foreach my $done_first (0,1) {
+            my $msg = &#x22;$method, done_first = $done_first&#x22;;
+            my @done_subs = map { Future-&#x3E;new-&#x3E;done($_) } 1..5;
+            my @fail_subs = map { Future-&#x3E;new-&#x3E;fail(&#x22;failure $_&#x22;) } 1..5;
+            my @subs = $done_first
+                ? (@done_subs, @fail_subs)
+                    : (@fail_subs, @done_subs);
+            my $f = eval {
+                Future-&#x3E;$method(@subs);
+                pass($msg);
+            };
+            if($@) {
+                fail($msg);
+                diag(&#x22;Exception: $@&#x22;);
+            }
+        }
+    }
+    
+    done_testing();
+
+
+Then the result was:
+
+    ok 1 - wait_all, done_first = 0
+    ok 2 - wait_all, done_first = 1
+    ok 3 - wait_any, done_first = 0
+    ok 4 - wait_any, done_first = 1
+    not ok 5 - needs_all, done_first = 0
+    #   Failed test &#x27;needs_all, done_first = 0&#x27;
+    #   at test.pl line 19.
+    # Exception: failure 1 at test.pl line 15.
+    not ok 6 - needs_all, done_first = 1
+    #   Failed test &#x27;needs_all, done_first = 1&#x27;
+    #   at test.pl line 19.
+    # Exception: failure 1 at test.pl line 15.
+    ok 7 - needs_any, done_first = 0
+    ok 8 - needs_any, done_first = 1
+    1..8
+    # Looks like you failed 2 tests of 8.
+
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Mon, 25 Mar 2013 05:09:05 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84188">
+<title>Error message is not user-friendly for followed_by(), and_then(), or_else() and repeat()</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84188</link>
+<description>I often forget to return a Future in the callback for followed_by(),
+and_then() or or_else() method, especially when I just mean to provide
+other parts of my program with a way to chain further callbacks.
+
+In this case, the error message should be more user-friendly.
+
+Example:
+
+    use Future 0.11;
+    my $f = Future-&#x3E;new;
+    $f-&#x3E;and_then(sub {
+        do_something(shift-&#x3E;get);  ## this does not return anything
+    });
+    
+    $f-&#x3E;done(&#x22;result&#x22;);
+
+Current error message:
+
+    Can&#x27;t call method &#x22;on_ready&#x22; on an undefined value at /usr/local/share/perl/5.14.2/Future.pm line 223.
+
+Should be like:
+
+    You must return a Future from and_then callback at your_script.pl line XXX.
+
+
+
+The same applies to Future::Utils::repeat function.
+
+Example:
+
+    my $ef = Future::Utils::repeat {
+        do_something();
+    } while =&#x3E; sub { 0 };
+
+Current error message:
+
+    Can&#x27;t call method &#x22;new&#x22; on an undefined value at /usr/local/share/perl/5.14.2/Future/Utils.pm line 181.
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Mon, 25 Mar 2013 05:10:30 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84189">
+<title>Behavior of repeat {...} foreach =&#x3E; [] may be counter-intuitive</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84189</link>
+<description>When Future::Utils::repeat() function is called with foreach =&#x3E; []
+option, the CODE block is executed once with undef value given as the
+$item.
+
+Because this behavior may be counter-intuitive for users, it should at
+least be documented.
+
+
+Example:
+
+    use Future;
+    use Future::Utils qw(repeat);
+    use Data::Dumper;
+    
+    repeat {
+        my $item = shift;
+        print Dumper $item;
+        return Future-&#x3E;new-&#x3E;done($item);
+    } foreach =&#x3E; [];
+
+
+Result:
+
+    $VAR1 = undef;
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Mon, 25 Mar 2013 05:12:20 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84312">
+<title>$f1-&#x3E;on_ready($f2) and $f1-&#x3E;cancel() throws an exception</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84312</link>
+<description>With the attached test script, I examined Future&#x27;s behavior when it is
+cancelled. Then I found that $f1-&#x3E;on_ready($f2) and $f1-&#x3E;cancel()
+throws an exception.
+
+Example:
+
+    my $f1 = Future-&#x3E;new;
+    my $f2 = Future-&#x3E;new;
+    
+    $f1-&#x3E;on_ready($f2);
+    $f1-&#x3E;cancel();
+
+Result: $f1-&#x3E;cancel() throws an exception
+
+    Future=HASH(0x9a76fd8) -&#x3E;fail requires an exception that is true at eg.pl line 10.
+
+
+It throws an excetion if on_ready() is called after cancel(), too.
+
+The document does not clearly explain what will happen to $f2 when $f1
+is cancelled.  I suppose $f2 should be cancelled, too.
+
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Sun, 31 Mar 2013 01:05:53 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=84313">
+<title>on_done() and on_fail() do not return the invocant in some cases</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=84313</link>
+<description>I tested the behavior of on_done() and on_fail() methods with the
+attached test script, and found out they do not return the invocant
+Future object in the following cases.
+
+- on_done() is called on already failed Future
+- on_done() is called on already cancelled Future
+- on_fail() is called on already done (succeeded) Future
+- on_fail() is called on already cancelled Future
+
+on_done() and on_fail() should always return the invocant.
+
+
+By the way, the last test in the attached test script fails because of
+the bug I reported in https://rt.cpan.org/Ticket/Display.html?id=84312
+
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Sun, 31 Mar 2013 01:18:18 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=85134">
+<title>Return $self from -&#x3E;on_cancel?</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=85134</link>
+<description>It&#x27;d be useful for symmetry to have -&#x3E;on_cancel return $self, same as -&#x3E;on_done / -&#x3E;on_fail behaviour.
+
+At the moment:
+
+ my $f = Future-&#x3E;new
+ -&#x3E;on_done(sub { ... })
+ -&#x3E;on_fail(sub { ... });
+
+works as expected, but:
+
+ my $f = Future-&#x3E;new
+ -&#x3E;on_done(sub { ... })
+ -&#x3E;on_fail(sub { ... })
+ -&#x3E;on_cancel(sub { ... });
+
+doesn&#x27;t - $f ends up as either undef or 1 in the above example.
+
+cheers,
+
+Tom</description>
+<dc:creator>TEAM@cpan.org</dc:creator>
+<dc:date>Wed, 8 May 2013 10:32:27 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=88967">
+<title>Can&#x27;t call method &#x22;cancel&#x22; on unblessed reference ...</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=88967</link>
+<description>Unit tests and so on occasionally throw
+
+  (in cleanup) Can&#x27;t call method &#x22;cancel&#x22; on unblessed reference at /usr/share/perl5/Future.pm line 992 during global destruction.
+
+(in cleanup) suggests DESTROY, and the only DESTROY in IO::Async is this one, in Process.pm:
+
+ 518 sub DESTROY
+ 519 {
+ 520    my $self = shift;
+ 521    $self-&#x3E;{finish_future}-&#x3E;cancel if $self-&#x3E;{finish_future};
+ 522 }
+
+Offhand I can&#x27;t quite recall if we need or want that in there. If so perhaps it just needs guarding by Devel::GlobalDestruction. May be best to delete it though if it&#x27;s not actually required.
+
+-- 
+
+Paul Evans</description>
+<dc:creator>leonerd-cpan@leonerd.org.uk</dc:creator>
+<dc:date>Wed, 25 Sep 2013 16:33:36 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=89185">
+<title>typo fixes</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=89185</link>
+<description>Future.pm
+53: asynchonous -&#x3E; asynchronous
+455: argmuents -&#x3E; arguments</description>
+<dc:creator>dsteinbrunner@pobox.com</dc:creator>
+<dc:date>Wed, 2 Oct 2013 00:55:04 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=91147">
+<title>Attempting to mark as -&#x3E;done when cancelling repeat { }</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=91147</link>
+<description>Seems that calling -&#x3E;cancel on a repeat {} block can cause things to be marked as done. Does the attached test case look valid?
+
+This is from a larger piece of code which uses timeouts to cancel various actions, the &#x27;already cancelled and cannot be -&#x3E;done&#x27; error seems to crop up every now and then and I *think* this is the cause.
+
+ # Repeat cycle
+ ok 1 - mark trial as done
+ # Cancel repeat future
+ # Repeat cycle
+ ok 2 - can cancel repeat future
+ # Repeat cycle
+ Future=HASH(0xf1ae08) is already cancelled and cannot be -&#x3E;done at .../Future.pm line 565.
+        Future::done(Future=HASH(0xf1ae08)) called at .../Future.pm line 837
+        Future::on_done(Future=HASH(0xf2ecf8), Future=HASH(0xf1ae08)) called at .../Future/Utils.pm line 204
+        Future::Utils::_repeat(CODE(0xa24770), Future=HASH(0xf1ae08), REF(0xc3b8f0), CODE(0xf1ab20), 0) called at .../Future/Utils.pm line 196
+        Future::Utils::__ANON__(Future=HASH(0xf2ecf8)) called at .../Future.pm line 516
+        Future::_mark_ready(Future=HASH(0xf2ecf8)) called at .../Future.pm line 568
+        Future::done(Future=HASH(0xf2ecf8)) called at util-cancel.t line 14
+
+cheers,
+
+Tom
+</description>
+<dc:creator>TEAM@cpan.org</dc:creator>
+<dc:date>Tue, 3 Dec 2013 12:43:27 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=92525">
+<title>-&#x3E;export_to_level in Future::Utils</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=92525</link>
+<description>Currently Future::Utils is just importing the &#x27;import&#x27; sub from Exporter - for some helper modules it&#x27;s useful to apply imports to the caller, particularly for tidying up the &#x27;use&#x27; list when similar patterns of modules are used in several places.
+
+Something along the lines of:
+
+ use Some::Helper::Module qw(:all);
+ try { fmap_void { pairmap { } ... } } catch { ... };
+
+Inheriting from Exporter is my usual approach for this, alternatively would it be possible to add export_to_level to the import list?
+
+With the inheritance approach, there seems to be a bug with base.pm (https://github.com/doy/try-tiny/pull/11) which parent.pm doesn&#x27;t have (https://github.com/doy/try-tiny/issues/14).
+
+cheers,
+
+Tom
+</description>
+<dc:creator>TEAM@cpan.org</dc:creator>
+<dc:date>Tue, 28 Jan 2014 03:02:32 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=93164">
+<title>then doesn&#x27;t seem to check it&#x27;s input</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=93164</link>
+<description>In this simple example the non-sub passed to then gets silently ignored:
+
+use warnings;
+
+use IO::Async::Loop;
+use Future;
+use Future::Utils &#x27;repeat&#x27;;
+
+my $loop = IO::Async::Loop-&#x3E;new;
+
+sub periodic_future {
+   my ($loop, $period, $cb) = @_;
+
+   $loop-&#x3E;delay_future(after =&#x3E; $period / 2)
+      -&#x3E;then(
+         repeat {
+            $loop-&#x3E;delay_future(after =&#x3E; $period)
+               -&#x3E;then($cb)
+         } while =&#x3E; sub { 1 }
+      )
+}
+
+Future-&#x3E;wait_all(
+   periodic_future($loop, 1, sub { say &#x27;woo!&#x27;; Future-&#x3E;wrap }),
+   periodic_future($loop, 2, sub { say &#x27;bang.&#x27;; Future-&#x3E;wrap }),
+)-&#x3E;get;
+
+
+</description>
+<dc:creator>frioux@gmail.com</dc:creator>
+<dc:date>Wed, 19 Feb 2014 13:58:33 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=94040">
+<title>Cyclic reference in then()</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=94040</link>
+<description>I ran the attached test (future_cycle.t) and found there is a cyclic reference in Futures when then() method is called and some of the futures are pending.
+
+I modified Future.pm (attached) so that futures in @{$self-&#x3E;{on_cancel}} are weak-refs. It passed the future_cycle.t test.
+
+However, the modified version fails t/06followed_by.t, which seems to claim there SHOULD be a cyclic ref.
+
+So my question is, is it your intension to create the cyclic ref?
+</description>
+<dc:creator>TOSHIOITO@cpan.org</dc:creator>
+<dc:date>Thu, 20 Mar 2014 13:17:44 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=96409">
+<title>questions in Build.PL</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=96409</link>
+<description>Questions in Build.PL prevent cpantesters smoker from functioning correctly: they cannot test this module and smoker hangs. Please use prompt method from Module::Build. Also, environment variables PERL_MM_USE_DEFAULT or AUTOMATED_TESTING can be used to skip questions.
+
+-- 
+Alexandr Ciornii, http://chorny.net
+</description>
+<dc:creator>CHORNY@cpan.org</dc:creator>
+<dc:date>Thu, 12 Jun 2014 20:40:26 +0000</dc:date>
+</item>
+<item rdf:about="https://rt.cpan.org/Ticket/Display.html?id=96685">
+<title>sub-future cancellation for aggregates</title>
+<link>https://rt.cpan.org/Ticket/Display.html?id=96685</link>
+<description>Hi,
+
+The current behaviour when cancelling sub-futures seems unintuitive.
+
+Given a dependent Future (via -&#x3E;needs_all) with 2 subs, when each sub-Future is cancelled that should reduce the pending count. Once all subs are ready (cancelled/failed/complete), should the dependent not also be marked as ready?
+
+Currently, it seems that cancelling all the subs leaves the dependent Future untouched - likewise, cancelling one of the subs would leave $pending non-zero so the dependent would never be marked as ready no matter what any of the other subs do.
+
+If this is the case, I&#x27;d expect the same to apply to other dependent Futures, -&#x3E;needs_any for example - I can put together a better set of test cases (and/or patches) if so.
+
+cheers,
+
+Tom</description>
+<dc:creator>TEAM@cpan.org</dc:creator>
+<dc:date>Tue, 24 Jun 2014 13:51:44 +0000</dc:date>
+</item>
+</rdf:RDF>

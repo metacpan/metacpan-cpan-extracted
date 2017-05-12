@@ -1,0 +1,3 @@
+classes:
+  - Hardware.gl.hardware
+  - Hardware.gl.software.avoid

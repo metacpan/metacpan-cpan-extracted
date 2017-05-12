@@ -1,0 +1,142 @@
+Revision history for Perl extension Business::OnlinePayment::AuthorizeNet.
+
+3.23  Sun Dec 20 13:05:34 PST 2015
+        - Don't require libense_num / license_state / license_dob for E-Check
+          transacitons; not a universal requirement.  Patches from Craig
+          Pearlman and Adi Fairbank, thanks! (closes: CPAN#110352)
+        - Documentation: fix spelling errors, thanks to Xavier Guimard
+        - Documentation: remove redundant/out-of-date AUTHORS section in AIM.pm
+        - Documentation: add country and email fields to example
+          (closes: CPAN#80337)
+        - Documentation: update repo info
+
+3.22  Mon Sep 26 15:06:52 PDT 2011
+        - Add missing t/lib/Business/FraudDetect/_Fake.pm to MANIFEST to fix
+          tests.  Patch from Rob Brown, thanks!  (closes: CPAN#52444)
+        - Incorporate Business::OnlinePayment::AuthorizeNet::AIM::ErrorCodes by
+          Thomas Sibley and, using it, provide more descriptive error messages.
+          (closes: CPAN#34362)
+        - Switch to Business::OnlinePayment::HTTPS instead of using Net::SSLeay
+          directly
+        - Silence new warnings about lc(undef) introduced in perl 5.12.  Patch
+          from Todd Rinaldo, thanks!  (closes: CPAN#56172)
+
+3.21  Tue Nov 24 10:45:21 PST 2009
+        - Add repository, contributing and contirbutor information to the docs.
+        - Patch from Nate Nuss <ogmoid[...]gmail.com> implementing ("Additional
+          Shipping Information (Level 2 Data)" ~pg 24 in the AIM guide):
+          tax, freight, duty, tax_exempt, po_number.  Thanks!
+          (closes: CPAN#42046)
+        - Patch from Michael Peters to fix a bug in email address handling:
+          exclude x_Email_Customer flag when it is not specified in content,
+          to avoid overriding admin settings.  (closes: CPAN#51501)
+        - Patch from Josh Rosenbaum to fix encapsulation problems.  Thanks!
+          (closes: CPAN#15210)
+        - Clarified documentation wrt transaction key (closes: CPAN#23753)
+        - ARB (recurring billing) fixes from John Springer, thanks!
+          (closes: CPAN#48625)
+        - Add META.yml
+
+3.20  Wed Jun 18 16:46:10 PDT 2008
+        - Patch from Erik Hollensbe <erikh@opensourcery.com> implementing
+          card-present data (track1/track2) and the duplicate_window parameter,
+          and test fixes.  Thanks!
+        - Patch from Paul Timmins <paul@timmins.net> adding check_number field.
+
+3.19  Fri Nov 23 12:46:05 PST 2007
+        - ironically, forgot the 3.18 changelog, so this is 3.19 anyway :)
+
+3.18  Fri Nov 23 10:55:44 PST 2007
+        - Patch From Steve Simitzis for better compatiblity with
+          eProcessingNetwork's AuthorizeNet compatability mode.
+        - added ARB support, rearranging code in the process (Jeff Finucane)
+
+3.17  Tue Jul 10 21:12:46 PDT 2007
+        - Trim the extra 'ip_addr="1.2.3.4"' added by eProcessingNetwork's
+          AuthorizeNet compatability mode.
+        - add bank account type handling
+
+3.16  Tue Nov 14 02:35:30 PST 2006
+	- Update link to API docs, now it is called "Advanced Integration
+	  Method (AIM)"
+	- Update test account, separate ACH-capable one
+	- patch to map ship_company properly to x_Ship_To_Company from Mike
+	  Barry <MBarry@cos.com>
+	- Documentation patch from William McKee <WMCKEE@cpan.org>
+	From Michael G. Schwern <MSCHWERN@cpan.org>:
+	- Eliminate inheriting from AutoLoader. We're not using it and it just
+          screws up the error messages.
+        - account_type mentioned twice in the required fields for checks.
+        - Quiet an uninit value warning when customer_org is not set.
+	- Fix t/credit_card.t test to use a date 11 months in the future as
+	  the expiration date, and to print the error message on failure.
+	- Update tests to use Test::More
+
+3.15  Wed Mar 16 01:10:51 PST 2005
+	- Ask for ',' delimiter and '"' quote explicitly to prevent problems
+	  when a merchant has them configured differently.
+	- expiration is not a required field for credits
+
+3.14  Tue Sep 21 01:10:46 PDT 2004
+	- Added ship_ name/address fields
+	- Fixed required fields for echeck voiding
+	From T.J. Mather <tjmather@maxmind.com> (closes: cpan#6761):
+	- Added cvv2_response and cavv_response to get the cvv2 and cavv
+	  response codes back from authorize.net.
+	- Added example of how to capture a transaction to the synopsis.
+	- Added example of how to get the avs_code, cvv2_response, and
+	  cavv_response from the response
+
+3.13  Sun Aug 10 21:56:34 PDT 2003
+	- removed Michael Mavroudis's email address
+	- added 'void' action, patch from Yuri V. Mkrtumyan
+	  <yuramk@novosoft.ru>
+	- allow "Post Authorize" with order_number but no card info, patch
+	  from Paul Zimmer <AuthorizeNetpm@pzimmer.box.bepress.com>
+	- Don't require "check_type" field
+	- s/x_Bank_Account_Name/x_Bank_Acct_Name/ for ACH transactions
+	From Daemon Hughes <daemmon@daemmonhughes.com>:
+	- add "transaction key" (x_Tran_Key) authentication in addition to
+	  password
+	- add "recurring_billing" field
+	- added "md5" method
+	From valerian <valerian2@hotpop.com>:
+	- Added "avs_code" method
+	- Return "order_number" for unsucessful transactions also
+
+3.12  Thu Nov 21 17:05:19 2002
+	- Added cvv2 field, patch from T.J. Mather <tjmather@maxmind.com>
+	  (closes: cpan#1805)
+	- Added referer field, patch from Mike Barry <mbarry@cos.com>
+	- Added currency field, request from
+	  Oleksandr Kapitanenko <kapitan@portaone.com>
+	- Added documentation about referrer field at Authorize.Net
+	- Added nonascii.patch from "T.J. Mather" <tjmather@maxmind.com> to
+	  put Text::CSV in binary mode to prevent problems with i18n
+	  characters (closes: cpan#1804)
+	- ECHECK (ACH) patch from Michael Mavroudis <email removed by
+	  request> to add fields for ssn and license #
+
+3.11  Sat May  4 00:43:36 PDT 2002
+	- forgot 3.10 changelog in 3.10 :)
+	- extremely verbose debugging information for responses without
+	  response code
+	- PREREQ_PM on Business::OnlinePayment
+	- Escape 0x00 (NULL) in responses from Authorize.Net.  wtf?
+
+3.10  Wed Mar 13 2002
+	- updated for Authorize.Net API 3.1
+	- enable t/credit_card.t test again; testing account seems to work
+	- working Post Authorization support
+	- s/CSV/CSV_XS/
+
+3.01  Wed Nov 14 13:42:06 2001
+	- update README
+	- disable t/credit_card.t test; testdrive account no longer valid
+
+3.00  Sat Sep  1 13:29:34 2001
+	- new maintainer, updated for Authorize.Net API 3.0
+
+0.01  Sun Jul 25 16:37:11 1999
+	- original version; created by h2xs 1.19
+

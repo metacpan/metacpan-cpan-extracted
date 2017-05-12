@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+dist.ini
+lib/Bessarabv/Weight.pm
+t/00-load.t
+xt/whitespaces.t

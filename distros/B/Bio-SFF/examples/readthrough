@@ -1,0 +1,11 @@
+#! /usr/bin/env perl
+use strict;
+use warnings FATAL => 'all';
+
+use Bio::SFF::Reader::Sequential;
+die 'No argument given' if not @ARGV;
+my $reader = Bio::SFF::Reader::Sequential->new(file => $ARGV[0]);
+
+my $i = 0;
+$i++ while $reader->next_entry;
+printf "%d entries (should be %d)\n", $i, $reader->header->number_of_reads;

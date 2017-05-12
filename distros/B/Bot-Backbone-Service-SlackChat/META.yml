@@ -1,0 +1,37 @@
+---
+abstract: 'Bot::Backbone service for communicating with Slack'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  Bot::Backbone: '0'
+  Test::More: '0'
+  lib: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Backbone-Service-SlackChat
+requires:
+  AnyEvent::SlackRTM: '0'
+  Bot::Backbone::Message: '0'
+  Bot::Backbone::Service: '0'
+  Bot::Backbone::Service::Role::BareMetalChat: '0'
+  Bot::Backbone::Service::Role::Dispatch: '0'
+  Bot::Backbone::Service::Role::GroupJoiner: '0'
+  Bot::Backbone::Service::Role::Service: '0'
+  CHI: '0'
+  Carp: '0'
+  Encode: '0'
+  WebService::Slack::WebApi: '0'
+  perl: v5.14.0
+resources:
+  bugtracker: https://github.com/zostay/Bot-Backbone-Service-SlackChat/issues
+  repository: https://github.com/zostay/Bot-Backbone-Service-SlackChat.git
+version: '0.161950'
+x_serialization_backend: 'YAML::Tiny version 1.69'

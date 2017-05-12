@@ -1,0 +1,41 @@
+---
+abstract: 'Translate DNA sequences'
+author:
+  - 'Kevin Galinsky <kgalinsky plus cpan at gmail dot com>'
+build_requires:
+  List::Compare: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-Translator
+provides:
+  Bio::Translator:
+    file: lib/Bio/Translator.pm
+    version: v0.6.1
+  Bio::Translator::Table:
+    file: lib/Bio/Translator/Table.pm
+    version: 0
+  Bio::Translator::Table::Pair:
+    file: lib/Bio/Translator/Table.pm
+    version: 0
+  Bio::Translator::Utils:
+    file: lib/Bio/Translator/Utils.pm
+    version: 0
+  Bio::Translator::Validations:
+    file: lib/Bio/Translator/Validations.pm
+    version: 0
+requires:
+  Bio::Util::AA: 0.001000
+  Bio::Util::DNA: 0.002000
+  Carp: 0
+  Class::Accessor: 0
+  Params::Validate: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.6.1

@@ -1,0 +1,56 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2RayCastInput} class b2RayCastInput
+{
+
+b2RayCastInput();
+
+%{
+
+b2Vec2*
+b2RayCastInput::p1( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->p1 = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->p1);
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2RayCastInput::p2( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->p2 = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->p2);
+	OUTPUT:
+		RETVAL
+
+float32
+b2RayCastInput::maxFraction( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxFraction = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxFraction;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Benchmark::Confirm>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Benchmark-Confirm"><img src="https://secure.travis-ci.org/bayashi/Benchmark-Confirm.png"/></a> <a href="https://coveralls.io/r/bayashi/Benchmark-Confirm"><img src="https://coveralls.io/repos/bayashi/Benchmark-Confirm/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Benchmark::Confirm installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Benchmark::Confirm
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Benchmark::Confirm documentation is available as in POD. So you can do:
+
+    % perldoc Benchmark::Confirm
+
+
+=head1 REPOSITORY
+
+Benchmark::Confirm is hosted on github
+L<http://github.com/bayashi/Benchmark-Confirm>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

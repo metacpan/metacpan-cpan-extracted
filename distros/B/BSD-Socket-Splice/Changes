@@ -1,0 +1,31 @@
+Revision history for Perl extension BSD::Socket::Splice.
+
+0.06 2015-03-07
+    - Add github repository p5-bsd-socket-splice.
+
+0.05 2013-01-16
+    - After a maximum length splice, the OpenBSD kernel returns an
+      error EFBIG now.  Adapt the tests to this behavior.
+    - Add a test for splicing with idle timeout and ETIMEDOUT error.
+
+0.04 2011-09-13
+    - add test that this module is faster than pack and setsockopt
+
+0.03 2011-07-03
+    - add tests for idle
+    - max and idle value may be undef
+    - kernel can now handle idle timeouts, add support for sp_idle
+
+0.02 2011-03-04
+    - provide useful text in the readme
+    - fix man page pod
+    - fix test for sparc64
+    - do not undef $@ before eval in tests
+    - include more feedback from Steffen Ullrich
+
+0.01 2011-03-01
+    - include feedback from Steffen Ullrich
+    - write documentation
+    - write tests
+    - implement functions setsplice, getsplice, geterror, SO_SPLICE
+    - original version; created by h2xs 1.23 with -A -n BSD::Socket::Splice

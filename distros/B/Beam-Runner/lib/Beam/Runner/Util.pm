@@ -1,0 +1,135 @@
+package Beam::Runner::Util;
+our $VERSION = '0.009';
+# ABSTRACT: Utilities for Beam::Runner command classes
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Beam::Runner::Util qw( find_container_path );
+#pod
+#pod     my $path = find_container_path( $container_name );
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module has some shared utility functions for creating
+#pod L<Beam::Runner::Command> classes.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Beam::Runner>, L<beam>, L<Exporter>
+#pod
+#pod =cut
+
+use strict;
+use warnings;
+use Exporter 'import';
+use Path::Tiny qw( path );
+
+our @EXPORT_OK = qw( find_container_path );
+
+# File extensions to try to find, starting with no extension (which is
+# to say the extension is given by the user's input)
+our @EXTS = ( "", qw( .yml .yaml .json .xml .pl ) );
+
+# The "BEAM_PATH" separator value. Windows uses ';' to separate
+# PATH-like variables, everything else uses ':'
+our $PATHS_SEP = $^O eq 'MSWin32' ? ';' : ':';
+
+#pod =sub find_container_path
+#pod
+#pod     my $path = find_container_path( $container_name );
+#pod
+#pod Find the path to the given container. If the given container is already
+#pod an absolute path, it is simply returned. Otherwise, the container is
+#pod searched for in the directories defined by the C<BEAM_PATH> environment
+#pod variable.
+#pod
+#pod If the container cannot be found, throws an exception with a user-friendly
+#pod error message.
+#pod
+#pod =cut
+
+sub find_container_path {
+    my ( $container ) = @_;
+    my $path;
+    if ( path( $container )->is_file ) {
+        return path( $container );
+    }
+
+    my @dirs = ( "." );
+    if ( $ENV{BEAM_PATH} ) {
+        push @dirs, split /$PATHS_SEP/, $ENV{BEAM_PATH};
+    }
+
+    DIR: for my $dir ( @dirs ) {
+        my $d = path( $dir );
+        for my $ext ( @EXTS ) {
+            my $f = $d->child( $container . $ext );
+            if ( $f->exists ) {
+                $path = $f;
+                last DIR;
+            }
+        }
+    }
+
+    die sprintf qq{Could not find container "%s" in directories: %s\n},
+        $container, join( $PATHS_SEP, @dirs )
+        unless $path;
+
+    return $path;
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Beam::Runner::Util - Utilities for Beam::Runner command classes
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+    use Beam::Runner::Util qw( find_container_path );
+
+    my $path = find_container_path( $container_name );
+
+=head1 DESCRIPTION
+
+This module has some shared utility functions for creating
+L<Beam::Runner::Command> classes.
+
+=head1 SUBROUTINES
+
+=head2 find_container_path
+
+    my $path = find_container_path( $container_name );
+
+Find the path to the given container. If the given container is already
+an absolute path, it is simply returned. Otherwise, the container is
+searched for in the directories defined by the C<BEAM_PATH> environment
+variable.
+
+If the container cannot be found, throws an exception with a user-friendly
+error message.
+
+=head1 SEE ALSO
+
+L<Beam::Runner>, L<beam>, L<Exporter>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

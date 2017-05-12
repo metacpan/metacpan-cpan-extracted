@@ -1,0 +1,220 @@
+
+=head1 NAME
+
+Box2D::b2PulleyJointDef - Pulley joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2PulleyJointDef->new();
+  $joint_def->Initialize( $bodyA, $bodyB, $groundAnchorA,
+      $groundAnchorB, $anchorA, $anchorB, $ratio );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Pulley joint definition. This requires two ground anchors, two dynamic
+body anchor points, max lengths for each side, and a pulley ratio.
+
+=head1 METHODS
+
+Default constructor.
+
+Returns a C<Box2D::b2PulleyJointDef>
+
+=head2 Initialize( $bodyA, $bodyB, $groundAnchorA, $groundAnchorB,
+$anchorA, $anchorB, $ratio )
+
+Initialize the bodies, anchors, lengths, max lengths, and ratio using
+the world anchors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body> C<$bodyA>
+
+=item * C<Box2D::b2Body> C<$bodyB>
+
+=item * C<Box2D::b2Vec2> C<$groundAnchorA>
+
+=item * C<Box2D::b2Vec2> C<$groundAnchorB>
+
+=item * C<Box2D::b2Vec2> C<$anchorA>
+
+=item * C<Box2D::b2Vec2> C<$anchorB>
+
+=item * C<float32> C<$ratio>
+
+=back
+
+=head2 groundAnchorA()
+
+=head2 groundAnchorA( $groundAnchorA )
+
+The first ground anchor in world coordinates. This point never moves.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$groundAnchorA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 groundAnchorB()
+
+=head2 groundAnchorB( $groundAnchorB )
+
+The second ground anchor in world coordinates. This point never moves.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$groundAnchorB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 lengthA()
+
+=head2 lengthA( $lengthA )
+
+The a reference length for the segment attached to bodyA.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$lengthA> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 lengthB()
+
+=head2 lengthB( $lengthB )
+
+The a reference length for the segment attached to bodyB.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$lengthB> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 localAnchorA()
+
+=head2 localAnchorA( $localAnchorA )
+
+The local anchor point relative to bodyA's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localAnchorB()
+
+=head2 localAnchorB( $localAnchorB )
+
+The local anchor point relative to bodyB's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 maxLengthA()
+
+=head2 maxLengthA( $maxLengthA )
+
+The maximum length of the segment attached to bodyA.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxLengthA> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 maxLengthB()
+
+=head2 maxLengthB( $maxLengthB )
+
+The maximum length of the segment attached to bodyB.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxLengthB> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 ratio()
+
+=head2 ratio( $ratio )
+
+The pulley ratio, used to simulate a block-and-tackle.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$ratio> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2PulleyJoint>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

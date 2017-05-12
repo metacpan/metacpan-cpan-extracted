@@ -1,0 +1,12 @@
+Revision history for Business-OnlinePayment-NMI
+
+0.03    Mon Aug 15 18:58:41 PDT 2011
+        - POD updates
+        - CPAN upload
+
+0.02    Tue Jun 15 12:16:59 PDT 2010
+        - Clean up for public release, add functional tests.
+
+0.01    Tue May 18 11:53:39 PDT 2010
+        - Initial release
+

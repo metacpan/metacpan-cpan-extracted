@@ -1,0 +1,9 @@
+Revision history for Bot-Applebot
+
+0.02    Fri Sep 11 17:01:40 2009 JST
+        Fix crashbug! Arity issue
+        Highlight the adjective in "time to judge"
+        Streak tracking
+        Color the judge in the long judge message
+        Fix some warnings
+        Fix distribution packaging issue

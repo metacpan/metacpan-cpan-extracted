@@ -1,0 +1,147 @@
+---
+abstract: "Bio::Das::ProServer is an implementation of the BioDAS protocol,\nhttp://biodas.org/ for the serving of biological data using XML over\nHTTP.\n\nBio::Das::ProServer is designed as a lightweight alternative to some\nother DAS servers. Version 2.0 is a drop-in replacement for previous\nversions but has a core based on the POE system which is much better\ntested and debugged than the ProServer v1 core. ProServer can be seen\nas the server-side complement to the Bio-DasLite client.\n\nMore information can be found at the ProServer homepage:\n\n    http://www.sanger.ac.uk/proserver/\n"
+author:
+  - 'Roger M Pettett <rmp@sanger.ac.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-Das-ProServer
+provides:
+  Bio::Das::ProServer:
+    file: lib/Bio/Das/ProServer.pm
+    version: 687
+  Bio::Das::ProServer::Authenticator:
+    file: lib/Bio/Das/ProServer/Authenticator.pm
+    version: 688
+  Bio::Das::ProServer::Authenticator::http:
+    file: lib/Bio/Das/ProServer/Authenticator/http.pm
+    version: 688
+  Bio::Das::ProServer::Authenticator::ip:
+    file: lib/Bio/Das/ProServer/Authenticator/ip.pm
+    version: 688
+  Bio::Das::ProServer::Config:
+    file: lib/Bio/Das/ProServer/Config.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor:
+    file: lib/Bio/Das/ProServer/SourceAdaptor.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::bed12:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/bed12.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::bioseqio:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/bioseqio.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::csv:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/csv.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::dbi:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/dbi.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::ensembl:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/ensembl.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::file:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/file.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::generic:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/generic.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::getz:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/getz.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::martservice:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/martservice.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::oracle:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/oracle.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::Transport::sif:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/sif.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::Transport::wgetz:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/Transport/wgetz.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::all_in_group:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/all_in_group.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::bed12:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/bed12.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::bioseq:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/bioseq.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::file:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/file.pm
+    version: 0
+  Bio::Das::ProServer::SourceAdaptor::grouped_db:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/grouped_db.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::proxy:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/proxy.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::sif:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/sif.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::simple:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/simple.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::simple_interaction:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/simple_interaction.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::simple_volmap:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/simple_volmap.pm
+    version: 688
+  Bio::Das::ProServer::SourceAdaptor::simpledb:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/simpledb.pm
+    version: 687
+  Bio::Das::ProServer::SourceAdaptor::styletest:
+    file: lib/Bio/Das/ProServer/SourceAdaptor/styletest.pm
+    version: 687
+  Bio::Das::ProServer::SourceHydra:
+    file: lib/Bio/Das/ProServer/SourceHydra.pm
+    version: 687
+  Bio::Das::ProServer::SourceHydra::dbi:
+    file: lib/Bio/Das/ProServer/SourceHydra/dbi.pm
+    version: 687
+  Bio::Das::ProServer::SourceHydra::sql:
+    file: lib/Bio/Das/ProServer/SourceHydra/sql.pm
+    version: 687
+recommends:
+  Bio::DB::Flat: 0
+  Bio::Das::Lite: 1.051
+  Bio::EnsEMBL::DBSQL::DBAdaptor: 0
+  Bio::EnsEMBL::Registry: 0
+  Bio::SeqIO: 0
+  Cache::Cache: 1.05
+  DBI: 1.52
+  LWP::UserAgent: 2.033
+  List::MoreUtils: 0
+  Net::IP: 1.25
+  XML::Writer: 0.612
+requires:
+  CGI: 3.29
+  Compress::Zlib: 2.005
+  Config::IniFiles: 2.32
+  File::Spec: 3.25
+  Getopt::Long: 2.34
+  HTML::Entities: 1.27
+  HTTP::Date: 1.47
+  HTTP::Request: 1.40
+  HTTP::Response: 1.53
+  POE: 0.9999
+  POE::Filter::HTTPD: 1.2188
+  POE::Wheel::ReadWrite: 1.2199
+  POE::Wheel::SocketFactory: 1.2194
+  POSIX: 1.08
+  Readonly: 1.03
+  Socket: 1.77
+  Sys::Hostname: 1.11
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.20

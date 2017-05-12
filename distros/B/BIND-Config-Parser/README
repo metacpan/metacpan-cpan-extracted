@@ -1,0 +1,27 @@
+BIND::Config::Parser version 0.01
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Parse::RecDescent
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2005 Matt Dainty.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+AUTHORS
+
+Matt Dainty <matt@bodgit-n-scarper.com>

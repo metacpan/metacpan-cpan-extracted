@@ -1,0 +1,15 @@
+Copyright (c) 2004 Ivan Kohler
+Copyright (c) 2012 Freeside Internet Services, Inc.
+Copyright (c) 2008-2011 DonorWare LLC
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the  same terms as Perl itself.
+
+This is Business::OnlinePayment::eSelectPlus, an Business::OnlinePayment
+backend module for the Moneris eSelect Plus gateway .  It is only
+useful if you have a merchant account with Moneris:
+https://www3.moneris.com/connect/en/
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").

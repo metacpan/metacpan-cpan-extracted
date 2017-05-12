@@ -1,0 +1,9 @@
+classes:
+  - hw.mac.laptop
+  - Hardware.motherboard.intel.core2duo
+  - Hardware.laptop
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include support for Apple MacBook2,1 laptop

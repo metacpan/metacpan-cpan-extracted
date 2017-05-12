@@ -1,0 +1,17 @@
+Revision history for Badge-Depot-Plugin-Perl
+
+0.0103 2016-01-13T22:54:07Z UTC
+ [Bug Fixes]
+ - Really fixed the bug where 'trailing' wasn't set.
+
+0.0102 2016-01-11T15:25:50Z UTC
+ [Bug Fixes]
+ - Fixed a bug where sometimes the 'trailing' attribute became undefined.
+
+0.0101 2015-04-18T23:49:55Z CEST
+ [Documentation]
+ - Added a Pod::Weaver::Section::Badges example.
+
+0.0100 2015-03-07T12:46:14Z CET
+ - Initial release
+

@@ -1,0 +1,100 @@
+MODULE FOR SALE
+    I am not planning to make any changes to this module as I have not been
+    a customer of TMobile for over a year. If someone would like to take
+    over maintenance/development of this module please get in touch.
+
+ANTI-TMOBILE RANT
+    TMobile's lax fraud prevention procedures allowed a random person in a
+    random part of the UK to buy a mobile phone contract at my parents
+    address. TMobile then started to demand money from my parents and
+    ignored initial attempts to explain that the person has a different name
+    from the residents and has never lived at their address. TMobile
+    eventually, after much chasing, agreed to stop demanding money that my
+    family did not owe them, but they to date have not properly apologied
+    for their actions or explained how on earth this person was able to
+    setup the phone contract in the first place.
+
+    I encourage people not to use T-Mobile.
+
+NAME
+    Business::Billing::TMobile::UK - The fantastic new
+    Business::Billing::TMobile::UK!
+
+SYNOPSIS
+     use Business::Billing::TMobile::UK
+
+DESCRIPTION
+    An interface to TMobile UK's website for getting allowance and billing
+    information.
+
+CLASS METHODS
+  new
+     new(username => $username, password => $password)
+
+OBJECT METHODS
+  get_allowances
+     get_allowances()
+
+    Logs into the My Account section of the T-Mobile website and parses out
+    the Allowance information if available.
+
+INSTALLATION
+    This module uses Module::Build for its installation. To install this
+    module type the following:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+    If you do not have Module::Build type:
+
+      perl Makefile.PL
+
+    to fetch it. Or use CPAN or CPANPLUS and fetch it "manually".
+
+DEPENDENCIES
+    This module requires these other modules and libraries:
+
+     Test::More
+
+    Test::More is only required for testing purposes
+
+    This module has these optional dependencies:
+
+     Test::Distribution
+
+    This is just requried for testing purposes.
+
+TODO
+    If find this module useful please do let me know and I'll spend more
+    effort on expanding/improving it. All enhancement requests are welcome.
+
+    *   _logout method (just to be nice)
+
+BUGS
+    To report a bug or request an enhancement use CPAN's excellent Request
+    Tracker, either via the web:
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-Billing-TMobile
+    -UK>
+
+    or via email:
+
+    "bug-business-billing-tmobile-uk@rt.cpan.org"
+
+SOURCE AVAILABILITY
+    This source is part of a SourceForge project which always has the latest
+    sources in svn.
+
+    http://sourceforge.net/projects/sagar-r-shah/
+
+AUTHOR
+    Sagar R. Shah, "<sagarshah@softhome.net>"
+
+COPYRIGHT
+    Copyright 2005 Sagar R. Shah, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

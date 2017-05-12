@@ -1,0 +1,34 @@
+BerkeleyDB/Lite version 1.10
+============================
+
+BerkeleyDB::Lite streamlines the use of BerkeleyDB.pm.  For example,
+a single constructor acquires both the necessary env and db handles; and
+methods wrap common cursor operations.
+
+This installation will place all BerkeleyDB files under a single root.  
+This root directory is defined as the 'rootdir' member of the @defaults 
+structure.  This definition can be overridden in the constructors.
+
+INSTALLATION
+
+To install this module, edit line 25 of Lite.pm to specify an appropriate
+root directory.
+
+Then type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  BerkeleyDB
+  Storable
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2004 Jim Schueler
+

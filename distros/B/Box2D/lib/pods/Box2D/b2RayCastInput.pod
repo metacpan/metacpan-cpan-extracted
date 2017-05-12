@@ -1,0 +1,95 @@
+
+=head1 NAME
+
+Box2D::b2RayCastInput - Ray-cast input data.
+
+=head1 SYNOPSIS
+
+  my $input = Box2D::b2RayCastInput->new();
+  $input->p1( $p1 );
+  $input->p2( $p2 );
+  $input->maxFraction( $max_fraction );
+  $shape->RayCast( $output, $input, $transform );
+
+=head1 DESCRIPTION
+
+Ray-cast input data. The ray extends from p1 to
+S<p1 + maxFraction * (p2 - p1)>.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2RayCastInput>
+
+=head2 maxFraction()
+
+=head2 maxFraction( $maxFraction )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxFraction> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 p1()
+
+=head2 p1( $p1 )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$p1> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 p2()
+
+=head2 p2( $p2 )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$p2> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2RayCastOutput>
+
+=item * L<Box2D::b2AABB>
+
+=item * L<Box2D::b2Shape>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

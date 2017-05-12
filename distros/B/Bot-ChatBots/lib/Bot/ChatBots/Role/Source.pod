@@ -1,0 +1,318 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::Source - Bot::ChatBots Role for sources
+
+=head1 SYNOPSIS
+
+   package Bot::ChatBots::Whatever::WebHook;
+   use Moo;
+   with 'Bot::ChatBots::Role::Source';
+   with 'Bot::ChatBots::Role::WebHook';
+
+   sub normalize_record {
+      return shift; # not much of a normalization, huh?
+   }
+
+   sub parse_request {
+      my ($self, $request) = @_;
+      my @updates = $request->json;
+      return @updates;
+   }
+
+   sub render_response {
+      my ($self, $controller, $response, $update) = @_;
+
+      # E.g. Telegram allows you to answer directly...
+      $response = {text => $response} unless ref $response;
+      local $response->{method} = $response->{method}
+         // 'sendMessage';
+      local $response->{chat_id} = $response->{chat_id}
+         // $update->{message}{chat}{id};
+      return $controller->render(json => $response);
+   }
+
+   1;
+
+=head1 DESCRIPTION
+
+This role abstracts elements that identify a source. It is most probably
+used together with L<Bot::ChatBots::Role::WebHook> (which requires a lot
+of its methods) but it doesn't have to.
+
+=head2 What Should You Provide/Override
+
+This is what you should provide and probably override in the general case:
+
+=over
+
+=item *
+
+a C<class_custom_pairs> returning key/value pairs you want to add to the
+source provided back by L</pack_source>;
+
+=item *
+
+mandatorily a L</normalize_record> method (see below for details);
+
+=item *
+
+either provide a C<processor> (see L</processor>) or override L</process>.
+This is important if you want to do "something" e.g. with the return value
+from the L</processor>, so you might do this:
+
+   around process => sub {
+      my ($orig, $self, $record) = @_;
+      my $retval = $orig->($self, $record); # call original "super" method
+
+      # now you have $retval and $record... do what you deem necessary!
+
+      return $retval; # or anything else
+   };
+
+
+=back
+
+=head1 ACCESSORS
+
+The following methods have a same-named option that can be passed to the
+constructor.
+
+=head2 B<< custom_pairs >>
+
+   my $hash_ref = $obj->custom_pairs;
+   $obj->custom_pairs(\%some_key_value_pairs);
+
+Accessor for custom key/value pairs. These are expanded in the C<source>
+section of the record passed to L</process>.
+
+=head2 B<< processor >>
+
+   my $processor_sub = $obj->processor;
+
+Read-only accessor for a processor sub reference.
+
+By default, L</process> calls this to retrieve a sub reference that will
+be called with the update record. You might want to look at
+L<Data::Tubes>, although anything supporting the L</process> interface
+will do.
+
+=head2 B<< typename >>
+
+   my $name = $obj->typename;
+
+Read-only accessor to the type of this source of messages. See
+L<BUILD_typename> for the default value generated from the class name.
+
+=head1 METHODS
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< BUILD_processor >>
+
+Builder for L</processor>. Throws an exception. You can override this in
+your composing class.
+
+=head2 B<< BUILD_typename >>
+
+Builder for L</typename>. It is derived from the class name by getting the
+last meaningful part, see examples below:
+
+   WebHook                          --> webhook
+   Bot::ChatBots::Telegram::WebHook --> telegram
+   Bot::ChatBots::Whatever          --> whatever
+
+In simple terms:
+
+=over
+
+=item *
+
+if the class name has one single part only, take it
+
+=item *
+
+otherwise, take last if it's not C<webhook> (case-insensitively)
+
+=item *
+
+otherwise get the previous to last. This lets you call your class
+C<Something::WebHook> and get C<something> back, which makes more sense
+than taking C<webhook> (as it would probably be the name for a lot of
+adapters!).
+
+=back
+
+Of course you can set L</typename> directly on construction if you want.
+
+=head2 B<< pack_source >>
+
+   my $hashref = $obj->pack_source(%args);
+      $hashref = $obj->pack_source(\%args);
+
+Make a nice pack of info available for easy pushing inside a record and
+provide info along the line. This hash reference will most probably be
+available under key C<source> in the record passed to L</process>.
+
+The following fields will be set:
+
+=over
+
+=item C<class>
+
+the class name;
+
+=item C<refs>
+
+a L<Bot::ChatBots::Weak> instance containing the following fields:
+
+=over
+
+=item C<self>
+
+the instance itself;
+
+=back
+
+=item C<type>
+
+whatever L</typename> returns
+
+=back
+
+After these fields, if the class C<can('class_custom_pairs')>, they are
+retrieved and added. They might override the fields above of course.
+
+After this, all pairs recorded in L</custom_pairs> are added, again
+overriding whatever was already present.
+
+After this, all pairs in C<$args{source_pairs}> are added. so they
+can override everything.
+
+If C<$args{refs}> is present, its element are added to the
+L<Bot::ChatBots::Weak> object at key C<ref> (see above). This allows you
+to add elements that you want to keep around but do not want to propagate
+in case you want to freeze the record (e.g. to queue for execution
+elsewhere).
+
+=head2 B<< process >>
+
+   my $outcome = $obj->process($hashref);
+
+Process an incoming record. This is built by the relevant actual source,
+e.g. a webhook or a long-poll based class/object.
+
+By default it is a thin wrapper around L</processor>, in order to ease
+your library's client to provide a processing sub reference.
+
+=head2 B<< process_updates >>
+
+   my @results = $obj->process_updates(%args);
+   my $results = $obj->process_updates(%args);
+      @results = $obj->process_updates(\%args);
+      $results = $obj->process_updates(\%args);
+
+Process incoming I<updates>. Note that a I<record> is a wrapper to an
+I<update>, because it usually contains the I<update> at key C<update>.
+
+The input C<%args> can contain the following keys:
+
+=over
+
+=item C<rethrow>
+
+C<process_updates> by default catches all exceptions and goes on, set this
+to a true value if you want the exception to be rethrown. You can also
+define a method C<rethrow> to return a boolean value, which will be used
+in case this key is not present in C<%args>; otherwise I<false> is
+assumed, meaning that the exceptions will NOT be rethrown;
+
+=item C<record_pairs>
+
+hash reference with key/value pairs that will be fit directly inside the
+I<record>. These key/value pairs override whatever is put in the record,
+so use with caution; see also C<source_pairs> below for something less
+invasive, and keep in mind that the object will still receive the record
+via L</process>;
+
+=item C<refs>
+
+hash reference with key/value pairs of references that should not be
+propagated in case the object is frozen. See L</pack_source>;
+
+=item C<source_pairs>
+
+hash reference with key/value pairs that will be fit inside the C<source>
+hash reference inside the I<record>. These values are actually used by
+L</pack_source>, see there for additional details;
+
+=item C<updates>
+
+array reference with the list of updates
+
+=back
+
+=head2 B<< should_rethrow >>
+
+   die $exception if $obj->should_rethrow(%args); # OR
+   die $exception if $obj->should_rethrow(\%args);
+
+Assess whether a rethrow is requestes or not, according to the following
+procedure:
+
+=over
+
+=item *
+
+first of all C<%args> is searched to look for key C<rethrow>, if present
+this is returned, OTHERWISE
+
+=item *
+
+if C<$obj> supports method C<rethrow>, it is called and provided back,
+OTHERWISE
+
+=item *
+
+C<0> (i.e. a I<false> value) is returned, under the assumption that you
+don't want to get exceptions back by default.
+
+=back
+
+=head1 REQUIRED METHODS
+
+This class defines a L<Moo::Role>, so it's not a standalone thing by
+itself. The following methods are I<required> to exist in the class that
+composes this role.
+
+=head2 B<< normalize_record >>
+
+   my $record = $obj->normalize_record($input_record);
+
+Give C<$input_record> a possibly better shape to allow for tubes down
+along the road to work on a common format.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::WebHook>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

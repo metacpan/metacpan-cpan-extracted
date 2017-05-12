@@ -1,0 +1,37 @@
+Revision history for Perl extension Business::OnlinePayment::InternetSecure.
+
+0.08
+	- Fix CVV2 Support
+
+0.08
+	- Recurring billing support
+
+0.07
+	- Added co-mantainer
+
+0.06
+	- Added support for CIMB (Customer DB, card tokenization)
+	- Documentation fixes
+
+0.04  Sat, 19 Aug 2006 15:02:51 -0400
+	These changes should make it easier to switch between this module
+	and other Business::OnlinePayment backends:
+
+	- Renamed exp_date field to expiration, in accordance with the
+	  Business::OnlinePayment documentation
+	- Renamed sales_number() to order_number() and avs_response() to
+	  avs_code(), following the informal convention set by other
+	  modules
+	- Added support for "CC" in type field, to denote a credit card of
+	  unknown type
+
+0.03  Mon, 08 May 2006 16:34:53 -0400
+	- Made get_remap_fields (and thus to_xml) non-destructive and
+	  idempotent
+
+0.02  Tue, 02 May 2006 17:30:49 -0400
+	- Worked around remap_fields bug in B:OP 2.x
+
+0.01  Sat, 18 Feb 2006 01:34:33 -0500
+	- Original release
+

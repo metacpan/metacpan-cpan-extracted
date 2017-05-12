@@ -1,0 +1,438 @@
+2017-04-07  Jarkko Hietaniemi  <jhi@iki.fi>
+	
+	* Prepend "./" to require-d pathnames in tests,
+	  in preparation of Perl 5.26.0. [cpan #120993]
+	
+	* Add RLIMIT_POSIXLOCKS from DragonFly BSD.
+
+	* Release 1.2911.
+
+2016-05-12  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add RLIMIT_RSESTACK from hpux/ia64, and RLIMIT_FREEMEM
+	  and RLIMIT_NTHR from QNX.
+
+	* Add more PRIO_ values from Solaris:
+
+	  PRIO_CONTRACT
+	  PRIO_LWP
+	  PRIO_PROJECT
+	  PRIO_SESSION
+	  PRIO_TASK
+	  PRIO_ZONE
+
+	* HPUX: Do not unconditionally define the RLIMIT_ and RLIM_NLIMITS
+
+	* Add missing word ('enough') in getrusage.t test skippage.
+
+	* Repoint all the license pointers to COPYRIGHT and LICENSE
+	  in Resource.pm, add LICENSE file as a new pointer.
+
+	* Release 1.2910.
+
+2015-11-15  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* The added RLIMIT_ values were not added quite right.
+	  Our own tests didn't detect this, but mod_perl2 ones did
+	  [cpan #108955]
+
+	* Release 1.2909.
+
+2015-10-21  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add more RLIMIT_ values from various systems,
+	  especially from Linux 2.6:
+
+          RLIMIT_MSGQUEUE
+          RLIMIT_NICE
+          RLIMIT_NPTS
+          RLIMIT_PTHREAD
+          RLIMIT_RTPRIO
+          RLIMIT_RTTIME
+          RLIMIT_SBSIZE
+          RLIMIT_SIGPENDING
+          RLIMIT_SWAP
+
+	  Check your system's setrlimit() documentation,
+	  and BSD::Resource::get_rlimits().
+
+	* Add PRIO_THREAD, if available.
+	  Check your system's setpriority() documentation.
+
+	* Release 1.2908.
+
+2013-07-12  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #86857: t/setrlimit.t failure
+	  Skip setrlimit() tests also if the hard limit is RLIM_INFINITY.
+
+	* Release 1.2907.
+
+2013-07-07  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Skip number-of-files and stack setrlimit tests in Cygwin:
+	  the constants exist but the implementation doesn't really
+	  seem to be there.  Document this in the pod.	Testing by dsolimano.
+
+	* For setrlimit tests involving byte sizes (memory or file size)
+	  round the byte sizes down to 4 kB boundaries.
+
+	* Fix some pod nits.
+
+	* Release 1.2906.
+
+2013-06-22  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #86334: typo fixes
+
+	* Address rt.cpan.org #62504: Disable user/system
+	  timing tests if workload accumulate too little time
+
+	* Attempt harder in getrusage.t to burn enough user and system time,
+	  refactor the "burn some cpu" utility into t/burn.pl, use that also
+	  in t/times.t.
+
+	* Fix a testing problem in NetBSD for t/setrlimit.t,
+	  the tests were misnumbered.
+
+	* Silence compilation warnings coming from Perl 5.18.0.
+
+	* Clarify the license to be Artistic 2.0 or LGPL 2.0.
+
+	* Regenerate ppport.h with Perl 5.18.0.
+
+	* Release 1.2905.
+
+2010-03-14  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #53856: memory leak in get_rlimits()
+
+	* Address rt.cpan.org #53859: clarify get_rlimits() docs
+
+	* Release 1.2904.
+
+2009-03-31  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #44082:
+	  "Bug in compiler detection (Makefile.PL)" (for AIX xlc)
+	  Patch submitted in the report by rehsack at cpan.org.
+
+	* Release 1.2903.
+
+2008-12-30  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Lowered the "0.95 of the current limit" down to
+	  "0.75 of the current limit" in setrlimit.t so that
+	  more memory-constrained systems (like 2MB or less of
+	  default stack) have slightly more chance of completing the test.
+	  The 0.75 also has more chance of aligning with page sizes.
+
+	* The scalar context return of getrlimit() was documented
+	  to return an object, even though it really returned the
+	  soft limit, reported by anicka@suse.cz.  Fixed the documentation.
+
+	* Judging by the cpantesters reports no netbsd has a functional
+	  RLIMIT_STACK, so skipping the test in all of them.
+
+	* Release 1.2902.
+
+2008-01-29  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* netbsd-alpha does not have a functional RLIMIT_STACK,
+	  reported by David Cantrell.  Skip the test, and document
+	  as a known issue.
+
+	* Release 1.2901.
+
+2008-01-27  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Rewrite the setrlimit.t test.	 Simplify it a lot; now all
+	  RLIM_INFINITY limits are simply skipped; for those that
+	  are limited we try setting only the soft limit, and accept
+	  a value lower than we tried to set, since various systems
+	  might either enforce lower limits, or round up the limits.
+	  Added documentation on setrlimit() about this.
+
+	* Allow calling getrlimit/setrlimit and getpriority/setpriority
+	  with the string names ("RLIMIT_NPROC", for example).
+
+	* Include ppport.h (generated with perl 5.8.8), reshuffle
+	  system header includes appropriately.
+
+	* Tested also with older Perls, 5.005_05 and 5.6.2, in OS X.
+	  (5.005_04 didn't work, it creates but then cannot dynaload
+	   the .bundle files, go figure.)
+
+	* Minor documentation tweaks and copyright year bumps.
+
+	* Release 1.29.
+
+2006-05-26  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Tweak the regexp parsing the ps -o output in setpriority.t,
+	  from Alexey Tourbin and Rafael Garcia-Suarez.	 Still just
+	  a best-effort attempt, but one can only try.
+
+	* Release 1.28.
+
+2006-05-25  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #13130 and #19412: try to cope with
+	  an already reniced shell running the setpriority.t.  The
+	  tricks used are trying "ps -o pid,nice" and looking for $$,
+	  and if that fails, then trying whether the nice(1) is the
+	  GNU one, and if so, running it without arguments.
+
+	* Release 1.27.
+
+2006-05-21  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #19298: bug in getrusage(): 'inblock' was
+	  misspelt as 'inlock' (the end result being that people looking
+	  for the 'inblock' field got zero)
+
+	* For Mac OS X reword the message about the RLIM_NPROC test failure
+	  (or rather, the possible failure).  Still a mystery under what
+	  exact conditions the test fails or succeeds.
+
+	* Add Test::Pod and Test::Pod::Coverage tests.
+
+	* Release 1.26.
+
+2006-04-09  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Address rt.cpan.org #13131: setrlimit.t tries to increase hard
+	  limits, cannot raise limits higher than the hard limit.
+
+	* Address rt.cpan.org #13130: getpriority.t and setpriority.t
+	  assume priority = 0, solution hopefully portable.  Now should
+	  work under e.g. "nice make test".
+
+	* Add more verbosity to the case of the known rlimit.t test
+	  failure in Mac OS X.
+
+	* Release 1.25.
+
+Sun Feb 29 16:51:34 2004  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* No functional changes but document the known fact that
+	  under at least Mac OS X 10.3.2 the t/setrlimit.t subtest #8
+	  may fail because of an OS bug.  Also reorder the documentation
+	  a bit to collect all the known issues under one heading.
+
+	* Release 1.24.
+
+Tue Oct	 7 21:54:04 2003  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Makefile.PL: use archlibexp instead of archlib in cc -I.../CORE
+	  so that Perls installed under ~user work.
+
+	* Release 1.23.
+
+Sun Feb	 9 12:12:42 2003  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add RLIMIT_LOCKS.
+
+	* Fix a typo s/RLIM_SAVEWD_MAX/RLIMIT_SAVED_MAX/
+
+	* Sort the @EXPORT list.
+
+	* Release 1.22.
+
+Thu Dec 12 01:15:44 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Patches for NCR MP-RAS from grommel@sears.com.
+
+	* Release 1.21.
+
+Tue Nov 26 04:20:38 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add a warning about the time/load-sensitivity of the
+	  tests to INSTALL and Makefile.PL.
+
+	* Rewrite the getrusage.t and times.t tests a bit to
+	  better work on a fast machine (IOW, try spending a
+	  bit more time).
+
+	* Release 1.20.
+
+Fri Nov 22 17:57:44 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Fixed a test problem found by Alain Barbet: in NetBSD
+	  the RLIMIT_STACK wants to be aligned.	 Fixed also the
+	  other memory-related limit tests to allow for alignment.
+
+	* Release 1.19.
+
+Wed Nov 20 16:42:50 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Problem found by Jeff Boes, forwarded and analyzed
+	  by Slaven Rezic: if one has a fast machine and/or
+	  the granularity of times() is low, one could get false
+	  negatives from far() in getrusage.t.	Fixed the same
+	  problem in times.t.
+
+	* Bumped the copyright statement years.
+
+	* Release 1.18.
+
+Thu Sep 19 16:53:26 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Patch from Miles Egan to use -I$archlib/CORE instead
+	  of -I$installarchlib/CORE in Makefile.PL, since they
+	  might be different but the first one is the one apps
+	  are supposed to be using.
+
+	* Sanity check for getrlimit/setrlimit/getpriority/setpriority
+	  so that one won't use the string "RLIMIT_..."/"PRIO_..." when
+	  one is supposed to be using the constant RLIMIT_.../PRIO_...
+
+	* Release 1.17.
+
+Sun Sep 15 18:44:36 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Patch from Allen Smith to avoid -lbsd in IRIX
+	  since it potentially brings in harmful side effects
+	  regarding setpgrp/setgroups.
+	
+	* Mention the use of VERBOSE in the probe failure message.
+	
+	* Release 1.16.
+
+Thu May	 9 04:18:09 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add COPYRIGHT AND LICENSE to Resource.pm.
+
+	* Release 1.15.
+
+Sat Jan 26 07:14:00 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* A space between the 2>/dev/null and the command is nice.
+
+	* Release 1.14.
+
+Tue Jan 22 16:55:44 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Alex J Avriette reported that in Darwin 5.2 the Makefile.PL
+	  dies with great noise.  Simplify the resource header scan.
+
+	* Release 1.13.
+
+Wed Jan 16 02:38:54 2002  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.12.
+
+	* Allen Smith had a compiler setup in IRIX 6.5 that made
+	  Makefile.PL wrongly think that there be no <sys/resource.h>
+	  ($ENV{CC} set to "cc -...", which made the basename() logic fail)
+
+Fri Sep 28 05:35:16 2001  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.11.
+
+	* I suck.  Vivek Khera reported NINE MONTHS ago that
+	  I was missing sub isrss().  My memory was jogged by
+	  a message from Jeff Boes ONE MONTH ago.  My apologies.
+
+Mon Mar	 5 16:43:44 2001  Jarkko Hietaniemi  <jhi@alpha.hut.fi>
+
+	* Release 1.10.
+
+	* Move $VERSION from Makefile.PL to Resource.pm as suggested
+	  by Philip Newton.
+
+	* Require at least Perl 5.002.
+
+Mon Oct 30 22:39:40 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.09.
+
+	  Fixed to work with 5.6.0 and Solaris: the default setting
+	  of Perl 5.6.0 is to use "large files", which does not mix with
+	  the Solaris /procfs interface.  Workaround: use the old trusty
+	  syscall().  The deficiency reported to Solaris kernel group,
+	  so there's hope that in some future patch/release the procfs
+	  will get fixed.
+
+	  Document the "Your vendor has not ..." error message.
+
+Sat Apr 15 23:45:06 2000  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.08: (about time)
+
+	  Fixed to work with 5.6.
+
+	  Fixed to work with Linux (PRIO_ are just enums, not defines).
+
+	  Added a few possible RLIMIT_ constants (RLIMIT_AIO_MEM,
+	  RLIMIT_AIO_OP, RLIMIT_OFILE, RLIMIT_TCACHE).
+
+Fri Jan 16 15:47:19 1998  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.07:
+
+	  Added pseudo-times().
+
+	  Major Solaris 5.[56] hackery to use the /proc.
+	  Don't know whether older Solarises work anymore :-/
+
+Mon Jun	 2 13:32:54 1997  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.06:
+
+	  Renamed release 1.05_02 to release 1.06 as the
+	  release seems quite stable.
+
+Sun Apr 27 18:20:00 1997  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.05_02:
+
+	  Tiny cleanup work.
+
+Sat Apr 26 21:10:00 1997  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.05_01:
+
+	  More platforms known to work
+
+		  MachTen 4.0.3		1)
+
+	  Many thanks to
+
+		Dominic Dunlop		<domo@slipper.ip.lu>
+
+
+	1) well, setrlimit() does not, at all, but this is
+	   a known bug in MachTen, Perl canna fix it...
+
+Tue Apr 08 01:27:33 1997  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 1.05:
+
+	  The platforms known to work
+		  
+		  AIX 3.2.5, 4.1.4
+		  Digital UNIX (aka DEC OSF/1) 3.2C, 4.0b
+		  FreeBSD 3.0
+		  HP-UX 9.03
+		  IRIX 5.3, 6.3, 6.4
+		  Linux 2.0.18
+		  Solaris 2.5.1
+		  SunOS 4.1.4
+
+	  Many thanks to
+
+		Jim Anderson		<jander@jander.com>
+		Ariel Faigon		<ariel@sgi.com>
+		Scott Henry		<scotth@sgi.com>
+		Brett M Hogden		<hogden@rge.com>
+		Nick Ing-Simmons	<nik@tiuk.ti.com>
+		Ollivier Robert		<roberto@eurocontrol.fr>
+		Ashok S			<ashoks@india.ti.com>
+		Larry W Virden		<lvirden@cas.org>
+		Ilya Zakharevich	<ilya@math.ohio-state.edu>
+
+	  for their testing and patches. Especially many
+	  thanks to Scott Henry and Ariel Faigon.
+
+--

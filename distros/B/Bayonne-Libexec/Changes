@@ -1,0 +1,11 @@
+Revision history for Perl extension Bayonne::Libexec.
+
+0.01  Fri Jun 10 10:54:55 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Bayonne::Libexec
+
+0.02  Sun Jul 24 10:00:00 2005
+	- based on current libexec/bayonne 2 0.6.x server release
+
+0.03  Tue Jun 20 10:00:00 2006
+	- based on current libexec/Bayonne 2 1.5.x server release

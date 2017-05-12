@@ -1,0 +1,20 @@
+=head1 USE
+
+The C<email> keyword is deprecated.  It was used to specify emails
+for C<authors> before that statement started taking pairs.
+
+It now works like C<contact_us>, but if you use both C<email>
+and C<contact_us>, C<email will be ignored.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<example> in these files:
+
+  docs/kids.bigtop
+  lib/GENKids.pm
+  lib/Kids.pm
+  lib/Kids/Child.pm

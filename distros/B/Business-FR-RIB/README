@@ -1,0 +1,105 @@
+NAME
+    Business::FR::RIB - Verify French RIB (Releve d'Identite Bancaire)
+
+VERSION
+    Version 0.05
+
+SYNOPSIS
+      use Business::FR::RIB;
+      my $object = Business::FR::RIB->new('1234567890DWFACEOFBOE08');
+      print "RIB valid" if $object->is_valid();
+
+DESCRIPTION
+    This module determines whether a French RIB (Releve d'Identite Bancaire)
+    is well-formed.
+
+    Please note that there is no way to determine whether a RIB is linked to
+    a true bank account without using it or asking the bank.
+
+METHODS
+  new
+     Usage     : my $object = Business::FR::RIB->new();
+     Purpose   : Constructor
+     Returns   : A Business::FR::RIB object
+     Argument  : The new constructor optionally takes a RIB string
+
+  is_valid
+     Usage     : $object->is_valid();
+     Purpose   : Check if the RIB is well-formed
+     Returns   : 1 or 0
+     Argument  : Optionally take the RIB string as argument
+     Comment   : Please note that there is no way to determine
+               : whether a RIB is linked to a true bank account
+               : without using it or asking the bank.
+
+  rib
+     Usage     : $object->rib();
+     Purpose   : Get and optionnally or set the object's RIB
+     Returns   : The RIB
+     Argument  : The rib method optionally takes a RIB string
+
+  get_code_banque
+     Usage     : $object->get_code_banque();
+     Returns   : The bank code
+
+  get_code_guichet
+     Usage     : $object->get_code_guichet();
+     Returns   : The counter code
+
+  get_no_compte
+     Usage     : $object->get_no_compte();
+     Returns   : The RIB account number
+
+  get_cle_rib
+     Usage     : $object->get_cle_rib();
+     Returns   : The RIB key
+
+BUGS and SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::FR::RIB
+
+    Bugs and feature requests will be tracked at RT:
+
+        http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-FR-RIB
+        bug-business-fr-rib at rt.cpan.org
+
+    The latest source code can be browsed and fetched at:
+
+        https://dev.fiat-tux.fr/projects/business-fr-rib
+        git clone git://fiat-tux.fr/Business-FR-RIB.git
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-FR-RIB>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Business-FR-RIB>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Business-FR-RIB>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Business-FR-RIB/>
+
+AUTHOR
+        Luc DIDRY
+        CPAN ID: LDIDRY
+        ldidry@cpan.org
+        http://www.fiat-tux.fr/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

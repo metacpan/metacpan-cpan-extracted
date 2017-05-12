@@ -1,0 +1,26 @@
+--- ./lib/Archive/Tar/Constant.pm-pre	Wed Aug 13 23:45:54 2003
++++ ./lib/Archive/Tar/Constant.pm	Thu Sep 18 22:48:14 2003
+@@ -64,8 +64,9 @@ use constant LONGLINK_NAME  => '././@Lon
+ use constant ZLIB           => do { eval { require IO::Zlib }; $@ ? 0 : 1 };
+ use constant GZIP_MAGIC_NUM => qr/^(?:\037\213|\037\235)/;
+ 
+-use constant CAN_CHOWN      => do { ($> == 0 and $^O ne "MacOS" and $^O ne "MSWin32") };
+-use constant CAN_READLINK   => ($^O ne 'MSWin32' and $^O !~ /RISC(?:[ _])?OS/i and $^O ne 'VMS');
+-use constant ON_UNIX        => ($^O ne 'MSWin32' and $^O ne 'MacOS' and $^O ne 'VMS');
++use constant CAN_CHOWN      => do { ($> == 0 and $^O ne "MacOS" and $^O ne "MSWin32" and $^O ne 'os2') };
++use constant CAN_READLINK   => ($^O ne 'MSWin32' and $^O !~ /RISC(?:[ _])?OS/i and $^O ne 'VMS' and $^O ne 'os2');
++# Guards symlink, link and mknode
++use constant ON_UNIX        => ($^O ne 'MSWin32' and $^O ne 'MacOS' and $^O ne 'VMS' and $^O ne 'os2');
+ 
+ 1;
+--- ./t/02_methods.t-pre	Wed Aug 13 23:45:54 2003
++++ ./t/02_methods.t	Thu Sep 18 22:43:30 2003
+@@ -18,7 +18,7 @@ my $expect = {
+ };
+ 
+ ### wintendo can't deal with too long paths, so we might have to skip tests ###
+-my $TOO_LONG    =   ($^O eq 'MSWin32' or $^O eq 'cygwin') 
++my $TOO_LONG    =   ($^O eq 'MSWin32' or $^O eq 'cygwin' or $^O eq 'os2') 
+                     && length( cwd(). $file ) > 247; 
+ 
+ if( $TOO_LONG ) {

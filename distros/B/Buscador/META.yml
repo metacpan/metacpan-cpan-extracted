@@ -1,0 +1,97 @@
+--- #YAML:1.0
+name: Buscador
+version: 0.2
+author:
+  - |-
+    Originally Simon Cozens, E<lt>simon@cpan.orgE<gt>
+    Now maintained by Simon Wistow, E<lt>simon@thegestalt.orgE<gt>
+abstract: a dynamic mail archiver with a twist
+license: perl
+requires:
+  Apache::MVC: 0
+  Cache::FileCache: 0
+  Class::DBI::Pager: 0
+  Date::Parse: 0
+  Email::Find: 0
+  Email::Store: 0.24
+  Email::Store::HTML: 0
+  Email::Store::NamedEntity: 0
+  Email::Store::Plucene: 0
+  Email::Store::Pristine: 1.21
+  Email::Store::Summary: 1.2
+  Email::Store::Thread: 1.2
+  File::NCopy: 0
+  HTML::Entities: 0
+  MIME::Base64: 0
+  Mail::Thread::Arc: 0.22
+  Mail::Thread::Chronological: 0
+  Maypole::Cache: 0
+  Maypole::Redirect: 0
+  Module::Pluggable::Ordered: 0
+  Plucene: 1.17
+  Sys::Hostname: 0
+  Text::Context: 0
+  Text::Decorator: 1.2
+  Text::Unidecode: 0
+  Time::Piece: 0
+  URI::Find::Schemeless::Stricter: 0
+dynamic_config: 1
+provides:
+  Buscador:
+    file: lib/Buscador.pm
+    version: 0.2
+  Buscador::Addressing:
+    file: lib/Buscador/Addressing.pm
+  Buscador::Atom:
+    file: lib/Buscador/Atom.pm
+  Buscador::Attachment:
+    file: lib/Buscador/Attachment.pm
+  Buscador::Build:
+    file: lib/Buscador/Build.pm
+  Buscador::Config:
+    file: lib/Buscador/Config.pm
+  Buscador::Date:
+    file: lib/Buscador/Date.pm
+  Buscador::Decorate:
+    file: lib/Buscador/Decorate.pm
+  Buscador::Raw:
+    file: lib/Buscador/Raw.pm
+  Buscador::Recent:
+    file: lib/Buscador/Recent.pm
+  Buscador::Root:
+    file: lib/Buscador/Root.pm
+  Buscador::Search:
+    file: lib/Buscador/Search.pm
+  Buscador::Thread:
+    file: lib/Buscador/Thread.pm
+  Buscador::UTF8:
+    file: lib/Buscador/UTF8.pm
+  Buscador::Vote:
+    file: lib/Buscador/Vote.pm
+  Email::Store::Addressing:
+    file: lib/Buscador/Addressing.pm
+  Email::Store::Attachment:
+    file: lib/Buscador/Attachment.pm
+  Email::Store::Date:
+    file: lib/Buscador/Date.pm
+  Email::Store::Entity:
+    file: lib/Buscador/Atom.pm
+  Email::Store::Entity::Address:
+    file: lib/Buscador/Addressing.pm
+  Email::Store::Entity::Name:
+    file: lib/Buscador/Addressing.pm
+  Email::Store::List:
+    file: lib/Buscador/Atom.pm
+  Email::Store::Mail:
+    file: lib/Buscador/UTF8.pm
+  Email::Store::Thread::Arc::Link:
+    file: lib/Buscador/Thread.pm
+  Email::Store::Vote:
+    file: lib/Email/Store/Vote.pm
+  Mail::Thread:
+    file: lib/Buscador/Thread.pm
+  Text::Decorator::Filter::Addresses:
+    file: lib/Buscador/Decorate.pm
+  Text::Decorator::Filter::NamedEntity:
+    file: lib/Buscador/Decorate.pm
+generated_by: Module::Build version 0.25

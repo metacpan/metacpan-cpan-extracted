@@ -1,0 +1,123 @@
+Revision history for Perl extension Bundle::Theory.
+
+1.08  2011-06-19T04:44:31
+      - Moved to [GitHub](https://github.com/theory/bundle-theory).
+      - Modules now listed in alphabetical order.
+      - Added:
+        + Test::Reporter::Transport::Metabase
+        + DBIx::Connector
+        + Module::Build::DB
+        + Plack
+        + Plack::Middleware::MethodOverride
+        + Plack::Session::Store::File
+        + Plack::Middleware::Session
+        + namespace::autoclean
+        + Router::Resource
+        + SemVer
+        + Try::Tiny
+        + XML::Builder
+        + Data::Dump
+        + TAP::Parser::SourceHandler::pgTAP
+        + Lucy
+        + WWW::PGXN
+      - Removed:
+        + CPANPLUS::Dist::Build
+        + CPANPLUS
+        + CPAN::Reporter
+        + Regexp::Grammars
+        + YAML::Syck
+        + Params::CallbackRequest
+        + Module::Build::JSAN
+        + SVN::Notify
+        + SVN::Notify::Filter::Markdown
+        + XMLRPC::Lite
+        + Cache::Memcached
+        + Module::Starter
+        + XML::Generator
+        + XML::SAX
+        + Data::Dumper::Names
+        + Data::Dumper
+        + PPI
+        + HOP::Stream
+        + HOP::Lexer
+        + HOP::Parer
+        + TAP::Parser
+        + TAP::Harness
+        + Exporter::Tidy
+        + JSON::Syck
+        + MasonX::Interp::WithCallbacks
+        + HTML::Template
+        + HTML::Template::Expr
+        + Template
+        + Net::FTPServer
+        + Text::Iconv
+        + KinoSearch
+
+1.07  2009-09-22T22:20:10
+      - Corrected Spelling of Module::CoreList.
+      - Added:
+        + Test::Spelling
+        + Test::XPath
+        + Template::Declare
+        + Template::Declare::Bricolage
+        + Regexp::Grammars
+        + YAML::Syck
+        + CPANPLUS::Dist::Build
+        + MooseX::Declare
+        + Mouse
+        + Class::C3
+        + Attribute::Handlers
+        + KinoSearch
+        + parent
+        + ExtUtils::CBuilder
+      - Removed:
+        + YAML
+        + Time::Piece::ISO
+        + Wiget::Meta
+        + Data::GUID
+        + A few Duplicates
+
+1.06  2008-05-05T17:51:28
+      - Added ExtUtils::XSBuilder to Bundle::Theory::Apache2.
+
+1.05  2008-04-10T02:29:49
+      - Added HTML::Template::Expr.
+      - Added Bundle::Theory::Apache.
+      - Added Bundle::Theory::Apache2.
+
+1.04  2008-04-09T22:17:16
+      - Added SVN::Notify::Filter::Markdown.
+      - Added Text::Trac.
+
+1.03  2008-04-02T19:26:52
+      - Changed from nonexistent Test::Coverage to the correct name,
+        Test::Pod::Coverage.
+      - Changed from nonexistent Net::FTP::Server to the correct name,
+        Net::FTPServer.
+      - Removed IO::Socket::SSL for now, since its tests fail.
+      - Added:
+        + Want
+        + Parse::RecDescent
+        + JSON and JSON::XS
+        + App::Ack
+        + Modul::CoreList
+        + PPI
+        + Perl::Tidy
+        + Scalar::Util
+        + Text::Markdown
+        + Text::MultiMarkdown
+        + HTML::HeadParser
+
+1.02  2008-02-05 00:07:25
+      - Added `t/basic.t` so that it would actually be distributed. Duh.
+
+1.01  2008-02-04 22:08:44
+      - Added `t/basic.t`, which just makes sure the bundle module loads, so
+        that there is at least one test for the distribution. This will
+        eliminate those "UNKNOWN" test retults from cpan-testers.
+      - Changed the "CONTENTS" header to uppercase to make `CPAN.pm` happy.
+      - Added Module::Install.
+      - Added CPAN::SQLite.
+
+1.00  2008-02-03 01:59:58
+      - Initial public release.

@@ -1,0 +1,92 @@
+Revision history for B-Hooks-EndOfScope
+
+0.21      2016-05-25 18:34:46Z
+  - work with Object::Remote by removing require() call on Tie::StdHash in PP
+
+0.20      2016-05-06 16:42:50Z
+  - remove unnecessary and erroneous extra crud in inc/
+
+0.19      2016-05-03 00:49:01Z
+  - bundled an updated ExtUtils::HasCompiler, to support building with a
+    noexec $TMPDIR.
+
+0.18      2016-04-21 15:22:10Z (TRIAL RELEASE)
+  - fixed unnecessary inlining of ExtUtils::HasCompiler dependencies
+    (RT#113685)
+
+0.17      2016-04-21 11:25:35Z (TRIAL RELEASE)
+  - Makefile.PL now checks for a working compiler using ExtUtils::HasCompiler
+    (inlined into the build) rather than ExtUtils::CBuilder (RT#113685)
+
+0.16      2015-09-19 19:01:04Z (TRIAL RELEASE)
+  - more Makefile.PL updates - these contain slight functionality changes,
+    hence the trial release
+
+0.15      2015-05-14 21:46:06Z
+  - updated the tooling for generating Makefile.PL
+  - removed Tie::StdHash from prereqs, which is not require()able as a module
+    on its own (despite being indexed) (miyagawa, GH #3)
+  - fixed the addition in release 0.14 of Hash::Util::FieldHash as a
+    prerequisite (which is not available prior to perl 5.010) for pure-perl
+    installations (RT#104435)
+
+0.14      2015-01-31 23:59:03Z
+  - line numbers in shipped code are now the same as the repository source,
+    for easier debugging
+  - more accurate dynamic prereq declarations
+
+0.13      2014-01-07 21:17:39Z
+  - Variable::Magic added as a runtime recommendation for greater visibility
+    (RT#89245)
+  - fixed broken logic in compiler detection on older perls
+  - fixed inaccurate repository metadata
+
+0.12   2012-12-04 20:13:00Z
+  - Complete pure-perl implementation in addition to the one based on
+    Variable::Magic. You can specify the implementation explicitly by
+    use-ing B::Hooks::EndOfScope::PP or B::Hooks::EndOfScope::XS, or
+    by setting $ENV{B_HOOKS_ENDOFSCOPE_IMPLEMENTATION} to either 'XS'
+    or 'PP'
+  - Switch from using Sub::Exporter to the more conservative
+    Sub::Exporter::Progressive
+
+0.11   2012-02-23 10:19:18Z
+  - A minor efficiency improvement.
+
+0.10   2012-02-16 08:41:54Z
+  - Stop propagating our magic through localisation.
+
+0.09   2010-05-07 20:11:49Z
+  - Improve distribution metadata.
+
+0.08   2009-04-19 17:15:44Z
+  - Depend on Variable::Magic 0.34 so exceptions during compile time that
+    trigger a destructor don't cause an exception on 5.10 anymore.
+
+0.07   2009-02-20 13:22:16Z
+  - Depend on Variable::Magic 0.31 so exceptions thrown in on_scope_end
+    blocks don't lose their error message.
+
+0.06   2009-01-18 23:51:45Z
+  - Depend on Variable::Magic 0.27 to stop exceptions thrown in
+    on_scope_end blocks from segfaulting. Also add a test for that.
+
+0.05   2009-01-04 19:46:07Z
+  - Use Variable::Magic and cast %^H instead Scope::Guard and relying
+    on a timely destruction of objects within %^H. This fixes using
+    on_scope_end in blocks where string evals are compiled as those
+    increment the refcount of objects in %^H on 5.10.
+
+0.04   2008-10-20 10:56:23Z
+  - Remove an unused bit from the $^H mask.
+
+0.03   2008-10-20 04:53:20Z
+  - Improve testing of multiple hooks.
+  - More documentation.
+  - Require perl 5.8.0.
+
+0.02   2008-10-19 08:25:15Z
+  - Specify all dependencies.
+
+0.01   2008-10-19 07:29:13Z
+  - Initial release.

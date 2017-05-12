@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+Changes
+lib/Business/Payment/SwissESR.pm
+lib/Business/Payment/SwissESR/PaymentSlip.pm
+lib/Business/Payment/SwissESR/V11Parser.pm
+lib/Business/Payment/SwissESR/esrTemplate.pdf
+lib/Business/Payment/SwissESR/ocrb10.otf
+lib/Business/Payment/SwissESR/ocrb10.txt
+t/paymentslip.t
+t/test3.v11
+t/test4.v11
+t/v11parser.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

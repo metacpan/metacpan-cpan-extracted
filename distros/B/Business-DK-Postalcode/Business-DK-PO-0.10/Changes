@@ -1,0 +1,109 @@
+Changes file for Business::DK::Postalcode
+
+Project site changelog:
+
+http://logiclab.jira.com/browse/BDKPST#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.10 2015-08-16 Maintenance release, update not necessary
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.09 2014-08-15
+
+- Maintenance release, update not necessary
+
+- Addressing Kwalitee, aligning version for version consistency in
+  modules in distribution
+
+
+0.08 2014-08-02
+
+- Maintenance release, update not necessary
+
+- Added example application in examples/
+
+- Added postdanmark script, script to monitor the main data source (downloadable Excel)
+  [BKDPST-24]
+
+- Added new subroutines:
+    - get_all_cities
+    - get_postalcode_from_city
+    - get_city_from_postalcode
+
+- Improved cleaning step in Build.PL [BDKPST-26]
+
+  https://logiclab.jira.com/browse/BDKPST-26
+
+- Added kwalitee.t implementing Test::Kwalitee tests [BDKPST-27]
+
+  https://logiclab.jira.com/browse/BDKPST-27
+
+
+0.07 2013-08-07
+
+- Data release, update recommended
+
+- Updated with data from 9th. july 2013 [BDKPST-22]
+
+- Added changes.t implementing Test::CPAN::Changes test. Introducing dependency
+  on Test::CPAN::Changes, see also BDKPST-21 [BDKPST-23]
+
+
+0.06 2013-07-27
+
+- Maintenance release, update not necessary
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [BDKPST-21]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/BDKPST-21
+
+
+0.05 2013-07-03
+
+- Bug fix release, update not necessary
+
+- Adressing test assertions, based on a reports on test failure from CPAN testers
+	- MSWin32-x86-multi-thread / 5.16.0:
+	  FAIL http://www.cpantesters.org/cpan/report/65b2a6f9-7559-1014-ba4a-88b5233f278b
+	- i386-freebsd / 5.18.0:
+      FAIL http://www.cpantesters.org/cpan/report/cbb48d5c-e35a-11e2-9495-f1a5bb320383
+
+
+0.04 2013-07-26
+
+- Data release, update recommended
+
+- Updated with data from 19th. june 2013 [BDKPST-19]
+
+
+0.03 2013-02-26
+
+- Data release, update recommended
+
+- Updated with data from 10th. january 2013 [BDKPST-18]
+
+
+0.02 2013-02-24
+
+- Bug fix release, update not necessary
+
+- Brushing up the requirements, based on a report on test failure from
+      CPAN testers:
+      http://www.cpantesters.org/cpan/report/448ad398-6c3c-1014-988a-6778d871b27e
+      [BDKPST-16]
+
+
+0.01 2013-02-22
+
+- Initial release
+
+- Implements validation of Danish postal codes based on inline data set
+
+- Implements hook for Data::FormValidator
+
+- Please see TODO file for future road map

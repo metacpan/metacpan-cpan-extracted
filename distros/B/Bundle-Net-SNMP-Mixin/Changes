@@ -1,0 +1,11 @@
+Revision history for Bundle::Net-SNMP-Mixin
+
+0.11	Sun Oct 26 17:24:00 MET 2008
+	Added Net::SNMP::Mixin::IpRouteTable
+
+0.10	Mo 28. Apr 09:50:40 CEST 2008
+	tests even for Bundle::... now successfull
+	thanx a lot to all CPAN testers!
+
+0.09	Fr 25. Apr 19:05:18 CEST 2008
+	separate Module, no longer within Net::SNMP::Mixin

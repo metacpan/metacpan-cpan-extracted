@@ -1,0 +1,45 @@
+{
+   "abstract" : "A Perl interface to the EMBL-EBI RNA-seq analysis API",
+   "author" : [
+      "Maria Keays <maria.keays@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "lgpl_3_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-EBI-RNAseqAPI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::Parse" : "0.32",
+            "LWP::UserAgent" : "6.06",
+            "Log::Log4perl" : "1.46",
+            "Moose" : "2.1402",
+            "MooseX::FollowPBP" : "0.05"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.04"
+}

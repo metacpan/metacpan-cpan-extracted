@@ -1,0 +1,137 @@
+Revision history for Perl extension Bio::Das::Lite.
+
+2.11 feature.type.cvId parsing fix from Nick Langridge
+
+2.10 DAS 1.6 spec, all patches from Andy
+
+2.05 Probably the last release on the DAS 1.53 spec
+
+2.04 Patches to catch out-of-date versions of libcurl.
+     Refactored some routines to reduce complexity.
+
+2.01 Bugfix for authenticating proxies.
+     No longer appends ? to DAS request URIs without query params.
+     Supports links with no descriptions.
+
+2.00 Switched to WWW::Curl::Simple (from LWP::Parallel::UserAgent)
+
+1.61 Minor: Fixed prereq (for CPANTS prereq_matches_use)
+
+1.60 Latest LWP has broken support for "parse_head"
+     function. Das::Lite attempts to correct for this by squirting an
+     ersatz version into the symbol table under LWP::Protocol, where
+     it used to be. A particularly ugly hack!
+
+1.58  Added 'no_proxy' configurable parameter.
+      Added 'max_hosts' configurable parameter.
+      Supports the X-DAS-Status header.
+      Supports score-based stylesheets (see DAS 1.53E spec).
+      Fixes for perlcritic.
+      Fixed issues of failings tests caused by retired DAS servers.
+
+1.53  kwalitee updates (Test::Pod::Coverage & LICENSE in Makefile.PL)
+
+1.50  added 'sequence' patch for alignments, patch from jt6
+
+1.49  new 'maxbins' parameter for feature requests:
+
+      In recent months more and more das sources appeared that provide
+      very condensed value based data. Sometimes it is a feature per
+      every 50 basepairs or even a feature per amino acid. It causes
+      two major problems:
+      1 - amount of XML being transferred is huge
+      2 - Ensembl can only do simple merge of the features, i.e just
+      pick max or min value - and in some cases das sources providers
+      want to use a completely different dataset for a different size
+      and resolution of the viewed region.
+
+      To solve these problems we have introduced a new `maxbins`
+      parameter to the `features` das request.  Using this parameter
+      Ensembl tells all das sources what is the width in pixels of the
+      image used to display the features.  Then the das sources smart
+      enough to understand the parameter will merge the features
+      themselves and for the rest Ensembl will do the work.
+
+1.48  'dna' request support. Minor refactorings and cleanups for perl-critic
+
+1.47  Reworked tests, a couple of fixes for structure handling
+
+1.44  Package namespace changed to Bio::Das::Lite
+      -compat tests added for compatibility with deprecated DasLite.pm
+      Codebase cleaned up to make Perl::Critic happy
+      Protein structure support, patch from rdf
+      'sources' request support, patch from rdf
+
+1.41  Protein alignment support, patch from rdf
+
+1.40  Cleanup for Perl::Critic purposes
+
+1.39  Minor typographical tidying up, some more tests
+
+1.38  Minor tweaks to http_proxy - support for http://user:pass@proxy.example.com:nnnn/ format http_proxy
+
+1.33  Minor tweaks to proxy_* methods; Addition of configurable user_agent
+
+1.32  Bugfixes: Cache cleaning for performing multiple queries using persistent objects
+                Regex fixes for group notes and links
+                Initial support for authenticating proxies (proxy_user, proxy_pass)
+
+1.27  Switched over to CVS version to make things easier for me to track
+      Minor revisions. Some more tests
+ 
+0.15  Includes registry support.
+      See 'new_from_registry', 'registry' and 'registry_sources' methods.
+
+0.14  Fix for entry_points structure and a new test for it
+      Added a new way to use the constructor: my $das = Bio::DasLite->new("http://server/das/source");
+      Added a convenience side-effect - give segment data in responses for segments without features in
+
+0.13  Absolutely minor change to include LWP::P::UA max_req connection throttling
+      Upgrade strongly recommended
+
+0.12  Reworked all the tests.
+      Tweaked basename regex to allow more flexibility in
+      specifying services rather than dsns, i.e.
+      'dsn' => 'http://das.mysite.com/das'
+      rather than
+      'dsn' => 'http://das.mysite.com/das/dsn'
+
+0.11  Added a little extra debug, some extra eval traps, improved url processing
+      and a couple of new WTSI extensions to the spec
+
+0.10  Fixed dsns DAS request (source basename)
+
+0.09  Fixed broken 'types' request
+
+0.08  Added multi-link, multi-note, multi-group-link and multi-group-note support
+      Added X-Forwarded-For HTTP header for IP-based ACLs
+      Added passthrough for HTTP header data
+
+0.07  Internal development version
+
+0.06  Fixes for the regex/stack problems in 0.05.
+      Added callback support for stylesheet and features calls
+
+0.05  Stylesheet support. Seems to tickle some perl regex/stack bugs
+      on certain platforms (x86 Linux, Alpha Tru64). It works fine on my G4.
+
+0.04  Internal version. Added duplication of segment data across
+      features in the 'features' call.
+
+0.03  Allowed for calls (namely 'features') with an arrayref of
+      segments, i.e. $das->features(["1:1,1000", "2:1,1000"]);
+      Minor modifications following some benchmarking and profiling.
+      Results are now cached (per Bio::DasLite instance) against
+      query URL by default.
+
+0.02  Following feedback, data structures returned by:
+      dsn, basename, dsns, entry_points, types, features, sequence
+      have now been homogenised across the board. Results are now
+      always hashed against the query which was made, regardless
+      of how many sources are configured.
+      Also added a few more tests including feature-by-id
+
+0.01  Fri Aug 19 16:38:05 2005
+	- original version; created by h2xs 1.23 with options
+		-cfn Bio::DasLite
+

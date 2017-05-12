@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>TimelineUnackedCountsPoller tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="spinner"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="./sinon.js"></script>
+    <script src="./uri.js"></script>
+    <script src="../../share/www/static/q.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script src="../../share/www/static/timeline.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var is = strictEqual;
+
+var setupContainer = function() {
+    $('<ul id="bb-status-container"></ul>').appendTo("#qunit-fixture");
+    return new bb.StatusContainer({selectorContainer: "#bb-status-container", timeline: "test"});
+};
+
+var setupPoller = function(container) {
+    return new bb.TimelineUnackedCountsPoller({statusContainer: container});
+};
+
+var FakeUnackedCountsServer = function() {
+    var self = this;
+    self.fakexhr = sinon.useFakeXMLHttpRequest();
+    self.incoming_request = Q.defer();
+    self.fakexhr.onCreate = function(req) {
+        if(!self.incoming_request.promise.isPending()) {
+            throw "request arrived while there is a unhandled request.";
+        }
+        self.incoming_request.resolve(req);
+    };
+};
+FakeUnackedCountsServer.prototype = {
+    restore: function() { this.fakexhr.restore() },
+    respond: function(unacked_counts_object) {
+        var self = this;
+        if(self.incoming_request.promise.isPending()) {
+            throw "attempt to respond while there is no unhandled request.";
+        }
+        self.incoming_request.promise.valueOf().respond(
+            200, {"Content-Type": "application/json; charset=utf8"},
+            JSON.stringify({"error": null, "unacked_counts": unacked_counts_object})
+        );
+        self.incoming_request = Q.defer();
+    },
+    waitForQuery: function() {
+        var self = this;
+        return self.incoming_request.promise.then(function(req) {
+            var query_object = URI.parseQuery(URI.parse(req.url).query || "");
+            delete query_object["_"];
+            return query_object;
+        });
+    },
+};
+
+asyncTest("TimelineUnackedCountsPoller", function() {
+    var server = new FakeUnackedCountsServer();
+    var status_container = setupContainer();
+    var poller = setupPoller(status_container);
+    var old_margin = bb.TimelineUnackedCountsPoller.LEVEL_MARGIN;
+    var waiting_deferreds = [];
+    var respondAndWaitForCallback = function(response_unacked_counts) {
+        var d = Q.defer();
+        waiting_deferreds.push(d);
+        server.respond(response_unacked_counts);
+        return d.promise;
+    };
+    bb.TimelineUnackedCountsPoller.LEVEL_MARGIN = 2;
+    poller.listenOnChange(function(got_counts) {
+        var d = waiting_deferreds.shift();
+        d.resolve(got_counts);
+    });
+    Q.fcall(function() {
+        poller.start();
+        return server.waitForQuery();
+    }).then(function(query) {
+        deepEqual(query, {total: "0", "-2": "0", "-1": "0", "0": "0", "1": "0", "2": "0"}, "initial query OK");
+        return respondAndWaitForCallback({total: 2, 0: 1, 2: 1});
+    }).then(function(callback_result) {
+        deepEqual(callback_result, {total: 2, 0: 1, 2: 1}, "listener event OK");
+        return server.waitForQuery();
+    }).then(function(query) {
+        deepEqual(query, {total: "2", "-2": "0", "-1": "0", "0": "1", "1": "0", "2": "1"}, "second query OK");
+        return status_container.setThresholdLevel(-3);
+    }).then(function() {
+        return respondAndWaitForCallback({total: 5, "-4": 2, "-1": 1, "0": 1, "2": 1});
+    }).then(function(callback_result) {
+        deepEqual(callback_result, {total: 5, "-4": 2, "-1": 1, "0": 1, "2": 1}, "listener event OK");
+        return server.waitForQuery();
+    }).then(function(query) {
+        deepEqual(query, {"total": "5", "-5": "0", "-4": "2", "-3": "0", "-2": "0", "-1": "1"},
+                  "query levels are adjusted according to the current threshold level");
+    }).fail(function(reason) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + reason);
+    }).then(function() {
+        server.restore();
+        bb.TimelineUnackedCountsPoller.LEVEL_MARGIN = old_margin;
+        start();
+    });
+});
+
+    </script>
+  </body>
+</html>

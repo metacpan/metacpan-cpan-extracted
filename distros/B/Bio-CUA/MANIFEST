@@ -1,0 +1,38 @@
+bin/cai_codon.pl
+bin/tai_codon.pl
+bin/cub_seq.pl
+bin/tabulate_codons.pl
+Changes
+ignore.txt
+lib/Bio/CUA.pm
+lib/Bio/CUA/CodonTable.pm
+lib/Bio/CUA/CUB.pm
+lib/Bio/CUA/CUB/Calculator.pm
+lib/Bio/CUA/CUB/Builder.pm
+lib/Bio/CUA/Seq.pm
+lib/Bio/CUA/SeqIO.pm
+lib/Bio/CUA/Summarizer.pm
+lib/Bio/CUA/Tutorial.pod
+LICENSE
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-seqio.t
+t/02-codontable.t
+t/03-summarizer.t
+t/04-builder.t
+t/05-calculator.t
+t/cai.out
+t/dmel_r5_apr2006.tRNA_copy
+t/expected.tsv
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/tai.out
+t/test.fa
+t/env.pm
+TODO
+xt/boilerplate.t
+Makefile.PL
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

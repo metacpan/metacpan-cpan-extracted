@@ -1,0 +1,174 @@
+
+=head1 NAME
+
+Box2D::b2Fixture - Used to attach a shape to a body for collision detection.
+
+=head1 SYNOPSIS
+
+  my $fixture = $body->CreateFixture( $shape, $density );
+
+=head1 DESCRIPTION
+
+A fixture is used to attach a shape to a body for collision detection.
+A fixture inherits its transform from its parent. Fixtures hold
+additional non-geometric data such as friction, collision filters, etc.
+Fixtures are created via C<Box2D::b2Body::CreateFixture>.
+
+Warning: you cannot reuse fixtures.
+
+=head1 METHODS
+
+=head2 GetBody()
+
+Get the parent body of this fixture. This is NULL if the fixture is not
+attached.
+
+Returns a C<Box2D::b2Body> - the parent body.
+
+=head2 GetDensity()
+
+Get the density of this fixture.
+
+Returns a C<float32>
+
+=head2 GetFriction()
+
+Get the coefficient of friction.
+
+Returns a C<float32>
+
+=head2 GetNext()
+
+Get the next fixture in the parent body's fixture list.
+
+Returns a C<Box2D::b2Fixture> - the next shape.
+
+=head2 GetRestitution()
+
+Get the coefficient of restitution.
+
+Returns a C<float32>
+
+=head2 GetShape()
+
+Get the child shape. You can modify the child shape, however you should
+not change the number of vertices because this will crash some
+collision caching mechanisms. Manipulating the shape may lead to
+non-physical behavior.
+
+Returns a C<Box2D::b2Shape>
+
+=head2 GetUserData()
+
+Get the user data that was assigned in the fixture definition. Use this
+to store your application specific data.
+
+Returns a C<scalar>
+
+=head2 IsSensor()
+
+Is this fixture a sensor (non-solid)?
+
+Returns a C<bool> - the true if the shape is a sensor.
+
+=head2 SetDensity( $density )
+
+Set the density of this fixture. This will _not_ automatically adjust
+the mass of the body. You must call C<Box2D::b2Body::ResetMassData> to
+update the body's mass.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$density>
+
+=back
+
+=head2 SetFriction( $friction )
+
+Set the coefficient of friction.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$friction>
+
+=back
+
+=head2 SetRestitution( $restitution )
+
+Set the coefficient of restitution.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$restitution>
+
+=back
+
+=head2 SetSensor( $sensor )
+
+Set if this fixture is a sensor.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$sensor>
+
+=back
+
+=head2 SetUserData( $data )
+
+Set the user data. Use this to store your application specific data.
+
+Parameters:
+
+=over 4
+
+=item * C<scalar> C<$data>
+
+=back
+
+=head2 TestPoint( $p )
+
+Test a point for containment in this fixture.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$p> - a point in world coordinates.
+
+=back
+
+Returns a C<bool>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Body>
+
+=item * L<Box2D::b2Shape>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

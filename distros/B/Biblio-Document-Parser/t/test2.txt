@@ -1,0 +1,19 @@
+This is a document
+
+bla
+bla
+bla
+bla
+
+
+References
+
+1. A Reference
+
+2. Another Reference
+
+3. Yet another reference
+
+4. Forth Reference
+
+5. Fifth Reference

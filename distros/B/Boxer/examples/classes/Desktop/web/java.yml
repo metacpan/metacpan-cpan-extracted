@@ -1,0 +1,12 @@
+classes:
+  - Language.java
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel support for Java-applet
+  pkg:
+    - icedtea-6-plugin
+  pkg-auto:
+    - openjdk-6-jre

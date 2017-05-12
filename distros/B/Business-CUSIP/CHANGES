@@ -1,0 +1,25 @@
+Version 1.03
+  06/11/06 - Fixed a typo in the documentation for issue_num().
+
+Version 1.02
+  04/01/02 - Fixed error in test cases of t/04-bad.t. It was looking for the
+    string "not correct" from Algorith::LUHN, which changed it to "incoorect."
+    Test now looks for either string.
+
+Version 1.01
+  03/27/02 - Fixed error() to return undef for valid CUSIP, as documented.
+    Set $ERROR to undef after successful is_valid() call.
+
+Version 1.00
+  11/18/01 - Added the error() method.
+
+Version 0.03
+  05/09/01 - Added t/05-acc.t test.
+
+Version 0.02
+
+ 05/03/01 - Added a lot of validations in is_valid. Added new test t/04-bad.t
+   to check new validations.
+
+ 05/01/01 - Changed the way the list of A..Z valid_chars is generated to be
+    more explicit.

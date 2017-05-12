@@ -1,0 +1,218 @@
+--- #YAML:1.0
+name: Bundle-PBib
+version: 2.08.01
+author:
+  - Peter Tandler <pbib@tandlers.de>
+abstract: >-
+  Something like BibTeX, but written in perl and designed to be extensible in
+  three dimensions: bibliographic databases (e.g. BibTeX, OpenOffice),
+  document file formats (e.g. Word, RTF, OpenOffice), styles (e.g. ACM, IEEE)
+license: perl
+resources:
+  bugtracker: |-
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bundle-PBib
+  homepage: http://tandlers.de/peter/pbib
+  license: http://dev.perl.org/licenses/
+requires:
+  Bundle::DBI: 11.02
+  Config::General: 2.18
+  Cwd: 2.06
+  Data::Dumper: 2.12
+  Module::Build: 0.2604
+  perl: 5.6.1
+build_requires:
+  Test::More: 0
+provides:
+  Biblio::BP:
+    file: lib/Biblio/BP.pm
+    version: 1.25
+  Biblio::BP::Util:
+    file: lib/Biblio/BP.pm
+  Biblio::Biblio:
+    file: lib/Biblio/Biblio.pm
+    version: 1.13
+  Biblio::Bibtex:
+    file: lib/Biblio/Bibtex.pm
+    version: 1.10
+  Biblio::Database:
+    file: lib/Biblio/Database.pm
+    version: 1.10
+  Biblio::File:
+    file: lib/Biblio/File.pm
+    version: 1.18
+  Biblio::Util:
+    file: lib/Biblio/Util.pm
+    version: 1.13
+  Config::General:
+    file: lib/Config/General.pm
+    version: 2.18
+  Config::General::Extended:
+    file: lib/Config/General/Extended.pm
+    version: 1.9
+  Config::General::Interpolated:
+    file: lib/Config/General/Interpolated.pm
+    version: 2.02
+  PBib::BibItemStyle:
+    file: lib/PBib/BibItemStyle.pm
+    version: 1.10
+  PBib::BibItemStyle::ACM:
+    file: lib/PBib/BibItemStyle/ACM.pm
+    version: 1.10
+  PBib::BibItemStyle::ElsevierJSS:
+    file: lib/PBib/BibItemStyle/ElsevierJSS.pm
+    version: 1.10
+  PBib::BibItemStyle::IEEE:
+    file: lib/PBib/BibItemStyle/IEEE.pm
+    version: 1.10
+  PBib::BibItemStyle::IEEETR:
+    file: lib/PBib/BibItemStyle/IEEETR.pm
+    version: 1.10
+  PBib::BibItemStyle::InderScience:
+    file: lib/PBib/BibItemStyle/InderScience.pm
+    version: 1.23
+  PBib::BibliographyStyle:
+    file: lib/PBib/BibliographyStyle.pm
+    version: 1.11
+  PBib::Builder:
+    file: lib/PBib/Builder.pm
+    version: 1.025
+  PBib::Config:
+    file: lib/PBib/Config.pm
+    version: 1.025
+  PBib::ConfigFile:
+    file: lib/PBib/ConfigFile.pm
+    version: 1.10
+  PBib::Document:
+    file: lib/PBib/Document.pm
+    version: 1.25
+  PBib::Document::MSWord:
+    file: lib/PBib/Document/MSWord.pm
+    version: 1.19
+  PBib::Document::OpenOffice:
+    file: lib/PBib/Document/OpenOffice.pm
+    version: 1.13
+  PBib::Document::OpenOffice::StringBufferFileHandle:
+    file: lib/PBib/Document/OpenOffice.pm
+  PBib::Document::OpenOfficeSXW:
+    file: lib/PBib/Document/OpenOfficeSXW.pm
+    version: 1.13
+  PBib::Document::PBib:
+    file: lib/PBib/Document/PBib.pm
+    version: 1.10
+  PBib::Document::RTF:
+    file: lib/PBib/Document/RTF.pm
+    version: 1.11
+  PBib::Document::XHTML:
+    file: lib/PBib/Document/XHTML.pm
+    version: 1.25
+  PBib::Document::XML:
+    file: lib/PBib/Document/XML.pm
+    version: 1.13
+  PBib::LabelStyle:
+    file: lib/PBib/LabelStyle.pm
+    version: 1.10
+  PBib::LabelStyle::CiteKey:
+    file: lib/PBib/LabelStyle/CiteKey.pm
+    version: 1.10
+  PBib::LabelStyle::Name:
+    file: lib/PBib/LabelStyle/Name.pm
+    version: 1.11
+  PBib::PBib:
+    file: lib/PBib/PBib.pm
+    version: 2.14
+  PBib::ReferenceConverter:
+    file: lib/PBib/ReferenceConverter.pm
+    version: 1.18
+  PBib::ReferenceConverter::MSWord:
+    file: lib/PBib/ReferenceConverter/MSWord.pm
+    version: 1.11
+  PBib::ReferenceStyle:
+    file: lib/PBib/ReferenceStyle.pm
+    version: 1.11
+  PBib::ReferenceStyle::BookmarkLink:
+    file: lib/PBib/ReferenceStyle/BookmarkLink.pm
+    version: 1.11
+  PBib::ReferenceStyle::Field:
+    file: lib/PBib/ReferenceStyle/Field.pm
+    version: 1.10
+  PBib::Style:
+    file: lib/PBib/Style.pm
+    version: 1.10
+  PBibTk::HistoryList:
+    file: lib/PBibTk/HistoryList.pm
+    version: 1.10
+  PBibTk::LitRefs:
+    file: lib/PBibTk/LitRefs.pm
+    version: 1.10
+  PBibTk::Main:
+    file: lib/PBibTk/Main.pm
+    version: 1.23
+  PBibTk::RefDialog:
+    file: lib/PBibTk/RefDialog.pm
+    version: 1.10
+  PBibTk::SearchDialog:
+    file: lib/PBibTk/SearchDialog.pm
+    version: 1.11
+  bib:
+    file: lib/Biblio/bp/lib/bp.pl
+  bp_auto:
+    file: lib/Biblio/bp/lib/bp-auto.pl
+  bp_bibtex:
+    file: lib/Biblio/bp/lib/bp-bibtex.pl
+  bp_bibtexo:
+    file: lib/Biblio/bp/lib/bp-bibtexo.pl
+  bp_canon:
+    file: lib/Biblio/bp/lib/bp-canon.pl
+  bp_cs_88591:
+    file: lib/Biblio/bp/lib/bp-cs-8859-1.pl
+  bp_cs_apple:
+    file: lib/Biblio/bp/lib/bp-cs-apple.pl
+  bp_cs_auto:
+    file: lib/Biblio/bp/lib/bp-cs-auto.pl
+  bp_cs_canon:
+    file: lib/Biblio/bp/lib/bp-cs-canon.pl
+  bp_cs_dead:
+    file: lib/Biblio/bp/lib/bp-cs-dead.pl
+  bp_cs_html:
+    file: lib/Biblio/bp/lib/bp-cs-html.pl
+  bp_cs_none:
+    file: lib/Biblio/bp/lib/bp-cs-none.pl
+  bp_cs_tex:
+    file: lib/Biblio/bp/lib/bp-cs-tex.pl
+  bp_cs_troff:
+    file: lib/Biblio/bp/lib/bp-cs-troff.pl
+  bp_cs_utf8:
+    file: lib/Biblio/bp/lib/bp-cs-utf8.pl
+  bp_cstra:
+    file: lib/Biblio/bp/lib/bp-cstra.pl
+  bp_endnote:
+    file: lib/Biblio/bp/lib/bp-endnote.pl
+  bp_html:
+    file: lib/Biblio/bp/lib/bp-html.pl
+  bp_ieee:
+    file: lib/Biblio/bp/lib/old/bp-ieee.pl
+  bp_inspec:
+    file: lib/Biblio/bp/lib/bp-inspec.pl
+  bp_inspec4:
+    file: lib/Biblio/bp/lib/bp-inspec4.pl
+  bp_medline:
+    file: lib/Biblio/bp/lib/bp-medline.pl
+  bp_melvyl:
+    file: lib/Biblio/bp/lib/bp-melvyl.pl
+  bp_output:
+    file: lib/Biblio/bp/lib/bp-output.pl
+  bp_powells:
+    file: lib/Biblio/bp/lib/old/bp-powells.pl
+  bp_procite:
+    file: lib/Biblio/bp/lib/bp-procite.pl
+  bp_refer:
+    file: lib/Biblio/bp/lib/bp-refer.pl
+  bp_rfc1807:
+    file: lib/Biblio/bp/lib/bp-rfc1807.pl
+  bp_text:
+    file: lib/Biblio/bp/lib/bp-text.pl
+  bp_tib:
+    file: lib/Biblio/bp/lib/bp-tib.pl
+  bp_util:
+    file: lib/Biblio/bp/lib/old/bp-p-output.pl
+generated_by: Module::Build version 0.2702

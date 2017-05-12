@@ -1,0 +1,79 @@
+NAME
+    Business::Hours -
+
+SYNOPSIS
+      use Business::Hours;
+      my $hours = Business::Hours->new();    
+      # Get a Set::IntSpan of all the business hours in the next week.
+      # use the default business hours of 9am to 6pm localtime.
+      $hours->business_hours_in_timespan(Start => time(), End => time()+(86400*7));
+
+DESCRIPTION
+    This module is a simple tool for calculating business hours in a time
+    period. Over time, additional functionality will be added to make it
+    easy to calculate the number of business hours between arbitrary dates.
+
+USAGE
+BUGS
+    Yes
+
+SUPPORT
+    Send email to bug-business-hours@rt.cpan.org
+
+AUTHOR
+        Jesse Vincent
+        Best Practical Solutions, LLC 
+        jesse@cpan.org
+        http://www.bestpractical.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+
+  sample_function
+     Usage     : How to use this function/method
+     Purpose   : What it does
+     Returns   : What it returns
+     Argument  : What it wants to know
+     Throws    : Exceptions and other anomolies
+     Comments  : This is a sample subroutine header.
+               : It is polite to include more pod and fewer comments.
+
+    See Also :
+
+  business_hours
+    Set the business hours for this Business::Hours object. Takes a hash of
+    the form :
+
+    { 0 => { Name => 'Sunday', Start => 'HH::MM', End => 'HH::MM'},
+
+        1 => { Name => 'Monday',
+                Start => 'HH::MM',
+                   End => 'HH::MM'},
+        ....
+
+        6 => { Name => 'Saturday',
+                Start => 'HH::MM',
+                   End => 'HH::MM'},
+        };
+
+        Start and end times are of the form HH:MM.  Valid times are
+        from 00:00 to 23:59.  If your hours are from 9am to 6pm, use
+        Start => '9:00', End => '18:00'.  A given day MUST have a start
+        and end time OR may declare both Start and End to be undef, if
+        there are no valid hours on that day.
+
+  for_timespan
+    Takes a paramhash with the following parameters
+
+            Start => The start of the period in question in seconds since the epoch
+            End => The end of the period in question in seconds since the epoch
+
+    Returns a Set::IntSpan of business hours for this period of time.
+

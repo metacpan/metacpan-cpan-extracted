@@ -1,0 +1,12 @@
+Copyright (c) 2003 Daniel Brooks <db48x@yahoo.com>
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::iAuthorizer, an Business::OnlinePayment
+backend module for iAuthorizer.  It is only useful if you have a merchant
+account with iAuthorizer: http://www.iauthorizer.net
+
+Daniel Brookss <db48x@yahoo.com> is the original author.
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.

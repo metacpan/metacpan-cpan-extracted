@@ -1,0 +1,32 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawChart);
+    function drawChart() {
+        [% attr = 0 %]
+        [% FOREACH e IN entities %]
+        [% attrid = "attr" _ attr %]
+        var data_[% attrid %] = google.visualization.arrayToDataTable([
+         [% $e %]
+        ]);
+
+        var options_[% attrid %] = {
+          title: '[% e %] of [% object %]',
+          hAxis: {title: 'Turn',  titleTextStyle: {color: '#333'}},
+          vAxis: {minValue: [% min.$e %]},
+          colors: ['[% colors.$e %]']
+        };
+
+        var chart_[% attrid %] = new google.visualization.AreaChart(document.getElementById('[% attrid %]'));
+        chart_[% attrid %].draw(data_[% attrid %], options_[% attrid %]);
+        [% attr = attr + 1 %]
+        [% END %]
+    }
+</script>
+[% attr = 0 %]
+[% FOREACH e IN entities %]
+[% attrid = "attr" _ attr %]
+<div id="[% attrid %]" style="width: 700px; height: 200px;"></div>
+[% attr = attr + 1 %]
+[% END %]
+

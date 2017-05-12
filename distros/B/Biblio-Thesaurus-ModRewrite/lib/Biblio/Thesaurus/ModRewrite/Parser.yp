@@ -1,0 +1,187 @@
+%{
+=head1 NAME
+
+Biblio::Thesaurus::ModRewrite::Parser - this module implements the parser
+for OML programs
+
+=head1 VERSION
+
+Version 0.02
+
+=cut
+
+our $VERSION = '0.03';
+
+my $File;
+my $t;
+### Reg exp for blocks
+
+my $bl0 = qr((?:\\[{}]|[^{}])*);
+my $bl1 = qr(\{$bl0\});
+my $bl2 = qr(\{$bl0(?:$bl1*$bl0)*\});
+my $bl3 = qr(\{$bl0(?:$bl2*$bl0)*\});
+my $bl4 = qr(\{$bl0(?:$bl3*$bl0)*\});
+my $blmidle = qr($bl0(?:$bl4*$bl0)*);
+
+
+
+=head1 DESCRIPTION
+
+This module implements the parser used in Biblio::Thesaurus::ModRewrite
+to execute programs written in OML. OML is a domain specific language
+to describe operations to execut eon ontologies.
+
+=head1 FUNCTIONS
+
+=cut
+
+=head2 new
+
+Create a new object.
+
+=cut
+%}
+
+%%
+
+program : statement_list { +{ program=>$_[1] } }
+        ;
+
+statement_list : statement_list statement DOT
+           {
+             my $n = keys %{$_[1]};
+             +{ %{$_[1]}, $n=>$_[2]}
+           }
+           | { +{} }
+           ;
+
+statement : cond_block ARROW action_block { +{cond=>$_[1],action=>$_[3]} }
+          | DO ARROW action_block { +{cond=>'true',action=>$_[3]} }
+          ;
+
+cond_block : token
+           | token oper cond_block { +{$_[2] => [$_[1],$_[3]]} }
+           ;
+
+token: term relation term { [ $_[1], $_[2], $_[3] ]  }
+     | TERM OPEN term CLOSE { +{'term'=>$_[3]} }
+     | REL OPEN relation CLOSE { +{'rel'=>$_[3]} }
+     ;
+
+term : STRING { +{'term'=>$_[1]} }
+     | VAR { +{'var'=>$_[1]} }
+     ;
+
+relation : STRING { +{'relation'=>$_[1]} }
+         | VAR { +{'var',$_[1]} }
+         ;
+
+oper : AND { 'and' }
+     | OR { 'or' }
+     ;
+
+action_block : action_list
+             ;
+
+action_list : action_list action
+               {
+                 my $n = keys %{$_[1]};
+                 +{ %{$_[1]}, $n=>$_[2] }
+               }
+            | { +{} }
+            ;
+
+action : ACTION OPEN token CLOSE { +{ $_[1] => $_[3] } }
+       | SUB CODE { +{ $_[1] => $_[2] } }
+       ;
+
+%%
+
+=head2 lex
+
+Function used to tokenize source code.
+
+=cut
+
+sub lex {
+    for ($File) {
+        s!^\s+!!;
+        s!^\#.*?\n!!;
+        ($_ eq '')    and return ('',undef);
+
+        s!^(\=\>)!!    and return('ARROW',$1);
+        s!^(and|\&\&|∧)!!i    and return('AND',$1);
+        s!^(or|\|\||∨)!!i    and return('OR',$1);
+        s!^(not|\!)!!i    and return('NOT',$1);
+        s!^(do|begin|end)!!i    and return('DO',$1);
+        s!^(\=\>|⇒)!!    and return('ARROW',$1);
+        s!^(\:)!!    and return('COLON',$1);
+        s!^(\()!!    and return('OPEN',$1);
+        s!^(\))!!    and return('CLOSE',$1);
+        s!^(\,)!!    and return('COMMA',$1);
+        s!^(\.)!!    and return('DOT',$1);
+        s!^(sub)!!    and return('SUB',$1);
+        #s!^\{(.*)\}!!s    and print "|$1|\n" and return('CODE',$1);
+        #s!^\{([^{}]*(\{[^{}]*\}[^{}]*)*)\}!!s and return('CODE',$1);
+        s!^\{($blmidle)\}!!s and return('CODE',$1);
+
+        s!^(term)!!    and return('TERM',$1);
+        s!^(rel)!!    and return('REL',$1);
+        s!^(add|del)!!    and return('ACTION',$1);
+        if (s!^(\w+|\'.*?\'|\".*?\")!!) {
+            my $zbr = $1;
+            $zbr =~ s/\'|\"//g;
+            return('STRING',$zbr);
+        }
+        s!^\$([a-z]+)!!    and return('VAR',$1);
+    }
+}
+
+=head2 yyerror
+
+Function used to report errors.
+
+=cut
+
+sub yyerror {
+  if ($_[0]->YYCurtok) {
+      printf STDERR ('Error: a "%s" (%s) was found where %s was expected'."\n",
+         $_[0]->YYCurtok, $_[0]->YYCurval, $_[0]->YYExpect)
+  }
+  else { print  STDERR "Expecting one of ",join(", ",$_[0]->YYExpect),"\n";
+  }
+}
+
+=head2 init_lex
+
+Function used to initialize everything we need.
+
+=cut
+
+sub init_lex {
+    my $self = shift;
+    $File = shift;
+
+    local $/;
+    undef $/;
+    #$File = <>
+}
+
+=head1 AUTHOR
+
+Nuno Carvalho, C<< <smash@cpan.org> >>
+
+J.Joao Almeida, C<< <jj@di.uminho.pt> >>
+
+Alberto Simoes, C<< <albie@alfarrabio.di.uminho.pt> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2008 Nuno Carvalho, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+# vim: set filetype=perl

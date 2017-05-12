@@ -1,0 +1,94 @@
+Revision history for Perl module BackPAN::Index
+
+0.42  Sun Dec 30 10:59:38 PST 2012
+  Test Fixes
+  * Fixed t/types.t on Windows.
+
+  Dist Fixes
+  * DBIx::Class::Schema::Loader is no longer needed to build the module.
+
+
+0.41  Thu Dec 27 04:00:45 PST 2012
+  Bug Fixes
+  * BackPAN::Index now has a file() method, as documented in BackPAN::Index::File.
+  * Changed the default backpan URL for fetching files to http://backpan.perl.org
+    rather than the backpan.cpan.org redirect. [rt.cpan.org 68492]
+
+  Test Fixes
+  * Tests were downloading an old index.
+
+  Misc
+  * The result classes are no longer generated at runtime. Speeds up load time
+    and reduces bugs.  This also fixes [rt.cpan.org 82107].
+  * Use the same filename for the unpacked index.
+
+  Dist Changes
+  * The compatibility Makefile.PL has been removed.  The build process has
+    gotten complicated.
+  * The bug tracker now points at the correct place.
+
+
+0.40  Tue, 01 Mar 2011 11:57:38 +1100
+  Fixes
+  * Using the BackPAN index from gitpan.integra.net which is kept up to date.
+  * Make all the primary keys not null to quiet a new DBIx::Class
+    warning (and its a good idea).
+
+
+0.39  Sat Apr 17 20:17:47 EEST 2010
+  Fixes
+  * Made compatible with DBIx::Class::Schema::Loader 0.05
+
+
+0.38  Tue Feb 23 20:27:17 PST 2010
+  Stable release, unaltered from 0.37_02.
+
+0.37_02 Wed Jan  6 18:37:06 PST 2010
+  - Added dists_changed_since() and releases_since()
+  - More information added to Dists
+  - Fixed missing App::Cache version requirement
+
+0.37_01 Mon Dec 28 01:51:09 PST 2009
+  - Rewritten to use SQLite and DBIx::Class
+  - Faster initialization
+  - Faster database creation
+  - More flexible
+  - BackPAN::Index added
+  - Parse::BACKPAN::Packages deprecated
+
+0.36 Mon Nov 16 08:48:45 GMT 2009
+  - add no_cache option (patch by Adriano Ferreira)
+  - add an example program examples/backpan.pl (patch by Adriano Ferreira)
+
+0.35 Sat Jun 27 18:28:30 BST 2009
+  - avoid warning when CPAN::DistnameInfo tails to get the dist
+    (patch by Florian Ragwitz)
+
+0.34 Thu Jan 15 19:54:40 GMT 2009
+  - update the tests
+  - perltidy
+  - add proxy support (patch by JDHEDDEN)
+  - amend distributions_by so that it returns an empty list if no
+    author or a new author is passed (patch by BARBIE)
+  - credit all authors/maintainers/release managers of a particular
+    distribution (patch by BARBIE)
+  - add a human-readable license
+  - use warnings
+
+0.33 Sun Jun  8 10:34:48 BST 2008
+  - update the tests
+
+0.32 Tue Jan 31 10:05:49 GMT 2006
+  - update tests to show that I've passed Net::DAV::Server onto someone else
+
+0.31 Tue Jul  5 00:48:46 BST 2005
+  - we now cache the data for an hour using App::Cache
+
+0.30 Thu Jun  9 16:27:36 BST 2005
+  - added distributions_by method, which returns a list of distribution
+    names representing all the distributions that an author has uploaded
+  - added authors method
+  - fix a bug where distributions was returning subdistributions too
+
+0.29 Mon Apr 11 19:32:22 BST 2005
+  - first release

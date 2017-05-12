@@ -1,0 +1,70 @@
+Revision history for Bench
+
+0.10    2014-05-14 (SHARYANTO)
+
+        - Use Benchmark as the backend instead of doing our own timing (we
+          haven't factored out the overhead of null loop, for example).
+
+
+0.09    2012-08-28 (SHARYANTO)
+
+        - No functional changes. Some POD tweaks. Add -v (version).
+
+
+0.08    2012-08-05 (SHARYANTO)
+
+        - Shuffle order of execution
+
+
+0.07    2012-08-05 (SHARYANTO)
+
+        - bin/bench: Add options -h, -M/m, -n, -I, -b
+
+
+0.06    2012-08-04 (SHARYANTO)
+
+        - bin/bench: Run at least 1s for each sub
+
+        - Show who's fastest at the end (and by how much)
+
+
+0.05    2012-07-27 (SHARYANTO)
+
+        - bin/bench: Forgot to support benchmarking multiple codes
+
+
+0.04    2012-07-27 (SHARYANTO)
+
+        - Handle division by zero error [CT]
+
+        - Add script: bin/bench
+
+
+0.03    2011-03-31 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - By default now only run code at most 100 times or 1s.
+
+        - Changed syntax for specifying multiple codes (suggested by
+          educated_foo).
+
+        - Use s all the time, but ms for per-call times.
+
+        [FIXES]
+
+        - A couple of small fixes.
+
+
+0.02    2011-03-30 (SHARYANTO)
+
+        [ENHANCEMENTS]
+
+        - Display time in ms when appropriate.
+
+        - Reduce benchmarking overhead (especially when n is negative).
+
+
+0.01    2011-03-30 (SHARYANTO)
+
+        - First release.

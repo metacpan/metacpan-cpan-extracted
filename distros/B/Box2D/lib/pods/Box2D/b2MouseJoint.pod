@@ -1,0 +1,153 @@
+
+=head1 NAME
+
+Box2D::b2MouseJoint - Make a point on a body track a specified point.
+
+=head1 SYNOPSIS
+
+  my $joint = $world->CreateJoint( $joint_def );
+  $joint->SetTarget( $target );
+
+=head1 DESCRIPTION
+
+A mouse joint is used to make a point on a body track a specified world
+point. This a soft constraint with a maximum force. This allows the
+constraint to stretch and without applying huge forces.
+
+NOTE: this joint is not documented in the manual because it was
+developed to be used in the testbed. If you want to learn how to use
+the mouse joint, look at the testbed.
+
+=head1 METHODS
+
+=head2 GetAnchorA()
+
+Implements C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Implements C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetDampingRatio()
+
+Returns a C<float32>
+
+=head2 GetFrequency()
+
+Returns a C<float32>
+
+=head2 GetMaxForce()
+
+Returns a C<float32>
+
+=head2 GetReactionForce( $inv_dt )
+
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head2 GetTarget()
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 SetDampingRatio( $ratio )
+
+Set/get the damping ratio (dimensionless).
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$ratio>
+
+=back
+
+=head2 SetFrequency( $hz )
+
+Set/get the frequency in Hertz.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$hz>
+
+=back
+
+=head2 SetMaxForce( $force )
+
+Set/get the maximum force in Newtons.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$force>
+
+=back
+
+=head2 SetTarget( $target )
+
+Use this to update the target point.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$target>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2MouseJointDef>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

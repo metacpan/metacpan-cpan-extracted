@@ -1,0 +1,35 @@
+Revision history for Perl extension BaseLib.
+
+0.05 Wed Oct 23 12:05:17 UTC 2002
+    - Scripts can now use their own global variable to hold the basedir
+    - A dash ("-") can be used to indicate default path for LIBDIR
+    - So let me state again: there's `docs' directory contains discussions
+      in local perl group, and shows the reasons and examples on using
+      BaseLib
+
+0.04  Mon Mar 19 13:43:59 JAVT 2001
+    - not released
+	- This is a rewritten version to address a couple of issues
+	- Improved the way the paths are handled for portability
+	  (untested)
+	- Fixed the conflict on $BaseDir global variable in mod_perl
+	  environment
+	- Changed default LIBDIR to `lib/perl'
+	- Updated the documentation (should be)
+	- Forgot to mention that there's a new `docs' directory in the
+	  distribution
+
+0.03  Tue Feb 27 16:55:39 JAVT 2001
+    - made sure that the BASEDIR argument is looked up as
+      a directory name
+    - called lib.pm only if the path to the lib dir isn't in @INC yet
+    - updated the documentation, primarily the section on CAVEAT
+
+0.02  Tue Aug 29 19:37:53 2000
+    - since I use so many croak()'s, I provide my own
+      private croak() routine as front end to Carp::croak().
+    - uses lib.pm to actually manipulate @INC.
+    - base directory name is now mandatory
+
+0.01  Wed Aug 23 18:57:49 2000
+	- original version; created by h2xs 1.19

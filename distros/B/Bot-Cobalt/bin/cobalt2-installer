@@ -1,0 +1,380 @@
+#!perl
+my $VERSION = 2;
+
+use v5.10;
+use strictures 2;
+
+use Scalar::Util 'reftype';
+use POSIX ();
+
+use List::Objects::WithUtils;
+
+use Path::Tiny;
+use Types::Path::Tiny -all;
+
+use Digest::MD5     'md5_hex';
+use File::ShareDir  'dist_dir';
+
+use Bot::Cobalt::Utils 'rplprintf', 'mkpasswd';
+use Bot::Cobalt::Frontend::Utils ':all';
+use Bot::Cobalt::Frontend::RC    'rc_read', 'rc_write';
+
+
+my $Rcfile = path(
+  $ENV{HOME} ? $ENV{HOME} . '/.cobalt2rc' : '.cobalt2rc'
+);
+
+my $NonInteractive = 0;
+my $SharedEtc;   # set to $dist_dir/etc in copy_base_confs if undef
+
+use Getopt::Long;
+GetOptions(
+  'config|rcfile=s'  => \$Rcfile,
+  'noninteractive|n' => \$NonInteractive,
+
+  'shared-etcdir=s'  => \$SharedEtc,
+
+  version => sub {
+    say "Bot::Cobalt installer (version $VERSION)";
+    exit 0
+  },
+
+  help    => sub {
+    print map "$_\n",
+      "$0",
+      "",
+      "Initialize a Bot::Cobalt instance; see 'perldoc cobalt2-installer'",
+      "",
+      "  --version",
+      "  --rcfile=PATH          Target rcfile path",
+      "    [default: $Rcfile]",
+      "",
+      "  --shared-etcdir=DIR    Base (distribution) share/etc/ path",
+    ;
+    exit 0
+  },
+);
+
+if (defined $SharedEtc) {
+  # user specified a base etcdir
+  $SharedEtc = path($SharedEtc);
+  die "--shared-etcdir specified but no such directory '$SharedEtc'"
+    unless $SharedEtc->exists;
+}
+
+
+sub read_format_write {
+  my ($path, $vars) = @_;
+  die "Expected Path::Tiny but got $path"
+    unless is_Path($path);
+  die "Expected HASH of template var replacements but got $vars"
+    unless reftype $vars eq 'HASH';
+  my $in = $path->slurp_utf8;
+  my $out = rplprintf($in, $vars);
+  $path->spew_utf8($out);
+  $path
+}
+
+sub build_dir_skeleton {
+  my ($base, $etc, $var) = @_;
+  die "Expected a base Path object but got '$base'"
+    unless is_Path($base);
+  $etc = path( $base . '/etc' ) unless $etc;
+  $var = path( $base . '/var' ) unless $var;
+  my $dbpath = path( $var . '/db' );
+  for my $path ($etc, $var, $dbpath) {
+    say " - Creating directory '$path'";
+    $path->mkpath
+  }
+}
+
+sub copy_base_confs {
+  my ($target_etc) = @_;
+  die "BUG; expected target etcdir" unless defined $target_etc;
+  $target_etc = path($target_etc) unless is_Path $target_etc;
+
+  $SharedEtc = path(join '/', dist_dir('Bot-Cobalt'), 'etc')
+    unless defined $SharedEtc;
+
+  die "Could not locate ShareDir at '$SharedEtc'"
+    unless $SharedEtc->exists;
+  die "ShareDir at '$SharedEtc' not a directory"
+    unless $SharedEtc->is_dir;
+
+  my $manifest = path(join '/', $SharedEtc, 'Manifest');
+  die "Could not locate Manifest at '$manifest'" unless $manifest->exists;
+
+  MANIFEST: for my $item ($manifest->lines_utf8) {
+    chomp $item;
+    next MANIFEST unless length $item;
+    my ($relpath, $sum_or_dir) = split / \^ /, $item;
+    if ($sum_or_dir eq 'DIR') {
+      my $newdir = path(join '/', $target_etc, $relpath);
+      say " - Creating directory '$newdir'";
+      die "Path '$newdir' already exists and is not a directory\n"
+       if $newdir->exists and not $newdir->is_dir;
+      $newdir->mkpath
+    } else {
+      my $oldfile = path(join '/', $SharedEtc, $relpath);
+      my $newfile = path(join '/', $target_etc, $relpath);
+      say " - Copying '$relpath' -> '$newfile'";
+      die "Could not copy '$relpath'; destination '$newfile' already exists\n"
+        if $newfile->exists;
+      $newfile->spew_utf8( $oldfile->slurp_utf8 );
+      my $newsum = md5_hex $newfile->slurp_raw;
+      warn "WARNING; checksum mismatch after copy: '$relpath'\n"
+        unless $sum_or_dir eq $newsum;
+    }
+  } # MANIFEST
+}
+
+
+sub non_interactive {
+  die "Non-interactive mode doesn't exist yet :(\n"
+  # FIXME set up some default var replacements
+  # FIXME env or command line opts for rc paths, basics?
+  # FIXME call rc_write, build_dir_skeleton, copy_base_confs,
+  #  read_format_write, chmod auth.conf
+}
+
+
+sub interactive_intro {
+  say $_ for
+    "This is the Bot::Cobalt install helper.",
+    "This script will create a cobalt2rc file specifying the bot's paths.",
+    "It will also help initialize some starter configuration files.",
+    "",
+    "Press ENTER to continue, Ctrl+C to quit." ;
+
+  readline STDIN;
+}
+
+sub interactive_rcfile {
+  say $_ for 
+    "The current rcfile location is:",
+    "[$Rcfile]" ;
+  $Rcfile = ask_question( prompt => 'Path to rcfile' ) if ask_yesno(
+    prompt  => 'Enter a different rcfile location?',
+    default => 'n',
+  );
+  $Rcfile = path($Rcfile);
+
+  say "Installing rcfile to $Rcfile";
+
+  say $_ for
+    "Bot::Cobalt needs a place to store config and variable data.",
+    "This can be any path writable by the user running the bot.",
+    "(If it doesn't exist, we will attempt to create it.)" ;
+  my $default_basedir = $ENV{HOME} ? $ENV{HOME} . '/cobalt2' : './cobalt2' ;
+  my $basedir_ans = ask_question(
+    prompt  => 'Base directory',
+    default => $default_basedir,
+  );
+
+  RCFILE: {
+    if ($Rcfile->exists) {
+      warn "WARNING; rcfile exists at '$Rcfile'\n";
+      my $overwrite = ask_yesno(
+        prompt => 'Overwriting existing rcfile?', default => 'n'
+      );
+      unless ($overwrite) {
+        say "Skipping rcfile write; attempting to use existing rcfile.";
+        last RCFILE
+      }
+    }
+    rc_write($Rcfile, $basedir_ans);
+  }
+
+  # read back new or old rcfile, build_dir_skeleton + copy_base_confs
+  my ($new_base, $new_etc, $new_var) = map {; path($_) } rc_read($Rcfile);
+  build_dir_skeleton($new_base, $new_etc, $new_var);
+  copy_base_confs($new_etc);
+}
+
+sub interactive_cobaltcf {
+  my ($conf_repl) = @_;
+  say " - 'cobalt.conf'";
+  my $cfvars = $conf_repl->get('cobalt');
+  
+  # CFG_BOT_NICK
+  $cfvars->set( CFG_BOT_NICK =>
+    ask_question( prompt  => 'Nickname', default => 'cobalt2' )
+  );
+
+  # CFG_BOT_USERNAME
+  $cfvars->set( CFG_BOT_USERNAME =>
+    ask_question( prompt => 'Username', default => 'cobalt' )
+  );
+  
+  # CFG_BOT_REALNAME
+  $cfvars->set( CFG_BOT_REALNAME =>
+    ask_question( prompt => 'Realname (GECOS)', default => 'Bot::Cobalt' )
+  );
+
+  # CFG_CMD_CHAR
+  $cfvars->set( CFG_CMD_CHAR =>
+    ask_question( prompt => 'Command prefix character', default => '!' )
+  );
+
+  # CFG_SERVER_ADDR
+  $cfvars->set( CFG_SERVER_ADDR =>
+    ask_question( prompt => 'Server address', default => 'irc.cobaltirc.org' )
+  );
+
+  # CFG_USE_SSL
+  say "If you choose to use SSL, POE::Component::SSLify must be installed.";
+  my $maybe_ssl = ask_yesno(
+    prompt => 'Use SSL for this server?', default => 'n'
+  );
+  if ($maybe_ssl) {
+    local $@;
+    eval {; require POE::Component::SSLify };
+    if (my $err = $@) {
+      say $_ for
+        "! POE::Component::SSLify could not be loaded: $err",
+        "! SSL may fail!";
+    }
+  }
+  $cfvars->set( CFG_USE_SSL => $maybe_ssl );
+
+  # CFG_SERVER_PORT
+  $cfvars->set( CFG_SERVER_PORT =>
+    ask_question(
+      prompt  => 'Server port',
+      default => ( $maybe_ssl ? 6697 : 6667 ),
+    )
+  );
+}
+
+sub interactive_channelscf {
+  my ($conf_repl) = @_;
+  say " - 'channels.conf'";
+  my $cfvars = $conf_repl->get('channels');
+  # FIXME audit this situation
+  #  ability to add more users?
+  #  access to other config opts
+  $cfvars->set( CHAN =>
+    ask_question( prompt => 'Default channel', default => '#eris' )
+  );
+}
+
+sub interactive_authcf {
+  my ($conf_repl) = @_;
+  say " - 'auth.conf'";
+  my $cfvars = $conf_repl->get('auth');
+
+  # AUTH_USER
+  say $_ for 
+    "You will want at least one SuperUser to control the bot.",
+    "SuperUsers are hard-coded in 'auth.conf'.",
+    "(Other levels of user can be added online later.)" ;
+  $cfvars->set( AUTH_USER =>
+    ask_question( prompt => 'Username for your superuser', default => 'MyUser' )
+  );
+
+  # AUTH_PASS
+  my $term = POSIX::Termios->new;
+  $term->getattr(0);
+  $term->setlflag( $term->getlflag & ~POSIX::ECHO );
+  $term->setattr(0);
+  my $ans = ask_question( 
+    prompt => 'Password for this superuser', default => ''
+  );
+  my $crypted = mkpasswd $ans;
+  $cfvars->set( AUTH_PASS => $crypted );
+  $term->setlflag( $term->getlflag | POSIX::ECHO );
+  $term->setattr(0);
+  print "\n";
+
+  # AUTH_MASK
+  $cfvars->set( AUTH_MASK =>
+    ask_question( 
+      prompt => 'Hostmask for this superuser', default => '*nobody@example.org'
+    )
+  );
+}
+
+
+sub interactive {
+  # step through interactive configuration;
+  #  $conf_repl is passed to each sub and filled:
+  #    hash(
+  #      cobalt => hash(
+  #         $TEMPLATE_VAR => $ANSWER,
+  #         ...
+  #      ),
+  #      ...
+  #    )
+  my @refs = (
+    \&interactive_intro,
+    \&interactive_rcfile,       # set up rcfile & dir skel, copy template confs
+    \&interactive_cobaltcf,     # configure etc/cobalt.conf
+    \&interactive_channelscf,   # configure etc/channels.conf
+    \&interactive_authcf,       # configure etc/auth.conf
+  );
+  my $conf_repl = hash(
+    cobalt    => hash,
+    channels  => hash,
+    auth      => hash,
+  );
+  $_->($conf_repl) for @refs;
+
+  # should have a readable rcfile now, load it to verify and get etcdir,
+  # then read/fill/write templates via read_format_write()
+  my (undef, $etcdir) = rc_read($Rcfile);
+  for my $kv ($conf_repl->kv->all) {
+    my ($path_prefix, $repl_hash) = @$kv;
+    my $actual = path( "${etcdir}/${path_prefix}.conf" );
+    say " - Writing '$actual'";
+    read_format_write($actual, $repl_hash);
+  }
+
+  my $authcf_path = path(join '/', $etcdir, 'auth.conf');
+  say " - Adjusting permissions for 'auth.conf' (0600) ...";
+  $authcf_path->chmod(0600);
+}
+
+
+$NonInteractive ? non_interactive : interactive;
+
+# FIXME more informative quit msg? paths etc
+say $_ for
+  " - Completed, exiting",
+  "Done!",
+  "(You should check over the files mentioned above manually to verify",
+  " correctness and tune other options.)",
+  "See 'cobalt2 --help' for help on starting the bot."
+;
+
+=pod
+
+=head1 NAME
+
+cobalt2-installer - Initialize a Bot::Cobalt instance
+
+=head1 SYNOPSIS
+
+  cobalt2-installer [ --rcfile=PATH ]
+
+=head1 DESCRIPTION
+
+A simple walk-through installer for fresh L<Bot::Cobalt> instances.
+
+Interactively asks a few questions to prepare a C<rcfile> and associated
+L<Bot::Cobalt> configuration files; language sets and essential skeleton
+directories are also copied to the bot home directory specified during the
+install process.
+
+Every L<Bot::Cobalt> instance has its own C<rcfile> and directory; to
+initialize and run multiple instances, specify a new C<rcfile>:
+
+  # Initialize FredBot:
+  cobalt2-installer --rcfile=${HOME}/cobalts/FredBot.rc
+  # Start the newly-configured instance:
+  cobalt2 --rcfile=${HOME}/cobalts/FredBot.rc
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

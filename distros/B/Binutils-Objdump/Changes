@@ -1,0 +1,6 @@
+Revision history for Perl extension Binutils::Objdump.
+
+0.01  Sun Sep 20 14:52:35 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Binutils::Objdump
+

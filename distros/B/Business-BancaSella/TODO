@@ -1,0 +1,8 @@
+To DO list for Business::BancaSella
+- Sync Error codes between Business::BancaSella::Ri* classes.
+- Implements the Java Gestpay online system payment.
+- Method prepare of Business::BancaSella::Ri*::FileFast classed should 
+  append passwords to working file.
+- Use algoritm in FileFast for open and check password in File.
+
+  

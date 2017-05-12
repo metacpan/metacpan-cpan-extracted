@@ -1,0 +1,23 @@
+Revision history for Perl extension Bio::FeatureIO.
+
+1.6.905   2014-09-05 12:34:22-05:00 America/Chicago
+   * Minor testing fix: move Bio::SeqFeature::Annotated
+     tests to release-only tests, since this requires
+     networking parameter checks via Module::Build.
+   
+1.6.904   2014-09-02 15:23:07-05:00 America/Chicago
+   * Fix bugtracker URL
+
+1.6.903   2014-09-02 14:22:48-05:00 America/Chicago
+   * Require Tree::DAG_Node
+   * Remove bundled Test::More/Exception/Warn dists
+     (rely on Bio::Root::Test, though this will be
+     switched to using Test::Most)
+
+1.6.902   2014-08-30 01:00:25-05:00 America/Chicago
+   * Release version that supercedes latest on CPAN
+   * No code changes
+
+1.6.0     2014-08-30 00:53:58-05:00 America/Chicago
+   * initial split off from BioPerl core 
+

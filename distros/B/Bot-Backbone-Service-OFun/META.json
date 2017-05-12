@@ -1,0 +1,63 @@
+{
+   "abstract" : "Services for Bot::Backbone optimized for fun",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bot-Backbone-Service-OFun",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Acme::Scurvy::Whoreson::BilgeRat" : "0",
+            "Bot::Backbone" : "0",
+            "Bot::Backbone::Service" : "0",
+            "Bot::Backbone::Service::Role::Responder" : "0",
+            "Bot::Backbone::Service::Role::Service" : "0",
+            "Bot::Backbone::Service::Role::Storage" : "0",
+            "Digest::SHA" : "0",
+            "File::Slurp" : "0",
+            "Hailo" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Readonly" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Bot-Backbone-Service-OFun@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-Backbone-Service-OFun"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zostay/Bot-Backbone-Service-OFun.git",
+         "web" : "http://github.com/zostay/Bot-Backbone-Service-OFun"
+      }
+   },
+   "version" : "0.142230"
+}
+

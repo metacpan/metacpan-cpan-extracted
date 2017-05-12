@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Business-OnlinePayment-Jety
+version:            0.09
+abstract:           Jety Payments ACH backend for Business::OnlinePayment
+author:
+    - Mark Wells <mark@freeside.biz>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Business::OnlinePayment:  0
+    Date::Format:         0
+    Net::HTTPS::Any:      0
+    Test::More:           0
+    Tie::IxHash:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

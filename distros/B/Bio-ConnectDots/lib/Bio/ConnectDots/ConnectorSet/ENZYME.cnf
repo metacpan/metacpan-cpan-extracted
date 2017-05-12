@@ -1,0 +1,17 @@
+# example cnf file for ENZYME
+
+name=ENZYME
+module=ENZYME
+version=20040618
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp.ebi.ac.uk
+ftp_files=/pub/databases/enzyme/release/enzyme.dat
+
+label=ECnumber, dotset=ECnumber
+label=Official_GeneName, dotset=Gene_Name
+label=Alias_Symbol, dotset=Gene_Symbol
+label=PROSITE, dotset=Protein_Domain_ID
+label=SwissProt, dotset=Sequence_ID

@@ -1,0 +1,16 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Welcome'; %]
+
+<h2>Critical Prefix Management</h2>
+<p>Choose an existing list to view/edit or create a new list:</p>
+
+<form action="cpm_workflow.cgi" method="GET">
+  <input type="radio" name="action" value="newlist" checked>Create new critical prefix list
+  <br>
+  <input type="radio" name="action" value="loadlist">Load existing critical prefix list
+  <br>
+  <br>
+  <input type="submit" value="Continue">
+</form>
+
+[% INCLUDE footer.html %]
+

@@ -1,0 +1,19 @@
+blog.txt
+Changes
+c_minus
+.gitignore
+lib/B/Stats/Minus.pm
+lib/B/Stats.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+speed.md
+Stats.xs
+t/compile.t
+t/options.t
+t/table.t
+t/test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

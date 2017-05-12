@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Buffalo::G54;
+
+my($onoff) = @ARGV;
+
+my $b = Buffalo::G54->new();
+$b->password();
+$b->connect();
+
+if(defined $onoff) {
+    $b->dhcp($onoff);
+}
+
+print "DHCP is ", $b->dhcp() ? "on" : "off", "\n";
+
+__END__
+
+=head1 NAME
+
+    buffalo-dhcp - Checks and sets the DHCP setting
+
+=head1 SYNOPSIS
+
+      # Check status
+    $ buffalo-dhcp
+    DHCP is on
+
+      # Switch on
+    $ buffalo-dhcp on
+    DHCP is on
+
+      # Switch off
+    $ buffalo-dhcp off
+    DHCP is off
+
+=head1 DESCRIPTION
+
+C<buffalo-dhcp> logs into the router at 192.168.0.1 and checks or sets
+its DHCP setting.
+
+=head1 LEGALESE
+
+Copyright 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2007, Mike Schilli <cpan@perlmeister.com>

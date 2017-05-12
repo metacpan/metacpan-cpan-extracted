@@ -1,0 +1,9 @@
+classes:
+  - Console
+parameters:
+  doc:
+    console:
+      pkg:
+        - install console multiplexer GNU screen
+  pkg:
+    - screen

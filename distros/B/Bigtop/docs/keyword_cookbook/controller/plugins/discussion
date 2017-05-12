@@ -1,0 +1,30 @@
+=head1 USE
+
+If your controller needs to use a Gantry plugin, add a C<plugins> statement.
+But, note that there is also a plugins statement in the Bigtop config
+section.  Use the one there to add default plugins for all controllers in the
+application.  Use the controller level version to affect only one
+controller.
+
+Note that if you have a global C<plugins> statement in the bigtop config
+block, using a controller level C<plugins> statement replaces the
+plugin list for the controller, so repeat any globals you still need.
+
+All plugins must live in the C<Gantry::Plugins::> namespace, use only the
+remainder of the module's package name in the C<plugins> statement.
+For example, to use the AuthCookie plugin, say:
+
+    plugins AuthCookie;
+
+The Control Gantry backend will prepend the Gantry plugin namespace.
+
+C<plugins> statements only affect GEN modules, not stubs.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Look for C<AuthCookie> in C<lib/Kids/GEN/Child.pm>.  Also notice
+the PluginNamespace and the namespace method.

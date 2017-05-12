@@ -1,0 +1,37 @@
+This directory is back.  While most of the docs have moved to the
+Bigtop::Docs:: namespace, there are still things here.
+
+1. The keyword_cookbook subdirectory contains at least one example of
+how to use every keyword that Bigtop understands.  Running tentmaker
+or looking in Bigtop::Docs::FullKeywords lists each keyword with discussion,
+the keyword_cookbook has more discussion and examples.
+
+The keyword_cookbook entries are divided by the type of the keyword.
+That type governs where the keyword appears in the bigtop file.  These
+are the types:
+
+    config              - top level conig block
+    app                 - app level
+    app_literal         - app level literal types
+    controller          - controller level
+    controller_literal  - controller level literal types
+    field               - field level
+    join_table          - join table level
+    method              - method level
+    table               - table level
+
+Each type has a directory.  Each keyword is a subdirectory of the
+type directory.  In each keyword subdirectory, there are (at least) two files
+(or there will be some day): discussion and example.bigtop.  The discussion
+has two POD sections.  The C<USE> section explains how, when, and where to
+use the keyword.  The C<EXAMPLE> section explains how to build the example
+and where to look for the results of the keyword in the resulting genreated
+code.
+
+The keyword being highlighted always appears at least once in example.bigtop.
+The important occurances (the ones mentioned in the discussion file)
+are preceded by comments.  No other comments are used.  So, you can
+either search for the keyword, or for lines which begin with a # sign.
+
+2. The screen shots for some of the Bigtop::Docs:: files live here.
+

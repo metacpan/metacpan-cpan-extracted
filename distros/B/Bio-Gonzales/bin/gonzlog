@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+BEGIN { $ENV{GONZLOG_SILENT} = 1 }
+
+use 5.010;
+
+use Bio::Gonzales::Project::Functions;
+use Bio::Gonzales::Util::Cerial;
+my $ns = shift;
+exit unless($ns && @ARGV && @ARGV >= 1);
+gonzlog->tee_stderr(0);
+gonzlog->namespace($ns);
+gonzlog->info(join(" ", @ARGV));

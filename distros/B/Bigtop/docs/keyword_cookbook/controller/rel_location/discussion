@@ -1,0 +1,22 @@
+=head1 USE
+
+Every controller needs to have either a C<location> or a C<rel_location>
+(except the base controller see below) to control its URL.
+
+The C<rel_location> specifies a URL which is relative to the base controller's
+URL.  This specifically means that the base controller cannot have
+a C<rel_location>.
+
+What if you need a module that will not be mounted on a URL?  Then,
+in my terminology, that module is not a controller.  You are welcome
+to have such modules in your application, just don't tell Bigtop about
+them.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and start app.server.  Look for C<rascals>
+in the list of URL choices.

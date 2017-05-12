@@ -1,0 +1,45 @@
+Revision history for Perl extension Bot-BasicBot-Pluggable-Module-Gitbot
+
+1.00.01  Sun, 07 Mar 2010 21:30:59 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Remove dead code from the tests.
+     - Clean up the .gitignore file.
+     - Add version, and Readme handling to the shipit steps.
+     - Add a README.mkdn so we get something pretty on GitHub.
+     - Update the POD examples.
+
+1.00  Thu, 04 Mar 2010 23:53:23 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Remove the bugtracker line from Makefile.PL
+     - Add support for <repo-name>/<ref-name> style linking.
+     - DRY up the creation of the test repositories.
+     - Add support for reporting on multiple matches within a single message.
+     - Refactor to DRY up retrieving information from/about a repository.
+     - Rework the output format.
+
+0.01.06  Tue, 02 Mar 2010 20:55:52 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Replace subtests with notes.
+     - Remove response when given something that looks like a SHA1, but can't be found.
+
+0.01.05  Sun, 28 Feb 2010 09:29:16 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing test requirements.
+
+0.01.04  Sun, 28 Feb 2010 07:22:57 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add missing requirements.
+
+0.01.03  Mon, 22 Feb 2010 06:37:08 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Ignore .author file
+     - Re-generate a proper META.yml
+
+0.01.02  Mon, 22 Feb 2010 06:00:38 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Switch to Module::Install.
+     - Remove automatic Twitter notifications from the ShipIt steps.
+     - Remove Build.PL from the MANIFEST.
+
+0.01.01  Mon, 22 Feb 2010 03:25:48 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Add a package line for the PAUSE indexer to find.
+
+0.01  Mon, 22 Feb 2010 02:21:17 -0000 (Jacob Helwig <jhelwig@cpan.org>)
+     - Initial Commit
+     - Initial 0.01 version of the module.
+     - Add .shipit file.
+     - Update release date in Changes file.
+     - Setup ShipIt

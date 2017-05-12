@@ -1,0 +1,8 @@
+.perl-version
+.travis.yml
+local
+\.git
+.*\.gz
+auth.txt
+cpanfile
+cpanfile.snapshot

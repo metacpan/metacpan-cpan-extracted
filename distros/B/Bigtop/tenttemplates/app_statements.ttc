@@ -1,0 +1,52 @@
+[%#
+    Template for App Level Statements table TentMaker home page.
+    Expects these view.data. parameters:
+
+    app                   - the application portion of the AST, used to
+                            retrieve various things (like statements)
+    statements            - hash describing statements built by
+                            Bigtop::Parser::get_keyword_docs
+%]
+<table class='bordered'>
+    <tr><th> Keyword </th>
+        <th> Value(s) </th>
+        <th> What Is It? </th>
+        <th> Who Understands It? </th>
+    </tr>
+    <!--    **********************************************
+            One row for each app level statement
+            ********************************************** -->
+    [% FOREACH statement IN view.data.statements.app.statements %]
+    [% keyword = statement.keyword %]
+    <tr>
+      <td>[% statement.keyword %]</td>
+      <td>
+        [% values       = view.data.app.get_app_statement( keyword )
+           single_value = values.0
+        %]
+
+        [% INCLUDE input_boxes.ttc
+            name_prefix    = 'app_statement'
+            method_group   = 'app_statement'
+            keyword_prefix = ''
+            name_prefix    = 'app::'
+            key            = keyword
+        %]
+      </td>
+      <td>[% statement.descr %]</td>
+      <td>
+        <!--    **********************************************
+                Show each understanding backend
+                ********************************************** -->
+      [% FOREACH definer IN view.data.statements.app.$keyword.callers %]
+        [% suffix          = definer.replace('Bigtop::Backend::', '') %]
+        [% pieces          = suffix.split( '::' ) %]
+        [% definer_type    = pieces.0              %]
+        [% definer_backend = pieces.1 || '*'       %]
+        [% definer_type %] [% definer_backend %]
+        [% UNLESS loop.last %]<br />[% END %]
+      [% END %]
+      </td>
+      </tr>
+    [% END %][%# end of loop over all registered app level statements %]
+</table>

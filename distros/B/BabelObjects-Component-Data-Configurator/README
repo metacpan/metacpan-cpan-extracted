@@ -1,0 +1,115 @@
+$Id: README,v 1.69 2001/04/20 19:04:34 Exp $
+
+--------------------
+What Configurator is
+--------------------
+
+The configurator Component enables you to package applications and
+configuration files in a one shot installation.
+
+--------------------
+Distribution Details
+--------------------
+
+This distribution comes with :
+  * the component Configurator.pm in BabelObjects/Component/Data
+  * one sample in the sample directory
+
+The lib/ directory includes a few useful utilities
+These utilities aren't installed either.
+
+There are no tests for the moment.
+
+------------------
+Basic Installation
+------------------
+
+This component may be installed through the CPAN shell in the usual CPAN shell
+manner.  It typically is:
+
+  perl -MCPAN -e 'install BabelObjects::Component::Data::Configurator'
+
+It involves a little more work if you have an older CPAN shell:
+
+  perl -MCPAN -e shell
+  install BabelObjects::Component::Data::Configurator
+
+--------------------------
+Getting The Latest Version
+--------------------------
+
+This component  can also be installed manually. Tarballs are available from 
+several sources:
+
+The most recent stable release can be found at your favorite CPAN
+mirror.  If you don't have a favorite CPAN mirror, there's always:
+
+  ftp://ftp.cpan.org/pub/CPAN/authors/id/K/KE/KERMAGO/
+
+The most recent development snapshot is available from :
+
+  http://www.BabelObjects.org/
+
+The BabelObjects project includes a CVS repository browser, so you can
+look around to see what's new.  It also has facilities for people to
+submit bug reports, patches, and support requests.
+
+On BabelObjects, you will find this same project in Java and Php (so
+you understand now the name Babel Objects :-). If you are brave, come
+and develop the framework in a new language.
+
+---------------------------
+Building The Latest Version
+---------------------------
+
+Downloading and unpacking the distribution are left as an exercise for
+the reader.  See the previous section for tarball locations.
+
+System requirements and compatibility issues are covered in the main
+BabelObjects manpage.  You can preview them before building BabelObjects.
+
+  perldoc ./BabelObjects.pm
+
+Please read the Changes file if you already have programs which use
+this component.  Sometimes there are changes that break compatibility
+with older versions, and the Changes file can tell you about them before you
+install it.
+
+  less ./Changes
+
+If everything looks good, build the component
+
+  perl Makefile.PL
+  make
+
+Then test the distribution.  This is an important step since it also
+ferrets out the modules BabelObjects needs.  It reports on the 
+BabelObjects components which won't work because of missing dependencies,
+and it recommends things to install.  Please read the dependency report
+carefully.  Tests are not available for the moment.
+
+  make test
+
+Now you're ready to install the component, but first you may want to look at
+its samples.  Some of the samples may not work; the important thing is
+that the tests pass.  
+
+Finally you can install it:
+
+  make install
+
+------------
+Test Results
+------------
+
+To do...
+
+--------------
+Test  Coverage
+--------------
+
+To do...
+
+Thanks for reading!
+
+-- Jean-Christophe Kermagoret / jck@BabelObjects.Org / www.BabelObjects.Org

@@ -1,0 +1,7 @@
+This version of konto_check contains a stripped-down version of zlib 1.2.3 for
+better support of the unattended smoke test of CPAN testers. This is not the
+complete tarball; the directories amiga/, as400/, contrib/, examples/, msdos/,
+old/, projects/, qnx/, and win32 are removed.
+
+In Makefile.PL the system is checked, if the zlib development package is installed;
+if not, this version of the library is compiled and used.

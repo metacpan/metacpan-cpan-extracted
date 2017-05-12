@@ -1,0 +1,62 @@
+<SBSConfig>
+  <name>SBS for windows</name>
+  <workingDir>PHENYXAPP/sbs</workingDir>
+  <logging>
+     <file>PHENYXAPP/sbs/logs/sbs.log</file>
+     <level>info</level>
+  </logging>
+  <Scheduler type="SBS::DefaultScheduler">
+    <!-- the ordering method to return which job is the next one -->
+    <schedulingMethod>prioritylimit</schedulingMethod>
+
+    <joblistIndex>PHENYXAPP/sbs/joblist.dump</joblistIndex>
+    <resourcesIndex>PHENYXAPP/sbs/resourceslist.dump</resourcesIndex>
+    <queuesIndex>PHENYXAPP/sbs/queuesstatus.dump</queuesIndex>
+
+    <!-- states if an update (scheduling of the next available job is to
+         done after a job ends -->
+    <autoupdate>yes</autoupdate>
+    <logging>
+      <file>PHENYXAPP/sbs/logs/scheduler.log</file>
+      <level>info</level>
+    </logging>
+    <resourcesList>
+      <!-- oneResource can either be of type cluster | machine -->
+      <!-- cluster => <machineFile> element -->
+      <!-- machine => <host> element -->
+      <oneResource type="machine">
+        <name>localhost_a</name>
+        <host>localhost</host>
+      </oneResource>
+      <oneResource type="machine">
+        <name>localhost_b</name>
+        <host>localhost</host>
+      </oneResource>
+      <oneResource type="machine">
+        <name>localhost_c</name>
+        <host>localhost</host>
+      </oneResource>
+    </resourcesList>
+    <queueList>
+      <oneQueue>
+         <name>engine_user_\w+</name>
+         <resource>
+            <type>machine</type>
+          </resource>
+         <!-- priority: the higest, the first -->
+         <priority>5</priority>
+         <!-- number of max concurent jobs running per queue -->
+         <maxConcurentJob>2</maxConcurentJob>
+      </oneQueue>
+    <oneQueue>
+         <name>phenyxmaster_default</name>
+         <resource>
+            <type>machine</type>
+         </resource>
+         <priority>5</priority>
+         <maxConcurentJob>5</maxConcurentJob>
+    </oneQueue>
+    </queueList>
+
+  </Scheduler>
+</SBSConfig>

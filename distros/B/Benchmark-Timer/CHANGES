@@ -1,0 +1,93 @@
+Version 0.7107: Sat May 2 2015
+- Prevent CPAN from indexing private-lib
+
+Version 0.7106: Mon Apr 20 2015
+- Clarify licensing terms
+- Move verbose testing to a private module, and implement it in a way that
+  doesn't require editing the Makefile after it is generated.
+
+Version 0.7105: Sun Apr 12 2015
+- Make basic.t 'Nonzero single result' test reliable
+  http://www.cpantesters.org/cpan/report/abcfc65a-de71-11e4-a1d1-8536eb4f9f07
+- Enable verbose testing for CPAN-testers
+- Consolidate issue tracking at rt.cpan.org
+
+Version 0.7104: Sat Apr 4 2015
+- Bundle Module::AutoInstall to prevent breaks when people don't have it
+  installed already. Thanks to Andreas Koenig <andk@cpan.org> for the report,
+  and Paul Howarth <paul@city-fan.org> for giving me a kick in the pants to
+  fix it. https://rt.cpan.org/Ticket/Display.html?id=65673
+
+Version 0.7103: Sun Mar 22 2015
+- Moved code to github
+- Added POD test
+
+Version 0.7102: Sun Aug 9 2009
+- Updated to the latest version of Module::Install
+
+Version 0.7101: Mon Jul 14 2008
+- Updated to the latest version of Module::Install
+- Removed auto-install for better compatibility with CPAN and others
+- Reformatted POD in module code
+- Moved hosting to Google Code
+
+Version 0.7100: Tue Dec 21 2004
+- Fixed version numbers, which were incompatible with some modules. (Thanks to
+  Tassilo von Parseval <tassilo.von.parseval@rwth-aachen.de> for the bug
+  report)
+- Removed custom installation prompts
+
+Version 0.7.0: Thu Oct 21 10:29:11 EDT 2004
+- Renamed get_report to report, and added reports method. (Thanks to Aaron
+  Wodrich <wodrich@gmail.com> for providing the impetus for the change.)
+- Clarified the documentation
+
+Version 0.6.2:
+- Switched to Test::More for better test reporting
+
+Version 0.6.1: Thu Sep 16 2004
+- Modified Makefile.PL to use Module::Install::CustomInstallationPath
+- Changed version numbering
+- Fixed broken dependency specification in Makefile.PL
+
+0.6 - September 2, 2004
+
+- Maintenance of the module transferred to David Coppit <david@coppit.org>
+- License changed to GNU GPL.
+- Improved reporting to support multiple tags
+- Added statistical sampling, allowing the user to time code until a certain
+  confidence level is reached. (Added error() and confidence() to support this
+  functionality)
+
+0.5 - April 20, 2001
+
+  * Added functionality to skip trials when doing repeated trials
+    via a "skip" constructor parameter, plus tests for this.
+  * Consistently use croak() and carp() instead of die() and warn().
+  * Added error tests to test that error conditions are properly met.
+  * Renamed Benchmark::Timer object to $t in the test cases to make
+    them more conventional.
+
+0.4 - March 29, 2001
+
+  * Changed internal method representation to an array instead of a
+    hash, for a tiny but measureable speed increase.
+  * Corrected timestr() to display microseconds and show integral times.
+  * Added delta.pl, a small script that calculates the approximate
+    overhead of using Benchmark::Timer versus plain Time::HiRes calls.
+
+0.3 - March 26, 2001
+
+  * Renamed Time::Timer to Benchmark::Timer after some discussion on
+    the comp.lang.perl.modules newsgroup.
+
+0.2 - March 24, 2001
+
+  * Added $t->result, $t->results, and $t->data methods to access data.
+  * warn() instead of puke when $t->report is called while an event is
+    still pending (thanks Ilmari Karonen <perl@itz.pp.sci.fi>).
+
+
+0.1 - March 23, 2001
+
+  * Original version, created by Andrew Ho (andrew@zeuscat.com), rolled.

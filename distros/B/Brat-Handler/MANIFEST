@@ -1,0 +1,25 @@
+AUTHORS
+bin/concatBratFiles.pl
+Build.PL
+Change
+examples/list.txt
+examples/taln-2012-long-001-resume.ann
+examples/taln-2012-long-001-resume.txt
+examples/taln-2012-long-002-resume.ann
+examples/taln-2012-long-002-resume.txt
+examples/taln-2012-long-003-resume.ann
+examples/taln-2012-long-003-resume.txt
+lib/Brat/Handler.pm
+lib/Brat/Handler/File.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/0-create.t
+t/1-loadFile.t
+t/2-printData.t
+t/3-loadFiles.t
+t/3-loadList.t
+t/4-concat.t
+TODO

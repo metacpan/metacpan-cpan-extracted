@@ -1,0 +1,58 @@
+Revision history for perl module Browsermob::Proxy
+
+0.17 2015-08-30
+ - Fix failing tests by depending on new Format::Text middleware
+   standalone module
+
+0.16 2015-08-17
+ - Add closest match's params to return signature of
+   cmp_request_params
+
+0.1501 2015-05-21
+ - Fix bug where find_open_port could return outside the range
+
+0.15 2015-05-21
+ - Add endpoint for managing timeouts on proxies
+ - Check for $gd during DEMOLISH to handle warnings properly
+ - Convert more tests over to Test::Spec
+
+0.14 2015-05-07
+ - Add negative assets on request parameters
+
+0.13 2015-05-01
+ - Add endpoint for filtering requests via LittleProxy
+
+0.12 2015-02-19
+ - Convince cmp_request_params to take a custom user sub for comparison
+ - Add utility functions required for parameter: :parameter cmp
+ - Bug fix for using `keys` on a ref instead of a hash
+
+0.10 2015-02-17
+ - Return missing params when cmp_request_params is called in list
+   context
+
+0.09 2015-02-15
+ - Add package for comparing request parameters
+ - Poorly clean up warnings during destruction. This is still broken,
+   though :(
+
+0.08 2014-07-25
+ - Clean up various documentation points
+ - Add convenience fn for generating firefox preferences for proxy
+
+0.05 2014-05-24
+ - Implement basic auth endpoint
+
+0.04 2014-04-21
+ - selenium_proxy method automatically invokes new_har unless passed a
+   truthy value
+
+0.03 2014-04-11
+ - Added selenium_proxy method to pass to Selenium::Remote::Driver
+
+0.02 2014-04-09
+ - `har` method now returns a json of the HAR instead of a
+   ::Spore::Response
+
+0.01 2014-04-03
+ - Initial commit

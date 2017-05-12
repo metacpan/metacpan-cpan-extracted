@@ -1,0 +1,41 @@
+Bundle-WeBWorK version 0.01
+============================
+
+This bundle installs many of the perl prerequisites for WeBWorK, an open source 
+online homework system for math and science courses.  WeBWorK also requires
+mod_perl2, some libapreq2 (Apache2::*) modules, DBD::mysql, and GD but I 
+left those out because IMHO it can take some sophistication to install those 
+from source, especially if you did not install apache2, mysql, and libgd from 
+source.  In particular, if you installed apache2, mysql and libgd from a package
+manager, then also install mod_perl2, the libapreq2 perl modules, DBD::mysql, 
+and GD from your package manager.
+
+For more information, see
+
+http://webwork.maa.org/wiki
+
+for documentation and 
+
+http://github.com/openwebwork
+
+for the code.
+
+INSTALLATION
+
+Remember, this only installs some of the perl prerequities for WeBWorK; it 
+doesn't actually install WeBWorK.  To do that, see the links above. 
+Also remember that this is a Bundle distribution, so CPAN treats it special.
+To get that special treatment, do, for example, 
+
+perl -MCPAN -e 'install Bundle::WeBWorK'
+
+and don't try doing 'perl Makefile.PL...'
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2012 by Jason Aubrey, <aubreyja@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself, either Perl version 5.12 or, at your 
+option, any later version of Perl 5 you may have available.

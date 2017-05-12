@@ -1,0 +1,366 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_manage_samples
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community;
+use Bio::Community::IO;
+use Bio::Community::Meta;
+use Getopt::Euclid qw(:minimal_keys);
+use List::Util qw(min);
+
+
+=head1 NAME
+
+bc_manage_samples - Include, delete, merge, sort or rename samples
+
+=head1 SYNOPSIS
+
+  bc_manage_samples -input_files   communities.generic              \
+                    -exclude_names soil1                            \
+                    -merge_names   freshwater2 freshwater5          \
+                    -merge_names   marine*                          \
+                    -output_prefix processed_communities
+
+=head1 DESCRIPTION
+
+This script reads files containing biological communities and includes, deletes
+merges, sorts or renames the specified communities. See L<Bio::Community> for
+more information.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+Input file containing the communities to manipulate. When providing communities
+in a format that supports only one community per file (e.g. gaas), you can
+provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_manage_samples'
+
+=item -np <name_prefix> | -name_prefix <name_prefix>
+
+Prefix to add to the beginning of all community names. Default: name_prefix.default
+
+=for Euclid:
+   name_prefix.type: string
+   name_prefix.default: ''
+
+=item -ns <name_suffix> | -name_suffix <name_suffix>
+
+Suffix to add to the end of all community names. Default: name_suffix.default
+
+=for Euclid:
+   name_suffix.type: string
+   name_suffix.default: ''
+
+=item -in <include_names>... | -include_names <include_names>...
+
+If names of communities are specified, only these communities will be included
+in the output file, in the requested order. This is also useful to arrange the
+communities in a specific order. Community names can be specified using
+wildcards, which means that 'marine*2013' will match all names starting with
+'marine' and finishing with '2013', while '*gut*' will match all names
+containing 'gut'.
+
+=for Euclid:
+   include_names.type: string
+
+=item -en <exclude_names>... | -exclude_names <exclude_names>...
+
+Name of communities to exclude from the output file. As with <include_names>,
+wildcards are supported.
+
+=for Euclid:
+   exclude_names.type: string
+
+=item -mn <merge_names>... | -merge_names <merge_names>...
+
+Specify the name of the communities to merge. Use this option multiple time if
+you need to merge multiple sets of communities. The count of the members of
+these communities are added. As with <include_names>, wildcards are supported.
+
+=for Euclid:
+   repeatable
+   merge_names.type: string
+
+=item -rm <renaming_method> | -renaming_method <renaming_method>
+
+When merging communities, specify a method to generate a name for the merged
+community:
+
+* a character that will join the names of the communities to merge, e.g. '+',
+  '_', ...
+
+* 'first': use the name of the first community
+
+* 'common': The largest substring common between the names, starting from the left.
+            After this, any trailing, non-alphanumerical character is considered
+            a separator and removed.
+
+Default: renaming_method.default
+
+=for Euclid:
+   renaming_method.type: string
+   renaming_method.default: '+'
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+
+manage( $ARGV{'input_files'}, $ARGV{'output_prefix'}  , $ARGV{'name_prefix'},
+        $ARGV{'name_suffix'}, $ARGV{'include_names'}  , $ARGV{'exclude_names'},
+        $ARGV{'merge_names'}, $ARGV{'renaming_method'} );
+
+exit;
+
+
+func manage ($input_files, $output_prefix, $name_prefix, $name_suffix,
+   $include_names, $exclude_names, $merge_names, $renaming_method) {
+
+   # Process regular expressions
+   my $include_regexps = regexify($include_names) if defined $include_names;
+   my $exclude_regexps = regexify($exclude_names) if defined $exclude_names;
+   my $merge_regexps = [ map { regexify($_) } @$merge_names ] if defined $merge_names;
+
+   # Read input communities, exclude or include as needed
+   my $meta = Bio::Community::Meta->new;
+   my $format;
+   my %included_comms;
+   my @included_names;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new( -file => $input_file );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         my $name = $community->name;
+         my $include = 0;
+         if ( $include_regexps ) {
+            # Only include specifically requested communities
+            if ($name ~~ @{$include_regexps}) {
+               $include = 1;
+            }
+         } else {
+            if (not $name ~~ @{$exclude_regexps}) {
+               $include = 1;
+            } # else it is specifically excluded
+         }
+         if ($include) {
+            $meta->add_communities([$community]);
+            if (exists $included_comms{$name}) {
+               die "Error: Community name $name is ambiguous because several ".
+                  "communities have this same name.\n";
+            } else {
+               $included_comms{$name} = $community;
+               push @included_names, $name;
+            }
+         }
+      }
+      $in->close;
+   }
+
+   if ($include_regexps) {
+      # Re-order communities
+      my %missings = map {$_ => undef} @$include_names;
+      my @names = @included_names;
+      my $ordered_meta = Bio::Community::Meta->new;
+      for my $i (0 .. scalar @$include_regexps - 1) {
+         my $regexp = $include_regexps->[$i];
+         my $regname = $include_names->[$i];
+         for (my $i = 0; $i < scalar @names; $i++) {
+            my $name = $names[$i];
+            if ($name =~ $regexp) {
+               splice @names, $i, 1;
+               $i--;
+               my $community = $meta->get_community_by_name($name);
+               $ordered_meta->add_communities([$community]);
+               delete $missings{$regname};
+            }
+         }
+      }
+      $meta = $ordered_meta;
+      # Warn if there are samples that were requested but not seen
+      my @missing = keys %missings;
+      if (scalar @missing > 0) {
+         die "Error: No communities seem to match: ".join(' ',map{"'".$_."'"}@missing)."\n";
+      }
+   }
+
+   # Merge communities
+   if (defined $merge_regexps) {
+      for my $i (0 .. scalar @$merge_regexps - 1) {
+         my $merge_set = $merge_regexps->[$i];
+         my $merge_names = $merge_names->[$i];
+         print "Processing ".join(' ', @$merge_names)."\n";
+         my $merged_community = Bio::Community->new( );
+         my @names;
+         for my $name (@included_names) {
+            if ($name ~~ @$merge_set) {
+               push @names, $name;
+               my $community = delete $included_comms{$name} ||
+                  die "Error: Could not find requested community, '$name' in the ".
+                     "input.\n";
+               while ( my $member = $community->next_member ) {
+                  my $count = $community->get_count($member);
+                  $merged_community->add_member($member, $count);
+               }
+            }
+         }
+         my $merged_name = gen_name(\@names, $renaming_method);
+         $merged_community->name($merged_name);
+         $included_comms{$merged_name} = $merged_community;
+      }
+      $meta = Bio::Community::Meta->new(-communities => [values %included_comms]);
+   }
+
+   # Write output communities
+   if ($meta->get_communities_count == 0) {
+      warn "Warning: No communities to write\n";
+   } else {
+      my $multiple_communities = Bio::Community::IO->new(-format=>$format)->multiple_communities;
+      my $num = 0;
+      my $out;
+      my $output_file;
+      while (my $community = $meta->next_community) {
+         if (not defined $out) {
+            if ($multiple_communities) {
+               $output_file = $output_prefix.'.'.$format;
+            } else {
+              $num++;
+               $output_file = $output_prefix.'_'.$num.'.'.$format;
+            }
+            $out = Bio::Community::IO->new(
+               -format => $format,
+               -file   => '>'.$output_file,
+            );
+         }
+         # Add and prefix and suffix to community name
+         $community->name( $name_prefix.$community->name.$name_suffix );
+         print "Writing community '".$community->name."' to file '$output_file'\n";
+         $out->write_community($community);
+         if (not $multiple_communities) {
+            $out->close;
+            $out = undef;
+         }
+      }
+      if (defined $out) {
+         $out->close;
+      }
+   }
+
+   return 1;
+}
+
+
+func regexify ($strings) {
+   # Given strings with wildcards, return the corresponding anchored regexps
+   # Example: 'marine.site1*2013' becomes '^marine\.site1.*2013$'
+   return [ map {
+      my $re = $_;
+      $re = quotemeta($re);
+      $re =~ s/\\\*/.*/g;
+      $re = qr/^$re$/;
+   } @$strings ];
+}
+
+
+func gen_name ($names, $method) {
+   # Generate a new name for the communities to merge
+   my $name;
+   if (length $method == 1) {
+      my $separator = $method;
+      $name = join($separator, @$names);
+   } elsif ($method eq 'first') {
+      $name = $names->[0];
+   } elsif ($method eq 'common') {
+      my $max = min( map {length $_} @$names );
+      OFF: for my $offset (0 .. $max-1) {
+         my $common;
+         for my $comm_name (@$names) {
+            my $char = substr $comm_name, $offset, 1;
+            if (not defined $common) {
+               $common = $char;
+               $name  .= $char;
+            } else {
+               if (not ($char eq $common)) {
+                  # Char at this position not in common
+                  chop $name;
+                  last OFF;
+               }
+            }
+         }
+      }
+      # Assume any trailing, non-alphanumeric character is a separator to remove
+      $name =~ s/[^\w]$//;
+      if (length $name == 0) {
+         die "Error: Could not find a string common to the given communities: ".
+            join(', ', @{$names})."\n";
+      }
+   } else {
+      die "Error: Got an invalid renaming_method, '$method'\n";
+   }
+   return $name;
+}

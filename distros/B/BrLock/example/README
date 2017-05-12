@@ -1,0 +1,43 @@
+
+This example provides three files: 
+resource.pl - a resource that should be accessed only exclusively. 
+br-node.pl  - a node instance (to be ran multiple times simultaneously). 
+mutex.conf  - a configuration file. 
+
+
+Firstly, run the resource: 
+
+ perl resource.pl 
+
+Running it in this default way, it'll become a server listening for 
+UDP datagrams in the port 3000. The sample mutex.conf configures an
+environment for 3 nodes. So, in another terminal/screen, run:
+
+ perl br-node.pl 3001 
+
+And, in another one, run 
+
+ perl br-node.pl 3002
+
+And, in yet another one, run 
+
+ perl br-node.pl 3003
+
+In this sample, every node takes 5 seconds to start sending messages. When
+a node starts sending messages, every one must be alive, so you must
+start all nodes in these 5 seconds. 
+
+Look at the resource.pl monitor. An end() message must always be just after
+its corresponding begin(). 
+
+Note: Actually, this isn't always warranted in this example, because the
+server is a UDP server which just prints out the message it receives. As 
+the receiving order isn't ensured to be the sending order, when a node
+releases the resource and another one imeddiately takes it, the next lock
+begin() message may reach the resource before the previous one end() 
+message. To ensure the receiving order is the same as the sending order,
+the resource should expect for an ACK from the resource, but it'd 
+outscopes the purpose of simplicity of this example. 
+
+
+

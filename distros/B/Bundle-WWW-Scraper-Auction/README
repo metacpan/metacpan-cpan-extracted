@@ -1,0 +1,8 @@
+Bundle::WWW::Scraper::Auction - A bundle to install all Auction scraper 
+engines.
+
+There are two steps in installing this Bundle.
+
+cpan> install G/GL/GLENNWOOD/Bundle-WWW-Scraper-Auction-<ver>.tar.gz
+...
+cpan> install Bundle::WWW::Scraper::Auction

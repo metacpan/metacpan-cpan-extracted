@@ -1,0 +1,4 @@
+<div class="menu head">
+<h4 class="head"><a href="<: $prefix :>"><: $info.title :></a></h4>
+</div>
+

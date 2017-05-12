@@ -1,0 +1,9 @@
+classes:
+  - Language.java.base
+parameters:
+  doc:
+    Language.java:
+      pkg:
+        - avoid OpenJDK 6
+  pkg-avoid:
+    - openjdk-6-jre

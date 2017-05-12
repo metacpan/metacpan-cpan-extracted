@@ -1,0 +1,24 @@
+0.4       2011-09-12 08:46:27 America/Los_Angeles
+
+ * fix a crash in a warning message about deleting obsolete files
+
+0.3       2011-05-18 16:16:59 America/Los_Angeles
+
+ * remove dependency on namespace::autoclean, which also pulls in Moose
+ * Returned seqs now have an undefined desc if no definition line is
+   in the BLAST database, instead of "No definition line found"
+
+0.2       2011-04-08 15:11:03 America/Los_Angeles
+
+ * Much better support for fetching very large sequences from BLAST
+   databases, or portions thereof.  get_sequence() method on a
+   Bio::BLAST::Database returns a new lazy-loading sequence object.
+   subseq() fetch only the requested sequence region, and calls which
+   require the full sequence (e.g. seq() and length() ) are handled by
+   an encapsulated Bio::Seq::LargePrimarySeq object. All of this
+   drastically improves speed and reduces memory usage when using very
+   large sequences.
+
+0.1   2011-04-07 16:01:00 America/Los_Angeles
+
+ * initial release

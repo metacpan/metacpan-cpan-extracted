@@ -1,0 +1,250 @@
+=pod
+
+=head1 NAME
+
+Bot::Cobalt::Manual::Plugins::Tutorial - Let's write a simple plugin
+
+=head1 SYNOPSIS
+
+Quick-start plugin authoring guide.
+
+=head1 DESCRIPTION
+
+Let's write a simple plugin that will respond to a command with a random 
+string.
+
+=head2 Outline
+
+We'll at least need a package name, a version, some utilities, and an 
+object constructor.
+
+Declare our package:
+
+  package My::Bot::Cobalt::Plugin;
+  
+
+
+We might need L<Bot::Cobalt::Common> utilities.
+It's good practice to use strict and warnings explicitly, although 
+L<Bot::Cobalt::Common> will import them for you. It's even better to 
+make warnings fatal as well via L<strictures>:
+
+  use strictures 2;
+  use Bot::Cobalt::Common;
+
+We probably also want the syntax sugar exported by L<Bot::Cobalt>. This 
+provides a simpler function interface to common core methods; we'll be 
+able to call C<broadcast()> to relay events and C<logger()> to log 
+messages.
+
+  use Bot::Cobalt;
+
+(See L<Bot::Cobalt::Core::Sugar> for more on exported sugar.)
+
+We can add a simple empty constructor:
+
+  sub new { bless {}, shift }
+
+=head2 Registering
+
+Our plugin can't be loaded unless it can handle B<Cobalt_register> and 
+B<Cobalt_unregister> events. It's also probably not very useful unless 
+it's registered to receive some kind of event, most often from 
+L<Bot::Cobalt::IRC>.
+
+Let's register to receive the in-channel command 'fortune' -- we'll 
+figure out some responses to it later. Since we 'use Bot::Cobalt' we 
+have the C<register()> and C<logger()> functions available:
+
+  sub Cobalt_register {
+    my ($self, $core) = splice @_, 0, 2;
+
+    register( $self, 'SERVER',
+      ## A list of events to catch.
+      qw/ 
+        public_cmd_fortune
+      /
+    );
+    
+    ## It's polite to log that we're here now.
+    logger->info("Loaded - $VERSION");
+    
+    return PLUGIN_EAT_NONE
+  }
+  
+  sub Cobalt_unregister {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    logger->info("Unloaded");
+    
+    return PLUGIN_EAT_NONE
+  }
+
+Notice the B<PLUGIN_EAT_NONE>? Our event handlers should B<always> 
+return a L<Object::Pluggable::Constants> constant indicating what 
+to do with the event after the handler is complete. This is typically 
+one of I<PLUGIN_EAT_NONE> or I<PLUGIN_EAT_ALL>, indicating whether to 
+let the event continue on down the pipeline or be terminated, 
+respectively.
+
+=head2 Handling commands
+
+Now we're loadable and will register to receive the 'SERVER' event 
+B<public_cmd_fortune> -- we just need a handler for it.
+
+The first argument after the C<$self> and C<$core> objects will be a 
+reference to a L<Bot::Cobalt::IRC::Message::Public> object. We'll 
+de-reference it and call some common methods to find out what we want to 
+know.
+
+  sub Bot_public_cmd_fortune {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    ## Get our (de-referenced) message object.
+    my $msg = ${ $_[0] };
+
+    ## Get our server context, source nickname, and channel.
+    my $context  = $msg->context;
+    my $src_nick = $msg->src_nick;
+    my $channel  = $msg->channel;
+    
+    ## We'll write our response method fortune() later.
+    my $fortune = $self->fortune;
+    my $response_string = "$src_nick: $fortune";
+    
+    ## Relay our response string back to Bot::Cobalt::IRC
+    broadcast( 'message', $context, $channel,
+      $response_string
+    );
+  
+    ## This one eats the event when it's complete.
+    return PLUGIN_EAT_ALL
+  }
+
+=head2 Add some data
+
+For convenience, we'll store our fortune cookies in the B<DATA> 
+filehandle until we need them.
+
+At the bottom of your plugin module:
+
+  1;  ## Perl modules must return a true value
+  __DATA__
+
+  You are not dead yet. Watch for further reports.
+  Don't look up.
+  You look tired.
+  Fine day for friends. Crappy day for you.
+
+Add as many as you like, one per line. When we want to retrieve them, we 
+just read B<DATA> like a normal file handle.
+
+Let's write our B<fortune()> method to pull a random fortune from 
+our retrieved B<DATA> -- this is nice and simple:
+
+  sub fortune {
+    my ($self) = @_;
+
+    $self->{fortunes} = [ readline(DATA) ]
+      unless defined $self->{fortunes};
+    
+    return $self->{fortunes}->[ rand( @{$self->{fortunes}} ) ]
+  }
+
+=head2 Finished product
+
+  package My::Bot::Cobalt::Plugin;
+  
+
+
+  use strictures 2;
+  use Bot::Cobalt::Common;
+  
+  use Bot::Cobalt;
+
+  sub new { bless {}, shift }
+
+  sub Cobalt_register {
+    my ($self, $core) = splice @_, 0, 2;
+
+    register( $self, 'SERVER',
+      ## A list of events to catch.
+      qw/ 
+        public_cmd_fortune
+      /
+    );
+    
+    ## It's polite to log that we're here now.
+    logger->info("Loaded - $VERSION");
+    
+    return PLUGIN_EAT_NONE
+  }
+  
+  sub Cobalt_unregister {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    logger->info("Unloaded");
+    
+    return PLUGIN_EAT_NONE
+  }
+
+  sub Bot_public_cmd_fortune {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    ## Get our (de-referenced) message object.
+    my $msg = ${ $_[0] };
+
+    ## Get our server context, source nickname, and channel.
+    my $context  = $msg->context;
+    my $src_nick = $msg->src_nick;
+    my $channel  = $msg->channel;
+    
+    my $fortune = $self->fortune;
+    my $response_string = "$src_nick: $fortune";
+    
+    ## Relay our response string back to Bot::Cobalt::IRC
+    broadcast( 'message', $context, $channel,
+      $response_string
+    );
+  
+    ## This one eats the event when it's complete.
+    return PLUGIN_EAT_ALL
+  }
+
+  sub fortune {
+    my ($self) = @_;
+
+    $self->{fortunes} = [ readline(DATA) ]
+      unless defined $self->{fortunes};
+  
+    return $self->{fortunes}->[ rand( @{$self->{fortunes}} ) ]
+  }
+
+  1;  ## Perl modules must return a true value
+  __DATA__
+  You are not dead yet. Watch for further reports.
+  Don't look up.
+  You look tired.
+  Fine day for friends. Crappy day for you.
+
+=head1 SEE ALSO
+
+L<Bot::Cobalt::Manual::Plugins> - Plugin authoring handbook
+
+L<Bot::Cobalt::Core>
+
+L<Bot::Cobalt::Core::Sugar>
+
+L<Bot::Cobalt::IRC>
+
+L<Bot::Cobalt::IRC::Event>
+
+L<Bot::Cobalt::IRC::Message>
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

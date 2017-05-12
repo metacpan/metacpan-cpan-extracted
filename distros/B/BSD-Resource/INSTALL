@@ -1,0 +1,49 @@
+#
+# INSTALL
+#
+
+To compile
+
+	perl Makefile.PL
+	make
+	make test
+
+Note that some of the tests (especially getrusage.t and times.t) are
+sensitive to timing, and therefore sensitive to the overall load of
+the testing machine.  If you get failures, wait for less busy moment
+and rerun the tests few times.
+
+To install
+
+	make install
+
+The documentation is the pod inlined into Resource.pm, use for example
+
+	pod2man Resource.pm | nroff -man | more
+
+to view the examples.
+
+You can test how well the extension works with
+
+	make test
+
+Please report any bugs and/or missing/excess functionality to me.
+Especially if your system does support these BSD functions but
+the Makefile.PL fails to locate them, please let me know.
+Remember to send the outputs of 'perl -v' and 'uname -a' (or equivalent).
+
+NOTE: The test t/getpriority may fail because in some systems the
+login shell may have an initial priority that is not 0 or 19, the
+usual values and this priority may be inherited by your Perl process
+doing the testing. Please run the test like this
+
+	perl -Mblib t/getpriority.t
+
+or (if the above does not work)
+
+	perl -Iblib/arch -Iblib/lib t/getpriority.t
+
+and report to me what it says and tell what kind of login you made.
+(telnet, rlogin, slogin, klogin, ...?)
+
+# eof

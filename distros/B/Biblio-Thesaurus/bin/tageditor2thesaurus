@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+
+#undef $/;
+#$/='';
+  my %ent =  # em utf8...
+qw(
+aacute	á
+Aacute	Á
+acirc 	â
+Acirc 	Â
+agrave	à
+Agrave	À
+aring 	å
+Aring 	Å
+atilde	ã
+Atilde	Ã
+auml  	ä
+Auml  	Ä
+aelig 	æ
+AElig 	Æ
+ccedil	ç
+Ccedil	Ç
+eacute	é
+Eacute	É
+ecirc 	ê
+Ecirc 	Ê
+egrave	è
+Egrave	È
+euml  	ë
+Euml  	Ë
+iacute	í
+Iacute	Í
+icirc 	î
+Icirc 	Î
+igrave	ì
+Igrave	Ì
+iuml  	ï
+Iuml  	Ï
+ntilde	ñ
+Ntilde	Ñ
+oacute	ó
+Oacute	Ó
+ocirc 	ô
+Ocirc 	Ô
+ograve	ò
+Ograve	Ò
+oslash	ø
+Oslash	Ø
+otilde	õ
+Otilde	Õ
+ouml  	ö
+Ouml  	Ö
+szlig 	ß
+uacute	ú
+Uacute	Ú
+ucirc 	û
+Ucirc 	Û
+ugrave	ù
+Ugrave	Ù
+uuml  	ü
+Uuml  	Ü
+yacute	ý
+Yacute	Ý
+yuml  	ÿ
+deg     °
+ordm    º
+ordf    ª
+copy    ©
+quot    '
+euro    €  
+
+laquo  «
+raquo  »
+
+amp     &amp;
+lt     &lt;
+gt     &gt;
+nbsp   _SPACE_
+);
+
+while(<>){
+ next if m{</?(body|html|meta)}i ;
+ next if m{^\w+:\s*$} ;
+ s/<!--\s*//;
+ s/\s*-->//;
+ print html2u($_);
+}
+
+sub html2u{
+  my $f = shift;
+  for ($f){
+    s#\&(\w+);#$ent{$1} || $& #ge;
+    s#\&\#(\d+);# pack("U",$1) #ge;
+    s#\&\#x([\dA-Fa-f]+);# pack("U",hex($1)) #ge;
+    s#_SPACE_# #ig;
+  }
+  $f
+}
+

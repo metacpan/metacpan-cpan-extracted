@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>BuzzSaw - Reports</title>
+  </head>
+
+  <body>
+    <h1>BuzzSaw - Reports</h1>
+
+    <h2>Introduction</h2>
+
+    <p>As well as being able to execute adhoc queries as required an
+    administrator often needs to be able to run regular reports which
+    analyse and summarise particular types of events which have
+    occurred within a given period. These might be hourly, daily,
+    weekly or monthly, all of which can be handled using
+    the <code>BuzzSaw::Reporter</code> module.</p>
+
+    <p>The reporter module can be run in one of two modes. It can
+    either be run at specific times (e.g. fron cron) and just execute
+    reports of a certain required type (e.g. hourly). Or alternatively
+    it can be run for all types and it will generate all reports which
+    have not been run within the specified period (e.g. if a weekly
+    report was last generated more than 7 days ago). The last report
+    generation time is recorded so either mode will work.</p>
+
+    <p>Typically reports will be generated using the buzzsaw
+    command-line tool like this:</p>
+
+<pre>
+buzzsaw report --all hourly
+</pre>
+
+<p>For full details on the supported options view the help page for the
+command like this:</p>
+
+<pre>
+buzzsaw help report
+</pre>
+
+<p>One particularly useful flag is <code>--debug</code> which will
+display a lot more information on stdout.</p>
+
+<p>The report command is configured via
+the <code>/etc/buzzsaw/reporter.yaml</code> file, that is typically
+managed using the LCFG buzzsaw component but could also be hand edited
+for one-off requirements (e.g. for testing new reports).</p>
+
+<h2>Writing a new Report Module</h2>
+
+<h3>First Steps</h3>
+
+<p>If you need to generate a report based on tags of a specific name
+then it is possible to just do this using the
+generic <code>BuzzSaw::Report</code> module. That is often the best
+starting point when you are needing to develop a completely new
+report. You can do something like the following as a simple
+script:</p>
+
+<pre>
+#!/usr/bin/perl                                                                 
+use strict;
+use warnings;
+
+use BuzzSaw::Report;
+
+my $report = BuzzSaw::Report->new( name => 'FooBar' );
+
+$report->add_tmpldir("$ENV{HOME}/buzzsaw_templates");
+
+$report->generate();
+</pre>
+
+<p>This will find all events which occurred during the previous day
+(the default date range) which were tagged as the lower-cased version
+of the report name (e.g. <code>foobar</code>). A report will be
+generated (and printed to stdout) using a template which has a name
+based on the lower-cased version of the report name with
+a <code>.tt</code> suffix (e.g. <code>foobar.tt</code>). That template
+will need to exist within one of the default template directories
+(<code>/usr/share/buzzsaw/templates/reports</code>
+or <code>/usr/share/buzzsaw/templates</code>) or your
+own <code>buzzsaw_templates</code> directory which you will need to
+create if required. Any template you put into
+your <code>buzzsaw_templates</code> directory will override a template
+of the same name in any of the default template directories. That
+makes it simple to test new developments to existing templates.</p>
+
+<h3>Writing a template</h3>
+
+<p>The template processing stage is carried out by
+the <code>process_template</code> method. This creates a new Template
+Toolkit object and passes in various data to the template
+processor. The following parameters are available in your
+template:</p>
+
+<dl>
+  <dt>events</dt>
+  <dd>A reference to an array of events which matched the query.</dd>
+  <dt>results</dt>
+  <dd>A reference to a hash of data returned by
+  the <code>process_events</code> method (empty by default).</dd>
+  <dt>params</dt>
+  <dd>Parameters set when the report object was created. Currently this is the values for the <em>start</em>, <em>end</em> and <em>tags</em> attributes.</dd>
+</dl>
+
+<p>A simple template might look like this:</p>
+
+<pre>
+% FOREACH e IN events -%]
+[% e.hostname %],[% e.logtime %],[% e.message %]
+[% END -%]
+</pre>
+
+<p>That will just print out a list of the comma-separated values of
+the hostname, timestamps and messages for each event which matched
+during the specified period.</p>
+
+<p>The Template Toolkit is a fairly powerful tool for mangling output
+so it is well worth reading the <code>Template::Manual</code>.</p>
+
+<h3>Sending Email</h3>
+
+<p>By default the report will be printed to stdout. That is fine when
+testing new code but not much use if you need to generate reports on a
+regular basis. The alternative is to get the report sent by
+email. This is done trivially by setting a value for
+the <code>email_to</code> attribute. For example:</p>
+
+<pre>
+my $report = BuzzSaw::Report->new( name     => 'FooBar',
+                                   email_to => 'fred@example.org' );
+</pre>
+
+<p>More typically this is done by setting parameters in the reporter
+configuration file. That is usually done using the buzzsaw component
+resource <code>report_email_to_</code><em>tag</em> for the particular
+report <em>tag</em> resource.</p>
+
+<p>You can send email to as many addresses as you like by using a
+reference to an array instead of a string. The first address in the
+list goes into the <em>To</em> field and the rest are added in
+the <em>Cc</em> field. You can also control the <em>From</em> address
+using the <code>email_from</code> attribute and the <em>Subject</em>
+using the <code>email_subject</code> attribute.</p>
+
+<h3>Creating a module</h3>
+
+<p>Once you have created a new report the preferred deployment method
+is to create a report module and get it and the template file added to
+the BuzzSaw distribution.</p>
+
+<p>A simple module would look like this:</p>
+
+<pre>
+package BuzzSaw::Report::FooBar;
+
+use Moose;
+
+extends 'BuzzSaw::Report';
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
+1;
+</pre>
+
+<p>The name of the report is now taken from the final part of the
+module name (i.e. <code>FooBar</code>). When
+the <code>generate()</code> method is called this module will generate
+exactly the same report as the previous example (events in the
+previous day tagged as <code>foobar</code>). The only difference is
+that the template (<code>foobar.tt</code>) now needs to be in one of
+the standard template directories. With the module in place it can be
+added to one of the report lists in the configuration for
+the <code>BuzzSaw::Reporter</code> module.</p>
+
+<h3>More complex reports</h3>
+
+<p>Occasionally it is necessary to analyse the data before generating
+the report or it might not be possible to do certain processing of the
+event data in the template. In this case a sub-class of
+the <code>BuzzSaw::Report</code> module is essential. The most
+appropriate way to do this is to override
+the <code>process_events</code> method which by default does nothing.
+
+<p>You need to do something like this in your sub-class:</p>
+
+<pre>
+override 'process_events' => sub {
+  my ( $self, @events ) = @_;
+
+  my %results;
+  for my $event (@events) {
+    # do some processing...
+    # stuff data in %results hash...
+  }
+
+  return %results;
+};
+</pre>
+
+<p>Tip: watch out for that obligatory trailing semi-colon. A good
+example of processing the events data in this way can be found in the
+Kernel report.</p>
+
+
+  </body>
+</html>

@@ -1,0 +1,24 @@
+Business-3DSecure version 0.01
+==============================
+
+This README is for Business::3DSecure, a module which provides Credit Card Authentication using 3DSecure 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2008 by Clayton Cottingham, C<< <clayton@wintermarket.net> >> 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

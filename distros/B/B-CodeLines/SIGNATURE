@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e435a5565742725f776584c51456cd624384c43 Build.PL
+SHA1 f886cc9bb0733c27180584ee0fa3a48a19eeb216 CHANGES
+SHA1 828163eb16ce740d3965b86c00e033237ab87382 ChangeLog
+SHA1 067a2e4b5e1f36609f5aa66c5c12179cba00c36b GNUmakefile
+SHA1 0227496c675594d85e448792bd648fa35b395c8a MANIFEST
+SHA1 cb821931705691532df5c352d1f8623b3ea21e8b META.json
+SHA1 d4e63709f92c3a026cc7935b19679c1e986a5ff4 META.yml
+SHA1 4392538543b935c8622117536db605dbab481958 Makefile.PL
+SHA1 9b8a247d6ff093c5d57564b0a54c8d71f62f5d54 README.pod
+SHA1 b4a8c67ea986486c20fae9385ab506d484fad6df examples/dolines.pl
+SHA1 126324968e767b089eca3bde438df4739daab4b9 examples/dolines.sh
+SHA1 42025d72b906a5d6c3ff40d07ada72345731c575 lib/B/CodeLines.pm
+SHA1 26b28eabb125f3af2997d3d28fb619de06e175e8 t/00load.t
+SHA1 0028fef9be7783d9eba29ae4d3940cc99cc8d14e t/00test-pod.t
+SHA1 8faf4a3f6c0cc822c6d28498f9f65ab92ce30098 t/10-test-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk/A2tQACgkQGo3lAIJ17CGkAQCfbeAuU9vCwoi/8vg6fO54jprY
+X+gAoIouPHLftftBg5k+T2HO/1PCsuBa
+=eMY7
+-----END PGP SIGNATURE-----

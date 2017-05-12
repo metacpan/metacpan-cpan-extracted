@@ -1,0 +1,28 @@
+---
+abstract: 'Online payment processing via Ogone'
+author:
+  - 'Tim Esselens <tim.esselens@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.033, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-Ogone
+requires:
+  Business::OnlinePayment: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  MIME::Base64: '0'
+  Test::Most: '0'
+  XML::Simple: '0'
+  common::sense: '0'
+resources:
+  homepage: https://github.com/timesselens/business-onlinepayment-ogone
+  repository: https://github.com/timesselens/business-onlinepayment-ogone.git
+version: 0.2.3
+x_authority: cpan:ESSELENS

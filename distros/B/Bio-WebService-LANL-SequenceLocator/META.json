@@ -1,0 +1,102 @@
+{
+   "abstract" : "Locate sequences within HIV using LANL's web tool",
+   "author" : [
+      "Thomas Sibley <trsibley@uw.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bio-WebService-LANL-SequenceLocator",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {
+      "server" : {
+         "description" : "Web API server",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "File::Share" : "0",
+                  "IO::String" : "0",
+                  "JSON" : "0",
+                  "JSON::XS" : "0",
+                  "Path::Tiny" : "0",
+                  "Plack::App::File" : "0",
+                  "Plack::Middleware::CrossOrigin" : "0",
+                  "Plack::Middleware::ReverseProxy" : "0",
+                  "Server::Starter" : "0",
+                  "Starlet" : "0",
+                  "Text::CSV" : "0",
+                  "Web::Simple" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "FindBin" : "0",
+            "JSON" : "0",
+            "Path::Tiny" : "0",
+            "Test::Deep" : "0",
+            "Test::LongString" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTML::TableExtract" : "0",
+            "HTML::TokeParser" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::AllUtils" : "0",
+            "Moo" : "0",
+            "perl" : "5.018",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator/issues"
+      },
+      "homepage" : "https://indra.mullins.microbiol.washington.edu/locate-sequence/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator.git",
+         "web" : "https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator"
+      }
+   },
+   "version" : "20170324"
+}
+

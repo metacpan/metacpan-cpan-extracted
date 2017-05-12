@@ -1,0 +1,24 @@
+[% site_title = 'Bracket ' _ c.config.year %]
+[% page_title = player.first_name _ ' ' _ player.last_name _ ' has '
+ _ player.points _ ' points' %]
+
+<div id="player_page">
+
+<div id="player_page_header">
+
+<div>
+  Brackets for <span class="player_name">[% player.first_name | ucfirst %]
+  [% player.last_name | ucfirst %] - [% player.points %] points</span>
+</div>
+
+[% IF (is_admin && player_id != 1);
+    INCLUDE 'admin/links.tt';
+ END %]
+
+</div>
+
+<div>
+[% INCLUDE 'nav/edit_view_links.tt' %]
+</div>
+
+</div>

@@ -1,0 +1,9 @@
+Revision history for Perl extension Bio::Glite.
+
+0.10 2009.03.30
+	- changed base URL 
+
+0.01  Tue Mar 17 14:20:29 2009
+	- original version; created by h2xs 1.23 with options
+		-X -A Bio::Glite
+

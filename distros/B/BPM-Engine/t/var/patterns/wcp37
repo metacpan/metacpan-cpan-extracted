@@ -1,0 +1,110 @@
+        <WorkflowProcess Id="wcp37" Name="WCP37: Local Synchronizing Merge">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="multi_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="deferred_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="path_taken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="MC" Name="MC">
+                    <Description>Multiple Choice (OR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="MC-A"/>
+                                    <TransitionRef Id="MC-B"/>
+                                    <TransitionRef Id="MC-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="DC" Name="DC">
+                    <Description>Deferred Choice (XOR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="DC-D"/>
+                                    <TransitionRef Id="DC-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="SM" Name="SM">
+                    <Description>Synchronizing Merge (OR-join)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="MC-A" From="MC" To="A">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="MC-B" From="MC" To="B">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('B')</Condition>                
+                </Transition>
+                <Transition Id="MC-C" From="MC" To="C">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('C')</Condition>                
+                </Transition>
+                <Transition Id="A-SM" From="A" To="SM"/>
+                <Transition Id="B-SM" From="B" To="SM"/>
+                <Transition Id="C-DC" From="C" To="DC"/>
+                <Transition Id="DC-D" From="DC" To="D">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('D')</Condition>                
+                </Transition>
+                <Transition Id="DC-E" From="DC" To="E">
+                    <Condition Type="OTHERWISE"/>                
+                </Transition>
+                <Transition Id="D-SM" From="D" To="SM"/>
+                <Transition Id="E-End" From="E" To="End"/>
+                <Transition Id="SM-End" From="SM" To="End"/>
+            </Transitions>
+        </WorkflowProcess>

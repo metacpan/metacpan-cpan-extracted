@@ -1,0 +1,4 @@
+Revision history for Benchmark-Perl-Formance-Plugin-Mandelbrot
+
+0.001     2016-04-23
+        - a Benchmark::Perl::Formance plugin collecting mandelbrot variants

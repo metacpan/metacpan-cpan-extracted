@@ -1,0 +1,54 @@
+Fri Jun 20 09:27:24 2003  jwheeler  <upsmodule@datademons.com>
+
+	* Changed namespace to the original Business::UPS to make room for
+	Dan Browning's Business::Shipping modules.
+
+Tue Jun 10 13:28:37 2003  jwheeler  <upsmodule@datademons.com>
+
+	* Came across this module, was horribly outdated, rewrote it to work again.
+	* Renamed to Business::Shipping::UPS so as not to interfere with solomon's namespace.
+
+Mon Feb 22 16:03:01 1999  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: Thanks to pudge@pobox.com, changed a {} to ()
+
+Tue Feb  9 20:16:07 1999  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: Added rate chart
+	Defaults to Destination in the US is none specified
+
+Fri Jan 22 17:11:40 1999  msolomon  <msolomon@fido.seva.net>
+
+	* Attic/Changes: Not in cvs
+
+	* examples/test.pl, test.pl, qwk-cost.zip, product-codes.txt, country-codes.txt, README, Makefile.PL, LICENSE.ups, MANIFEST, Attic/Changes:
+	Added files
+
+Mon Mar  9 21:17:01 1998  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: added copyright
+
+	* UPS.pm: *** empty log message ***
+
+	* UPS.pm: worked on docs
+
+	* UPS.pm: Cleaned up a great deal of code in UPStrack()
+
+Sat Feb 28 06:25:38 1998  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: Added UPStrack sub
+	  this allows tracking using UPS tracking number
+
+Mon Feb 23 17:10:52 1998  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm:
+	added international capability and added dimensions, oversized, and COD
+
+Mon Jan 19 14:51:31 1998  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: Change
+
+Sun Jan 18 05:43:07 1998  msolomon  <msolomon@fido.seva.net>
+
+	* UPS.pm: Change
+

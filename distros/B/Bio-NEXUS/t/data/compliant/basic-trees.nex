@@ -1,0 +1,64 @@
+#NEXUS
+
+BEGIN TAXA;
+      dimensions ntax=8;
+      taxlabels A B C D E F G H;  
+END;
+
+BEGIN CHARACTERS;
+      dimensions nchar=6;
+      format datatype=protein missing=? gap=-;
+      charlabels one two three four five six;
+      matrix
+A     WITH--
+B     WITH--
+C     WITH--
+D     WITH--
+E     WITH--
+F     WITH--
+G     WITH--
+H     WITH--;
+END;
+
+BEGIN TREES;
+	[this file tests the equlity of the tree _topology_ a separate test should performed to compare node attributes (such as NHX comments, bootstrap values, etc)]
+
+	tree bush =	(((A:1,B:1):1,(C:1,D:1):1):1,((E:1,F:1):1,(G:1,H:1):1):1);
+	tree bush_isomer = (((A:1,B:1):1,(C:1,D:1):1):1,((G:1,H:1):1,(E:1,F:1):1):1);
+	tree bush_diff = (((D:1,B:1):1,(C:1,A:1):1):1,((E:1,F:1):1,(G:1,H:1):1):1);
+	
+	tree ladder_one = (((A:1,B:1):1,C:1):1,D:1);
+	tree ladder_one_isomer_1 = (((B:1,A:1):1,C:1):1,D:1);
+	tree ladder_one_isomer_2 = ((C:1,(A:1,B:1):1):1,D:1);
+	tree ladder_one_diff = (((A:1,B:1):1,D:1):1,C:1);
+	
+	tree rake_one = (A:1,B:1,C:1,D:1,E:1,F:1,G:1,H:1);
+	tree rake_one_isomer_1 = (A:1,B:1,D:1,C:1,E:1,F:1,H:1,G:1);
+	tree rake_one_diff = (A:1,B:1,C:1,D:1,E:1,F:1,G:1);
+	
+	tree thing_one = (((A,B),C),(D,E));
+	tree thing_one_isomer_1 = ((C,(A,B)),(D,E));
+	tree thing_one_diff = (((D,E),C),(A,B));
+	
+	tree thing_two = (A,(B,C),(D,E));
+	tree thing_two_isomer_1 = (A,(D,E),(B,C));
+	tree thing_two_diff = (A,B,C,D,E);
+	
+	tree TF342628 = (A:0.00161[&&NHX:G=ENSG00000189395:O=ENST00000342416.2:S=HUMAN],((B:0[&&NHX:G=ENSG00000205275:O=ENST00000338938.2:S=HUMAN],C:0[&&NHX:G=ENSG00000188384:O=ENST00000342039.2:S=HUMAN])inode3:0[&&NHX:B=10:D=Y:S=HUMAN],D:0[&&NHX:G=ENSG00000205271:O=ENST00000379430.1:S=HUMAN])inode2:0.00161[&&NHX:B=10:D=Y:S=HUMAN])root[&&NHX:B=0:D=Y:S=HUMAN];
+	tree TF342628_diff_1 = (A:1[&&NHX:G=ENSG00000189395:O=ENST00000342416.2:S=HUMAN],((B:0[&&NHX:G=ENSG00000205275:O=ENST00000338938.2:S=HUMAN],C:0[&&NHX:G=ENSG00000188384:O=ENST00000342039.2:S=HUMAN])inode3:0[&&NHX:B=10:D=Y:S=HUMAN],D:0[&&NHX:G=ENSG00000205271:O=ENST00000379430.1:S=HUMAN])inode2:0.00161[&&NHX:B=10:D=Y:S=HUMAN])root[&&NHX:B=0:D=Y:S=HUMAN];
+
+	tree nhx_one = (((A:1[&&NHX:S=human:E=1],B:1[&&NHX:S=human:E=1]):1,C:1[&&NHX:S=Primates:E=1:D=Y:B=100]):1,D:1[&&NHX:S=nematode:E=1]);
+	[changing a tag in 'A']
+	tree nhx_one_diff_1 = (((A:1[&&NHX:S=chimp:E=1],B:1[&&NHX:S=human:E=1]):1,C:1[&&NHX:S=Primates:E=1:D=Y:B=100]):1,D:1[&&NHX:S=nematode:E=1]);
+	[removing an nhx comment completely]
+	tree nhx_one_diff_2 = (((A:1,B:1[&&NHX:S=human:E=1]):1,C:1[&&NHX:S=Primates:E=1:D=Y:B=100]):1,D:1[&&NHX:S=nematode:E=1]);
+	
+	tree attr_one = ((A:1,B:1),(C:1,D:1),(E:1,F:1));
+	tree attr_one_diff_1 = ((A:2,B:1),(C:1,D:1),(E:1,F:1));
+	tree attr_one_diff_2 = ((A:1,B:1):1,(C:1,D:1),(E:1,F:1));
+	tree attr_one_diff_3 = ((A:1,B:1),(C:1,D:1),(E:1,F:1)):1;
+	
+	[need challenging examples...]
+	[need trees with NHX comments...]
+	
+END;

@@ -1,0 +1,6 @@
+begin:vcard
+version:3.0
+fn:notes testcase
+n:testcase;notes;;;
+note:L7
+end:vcard

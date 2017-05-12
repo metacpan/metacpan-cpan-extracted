@@ -1,0 +1,38 @@
+# example cnf file for EPconDBmousechip5
+
+name=EPconDBmousechip5
+module=EPconDBmousechip5
+version=DoTS_rel9_20040922
+source_version=
+source_date=
+download_date=
+comment=
+ftp=http://www.cbil.upenn.edu/EPConDB/Downloads/PancChip/
+ftp_files=PancChip5.0/RAD_Panc5_ChipDump_DoTS_rel9_20040922.txt
+
+label=Feature_Location, dotset=Feature_Location
+label=Kaestner_ID, dotset=Gene_ID
+label=Source_and_ID, dotset=Sequence_ID
+label=LocusLink, dotset=Gene_ID
+label=LocuslinkSymbol, dotset=Gene_Symbol
+label=LocusGeneName, dotset=Gene_Name
+label=MGI_ID, dotset=Gene_ID
+label=MGI_Symbol, dotset=Gene_Symbol
+label=MGI_SYNONYM, dotset=Alias
+label=DoTS_GeneSymbol_and_Desc, dotset=Gene_Desc
+label=DoTS_Gene_Synonyms, dotset=Alias
+label=PCR_Failure_Flag, dotset=Status
+label=Name, dotset=Gene_Name
+label=DoTS_ID, dotset=Sequence_Cluster_ID
+label=RNA_DESC, dotset=RNA_Desc
+label=Predicted_GO_func, dotset=GO_Function
+label=Agencourt_seq_avail, dotset=Status
+label=Seq_verified, dotset=Status
+label=GenBank_Acc, dotset=Sequence_ID
+label=WashU_Name, dotset=Clone_ID
+label=Agencourt_IMAGE_ID, dotset=Sequence_ID
+label=old_IMAGE_ID, dotset=Sequence_ID
+label=RefSeq, dotset=Sequence_ID
+label=Plate_Name, dotset=Location
+label=Well_Location, dotset=Location
+

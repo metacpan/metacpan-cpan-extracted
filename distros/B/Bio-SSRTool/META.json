@@ -1,0 +1,48 @@
+{
+   "abstract" : "The great new Bio::SSRTool!",
+   "author" : [
+      "Ken Youens-Clark <kclark@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-SSRTool",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4003",
+            "Test::Exports" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Scalar" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::SSRTool" : {
+         "file" : "lib/Bio/SSRTool.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.04"
+}

@@ -1,0 +1,3951 @@
+Entrezgene ::= {
+  track-info {
+    geneid 1 ,
+    status live ,
+    create-date
+      std {
+        year 2003 ,
+        month 8 ,
+        day 28 ,
+        hour 20 ,
+        minute 30 ,
+        second 0 } ,
+    update-date
+      std {
+        year 2005 ,
+        month 3 ,
+        day 19 ,
+        hour 10 ,
+        minute 30 ,
+        second 0 } } ,
+  type protein-coding ,
+  source {
+    genome genomic ,
+    origin natural ,
+    org {
+      taxname "Homo sapiens" ,
+      common "human" ,
+      db {
+        {
+          db "taxon" ,
+          tag
+            id 9606 } } ,
+      syn {
+        "man" } ,
+      orgname {
+        name
+          binomial {
+            genus "Homo" ,
+            species "sapiens" } ,
+        lineage "Eukaryota; Metazoa; Chordata; Craniata; Vertebrata;
+ Euteleostomi; Mammalia; Eutheria; Euarchontoglires; Primates; Catarrhini;
+ Hominidae; Homo" ,
+        gcode 1 ,
+        mgcode 2 ,
+        div "PRI" } } ,
+    subtype {
+      {
+        subtype chromosome ,
+        name "19" } } } ,
+  gene {
+    locus "A1BG" ,
+    desc "alpha-1-B glycoprotein" ,
+    maploc "19q13.4" ,
+    db {
+      {
+        db "MIM" ,
+        tag
+          id 138670 } } ,
+    syn {
+      "A1B" ,
+      "ABG" ,
+      "GAB" ,
+      "HYST2477" ,
+      "DKFZp686F0970" } ,
+    locus-tag "HGNC:5" } ,
+  prot {
+    name {
+      "alpha 1B-glycoprotein" ,
+      "alpha-1B-glycoprotein" } } ,
+  summary "The protein encoded by this gene is a plasma glycoprotein of
+ unknown function. The protein shows sequence similarity to the variable
+ regions of some immunoglobulin supergene family member proteins." ,
+  location {
+    {
+      display-str "19q13.4" ,
+      method
+        map-type cyto } } ,
+  gene-source {
+    src "LocusLink" ,
+    src-int 1 ,
+    src-str2 "1" ,
+    gene-display FALSE ,
+    locus-display FALSE ,
+    extra-terms FALSE } ,
+  locus {
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NC_000019" ,
+      version 8 ,
+      seqs {
+        int {
+          from 63548355 ,
+          to 63556668 ,
+          strand minus ,
+          id
+            gi 42406306 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_130786" ,
+          version 2 ,
+          genomic-coords {
+            mix {
+              int {
+                from 63548355 ,
+                to 63550206 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63550530 ,
+                to 63550817 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63553547 ,
+                to 63553828 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63554568 ,
+                to 63554864 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63555460 ,
+                to 63555732 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63556105 ,
+                to 63556374 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63556469 ,
+                to 63556504 ,
+                strand minus ,
+                id
+                  gi 42406306 } ,
+              int {
+                from 63556581 ,
+                to 63556668 ,
+                strand minus ,
+                id
+                  gi 42406306 } } } ,
+          seqs {
+            whole
+              gi 21071029 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              accession "NP_570602" ,
+              version 2 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 63550199 ,
+                    to 63550206 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63550530 ,
+                    to 63550817 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63553547 ,
+                    to 63553828 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63554568 ,
+                    to 63554864 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63555460 ,
+                    to 63555732 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63556105 ,
+                    to 63556374 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63556469 ,
+                    to 63556504 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } ,
+                  {
+                    from 63556581 ,
+                    to 63556614 ,
+                    strand minus ,
+                    id
+                      gi 42406306 } } } ,
+              seqs {
+                whole
+                  gi 21071030 } } } } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_011109" ,
+      version 15 ,
+      seqs {
+        int {
+          from 31124733 ,
+          to 31133046 ,
+          strand minus ,
+          id
+            gi 29800594 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_130786" ,
+          version 2 ,
+          genomic-coords {
+            mix {
+              int {
+                from 31124733 ,
+                to 31126584 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31126908 ,
+                to 31127195 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31129925 ,
+                to 31130206 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31130946 ,
+                to 31131242 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31131838 ,
+                to 31132110 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31132483 ,
+                to 31132752 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31132847 ,
+                to 31132882 ,
+                strand minus ,
+                id
+                  gi 29800594 } ,
+              int {
+                from 31132959 ,
+                to 31133046 ,
+                strand minus ,
+                id
+                  gi 29800594 } } } ,
+          seqs {
+            whole
+              gi 21071029 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              accession "NP_570602" ,
+              version 2 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 31126577 ,
+                    to 31126584 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31126908 ,
+                    to 31127195 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31129925 ,
+                    to 31130206 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31130946 ,
+                    to 31131242 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31131838 ,
+                    to 31132110 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31132483 ,
+                    to 31132752 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31132847 ,
+                    to 31132882 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } ,
+                  {
+                    from 31132959 ,
+                    to 31132992 ,
+                    strand minus ,
+                    id
+                      gi 29800594 } } } ,
+              seqs {
+                whole
+                  gi 21071030 } } } } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_086907" ,
+      version 1 ,
+      seqs {
+        int {
+          from 8163589 ,
+          to 8172398 ,
+          strand minus ,
+          id
+            gi 51475048 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_130786" ,
+          version 2 ,
+          genomic-coords {
+            mix {
+              int {
+                from 8163589 ,
+                to 8165440 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8165763 ,
+                to 8166050 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8169274 ,
+                to 8169555 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8170297 ,
+                to 8170593 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8171190 ,
+                to 8171462 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8171835 ,
+                to 8172104 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8172199 ,
+                to 8172234 ,
+                strand minus ,
+                id
+                  gi 51475048 } ,
+              int {
+                from 8172311 ,
+                to 8172398 ,
+                strand minus ,
+                id
+                  gi 51475048 } } } ,
+          seqs {
+            whole
+              gi 21071029 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              accession "NP_570602" ,
+              version 2 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 8165433 ,
+                    to 8165440 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8165763 ,
+                    to 8166050 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8169274 ,
+                    to 8169555 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8170297 ,
+                    to 8170593 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8171190 ,
+                    to 8171462 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8171835 ,
+                    to 8172104 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8172199 ,
+                    to 8172234 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } ,
+                  {
+                    from 8172311 ,
+                    to 8172344 ,
+                    strand minus ,
+                    id
+                      gi 51475048 } } } ,
+              seqs {
+                whole
+                  gi 21071030 } } } } } } } ,
+  properties {
+    {
+      type comment ,
+      label "Nomenclature" ,
+      version 0 ,
+      source {
+        {
+          anchor "HUGO Gene Nomenclature Committee" } } ,
+      properties {
+        {
+          type property ,
+          label "Official Symbol" ,
+          text "A1BG" ,
+          version 0 } ,
+        {
+          type property ,
+          label "Official Full Name" ,
+          text "alpha-1-B glycoprotein" ,
+          version 0 } } } ,
+    {
+      type comment ,
+      heading "GeneOntology" ,
+      version 0 ,
+      source {
+        {
+          pre-text "Provided by" ,
+          anchor "GOA" ,
+          url "http://www.ebi.ac.uk/GOA/" } } ,
+      comment {
+        {
+          type comment ,
+          label "Function" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 3458201 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 5554 } ,
+                  anchor "molecular_function unknown" ,
+                  post-text "evidence: ND" } } } } } ,
+        {
+          type comment ,
+          label "Process" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 4 } ,
+                  anchor "biological_process unknown" ,
+                  post-text "evidence: ND" } } } } } ,
+        {
+          type comment ,
+          label "Component" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 3458201 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 5576 } ,
+                  anchor "extracellular region" ,
+                  post-text "evidence: IDA" } } } } } } } } ,
+  homology {
+    {
+      type comment ,
+      heading "Mouse, Rat" ,
+      version 0 ,
+      source {
+        {
+          src {
+            db "HomoloGene" ,
+            tag
+              id 11167 } ,
+          anchor "Map Viewer" ,
+          url "http://www.ncbi.nlm.nih.gov/mapview/maps.cgi?taxid=9606&chr=19&
+MAPS=genes-r-org/rat-chr/human%3A19,genes-r-org/mouse-chr/human%3A19,genes-r-o
+rg/human-chr19&query=e%3A1[id]+AND+gene[obj_type]&QSTR=a1bg&cmd=focus&fill=10" } } } } ,
+  comments {
+    {
+      type comment ,
+      heading "LocusTagLink" ,
+      version 0 ,
+      source {
+        {
+          src {
+            db "HGNC" ,
+            tag
+              id 5 } } } } ,
+    {
+      type comment ,
+      heading "RefSeq Status" ,
+      label "REVIEWED" ,
+      version 0 } ,
+    {
+      type comment ,
+      version 0 ,
+      refs {
+        pmid 15461460 ,
+        pmid 15221005 ,
+        pmid 14702039 ,
+        pmid 12477932 ,
+        pmid 8889549 ,
+        pmid 3458201 ,
+        pmid 2591067 } } ,
+    {
+      type comment ,
+      heading "Markers (Sequence Tagged Sites/STS)" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 89991 } ,
+              anchor "SHGC-67307" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "RH80032" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "RH86145" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 152074 } ,
+              anchor "D11S2921" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "GDB:461809" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 155756 } ,
+              anchor "D10S16" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "D10S23" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "GDB:193809" ,
+              version 0 } } } } } ,
+    {
+      type comment ,
+      heading "NCBI Reference Sequences (RefSeq)" ,
+      version 0 ,
+      products {
+        {
+          type mRNA ,
+          heading "mRNA Sequence" ,
+          accession "NM_130786" ,
+          version 2 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 21071029 } ,
+              anchor "NM_130786" } } ,
+          seqs {
+            whole
+              gi 21071029 } ,
+          products {
+            {
+              type peptide ,
+              heading "Product" ,
+              accession "NP_570602" ,
+              version 2 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 21071030 } ,
+                  anchor "NP_570602" ,
+                  post-text "alpha 1B-glycoprotein" } } ,
+              seqs {
+                whole
+                  gi 21071030 } ,
+              comment {
+                {
+                  type other ,
+                  heading "Consensus CDS (CCDS)" ,
+                  version 0 ,
+                  source {
+                    {
+                      src {
+                        db "CCDS" ,
+                        tag
+                          str "CCDS12976.1" } ,
+                      anchor "CCDS12976.1" } } } ,
+                {
+                  type other ,
+                  heading "Conserved Domains" ,
+                  version 0 ,
+                  source {
+                    {
+                      src {
+                        db "PROT_CDD" ,
+                        tag
+                          id 21071030 } ,
+                      pre-text "(1)" ,
+                      anchor "summary" } } ,
+                  comment {
+                    {
+                      type other ,
+                      version 0 ,
+                      source {
+                        {
+                          src {
+                            db "CDD" ,
+                            tag
+                              id 365 } ,
+                          anchor "smart00408: IGc2; Immunoglobulin C-2 Type" } } ,
+                      comment {
+                        {
+                          type other ,
+                          text "Location: 223 - 282  Blast Score: 103" ,
+                          version 0 } } } } } } } } ,
+          comment {
+            {
+              type other ,
+              heading "Source Sequence" ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "Nucleotide" ,
+                    tag
+                      str "AF414429,AK055885,AK056201" } ,
+                  anchor "AF414429,AK055885,AK056201" } } ,
+              comment {
+                {
+                  type other ,
+                  version 0 } } } } } } } ,
+    {
+      type comment ,
+      heading "Related Sequences" ,
+      version 0 ,
+      products {
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "AC010642" ,
+          version 5 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 9929687 } ,
+              anchor "AC010642" } } ,
+          seqs {
+            int {
+              from 41119 ,
+              to 43581 ,
+              strand plus ,
+              id
+                gi 9929687 } } ,
+          products {
+            {
+              type peptide ,
+              text "None" ,
+              version 0 } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AB073611" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 51555784 } ,
+              anchor "AB073611" } } ,
+          seqs {
+            whole
+              gi 51555784 } ,
+          products {
+            {
+              type peptide ,
+              accession "BAD38648" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 51555785 } ,
+                  anchor "BAD38648" } } ,
+              seqs {
+                whole
+                  gi 51555785 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AF414429" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 15778555 } ,
+              anchor "AF414429" } } ,
+          seqs {
+            whole
+              gi 15778555 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAL07469" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 15778556 } ,
+                  anchor "AAL07469" } } ,
+              seqs {
+                whole
+                  gi 15778556 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AK055885" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 16550723 } ,
+              anchor "AK055885" } } ,
+          seqs {
+            whole
+              gi 16550723 } ,
+          products {
+            {
+              type peptide ,
+              text "None" ,
+              version 0 } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AK056201" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 16551539 } ,
+              anchor "AK056201" } } ,
+          seqs {
+            whole
+              gi 16551539 } ,
+          products {
+            {
+              type peptide ,
+              text "None" ,
+              version 0 } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "BC035719" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 23273475 } ,
+              anchor "BC035719" } } ,
+          seqs {
+            whole
+              gi 23273475 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAH35719" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 23273476 } ,
+                  anchor "AAH35719" } } ,
+              seqs {
+                whole
+                  gi 23273476 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "BX537419" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 31873339 } ,
+              anchor "BX537419" } } ,
+          seqs {
+            whole
+              gi 31873339 } ,
+          products {
+            {
+              type peptide ,
+              accession "CAD97661" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 31873340 } ,
+                  anchor "CAD97661" } } ,
+              seqs {
+                whole
+                  gi 31873340 } } } } ,
+        {
+          type other ,
+          text "None" ,
+          version 0 ,
+          products {
+            {
+              type peptide ,
+              accession "P04217" ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 46577680 } ,
+                  anchor "P04217" } } ,
+              seqs {
+                whole
+                  gi 46577680 } } } } } } ,
+    {
+      type comment ,
+      heading "Additional Links" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "Evidence Viewer" ,
+                tag
+                  str "1" } ,
+              anchor "Evidence Viewer" ,
+              url "http://www.ncbi.nlm.nih.gov/sutils/evv.cgi?taxid=9606&conti
+g=NT_011109.15&gene=A1BG&lid=1&from=31124734&to=31133047" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "ModelMaker" ,
+                tag
+                  str "1" } ,
+              anchor "ModelMaker" ,
+              url "http://www.ncbi.nlm.nih.gov/mapview/modelmaker.cgi?taxid=96
+06&contig=NT_011109.15&gene=A1BG&lid=1" } } } ,
+        {
+          type comment ,
+          text "UniGene" ,
+          version 0 ,
+          xtra-properties {
+            {
+              tag "UNIGENE" ,
+              value "Hs.529161" } } ,
+          source {
+            {
+              src {
+                db "UniGene" ,
+                tag
+                  str "Hs.529161" } ,
+              anchor "Hs.529161" ,
+              url "http://www.ncbi.nlm.nih.gov/UniGene/clust.cgi?ORG=Hs&CID=52
+9161" } } } ,
+        {
+          type comment ,
+          text "MIM" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MIM" ,
+                tag
+                  str "138670" } ,
+              anchor "138670" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "HomoloGene" ,
+                tag
+                  str "1" } ,
+              anchor "HomoloGene" ,
+              url "http://www.ncbi.nlm.nih.gov/HomoloGene/homolquery.cgi?TEXT=
+1[loc]&TAXID=9606" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "AceView" ,
+                tag
+                  id 1 } ,
+              anchor "AceView" ,
+              url "http://www.ncbi.nlm.nih.gov/IEB/Research/Acembly/av.cgi?c=l
+ocusid&org=9606&l=1" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "GDB" ,
+                tag
+                  str "GDB:119638" } } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "Ensembl" ,
+                tag
+                  str "" } ,
+              url "http://www.ensembl.org/Homo_sapiens/contigview?geneid=AK055
+885" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UCSC" ,
+                tag
+                  str "" } ,
+              url "http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&position=
+AK055885" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MGC" ,
+                tag
+                  str "BC035719" } ,
+              anchor "MGC" ,
+              url "http://mgc.nci.nih.gov/Genes/CloneList?ORG=Hs&LIST=BC035719" } } } } } ,
+    {
+      type generif ,
+      text "A1BG-cysteine-rich secretory protein 3 complex displays a similar
+ function in protecting the circulation from a potentially harmful effect of
+ free CRISP-3" ,
+      version 0 ,
+      refs {
+        pmid 15461460 } ,
+      create-date
+        str "Nov  6 2004 10:01AM" ,
+      update-date
+        str "Nov  6 2004  3:27PM" } } ,
+  unique-keys {
+    {
+      db "LocusID" ,
+      tag
+        id 1 } ,
+    {
+      db "MIM" ,
+      tag
+        id 138670 } } ,
+  xtra-index-terms {
+    "LOC1" } }
+Entrezgene ::= {
+  track-info {
+    geneid 2 ,
+    status live ,
+    create-date
+      std {
+        year 2003 ,
+        month 8 ,
+        day 28 ,
+        hour 20 ,
+        minute 30 ,
+        second 0 } ,
+    update-date
+      std {
+        year 2005 ,
+        month 4 ,
+        day 3 ,
+        hour 13 ,
+        minute 27 ,
+        second 0 } } ,
+  type protein-coding ,
+  source {
+    genome genomic ,
+    origin natural ,
+    org {
+      taxname "Homo sapiens" ,
+      common "human" ,
+      db {
+        {
+          db "taxon" ,
+          tag
+            id 9606 } } ,
+      syn {
+        "man" } ,
+      orgname {
+        name
+          binomial {
+            genus "Homo" ,
+            species "sapiens" } ,
+        lineage "Eukaryota; Metazoa; Chordata; Craniata; Vertebrata;
+ Euteleostomi; Mammalia; Eutheria; Euarchontoglires; Primates; Catarrhini;
+ Hominidae; Homo" ,
+        gcode 1 ,
+        mgcode 2 ,
+        div "PRI" } } ,
+    subtype {
+      {
+        subtype chromosome ,
+        name "12" } } } ,
+  gene {
+    locus "A2M" ,
+    desc "alpha-2-macroglobulin" ,
+    maploc "12p13.3-p12.3" ,
+    db {
+      {
+        db "MIM" ,
+        tag
+          id 103950 } } ,
+    syn {
+      "FWP007" ,
+      "S863-7" ,
+      "DKFZp779B086" } ,
+    locus-tag "HGNC:7" } ,
+  prot {
+    name {
+      "alpha-2-macroglobulin" } } ,
+  summary "Alpha-2-macroglobulin is a protease inhibitor and cytokine
+ transporter. It inhibits many proteases, including trypsin, thrombin and
+ collagenase. A2M is implicated in Alzheimer disease (AD) due to its ability
+ to mediate the clearance and degradation of A-beta, the major component of
+ beta-amyloid deposits." ,
+  location {
+    {
+      display-str "12p13.3-p12.3" ,
+      method
+        map-type cyto } } ,
+  gene-source {
+    src "LocusLink" ,
+    src-int 2 ,
+    src-str2 "2" ,
+    gene-display FALSE ,
+    locus-display FALSE ,
+    extra-terms FALSE } ,
+  locus {
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NC_000012" ,
+      version 9 ,
+      seqs {
+        int {
+          from 9111576 ,
+          to 9159755 ,
+          strand minus ,
+          id
+            gi 51511728 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_000014" ,
+          version 3 ,
+          genomic-coords {
+            mix {
+              int {
+                from 9111576 ,
+                to 9111701 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9112045 ,
+                to 9112086 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9112602 ,
+                to 9112704 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9113607 ,
+                to 9113675 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9114350 ,
+                to 9114440 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9116221 ,
+                to 9116348 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9116515 ,
+                to 9116733 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9118422 ,
+                to 9118645 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9120618 ,
+                to 9120798 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9121208 ,
+                to 9121282 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9121563 ,
+                to 9121719 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9123106 ,
+                to 9123193 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9123501 ,
+                to 9123677 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9123956 ,
+                to 9124039 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9133062 ,
+                to 9133113 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9133764 ,
+                to 9133885 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9134218 ,
+                to 9134344 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9135063 ,
+                to 9135291 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9137327 ,
+                to 9137441 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9138835 ,
+                to 9138946 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9139401 ,
+                to 9139562 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9142469 ,
+                to 9142618 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9143243 ,
+                to 9143385 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9145006 ,
+                to 9145069 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9145309 ,
+                to 9145536 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9148101 ,
+                to 9148262 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9150098 ,
+                to 9150207 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9150353 ,
+                to 9150467 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9151386 ,
+                to 9151506 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9153183 ,
+                to 9153267 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9153729 ,
+                to 9153897 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9154176 ,
+                to 9154196 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9156021 ,
+                to 9156073 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9156239 ,
+                to 9156398 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9157222 ,
+                to 9157405 ,
+                strand minus ,
+                id
+                  gi 51511728 } ,
+              int {
+                from 9159626 ,
+                to 9159755 ,
+                strand minus ,
+                id
+                  gi 51511728 } } } ,
+          seqs {
+            whole
+              gi 6226959 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              label "precursor" ,
+              accession "NP_000005" ,
+              version 1 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 9111685 ,
+                    to 9111701 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9112045 ,
+                    to 9112086 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9112602 ,
+                    to 9112704 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9113607 ,
+                    to 9113675 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9114350 ,
+                    to 9114440 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9116221 ,
+                    to 9116348 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9116515 ,
+                    to 9116733 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9118422 ,
+                    to 9118645 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9120618 ,
+                    to 9120798 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9121208 ,
+                    to 9121282 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9121563 ,
+                    to 9121719 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9123106 ,
+                    to 9123193 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9123501 ,
+                    to 9123677 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9123956 ,
+                    to 9124039 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9133062 ,
+                    to 9133113 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9133764 ,
+                    to 9133885 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9134218 ,
+                    to 9134344 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9135063 ,
+                    to 9135291 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9137327 ,
+                    to 9137441 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9138835 ,
+                    to 9138946 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9139401 ,
+                    to 9139562 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9142469 ,
+                    to 9142618 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9143243 ,
+                    to 9143385 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9145006 ,
+                    to 9145069 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9145309 ,
+                    to 9145536 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9148101 ,
+                    to 9148262 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9150098 ,
+                    to 9150207 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9150353 ,
+                    to 9150467 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9151386 ,
+                    to 9151506 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9153183 ,
+                    to 9153267 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9153729 ,
+                    to 9153897 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9154176 ,
+                    to 9154196 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9156021 ,
+                    to 9156073 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9156239 ,
+                    to 9156398 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9157222 ,
+                    to 9157405 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } ,
+                  {
+                    from 9159626 ,
+                    to 9159711 ,
+                    strand minus ,
+                    id
+                      gi 51511728 } } } ,
+              seqs {
+                whole
+                  gi 4557225 } } } } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_009714" ,
+      version 16 ,
+      seqs {
+        int {
+          from 1979283 ,
+          to 2027462 ,
+          strand minus ,
+          id
+            gi 37543832 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_000014" ,
+          version 3 ,
+          genomic-coords {
+            mix {
+              int {
+                from 1979283 ,
+                to 1979408 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1979752 ,
+                to 1979793 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1980309 ,
+                to 1980411 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1981314 ,
+                to 1981382 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1982057 ,
+                to 1982147 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1983928 ,
+                to 1984055 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1984222 ,
+                to 1984440 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1986129 ,
+                to 1986352 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1988325 ,
+                to 1988505 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1988915 ,
+                to 1988989 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1989270 ,
+                to 1989426 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1990813 ,
+                to 1990900 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1991208 ,
+                to 1991384 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 1991663 ,
+                to 1991746 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2000769 ,
+                to 2000820 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2001471 ,
+                to 2001592 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2001925 ,
+                to 2002051 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2002770 ,
+                to 2002998 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2005034 ,
+                to 2005148 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2006542 ,
+                to 2006653 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2007108 ,
+                to 2007269 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2010176 ,
+                to 2010325 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2010950 ,
+                to 2011092 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2012713 ,
+                to 2012776 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2013016 ,
+                to 2013243 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2015808 ,
+                to 2015969 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2017805 ,
+                to 2017914 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2018060 ,
+                to 2018174 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2019093 ,
+                to 2019213 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2020890 ,
+                to 2020974 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2021436 ,
+                to 2021604 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2021883 ,
+                to 2021903 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2023728 ,
+                to 2023780 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2023946 ,
+                to 2024105 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2024929 ,
+                to 2025112 ,
+                strand minus ,
+                id
+                  gi 37543832 } ,
+              int {
+                from 2027333 ,
+                to 2027462 ,
+                strand minus ,
+                id
+                  gi 37543832 } } } ,
+          seqs {
+            whole
+              gi 6226959 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              label "precursor" ,
+              accession "NP_000005" ,
+              version 1 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 1979392 ,
+                    to 1979408 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1979752 ,
+                    to 1979793 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1980309 ,
+                    to 1980411 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1981314 ,
+                    to 1981382 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1982057 ,
+                    to 1982147 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1983928 ,
+                    to 1984055 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1984222 ,
+                    to 1984440 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1986129 ,
+                    to 1986352 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1988325 ,
+                    to 1988505 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1988915 ,
+                    to 1988989 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1989270 ,
+                    to 1989426 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1990813 ,
+                    to 1990900 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1991208 ,
+                    to 1991384 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 1991663 ,
+                    to 1991746 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2000769 ,
+                    to 2000820 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2001471 ,
+                    to 2001592 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2001925 ,
+                    to 2002051 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2002770 ,
+                    to 2002998 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2005034 ,
+                    to 2005148 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2006542 ,
+                    to 2006653 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2007108 ,
+                    to 2007269 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2010176 ,
+                    to 2010325 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2010950 ,
+                    to 2011092 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2012713 ,
+                    to 2012776 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2013016 ,
+                    to 2013243 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2015808 ,
+                    to 2015969 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2017805 ,
+                    to 2017914 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2018060 ,
+                    to 2018174 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2019093 ,
+                    to 2019213 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2020890 ,
+                    to 2020974 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2021436 ,
+                    to 2021604 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2021883 ,
+                    to 2021903 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2023728 ,
+                    to 2023780 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2023946 ,
+                    to 2024105 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2024929 ,
+                    to 2025112 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } ,
+                  {
+                    from 2027333 ,
+                    to 2027418 ,
+                    strand minus ,
+                    id
+                      gi 37543832 } } } ,
+              seqs {
+                whole
+                  gi 4557225 } } } } } } ,
+    {
+      type genomic ,
+      heading "Reference" ,
+      accession "NT_086792" ,
+      version 1 ,
+      seqs {
+        int {
+          from 4173171 ,
+          to 4221277 ,
+          strand minus ,
+          id
+            gi 51471135 } } ,
+      products {
+        {
+          type mRNA ,
+          heading "Reference" ,
+          accession "NM_000014" ,
+          version 3 ,
+          genomic-coords {
+            mix {
+              int {
+                from 4173171 ,
+                to 4173296 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4173640 ,
+                to 4173681 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4174197 ,
+                to 4174299 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4175201 ,
+                to 4175269 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4175944 ,
+                to 4176034 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4177816 ,
+                to 4177943 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4178110 ,
+                to 4178328 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4180017 ,
+                to 4180240 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4182213 ,
+                to 4182393 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4182803 ,
+                to 4182877 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4183158 ,
+                to 4183314 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4184702 ,
+                to 4184789 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4185097 ,
+                to 4185273 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4185552 ,
+                to 4185635 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4194661 ,
+                to 4194712 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4195363 ,
+                to 4195484 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4195817 ,
+                to 4195943 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4196662 ,
+                to 4196890 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4198926 ,
+                to 4199040 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4200364 ,
+                to 4200475 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4200930 ,
+                to 4201091 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4203997 ,
+                to 4204146 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4204771 ,
+                to 4204913 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4206534 ,
+                to 4206597 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4206837 ,
+                to 4207064 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4209629 ,
+                to 4209790 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4211627 ,
+                to 4211736 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4211882 ,
+                to 4211996 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4212916 ,
+                to 4213036 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4214705 ,
+                to 4214789 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4215251 ,
+                to 4215419 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4215698 ,
+                to 4215718 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4217543 ,
+                to 4217595 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4217761 ,
+                to 4217920 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4218744 ,
+                to 4218927 ,
+                strand minus ,
+                id
+                  gi 51471135 } ,
+              int {
+                from 4221148 ,
+                to 4221277 ,
+                strand minus ,
+                id
+                  gi 51471135 } } } ,
+          seqs {
+            whole
+              gi 6226959 } ,
+          products {
+            {
+              type peptide ,
+              heading "Reference" ,
+              label "precursor" ,
+              accession "NP_000005" ,
+              version 1 ,
+              genomic-coords {
+                packed-int {
+                  {
+                    from 4173280 ,
+                    to 4173296 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4173640 ,
+                    to 4173681 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4174197 ,
+                    to 4174299 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4175201 ,
+                    to 4175269 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4175944 ,
+                    to 4176034 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4177816 ,
+                    to 4177943 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4178110 ,
+                    to 4178328 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4180017 ,
+                    to 4180240 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4182213 ,
+                    to 4182393 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4182803 ,
+                    to 4182877 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4183158 ,
+                    to 4183314 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4184702 ,
+                    to 4184789 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4185097 ,
+                    to 4185273 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4185552 ,
+                    to 4185635 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4194661 ,
+                    to 4194712 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4195363 ,
+                    to 4195484 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4195817 ,
+                    to 4195943 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4196662 ,
+                    to 4196890 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4198926 ,
+                    to 4199040 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4200364 ,
+                    to 4200475 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4200930 ,
+                    to 4201091 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4203997 ,
+                    to 4204146 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4204771 ,
+                    to 4204913 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4206534 ,
+                    to 4206597 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4206837 ,
+                    to 4207064 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4209629 ,
+                    to 4209790 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4211627 ,
+                    to 4211736 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4211882 ,
+                    to 4211996 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4212916 ,
+                    to 4213036 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4214705 ,
+                    to 4214789 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4215251 ,
+                    to 4215419 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4215698 ,
+                    to 4215718 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4217543 ,
+                    to 4217595 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4217761 ,
+                    to 4217920 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4218744 ,
+                    to 4218927 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } ,
+                  {
+                    from 4221148 ,
+                    to 4221233 ,
+                    strand minus ,
+                    id
+                      gi 51471135 } } } ,
+              seqs {
+                whole
+                  gi 4557225 } } } } } } } ,
+  properties {
+    {
+      type comment ,
+      label "Nomenclature" ,
+      version 0 ,
+      source {
+        {
+          anchor "HUGO Gene Nomenclature Committee" } } ,
+      properties {
+        {
+          type property ,
+          label "Official Symbol" ,
+          text "A2M" ,
+          version 0 } ,
+        {
+          type property ,
+          label "Official Full Name" ,
+          text "alpha-2-macroglobulin" ,
+          version 0 } } } ,
+    {
+      type comment ,
+      heading "GeneOntology" ,
+      version 0 ,
+      source {
+        {
+          pre-text "Provided by" ,
+          anchor "GOA" ,
+          url "http://www.ebi.ac.uk/GOA/" } } ,
+      comment {
+        {
+          type comment ,
+          label "Function" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 11435418 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 19899 } ,
+                  anchor "enzyme binding" ,
+                  post-text "evidence: IPI" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 9714181 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 19966 } ,
+                  anchor "interleukin-1 binding" ,
+                  post-text "evidence: IDA" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 10880251 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 19959 } ,
+                  anchor "interleukin-8 binding" ,
+                  post-text "evidence: IPI" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 8320 } ,
+                  anchor "protein carrier activity" ,
+                  post-text "evidence: NR" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 4867 } ,
+                  anchor "serine-type endopeptidase inhibitor activity" ,
+                  post-text "evidence: IEA" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 9714181 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 43120 } ,
+                  anchor "tumor necrosis factor binding" ,
+                  post-text "evidence: IDA" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 17114 } ,
+                  anchor "wide-spectrum protease inhibitor activity" ,
+                  post-text "evidence: IEA" } } } } } ,
+        {
+          type comment ,
+          label "Process" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 6886 } ,
+                  anchor "intracellular protein transport" ,
+                  post-text "evidence: NR" } } } ,
+            {
+              type comment ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 51260 } ,
+                  anchor "protein homooligomerization" ,
+                  post-text "evidence: NAS" } } } } } ,
+        {
+          type comment ,
+          label "Component" ,
+          version 0 ,
+          comment {
+            {
+              type comment ,
+              version 0 ,
+              refs {
+                pmid 14718574 } ,
+              source {
+                {
+                  src {
+                    db "GO" ,
+                    tag
+                      id 5576 } ,
+                  anchor "extracellular region" ,
+                  post-text "evidence: NAS" } } } } } } } } ,
+  homology {
+    {
+      type comment ,
+      heading "Mouse, Rat" ,
+      version 0 ,
+      source {
+        {
+          src {
+            db "HomoloGene" ,
+            tag
+              id 37248 } ,
+          anchor "Map Viewer" ,
+          url "http://www.ncbi.nlm.nih.gov/mapview/maps.cgi?taxid=9606&chr=12&
+MAPS=genes-r-org/rat-chr/human%3A12,genes-r-org/mouse-chr/human%3A12,genes-r-o
+rg/human-chr12&query=e%3A2[id]+AND+gene[obj_type]&QSTR=a2m&cmd=focus&fill=10" } } } } ,
+  comments {
+    {
+      type comment ,
+      heading "LocusTagLink" ,
+      version 0 ,
+      source {
+        {
+          src {
+            db "HGNC" ,
+            tag
+              id 7 } } } } ,
+    {
+      type comment ,
+      heading "RefSeq Status" ,
+      label "REVIEWED" ,
+      version 0 } ,
+    {
+      type comment ,
+      version 0 ,
+      refs {
+        pmid 15511627 ,
+        pmid 15023809 ,
+        pmid 14760718 ,
+        pmid 14718574 ,
+        pmid 14715656 ,
+        pmid 14678766 ,
+        pmid 14675603 ,
+        pmid 14637088 ,
+        pmid 14506912 ,
+        pmid 12966032 ,
+        pmid 12755687 ,
+        pmid 12755614 ,
+        pmid 12631277 ,
+        pmid 12477932 ,
+        pmid 12221172 ,
+        pmid 12175343 ,
+        pmid 12062545 ,
+        pmid 12042276 ,
+        pmid 12015318 ,
+        pmid 11916201 ,
+        pmid 11910179 ,
+        pmid 11901360 ,
+        pmid 11823454 ,
+        pmid 11811950 ,
+        pmid 11435418 ,
+        pmid 11100124 ,
+        pmid 10880251 ,
+        pmid 9714181 ,
+        pmid 2581245 ,
+        pmid 2408344 ,
+        pmid 1707161 ,
+        pmid 1370808 ,
+        pmid 1281457 } } ,
+    {
+      type comment ,
+      heading "Phenotypes" ,
+      version 0 ,
+      comment {
+        {
+          type phenotype ,
+          text "Alzheimer disease, susceptibility to" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MIM" ,
+                tag
+                  id 103950 } ,
+              anchor "MIM: 103950" } } } ,
+        {
+          type phenotype ,
+          text "Emphysema due to alpha-2-macroglobulin deficiency" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MIM" ,
+                tag
+                  id 103950 } ,
+              anchor "MIM: 103950" } } } } } ,
+    {
+      type comment ,
+      heading "Markers (Sequence Tagged Sites/STS)" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 25036 } ,
+              anchor "RH1601" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "RH44109" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "stSG1293" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 40245 } ,
+              anchor "SGC31674" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "EST130345" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "RH52474" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "WI-219" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 46849 } ,
+              anchor "RH11157" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "RH44108" ,
+              version 0 } ,
+            {
+              type other ,
+              label "Alternate name" ,
+              text "stSG1290R" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 95143 } ,
+              anchor "G44356" ,
+              post-text "(e-PCR)" } } ,
+          comment {
+            {
+              type other ,
+              label "Alternate name" ,
+              text "WIAF-1430-STS" ,
+              version 0 } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 147540 } ,
+              anchor "NoName" ,
+              post-text "(e-PCR)" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UniSTS" ,
+                tag
+                  id 151442 } ,
+              anchor "NoName" ,
+              post-text "(e-PCR)" } } } } } ,
+    {
+      type comment ,
+      heading "NCBI Reference Sequences (RefSeq)" ,
+      version 0 ,
+      products {
+        {
+          type mRNA ,
+          heading "mRNA Sequence" ,
+          accession "NM_000014" ,
+          version 3 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 6226959 } ,
+              anchor "NM_000014" } } ,
+          seqs {
+            whole
+              gi 6226959 } ,
+          products {
+            {
+              type peptide ,
+              heading "Product" ,
+              accession "NP_000005" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 4557225 } ,
+                  anchor "NP_000005" ,
+                  post-text "alpha-2-macroglobulin precursor" } } ,
+              seqs {
+                whole
+                  gi 4557225 } ,
+              comment {
+                {
+                  type other ,
+                  heading "Conserved Domains" ,
+                  version 0 ,
+                  source {
+                    {
+                      src {
+                        db "PROT_CDD" ,
+                        tag
+                          id 4557225 } ,
+                      pre-text "(2)" ,
+                      anchor "summary" } } ,
+                  comment {
+                    {
+                      type other ,
+                      version 0 ,
+                      source {
+                        {
+                          src {
+                            db "CDD" ,
+                            tag
+                              id 5952 } ,
+                          anchor "pfam00207: A2M; Alpha-2-macroglobulin family" } } ,
+                      comment {
+                        {
+                          type other ,
+                          text "Location: 725 - 1463  Blast Score: 2329" ,
+                          version 0 } } } ,
+                    {
+                      type other ,
+                      version 0 ,
+                      source {
+                        {
+                          src {
+                            db "CDD" ,
+                            tag
+                              id 25832 } ,
+                          anchor "pfam01835: A2M_N; Alpha-2-macroglobulin
+ family N-terminal region" } } ,
+                      comment {
+                        {
+                          type other ,
+                          text "Location: 21 - 628  Blast Score: 1960" ,
+                          version 0 } } } } } } } } ,
+          comment {
+            {
+              type other ,
+              heading "Source Sequence" ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "Nucleotide" ,
+                    tag
+                      str "M11313" } ,
+                  anchor "M11313" } } ,
+              comment {
+                {
+                  type other ,
+                  version 0 } } } } } } } ,
+    {
+      type comment ,
+      heading "Related Sequences" ,
+      version 0 ,
+      products {
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "AF349032" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 13661813 } ,
+              anchor "AF349032" } } ,
+          seqs {
+            whole
+              gi 13661813 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAK38109" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 13661814 } ,
+                  anchor "AAK38109" } } ,
+              seqs {
+                whole
+                  gi 13661814 } } } } ,
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "AF349033" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 13661815 } ,
+              anchor "AF349033" } } ,
+          seqs {
+            whole
+              gi 13661815 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAK38110" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 13661816 } ,
+                  anchor "AAK38110" } } ,
+              seqs {
+                whole
+                  gi 13661816 } } } } ,
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "X68728" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 450521 } ,
+              anchor "X68728" } } ,
+          seqs {
+            whole
+              gi 450521 } ,
+          products {
+            {
+              type peptide ,
+              accession "CAA48670" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 825615 } ,
+                  anchor "CAA48670" } } ,
+              seqs {
+                whole
+                  gi 825615 } } } } ,
+        {
+          type genomic ,
+          heading "Genomic" ,
+          accession "Z11711" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 24760 } ,
+              anchor "Z11711" } } ,
+          seqs {
+            whole
+              gi 24760 } ,
+          products {
+            {
+              type peptide ,
+              accession "CAA77774" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 24761 } ,
+                  anchor "CAA77774" } } ,
+              seqs {
+                whole
+                  gi 24761 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AB209614" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 62088807 } ,
+              anchor "AB209614" } } ,
+          seqs {
+            whole
+              gi 62088807 } ,
+          products {
+            {
+              type peptide ,
+              accession "BAD92851" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 62088808 } ,
+                  anchor "BAD92851" } } ,
+              seqs {
+                whole
+                  gi 62088808 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AF109189" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 33337723 } ,
+              anchor "AF109189" } } ,
+          seqs {
+            whole
+              gi 33337723 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAQ13498" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 33337724 } ,
+                  anchor "AAQ13498" } } ,
+              seqs {
+                whole
+                  gi 33337724 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "AY591530" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 46812314 } ,
+              anchor "AY591530" } } ,
+          seqs {
+            whole
+              gi 46812314 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAT02228" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 46812315 } ,
+                  anchor "AAT02228" } } ,
+              seqs {
+                whole
+                  gi 46812315 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "BC026246" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 45708660 } ,
+              anchor "BC026246" } } ,
+          seqs {
+            whole
+              gi 45708660 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAH26246" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 45708661 } ,
+                  anchor "AAH26246" } } ,
+              seqs {
+                whole
+                  gi 45708661 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "BC040071" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 25303945 } ,
+              anchor "BC040071" } } ,
+          seqs {
+            whole
+              gi 25303945 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAH40071" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 25303946 } ,
+                  anchor "AAH40071" } } ,
+              seqs {
+                whole
+                  gi 25303946 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "BX647329" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 34366357 } ,
+              anchor "BX647329" } } ,
+          seqs {
+            whole
+              gi 34366357 } ,
+          products {
+            {
+              type peptide ,
+              text "None" ,
+              version 0 } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "CR749334" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 51476395 } ,
+              anchor "CR749334" } } ,
+          seqs {
+            whole
+              gi 51476395 } ,
+          products {
+            {
+              type peptide ,
+              accession "CAH18188" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 51476396 } ,
+                  anchor "CAH18188" } } ,
+              seqs {
+                whole
+                  gi 51476396 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "M11313" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 177869 } ,
+              anchor "M11313" } } ,
+          seqs {
+            whole
+              gi 177869 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAA51551" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 177870 } ,
+                  anchor "AAA51551" } } ,
+              seqs {
+                whole
+                  gi 177870 } } } } ,
+        {
+          type mRNA ,
+          heading "mRNA" ,
+          accession "M36501" ,
+          version 1 ,
+          source {
+            {
+              src {
+                db "Nucleotide" ,
+                tag
+                  id 177871 } ,
+              anchor "M36501" } } ,
+          seqs {
+            whole
+              gi 177871 } ,
+          products {
+            {
+              type peptide ,
+              accession "AAA51552" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 177872 } ,
+                  anchor "AAA51552" } } ,
+              seqs {
+                whole
+                  gi 177872 } } } } ,
+        {
+          type other ,
+          text "None" ,
+          version 0 ,
+          products {
+            {
+              type peptide ,
+              accession "P01023" ,
+              version 0 ,
+              source {
+                {
+                  src {
+                    db "Protein" ,
+                    tag
+                      id 112911 } ,
+                  anchor "P01023" } } ,
+              seqs {
+                whole
+                  gi 112911 } } } } } } ,
+    {
+      type comment ,
+      heading "Additional Links" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "Evidence Viewer" ,
+                tag
+                  str "2" } ,
+              anchor "Evidence Viewer" ,
+              url "http://www.ncbi.nlm.nih.gov/sutils/evv.cgi?taxid=9606&conti
+g=NT_009714.16&gene=A2M&lid=2&from=1979284&to=2027463" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "ModelMaker" ,
+                tag
+                  str "2" } ,
+              anchor "ModelMaker" ,
+              url "http://www.ncbi.nlm.nih.gov/mapview/modelmaker.cgi?taxid=96
+06&contig=NT_009714.16&gene=A2M&lid=2" } } } ,
+        {
+          type comment ,
+          text "UniGene" ,
+          version 0 ,
+          xtra-properties {
+            {
+              tag "UNIGENE" ,
+              value "Hs.212838" } } ,
+          source {
+            {
+              src {
+                db "UniGene" ,
+                tag
+                  str "Hs.212838" } ,
+              anchor "Hs.212838" ,
+              url "http://www.ncbi.nlm.nih.gov/UniGene/clust.cgi?ORG=Hs&CID=21
+2838" } } } ,
+        {
+          type comment ,
+          text "MIM" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MIM" ,
+                tag
+                  str "103950" } ,
+              anchor "103950" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "HomoloGene" ,
+                tag
+                  str "2" } ,
+              anchor "HomoloGene" ,
+              url "http://www.ncbi.nlm.nih.gov/HomoloGene/homolquery.cgi?TEXT=
+2[loc]&TAXID=9606" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "AceView" ,
+                tag
+                  id 2 } ,
+              anchor "AceView" ,
+              url "http://www.ncbi.nlm.nih.gov/IEB/Research/Acembly/av.cgi?c=l
+ocusid&org=9606&l=2" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "GDB" ,
+                tag
+                  str "GDB:119639" } } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "HGMD" ,
+                tag
+                  str "" } ,
+              url "http://www.uwcm.ac.uk/uwcm/mg/search/119639.html" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "Ensembl" ,
+                tag
+                  str "" } ,
+              url "http://www.ensembl.org/Homo_sapiens/contigview?geneid=CR749
+334" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "UCSC" ,
+                tag
+                  str "" } ,
+              url "http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&position=
+CR749334" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "KEGG" ,
+                tag
+                  str "" } ,
+              url "http://www.genome.ad.jp/dbget-bin/www_bget?hsa:2" } } } ,
+        {
+          type comment ,
+          text "PharmGKB" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "PharmGKB" ,
+                tag
+                  str "PA24357" } ,
+              anchor "PA24357" } } } ,
+        {
+          type comment ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "MGC" ,
+                tag
+                  str "BC040071" } ,
+              anchor "MGC" ,
+              url "http://mgc.nci.nih.gov/Genes/CloneList?ORG=Hs&LIST=BC040071" } } } } } ,
+    {
+      type comment ,
+      heading "Pathways" ,
+      version 0 ,
+      comment {
+        {
+          type comment ,
+          text "KEGG pathway: Alzheimer's disease" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "05010" ,
+                tag
+                  str "05010" } ,
+              anchor "05010" ,
+              url "http://www.genome.jp/dbget-bin/show_pathway?hsa05010+2" } } } ,
+        {
+          type comment ,
+          text "KEGG pathway: Coagulation cascade" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "04610" ,
+                tag
+                  str "04610" } ,
+              anchor "04610" ,
+              url "http://www.genome.jp/dbget-bin/show_pathway?hsa04610+2" } } } ,
+        {
+          type comment ,
+          text "KEGG pathway: Complement and coagulation cascades" ,
+          version 0 ,
+          source {
+            {
+              src {
+                db "04610" ,
+                tag
+                  str "04610" } ,
+              anchor "04610" ,
+              url "http://www.genome.jp/dbget-bin/show_pathway?hsa04610+2" } } } ,
+        {
+          type comment ,
+          text "Reactome: Hemostasis" ,
+          version 0 ,
+          source {
+            {
+              anchor "49292" ,
+              url "http://www.reactome.org/cgi-bin/link?SOURCE=UniProt&ID=P010
+23" } } } } } ,
+    {
+      type generif ,
+      text "an important involvement of alpha2M in regulation of increased
+ proteolytic activity occurring in multiple sclerosis disease" ,
+      version 0 ,
+      refs {
+        pmid 15511627 } ,
+      create-date
+        str "Dec 18 2004 10:01AM" ,
+      update-date
+        str "Dec 18 2004  1:19PM" } ,
+    {
+      type generif ,
+      text "alpha2-macroglobulin inhibits human pepsin and gastricsin" ,
+      version 0 ,
+      refs {
+        pmid 14506912 } ,
+      create-date
+        str "Oct  7 2003 12:00AM" ,
+      update-date
+        str "Jul  7 2004  1:36PM" } ,
+    {
+      type generif ,
+      text "There is a significant genetic association of the 5 bp deletion
+ and two novel polymorphisms in alpha-2-macroglobulin alpha-2-macroglobulin
+ precursor with AD" ,
+      version 0 ,
+      refs {
+        pmid 12966032 } ,
+      create-date
+        str "Jun 27 2004  5:41PM" ,
+      update-date
+        str "Jun 27 2004  6:18PM" } ,
+    {
+      type generif ,
+      text "Alpha2-macroglobulin is a substrate and an endogenous inhibitor
+ for ADAMTS-4 and ADAMTS-5" ,
+      version 0 ,
+      refs {
+        pmid 14715656 } ,
+      create-date
+        str "Jun 14 2004  4:41PM" ,
+      update-date
+        str "Jun 14 2004  5:44PM" } ,
+    {
+      type generif ,
+      text "A2M-D allele played a weak Alzheimer disease protective role, and
+ APOE-E4 and A2M-G alleles might act synergistically in Alzheimer disease risk
+ for mainland Han Chinese." ,
+      version 0 ,
+      refs {
+        pmid 14675603 } ,
+      create-date
+        str "Feb 17 2004 12:00AM" ,
+      update-date
+        str "Apr 13 2004  1:35PM" } ,
+    {
+      type generif ,
+      text "Plasma from patients homozygous for the intronic deletion (DD)
+ showed normal alpha(2)M subunit size, conformation, and proteinase inhibitory
+ activity. Plasma alpha(2)M from two DD patients showed markedly increased
+ TGF-beta1 binding." ,
+      version 0 ,
+      refs {
+        pmid 14678766 } ,
+      create-date
+        str "Jan 20 2004 12:00AM" ,
+      update-date
+        str "Mar  7 2004  7:01AM" } ,
+    {
+      type generif ,
+      text "The presence of MPO-G/G and A2M-Val/Val genotypes synergistically
+ increased the risk of AD (OR, 25.5; 95% CI, 4.65-139.75)." ,
+      version 0 ,
+      refs {
+        pmid 15023809 } ,
+      create-date
+        str "Mar 25 2004 12:00AM" ,
+      update-date
+        str "Apr 18 2004  7:02AM" } ,
+    {
+      type generif ,
+      text "alpha2-M deletion polymorphism is probably not associated with
+ functional deficiencies important in Alzheimer's disease pathology" ,
+      version 0 ,
+      refs {
+        pmid 14637088 } ,
+      create-date
+        str "Dec 31 2003 12:00AM" ,
+      update-date
+        str "Jan 11 2004  7:02AM" } ,
+    {
+      type generif ,
+      text "FGF-2 and this protein interact at specific binding sites,
+ involving different FGF-2 sequences." ,
+      version 0 ,
+      refs {
+        pmid 12755687 } ,
+      create-date
+        str "Sep  7 2003 12:00AM" ,
+      update-date
+        str "Sep 28 2003  7:01AM" } ,
+    {
+      type generif ,
+      text "alpha(2)M-derived peptides target the receptor-binding sequence in
+ TGF-beta" ,
+      version 0 ,
+      refs {
+        pmid 12755614 } ,
+      create-date
+        str "Jun 25 2003 12:00AM" ,
+      update-date
+        str "Jul  6 2003  7:01AM" } ,
+    {
+      type generif ,
+      text "These results suggest the possible involvement of cathepsin E in
+ disruption of the structural and functional integrity of alpha
+ 2-macroglobulin in the endolysosome system." ,
+      version 0 ,
+      refs {
+        pmid 12631277 } ,
+      create-date
+        str "May  8 2003 12:00AM" ,
+      update-date
+        str "May 11 2003  7:01AM" } ,
+    {
+      type generif ,
+      text "Alpha 2-macroglobulin enhances prothrombin activation and thrombin
+ potential by inhibiting the anticoagulant protein C/protein S system in cord
+ and adult plasma." ,
+      version 0 ,
+      refs {
+        pmid 12062545 } ,
+      create-date
+        str "Feb  6 2003 12:00AM" ,
+      update-date
+        str "Aug 17 2003  7:01AM" } ,
+    {
+      type generif ,
+      text "relationship between serum VEGF levels, alpha(2)M levels and the
+ development of OHSS in hyperstimulated subjects undergoing IVF" ,
+      version 0 ,
+      refs {
+        pmid 12042276 } ,
+      create-date
+        str "Dec 16 2002 12:00AM" ,
+      update-date
+        str "Feb  2 2003  7:00AM" } ,
+    {
+      type generif ,
+      text "Genetic association of alpha2-macroglobulin polymorphisms with
+ Alzheimer's disease" ,
+      version 0 ,
+      refs {
+        pmid 12221172 } ,
+      create-date
+        str "Sep 27 2002 12:00AM" ,
+      update-date
+        str "Oct  7 2002  8:10AM" } ,
+    {
+      type generif ,
+      text "Genetic association of argyrophilic grain disease with
+ polymorphisms in alpha-2 macroglobulin." ,
+      version 0 ,
+      refs {
+        pmid 12175343 } ,
+      create-date
+        str "Sep 24 2002 12:00AM" ,
+      update-date
+        str "Oct  7 2002  8:10AM" } ,
+    {
+      type generif ,
+      text "The three-dimensional structure of the dimer reveals its
+ structural organization in the tetrameric native and chymotrypsin alpha
+ 2-macroglobulin complexes." ,
+      version 0 ,
+      refs {
+        pmid 12015318 } ,
+      create-date
+        str "Sep  5 2002 12:00AM" ,
+      update-date
+        str "Sep 23 2002  6:27AM" } ,
+    {
+      type generif ,
+      text "has an important role in the AD-specific neurodegenerative process
+ but its exon 24 Val-1000-Ile polymorphism is not likely to be associated with
+ late-onset sporadic AD in the Hungarian population" ,
+      version 0 ,
+      refs {
+        pmid 11901360 } ,
+      create-date
+        str "Aug  6 2002 12:00AM" ,
+      update-date
+        str "Aug 28 2002  6:15PM" } ,
+    {
+      type generif ,
+      text "REVIEW: binds and neutralizes alfimeprase, which has direct
+ proteolytic activity against the fibrinogen Aalpha chain" ,
+      version 0 ,
+      refs {
+        pmid 11910179 } ,
+      create-date
+        str "Jun 12 2002 12:00AM" ,
+      update-date
+        str "Sep  7 2003  7:01AM" } ,
+    {
+      type generif ,
+      text "distinct binding sites mediate interaction with beta-amyloid
+ peptide and growth factors" ,
+      version 0 ,
+      refs {
+        pmid 11823454 } ,
+      create-date
+        str "May  4 2002 12:00AM" ,
+      update-date
+        str "May 18 2002  6:08AM" } ,
+    {
+      type generif ,
+      text "Differential binding to ldl receptor related protein" ,
+      version 0 ,
+      refs {
+        pmid 11811950 } ,
+      create-date
+        str "Feb 14 2002 12:00AM" ,
+      update-date
+        str "Mar  4 2002  7:46AM" } ,
+    {
+      type generif ,
+      heading "HIV-1 protein interactions" ,
+      version 0 ,
+      comment {
+        {
+          type generif ,
+          text "Binding of HIV-1 Tat to LRP inhibits neuronal binding, uptake
+ and degradation of physiological ligands for LRP, including
+ alpha2-macroglobulin, apolipoprotein E4, amyloid precursor and amyloid
+ beta-protein" ,
+          version 0 ,
+          refs {
+            pmid 11100124 } ,
+          comment {
+            {
+              type comment ,
+              label "Tat" ,
+              accession "NP_057853" ,
+              version 1 ,
+              source {
+                {
+                  src {
+                    db "GeneID" ,
+                    tag
+                      id 155871 } } } } ,
+            {
+              type comment ,
+              accession "NP_000005" ,
+              version 1 } } ,
+          create-date
+            str "May 11 2004 12:48PM" ,
+          update-date
+            str "May 11 2004  1:10PM" } } } } ,
+  unique-keys {
+    {
+      db "LocusID" ,
+      tag
+        id 2 } ,
+    {
+      db "MIM" ,
+      tag
+        id 103950 } } ,
+  xtra-index-terms {
+    "LOC2" } ,
+  xtra-properties {
+    {
+      tag "PROP" ,
+      value "phenotype" } } }

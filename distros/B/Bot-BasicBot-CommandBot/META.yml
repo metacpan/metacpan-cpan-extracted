@@ -1,0 +1,18 @@
+---
+abstract: 'you can declare them all on the same package.'
+author:
+  - 'Altreus <altreus@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-BasicBot-CommandBot
+requires:
+  Bot::BasicBot: '0'
+  Tie::RegexpHash: '0'
+version: '0.05'

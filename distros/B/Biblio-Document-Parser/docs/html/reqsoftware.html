@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ParaTools 1.00 Documentation - Required Software</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ParaTools 1.00 Documentation - Required Software</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#what_software_does_biblio__document__parser_need">What software does Biblio::Document::Parser need?</a></li>
+	<ul>
+
+		<li><a href="#perl_modules">Perl Modules</a></li>
+		<li><a href="#installing_perl_modules">Installing Perl Modules</a></li>
+		<li><a href="#document_converters">Document Converters</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="what_software_does_biblio__document__parser_need">What software does Biblio::Document::Parser need?</a></h1>
+<p>
+</p>
+<h2><a name="perl_modules">Perl Modules</a></h2>
+<p>The ParaTools::Utils module provides functions to retrieve and convert files both on the Internet and on a local file-system. The former requires a few extra Perl modules to function:</p>
+<dl>
+<dt><strong><a name="item_lwp_3a_3asimple_and_lwp_3a_3auseragent"><strong>LWP::Simple</strong> and <strong>LWP::UserAgent</strong></a></strong><br />
+</dt>
+<dd>
+These are Perl modules that provide an interface to the World Wide Web, and are used by the ParaTools Document::Parser to retrieve documents from the Internet.
+</dd>
+<p></p>
+<dt><strong><a name="item_file_3a_3atemp"><strong>File::Temp</strong></a></strong><br />
+</dt>
+<dd>
+This module handles temporary files across multiple platforms.
+</dd>
+<p></p></dl>
+<p>There are also some dependencies for the above modules, including MIME::Base64, HTML::TagSet, and Digest::MD5.</p>
+<p>All of the above are available at <a href="http://paracite.eprints.org/files/perlmods/.">http://paracite.eprints.org/files/perlmods/.</a> Although these are not guaranteed to be the most recent versions, they are the versions that ParaTools has been tested with. For the most recent releases, the Perl modules can also be found at <a href="http://www.cpan.org.">http://www.cpan.org.</a></p>
+<p>
+</p>
+<h2><a name="installing_perl_modules">Installing Perl Modules</a></h2>
+<p>This describes the way to install a simple perl module, some require a bit more effort. We will use the non-existent FOO module as an example.</p>
+<dl>
+<dt><strong><a name="item_unpack_the_archive_3a">Unpack the archive:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % gunzip FOO-5.23.tar.gz
+ % tar xf FOO-5.23.tar</pre>
+</dd>
+<dt><strong><a name="item_enter_the_directory_this_creates_3a">Enter the directory this creates:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % cd FOO-5.23</pre>
+</dd>
+<dt><strong><a name="item_run_the_following_commands_3a">Run the following commands:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % perl Build.PL
+ % ./Build
+ % ./Build test
+ % ./Build install</pre>
+</dd>
+</dl>
+<p>
+</p>
+<h2><a name="document_converters">Document Converters</a></h2>
+<p>These programs are used by the Biblio::Document::Parser::Utils module to convert documents to ASCII from other formats. If you would like to add other formats, see the
+HOWTO later in this manual.</p>
+<dl>
+<dt><strong><a name="item_wvtext"><strong>wvText</strong></a></strong><br />
+</dt>
+<dd>
+This is part of the wvWare package, and provides a command to convert Word documents into ASCII, as well as into other formats.
+</dd>
+<dd>
+<p>wvWare is available from: <a href="http://www.wvware.com/wvWare.html">http://www.wvware.com/wvWare.html</a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pdftotext"><strong>pdftotext</strong></a></strong><br />
+</dt>
+<dd>
+This is provided with xpdf, and can convert PDF to ASCII.
+</dd>
+<dd>
+<p>Xpdf is available from: <a href="http://www.foolabs.com/xpdf/download.html">http://www.foolabs.com/xpdf/download.html</a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pstotext"><strong>pstotext</strong></a></strong><br />
+</dt>
+<dd>
+pstotext is a program that works with GhostScript to convert PS and PDF files to ASCII.
+</dd>
+<dd>
+<p>pstotext is available from: <a href="http://www.research.compaq.com/SRC/virtualpaper/pstotext.html">http://www.research.compaq.com/SRC/virtualpaper/pstotext.html</a></p>
+</dd>
+<dd>
+<p>GhostScript is available from: <a href="http://www.cs.wisc.edu/~ghost/">http://www.cs.wisc.edu/~ghost/</a></p>
+</dd>
+<p></p>
+<dt><strong><a name="item_links"><strong>links</strong></a></strong><br />
+</dt>
+<dd>
+Links is an excellent ASCII web browser that can display complex pages with tables and frames. It also has a very effective ASCII dump option, which ParaTools::Utils uses to convert HTML to ASCII.
+</dd>
+<dd>
+<p>Links is available from: <a href="http://artax.karlin.mff.cuni.cz/~mikulas/links/">http://artax.karlin.mff.cuni.cz/~mikulas/links/</a></p>
+</dd>
+<p></p></dl>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ParaTools 1.00 Documentation - Required Software</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+Revision history for Perl extension Business::US_Amort
+                                        Time-stamp: "2004-12-29 19:57:33 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+	* Release 0.09 -- just rebundling, no code changes.
+	
+2002-08-17  Sean M. Burke  sburke@cpan.org
+	* Release 0.08 -- bugfix version
+	* Just a syntax tweak. No new features.
+	
+2000-05-14  Sean M. Burke  sburke@cpan.org
+	* Release 0.07 -- noting my new email address.
+	* Allows computing 0-interest loans now.
+
+1999-10-29  Sean M. Burke  sburke@netadventure.net
+	* Release 0.05 -- second release version.
+	* Fixed typo that made Business::US_Amort::simple
+	in list context die.
+	
+1999-03-05  Sean M. Burke  sburke@netadventure.net
+
+	* Release 0.04 -- first release version.
+

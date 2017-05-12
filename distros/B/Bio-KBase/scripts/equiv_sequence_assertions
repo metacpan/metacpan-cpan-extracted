@@ -1,0 +1,162 @@
+#!perl
+use strict;
+use Data::Dumper;
+use Carp;
+
+#
+# This is a SAS Component
+#
+
+=head1 equiv_sequence_assertions
+
+
+Different groups have made assertions of function for numerous protein sequences.
+The equiv_sequence_assertions allows the user to gather function assertions from
+all of the sources.  Each assertion includes a field indicating whether the person making
+the assertion viewed themself as an "expert".  The routine gathers assertions for all
+proteins having identical protein sequence.
+
+
+Example:
+
+    equiv_sequence_assertions [arguments] < input > output
+
+The standard input should be a tab-separated table (i.e., each line
+is a tab-separated set of fields).  Normally, the last field in each
+line would contain a protein identifier (i.e., an md5 value). 
+If another column contains the md5s
+use
+
+    -c N
+
+where N is the column (from 1) that contains the protein identifiers.
+
+This is a pipe command. The input is taken from the standard input, and the
+output is to the standard output.
+
+=head2 Documentation for underlying call
+
+This script is a wrapper for the CDMI-API call equiv_sequence_assertions. It is documented as follows:
+
+  $return = $obj->equiv_sequence_assertions($proteins)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$proteins is a proteins
+$return is a reference to a hash where the key is a protein and the value is a function_assertions
+proteins is a reference to a list where each element is a protein
+protein is a string
+function_assertions is a reference to a list where each element is a function_assertion
+function_assertion is a reference to a list containing 4 items:
+	0: an id
+	1: a function
+	2: a source
+	3: an expert
+id is a string
+function is a string
+source is a string
+expert is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$proteins is a proteins
+$return is a reference to a hash where the key is a protein and the value is a function_assertions
+proteins is a reference to a list where each element is a protein
+protein is a string
+function_assertions is a reference to a list where each element is a function_assertion
+function_assertion is a reference to a list containing 4 items:
+	0: an id
+	1: a function
+	2: a source
+	3: an expert
+id is a string
+function is a string
+source is a string
+expert is a string
+
+
+=end text
+
+=back
+
+=head2 Command-Line Options
+
+=over 4
+
+=item -c Column
+
+This is used only if the column containing the md5s is not the last column.
+
+=item -i InputFile    [ use InputFile, rather than stdin ]
+
+=back
+
+=head2 Output Format
+
+The standard output is a tab-delimited file. It consists of the input
+file with extra columns added (identifier,source,function,expert).
+
+Input lines that cannot be extended are written to stderr.
+
+=cut
+
+
+my $usage = "usage: equiv_sequence_assertions [-c column] < input > output";
+
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+
+my $column;
+
+my $input_file;
+
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+				      'i=s' => \$input_file);
+if (! $kbO) { print STDERR $usage; exit }
+
+my $ih;
+if ($input_file)
+{
+    open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+}
+else
+{
+    $ih = \*STDIN;
+}
+
+while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
+    my @h = map { $_->[0] } @tuples;
+    my $h = $kbO->equiv_sequence_assertions(\@h);
+    for my $tuple (@tuples) {
+        #
+        # Process output here and print.
+        #
+        my ($id, $line) = @$tuple;
+        my $v = $h->{$id};
+
+        if (! defined($v))
+        {
+            print STDERR $line,"\n";
+        }
+        elsif (ref($v) eq 'ARRAY')
+        {
+            foreach $_ (@$v)
+            {
+		print join("\t",($line,@$_)),"\n";
+            }
+        }
+        else
+        {
+            print "$line\t$v\n";
+        }
+    }
+}

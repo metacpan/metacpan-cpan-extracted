@@ -1,0 +1,38 @@
+---
+abstract: 'Consume the Twitter firehose and babble to Twitter with L<Hailo>'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 3.101400, CPAN::Meta::Converter version 2.101390'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-Twatterhose
+no_index:
+  directory:
+    - t
+requires:
+  Any::Moose: 0
+  Encode: 0
+  Hailo: 0
+  JSON: 0
+  Mouse: 0.50
+  MouseX::Getopt: 0.2601
+  MouseX::Types: 0.05
+  Net::Twitter::Lite: 0
+  Scalar::Util: 0
+  Sys::Prctl: 0
+  autodie: 0
+  namespace::clean: 0
+  open: 0
+  perl: 5.010
+resources:
+  Ratings: http://cpanratings.perl.org/d/Bot-Twatterhose
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bot-Twatterhose
+  homepage: http://search.cpan.org/dist/Bot-Twatterhose/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/avar/bot-twatterhose
+version: 0.04

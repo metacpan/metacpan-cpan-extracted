@@ -1,0 +1,16 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+DISCLAIMER
+README
+SCF.pm
+SCF.xs
+SCF/Arrays.pm
+eg/read_test_obj.pl
+eg/read_test_tied.pl
+eg/write_test_obj.pl
+eg/write_test_tied.pl
+t/scf.t
+test.scf
+META.yml                                 Module meta-data (added by MakeMaker)

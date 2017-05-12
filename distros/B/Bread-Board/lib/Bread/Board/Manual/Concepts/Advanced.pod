@@ -1,0 +1,227 @@
+# PODNAME: Bread::Board::Manual::Concepts::Advanced
+# ABSTRACT: An overview of some of the more advanced Bread::Board concepts
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bread::Board::Manual::Concepts::Advanced - An overview of some of the more advanced Bread::Board concepts
+
+=head1 VERSION
+
+version 0.34
+
+=head1 INTRODUCTION
+
+In the L<Bread::Board::Manual::Concepts> document we attempted to
+explain the conceptual foundations of Bread::Board. In that we exposed
+you to the idea of a container and a service and showed how they
+could be used. In that document we built a hierarchical container
+which organized different sets of services into what could be seen
+as subsystems within an overall application. While this alone has
+plenty of value, you might be asking yourself, what about re-use?
+Bread::Board already encourages decoupled object design by removing
+the need to manually wire your application components together, but
+what about re-using Bread::Board components themselves?
+
+This document will illustrate some of the more advanced concepts in
+Bread::Board with the specific focus on re-use and extension.
+
+=head1 ADVANCED CONCEPTS
+
+NOTE: This is just a quick sketch of these docs, more to come in the
+next few releases, for now I need to get this one out the door.
+
+=head2 Subclassing
+
+Bread::Board was built from the very start to be an open system and
+to allow for the subclassing of all its internal components.
+
+Here is a simple example of extending L<Bread::Board::Container> to
+build a container specific to your application.
+
+  package My::Application::Container;
+  use Moose;
+  use Bread::Board;
+
+  extends 'Bread::Board::Container';
+
+  has 'log_file_name' => (
+      is      => 'ro',
+      isa     => 'Str',
+      default => 'logfile.log',
+  );
+
+  sub BUILD {
+      my $self = shift;
+      container $self => as {
+
+          service 'log_file' => $self->log_file_name;
+
+          service 'logger' => (
+              class        => 'My::FileLogger',
+              lifecycle    => 'Singleton',
+              dependencies => {
+                  log_file => depends_on('log_file'),
+              }
+          );
+
+          service 'application' => (
+              class        => 'My::Application',
+              dependencies => {
+                  logger => depends_on('logger'),
+              }
+          );
+      };
+  }
+
+Then you can simply create an instance of the container
+and instantiate an instance of the application.
+
+  my $c = My::Application::Container->new(
+      name          => 'MyLoggingContainer',
+      log_file_name => 'other_logfile.log'
+  );
+
+  my $app = $c->resolve( service => 'application');
+
+It should be noted that when calling the constructor of a
+subclass of Bread::Board::Container, you must pass the "name"
+attribute as a parameter. Additionally you could use the
+C<+name> syntax in the subclass itself like so:
+
+  has '+name' => ( default => 'MyLoggingContainer' );
+
+which will remove the requirement in the constructor unless
+you choose to override it.
+
+It is also possible to extend/specialize a
+L<Bread::Board::Service> type to customize it for your
+needs.
+
+More to come later.
+
+=head2 Parameterized Containers
+
+Extending containers is just one form of re-use, just like
+extending a class in plain old OOP. But Bread::Board also
+provides another means of re-use, and that is parameterized
+containers.
+
+If you are familiar with functors in Standard ML or O'Caml
+then this might look familiar to you. A parameterized
+container is basically a container which expects another
+container (or containers) as an argument and produces a
+third container as the result.
+
+Lets take a simple example here of a Logger object which
+logs to a database.
+
+  my $db_logger = container 'DatabaseLogger' => [ 'DBConnInfo' ] => as {
+      service 'handle' => (
+          class        => 'My::Database::Logger',
+          dependencies => {
+              dsn      => depends_on('DBConnInfo/dsn'),
+              username => depends_on('DBConnInfo/username'),
+              password => depends_on('DBConnInfo/password'),
+          }
+      );
+  };
+
+It is parameterized with a C<DBConnInfo> container which has
+three services, a C<dsn>, a C<username> and a C<password>.
+Now let's create a simple container which fulfills these
+requirements.
+
+  my $db_conn_info = container 'DatabaseConnection' => as {
+      service 'dsn'      => 'dbi:mysql:foo';
+      service 'username' => 'bar';
+      service 'password' => '***';
+  };
+
+The above container fulfills the bare minimum, but this could have
+just as easily have been a much more complex container which
+also had a service for a L<DBIx::Class> schema, or a L<KiokuDB>
+directory object. As long as the container provided the
+three required services, that was all that the C<DatabaseLogger>
+parameterized container required.
+
+Now, a parameterized container is not a usable container, you
+must create an instance of it. That is as simple as calling the
+C<create> method, like so.
+
+  my $my_db_logger = $db_logger->create(
+      DBConnInfo => $db_conn_info
+  );
+
+After which you can use it just like any other Bread::Board
+container would be used.
+
+  my $log_handle = $my_db_logger->resolve(
+      service => 'handle'
+  );
+
+Parameterized containers can also be nested, here is an example
+of an Application container that expects a Logger.
+
+  my $app = container 'Application' => [ 'Logger' ] => as {
+      service 'app' => (
+          class        => 'My::Application',
+          dependencies => {
+              log_handle => depends_on('Logger/handle')
+          }
+      );
+  };
+
+And here we instantiate an instance of our Application container
+using the DatabaseLogger.
+
+  my $db_app = $app->create(
+      Logger => $db_logger->create(
+          DBConnInfo => $db_conn_info
+      )
+  );
+
+And of course, since the Logger is a parameter we could just as
+easily pass in a simpler screen logger for a test environment or
+something. Here is what that would look like.
+
+  my $simple_logger = container 'SimpleLogger' => as {
+      service 'handle' => (
+          class => 'My::Simple::Logger'
+      );
+  };
+
+  my $simple_app = $app->create(
+      Logger => $simple_logger
+  );
+
+Parameterized containers provide a useful and powerful means
+of re-use and abstraction, making it easy to create flexible
+containers to model your applications subsystems.
+
+=head1 AUTHOR
+
+Stevan Little <stevan@iinteractive.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/stevan/BreadBoard/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

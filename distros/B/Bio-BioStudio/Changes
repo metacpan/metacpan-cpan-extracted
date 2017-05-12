@@ -1,0 +1,20 @@
+Revision history for Bio::BioStudio
+
+1.06
+	Changed features to Bio::Root::Root descended objects
+	updated Exporter and Version information
+1.05 
+	Started moving soft objects over to hard objects
+	Revamped Diff system
+	Revamped RestrictionEnzyme system to reflect changes in Bio::GeneDesign
+	added objects for Chunks and Megachunks
+1.03
+	Added Bio::BioStudio::Cairo
+	minor bug fixes
+1.02
+	Minor changes for CPAN
+1.01	11.11.28
+	Fixed minor function import issues
+	Removed gene_color from GBrowse.pm for localization issues
+1.00	11.11.28
+        First version to CPAN and bitbucket

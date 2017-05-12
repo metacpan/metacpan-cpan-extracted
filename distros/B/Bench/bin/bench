@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+
+use 5.010;
+#use strict;
+use warnings;
+
+use Cwd qw(abs_path);
+use Getopt::Long;
+
+our $VERSION = '0.10'; # VERSION
+our $DATE = '2014-05-14'; # DATE
+
+# code to implement -m and -M options
+my $err;
+my $code_m = sub {
+    my $imp   = $_[0] eq 'm' ? ' ()' : '';
+    my $mod   = $_[1];
+    my $is_no = $mod =~ s/^-//;
+    if ($mod =~ /=/) {
+        $imp = '';
+        $mod =~ s!=(.*)! split(/,/,q{$1})!;
+    }
+    my $code = ($is_no ? "no " : "use ") . "$mod$imp;";
+    #say $code;
+    eval $code;
+    $err = $@ if $@;
+};
+
+my @codes;
+my %opts = (n=>100, help=>0);
+
+Getopt::Long::Configure('bundling', 'no_permute', 'no_ignore_case');
+GetOptions(
+    'I=s'     => sub {
+        eval "use lib q{$_[1]};";
+        $err = $@ if $@;
+    },
+    'm=s'     => sub { $code_m->(@_) },
+    'M=s'     => sub { $code_m->(@_) },
+    'e=s'     => sub { push @codes, $_[1] },
+    'h'       => \$opts{help},
+    'n=i'     => \$opts{n},
+    'b=s'     => sub {
+        eval $_[1];
+        $err = $@ if $@;
+    },
+    'v'     => sub {
+        say "bench version $main::VERSION";
+        exit 0;
+    },
+);
+die $err if $err;
+
+if (!@codes && !@ARGV || $help) {
+    print <<'_';
+bench - Benchmark running times of Perl code
+
+Usage:
+  bench [options] <perl-program> [program-args ...]
+  bench [options] <code> ...
+
+Options:
+  -n N (default: 100)
+             How many times (or how long in -N CPU secs, if N < 0) to run the
+             subs
+  -e <code>  Add subroutine code to bench (can also add via arguments)
+  -b <code>  Run code before benchmarking
+  -I <dir>   Prepend dir to @INC
+  -m <mod>
+  -M <mod>   Load module, like perl's -m/-M
+  -h         Show this help message and exit
+  -v         Show version and exit
+
+_
+  exit !$help;
+}
+
+if (!@codes && (-f $ARGV[0])) {
+    my $prog  = shift @ARGV;
+    my $aprog = abs_path($prog); # or die "can't abs_path($prog): $!\n";
+    say "Benchmarking $aprog ...";
+    require Bench; Bench->import;
+    do $aprog;
+} else {
+    push @codes, @ARGV;
+
+    my $name = "a";
+    my %subs;
+    for (@codes) { eval "\$subs{".($name++)."} = sub { $_ };" }
+    $name = "a";
+    say "Benchmarking ",
+        join(", ", map { $name++ . " => sub { $_ }" } @codes), " ...";
+    for (@codes) {
+        eval "push \@subs, sub { $_ };";
+        die $@ if $@;
+    }
+    require Bench;
+    Bench::bench(\%subs, {n=>$opts{n}});
+}
+
+1;
+# ABSTRACT: Benchmark running times of Perl code
+# PODNAME: bench
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bench - Benchmark running times of Perl code
+
+=head1 VERSION
+
+This document describes version 0.10 of bench (from Perl distribution Bench), released on 2014-05-14.
+
+=head1 SYNOPSIS
+
+ % bench -e 'some_code()'                    ; # -e is optional
+ Benchmarking sub { some_code() } ...
+ 26 calls (28.98/s), 0.897s (34.51ms/call)
+
+ % bench -MFoo::Bar 'code1()' 'code2()'      ; # multiple code
+ Benchmarking sub { code1() }, sub { code2() } ...
+ a: 26 calls (28.98/s), 0.897s (34.51ms/call)
+ b: 14 calls (15.37/s), 0.911s (65.07ms/call)
+ Fastest is a (1.886x b)
+
+ % bench prog.pl;                            ; # file is automatically detected
+ Benchmarking /abs/path/to/prog.pl ...
+ 0.0520s
+
+=head1 DESCRIPTION
+
+This script is a command-line interface for L<Bench>.
+
+For all available options, try C<bench -h>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Bench>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Bench>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bench>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

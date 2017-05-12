@@ -1,0 +1,22 @@
+Bundle/MyLibrary version 0.05
+=============================
+
+This is a bundle for installing dependencies for the Urchin RSS toolkit 
+For details see: http://urchin.sourceforge.net/
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Ed Summers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

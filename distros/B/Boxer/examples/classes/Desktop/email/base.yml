@@ -1,0 +1,8 @@
+classes:
+  - x11
+  - Desktop.base
+parameters:
+  doc:
+    desktop-email:
+      headline:
+        - Desktop email

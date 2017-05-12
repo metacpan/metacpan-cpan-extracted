@@ -1,0 +1,46 @@
+=head1 USE
+
+The C<authors> keyword controls what names appear in the AUTHOR POD sections
+at the bottom of Perl modules.  You can specify multiple authors by
+separating them with commas.  For each author, you may include an
+optional email address by using a pair instead of a single name:
+
+    authors `Phil Crow` => `crow.phil@gmail.com`, `Someone Else`;
+
+No email address will be shown unless you use a pair for the author.
+
+If you omit this keyword, you get the same default you would get from h2xs.
+That is, you get the name from the gcos field in /etc/passwd, or its moral
+equivalent for your system and a manufactured email address which is rarely
+correct.
+
+If you omit the copyright_holder keyword, the first person listed in authors
+will be the default copyright_holder.
+
+If you use kick start syntax like this:
+
+    bigtop -n AppName 'tbl1(col1,col2)->tbl2(cola)'
+
+no authors statement will be included, unless you have a file called
+C<.bigtopdef> in your home directory.  If you have that file, it must be
+a valid bigtop file in it, which may include an authors statement.
+
+=head1 THE EXAMPLE
+
+In the example, the above author statement is used.  When you build
+the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for Phil Crow in these files:
+
+ README
+ docs/kids.bigtop
+ lib/GENKids.pm
+ lib/Kids.pm
+ lib/Kids/Child.pm
+ lib/Kids/GENModel.pm
+ lib/Kids/Model.pm
+
+'Someone Else' appears in all of those except README, where Phil is listed
+solely because he is the default copyright holder.

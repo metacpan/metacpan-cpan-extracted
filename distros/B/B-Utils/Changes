@@ -1,0 +1,163 @@
+Revision history for Perl extension B::Utils.
+
+   - remove build/IFiles.pm from the shipped dist, as it is meant to be
+     auto-generated at install time (was added in 0.26)
+   - Support native B::OP::parent with 5.21.2 -DPERL_OP_PARENT (Reini Urban)
+   - fix t/utils/40walk.t with 5.6 (Reini Urban)
+   - Add $op->_parent method as fallback to our parent method since 5.21.2.
+
+0.26
+   - fix tests for perl 5.21.7 (change to nulled COPs) (RT#100508, Father
+     Chrysostomos)
+
+0.25
+   - Re-expose symbols by setting dl_load_flags. Hope this is ok for HP-UX
+
+0.24
+   - Export C symbols, breakage from 0.22
+
+0.23
+   - 5.10, 5.12, 5.14 compatibile syntax
+
+0.22
+   - resolve nameclashes with CORE, fix hpux and openbsd failures (Reini Urban)
+   - remove unneeded ExtUtils::CBuilder req (Reini Urban)
+   - do not use FUNCLIST on hpux (Reini Urban)
+   - Use FUNCLIST to declare exported symbols (Alexandr Ciornii)
+
+0.21
+   - Avoid undeclared dependency on Test::Exception introduced by 0.19
+
+0.19
+   - Fix typo in in walkallops_filtered function call
+
+0.16 Fri Jul 08 2011
+   - EU::Depends version. The CPAN built version specified only 0.301
+     but Windows computers needed 0.302 so their CPAN clients were
+     broken.
+
+0.15 Mon Apr 18 2011
+   - Try harder to add ExtUtils::Depends to META.yml's configure_requires
+
+0.14 Sat Mar 18 2011
+   - Predeclare carp and croak with proper signature
+   - Add ExtUtils::Depends to META.yml's configure_requires
+
+0.12 Mon Jan 24 2011
+   - EU::Depends version [RT #53415]
+   - Build with Dist::Zilla
+
+0.11 Tue Jan 12 2010
+   - Repackaged using environment variables COPYFILE_DISABLE=1 and COPYFILE_EXTENDED_ATTRIBUTES_DISABLE=1
+   - Silenced PROTOTYPES warning on compilation
+   - Update manifest
+
+0.10 Sun Dec 20 2009
+   - Fixed B::OP::siblings
+   - Updated docs
+
+0.09 Sun Dec 06 21:36:00 PDT 2009
+   - Add ExtUtils::CBuilder to prequisite list to hopefully quench any
+     bad builds attempted on perl-5.
+
+0.08 Tue Sep 01 08:29:00 PDT 2009
+    - Add xt/version.t to keep all our version #s in sync
+    - Regenerate README
+    - Add disabled Test::PPPort
+    - Move author tests to xt/
+    - declare dep on 5.6 for installation
+    - Add .gitignore
+    - compatibility layer in Makefile.PL (Alexandr Ciornii)
+    - use configure_requires, good error messages in case of missing modules (Alexandr Ciornii)
+    - correct prereqs (Alexandr Ciornii)
+    - use ppport.h for compatibility (Alexandr Ciornii)
+
+0.07 Tue Nov 11 23:05:.. PDT 2008
+    - Fixed a refactoring error in walkallops_simple. walkallops* was broken.
+    - Avoided base.pm because that library is kind of nasty
+    - b94bf3bd96bc73320ebcc2def55bdec0dbd28663
+
+0.06 ???
+    - Ask CLKAO
+
+0.05_09 Sat Apr 6 16:09:.. CEST 2008
+    - Allow for nested disjunctions in opgrep patterns.
+
+0.05_08 Sat Apr 5 22:58:.. CEST 2008
+    - I-am-a-muppet.
+    - Removed spurious use of Data::Compare.
+
+0.05_07 Tue Apr 4 18:15:.. CEST 2008
+    - opgrep() can now capture sub-ops so if you plan to
+      extract information from or modify a deeply nested
+      op-tree, you don't have to do the tree-walking
+      yourself.
+
+0.05_06 Tue Apr 3 18:15:.. CEST 2008
+    - Add the as_opgrep_pattern() method to B::OP for
+      dumping op trees as patterns for matching with opgrep.
+    - Add warnings.
+    - Documentation fixes.
+
+0.05_05 Tue Apr  1 18:15:.. CEST 2008
+    - Fix POD error and update README.
+
+0.05_04 Tue Apr  1 18:10:.. CEST 2008
+    - Fix bug in opgrep() alternations.
+    - Add the "kids" keyword to the opgrep syntax.
+    - Add the "dump" keyword to the opgrep syntax for debugging.
+    - Fixed the Change log (yes, this file) for the last
+      version since the comment on an opgrep() change was
+      incorrect.
+
+0.05_03 Sun Mar 30 11:13:.. CEST 2008
+    - Fix various bugs in opgrep(). Did that work in 0.05_02 at all?
+    - Introduce op_or() to match one of many possible conditions.
+    - Add a longer example to opgrep() documentation.
+    - Fix POD markup.
+    - Add a clear license statement to the docs.
+    - Use a string as version -- otherwise it might not be flagged
+      as a development release!
+
+0.05_02 Thu Dec  1 ..:..:.. ... 2005
+    - ->parent works for all tests now.
+    - Added more tests.
+
+0.05_01 Fri Oct 28 23:00:00 CST 2005
+    - Added tests. That's the focus of my work right now.
+    - opgrep() now acceps \@conditions
+      assertions may be code references
+    - Lots of changes to ->parent. This is in progress. It fails when
+      the parent of a node does not exist in the execution pathway of
+      a program. The unused null() ops rooting some conditionals, etc.
+
+      This function fails tests.
+    - Added a function recalc_sub_cache so anon_subs, all_starts, and
+      all_roots' cache of functions can be cleared.
+    - Added functions ->siblings, ->ancestors, ->descendants, and
+      _uniq_ops.
+    - 9c7916e3748382aed046612e3100d92d8127b0c2
+
+0.05 Thu Nov 25 22:23:00 CST 2004
+    - My birthday
+    - Fixed infinite loop in ->parent
+    - ea3df10542f446b1afb9fa98c0a4e49896deb3ca
+
+0.04 Thu May  2 21:56:03 BST 2002
+    - Various fixes to walkoptrees stuff.
+    - 9452f39d9b5968dacf85f6be8ba3c30e0d0d19af
+
+0.03  Wed Dec 12 22:20:07 GMT 2001
+    - Fix up bad showstopper bug in ->kids()
+    - Some patches from Schwern.
+
+0.02  Wed Aug 15 07:03:21 2001
+    - Fix up some horribly glaring bugs
+    - Add opgrep, walk*, croak and carp
+    - 3f02e781e732d610bed0f39e4654ce28bd651d02
+
+0.01  Mon Aug  6 22:07:26 2001
+    - original version; created by h2xs 1.21 with options
+        -XA -n B::Utils
+    - b94bf3bd96bc73320ebcc2def55bdec0dbd28663
+

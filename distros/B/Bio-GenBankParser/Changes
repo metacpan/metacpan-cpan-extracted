@@ -1,0 +1,26 @@
+Revision history for Bio-GenBankParser
+
+0.01    2008-01-23
+        First version released.
+
+0.02    2008-01-28
+        Fixed up Build.PL to try to avoid automated testing errors, added
+        docs, expanded example script a bit, allowed a RefSeq accession to 
+        be valid in the parser.
+
+0.03    2008-03-06
+        Added project line, fixed base summary.
+
+0.04    2008-06-20
+        Changed locus name, not necessarily a genbank accession. Handle
+        empty records, genbank division in LOCUS is now optional, added
+        ability to comment out a line using a leading "#," genbank
+        accession is now just /\w+/, sequence length can be "aa" or
+        "bp," take the first accession from ACCESSION and put the rest
+        into VERSION, added DBSOURCE, authors is optional in reference
+        and remarks can appear in two places(?!), finally fixed handling
+        of PUBMED (?), added "CONSRTM."  Keep remark undef to maintain
+        backward-compat.
+
+0.05    2010-06-22
+        Added CONTIG parser.  Fixed "ACCESSION" to parse multiple lines.

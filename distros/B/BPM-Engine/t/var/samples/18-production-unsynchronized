@@ -1,0 +1,120 @@
+        <WorkflowProcess Id="production-unsynchronized" Name="production-unsynchronized">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="test1_ok" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="test2_ok" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="run_test2" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'C'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Assemble" Name="Assemble">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Join1" Name="Join1">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Configure" Name="Configure">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>                
+                <Activity Id="Test1" Name="Test1">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Split1" Name="Split1">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split1-Test2"/>
+                                    <TransitionRef Id="Split1-Join1"/>
+                                    <TransitionRef Id="Split1-Join2"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Test2" Name="Test2">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="Split2" Name="Split2">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split2-Join2"/>
+                                    <TransitionRef Id="Split2-Join1"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Join2" Name="Join2">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Package" Name="Package">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-Assemble" From="Start" To="Assemble"/>
+                <Transition Id="Assemble-Join1" From="Assemble" To="Join1"/>
+                <Transition Id="Join1-Configure" From="Join1" To="Configure"/>
+                <Transition Id="Configure-Test1" From="Configure" To="Test1"/>
+                <Transition Id="Test1-Split1" From="Test1" To="Split1"/>
+                <Transition Id="Split1-Join1" From="Split1" To="Join1">
+                    <Condition Type="CONDITION">!attribute('test1_ok')</Condition>
+                </Transition>
+                <Transition Id="Split1-Test2" From="Split1" To="Test2">
+                    <Condition Type="CONDITION">attribute('run_test2')</Condition>
+                </Transition>
+                <Transition Id="Split1-Join2" From="Split1" To="Join2">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="Test2-Split2" From="Test2" To="Split2"/>
+                <Transition Id="Split2-Join1" From="Split2" To="Join1">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="Split2-Join2" From="Split2" To="Join2">
+                    <Condition Type="CONDITION">attribute('test2_ok')</Condition>
+                </Transition>
+                <Transition Id="Join2-Package" From="Join2" To="Package"/>
+                <Transition Id="Package-End" From="Package" To="End"/>
+            </Transitions>
+        </WorkflowProcess>
+

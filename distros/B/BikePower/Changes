@@ -1,0 +1,41 @@
+Revision history for Perl extension BikePower.
+
+0.33
+	- NumEntries call $autocalc subroutine
+
+0.32
+	- XS fix
+
+0.31
+	- fix for 5.005_55
+
+0.30
+	- XS version of calc. The old perl implementation is
+	  renamed to calc_slow.
+
+0.17
+	- bugfix (save_defaults)
+
+0.16
+	- POD additions
+	- minor fixes
+
+0.15
+	- bugfix (missing _init_output)
+	- new README, improved test.pl
+	- a slightly better POD
+
+0.14
+	- tk_interface now in BikePower/Tk.pm
+
+0.13
+	- automatic checkbutton
+	- using NumEntry if available
+	- Help menu: About and Reference
+	- prefer getOpenFile/getSaveFile over FileDialog (on Tk800)
+	- no failure on getpwuid (for Win32)
+	- some fixes
+
+0.10  Mon Nov 10 20:00:15 1997
+	- original version
+

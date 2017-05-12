@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b67ccca482b91c862584e929ed9fe911080d67ec Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 a5d8888d68707497096338f505d524012f835062 MANIFEST
+SHA1 e476d8bd724d46eb9e255cc8afc98b92269e2255 MANIFEST.SKIP
+SHA1 a90262c93d261ffe181214b35a0b9336444699dd META.json
+SHA1 084e922e9da4e1e070a15ed6dbff01c2e83d97ef META.yml
+SHA1 7ca81bdcf42eaa6f4cfb777b54c914bd9a8c6a4c Makefile.PL
+SHA1 7e27ecbd2a455bf2ec9f91f1b8c29853a3663d62 README
+SHA1 d9c0aa93a7ba34a1de2ef1096ea7b6dac9464bb3 lib/Business/Hours.pm
+SHA1 a9c1a7b193f0ce4419bd6ae3a5b84bf1a6f94dfa t/1-business-hours.t
+SHA1 18ff7b16cde0b1ba61858ee263ea50a87a1a6919 t/2-holidays.t
+SHA1 e18498f5413cb08aa563e3d0c76a1d9c6520b8c5 t/99-pod-coverage.t
+SHA1 aaf51e0d68143ceff893513e9a95bd01cdfa216f t/99-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iEYEARECAAYFAlIWKzEACgkQvH6dkeDZaS9P4ACeIwY/ETX/j4kK+VVHY3wnEzX0
+/q0An3ioyiXz2k2qXAuDNCvKuwZo+CeL
+=KHND
+-----END PGP SIGNATURE-----

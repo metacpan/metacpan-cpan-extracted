@@ -1,0 +1,20 @@
+Revision history for Perl extension Benchmark::Object.
+
+
+0.01  Thu Sep 26 18:32:22 2013
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Benchmark::OO
+
+0.02  Sat Sep 28 22:24:54 2013
+	- added pause and resume functions
+	- changed print_benchmark funtion to print result in tabular form
+	- update POD
+
+0.03  Mon Oct 14 15:40:07 2013
+	- Changing name from Benchmark:OO to Benchmark::Object as per suggestions.
+	- Fixed 'total microseconds' print problem with print_benchmark() subroutine. 
+		On some machines output was -1.
+	- Updated POD accordingly.
+	
+0.04  Mon Dec 22 17:00:07 2013
+	- Fixed 'make' failing issue

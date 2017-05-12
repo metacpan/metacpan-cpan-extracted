@@ -1,0 +1,18 @@
+{
+    "select" : [
+        "NAME",
+        "VALUE",
+        "comment",
+        "compiler",
+        "keyword"
+    ],
+    "where" : [
+        ["=" , "NAME"    , "benchmarkanything.test.metric" ],
+        ["=",  "compiler" , "gcc" ]
+    ],
+    "order_by" : [
+        ["VALUE", "DESC", { "numeric" : 1 } ]
+    ],
+    "limit" : 0,
+    "offset" : 0
+}

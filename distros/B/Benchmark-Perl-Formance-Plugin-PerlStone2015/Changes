@@ -1,0 +1,8 @@
+Revision history for Benchmark-Perl-Formance-Plugin-PerlStone2015
+
+0.002     2016-04-23
+        - dist maintenance
+
+0.001     2016-04-23
+        - a Benchmark::Perl::Formance plugin combining several benchmarks
+          that don't have too many cpan dependencies (though still some)

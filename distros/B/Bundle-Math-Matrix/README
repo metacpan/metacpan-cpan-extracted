@@ -1,0 +1,27 @@
+Bundle::Math::Matrix version 1.01
+=================================
+
+This is a bundle of modules related to math with matrices or vectors.
+
+INSTALLATION
+
+To install this module, please use the CPAN shell or better yet CPANPLUS.
+
+SEE ALSO
+
+Bundle::Math
+
+Current versions of this module may be found on http://steffen-mueller.net or
+CPAN.
+
+Please send your suggestions, inquiries, and feedback to
+bundlemath-module at steffen-mueller dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

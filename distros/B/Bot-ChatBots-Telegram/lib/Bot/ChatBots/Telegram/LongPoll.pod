@@ -1,0 +1,191 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::LongPoll - Telegram updates receiver, long-poll
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Telegram::LongPoll;
+   my $lp = Bot::ChatBots::Telegram::LongPoll->new(
+      token     => $ENV{TOKEN},
+      processor => \&processor,
+      start     => 1,
+   );
+   sub processor { # tube-compliant
+      my $record = shift;
+      # ... $record is normalized, by default
+      return $record; # follow on..
+   }
+
+=head1 DESCRIPTION
+
+This is an updates receiver and dispatcher for the Telegram
+infrastructure. It connects to Telegram's API for I<long-poll> style (i.e.
+pulling updates continuously), so it's somehow inefficient but should let
+you get started in all conditions in which you can at least browse the
+Internet (webhook require that your endpoint lives in a routable place).
+
+At the base, you have to provide I<at least> the L</token> and the
+L</processor>. The former is needed to connect to Telegram and get
+updates, the latter is what will be invoked for each update that is
+received.
+
+When you have an object, you have to L</start> to get the ball rolling.
+You can also pass C<start> in the constructor, this will start the
+L<Mojo::IOLoop> directly (so you can use it in case you don't have other
+stuff to do).
+
+When invoked, the L</processor> tube can return a record with the C<response>
+field set. In this case, this update receiver can act also on the other way
+around, and send the C<response> towards Telegram using a
+L<Bot::ChatBots::Telegram::Sender>.
+
+=head1 ACCESSORS
+
+This class consumes roles L<Bot::ChatBots::Telegram::Role::Source> and
+L<Bot::ChatBots::Role::Source> and all its accessors.
+
+=head2 B<< connect_timeout >>
+
+   my $to = $obj->connect_timeout;
+   $obj->connect_timeout(10);
+
+Acccessor for the connection timeout for
+L<Bot::ChatBots::Telegram::Sender>'s user agent (this is
+L<Mojo::UserAgent>).
+
+=head2 B<< interval >>
+
+   $secs = $obj->interval;
+   $obj->interval(0.2); # secs
+
+Accessor for the interval of scheduling calls to C<getUpdates>. You can
+set this to a pretty low value (default is 0.1 seconds) because there is
+a flag that prevents calls from being sent if another one is ongoing.
+
+=head2 B<< max_redirects >>
+
+   my $n = $obj->max_redirects;
+   $obj->max_redirects(7); # default is 5
+
+Accessors for maximum number of redirects acceptable for the underlying
+L<Mojo::UserAgent>. Defaults to 5.
+
+=head2 B<< sender >>
+
+   my $sender = $obj->sender;
+   $obj->sender(Bot::ChatBots::Telegram::Sender->new(token => $token));
+
+Accessor for the L<Bot::ChatBots::Telegram::Sender> object used for
+managing communications from/to Telegram.
+
+=head2 B<< update_timeout >>
+
+   my $to = $obj->update_timeout;
+   $obj->update_timeout(30);
+
+Accessor to set/get the C<update_timeout> set in the C<getUpdates> call to
+the Telegram API. Defaults to 300 seconds, i.e. you should get I<at least>
+one update every 5 minutes.
+
+
+=head1 METHODS
+
+This class consumes roles L<Bot::ChatBots::Telegram::Role::Source> and
+L<Bot::ChatBots::Role::Source> and all its methods.
+
+=head2 B<< BUILD >>
+
+Method called upon construction. It checks for the presence of a C<start>
+parameter set to I<true> and in case calls L</start>.
+
+=head2 B<< class_custom_pairs >>
+
+   my @pairs = $obj->class_custom_pairs;
+
+Returns custom pairs, used by role L<Bot::ChatBots::Role::Source>. It adds
+a C<token> to the parameters put in the C<source> key inside the record
+passed to the C<process> method, when invoked.
+
+=head2 B<< parse_response >>
+
+   my @updates = $obj->parse_response($res, $threshold_id);
+
+Parse the response to the polling request (C<$res> is
+a L<Mojo::Message::Result> object) and filters all updates whose
+identifier (according to field C<update_id>) are greater than, or equal
+to, the C<$threshold_id>. It takes care to check the return values and the
+rest.
+
+=head2 B<< poller >>
+
+   my $subref = $obj->poller(%args);
+      $subref = $obj->poller(\%args);
+
+Build a polling sub reference suitable for being installed as a repetitive
+task in L</start>. This I<poller> sends one single request to the Telegram
+endpoint for the I<longpoll> and processes one single response.
+
+In particular, it extracts the list of updates from the response and calls
+L<Bot::ChatBots::Role::Source/process_updates> on them.
+
+The C<source> key in the record that is eventually generated contains:
+
+=over
+
+=item *
+
+C<refs> with C<sender>, C<tx> and C<ua>
+
+=item *
+
+an additional item in C<source> that is a hash reference associated to the
+key C<query>. Inside this you can find a key C<offset> that you can use to
+increase the offset to be used in following calls. This is done
+automatically in L</process>.
+
+=back
+
+=head2 B<< process >>
+
+   my $retval = $self->process($record);
+
+Wrapper around L<Bot::ChatBots::Role::Source/process> to cope with the
+need to increase the C<offset> for each incoming update (see L</poller>
+for additional details).
+
+=head2 B<< start >>
+
+   $obj->start(%args); # OR
+   $obj->start(\%args);
+
+Start polling Telegram for new updates. L</poller> is called to retrieve
+a sub reference that is then installed as a recurring job according to
+L</interval>.
+
+This method is called automatically upon object construction if option
+C<start> is present and set to a I<true> value.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Telegram::WebHooks>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

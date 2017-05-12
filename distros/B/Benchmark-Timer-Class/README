@@ -1,0 +1,63 @@
+                 Benchmark::Timer::Class Version 0.01
+
+Copyright (c) 2001 Doug Neil
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+This Perl module allows you to determine the elapsed time of all the
+method calls to a specified object with minimal editing of your
+original program.
+
+For example, if you start with a program such as:
+
+    use TestC;
+    use strict;
+    my $tc         = new TestC; 
+    my $one_var    = $tc->load1();
+    my (@two_vars) = $tc->load2();
+    $one_var       = $tc->load1();
+    @two_vars      = $tc->load2();
+
+and you want to time all the calls, you need only modify the code to
+be:
+
+    use Benchmark::Timer::Class;
+    use TestC;
+    use strict;
+    my $tc_original = new TestC;
+    my $tc          = new Benchmark::Timer::Class($tc_original);
+    my $one_var     = $tc->load1();
+    my (@two_vars)  = $tc->load2();
+    $one_var        = $tc->load1();
+    @two_vars       = $tc->load2();
+    $tc->report();
+
+Notice that the only original line of code which needed to be changed was the
+call to the constructor of TestC.
+
+The above example exists in the examples subdirectory of the distribution.
+
+To configure this module, cd to the directory that contains this
+README file and type the following:
+
+        perl Makefile.PL
+
+Alternatively, if you plan to install Benchmark::Timer::Class
+somewhere other than your system's perl library directory. You can
+type something like this:
+
+        perl Makefile.PL PREFIX=/home/me/perl INSTALLDIRS=perl
+
+Then to build you run make.
+
+        make
+
+You can then test the module by typing:
+
+        make test
+
+If you have write access to the installation directories, you may then
+install by typing:
+
+        make install

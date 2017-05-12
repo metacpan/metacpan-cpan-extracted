@@ -1,0 +1,8 @@
+0.02    22 April 2010
+        Added DBIC Store + Schema, which supports tagging
+        Added Web::Simple app for displaying notes as a web page
+        Added notesbot.pl as example
+          NB: These have local paths in, change for own use!
+
+0.01    13 April 2010
+        Initial release.

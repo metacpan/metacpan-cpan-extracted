@@ -1,0 +1,115 @@
+=head1 NAME
+
+Bot::BasicBot::Pluggable::Module::RT - Retrieves information of RT tickets
+
+=head1 SYNOPSIS
+
+    < you> RT#12345
+    < bot> RT 12345: there is a bug in the matrix! - open
+
+=head1 DESCRIPTION
+
+This module uses RT::Client::REST::Ticket to connect to a RT server and grab
+information on tickets.
+
+=head1 IRC USAGE
+
+See synopsis
+
+=head1 VARS
+
+=over
+
+=item server
+
+The url of the RT server. Set it using:
+
+  !set RT server <url>
+
+=item login
+
+The login to use. Set it using:
+
+  !set RT login <login>
+
+=item password
+
+The password to use. Set it using:
+
+  !set RT password <password>
+
+=item output
+
+The output format the bot should use to display information. Set it using:
+
+  !set RT output <output_string>. 
+
+the string can contain the following placeholders :
+
+  %i : id of the ticket
+  %q : queue of the ticket
+  %c : creator of the ticket
+  %s : subject of the ticket
+  %S : status of the ticket
+  %p : priotity of the ticket
+  %C : time where it was created
+
+Default is : 'RT %i: %s - %S';
+
+=item regexp
+
+The regexp that is used to extract the rt number from the body. Set it using:
+
+  !set RT regexp <some_regexp>.
+
+Its first match should be the rt number.
+Default is (?:^|\s)rt\s*#?\s*(\d+)
+
+=back
+
+=head1 COMPLETE EXAMPLE
+
+  #!/usr/bin/perl 
+  
+  use strict;
+  use warnings;
+  use Bot::BasicBot::Pluggable;
+  
+  my $bot = Bot::BasicBot::Pluggable->new(
+      server => "server",
+      port   => "6667",
+      channels => ["#bottest"],
+      nick      => "arty",
+      alt_nicks => ["arty_", "_arty"],
+      username  => "RT",
+      name      => "RT Bot",
+      charset => "utf-8", # charset the bot assumes the channel is using
+  );
+  
+  my $rt_module=$bot->load("RT");
+  $rt_module->set(user_server => 'http://rt.yourcompany.com');
+  $rt_module->set(user_login => "user");
+  $rt_module->set(user_password => "password");
+  
+  $bot->run();
+
+=head1 AUTHOR
+
+Damien "dams" Krotkine, C<< <dams@cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-bot-basicbot-pluggable-module-rt@rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/>. I will be notified, and
+then you'll automatically be notified of progress on your bug as I
+make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2007-2011 Damien "dams" Krotkine, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,26 @@
+Revision history for Bio-WebService-LANL-SequenceLocator
+
+20170324  2017-03-24 10:26:22 PDT
+    - Update example URLs pointing to indra.mullins.microbiol.washington.edu to
+      use https://, thus avoiding redirect issues
+    - Update LANL endpoint to use HTTPS, as required
+    - Fix sequence submission to LANL and result parsing for LANL updates
+
+20140624  2014-06-24 13:05:02 PDT
+    - CSV: Include region-relative start/end positions
+
+20140619  2014-06-19 17:39:31 PDT
+    - Support FASTA input and CSV output
+    - Document the status of reverse complementing (unsupported)
+    - Fix invalid JSON in example results
+    - Document how to install dependencies for the web API server
+    - Automated functional tests for author release testing
+
+20140502  2014-05-02 16:58:44 PDT
+        - Adds optional parameter to specify the base type for all query sequences
+        - Improves extraction of alignments from LANL's HTML
+        - Adds example in R
+        - Enables CORS requests in the example API service
+
+20140328  2014-03-28 11:53:12 PDT
+        - Initial release

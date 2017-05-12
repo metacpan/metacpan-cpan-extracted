@@ -1,0 +1,41 @@
+INSTALL INSTRUCTIONS
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+IMPLEMENTATION NOTES
+
+The primary module provided with this distribution, 
+Bio::GMOD::GenericGenePage, is an abstract perl class that provides a 
+render_xml method to create the gene page XML, but does not fetch the
+data.  In order to effectively use this module, you need to subclass it
+and implement all of the methods that are listed under ABSTRACT CLASSES
+below for your database.  These abstract methods are responsible for 
+providing Bio::GMOD::GenericGenePage with the data to create the XML.
+
+There are two example implementations included with this module.  
+Bio::GMOD::GenericGenePage::Chado is a simple implementation for a Chado
+database populated with S. cerevisiae data obtained from SGD as GFF3. 
+Currently, the output of this implementation can be seen at 
+
+  http://gmod.org/cgi-bin/gbrowse/chado_yeast/
+
+and by clicking on any of the genes (red arrows).
+
+The other implementation, CXGN::Phenome::GenericGenePage, is from SGN, the SOL
+Genomics Network.  The XML they provide can be seen by clicking on the
+"Download GMOD XML" link on any of there locus pages; for example, this one:
+
+  http://sgn.cornell.edu/phenome/locus_display.pl?locus_id=1238
+
+For more information see http://gmod.org/wiki/Bio_GMOD_GenericGenePage or
+contact Scott Cain, scain@cpan.org.
+
+While there is no example cgi included in this distribution that show
+how this module can be used, that could be included in future distribution
+if there is interest in it.
+

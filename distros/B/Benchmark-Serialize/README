@@ -1,0 +1,99 @@
+NAME
+    Benchmark::Serialize - Benchmarks of serialization modules
+
+SYNOPSIS
+        use Benchmark::Serialise qw(cmpthese);
+
+        my $structure = {
+            array  => [ 'a' .. 'j' ],
+            hash   => { 'a' .. 'z' ]
+            string => 'x' x 200,
+        };
+
+        cmpthese( -5, $structure, qw(:core :json :yaml) );
+
+DESCRIPTION
+    This module encapsulates some basic benchmarks to help you choose a
+    module for serializing data. Note that using this module is only a part
+    of chosing a serialization format. Other factors than the benchmarked
+    might be of relevance!
+
+    Included is support for 24 different serialization modules. Also supported
+    is the Data::Serializer wrapper providing a unified interface for
+    serialization and some extra features. Benchmarking of specialized modules
+    made with Protocol Buffers for Perl/XS (protobuf-perlxs) is also available.
+
+    See the in-module documentation for more information.
+
+RESULTS
+
+    The following is the result from benchmarking the serialization modules
+    included in the core Perl distribution (Storable and Data::Dumper) and
+    a couple of well-performing other modules. The 'StructureXS' module is
+    an XS bases Google ProtocolBuffers class.
+
+    The tested datastructure is available from 
+      http://github.com/pmakholm/benchmark-serialize-perl/blob/e6263840439b7246c2b87a91b8db489c6eb80400/benchmarks/jvm-serializers/structure.pl
+
+Modules
+Data::Dumper      :    2.128 Identical
+Data::MessagePack :     0.34 Identical
+JSON::XS          :      2.3 Identical
+Storable          :     2.21 Identical
+StructureXS       :      1.0 Identical
+
+Sizes
+                  bytes StructureXS Data::MessagePack JSON::XS Storable Data::Dumper
+StructureXS         245          --              -36%     -48%     -53%         -82%
+Data::MessagePack   380         55%                --     -19%     -26%         -72%
+JSON::XS            468         91%               23%       --      -9%         -65%
+Storable            516        111%               36%      10%       --         -62%
+Data::Dumper       1354        453%              256%     189%     162%           --
+
+Deflate (perl -> serialized)
+                      Rate Data::Dumper Storable StructureXS JSON::XS Data::MessagePack
+Data::Dumper        8812/s           --     -59%        -85%     -92%              -92%
+Storable           21354/s         142%       --        -63%     -80%              -80%
+StructureXS        57961/s         558%     171%          --     -45%              -46%
+JSON::XS          105411/s        1096%     394%         82%       --               -2%
+Data::MessagePack 107789/s        1123%     405%         86%       2%                --
+
+Inflate (serialized -> perl)
+                     Rate Data::Dumper StructureXS Data::MessagePack Storable JSON::XS
+Data::Dumper      11395/s           --        -67%              -78%     -79%     -83%
+StructureXS       34600/s         204%          --              -32%     -36%     -50%
+Data::MessagePack 50777/s         346%         47%                --      -6%     -26%
+Storable          53894/s         373%         56%                6%       --     -21%
+JSON::XS          68620/s         502%         98%               35%      27%       --
+
+Roundtrip
+                     Rate Data::Dumper Storable StructureXS Data::MessagePack JSON::XS
+Data::Dumper       4830/s           --     -61%        -73%              -84%     -85%
+Storable          12401/s         157%       --        -31%              -58%     -62%
+StructureXS       18101/s         275%      46%          --              -39%     -44%
+Data::MessagePack 29805/s         517%     140%         65%                --      -9%
+JSON::XS          32582/s         575%     163%         80%                9%       --
+ 
+AUTHOR
+    Peter Makholm, "<peter at makholm.net>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-benchmark-serialize
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Benchmark-Serialize>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    This module started out as a script written by Christian Hansen, see
+    http://idisk.mac.com/christian.hansen/Public/perl/serialize.pl
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Peter Makholm.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,17 @@
+[%- PROCESS header title="Thread view" -%]
+[%- PROCESS macros -%]
+[%- PROCESS view_macros -%]
+
+<h1>[% mail.subject | html %]</h1>
+
+<p class="searchhints">
+You can also view this thread in <a href="[% base|remove('/$') %]/mail/lurker/[% mail.id %]">chronological view</a>
+or as an SVG <a href="[% base|remove('/$') %]/mail/arc/[% mail.id %]">thread arc</a></p>
+
+<ul class="threads">
+[%- PROCESS thread_view -%]
+[%- INCLUDE display_thread_rec thread=thread depth=0 -%]
+</ul>
+
+[% make_atom("mail/thread/atom/$mail.id") %]
+[% INCLUDE footer %]

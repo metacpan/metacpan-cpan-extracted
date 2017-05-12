@@ -1,0 +1,96 @@
+Changes file for Business::DK::PO
+
+Project Change Log:
+
+http://logiclab.jira.com/browse/BDKPO#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.08 2015-08-15 maintenance release, update not required
+
+- Migrated from Module::Build based release to Dist::Zilla based
+
+
+0.07 2014-08-23 maintenance release, update not required
+
+- Added Perl version requirement 5.6 as pointed out by
+  Perl::Critic
+
+- Added changes.t automatic assertion of the integrity of the
+  Changes file, see also BDKPO-7
+
+  https://logiclab.jira.com/browse/BDKPO-8
+
+
+0.06 2013-07-29
+
+- Fixed up Changes file as part of my Questhub quest adhering to
+  the standard described in: CPAN::Changes::Spec [BDKPO-7]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/BDKPO-7
+
+- Added contemporay boiler plate of Perl::Critic test [BDKPO-5]
+
+  https://logiclab.jira.com/browse/BDKPO-5
+
+
+0.05 2010-09-08
+
+- Update not required
+
+- Added wrapper on validate method, so we now also export a
+  validatePO, which is less intrusive [BDKPO-2]
+
+- Added prerequisites test [BDKPO-1]
+
+- Beautified code with Perl::Tidy and did basic Perl::Critic
+  violation cleanup
+
+
+0.04 2007-03-13
+
+- Added some POD, nothing significant
+
+- Fixed problem in t/critic.t, I had implemented a mix of my own
+  and the recommended Perl::Critic test, so it gave unforseen test failures
+
+
+0.03 2007-03-12
+
+- Set severity of Perl::Critic test to 5, gentle
+
+- Updated t/kwalitee.t to more contemporary version
+
+- Added Perl::Critic test, t/critic.t and added perlcriticrc to t/
+
+- Updated to more contemporary versions of:
+    t/pod-coverage.t
+    t/pod.t
+
+  These should be there for the quality, but will not be run as a
+  part of the normal test run, unless the TEST_POD environment
+  variable is set.
+
+  This seem to be the defacto way of doing things.
+
+
+0.02 2006-02-21
+
+- Added version information to POD
+
+- Added related module to SEE ALSO section in POD
+
+- Added private message to EXPORT_OK and updated POD
+
+- Added use of MODULUS_OPERAND in one place, apparently this had
+  been overlooked
+
+- Removed some verbose message from unit-tests
+
+- Restructured tests some positive tests are first in the file
+
+
+0.01 2006-02-20
+
+- Initial version

@@ -1,0 +1,16 @@
+# QIIME v1.3.0 OTU table
+#OTU ID	Com. 1	Consensus Lineage
+0	17	Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Miscellaneous
+1	2	Archaea;Euryarchaeota;Halobacteria;Halobacteriales;Miscellaneous
+2	6.01	Archaea;Crenarchaeota;Miscellaneous
+3	7	Bacteria;Proteobacteria;Alphaproteobacteria;Sphingomonadales;Sphingomonadaceae;Sphingobium;Sphingomonas
+4	1	Bacteria; Proteobacteria; Alphaproteobacteria; Sphingomonadales; Sphingomonadaceae; Sphingomonas
+5	5	Bacteria;Proteobacteria;Alphaproteobacteria;Sphingomonadales;Sphingomonadaceae;Sphingomonas;uncultured
+6	27	Bacteria;Proteobacteria;Betaproteobacteria;Rhodocyclales;Rhodocyclaceae;Uliginosibacterium;Sphingomonas
+7	1.5	Bacteria;Bacteroidetes;Sphingobacteria;Sphingobacteriales;Chitinophagaceae;Sediminibacterium;Flexibacter
+8	17	Bacteria;Proteobacteria;Betaproteobacteria;Rhodocyclales;Rhodocyclaceae;uncultured;uncultured
+9	0.5	Bacteria;WCHB1-60;unidentified
+10	9	Eukaryota;Katablepharidophyta;Katablepharidaceae;Leucocryptos;;Leucocryptos
+11	6.99	Eukaryota;Fungi;Chytridiomycota;environmental
+
+

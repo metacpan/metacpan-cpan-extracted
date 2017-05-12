@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+=pod
+
+=head1 Bio::GMOD: A Unified API To Model Organism Databases
+
+Bio::GMOD is a suite of Perl modules that provides a unified
+programming interface to Model Organism Databases.  These databases
+house a wealth of information that extends beyond the primary genomic
+sequences of the organisms on which they focus.
+
+This document was derived from a talk given at the May 2005 Generic
+Model Organism Database meeting in Menlo Park, CA.
+
+=head1 Current Problems
+
+	Need to be knowledgable in both database structure and terminology
+	Difficult to fetch similar/related data across sites
+
+=head1 Objectives
+
+	insulate end users from changes in data schemas
+	provide unified API to wealth of data housed in MODs
+
+=head1 Solutions
+
+	open-ended defaults - can generically create as necessary
+
+=head1 Limitations
+
+	one instance, one MOD
+	little movement between classes
+

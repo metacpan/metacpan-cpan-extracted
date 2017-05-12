@@ -1,0 +1,85 @@
+Business-BR-Ids version 0.00_21
+===============================
+
+The intention of this distribution is to provide facilities
+to deal with Brazilian identification numbers and codes.
+It is part of a set of distributions to approach programming
+on Brazilian business-related subjects.
+The distribution is starting up with support to CPF and CNPJ
+(tests for correctness, canonicalization, formatting, parsing,
+random generation for mass tests). More is to come.
+
+The actually supported codes follow along with a brief explanation
+of what they are good for and who emits them.
+
+  * CPF  - to identify citizens as taxpayers in nation-wide context, 
+           emitted by the Brazilian Ministry of Revenue
+  * CNPJ - to identify companies as taxpayers in nation-wide context, 
+           emitted by the Brazilian Ministry of Revenue
+  * PIS  - to identify citizens as users of the public health services
+  * IE/AC
+    IE/AL
+    IE/AP
+    IE/AM
+    IE/BA
+    IE/MA
+    IE/MG
+    IE/PR
+    IE/RO
+    IE/RR
+    IE/SP
+         - to identify companies as taxpayers in state-wide context,
+           emitted by Revenue Secretariats of Brazilian States
+           (by now supporting only the states of Acre, Alagoas,
+           Amapá, Maranhão, Minas Gerais, Rondônia, Roraima, São Paulo 
+           and Paraná)
+
+Some of the next ones to be supported are:
+
+  * IE   - to identify companies as taxpayers in state-wide contexts,
+           emitted by the Secretariat of Revenue of each state
+  * TE   - to identify citizens as allowed voters, emitted by
+           Regional Electoral Courts under the control 
+           of the Superior Electoral Court
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Scalar::Util 1.11
+  Test::More
+
+TO DO
+
+* write tests for module Business::BR::CNPJ
+* introduce Business::BR::TE
+* write article 'br-docs.pod'
+* get rid of Business::BR::Biz
+* random_cnpj() calls for a better pseudo-random
+  distribution when selecting variation in Business::BR::CNPJ
+* introduce the $canon argument to test_*(),
+  format_*(), parse_*() methods
+* write tests for module Business::BR::Ids
+* what about Business::BR::Passport?
+* complete Business::BR::IE
+* enhance Business::BR::Ids docs
+* parse_ie_sp() is missing
+* document Business::BR::PIS
+
+* 0.01 milestone: complete code for IE of each Brazilian state
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 by A. R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

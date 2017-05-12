@@ -1,0 +1,43 @@
+--- #YAML:1.0
+name:                Bot-BasicBot-Pluggable-Module-Crontab
+version:             0.01
+abstract:            Provides a crontab-like message service for IRC channels
+license:             artistic_2
+distribution_type:   module
+installdirs:         site
+
+author:
+    - Barbie <barbie@cpan.org>
+
+requires:
+  perl:                           5.006
+  Bot::BasicBot::Pluggable:       0
+  DateTime:                       0
+  IO::File:                       0
+  Time::Crontab:                  0
+recommends:
+  Test::CPAN::Meta:               0
+  Test::CPAN::Meta::JSON:         0
+  Test::Pod:                      1.00
+  Test::Pod::Coverage:            0.08
+build_requires:
+  Test::More:                     0.70
+
+provides:
+  Bot::BasicBot::Pluggable::Module::Crontab:
+    file:     lib/Bot/BasicBot/Pluggable/Module/Crontab.pm
+    version:  0.01
+
+no_index:
+  directory:
+    - t
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Bot-BasicBot-Pluggable-Module-Crontab
+  repository: https://github.com/barbie/bot-basicbot-pluggable-module-crontab
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

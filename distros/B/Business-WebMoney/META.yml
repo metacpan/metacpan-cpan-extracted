@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Business-WebMoney
+version:             0.11
+abstract:            Perl API to WebMoney
+license:             ~
+author:              
+    - Alexander Lourier <aml@rulezz.ru>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Crypt::SSLeay:                 0
+    File::Spec:                    0
+    HTTP::Request:                 0
+    LWP::UserAgent:                0
+    Net::SSL:                      0
+    POSIX:                         0
+    XML::LibXML:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

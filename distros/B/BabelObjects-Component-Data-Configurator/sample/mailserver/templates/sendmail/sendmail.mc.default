@@ -1,0 +1,70 @@
+divert(-1)
+
+dnl        m4 /etc/sendmail.mc > /etc/sendmail/cf
+dnl
+dnl You will need to have the sendmail-cf package installed for this to
+dnl work.
+
+include(`/usr/lib/sendmail-cf/m4/cf.m4')
+define(`confDEF_USER_ID',``8:12'')
+
+OSTYPE(`linux')
+
+undefine(`UUCP_RELAY')
+undefine(`BITNET_RELAY')
+
+define(`confAUTO_REBUILD')
+define(`confTO_CONNECT', `1m')
+define(`confTRY_NULL_MX_LIST',true)
+define(`confDONT_PROBE_INTERFACES',true)
+define(`PROCMAIL_MAILER_PATH',`/usr/bin/procmail')
+
+define(`confBIND_OPTS',`-DNSRCH -DEFNAMES')
+define(`LUSER_RELAY',`localhost')
+
+define(`CYRUS_MAILER_PATH',`/usr/local/cyrus/bin/deliver')
+define(`confLOCAL_MAILER',`cyrus')
+
+dnl gestion des alias
+define(`ALIAS_FILE',`/etc/mail/aliases,sequence:virtuser')
+define(`confLDAP_DEFAULT_SPEC',`-h"$(CONFIGURATOR.LDAP_HOST)" -b"$(CONFIGURATOR.BASE_ALIAS)" -p $(CONFIGURATOR.PORT)')
+
+dnl This flag is necessary to permit a recursive query for aliases
+define(`SMTP_MAILER_FLAGS',`A')
+define(`RELAY_MAILER_FLAGS',`A')
+
+FEATURE(nocanonify)
+FEATURE(`smrsh',`/usr/sbin/smrsh')
+FEATURE(always_add_domain)
+FEATURE(local_procmail)
+
+dnl FEATURE(`accept_unresolvable_domains')
+
+FEATURE(`access_db')
+FEATURE(`relay_hosts_only')
+FEATURE(`blacklist_recipients')
+
+MAILER(local)
+MAILER(cyrus)
+MAILER(smtp)
+MAILER(procmail)
+
+LOCAL_CONFIG
+
+FEATURE(`virtusertable')dnl
+RELAY_DOMAIN(`svrmail2.vecteurplus.com')dnl
+LDAPROUTE_DOMAIN(`svrmail2.vecteurplus.com')dnl
+FEATURE(`ldap_routing')dnl
+
+MAILER_DEFINITIONS
+Mcyrus,		P=[IPC], F=lsDFMnqA5@/:|SmXz, E=\r\n,
+		S=EnvFromL, R=EnvToL/HdrToL, T=DNS/RFC822/X-Unix, 
+		A=FILE /opt/var/imap/socket/lmtp
+
+LOCAL_RULE_0
+Rbb + $+ < @ $=w . >	$#cyrus $: + $1
+
+LOCAL_RULESETS
+# if there's a plus part, we want to directly deliver it
+SLocal_localaddr
+R$+ + $*	$#cyrus $@ $: $1 + $2

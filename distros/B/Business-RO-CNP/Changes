@@ -1,0 +1,10 @@
+Revision history for Business-RO-CNP
+
+0.01 2010-11-04
+        First version, released on an unsuspecting world.
+
+0.02 2010-11-06
+Added some more tests (t/invalid.t), improved the documentation, added some requirements in Makefile.PL (Moose, utf8, DateTime::Format::Strptime).
+
+0.03 2011-01-23
+Tidy up, make it perlcritic-friendly.

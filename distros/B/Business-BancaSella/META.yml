@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-BancaSella
+version:      0.13
+version_from: BancaSella.pm
+installdirs:  site
+requires:
+    HTML::Entities:                0
+    URI:                           0
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,10 @@
+Revision history for Bot-BasicBot-Pluggable-Module-WWW-Shorten
+
+0.03	Mi 2. Dez 10:18:48 CET 2009
+
+	Because i tried to acccess the wrong variabe name service
+	instead of user_service, 0.02 won't work. Please update.
+
+0.02    Mi 25 Nov 2009 22:07:13 CET
+        Initial version
+

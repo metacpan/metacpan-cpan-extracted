@@ -1,0 +1,10 @@
+---
+input:
+- format: List
+  list: [ 'a', 'b', 'c' ]
+  
+job_name: testenv
+mode: Consecutive
+
+prefix_output_dirs: 1
+no_prompt: 1

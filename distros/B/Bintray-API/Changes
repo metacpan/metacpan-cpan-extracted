@@ -1,0 +1,44 @@
+Version History for Bintray-API
+Mithun Ayachit
+
+
+
+1.0.2
+
+
+-   Fix version numbers across all modules
+
+
+
+1.0.1
+
+
+-   Bump version to allow change in version number strategy
+
+
+
+0.3.0
+
+
+-   Bump version to allow cpan reindex
+
+
+
+0.2.1
+
+
+-   No functional changes. Use semver and github-issues
+
+
+
+0.02
+
+
+-   Fixed dependencies
+
+
+
+0.01
+
+
+-   Initial Release

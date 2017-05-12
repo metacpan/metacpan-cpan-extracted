@@ -1,0 +1,31 @@
+---
+abstract: 'take a Benchmark and confirm returned values'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.04'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.04'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Benchmark-Confirm
+provides:
+  Benchmark::Confirm:
+    file: lib/Benchmark/Confirm.pm
+    version: '1.00'
+requires:
+  Benchmark: '1.051'
+  IO::Capture::Stdout: '0'
+  Test::More: '0.88'
+  perl: '5.008005'
+resources:
+  bugtracker: http://github.com/bayashi/Benchmark-Confirm/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Benchmark-Confirm
+version: '1.00'

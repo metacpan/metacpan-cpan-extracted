@@ -1,0 +1,41 @@
+---
+abstract: 'Interface to Paperless Transaction Corporation BackOffice API'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-OnlinePayment-PaperlessTrans
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  Business::OnlinePayment::PaperlessTrans:
+    file: lib/Business/OnlinePayment/PaperlessTrans.pm
+    version: 0.001006
+requires:
+  Business::OnlinePayment: 0
+  Carp: 0
+  File::ShareDir: 0
+  LWP::Protocol::https: 0
+  Module::Load: 0
+  XML::Compile::SOAP11: 0
+  XML::Compile::Transport::SOAPHTTP: 0
+  XML::Compile::WSDL11: 0
+  parent: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/xenoterracide/business-onlinepayment-paperlesstrans/issues
+  homepage: https://metacpan.org/release/Business-OnlinePayment-PaperlessTrans
+  repository: git://github.com/xenoterracide/business-onlinepayment-paperlesstrans.git
+version: 0.001006

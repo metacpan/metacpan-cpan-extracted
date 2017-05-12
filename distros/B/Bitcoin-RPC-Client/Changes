@@ -1,0 +1,18 @@
+Revision history for Bitcoin::RPC::Client 
+
+0.05    2016-1-16/14
+        - New Debug flag dumps HTTP data
+        - Print to STDERR error strings same as bitcoin-cli
+        - Support for boolean parameters 
+
+0.04    2016-10-17/14
+        Add warnings and strict.
+
+0.03    2016-10-13/10
+        Fixed broken test.
+
+0.02    2016-10-12/15
+        Added META files.
+
+0.01    2016-10-12/10
+        First version, released on an unsuspecting world.

@@ -1,0 +1,27 @@
+0.10 - Sat Sep 16 03:42:40 2006
+	* This is the initial release of a group of modules which
+	implement the web services of the US Postal Service. This
+	isn't screen scraping!
+	* See http://www.usps.com/webtools/
+
+1.11 - Sat Nov  3 00:49:12 2007
+	* cleanups to move from CVS to SVN
+	* now requires perl 5.6
+	* cleanups to the disto; no need to upgrade if you already have this
+
+0.00 - Thu Oct 25 22:04:42 2007
+	* distro adjustments. no big whoop.
+
+1.09 - Mon Feb  5 18:16:12 2007
+	* Jay Buffington noted I wasn't escaping the query strings
+	correctly (meaning, at all), so I fixed that.
+	* This is an important fix that everyone should upgrade too.
+
+1.06 - Wed Jan 10 00:13:28 2007
+	* First official release :)
+
+0.10 - Tue Sep 26 16:21:58 2006
+	* Changed namespace to Business::US::USPS::*
+	* More docs to point out you need the USPS UserID to use any of this
+	* See http://www.usps.com/webtools/
+

@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Bot-BasicBot-Pluggable-Module-GitHub
+version:            0.04
+abstract:           GitHub-related modules for IRC bots running Bot::BasicBot::Pluggable
+author:
+    - David Precious <davidp@preshweb.co.uk>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bot::BasicBot::Pluggable::Module:  0
+    JSON:                 0
+    LWP::Simple:          0
+    Net::GitHub::V2:      0
+    Test::More:           0
+    URI::Title:           0
+    YAML:                 0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,31 @@
+2015-04-27  k  <andk@cpan.org>
+
+	* release 1.862
+
+	* 00signature.t: survive recent changes in ExtUtils::MakeMaker (_eumm)
+	and in Module::Signature ($ENV{TEST_SIGNATURE})
+
+2012-03-02  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 1.861
+
+	* kentfrederic has provided a metadata patch for META.* files
+
+2012-02-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 1.859
+
+	* remove Scalar::Util, it is nowadays declared dependency of IO::Compress::Base
+
+2009-07-02  Andreas J. Koenig  <andk@cpan.org>
+
+	* release 1.858
+
+	* add bzip2 and parse::meta::yaml (suggested by David Golden)
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

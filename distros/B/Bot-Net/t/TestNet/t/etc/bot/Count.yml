@@ -1,0 +1,14 @@
+irc_connect:
+  nick: count
+  username: count
+  ircname: Count von Count
+  
+  server: localhost
+  port: 6667
+
+  flood: 1
+
+state_file: var/bot/Count.db
+
+channels:
+ - '#test'

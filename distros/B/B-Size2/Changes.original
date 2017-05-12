@@ -1,0 +1,58 @@
+=item 0.09 December 2, 2006
+
+Fix a bug specific to mod_perl2 environment where $q->script_name
+doesn't work sinc we don't use CGI.
+Submitted by: Jonathan <modperl-list@2xlp.com>
+Reviewed by: David Scott <ds94103@earthlink.net>
+Tweaked by: Philip M. Gollucci<pgollucci@p6m7g8.com>
+
+=item 0.08 May 29, 2006
+
+no changes other then the package distrubution is correct.
+0.07 was incorrectly released as 0.07_01
+
+=item 0.07 May 29, 2006
+
+http://rt.cpan.org/Ticket/Display.html?id=14953
+fix warning: cast to pointer from integer of different size
+compile warnings where on a 32bit OS, 
+IV's are larger than pointers.
+
+Also, finally silence the well know warning:
+Size.pm: Prototype mismatch: sub B::OP::size: none vs () 
+[Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+=item 0.06 - November 5, 2005
+
+Now compatable with mod_perl 2.0 RC5 and higher for use with Apache2::Status
+[Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+Moved from CVS to SVN at http://svn.perl.org/modules/B-Size
+[Philip M. Gollucci <pgollucci@p6m7g8.com>]
+
+Maintainership passed to Philip M. Gollucci <pgollucci@p6m7g8.com>
+
+=item 0.05 - August 28, 2002
+
+fix to compile with 5.8.0+ ithreads
+
+=item 0.04 - May 16, 2000
+
+OnMouseOver displays opcode description in the status window
+thanks to Charles Lee <charles@goXsports.com> for the link attribute
+magic
+
+source code is displayed in its own window
+
+use a reasonable size code window instead of the entire file when
+viewing source code linked to from opcodes
+
+number lines in source code windows
+
+fixes for 5.6.0
+
+fix for threaded perl [Daniel Sully <daniel@electricrain.com>]
+
+=item 0.03 - September 2, 1999
+
+first public release

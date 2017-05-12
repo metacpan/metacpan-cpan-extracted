@@ -1,0 +1,19 @@
+=head1 USE
+
+All field keywords beginning with C<html_form_> are passed directly
+into the form hash.  Thus, they are really defined in form.tt which
+ships with Gantry.
+
+C<html_form_default_value> specifies a fall back value to use when no
+other default can be found.  Note that this affects HTML only and has nothing
+to do with SQL.  For SQL defaults, you need to do something in the C<is>
+statement or a literal SQL statement.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in the form method in
+lib/Kids/GEN/Child.pm.

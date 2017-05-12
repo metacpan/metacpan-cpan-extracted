@@ -1,0 +1,58 @@
+{
+   "abstract" : "Bot::Backbone service for chatting with IRC",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bot-Backbone-Service-IRChat",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::Backbone::Message" : "0",
+            "Bot::Backbone::Service" : "0",
+            "Bot::Backbone::Service::Role::BareMetalChat" : "0",
+            "Bot::Backbone::Service::Role::Dispatch" : "0",
+            "Bot::Backbone::Service::Role::GroupJoiner" : "0",
+            "Bot::Backbone::Service::Role::Service" : "0",
+            "POE" : "0",
+            "POE::Component::IRC::State" : "0",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Bot-Backbone-Service-IRChat@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-Backbone-Service-IRChat"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zostay/Bot-Backbone-Service-IRChat.git",
+         "web" : "http://github.com/zostay/Bot-Backbone-Service-IRChat"
+      },
+      "x_IRC" : "irc://irc.perl.org/#backbone"
+   },
+   "version" : "0.160630"
+}
+

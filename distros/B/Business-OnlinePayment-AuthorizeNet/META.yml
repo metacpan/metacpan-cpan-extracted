@@ -1,0 +1,30 @@
+---
+abstract: unknown
+author:
+  - 'Ivan Kohler <ivan-authorizenet@420.am>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-AuthorizeNet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3'
+  Business::OnlinePayment::HTTPS: '0'
+  Net::HTTPS::Any: '0'
+  Test::More: '0.42'
+  Text::CSV_XS: '0'
+  Tie::IxHash: '0'
+  XML::Simple: '0'
+  XML::Writer: '0'
+version: '3.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

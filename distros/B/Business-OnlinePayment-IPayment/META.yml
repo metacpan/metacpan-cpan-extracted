@@ -1,0 +1,29 @@
+---
+abstract: 'Checkout via Ipayment Silent Mode'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-IPayment
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3'
+  Crypt::SSLeay: '0'
+  Moo: '1'
+  URI: '1'
+  XML::Compile::SOAP: '0'
+  XML::Compile::WSDL11: '0'
+  perl: '5.010001'
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

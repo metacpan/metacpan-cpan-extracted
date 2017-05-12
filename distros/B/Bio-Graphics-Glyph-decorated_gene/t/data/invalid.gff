@@ -1,0 +1,30 @@
+##gff-version	3
+##feature-ontology	so.obo
+##attribute-ontology	gff3_attributes.obo
+##sequence-region	MAL1	1	643292
+MAL1	PlasmoDB_70	supercontig	1	643292	.	+	.	ID=MAL1;Name=MAL1;size=643292;molecule_type=dsDNA;organism_name=Plasmodium falciparum
+
+MAL1	PlasmoDB_70	gene	549319	550102	.	-	.	ID=PFA0680c;Name=PFA0680c-minus;Note=Signal peptide spans intron, isoform1 has extra callback decoration, isoform2 lacks TM domain
+MAL1	PlasmoDB_70	mRNA	549319	550102	.	-	.	ID=rna_PFA0680c-1;Name=isoform1;protein_decorations=TMHMM:TM:1:1790:5,TMHMM:TM:184:223:10,SignalP4:SP:1:25:0.444,exportpred:VTS:42:48:7.50725;Parent=PFA0680c
+MAL1	PlasmoDB_70	CDS	550034	550102	.	-	0	ID=cds_PFA0680c-1-1;Name=cds_PFA0680c-1-1;Parent=rna_PFA0680c-1
+MAL1	PlasmoDB_70	CDS	549319	549939	.	-	0	ID=cds_PFA0680c-1-2;Name=cds_PFA0680c-2-2;Parent=rna_PFA0680c-1
+MAL1	PlasmoDB_70	mRNA	549500	550102	.	-	.	ID=rna_PFA0680c-2;Name=isoform2;protein_decorations=SignalP4:SP:1:25:0.444,exportpred:VTS:42:48:7.50725;Parent=PFA0680c
+MAL1	PlasmoDB_70	CDS	550034	550102	.	-	0	ID=cds_PFA0680c-2-1;Name=cds_PFA0680c-2-1;Parent=rna_PFA0680c-2
+MAL1	PlasmoDB_70	CDS	549500	549939	.	-	0	ID=cds_PFA0680c-2-2;Name=cds_PFA0680c-2-2;Parent=rna_PFA0680c-2
+
+MAL1	PlasmoDB_70	gene	549319	550102	.	-	.	ID=PFA0680c-p;Name=PFA0680c-plus;Note=a TM decoration outside of protein boundaries for secound isoform
+MAL1	PlasmoDB_70	mRNA	549319	550102	.	-	.	ID=rna_PFA0680c-p-1;Name=isoform1;protein_decorations=TMHMM:TM:1:1790:10,TMHMM:TM:184:223:10,SignalP4:SP:1:25:0.444,exportpred:VTS:42:48:7.50725;Parent=PFA0680c-p
+MAL1	PlasmoDB_70	CDS	550034	550102	.	-	0	ID=cds_PFA0680c-p-1-1;Name=cds_PFA0680c-p-1-1;Parent=rna_PFA0680c-p-1
+MAL1	PlasmoDB_70	CDS	549319	549939	.	-	0	ID=cds_PFA0680c-p-1-2;Name=cds_PFA0680c-p-2-2;Parent=rna_PFA0680c-p-1
+MAL1	PlasmoDB_70	mRNA	549500	550102	.	-	.	ID=rna_PFA0680c-p-2;Name=isoform2;protein_decorations=SignalP4:SP:1:25:0.444,exportpred:VTS:42:48:7.50725;Parent=PFA0680c-p
+MAL1	PlasmoDB_70	CDS	550034	550102	.	-	0	ID=cds_PFA0680c-p-2-1;Name=cds_PFA0680c-p-2-1;Parent=rna_PFA0680c-p-2
+MAL1	PlasmoDB_70	CDS	549500	549939	.	-	0	ID=cds_PFA0680c-p-2-2;Name=cds_PFA0680c-p-2-2;Parent=rna_PFA0680c-p-2
+
+MAL1	PlasmoDB_70	gene	549319	549619	.	+	.	ID=test1;Name=test1;Note=decoration coordinate invalid
+MAL1	PlasmoDB_70	mRNA	549319	549619	.	+	.	ID=rna_test1-1;Name=rna_test1-1;protein_decorations=SignalP:SP:.5:10aef:1.d0,method1:very interesting region:30:80:0.88;Parent=test1
+MAL1	PlasmoDB_70	CDS	549319	549619	.	+	0	ID=cds_test1-1;Parent=rna_test1-1
+
+MAL1	PlasmoDB_70	gene	549319	549619	.	-	.	ID=PVX_000640;Name=test2;Note=decoration missing a coordinate
+MAL1	PlasmoDB_70	mRNA	549319	549619	.	-	.	ID=rna_PVX_000640-1;Name=PVX_000640-1;Parent=PVX_000640;protein_decorations=PfamA25:Ribosomal_S12:1
+MAL1	PlasmoDB_70	UTR	549589	549619	.	-	0	ID=utr_PVX_000640-1;Name=utr_PVX_000640-1;Parent=rna_PVX_000640-1
+MAL1	PlasmoDB_70	CDS	549319	549588	.	-	0	ID=cds_PVX_000640-1;Name=cds_PVX_000640-1;Parent=rna_PVX_000640-1

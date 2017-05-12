@@ -1,0 +1,259 @@
+#Meta definitions
+
+_baselang_
+NT PT
+
+_order_ 
+NT SN, NT, INST, HAS, BY, MAKES, URL, POF, IOF, PT, EN, FR, BT
+
+_language_
+NT EN, FR
+
+_top_
+NT Alfarrábio
+
+_relation_
+NT INST, HAS, BY, MAKES, URL, POF, IOF
+
+_external_
+NT URL
+
+INST
+SN     Intance of
+INV    IOF
+
+HAS
+INV    POF
+
+POF
+SN     Part of
+
+BY
+INV    MAKES
+SN     Made by
+
+MAKES
+SN     he makes
+
+#Fim de Meta 
+
+Alfarrábio
+NT  elemento   urbano
+NT	local
+NT	pessoa
+NT	imagem
+NT	arquivo
+NT	música
+NT	associações e instituições
+NT	texto
+
+desporto e lazer
+NT	orientação
+NT	trilhos
+NT	turismo
+
+
+turismo
+NT   quintas e solares
+
+arquivo
+NT	enciclopédia,
+NT	paginaCooperante, revista, agenda cultural
+HAS	fundo
+INST	Alfarrábio, Vercial, Geira, Arquivo de letras de música portuguesa,
+      Cancioneiro, História de Portugal
+
+agenda cultural
+INST	Agenda Braga Cultural
+
+escritor
+NT	poeta
+
+matemático
+
+músico
+NT	compositor de música clássica, agrupamento musical, compositor, cantor
+SN	pessoa ou conjunto de pessoas directamente ligados à
+   música
+RT	instrumentos musicais
+MAKES	música
+
+música
+NT	karaoke, partitura
+NT	instrumentos musicais, fado, mornas, romances
+NT	música com acordes
+NT      etno-musicologia
+UF    canção
+
+pessoa
+SN	pg. ou conjunto que contem informação sobre uma determinada pessoa
+NT	artista, matemático, personagem
+NT	jornalista, médico, industrial, político, advogado
+
+artista
+NT	escritor, músico, cineasta, escultor, pintor
+
+personagem
+SN	personagem histórica
+NT	monarca, navegador
+
+rei
+USE monarca
+
+pintor
+SN	inclui artistas autores de pinturas, desenhos, gravuras, aguarelas
+MAKES	pintura, desenho, aguarela
+
+poema
+BY	poeta
+
+texto
+BY	escritor
+NT	lenda, oração, poema, conto popular, biografia, monografia, livro, artigo
+
+estátua
+BY	escultor
+
+revista
+UF	jornal
+
+foto
+UF	fotografia
+BT	imagem
+
+imagem
+NT	desenho, aguarela, foto, pintura
+
+línguas
+INST	português, galego, chinês
+NT	gramática
+
+português
+UF	língua portuguesa
+
+software
+SN	programas, script, módulos, ...
+NT	script, module, CGI
+
+associação
+SN	incluindo núcleos, clubes, etc
+UF	grupo, núcleo
+
+associações e instituições
+NT	associação, museu, biblioteca, parque,
+
+parque
+UF	parque natural, area-protegida
+INST	Parque Nacional da Peneda-Gerês ,Parque Natural do Alvão
+INST    Area Protegida do Litoral de Esposende
+
+período barroco
+NT      sec. XVIII
+
+ciência
+NT	matemática, físico-química, botânica, zoologia,  ecologia, astronomia,
+   geologia, telecomunicões
+
+astronomia
+
+ecologia
+NT	parque
+
+literatura
+BY	escritor
+
+curso
+BT	didática
+
+físico-química
+
+matemática
+BY	matemático
+
+monografia
+SN	texto ou conjunto de textos acerca de uma localidade
+
+casa
+NT café
+NT igreja
+NT convento
+
+café
+HAS esplanada
+
+monumento
+NT igreja , paço, convento, ruína
+
+igreja
+HAS igreja_po, rosácea
+
+janela
+NT janela de rótula
+
+elemento urbano
+NT jardim, praça, rua, monumento, pormenor arq, casa
+
+elemento natural/rural
+NT flor, árvore, paisagem, moinhos
+
+pormenor arq
+NT janela, estátua, porta, varanda, clara-bóia
+
+local
+NT	povoação, região, cidade, vila, freguesia, concelho, distrito, província
+NT      país
+
+cidade
+INST	Viana do Castelo, Bragança, Porto, Braga, Vila Real, Miranda do Douro
+INST	Guimarães, Esposende,  Póvoa do Varzim, Chaves, Famalicão
+INST	Fafe, Mirandela, Valpaços
+
+vila
+INST	Taipas, Ponde do Lima, Ponte da Barca, Lindoso, Vila Flor
+INST	Vila do Conde, Monção
+
+Minho
+IOF 	província
+HAS	Viana do Castelo, Braga, Guimarães, Esposende, Fafe
+HAS	Taipas, Ponde do Lima, Ponte da Barca, Lindoso
+HAS	Caminha, Melgaço, Valença, Famalicão, Monção
+
+Trás-os-Montes
+IOF 	província
+HAS	Bragança, Vila Real, Miranda do Douro, Chaves, Valpaços
+HAS     Vila Flor, Mirandela, Mogadouro, Macedo de Cavaleiros, Moncorvo
+
+Douro Litoral
+IOF 	província
+HAS     Porto
+
+Portugal
+IOF     país
+HAS     Trás-os-Montes, Douro Litoral, Minho
+
+Cabo Verde
+IOF     país
+RT	mornas
+
+etnografia
+NT      seda, olaria, linho, rendas, alfaias agrícolas, etno-musicologia
+
+têxtil
+NT     linho, seda, rendas
+
+linho
+URL   http://natura.di.uminho.pt/~jj/linho/
+
+história
+NT    numismática, arqueologia
+HAS   personagem
+
+arqueologia
+NT   arqueosítio
+
+visita guiada
+SN    Exemplo: passeios virtuais, etc
+
+clérigo
+UF padre
+BT  pessoa

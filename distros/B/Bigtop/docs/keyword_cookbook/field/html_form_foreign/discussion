@@ -1,0 +1,28 @@
+=head1 USE
+
+All field keywords beginning with C<html_form_> are passed directly
+into the form hash.  Thus, they are really defined in form.tt which
+ships with Gantry.
+
+C<html_form_foreign> applies only when the field's html_form_type is display.
+It indicates that this field is a foreign key and C<foreign_display>
+should be used to get a human readable value to display instead of
+showing the rather meaningless foreign row id.
+
+Note that this keyword is usually used when two different versions of
+a form are presented depending on the context.  The base form uses
+C<html_form_type> select and C<html_form_foreign> is ignored.  Later,
+another form is displayed (to a less priviledged user) which uses
+C<html_form_type> display.  The form type is usually switched with
+the C<Gantry::Utils::FormMunger>.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in the form method
+in lib/Kids/GEN/Child.pm.  Note the use of data statements to populate
+the table.  See the pod for C<Gantry::Utils::FormMunger> for a more
+natural approach.

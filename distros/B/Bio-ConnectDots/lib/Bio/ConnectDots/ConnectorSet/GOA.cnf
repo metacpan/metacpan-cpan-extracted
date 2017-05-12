@@ -1,0 +1,25 @@
+# example cnf file for GOA
+
+name=GOA
+module=GOA
+version=07/07/2004
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp.ebi.ac.uk
+ftp_files=/pub/databases/GO/goa/HUMAN/gene_association.goa_human.gz,/pub/databases/GO/goa/MOUSE/gene_association.goa_mouse.gz,/pub/databases/GO/goa/RAT/gene_association.goa_rat.gz
+
+
+label=Database, dotset=Database_Name
+label=DB_Object_ID, dotset=Sequence_ID
+label=DB_Object_Symbol, dotset=Gene_Name
+label=GO_id, dotset=Sequence_ID
+label=DB_Reference, dotset=Reference
+label=Evidence, dotset=Reference
+label=Aspect, dotset=Ontology
+label=DB_Object_Name, dotset=Gene_Name
+label=IPI_id, dotset=Sequence_ID
+label=Taxon_ID, dotset=Taxonomy
+
+

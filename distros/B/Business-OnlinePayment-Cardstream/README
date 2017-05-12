@@ -1,0 +1,15 @@
+
+BETA VERSION.
+
+Business::OnlinePayment::Cardstream is a sub class to Business::OnlinePayment, a generic online payment module, to enable integration with Cardstream.
+
+INSTALLATION (Quick).
+
+	perl makefile.PL
+	make
+	make install
+
+See the pod documentation of Cardstream.pm and Business::OnlinePayment for useage instructions.
+
+
+For information on obtaining a merchant account please visit http://www.cardstream.com or e-mail sales@cardstream.com.  

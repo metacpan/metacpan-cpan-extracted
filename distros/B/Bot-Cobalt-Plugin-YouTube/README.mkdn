@@ -1,0 +1,22 @@
+# NAME
+
+Bot::Cobalt::Plugin::YouTube - YouTube plugin for Bot::Cobalt
+
+# SYNOPSIS
+
+    !plugin load YT Bot::Cobalt::Plugin::YouTube
+
+# DESCRIPTION
+
+A [Bot::Cobalt](https://metacpan.org/pod/Bot::Cobalt) plugin.
+
+Retrieves YouTube links pasted to an IRC channel and reports titles
+(as well as shorter urls) to IRC.
+
+Operates on both 'youtube.com' and 'youtu.be' links.
+
+Disregards channels with a 'no\_yt\_retrieve' flag enabled.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>

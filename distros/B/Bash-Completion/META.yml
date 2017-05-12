@@ -1,0 +1,29 @@
+---
+abstract: 'Extensible system to provide bash completion'
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::Deep: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bash-Completion
+requires:
+  File::Spec: 0
+  File::Spec::Functions: 0
+  Getopt::Long: 2.36
+  List::MoreUtils: 0
+  Module::Load: 0.22
+  Module::Pluggable: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/melo/bash-completion/issues
+  repository: git://github.com/melo/bash-completion.git
+version: 0.008

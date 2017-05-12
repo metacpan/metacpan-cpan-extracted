@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<?xml-stylesheet type="text/xml" href="http://www.wormbase.org/dtd/bio-gmod/xsl/species_index.xsl"?>-->
+<!--<!DOCTYPE bio_gmod_defaults SYSTEM "http://localhost/standard_urls/dtd/standard_urls.dtd">-->
+<gmod_defaults>
+<live_server>
+    <name>WormBase Production Server</name>
+    <url>http://www.wormbase.org</url>
+    <description>The primary WormBase server</description>
+  </live_server>
+
+<development_server>
+    <name>WormBase Development Server</name>
+    <url>http://dev.wormbase.org</url>
+    <description>The WormBase development server</description>
+</development_server>
+
+<installation_paths>
+    <acedb>/usr/local/acedb</acedb>
+    <mysql>/usr/local/mysql/data</mysql>
+    <tmp>/user/local/gmod/wormbase/releases</tmp>
+    <install>/usr/local/wormbase</install>
+</installation_paths>
+
+<remote_paths>
+    <ftp_site>dev.wormbase.org</ftp_site>
+    <ftp_root>/usr/local/ftp</ftp_root>
+    <ftp_base>/pub/wormbase</ftp_base>
+
+
+<install_components>
+    <component>
+        <name>acedb</acedb>
+        <path>$ACEDB_ROOT</path>
+        <filename>elegans_%s.ace.tgz</filename> 
+        <disk_space_requirements>
+               <download>2</download>
+               <install>10</install>
+        </disk_space_requirements>
+    </component>
+
+    <component>
+        <name>elegans_gff</acedb>
+        <path>$MYSQL_ROOT</path>
+        <filename>elegans_%s.gff.tgz</filename> 
+        <disk_space_requirements>
+               <download>0.7</download>
+               <install>3.5</install>
+        </disk_space_requirements>
+    </component>
+
+    <component>
+        <name>briggsae_gff</acedb>
+        <path>$MYSQL_ROOT</path>
+        <filename>briggsae_%s.gff.tgz</filename> 
+        <disk_space_requirements>
+              <download>0.7</download>
+              <install>5</install>
+        </disk_space_requirements>
+    </component>
+
+    <component>
+        <name>blast_blat</acedb>
+        <path>$MYSQL_ROOT</path>
+        <filename>blast_%s.tgz</filename> 
+        <disk_space_requirements>
+              <download>0.2</download>
+              <install>0.5</install>
+        </disk_space_requirements>
+    </component>
+</install_components>
+
+</gmod_defaults>

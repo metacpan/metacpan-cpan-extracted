@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use strict;
+use BSD::Process::Affinity;
+
+if(scalar @ARGV < 2){
+	print "Usage: affinity_mask command_and_args\n";
+	exit;
+}
+
+my $affinity = shift @ARGV;
+
+BSD::Process::Affinity
+    ->get_process_mask()
+	->set($affinity)
+	->update()
+;
+exec(@ARGV);
+
+__END__
+
+=head1 NAME
+
+runaffinity - Runs given command with affinity set
+
+=head1 SYNOPSIS
+
+Typical usage:
+
+ $ runaffinity 0100 gzip -7 /some/large/file
+
+Options synopsis:
+
+ $ runaffinity affinity_mask command_and_args
+
+=head1 DESCRIPTION
+
+Runs supplied command with affinity applied. Mask must be a string
+consisting of 0 and 1. CPU0 comes rightmost, here are two examples:
+
+	0101 - CPU0 + CPU2
+	1000 - CPU3 only
+
+=head1 SEE ALSO
+
+man 2 cpuset_getaffinity
+
+man 2 cpuset
+
+=head1 AUTHOR
+
+Sergey Aleynikov <sergey.aleynikov@gmail.com>
+
+=cut

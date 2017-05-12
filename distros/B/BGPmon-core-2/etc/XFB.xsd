@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<xs:schema targetNamespace="urn:ietf:params:xml:ns:xfb-0.1" xmlns="urn:ietf:params:xml:ns:xfb-0.1" xmlns:xfb="urn:ietf:params:xml:ns:xfb-0.1" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:annotation>
+    <xs:documentation>
+      XML Format for BGP Information v0.1, see RFC XXX
+      </xs:documentation>
+  </xs:annotation>
+  <xs:element name="BGP_MESSAGE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="xfb:TIME"/>
+        <xs:element ref="xfb:PEERING" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="xfb:ASCII_MSG" minOccurs="0" maxOccurs="1"/>
+        <xs:element ref="xfb:OCTET_MSG" minOccurs="0" maxOccurs="1"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="xfb:STATUS_MSG"/>
+      </xs:sequence>
+      <xs:attribute type="xs:string" name="version" fixed="0.1" use="required"/>
+      <xs:attribute use="required" name="length" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TIME">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element type="xs:long" name="TIMESTAMP"/>
+        <xs:element type="xs:dateTime" name="DATETIME" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="PRECISION_TIME" type="xs:long" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PEERING">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SRC_ADDR" type="xfb:address"/>
+        <xs:element name="SRC_PORT" type="xfb:port"/>
+        <xs:element type="xfb:asn" name="SRC_AS" minOccurs="0" maxOccurs="1"/>
+        <xs:element type="xfb:address" name="DST_ADDR"/>
+        <xs:element name="DST_PORT" type="xfb:port"/>
+        <xs:element name="DST_AS" type="xfb:asn" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OCTET_MSG">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="MARKER" type="xfb:octets"/>
+        <xs:element name="LENGTH" type="xs:nonNegativeInteger"/>
+        <xs:element name="TYPE" type="xfb:bgp_type"/>
+        <xs:element name="OCTETS" type="xfb:octets"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ASCII_MSG">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="MARKER" type="xfb:octets"/>
+        <xs:element name="LENGTH" type="xs:nonNegativeInteger"/>
+        <xs:element name="TYPE" type="xfb:bgp_type"/>
+        <xs:choice>
+          <xs:element ref="xfb:OPEN"/>
+          <xs:element ref="xfb:UPDATE"/>
+          <xs:element ref="xfb:NOTIFICATION"/>
+          <xs:element ref="xfb:KEEPALIVE"/>
+          <xs:element ref="xfb:ROUTE_REFRESH"/>
+          <xs:element ref="xfb:CISCO_ROUTE_REFRESH"/>
+          <xs:element ref="xfb:UNKNOWN"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="STATUS_MSG">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="xfb:BGPMON"/>
+        <xs:choice>
+          <xs:element ref="xfb:SESSION_STATUS" minOccurs="0" maxOccurs="1"/>
+          <xs:element ref="xfb:CHAIN_STATUS" minOccurs="0" maxOccurs="1"/>
+          <xs:element minOccurs="0" maxOccurs="1" ref="xfb:QUEUE_STATUS"/>
+          <xs:element ref="xfb:BGPMON_STATUS" minOccurs="0" maxOccurs="1"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OPEN">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="VERSION" type="xs:string"/>
+        <xs:element name="SRC_AS" type="xfb:asn"/>
+        <xs:element name="HOLD_TIME" type="xs:nonNegativeInteger"/>
+        <xs:element name="SRC_BGP" type="xfb:address"/>
+        <xs:element name="OPT_PAR_LEN" type="xs:nonNegativeInteger"/>
+        <xs:element ref="xfb:OPT_PAR"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="OPT_PAR">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" minOccurs="0" ref="xfb:PARAMETER"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PARAMETER">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="LENGTH" type="xs:nonNegativeInteger"/>
+        <xs:element name="TYPE" type="xfb:par_type"/>
+        <xs:choice>
+          <xs:element ref="xfb:AUTHENTICATION"/>
+          <xs:element ref="xfb:CAPABILITIES"/>
+          <xs:element ref="xfb:OTHER"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="code" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AUTHENTICATION">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:hexBinary">
+          <xs:attribute name="code" type="xs:string"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CAPABILITIES">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="CAP">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CODE" type="xs:string"/>
+              <xs:element name="LENGTH" type="xs:long"/>
+              <xs:element name="DATA" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:integer" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UNKNOWN" type="xs:hexBinary"/>
+  <xs:element name="UPDATE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="WITHDRAWN_LEN" type="xs:nonNegativeInteger"/>
+        <xs:element ref="xfb:WITHDRAWN"/>
+        <xs:element name="PATH_ATTRIBUTES_LEN" type="xs:nonNegativeInteger"/>
+        <xs:element ref="xfb:PATH_ATTRIBUTES"/>
+        <xs:element ref="xfb:NLRI"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PATH_ATTRIBUTES">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="xfb:ATTRIBUTE"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ATTRIBUTE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="FLAGS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OPTIONAL" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="TRANSITIVE" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="PARTIAL" minOccurs="0" maxOccurs="1"/>
+              <xs:element name="EXTENDED" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+            <xs:attribute name="code" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="LENGTH" type="xs:long"/>
+        <xs:element name="TYPE" type="xfb:attr_type"/>
+        <xs:choice>
+          <xs:element ref="xfb:ORIGIN"/>
+          <xs:element ref="xfb:AS_PATH"/>
+          <xs:element ref="xfb:NEXT_HOP"/>
+          <xs:element ref="xfb:MULTI_EXIT_DISC"/>
+          <xs:element ref="xfb:LOCAL_PREF"/>
+          <xs:element ref="xfb:ATOMIC_AGGREGATE"/>
+          <xs:element ref="xfb:AGGREGATOR"/>
+          <xs:element ref="xfb:COMMUNITIES"/>
+          <xs:element ref="xfb:ORIGINATOR_ID"/>
+          <xs:element ref="xfb:CLUSTER_LIST"/>
+          <xs:element ref="xfb:ADVERTISER"/>
+          <xs:element ref="xfb:RCID_PATH"/>
+          <xs:element ref="xfb:MP_REACH_NLRI"/>
+          <xs:element ref="xfb:MP_UNREACH_NLRI"/>
+          <xs:element ref="xfb:EXTENDED_COMMUNITIES"/>
+          <xs:element ref="xfb:AS4_PATH"/>
+          <xs:element ref="xfb:AS4_AGGREGATOR"/>
+          <xs:element ref="xfb:OTHER"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ORIGIN" type="xfb:origin_type"/>
+  <xs:element name="AS_PATH" type="xfb:as_path"/>
+  <xs:element name="NEXT_HOP" type="xfb:address"/>
+  <xs:element name="MULTI_EXIT_DISC" type="xs:integer"/>
+  <xs:element name="LOCAL_PREF" type="xs:integer"/>
+  <xs:element name="ATOMIC_AGGREGATE"/>
+  <xs:element name="AGGREGATOR" type="xfb:aggregator"/>
+  <xs:element name="COMMUNITIES">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="NO_EXPORT"/>
+        <xs:element name="NO_ADVERTISE"/>
+        <xs:element name="NO_EXPORT_SUBCONFED"/>
+        <xs:element ref="xfb:COMMUNITY"/>
+        <xs:element ref="xfb:RESERVED_COMMUNITY"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="COMMUNITY" type="xfb:community_type"/>
+  <xs:element name="RESERVED_COMMUNITY" type="xfb:community_type"/>
+  <xs:element name="ORIGINATOR_ID" type="xs:integer"/>
+  <xs:element name="CLUSTER_LIST">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ADVERTISER" type="xfb:address"/>
+  <xs:element name="RCID_PATH">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MP_REACH_NLRI">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AFI" type="xfb:afi_type"/>
+        <xs:element name="SAFI" type="xfb:safi_type"/>
+        <xs:element ref="xfb:NEXT_HOP"/>
+        <xs:element name="SNPA_LIST_LEN" type="xs:nonNegativeInteger"/>
+        <xs:element ref="xfb:SNPA_LIST"/>
+        <xs:element ref="xfb:NLRI"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SNPA_LIST">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="SNPA" type="xfb:prefix" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MP_UNREACH_NLRI">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="AFI" type="xfb:afi_type"/>
+        <xs:element name="SAFI" type="xfb:safi_type"/>
+        <xs:element ref="xfb:WITHDRAWN"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EXTENDED_COMMUNITIES" type="xfb:octets_attribute"/>
+  <xs:element name="AS4_PATH" type="xfb:as_path"/>
+  <xs:element name="AS4_AGGREGATOR" type="xfb:aggregator"/>
+  <xs:element name="OTHER">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="OCTETS" type="xfb:octets"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="WITHDRAWN" type="xfb:prefixes"/>
+  <xs:element name="NLRI" type="xfb:prefixes"/>
+  <xs:element name="NOTIFICATION">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="CODE" type="xfb:error_type"/>
+        <xs:element name="SUBCODE" type="xfb:error_type"/>
+        <xs:element name="DATA" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="KEEPALIVE"/>
+  <xs:element name="ROUTE_REFRESH">
+    <xs:complexType>
+      <xs:attributeGroup ref="xfb:attr_group_afi"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CISCO_ROUTE_REFRESH"/>
+  <xs:element name="BGPMON_STATUS">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element name="START"/>
+        <xs:element name="STOP"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QUEUE_STATUS">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="xfb:QUEUE"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="QUEUE">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="NAME" type="xs:string"/>
+        <xs:element name="ITEM" type="xfb:stat_type"/>
+        <xs:element name="WRITER" type="xfb:stat_type"/>
+        <xs:element name="READER" type="xfb:stat_type"/>
+        <xs:element name="PACING">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FLAG" type="xs:string"/>
+              <xs:element name="COUNT" type="xfb:stat_type"/>
+              <xs:element type="xfb:stat_type" name="WRITE_LIMIT"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CHAIN_STATUS">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="xfb:CHAIN" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CHAIN">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="PEERING_STAT"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SESSION_STATUS">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="xfb:SESSION" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SESSION">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="xfb:PEERING_STAT"/>
+        <xs:group ref="xfb:SESSION_STAT" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="BGPMON">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ADDR" type="xfb:address"/>
+        <xs:element name="PORT" type="xfb:port"/>
+        <xs:element type="xfb:asn" name="AS" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="PEERING_STAT">
+    <xs:sequence>
+      <xs:element type="xfb:address" name="ADDR"/>
+      <xs:element name="PORT" type="xfb:port" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="AS" type="xfb:asn" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="STATE" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="STATE_CHANGE" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="OLD_STATE" type="xs:integer"/>
+            <xs:element name="NEW_STATE" type="xs:integer"/>
+            <xs:element name="REASON" type="xs:integer"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="OPTIME" type="xfb:time_type" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="RECV_MESSAGE" type="xfb:stat_type" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="RESET" type="xfb:stat_type" minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="SESSION_STAT">
+    <xs:sequence>
+      <xs:element name="PREFIX"/>
+      <xs:element name="ATTRIBUTE"/>
+      <xs:element name="MEMORY_USAGE"/>
+      <xs:element name="ANNOUNCEMENT" type="xfb:stat_type"/>
+      <xs:element name="DUP_ANNOUNCEMENT" type="xfb:stat_type"/>
+      <xs:element name="SAME_PATH" type="xfb:stat_type"/>
+      <xs:element name="DIFF_PATH" type="xfb:stat_type"/>
+      <xs:element name="WITHDRAWAL" type="xfb:stat_type"/>
+      <xs:element name="DUP_WITHDRAWAL" type="xfb:stat_type"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="address">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attributeGroup ref="attr_group_afi"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="prefix">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="label" type="xs:string"/>
+        <xs:attributeGroup ref="attr_group_afi"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="prefixes">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" type="xfb:prefix" name="PREFIX"/>
+    </xs:sequence>
+    <xs:attribute name="count" type="xs:nonNegativeInteger"/>
+  </xs:complexType>
+  <xs:simpleType name="port">
+    <xs:restriction base="xs:integer">
+      <xs:maxInclusive value="65535"/>
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="asn">
+    <xs:restriction base="xs:nonNegativeInteger"/>
+  </xs:simpleType>
+  <xs:complexType name="as_path">
+    <xs:sequence>
+      <xs:element name="AS" type="xfb:asn" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xfb:enum_as_path_type"/>
+  </xs:complexType>
+  <xs:complexType name="aggregator">
+    <xs:sequence>
+      <xs:element name="AS" type="xfb:asn"/>
+      <xs:element name="ADDR" type="xfb:address"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="octets">
+    <xs:simpleContent xml:base="xs:hexBinary">
+      <xs:extension base="xs:string">
+        <xs:attribute name="length" type="xs:nonNegativeInteger" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="bgp_type">
+    <xs:simpleContent>
+      <xs:extension base="enum_bgp_type">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="origin_type">
+    <xs:simpleContent>
+      <xs:extension base="enum_origin_type">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="par_type">
+    <xs:simpleContent>
+      <xs:extension base="enum_par_type">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="afi_type">
+    <xs:simpleContent>
+      <xs:extension base="enum_afi_type">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="safi_type">
+    <xs:simpleContent>
+      <xs:extension base="enum_safi_type">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="attr_type">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="error_type">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:nonNegativeInteger" name="value"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="community_type">
+    <xs:sequence>
+      <xs:element name="AS" type="xfb:asn"/>
+      <xs:element name="VALUE" type="xs:nonNegativeInteger"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="octets_attribute">
+    <xs:sequence>
+      <xs:element type="xfb:octets" name="OCTETS"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:simpleType name="enum_yes_no_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YES"/>
+      <xs:enumeration value="NO"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_origin_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="IGP"/>
+      <xs:enumeration value="BGP"/>
+      <xs:enumeration value="INCOMPLETE"/>
+      <xs:enumeration value="OTHER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_par_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="AUTHENTICATION"/>
+      <xs:enumeration value="CAPABILITIES"/>
+      <xs:enumeration value="OTHER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_bgp_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="OPEN"/>
+      <xs:enumeration value="UPDATE"/>
+      <xs:enumeration value="NOTIFICATION"/>
+      <xs:enumeration value="KEEPALIVE"/>
+      <xs:enumeration value="ROUTE_REFRESH"/>
+      <xs:enumeration value="CISCO_ROUTE_REFRESH"/>
+      <xs:enumeration value="UNKNOWN"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_afi_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="IPV4"/>
+      <xs:enumeration value="IPV6"/>
+      <xs:enumeration value="OTHER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_as_path_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="as_sequence"/>
+      <xs:enumeration value="as_set"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="enum_safi_type">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="NLRI_UNICAST"/>
+      <xs:enumeration value="NLRI_MULTICAST"/>
+      <xs:enumeration value="NLRI_MPLS"/>
+      <xs:enumeration value="OTHER"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="stat_type">
+    <xs:simpleContent>
+      <xs:extension base="xs:float">
+        <xs:attributeGroup ref="xfb:attr_group_stat"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="time_type">
+    <xs:simpleContent>
+      <xs:extension base="xs:float">
+        <xs:attributeGroup ref="xfb:attr_group_time"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:attributeGroup name="attr_group_stat">
+    <xs:attribute name="avg" use="optional" type="xs:float"/>
+    <xs:attribute name="sdv" use="optional" type="xs:float"/>
+    <xs:attribute name="min" type="xs:float" use="optional"/>
+    <xs:attribute name="max" type="xs:float" use="optional"/>
+    <xs:attribute name="accu" type="xs:float"/>
+    <xs:attribute name="limit" type="xs:float" use="optional"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="attr_group_time">
+    <xs:attribute name="last_startup" use="optional" type="xs:long"/>
+    <xs:attribute name="last_down" use="optional" type="xs:long"/>
+    <xs:attribute name="last_action" use="optional" type="xs:long"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="attr_group_afi">
+    <xs:attribute name="afi" type="xfb:enum_afi_type" use="optional"/>
+    <xs:attribute name="afi_value" type="xs:nonNegativeInteger" use="optional"/>
+    <xs:attribute name="safi" type="xfb:enum_safi_type" use="optional"/>
+    <xs:attribute name="safi_value" type="xs:nonNegativeInteger" use="optional"/>
+  </xs:attributeGroup>
+</xs:schema>
+

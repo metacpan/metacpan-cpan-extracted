@@ -1,0 +1,14 @@
+a BT b        ==> add(b NT a).
+$a capital $b ==> add($b temComoCapital $a) add($a isa cidade) add($b isa país ).
+$a isa $a     ==> sub{ warn( "isa reclexia para $a\n"); }
+
+__END__
+
+fazMilagres regras the
+
+
+(vai executar:
+t1 = Thesaurusload("x").
+aplica(t1,PP); 
+ThesurusSave(t1,"y");
+)

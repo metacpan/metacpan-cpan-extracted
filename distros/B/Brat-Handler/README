@@ -1,0 +1,66 @@
+Brat-Handler version 0.1
+================================
+
+Brat::Handler is module for managing and handling Brat annotation
+files. It allows to print annotations in various formats.
+
+Contains this script :
+
+    concatBratFiles.pl
+
+(see MANIFEST for all the files)
+
+INSTALLATION
+
+It requires Mdoule::Build version 0.28 (at least)
+
+
+To install this module type the following:
+
+   perl Build.PL
+   Build
+   Build test
+   Build install
+
+Or if you like better the "make" program:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+        Module::Build => 0.28,
+	Getopt::Long
+	Test::Pod::Coverage
+	Test::Pod
+	Pod::Usage
+
+ If one of those modules are not installed, download it from
+ http://search.cpan.org and run the installation script (see the
+ README), or use the cpan command (switch as root or administrator
+ account if necessary):
+
+   cpan module
+
+   For instance: cpan Config::General
+
+   It will check the dependencies and install the module. 
+
+DOCUMENTATION
+
+See the documentation in the module (man yatea and man Brat::Handler)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Thierry Hamon
+
+This library and this program are free software; you can redistribute
+them and/or modify it under the same terms as Perl itself, either Perl
+version 5.8.6 or, at your option, any later version of Perl 5 you may
+have available.
+
+

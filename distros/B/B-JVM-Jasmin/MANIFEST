@@ -1,0 +1,36 @@
+MANIFEST                               This list of files in package
+MANIFEST.SKIP                          This list of files to ignore here
+README                                 Information about this package
+LICENSE                                Licensing of this module
+COPYING                                The GNU GPL; see LICENSE
+Artistic                               The Artistic License; see LICENSE
+ChangeLog                              Changes made on this package
+Jasmin.pm                              Primary module, B::JVM::Jasmin
+Makefile.PL                            MakeMaker Perl Makefile for package
+perljvm.PL                             Program to compile Perl to JVM
+lib/B/JVM/Jasmin/CompileState.pm       Internal package used by B::JVM::Jasmin
+lib/B/JVM/Emit.pm                      JVM code Emitter
+lib/B/JVM/Jasmin/Emit.pm               Code Emitter that uses Jasmin
+lib/B/JVM/Utils.pm                     Utility package for B::JVM modules
+test.pl                                Perl program to test this package
+tests/not-from-perl/truth.t            Test we wrote that do not come with perl
+tests/not-from-perl/print.t            Test we wrote that do not come with perl
+tests/not-from-perl/concat.t           Test we wrote that do not come with perl
+tests/not-from-perl/seq-neq.t          Test we wrote that do not come with perl
+tests/base/if.t                        Tests copied from the perl distribution
+Java/Makefile.PL                       Makefile for Java source
+Java/org/perl/internals/InvalidSvFieldException.java     Internal Java class
+Java/org/perl/internals/ScalarException.java             Internal Java class
+Java/org/perl/internals/Scalar.java                      Internal Java class
+Java/org/perl/internals/ScalarCreationException.java     Internal Java class
+Java/org/perl/internals/SvBase.java                      Internal Java class
+Java/org/perl/internals/SvDouble.java                    Internal Java class
+Java/org/perl/internals/SvInteger.java                   Internal Java class
+Java/org/perl/internals/SvString.java                    Internal Java class
+Java/org/perl/internals/SvStringIntegerDouble.java       Internal Java class
+Java/org/perl/internals/Stash.java                       Internal Java class
+Java/org/perl/internals/HV.java                          Internal Java class
+Java/org/perl/internals/GV.java                          Internal Java class
+Java/org/perl/internals/StackElement.java                Internal Java class
+Java/org/perl/internals/Functions.java                   Internal Java class
+Java/org/perl/internals/Hash.java                        Internal Java class

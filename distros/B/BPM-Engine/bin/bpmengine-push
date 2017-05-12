@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Pod::Usage;
+use Getopt::Long;
+use BPM::Engine;
+
+my $__help     = undef;
+my $__verbose  = undef;
+my $__force    = undef;
+
+GetOptions(
+    "help|h"       => \$__help,
+    "verbose|v"    => \$__verbose,
+    "force|f"      => \$__force,
+);
+
+pod2usage(1) if ($__help || scalar @ARGV != 2);
+
+my $dsn = "dbi:SQLite:dbname=$ARGV[1]";
+my $engine = BPM::Engine->new( connect_info => $dsn );
+$engine->create_package($ARGV[0]);
+
+print "Package file $ARGV[0] seeded\n";
+
+=pod
+
+=head1 NAME
+
+bpmengine-push - Push documents from the filesystem to the BPM::Engine database
+
+=head1 SYNOPSIS
+
+  bpmengine-push [OPTION]... <XPDL_FILE>... <DATABASE_FILE>
+
+Options:
+
+  -h, --help            This help message
+  -v, --verbose         Verbose output
+  -f, --force           Overwrite package that already exists
+
+Saving an XPDL file to the SQLite database t/var/bpmengine.db:
+
+  bpmengine-push t/var/01-basic.xpdl t/var/bpmengine.db
+
+=head1 DESCRIPTION
+
+This script will take an XPDL file and publish it to a BPM::Engine database.
+
+=head1 SEE ALSO
+
+L<BPM::Engine|BPM::Engine>
+
+=head1 AUTHOR
+
+Peter de Vos, C<< <sitetech at cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010, 2011 Peter de Vos, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

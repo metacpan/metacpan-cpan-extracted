@@ -1,0 +1,17 @@
+Revision history for Perl extension Bit::Vector::Minimal.
+
+1.3 Tue Oct  4 11:07:43 UTC 2005
+  - Minor minor tweaks
+  - Document 'display' method
+
+1.2 Thu Sep  1 07:57:25 UTC 2005
+  - Properly initialise pattern where size is not a multiple of 8
+    (Marvin Humphrey)
+
+1.1 Sun Oct 10 09:04:02 UTC 2004
+  - Tony Bowden now maintainer
+
+1.0  Tue Nov  4 16:09:08 2003
+  - original version; created by h2xs 1.22 with options
+    -b 5.6.0 -AX -n Bit::Vector::Minimal
+

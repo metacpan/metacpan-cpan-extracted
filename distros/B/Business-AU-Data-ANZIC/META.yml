@@ -1,0 +1,22 @@
+abstract: Australian New Zealand Standard Industrial Classification (ANZSIC) Codes
+author: Adam Kennedy <adamk@cpan.org>
+build_requires: 
+  ExtUtils::MakeMaker: 6.11
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Business-AU-Data-ANZIC
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Data::Package: 1.00
+  File::ShareDir: 0.05
+  IO::File: 1.14
+  Params::Util: 0.22
+  Parse::CSV: 1.00
+  perl: 5.005
+version: 0.01

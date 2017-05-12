@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 e730231256e60327113a3cb045e6efe49d8a738a Changes
+SHA1 f8540f03bf35f4d88fcb085ccc39b0591822dec8 INSTALL
+SHA1 4ebc9beec3e4e9a2aab4aabde50e720c40be5178 LICENSE
+SHA1 c2ca2fd582e49e6fd756cda7b43df57e8fac2f57 MANIFEST
+SHA1 0c1f5c595328ef5fd66c395fa312bb8245a93982 META.yml
+SHA1 8ca1407003209003b952ffb222bf2f871ffb15bb Makefile.PL
+SHA1 b988a83d8944a2a044fe5684f216c915ff9176b0 README
+SHA1 b779c6feec121285522c3902ad544b7dccf5502e README.pod
+SHA1 6da531acb189aeb00b4ccdd5c13c879c787a34c4 dist.ini
+SHA1 89426b91b3e226f83ecc65fb903383880311da99 lib/Business/OnlinePayment/Ogone.pm
+SHA1 6766b5f7718c8b82d43ece0da6d2efd9c026054b lib/Business/OnlinePayment/Ogone/Status.pm
+SHA1 021b9923e3932b2a87fd7adebd76ee51a10ccc82 t/00_use.t
+SHA1 d94a8609a318e0fb8c0ea5b3e8080b5f75bebcf6 t/10_functional.t
+SHA1 9a4d246eff39270d6eb360f3fb0cd89854a5da71 t/20_account.t
+SHA1 174aca8963f56307e21b2348035f44fba58a3cf5 t/30_alias.t
+SHA1 837ec9ecbfb96ed237405fac996482b559aa0990 t/40_recur.t
+SHA1 b0e175d192140c49ddd09942d7808499b0e7697f t/50_lowercase_pspid.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iF4EAREIAAYFAlUJH58ACgkQRYEBOuBGfunWHwD9Fsi2ZoHAWx31LGFmH02830Jv
+adb3HgkesAZ2JeRPo1wA/1VlHVRqd55XwnA/tRz+gh32OcRmNnnzxvek43HDkWJW
+=eDeQ
+-----END PGP SIGNATURE-----

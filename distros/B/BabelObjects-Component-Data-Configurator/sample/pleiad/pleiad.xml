@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+
+<!DOCTYPE bo [
+  <!ENTITY file_version   "1.0.1" >
+  <!ENTITY bo_base_conf "/var/cache/babelobjects/conf" >
+  <!ENTITY admin          "administrateur" >
+  <!ENTITY server         "tests" >
+  <!ENTITY ip             "192.168.2.--" >
+  <!ENTITY webdomain      "pleiad.net" >
+  <!ENTITY mailserver     "mailhub.pleiad.net" >
+  <!ENTITY maildomain     "pdl.pleiad.net" >
+]>
+
+<bo>
+  <parameter>
+        <bo_base_conf>&bo_base_conf;</bo_base_conf>
+  </parameter>
+  <classes>
+      <parameter>
+         <configurator>BO::Module::Data::Configurator</configurator>
+      </parameter>
+  </classes>
+  <rpms>
+    <rpm>apache-1.3.12-4.i686.rpm</rpm>
+    <rpm>apache-module-1.0-1.i386.rpm</rpm>
+    <rpm>mod_perl-1.24-1.i386.rpm</rpm>
+    <rpm>RedHat/bind-8.2.2_P5-9.i386.rpm</rpm>
+    <rpm>RedHat/bind-devel-8.2.2_P5-9.i386.rpm</rpm>
+    <rpm>RedHat/bind-utils-8.2.2_P5-9.i386.rpm</rpm>
+    <rpm>RedHat/openssl-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssl-devel-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-clients-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-server-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>db-3.1.14-1.i386.rpm</rpm>
+    <rpm>cyrus-sasl-1.5.24-1.i386.rpm</rpm>
+    <rpm>openldap-2.0.7-2.i386.rpm</rpm>
+    <rpm>ldapsdk-4.11-1.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-7.0.2-2.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-devel-7.0.2-2.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-jdbc-7.0.2-2.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-perl-7.0.2-2.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-python-7.0.2-2.i386.rpm</rpm>
+    <rpm>RedHat/postgresql-server-7.0.2-2.i386.rpm</rpm>
+    <rpm>java-blackdown-1.3-4.i686.rpm</rpm>
+    <rpm>java-jakarta-3.1-3.i686.rpm</rpm>
+    <rpm>java-ext-opensource-1.0-3.i686.rpm</rpm>
+    <rpm>java-ext-sun-1.0-2.i686.rpm</rpm>
+    <rpm>pleiad-java-1.0-1.i686.rpm</rpm>
+    <rpm>pleiad-conf-1.0-3.i686.rpm</rpm>
+  </rpms>
+ 
+  <services>
+    <service>apache</service>
+    <service>jakarta</service>
+    <service>pleiad</service>
+    <service>sendmail</service>
+  </services>
+
+  <apache>
+    <file>
+      <default>&bo_base_conf;/apache/httpd.conf.default</default>
+      <conf>/usr/local/apache/conf/httpd.conf</conf>
+    </file>
+      <parameter>
+        <loadmodule>
+            LoadModule perl_module        libexec/libperl.so
+            LoadModule php4_module        libexec/libphp4.so
+            LoadModule speling_module     libexec/mod_speling.so
+            PerlModule Apache::DBI
+            CheckSpelling on
+         </loadmodule>
+      </parameter>
+      <parameter>
+         <tomcat>Include /usr/local/babelobjects/conf/tomcat-apache.conf</tomcat>
+      </parameter>
+      <parameter>
+        <user>nobody</user>
+      </parameter>
+      <parameter>
+        <group>nobody</group>
+      </parameter>
+      <parameter>
+        <serveradmin>&admin;@&maildomain;</serveradmin>
+      </parameter>
+      <parameter>
+        <servername>&server;.&webdomain;</servername>
+      </parameter>
+      <parameter>
+        <documentroot>/opt/www/&server;.&webdomain;</documentroot>
+      </parameter>
+      <parameter>
+        <indexlist>index.php index.php3 index.bo Index.php Index.php3 Index.html Index.bo</indexlist>
+      </parameter>
+      <parameter>
+        <addtype>#</addtype>
+      </parameter>
+      <parameter>
+        <namevirtualhost>&ip;:80</namevirtualhost>
+      </parameter>
+      <parameter>
+        <virtualhosts>
+         # Configuration d'un serveur web virtuel pour Pleiad
+         &lt;VirtualHost &server;.&webdomain;&gt;
+             ServerAdmin &admin;@&maildomain;
+             ServerName &server;.&webdomain;
+             DocumentRoot /opt/www/&server;.&webdomain;
+ 
+             AddType text/html .html .php3 .php
+             AddType application/x-httpd-php .html .php3 .php .css
+ 
+             &lt;Location /&gt;
+                ErrorDocument     403 http://&server;.&webdomain;/non.html
+                ErrorDocument     404 http://&server;.&webdomain;/missing.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /SitesWWW&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /Administration&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /DOWNLOADS&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+
+             &lt;Location /Fr&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /Recapitulatif.html&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /sa&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+ 
+             &lt;Location /cnam/servlet/com.naonet.client.cnam.Administration&gt;
+                PerlAccessHandler Apache::auth_www_pleiad
+                ErrorDocument     403 http://&server;.&webdomain;/Login.html
+             &lt;/Location&gt;
+         &lt;/VirtualHost&gt;
+ 
+         &lt;VirtualHost webmail.&webdomain;&gt;
+             ServerAdmin &admin;@&maildomain;
+             ServerName webmail.&webdomain;
+             DocumentRoot /opt/www/webmail.&webdomain;
+         &lt;/VirtualHost&gt;
+         </virtualhosts>
+      </parameter>
+  </apache>
+
+  <jakarta>
+    <file>
+      <default>&bo_base_conf;/jakarta/server.xml.default</default>
+      <conf>/usr/local/java/jakarta/jakarta-tomcat/conf/server.xml</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/jakarta/web.xml.default</default>
+      <conf>/usr/local/java/jakarta/jakarta-tomcat/conf/web.xml</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/jakarta/tomcat-apache.conf.default</default>
+      <conf>/usr/local/babelobjects/conf/tomcat-apache.conf</conf>
+    </file>
+      <parameter>
+        <context>
+          &lt;Context path="/cnam" docBase="webapps/cnam" debug="1" reloadable="false"&gt;
+          &lt;/Context&gt;
+
+        </context>
+      </parameter>
+      <parameter>
+        <tomcatconf>
+Alias /cnam /usr/local/java/jakarta-3.1/jakarta-tomcat/webapps/cnam
+&lt;Directory "/usr/local/java/jakarta-3.1/jakarta-tomcat/webapps/cnam"&gt;
+    Options Indexes FollowSymLinks
+&lt;/Directory&gt;
+ApJServMount /cnam/servlet /cnam
+&lt;Location /cnam/WEB-INF/ &gt;
+    AllowOverride None
+    deny from all
+&lt;/Location&gt;
+        </tomcatconf>
+      </parameter>
+      <parameter>
+        <suffix>.bo</suffix>
+      </parameter>
+      <parameter>
+        <moreservlet>
+        &lt;servlet&gt;
+          &lt;servlet-name&gt;
+            com.naonet.client.cnam.Administration
+          &lt;/servlet-name&gt;
+          &lt;servlet-class&gt;
+            com.naonet.client.cnam.Administration
+          &lt;/servlet-class&gt;
+          &lt;init-param&gt;
+                &lt;param-name&gt;configFile&lt;/param-name&gt;
+                &lt;param-value&gt;/usr/local/pleiad/conf/admin-pgsql.properties&lt;/param-value&gt;
+          &lt;/init-param&gt;
+        &lt;/servlet&gt;
+        </moreservlet>
+      </parameter>
+
+  </jakarta>
+
+  <pleiad>
+    <file>
+      <default>&bo_base_conf;/pleiad/admin-pgsql.properties.default</default>
+      <conf>/usr/local/pleiad/conf/admin-pgsql.properties</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pleiad/auth_www_pleiad.pm.default</default>
+      <conf>/usr/local/lib/perl5/site_perl/5.6.0/Apache/auth_www_pleiad.pm</conf>
+    </file>
+    <file>
+      <default>&bo_base_conf;/pleiad/tables-pgsql.xml.default</default>
+      <conf>/usr/local/pleiad/conf/tables-pgsql.xml</conf>
+    </file>
+      <parameter>
+        <host>&server;.&webdomain;</host>
+      </parameter>
+      <parameter>
+        <dbhost>&server;.&webdomain;</dbhost>
+      </parameter>
+      <parameter>
+        <passwd>""</passwd>
+      </parameter>
+      <parameter>
+        <servlethost>&server;.&webdomain;</servlethost>
+      </parameter>
+      <parameter>
+        <webhost>&server;.&webdomain;</webhost>
+      </parameter>
+      <parameter>
+        <tplhost>&server;.&webdomain;</tplhost>
+      </parameter>
+      <parameter>
+        <domain>&webdomain;</domain>
+      </parameter>
+  </pleiad>
+
+  <sendmail>
+    <file>
+      <default>&bo_base_conf;/sendmail/sendmail.mc.pleiad.default</default>
+      <conf>/etc/mail/sendmail.mc</conf>
+    </file>
+    <parameter>
+        <mail_hub>&mailserver;</mail_hub>
+    </parameter>
+  </sendmail>
+
+  <cyrus>
+  </cyrus>
+</bo>

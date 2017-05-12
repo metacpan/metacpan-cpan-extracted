@@ -1,0 +1,63 @@
+CREATE TABLE number (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    number VARCHAR(100),
+    phone_type VARCHAR(100)
+);
+
+CREATE TABLE bday (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    contact MEDIUMINT,
+    bday date,
+    anniversary date,
+    known_since date
+);
+
+CREATE TABLE tshirt (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    ident VARCHAR(100)
+);
+
+CREATE TABLE color (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    ident VARCHAR(100),
+    foreigner MEDIUMINT
+);
+
+CREATE TABLE tshirt_color (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    tshirt MEDIUMINT,
+    color MEDIUMINT
+);
+CREATE TABLE tshirt_author (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    tshirt MEDIUMINT,
+    author MEDIUMINT
+);
+CREATE TABLE author (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    ident VARCHAR(100)
+);
+
+CREATE TABLE book (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    ident VARCHAR(100)
+);
+
+CREATE TABLE author_book (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    author MEDIUMINT,
+    book MEDIUMINT,
+    extra_field VARCHAR(100),
+    second_extra boolean
+);
+
+INSERT INTO author_book ( author, book, extra_field )
+    VALUES ( 1, 1, 'hello' );
+
+CREATE TABLE sch.name (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    number VARCHAR(100)
+);
+

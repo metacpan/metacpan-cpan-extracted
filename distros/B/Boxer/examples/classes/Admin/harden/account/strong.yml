@@ -1,0 +1,9 @@
+classes:
+  - Admin.harden.account
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include proactive account hardening tool John the Ripper
+  pkg:
+  - john

@@ -1,0 +1,69 @@
+#!/usr/bin/perl -s
+
+use strict;
+
+our($dn8_2, $dx8_1, $sufixo_p, $tab, $the);
+$dn8_2    //= 0;
+$dx8_1    //= 1;
+$sufixo_p //= 1;
+$the //= 1;
+
+my $A=qr{[a-zA-Z_]};
+my $N=qr{[0-9]};
+my $X=qr{[1-9]};
+my $P=qr{[0-9]};
+
+my $f1=qr{\s*$};
+my $f2=qr{\b};
+my $f3=qr{[ \t\-:]|$};
+
+my $termo;
+
+while(<>){
+#if($termo =~ m/^($A)($A)$f2/){ add("NT", $1) }
+#if($termo =~ m/^($A$A)($N$N)$f2/){ add("NT", $1) }
+  if(/(.*)\s/){$termo=$1} else {$termo=""}
+  print;
+  if ($dn8_2){
+    if($termo =~ m/^($N{6})($N{2})$f2/){ add($termo,"BT","${1}");next }
+    if($termo =~ m/^($N{4})($N{2})$f2/){ add($termo,"BT","${1}");next }
+    if($termo =~ m/^($N{2})($N{2})$f2/){ add($termo,"BT","${1}");next }
+  }
+
+  if ($dx8_1){
+    if($termo =~ m/^($N{1})$X(0{6})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{2})$X(0{5})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{3})$X(0{4})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{4})$X(0{3})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{5})$X(0{2})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{6})$X(0{1})$f2/){ add($termo,"BT","${1}0$2");next }
+    if($termo =~ m/^($N{7})$X$f2/)      { add($termo,"BT","${1}0"  );next }
+  }
+
+  if ($sufixo_p){
+    if($termo =~ m!^(\S+)[:._/](\S+)$f2!){ add($termo,"BT",$1);next;}
+  }
+}
+
+sub add{my ($a,$b,$c)=@_;
+  print "$b  $c\n" 
+}
+__END__
+
+\d\d$/GBT/00#\d\d\00$/GBT/0000#\d\d0000$/GBT/000000
+
+03111400-6
+
+XX000000-Y
+XXX00000-Y
+XXXX0000-Y
+XXXXX000-Y
+XXXXXX00-Y
+XXXXXXX0-Y
+
+A|A
+AA|XX
+
+NN|X|X|X|X|X|X-Y      X = digit or 0 /   N = digit /  P = parity digit
+
+NN|X|X|X|X|X|X-Y      Z = digit or nothing  / 

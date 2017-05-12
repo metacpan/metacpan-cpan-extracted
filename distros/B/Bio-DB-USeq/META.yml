@@ -1,0 +1,35 @@
+---
+abstract: 'Read USeq archive database files'
+author:
+  - 'Timothy Parnell <parnell.tj@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-DB-USeq
+provides:
+  Bio::DB::USeq:
+    file: lib/Bio/DB/USeq.pm
+    version: '0.23'
+  Bio::DB::USeq::Feature:
+    file: lib/Bio/DB/USeq.pm
+  Bio::DB::USeq::Iterator:
+    file: lib/Bio/DB/USeq.pm
+  Bio::DB::USeq::Segment:
+    file: lib/Bio/DB/USeq.pm
+  Bio::DB::USeq::Summary:
+    file: lib/Bio/DB/USeq.pm
+  Bio::DB::USeq::Wiggle:
+    file: lib/Bio/DB/USeq.pm
+requires:
+  Archive::Zip: '1.30'
+  Bio::Root::Version: '1.0069001'
+  perl: v5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.23'

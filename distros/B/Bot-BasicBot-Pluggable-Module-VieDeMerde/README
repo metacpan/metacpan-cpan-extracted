@@ -1,0 +1,44 @@
+Bot-BasicBot-Pluggable-Module-WatchLinks
+
+IRC frontend for WWW::VieDeMerde.
+
+See WWW::VieDeMerde and viedemerde.fr for more information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bot::BasicBot::Pluggable::Module::WatchLinks
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Module-WatchLinks
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-WatchLinks
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-WatchLinks
+
+    Search CPAN
+        http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-WatchLinks
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Olivier Schwander
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,33 @@
+Revision history for Business-Tax-Avalara
+
+v1.2.0	 2017-02-23
+        Updated the Avalara API URL.
+        Added basic support for CurrencyCode.
+        Added the ability to specify the original tax date when issuing a refund on part of an order.
+
+v1.1.0   2013-11-06
+        Added new function cancel_tax
+        Added debug mode option
+        Returning the error response on error rather than undef
+
+v1.0.6   2013-09-19
+        Added document_code optional node.
+        
+v1.0.5   2013-04-30
+        Split tests into t and xt directories. Cleaned up test results.
+        Cleaned up distribution bundling. No functional changes.
+
+v1.0.4   2013-04-29
+        Sacrificed on the altar of release management.
+        
+v1.0.3   2012-11-13
+        Changed commit boolean to send 'true' or 'false'.
+
+v1.0.2   2012-11-01
+        Added a request timeout, set the default to 3 seconds.
+        
+v1.0.1   2012-10-20
+        Added explicit perl version.
+        
+v1.0.0   2012-02-28
+        First public release.

@@ -1,0 +1,32 @@
+BioX-SeqUtils-Promoter version 0.1.1
+
+Perl tools for identification of core promoter elements in DNA sequneces
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, Charles Stephen Embry
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

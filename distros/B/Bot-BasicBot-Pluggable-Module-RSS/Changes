@@ -1,0 +1,11 @@
+Revision history for Bot-BasicBot-Pluggable-Module-RSS
+
+0.02	So 19 Jul 2009 22:13:26 CEST
+	added user_format to define output of news
+	changed some variables to be user definable
+	removed spurious warnings
+	prepared v0.02
+
+0.01    So 19 Jul 2009 12:28:39 CEST
+        First version, released on an unsuspecting world.
+

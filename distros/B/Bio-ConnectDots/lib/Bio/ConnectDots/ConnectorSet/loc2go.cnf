@@ -1,0 +1,15 @@
+# example cnf file for DoTS
+
+name=loc2go
+module=loc2go
+version=20041102
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.ncbi.nih.gov/refseq/LocusLink/
+ftp_files=loc2go
+
+label=LocusLink, dotset=LocusLink_ID
+label=GO, dotset=Ontology_ID
+label=GO_evidence, dotset=Evidence_ID

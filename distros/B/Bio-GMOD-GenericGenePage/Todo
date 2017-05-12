@@ -1,0 +1,9 @@
+TODO list for Perl module Bio::GMOD::GenericGenePage
+
+- Implement the render_html method
+- DONE! Add a description hook (comment type="function"?)
+- DONE! Add GO catagories
+- Add support for evidence codes for GO terms
+- Tentatively DONE! Add accession and something like data_source tag
+
+

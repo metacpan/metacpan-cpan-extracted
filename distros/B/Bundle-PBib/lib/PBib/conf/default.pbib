@@ -1,0 +1,112 @@
+/* $Id: default.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * Define defaults for PBib
+ *
+ * This file should NOT be changed, you can add your 
+ * - site's options to the "local.pbib" file and your 
+ * - personal options to the "user.pbib" file in your $HOME
+ *
+ */
+
+
+<biblio>
+	# what is the default length for text columns
+	column-max-string-length 65535
+	
+	# pass the database design to pbib
+	<column-types>
+		CiteKey	varchar(128)
+		CiteType tinyint unsigned
+		Category varchar(128)
+		Identifier varchar(128)
+		
+		CrossRef varchar(128)
+		
+		AccessMonth varchar(64)
+		AccessYear varchar(64)
+		Authors	text
+		Chapter	varchar(128)
+		Edition	varchar(128)
+		Editors	text
+		HowPublished varchar(128)
+		Institution varchar(128)
+		ISBN varchar(64)
+		ISSN varchar(64)
+		Journal	varchar(255)
+		Location varchar(255)
+		Month varchar(64)
+		Number varchar(64)
+		Organization varchar(255)
+		Pages varchar(64)
+		Publisher varchar(255)
+		ReportType varchar(255)
+		School varchar(255)
+		Series varchar(255)
+		SuperTitle varchar(255)
+		Title varchar(255)
+		Volume varchar(64)
+		Year varchar(64)
+		
+		Abstract text
+		Annotation text
+		BibDate datetime
+		BibNote	text
+		ExportDate datetime
+		Keywords varchar(255)
+		Note text
+		PBibNote text
+		Recommendation varchar(255)
+		
+		File text
+		Source text
+	</column-types>
+	
+	# map PBib's field names to the database columns
+	# per default all columns have the field's names.
+	<column-mapping>
+	</column-mapping>
+</biblio>
+
+# options for the user interface
+<pbib>
+	<query-author-fields>
+		Authors
+		Editors
+	</query-author-fields>
+	<query-keyword-fields>
+		CiteKey
+		Category
+		Identifier
+		Title
+		Abstract
+		Annotation
+		BibNote
+		Keywords
+		Note
+		PBibNote
+		Recommendation
+	</query-keyword-fields>
+</pbib>
+
+# supported file types (patterns to match the filename)
+<doc>
+	<file-types>
+		\.doc$		PBib::Document::MSWord
+		\.rtf$		PBib::Document::RTF
+		\.s[tx]w$	PBib::Document::OpenOfficeSXW
+		\.xml$		PBib::Document::XML
+		\.xhtml$	PBib::Document::XHTML
+	</file-types>
+</doc>
+
+<label>
+	unique 1
+</label>
+
+/*
+ * $Log: default.pbib,v $
+ * Revision 1.1  2003/06/16 09:10:54  tandler
+ * some new config files
+ * - default.pbib contains config that was previously directly in the perl source
+ *
+ */

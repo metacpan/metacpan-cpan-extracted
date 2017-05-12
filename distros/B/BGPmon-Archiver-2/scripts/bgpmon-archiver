@@ -1,0 +1,66 @@
+#!/bin/sh
+
+# Startup Debian and Ubuntu script for BGPmon-Archiver.
+# Author: Kaustubh Gadkari
+# kaustubh@cs.colostate.edu
+
+
+### BEGIN INIT INFO
+# Provides:          bgpmon-archiver.pl
+# Required-Start:    $syslog $local_fs $time
+# Required-Stop:     $syslog $local_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start BGPmon
+# Description:       Start BGPmon at boot time
+### END INIT INFO
+
+# Using LSB funtions:
+. /lib/lsb/init-functions
+
+set -e
+
+ARCHIVER=bgpmon-archiver.pl
+BINDIR=/usr/local/bin
+STATEDIR=/var/run/bgpmon-archiver
+ARCHIVER_EXEC=${BINDIR}/${ARCHIVER}
+SYSCONFDIR=/usr/local/etc
+CONFIG_FILE=${SYSCONFDIR}/archiver.conf
+PIDFILE=$STATEDIR/archiver.pid
+STARTSTOPD=/sbin/start-stop-daemon
+ARGS=" -config $CONFIG_FILE -daemonize"
+
+case "$1" in
+  start)
+        if [ -f $PIDFILE ]
+        then
+                echo "$PIDFILE exists, $ARCHIVER is already running or crashed!"
+        else
+                log_begin_msg "Starting bgpmon-archiver"
+                mkdir -p $STATEDIR
+                chown bgpmon:bgpmon $STATEDIR
+                ${STARTSTOPD} --start --quiet --user bgpmon --chuid bgpmon --pidfile $PIDFILE --exec $ARCHIVER_EXEC -- $ARGS || return 1
+                log_end_msg $?
+        fi
+        ;;
+  stop)
+
+        if [ ! -f $PIDFILE ]
+        then
+                echo "$PIDFILE does not exist, $ARCHIVER is not running!"
+        else
+                echo -n "Shutting down $ARCHIVER"
+                ${STARTSTOPD} --stop --oknodo --user bgpmon --retry 5 --quiet --pidfile $PIDFILE
+                log_end_msg $?
+        fi
+        ;;
+ restart)
+        $0 stop && sleep 30 && $0 start
+        ;;
+ *)
+        log_warning_msg "Usage: $ARCHIVER {start|stop|restart}" >&2
+        exit 1
+esac
+
+exit 0
+

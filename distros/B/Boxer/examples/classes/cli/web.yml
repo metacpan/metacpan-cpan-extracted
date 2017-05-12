@@ -1,0 +1,4 @@
+# elinks is arguably better, but not recognized by default by mc
+parameters:
+  pkg:
+    - links

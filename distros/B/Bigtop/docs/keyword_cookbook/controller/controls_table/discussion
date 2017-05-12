@@ -1,0 +1,41 @@
+=head1 USE
+
+One of the most commonly used controller keywords, C<controls_table>
+must be the name of a C<table> block in the same bigtop file.  This adds
+a use statement for the table's model and provides the link between
+controller methods and the underlying table.  This affects things like
+column labels on main listings, HTML form input element labels, etc.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Look in C<lib/Kids/Child.pm> to see
+
+    use Kids::Model::child qw(
+        $CHILD
+    );
+
+    #...
+    sub get_model_name {
+        return $CHILD;
+    }
+
+The model use statement is repeated in C<lib/Kids/GEN/Child.pm> from
+which C<Kids::Child> inherits.  To see side affects of C<controls_table>,
+look in the generated C<do_main>:
+
+    my $retval = {
+        headings       => [
+            'Name',
+            'Birth Day',
+        ],
+    };
+
+The C<Name> and C<Birth Day> labels were taken from the C<label> statements of
+fields blocks in the C<child>table, because they were listed in the C<cols>
+statement.
+
+Other similar magic happens because of C<controls_table>.

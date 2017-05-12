@@ -1,0 +1,74 @@
+Changelog for Beam-Runner
+
+0.009     2017-05-08 14:23:56-05:00 America/Chicago
+
+    [Added]
+
+    - A `summary` field in the task configuration to allow custom
+      summaries for tasks. These summaries appear in `beam list` instead
+      of the default summary (the module's `NAME` POD section)
+
+    [Fixed]
+
+    - Clarified the documentation a little: "Services" are now just
+      called "tasks" or "objects" depending on if they're executable or
+      not.
+
+0.008     2017-05-08 14:09:47-05:00 America/Chicago
+
+    [Fixed]
+
+    - Fix test failure when BEAM_PATH is set in environment
+    - Fix error message saying "service not found" when the service
+      failed to load because one of its dependencies was not found.
+
+0.007     2017-04-28 01:58:08-05:00 America/Chicago
+
+    [Fixed]
+
+    - `beam list` no longer displays container without runnable
+      services. This allows us to have utility containers without
+      cluttering up the output.
+
+    - `beam list <container>` will now throw an error if the given
+      container contains no runnable services
+
+0.006     2017-01-03 00:29:41-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed `help` command tests failing on Windows because of regex
+      metacharacters in Windows paths
+
+0.005     2017-01-01 23:01:20-06:00 America/Chicago
+
+    [Fixed]
+
+    - Fixed `help` command tests failing on Windows because of incorrect
+      path comparisons
+
+0.004     2016-12-31 22:46:21-06:00 America/Chicago
+
+    [Added]
+
+    - Added basic "help" command which shows the class documentation for
+      the given service from the given container.
+
+0.003     2016-12-29 01:15:57-06:00 America/Chicago
+
+    [Added]
+
+    - Added more information to the "list" command so that users can see
+      a short summary of what's in the listed container files, and an
+      abstract about what those runnable tasks might do. The previous
+      version only listed the names of containers/services, which wasn't
+      very useful.
+
+0.002     2016-12-27 23:10:30-06:00 America/Chicago
+
+    - Add basic "list" command to list the available containers and the
+      services within them
+
+0.001     2016-12-27 00:30:46-06:00 America/Chicago
+
+    - Initial release of "run" command

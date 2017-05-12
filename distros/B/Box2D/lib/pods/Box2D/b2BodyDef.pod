@@ -1,0 +1,275 @@
+
+=head1 NAME
+
+Box2D::b2BodyDef - Holds all the data needed to construct a rigid body.
+
+=head1 SYNOPSIS
+
+  my $body_def = Box2D::b2BodyDef->new();
+  $body_def->type( Box2D::b2_dynamicBody );
+  $body_def->position->Set( $x, $y );
+  $body_def->angle( $theta );
+  my $body = $world->CreateBody( $body_def );
+
+=head1 DESCRIPTION
+
+A body definition holds all the data needed to construct a rigid body.
+You can safely re-use body definitions. Shapes are added to a body after
+construction.
+
+=head1 METHODS
+
+=head2 new()
+
+This constructor sets the body definition default values.
+
+Returns a C<Box2D::b2BodyDef>
+
+=head2 active()
+
+=head2 active( $active )
+
+Does this body start out active?
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$active> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 allowSleep()
+
+=head2 allowSleep( $allowSleep )
+
+Set this flag to false if this body should never fall asleep. Note that
+this increases CPU usage.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$allowSleep> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 angle()
+
+=head2 angle( $angle )
+
+The world angle of the body in radians.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$angle> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 angularDamping()
+
+=head2 angularDamping( $angularDamping )
+
+Angular damping is use to reduce the angular velocity. The damping
+parameter can be larger than 1.0f but the damping effect becomes
+sensitive to the time step when the damping parameter is large.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$angularDamping> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 angularVelocity()
+
+=head2 angularVelocity( $angularVelocity )
+
+The angular velocity of the body.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$angularVelocity> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 awake()
+
+=head2 awake( $awake )
+
+Is this body initially awake or sleeping?
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$awake> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 bullet()
+
+=head2 bullet( $bullet )
+
+Is this a fast moving body that should be prevented from tunneling
+through other moving bodies? Note that all bodies are prevented from
+tunneling through kinematic and static bodies. This setting is only
+considered on dynamic bodies.
+
+Warning: You should use this flag sparingly since it increases
+processing time.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$bullet> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 fixedRotation()
+
+=head2 fixedRotation( $fixedRotation )
+
+Should this body be prevented from rotating? Useful for characters.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$fixedRotation> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 linearDamping()
+
+=head2 linearDamping( $linearDamping )
+
+Linear damping is use to reduce the linear velocity. The damping
+parameter can be larger than 1.0f but the damping effect becomes
+sensitive to the time step when the damping parameter is large.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$linearDamping> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 linearVelocity()
+
+=head2 linearVelocity( $linearVelocity )
+
+The linear velocity of the body's origin in world co-ordinates.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$linearVelocity> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 position()
+
+=head2 position( $position )
+
+The world position of the body. Avoid creating bodies at the origin
+since this can lead to many overlapping shapes.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$position> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 type()
+
+=head2 type( $type )
+
+The body type: C<Box2D::b2_staticBody>, C<Box2D::b2_kinematicBody>, or
+C<Box2D::b2_dynamicBody>.
+
+Note: if a dynamic body would have zero mass, the mass is set to one.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2BodyType> C<$type> (optional)
+
+=back
+
+Returns a C<Box2D::b2BodyType>
+
+=head2 userData()
+
+=head2 userData( $userData )
+
+Use this to store application specific body data.
+
+Parameters:
+
+=over 4
+
+=item * C<scalar> C<$userData> (optional)
+
+=back
+
+Returns a C<scalar>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Body>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

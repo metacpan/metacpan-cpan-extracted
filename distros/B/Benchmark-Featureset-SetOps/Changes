@@ -1,0 +1,52 @@
+Revision history for Perl extension Benchmark::Featureset::SetOps.
+
+1.06  2017-04-17T18:08:00
+	- Fix typo in Makefile.PL where I specified File::Slurper V 0.0098 but meant V 0.009.
+
+1.05  2016-09-14T17:34:00
+	- Stop using Test::Stream. Use Test::More shipped in the Test::Simple distro.
+		See RT#116938. Thanx to Chad Granum aka EXODIST.
+	- Update version #s in pre-reqs.
+	- Adopt new repo structure. For details, see
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+	- Update .gitignore and MANIFEST.SKIP.
+	- Add File::Spec and File::Temp to TEST_REQUIRES within Makefile.PL.
+
+1.04  Mon Nov 16 09:56:00 2015
+	- Remove EO::Array from config/module.list.ini because it won't install. This means it is no
+		longer included in any reports.
+	- Add Set::Equivalence in module.list.ini, but don't try to test its features.
+	- Convert from Hash::FieldHash to Moo.
+	- Convert from Perl6::Slurp to File::Slurper.
+	- Convert from Test::More to Test::Stream. Test::More is still used for pod tests.
+	- Remove Build.PL.
+	- Update pre-reqs in Makefile.PL.
+	- Chop benchmarks copied from docs for Set::Tiny.
+	- Re-create html/setops.report.html.
+	- Add repo https://github.com/ronsavage/Benchmark-Featureset-SetOps to docs and Makefie.PL.
+
+1.03  Wed Feb 18 16:32:00 2015
+	- Rename CHANGES to Changes.
+	- Removed unused dir share/.
+	- Fix some dates in the docs (2011 -> 2012).
+
+1.02  Thu May 24 13:18:00 2012
+	- Update pre-reqs in Build.PL and Makefile.PL.
+		Various Set::* modules are not included. To run scripts/symmetric.demo.pl, install
+		Set::Array, Set::Scalar and Set::Tiny manually.
+	- Simplify scripts/symmetric.demo.pl, so it has less pre-reqs.
+
+1.01  Wed May 23 10:25:00 2012
+	- Implement overload_type = 3 instead of hard-coding the name Object::Array.
+	- Include links to MetaCPAN in the output report.
+	- Fix version # in Benchmark::Featureset::SetOps::Config.
+	- Add a recommendation, as a note to Set::Object, and various other notes.
+	- Change design of HTML template slightly.
+	- Include statistics from Set::Tiny's benchmark.pl.
+	- Update various notes per module.
+	- Identify the report generator (this module) in the report body.
+	- Ship scripts/symmetric.demo.pl.
+	- Ship data/benchmark.log.
+
+1.00  Tue May 22 11:53:00 2012
+	- Original version

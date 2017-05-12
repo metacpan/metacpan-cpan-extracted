@@ -1,0 +1,163 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Math} class b2Math
+{
+
+%{
+
+bool
+b2IsValid( x )
+	float32 x
+	CODE:
+		RETVAL = b2IsValid(x);
+	OUTPUT:
+		RETVAL
+
+float32
+b2InvSqrt( x )
+	float32 x
+	CODE:
+		RETVAL = b2InvSqrt(x);
+	OUTPUT:
+		RETVAL
+
+float32
+b2Abs( x )
+	float32 x
+	CODE:
+		RETVAL = b2Abs(x);
+	OUTPUT:
+		RETVAL
+
+float32
+b2DotV2V2( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	CODE:
+		RETVAL = b2Dot( *a, *b );
+	OUTPUT:
+		RETVAL
+
+float32
+b2CrossV2V2( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	CODE:
+		RETVAL = b2Cross( *a, *b );
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2CrossV2S( a, s )
+	b2Vec2* a
+	float32 s
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(b2Cross( *a, s ));
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2CrossSV2( s, a )
+	float32 s
+	b2Vec2* a
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(b2Cross( s, *a ));
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2MulM22V2( A, v )
+	b2Mat22* A
+	b2Vec2* v
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(b2Mul( *A, *v ));
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2MulTM22V2( A, v )
+	b2Mat22* A
+	b2Vec2* v
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(b2MulT( *A, *v ));
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2AddV2V2( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2( *a + *b );
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2SubV2V2( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2( *a - *b );
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2MulSV2( s, a )
+	float32 s
+	b2Vec2* a
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2( s * *a );
+	OUTPUT:
+		RETVAL
+
+bool
+b2EqlV2V2( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	CODE:
+		RETVAL = *a == *b;
+	OUTPUT:
+		RETVAL
+
+float32
+b2Distance( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	CODE:
+		RETVAL = b2Distance( *a, *b );
+	OUTPUT:
+		RETVAL
+
+float32
+b2DistanceSquared( a, b )
+	b2Vec2* a
+	b2Vec2* b
+	CODE:
+		RETVAL = b2DistanceSquared( *a, *b );
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

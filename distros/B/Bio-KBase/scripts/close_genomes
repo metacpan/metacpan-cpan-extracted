@@ -1,0 +1,178 @@
+#!perl
+use strict;
+use Data::Dumper;
+use Carp;
+
+#
+# This is a SAS Component
+#
+
+=head1 close_genomes
+
+Example:
+
+    close_genomes [arguments] < input > output
+
+This is a strange command.  It has two quite distinct uses:
+
+    1. it can be used to find genomes close to existing genomes (stored in either
+       the KBase CS or the PubSEED).  
+    2. Alternatively, it can be used to compute close genomes for a new genome
+       encoded in a JSON file.
+
+The second use will be performed iff the 
+
+     -g Encoded_JSON_directory
+
+is used.  In that case, the updated genome directory will be written to STDOUT.
+
+If the input is to be one or more genomes from the CS, then
+the standard input should be a tab-separated table (i.e., each line
+is a tab-separated set of fields).  Normally, the last field in each
+line would contain the identifer. If another column contains the identifier
+use
+
+    -c N
+
+where N is the column (from 1) that contains the identifier.
+
+This is a pipe command. The input is taken from the standard input, and the
+output is to the standard output.
+
+=head2 Documentation for underlying call
+
+This script is a wrapper for the CDMI-API call close_genomes. It is documented as follows:
+
+  $return = $obj->close_genomes($genomes, $how, $n)
+
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$genomes is a genomes
+$how is a how
+$n is an int
+$return is a reference to a hash where the key is a genome and the value is a genomes
+genomes is a reference to a list where each element is a genome
+genome is a string
+how is an int
+
+</pre>
+
+=end html
+
+=begin text
+
+$genomes is a genomes
+$how is a how
+$n is an int
+$return is a reference to a hash where the key is a genome and the value is a genomes
+genomes is a reference to a list where each element is a genome
+genome is a string
+how is an int
+
+
+=end text
+
+=back
+
+=head2 Command-Line Options
+
+=over 4
+
+=item -c Column
+
+This is used only if the column containing the identifier is not the last column.
+
+=item -i InputFile    [ use InputFile, rather than stdin ]
+
+=item -n N            [ N is the number of close genomes desired ]
+
+
+=back
+
+=head2 Output Format
+
+If close genomes are being computed for genomes in the CS, then
+the input is a tab-delimited file, and the output will have two
+extra columns: [projected degree of identity,close-genome].
+If the -g option is used, then an updated genome structure will
+be encoded and written to STDOUT.
+
+=cut
+
+use SeedUtils;
+
+my $usage = "usage: close_genomes [-c column] < input > output";
+
+use Bio::KBase::CDMI::CDMIClient;
+use Bio::KBase::Utilities::ScriptThing;
+
+my $column;
+
+my $input_file;
+my $n = 5;
+my $genomeF;
+my $kbO = Bio::KBase::CDMI::CDMIClient->new_for_script('c=i' => \$column,
+				                       'i=s' => \$input_file,
+				                       'n=i' => \$n,
+				                       'g=s' => \$genomeF);
+if (! $kbO) { print STDERR $usage; exit }
+
+if (defined($genomeF))
+{
+    my $close = $kbO->close_genomes([$genomeF],$n);
+    my $tuples = $close->{$genomeF};
+    my $json = JSON::XS->new;
+    my $genome;
+    local $/;
+    undef $/;
+    open(GENOME,"<$genomeF") || die "could not open $genomeF";
+    my $genome_txt = <GENOME>;
+    close(GENOME);
+    $genome = $json->decode($genome_txt);
+    $genome->{close_genomes} = $tuples;
+    $json->pretty(1);
+    print $json->encode($genome);
+}
+else
+{
+    my $ih;
+    if ($input_file)
+    {
+	open $ih, "<", $input_file or die "Cannot open input file $input_file: $!";
+    }
+    else
+    {
+	$ih = \*STDIN;
+    }
+
+    while (my @tuples = Bio::KBase::Utilities::ScriptThing::GetBatch($ih, undef, $column)) {
+	my @h = map { $_->[0] } @tuples;
+	my $h = $kbO->close_genomes(\@h,$n);
+	for my $tuple (@tuples) {
+        #
+        # Process output here and print.
+        #
+	    my ($id, $line) = @$tuple;
+	    my $v = $h->{$id};
+
+	    if (! defined($v))
+	    {
+		print STDERR $line,"\n";
+	    }
+	    elsif (ref($v) eq 'ARRAY')
+	    {
+		foreach $_ (@$v)
+		{
+		    my($g,$sc) = @$_;
+		    print "$line\t$sc\t$g\n";
+		}
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+  <div class="utility">
+: if ! $no_hide {
+  <a class="toggle show right-most" style="display:none" href=""><: _('show') :></a>
+  <a class="toggle hide right-most" href=""><: _('hide') :></a>
+: }
+
+: if $admin {
+: if $no_hide {
+  <a class="right-most" href="<: $prefix :>admin/entry/<: $entry.id :>"><: _('edit') :></a>
+: } else {
+  <a href="<: $prefix :>admin/entry/<: $entry.id :>"><: _('edit') :></a>
+: }
+<a href="" name="<: $entry.id :>" class="delete-entry"><: _('delete') :></a>
+: }
+  </div>

@@ -1,0 +1,12 @@
+classes:
+  - Hardware.harden
+  - Desktop.tools.pgp
+  - Desktop.base
+parameters:
+  doc:
+    desktop:
+      pkg:
+        - include desktop hardening helper tools
+  pkg:
+    - parcimonie
+    - gnome-disk-utility

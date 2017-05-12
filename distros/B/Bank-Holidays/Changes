@@ -1,0 +1,47 @@
+Revision history for Perl extension Bank::Holidays.
+
+0.86 Mon Jan 09 22:04:00 2017
+  - Perldoc update
+
+0.84 Mon Jan 09 21:17:00 2017
+  - Fixed failing tests
+  - Small, misc changes
+
+0.82 Sun Jul 19 22:48:00 2015
+  - Remove EXPORTER and exported functions, because none
+    worked without the `new' constructor.
+  - Added perldoc regarding the above.
+  - Remove indirectly built LWP::UserAgent and
+    HTTP::Request objects.
+  - Minor documentation updates.
+  - Author: CSEATON
+
+0.81 Fri Jul 10 12:20:00 2015
+  - Convert tests to Test::More
+  - Support 'date' parameter in constructor as per the
+    example in the SYNOPSIS.
+  - Author: CSEATON
+
+0.79 Mon Nov 11 19:40:00 2013
+  - Fix a problem in one of the tests.
+  
+0.78 Mon Nov 11 11:49:00 2013
+  - Improve the tests to ensure proper function.
+
+0.76 Tue Nov 05 01:36:00 2013
+  - Use make dist. (Color me shamed)
+
+0.75 Tue Nov 05 11:49:00 2013
+  - Cache the data from the Fed to avoid reloading the page.
+      Helps with performance.
+
+0.66 Fri Mar 02 07:54:00 2012
+  - rleap found out that LWP::Simple can no longer read the
+       holidays page. Switched to UA module and it works fine.
+       Very sneaky Federal Reserve!
+
+0.56 Thu Feb 08 15:42:00 2007
+  - Fixed PreReq
+
+0.55  Tue Feb 14 07:38:15 2006
+	- Initial release to CPAN

@@ -1,0 +1,9 @@
+classes:
+  - Service.web.uwsgi.psgi
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - include webmail service CiderWebmail
+  pkg-auto:
+    - ciderwebmail

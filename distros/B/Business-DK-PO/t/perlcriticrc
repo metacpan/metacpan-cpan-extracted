@@ -1,0 +1,40 @@
+
+verbose = 8
+severity = 1
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR|COPYRIGHT
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-NamingConventions::Capitalization]
+
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print
+
+#TODO address these policies
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+
+[-RegularExpressions::RequireDotMatchAnything]
+
+[-ControlStructures::ProhibitCStyleForLoops]
+
+[-ControlStructures::ProhibitPostfixControls]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+[-ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+
+[-Documentation::RequirePodLinksIncludeText]

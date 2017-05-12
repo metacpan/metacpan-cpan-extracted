@@ -1,0 +1,12 @@
+Revision history for Perl extension Cashcow.
+
+0.01  Mon Nov  8 14:59:57 1999
+	- original version; created by h2xs 1.19
+
+0.05  Fri Dec  3 15:35:00 1999
+	- the initally published version.
+
+0.61  Wen Dec  8 20:49:47 1999
+	- Some minor pathes to the pod submitted by
+	Ask Bjørn Hansen <ask@netcetera.dk>
+

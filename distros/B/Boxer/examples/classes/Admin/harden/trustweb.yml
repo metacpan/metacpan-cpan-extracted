@@ -1,0 +1,9 @@
+classes:
+  - Admin
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include web-of-trust hardening tool Monkeysphere
+  pkg:
+  - monkeysphere

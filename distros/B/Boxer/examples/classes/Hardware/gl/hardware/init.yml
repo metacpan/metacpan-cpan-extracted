@@ -1,0 +1,9 @@
+classes:
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include OpenGL hardware rasterizers
+  pkg:
+    - libgl1-mesa-dri

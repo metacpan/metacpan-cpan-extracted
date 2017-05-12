@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use autodie;
+use FindBin qw($Bin);
+use File::Copy;
+use File::Spec;
+
+my %opts = @ARGV;
+
+# Mocking the following command:
+# "Qcontacts -prefOut /some/tmp/dir -c2 L -i t/1.pdb -probe 1.4 -c1 A"
+
+copy( File::Spec->catfile( $Bin, $_ ), $opts{-prefOut} )
+  for ( '-by-atom.vor', '-by-res.vor' );

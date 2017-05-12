@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl -wT
+use lib qw(./blib/lib ./lib ../blib/lib);
+use strict;
+use Bio::Das::Lite;
+use Data::Dumper;
+
+$Bio::Das::Lite::DEBUG = 0;
+
+my $bd = Bio::Das::Lite->new("http://www.ebi.ac.uk/das-srv/uniprot/das/uniprot");
+#print Dumper($bd->features("P50225"));
+
+my $blks = [];
+my $res = $bd->features('P50225',
+	      sub {
+		my ($a) = @_;
+
+		my $rq_key = (keys %{$bd->{'data'}})[0];
+		push @{$blks}, $bd->{'data'}->{$rq_key};
+#		print STDERR "a=$a\n";
+#		print STDERR "CALLBACK a=".Dumper($a)."\n";
+	      },
+	     );
+
+print "First block was: $blks->[0]\n";
+print "Callback was called @{[scalar @$blks]} times\n";
+my $key = (keys %$res)[0];
+print "res=$res, key=$key, res->key = $res->{$key}\n";
+if(ref($res->{$key}) eq "ARRAY") {
+  print "Got @{[scalar @{$res->{$key}}]} sets back\n";
+} else {
+  print Dumper $res;
+}

@@ -1,0 +1,30 @@
+package Bio::Chado::Schema::Result::Companalysis;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Companalysis - Augments sequence module with descriptions of computational
+analyses and features resulting from those analyses
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Companalysis module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Companalysis::Analysis>
+
+L<Bio::Chado::Schema::Result::Companalysis::Analysisfeature>
+
+L<Bio::Chado::Schema::Result::Companalysis::Analysisfeatureprop>
+
+L<Bio::Chado::Schema::Result::Companalysis::Analysisprop>
+
+=cut
+
+1;

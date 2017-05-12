@@ -1,0 +1,405 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>DAS Workshop 2010: ProServer Tutorial Part 2</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <style type="text/css">
+body {
+  font-family: Verdana,Arial,Helvetica,sans-serif;
+  font-size: 0.9em;
+}
+th {
+  font-weight: normal;
+  font-style: italic;
+}
+table {
+  text-align: left;
+}
+div.code {
+  background-color: rgb(220, 220, 220);
+  border: 1px dotted;
+  padding: 5px;
+}
+  </style>
+</head>
+
+<body>
+<script type="text/javascript">
+  function reveal(id) {
+    var el = document.getElementById(id);
+    if (el.style.display == "none") {
+      el.style.display = 'block';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+</script>
+
+<h1 style="text-align: center;">DAS Workshop 2010 ProServer Tutorial</h1>
+
+<h2 style="text-align: center;">Part 2</h2>
+
+<p>Andy Jenkinson, EMBL-EBI, 7th April 2010</p>
+
+<h2>Overview</h2>
+
+<p>
+  Now that you have completed <a href="../proserver_tutorial_1/proserver_tutorial_1.html">Part 1</a> of
+  the tutorial and so are familiar with running and configuring ProServer,
+  let us imagine you wish to run a DAS server from some annotations generated in
+  your lab. The data are in a custom file format, for which you will now write
+  your own SourceAdaptor plugin.
+</p>
+
+<h2><a name="plugins">SourceAdaptor plugins</a></h2>
+
+<p>
+  Each data source in ProServer is backed by an object that is a subclass of
+  <em>Bio::Das::ProServer::SourceAdaptor</em>. Note that each data source gets
+  its own instance, and thus the same class/module could be used independently
+  by different data sources. In addition to subclassing <em>Bio::Das::ProServer::SourceAdaptor</em>,
+  each adaptor must exist in the <em>Bio::Das::ProServer::SourceAdaptor</em>
+  namespace (e.g. <em>Bio::Das::ProServer::SourceAdaptor::myplugin</em>):
+</p>
+
+<div class="code">
+<pre>
+package Bio::Das::ProServer::SourceAdaptor::myplugin;
+
+use strict;
+use base qw(Bio::Das::ProServer::SourceAdaptor);
+
+# ... code ...
+
+1;
+</pre>
+</div>
+
+<h3>Implementing commands</h3>
+
+<p>
+  The contract of a SourceAdaptor is to provide the data for a DAS query in a
+  data structure that the ProServer core can understand. In simplistic terms,
+  this is done by implementing a single method for each DAS command. For example,
+  most DAS sources implement the DAS <em>features</em> command. This is done
+  by creating a <em>build_features</em> method in the adaptor. This method
+  is passed a hashref containing the request arguments, and is expected to
+  return an array of hashes. Each hash represents a single annotation. This
+  pseudocode gives an example:
+</p>
+
+<div class="code">
+<pre>
+sub build_features {
+  my ($self, $args) = @_;
+
+  # e.g. /das/mysource/features?segment = X:1,100
+  my $segment = $args->{'segment'}; # X
+  my $start   = $args->{'start'};   # 1
+  my $end     = $args->{'end'};     # 100
+
+  return (
+    {
+      # feature 1 ...
+    },
+    {
+      # feature 2 ...
+    },
+    # etc
+  );
+}
+</pre>
+</div>
+
+<h3>The 'init' method</h3>
+
+<p>
+  The <em>init</em> method is called by ProServer when each data sources'
+  adaptor object is created, and is useful for initialising your plugin and
+  setting metadata. One of its uses is to tell ProServer which DAS commands your
+  data source will support. ProServer needs this information before it will
+  forward DAS requests to the plugin. You can declare support for the <em>features</em>
+  command like this:
+</p>
+
+<div class="code">
+<pre>
+sub init {
+  my $self = shift;
+  $self->{'capabilities'} = {'features' => '1.1'};
+}
+</pre>
+</div>
+
+
+<h2><a name="creating">Creating a new SourceAdaptor</a></h2>
+
+<p>
+  Your goal is to build a plugin to serve annotations from a custom file. The
+  example file <a href="exons.txt">exons.txt</a> contains a few exons annotated
+  onto human chromosome 5, and each field is separated by pipe ("|") characters.
+  The data were taken from the Ensembl database.
+</p>
+
+<h3>Create the adaptor file</h3>
+
+<p>
+  Using the code templates in the preceding section, create a new adaptor module
+  in the Perl library path. You may find it easiest to do this within ProServer's
+  "lib" directory:
+</p>
+
+<div class="code">
+<pre>
+cd ~/Bio-Das-ProServer
+touch lib/Bio/Das/ProServer/SourceAdaptor/myplugin.pm
+</pre>
+</div>
+
+<p>
+  Fill the file with the template code using a text editor. You can copy and
+  paste the below contents (click <a href="javascript: reveal('code_template');">here</a> to show/hide):
+</p>
+
+<div id="code_template" class="code" style="display:none">
+<pre>
+package Bio::Das::ProServer::SourceAdaptor::myplugin;
+
+use strict;
+use base qw(Bio::Das::ProServer::SourceAdaptor);
+
+sub init {
+  my $self = shift;
+  $self->{'capabilities'} = {'features' => '1.1'};
+}
+
+sub build_features {
+  my ($self, $args) = @_;
+
+  # e.g. /das/mysource/features?segment = X:1,100
+  my $segment = $args->{'segment'}; # X
+  my $start   = $args->{'start'};   # 1
+  my $end     = $args->{'end'};     # 100
+
+  return (
+    {
+      # feature 1 ...
+    },
+    {
+      # feature 2 ...
+    },
+    # etc
+  );
+}
+
+1;
+</pre>
+</div>
+
+<h3>Read the file contents</h3>
+
+<p>
+  You now have the shell of a new plugin, but so far it will not do very much.
+  Your plugin will need to read the contents of the file line by line in order
+  to extract its information. Here is some standard code to do that
+  (click <a href="javascript: reveal('code_read');">here</a> to show/hide):
+</p>
+
+<div id="code_read" class="code" style="display:none">
+<pre>
+  open (FH, '<', 'exons.txt') || die "Unable to open exons.txt for reading";
+  while (defined(my $line = &lt;FH&gt;)) {
+    chomp $line;
+    
+    # do something
+  }
+  close FH;
+</pre>
+</div>
+
+<h3>Create annotation hashrefs</h3>
+
+<p>
+  Next we need to translate the contents of the file into DAS features, and
+  select those that overlap the segment of query sequence (the segment, start
+  and end parameters). Take a look at the file contents. Each line of our file
+  an exon, along with the transcript and gene to which it belongs:
+</p>
+
+<div class="code">
+|5|ENSG00000153404|140373|190087|ENST00000398036|140373|157131|ENSE00001648483|156888|157131|
+</div>
+
+<p>
+  Here we have the following fields:
+</p>
+
+<ol>
+  <li>chromosome</li>
+  <li>gene ID</li>
+  <li>gene start</li>
+  <li>gene end</li>
+  <li>transcript ID</li>
+  <li>transcript start</li>
+  <li>transcript end</li>
+  <li>exon ID</li>
+  <li>exon start</li>
+  <li>exon end</li>
+</ol>
+
+<p>
+  Firstly, the chromosome field is our DAS segment ID. But each line actually
+  contains three DAS annotations - one for the
+  exon, one for the transcript, and one for the gene. The gene and transcript
+  annotations are duplicated on different lines. The <em>build_features</em>
+  method must return an array of hashrefs for each annotation that overlaps the
+  query segment. Each hashref should contain the following information:
+</p>
+
+<ul>
+  <li>id</li>
+  <li>start</li>
+  <li>end</li>
+  <li>type</li>
+  <li>method</li>
+  <li>parent (arrayref of parent annotation IDs)</li>
+  <li>part (arrayref of child annotation IDs)</li>
+</ul>
+
+<p>
+  Now modify the plugin to do the following (click <a href="javascript: reveal('code_create');">here</a>
+  to show/hide the code):
+</p>
+
+<ol>
+  <li>parse each field</li>
+  <li>check if the gene, transcript or exon overlap the query segment</li>
+  <li>filter duplicate transcripts and genes</li>
+  <li>create hashrefs for each annotation</li>
+  <li>return an array of the selected hashrefs</li>
+</ol>
+
+<div id="code_create" class="code" style="display:none">
+<pre>
+package Bio::Das::ProServer::SourceAdaptor::myplugin;
+
+use strict;
+use base qw(Bio::Das::ProServer::SourceAdaptor);
+
+sub init {
+  my $self = shift;
+  $self->{'capabilities'} = {'features' => '1.1'};
+}
+
+sub build_features {
+  my ($self, $args) = @_;
+
+  # e.g. /das/mysource/features?segment = X:1,100
+  my $segment = $args->{'segment'}; # X
+  my $start   = $args->{'start'};   # 1
+  my $end     = $args->{'end'};     # 100
+  my %features;
+
+  open (FH, '<', 'exons.txt') || die "Unable to open exons.txt for reading";
+  while (defined(my $line = &lt;FH&gt;)) {
+    chomp $line;
+    my @fields = split /\|/, $line;
+    my ($chromosome, $g_id, $g_start, $g_end, $t_id, $t_start, $t_end, $e_id, $e_start, $e_end) = @fields[1..10];
+
+    $chromosome eq $segment || next;
+
+    # Check if the gene overlaps the query segment
+    if ($g_start <= $end && $g_end >= $start) {
+      if (!$features{$g_id}) {
+        $features{$g_id} = {
+          'id'     => $g_id,
+          'start'  => $g_start,
+          'end'    => $g_end,
+          'type'   => 'gene',
+          'method' => 'Ensembl',
+          'part'   => [],
+        };
+      }
+    }
+
+    # Check if the transcript overlaps the query segment
+    if ($t_start <= $end && $t_end >= $start) {
+      if (!$features{$t_id}) {
+        $features{$t_id} = {
+          'id'     => $t_id,
+          'start'  => $t_start,
+          'end'    => $t_end,
+          'type'   => 'transcript',
+          'method' => 'Ensembl',
+          'part'   => [],
+          'parent' => [],
+        };
+
+        # Create the parent/part links between the annotations
+        push @{ $features{$g_id}{'part'} }, $t_id;
+        push @{ $features{$t_id}{'parent'} }, $g_id;
+      }
+    }
+
+    # Check if the exon overlaps the query segment
+    if ($e_start <= $end && $e_end >= $start) {
+      if (!$features{$e_id}) {
+        $features{$e_id} = {
+          'id'     => $e_id,
+          'start'  => $e_start,
+          'end'    => $e_end,
+          'type'   => 'exon',
+          'method' => 'Ensembl',
+          'parent' => [],
+        };
+
+        # Create the parent/part links between the annotations
+        push @{ $features{$t_id}{'part'}   }, $e_id;
+        push @{ $features{$e_id}{'parent'} }, $t_id;
+      }
+    }
+  }
+  close FH;
+
+  return values %features;
+}
+
+1;
+</pre>
+</div>
+
+<h3>Create an INI file</h3>
+
+<p>
+  Your plugin is now complete. To test it you will need a configuration file.
+  Save the following as <code>eg/mysource.ini</code>:
+</p>
+
+<div class="code">
+<pre>
+[mysource]
+adaptor = myplugin
+state   = on
+</pre>
+</div>
+
+<h3>Rebuild and run the server</h3>
+
+<p>
+  Now <strong>rebuild ProServer</strong>, and run it with the new configuration:
+</p>
+
+<div class="code">
+<pre>
+./Build
+eg/proserver -x -c eg/mysource.ini
+</pre>
+</div>
+
+<p>
+  And see if it works:
+</p>
+
+<div class="code">
+<a href="http://localhost:9000/das/mysource/features?segment=5:144942,155558">http://localhost:9000/das/mysource/features?segment=5:144942,155558</a>
+</div>

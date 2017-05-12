@@ -1,0 +1,471 @@
+---
+-
+  name: Open Fusion Pty Ltd
+  before: Open Fusion
+  des: Pty Ltd
+  des_std: Pty. Ltd.
+  lang: en
+  position: end
+-
+  name: News Corporation
+  before: News
+  des: Corporation
+  des_std: Corporation
+  lang: en
+  position: end
+-
+  name: Wesfarmers Limited
+  before: Wesfarmers
+  des: Limited
+  des_std: Limited
+  lang: en
+  position: end
+-
+  name: Wesfarmers Ltd
+  before: Wesfarmers
+  des: Ltd
+  des_std: Ltd.
+  lang: en
+  position: end
+-
+  name: Gartner Inc.
+  before: Gartner
+  des: Inc.
+  des_std: Inc.
+  lang: en
+  position: end
+-
+  name: Gartner Inc
+  before: Gartner
+  des: Inc
+  des_std: Inc.
+  lang: en
+  position: end
+-
+  name: Gruppo Formula SpA
+  before: Gruppo Formula
+  des: SpA
+  des_std: S.p.A.
+  lang: it
+  position: end
+-
+  name: Gruppo Formula SPA
+  before: Gruppo Formula
+  des: SPA
+  des_std: S.p.A.
+  lang: it
+  position: end
+-
+  name: MySQL AB
+  before: MySQL
+  des: AB
+  des_std: AB
+  lang: se
+  position: end
+-
+  name: A Schulman Plastics SL
+  before: A Schulman Plastics
+  des: SL
+  des_std: S.L.
+  lang: es
+  position: end
+-
+  name: Stølen Mat AS
+  before: Stølen Mat
+  des: AS
+  des_std: AS
+  lang: da
+  position: end
+-
+  name: Mec Denmark A/S
+  before: Mec Denmark
+  des: A/S
+  des_std: A/S
+  lang: da
+  position: end
+-
+  name: Mec Denmark AS
+  before: Mec Denmark
+  des: AS
+  des_std: AS
+  lang: da
+  position: end
+-
+  name: Sheng Siong Supermarket Pte Ltd
+  before: Sheng Siong Supermarket
+  des: Pte Ltd
+  des_std: Pte. Ltd.
+  lang: en
+  position: end
+-
+  name: Kernkraftwerk Brokdorf GmbH & Co OHG
+  before: Kernkraftwerk Brokdorf
+  des: GmbH & Co OHG
+  des_std: GmbH & Co OHG
+  lang: de
+  position: end
+-
+  name: Zukunftsbaugesellschaft MBH
+  before: Zukunftsbaugesellschaft
+  des: MBH
+  des_std: mbH
+  lang: de
+  position: end
+-
+  name: Accessoires Pour Velos O G D Ltée
+  before: Accessoires Pour Velos O G D
+  des: Ltée
+  des_std: Ltée
+  lang: fr
+  position: end
+-
+  name: Accessoires Pour Velos O G D Ltee
+  before: Accessoires Pour Velos O G D
+  des: Ltee
+  des_std: Ltée
+  lang: fr
+  position: end
+-
+  name: Woon-En Zorgcentrum Onze-Lieve-Vrouw Van Antwerpen Verkort Olva VZW
+  before: Woon-En Zorgcentrum Onze-Lieve-Vrouw Van Antwerpen Verkort Olva
+  des: VZW
+  des_std: VZW
+  lang: nl
+  position: end
+-
+  name: Iberese Sociedad Anónima
+  before: Iberese
+  des: Sociedad Anónima
+  des_std: Sociedad Anónima
+  lang: es
+  position: end
+-
+  name: Iberese Sociedad Anonima
+  before: Iberese
+  des: Sociedad Anonima
+  des_std: Sociedad Anónima
+  lang: es
+  position: end
+-
+  name: Verein Fuer Jugendfuersorge und Jugendpflege E. V.
+  before: Verein Fuer Jugendfuersorge und Jugendpflege
+  des: E. V.
+  des_std: e.V.
+  lang: de
+  position: end
+-
+  name: IT Solution Services Company Ltd
+  before: IT Solution Services
+  des: Company Ltd
+  des_std: Company Ltd.
+  lang: en
+  position: end
+-
+  name: Amerihealth Insurance Company of NJ
+  before:  Amerihealth Insurance
+  des: Company
+  des_std: Company
+  after: of NJ
+  lang: en
+  position: mid
+-
+  name: True World Foods Inc of Hawaii
+  before: True World Foods
+  des: Inc
+  des_std: Inc.
+  after: of Hawaii
+  lang: en
+  position: mid
+-
+  name: Trenkwalder Personal AG Schweiz
+  before: Trenkwalder Personal
+  des: AG
+  des_std: AG
+  after: Schweiz
+  lang: de
+  position: mid
+-
+  name: Media Markt Tv-Hifi-Elektro GmbH Köln-Kalk
+  before: Media Markt Tv-Hifi-Elektro
+  des: GmbH
+  des_std: GmbH
+  after: Köln-Kalk
+  lang: de
+  position: mid
+-
+  name: Fine Image Co., Ltd.
+  before: Fine Image
+  des: Co., Ltd.
+  des_std: Co. Ltd.
+  lang: en
+  position: end
+-
+  name: Epic Integrated Services, Inc
+  before: Epic Integrated Services
+  des: Inc
+  des_std: Inc.
+  lang: en
+  position: end
+-
+  name: MIH Internet Africa (Pty) Ltd
+  before: MIH Internet Africa
+  des: (Pty) Ltd
+  des_std: (Pty.) Ltd.
+  lang: en
+  position: end
+-
+  name: Tshwane Trust Co. (Pty) Ltd
+  before: Tshwane Trust
+  des: Co. (Pty) Ltd
+  des_std: Co. (Pty.) Ltd.
+  lang: en
+  position: end
+-
+  name: Epithelix SàRL
+  before: Epithelix
+  des: SàRL
+  des_std: SàRL
+  lang:
+    - en
+    - fr
+  position: end
+-
+  name: OKG ehf
+  before: OKG
+  des: ehf
+  des_std: ehf.
+  lang: is
+  position: end
+-
+  name: OKG EHF
+  before: OKG
+  des: EHF
+  des_std: ehf.
+  lang: is
+  position: end
+-
+  name: DIGITAL SZAMITASTECHNIKAI KERESKEDELMI ES SZOLGALTATO KORLATOLT FELELOSSEGU TARSASAG
+  before: DIGITAL SZAMITASTECHNIKAI KERESKEDELMI ES SZOLGALTATO
+  des: KORLATOLT FELELOSSEGU TARSASAG
+  des_std: Korlátolt Felelősségű Társaság
+  lang: hu
+  position: end
+-
+  name: Chattanooga Endoscopy ASC LLC
+  before: Chattanooga Endoscopy
+  des: ASC LLC
+  des_std: ASC L.L.C.
+  lang:
+    - en
+    - fr
+  position: end
+-
+  name: BP p.l.c.
+  before: BP
+  des: p.l.c.
+  des_std: p.l.c.
+  lang: en
+  position: end
+-
+  name: Bank of America, National Association
+  before: Bank of America
+  des: National Association
+  des_std: National Association
+  lang: en
+  position: end
+-
+  name: The Royal Bank of Scotland NV
+  before: The Royal Bank of Scotland
+  des: NV
+  des_std: N.V.
+  lang: nl
+  position: end
+-
+  name: 'УКРАИНСКИЙ ПОЖАРНЫЙ ДОМ ООО'
+  before: 'УКРАИНСКИЙ ПОЖАРНЫЙ ДОМ'
+  des: 'ООО'
+  des_std: 'ООО'
+  lang: ru
+  position: end
+-
+  name: OOO Uchebno-konsultatsionnyy Tsentr
+  des: OOO
+  des_std: OOO
+  after: Uchebno-konsultatsionnyy Tsentr
+  lang: ru
+  position: begin
+-
+  name: Vennootschap Onder Firma Administratiekantoor R. Jansen
+  des: Vennootschap Onder Firma
+  des_std: Vennootschap onder firma
+  after: Administratiekantoor R. Jansen
+  lang: nl
+  position: begin
+-
+  name: Commanditaire Vennootschap Colourplast
+  des: Commanditaire Vennootschap
+  des_std: Commanditaire vennootschap
+  after: Colourplast
+  lang: nl
+  position: begin
+-
+  name: De Vennootschap Onder Firma Uitgeverij 010
+  des: De Vennootschap Onder Firma
+  des_std: De vennootschap onder firma
+  after: Uitgeverij 010
+  lang: nl
+  position: begin
+-
+  name: Vennootschap Cardiologen Hengelo
+  des: Vennootschap
+  des_std: Vennootschap
+  after: Cardiologen Hengelo
+  lang: nl
+  position: begin
+-
+  name: 'OOO «Komplektatsiya»'
+  des: OOO
+  des_std: OOO
+  after: '«Komplektatsiya»'
+  lang: ru
+  position: begin
+-
+  name: 'Gvozdika, gostinitsa OOO ""Eko-Treyd""'
+  before: 'Gvozdika, gostinitsa'
+  des: OOO
+  des_std: OOO
+  after: '""Eko-Treyd""'
+  lang: ru
+  position: mid
+-
+  name: Barcelona Materiales S L / CASA-CERAM
+  before: Barcelona Materiales
+  des: S L
+  des_std: S.L.
+  after: / CASA-CERAM
+  lang: es
+  position: mid
+-
+  name: Arniz Asesores S L P
+  before: Arniz Asesores
+  des: S L P
+  des_std: S.L.P.
+  lang: es
+  position: end
+-
+  name: Conduïm L Aigua S L U
+  before: Conduïm L Aigua
+  des: S L U
+  des_std: S.L.U.
+  lang: es
+  position: end
+-
+  name: Vicente Campano S L (COMERCIAL VICAM)
+  before: Vicente Campano
+  des: S L
+  des_std: S.L.
+  after: (COMERCIAL VICAM)
+  lang: es
+  position: mid
+-
+  name: S L N Carpets
+  before: S L N Carpets
+  lang: en
+  position: none
+-
+  name: Dr S L Ledingham - Beaumont Street Practice
+  before: Dr S L Ledingham - Beaumont Street Practice
+  lang: en
+  skip_unless_lang: 1
+  position: none
+-
+  name: Sears Roebuck and Company
+  before: Sears Roebuck
+  des: and Company
+  des_std: and Company
+  lang: en
+  position: end
+-
+  name: Sears Roebuck And Co.
+  before: Sears Roebuck
+  des: And Co.
+  des_std: and Co.
+  lang: en
+  position: end
+-
+  name: 'Sears Roebuck & Co.'
+  before: Sears Roebuck
+  des: '& Co.'
+  des_std: '& Co.'
+  lang: en
+  position: end
+-
+  name: 'Hakuyosha   Company   Ltd.'
+  before: Hakuyosha
+  des: Company   Ltd.
+  des_std: Company Ltd.
+  lang: en
+  position: end
+-
+  name: 'Hakuyosha Company, Ltd.'
+  before: Hakuyosha
+  des: Company, Ltd.
+  des_std: Company Ltd.
+  lang: en
+  position: end
+-
+  name: 'Hakuyosha Co.,Ltd.'
+  before: Hakuyosha
+  des: Co.,Ltd.
+  des_std: Co. Ltd.
+  lang: en
+  position: end
+-
+  name: 2Connect W.L.L.
+  before: 2Connect
+  des: W.L.L.
+  des_std: W.L.L.
+  lang: en
+  position: end
+-
+  name: 2Connect WLL
+  before: 2Connect
+  des: WLL
+  des_std: W.L.L.
+  lang: en
+  position: end
+-
+  name: CVS Pharmacy
+  before: CVS Pharmacy
+  des: ~
+  des_std: ~
+  lang: en
+  position: none
+-
+  name: Interstate Hotels & Resorts, Inc
+  before: Interstate Hotels & Resorts
+  des: Inc
+  des_std: Inc.
+  lang: en
+  position: end
+-
+  name: Interstate Hotels & Resorts,Inc
+  before: Interstate Hotels & Resorts
+  des: Inc
+  des_std: Inc.
+  lang: en
+  position: end
+-
+  name: E.S.E. Hospital Cumbal
+  after: Hospital Cumbal
+  des: E.S.E.
+  des_std: E.S.E.
+  lang: es
+  position: begin
+-
+  name: Hospital San Vicente de Arauca E.S.E.
+  before: Hospital San Vicente de Arauca
+  des: E.S.E.
+  des_std: E.S.E.
+  lang: es
+  position: end

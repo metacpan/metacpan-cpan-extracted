@@ -1,0 +1,26 @@
+classes:
+  - Desktop.office.locale.EU
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice locales for Europe (UN M.49 definition)
+  pkg:
+    - libreoffice-l10n-ast
+    - libreoffice-l10n-be
+    - libreoffice-l10n-br
+    - libreoffice-l10n-bs
+    - libreoffice-l10n-ca
+    - libreoffice-l10n-cy
+    - libreoffice-l10n-eu
+    - libreoffice-l10n-gl
+    - libreoffice-l10n-is
+    - libreoffice-l10n-ka
+    - libreoffice-l10n-mk
+    - libreoffice-l10n-nb
+    - libreoffice-l10n-nn
+    - libreoffice-l10n-oc
+    - libreoffice-l10n-ru
+    - libreoffice-l10n-sr
+    - libreoffice-l10n-tr
+    - libreoffice-l10n-uk

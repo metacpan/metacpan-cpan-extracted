@@ -1,0 +1,13 @@
+Revision history for Business-AT-SSN
+
+0.92  2014-11-24 09:30:26 CET
+        - moved prereqs to cpanfile
+
+0.91  2014-11-23 20:33:32 CET
+        - fixed prereqs 
+        - added some docs
+
+0.9  2014-11-21 19:11:44 CET
+        - Initial release
+        - Takes a String and checks wether the String may be a
+          valid Austrian Social Security Number (Sozialversicherungsnummer)

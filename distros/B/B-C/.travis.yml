@@ -1,0 +1,54 @@
+language: "perl"
+sudo: false
+perl:
+  - "5.24"
+  - "5.22"
+  - "5.14"
+  - "5.24-dbg"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.12"
+  - "5.10"
+  - "5.8"
+  - "5.14-thr"
+  - "5.22-thr"
+  - "dev"
+  - "blead"
+
+# "cperl-5.24.0"/"5.24c" not yet
+
+# fast_finish: http://blog.travis-ci.com/2013-11-27-fast-finishing-builds/
+matrix:
+  fast_finish: true
+  allow_failures:
+    - perl: "5.24"
+    - perl: "5.24-dbg"
+    - perl: "5.22-thr"
+    - perl: "5.8"
+    - perl: "dev"
+    - perl: "blead"
+
+before_install:
+  - mkdir /home/travis/bin || true
+  - ln -s `which true` /home/travis/bin/cpansign
+  - rm t/CORE/v5.14/C-COMPILED/{testc,template}.pl
+  - eval $(curl https://travis-perl.github.io/init) --auto
+
+install:
+  - export COVERAGE=0 AUTOMATED_TESTING=1
+  - cpan-install --deps
+  - cpan-install IPC::Run B::Flags Opcodes IO::Socket::SSL JSON::XS LWP::UserAgent
+  - cpan-install Net::SSLeay Net::LibIDN Net::IDN::Encode Net::DNS EV
+  - cpan-install Coro || cpan-install RURBAN/Coro-6.4801.tar.gz
+
+script: "perl Makefile.PL && make && make testfast"
+
+notifications:
+  irc: "irc.perl.org#compiler"
+  recipients:
+    - perl-compiler@googlegroups.com
+  email:
+    on_success: change
+    on_failure: always
+

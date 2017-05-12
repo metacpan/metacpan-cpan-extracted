@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use lib '/home/pcrow/Bigtop/examples/Apps-AddressBook/lib',
+        '/home/pcrow/srcgantry/lib';
+
+use CGI::Carp         qw{ fatalsToBrowser };
+use Apps::AddressBook qw{ -Engine=CGI -TemplateEngine=TT };
+
+use Gantry::Server;
+
+use Gantry::Engine::CGI;
+
+my $cgi = Gantry::Engine::CGI->new( {
+    config => {
+        auth_dbconn => 'dbi:Pg:dbname=malcolm',
+        auth_dbuser => 'apache',
+        dbconn => 'dbi:Pg:dbname=address',
+        dbuser => 'apache',
+        template_wrapper => 'wrapper.tt',
+        root => '/home/pcrow/Bigtop/examples/Apps-AddressBook/html:/home/pcrow/srcgantry/root',
+    },
+    locations => {
+        '/apps' => 'Apps::AddressBook',
+        '/apps/address' => 'Apps::AddressBook::Address',
+        '/apps/birthday' => 'Apps::AddressBook::Birth',
+    },
+} );
+
+my $server = Gantry::Server->new( );
+$server->set_engine_object( $cgi );
+$server->run();

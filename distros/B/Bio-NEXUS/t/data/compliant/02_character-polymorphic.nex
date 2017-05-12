@@ -1,0 +1,19 @@
+#NEXUS
+
+begin taxa;
+	dimensions ntax=3;
+	taxlabels taxon_1 taxon_2 taxon_3;
+end;
+
+['Characters' block from Maddison et al. 1997, p. 603 right column, above]
+[except that we are using single quotes-- double-quotes are not parsed]
+
+begin characters;
+dimensions nchar=9;
+format symbols='- + x';
+matrix
+ taxon_1 (-+)(-+)+---+--
+ taxon_2 +x-++--+x
+ taxon_3 -++++--+x;
+end;
+

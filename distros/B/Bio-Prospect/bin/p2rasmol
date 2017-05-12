@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+#-------------------------------------------------------------------------------
+# NAME p2rasmol
+# PURPOSE: generate a rasmol script for a specified alignment in Prospect XML
+#          output
+# USAGE: p2rasmol < prospect_xml_output [template_name]
+#
+# $Id: p2rasmol,v 1.7 2003/11/18 19:45:46 rkh Exp $
+#-------------------------------------------------------------------------------
+
+use Bio::Structure::IO;
+use Bio::Prospect::Init;
+use Bio::Prospect::File;
+use warnings;
+use strict;
+use vars qw( $VERSION );
+$VERSION = sprintf( "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/ );
+
+
+my $tname = shift;
+defined $tname
+  || die("USAGE: p2rasmol < prospect_xml_output [template_name]\n");
+
+my $pf = new Bio::Prospect::File;
+$pf->open( "-" );
+
+my $t;
+while( my $t0 = $pf->next_thread() ) {
+  if ( $t0->tname() eq $tname ) {
+	$t = $t0; last;
+  }
+}
+
+if (not defined $t) {
+  die("didn't find a thread for $tname\n");
+}
+
+
+my $fn = "$Bio::Prospect::Init::PROCESSED_PDB_PATH/$tname.pdb";
+my $str = Bio::Structure::IO->new(
+	-file => $fn, -format => 'pdb')->next_structure();
+if (not defined $str) {
+  die("Couldn't find a structure for $fn; check PDB_PATH environment variable\n");
+}
+
+print $t->output_rasmol_script( $str );
+
+exit(0);

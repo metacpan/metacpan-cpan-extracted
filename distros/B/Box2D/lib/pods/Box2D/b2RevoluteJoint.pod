@@ -1,0 +1,204 @@
+
+=head1 NAME
+
+Box2D::b2RevoluteJoint - Constrains two bodies to share a common point.
+
+=head1 SYNOPSIS
+
+  my $joint = $world->CreateJoint( $joint_def );
+  $joint->EnableMotor( 1 );
+  $joint->SetMaxMotorTorque( $torque );
+  $joint->SetMotorSpeed( $speed );
+
+=head1 DESCRIPTION
+
+A revolute joint constrains two bodies to share a common point while
+they are free to rotate about the point. The relative rotation about
+the shared point is the joint angle. You can limit the relative
+rotation with a joint limit that specifies a lower and upper angle. You
+can use a motor to drive the relative rotation about the shared point.
+A maximum motor torque is provided so that infinite forces are not
+generated.
+
+=head1 METHODS
+
+=head2 EnableLimit( $flag )
+
+Enable/disable the joint limit.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 EnableMotor( $flag )
+
+Enable/disable the joint motor.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$flag>
+
+=back
+
+=head2 GetAnchorA()
+
+Get the anchor point on bodyA in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Get the anchor point on bodyB in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetJointAngle()
+
+Get the current joint angle in radians.
+
+Returns a C<float32>
+
+=head2 GetJointSpeed()
+
+Get the current joint angle speed in radians per second.
+
+Returns a C<float32>
+
+=head2 GetLowerLimit()
+
+Get the lower joint limit in radians.
+
+Returns a C<float32>
+
+=head2 GetMotorSpeed()
+
+Get the motor speed in radians per second.
+
+Returns a C<float32>
+
+=head2 GetMotorTorque()
+
+Get the current motor torque, usually in N-m.
+
+Returns a C<float32>
+
+=head2 GetReactionForce( $inv_dt )
+
+Get the reaction force on body2 at the joint anchor in Newtons.
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Get the reaction torque on body2 in N*m. Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head2 GetUpperLimit()
+
+Get the upper joint limit in radians.
+
+Returns a C<float32>
+
+=head2 IsLimitEnabled()
+
+Is the joint limit enabled?
+
+Returns a C<bool>
+
+=head2 IsMotorEnabled()
+
+Is the joint motor enabled?
+
+Returns a C<bool>
+
+=head2 SetLimits( $lower, $upper )
+
+Set the joint limits in radians.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$lower>
+
+=item * C<float32> C<$upper>
+
+=back
+
+=head2 SetMaxMotorTorque( $torque )
+
+Set the maximum motor torque, usually in N-m.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$torque>
+
+=back
+
+=head2 SetMotorSpeed( $speed )
+
+Set the motor speed in radians per second.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$speed>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2RevoluteJointDef>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

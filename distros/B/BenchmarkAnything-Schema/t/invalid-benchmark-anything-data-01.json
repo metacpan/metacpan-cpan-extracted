@@ -1,0 +1,10 @@
+{
+    "comment": "Example for wrong/missing intro key",
+    "BenchmarkAnythingData" : [
+        {
+            "VALUE"    : 27.34,
+            "compiler" : "gcc",
+            "keyword"  : "affe"
+        }
+    ]
+}

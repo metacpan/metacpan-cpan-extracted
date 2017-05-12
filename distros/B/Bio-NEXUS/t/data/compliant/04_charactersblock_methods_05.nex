@@ -1,0 +1,19 @@
+#NEXUS
+
+begin taxa;
+	dimensions ntax=3;
+	taxlabels taxon_1 taxon_2 taxon_3;
+end;
+
+['Characters' block from Maddison et al. 1997, p. 601 right column]
+
+begin characters;
+	dimensions nchar=3;
+	charstatelabels 1 hair/absent present, 2 color/red blue, 3 size/small big;
+	format
+		tokens;
+	matrix
+		taxon_1 absent red big
+		taxon_2 absent blue small
+		taxon_3 present blue small;
+end;

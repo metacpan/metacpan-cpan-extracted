@@ -1,0 +1,322 @@
+--- ./lib/IPC/Run/Win32Helper.pm-pre	Thu May  9 06:31:14 2002
++++ ./lib/IPC/Run/Win32Helper.pm	Fri Oct 10 00:16:42 2003
+@@ -29,23 +29,24 @@ contact me at barries@slaysys.com, thank
+ use strict ;
+ use Carp ;
+ use IO::Handle ;
++use Fcntl;
+ #use IPC::Open3 ();
+ require POSIX ;
+ 
+ ## Work around missing prototypes in old Socket.pm versions
+-sub Socket::IPPROTO_TCP() ;
+-sub Socket::TCP_NODELAY() ;
++#sub Socket::IPPROTO_TCP() ;
++#sub Socket::TCP_NODELAY() ;
+ 
+ use Text::ParseWords ;
+-use Win32::Process ;
++use OS2::Process ;
+ use IPC::Run::Debug;
+ ## REMOVE OSFHandleOpen
+-use Win32API::File qw(
+-   FdGetOsFHandle
+-   SetHandleInformation
+-   HANDLE_FLAG_INHERIT
+-   INVALID_HANDLE_VALUE
+-) ;
++#use Win32API::File qw(
++#   FdGetOsFHandle
++#   SetHandleInformation
++#   HANDLE_FLAG_INHERIT
++#   INVALID_HANDLE_VALUE
++#) ;
+ 
+ ## Takes an fd or a GLOB ref, never never never a Win32 handle.
+ sub _dont_inherit {
+@@ -54,10 +55,14 @@ sub _dont_inherit {
+       my $fd = $_ ;
+       $fd = fileno $fd if ref $fd ;
+       _debug "disabling inheritance of ", $fd if _debugging_details ;
+-      my $osfh = FdGetOsFHandle $fd ;
+-      croak $^E if ! defined $osfh || $osfh == INVALID_HANDLE_VALUE ;
+-
+-      SetHandleInformation( $osfh, HANDLE_FLAG_INHERIT, 0 ) ;
++     if ($^O ne 'os2') {
++      my $osfh = FdGetOsFHandle($fd) ;
++      croak $^E if ! defined $osfh || $osfh == INVALID_HANDLE_VALUE() ;
++
++      SetHandleInformation( $osfh, HANDLE_FLAG_INHERIT(), 0 ) ;
++     } else {
++	fcntl($fd, F_SETFD, FD_CLOEXEC);
++     }
+    }
+ }
+ 
+@@ -67,10 +72,14 @@ sub _inherit {       #### REMOVE
+       my $fd = $_ ;       #### REMOVE
+       $fd = fileno $fd if ref $fd ;       #### REMOVE
+       _debug "enabling inheritance of ", $fd if _debugging_details ;       #### REMOVE
+-      my $osfh = FdGetOsFHandle $fd ;       #### REMOVE
+-      croak $^E if ! defined $osfh || $osfh == INVALID_HANDLE_VALUE ;       #### REMOVE
++     if ($^O ne 'os2') {
++      my $osfh = FdGetOsFHandle($fd) ;       #### REMOVE
++      croak $^E if ! defined $osfh || $osfh == INVALID_HANDLE_VALUE() ;       #### REMOVE
+        #### REMOVE
+-      SetHandleInformation( $osfh, HANDLE_FLAG_INHERIT, 1 ) ;       #### REMOVE
++      SetHandleInformation( $osfh, HANDLE_FLAG_INHERIT(), 1 ) ;       #### REMOVE
++     } else {
++	fcntl($fd, F_SETFD, 0);
++     }
+    }       #### REMOVE
+ }       #### REMOVE
+        #### REMOVE
+@@ -440,6 +449,12 @@ sub win32_spawn {
+       }
+    }
+ 
++   if ($^O eq 'os2') {
++	my $pid = system 1, @$cmd;
++	croak "Can't start $cmd->[0]: $!; system error $^E" if $pid <= 0;
++	return $pid;
++   }
++
+    my $process ;
+    my $cmd_line = join " ", map {
+       if ( /["\s]/ ) {
+@@ -459,7 +474,7 @@ sub win32_spawn {
+       $cmd->[0],
+       $cmd_line,
+       1,  ## Inherit handles
+-      NORMAL_PRIORITY_CLASS,
++      NORMAL_PRIORITY_CLASS(),
+       ".",
+    ) or croak "$!: Win32::Process::Create()" ;
+ 
+--- ./lib/IPC/Run/Win32IO.pm-pre	Thu May  9 06:33:04 2002
++++ ./lib/IPC/Run/Win32IO.pm	Fri Oct 10 01:41:10 2003
+@@ -30,13 +30,13 @@ use Socket ;
+ require POSIX ;
+ 
+ ## Work around missing prototypes in old Socket.pm versions
+-sub Socket::IPPROTO_TCP() ;
+-sub Socket::TCP_NODELAY() ;
++#sub Socket::IPPROTO_TCP() ;
++#sub Socket::TCP_NODELAY() ;
+ 
+ use Socket qw( IPPROTO_TCP TCP_NODELAY ) ;
+ use Symbol ;
+ use Text::ParseWords ;
+-use Win32::Process ;
++#use Win32::Process ;
+ use IPC::Run::Debug qw( :default _debugging_level );
+ use IPC::Run::Win32Helper qw( _inherit _dont_inherit );
+ use Fcntl qw( O_TEXT O_RDONLY );
+@@ -67,27 +67,27 @@ use fields (
+ 
+ 
+ ## REMOVE OSFHandleOpen
+-use Win32API::File qw(
+-   GetOsFHandle
+-   OsFHandleOpenFd
+-   OsFHandleOpen
+-   FdGetOsFHandle
+-   SetHandleInformation
+-   SetFilePointer
+-   HANDLE_FLAG_INHERIT
+-   INVALID_HANDLE_VALUE
+-
+-   createFile
+-   WriteFile
+-   ReadFile
+-   CloseHandle
+-
+-   FILE_ATTRIBUTE_TEMPORARY
+-   FILE_FLAG_DELETE_ON_CLOSE
+-   FILE_FLAG_WRITE_THROUGH
++#use Win32API::File qw(
++#   GetOsFHandle
++#   OsFHandleOpenFd
++#   OsFHandleOpen
++#   FdGetOsFHandle
++#   SetHandleInformation
++#   SetFilePointer
++#   HANDLE_FLAG_INHERIT
++#   INVALID_HANDLE_VALUE
++
++#   createFile
++#   WriteFile
++#   ReadFile
++#   CloseHandle
++
++#   FILE_ATTRIBUTE_TEMPORARY
++#   FILE_FLAG_DELETE_ON_CLOSE
++#   FILE_FLAG_WRITE_THROUGH
+ 
+-   FILE_BEGIN
+-) ;
++#   FILE_BEGIN
++#) ;
+ 
+ #   FILE_ATTRIBUTE_HIDDEN
+ #   FILE_ATTRIBUTE_SYSTEM
+@@ -99,18 +99,18 @@ BEGIN {
+    () = (
+       SOL_SOCKET,
+       SO_REUSEADDR,
+-      IPPROTO_TCP,
+-      TCP_NODELAY,
+-      HANDLE_FLAG_INHERIT,
+-      INVALID_HANDLE_VALUE,
++      IPPROTO_TCP(),
++      TCP_NODELAY(),
++#      HANDLE_FLAG_INHERIT,
++#      INVALID_HANDLE_VALUE,
+    );
+ }
+ 
+ 
+-use constant temp_file_flags => (
+-   FILE_ATTRIBUTE_TEMPORARY()   |
+-   FILE_FLAG_DELETE_ON_CLOSE()  |
+-   FILE_FLAG_WRITE_THROUGH()
++use constant temp_file_flags => ( 0
++#   FILE_ATTRIBUTE_TEMPORARY()   |
++#   FILE_FLAG_DELETE_ON_CLOSE()  |
++#   FILE_FLAG_WRITE_THROUGH()
+ );
+ 
+ #   FILE_ATTRIBUTE_HIDDEN()    |
+@@ -189,7 +189,7 @@ sub _create_temp_file {
+ 
+ sub _reset_temp_file_pointer {
+    my $self = shift;
+-   SetFilePointer( $self->{TEMP_FILE_HANDLE}, 0, 0, FILE_BEGIN )
++   SetFilePointer( $self->{TEMP_FILE_HANDLE}, 0, 0, FILE_BEGIN() )
+       or confess "$^E seeking on (fd $self->{TFD}) $self->{TEMP_FILE_NAME} for kid's fd $self->{KFD}";
+ }
+ 
+@@ -351,7 +351,7 @@ sub _spawn_pumper {
+       $^X,
+       $cmd_line,
+       1,  ## Inherit handles
+-      NORMAL_PRIORITY_CLASS,
++      NORMAL_PRIORITY_CLASS(),
+       ".",
+    ) or croak "$!: Win32::Process::Create()" ;
+ 
+--- ./lib/IPC/Run.pm~	Fri Oct 10 02:19:16 2003
++++ ./lib/IPC/Run.pm	Fri Oct 10 08:40:46 2003
+@@ -6,6 +6,10 @@ package IPC::Run ;
+ # License or the Artistic License, as specified in the README file.
+ #
+ 
++BEGIN {die "porting of this module is not finished, set \$ENV{OS2_IPC_RUN} to enable"
++	unless $ENV{OS2_IPC_RUN}
++}
++
+ $VERSION = 0.75 ;
+ 
+ =head1 NAME
+@@ -1053,8 +1057,10 @@ use Fcntl ;
+ use POSIX () ;
+ use Symbol ;
+ use Carp ;
++sub croak {Carp::confess @_}
+ use File::Spec ;
+ use IO::Handle ;
++use Config ;
+ require IPC::Run::IO ;
+ require IPC::Run::Timer ;
+ use UNIVERSAL qw( isa ) ;
+@@ -1195,7 +1201,7 @@ sub _search_path {
+    }
+ 
+    my $dirsep =
+-      ( Win32_MODE
++      ( (Win32_MODE || $^O eq 'os2')
+          ? '[/\\\\]'
+       : $^O =~ /MacOS/
+          ? ':'
+@@ -1204,11 +1210,11 @@ sub _search_path {
+       : '/'
+       ) ;
+ 
+-   if ( Win32_MODE
++   if ( (Win32_MODE || $^O eq 'os2')
+       && ( $cmd_name =~ /$dirsep/ )
+       && ( $cmd_name !~ /\..+$/ )  ## Only run if cmd_name has no extension?
+     ) {
+-      for ( split /;/, $ENV{PATHEXT} || ".COM;.BAT;.EXE" ) {
++      for ( split /;/, $ENV{PATHEXT} || ".COM;.CMD;.BAT;.EXE" ) {
+          my $name = "$cmd_name$_";
+          $cmd_name = $name, last if -f $name && -x _;
+       }
+@@ -1218,7 +1224,7 @@ sub _search_path {
+       _debug "'$cmd_name' contains '$1'"  if _debugging;
+       croak "file not found: $cmd_name"    unless -e $cmd_name ;
+       croak "not a file: $cmd_name"        unless -f $cmd_name ;
+-      croak "permission denied: $cmd_name" unless -x $cmd_name ;
++      croak "permission denied: $cmd_name" unless -x $cmd_name or $^O eq 'os2';
+       return $cmd_name ;
+    }
+ 
+@@ -1233,10 +1239,7 @@ sub _search_path {
+ 
+    my @searched_in ;
+ 
+-   ## This next bit is Unix/Win32 specific, unfortunately.
+-   ## There's been some conversation about extending File::Spec to provide
+-   ## a universal interface to PATH, but I haven't seen it yet.
+-      my $re = Win32_MODE ? qr/;/ : qr/:/ ;
++   my $re = qr/$Config{path_sep}/ ;
+ 
+ LOOP:
+    for ( split( $re, $ENV{PATH}, -1 ) ) {
+@@ -1247,8 +1250,8 @@ LOOP:
+       my @prospects ;
+ 
+       @prospects =
+-         ( Win32_MODE && ! ( -f $prospect && -x _ ) )
+-            ? map "$prospect$_", split /;/, $ENV{PATHEXT} || ".COM;.BAT;.EXE"
++         ( (Win32_MODE || $^O eq 'os2') && ! ( -f $prospect && -x _ ) )
++            ? map "$prospect$_", split /;/, $ENV{PATHEXT} || ".COM;.cmd;.BAT;.EXE"
+             : ( $prospect ) ;
+ 
+       for my $found ( @prospects ) {
+@@ -1366,7 +1369,7 @@ sub _pipe_nb {
+    croak "$!: pipe()" unless defined $f ;
+    my ( $r, $w ) = ( fileno R, fileno W ) ;
+    _debug "pipe_nb pipe() = ( $r, $w )" if _debugging_details ;
+-   unless ( Win32_MODE ) {
++   unless ( Win32_MODE or $^O eq 'os2' ) {
+       ## POSIX::fcntl doesn't take fd numbers, so gotta use Perl's and
+       ## then _dup the originals (which get closed on leaving this block)
+       my $fres = fcntl( W, &F_SETFL, O_WRONLY | O_NONBLOCK );
+@@ -1402,12 +1405,12 @@ sub _read {
+ 
+ 
+ ## A METHOD, not a function.
+-sub spawn {
++sub _spawn {
+    my IPC::Run $self = shift ;
+    my ( $kid ) = @_ ;
+ 
+-   my @kid = %$kid;
+-   die "Spawinging `@kid': not implemented";
++   #my @kid = %$kid;
++   #die "Spawinging `@kid': not implemented";
+    _debug "opening sync pipe ", $kid->{PID} if _debugging_details ;
+    my $sync_reader_fd ;
+    ( $sync_reader_fd, $self->{SYNC_WRITER_FD} ) = _pipe ;
+--- ./lib/IPC/Run/Debug.pm~	Fri Apr 26 06:12:46 2002
++++ ./lib/IPC/Run/Debug.pm	Fri Oct 10 02:59:08 2003
+@@ -123,7 +123,7 @@ sub _map_fds {
+    my $digit = 0 ;
+    my $in_use ;
+    my $dummy ;
+-   for my $fd (0..63) {
++   for my $fd (0..17) {
+       ## I'd like a quicker way (less user, cpu & expecially sys and kernal
+       ## calls) to detect open file descriptors.  Let me know...
+       ## Hmmm, could do a 0 length read and check for bad file descriptor...

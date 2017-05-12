@@ -1,0 +1,19 @@
+Revision history for Perl extension Biblio::Citation::Compare.
+
+0.01  Mon Feb  7 20:12:19 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Biblio::Citation::Compare
+0.02  Feb 8
+    - Fixed dependency issues
+0.03  Feb 8
+    - Improved doc
+0.21  Nov 24 2012
+    - Tons of improvements, stable version
+0.22  Dec 27 2014
+    - Fix for "_" in titles
+0.23  Dec 31 2014
+    - Removed debug prints
+0.24  Dec 31 2014
+    - Removed unnecessary "use" statements in Makefile.PL, fixing bug RT 101163
+0.4   Jun 11 2015
+    - Improved detection and handling of editions; minor bug fixes

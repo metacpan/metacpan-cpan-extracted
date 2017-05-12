@@ -1,0 +1,27 @@
+---
+abstract: 'Work with Library of Congress Control Number (LCCN) codes'
+author:
+  - 'Anirvan Chatterjee <anirvan@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-LCCN
+provides:
+  Business::LCCN:
+    file: lib/Business/LCCN.pm
+    version: 1.01
+requires:
+  Carp: 0
+  Moose: 0.34
+  Moose::Util::TypeConstraints: 0
+  Scalar::Util: 1.23
+  Test::More: 0
+  URI: 1.19
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.01

@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Bio/CIPRES.pm
+lib/Bio/CIPRES/Error.pm
+lib/Bio/CIPRES/Job.pm
+lib/Bio/CIPRES/Output.pm
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/boilerplate.t
+t/cipres.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test_data/cipres.conf
+META.yml
+META.json
+LICENSE

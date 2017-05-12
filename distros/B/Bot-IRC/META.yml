@@ -1,0 +1,54 @@
+---
+abstract: 'Yet Another IRC Bot'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Lib: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Output: '0'
+  blib: '1.01'
+  constant: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-IRC
+requires:
+  Carp: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  Daemon::Device: '0'
+  Date::Format: '0'
+  DateTime: '0'
+  DateTime::Format::Human::Duration: '0'
+  Email::Valid: '0'
+  Encode: '0'
+  File::Grep: '0'
+  IO::Socket: '0'
+  IO::Socket::SSL: '0'
+  JSON::XS: '0'
+  Mail::Send: '0'
+  Math::Expression: '0'
+  Math::Units: '0'
+  Time::Crontab: '0'
+  YAML::XS: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Bot-IRC/issues
+  homepage: https://github.com/gryphonshafer/Bot-IRC
+  repository: https://github.com/gryphonshafer/Bot-IRC.git
+version: '1.13'
+x_serialization_backend: 'YAML::Tiny version 1.69'

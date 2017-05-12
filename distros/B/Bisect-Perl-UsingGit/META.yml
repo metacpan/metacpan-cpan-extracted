@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Bisect-Perl-UsingGit
+version:            0.33
+abstract:           Help you to bisect Perl
+author:
+    - Leon Brocard <acme@astray.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Capture::Tiny:        0
+    Moose:                0
+    MooseX::Getopt:       0
+    MooseX::Types::Path::Class:  0
+    Test::More:           0.01
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,24 @@
+#! /usr/local/bin/perl -w
+
+use strict;
+use lib qw(blib/arch blib/lib);
+
+use BSD::Sysctl;
+
+my $iter = BSD::Sysctl->iterator( shift );
+while ($iter->next) {
+    my $val = $iter->value;
+    if (!defined $val) {
+        $val = '<undef>';
+    }
+    elsif (ref $val eq 'HASH') {
+        $val = "{\n  "
+            . join( "\n  ", map { "$_ => $val->{$_}" } sort keys %$val )
+            . "\n}"
+        ;
+    }
+    elsif (ref $val eq 'ARRAY') {
+        $val = "[@$val]";
+    }
+    print $iter->name, ": $val\n";
+}

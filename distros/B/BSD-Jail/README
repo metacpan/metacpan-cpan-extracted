@@ -1,0 +1,25 @@
+BSD/Jail version 0.01
+=====================
+
+An perl interface to the FreeBSD jail() system call family.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    FreeBSD jail(2)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Travis Boucher <tbone@tbone.ca> All Rights Reserved
+
+This library is free software; you may redistribute it and/or modify it under the same terms as Perl itself.

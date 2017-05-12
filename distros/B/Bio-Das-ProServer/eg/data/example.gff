@@ -1,0 +1,5 @@
+##gff-version 2
+##date 2009-04-06
+X	hand_built	SNP	17	17	32.6	+	2	Consequence "frameshift" ; Base "A"
+Y	hand_built	SNP	35	35	81.1	-	1	Consequence "synonymous" ; Base "C"
+Y	hand_built	SNP	80	80	97.8	-	0	Consequence "nonsynonymous" ; Base "T"

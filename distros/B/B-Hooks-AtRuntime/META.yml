@@ -1,0 +1,34 @@
+---
+abstract: 'Lower blocks from compile time to runtime'
+author:
+  - 'Ben Morrow <ben@morrow.me.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::Exception: '0.31'
+  Test::Exports: '1'
+  Test::More: '1.001002'
+  Test::Warn: '0.22'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: B-Hooks-AtRuntime
+provides:
+  B::Hooks::AtRuntime:
+    file: lib/B/Hooks/AtRuntime.pm
+    version: '4'
+requires:
+  Exporter::Tiny: '0'
+  Filter::Util::Call: '0'
+  Sub::Name: '0.05'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=B-Hooks-AtRuntime
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: http://github.com/mauzo/B-Hooks-AtRuntime
+version: '4'

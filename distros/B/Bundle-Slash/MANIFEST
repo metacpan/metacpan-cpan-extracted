@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+README
+Slash.pm
+t/slash.t

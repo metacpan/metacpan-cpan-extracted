@@ -1,0 +1,171 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Role::UserAgent - Bot::ChatBots Role for having a user agent
+
+=head1 SYNOPSIS
+
+   package Bot::ChatBots::Whatever::Sender;
+   use Moo;
+   with 'Bot::ChatBots::Role::Sender';
+   with 'Bot::ChatBots::Role::UserAgent';
+
+   sub send_message {
+      my ($self, $message) = @_;
+      $self->ua_request(
+         GET => 'http://frobozz.example.com/v1/whatever',
+         {Accept => 'application/json'},
+         json => $message
+      );
+   }
+   1;
+
+=head1 DESCRIPTION
+
+This role adds some user-agent capabilities using L<Mojo::UserAgent>.
+
+=head1 ACCESSORS
+
+The following methods have a same-named option that can be passed to the
+constructor.
+
+=head2 B<< callback >>
+
+   my $cb = $obj->callback;
+   $obj->callback(sub {...});
+
+Accessor for a possible callback sub reference. This is/can be used when
+callling L<Mojo::UserAgent> in non-blocking mode.
+
+=head2 B<< start_loop >>
+
+   say 'loop starts automatically' if $obj->start_loop;
+   $obj->start_loop(0); # don't start automatically
+   $obj->start_loop(1); # start loop automatically
+
+Accessor for boolean attribute that instructs L</ua_request> to start the
+L<Mojo::IOLoop> automatically. This can still be overridden by anything
+passed with key C<start_loop> in L</ua_request>.
+
+Defaults to C<0> (I<false>).
+
+=head2 B<< ua >>
+
+   my $ua = $obj->ua;
+   $obj->ua(Mojo::UserAgent->new);
+
+Accessor for a L<Mojo::UserAgent> compatible object.
+
+=head1 METHODS
+
+It should be safe to override the following methods in your classes
+composing this role.
+
+=head2 B<< BUILD_ua >>
+
+Builder for L</ua>. Defaults to a new fresh instance of
+L<Mojo::UserAgent>.
+
+=head2 B<< clear_callback >>
+
+   $obj->clear_callback;
+
+Remove any L</callback> currently set.
+
+=head2 B<< has_callback >>
+
+   say 'yes' if $obj->has_callback;
+
+Predicate function to assess whethere a L</callback> is set or not.
+
+=head2 B<< may_start_loop >>
+
+   $self->may_start_loop(%args);
+   $self->may_start_loop(\%args);
+
+Evaluates conditions for starting L<Mojo::IOLoop>. These conditions are:
+
+=over
+
+=item *
+
+if the provided C<%args> contains a key C<start_loop>, it is used to
+establish whether to start the loop or not, OTHERWISE
+
+=item *
+
+if L</start_loop> is I<false>, the loop is not started, OTHERWISE
+
+=item *
+
+the loop is started if it's not already running.
+
+=back
+
+This method is used by L</ua_request>.
+
+It is suggested to use this method only if you are also using a callback
+in your call. Assuming that C<@callback> contains a callback or not, you
+might want to call this method like this:
+
+   $obj->may_start_loop(%args) if @callback;
+
+=head2 B<< ua_request >>
+
+   $obj->ua_request($method, %args);
+
+This is a wrapper around different C<$method> methods available in
+L<Mojo::UserAgent>. For example, this call:
+
+   $obj->ua_request(get => ua_args => \@parameters);
+
+translates into this:
+
+   $obj->ua->get(@parameters);
+
+If a L</callback> is available (see L</has_callback>), it is appended to
+the C<@parameters> I<unless> the last item is a sub reference itself. In
+either cases, C<Mojo::IOLoop> is started unless it's already running.
+
+Returns whatever the call to L<Mojo::UserAgent> returns.
+
+The recognised keys in C<%args> are the following:
+
+=over
+
+=item C<start_loop>
+
+in case there is a callback, this flag tells C<ua_request> to start the
+L<Mojo::IOLoop> if it's not already running. Defaults to what set in
+accessor L</start_loop>.
+
+=item C<ua_args>
+
+the argument list for L<Mojo::UserAgent>. This might be I<extended> if it
+does not contain a callback but the object L</has_callback>.
+
+=back
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Bot::ChatBots::Role::Sender>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

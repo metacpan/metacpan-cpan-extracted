@@ -1,0 +1,86 @@
+@import "../base/main.css";
+
+div.meta {
+    margin-top: -1%;
+}
+
+#menu {
+    float: right;
+    width: 24%;
+    margin: 0.5%;
+}
+
+#menu div.menu.head {
+    text-align: center;
+}
+
+#menu div.menu.profile {
+    min-height: 12ex;
+}
+
+#menu div.menu.profile img {
+    float: left;
+    margin: 1%;
+    margin-right: 3%;
+    border: 0;
+}
+
+#menu div.menu.profile ul {
+    float: left;
+}
+
+#menu div.menu.search {
+    margin: 0;
+    padding-top: 0; 
+}
+
+#menu .toggle-expand {
+    float: left;
+    margin-right: 2%;
+}
+
+#menu ul {
+    list-style-type: none;
+    margin-top: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
+    margin-left: 0;
+    padding: 0;
+}
+
+#menu ul li {
+    margin-bottom: 1%;
+    word-wrap: break-word;
+}
+
+#menu ul ul {
+    margin-bottom: 0;
+    margin-left: 1%;
+}
+
+#menu ul ul li {
+    margin-bottom: 2%;
+}
+
+#menu div {
+    margin-top: 1%;
+    margin-right: 1%;
+    margin-bottom: 2%;
+}
+
+#container {
+    height: auto !important;
+    margin: 0 auto -1%;
+}
+
+#content {
+    margin-top: 0.5%;
+    margin-left: 1%;
+    margin-right: 25%;
+    margin-bottom: 1%;
+}
+
+h3.menu a, h4.head a {
+    text-decoration: none;
+}
+

@@ -1,0 +1,60 @@
+---
+abstract: 'extended simple IRC bot for pluggable modules'
+author:
+  - 'David Precious <davidp@preshweb.co.uk>'
+build_requires:
+  DBD::SQLite: '0'
+  FindBin: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  YAML::XS: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-BasicBot-Pluggable
+requires:
+  Bot::BasicBot: '0.91'
+  CGI: '0'
+  Carp: '0'
+  Config::Find: '0'
+  Crypt::SaltedHash: '0.06'
+  DBI: '0'
+  DBM::Deep: '0'
+  Data::Dumper: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  LWP::UserAgent: '0'
+  List::MoreUtils: '0'
+  Log::Log4perl: '1.11'
+  Log::Log4perl::Level: '0'
+  Module::Load: '0'
+  Module::Pluggable: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Getopt: '0'
+  MooseX::Getopt::Dashes: '0'
+  MooseX::SimpleConfig: '0'
+  POE: '0'
+  Socket: '0'
+  Storable: '0'
+  Text::Unidecode: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  URI::Find::Simple: '0'
+  URI::Title: '0'
+  XML::Feed: '0'
+  base: '0'
+  constant: '0'
+  lib: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+version: '1.20'
+x_serialization_backend: 'YAML::Tiny version 1.69'

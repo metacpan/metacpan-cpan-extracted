@@ -1,0 +1,86 @@
+#############################################################
+#### Sample BingoX configuration file for Apache/mod_perl ###
+#############################################################
+################## Load Apache Modules Now ##################
+#############################################################
+PerlModule Apache::DBI
+#PerlModule Apache::DebugDBI
+
+
+#############################################################
+################### Set Server Environment ##################
+#############################################################
+DocumentRoot /home/www/docs
+
+SetEnv SERVER_ROOT /home/www
+PerlSetEnv SERVER_ROOT /home/www
+
+
+#############################################################
+#################### Set Project Variables ##################
+#############################################################
+PerlSetVar AdminMainIndex /index.xpml
+
+
+<Perl>
+	### You will need to change this for your sandbox or ###
+	### to reflect the actual library location.          ###
+	use CGI qw(*center *table *Tr *td *b *font);
+
+	@PROJECTNAME::connectarray = (
+		"dbi:Sybase:database=[DATABASE];server=[SERVER]",
+		'[username]',	# username
+		'[password]',	# password
+		{
+			PrintError => 0,	# warn() on errors
+			RaiseError => 0,	# don't die on error
+			ChopBlanks => 1,	# who likes blanks anyway?
+			AutoCommit => 1		# commit executes immediately
+		}
+	);
+
+	Apache::DBI->connect_on_init(@PROJECTNAME::connectarray)
+		|| warn "couldn't connect to database " . DBI->errstr();
+</Perl>
+
+
+#############################################################
+#################### Development Settings ###################
+#############################################################
+#PerlInitHandler Apache::StatINC
+PerlSendHeader Off
+PerlTaintCheck On
+PerlWarn On
+
+
+#############################################################
+#################### Require Files Here #####################
+#############################################################
+PerlModule CGI
+PerlModule BingoX::Argon
+PerlModule BingoX::Carbon
+PerlModule BingoX::Cobalt
+PerlModule BingoX::Chromium
+PerlModule Apache::XPP
+
+PerlModule Time::Object
+PerlModule Date::Format
+PerlModule Date::Language
+PerlModule Date::Parse
+
+
+#############################################################
+##################### Apache XPML Handler ###################
+################### Include FIle Directory ##################
+#############################################################
+AddType text/html .xpml
+
+<Files *.xpml>
+	PerlSendHeader Off
+	SetHandler perl-script
+	PerlHandler Apache::XPP
+</Files>
+
+	PerlSetVar XPPIncludeDir include
+	PerlSetVar XPMLHeaders header.xmi
+#	PerlSetVar XPMLFooters footer.xmi

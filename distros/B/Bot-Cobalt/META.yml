@@ -1,0 +1,60 @@
+---
+abstract: 'IRC darkbot-alike plus plugin authoring sugar'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::File::ShareDir: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Cobalt
+recommends:
+  POE::Component::SSLify: '1.006'
+requires:
+  App::bmkpasswd: '2'
+  DB_File: '0'
+  Devel::StackTrace: '0'
+  Digest::MD5: '0'
+  Exporter::Tiny: '0'
+  Fcntl: '0'
+  File::ShareDir: '1'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  IRC::Utils: '0.12'
+  Import::Into: '0'
+  JSON::MaybeXS: '0'
+  List::Objects::Types: '1.002'
+  List::Objects::WithUtils: '2.008'
+  Module::Runtime: '0'
+  Moo: '1.006'
+  Net::IP::Minimal: '0.04'
+  POE: '1.3'
+  POE::Component::Client::DNS: '0'
+  POE::Component::Client::HTTP: '0.947'
+  POE::Component::Client::Keepalive: '0'
+  POE::Component::IRC: '6.78'
+  POE::Component::Resolver: '0.920'
+  POE::Component::Syndicator: '0.06'
+  Path::Tiny: '0.05'
+  Proc::PID::File: '1.26'
+  Try::Tiny: '0'
+  Type::Tiny: '0.04'
+  Types::Path::Tiny: '0.005'
+  URI::Escape: '0'
+  YAML::XS: '0.34'
+  perl: v5.12.1
+  strictures: '2'
+resources:
+  repository: git://github.com/avenj/bot-cobalt.git
+version: '0.021003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

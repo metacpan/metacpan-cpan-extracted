@@ -1,0 +1,24 @@
+Revision history for BLASTaid
+
+0.0.3  Thu Apr  6 19:51:00 CDT 2006 
+       Small update to POD.
+
+0.0.2  Thu Apr  6 13:11:22 CDT 2006 
+       -- Version 0.0.1 index files will not work with this version:
+          re-compile the index using this version.
+       -- Index order now corresponds to order of queries in the
+          multi-report BLAST file.
+       -- ID parse is a little lazier now; previous regex was being
+          too restrictive.
+       -- Index output now includes if alignements are in the report
+          (TRUE) or no alignments (FALSE).
+       -- Index output now includes type of BLAST per report.
+       -- Partial report is no longer restricted to "EXIT CODE 0";
+          simply requires an EXIT CODE to continue.
+       -- The "each_report" method now supports an "ignore"
+          attribute... for ignoring entries without alignments.
+       -- Added the following external methods: type; undef.
+
+0.0.1  Mon Feb 13 13:49:47 CST 2006 
+       Initial release of module to CPAN.
+

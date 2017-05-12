@@ -1,0 +1,21 @@
+Artistic
+Changes
+Copying
+lib/B/Generate.pm
+Generate.xs
+Makefile.PL
+MANIFEST
+README
+t/basic.t
+t/cpan70396.t
+t/cpan70398.t
+t/const.t
+t/find_cv.t
+t/new_cv.t
+t/op_list.t
+t/op_list_bgen.t
+t/scope.t
+t/svclasses.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

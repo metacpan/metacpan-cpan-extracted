@@ -1,0 +1,9 @@
+classes:
+  - Console
+parameters:
+  doc:
+    console:
+      pkg:
+        - install console editor GNU nano
+  pkg:
+    - nano

@@ -1,0 +1,5 @@
+<!ELEMENT  mod_version (name, description, version, release_date) >
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT description (#PCDATA)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT release_date (#PCDATA)>

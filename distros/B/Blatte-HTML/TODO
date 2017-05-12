@@ -1,0 +1,2 @@
+Facilities for suppressing automatic entity-encoding and automatic
+<p>-tag insertion (allowing inclusion of literal HTML, for instance).

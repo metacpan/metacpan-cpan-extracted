@@ -1,0 +1,7 @@
+Ipfwgen.pm
+Makefile.PL
+MANIFEST
+Ipfwgen.pod
+examples/gen-another
+examples/gen-idiom
+examples/gen-news

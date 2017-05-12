@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>HIV Sequence Locator API</title>
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <style type="text/css">
+            code {
+                color: inherit;
+            }
+
+            .form-inline .form-group {
+                vertical-align: top;
+            }
+
+            .form-inline .btn {
+                margin-left: 1em;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>HIV Sequence Locator API</h1>
+                <p>
+                    A dead-simple web API for
+                    <a href="http://www.hiv.lanl.gov/content/sequence/LOCATE/locate.html">LANL's HIV sequence locator</a>
+                    providing results in JSON.  Positioning, region, and
+                    protein information is all available.  Most of the data
+                    presented in the human-readable HTML page is extracted via
+                    this API.  Get in touch if you need something that's
+                    missing!
+                </p>
+
+                <h2>Endpoint</h2>
+                <h3><code>POST .../within/hiv</code></h3>
+                <p>
+                    Requires one or more values for the POST parameter
+                    <code>sequence</code> <em>or</em> a single-valued
+                    <code>fasta</code> parameter as a URL-encoded string or
+                    file upload of <a href="https://en.wikipedia.org/wiki/FASTA">FASTA</a>-formatted
+                    sequences.
+                </p>
+                <p>
+                    Both protein and nucleotide
+                    sequences are accepted, although the data returned varies
+                    by type due to what LANL returns.  See the
+                    <a href="#curl">curl example</a> which queries a protein
+                    sequence and the same sequence as nucleotides.  If you use
+                    LANL's tool directly, the reverse complements of your
+                    sequences will also be attempted and the best matching
+                    picked; in the interests of reliability and consistency,
+                    this API tells LANL <b>not</b> to reverse complement
+                    sequences.  You should instead take care of this before
+                    submitting.
+                </p>
+                <p>
+                    Optionally accepts a (<em>highly recommended</em>) <code>base</code>
+                    parameter set to <code>nucleotide</code> or <code>amino
+                    acid</code> which forces all sequences to be interpreted as
+                    the given base type.  This is necessary when submitting
+                    sequences with an ambiguous base type due to the overlap in
+                    IUPAC alphabets.  In such cases, LANL seems to assume
+                    nucleotides, potentially producing incorrect results.  For
+                    example, the amino acid sequence <code>MGGDMKDNW</code> is
+                    also a valid nucleotide sequence, albeit one many ambiguous
+                    bases.  Interpreting it as nucleotides, however, is
+                    incorrect.  It is not uncommon for short amino acid
+                    peptides to exhibit this property.
+                </p>
+                <p>
+                    On success (HTTP 200) the response body is a JSON array
+                    of objects, one per sequence.  Both HTTP 4xx and 5xx
+                    status codes are used on failure with plain text bodies
+                    containing an error message.
+                </p>
+                <p>
+                    The <code>format</code> parameter may be set to
+                    <code>csv</code> to return comma-separated values partially
+                    representating the full results.  <code>format</code> may
+                    also be explicitly set to <code>json</code>, though there is
+                    no need to as JSON is the default and will remain so.
+                </p>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th>HTTP Status</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>405 Method Not Allowed</td>
+                            <td>The request did not use the HTTP POST method</td>
+                        </tr>
+                        <tr>
+                            <td>415 Unsupported Media Type</td>
+                            <td>The provided <code>fasta</code> parameter appears to be in the wrong format</td>
+                        </tr>
+                        <tr>
+                            <td>422 Unprocessable Entity</td>
+                            <td>No <code>sequence</code> or <code>fasta</code> parameter was provided, or the parameter did not contain any sequences</td>
+                        </tr>
+                        <tr>
+                            <td>503 Service Unavailable</td>
+                            <td>An unexpected condition occurred while parsing results from LANL</td>
+                        </tr>
+                        <tr>
+                            <td>500 Internal Server Error</td>
+                            <td>An unexpected error occurred while processing your request</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    The API tries not to return incorrect data from misparses
+                    of LANL's output.  If it detects an anomoly in any of its
+                    parsing stages, it will abort the request and return an
+                    HTTP 503 Service Unavailable.  If this happens to your
+                    request, or if you are receiving results you don't expect,
+                    please <a href="mailto:mullspt+cfar@uw.edu">let us know</a>!
+                </p>
+
+                <h2>Quick lookup</h2>
+                <p>
+                    Submit sequences as a FASTA file and download the location
+                    results as a CSV file.  Note that the CSV does not contain
+                    all of the information the API can provide since CSV does
+                    not have standard support for nested or multi-valued data
+                    structures.  This form uses the API described above.
+                </p>
+                <form action="within/hiv" method="POST" enctype="multipart/form-data" role="form" class="form-inline">
+                    <div class="form-group">
+                        <label for="fasta-upload">FASTA file</label>
+                        <input type="file" id="fasta-upload" name="fasta" style="width: 15em"></label>
+                    </div>
+                    <div class="form-group">
+                        <label><input type="radio" name="base" value="nuc"> Nucleotides</label><br>
+                        <label><input type="radio" name="base" value="aa"> Amino acids</label>
+                    </div>
+                    <input type="hidden" name="format" value="csv">
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+
+                <hr>
+                <p>
+                    Created by Thomas Sibley of the
+                    <a href="http://mullinslab.microbiol.washington.edu">Mullins Lab</a>
+                    at the University of Washington, Department of Microbiology.
+                </p>
+                <p>
+                    Questions? <a href="mailto:mullspt+cfar@uw.edu">Drop us a line</a>.
+                </p>
+                <p>
+                    <a href="https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator">Source code</a>
+                </p>
+            </div>
+            <div class="col-md-6">
+                <h2>Examples</h2>
+<a name="curl"></a>
+<h3>curl</h3>
+<pre>
+curl -X POST https://indra.mullins.microbiol.washington.edu/locate-sequence/within/hiv \
+     --data sequence=SLYNTVAVLYYVHQR \
+     --data sequence=TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG
+</pre>
+<pre class="pre-scrollable">
+[
+   {
+      "query" : "sequence_1",
+      "query_sequence" : "SLYNTVAVLYYVHQR",
+      "base_type" : "amino acid",
+      "reverse_complement" : "0",
+      "alignment" : "\n Query SLYNTVAVLY YVHQR  15\n       :::::::.::  ::::    \n  HXB2 SLYNTVATLY CVHQR\n\n  ",
+      "hxb2_sequence" : "SLYNTVATLYCVHQR",
+      "similarity_to_hxb2" : "86.7",
+      "start" : "77",
+      "end" : "91",
+      "genome_start" : "1018",
+      "genome_end" : "1062",
+      "polyprotein" : "Gag",
+      "region_names" : [
+         "Gag",
+         "p17"
+      ],
+      "regions" : [
+         {
+            "cds" : "Gag",
+            "aa_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "15"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ]
+         },
+         {
+            "cds" : "p17",
+            "aa_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "15"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ]
+         }
+      ]
+   },
+   {
+      "query" : "sequence_2",
+      "query_sequence" : "TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG",
+      "base_type" : "nucleotide",
+      "reverse_complement" : "0",
+      "alignment" : "\n Query TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  45\n       :::::::::: :::::::::: :::::::::: :::::::::: ::::: \n  HXB2 TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  1062\n\n  ",
+      "hxb2_sequence" : "TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG",
+      "similarity_to_hxb2" : "100.0",
+      "start" : "229",
+      "end" : "273",
+      "genome_start" : "1018",
+      "genome_end" : "1062",
+      "polyprotein" : "Gag",
+      "region_names" : [
+         "Gag",
+         "p17"
+      ],
+      "regions" : [
+         {
+            "cds" : "Gag",
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "na_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ],
+            "na_from_query_start" : [
+               "1",
+               "45"
+            ],
+            "protein_translation" : "SLYNTVATLYCVHQR"
+         },
+         {
+            "cds" : "p17",
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "na_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ],
+            "na_from_query_start" : [
+               "1",
+               "45"
+            ],
+            "protein_translation" : "SLYNTVATLYCVHQR"
+         }
+      ]
+   }
+]
+</pre>
+<pre>
+curl -X POST https://indra.mullins.microbiol.washington.edu/locate-sequence/within/hiv \
+     --data base='amino acid' \
+     --data sequence=MGGDMKDNW
+</pre>
+<pre>
+curl -X POST https://indra.mullins.microbiol.washington.edu/locate-sequence/within/hiv \
+     --form base=nucleotide \
+     --form fasta=@<i>/path/to/your/input.fa</i>
+</pre>
+
+<a name="perl"></a>
+<h3>Perl</h3>
+<h4>Directly using <a href="https://metacpan.org/pod/Bio::WebService::LANL::SequenceLocator"><code>Bio::WebService::LANL::SequenceLocator</code></a></h4>
+<pre>
+#!/usr/bin/env perl
+#
+# First install the library:
+#   cpan -i Bio::WebService::LANL::SequenceLocator
+# 
+use strict;
+use warnings;
+use Bio::WebService::LANL::SequenceLocator;
+
+my $locator = Bio::WebService::LANL::SequenceLocator->new(
+    agent_string => 'Your Organization - you@example.com',
+);
+
+my @sequences = $locator->find([
+    "agcaatcagatggtcagccaaaattgccctatagtgcagaacatcc"
+   ."aggggcaagtggtacatcaggccatatcacctagaactttaaatgca",
+]);
+</pre>
+
+<h4>Through our web API</h4>
+<pre>
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use JSON qw< decode_json >;
+use LWP::UserAgent;
+
+my $agent    = LWP::UserAgent->new( agent => 'you@example.com' );
+my $response = $agent->post(
+    "https://indra.mullins.microbiol.washington.edu/locate-sequence/within/hiv" => [
+        sequence => "TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG",
+    ],
+);
+unless ($response->is_success) {
+    die "Request failed: ", $response->status_line, "\n",
+        $response->decoded_content;
+}
+my $results = decode_json( $response->decoded_content );
+
+# $results is now an array ref, like the JSON above
+print $results->[0]{polyprotein}, "\n";
+</pre>
+
+<a name="python"></a>
+<h3>Python</h3>
+<pre>
+#!/usr/bin/env python2
+from urllib2 import Request, urlopen, URLError
+from urllib  import urlencode
+import json
+
+request = Request('https://indra.microbiol.washington.edu/locate-sequence/within/hiv')
+data = urlencode({
+    'sequence': [
+        'SLYNTVAVLYYVHQR',
+        'TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG'
+    ]
+}, True);
+
+try:
+    response = urlopen(request, data)
+    text     = response.read()
+    results  = json.loads(text)
+except URLError, e:
+    print 'Request failed: ', e
+except ValueError, e:
+    print 'Decoding JSON failed: ', e
+finally:
+    if results == None:
+        exit(1)
+
+print results
+</pre>
+
+<a name="R"></a>
+<h3>R</h3>
+<pre>
+library("RCurl")
+library("rjson")
+
+results = tryCatch(
+  fromJSON(
+    postForm(
+      "https://indra.mullins.microbiol.washington.edu/locate-sequence/within/hiv",
+      sequence="SLYNTVAVLYYVHQR",
+      sequence="TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG")),
+  HTTPError = function(e) cat("Error making request: ", e$message),
+  error = function(e) cat("Error decoding JSON"))
+
+print(lapply(results, function(s) s$genome_start))
+</pre>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,22 @@
+SYNOPSIS
+
+     use Business::ID::BCA::Account qw(parse_bca_account);
+     my $res = parse_bca_account(account => '6000327555');
+
+DESCRIPTION
+
+    This module parses/validates BCA account number. BCA (Bank Central
+    Asia) is one of the major banks in Indonesia.
+
+    It also contains a routine to list known BCA branches. Data is
+    retrieved from the Gudang Data project
+    (http://github.com/sharyanto/gudangdata ).
+
+    Indonesian keywords: struktur nomor rekening BCA, format rekening BCA,
+    daftar kode cabang BCA
+
+BUGS/NOTES
+
+    Check digit checking is not implemented yet. Anybody knows the
+    algorithm used?
+

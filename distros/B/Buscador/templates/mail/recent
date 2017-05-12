@@ -1,0 +1,19 @@
+[% INCLUDE header %]
+[% PROCESS macros %]
+<h1>Recent mail</h1>
+
+[% INCLUDE searchbox %]
+
+<p><a href="[% base | remove('/$')%]/list/list">View by mailing list</a></p>
+[% FOR mail = mails;
+    mailday = mail.date.ymd;
+    IF mail == recent.first or mailday != previous %]
+        <h3>[% mailday %]</h3>
+    [% END %]
+    [% previous = mailday %]
+    [% summary(mail); %]
+
+[% END %]
+
+[% make_atom("mail/atom") %]
+[% INCLUDE footer %]

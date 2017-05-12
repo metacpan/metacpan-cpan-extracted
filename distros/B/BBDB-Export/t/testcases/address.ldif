@@ -1,0 +1,13 @@
+dn: cn=address testcase, ou=addressbook, dc=geekfarm, dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: address testcase
+givenName: address
+sn: testcase
+ou: addressbook
+street: 1234 north street
+l: san francisco
+st: CA
+postalCode: 94123

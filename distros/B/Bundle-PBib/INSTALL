@@ -1,0 +1,39 @@
+Requirements
+============
+
+Requirements to install and run PBib:
+
+- You need some perl to run PBib. I use the ActivePerl 5.8
+  (you can get it from http://www.activestate.com/ActivePerl).
+  I recommend that the perl interpreter is in your PATH.
+  If you use another perl distribution, you might need to install
+  some other packages, not mentioned in the dependencies.
+
+- To run the scripts, you should associate the .pl extension with 
+  perl on Windows, on Unix you perl should be in /usr/bin/perl.
+
+- You need a couple of Perl modules. These are listed in Build.PL.
+  In this distribution, Config::General and bp are included.
+
+- If you want to run PBibTk (the GUI for PBib), you need the 
+  perl Tk package. This comes with ActivePerl.
+
+- If you want to install the PBib perl modules (not necessary if 
+  you just want to run PBib or PBibTk), you need Module::Build.
+  You can get it e.g. from 
+  http://cpan.org/modules/by-module/Module/Module-Build-0.2604.tar.gz
+  Please be aware that when installing the perl modules,
+  Config::General is silently overwritten.
+
+
+Installing PBib modules
+=======================
+
+The easiest way to do this is like so:
+
+perl Build.PL
+perl Build
+perl Build install
+
+You can also optionally run 'perl Build test', which will run a few checks on the modules.
+

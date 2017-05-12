@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Util.xs
+t/Bit-Util.t
+lib/Bit/Util.pm
+META.yml                                 Module meta-data (added by MakeMaker)

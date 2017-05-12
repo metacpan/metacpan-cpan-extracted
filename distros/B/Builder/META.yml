@@ -1,0 +1,33 @@
+---
+abstract: 'Build XML, HTML, CSS and other outputs in blocks'
+author:
+  - 'Barry Walsh <draegtun@cpan.org>'
+build_requires:
+  Carp: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Builder
+provides:
+  Builder:
+    file: lib/Builder.pm
+    version: 0.06
+  Builder::Utils:
+    file: lib/Builder/Utils.pm
+    version: 0.06
+  Builder::XML:
+    file: lib/Builder/XML.pm
+    version: 0.06
+  Builder::XML::Utils:
+    file: lib/Builder/XML/Utils.pm
+    version: 0.06
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/draegtun/builder
+version: 0.06

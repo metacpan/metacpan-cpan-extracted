@@ -1,0 +1,48 @@
+Date: 18 February 2005
+New CPAN namespace proposal: Bio::GMOD
+Author: Todd Harris (harris@cshl.edu)
+
+Description in module list: 
+Unified Generic Model Organism Database API
+
+Rationale:
+
+Background:
+Bio::GMOD::* is a unified Perl interface to participating Model
+Organism Databases (MOD).  MODs serve as a clearing house of
+biological data, housing a vast variety of data relating to
+widely-used experimental systems.  This data includes genomic
+sequence, gene model predictions, experimental reagents, curated
+literature, and functional annotations.
+
+To promote software reuse, MODs have organized into the Generic Model
+Organism Database (GMOD) project which has given rise to a number of
+projects including a generic graphical genome browser, a generic
+schema for storing biological data, and a template-driven website
+system.
+
+Although each MOD may use distinct DBMSs, data models, and data mining
+protocols, they all confront similar issues - namely, how to store and
+present biological information of experiment model organism systems.
+The evolutionary relationships between model organisms -- and between
+the data housed in MODs -- is a central cornerstone of modern biology.
+
+Approach:
+Bio::GMOD::* seeks to further the GMOD project by providing a unified
+API across participating MODs.  Bio::GMOD::* uses a strongly
+object-oriented adaptor based architecture that serves to insulate end
+users from differences in naming schemes, data mining protocols, and
+adjustments to data models.  Core modules are generically subclassable
+in order to create custom solutions for different MODs.  Among current
+features are facilities for updates/maintainence of remote
+installations and remote version checking.  Features currently under
+development include cross-MOD querying and data fetching.
+
+Namespace rationale:
+Bio::GMOD is most appropriately associated with other
+biologically-related modules and hence does not require a new
+root-level namespace.  Although many features of Bio::GMOD will be
+used by a small core group of MOD developers, the data mining
+facilities will be of general use to all biologists using
+computational approaches. For this reason, Bio::GMOD should be listed
+in the main module list.

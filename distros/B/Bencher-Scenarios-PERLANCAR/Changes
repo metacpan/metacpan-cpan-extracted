@@ -1,0 +1,39 @@
+0.06    2017-01-25 (PERLANCAR)
+
+        - Add scenario: PERLANCAR::grep_bool,
+          PERLANCAR::method_call_using_variable, PERLANCAR::pkg_to_pkgpm.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.05    2016-04-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rephrase so we avoid multiple package declaration that confuses some
+          DZ plugin.
+
+
+0.04    2016-04-13 (PERLANCAR)
+
+        - Add scenario: PERLANCAR::In.
+
+
+0.03    2016-03-23 (PERLANCAR)
+
+        - Add scenarios: PERLANCAR::PERLANCARwarningsStartup,
+          PERLANCAR::CommonModulesStartup, PERLANCAR::pass_list_vs_array.
+
+
+0.02    2016-01-21 (PERLANCAR)
+
+        - Add scenario: PERLANCAR::state.
+
+        - Add some notes.
+
+
+0.01    2016-01-21 (PERLANCAR)
+
+        - First release.

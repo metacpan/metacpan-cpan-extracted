@@ -1,0 +1,93 @@
+<SBSConfig>
+  <name>SBS demo #1</name>
+  <workingDir>/tmp/SBS-demo</workingDir>
+  <logging>
+     <file>/tmp/SBS-demo/sbs-demo.log</file>
+     <level>info</level>
+  </logging>
+  <Scheduler type="SBS::DefaultScheduler">
+    <!-- the ordering method to return which job is the next one -->
+    <schedulingMethod>prioritylimit</schedulingMethod>
+    <!-- hard dump of the jobs list + status -->
+    <joblistIndex>/tmp/SBS-demo/joblist.dump</joblistIndex>
+    <!-- hard dump of resources status -->
+    <resourcesIndex>/tmp/SBS-demo/resourceslist.dump</resourcesIndex>
+    <!-- hard dump of resources status -->
+    <queuesIndex>/tmp/SBS-demo/queueslist.dump</queuesIndex>
+    <!-- states if an update (scheduling of the next available job is to done after a job ends -->
+    <autoupdate>yes</autoupdate>
+    <resourcesList>
+      <!-- oneResource can either be of type cluster | machine -->
+      <!-- cluster => <machineFile> element -->
+      <!-- machine => <host> element -->
+      <oneResource type="cluster">
+        <name>subcluster_A</name>
+        <machineFile>olavdev-cluster.mach</machineFile>
+      </oneResource>
+      <oneResource type="cluster">
+        <name>subcluster_B</name>
+        <machineFile>olavdev-cluster.mach</machineFile>
+      </oneResource>
+      <oneResource type="cluster">
+        <name>vs-cluster_A</name>
+        <machineFile>vs-cluster.mach</machineFile>
+        <!-- it is possible to add properties -->
+        <!-- They will have to fullfill the one stated into a queue -->
+        <property name='nodetype'>vs</property>
+      </oneResource>
+      <oneResource type="machine">
+        <name>mynode_ip</name>
+        <host>192.168.173.10</host>
+      </oneResource>
+      <oneResource type="machine">
+        <name>mynode_name</name>
+        <host>olavdev</host>
+      </oneResource>
+      <oneResource type="machine">
+        <name>mynode_lh</name>
+        <host>localhost</host>
+      </oneResource>
+    </resourcesList>
+    <queueList>
+      <oneQueue>
+         <!-- if a regexp is given, it will be possible to submit to user_default_jack, user_default_jimmy etc... the queues will be created with the same attributes as the template one -->
+         <name>user_default_\w+</name>
+         <resource>
+            <!-- resource/type must be of (machine|cluster) -->
+            <type>machine</type>
+         </resource>
+         <!-- priority: the higest, the first -->
+         <priority>5</priority>
+         <!-- number of max concurent jobs running per queue -->
+         <maxConcurentJob>2</maxConcurentJob>
+      </oneQueue>
+      <oneQueue>
+         <name>single.*</name>
+         <resource>
+            <type>machine</type>
+         </resource>
+         <priority>5</priority>
+         <maxConcurentJob>2</maxConcurentJob>
+      </oneQueue>
+      <oneQueue>
+         <name>single_high</name>
+         <resource>
+            <type>machine</type>
+         </resource>
+         <priority>10</priority>
+         <maxConcurentJob>10</maxConcurentJob>
+      </oneQueue>
+      <oneQueue>
+         <name>cluster_default</name>
+         <resource>
+            <type>cluster</type>
+            <!-- if properties are present, a resource must fullfill them all before being attributed -->
+            <property name='nodetype'>vs</property>
+         </resource>
+         <priority>5</priority>
+         <maxConcurentJob>1</maxConcurentJob>
+      </oneQueue>
+    </queueList>
+
+  </Scheduler>
+</SBSConfig>

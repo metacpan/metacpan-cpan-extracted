@@ -1,0 +1,447 @@
+
+=pod
+
+=head1 NAME
+
+BusyBird::Manual::WebAPI - Web API reference
+
+=head1 DESCRIPTION
+
+This is a reference guide to Web API of L<BusyBird>.
+
+The API paths are based on the path root (C</>) of the application.
+
+For all HTTP requests with the message body,
+data format of the body must be JSON encoded by UTF-8,
+so C<Content-Type> header should be C<application/json; charset=utf-8>.
+
+The data format of HTTP responses is determined by the extension (string after period (C<.>))
+of endpoint paths. Text responses are always encoded by UTF-8.
+
+
+=head1 ENDPOINTS
+
+=head2 GET /timelines/{timeline}/statuses.{format}
+
+Fetches an array of statuses from the specified timeline.
+See L<BusyBird::Manual::Status> for the structure of a status object.
+
+
+B<Path Parameters>
+
+=over
+
+=item C<timeline> = STR (required)
+
+Timeline name.
+
+=item C<format> = {json,html} (required)
+
+Response format. It is either C<json> or C<html>.
+
+If C<html> format is specified, the response message is
+a sequence of HTML C<< <li> >> elements.
+
+
+=back
+
+B<Query Parameters>
+
+=over
+
+=item C<ack_state> = {any,acked,unacked} (optional, default: any)
+
+Specifies the acked/unacked state of the statuses to be fetched.
+
+By setting it to C<unacked>, it returns only unacked statuses from the timeline.
+By setting it to C<acked>, it returns only acked
+statuses.
+By setting it to C<any>, it returns both acked and unacked statuses.
+
+=item C<max_id> = STATUS_ID (optional, default: none)
+
+Specifies the latest ID of the statuses to be fetched.
+It fetches statuses with IDs older than or equal to the specified C<max_id>.
+
+If this option is omitted, statuses starting from the latest status are fetched.
+
+=item C<count> = NUM (optional, default: 20)
+
+Specifies the maximum number of statuses to be fetched.
+
+=item C<only_statuses> = NUM (optional, default: 0)
+
+If set to 0, which is the default, the response includes statuses and the error message.
+If set to non-zero, the response is only statuses.
+
+This option is effective only when the C<format> is C<json>.
+It is useful when you transfer statuses from one L<BusyBird> instance to another.
+
+=back
+
+B<Response>
+
+In success, the HTTP response code is 200.
+
+=over
+
+=item *
+
+If C<format> is C<json> and C<only_statuses> is 0, the response is a JSON object.
+C<error> attribute of the object is C<null>, and C<statuses> attribute is the array of status objects fetched.
+The array can be empty.
+
+=item *
+
+If C<format> is C<json> and C<only_statuses> is non-zero, the response is a JSON array that contains status objects fetched.
+The array can be empty.
+
+=item *
+
+If C<format> is C<html>, the response is a sequence of HTML C<< <li> >> elements,
+each of which represents a status object.
+
+=back
+
+
+In failure, the HTTP response code is 4** or 5**.
+
+=over
+
+=item *
+
+If C<format> is C<json> and C<only_statuses> is 0, the response is a JSON object.
+C<error> attribute of the response object is non-null and it describes the error.
+
+=item *
+
+If C<format> is C<json> and C<only_statuses> is non-zero, the response is an empty JSON array.
+
+=item *
+
+If C<format> is C<html>, the response is an HTML element describing the error.
+
+=back
+
+B<< Example 1 >>
+
+Request URL:
+
+    GET /timelines/home/statuses.json?count=1&ack_state=any&max_id=http://example.com/page/2013/0202
+
+
+Response Body:
+
+    {
+      "error": null,
+      "statuses": [
+        {
+          "id": "http://example.com/page/2013/0202",
+          "created_at": "Sat Feb 02 17:38:12 +0900 2013",
+          "text": "another content"
+        }
+      ]
+    }
+
+
+B<< Example 2 >>
+
+Request URL:
+
+    GET /timelines/home/statuses.json?count=1&ack_state=any&max_id=http://example.com/page/2013/0202&only_statuses=1
+
+Response Body:
+
+    [
+        {
+          "id": "http://example.com/page/2013/0202",
+          "created_at": "Sat Feb 02 17:38:12 +0900 2013",
+          "text": "another content"
+        }
+    ]
+
+=head2 POST /timelines/{timeline}/ack.json
+
+Acknowledges statuses in the specified timeline, that is, changing 'unacked' statuses into 'acked'.
+This operation is usually called "mark as read" in other applications.
+You should ack statuses when you load and display them for the user.
+
+You can set parameters in the request body as a JSON object.
+If you omit all parameters, you can omit the entire request body.
+
+
+B<Path Parameters>
+
+=over
+
+=item C<timeline> = STR (required)
+
+Timeline name.
+
+=back
+
+B<Request Body Parameters>
+
+=over
+
+=item C<ids> = {STATUS_ID, ARRAY_OF_STATUS_IDS} (optional, default: C<null>)
+
+Specifies the IDs of the statuses to be acked.
+
+If it is a string, the status with the specified ID is acked.
+If it is an array of IDs, the statuses with those IDs are acked.
+
+If both C<max_id> and C<ids> are omitted or set to C<null>, all unacked statuses are acked.
+If both C<max_id> and C<ids> are specified, both statuses older than or equal to C<max_id>
+and statuses specifed by C<ids> are acked.
+
+
+=item C<max_id> = STATUS_ID (optional, default: C<null>)
+
+Specifies the latest ID of the statuses to be acked.
+
+If specified, unacked statuses with IDs older than or equal to the specified C<max_id> are acked.
+If there is no unacked status with ID C<max_id>, no status is acked.
+
+If both C<max_id> and C<ids> are omitted or set to C<null>, all unacked statuses are acked.
+If both C<max_id> and C<ids> are specified, both statuses older than or equal to C<max_id>
+and statuses specifed by C<ids> are acked.
+
+
+=back
+
+B<Response>
+
+The response is a JSON object.
+
+In success, the HTTP response code is 200.
+C<error> attribute of the response object is C<null>,
+and C<count> attribute is the number of acked statuses.
+
+In failure, the HTTP response code is 4** or 5**.
+C<error> attribute of the response object is non-null and it describes the error.
+
+B<Example>
+
+Request URL:
+
+    POST /timelines/home/ack.json
+
+Request Body:
+
+    {
+      "max_id": "http://example.com/page/2013/0202",
+      "ids": [
+        "http://example.com/page/2013/0204"
+       ]
+    }
+
+Response Body:
+
+    {"error": null, "count": 2}
+
+
+=head2 POST /timelines/{timeline}/statuses.json
+
+Adds new statuses to the specified timeline.
+
+This endpoint uses L<BusyBird::Timeline>'s C<add_statuses()> method.
+Therefore, it applies the status filter to the input statuses, and it generates C<id> and C<created_at> fields if they don't exist.
+
+B<Path Parameters>
+
+=over
+
+=item C<timeline> = STR (required)
+
+Timeline name.
+
+=back
+
+B<Request Body>
+
+A status object or an array of status objects in JSON format.
+
+See L<BusyBird::Manual::Status> for the structure of status objects.
+
+B<Response>
+
+The response is a JSON object.
+
+In success, the HTTP response code is 200.
+C<error> attribute of the response object is C<null> and C<count> attribute is the number of statuses added.
+
+In failure, the HTTP response code is 4** or 5**.
+C<error> attribute of the response object is non-null and it describes the error.
+
+B<Example>
+
+Request URL:
+
+    POST /timelines/home/statuses.json
+
+Request Body:
+
+    [
+      {
+        "id": "http://example.com/page/2013/0204",
+        "created_at": "Mon Feb 04 11:02:45 +0900 2013",
+        "text": "content of the status",
+        "busybird": { "level": 3 }
+      },
+      {
+        "id": "http://example.com/page/2013/0202",
+        "created_at": "Sat Feb 02 17:38:12 +0900 2013",
+        "text": "another content"
+      }
+    ]
+
+Response Body:
+
+    {"error": null, "count": 2}
+
+
+=head2 GET /timelines/{timeline}/updates/unacked_counts.json
+
+Watches updates in numbers of unacked statuses (i.e. unacked counts) in the specified timeline, and gets them when necessary.
+
+This is an endpoint for long-polling (Comet) access.
+The response is delayed until the current unacked counts are different
+from the unacked counts given in the query parameters.
+
+
+B<Path Parameters>
+
+=over
+
+=item C<timeline> = STR (required)
+
+Timeline name.
+
+=back
+
+B<Query Parameters>
+
+The query parameters specify the assumed unacked counts.
+As long as the current unacked counts are the same as the assumed unacked counts,
+the response is delayed.
+
+The assumed unacked counts can be specified per status level and/or in total.
+
+=over
+
+=item C<total> = NUM (optional)
+
+Specifies the total number of unacked statuses in the timeline.
+
+=item C<{level}> = NUM (optional)
+
+Specifies the number of unacked statuses in the status level of C<{level}>.
+C<{level}> can be any integer.
+
+=back
+
+B<Response>
+
+The response is a JSON object.
+
+In success, the HTTP response code is 200.
+C<error> attribute of the response object is C<null> and
+C<unacked_counts> attribute is an object describing the current unacked counts (See Example).
+
+In failure, the HTTP response code is 4** or 5**.
+C<error> attribute of the response object is non-null and it describes the error.
+
+B<Example>
+
+Request URL:
+
+The following request means that you assume there are two unacked statuses in 'home' timeline,
+and they are both in level 0.
+
+    GET /timelines/home/updates/unacked_counts.json?total=2&0=2
+
+Response Body:
+
+The server sends back the following response because the current unacked count for level 0
+is one instead of two.
+
+    {
+      "error": null,
+      "unacked_counts": {
+        "total": 2,
+        "0": 1,
+        "3": 1
+      }
+    }
+
+
+=head2 GET /updates/unacked_counts.json
+
+Watches updates in numbers of unacked statuses (i.e. unacked counts) in multiple timelines, and gets them when necessary.
+
+This is an endpoint for long-polling (Comet) access.
+The response is delayed until the current unacked counts are different from the unacked counts given in the query parameters.
+
+
+B<Query Parameters>
+
+The query parameters specify the assumed unacked counts.
+As long as the current unacked counts are the same as the assumed unacked counts,
+the response is delayed.
+
+This endpoint allows you to watch updates in multiple timelines,
+but you can watch only one status level (or 'total').
+
+=over
+
+=item C<level> = {total,NUM} (optional, default: total)
+
+Specifies the status level to be watched.
+
+=item C<tl_{timeline}> = NUM (optional)
+
+Specifies the unacked counts for the timeline C<{timeline}> in the status level.
+C<{timeline}> is the name of the timeline you want to watch.
+
+=back
+
+B<Response>
+
+The response is a JSON object.
+
+In success, the HTTP response code is 200.
+C<error> attribute of the response object is C<null> and
+C<unacked_counts> attribute is an object describing the current unacked counts (See Example).
+
+In failure, the HTTP response code is 4** or 5**.
+C<error> attribute of the response object is non-null and it describes the error.
+
+B<Example>
+
+Request URL:
+
+The following request means that you assume there are no unacked statuses in timeline 'home' or timeline 'foobar'.
+
+    GET /updates/unacked_counts.json?level=total&tl_home=0&tl_foobar=0
+
+Response Body:
+
+The server sends back the following response because there are two unacked statuses in timeline 'home'.
+
+    {
+      "error": null,
+      "unacked_counts": {
+        "home": {
+          "total": 2,
+          "0": 1,
+          "3": 1
+        }
+      }
+    }
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut

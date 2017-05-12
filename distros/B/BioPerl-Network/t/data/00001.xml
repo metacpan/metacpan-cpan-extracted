@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HPRDr2 SYSTEM "hprdr2.dtd">
+<HPRDr2 xmlns="org:hprd:dtd:hprdr2">
+  <protein isoform="1" version="1" id="HPRD_00001">
+   <title>Aldehyde dehydrogenase 1</title>
+    
+        <alt_title>Aldehyde dehydrogenase 1 family, member A1</alt_title>
+    
+    
+        <alt_title>ALDH1</alt_title>
+    
+    
+        <alt_title>ALHDII</alt_title>
+    
+    
+        <alt_title>ALDH-E1</alt_title>
+    
+    
+        <alt_title>Acetaldehyde dehydrogenase 1</alt_title>
+    
+    
+        <alt_title>ALDH, Liver cytosolic</alt_title>
+    
+    
+        <alt_title>Retinal dehydrogenase 1</alt_title>
+    
+    
+        <alt_title>RALDH 1</alt_title>
+    
+    
+        <alt_title>ALDC</alt_title>
+    
+    <omim>100640</omim> 
+    <gene_symbol>ALDH1A1</gene_symbol>
+    <gene_map_locus>
+      <title>9q21.13</title>
+      
+          <pubmed>3013004</pubmed>
+      
+    </gene_map_locus>
+    <seq_entry source="Ref-Seq">
+      <entry_cdna>NM_000689.3</entry_cdna>
+      <entry_protein>NP_000680.2</entry_protein>
+    </seq_entry>
+    <molecular_weight>54865</molecular_weight>
+    <!-- Large sections begin here. -->
+    <entry_sequence>
+      <cdna length="2116">atcagaacca aattgctgag ccagtcacct
+gtgttccagg agccgaatca gaaatgtcat
+cctcaggcac gccagactta cctgtcctac
+tcaccgattt gaagattcaa tatactaaga
+tcttcataaa caatgaatgg catgattcag
+tgagtggcaa gaaatttcct gtctttaatc
+ctgcaactga ggaggagctc tgccaggtag
+aagaaggaga taaggaggat gttgacaagg
+cagtgaaggc cgcaagacag gcttttcaga
+ttggatcccc gtggcgtact atggatgctt
+ccgagagggg gcgactatta tacaagttgg
+ctgatttaat cgaaagagat cgtctgctgc
+tggcgacaat ggagtcaatg aatggtggaa
+aactctattc caatgcatat ctgaatgatt
+tagcaggctg catcaaaaca ttgcgctact
+gtgcaggttg ggctgacaag atccagggcc
+gtacaatacc aattgatgga aattttttta
+catatacaag acatgaacct attggtgtat
+gtggccaaat cattccttgg aatttcccgt
+tggttatgct catttggaag atagggcctg
+cactgagctg tggaaacaca gtggttgtca
+aaccagcaga gcaaactcct ctcactgctc
+tccacgtggc atctttaata aaagaggcag
+ggtttcctcc tggagtagtg aatattgttc
+ctggttatgg gcctacagca ggggcagcca
+tttcttctca catggatata gacaaagtag
+ccttcacagg atcaacagag gttggcaagt
+tgatcaaaga agctgccggg aaaagcaatc
+tgaagagggt gaccctggag cttggaggaa
+agagcccttg cattgtgtta gctgatgccg
+acttggacaa tgctgttgaa tttgcacacc
+atggggtatt ctaccaccag ggccagtgtt
+gtatagccgc atccaggatt tttgtggaag
+aatcaattta tgatgagttt gttcgaagga
+gtgttgagcg ggctaagaag tatatccttg
+gaaatcctct gaccccagga gtcactcaag
+gccctcagat tgacaaggaa caatatgata
+aaatacttga cctcattgag agtgggaaga
+aagaaggggc caaactggaa tgtggaggag
+gcccgtgggg gaataaaggc tactttgtcc
+agcccacagt gttctctaat gttacagatg
+agatgcgcat tgccaaagag gagatttttg
+gaccagtgca gcaaatcatg aagtttaaat
+ctttagatga cgtgatcaaa agagcaaaca
+atactttcta tggcttatca gcaggagtgt
+ttaccaaaga cattgataaa gccataacaa
+tctcctctgc tctgcaggca ggaacagtgt
+gggtgaattg ctatggcgtg gtaagtgccc
+agtgcccctt tggtggattc aagatgtctg
+gaaatggaag agaactggga gagtacggtt
+tccatgaata tacagaggtc aaaacagtca
+cagtgaaaat ctctcagaag aactcataaa
+gaaaatacaa gagtggagag aagctcttca
+atagctaagc atctccttac agtcactaat
+atagtagatt ttaaagacaa aatttttctt
+ttcttgattt ttttaaacat aagctaaatc
+atattagtat taatactacc catagaaaac
+ttgacatgta gcttcttctg aaagaattat
+ttgccttctg aaatgtgacc cccaagtcct
+atcctaaata aaaaaagaca aattcggatg
+tatgatctct ctagctttgt catagttatg
+tgattttcct ttgtagctac ttttgcagga
+taataatttt atagaaaagg aacagttgca
+tttagcttct ttcccttagt gactcttgaa
+gtacttaaca tacacgttaa ctgcagagta
+aattgctctg ttcccagtag ttataaagtc
+cttggactgt tttgaaaagt ttcctaggat
+gtcatgtctg cttgtcaaaa gaaataatcc
+ctgtaatatt tagctgtaaa ctgaatataa
+agcttaataa aaacaacctt gcatgaaaaa
+aaaaaaaaaa aaaaaa
+</cdna>
+      <cdna_utr5 start="1" end="53"/>
+      <cdna_coding start="54" end="1559"/>
+      <cdna_utr3 start="1560" end="2116"/>
+      <protein_sequence length="501">msssgtpdlp vlltdlkiqy tkifinnewh
+dsvsgkkfpv fnpateeelc qveegdkedv
+dkavkaarqa fqigspwrtm dasergrlly
+kladlierdr lllatmesmn ggklysnayl
+ndlagciktl rycagwadki qgrtipidgn
+fftytrhepi gvcgqiipwn fplvmliwki
+gpalscgntv vvkpaeqtpl talhvaslik
+eagfppgvvn ivpgygptag aaisshmdid
+kvaftgstev gklikeaagk snlkrvtlel
+ggkspcivla dadldnavef ahhgvfyhqg
+qcciaasrif veesiydefv rrsverakky
+ilgnpltpgv tqgpqidkeq ydkildlies
+gkkegaklec gggpwgnkgy fvqptvfsnv
+tdemriakee ifgpvqqimk fkslddvikr
+anntfyglsa gvftkdidka itissalqag
+tvwvncygvv saqcpfggfk msgngrelge
+ygfheytevk tvtvkisqkn s
+</protein_sequence>
+    </entry_sequence>
+    
+    <expressions>
+      <expression>
+        <title>Liver</title>
+        
+            <pubmed>730161</pubmed>
+        
+      </expression>
+      <expression>
+        <title>Kidney</title>
+        
+            <pubmed>730161</pubmed>
+        
+      </expression>
+      <expression>
+        <title>Red blood cell</title>
+        
+            <pubmed>224930</pubmed>
+        
+      </expression>
+      <expression>
+        <title>Cornea</title>
+        
+            <pubmed>9723161</pubmed>
+        
+      </expression>
+    </expressions>
+    <functions>
+      <molecular_class>Enzyme: Dehydrogenase</molecular_class>
+      
+         <molecular_function>
+            <title>Catalytic activity</title>
+            <goid>0003824</goid>
+         </molecular_function>
+      
+      <biological_processes>
+         <biological_process>
+            <title>Metabolism</title>
+            <goid>0008152</goid>
+         </biological_process>
+         <biological_process>
+            <title>Energy pathways</title>
+            <goid>0006091</goid>
+         </biological_process>
+      </biological_processes>
+    </functions>
+    <cellular_component>
+      
+          <primary>
+              <title>cytoplasm</title>
+              <go_id>GO:0005737</go_id>
+              <go_abbreviation>TAS</go_abbreviation>
+              
+                 <pubmed>9166904</pubmed>
+              
+          </primary>
+      
+           
+          
+      
+    </cellular_component>
+    <modifications>
+      <modification type="acetylation">
+        <ptm_site>2</ptm_site>
+        
+          
+            
+            <ptm_enzyme db="none_specified"></ptm_enzyme>
+          
+        
+        <exp_type>in vitro</exp_type>
+        
+           <pubmed>6427007</pubmed>
+        
+      </modification>
+    </modifications>
+    
+    <interactions>
+<entrySet xmlns="net:sf:psidev:mi"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd"
+          level="1" version="1">
+    <entry>
+        <source>
+            <names>
+                <shortLabel>HPRD</shortLabel>
+                <fullName>Human Protein Reference Database</fullName>
+            </names>
+            <bibref>
+                <xref>
+                     <primaryRef db="PubMed" id="14525934"/>
+                     <secondaryRef db="PubMed" id="14681466"/>
+                </xref>
+            </bibref>
+        </source>
+        <availabilityList>
+            <availability id="copyright">
+                This data is copyrighted by Johns Hopkins University.
+                Commercial entities may not use this without prior licensing
+                authorization. Other databases must agree to enforce the same
+                licensing guidelines before making this data public on their website.
+            </availability>
+        </availabilityList>
+
+        <interactorList>
+          
+            <proteinInteractor id="ID_HPRD_00001">
+                <names>
+                    <shortLabel>Aldehyde dehydrogenase 1</shortLabel>
+                </names>
+                <xref>
+                    <primaryRef db="HPRD" id="HPRD_00001"/>
+                     
+                       <secondaryRef db="PubMed"
+    id="3013004"/>
+                    
+                    <secondaryRef version="2" db="Ref-Seq"
+    id="NP_000680"/>
+                    
+                        <secondaryRef db="Swiss-Prot"
+    id="P00352"/> 
+                    
+                    <secondaryRef db="Locus-Link" id="216"/> 
+                    
+                        <secondaryRef db="Unigene"
+    id="76392"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id="1CW3"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1NZX"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1O00"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1O01"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1O02"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1O04"/> 
+                    
+                    
+                         <secondaryRef db="PDB" id=" 1O05"/> 
+                    
+                </xref>
+                <organism ncbiTaxId="9606">
+                   <names>
+                      <shortLabel>Human</shortLabel>
+                      <fullName>Homo sapiens</fullName>
+                   </names>
+                </organism>
+                <sequence>msssgtpdlp vlltdlkiqy tkifinnewh
+dsvsgkkfpv fnpateeelc qveegdkedv
+dkavkaarqa fqigspwrtm dasergrlly
+kladlierdr lllatmesmn ggklysnayl
+ndlagciktl rycagwadki qgrtipidgn
+fftytrhepi gvcgqiipwn fplvmliwki
+gpalscgntv vvkpaeqtpl talhvaslik
+eagfppgvvn ivpgygptag aaisshmdid
+kvaftgstev gklikeaagk snlkrvtlel
+ggkspcivla dadldnavef ahhgvfyhqg
+qcciaasrif veesiydefv rrsverakky
+ilgnpltpgv tqgpqidkeq ydkildlies
+gkkegaklec gggpwgnkgy fvqptvfsnv
+tdemriakee ifgpvqqimk fkslddvikr
+anntfyglsa gvftkdidka itissalqag
+tvwvncygvv saqcpfggfk msgngrelge
+ygfheytevk tvtvkisqkn s
+</sequence>
+            </proteinInteractor>
+          
+        </interactorList>
+        <interactionList>
+           
+            <interaction>
+                <availabilityRef ref="copyright"/>
+                <experimentList>
+                  
+                    <experimentDescription
+    id="I10608442485768_vv">
+                        <bibref>
+                            <xref>
+                               
+                                  
+                                       <primaryRef
+    db="PubMed" id="12081471"/>
+                                       
+                                  
+                                
+                            </xref>
+                        </bibref>
+                        <interactionDetection>
+                            <names>
+                                <shortLabel>vv</shortLabel> 
+                                <fullName>in vivo</fullName>
+                            </names>
+                            <xref>
+                                <primaryRef db="IOB"
+    id="IOB:0001"/> 
+                            </xref>
+                        </interactionDetection>
+                    </experimentDescription>
+                  
+                </experimentList>
+                <participantList>
+                    <proteinParticipant>
+                        <proteinInteractorRef
+    ref="ID_HPRD_00001"/>
+                    </proteinParticipant>
+                    <proteinParticipant>
+                        <proteinInteractorRef
+    ref="ID_HPRD_00001"/>
+                    </proteinParticipant>
+                </participantList>
+                <xref>
+                    <primaryRef db="HPRD" id="HPRD_00001"/>
+                </xref>
+                <attributeList>
+                   
+                      <attribute name="HPRD Author">gopa</attribute>
+                      
+                   <attribute name="last_updated">3_30_2005</attribute>             
+                </attributeList>
+            </interaction>
+             
+        </interactionList>
+    </entry>
+</entrySet>
+</interactions>
+
+    <EXTERNAL_LINKS>
+      <SwissProt>P00352</SwissProt>
+      <locusLink>216</locusLink>
+      <unigene>Hs.76392</unigene>
+      <otherResources>None</otherResources>
+      <PDB>1CW3; 1NZX; 1O00; 1O01; 1O02; 1O04; 1O05</PDB>
+    </EXTERNAL_LINKS>
+
+    <author>
+       <annotator>gopa</annotator>
+       
+    </author>
+    <last_updated>3_30_2005</last_updated>
+
+   </protein>
+</HPRDr2>
+
+

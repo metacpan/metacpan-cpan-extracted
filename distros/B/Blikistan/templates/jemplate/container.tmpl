@@ -1,0 +1,37 @@
+<!-- head -->
+<div id="head">
+<h1><a rel="home" href="[% site_base %]">[% site_title %]</a></h1>
+<h2>[% site_tagline %]</h2>
+
+</div>
+
+<!-- left -->
+<div id="sidebar-1">
+[% FOR l IN sidebar_links %]
+    <p class="linklist"><a href="[% l.href %]" title="[% l.title %]">[% l.name %]</a><br />
+[% END %]
+[% email %]
+</div>
+
+<!-- right -->
+<div id="sidebar-2">
+  <img src="[% side_image.src %]" alt="[% side_image.alt %]"/><br />
+  <form action="[% rester.server %][% rester.workspace %]/index.cgi" method="get">
+    <p>Search<br />
+      <input type="text" name="search_term" value="" size="15" />
+      <input type="hidden" name="action" value="search" />
+    </p>
+  </form>
+
+  <p><a href="[% rester.server %]/noauth/feed/workspace[% rester.workspace %]?category=Recent%20Changes">RSS Feed</a></p>
+  [% sidebar_extra %]
+</div>
+
+<!-- center -->
+<div id="content">
+</div>
+
+<!-- footer -->
+<div id="foot">All posts come from <a href="[% rester.server %][% rester.workspace %]/index.cgi?action=category_display;category=[% post_tag %];tag=/[% post_tag %]">this wiki</a></div>
+
+

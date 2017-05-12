@@ -1,0 +1,49 @@
+0.08    2017-01-25 (PERLANCAR)
+
+	- Add participants: Text::Table::HTML, Text::Table::HTML::DataTables.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.07    2016-10-19 (PERLANCAR)
+
+	- Add participants: Text::Table::Tiny{Color,ColorWide,Wide}.
+
+
+0.06    2016-08-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Split sample benchmark results per dataset.
+
+
+0.05    2016-06-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to show abstract.
+
+
+0.04    2016-01-05 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Bencher::Scenario
+          (0.03) which shows sample benchmark participants & results in POD.
+
+
+0.03    2015-12-19 (PERLANCAR)
+
+	- Add participant: Text::Table::CSV.
+
+
+0.02    2015-12-17 (PERLANCAR)
+
+	- Add participant: Text::Table::Org.
+
+
+0.01    2015-10-11 (PERLANCAR)
+
+        - First release.

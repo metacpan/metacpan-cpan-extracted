@@ -1,0 +1,3 @@
+Second entry
+
+This is a sample second blog entry in flatfile format.

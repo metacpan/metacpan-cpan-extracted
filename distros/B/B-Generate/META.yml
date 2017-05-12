@@ -1,0 +1,28 @@
+---
+abstract: 'Create your own op trees.'
+author:
+  - 'Simon Cozens'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 8.0404, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: B-Generate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: '0'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::Embed: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/rurban/b-generate
+version: '1.55'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

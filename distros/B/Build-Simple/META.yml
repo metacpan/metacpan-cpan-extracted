@@ -1,0 +1,32 @@
+---
+abstract: 'A minimalistic dependency system'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Basename: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  Test::Differences: 0
+  Test::Fatal: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build::Tiny: 0.019
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Build-Simple
+requires:
+  Carp: 0
+  File::Path: 0
+  Moo: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Build-Simple
+  repository: git://github.com/Leont/build-simple.git
+version: 0.002

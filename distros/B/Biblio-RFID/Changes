@@ -1,0 +1,10 @@
+Revision history for RFID-Biblio
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	2010-08-06
+		Second API revision with RFID::Biblio::Reader as main class
+
+0.03	2010-08-25
+		Renamed to Biblio::RFID

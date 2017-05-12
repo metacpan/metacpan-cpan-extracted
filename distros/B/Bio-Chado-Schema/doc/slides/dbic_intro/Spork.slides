@@ -1,0 +1,301 @@
+----
+presentation_topic: dbic_chado
+presentation_title: Introduction to DBIx::Class
+presentation_subtitle: 
+presentation_place: Portland, OR
+presentation_date: April 14, 2010
+----
+= What is DBIx::Class?
+
+* Object-relational mapping framework for Perl
+* is now the de-facto standard
+* nice features
+
+----
+= What is DBIx::Class?
+
+* query building (the magic of chainable ResultSets)
+* cross-database deployment (using |SQL::Translator| in the backend)
+* lots and lots of plugins availabe (dates, testing, ...)
+
+see the manual: http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod
+
+----
+= What it looks like
+
+  package My::Schema;
+
+  __PACKAGE__->load_namespaces;
+
+  package My::Schema::Result::Foo;
+
+  __PACKAGE__->table('foo');
+  __PACKAGE__->add_columns(qw( foo_id bar baz ));
+  __PACKAGE__->has_many('bars' => 'My::Schema::Result::Bar');
+  # also belongs_to  many_to_many
+
+  package My::Schema::Result::Bar;
+
+  __PACKAGE__->table('bar');
+  # and so on
+
+* use |DBIx::Class::Schema::Loader| to generate this from a DB
+* use |$schema->deploy| to make a DB from this
+
+----
+= Basic Usage
+
+* open the schema.  ( actual DB connection is deferred )
++  my $schema = My::Schema->connect( 'dbi:Pg:...', $user, $pass );
+
++* get a ResultSet object representing a set of Rows
++  my $orgs_rs = $schema->resultset('Organism');
+
++* take a subset of those (another ResultSet)
++  my $chickeny_things = $orgs_rs->search({ genus => 'Gallus' });
+
++* first one in the result set
++  my $chicken = $chickeny_things->first;     #< actual query is run
+
+----
+= Basic Usage
+
++* getting actual data
++  my $wombat = $orgs_rs->find( 232432 );
++  say $wombat->genus.' '.$wombat->species; #< print 'Vombatus ursinus' or something
+
+  # or search in list context returns all resulting rows
+  my @all_nightshades = $orgs_rs->search({ genus => 'Solanum' });
+
+----
+= Basic Usage
+
+* traverse relationships (joined queries)
++  my $chickeny_things = $ck_rs->search({ genus => 'Gallus' });
++  my @chr = $chickeny_things->chromosomes;  #< query is run here
++  my @genes = $chicken->chromosomes->features->search({ type => 'gene' });
+
++* loading
++   $orgs_rs>create({ genus => 'Mus', species => 'musculus' })
++   # or piecewise
++   my $new = $orgs_rs->new;
+   $new->genus('Mus');  $new->species('musculus');
+   $new->insert;
+
++* deleting
+  $chicken->chromosomes->features->search({ type => 'gene' })->delete;
+
+
+----
+= When not to use DBIC
+
+* tiny app, tiny schema (setup overhead)
++* or tiny number of different queries
++* or hate objects
+
+strengths/weaknesses ...
+
+----
+= Strengths and Weaknesses
+
+* strengths
++** chainable ResultSets
++** lazy querying
++** good support for custom SQL
++** prefetching
++** lots of nice extensions
+
++* weaknesses
++** non-ORM-y things are possible, but can be cumbersome
+
+----
+= Chainable ResultSets
+
+  my $styx_tracks =
+       $music_schema->resultset('Artist')
+                    ->search({ name => 'Styx' })
+                    ->albums
+                    ->tracks;
+
+  SELECT ...
+    FROM artist
+    JOIN albums ON ...
+    JOIN tracks ON ...
+    WHERE artist.name = 'Styx'
+
+----
+= Lazy Querying
+
+* does not run the query until data is actually needed
+
+  # fetch all
+  my @tracks = $styx_tracks->all;
+
+  # or iterate
+  while( my $track = $styx_tracks->next ) { ... }
+
+----
+= Custom SQL
+
+* can make a view |ResultSource| for big tuned queries
+
+  package My::Schema::SummarizedFrobs;
+  __PACKAGE__->table_class('DBIx::Class::ResultSource::View');
+  __PACKAGE__->result_source_instance->view_definition(<<'');
+     SELECT omg_so_much_stuff
+     UNION
+     SELECT ( SELECT blah blah blah FROM blah ),
+            ( blah blah blah ),
+     WHERE blah blah blah
+     UNION
+        blah blah blah
+      
+  __PACKAGE__->add_column( <cols in your view> )
+
+----
+= Custom SQL
+
+* for custom conditions, searches accept |SQL::Abstract| syntax
+
+  $schema->resultSet('Sequence::Feature')
+         ->search({
+              'me.feature_id' =>
+                \[ "IN( select feature_id from clone_feature where clone_id = ?)",
+                   [ dummy => $self->clone_id ],
+                 ],
+              },
+              { rows => 10,
+                order_by => [qw[ me.name me.type_id ]],
+                having
+              });
+
+
+----
+= Prefetching
+
+  # query will get the wombat organism, and also prefetch *all its
+  # chromosomes and features on those chromosomes*
+  my $rs = $schema->resultset('Organism')->search(
+   { genus => 'Vombatus', species => 'ursinus' },
+   { prefetch => { chromosomes => features => } },
+  );
+
+(in a real biological DB this would probably blow your memory)
+
+----
+= Extensions
+
+* |DBIx::Class::Helpers|
+** |fREW|'s miscellaneous things
++* |DBIx::Class::Cursor::Cached|
+** tunable, flexible resultset caching
++* |DBIx::Class::Ordered|
+** nice for doing ordering or ranking columns in a table
++* |DBIx::Class::InflateColumn::DateTime|, |DBIx::Class::Timestamp|
+** work with dates, times, and timestamps as |DateTime| objects
+
+----
+= Thread-Safe / Fork-Safe
+
+* |theory|'s |DBix::Connector|
+
+----
+= Non-linear Join
+
+  # get features via the potato organism, also joining in the cvterms table
+  my $potato_bacs =
+       $schema->resultset('Organism')
+              ->search({ species => 'Solanum tuberosum' })
+              ->search_related( 'features',
+                               { 'type.name' => 'BAC_clone'},
+                               { 'join' => 'type' },
+                             );
+
+----
+= Non-linear Join
+
+  # the equivalent bare SQL
+  my $potato_bacs = $dbh->selectall_arrayref( <<EOS, undef, 'Solanum tuberosum', 'BAC_clone');
+  SELECT features.feature_id
+       , features.dbxref_id
+       , features.organism_id
+       , features.name
+       , features.uniquename
+       , features.residues
+       , features.seqlen
+       , features.md5checksum
+       , features.type_id
+       , features.is_analysis
+       , features.is_obsolete
+       , features.timeaccessioned
+       , features.timelastmodified
+  FROM organism me
+  LEFT JOIN feature features
+         ON features.organism_id = me.organism_id
+  JOIN cvterm type
+         ON type.cvterm_id = features.type_id
+  WHERE species = ? AND type.name = ?
+  EOS
+
+----
+= Convenient Loading of Relationships
+
+  $chado->resultset( 'Cv::Cv' )
+        ->find_or_create({ name => 'My Fake Ontology' })
+        ->create_related(  'cvterm',
+                           { name => 'MyFakeTerm' });
+
+makes the SQL:
+
+  SELECT me.cv_id
+       , me.name
+       , me.definition
+  FROM cv me
+  WHERE ( me.name = 'my fake ontology' )
+
+  INSERT INTO cv ( name )
+          VALUES ( 'my fake ontology' )
+       RETURNING cv_id
+
+  INSERT INTO cvterm ( cv_id,  name        )
+              VALUES ( ?,     'MyFakeTerm' )
+
+----
+= Transactions
+
+  $schema->txn_do(sub {
+
+      $schema->resultset('Cv::Cv')
+             ->find_or_create({ name => 'My Fake Ontology' })
+             ->create_related( 'cvterm', { name => 'MyFakeTerm' } );
+
+  });
+
+----
+= The Real Advantages of DBIC
+
+* easier to manipulate and assemble queries
+
+----
+= The Real Advantages of DBIC
+
+* complex joined queries (Chado queries) are very easy and compact
+
+----
+= The Real Advantages of DBIC
+
+* SQL syntax errors are more difficult to make
+
+----
+= The Real Advantages of DBIC
+
+* it's all objects.  you can delegate to them, pass them around, etc.
+* HOWEVER:
++** usually you don't want to subclass them
+** but, see |DBIx::Class::Manual::Cookbook|
+
+----
+== That's All
+
+* The END
+

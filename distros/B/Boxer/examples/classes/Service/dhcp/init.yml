@@ -1,0 +1,9 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include DHCP service
+  pkg:
+    - isc-dhcp-server

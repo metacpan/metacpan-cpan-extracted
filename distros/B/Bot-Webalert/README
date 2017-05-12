@@ -1,0 +1,118 @@
+######################################################################
+    Bot::Webalert 0.01
+######################################################################
+
+NAME
+    Bot::Webalert - IRC bot watches Web sites and reports changes to IRC
+    channels
+
+SYNOPSIS
+        use Bot::Webalert;
+        use HTTP::Request::Common;
+
+        my $bot = Bot::Webalert->new(
+            server      => 'irc.example.com',
+            channels    => ["#friends_of_webalert"],
+            ua_request  => GET("http://somewhere/changes.rss"),
+        );
+
+        $bot->run();
+
+DESCRIPTION
+    Bot::Webalert implements an IRC bot that periodically checks the content
+    of a web page and sends a message to an IRC channel if there are
+    interesting changes.
+
+    Changes are determined by a user-defined callback function that gets
+    called by the bot with the HTTP response object and either returns undef
+    or a string with the message it wants the bot to send to the IRC
+    channel. Typically, this is some explanatory text and the URL of the
+    watched web page, so channel users can click on the link to see what's
+    new.
+
+    The easiest way to write a web-watching bot is to let Bot::Webalert use
+    its default response handler, which posts a message whenever the watched
+    web page changes:
+
+        use Bot::Webalert;
+        use HTTP::Request::Common;
+
+        my $bot = Bot::Webalert->new(
+            server      => 'irc.example.com',
+            channels    => ["#friends_of_webalert"],
+            ua_request  => GET("http://somewhere/changes.rss"),
+        );
+
+        $bot->run();
+
+    This will fetch the URL specified once per hour and call Bot::Webalert's
+    default response handler, which triggers a message to the IRC channel
+    the first time it is run and then whenever the web server's response is
+    different from the previous one. The message sent by the default handler
+    looks like
+
+        webalert-bot says: http://foobar.com has changed!
+
+    and will be sent to all channels specified in the "channels" option. If
+    you'd like to customize the message or have better control over what
+    kind of changes are reported, write your own response handler:
+
+        use Bot::Webalert;
+        use HTTP::Request::Common;
+
+        my $bot = Bot::Webalert->new(
+                server   => 'irc.freenode.net',
+                channels => ["#friends_of_webalert"],
+                ua_request  => GET("http://somewhere/changes.rss"),
+                ua_fetch_interval => 60, # check every minute
+                ua_callback       => \&response_handler,
+        );
+
+        my $old_content = "";
+
+        sub response_handler {
+            my($resp) = @_;
+
+            if( $resp->is_success() ) {
+                my $new_content = $resp->content();
+                if($old_content ne $new_content) {
+                    $old_content = $new_content;
+                    return "Ladies and Gentlemen, new content on " .
+                        $resp->request->url->as_string() . " !";
+                }
+            }
+            return undef;
+        }
+
+        $bot->run();
+
+    The response handler above returns a customized message if the fetch was
+    successful and the web content has changed since the last call.
+    Bot::Webalert will send the string returned by the response handler to
+    the channel. If the response handler returns undef, no message will be
+    sent.
+
+  Bot::BasicBot
+    Bot::Webalert ist a subclass of Tom Insam's excellent Bot-BasicBot
+    package on CPAN. It uses POE under the hood, and Bot::Webalert adds
+    further POE components like the POE::Component::Client::HTTP component
+    to fetch web pages.
+
+  Logging
+    Bot::Webalert is Log4perl-enabled, so you can enable its embedded
+    logging statements simply by initializing Log4perl:
+
+        use Log::Log4perl qw(:easy);
+        Log::Log4perl->easy_init($DEBUG);
+
+    As usual with Log4perl, you can enable logging in different parts of the
+    system by initializing it differently, check log4perl.com for details.
+
+LEGALESE
+    Copyright 2009 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2009, Mike Schilli <cpan@perlmeister.com>
+

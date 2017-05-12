@@ -1,0 +1,28 @@
+---
+abstract: 'Object interface to neXtProt REST API.'
+author:
+  - 'Felipe da Veiga Leprevost <leprevost@cpan.org>'
+build_requires:
+  Net::FTP::Tiny: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-DB-NextProt
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  REST::Client: '0'
+  perl: '5.012'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-DB-NextProt
+  homepage: https://github.com/Leprevost/Bio-DB-NextProt
+  repository: https://github.com/Leprevost/Bio-DB-NextProt.git
+version: '1.05'

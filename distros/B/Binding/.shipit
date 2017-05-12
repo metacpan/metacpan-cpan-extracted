@@ -1,0 +1,7 @@
+# auto-generated shipit config file.
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN, Twitter
+
+CheckChangeLog.files = Changes
+twitter.config = /Users/gugod/.twitterrc
+git.tagpattern = release-%v
+

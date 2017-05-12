@@ -1,0 +1,80 @@
+---
+abstract: 'A simple, web-based, payments/receipts manager'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0.94
+  Test::Pod: 1.41
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-AU-Ledger
+provides:
+  Business::AU::Ledger:
+    file: lib/Business/AU/Ledger.pm
+    version: 0.88
+  Business::AU::Ledger::Database:
+    file: lib/Business/AU/Ledger/Database.pm
+    version: 0.88
+  Business::AU::Ledger::Database::Base:
+    file: lib/Business/AU/Ledger/Database/Base.pm
+    version: 0.88
+  Business::AU::Ledger::Database::Payment:
+    file: lib/Business/AU/Ledger/Database/Payment.pm
+    version: 0.88
+  Business::AU::Ledger::Database::Receipt:
+    file: lib/Business/AU/Ledger/Database/Receipt.pm
+    version: 0.88
+  Business::AU::Ledger::Util::Config:
+    file: lib/Business/AU/Ledger/Util/Config.pm
+    version: 0.88
+  Business::AU::Ledger::Util::Create:
+    file: lib/Business/AU/Ledger/Util/Create.pm
+    version: 0.88
+  Business::AU::Ledger::Util::Validate:
+    file: lib/Business/AU/Ledger/Util/Validate.pm
+    version: 0.88
+  Business::AU::Ledger::View:
+    file: lib/Business/AU/Ledger/View.pm
+    version: 0.88
+  Business::AU::Ledger::View::Base:
+    file: lib/Business/AU/Ledger/View/Base.pm
+    version: 0.88
+  Business::AU::Ledger::View::Context:
+    file: lib/Business/AU/Ledger/View/Context.pm
+    version: 0.88
+  Business::AU::Ledger::View::Payment:
+    file: lib/Business/AU/Ledger/View/Payment.pm
+    version: 0.88
+  Business::AU::Ledger::View::Receipt:
+    file: lib/Business/AU/Ledger/View/Receipt.pm
+    version: 0.88
+  Business::AU::Ledger::View::Reconciliation:
+    file: lib/Business/AU/Ledger/View/Reconciliation.pm
+    version: 0.88
+requires:
+  CGI::Application: 4.31
+  CGI::Session: 4.42
+  Config::Tiny: 2.12
+  DBIx::Admin::CreateTable: 2.04
+  DBIx::Simple: 1.32
+  Data::FormValidator: 4.65
+  Data::FormValidator::Constraints: 4.65
+  Date::Simple: 3.03
+  Encode: 2.39
+  FindBin::Real: 1.05
+  HTML::Template: 2.9
+  Hash::FieldHash: 0.1
+  JSON::XS: 2.27
+  Log::Dispatch: 2.26
+  Log::Dispatch::DBI: 0.02
+  Moose: 0.98
+  Regexp::Common: 2010010201
+  namespace::autoclean: 0.09
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 0.88

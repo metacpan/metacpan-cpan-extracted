@@ -1,0 +1,17 @@
+CHANGES file for BFD
+
+0.31 Wed Mar 10 13:09:07 EST 2004
+  - Docs fix ("Newton, Philip" <Philip.Newton@datenrevision.de>)
+  - d_to_string(), d_to() added
+
+0.3 Tue Feb 11 09:28:26 EST 2003
+  - Remove PREREQ_PM dependancy on Filter::Util, which is no
+    longer ever used.
+
+0.2
+  - Prefixes each line of output so you can see where it came from.
+    This is probably a bit too verbose for many users, I'll make it
+    optional in the future.
+
+0.1 Initial Release
+  - Just calls Data::Dumper with some non-default options.

@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4bb378ab96484cb00da2754bb1037a1d2edd18c7 Changes
+SHA1 91e34f6b0d8fbd2b6f064bd965eae1c0f2e510bd LICENSE
+SHA1 21dfd6a2e2d65bc871ef304c640b648261df596a MANIFEST
+SHA1 3ffa5d77c545f41013d2ecf6ea1b518624aa0764 META.yml
+SHA1 62eb12adde421439e96b982a8213fc9bce63c7c8 Makefile.PL
+SHA1 9523556cbb70bc208c745a86f2101869df4b8b42 README
+SHA1 1065034034bd5b80d2780d50b7f26981ad5335ba lib/Business/SLA.pm
+SHA1 0ee802d50a596700602176a59daa1ad1d93dda45 t/01use.t
+SHA1 109722c28e0fd5fc4241e107826dc7b3a098b1e7 t/basics.t
+SHA1 c6684c60bca4a26861871bed90fa8b6ffd9966ac t/business_hours.t
+SHA1 5221b2369f2156a2b604cd3d4bf949bdbfbaee69 t/utils.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFGRMkXvH6dkeDZaS8RAsy7AJ9quABYXfICvDD7b+SEeoJupGXIiQCfTZdL
+gMoL3WDJjQFXqjRnqD9u65E=
+=sEsv
+-----END PGP SIGNATURE-----

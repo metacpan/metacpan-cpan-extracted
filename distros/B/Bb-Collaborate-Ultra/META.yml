@@ -1,0 +1,40 @@
+---
+abstract: 'Perl bindings for Blackboard Ultra virtual classrooms'
+author:
+  - 'David Warring <david.warring@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Bb::Collaborate::Ultra
+name: Bb-Collaborate-Ultra
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Data::Inheritable: 0
+  Clone: 0
+  Crypt::JWT: 0
+  Data::Compare: 0
+  Date::Parse: 0
+  JSON: '2.90'
+  Mouse: 0
+  Mouse::Util::TypeConstraints: 0
+  Pod::Usage: 1.33
+  REST::Client: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  parent: 0
+  perl: 5.8.3
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dwarring/p5-Bb-Collaborate-Ultra.git
+version: 0.01.02

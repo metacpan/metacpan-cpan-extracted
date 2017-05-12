@@ -1,0 +1,21 @@
+BSD::Itimer allows you to access the interval timer many Unix systems
+provide without resorting to non-portable syscalls.
+
+This is version 0.8.  It has a very simple functional interface to the
+get/setitimer functions.  Suggestions or code implementing a nicer
+interface welcome; I can be reached as hag@linnaean.org .
+
+BSD::Itimer is available from my home page,
+http://www.linnaean.org/~hag/ , and your nearest CPAN mirror in
+CPAN/authors/id/H/HA/HAG.
+
+Version 0.8 has been tested on:
+
+Linux 2.0.36
+NetBSD 1.4
+FreeBSD 2.2.6
+SunOS 4.1.4
+Solaris 2.6
+IRIX 6.5
+OSF/1 4.0
+HPUX 10.10

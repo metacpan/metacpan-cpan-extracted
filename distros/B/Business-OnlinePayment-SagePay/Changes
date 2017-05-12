@@ -1,0 +1,58 @@
+Revision history for Perl extension Business::SagePay.
+0.17  2015-06-17
+      - Add billing_agreement for PayPal transactions, thanks @cubabit!
+
+0.16  2015-12-15
+      - Bump protocol version.
+
+0.15  2014-12-15
+      - Missing pre-req.
+
+0.14  2013-12-17
+      - Fixed void_action.
+      - Added missing RelatedTxAuthNo for auth_action refunds.
+      - Added REPEAT payment action.
+
+0.13  2011-11-15
+      - Paypal support. Many thanks to cubabit (Pete Smith)
+      - refactor error messages
+
+0.12  Wed Feb 17 2010
+      - support 'international maestro' as card type (handled as maestro).
+
+0.11  Tues Feb 16 2010
+      - visa debit now sent as DELTA as confirmed by sagepay support.
+
+0.10  Fri Apr 17 2009
+      - show debug for 3Dsecure fails
+
+0.09  Fri Apr 17 2009
+      - New friendly status codes
+
+0.08  Fri Apr 17 2009
+      - Improve debugging
+      - Catch more status codes
+
+0.07  Fri Apr 17 2009
+      - Fix bad live URI
+      - Fix status code/message on authz
+
+0.06  Fri Apr 17 2009
+      - Rename to SagePay
+
+0.05  Fri Apr 17 2009
+      - Update to support ENV PROTX_DEBUG which will display responses from protx
+      - Added cancel action
+
+0.04  Tue Oct 14 2008
+      - rewrite
+
+0.03  Wed Jul 22 2005
+      - fixed bug parsing responses
+
+0.02  Wed Jun 08 2005
+      - Added Deferred and Preauth transactions
+
+0.01  Tue Apr 26 09:50:20 2005
+      - original version; created by h2xs 1.23 with options
+      -X Business::Protx

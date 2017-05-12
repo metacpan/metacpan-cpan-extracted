@@ -1,0 +1,47 @@
+Installing Bintray-API
+Mithun Ayachit
+
+
+
+DISTRIBUTION PAGE
+
+
+The latest and all previous releases for Bintray-API can be downloaded
+from https://metacpan.org/release/Bintray-API
+
+
+
+INSTALL USING cpanm
+
+
+Bintray-API can be installed with cpanm using the following command
+
+    cpanm .
+
+
+
+INSTALL USING Module::Build
+
+
+Bintray-API can be installed with Module::Build using the following
+commands
+
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+INSTALL USING ExtUtils::MakeMaker
+
+
+Bintray-API can be installed with ExtUtils::MakeMaker using the
+following commands
+
+    perl ./Makefile.PL
+    make
+    make test
+    make install
+
+------------------------------------------------------------------------

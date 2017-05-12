@@ -1,0 +1,34 @@
+0.006   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.005   2016-06-18 (PERLANCAR)
+
+	- Add participant: Pegex version.
+
+
+0.004   2016-06-18 (PERLANCAR)
+
+	- Add longer datasets.
+
+
+0.003   2016-06-18 (PERLANCAR)
+
+	- Add participant: NoHash.
+
+	- [dist] Enable sample benchmark of module startup overhead.
+
+
+0.002   2016-06-18 (PERLANCAR)
+
+	- Add Marpa version as participant.
+
+
+0.001   2016-06-16 (PERLANCAR)
+
+        - First release.

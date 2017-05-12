@@ -1,0 +1,31 @@
+{
+   "abstract" : "Perl extension for manipulating Universal Product Codes",
+   "author" : [
+      "Rob Fugina <robf@fugina.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-UPC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      }
+   },
+   "provides" : {
+      "Business::UPC" : {
+         "file" : "lib/Business/UPC.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.06"
+}

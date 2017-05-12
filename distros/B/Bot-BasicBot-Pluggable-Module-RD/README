@@ -1,0 +1,52 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::RD - RecDescent grammar adaptor plugin
+
+SYNOPSIS
+      !load RD
+
+    See the synopsis of Bot::BasicBot::Pluggable for how to load this
+    plugin.
+
+DESCRIPTION
+    Many bots are concerned with responding to commands issued on IRC. The
+    simple approach of regular expressions is used by many of the bot
+    plugins. However, this module offers full syntax parsing via
+    Parse::RecDescent.
+
+    Rather than each bot plugin doing its own parsing in an overridden
+    "said()" routine, the approach used here is for a single grammar shared
+    between the bot plugins. This module and namespace is the keeper of the
+    grammar, and others can extend the grammar by adding rules to it.
+
+    The following simple commands are provided:
+
+      say Hello channel
+      tell ivorw I'm connected
+
+  Methods "init", "told", "help"
+    See the documentation for Bot::BasicBot::Pluggable::Module and
+    Bot::BasicBot.
+
+  extend
+    This is called by any pluggable modules in order to add rules to the
+    bot's Parse::RecDescent grammar.
+
+BUGS
+    Please report any bugs to <http://rt.cpan.org>.
+
+AUTHOR
+        Ivor Williams
+        CPAN ID: IVORW
+     
+        ivorw@cpan.org
+     
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

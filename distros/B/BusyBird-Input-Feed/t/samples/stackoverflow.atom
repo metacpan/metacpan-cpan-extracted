@@ -1,0 +1,2140 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" xmlns:re="http://purl.org/atompub/rank/1.0">
+    <title type="text">Recent Questions - Stack Overflow</title>
+    <link rel="self" href="http://stackoverflow.com/feeds" type="application/atom+xml" />
+    <link rel="alternate" href="http://stackoverflow.com/questions" type="text/html" />
+    <subtitle>most recent 30 from stackoverflow.com</subtitle>
+    <updated>2014-07-06T05:33:58Z</updated>
+    <id>http://stackoverflow.com/feeds</id>
+    <creativeCommons:license>http://www.creativecommons.org/licenses/by-sa/3.0/rdf</creativeCommons:license> 
+    <entry>
+        <id>http://stackoverflow.com/q/24593005</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How to write Unit Test for IValidatableObject Model</title>
+            <category scheme="http://stackoverflow.com/tags" term="asp.net-mvc-4" />
+            <category scheme="http://stackoverflow.com/tags" term="unit-testing" />
+        <author>
+            <name>Nps</name>
+            <uri>http://stackoverflow.com/users/276970</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24593005/how-to-write-unit-test-for-ivalidatableobject-model" />
+        <published>2014-07-06T05:33:05Z</published>
+        <updated>2014-07-06T05:33:05Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have created a ViewModel as below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;   public class ProjectViewModel: IValidatableObject
+    {
+        public int ProjectID { get; set; }
+
+        [DisplayName(&quot;Name&quot;)]
+        [Required]
+        public string Name { get; set; }
+
+        [DisplayName(&quot;Start Date&quot;)]
+        public DateTime StartDate { get; set; }
+
+        [DisplayName(&quot;End Date&quot;)]
+        [Compare(&quot;EndDate&quot;)]
+        public DateTime EndDate { get; set; }
+
+        [DisplayName(&quot;Project States&quot;)]
+        public List&amp;lt;ProjectStateViewModel&amp;gt; States { get; set; }
+        public string PageTitle { get; set; }
+
+
+        public IEnumerable&amp;lt;ValidationResult&amp;gt; Validate(ValidationContext validationContext)
+        {
+            List&amp;lt;ValidationResult&amp;gt; res = new List&amp;lt;ValidationResult&amp;gt;();
+            if (EndDate &amp;lt;= StartDate)
+            {
+                res.Add( new ValidationResult(ErrorMessage.END_DATE_AFTER_START_DATE));
+            }
+
+            return res;
+        }
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Also written the below test case&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[TestMethod]
+[ExpectedException( typeof(ValidationException),&quot;End Date must be greater than Start Date.&quot;)]
+public void Create_New_Project_EndDate_Earlier_StartDate()
+{
+    ProjectViewModel model = new ProjectViewModel
+    {
+        ProjectID = 3,
+        Name = &quot;Test Project&quot;,
+        StartDate = DateTime.Now.Date,
+        EndDate = DateTime.Now.AddMonths(-1),
+        States = new List&amp;lt;ProjectStateViewModel&amp;gt; { new ProjectStateViewModel { StateName = &quot;Pending&quot; } }
+    };
+
+    Task&amp;lt;ActionResult&amp;gt; task = _projectController.Edit(model);
+
+    ViewResult result = task.Result as ViewResult;
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;it works fine when actual code executing in MVC app through browser.  But ModelState.IsValid returns always true in my Unit test and it fails.  &lt;strong&gt;Later I understood that Validation is not executed by controller.&lt;/strong&gt;  Controller received the model after Validation happens so it&#39;ll have appropriate ModelState.  &lt;strong&gt;My question is what should be my approach to write unit test for Model Validation or should I write it at all?&lt;/strong&gt;&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24593002</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">hide softkeyboard when it is called from menuitem</title>
+            <category scheme="http://stackoverflow.com/tags" term="menuitem" />
+            <category scheme="http://stackoverflow.com/tags" term="android-softkeyboard" />
+            <category scheme="http://stackoverflow.com/tags" term="android-menu" />
+        <author>
+            <name>JoeCoolman</name>
+            <uri>http://stackoverflow.com/users/1576546</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24593002/hide-softkeyboard-when-it-is-called-from-menuitem" />
+        <published>2014-07-06T05:31:56Z</published>
+        <updated>2014-07-06T05:31:56Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;One of the menu items allows to send an email to the author of the app, so I have something like this when this item is clicked&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View view = factory.inflate(R.layout.sendemail, null);
+        // set title
+        alertDialogBuilder.setTitle(&quot;About the Author&quot;);
+
+        // set dialog message
+        alertDialogBuilder
+            .setView(view)
+            .setMessage(mensaje)
+            .setPositiveButton(&quot;Send eMail&quot;,new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,int id) {
+                    sM(); //this method will display the google email view
+                }
+              })
+            .setNegativeButton etc etc etc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem is the softkeyboard (skb) doesn&#39;t hide automatically after sending or canceling message. I also tried with&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;in the &lt;em&gt;OnCreate&lt;/em&gt; the main activity part.
+Something related to send email from an item menu is not working to hide the skb because if I try the same method sM() from a button (real button) everything runs fine, the skb hide normally. Any suggestion?. :-/  The app is intended to work from Android 2.2 and newer.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24593001</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Using include element how to extend html_5.xsd phrasingContent by another .xsd file</title>
+            <category scheme="http://stackoverflow.com/tags" term="html" />
+            <category scheme="http://stackoverflow.com/tags" term="visual-studio" />
+            <category scheme="http://stackoverflow.com/tags" term="xsd" />
+        <author>
+            <name>Amin Uddin</name>
+            <uri>http://stackoverflow.com/users/3721030</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24593001/using-include-element-how-to-extend-html-5-xsd-phrasingcontent-by-another-xsd-f" />
+        <published>2014-07-06T05:31:38Z</published>
+        <updated>2014-07-06T05:31:38Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Visual Studio uses C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\Packages\schemas\html\html_5.xsd to maintain its html intellisense.
+ if I add any text to the following group like&lt;/p&gt;
+
+&lt;p&gt;&amp;lt; xsd:group name=&quot;phrasingContent&quot;&amp;gt;&lt;br&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    &amp;lt;xsd:choice&amp;gt;
+        &amp;lt;xsd:element ref=&quot;a&quot; /&amp;gt;
+        &amp;lt;xsd:element ref=&quot;abbr&quot; /&amp;gt;
+         ...........
+         ............
+       **&amp;lt;xsd:element ref=&quot;NewDiv&quot; /&amp;gt;**
+      .........
+      .........
+     &amp;lt;/xsd:choice&amp;gt;
+ &amp;lt;/xsd:group&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When I add &quot;NewDiv&quot; then I get it from html page. It is not my problem. &lt;/p&gt;
+
+&lt;p&gt;Now I want to maintain another file html_5extend.xsd with include element  which contains only &lt;/p&gt;
+
+&lt;p&gt;&amp;lt; xsd:element ref=&quot;NewDiv&quot; / &amp;gt;
+ &amp;lt; xsd:element ref=&quot;NewA&quot;  /&amp;gt;&lt;/p&gt;
+
+&lt;p&gt;&amp;lt; xsd:element ref=&quot;NewB&quot; /&amp;gt;&lt;/p&gt;
+
+&lt;p&gt;Now I want to get my newly added element in  html intellisense. Thanks&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592998</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Adding Custom Controls to Commonsware RichEditText in android</title>
+            <category scheme="http://stackoverflow.com/tags" term="android" />
+            <category scheme="http://stackoverflow.com/tags" term="custom-controls" />
+            <category scheme="http://stackoverflow.com/tags" term="commonsware-cwac" />
+            <category scheme="http://stackoverflow.com/tags" term="richedittext" />
+        <author>
+            <name>AndroidKid</name>
+            <uri>http://stackoverflow.com/users/568613</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592998/adding-custom-controls-to-commonsware-richedittext-in-android" />
+        <published>2014-07-06T05:31:10Z</published>
+        <updated>2014-07-06T05:31:10Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Create an activity which comprises of&lt;/p&gt;
+
+&lt;p&gt;1) an edittext (Commonsware RichEditText)&lt;/p&gt;
+
+&lt;p&gt;2) a toolbar with the following buttons&lt;/p&gt;
+
+&lt;p&gt;Bold, Italic, underline, strikethrough, font, Center Align, Left Align, Right Align, Justified,...etc&lt;/p&gt;
+
+&lt;p&gt;4) A Save button&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Usage:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;User enters text and edits it by selecting text as a whole or parts. Effects are applied to selected text.When the user is finished editing the text into the editor, he clicks Save button. Everything is read from the RichEditText and sent to a database for later usage with the tags and formatting in html.
+I use the following code for saving and retriving.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Spanned s = Html.fromHtml(&quot;&amp;lt;i&amp;gt;Hi&amp;lt;/i&amp;gt; There ! &amp;lt;b&amp;gt;how&#39;re you ?&amp;lt;/b&amp;gt;&quot;);
+et.setText(s);
+
+//--save to string--
+Editable e = et.getText();
+String s2 = Html.toHtml(e);
+
+//--restore from string--
+Spanned s3 = Html.fromHtml(s2);
+et.setText(s3);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;src: &lt;a href=&quot;https://stackoverflow.com/questions/20992922/copy-to-clipboard-using-commonsware-cwac-richedit-library&quot;&gt;Copy to clipboard using commonsware cwac-richedit library&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The Problem:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I have to apply Bold, Italic, underline, strikethrough, font, Center Align, Left Align, Right Align, Justified,...etc to selected text on click of a button in a tool bar different than an action bar button. Is there any way I can place the entire view shown in the actionbar when selection is made in a layout above the RichEditText? Say a Horizontal LinearLayout or some adaptive layouts?&lt;/p&gt;
+
+&lt;p&gt;It would be really helpfull if some one can tell he how to add any one effect to a selected text on click of a button. I saw the following method but not sure what is T value.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;myRichEditText.applyEffect(effect, value);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592995</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Set color of FillRect() using value of scrollbar or spinner</title>
+            <category scheme="http://stackoverflow.com/tags" term="swing" />
+        <author>
+            <name>user3464728</name>
+            <uri>http://stackoverflow.com/users/3464728</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592995/set-color-of-fillrect-using-value-of-scrollbar-or-spinner" />
+        <published>2014-07-06T05:30:30Z</published>
+        <updated>2014-07-06T05:30:30Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have created two panel and add it on mainpanel then added it on the JFrame. I am unable to set the color of rectangle using changing value of spinner or scrollbar. If any one have solution then help me for this paroblem.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;enter code here
+
+     TestColorFrame.java 
+
+     import java.awt.BorderLayout;
+     import java.awt.GridLayout;import javax.swing.JFrame;
+     import javax.swing.JPanel;
+     import javax.swing.UIManager;
+     import javax.swing.UnsupportedLookAndFeelException;
+     import javax.swing.plaf.metal.MetalLookAndFeel;
+     import com.swing.Myframe;
+
+     public class TestColorFrame extends JFrame
+         {
+               public static void main(String[] args)
+             {
+                try 
+    {
+        UIManager.setLookAndFeel(&quot;javax.swing.plaf.metal.MetalLookAndFeel&quot;);
+    } 
+    catch (ClassNotFoundException | InstantiationException
+            | IllegalAccessException | UnsupportedLookAndFeelException e) 
+    {
+
+        e.printStackTrace();
+    }
+    JFrame f = new JFrame();
+    JPanel Mainpanel = new JPanel(new GridLayout(2, 1));
+
+    ColorPanel1 p = new ColorPanel1();
+    ColorPanel2 p1 = new ColorPanel2();
+
+    //f.getContentPane().setLayout(new BorderLayout() );
+    f.add(Mainpanel);
+
+
+
+    Mainpanel.add(p);
+    Mainpanel.add(p1,BorderLayout.SOUTH);
+
+
+    f.setVisible(true);
+    f.setResizable(false);
+    f.setSize(500,500);
+    f.setTitle(&quot;My Color Frame&quot;);
+    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   
+
+    }
+  }
+
+
+import java.awt.Adjustable;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import javax.swing.JColorChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.JSpinner;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+ ColorPanel1.java
+   public class ColorPanel1 extends JPanel implements AdjustmentListener,ChangeListener
+      { ColorPanel2 p;
+     private JLabel jLabelred,jLabelgreen,jLabelblue;
+
+public JScrollBar jRedScrollbar,jGreenScollbar,jBlueScrollbar;
+//private JTextField jRedtext,jGreentext,jBluetext;
+protected JSpinner jRed, jGreen, jBlue;
+ColorPanel2 color2;
+public Color current;
+
+
+public ColorPanel1() 
+{
+    setLayout(new GridLayout(3, 3,60,60));
+    jLabelred = new JLabel(&quot;RED&quot;);
+    add(jLabelred);
+
+    SpinnerModel spinnerModel = new SpinnerNumberModel(100, 0, 255, 1) ;
+    jRed = new JSpinner(spinnerModel);
+    add(jRed); 
+    jRedScrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 100, 40, 0, 255);
+    add(jRedScrollbar);
+
+    jLabelgreen = new JLabel(&quot;GREEN&quot;);
+    add(jLabelgreen);
+    SpinnerModel spinnerModel1 = new SpinnerNumberModel(200, 0, 255, 1);
+    jGreen = new JSpinner(spinnerModel1);
+    add(jGreen);
+
+    jGreenScollbar = new JScrollBar(JScrollBar.HORIZONTAL, 200, 4, 0, 255);
+    add(jGreenScollbar);
+
+    jLabelblue = new JLabel(&quot;BLUE&quot;);
+    add(jLabelblue);
+    SpinnerModel spinnerModel2 = new SpinnerNumberModel(50, 0, 255, 1);
+    jBlue = new JSpinner(spinnerModel2);
+    add(jBlue);
+
+    jBlueScrollbar = new JScrollBar(JScrollBar.HORIZONTAL, 50, 40, 0, 255);
+    add(jBlueScrollbar);
+
+
+
+
+        jRedScrollbar.addAdjustmentListener(this);
+        jBlueScrollbar.addAdjustmentListener(this);
+        jGreenScollbar.addAdjustmentListener(this);
+        spinnerModel.addChangeListener(this);
+        spinnerModel1.addChangeListener(this);
+        spinnerModel2.addChangeListener(this);
+}
+
+
+
+@Override
+public void adjustmentValueChanged(AdjustmentEvent e) 
+{
+     int r = jRedScrollbar.getValue();
+     int g = jGreenScollbar.getValue();
+     int b = jBlueScrollbar.getValue();
+
+     jRed.setValue(jRedScrollbar.getValue()); 
+     jBlue.setValue(jBlueScrollbar.getValue());
+     jGreen.setValue(jGreenScollbar.getValue());
+}
+
+@Override
+public void stateChanged(ChangeEvent e)
+{
+
+
+    SpinnerModel spinnerModel = jRed.getModel();
+    if (spinnerModel instanceof SpinnerModel) 
+    {
+        jRedScrollbar.setValue((int) spinnerModel.getValue());
+    }
+
+
+        SpinnerModel spinnerModel1 = jGreen.getModel();
+        if(spinnerModel1 instanceof SpinnerModel)
+        {
+            jGreenScollbar.setValue((int) jGreen.getValue());
+        }
+
+            SpinnerModel spinnerModel2 = jBlue.getModel();
+            if(spinnerModel2 instanceof SpinnerModel)
+            {
+                jBlueScrollbar.setValue((int) jBlue.getValue());
+            }           
+     } 
+  }
+
+    ColorPanel2.java
+
+ import java.awt.BorderLayout;
+ import java.awt.Color;
+ import java.awt.Graphics;
+ import javax.swing.JColorChooser;
+ import javax.swing.JFrame;
+ import javax.swing.JPanel;
+ import javax.swing.SpinnerModel;
+ import javax.swing.SpinnerNumberModel;
+
+public class ColorPanel2 extends JPanel
+{
+
+private JColorChooser colorchooser;
+ColorPanel1 color=new ColorPanel1();
+
+public ColorPanel2()
+{
+    setLayout(new BorderLayout());
+}
+
+public void paintComponent(Graphics graphics)
+{   
+    super.paintComponent(graphics);
+    int r = (int) color.jRed.getValue();
+    int g = (int) color.jGreen.getValue();
+    int b = (int) color.jBlue.getValue();
+    graphics.setColor(new Color(r,g,b));
+    graphics.fillRect(100, 50, 300, 150);
+} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;}&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592990</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Are Heroku&#39;s environmental variables a secure way to store sensitive data?</title>
+            <category scheme="http://stackoverflow.com/tags" term="ruby-on-rails" />
+            <category scheme="http://stackoverflow.com/tags" term="ruby" />
+            <category scheme="http://stackoverflow.com/tags" term="heroku" />
+        <author>
+            <name>tdkr</name>
+            <uri>http://stackoverflow.com/users/2419441</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592990/are-herokus-environmental-variables-a-secure-way-to-store-sensitive-data" />
+        <published>2014-07-06T05:28:09Z</published>
+        <updated>2014-07-06T05:28:09Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I use Heroku to deploy a Rails app. I store sensitive data such as API keys and passwords in Heroku&#39;s environment variables, and then use the data in rake tasks that utilize various APIs.&lt;/p&gt;
+
+&lt;p&gt;I am just wondering how secure Heroku&#39;s environmental variables are? Is there a way to hash these variables while retaining the ability to use them in the background somehow?&lt;/p&gt;
+
+&lt;p&gt;I came across a previous thread here: &lt;a href=&quot;http://stackoverflow.com/questions/12461484/is-it-secure-to-store-passwords-as-environment-variables-rather-than-as-plain-t&quot;&gt;Is it secure to store passwords as environment variables (rather than as plain text) in config files?&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;But it doesn&#39;t quite cover instances when I still need to unhashed password to perform important background tasks.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592989</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">Upload multiple files to server through WCF Service</title>
+            <category scheme="http://stackoverflow.com/tags" term="c#" />
+            <category scheme="http://stackoverflow.com/tags" term="winforms" />
+            <category scheme="http://stackoverflow.com/tags" term="wcf" />
+        <author>
+            <name>Ranish</name>
+            <uri>http://stackoverflow.com/users/1792110</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592989/upload-multiple-files-to-server-through-wcf-service" />
+        <published>2014-07-06T05:28:02Z</published>
+        <updated>2014-07-06T05:28:02Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;As per requirement, I want to upload multiple files to Server from a windows application.  I am planning to use a WCF service to upload the files. Is there any other better approach?
+If possible please provide me the code samples.&lt;/p&gt;
+
+&lt;p&gt;Thanks in Advance.&lt;/p&gt;
+
+&lt;p&gt;Ranish&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592988</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How do I incorporate full-scale responsive images, horizonatal scrolling, and lazy loading?</title>
+            <category scheme="http://stackoverflow.com/tags" term="jquery" />
+            <category scheme="http://stackoverflow.com/tags" term="responsive-design" />
+            <category scheme="http://stackoverflow.com/tags" term="lazy-loading" />
+            <category scheme="http://stackoverflow.com/tags" term="horizontal-scrolling" />
+        <author>
+            <name>user3808880</name>
+            <uri>http://stackoverflow.com/users/3808880</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592988/how-do-i-incorporate-full-scale-responsive-images-horizonatal-scrolling-and-la" />
+        <published>2014-07-06T05:27:53Z</published>
+        <updated>2014-07-06T05:27:53Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;ve been working on these images-based projects that are meant to be full-screen horizontal scrolls. This is meant as sort of an art project, not meant for optimal quick and practical web viewing. The images are high resolution, right now they are 1200px by 1200px to test with large images, but they could be smaller. Because they are larger, I want the images to load in order. When they load across the board it makes for a more awkward experience. The problem is that I can&#39;t make them load in order horizontally using Jquery. Whether or not they load seems dependent on window size, and not where they are sitting.&lt;/p&gt;
+
+&lt;p&gt;I am not sure if what I want is possible, but it seems like it is just on the cusp of working. I have a demo below. In it you can see that images that are viewable within the window are loaded, but when you scroll horizontally nothing is loaded. But, when you change the proportions of the window, and more of the images come into view, they will start to load.&lt;/p&gt;
+
+&lt;p&gt;Here is the demo: &lt;a href=&quot;http://connorwillumsen.com/shadow_scroll_demo_2_test/test2.html&quot; rel=&quot;nofollow&quot;&gt;http://connorwillumsen.com/shadow_scroll_demo_2_test/test2.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I will list the Jquery scripts I am using in case they are conflicting;&lt;/p&gt;
+
+&lt;p&gt;a) A mouswheel script that makes the page scroll horizontally when using the scroll up/down function on a trackpad or mousehweel.&lt;/p&gt;
+
+&lt;p&gt;b) A Jquery function to make the proportion of the images relative to the browser window&lt;/p&gt;
+
+&lt;p&gt;c) Lazy Load script.&lt;/p&gt;
+
+&lt;p&gt;I&#39;m not very experienced with this and learning as I go, so I apologize if my code is sloppy. I tried to clean it up as much as possible.&lt;/p&gt;
+
+&lt;p&gt;CSS:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;body {
+
+}
+
+html,body {
+width: auto;
+margin:0;
+padding:0;
+overflow-y: hidden;
+overflow-x: scroll;
+
+}
+
+#container {
+width: 100%;
+height:100%;
+overflow-x: scroll;
+overflow-y: hidden;
+white-space: nowrap;
+margin:0;
+padding:0;
+background-color: #ffffff;
+
+}
+
+* {
+margin: 0;
+padding: 0;
+border: 0;
+}
+
+
+.lazy {
+width: 100%; 
+height: 100%; 
+display: inline; 
+margin-left: -4px;}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SCRIPTS: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;-script src=&quot;jquery-2.1.0.min.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;-script src=&quot;http://voodarius.com/id/scroll.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;-script src=&quot;jquery.lazyload.js&quot;&amp;gt;&amp;lt;/script&amp;gt;
+
+&amp;lt;script&amp;gt;
+    // MOUSEWHEEL SCRIPT
+    $(document).ready(function() {
+    $(&#39;html, body, *, #container, .lazy&#39;).mousewheel(function(e, delta) {
+    this.scrollLeft -= (delta * 40);
+    e.preventDefault();
+    });
+    });
+
+
+    if (deltaY != 0){
+        // Anything that makes vertical wheelscroll keeps normal
+    } else {
+        // Only prevent if scroll is not vertical
+        event.preventDefault();
+    }
+&amp;lt;/script&amp;gt;
+
+&amp;lt;!-- Resize lazy image Script --&amp;gt;
+
+&amp;lt;script&amp;gt;
+    $( document ).ready(function(){
+     $(&#39;.lazy&#39;).width($(window).height());
+    $(&#39;.lazy&#39;).height($(window).height());
+    });
+
+    $(window).resize(function(){
+    $(&#39;.lazy&#39;).width($(window).height());
+    $(&#39;.lazy&#39;).height($(window).height());
+    });
+&amp;lt;/script&amp;gt;
+
+&amp;lt;script&amp;gt;
+    $( document ).ready(function(){
+    $(&#39;#container&#39;).height($(window).height());
+
+    });
+
+    $(window).resize(function(){
+    $(&#39;#container&#39;).height($(window).height());
+
+    });
+&amp;lt;/script&amp;gt;
+
+
+&amp;lt;!-- LAZY LOADER SCRIPT --&amp;gt;
+
+&amp;lt;script&amp;gt;
+    $(function() {
+     $(&quot;img.lazy&quot;).lazyload();
+        container: $(&quot;#container&quot;)
+    });
+&amp;lt;/script&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;HTML&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;div id=&quot;container&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;01.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;02.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;03.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;04.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;05.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;06.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;07.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;08.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;09.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;10.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;11.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;12.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;13.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;14.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;15.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;16.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;17.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;img class=&quot;lazy&quot; data-original=&quot;18.png&quot; width=&quot;100%&quot; height=&quot;100%&quot;&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks!&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592983</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">C++ - using a 2D array of which the dimension is [250][12]</title>
+            <category scheme="http://stackoverflow.com/tags" term="c++" />
+            <category scheme="http://stackoverflow.com/tags" term="out-of-memory" />
+            <category scheme="http://stackoverflow.com/tags" term="2d-array" />
+        <author>
+            <name>user3704562</name>
+            <uri>http://stackoverflow.com/users/3704562</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592983/c-using-a-2d-array-of-which-the-dimension-is-25012" />
+        <published>2014-07-06T05:25:41Z</published>
+        <updated>2014-07-06T05:31:28Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have a CSV file which contains 250 lines and each line contains 12 items separated by commas. I am going to store this in a 2D array of which the dimension is [250][12].&lt;/p&gt;
+
+&lt;p&gt;My question is : &quot; Is it a bad programming practice to use such a huge array ?
+                   I am going to pass this array to a method which takes a 2D array as the argument. It comes with openCV.
+                   will there be a memory overflow ? &quot;&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592977</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">Apache tomcat server 7.0</title>
+            <category scheme="http://stackoverflow.com/tags" term="apache" />
+            <category scheme="http://stackoverflow.com/tags" term="tomcat" />
+        <author>
+            <name>user1787554</name>
+            <uri>http://stackoverflow.com/users/1787554</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592977/apache-tomcat-server-7-0" />
+        <published>2014-07-06T05:24:15Z</published>
+        <updated>2014-07-06T05:29:31Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have Apache Tomcat server version 7.0 installed in my Eclipse Kepler. Previously I had Wildfly 8.0 (which was giving problems). &lt;/p&gt;
+
+&lt;p&gt;When i had Wildfly I could run any servlet program by right clicking on the program and then run as on Wildfly 8.0 server.&lt;/p&gt;
+
+&lt;p&gt;But now in case of Tomcat, the server name appears but the option for &lt;code&gt;finish&lt;/code&gt; button is inactive and Ii can&#39;t run the program.&lt;/p&gt;
+
+&lt;p&gt;Now if I include the Tomcat server while creating the dynamic web project, then only I can run as and do the rest and not by simply running any other program than that web project.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592959</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How to enable the button when text is entered and disable in Android java?</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="android" />
+            <category scheme="http://stackoverflow.com/tags" term="eclipse" />
+        <author>
+            <name>user3805750</name>
+            <uri>http://stackoverflow.com/users/3805750</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592959/how-to-enable-the-button-when-text-is-entered-and-disable-in-android-java" />
+        <published>2014-07-06T05:22:04Z</published>
+        <updated>2014-07-06T05:28:45Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;How to enable the button when text is entered and disable when the textfield is empty?
+OR 
+When the button is clicked check the textfield if empty alert else run the func();&lt;/p&gt;
+
+&lt;p&gt;I just want to know which method can do the above? &lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592946</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Celery worker not running : Not able to register the task: Django + RabbitMq + Django-Celery</title>
+            <category scheme="http://stackoverflow.com/tags" term="python" />
+            <category scheme="http://stackoverflow.com/tags" term="django" />
+            <category scheme="http://stackoverflow.com/tags" term="celery" />
+            <category scheme="http://stackoverflow.com/tags" term="django-celery" />
+        <author>
+            <name>theLeanDeveloper</name>
+            <uri>http://stackoverflow.com/users/3196981</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592946/celery-worker-not-running-not-able-to-register-the-task-django-rabbitmq-d" />
+        <published>2014-07-06T05:19:52Z</published>
+        <updated>2014-07-06T05:29:49Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;The celery worker is giving me error saying unregistered task. I am using celeryd as daemon. Restarting didn&#39;t help.&lt;/p&gt;
+
+&lt;p&gt;Here is my task.py
+celeryApp &gt; tasks.py&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;from __future__ import absolute_import
+from celery import task
+
+@task
+def add(a,b):
+    return a+b
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;celeryProj.py &amp;lt;&amp;lt; I have changed the name from celery.py as it was creating problem&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;from __future__ import absolute_import
+import os
+from celery import Celery
+from django.conf import settings
+
+# Indicate Celery to use the default Django settings module
+os.environ.setdefault(&#39;DJANGO_SETTINGS_MODULE&#39;, &#39;my_proj.settings&#39;)
+
+app = Celery(&#39;my_app&#39;)
+app.config_from_object(&#39;django.conf:settings&#39;)
+# This line will tell Celery to autodiscover all your tasks.py that are in your app     folders
+app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;__init__.py&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;from __future__ import absolute_import
+
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celeryProj import app as celeryApp
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;settings.py&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;from __future__ import absolute_import
+import os
+import sys
+import djcelery
+from celery.schedules import crontab
+
+
+djcelery.setup_loader()
+
+INSTALLED_APPS = (
+    ..
+    ...
+    &#39;my_app&#39;,
+    &#39;djcelery&#39;,
+    &#39;celeryApp&#39;,
+)
+
+BROKER_URL = &quot;amqp://user:password@localhost:5672/v_host&quot;
+
+## celery configrations 
+
+CELERY_TASK_SERIALIZER = &#39;json&#39;
+CELERY_RESULT_SERIALIZER = &#39;json&#39;
+CELERY_ACCEPT_CONTENT=[&#39;json&#39;]
+CELERY_TIMEZONE = &#39;Asia/Kolkata&#39;
+CELERY_ENABLE_UTC = True
+
+CELERY_RESULT_BACKEND=&#39;djcelery.backends.database:DatabaseBackend&#39;
+CELERYBEAT_SCHEDULER = &#39;djcelery.schedulers.DatabaseScheduler&#39;
+
+## These config can be commented in production
+
+CELERY_BIN = &quot;/usr/local/bin/celery&quot;
+CELERYD_NODES = &quot;worker1 worker2 worker3&quot;
+CELERYD_CHDIR=&quot;/home/user/proj/&quot;
+CELERYD_OPTS=&quot;--time-limit=300 --concurrency=8&quot;
+CELERYD_USER=&quot;celery&quot;
+CELERYD_GROUP=&quot;celery&quot;
+CELERY_CREATE_DIRS=1
+
+
+CELERY_IMPORTS = (&#39;celeryApp.tasks&#39;,)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;My directory structure is :&lt;/p&gt;
+
+&lt;p&gt;myProj &gt; my_app ,__init__.py, setting.py, celeryProj.py
+ myProj &gt; celeryApp &gt; tasks.py&lt;/p&gt;
+
+&lt;p&gt;I am getting this error log: &lt;/p&gt;
+
+&lt;p&gt;[2014-07-06 10:17:43,674: ERROR/MainProcess] Received unregistered task of type u&#39;celeryApp.tasks.add&#39;.
+The message has been ignored and discarded.&lt;/p&gt;
+
+&lt;p&gt;Did you remember to import the module containing this task?
+Or maybe you are using relative imports?
+Please see &lt;a href=&quot;http://bit.ly/gLye1c&quot; rel=&quot;nofollow&quot;&gt;http://bit.ly/gLye1c&lt;/a&gt; for more information.&lt;/p&gt;
+
+&lt;p&gt;The full contents of the message body was:
+{u&#39;utc&#39;: True, u&#39;chord&#39;: None, u&#39;args&#39;: [2, 2], u&#39;retries&#39;: 0, u&#39;expires&#39;: None, u&#39;task&#39;: u&#39;celeryApp.tasks.add&#39;, u&#39;callbacks&#39;: None, u&#39;errbacks&#39;: None, u&#39;timelimit&#39;: [None, None], u&#39;taskset&#39;: None, u&#39;kwargs&#39;: {}, u&#39;eta&#39;: None, u&#39;id&#39;: u&#39;620007e6-4c7d-49cc-9516-4f089c200df9&#39;} (260b)
+Traceback (most recent call last):
+  File &quot;/usr/local/lib/python2.7/dist-packages/celery/worker/consumer.py&quot;, line 455, in on_task_received
+    strategies[name](message, body,
+KeyError: u&#39;celeryApp.tasks.add&#39;&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592910</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Adding a date variable to alter table</title>
+            <category scheme="http://stackoverflow.com/tags" term="sql" />
+            <category scheme="http://stackoverflow.com/tags" term="sql-server" />
+        <author>
+            <name>user3166881</name>
+            <uri>http://stackoverflow.com/users/3166881</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592910/adding-a-date-variable-to-alter-table" />
+        <published>2014-07-06T05:12:45Z</published>
+        <updated>2014-07-06T05:30:09Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am trying to alter a temp table by adding a &quot;Comments&quot; column which contains the sentence &quot;employee will begin in&quot; + the date they will join.&lt;/p&gt;
+
+&lt;p&gt;I tried starting off small by setting a fixed date to make the query work, but the @date variable is not returning 7/4/2014 after the sentence.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;
+DECLARE @date datetime
+SET @date=&#39;7/4/2014&#39;
+DECLARE @sql varchar (1000)
+SELECT @sql =&#39;ALTER TABLE #employ ADD Comments varchar (200) DEFAULT &#39;&#39;employee will begin in&#39; + &#39;@date&#39;&#39;&#39;
+EXEC (@sql)&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Once I get past this step, I can try working to figure out how to assign different date values for each employee ID.&lt;/p&gt;
+
+&lt;p&gt;Thank you very much, any tips would be greatly appreciated.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592890</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Show banner based on cookie only once per browser session using asp.net</title>
+            <category scheme="http://stackoverflow.com/tags" term="c#" />
+            <category scheme="http://stackoverflow.com/tags" term="asp.net" />
+            <category scheme="http://stackoverflow.com/tags" term="webforms" />
+        <author>
+            <name>KnowledgeSeeker</name>
+            <uri>http://stackoverflow.com/users/1122748</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592890/show-banner-based-on-cookie-only-once-per-browser-session-using-asp-net" />
+        <published>2014-07-06T05:08:00Z</published>
+        <updated>2014-07-06T05:29:58Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I want to show a banner only once per browser session.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; &amp;lt;asp:Panel ID=&quot;Panel1&quot; runat=&quot;server&quot;&amp;gt;
+&amp;lt;img src=&quot;path&quot;/&amp;gt;
+ &amp;lt;/asp:Panel&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I want to achieve this using cookie from code-behind file.&lt;/p&gt;
+
+&lt;p&gt;My code is below but the banner keeps showing ever time, How i achieve this in bets manner&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    protected void Page_Load(object sender, EventArgs e)
+    {
+    if (!IsPostBack)
+    {
+    //Set Banner Cookie
+    HttpCookie BannerCookie = new HttpCookie(&quot;ShowBanner&quot;);
+    BannerCookie.Value = &quot;YES&quot;;
+     Response.Cookies.Add(bannercookie)
+     Panel1.Visible = False;
+    //Do Somthing...
+    ShowPageDetails();
+    ShowBanner();
+
+    }
+    else
+    {
+    //Do Somthing
+    Panel1.Visible = False;
+    ShowPageDetails();
+    ShowBanner();
+    }
+}
+
+public void ShowBanner()
+{
+ HttpCookie BannerCookie = Request.Cookies[&quot;ShowBanner&quot;];
+ if (BannerCookie != null)
+ {
+ Panel1.Visible = True;
+            BannerCookie.Value = null;
+            Response.Cookies.Add(BannerCookie);
+ }
+else
+{
+Panel1.Visible = false;
+}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592888</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">CSS / HTML help. Text align left and right on the same line?</title>
+            <category scheme="http://stackoverflow.com/tags" term="html" />
+            <category scheme="http://stackoverflow.com/tags" term="css" />
+        <author>
+            <name>user3808918</name>
+            <uri>http://stackoverflow.com/users/3808918</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592888/css-html-help-text-align-left-and-right-on-the-same-line" />
+        <published>2014-07-06T05:07:19Z</published>
+        <updated>2014-07-06T05:32:31Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am working on my about page and having trouble with this.  Trying to align the (years or pending) to the right side of the column.  See image for example. &lt;/p&gt;
+
+&lt;p&gt;Top is how it looks now.  Bottom image is how I want it to look. &lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://i60.tinypic.com/x20vu0.jpg&quot; rel=&quot;nofollow&quot;&gt;http://i60.tinypic.com/x20vu0.jpg&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Site is located; &lt;a href=&quot;http://www.eatlovepray.me/portfolio/about-me/&quot; rel=&quot;nofollow&quot;&gt;http://www.eatlovepray.me/portfolio/about-me/&lt;/a&gt;&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592834</id>
+        <re:rank scheme="http://stackoverflow.com">3</re:rank>
+        <title type="text">Why Major Garbage collection is slower than Minor?</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="garbage-collection" />
+        <author>
+            <name>M Sach</name>
+            <uri>http://stackoverflow.com/users/802050</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592834/why-major-garbage-collection-is-slower-than-minor" />
+        <published>2014-07-06T04:56:32Z</published>
+        <updated>2014-07-06T05:29:34Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Gone thru this &lt;a href=&quot;http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/gc01/index.html&quot; rel=&quot;nofollow&quot;&gt;link&lt;/a&gt; but still
+has confusion what actually happens in minor and major GC collection.&lt;/p&gt;
+
+&lt;p&gt;Say i have 100 objects in younger generation out of which 85 object are unreachabe objects. Now when Minor GC runs,
+it will reclaim the memory of 85 objects and move 15 objects to older(tenured) generation. &lt;/p&gt;
+
+&lt;p&gt;Now 15 live objects exists in older generation out of which 3 are unreachable. Say Major GC takes places.  It will keep
+15 objects as it is and reclaim the memory for 3 unreachable object. Major GC is said to be slower than minor GC. &lt;code&gt;My question is why ? Is it because of major GC happens on generally greater number of objects than minor as minor gc occurs more frequently than major?&lt;/code&gt; &lt;/p&gt;
+
+&lt;p&gt;As per understanding &lt;code&gt;major GC should be faster as it needs to do less work&lt;/code&gt; i.e reclaiming memory from unreachable objects than minor GC because
+high mortality rate in young generation. &lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592493</id>
+        <re:rank scheme="http://stackoverflow.com">-1</re:rank>
+        <title type="text">Updating Tables MySql/PHP - inserting variable name instead of values</title>
+            <category scheme="http://stackoverflow.com/tags" term="php" />
+            <category scheme="http://stackoverflow.com/tags" term="mysql" />
+            <category scheme="http://stackoverflow.com/tags" term="forms" />
+        <author>
+            <name>rt3norio</name>
+            <uri>http://stackoverflow.com/users/3808783</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592493/updating-tables-mysql-php-inserting-variable-name-instead-of-values" />
+        <published>2014-07-06T03:37:30Z</published>
+        <updated>2014-07-06T05:31:43Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;i&#39;ve searched too much about it, but, i&#39;m not even rookie in PHP scripting... so I need     help.&lt;/p&gt;
+
+&lt;p&gt;i&#39;m developing a homemade system to home automation, based on PHP/MySql, and, i need a backend to update the database tables and make things really happen in live.&lt;/p&gt;
+
+&lt;p&gt;so, i found the code i need, and, after some adaptation, here it is.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?php
+$username = &quot;root&quot;;
+$password = &quot;&quot;;
+$hostname = &quot;localhost&quot;; 
+$database = &quot;domonet&quot;;
+$tabela = &quot;AtuadorAnalogico&quot;;
+$valor1 = &quot;AA_id&quot;;
+$valor2 = &quot;AA_nome&quot;;
+$valor3 = &quot;AA_valor&quot;;
+
+//connection to the database
+
+$dbhandle = mysql_connect($hostname, $username, $password) 
+  or die(&quot;Unable to connect to MySQL&quot;);
+echo &quot;Connected to MySQL&amp;lt;br&amp;gt;&quot;;
+
+
+//select a database to work with
+
+$selected = mysql_select_db($database,$dbhandle) 
+  or die(&quot;Could not select examples&quot;);
+  echo &quot;Connected ao banco&amp;lt;br&amp;gt;&quot;;
+
+//get data from db
+
+$sql = mysql_query(&quot;SELECT * FROM $tabela&quot;);
+$count=mysql_num_rows($sql);
+
+//start a table
+
+echo &#39;&amp;lt;form name=&quot;form1&quot; method=&quot;post&quot; action=&quot;&quot;&amp;gt;
+&amp;lt;table width=&quot;292&quot; border=&quot;0&quot; cellspacing=&quot;1&quot; cellpadding=&quot;0&quot;&amp;gt;&#39;;
+
+//start header of table
+
+echo &#39;&amp;lt;tr&amp;gt;
+&amp;lt;th&amp;gt;&amp;amp;nbsp;&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Email&amp;lt;/th&amp;gt;
+&amp;lt;/tr&amp;gt;&#39;;
+
+//loop through all results
+
+while($r=mysql_fetch_object($sql)){
+
+//print out table contents and add id into an array and email into an array
+
+echo &#39;&amp;lt;tr&amp;gt;
+&amp;lt;td&amp;gt;&amp;lt;input type=&quot;hidden&quot; name=&quot;id[]&quot; value=&#39;.$r-&amp;gt;$valor1.&#39; readonly&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;td&amp;gt;&#39;.$r-&amp;gt;$valor2.&#39;&amp;lt;/td&amp;gt;
+&amp;lt;td&amp;gt;&amp;lt;input name=&quot;email[]&quot; type=&quot;text&quot; id=&quot;price&quot; value=&quot;&#39;.$r-&amp;gt;$valor3.&#39;&quot;&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;/tr&amp;gt;&#39;;
+}
+
+//submit button
+
+
+echo&#39; &amp;lt;tr&amp;gt;
+&amp;lt;td colspan=&quot;3&quot; align=&quot;center&quot;&amp;gt;&amp;lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;/tr&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;/form&amp;gt;&#39;;
+
+
+// if form has been submitted, process it
+
+
+if(isset($_POST[&quot;Submit&quot;]))
+{
+   // get data from form
+
+ $name = $_POST[&#39;name&#39;];
+
+   // loop through all array items
+
+   foreach($_POST[&#39;id&#39;] as $value)
+   {
+
+   // minus value by 1 since arrays start at 0      
+
+           $item = $value-1;
+
+                //update table
+
+    //appending suggested changes  
+    //place of var_dumps
+   //$sql1 = mysql_query(&quot;UPDATE $tabela SET $valor3=&#39;$valor3[$item]&#39; WHERE     $valor1=&#39;$value&#39;&quot;) or die(mysql_error());
+   $sql1 = mysql_query(&quot;UPDATE $tabela SET $valor3=&#39;$email[$item]&#39; WHERE $valor1=&#39;$value&#39;&quot;) or die(mysql_error());
+
+
+
+   }
+
+// redirect user
+
+$_SESSION[&#39;success&#39;] = &#39;Updated&#39;;
+header(&quot;location:index.php&quot;);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The problem is, after clicking at the &#39;submit&#39; button, the database table just get weird.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;From This:
+mysql&amp;gt; select * from AtuadorAnalogico;
++-------+---------+----------+
+| AA_id | AA_nome | AA_valor |
++-------+---------+----------+
+|     0 | nome1   | d        |
+|     1 | nome2   | Agfd     |
+|     2 | nome3   | Aasd     |
+|     3 | nome4   | _asda    |
+|     5 | teste5  | a        |
+|     6 | teste6  | asda     |
+|     7 | testte1 | o        |
+|     8 | testte2 | rwqdq    |
+|     9 | asdadsd | gwrg     |
+|    10 | asdadsd | qdw      |
+|    11 | adasd   | 234      |
+|    12 | adasd   | g42      |
++-------+---------+----------+
+12 rows in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;To This:
+mysql&amp;gt; select * from AtuadorAnalogico
++-------+---------+----------+
+| AA_id | AA_nome | AA_valor |
++-------+---------+----------+
+|     0 | nome1   |          |
+|     1 | nome2   |          |
+|     2 | nome3   |          |
+|     3 | nome4   |          |
+|     5 | teste5  |          |
+|     6 | teste6  |          |
+|     7 | testte1 |          |
+|     8 | testte2 |          |
+|     9 | asdadsd |          |
+|    10 | asdadsd |          |
+|    11 | adasd   |          |
+|    12 | adasd   |          |
++-------+---------+----------+
+12 rows in set (0.00 sec)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Please, I really can&#39;t see my mistake.&lt;/p&gt;
+
+&lt;p&gt;Thanks a lot for the code revision.&lt;/p&gt;
+
+&lt;p&gt;PS.: just to remember. When i run the php in browser, it DOES show the contents of the database table just as it is. after clicking the submit, the thing goes crazy.&lt;/p&gt;
+
+&lt;h1&gt;EDIT1&lt;/h1&gt;
+
+&lt;p&gt;after renaming &#39;valor3&#39; to &#39;email&#39;, it is not writing the string to the table anymore.
+but, leaving the whole column blank (writing blank in all column cells as shown above) .&lt;/p&gt;
+
+&lt;h1&gt;EDIT2&lt;/h1&gt;
+
+&lt;p&gt;in comments, we just figured that is a logical problem with the code.
+just can&#39;t figure out what to do.&lt;/p&gt;
+
+&lt;h1&gt;Update&lt;/h1&gt;
+
+&lt;pre&gt;&lt;code&gt;the output from just before the sql1 query:
+var_dump($email);
+var_dump($tabela);
+var_dump($item);
+var_dump($valor3);
+var_dump($valor1);
+var_dump($value);
+
+vardump $email: NULL
+vardump $tabela: string(16) &quot;AtuadorAnalogico&quot;
+vardump $item: int(-1)
+vardump $valor3: string(8) &quot;AA_valor&quot;
+vardump $valor1: string(5) &quot;AA_id&quot;
+vardump $value: string(1) &quot;0&quot;
+
+vardump $email: NULL
+vardump $tabela: string(16) &quot;AtuadorAnalogico&quot;
+vardump $item: int(0)
+vardump $valor3: string(8) &quot;AA_valor&quot;
+vardump $valor1: string(5) &quot;AA_id&quot;
+vardump $value: string(1) &quot;1&quot;
+vardump $email: NULL
+
+vardump $tabela: string(16) &quot;AtuadorAnalogico&quot;
+vardump $item: int(1)
+vardump $valor3: string(8) &quot;AA_valor&quot;
+vardump $valor1: string(5) &quot;AA_id&quot;
+vardump $value: string(1) &quot;2&quot; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;ps.: i reduced the number of rows, so makes easyer to see and think.&lt;/p&gt;
+
+&lt;h1&gt;I FOUND IT!&lt;/h1&gt;
+
+&lt;p&gt;stack didn&#39;t allowed me to answer my own question, so, i&#39;m editing as they wish.&lt;/p&gt;
+
+&lt;p&gt;renaming this line fields &#39;name&#39; and &#39;id&#39; to &quot;&quot;anything&quot;&quot;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;td&amp;gt;&amp;lt;input name=&quot;valores[]&quot; type=&quot;text&quot; id=&quot;valores&quot; value=&quot;&#39;.$r-&amp;gt;$valor3.&#39;&quot;&amp;gt;&amp;lt;/td&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;renaming this to the same as before:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;     $valores = $_POST[&#39;valores&#39;];
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;changing this to EQUAL (as stated by @JA):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  $item = $value;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and adapting the query like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;    $sql1 = mysql_query(&quot;UPDATE $tabela SET $valor3=&#39;$valores[$item]&#39; WHERE $valor1=&#39;$value&#39;&quot;) or die(mysql_error());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and IT&#39;s DONE!&lt;/p&gt;
+
+&lt;h1&gt;Thanks so much for your brainstorming.&lt;/h1&gt;
+
+&lt;p&gt;and special thanks for @arielnmz who gave me the idea of dumping the vars so i can find the logic error.&lt;/p&gt;
+
+&lt;p&gt;by the way, the code finished.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;?php
+$username = &quot;root&quot;;
+$password = &quot;&quot;;
+$hostname = &quot;localhost&quot;; 
+$database = &quot;domonet&quot;;
+$tabela = &quot;AtuadorAnalogico&quot;;
+$valor1 = &quot;AA_id&quot;;
+$valor2 = &quot;AA_nome&quot;;
+$valor3 = &quot;AA_valor&quot;;
+
+//connection to the database
+
+$dbhandle = mysql_connect($hostname, $username, $password) 
+  or die(&quot;Unable to connect to MySQL&quot;);
+echo &quot;Connected to MySQL&amp;lt;br&amp;gt;&quot;;
+
+
+//select a database to work with
+
+$selected = mysql_select_db($database,$dbhandle) 
+  or die(&quot;Could not select examples&quot;);
+  echo &quot;Connected ao banco&amp;lt;br&amp;gt;&quot;;
+
+//get data from db
+
+$sql = mysql_query(&quot;SELECT * FROM $tabela&quot;);
+$count=mysql_num_rows($sql);
+
+//start a table
+
+echo &#39;&amp;lt;form name=&quot;form1&quot; method=&quot;post&quot; action=&quot;&quot;&amp;gt;
+&amp;lt;table width=&quot;292&quot; border=&quot;0&quot; cellspacing=&quot;1&quot; cellpadding=&quot;0&quot;&amp;gt;&#39;;
+
+//start header of table
+
+echo &#39;&amp;lt;tr&amp;gt;
+&amp;lt;th&amp;gt;&amp;amp;nbsp;&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Name&amp;lt;/th&amp;gt;
+&amp;lt;th&amp;gt;Email&amp;lt;/th&amp;gt;
+&amp;lt;/tr&amp;gt;&#39;;
+
+//loop through all results
+
+while($r=mysql_fetch_object($sql)){
+
+//print out table contents and add id into an array and email into an array
+
+echo &#39;&amp;lt;tr&amp;gt;
+&amp;lt;td&amp;gt;&amp;lt;input type=&quot;hidden&quot; name=&quot;id[]&quot; value=&#39;.$r-&amp;gt;$valor1.&#39; readonly&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;td&amp;gt;&#39;.$r-&amp;gt;$valor2.&#39;&amp;lt;/td&amp;gt;
+&amp;lt;td&amp;gt;&amp;lt;input name=&quot;valores[]&quot; type=&quot;text&quot; id=&quot;valores&quot; value=&quot;&#39;.$r-&amp;gt;$valor3.&#39;&quot;&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;/tr&amp;gt;&#39;;
+}
+
+//submit button
+
+
+echo&#39; &amp;lt;tr&amp;gt;
+&amp;lt;td colspan=&quot;3&quot; align=&quot;center&quot;&amp;gt;&amp;lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Submit&quot;&amp;gt;&amp;lt;/td&amp;gt;
+&amp;lt;/tr&amp;gt;
+&amp;lt;/table&amp;gt;
+&amp;lt;/form&amp;gt;&#39;;
+
+// if form has been submitted, process it
+
+if(isset($_POST[&quot;Submit&quot;]))
+{
+       // get data from form
+
+     $valores = $_POST[&#39;valores&#39;];
+
+       // loop through all array items
+
+   foreach($_POST[&#39;id&#39;] as $value)
+       {
+       // minus value by 1 since arrays start at 0 (not anymore)
+
+               $item = $value;
+                //update table
+
+       $sql1 = mysql_query(&quot;UPDATE $tabela SET $valor3=&#39;$valores[$item]&#39; WHERE     $valor1=&#39;$value&#39;&quot;) or die(mysql_error());
+
+   }
+
+// redirect user
+
+$_SESSION[&#39;success&#39;] = &#39;Updated&#39;;
+header(&quot;location:index.php&quot;);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Everybody have a great night!&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592487</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">unsupported operand type(s) for +: &#39;NoneType&#39; and &#39;NoneType&#39;</title>
+            <category scheme="http://stackoverflow.com/tags" term="django" />
+            <category scheme="http://stackoverflow.com/tags" term="django-models" />
+            <category scheme="http://stackoverflow.com/tags" term="django-errors" />
+            <category scheme="http://stackoverflow.com/tags" term="django-aggregation" />
+        <author>
+            <name>user3806832</name>
+            <uri>http://stackoverflow.com/users/3806832</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592487/unsupported-operand-types-for-nonetype-and-nonetype" />
+        <published>2014-07-06T03:36:25Z</published>
+        <updated>2014-07-06T05:32:46Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;How can I handle this error, its driving me crazy:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;unsupported operand type(s) for +: &#39;NoneType&#39; and &#39;NoneType&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Also&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;unsupported operand type(s) for +: &#39;Float&#39; and &#39;NoneType&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I get what its telling me (I think) so this is the code I wrote to try and battle it&lt;/p&gt;
+
+&lt;p&gt;View:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;session = request.session._session_key
+ind = signedup.objects.filter(sessionid = session)
+team = team_signup.objects.filter(sessionid = session)
+combine = list(chain(ind, team))
+
+
+check = signedup.objects.filter(sessionid = session).count() + team_signup.objects.filter(sessionid = session).count()
+ind = signedup.objects.filter(sessionid = session).aggregate(Sum (&#39;price&#39;))[&#39;price__sum&#39;]
+team = team_signup.objects.filter(sessionid = session).aggregate(Sum (&#39;price&#39;))[&#39;price__sum&#39;]
+if check == 0:
+  carttotal = 0.00
+elif ind == None:
+  ind = 0.00
+elif team == None:
+  team = 0.00
+
+carttotal = ind + team
+
+
+return render_to_response(&quot;cart.html&quot;,locals(),context_instance = RequestContext(request))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I figured what I was doing was setting their values to 0 before adding it up if it happened to be come up with none as a value. Is there another way to handle this so that when one of them does come up none, it gets set to zero so it can be added. Also when BOTH come up to none they can be set to  0 so that they can be added.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592310</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Can&#39;t install RMagick 2.13.2</title>
+            <category scheme="http://stackoverflow.com/tags" term="ruby" />
+            <category scheme="http://stackoverflow.com/tags" term="osx" />
+            <category scheme="http://stackoverflow.com/tags" term="imagemagick" />
+            <category scheme="http://stackoverflow.com/tags" term="rmagick" />
+        <author>
+            <name>umair</name>
+            <uri>http://stackoverflow.com/users/842782</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592310/cant-install-rmagick-2-13-2" />
+        <published>2014-07-06T02:56:16Z</published>
+        <updated>2014-07-06T05:33:04Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am having an issue on OS X Maverick when trying to install the rmagick gem. Following are some details&lt;/p&gt;
+
+&lt;p&gt;ImageMagic details&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mairs-MacBook-Pro:social-login-in-rails umair$ convert --version
+Version: ImageMagick 6.8.9-1 Q16 x86_64 2014-07-06 http://www.imagemagick.org
+Copyright: Copyright (C) 1999-2014 ImageMagick Studio LLC
+Features: DPC Modules
+Delegates: bzlib freetype jng jpeg ltdl lzma png xml zlib
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I tried installing with and without paths but I am unable to install rmagick.
+Error on installing rmagick&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Umairs-MacBook-Pro:social-login-in-rails umair$ sudo C_INCLUDE_PATH=/opt/ImageMagick/include/ImageMagick-6/ PKG_CONFIG_PATH=/opt/ImageMagick/lib/pkgconfig/ gem install rmagick
+Building native extensions.  This could take a while...
+/Users/umair/.rvm/rubies/ruby-2.1.0/lib/ruby/site_ruby/2.1.0/rubygems/ext/builder.rb:73: warning: Insecure world writable dir /usr in PATH, mode 040777
+ERROR:  Error installing rmagick:
+ERROR: Failed to build gem native extension.
+
+/Users/umair/.rvm/rubies/ruby-2.1.0/bin/ruby extconf.rb
+checking for Ruby version &amp;gt;= 1.8.5... yes
+checking for gcc... yes
+checking for Magick-config... yes
+
+Warning: Found more than one ImageMagick installation. This could cause problems at runtime.
+     /usr/local/bin/Magick-config reports version 6.8.9 Q16 is installed in /usr/local/Cellar/imagemagick/6.8.9-1
+     /opt/ImageMagick/bin/Magick-config reports version 6.8.8 Q16 is installed in /opt/ImageMagick
+Using 6.8.9 Q16 from /usr/local/Cellar/imagemagick/6.8.9-1.
+
+checking for ImageMagick version &amp;gt;= 6.4.9... yes
+checking for HDRI disabled version of ImageMagick... yes
+/usr/local/bin/Magick-config: line 41: pkg-config: command not found
+/usr/local/bin/Magick-config: line 47: pkg-config: command not found
+/usr/local/bin/Magick-config: line 50: pkg-config: command not found
+/usr/local/bin/Magick-config: line 53: pkg-config: command not found
+checking for stdint.h... yes
+checking for sys/types.h... yes
+checking for wand/MagickWand.h... yes
+/usr/local/bin/Magick-config: line 53: pkg-config: command not found
+Can&#39;t install RMagick 2.13.2. Can&#39;t find the ImageMagick library or one of the dependent libraries. Check the mkmf.log file for more detailed information.
+
+*** extconf.rb failed ***
+Could not create Makefile due to some reason, probably lack of necessary
+libraries and/or headers.  Check the mkmf.log file for more details.  You may
+need configuration options.
+
+Provided configuration options:
+    --with-opt-dir
+    --without-opt-dir
+    --with-opt-include
+    --without-opt-include=${opt-dir}/include
+    --with-opt-lib
+    --without-opt-lib=${opt-dir}/lib
+    --with-make-prog
+    --without-make-prog
+    --srcdir=.
+    --curdir
+    --ruby=/Users/umair/.rvm/rubies/ruby-2.1.0/bin/ruby
+
+extconf failed, exit code 1
+
+Gem files will remain installed in /Users/umair/.rvm/rubies/ruby-2.1.0/lib/ruby/gems/2.1.0/gems/rmagick-2.13.2 for inspection.
+Results logged to /Users/umair/.rvm/rubies/ruby-2.1.0/lib/ruby/gems/2.1.0/extensions/x86_64-darwin-13/2.1.0-static/rmagick-2.13.2/gem_make.out
+&lt;/code&gt;&lt;/pre&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24592186</id>
+        <re:rank scheme="http://stackoverflow.com">1</re:rank>
+        <title type="text">Having issues using the printf()</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="eclipse" />
+            <category scheme="http://stackoverflow.com/tags" term="printf" />
+        <author>
+            <name>user3807408</name>
+            <uri>http://stackoverflow.com/users/3807408</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24592186/having-issues-using-the-printf" />
+        <published>2014-07-06T02:27:08Z</published>
+        <updated>2014-07-06T05:28:48Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;this is my code so far.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import java.util.*;
+public class one {
+
+    public static void main(String[] args) {
+        System.out.println(&quot;--- Stage 1 Taxi Fare Calculator ---&quot;);
+
+        Scanner user_input = new Scanner( System.in );
+        String startTime;
+        System.out.print(&quot;Enter in pick up time:  &quot;);
+        startTime = user_input.next();
+
+        String pickUp;
+        System.out.print(&quot;Enter in pickup point:  &quot;);
+        pickUp = user_input.next();
+
+        String dropOff;
+        System.out.print(&quot;Enter in drop off point:  &quot;);
+        dropOff = user_input.next();
+
+        Double tripDist;
+        System.out.print(&quot;Enter in trip distance in km:  &quot;);
+        tripDist = user_input.nextDouble();
+        user_input.nextLine();
+
+        Double fareRate = 1.60;
+        Double baseFare = tripDist * fareRate;
+        Double totalFare = baseFare;
+        String m1 = &quot;The pickup point was: &quot; ;
+        String m2 = &quot;The drop off point was: &quot;;
+        String m3 = &quot;The pickup time was: &quot;;
+        String m4 = &quot;Estimated distance (km): &quot;;
+        String m5 = &quot;Fare Charged: $&quot;;
+        String m6 = &quot;Base fare: $&quot;;
+        String m7 = &quot;Total fare: $ &quot;;
+
+        System.out.println(&quot; --- Taxi fare details --- &quot;);
+        System.out.printf(m1 + pickUp); 
+        System.out.printf(m2 + dropOff);
+        System.out.printf(m3 + startTime);
+        System.out.printf(m4 + tripDist);
+        System.out.printf(m5 + fareRate);
+        System.out.printf(m6 + baseFare);
+        System.out.printf(m7 + totalFare);
+    }
+
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;EDIT : I have added more to my code and have now got what you see above, I need to use the field width modifiers in the printf statement to make it look nice and print it out on multiple lines, Not just the one line which is what is happening now, I am currently googling to no end and cant find how to make it work. anyone know where I could look?&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24591898</id>
+        <re:rank scheme="http://stackoverflow.com">2</re:rank>
+        <title type="text">scatter plot in jfreechart from database</title>
+            <category scheme="http://stackoverflow.com/tags" term="java" />
+            <category scheme="http://stackoverflow.com/tags" term="mysql" />
+            <category scheme="http://stackoverflow.com/tags" term="swing" />
+            <category scheme="http://stackoverflow.com/tags" term="jfreechart" />
+            <category scheme="http://stackoverflow.com/tags" term="scatter-plot" />
+        <author>
+            <name>enjal</name>
+            <uri>http://stackoverflow.com/users/2657277</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24591898/scatter-plot-in-jfreechart-from-database" />
+        <published>2014-07-06T01:20:55Z</published>
+        <updated>2014-07-06T05:30:13Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;How can i draw scatter plot of datas in mysql database table using jfreechart in java. I have used swing library.
+Any link would be helpful. I searched google but couldnot find a understanding solution.
+If you have got code just provide me.
+Actually i did do barchart and plot it using jfreechart.
+The code i used for my barchart is here. Here display3 function displays the barchart. 
+How can i modify it  to display scatter plot?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void display3() throws SQLException, ClassNotFoundException{
+
+    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+    String JDBC_DRIVER=&quot;com.mysql.jdbc.Driver&quot;;
+    String DB_URL=&quot;jdbc:mysql://localhost/data2&quot;;
+    Connection conn;
+    Statement stmt;
+    String USER = &quot;root&quot;;
+    String PASS = &quot;&quot;;
+    try{
+        Class.forName(JDBC_DRIVER);
+        conn=DriverManager.getConnection(DB_URL,USER,PASS);
+        System.out.println(&quot;Creating statement...&quot;);
+        stmt = conn.createStatement();
+
+        String sql;
+        sql=&quot;SELECT * FROM `production` WHERE crop_id = 1 AND location_id = 1&quot;;
+        ResultSet rs=stmt.executeQuery(sql);
+
+        while (rs.next()){
+            //String student = rs.getString(&quot;studentname&quot;);
+            String yeartext = rs.getString(&quot;year_of_production&quot;);
+            //double value = Double.parseDouble(text);
+            String productiontext = rs.getString(&quot;production_amount&quot;);
+            double production = Double.parseDouble(productiontext);
+            Integer year = Integer.parseInt(yeartext);
+
+            dataset.setValue(production, &quot;production&quot;, year);
+
+
+        }
+
+
+
+        JFreeChart chart = ChartFactory.createBarChart(&quot;Bar Graph&quot;,// Chart Title
+                &quot;Year&quot;, //horizontal axis label
+                &quot;Paddy Production&quot;, // vertical axis label
+                dataset, //data
+                PlotOrientation.VERTICAL, //orientation of chart
+                true, //include legend
+                false, // tool tips
+                true);//urls
+        CategoryPlot p = chart.getCategoryPlot();
+        ChartPanel chartPanel = new ChartPanel(chart, false);
+        jPanel9.setLayout(new BorderLayout());
+        jPanel9.add(chartPanel, BorderLayout.EAST);
+        jPanel9.add(chartPanel);
+        SwingUtilities.updateComponentTreeUI(this);
+        p.setRangeGridlinePaint(blue);
+
+        System.out.println(&quot;Database created successfully...&quot;);
+
+    } catch(SQLException se) {
+        //Handle errors for JDBC
+        System.out.println(&quot;Connect failed ! &quot;);
+        se.printStackTrace();
+    }
+
+}       
+
+  I finally solved my problem: 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The refine code is below and it works: &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;public void display3() throws SQLException, ClassNotFoundException{
+
+        //DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+         XYSeriesCollection dataset = new XYSeriesCollection();
+         XYSeries series = new XYSeries(&quot;production&quot;);
+        String JDBC_DRIVER=&quot;com.mysql.jdbc.Driver&quot;;
+    String DB_URL=&quot;jdbc:mysql://localhost/data2&quot;;
+    Connection conn;
+    Statement stmt;
+    String USER = &quot;root&quot;;
+    String PASS = &quot;&quot;;
+        try{
+            Class.forName(JDBC_DRIVER);
+            conn=DriverManager.getConnection(DB_URL,USER,PASS);
+            System.out.println(&quot;Creating statement...&quot;);
+            stmt = conn.createStatement();
+                        String sql;
+                        sql=&quot;SELECT * FROM `production` WHERE crop_id = 1 AND location_id = 1&quot;;
+                        ResultSet rs=stmt.executeQuery(sql);
+
+                        while (rs.next()){
+                            //String student = rs.getString(&quot;studentname&quot;);
+                            String yeartext = rs.getString(&quot;year_of_production&quot;);
+                            //double value = Double.parseDouble(text);
+                            String productiontext = rs.getString(&quot;production_amount&quot;);
+                            double production = Double.parseDouble(productiontext);
+                            double year = Double.parseDouble(yeartext);
+                            series.add(year,production) ;
+                            //dataset.addSeries(series);
+
+
+
+
+                        }
+                        dataset.addSeries(series);
+
+                        JFreeChart chart = ChartFactory.createScatterPlot(&quot;Scatter Plot&quot;,&quot;Year&quot;,&quot;Paddy Production&quot;, dataset);
+
+                        //CategoryPlot p = chart.getCategoryPlot();
+                         //XYPlot xyplot = (XYPlot)jfreechart.getPlot();
+                        //http://stackoverflow.com/questions/12417732/jfreechart-with-scroller
+                        ChartPanel chartPanel = new ChartPanel(chart, false);
+                        jPanel9.setLayout(new BorderLayout());
+                        jPanel9.add(chartPanel, BorderLayout.EAST);
+                        jPanel9.add(chartPanel);
+                        SwingUtilities.updateComponentTreeUI(this);
+                       // p.setRangeGridlinePaint(blue);
+
+                        System.out.println(&quot;Database created successfully...&quot;);
+
+                }catch(SQLException se){
+                    //Handle errors for JDBC
+                    System.out.println(&quot;Connect failed ! &quot;);
+                    se.printStackTrace();
+//                    JOptionPane.showMessageDialog(MajorUI.this, err.getMessage());
+                    }
+
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The output is: 
+&lt;a href=&quot;http://i58.tinypic.com/29ynsxh.png&quot; rel=&quot;nofollow&quot;&gt;http://i58.tinypic.com/29ynsxh.png&lt;/a&gt;&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24591673</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Where to add specific function in the Map/Reduce Framework</title>
+            <category scheme="http://stackoverflow.com/tags" term="hadoop" />
+            <category scheme="http://stackoverflow.com/tags" term="mapreduce" />
+            <category scheme="http://stackoverflow.com/tags" term="distributed-computing" />
+        <author>
+            <name>user3804098</name>
+            <uri>http://stackoverflow.com/users/3804098</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24591673/where-to-add-specific-function-in-the-map-reduce-framework" />
+        <published>2014-07-06T00:26:43Z</published>
+        <updated>2014-07-06T05:32:34Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I have a general question to the MAP/Reduce Framework.&lt;/p&gt;
+
+&lt;p&gt;I have a task, which can be separated into several partitions. For each partition, I need to run a computation intensive algorithm.&lt;/p&gt;
+
+&lt;p&gt;Then, according to the MAP/Reduce Framework, it seems that I have two choices:&lt;/p&gt;
+
+&lt;p&gt;Run the algorithm in the Map stage, so that in the reduce stage, there is no work needed to be done, except collect the results of each partition from the Map stage and do summarization&lt;/p&gt;
+
+&lt;p&gt;In the Map stage, just divide and send the partitions (with data) to the reduce stage. In the reduce stage, run the algorithm first, and then collect and summarize the results from each partitions.&lt;/p&gt;
+
+&lt;p&gt;Correct me if I misunderstand.&lt;/p&gt;
+
+&lt;p&gt;I am a beginner. I may not understand the MAP/Reduce very well. I only have basic parallel computing concept.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24590458</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">How to add .mdb database into to Visual Studio 2013 published application</title>
+            <category scheme="http://stackoverflow.com/tags" term=".net" />
+            <category scheme="http://stackoverflow.com/tags" term="vb.net" />
+            <category scheme="http://stackoverflow.com/tags" term="visual-studio" />
+            <category scheme="http://stackoverflow.com/tags" term="visual-studio-2012" />
+            <category scheme="http://stackoverflow.com/tags" term="visual-studio-2013" />
+        <author>
+            <name>Dr. Atul Tiwari</name>
+            <uri>http://stackoverflow.com/users/2587662</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24590458/how-to-add-mdb-database-into-to-visual-studio-2013-published-application" />
+        <published>2014-07-05T20:50:18Z</published>
+        <updated>2014-07-06T05:31:03Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am very new to VS 2013. I am using visual basic. I created a folder named &quot;assets&quot; and placed &lt;code&gt;mq.mdb&lt;/code&gt; into this folder. Then from Solution Explorer of VS 2013, right clicked on &lt;code&gt;mq.mdb&lt;/code&gt; and selected include in project. The file is also listed in project properties. My program works in debug and release mode, i.e. it uses mq.mdb file from assets folder.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;But when I publish this and then try to run the app, it throws error for Not valid path.&lt;/strong&gt; (please have a look at the attached screenshot)&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.stack.imgur.com/QLLXP.png&quot; alt=&quot;screenshot of error&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;I even visited the location. It&#39;s path is very long, but .mdb file is present there too, but i am still getting errors. I am stuck here for hours.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;P.S.&lt;/strong&gt; - Isn&#39;t there any way to make a package that will install all the required files (including assets/mq.mdb) into default program files folder instead of keep it into AppData/local folder as mentioned in image?&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;&lt;strong&gt;Edit 1.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;(if it helps in solving query) I am calling MS access database like this -&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;dbProvider = &quot;PROVIDER=Microsoft.Jet.OLEDB.4.0;&quot;
+dbSource = &quot;Data Source = &quot; + AppDomain.CurrentDomain.BaseDirectory + &quot;assets/mq.mdb;&quot;
+dbPassword = &quot;Jet OLEDB:Database Password=password;&quot;
+con.ConnectionString = dbProvider &amp;amp; dbSource &amp;amp; dbPassword
+con.Open()
+sql = &quot;SELECT * FROM tblTest&quot;
+da = New OleDb.OleDbDataAdapter(sql, con)
+da.Fill(ds, &quot;Test&quot;)
+con.Close()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks. Regards,&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24587458</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">QT QTcpSocket not receiving any data</title>
+            <category scheme="http://stackoverflow.com/tags" term="c#" />
+            <category scheme="http://stackoverflow.com/tags" term="c++" />
+            <category scheme="http://stackoverflow.com/tags" term="qt" />
+            <category scheme="http://stackoverflow.com/tags" term="sockets" />
+            <category scheme="http://stackoverflow.com/tags" term="networking" />
+        <author>
+            <name>user3551745</name>
+            <uri>http://stackoverflow.com/users/3551745</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24587458/qt-qtcpsocket-not-receiving-any-data" />
+        <published>2014-07-05T14:35:05Z</published>
+        <updated>2014-07-06T05:32:27Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;m writing a C++ project in Qt Creator, and I have a &lt;code&gt;QTcpSocket&lt;/code&gt;. It is connecting ok, but &lt;code&gt;bytesAvailable()&lt;/code&gt; is always &lt;code&gt;zero&lt;/code&gt;, even when I send data to it from another project I wrote in C#. I tested that the C# project is actually sending data by using another C# project, and it is sending the data correctly. Here is my code:  &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;QTcpSocket&amp;gt;
+#include &amp;lt;QDebug&amp;gt;
+
+void main()
+{
+    QTcpSocket *tcpSocket=new QTcpSocket();
+    tcpSocket-&amp;gt;connectToHost(&quot;127.0.0.1&quot;,8080);
+    while(true)
+    {
+        if(tcpSocket-&amp;gt;bytesAvailable()!=0)
+        {
+            qDebug()&amp;lt;&amp;lt;tcpSocket&amp;lt;-bytesAvailable();
+        }
+    }
+    tcpSocket-&amp;gt;disconnectFromHost();
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks. :D&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24582383</id>
+        <re:rank scheme="http://stackoverflow.com">1</re:rank>
+        <title type="text">QMimeData: setting and getting the right MIME types for arbitrary widgets</title>
+            <category scheme="http://stackoverflow.com/tags" term="qt" />
+            <category scheme="http://stackoverflow.com/tags" term="pyqt" />
+            <category scheme="http://stackoverflow.com/tags" term="mime-types" />
+            <category scheme="http://stackoverflow.com/tags" term="pyside" />
+        <author>
+            <name>neuronet</name>
+            <uri>http://stackoverflow.com/users/1886357</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24582383/qmimedata-setting-and-getting-the-right-mime-types-for-arbitrary-widgets" />
+        <published>2014-07-05T02:17:00Z</published>
+        <updated>2014-07-06T05:29:42Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;Using PySide, I construct a draggable label that works exactly how I want:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class DraggableLabel(QtGui.QLabel):
+    def __init__(self, txt, parent):
+        QtGui.QLabel.__init__(self, txt, parent)
+        self.setStyleSheet(&quot;QLabel { background-color: rgb(255, 255, 0)}&quot;)
+    def mouseMoveEvent(self, event):
+        drag=QtGui.QDrag(self)
+        dragMimeData=QtCore.QMimeData()  
+        drag.setMimeData(dragMimeData) 
+        drag.exec_(QtCore.Qt.MoveAction)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Unfortunately, I do not understand what is going on with &lt;code&gt;QMimeData&lt;/code&gt;, and fear I am going to run into big problems when I use similar code in real-world examples.&lt;/p&gt;
+
+&lt;p&gt;In particular, I am worried that my reimplementation of &lt;code&gt;mouseMoveEvent&lt;/code&gt; creates an instance of &lt;code&gt;QMimeData&lt;/code&gt; without any argument passed: &lt;code&gt;QtCore.QMimeData()&lt;/code&gt;. Is this normal? Within more complex widgets will I be OK if I keep doing that within the relevant event handler: will the program automatically create the right type of MIME data for dragging and dropping?&lt;/p&gt;
+
+&lt;p&gt;The reason I fear I am missing something is because at the &lt;a href=&quot;http://qt-project.org/doc/qt-4.8/dnd.html&quot; rel=&quot;nofollow&quot;&gt;Qt Drag and Drop documentation&lt;/a&gt;, it has lines of code like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;mimeData -&amp;gt; setText(commentEdit-&amp;gt;toPlainText());
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;which seems decidedly &lt;em&gt;not&lt;/em&gt; like just letting the program take care of things within a reimplementation of an event handler.&lt;/p&gt;
+
+&lt;p&gt;Also, the &lt;a href=&quot;http://srinikom.github.io/pyside-docs/PySide/QtCore/QMimeData.html&quot; rel=&quot;nofollow&quot;&gt;QMimeData Documentation&lt;/a&gt; discusses convenience functions to test, get, and set data, but those are for standard data types (e.g., text, urls). I have found no clear way to define such convenience functions for widgets like my draggable &lt;code&gt;QLabel&lt;/code&gt;. Am I missing it? Is there a simple way to find out if I am dragging around a widget of type X?&lt;/p&gt;
+
+&lt;p&gt;Edit: I&#39;ve tried the same code above with much more complicated widgets than QLabels, and it does not work. I am still tinkering a bit, and will report any discoveries. Should I be using QGraphicsView to implement drag/drop functionality with custom widgets? That is, am I barking up the wrong tree altogether with my approach, given that my goal is simply to drag/drop widgets?&lt;/p&gt;
+
+&lt;p&gt;Potentially relevant posts:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://stackoverflow.com/questions/18299077/dragging-a-qwidget-in-qt-5&quot;&gt;Dragging a QWidget in QT 5&lt;/a&gt;&lt;br/&gt;
+&lt;a href=&quot;http://stackoverflow.com/questions/20453308/how-to-drag-and-drop-custom-widgets&quot;&gt;How to Drag and Drop Custom Widgets?&lt;/a&gt;&lt;br/&gt;
+&lt;a href=&quot;http://www.qtcentre.org/wiki/index.php?title=Moving_widgets&quot; rel=&quot;nofollow&quot;&gt;http://www.qtcentre.org/wiki/index.php?title=Moving_widgets&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;Note I&#39;m posting this (and just dropped the full code example that includes the above excerpt) at &lt;a href=&quot;http://www.qtcentre.org/threads/59687-QMimeData-setting-and-getting-the-right-MIME-types-for-arbitrary-widgets&quot; rel=&quot;nofollow&quot;&gt;QtCentre&lt;/a&gt; as well, will post anything useful from there.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24513176</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">Safari Bug for text-shadow?</title>
+            <category scheme="http://stackoverflow.com/tags" term="css3" />
+            <category scheme="http://stackoverflow.com/tags" term="safari" />
+            <category scheme="http://stackoverflow.com/tags" term="glyphicons" />
+            <category scheme="http://stackoverflow.com/tags" term="css-text-shadow" />
+        <author>
+            <name>agapitocandemor</name>
+            <uri>http://stackoverflow.com/users/833700</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24513176/safari-bug-for-text-shadow" />
+        <published>2014-07-01T14:46:27Z</published>
+        <updated>2014-07-06T05:30:33Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I&#39;m having an issue where safari is not rendering a complete text-shadow on a custom glyphicon like chrome or ff does. I attach an image of the button.&lt;/p&gt;
+
+&lt;p&gt;Do you know if there&#39;s any known bug or anything related to that?&lt;/p&gt;
+
+&lt;p&gt;Thanks a lot!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.stack.imgur.com/HnSry.png&quot; alt=&quot;enter image description here&quot;&gt;&lt;/p&gt;
+
+&lt;p&gt;Upd: Happens in Safari 6.1.4, not in the new version 7.0.4, but anyway I have to fix that!&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/24423788</id>
+        <re:rank scheme="http://stackoverflow.com">1</re:rank>
+        <title type="text">Expose a template-based container class to Qt script engine?</title>
+            <category scheme="http://stackoverflow.com/tags" term="c++" />
+            <category scheme="http://stackoverflow.com/tags" term="qt" />
+        <author>
+            <name>Tay2510</name>
+            <uri>http://stackoverflow.com/users/2995038</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/24423788/expose-a-template-based-container-class-to-qt-script-engine" />
+        <published>2014-06-26T06:29:19Z</published>
+        <updated>2014-07-06T05:32:39Z</updated>
+        <summary type="html">
+            
+
+            &lt;h1&gt;Situation&lt;/h1&gt;
+
+&lt;p&gt;I have a few instances of &lt;code&gt;QVector&amp;lt;MyClass&amp;gt;&lt;/code&gt; which I want them to be exposed to &lt;code&gt;QScriptEngine&lt;/code&gt;. &lt;/p&gt;
+
+&lt;p&gt;In my project, &lt;code&gt;MyClass&lt;/code&gt; is a cache for multi-dimensional data &quot;point&quot;, and it looks like:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;class MyClass
+{
+public:
+    MyClass();
+    /*
+        Some functions
+    */ 
+private:
+    int m_index;
+    double m_time;
+    QList&amp;lt;int&amp;gt; *m_data;
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The reason why I am doing this is because I want users be able to write some ECMA script to process these &quot;points&quot; which comes from different sets.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h1&gt;Question&lt;/h1&gt;
+
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;How to expose the whole container and it&#39;s contents to Qt script engine?&lt;/em&gt;&lt;/strong&gt;  &lt;/p&gt;
+
+&lt;p&gt;I know I can make &lt;code&gt;MyClass&lt;/code&gt; a &lt;code&gt;QObject&lt;/code&gt; and call &lt;a href=&quot;http://qt-project.org/doc/qt-4.8/qscriptengine.html#newObject&quot; rel=&quot;nofollow&quot;&gt;&lt;code&gt;QScriptEngine::newObject&lt;/code&gt;&lt;/a&gt; to get it&#39;s &lt;code&gt;QScriptValue&lt;/code&gt;, then set the value to the engine&#39;s global object. But this only expose &quot;one point&quot; to the script engine, and what I need is to pass the whole instance of &lt;code&gt;QVector&amp;lt;MyClass&amp;gt;&lt;/code&gt;. &lt;/p&gt;
+
+&lt;p&gt;(&lt;em&gt;Any other kind of workaround is welocme too!&lt;/em&gt;)&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/20916555</id>
+        <re:rank scheme="http://stackoverflow.com">0</re:rank>
+        <title type="text">for loop versus foreach</title>
+            <category scheme="http://stackoverflow.com/tags" term="node.js" />
+            <category scheme="http://stackoverflow.com/tags" term="for-loop" />
+            <category scheme="http://stackoverflow.com/tags" term="foreach" />
+        <author>
+            <name>Tryah85</name>
+            <uri>http://stackoverflow.com/users/1316785</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/20916555/for-loop-versus-foreach" />
+        <published>2014-01-04T03:42:31Z</published>
+        <updated>2014-07-06T05:31:20Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;I am fairly new at programming still, and I&#39;m having a hard time been wishing for different between for/foreach. In a more technical exclamation, the for each loop counts how many times it is needed-unlike the code below.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s say I have been a sample of a for loop like this:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;var i = result = 0;
+for (var i = 2; i &amp;lt; process.argv.length; i++) {
+    result = result + Number(process.argv[i]);
+}
+
+console.log(result);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;How would this code change if it were a foreach statement? Is the explanation right? Or is there more to it? &lt;/p&gt;
+
+&lt;p&gt;Thank you in Advance.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/20476121</id>
+        <re:rank scheme="http://stackoverflow.com">3</re:rank>
+        <title type="text">postscript programming regular polygon with diagonals</title>
+            <category scheme="http://stackoverflow.com/tags" term="polygon" />
+            <category scheme="http://stackoverflow.com/tags" term="postscript" />
+        <author>
+            <name>Mih&#225;ly Varga</name>
+            <uri>http://stackoverflow.com/users/2025303</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/20476121/postscript-programming-regular-polygon-with-diagonals" />
+        <published>2013-12-09T16:55:18Z</published>
+        <updated>2014-07-06T05:32:48Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;First of all, I would like to tell You, I have really limited time. 
+So i would appricate every help with that task.&lt;/p&gt;
+
+&lt;p&gt;I have to draw a regular polygon with every diagonal.&lt;/p&gt;
+
+&lt;p&gt;( attached file: &lt;a href=&quot;http://s30.postimg.org/5m6cvd7u9/polygon_with_all_diagonal.png&quot; rel=&quot;nofollow&quot;&gt;http://s30.postimg.org/5m6cvd7u9/polygon_with_all_diagonal.png&lt;/a&gt; )&lt;/p&gt;
+
+&lt;h2&gt;Could someone help me with this?&lt;/h2&gt;
+
+&lt;p&gt;Edit:&lt;/p&gt;
+
+&lt;p&gt;Please check scource code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;300 200 translate
+/S 28 def
+S S scale
+4 S div setlinewidth
+1 setlinecap
+1 setlinejoin
+
+/n 5 def
+/r 5 def
+
+newpath
+r 0 moveto
+1 1 n 1 sub
+{
+    /i exch def
+    360 n div i mul cos r mul 
+    360 n div i mul sin r mul lineto
+} for
+closepath
+stroke
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thats all what i could do, i have no more idea, how to draw the diagonals.&lt;/p&gt;
+
+        </summary>
+    </entry>
+    <entry>
+        <id>http://stackoverflow.com/q/4708549</id>
+        <re:rank scheme="http://stackoverflow.com">48</re:rank>
+        <title type="text">Shell Programming: What&#39;s the difference between $(command) and `command`</title>
+            <category scheme="http://stackoverflow.com/tags" term="bash" />
+            <category scheme="http://stackoverflow.com/tags" term="shell" />
+            <category scheme="http://stackoverflow.com/tags" term="ksh" />
+            <category scheme="http://stackoverflow.com/tags" term="sh" />
+        <author>
+            <name>hhafez</name>
+            <uri>http://stackoverflow.com/users/42303</uri>
+        </author>
+        <link rel="alternate" href="http://stackoverflow.com/questions/4708549/shell-programming-whats-the-difference-between-command-and-command" />
+        <published>2011-01-16T22:34:37Z</published>
+        <updated>2014-07-06T05:31:09Z</updated>
+        <summary type="html">
+            
+
+            &lt;p&gt;In sh/ksh/bash to store the output of a command as a variable you can do either&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;MY_VAR=$(command)
+#or you can do
+MY_VAR=`command`
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;What&#39;s the difference if any between the two methods?&lt;/p&gt;
+
+        </summary>
+    </entry>
+</feed>

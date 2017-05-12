@@ -1,0 +1,9 @@
+Build.PL
+lib/Block/NamedVar.pm
+lib/Block/NamedVar/ForLike.pm
+lib/Block/NamedVar/MapLike.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/NamedVar.t

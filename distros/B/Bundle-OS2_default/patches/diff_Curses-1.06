@@ -1,0 +1,111 @@
+--- ./Makefile.PL.orig	Wed Jul 25 10:15:40 2001
++++ ./Makefile.PL	Thu Sep 18 16:37:52 2003
+@@ -97,6 +97,15 @@ my $f_libs;
+ #    combinations of "-I/usr/include" and "-DSYSV=1" in $inc to see if
+ #    it fixes things.
+ 
++my @inc;
++if ($^O eq 'os2') {	# form.h from Perl conflicts with one of NCurses
++   if (exists $ENV{C_INCLUDE_PATH}) {
++     require Config;
++     @inc = split /\Q$Config::Config{path_sep}/, $ENV{C_INCLUDE_PATH};
++     @inc = map "-I$_", grep -r "$_/form.h", @inc;
++   }
++}
++
+ ##   OS            default guess for $inc      default guess for $libs
+ #
+ my $guess_cfg = {
+@@ -130,7 +139,7 @@ my $guess_cfg = {
+   'openbsd'   => [ ''                       => '-lcurses -ltermcap'        ],  
+   'os2'       => {
+     'bsd'     => [ ''                       => '-lcurses -ltermcap'        ],
+-    'ncurses' => [ ''                       => '-lncurses'                 ],
++    'ncurses' => [ "@inc",                  => '-lncurses -lncurses_s -lpanel_s -lmenu_s -lform_s'],
+     'default' =>   'ncurses'
+   },
+   'sco'       => [ ''                       => '-lcurses -ltermcap'        ],
+@@ -160,18 +169,6 @@ my $panels;
+ my $menus;
+ my $forms;
+ 
+-my @argv;
+-while (@ARGV) {
+-    my $arg = shift;
+-
+-    if    ($arg eq 'GEN')    { $gen    = $arg   }
+-    elsif ($arg eq 'PANELS') { $panels = $arg   }
+-    elsif ($arg eq 'MENUS')  { $menus  = $arg   }
+-    elsif ($arg eq 'FORMS')  { $forms  = $arg   }
+-    else                     { push @argv, $arg }
+-}
+-@ARGV = @argv;   # pass non-Curses arguments to MakeMaker
+-
+ my $guess  = $guess_cfg->{$^O};
+ my $source = "hints/c-$^O";
+ 
+@@ -184,6 +181,29 @@ if (ref $guess eq 'HASH') {
+ if (ref $guess ne 'ARRAY') {
+     die "FATAL: internal error: guess_cfg is bad\n";
+ }
++
++if ($guess->[1] and $] >= 5.008001) {
++  require ExtUtils::Liblist;		# Buggy before this
++  ($list) = ExtUtils::Liblist->ext($guess->[1]);
++  $panels = 'PANELS' if $list =~ /-lpanel/;
++  $menus = 'MENUS'   if $list =~ /-lmenu/;
++  $forms = 'FORMS'   if $list =~ /-lform/;
++}
++
++my @argv;
++while (@ARGV) {
++    my $arg = shift;
++
++    if    ($arg eq 'GEN')    { $gen    = $arg   }
++    elsif ($arg eq 'PANELS') { $panels = $arg   }
++    elsif ($arg eq 'NOPANELS'){$panels = ''     }
++    elsif ($arg eq 'MENUS')  { $menus  = $arg   }
++    elsif ($arg eq 'NOMENUS'){ $menus  = ''     }
++    elsif ($arg eq 'FORMS')  { $forms  = $arg   }
++    elsif ($arg eq 'NOFORMS'){ $forms  = ''     }
++    else                     { push @argv, $arg }
++}
++@ARGV = @argv;   # pass non-Curses arguments to MakeMaker
+ 
+ print "GEN    support: ", ($gen    ? "enabled" : "not applicable"), "\n";
+ print "PANELS support: ", ($panels ? "enabled" : "not enabled"), "\n";
+--- ./test.syms.orig	Tue Jul 24 12:40:48 2001
++++ ./test.syms	Thu Sep 18 16:41:34 2003
+@@ -41,8 +41,8 @@ while (@ARGV) {
+ 
+ 	next;
+     };	
+-    $arg =~ /^-/ and Usage("Unknown option: $_");
+-    Usage("Unknown argument: $_");
++    $arg =~ /^-/ and Usage("Unknown option: $arg");
++    Usage("Unknown argument: $arg");
+ }
+ if (@ARGV) { Usage() }
+ 
+@@ -217,9 +217,9 @@ while (<IN>) {
+ 	"*/\n";
+ }
+ 
+-unlink "testsym";
+-unlink "testint";
+-unlink "testtyp";
++unlink "testsym", "testsym.exe";
++unlink "testint", "testint.exe";
++unlink "testtyp", "testtyp.exe";
+ 
+ 1 while unlink "testsym.obj";   # Possibly pointless VMSism
+ 1 while unlink "testint.obj";   # Possibly pointless VMSism
+@@ -237,7 +237,7 @@ exit 0;
+ sub Usage {
+     print LOG @_, "\n";
+     print LOG <<EOM;
+-Usage: find_syms [options]
++Usage: $0 [options]
+ where options include:
+ 
+    -h         This message.   

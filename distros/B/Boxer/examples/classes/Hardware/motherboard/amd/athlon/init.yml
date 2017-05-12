@@ -1,0 +1,10 @@
+classes:
+  - hw.x86.i686
+  - hw.firmware
+  - hw.acpi
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include core support for board with AMD Athlon CPU

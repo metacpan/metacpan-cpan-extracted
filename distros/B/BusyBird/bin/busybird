@@ -1,0 +1,77 @@
+#!perl
+use strict;
+use warnings;
+use Pod::Usage;
+use BusyBird::Runner qw(run);
+
+my $need_help = run(@ARGV);
+if(defined $need_help) {
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit 1;
+}
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+busybird - BusyBird runner script
+
+=head1 SYNOPSIS
+
+    ## SYNTAX
+    $ busybird [OPTIONS] [CONFIG_FILE]
+    
+    ## read config file from ~/.busybird/config.psgi
+    $ busybird
+
+    ## explicit config file
+    $ busybird another_config.psgi
+
+    ## explicitly binding address/port
+    $ busybird --host 0.0.0.0 --port 18888
+
+=head1 DESCRIPTION
+
+C<busybird> command runs a L<BusyBird> process instance.
+
+=head1 ARGUMENTS
+
+=over
+
+=item CONFIG_FILE (default: ~/.busybird/config.psgi)
+
+The L<BusyBird> configuration file. See L<BusyBird::Manual::Tutorial> and L<BusyBird::Manual::Config> for how to write this file.
+
+If omitted, C<~/.busybird/config.psgi> is used. If this file does not exist, it is automatically created.
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+=item -o,--host ADDRESS (default: 127.0.0.1)
+
+IP address or hostname to listen.
+By default, it listens to C<127.0.0.1>, meaning that it only accepts requests from the local machine.
+
+=item -p,--port PORT (default: 5000)
+
+TCP port number to listen.
+By default, it listens to C<5000>.
+
+=item -h,--help
+
+Show this help message.
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< toshioito [at] cpan.org >>
+
+=cut
+

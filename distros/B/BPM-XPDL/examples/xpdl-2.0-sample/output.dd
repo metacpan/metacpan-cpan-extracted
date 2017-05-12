@@ -1,0 +1,3231 @@
+$VAR1 = {
+  Id => '1',
+  ConformanceClass => {
+    GraphConformance => 'NON_BLOCKED'
+  },
+  ExtendedAttributes => {
+    ExtendedAttribute => [
+      bless( do{\(my $o = 42397232)}, 'XML::LibXML::Element' ),
+      bless( do{\(my $o = 45546800)}, 'XML::LibXML::Element' )
+    ]
+  },
+  Participants => {
+    Participant => [
+      {
+        Id => 'DBConnection',
+        Description => 'Reference to Database Resource',
+        ParticipantType => {
+          Type => 'SYSTEM'
+        }
+      }
+    ]
+  },
+  TypeDeclarations => {
+    TypeDeclaration => [
+      {
+        Id => 'Order',
+        ExternalReference => {
+          location => 'http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd'
+        },
+        Name => 'Order'
+      },
+      {
+        Id => 'OrderStatus',
+        SchemaType => {
+          schema => [
+            bless( do{\(my $o = 45293536)}, 'XML::LibXML::Element' )
+          ]
+        },
+        Name => 'OrderStatus'
+      },
+      {
+        Id => 'CardType',
+        ExternalReference => {
+          xref => 'cardType',
+          namespace => 'orderschema/Order',
+          location => 'http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd'
+        },
+        Name => 'CardType'
+      },
+      {
+        Id => 'CreditInfo',
+        ExternalReference => {
+          xref => 'CreditInfo',
+          location => 'http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl'
+        },
+        Name => 'CreditInfo'
+      }
+    ]
+  },
+  WorkflowProcesses => {
+    WorkflowProcess => [
+      {
+        Status => 'None',
+        AccessLevel => 'PUBLIC',
+        Applications => {
+          Application => [
+            {
+              Id => 'transformData',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderStringIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'STRING'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'orderInfo',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'Order'
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              Id => 'checkData',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderInfo',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'Order'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'statusOut',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'OrderStatus'
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              Id => 'checkVendor',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'accountNumberIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'amountIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'FLOAT'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'statusOut',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'OrderStatus'
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              Id => 'enterOrder',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderInfoIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'Order'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'orderNumber',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              Id => 'composeMessage',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'statusIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'OrderStatus'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'orderNumber',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        AdHocOrdering => 'Parallel',
+        SuppressJoinFailure => 0,
+        Activities => {
+          Activity => [
+            {
+              IsATransaction => 0,
+              Id => '10',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '75.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '128.0',
+                      YCoordinate => '96.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45372640)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45372704)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'transformData'
+                  }
+                }
+              },
+              StartQuantity => 1,
+              Name => 'Transform Data'
+            },
+            {
+              Id => '12',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '75.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '228.0',
+                      YCoordinate => '98.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'XOR',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '17'
+                          },
+                          {
+                            Id => '23'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45379120)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45379184)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'checkData'
+                  }
+                }
+              },
+              Name => 'Check Data'
+            },
+            {
+              Route => {
+                MarkerVisible => 1,
+                GatewayType => 'XOR',
+                Instantiate => 0
+              },
+              Id => '13',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '44.0',
+                    Width => '44.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '420.0',
+                      YCoordinate => '70.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'XOR',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '18'
+                          },
+                          {
+                            Id => '20'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Name => 'check order type'
+            },
+            {
+              Id => '14',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '43.0',
+                    Width => '43.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '576.0',
+                      YCoordinate => '130.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'XOR',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '24'
+                          },
+                          {
+                            Id => '28'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45395968)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45396032)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45396096)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'checkVendor'
+                  }
+                }
+              },
+              Name => 'Check Vendor Account'
+            },
+            {
+              Id => '19',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '46.0',
+                    Width => '52.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '563.0',
+                      YCoordinate => '11.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'XOR',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '27'
+                          },
+                          {
+                            Id => '25'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                SubFlow => {
+                  ActualParameters => {
+                    ActualParameter => [
+                      'orderInfo.accountNumber',
+                      'orderInfo.cardType',
+                      'orderInfo.emailAddress',
+                      'status'
+                    ]
+                  },
+                  Id => '3',
+                  Execution => 'SYNCHR'
+                }
+              },
+              Name => 'Credit Check'
+            },
+            {
+              Id => '21',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '42.0',
+                    Width => '66.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '998.0',
+                      YCoordinate => '195.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Join => {
+                      Type => 'XOR'
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45397808)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45404720)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'composeMessage'
+                  }
+                }
+              },
+              Name => 'Compose Rejection Message'
+            },
+            {
+              Id => '26',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '49.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '873.0',
+                      YCoordinate => '73.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Join => {
+                      Type => 'XOR'
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45412544)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45412608)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'enterOrder'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Enter Order'
+            },
+            {
+              IsATransaction => 0,
+              Id => '29',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '35.0',
+                    Width => '60.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '996.0',
+                      YCoordinate => '78.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                SubFlow => {
+                  ActualParameters => {
+                    ActualParameter => [
+                      'orderNumber',
+                      'orderInfo.orderType',
+                      'orderInfo.emailAddress'
+                    ]
+                  },
+                  Id => '4',
+                  Execution => 'SYNCHR'
+                }
+              },
+              StartQuantity => 1,
+              Name => 'Fill Order'
+            },
+            {
+              Route => {
+                MarkerVisible => 1,
+                GatewayType => 'AND',
+                Instantiate => 0
+              },
+              Id => '30',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '37.0',
+                    Width => '37.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '941.3999633789062',
+                      YCoordinate => '81.20000457763672'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'AND',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '36'
+                          },
+                          {
+                            Id => '39'
+                          },
+                          {
+                            Id => '40'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Name => ''
+            },
+            {
+              Route => {
+                MarkerVisible => 1,
+                GatewayType => 'AND',
+                Instantiate => 0
+              },
+              Id => '31',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '41.0',
+                    Width => '41.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '1086.800048828125',
+                      YCoordinate => '75.19999694824219'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Join => {
+                      Type => 'AND'
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Name => ''
+            },
+            {
+              IsATransaction => 0,
+              Id => '33',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '43.0',
+                    Width => '59.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '994.0',
+                      YCoordinate => '22.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45429392)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45429456)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'composeMessage'
+                  }
+                }
+              },
+              StartQuantity => 1,
+              Name => 'Compose Acceptance Message'
+            },
+            {
+              Id => '34',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '40.0',
+                    Width => '62.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '997.0',
+                      YCoordinate => '131.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              ExtendedAttributes => {
+                ExtendedAttribute => [
+                  bless( do{\(my $o = 45427136)}, 'XML::LibXML::Element' ),
+                  bless( do{\(my $o = 45428576)}, 'XML::LibXML::Element' )
+                ]
+              },
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                No => {}
+              },
+              Name => 'Email Confirmation'
+            },
+            {
+              IsATransaction => 0,
+              Id => '46',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '50.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '142.0',
+                      YCoordinate => '121.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                IntermediateEvent => {
+                  Target => '10',
+                  Trigger => 'Error',
+                  ResultError => {
+                    ErrorCode => '1'
+                  },
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => ''
+            },
+            {
+              IsATransaction => 0,
+              Id => '48',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '39.0',
+                    Width => '39.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '59.0',
+                      YCoordinate => '103.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                IntermediateEvent => {
+                  Trigger => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'start'
+            },
+            {
+              IsATransaction => 0,
+              Id => '50',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '33.0',
+                    Width => '33.0',
+                    Page => '1',
+                    LaneId => '0',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '1150.0',
+                      YCoordinate => '79.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                IntermediateEvent => {
+                  Trigger => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'end'
+            }
+          ]
+        },
+        EnableInstanceCompensation => 0,
+        ActivitySets => {},
+        FormalParameters => {
+          FormalParameter => [
+            {
+              Id => 'orderString',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            },
+            {
+              Id => 'returnMessage',
+              IsArray => 0,
+              Mode => 'OUT',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            }
+          ]
+        },
+        ProcessHeader => {},
+        Id => '2',
+        ProcessType => 'None',
+        AdHoc => 0,
+        DataFields => {
+          DataField => [
+            {
+              Length => '0',
+              Id => '1',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              Name => 'orderNumber',
+              Description => '',
+              DataType => {
+                BasicType => {
+                  Type => 'INTEGER'
+                }
+              }
+            },
+            {
+              Length => '0',
+              Id => '3',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              Name => 'status',
+              Description => '',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            },
+            {
+              Length => '0',
+              Id => '4',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              Name => 'orderInfo',
+              Description => '',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            }
+          ]
+        },
+        Transitions => {
+          Transition => [
+            {
+              Id => '16',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '203.5',
+                        YCoordinate => '122.82308197021484'
+                      },
+                      {
+                        XCoordinate => '228.5',
+                        YCoordinate => '123.2227783203125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '12',
+              Quantity => 1,
+              Name => '',
+              From => '10'
+            },
+            {
+              Id => '20',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '464.1615295410156',
+                        YCoordinate => '92.83846282958984'
+                      },
+                      {
+                        XCoordinate => '506.0',
+                        YCoordinate => '93.0'
+                      },
+                      {
+                        XCoordinate => '507.0',
+                        YCoordinate => '33.0'
+                      },
+                      {
+                        XCoordinate => '563.5',
+                        YCoordinate => '32.13414764404297'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '19',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45430688)}, 'XML::LibXML::Element' ),
+              From => '13'
+            },
+            {
+              Id => '18',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '464.5',
+                        YCoordinate => '92.5'
+                      },
+                      {
+                        XCoordinate => '506.0',
+                        YCoordinate => '92.0'
+                      },
+                      {
+                        XCoordinate => '507.0',
+                        YCoordinate => '151.0'
+                      },
+                      {
+                        XCoordinate => '576.6181030273438',
+                        YCoordinate => '151.88186645507812'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '14',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45425968)}, 'XML::LibXML::Element' ),
+              From => '13'
+            },
+            {
+              Id => '28',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '619.450927734375',
+                        YCoordinate => '151.95091247558594'
+                      },
+                      {
+                        XCoordinate => '816.0',
+                        YCoordinate => '151.0'
+                      },
+                      {
+                        XCoordinate => '817.0',
+                        YCoordinate => '98.0'
+                      },
+                      {
+                        XCoordinate => '853.5',
+                        YCoordinate => '96.11983489990234'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '26',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45445728)}, 'XML::LibXML::Element' ),
+              From => '14'
+            },
+            {
+              Id => '24',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '619.3720092773438',
+                        YCoordinate => '151.8720245361328'
+                      },
+                      {
+                        XCoordinate => '681.0',
+                        YCoordinate => '151.0'
+                      },
+                      {
+                        XCoordinate => '683.0',
+                        YCoordinate => '216.0'
+                      },
+                      {
+                        XCoordinate => '993.5',
+                        YCoordinate => '215.60791015625'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '21',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45413056)}, 'XML::LibXML::Element' ),
+              From => '14'
+            },
+            {
+              Id => '25',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '589.5',
+                        YCoordinate => '57.5'
+                      },
+                      {
+                        XCoordinate => '589.0',
+                        YCoordinate => '111.0'
+                      },
+                      {
+                        XCoordinate => '743.0',
+                        YCoordinate => '111.0'
+                      },
+                      {
+                        XCoordinate => '743.0',
+                        YCoordinate => '216.0'
+                      },
+                      {
+                        XCoordinate => '993.5',
+                        YCoordinate => '215.63043212890625'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '21',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45445296)}, 'XML::LibXML::Element' ),
+              From => '19'
+            },
+            {
+              Id => '35',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '922.5',
+                        YCoordinate => '98.00992584228516'
+                      },
+                      {
+                        XCoordinate => '939.65673828125',
+                        YCoordinate => '97.15673828125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '30',
+              Quantity => 1,
+              Name => '',
+              From => '26'
+            },
+            {
+              Id => '36',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '974.5991821289062',
+                        YCoordinate => '96.90082550048828'
+                      },
+                      {
+                        XCoordinate => '996.5',
+                        YCoordinate => '97.54743194580078'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '29',
+              Quantity => 1,
+              Name => '',
+              From => '30'
+            },
+            {
+              Id => '37',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '1056.5',
+                        YCoordinate => '96.90939331054688'
+                      },
+                      {
+                        XCoordinate => '1078.59423828125',
+                        YCoordinate => '97.09429168701172'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '31',
+              Quantity => 1,
+              Name => '',
+              From => '29'
+            },
+            {
+              Id => '39',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '970.4146728515625',
+                        YCoordinate => '91.71468353271484'
+                      },
+                      {
+                        XCoordinate => '1000.2640380859375',
+                        YCoordinate => '65.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '33',
+              Quantity => 1,
+              Name => '',
+              From => '30'
+            },
+            {
+              Id => '40',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '970.9235229492188',
+                        YCoordinate => '108.17644500732422'
+                      },
+                      {
+                        XCoordinate => '1001.8546752929688',
+                        YCoordinate => '131.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '34',
+              Quantity => 1,
+              Name => '',
+              From => '30'
+            },
+            {
+              Id => '41',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '1053.5',
+                        YCoordinate => '62.4793586730957'
+                      },
+                      {
+                        XCoordinate => '1095.1297607421875',
+                        YCoordinate => '88.3702392578125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '31',
+              Quantity => 1,
+              Name => '',
+              From => '33'
+            },
+            {
+              Id => '42',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '1057.8876953125',
+                        YCoordinate => '131.5'
+                      },
+                      {
+                        XCoordinate => '1095.8941650390625',
+                        YCoordinate => '104.79414367675781'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '31',
+              Quantity => 1,
+              Name => '',
+              From => '34'
+            },
+            {
+              Id => '49',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '97.99977111816406',
+                        YCoordinate => '122.40513610839844'
+                      },
+                      {
+                        XCoordinate => '128.5',
+                        YCoordinate => '122.25675201416016'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '10',
+              Quantity => 1,
+              Name => '',
+              From => '48'
+            },
+            {
+              Id => '47',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '166.2860107421875',
+                        YCoordinate => '170.98980712890625'
+                      },
+                      {
+                        XCoordinate => '165.0',
+                        YCoordinate => '216.0'
+                      },
+                      {
+                        XCoordinate => '998.5',
+                        YCoordinate => '216.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '21',
+              Quantity => 1,
+              Name => '',
+              From => '46'
+            },
+            {
+              Id => '17',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '303.5',
+                        YCoordinate => '123.5'
+                      },
+                      {
+                        XCoordinate => '360.0',
+                        YCoordinate => '123.0'
+                      },
+                      {
+                        XCoordinate => '359.0',
+                        YCoordinate => '92.0'
+                      },
+                      {
+                        XCoordinate => '420.5',
+                        YCoordinate => '92.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '13',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45489792)}, 'XML::LibXML::Element' ),
+              From => '12'
+            },
+            {
+              Id => '23',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '264.84259033203125',
+                        YCoordinate => '148.5'
+                      },
+                      {
+                        XCoordinate => '263.0',
+                        YCoordinate => '177.0'
+                      },
+                      {
+                        XCoordinate => '343.0',
+                        YCoordinate => '177.0'
+                      },
+                      {
+                        XCoordinate => '344.0',
+                        YCoordinate => '216.0'
+                      },
+                      {
+                        XCoordinate => '998.5',
+                        YCoordinate => '216.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '21',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45457008)}, 'XML::LibXML::Element' ),
+              From => '12'
+            },
+            {
+              Id => '100',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '1128.2655029296875',
+                        YCoordinate => '96.23451232910156'
+                      },
+                      {
+                        XCoordinate => '1150.002197265625',
+                        YCoordinate => '95.77201080322266'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '50',
+              Quantity => 1,
+              Name => '',
+              From => '31'
+            },
+            {
+              Id => '101',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '1053.5',
+                        YCoordinate => '62.4793586730957'
+                      },
+                      {
+                        XCoordinate => '1095.1297607421875',
+                        YCoordinate => '88.3702392578125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '50',
+              Quantity => 1,
+              Name => '',
+              From => '21'
+            },
+            {
+              Id => '27',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '615.5',
+                        YCoordinate => '34.5'
+                      },
+                      {
+                        XCoordinate => '817.0',
+                        YCoordinate => '34.0'
+                      },
+                      {
+                        XCoordinate => '816.0',
+                        YCoordinate => '97.0'
+                      },
+                      {
+                        XCoordinate => '873.5',
+                        YCoordinate => '98.19938659667969'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '26',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45493920)}, 'XML::LibXML::Element' ),
+              From => '19'
+            }
+          ]
+        },
+        Name => 'EORDER'
+      },
+      {
+        Status => 'None',
+        AccessLevel => 'PRIVATE',
+        Applications => {
+          Application => [
+            {
+              Id => 'setCreditInfo',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'accountNumber',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'amount',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'FLOAT'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'cardType',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'CardType'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'creditInfo',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'CreditInfo'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'Creates and initializes a CreditInfo object.'
+            },
+            {
+              Id => 'getCreditAuthorization',
+              ExternalReference => {
+                xref => 'GetCreditAuthorization',
+                location => 'http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl'
+              },
+              Description => 'Gets credit authorization from a charge card web service.'
+            },
+            {
+              Id => 'setOrderStatus',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'creditStatus',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'STRING'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'orderStatus',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      DeclaredType => {
+                        Id => 'OrderStatus'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'Converts status returned by credit check to OrderStatus.'
+            }
+          ]
+        },
+        AdHocOrdering => 'Parallel',
+        SuppressJoinFailure => 0,
+        Activities => {
+          Activity => [
+            {
+              IsATransaction => 0,
+              Id => '52',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '37.0',
+                    Width => '37.0',
+                    Page => '1',
+                    LaneId => '1',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '81.0',
+                      YCoordinate => '272.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                StartEvent => {
+                  Trigger => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'start'
+            },
+            {
+              Id => '53',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '75.0',
+                    Page => '1',
+                    LaneId => '1',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '162.0',
+                      YCoordinate => '265.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45546544)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45546608)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45546672)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45546736)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'setCreditInfo'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Set Credit Info'
+            },
+            {
+              Id => '54',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '75.0',
+                    Page => '1',
+                    LaneId => '1',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '286.0',
+                      YCoordinate => '266.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              ExtendedAttributes => {
+                ExtendedAttribute => [
+                  bless( do{\(my $o = 45521664)}, 'XML::LibXML::Element' )
+                ]
+              },
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45548560)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45548624)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'getCreditAuthorization'
+                  }
+                }
+              },
+              Name => 'Get Credit Authorization'
+            },
+            {
+              IsATransaction => 0,
+              Id => '55',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '50.0',
+                    Width => '75.0',
+                    Page => '1',
+                    LaneId => '1',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '412.0',
+                      YCoordinate => '267.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45550288)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45550352)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'setOrderStatus'
+                  }
+                }
+              },
+              StartQuantity => 1,
+              Name => 'Set Order Status'
+            },
+            {
+              IsATransaction => 0,
+              Id => '56',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '37.0',
+                    Width => '37.0',
+                    Page => '1',
+                    LaneId => '1',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '529.0',
+                      YCoordinate => '275.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                EndEvent => {
+                  Result => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'end'
+            }
+          ]
+        },
+        EnableInstanceCompensation => 0,
+        ActivitySets => {},
+        FormalParameters => {
+          FormalParameter => [
+            {
+              Id => 'accountNumber',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                BasicType => {
+                  Type => 'INTEGER'
+                }
+              }
+            },
+            {
+              Id => 'amount',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                BasicType => {
+                  Type => 'FLOAT'
+                }
+              }
+            },
+            {
+              Id => 'cardType',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                DeclaredType => {
+                  Id => 'CardType'
+                }
+              }
+            },
+            {
+              Id => 'status',
+              IsArray => 0,
+              Mode => 'OUT',
+              DataType => {
+                DeclaredType => {
+                  Id => 'OrderStatus'
+                }
+              }
+            }
+          ]
+        },
+        ProcessHeader => {},
+        Id => '3',
+        ProcessType => 'None',
+        AdHoc => 0,
+        DataFields => {
+          DataField => [
+            {
+              Length => '0',
+              Id => 'creditStatus',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            }
+          ]
+        },
+        Transitions => {
+          Transition => [
+            {
+              Id => '57',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '117.99984741210938',
+                        YCoordinate => '293.57501220703125'
+                      },
+                      {
+                        XCoordinate => '162.5',
+                        YCoordinate => '293.7554016113281'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '53',
+              Quantity => 1,
+              Name => '',
+              From => '52'
+            },
+            {
+              Id => '58',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '237.5',
+                        YCoordinate => '294.14959716796875'
+                      },
+                      {
+                        XCoordinate => '286.5',
+                        YCoordinate => '294.507080078125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '54',
+              Quantity => 1,
+              Name => '',
+              From => '53'
+            },
+            {
+              Id => '59',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '361.5',
+                        YCoordinate => '295.1332092285156'
+                      },
+                      {
+                        XCoordinate => '412.5',
+                        YCoordinate => '295.5028076171875'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '55',
+              Quantity => 1,
+              Name => '',
+              From => '54'
+            },
+            {
+              Id => '60',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '487.5',
+                        YCoordinate => '294.5947265625'
+                      },
+                      {
+                        XCoordinate => '526.0115356445312',
+                        YCoordinate => '293.1529846191406'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '56',
+              Quantity => 1,
+              Name => '',
+              From => '55'
+            }
+          ]
+        },
+        Name => 'CreditCheck'
+      },
+      {
+        Status => 'None',
+        AccessLevel => 'PRIVATE',
+        Applications => {
+          Application => [
+            {
+              Id => 'shipOrder',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'OrderNumberParam',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'Status',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    Description => 'The String that describes the status -- either "Complete" 
+or "Backorder"',
+                    DataType => {
+                      BasicType => {
+                        Type => 'STRING'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'This application presents a screen that presents order information 
+for the order identified by shipOrder. The user may update the order with 
+any changes such as back order information. It returns a string indicating 
+whether the order is complete or on back order.'
+            },
+            {
+              Id => 'charge',
+              ExternalReference => {
+                xref => 'ChargeCreditAccount',
+                location => 'http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl'
+              },
+              Description => 'Charges the credit card and prepares a receipt for a credit order'
+            },
+            {
+              Id => 'billAccount',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderNumberParam',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'Bills the vendor account'
+            },
+            {
+              Id => 'createInvoice',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderNumber',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'docURI',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      BasicType => {
+                        Type => 'STRING'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'Creates an invoice using the order information and stores it on a 
+server.'
+            },
+            {
+              Id => 'createReceipt',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderNumber',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  },
+                  {
+                    Id => 'docURI',
+                    IsArray => 0,
+                    Mode => 'OUT',
+                    DataType => {
+                      BasicType => {
+                        Type => 'STRING'
+                      }
+                    }
+                  }
+                ]
+              },
+              Description => 'Creates a receiptusing the order information and stores it on a 
+server.'
+            },
+            {
+              Id => 'cancelOrder',
+              FormalParameters => {
+                FormalParameter => [
+                  {
+                    Id => 'orderNumberIn',
+                    IsArray => 0,
+                    Mode => 'IN',
+                    DataType => {
+                      BasicType => {
+                        Type => 'INTEGER'
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        AdHocOrdering => 'Parallel',
+        SuppressJoinFailure => 0,
+        Activities => {
+          Activity => [
+            {
+              IsATransaction => 0,
+              Id => '61',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '33.0',
+                    Width => '33.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '81.0',
+                      YCoordinate => '375.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                IntermediateEvent => {
+                  Trigger => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'start'
+            },
+            {
+              Id => '62',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '39.0',
+                    Width => '57.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '167.0',
+                      YCoordinate => '373.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Deadline => [
+                {
+                  Execution => 'ASYNCHR',
+                  ExceptionName => 'notifyException',
+                  DeadlineDuration => bless( do{\(my $o = 45569056)}, 'XML::LibXML::Element' )
+                },
+                {
+                  Execution => 'SYNCHR',
+                  ExceptionName => 'timeoutException',
+                  DeadlineDuration => bless( do{\(my $o = 45576800)}, 'XML::LibXML::Element' )
+                }
+              ],
+              StartQuantity => 1,
+              TransitionRestrictions => {
+                TransitionRestriction => [
+                  {
+                    Split => {
+                      Type => 'AND',
+                      TransitionRefs => {
+                        TransitionRef => [
+                          {
+                            Id => '73'
+                          },
+                          {
+                            Id => '74'
+                          },
+                          {
+                            Id => '81'
+                          },
+                          {
+                            Id => '82'
+                          }
+                        ]
+                      }
+                    }
+                  }
+                ]
+              },
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45326960)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45588160)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'shipOrder'
+                  }
+                }
+              },
+              Description => 'View order and enter fulfillment info',
+              Performers => {
+                Performer => [
+                  'DBConnection and Shipper'
+                ]
+              },
+              Name => 'Ship Order'
+            },
+            {
+              Id => '63',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '29.0',
+                    Width => '45.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '388.0',
+                      YCoordinate => '350.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45605280)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'billAccount'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Billing'
+            },
+            {
+              Id => '64',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '32.0',
+                    Width => '47.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '541.0',
+                      YCoordinate => '351.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45613856)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45613920)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'createInvoice'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Create Invoice'
+            },
+            {
+              IsATransaction => 0,
+              Id => '65',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '42.0',
+                    Width => '61.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '645.0',
+                      YCoordinate => '370.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                No => {}
+              },
+              StartQuantity => 1,
+              Name => 'Email Receipt or Invoice'
+            },
+            {
+              IsATransaction => 0,
+              Id => '66',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '33.0',
+                    Width => '33.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '807.0',
+                      YCoordinate => '395.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Event => {
+                IntermediateEvent => {
+                  Trigger => 'None',
+                  Implementation => 'WebService'
+                }
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              Name => 'end'
+            },
+            {
+              Id => '67',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '32.0',
+                    Width => '52.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '539.0',
+                      YCoordinate => '402.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45600496)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45616160)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'createReceipt'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Create Receipt'
+            },
+            {
+              Id => '68',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '31.0',
+                    Width => '50.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '387.0',
+                      YCoordinate => '402.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45624608)}, 'XML::LibXML::Element' ),
+                        bless( do{\(my $o = 45624672)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'getCreditInfo'
+                  }
+                }
+              },
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Get Credit Info'
+            },
+            {
+              IsATransaction => 0,
+              Id => '69',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '43.0',
+                    Width => '51.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '458.0',
+                      YCoordinate => '398.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              Implementation => {
+                No => {}
+              },
+              StartQuantity => 1,
+              Name => 'Charge Credit Card'
+            },
+            {
+              Id => '70',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '33.0',
+                    Width => '53.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '127.0',
+                      YCoordinate => '447.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              ExtendedAttributes => {
+                ExtendedAttribute => [
+                  bless( do{\(my $o = 45615808)}, 'XML::LibXML::Element' )
+                ]
+              },
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                No => {}
+              },
+              Name => 'Raise Alarm'
+            },
+            {
+              Id => '71',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    Height => '38.0',
+                    Width => '59.0',
+                    Page => '1',
+                    LaneId => '2',
+                    FillColor => '-1114150',
+                    Coordinates => {
+                      XCoordinate => '308.0',
+                      YCoordinate => '445.0'
+                    },
+                    BorderColor => '-16777216'
+                  }
+                ]
+              },
+              Status => 'None',
+              StartQuantity => 1,
+              IsATransaction => 0,
+              Implementation => {
+                Task => {
+                  TaskApplication => {
+                    ActualParameters => {
+                      ActualParameter => [
+                        bless( do{\(my $o = 45632784)}, 'XML::LibXML::Element' )
+                      ]
+                    },
+                    Id => 'cancelOrder'
+                  }
+                }
+              },
+              Description => 'View order and enter fulfillment info',
+              Performers => {
+                Performer => [
+                  'DBConnection'
+                ]
+              },
+              Name => 'Cancel Order'
+            }
+          ]
+        },
+        Participants => {
+          Participant => [
+            {
+              Id => 'Shipper',
+              Description => 'Order shipper',
+              ParticipantType => {
+                Type => 'ROLE'
+              }
+            }
+          ]
+        },
+        EnableInstanceCompensation => 0,
+        ActivitySets => {},
+        FormalParameters => {
+          FormalParameter => [
+            {
+              Id => 'orderNumber',
+              IsArray => 0,
+              Mode => 'IN',
+              Description => 'Order number assigned to the order.',
+              DataType => {
+                BasicType => {
+                  Type => 'INTEGER'
+                }
+              }
+            },
+            {
+              Id => 'orderType',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                ExternalReference => {
+                  xref => 'orderType',
+                  namespace => 'orderschema/Order',
+                  location => 'http://wfmc.org/standards/docs/xpdl_sample/orderschema.xsd'
+                }
+              }
+            },
+            {
+              Id => 'emailAddress',
+              IsArray => 0,
+              Mode => 'IN',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            }
+          ]
+        },
+        ProcessHeader => {},
+        Id => '4',
+        ProcessType => 'None',
+        AdHoc => 0,
+        DataFields => {
+          DataField => [
+            {
+              Id => 'docURI',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              Description => 'URI of receipt or invoice.',
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            },
+            {
+              Id => 'orderStatus',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            },
+            {
+              Id => 'creditInfo',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              DataType => {
+                DeclaredType => {
+                  Id => 'CreditInfo'
+                }
+              }
+            },
+            {
+              Id => 'creditStatus',
+              IsArray => 'FALSE',
+              Correlation => 0,
+              DataType => {
+                BasicType => {
+                  Type => 'STRING'
+                }
+              }
+            }
+          ]
+        },
+        Transitions => {
+          Transition => [
+            {
+              Id => '72',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '113.98829650878906',
+                        YCoordinate => '380.12127685546875'
+                      },
+                      {
+                        XCoordinate => '168.5',
+                        YCoordinate => '382.1752624511719'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '62',
+              Quantity => 1,
+              Name => '',
+              From => '61'
+            },
+            {
+              Id => '75',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '433.5',
+                        YCoordinate => '365.4674987792969'
+                      },
+                      {
+                        XCoordinate => '541.5',
+                        YCoordinate => '367.2218933105469'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '64',
+              Quantity => 1,
+              Name => '',
+              From => '63'
+            },
+            {
+              Id => '76',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '437.5',
+                        YCoordinate => '419.1833190917969'
+                      },
+                      {
+                        XCoordinate => '458.5',
+                        YCoordinate => '419.70098876953125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '69',
+              Quantity => 1,
+              Name => '',
+              From => '68'
+            },
+            {
+              Id => '77',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '509.5',
+                        YCoordinate => '419.9206237792969'
+                      },
+                      {
+                        XCoordinate => '539.5',
+                        YCoordinate => '419.32568359375'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '67',
+              Quantity => 1,
+              Name => '',
+              From => '69'
+            },
+            {
+              Id => '78',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '588.5',
+                        YCoordinate => '372.7461853027344'
+                      },
+                      {
+                        XCoordinate => '645.5',
+                        YCoordinate => '385.0826416015625'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '65',
+              Quantity => 1,
+              Name => '',
+              From => '64'
+            },
+            {
+              Id => '79',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '591.5',
+                        YCoordinate => '412.4445495605469'
+                      },
+                      {
+                        XCoordinate => '645.5',
+                        YCoordinate => '399.2513732910156'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '65',
+              Quantity => 1,
+              Name => '',
+              From => '67'
+            },
+            {
+              Id => '80',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '706.5',
+                        YCoordinate => '395.7386169433594'
+                      },
+                      {
+                        XCoordinate => '807.14794921875',
+                        YCoordinate => '409.29522705078125'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '66',
+              Quantity => 1,
+              Name => '',
+              From => '65'
+            },
+            {
+              Id => '83',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '262.5',
+                        YCoordinate => '464.5'
+                      },
+                      {
+                        XCoordinate => '706.0',
+                        YCoordinate => '464.0'
+                      },
+                      {
+                        XCoordinate => '808.4353637695312',
+                        YCoordinate => '418.23101806640625'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '66',
+              Quantity => 1,
+              Name => '',
+              From => '71'
+            },
+            {
+              Id => '81',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '184.88658142089844',
+                        YCoordinate => '412.5'
+                      },
+                      {
+                        XCoordinate => '164.15447998046875',
+                        YCoordinate => '447.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '70',
+              Quantity => 1,
+              Name => 'notifyException',
+              From => '62'
+            },
+            {
+              Id => '82',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '206.23150634765625',
+                        YCoordinate => '412.5'
+                      },
+                      {
+                        XCoordinate => '223.3087158203125',
+                        YCoordinate => '445.5'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '71',
+              Quantity => 1,
+              Name => 'timeoutException',
+              From => '62'
+            },
+            {
+              Id => '73',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '224.5',
+                        YCoordinate => '393.11090087890625'
+                      },
+                      {
+                        XCoordinate => '324.0',
+                        YCoordinate => '393.0'
+                      },
+                      {
+                        XCoordinate => '324.0',
+                        YCoordinate => '365.0'
+                      },
+                      {
+                        XCoordinate => '388.5',
+                        YCoordinate => '365.13006591796875'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '63',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45646304)}, 'XML::LibXML::Element' ),
+              From => '62'
+            },
+            {
+              Id => '74',
+              ConnectorGraphicsInfos => {
+                ConnectorGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-1114150',
+                    Coordinates => [
+                      {
+                        XCoordinate => '224.5',
+                        YCoordinate => '393.11090087890625'
+                      },
+                      {
+                        XCoordinate => '324.0',
+                        YCoordinate => '393.0'
+                      },
+                      {
+                        XCoordinate => '324.0',
+                        YCoordinate => '417.0'
+                      },
+                      {
+                        XCoordinate => '387.5',
+                        YCoordinate => '417.8579406738281'
+                      }
+                    ],
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              To => '68',
+              Quantity => 1,
+              Name => '',
+              Condition => bless( do{\(my $o = 45615008)}, 'XML::LibXML::Element' ),
+              From => '62'
+            }
+          ]
+        },
+        Name => 'Fill Order'
+      }
+    ]
+  },
+  PackageHeader => {
+    Created => '06/04/2005 14:50:58 PM',
+    Vendor => 'Global 360',
+    XPDLVersion => '2.0'
+  },
+  Script => {
+    Type => 'text/javascript'
+  },
+  Name => 'sample process',
+  Pools => {
+    Pool => [
+      {
+        Lanes => {},
+        Process => '1',
+        Orientation => 'HORIZONTAL',
+        Id => '2',
+        NodeGraphicsInfos => {
+          NodeGraphicsInfo => [
+            {
+              IsVisible => 1,
+              Page => '1'
+            }
+          ]
+        },
+        BoundaryVisible => 0
+      },
+      {
+        Lanes => {
+          Lane => [
+            {
+              Id => '0',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-32',
+                    Height => '239.0',
+                    Width => '1176.0',
+                    Coordinates => {
+                      XCoordinate => '22.0',
+                      YCoordinate => '4.0'
+                    },
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              ParentLane => '3',
+              Name => 'Lane-0'
+            }
+          ]
+        },
+        Process => '2',
+        Orientation => 'HORIZONTAL',
+        Id => '3',
+        NodeGraphicsInfos => {
+          NodeGraphicsInfo => [
+            {
+              IsVisible => 1,
+              FillColor => '-32',
+              Height => '247.0',
+              Width => '1200.0',
+              Coordinates => {
+                XCoordinate => '0.0',
+                YCoordinate => '0.0'
+              },
+              BorderColor => '-16777216',
+              Page => '1'
+            }
+          ]
+        },
+        Name => '',
+        BoundaryVisible => 1
+      },
+      {
+        Lanes => {
+          Lane => [
+            {
+              Id => '1',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-32',
+                    Height => '80.0',
+                    Width => '1176.0',
+                    Coordinates => {
+                      XCoordinate => '22.0',
+                      YCoordinate => '252.0'
+                    },
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              ParentLane => '5',
+              Name => 'Lane-1'
+            }
+          ]
+        },
+        Process => '3',
+        Orientation => 'HORIZONTAL',
+        Id => '5',
+        NodeGraphicsInfos => {
+          NodeGraphicsInfo => [
+            {
+              IsVisible => 1,
+              FillColor => '-32',
+              Height => '88.0',
+              Width => '1200.0',
+              Coordinates => {
+                XCoordinate => '0.0',
+                YCoordinate => '248.0'
+              },
+              BorderColor => '-16777216',
+              Page => '1'
+            }
+          ]
+        },
+        Name => '',
+        BoundaryVisible => 1
+      },
+      {
+        Lanes => {
+          Lane => [
+            {
+              Id => '2',
+              NodeGraphicsInfos => {
+                NodeGraphicsInfo => [
+                  {
+                    IsVisible => 1,
+                    FillColor => '-32',
+                    Height => '156.0',
+                    Width => '1176.0',
+                    Coordinates => {
+                      XCoordinate => '22.0',
+                      YCoordinate => '342.0'
+                    },
+                    BorderColor => '-16777216',
+                    Page => '1'
+                  }
+                ]
+              },
+              ParentLane => '7',
+              Name => 'Lane-2'
+            }
+          ]
+        },
+        Process => '4',
+        Orientation => 'HORIZONTAL',
+        Id => '7',
+        NodeGraphicsInfos => {
+          NodeGraphicsInfo => [
+            {
+              IsVisible => 1,
+              FillColor => '-32',
+              Height => '164.0',
+              Width => '1200.0',
+              Coordinates => {
+                XCoordinate => '0.0',
+                YCoordinate => '338.0'
+              },
+              BorderColor => '-16777216',
+              Page => '1'
+            }
+          ]
+        },
+        Name => '',
+        BoundaryVisible => 1
+      }
+    ]
+  }
+};

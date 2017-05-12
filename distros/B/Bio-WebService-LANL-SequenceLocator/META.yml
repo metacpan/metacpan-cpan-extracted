@@ -1,0 +1,57 @@
+---
+abstract: "Locate sequences within HIV using LANL's web tool"
+author:
+  - 'Thomas Sibley <trsibley@uw.edu>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-WebService-LANL-SequenceLocator
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+optional_features:
+  server:
+    description: 'Web API server'
+    requires:
+      File::Share: '0'
+      IO::String: '0'
+      JSON: '0'
+      JSON::XS: '0'
+      Path::Tiny: '0'
+      Plack::App::File: '0'
+      Plack::Middleware::CrossOrigin: '0'
+      Plack::Middleware::ReverseProxy: '0'
+      Server::Starter: '0'
+      Starlet: '0'
+      Text::CSV: '0'
+      Web::Simple: '0'
+requires:
+  Data::Dumper: '0'
+  HTML::LinkExtor: '0'
+  HTML::TableExtract: '0'
+  HTML::TokeParser: '0'
+  HTTP::Request::Common: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  List::AllUtils: '0'
+  Moo: '0'
+  perl: '5.018'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator/issues
+  homepage: https://indra.mullins.microbiol.washington.edu/locate-sequence/
+  repository: https://github.com/MullinsLab/Bio-WebService-LANL-SequenceLocator.git
+version: '20170324'

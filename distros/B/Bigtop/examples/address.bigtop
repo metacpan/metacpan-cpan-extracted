@@ -1,0 +1,88 @@
+config {
+    engine          CGI;
+    template_engine TT;
+    Init            Std             {}
+    SQL             SQLite          {}
+    CGI             Gantry          {
+            gantry_conf 1; with_server 1; flex_db 1; gen_root 1;
+    }
+    Control         Gantry          { dbix 1; }
+    Model           GantryDBIxClass {}
+    SiteLook        GantryDefault   {}
+    Conf            Gantry          { instance address; }
+}
+app Apps::AddressBook {
+    authors `Phil Crow` => `crow.phil@gmail.com`,
+            `Joe Smith`;
+    config {
+        dbconn    `dbi:SQLite:dbname=app.db`       => no_accessor;
+        dbuser    apache                           => no_accessor;
+        template_wrapper `genwrapper.tt`           => no_accessor;
+    }
+    table    address {
+        field id { is int4, primary_key, auto; }
+        field name {
+            is             varchar;
+            label          Name;
+            html_form_type text;
+        }
+        field street {
+            is             varchar;
+            label          Street;
+            html_form_type text;
+        }
+        field city {
+            is             varchar;
+            label          City;
+            html_form_type text;
+        }
+        field state {
+            is             varchar;
+            label          State;
+            html_form_type text;
+        }
+        field zip {
+            is             varchar;
+            label          Zip;
+            html_form_type text;
+        }
+        field phone {
+            is             varchar;
+            label          Number;
+            html_form_type text;
+        }
+        field send_xmas_card {
+            is             boolean;
+            label          `Send Christmas Card`;
+            html_form_type select;
+            html_form_options `Yes` => 1, `No, they never send us one` => 0;
+        }
+        field relationship {
+            is             varchar;
+            label          `How they are related`;
+            html_form_type select;
+            html_form_options
+                    `Relative`   => `stuck_with`,
+                    `Friend`     => `picked`,
+                    `Colleague`  => `stuck_working_with`;
+        }
+    }
+    controller Address is AutoCRUD {
+        controls_table   address;
+        rel_location     address;
+        text_description `address`;
+        page_link_label  Address;
+        method do_main is main_listing {
+            title            `Address`;
+            cols             name, phone;
+            header_options   Add;
+            row_options      Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name        address;
+            all_fields_but   id;
+            extra_keys
+                legend     => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+}

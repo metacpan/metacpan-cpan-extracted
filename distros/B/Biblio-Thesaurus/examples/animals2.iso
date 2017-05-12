@@ -1,0 +1,42 @@
+%externals SN URL
+
+%language EN
+
+%baselanguage EN
+
+%inverse NT BT
+%inverse RT RT
+%inverse USE UF
+%inverse UF USE
+%inverse BT NT
+
+
+%description NT Narrower term
+%description SN Scope note
+%description RT Related term
+%description USE Synonym
+%description TT Top term
+%description UF Quasi synonym
+%description IS-A ...
+%description BT Broader term
+
+
+
+
+lion
+
+Carnivora
+BT	Felis
+
+house_cat
+NT	Felis
+
+Lucky
+IS-A	lion
+
+Felis
+NT	Carnivora
+BT	house_cat
+
+the_lion_king
+IS-A	lion

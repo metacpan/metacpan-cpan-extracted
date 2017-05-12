@@ -1,0 +1,110 @@
+#############################################################
+################# BingoX Installation Guide #################
+#############################################################
+
+	1.0	Get distribution and required packages
+	2.0	How to install BingoX
+	2.1	Putting everything in the right place
+	2.2	Setting up the conf files
+	3.0	Include bingox.conf in httpd.conf
+	3.1	Restart the webserver
+	4.0	Disclaimer
+
+1.0 Get distribution and required packages
+
+	Get the latest BingoX distribution.  BingoX requires that you also have
+	these modules:
+
+	Time::Object
+		Can be found on CPAN.
+		<http://www.cpan.org/modules/by-module/Time/Time-Object-0.11.readme>
+		<http://www.cpan.org/modules/by-module/Time/Time-Object-0.11.tar.gz>
+
+	Apache::XPP
+		Can be found at Cnation's OpenSource site, CPAN, or Sorceforge.
+		<http://opensource.cnation.com/projects/xpp/>
+
+	Graham Barr's Date modules
+		Date::Format
+		Date::Parse
+		Date::Language
+		Can be found on CPAN.
+		<http://www.cpan.org/authors/id/G/GB/GBARR/TimeDate-1.09.readme>
+		<http://www.cpan.org/authors/id/G/GB/GBARR/TimeDate-1.09.tar.gz>
+
+2.0 How to install BingoX:
+
+	Installing BingoX should be a fairly simple process. Download the the
+	latest distriubtion, make, and install. Then setup the configuration files (see below.)
+
+2.1 Putting everything in the right place:
+
+	Download a copy of BingoX-current.tar.gz. From the directory BingoX is
+	downloaded to do the following to extract the files and install them.
+
+	[thai@lava apps]# gunzip -c BingoX-current.tar.gz | tar -xf -
+	[thai@lava apps]# cd BingoX-1.90
+	[thai@lava BingoX-1.90]# cd perl Makefile.PL
+	[thai@lava BingoX-1.90]# make
+	[thai@lava BingoX-1.90]# make install
+
+2.2 Setting up the configuration files:
+
+	The example configuration file is: "conf/bingox.conf.template".  You can 
+	copy this file to "bingox.conf" or make a symbolic link to it in your 
+	webserver conf directory.
+
+	DocumentRoot   (Apache Directive)	- the path to your HTML/XPML pages
+	SERVER_ROOT	   (Environment var)	- the path to your webserver root diretory
+	AdminMainIndex (PerlSetVar)			- the main Admin Index page
+
+	Setup DBI string
+	ie. "dbi:Sybase:database=bingox_db;server=bingox_server", 'bingox', 'bingox'
+	dbi				= [ Sybase | Pg | Oracle ]
+	database		= [ DATABASE ]
+	username		= [ USERNAME ]
+	password		= [ PASSWORD ]
+
+	PrintError		=> warns on errors
+	RaiseError		=> don't die on error
+	ChopBlanks		=> removes trailing blanks
+	AutoCommit		=> commit executes immediately
+
+	PerlInitHandler Apache::StatINC	- for development, doesn't require 
+										webserver to be restarted for changes
+	PerlSendHeader Off				- tells mod_perl not to send HTTP headers automatically
+	PerlTaintCheck On				- toggles taint checking
+	PerlWarn On						- toggles warnings
+
+	Require files need for your project/application
+	include [ apps/project/conf/project.conf.data ]
+
+	Setup Files location block for *.xpml pages
+	XPPIncludeDir  (PerlSetVar)	- the path to your include files directory
+	XPMLHeaders	   (PerlSetVar)	- the header file(s) that are included at the top of any XPML pages
+	XPMLFooters	   (PerlSetVar)	- the footer file(s) that are included at the bottom of any XPML pages
+
+3.0	Require bingox.conf in httpd.conf
+
+	"Include /home/www/apps/BingoX/conf/bingox.conf", or use the path to your 
+	bingox.conf file.
+
+3.1	Restart the webserver
+
+4.0	Disclaimer
+
+	This release was developed and tested using version 5.005_03 
+	built for i386-linux.
+
+	Please contact me if you use this for anything non-trivial.  
+	This is not for permission, it's so I can get some idea of 
+	what folks are using the package for other than trivial scripts.
+
+	Please report any bugs/suggestions to <thai@cnation.com>.
+
+	Copyright (c) 1998-2000 Cnation.
+
+	All rights reserved. This program is free software; you can
+	redistribute it and/or modify it under the terms of the GNU
+	Lesser General Public License.
+

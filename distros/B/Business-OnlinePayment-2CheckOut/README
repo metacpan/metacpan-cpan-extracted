@@ -1,0 +1,31 @@
+Business/OnlinePayment/2CheckOut version 0.01
+=============================================
+
+This is Business::OnlinePayment::2CheckOut, an Business::OnlinePayment
+backend module for 2CheckOut authorization service.  It is only useful
+if you have a merchant account with 2CheckOut: http://www.2checkout.com
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Business::OnlinePayment
+
+COPYRIGHT AND LICENCE
+
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Copyright (C) 2002 Alexey Khobov

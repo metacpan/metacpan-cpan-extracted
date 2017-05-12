@@ -1,0 +1,10 @@
+: if template_exists( $parent.type ~ '_entry_comment_body.tx' ) {
+:   include $parent.type ~ '_entry_comment_body.tx';
+: } else {
+<div class="body" title="<: $entry.id :>" >
+: include '_wedge.tx' { template => 'entry_comment_body_start.tx' };
+<: $entry.body_html |raw :>
+: include '_wedge.tx' { template => 'entry_comment_body_end.tx' };
+</div>
+: }
+

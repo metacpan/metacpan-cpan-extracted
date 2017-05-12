@@ -1,0 +1,13 @@
+Revision history for B-Lint-Pluggable
+
+0.01_01  2006-02-16
+         Just uploading my ~/src/B-Lint-Pluggable to CPAN, polish to come later.
+
+0.02 2007-03-18
+     Just require the latest B::Lint. Argh. This module is too much of a pain to live.
+
+1.00 sometime in the past
+     Scooped the guts out.
+
+2.00 2007-12-21
+     Fixed for tests and such. It's still empty. Go use B::Lint for real instead.

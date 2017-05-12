@@ -1,0 +1,7 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/BFD.pm
+t/BFD.t
+CHANGES

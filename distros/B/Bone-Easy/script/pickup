@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+
+use Bone::Easy;
+
+print pickup, "\n";
+
+=pod
+
+=head1 NAME
+
+pickup - Generate pickup lines
+
+=head1 SYNOPSIS
+
+    pickup
+
+=head1 DESCRIPTION
+
+Generates pickup-lines GUARANTEED to get something thrown in your face.
+
+B<WARNING> these get pretty rauncy.
+
+
+=head1 AUTHOR
+
+Michael G Schwern <schwern@pobox.com>
+
+=head1 SEE ALSO
+
+L<Bone::Easy>
+
+=cut

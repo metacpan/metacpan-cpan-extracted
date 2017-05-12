@@ -1,0 +1,7 @@
+classes:
+  - Console
+parameters:
+  doc:
+    console-media:
+      headline:
+        - Console media

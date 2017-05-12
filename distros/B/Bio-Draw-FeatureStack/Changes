@@ -1,0 +1,12 @@
+Revision history for Perl extension Bio::Draw::FeatureStack.
+
+0.03  Fri Jun 29 14:00:01 2012
+	- t/figures_manuscript.t: use decorated_gene glyph instead of regular gene glyph for figure2
+
+0.02  Fri Jun 29 11:46:01 2012
+	- added Test::Exception to list of required modules in Makefile.PL
+
+0.01  Wed Jun  6 11:16:01 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Bio::Draw::FeatureStack
+

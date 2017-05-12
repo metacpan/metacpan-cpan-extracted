@@ -1,0 +1,62 @@
+[
+   {
+      "alignment" : "\n Query MGGDMKDNW  9\n        ::::.:::     \n  HXB2 GGGDMRDNW\n\n  ",
+      "base_type" : "amino acid",
+      "end" : "479",
+      "genome_end" : "7661",
+      "genome_start" : "7635",
+      "hxb2_sequence" : "GGGDMRDNW",
+      "polyprotein" : "gp160",
+      "query" : "sequence_1",
+      "query_sequence" : "MGGDMKDNW",
+      "region_names" : [
+         "gp160",
+         "gp120"
+      ],
+      "regions" : [
+         {
+            "aa_from_cds_start" : [
+               "1411",
+               "1437"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "471",
+               "479"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "9"
+            ],
+            "cds" : "gp160",
+            "na_from_hxb2_start" : [
+               "7635",
+               "7661"
+            ]
+         },
+         {
+            "aa_from_cds_start" : [
+               "1411",
+               "1437"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "471",
+               "479"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "9"
+            ],
+            "cds" : "gp120",
+            "na_from_hxb2_start" : [
+               "7635",
+               "7661"
+            ]
+         }
+      ],
+      "reverse_complement" : "0",
+      "similarity_to_hxb2" : "77.8",
+      "start" : "471"
+   }
+]

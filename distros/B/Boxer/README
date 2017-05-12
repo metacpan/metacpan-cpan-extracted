@@ -1,0 +1,30 @@
+NAME
+    Boxer - system deployment ninja tricks
+
+VERSION
+    Version v1.1.5
+
+DESCRIPTION
+    Framework for system deployment ninja tricks
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>.
+
+SEE ALSO
+    boxer.
+
+AUTHOR
+    Jonas Smedegaard `<dr@jones.dk>`.
+
+COPYRIGHT AND LICENCE
+    Copyright © 2013-2016 Jonas Smedegaard
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

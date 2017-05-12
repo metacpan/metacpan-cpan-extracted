@@ -1,0 +1,30 @@
+---
+abstract: 'loads lazily Bread::Board containers from files'
+author:
+  - 'Roman Daniel <roman@daniel.cz>'
+build_requires:
+  Test::Exception: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bread-Board-LazyLoader
+no_index:
+  package:
+    - Bread::Board::LazyLoader::Container
+    - Bread::Board::LazyLoader::Supersite
+    - Bread::Board::LazyLoader::Obj
+    - Bread::Board::LazyLoader::Site
+requires:
+  Bread::Board: '0.32'
+  Module::Find: '0'
+  Path::Class: '0'
+  Type::Params: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  common::sense: '0'
+version: '0.14'

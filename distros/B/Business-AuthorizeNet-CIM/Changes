@@ -1,0 +1,45 @@
+Revision history for Perl extension Business-AuthorizeNet-CIM
+
+0.14    2016-02-12
+        unmaskExpirationDate (paulwelscott)
+
+0.13    2015-09-23
+        Production Web Service URL update, Support for validationMode (paulwelscott)
+
+0.12    2015-06-06
+        Allow optional customerProfileId in createCustomerProfileTransaction (used in refund scenarios on non CIM transactions). (paulwelscott)
+
+0.11    2015-06-01
+        allow optional customerPaymentProfileId (paulwelscott)
+        introduce "test_host_only" constructor arg to hit the test api host and allow default validationMode of "liveMode" (paulwelscott)
+
+0.10    2015-05-26
+        allow additional params to be passed to getHostedProfilePageRequest (Olaf Alders)
+
+0.09    2015-05-26
+        add getHostedProfilePageRequest method (Olaf Alders)
+
+0.08    2013.03.13
+        remove validationMode element from API calls that do not support it [Rhesa Rozendaal]
+
+0.07    2013.01.16
+        Fix RT 80389: properly generate xml for multiple lineItems in a transaction (rhesa, Rhesa Rozendaal)
+
+0.06    2011.12.24
+        bug fixes from rjbs
+
+0.05    2011.12.23
+        don't return (undef) from getCustomerProfileIds (rjbs)
+
+0.04    2011.4.23
+        remove test_mode in deleteCustomerProfile (RT 61975, thanks to Patrick)
+        typo fix in createCustomerPaymentProfileRequest and make cardCode real optional (RT 67428, thanks to Pawel)
+
+0.03    2011.1.13
+        ...invalid child element 'validationMode'... in getCustomerProfileIds/getCustomerProfile (RT 64723 from Gordon Hunt)
+
+0.02    2010.9.12
+        POD SYNOPSIS fixes
+
+0.01    2010.9.12
+        a start

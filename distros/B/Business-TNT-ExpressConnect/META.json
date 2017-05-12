@@ -1,0 +1,71 @@
+{
+   "abstract" : "TNT ExpressConnect interface",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "keywords" : [
+      "TNT",
+      "ExpressConnect",
+      "shipping",
+      "price"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-TNT-ExpressConnect",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::SysPath" : "0.13",
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607",
+            "Module::Build::SysPath" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::INI::Reader" : "0",
+            "DateTime" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Path::Class" : "0.04",
+            "XML::Compile::Schema" : "0",
+            "XML::Compile::Util" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Business::TNT::ExpressConnect" : {
+         "file" : "lib/Business/TNT/ExpressConnect.pm",
+         "version" : "0.02"
+      },
+      "Business::TNT::ExpressConnect::SPc" : {
+         "file" : "lib/Business/TNT/ExpressConnect/SPc.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/meon/Business-TNT-ExpressConnect/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/meon/Business-TNT-ExpressConnect.git"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,212 @@
+#body {
+	margin:auto;
+	clear:auto;
+}
+#content {
+}
+
+.container {
+	margin:auto;
+	padding: 0px;
+	max-width: 60em;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+table.container {
+	border: white;
+	borer-collapse: collapse;
+	padding: 0px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+td.container {
+	border: white;
+	padding: 0px;
+}
+
+
+.message { color:#347235; font-style:italic; }
+.error_message { color:#800517; font-weight: bold; }
+.error { color:#800517; }
+
+
+table {
+	border-collapse: collapse; 
+}
+#all_player_home {
+	font-size: 1.00em;
+}
+table#all_player_home {
+	border: none; 
+	font: arial, helvetica, verdana, sans-serif;
+} 
+
+#all_player_home th {
+	vertical-align: middle;
+	font-weight: bold;
+	padding: 2px;
+} 
+
+#all_player_home td {
+	vertical-align: middle; 
+	padding: 2px;
+} 
+
+/* Styles Regional Bracke */
+td p { 
+	border-bottom: solid thin black; 
+	margin: 0; 
+	padding: 5px 5px 2px 5px; 
+	cursor: pointer;
+} 
+
+
+.out {
+	text-decoration: line-through; 
+	font-size: smaller;
+}
+
+.in {
+	color: green;
+}
+
+.pending {}
+
+.points {
+	font-size: bigger; 
+	color: chocolate;
+}
+
+.cash {
+	color: darkgreen;
+}
+
+.odd {
+	background-color: #f0f0f0;
+}
+
+.even {}
+
+.tournament_header {
+    float:left; 
+    clear:left;
+    font-size: 0.92em;
+    border:#eee 1px solid;
+    padding: 3px;
+    margin: 0.1em;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.no_border {
+	border: none;
+}
+
+.page_header {
+	width: 100%;
+}
+
+td p:hover { background-color:cornsilk;  border: solid 1px black;}
+
+table.regional_bracket {
+	margin-left: 4em;
+	margin-top: 1em;
+	background: white;
+}
+.regional_bracket td { 
+	vertical-align: middle;
+/*	width: 12em; */ 
+	margin: 0;
+	padding: 0; 
+} 
+
+.region_name {
+	font-weight: bold;
+	text-align: left;
+	background-color: #ffffcc;
+}
+#player_page_header {
+	-moz-border-radius: 10px;
+    border-radius: 10px;
+    max-width: 28em;
+}
+table#player_links_table { 
+    margin:auto; 
+    background-color: white;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+}
+table#player_links_table td { 
+	padding: 0.5em; 
+	font-size: 1.0em;
+	border-bottom: thin gray solid;
+
+}
+#player_page {
+	margin:auto; 
+	text-align:center; 
+	max-width:27em; 
+	clear:both;
+	font-size: 1.00em;
+	-moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.admin_links {
+	border: thin gray solid;
+	background-color: #e5ffcc;
+	font-size: 0.92em;
+	-moz-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.player_name {
+	font-style: italic;
+	font-weight: bold;
+	background-color: white;
+	padding-right: 5px;
+	padding-left: 3px;
+	color: #990019;
+}
+.register_link {
+	font-size: 1.00em;
+	background-color: #ffffcc;
+	border: thin solid grey;
+	max-width: 13em;
+	padding: 3px;
+}
+
+.separator {
+    font-size: 0.72em; 
+    color: gray; 
+    vertical-align: 20%;
+}
+
+h1 {
+	border: thin solid grey;
+	font-size: 1.33em;
+	padding: 3px;
+	padding-left: 6px;
+	margin-left: 2.2em;
+	background-color: cornsilk;
+	-moz-border-radius: 10px;
+    border-radius: 10px;
+    max-width: 28em;
+}
+
+.region_picks_made {
+    font-size: 0.72em;
+    font-style: italic;
+}
+
+.account_links {
+    float: right;
+    clear: both;
+    margin-left: 2rem;
+    padding: 1rem;
+    list-style: none;
+}
+.account_links li {
+	padding-bottom: 0.75em;
+}

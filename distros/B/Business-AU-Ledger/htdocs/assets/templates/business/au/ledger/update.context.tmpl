@@ -1,0 +1,17 @@
+<table align="center">
+<tr><td align="center">Financial Year</td></tr>
+<tr><td align="center"><div id="context_result"><tmpl_var name=result escape=html></div></td></tr>
+<tr><td><hr /></td></tr>
+</table>
+<form name="context_form" id="context_form" action="" method="post" onSubmit="return context_onsubmit()">
+<table align="center">
+<tr>
+<td>First month: <input type="text" name="start_month" id="start_month" size="10" value="<tmpl_var name=start_month>" /></td><td><input type="text" name="start_year" id="start_year" size="10" value="<tmpl_var name=start_year>" /></td>
+</tr>
+<tr>
+<td align="center" colspan="2"><input type="submit" name="submit_context" id="submit_context" value="Submit" /></td>
+</tr>
+</table>
+<input type="hidden" name="rm" id="rm" value="<tmpl_var name=rm>" />
+<input type="hidden" name="sid" id="sid" value="<tmpl_var name=sid>" />
+</form>

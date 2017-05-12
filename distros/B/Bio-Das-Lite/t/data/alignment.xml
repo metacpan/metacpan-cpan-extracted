@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dasalignment xmlns="http://www.efamily.org.uk/xml/das/2004/06/17/dasalignment.xs" href="http://das.gencode.org/das/gencodealign/alignment?query=AP000295.6-002" xsd:schemaLocation="http://www.efamily.org.uk/xml/das/2004/06/17/dasalignment.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance" xmlns:align="http://www.efamily.org.uk/xml/das/2004/06/17/alignment.xsd">
+  <alignment alignType="GENCODE_Swissprot">
+    <alignObject dbAccessionId="AP000295.6-002" objectVersion="unknown" dbSource="GENCODE" intObjectId="AP000295.6-002" dbVersion="2.2" type="PROTEIN" dbCoordSys="Gencode_2.2,Protein Sequence,Homo sapiens">
+      <alignObjectDetail dbSource="GENCODE" property="region">0-515</alignObjectDetail>
+      <alignObjectDetail dbSource="GENCODE" property="description">GENCODE reference protein "AP000295.6-002" from GENCODE Dataset v2.2 (Oct 2005)</alignObjectDetail>
+    </alignObject>
+    <alignObject dbAccessionId="INAR2_HUMAN" objectVersion="unknown" dbSource="UniProt Knowledge Base/Swiss-Prot" intObjectId="UNIPROT:INAR2_HUMAN" dbVersion="" type="PROTEIN" dbCoordSys="Uniprot,Protein Sequence">
+      <alignObjectDetail dbSource="UniProt Knowledge Base/Swiss-Prot" property="region">0-515</alignObjectDetail>
+    </alignObject>
+    <block blockOrder="1" blockScore="2703">
+      <segment intObjectId="AP000295.6-002" end="515" start="0">
+        <cigar>515M</cigar>
+      </segment>
+    </block>
+  </alignment>
+</dasalignment>

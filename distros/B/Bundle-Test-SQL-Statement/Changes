@@ -1,0 +1,6 @@
+Revision history for Bundle-Test-SQL-Statement
+
+1.33    2011-02-06
+        Releasing Bundle::Test::SQL::Statement first time to reduce
+	dependencies in SQL::Statement
+

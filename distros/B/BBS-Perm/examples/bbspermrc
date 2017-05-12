@@ -1,0 +1,42 @@
+---
+global:  
+# Default values for all sites
+    title: 'bbs-perm'
+    protocol: ssh
+    port: 22
+    agent: 'bbs-perm-agent'
+    font: 'WenQuanYi Micro Hei Mono 20'
+# send some character every 60 seconds for anti-idle
+    timeout: 60
+    background_file: /path/to/picture
+    background_transparent: 0
+    mouse_autohide: 0
+    color:
+        background: black
+        foreground: white
+    plugins:
+        uri:
+            default: 'http://www.google.com'
+            browser: 'firefox -new-tab'
+        ip:
+            qqwry: /opt/qqwry.dat
+        feed:
+            label: Feed
+newsmth:
+# use Alt+s to connect
+    shortcut: 'M-s'
+    encoding: gbk
+    title: sunnavy@newsmth
+    site: newsmth.net
+    username: sunnavy
+# use MIME::Base64; encode_base64('password')
+    password: cGFzc3dvcmQ=
+    protocol_version: 1
+bash:
+  agent: /bin/bash
+  protocol: bash
+# use Alt+Win+l to load
+  shortcut: MW-l
+  title: bash
+  timeout: 0
+

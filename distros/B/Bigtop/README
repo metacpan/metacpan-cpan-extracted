@@ -1,0 +1,58 @@
+Bigtop version 0.15
+===========================
+
+Bigtop is a central place to collect everything that has anything to
+do with your database driven web application.  I call it a Web Application
+Data Language.
+
+By specifying a Bigtop file and running bigtop on it, you can generate
+a working web application.  As things change (like the data model), you
+can rerun bigtop to update the generated parts of the application without
+fear of loosing the parts you wrote by hand.
+
+See Bigtop::Docs::Tutorial for details.
+
+INSTALLATION
+
+To install this module type:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Module::Build
+    Parse::RecDescent
+    Config::General
+    Template
+    Inline
+    Inline::TT
+
+It also requires these modules during testing:
+
+    Test::More
+    Test::Warn
+
+JOIN US
+
+If you would like to discuss bigtop, please join the Gantry mailing list.
+Go to http://www.usegantry.org and click on the Mailing List tab under the
+banner for instructions.
+
+If you want to see the most recent version of Bigtop before it hits CPAN,
+you may check it out:
+
+    svn checkout http://svn.usegantry.org/repo/bigtop/trunk/ yourdir
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 by Phil Crow.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+

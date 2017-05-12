@@ -1,0 +1,38 @@
+Business-OnlinePayment-Multiplex version 0.01
+=============================================
+
+This module is a quick and dirt hack to allow a code callback from within
+the Business::OnlinePayment content method which will be executed when the
+submit action is called on the transaction.  This is useful for things like
+switching processors depending on load and time of day, or sneakily saving
+encrypted copies using StoredTransaction and various other things Visa/MC
+don't want you to do.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Business::OnlinePayment
+  Business::OnlinePayment::StoredTransaction
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by mock
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

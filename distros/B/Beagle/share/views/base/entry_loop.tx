@@ -1,0 +1,7 @@
+: for $entries -> $entry {
+:   include "entry.tx" { entry => $entry };
+: }
+
+: if ( !$static ) {
+: include "page.tx";
+: }

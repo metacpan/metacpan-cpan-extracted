@@ -1,0 +1,19 @@
+---
+global:
+    - indir: data/raw
+    - outdir: data/processed
+    - file_rule: (.*)csv$
+    - plugins:
+        - FileExists
+rules:
+    - backup:
+        local:
+            - wait: 0
+        process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.csv
+    - grep_VARA:
+        process: |
+            echo "Working on {$self->{indir}}/{$sample.csv}"
+            grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv
+    - grep_VARB:
+        process: |
+            grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv

@@ -1,0 +1,19 @@
+name=GSEseries
+module=gse_series
+version=20041124
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=SeriesID, dotset=SeriesID
+label=Status, dotset=Status
+label=Title, dotset=SeriesTitle
+label=Type, dotset=SeriesType
+label=PubMedID, dotset=Publication_ID
+label=Link, dotset=Link
+label=Description, dotset=Description
+label=Keyword, dotset=Keyword
+label=SampleID, dotset=SampleID

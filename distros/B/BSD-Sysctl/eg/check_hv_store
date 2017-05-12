@@ -1,0 +1,17 @@
+#! /usr/bin/perl -w
+# check_hv_store
+#
+# Copyright (C) 2006 David Landgren, all rights reserved.
+
+use strict;
+
+# check that the hv_store() length params are sane:
+# hv_store(c, "unreach",  7, newSVuv(inf->tcps_sc_unreach), 0);
+# hv_store(c, "zonefail", 3, newSVuv(inf->tcps_sc_zonefail), 0);
+
+while (<>) {
+    chomp;
+    next unless /\bhv_store\s*\(\s*\w+\s*,\s*"([^"]+)"\s*,\s*(\d+)/;
+    next unless (my $len = length($1)) != $2;
+    print "$.: $1 expected = $len, actual = $2\n";
+}

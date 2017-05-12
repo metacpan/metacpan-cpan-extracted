@@ -1,0 +1,6 @@
+0.01      2012-02-24 09:16:45 Europe/London
+
+- Basic tea bot with support for tea rounds, volunteers, away users,
+  status checks and random tea rounds.
+- The tea round is also reset after 8 hours of inactivity, i.e., the
+  next day.

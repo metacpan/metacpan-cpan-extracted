@@ -1,0 +1,19 @@
+################################################################
+#
+#  Typemap for module "Bit::ShiftReg" version 2.0
+#
+#  Copyright (c) 1997 by Steffen Beyer. All rights reserved.
+#  This package is free software; you can redistribute it
+#  and/or modify it under the same terms as Perl itself.
+#
+#  Last modified 19-Mar-1997
+#
+################################################################
+
+TYPEMAP
+
+N_char	T_U_CHAR
+N_short	T_IV
+N_int	T_IV
+N_long	T_IV
+boolean	T_IV

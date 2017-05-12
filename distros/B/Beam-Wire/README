@@ -1,0 +1,46 @@
+Beam::Wire
+
+Beam::Wire is a configuration module and a dependency injection
+container. In addition to complex data structures, Beam::Wire configures
+and creates plain old Perl objects.
+
+A dependency injection (DI) container creates an inversion of control:
+Instead of manually creating all the dependent objects (also called
+"services") before creating the main object that we actually want, a DI
+container handles that for us: We describe the relationships between
+objects, and the objects get built as needed.
+
+Dependency injection is sometimes called the opposite of garbage
+collection. Rather than ensure objects are destroyed in the right order,
+dependency injection makes sure objects are created in the right order.
+
+Using Beam::Wire in your application brings great flexibility, allowing
+users to easily add their own code to customize how your project
+behaves.
+
+For an introduction to the Beam::Wire service configuration format, see
+Beam::Wire::Help::Config.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

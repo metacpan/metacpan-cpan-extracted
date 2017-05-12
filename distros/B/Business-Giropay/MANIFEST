@@ -1,0 +1,34 @@
+Changes
+lib/Business/Giropay.pm
+lib/Business/Giropay/Notification.pm
+lib/Business/Giropay/Request/Issuer.pm
+lib/Business/Giropay/Request/Bankstatus.pm
+lib/Business/Giropay/Request/Status.pm
+lib/Business/Giropay/Request/Transaction.pm
+lib/Business/Giropay/Response/Issuer.pm
+lib/Business/Giropay/Response/Bankstatus.pm
+lib/Business/Giropay/Response/Status.pm
+lib/Business/Giropay/Response/Transaction.pm
+lib/Business/Giropay/Role/Core.pm
+lib/Business/Giropay/Role/Network.pm
+lib/Business/Giropay/Role/Response.pm
+lib/Business/Giropay/Role/Request.pm
+lib/Business/Giropay/Role/Urls.pm
+lib/Business/Giropay/Types.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/girocockpit.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+t/request/role.t
+t/request/transaction.t
+t/request/issuer.t
+t/request/bankstatus.t
+t/response/transaction.t
+t/response/issuer.t
+t/response/bankstatus.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

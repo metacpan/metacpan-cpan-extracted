@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name: Business-PinPayment
+version: 0.03
+author:
+  - Xufeng (Danny) Liang <danny.glue@gmail.com>
+abstract: Interface to Pin Payment API
+license: perl
+requires:
+  Test::More: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Net::SSL: 0
+  JSON: 0

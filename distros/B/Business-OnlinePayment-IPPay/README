@@ -1,0 +1,19 @@
+Copyright (c) 1999 Jason Kohles.
+Copyright (c) 2002-2003 Ivan Kohler
+Copyright (c) 2008 Jeff Finucane
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::IPPay, a Business::OnlinePayment backend
+module for IPPay.  It is only useful if you have a merchant account with
+IPPay Merchant Services: http://www.ippay.com
+
+This module implements the IPPay XML Product Specification Revision 1.1.2
+
+Jeff Finucane is the original author.  Please send patches as unified
+diffs (diff -u).  Mr. Kohles and Mr. Kohler provided material for cribbing.
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").

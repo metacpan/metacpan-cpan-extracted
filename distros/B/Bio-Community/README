@@ -1,0 +1,104 @@
+Bio-Community
+==========================
+
+
+ABOUT
+
+The Bio-Community distribution contains a set of generic, open, object-oriented,
+cross-platform Perl modules to represent and manipulate communities of
+biological organisms. Bio-Community is part of the BioPerl project
+(http://bioperl.org/).
+
+
+INSTALLATION & DEPENDENCIES
+
+Bio-Community requires Perl 5.10 or above. Additionally, these Perl modules are
+required and will be installed during the installation procedure:
+
+  BioPerl version >= 1.6.923
+  DateTime
+  Getopt::Euclid
+  JSON::XS
+  Hash::Util
+  Math::Random::MT
+  Method::Signatures
+  Module::Runtime
+  Moose
+  MooseX::NonMoose
+  MooseX::StrictConstructor
+  PerlIO:eol
+  Scalar::Util
+  Tie::IxHash
+  Test::Number::Delta
+
+These other modules are recommended:
+  Math::GSL::SF
+  Math::GSL::Randist
+  Math::GSL::RNG
+
+The easiest way to install Bio-Community is using the CPAN way. See the detailed
+instructions at http://www.cpan.org/modules/INSTALL.html
+
+To install the Bio-Community modules by hand, type the following in a terminal:
+   perl Build.PL
+   ./Build installdeps   (as administrator)
+   ./Build
+   ./Build test
+   ./Build install       (as administrator)
+
+
+OVERVIEW
+
+The ./lib/ folder contains the Bio-Community modules, which provide various
+objects and operations:
+
+ * The main objects are the community, member and metacommunity, provided by
+   Bio::Community, Bio::Community::Member and Bio::Community::Meta, respectively
+
+ * Reading and writing files in various formats, e.g. QIIME, biom, is possible
+   through Bio::Community::IO
+
+ * Alpha, beta and gamma diversity metrics are implemented in the modules
+   Bio::Community::Alpha, Bio::Community::Meta::Beta and Bio::Community::Meta::Gamma
+
+ * Bio::Community::Tools::* are modules providing various operations like random
+   sampling, rarefaction or taxonomic summaries.
+
+The ./scripts/ folder contains scripts. All these scripts use the Bio::Community
+modules and are useful for reading or writing files, rarefying, 
+They are good examples of how Bio::Community modules can be used as building
+blocks for more complex programs. For convenience, all scripts are prefixed with
+'bc_'.
+
+The ./t/ folder contains unit tests to ensure the proper functioning of the
+Bio-Community mocules. The ./t/data/ further contains data files used for the
+tests and is thus a good source of example data.
+
+
+BUGS, SUPPORT AND CONTRIBUTIONS
+
+User feedback is an integral part of the evolution of these BioPerl modules.
+Please direct usage questions or support issues to the mailing list, rather
+than to the module maintainer directly:
+   bioperl-l@bioperl.org
+Many experienced and reponsive experts will be able look at the problem and
+quickly address it. Please include a thorough description of the problem with
+code and data examples if at all possible.
+
+If you have found a bug, please report it on the BioPerl bug tracking system
+to help us keep track the bugs and their resolution:
+   https://redmine.open-bio.org/projects/bioperl/
+
+The development code for Bio-Community is hosted on GitHub. To fork it and
+start hacking, simply run:
+   git clone https://github.com/bioperl/Bio-Community.git
+
+
+COPYRIGHT
+
+Copyright 2011-2014 by Florent Angly <florent.angly@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+

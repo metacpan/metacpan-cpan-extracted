@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:tns="http://wfmc.org/standards/docs/xpdl_sample/creditService.wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://schemas.xmlsoap.org/wsdl/ http://schemas.xmlsoap.org/wsdl/">
+   <types>
+      <schema xmlns="http://www.w3.org/2001/XMLSchema">
+         <element name="CreditInfo">
+            <complexType>
+               <sequence>
+                  <element name="MerchantNumber"/>
+                  <element name="AccountNumber"/>
+                  <element name="Amount"/>
+                  <element name="CardType"/>
+               </sequence>
+            </complexType>
+         </element>
+      </schema>
+   </types>
+   <message name="creditInput">
+      <part name="CreditInfo" element="tns:CreditInfo"/>
+   </message>
+   <message name="creditOutput">
+      <part name="status" type="string"/>
+   </message>
+   <portType name="CreditPortType">
+      <operation name="GetCreditAuthorization">
+         <input message="tns:creditInput"/>
+         <output message="tns:creditOutput"/>
+      </operation>
+      <operation name="ChargeCreditAccount">
+         <input message="tns:creditInput"/>
+         <output message="tns:creditOutput"/>
+      </operation>
+   </portType>
+   <binding name="CreditBinding" type="tns:CreditPortType">
+      <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <operation name="GetCreditAuthorization">
+         <soap:operation soapAction="http://sample.com/GetCreditAuthorization"/>
+         <input>
+            <soap:body use="literal"/>
+         </input>
+         <output>
+            <soap:body use="literal"/>
+         </output>
+      </operation>
+      <operation name="ChargeCreditAccount">
+         <soap:operation soapAction="http://sample.com/ChargeCreditAccount"/>
+         <input>
+            <soap:body use="literal"/>
+         </input>
+         <output>
+            <soap:body use="literal"/>
+         </output>
+      </operation>
+   </binding>
+   <service name="CreditService">
+      <port name="CreditServicePort" binding="tns:CreditBinding">
+         <soap:address location="http://sample.com/CreditCharge"/>
+      </port>
+   </service>
+</definitions>

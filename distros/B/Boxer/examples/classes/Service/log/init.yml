@@ -1,0 +1,11 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service-log:
+      headline:
+        - Syslog service
+      pkg:
+        - include syslog service Rsyslog
+  pkg:
+    - rsyslog

@@ -1,0 +1,21 @@
+use common::sense;
+
+use Bread::Board;
+use Test::More;
+use t::Utils qw(mark_file_loaded);
+
+mark_file_loaded(__FILE__);
+
+sub {
+    my ( $name, $next, @args ) = @_;
+
+    is( $name, 'Root', 'Root container builder called with proper name');
+    is( ref($next), 'CODE', '$next passed is a coderef');
+
+    container $name => as {
+	service package => __PACKAGE__;
+	service args => \@args;
+        service core_present => 1;
+        service source       => 'core_root';
+    };
+};

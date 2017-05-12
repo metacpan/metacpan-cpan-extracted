@@ -1,0 +1,8 @@
+CREATE TABLE child (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    birth_day date,
+    created datetime,
+    modified datetime
+);
+

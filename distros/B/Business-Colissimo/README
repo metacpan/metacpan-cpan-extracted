@@ -1,0 +1,340 @@
+NAME
+    Business::Colissimo - Shipping labels for ColiPoste
+
+VERSION
+    Version 0.2200
+
+SYNOPSIS
+        use Business::Colissimo;
+
+        $colissimo = Business::Colissimo->new(mode => 'access_f',
+                                   customer_number => '900001',
+                                   parcel_number => '2052475203',
+                                   postal_code => '72240',
+                                   weight => 120);
+
+        # get logo file name
+        $colissimo->logo;
+
+        # produce barcode images
+        $colissimo->barcode('tracking', spacing => 1);
+        $colissimo->barcode('shipping', spacing => 1);
+
+        # customer number
+        $colissimo->customer_number('900001')
+        # parcel number from your alloted range numbers
+        $colissimo->parcel_number('2052475203');
+
+        # country code for recipient (expert_i and expert_i_kpg mode)
+        $colissimo->country_code('DE');
+
+        # postal code for recipient
+        $colissimo->postal_code('72240');
+
+        # add weight in grams
+        $colissimo->weight(250);
+
+        # not mechanisable option
+        $colissimo->not_mechanisable(1);
+    
+        # cash on delivery option (expert mode only)
+        $colissimo->cod(1);
+
+        # insurance level (expert mode only)
+        $colissimo->level('01');
+
+        # recommendation level (expert_f and expert_om mode only)
+        $colissimo->level('21');
+
+        # set scale in pixels for barcode image (default: 1)
+        $colissimo->scale(2);
+
+        # set height in pixels for barcode image (default: 77)
+        $colissimo->height(100);
+
+DESCRIPTION
+    Business::Colissimo helps you to produce shipping labels for the
+    following ColiPoste services:
+
+    Access France
+            $colissimo = Business::Colissimo->new(mode => 'access_f');
+
+    Expert France
+            $colissimo = Business::Colissimo->new(mode => 'expert_f');
+
+    Expert Outre Mer
+            $colissimo = Business::Colissimo->new(mode => 'expert_om');
+
+    Expert International
+            KPG countries:
+
+            $colissimo = Business::Colissimo->new(mode => 'expert_i_kpg');
+
+            Countries outside of KPG:
+
+            $colissimo = Business::Colissimo->new(mode => 'expert_i');
+
+METHODS
+  new
+        $colissimo = Business::Colissimo->new(mode => 'access_f',
+             customer_number => '900001',
+             parcel_number => '2052475203',
+             postal_code => '72240',
+             weight => 250);
+
+        $colissimo = Business::Colissimo->new(mode => 'expert_f',
+             customer_number => '900001',
+             parcel_number => '2052475203',
+             postal_code => '72240',
+             weight => 250,
+             cod => 1,
+             level => '01');
+
+  barcode
+    Produces the tracking barcode:
+
+        $colissimo->barcode('tracking');
+
+    Same with proper spacing for the shipping label:
+
+        $colissimo->barcode('tracking', spacing => 1);
+
+    Produces the sorting barcode:
+
+        $colissimo->barcode('sorting');
+
+    Same with proper spacing for the shipping label:
+
+        $colissimo->barcode('sorting', spacing => 1);
+
+  barcode_image
+    Produces PNG image for tracking barcode:
+
+        $colissimo->barcode_image('tracking');
+
+    Produces PNG image for sorting barcode:
+
+        $colissimo->barcode_image('sorting');
+
+    Produces PNG image for arbitrary barcode:
+
+        $colissimo->barcode_image('8L20524752032');
+
+    The scale of the image can be changed for each barcode individually:
+
+        $colissimo->barcode_image('8L20524752032', scale => 2);
+
+    The default scale is set to 1, because that produces images with the
+    right number of pixels to include them into PDF with PDF::API2, which
+    uses 72dpi resolution for images unless you specify width and height
+    explicitly (see PDF::API2::Content).
+
+    The formula for calculating width in mm for a 72dpi resolution is as
+    follows:
+
+        (1px * 25.4) / 72dpi
+
+    This fits into Colissimo's requirement for the basic module (narrowest
+    element of the bar code) of 0.33 to 0.375 mm.
+
+  logo
+    Returns logo file name for selected service.
+
+        $colissimo->logo;
+
+  test
+    Toggles testing.
+
+        $colissimo->test(1);
+
+  scale
+    Get current scale for barcode image:
+
+        $colissimo->scale;
+
+    Set current scale for barcode image:
+
+        $colissimo->scale(3);
+
+  height
+    Get current height for barcode image:
+
+        $colissimo->height;
+
+    Set current height for barcode image:
+
+        $colissimo->height(100);
+
+  padding
+    Get current padding for barcode image:
+
+        $colissimo->padding;
+
+    Set current padding for barcode image:
+
+        $colissimo->padding(0);
+
+  customer_number
+    Get current customer number:
+
+        $colissimo->customer_number;
+
+    Set current customer number:
+
+        $colissimo->customer_number('900001');
+
+  parcel_number
+    Get current parcel number:
+
+        $colissimo->parcel_number;
+    
+    Set current parcel number:
+
+        $colissimo->parcel_number('2052475203');
+
+  country_code
+    Get current country code:
+
+        $colissimo->country
+
+    Set current country code:
+
+        $colissimo->country('BE');
+
+    The country code is defined in the ISO 3166 standard.
+
+    Switches to expert_i_kpg mode automatically.
+
+  postal_code
+    Get current postal code:
+
+        $colissimo->postal_code
+
+    Set current postal code:
+
+        $colissimo->postal_code('72240');
+
+  weight
+    Get current weight:
+
+       $colissimo->weight;
+
+    Set weight in grams:
+
+       $colissimo->weight(250);
+
+  not_mechanisable
+    Get current value of not mechanisable option:
+
+        $colissimo->not_mechanisable;
+
+    Set current value of not mechanisable option:
+
+        $colissimo->not_mechanisable(1);
+
+    Possible values are 0 (No) and 1 (Yes).
+
+  cod
+    Get current value of cash on delivery option:
+
+        $colissimo->cod;
+
+    Set current value of cash on delivery option:
+
+        $colissimo->cod(1);
+
+    The cash on delivery option is available only in export mode, possible
+    values are 0 (No) and 1 (Yes).
+
+  level
+    Get current insurance resp. recommendation level:
+
+        $colissimo->level;
+
+    Set current insurance resp. recommendation level:
+
+        $colissimo->level('O1');
+        $colissimo->level('21');
+
+    The level option is only available in expert mode, possible values are
+    01 ... 10 for insurance level and 21 ... 23 for recommendation level.
+
+  ack_receipt
+    Get current value for acknowledgement of receipt (AR):
+
+        $colissimo->ack_receipt;
+
+    Set current value for acknowledgement of receipt (AR):
+
+        $colissimo->ack_receipt(1);
+
+    Returns 1 if acknowledgement of receipt is enabled, 0 otherwise.
+
+    The ack_receipt option is only available in expert_om and expert_i
+    modes, possible values are 0 (No) and 1 (Yes).
+
+  duty_free
+    Get current value for customs duty free (FTD):
+
+        $colissimo->duty_free;
+
+    Set current value for customs duty free (FTD):
+
+        $colissimo->duty_free(1);
+
+    The custom duty free option is only available in expert_om mode,
+    possible values are 0 (No) and 1 (Yes).
+
+  international
+    Returns 1 on international (expert_i or expert_i_kpg) shippings, 0
+    otherwise.
+
+  organisation
+    Returns the acronym of the inter-postal organisation (KPG or EPG)
+    corresponding to the destination country.
+
+  control_key
+    Returns control key for barcode.
+
+AUTHOR
+    Stefan Hornburg (Racke), `<racke at linuxia.de>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-business-colissimo at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-Colissimo. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::Colissimo
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-Colissimo
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Business-Colissimo
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Business-Colissimo
+
+    * Search CPAN
+        http://search.cpan.org/dist/Business-Colissimo/
+
+ACKNOWLEDGEMENTS
+    Thanks to Ton Verhagen for being a big supporter of my projects in all
+    aspects.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011-2012 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

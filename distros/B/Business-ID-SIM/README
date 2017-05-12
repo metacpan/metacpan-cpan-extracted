@@ -1,0 +1,22 @@
+SYNOPSIS
+
+     use Business::ID::SIM qw(parse_sim);
+    
+     my $res = parse_sim(sim => "0113 40 00 0001");
+
+DESCRIPTION
+
+    This module can be used to validate Indonesian driving license number,
+    Nomor Surat Izin Mengemudi (SIM).
+
+    SIM is composed of 12 digits as follow:
+
+     yymm.pp.aa.ssss
+
+    yy and mm are year and month of birth, pp and aa are area code
+    (province+district of some sort), ssss is 4-digit serial most probably
+    starting from 1.
+
+    Note that there are several kinds of SIM (A, B1, B2, C) but this is not
+    encoded in the SIM number and all SIM's have the same number.
+

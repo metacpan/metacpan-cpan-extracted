@@ -1,0 +1,149 @@
+
+=head1 NAME
+
+Box2D::b2AABB - An axis aligned bounding box.
+
+=head1 SYNOPSIS
+
+  my $aabb = Box2D::b2AABB->new();
+  $aabb->lowerBound( Box2D::b2Vec2->new( $x1, $y1 ) );
+  $aabb->upperBound( Box2D::b2Vec2->new( $x2, $y2 ) );
+
+  $aabb->Combine( $aabb1, $aabb2 );
+
+  my $center  = $aabb->GetCenter();
+  my $extents = $aabb->GetExtents();
+
+  my $input  = Box2D::b2RayCastInput->new();
+  my $output = Box2D::b2RayCastOutput->new();
+  $aabb->RayCast( $output, $input );
+
+=head1 DESCRIPTION
+
+An axis aligned bounding box.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2AABB>
+
+=head2 Combine( $aabb1, $aabb2 )
+
+Combine two AABBs into this one.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2AABB> C<$aabb1>
+
+=item * C<Box2D::b2AABB> C<$aabb2>
+
+=back
+
+=head2 Contains( $aabb )
+
+Does this aabb contain the provided AABB.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2AABB> C<$aabb>
+
+=back
+
+Returns a C<bool>
+
+=head2 GetCenter()
+
+Get the center of the AABB.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetExtents()
+
+Get the extents of the AABB (half-widths).
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 IsValid()
+
+Verify that the bounds are sorted.
+
+Returns a C<bool>
+
+=head2 RayCast( $output, $input )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2RayCastOutput> C<$output>
+
+=item * C<Box2D::b2RayCastInput> C<$input>
+
+=back
+
+Returns a C<bool>
+
+=head2 lowerBound()
+
+=head2 lowerBound( $lowerBound )
+
+the lower vertex
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$lowerBound> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 upperBound()
+
+=head2 upperBound( $upperBound )
+
+the upper vertex
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$upperBound> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2RayCastInput>
+
+=item * L<Box2D::b2RayCastOutput>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

@@ -1,0 +1,17 @@
+Copyright (c) 2002 Ivan Kohler
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::VirtualNet, an Business::OnlinePayment
+backend module for Vital VirtualNet.  It is only useful if you have a merchant
+account with Vital VirtualNet:
+http://www.vitalps.com/sections/merch/mer_ps_VNET_info.html
+
+It based on Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+
+Ivan Kohler <ivan-virtualnet@420.am>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").

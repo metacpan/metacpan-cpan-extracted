@@ -1,0 +1,15 @@
+<?xml version='1.0' standalone='no' ?>
+<!DOCTYPE DASTYPES SYSTEM 'dastypes.dtd' >
+<DASTYPES>
+  <GFF version="1.0" href="http://servlet.sanger.ac.uk:8080/das/ensembl1834/types">
+    <SEGMENT version="18">
+      <TYPE id="translation" />
+      <TYPE id="supercontig" />
+      <TYPE id="clone" />
+      <TYPE id="contig" />
+      <TYPE id="exon" />
+      <TYPE id="karyotype" />
+      <TYPE id="transcript" />
+    </SEGMENT>
+  </GFF>
+</DASTYPES>

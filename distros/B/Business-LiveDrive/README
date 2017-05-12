@@ -1,0 +1,35 @@
+Business-LiveDrive version 0.01
+===============================
+
+A perl interface to the livedrive.com reseller API.
+
+See http://www.livedrive.com/ for details of the service and their
+reseller service.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Class::Accessor
+  SOAP::Lite
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Jason Clifford <jason@ukfsn.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 or
+later.
+
+

@@ -1,0 +1,7 @@
+Revision history for Perl extension Benchmark::Timer::Class.
+
+0.01  Tue Mar 27 00:26:38 2001
+	- original version; created by h2xs 1.19
+
+0.02  Tue Mar 27 20:26:00 2000
+        - updated to allow access to more Benchmark::Timer methods

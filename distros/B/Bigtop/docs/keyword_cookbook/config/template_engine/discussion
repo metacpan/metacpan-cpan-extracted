@@ -1,0 +1,20 @@
+=head1 USE
+
+The bigtop config block keyword C<template_engine> specifies the template
+engine for your app.  Gantry only supports C<TT> (Template Toolkit) or
+C<Default> (no templating).  Template plugins for Gantry only require
+you to write four methods, so it wouldn't be hard to add more.  When you
+do, bigtop will support them immediately.  Add them to C<Bigtop::Keywords>
+and tentmaker will support them as well.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<TT> in these files:
+
+      docs/httpd.conf 6
+      lib/GENKids.pm 8
+      t/10_run.t

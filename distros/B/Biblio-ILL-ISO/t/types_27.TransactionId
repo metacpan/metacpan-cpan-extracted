@@ -1,0 +1,15 @@
+$VAR1 = bless( {
+                 'initial-requester-id' => bless( {
+                                                    'person-or-institution-symbol' => bless( {
+                                                                                               'institution-symbol' => bless( {
+                                                                                                                                'generalstring' => 'MWPL'
+                                                                                                                              }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                             }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                                  }, 'Biblio::ILL::ISO::SystemId' ),
+                 'transaction-qualifier' => bless( {
+                                                     'generalstring' => '001'
+                                                   }, 'Biblio::ILL::ISO::ILLString' ),
+                 'transaction-group-qualifier' => bless( {
+                                                           'generalstring' => 'PLS'
+                                                         }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::TransactionId' );

@@ -1,0 +1,202 @@
+======================================
+  Module "Bit::ShiftReg" Version 2.0
+======================================
+   for Perl version 5.000 or higher
+
+
+Contents of this file:
+----------------------
+
+    -   Legal stuff
+    -   Requirements
+    -   What does it do
+    -   Preliminary steps for use with Perl prior to version 5.002
+    -   How to install it
+    -   Version history
+    -   Credits
+    -   Final note
+
+
+Legal stuff:
+------------
+
+Copyright (c) 1997 by Steffen Beyer. All rights reserved.
+This package is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+
+Requirements:
+-------------
+
+Perl version 5.000 or higher, a C compiler capable of the ANSI C standard (!)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+What does it do:
+----------------
+
+This module implements rotate left, rotate right, arithmetic shift left
+and logical shift right operations with carry flag for all C integer types.
+
+The results depend on the number of bits that the integer types unsigned
+char, unsigned short, unsigned int and unsigned long have on your machine.
+
+The module automatically determines the number of bits of each integer type
+and adjusts its internal constants accordingly.
+
+
+Preliminary steps for use with Perl prior to version 5.002:
+-----------------------------------------------------------
+
+Edit the file "Makefile.PL" in this distribution and change the line
+
+    'VERSION_FROM'	=> 'ShiftReg.pm',
+
+to
+
+    'VERSION'		=> '2.0',
+
+Then edit the file "ShiftReg.pm" and change the line
+
+    bootstrap Bit::ShiftReg $VERSION;
+
+to
+
+    bootstrap Bit::ShiftReg;
+
+Finally, edit the file "ShiftReg.xs" and delete the line
+
+    PROTOTYPES: DISABLE
+
+
+How to install it:
+------------------
+
+Please unpack and build this package OUTSIDE the Perl source and distribution
+tree!!
+
+ 1) Change directory to the directory that has been created by unpacking this
+    package ("Bit-ShiftReg-2.0/").
+
+ 2) Type "perl Makefile.PL" (or whatever the name and path of your Perl 5
+    binary is).
+
+    This will create a "Makefile" with the appropriate parameters for your
+    system (for instance, where the install directories are, and so on).
+
+ 3) Type "make".
+
+    This will create a dynamically linkable library file that will be linked
+    to Perl later, at runtime, provided your system supports dynamic linking.
+
+    Please refer to the MakeMaker documentation for instructions on how
+    to build a new Perl with statically linked libraries (invoke "perldoc
+    ExtUtils::MakeMaker" for this), if your system does NOT support dynamic
+    linking!
+
+    Should you encounter any compiler warnings or errors (like the redefini-
+    tion of certain types already defined by your system), please contact
+    me by mail at <sb@sdm.de>, sending me your compiler output (both STDOUT
+    and STDERR). Thank you!
+
+    ======================================================================
+    Be aware that you need a C compiler which supports ANSI C in order to
+    successfully compile this package!
+    ======================================================================
+
+    Also note that problems may arise with the c89 compiler of HP, although
+    it allegedly supports ANSI C!
+
+    I recommend the GNU gcc compiler, which is available for free on the
+    Internet.
+
+    (HP users are strongly recommended to install the GNU assembler GAS
+    first before installing GNU gcc)
+
+    Should you get the error messages
+
+    ShiftReg.c: 15: Unable to find include file 'EXTERN.h'.
+    ShiftReg.c: 16: Unable to find include file 'perl.h'.
+    ShiftReg.c: 17: Unable to find include file 'XSUB.h'.
+
+    then edit the file Makefile.PL and change the line
+
+    'INC'	=> '',     # e.g., '-I/opt/pkg/perl5.003/dist'
+
+    in such a way that it points to your Perl 5 distribution tree, e.g.,
+
+    'INC'	=> '-I/usr/ctr/dlt/private/perl/perl5.003',
+
+    or the like, and start over with the generation of the Makefile at 2).
+
+ 4) Now issue "make test".
+
+    The output should look somewhat like this:
+
+    PERL_DL_NONLAZY=1 /usr/bin/perl -I./blib/arch -I./blib/lib
+    -I/e/www/sw/pkg/perl/lib/i386-freebsd/5.003 -I/e/www/sw/pkg/perl/lib
+    -e 'use Test::Harness qw(&runtests $verbose); $verbose=0; runtests @ARGV;'
+    t/*.t
+    t/f000..............ok
+    t/f001..............ok
+    t/f002..............ok
+    t/f003..............ok
+    t/f004..............ok
+    t/f005..............ok
+    t/f006..............ok
+    t/f007..............ok
+    All tests successful.
+    Files=8,  Tests=234,  1 secs ( 1.40 cusr  0.23 csys =  1.63 cpu)
+
+ 5) At last, type "make install".
+
+ 6) Share and enjoy!
+
+
+Version history:
+----------------
+
+Version 1.0 was the initial release.
+
+Version 1.1 fixed a possible bug in the XS file where the number of bits
+of an unsigned char was assumed to be 8 bits (without even checking) in
+the previous version.
+
+Version 2.0 provides new "MSB" and "LSB" functions (for all types).
+
+This version also changed the module's name from "ROL_ROR" to "Bit::ShiftReg".
+
+It also provides testing routines so that "make test" now works.
+
+And last but not least this version changed the interfaces of the existing
+functions so that they can be chained to form ever larger shift registers.
+
+
+Credits:
+--------
+
+Many thanks to Andreas Koenig <andreas.koenig@mind.de> (as always!)
+for his relentless support and efforts as upload manager of the CPAN!
+
+Also many thanks to Jon Orwant <orwant@media.mit.edu> and Tim Bunce
+<Tim.Bunce@ig.co.uk> for their suggestions concerning this module's
+name and its implementation!
+
+
+Final note:
+-----------
+
+If you need any assistance or have any comments, problems, suggestions,
+findings, complaints, questions, insights, compliments or donations to give ;-)
+then please don't hesitate to send me a mail:
+
+sb@sdm.de (Steffen Beyer)
+
+Yours sincerely,
+--
+          _____        _____      .__
+        _/ ____\____ _/ ____\____ |__|______
+        \   __\\__  \\   __\/    \|  \_  __ \       Steffen Beyer
+         |  |   / __ \|  | |   |  \  ||  | \/         sb@sdm.de
+         |__|  (____  /__| |___|  /__||__|           sb@en.muc.de
+                    \/          \/           http://www.engelschall.com/u/sb/

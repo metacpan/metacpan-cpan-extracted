@@ -1,0 +1,136 @@
+Backup-EZ
+
+Backup::EZ is backup software that is designed to be as easy to use
+as possible, yet provide a robust backup solution. I haven't been
+able to find an open-source backup solution that worked how I wanted
+it to. There are no shortage of options, but the ones I found store
+the data in a format that isn't straight-forward. With this, if you
+can use ls and rsync/scp, you can do a restore. No muss, no fuss,
+just works.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+POST INSTALLATION
+
+	1. configure ssh keys for your remote username
+		a. su - root
+		b. ssh-keygen -t rsa (skip if already in place)
+		c. ssh-copy-id USERNAME@YOURBACKUPHOST
+		d. verify you can auto-login
+	 		ssh root@YOURBACKUPHOST
+		e. exit
+		
+	2. identify (create if necessary) remote backup directory
+		example: /backups
+		
+	3. run "ezbackup -installcfg"
+		
+	4. edit /etc/ezbackup/ezbackup.conf and modify the TODO's with the
+		appropriate values
+
+	OPTIONAL
+	
+	5.  do a manual backup to get things started
+		 run: "ezbackup"
+
+	AUTOMATE
+		
+	6.  Setup cron to run ezbackup on a schedule.  You can do this manually
+		if you prefer or let ezbackup do it for you.  Run: 
+			"ezbackup -installcron daily" 
+				(or whatever freq you prefer in /etc/cron.*)	
+		
+RESTORE
+
+	There are a plethora of ways to restore files.  You could use scp,
+	rsync, cp via nfs, etc.  How to use these utilities is beyond the scope
+	of this document.  Here is one example with scp.
+	
+	1.  login to remote backup server
+	
+	2.  cd YOURDESTDIR
+	
+	3.  ls 
+	
+	4.  cd <the subdir of your choice>	
+
+	5.  pwd
+	
+	6.  open another terminal on the source host and login as the user that
+		performs backups
+	
+	7.  scp \
+		USERNAME@YOURBACKUPHOST:<DIR FROM STEP 5>/some/dir/you/want/to/restore \
+		<YOUR LOCAL DIR>
+
+	
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Backup::EZ
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Backup-EZ
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Backup-EZ
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Backup-EZ
+
+    Search CPAN
+        http://search.cpan.org/dist/Backup-EZ/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 John Gravatt
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

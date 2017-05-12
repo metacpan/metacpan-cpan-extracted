@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-3DSecure-Cardinal
+version:      0.06
+version_from: lib/Business/3DSecure/Cardinal.pm
+installdirs:  site
+requires:
+    Business::3DSecure:            0
+    Error:                         0
+    LWP::UserAgent:                0
+    SOAP::Lite:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

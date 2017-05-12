@@ -1,0 +1,57 @@
+4 tests fail anyway...
+
+--- ./Makefile.PL-pre	Sat Aug 16 23:12:54 2003
++++ ./Makefile.PL	Thu Oct  9 01:57:08 2003
+@@ -55,6 +55,8 @@ $openssl_vers2 = '0.9.7b';
+ 
+ print "Checking for OpenSSL-$openssl_vers or $openssl_vers2 or newer...\n";
+ 
++my $other_try;
++
+ while (1) {
+     $exe_path = "$openssl_path/bin/openssl";
+     last if -x $exe_path;
+@@ -64,6 +66,16 @@ while (1) {
+     last if -x $exe_path;
+     $exe_path = "$openssl_path/out32dll/openssl.exe";
+     last if -x $exe_path;
++
++    if (not($other_try++) and $] >= 5.008001) {
++	require ExtUtils::Liblist;		# Buggy before this
++	my ($list) = ExtUtils::Liblist->ext("-lssl");
++	if ($list =~ /-lssl\b/) {
++		$exe_path = 'openssl' if $list =~ /-lssl\b/;
++		$openssl_path = '/';	# dummy
++		last;
++	}
++    }
+ 
+     print "I could not find your OpenSSL in `$openssl_path'\n";
+     print "Please provide OpenSSL-$openssl_vers or\n"
+--- ./test.pl-pre	Sat Aug 16 23:27:54 2003
++++ ./test.pl	Thu Oct  9 02:04:02 2003
+@@ -44,7 +44,9 @@ sub test {
+ 
+ my $inc = join ' ', map("-I$_", @INC);
+ #$perl = "perl $inc";
+-my $perl = "$Config{perlpath} $inc";
++my $binperl = $^X;
++$binperl = $Config{perlpath} unless defined $binperl and -f $binperl;
++my $perl = "$binperl $inc";
+ print "Using perl at `$perl'\n" if $trace>1;
+ 
+ ### Pointer casting test for 64 bit architectures
+--- ./SSLeay.pm-pre	Sun Aug 17 07:24:32 2003
++++ ./SSLeay.pm	Sun Oct 12 18:55:22 2003
+@@ -1857,8 +1857,10 @@ sub randomize (;$$) {
+     $egd_path = '/tmp/entropy'   unless $egd_path;
+     
+     RAND_seed(rand() + $$);  # Stir it with time and pid
++    RAND_poll();	     # Stir it with some info from the system
+     
+-    unless ($rnsf || -r $Net::SSLeay::random_device || $seed || -S $egd_path) {
++    unless ($rnsf || -r $Net::SSLeay::random_device || $seed || -S $egd_path
++	    || $^O eq 'os2') {	# On some architectures RAND_poll collects stuff
+ 	warn "Random number generator not seeded!!!" if $trace;
+     }
+     

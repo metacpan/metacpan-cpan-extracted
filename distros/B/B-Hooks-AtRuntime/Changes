@@ -1,0 +1,10 @@
+Revision history for B::Hooks::AtRuntime.
+
+2       2015-12-25
+    - Change to XS-based ::run, eliminating extra scope.
+    - Add after_runtime.
+    - Switch to Exporter::Tiny.
+
+1       2012-02-13
+    - Uses lex_stuff_sv on 5.12.
+    - Filter-based substitute before that.

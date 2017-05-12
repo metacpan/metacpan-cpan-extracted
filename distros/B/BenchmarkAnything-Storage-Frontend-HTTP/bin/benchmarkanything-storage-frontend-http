@@ -1,0 +1,35 @@
+#! /usr/bin/perl
+# PODNAME: benchmark-anything-storage-frontend-http
+# ABSTRACT: HTTP frontend to a BenchmarkAnything store
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+# Start command line interface for application
+require Mojolicious::Commands;
+Mojolicious::Commands->start_app('BenchmarkAnything::Storage::Frontend::HTTP');
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+benchmark-anything-storage-frontend-http - HTTP frontend to a BenchmarkAnything store
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

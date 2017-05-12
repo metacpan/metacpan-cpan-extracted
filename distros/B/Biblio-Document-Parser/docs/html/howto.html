@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ParaTools 1.00 Documentation - How-To Guides</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ParaTools 1.00 Documentation - How-To Guides</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#how_to__modify_converters_in_document__parser__utils">HOW TO: Modify Converters in Document::Parser::Utils</a></li>
+	<ul>
+
+		<li><a href="#how_to__create_a_document_parser">HOW TO: Create a Document Parser</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="how_to__modify_converters_in_document__parser__utils">HOW TO: Modify Converters in Document::Parser::Utils</a></h1>
+<ul>
+<li></li>
+Locate where your Utils.pm file has been installed.
+<p>On Linux systems this should just involve doing 'locate Utils.pm', otherwise 'find / -name Utils.pm' should work. 
+Alternatively, you can edit the Utils.pm in the Document/Parser/ directory of an unpacked distribution, and install it once you have finished.</p>
+<p></p>
+<li></li>
+Add the converter to the list.
+<p>If you are editing an already installed Utils.pm file you will probably have to be root to do this. If you are editing the Utils.pm inside an unpacked distribution, you will have to reinstall the modules once you are finished (see the Installation section).</p>
+<p>The %CONVERTERS hash maps from file extension to converter - _IN_ is replaced by the input file, _OUT_ is replaced by the output (ASCII) file. For example:</p>
+<pre>
+ html =&gt; &quot;links --dump _IN_ &gt; _OUT_&quot;</pre>
+<p>This takes an input HTML file (say, in.html) and an output ASCII file (out.txt), and carries out 'links --dump in.html &gt; out.txt'.</p>
+<p>NB: Don't forget a comma after your converter.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="how_to__create_a_document_parser">HOW TO: Create a Document Parser</a></h2>
+<p>All new document parsers should be named Biblio::Document::Parser::SomeName, where SomeName is replaced with a unique name (ideally the author's surname).  The parser should extend the Biblio::Document::Parser module like so:</p>
+<pre>
+ package Biblio::Document::Parser::SomeName;
+ require Exporter;
+ @ISA = (&quot;Exporter&quot;, &quot;Biblio::Document::Parser&quot;);
+ our @EXPORT_OK = ( 'new', 'parse' );</pre>
+<p>You should then override the 'new' and 'parse' methods:</p>
+<p>e.g.</p>
+<pre>
+ sub new
+ {
+         my($class) = @_;
+         my $self = {};
+         return bless($self, $class);
+ }</pre>
+<pre>
+ sub parse
+ {
+        my($self, $lines, %options) = @_;</pre>
+<pre>
+        # Do something with the lines
+        my @lines = split(&quot;\n&quot;, $lines);
+        my @references = get_refs(@lines);
+        return @references;
+ }</pre>
+<p>This makes it easy for users to swap out one document parser for another.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;ParaTools 1.00 Documentation - How-To Guides</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

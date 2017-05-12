@@ -1,0 +1,19 @@
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::Ingotz, an Business::OnlinePayment
+backend module for Ingotz.  It is only useful if you have a merchant
+account with Ingotz: http://www.ingotz.com
+
+Installation process is pretty easy:
+
+ perl Makefile.PL
+ make
+ make test (optional)
+ make install
+
+To read module documentation 
+
+ perldoc Business::OnlinePayment::Ingotz
+
+Check examples/ folder for examples.

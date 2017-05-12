@@ -1,0 +1,27 @@
+
+inventory DB:
+-------------
+ default loc:
+    [TARGET:foo]'s "inventory_db" key, or
+    "$ENV{HOME}/.brackup-target-$name.invdb";
+
+ mapping:
+
+   pchunk->inventory_key   --->  join(" ", $schunk->backup_digest, $schunk->backup_length))
+   <dig>;to=<rcpt>
+   <dig>;raw
+
+
+Digest DB:
+----------
+  default loc:
+    [SOURCE:foo]'s 'digestdb_file' key, or
+    "$SOURCE_DIR/.brackup-digest.db"
+
+ table:  "digest_cache"
+
+    <cache_key> => "sha1:xxxxxxxxx"
+
+ cache_key ::=
+    [<root>]<path>:<ctime>,<mtime>,<size>,<ino>
+

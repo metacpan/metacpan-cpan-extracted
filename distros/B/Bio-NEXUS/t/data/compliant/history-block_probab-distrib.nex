@@ -1,0 +1,37 @@
+#NEXUS
+BEGIN TAXA;
+    dimensions ntax=4;
+    taxlabels A B C D;  
+END;
+BEGIN CHARACTERS;
+    dimensions nchar=6;
+    format
+        datatype=standard missing=? gap=-;
+    matrix
+        A   011011
+        B   001001
+        C   001001
+        D   011011
+        ;
+END;
+BEGIN TREES;
+[ this block is not complete ]
+ TREE test_tree = (((A,B)node1,C)node2,D)root;
+END;
+BEGIN HISTORY;
+[ this block is not complete ]
+	title foo;
+	dimensions ntax=4 nchar=6;
+	format
+		datatype=standard missing=? gap=- statesformat=frequency;
+	matrix
+        A       (0:1)(1:1)(1:1)(0:1)(1:1)(1:1)
+        B       (0:1)(0:1)(1:1)(0:1)(0:1)(1:1)
+        C       (0:1)(0:1)(1:1)(0:1)(0:1)(1:1)
+        D       (0:1)(1:1)(1:1)(0:1)(1:1)(1:1)
+        node1  (0:0.5 1:0.5)(0:0.4 1:0.6)(0:0.5 1:0.5)(0:0 0:1)(0:1 0:0)(0:0.1 1:0.9)
+        node2  (0:0.5 1:0.5)(0:0.4 1:0.6)(0:0.5 1:0.5)(0:0 0:1)(0:1 0:0)(0:0.1 1:0.9)
+        root    (0:0.5 1:0.5)(0:0.4 1:0.6)(0:0.5 1:0.5)(0:0 0:1)(0:1 0:0)(0:0.1 1:0.9)
+ ;
+ TREE test_tree = (((A,B)node1,C)node2,D)root;
+END;

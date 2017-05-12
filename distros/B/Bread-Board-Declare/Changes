@@ -1,0 +1,64 @@
+Revision history for Bread-Board-Declare
+
+0.16  2014-02-25
+      - fix tests for new moose (reported by kentfredric, #4)
+
+0.15  2013-10-03
+      - fix a memory leak with block injections (Roman Daniel)
+
+0.14  2013-05-14
+      - fix inheriting from classes which aren't yet loaded (reported by
+        xenoterracide)
+
+0.13  2013-03-07
+      - fix for hash randomization in blead
+
+0.12  2012-02-12
+      - add explicit dep on Class::Load, since Moose didn't do that until 2.04
+
+0.11  2012-01-26
+      - dependencies can now be specified inline with the dep() function
+      - type inference can now infer dependencies that are non-moose classes,
+        and dependencies which are created by block injections (as long as the
+        class is also specified)
+      - Bread::Board::Declare classes can now specify subcontainers - see
+        Bread::Board::Declare::Meta::Role::Attribute::Container and
+        t/subcontainers.t for more details
+
+0.10  2011-07-27
+      - bump Bread::Board prereq due to a bug
+      - allow specifying parameters for services
+      - inferring services should just set up parameters, not die
+
+0.09  2011-06-02
+      - make sure coercions are run in all cases (rafl)
+
+0.08  2011-06-01
+      - allow inferring dependencies for constructor injection services
+        (infer => 1 in the attribute definition)
+
+0.07  2011-04-26
+      - fix test suite for upcoming moose error message changes
+
+0.06  2011-04-02
+      - set the 'class' attribute on block services, so that circular
+        dependencies can work better. (jasonmay)
+
+0.05  2011-03-31
+      - bump Bread::Board dep
+
+0.04  2011-03-24
+      - resolving dependencies for services should also check the type
+        constraint on the associated attribute
+
+0.03  2011-03-04
+      - oops, i broke inlining for moose 2 at some point
+
+0.02  2011-03-02
+      - more useful handling of attributes that don't explicitly define a
+        service: they will get a service that throws an exception if it is
+        resolved, which allows the value of that service to be provided by the
+        attribute.
+
+0.01  2011-02-26
+      - Initial release

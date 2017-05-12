@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+#-------------------------------------------------------------------------------
+# NAME p2alignments
+# PURPOSE: extract selected prospect2 alignments from xml file in order 
+#          specified on the command-line
+# USAGE: p2alignments < prospect_xml_output [template ids ...]
+#
+# $Id: p2alignments,v 1.8 2003/11/18 19:45:46 rkh Exp $
+#-------------------------------------------------------------------------------
+
+use warnings;
+use strict;
+use Bio::Prospect::File;
+
+use vars qw( $VERSION );
+$VERSION = sprintf( "%d.%02d", q$Revision: 1.8 $ =~ /(\d+)\.(\d+)/ );
+
+my %al;
+my %wanted = map {$_=>1} @ARGV;
+
+my $pf = new Bio::Prospect::File;
+$pf->open( "-" );
+
+while( my $t = $pf->next_thread() ) {
+  my $tname = $t->tname();
+  if ( $wanted{$tname} )	{
+	$al{$tname} = 
+	  sprintf("* %s->%s   raw=%d mut=%d pair=%d\n",
+			  $t->qname(), $tname,
+			  $t->raw_score(), $t->mutation_score(), $t->pair_score() )
+		. $t->alignment(undef,$tname);
+	delete $wanted{ $tname };
+  }
+}
+
+my @missed = keys %wanted;
+printf(STDERR "didn't find %d template alignments for %s\n",
+	   $#missed+1,join(',',@missed)) if $#missed > -1;
+
+print $al{$_} for grep { not exists $wanted{$_} } @ARGV;

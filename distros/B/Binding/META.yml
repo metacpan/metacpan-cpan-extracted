@@ -1,0 +1,31 @@
+---
+abstract: 'eval with variable binding of caller stacks.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Binding
+name: Binding
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Data::Dump: 1.14
+  Devel::Caller: 2.03
+  PadWalker: 1.7
+  UNIVERSAL::isa: 0
+  perl: 5.8.0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.06

@@ -1,0 +1,10 @@
+# $Id: local.pbib 21 2004-12-14 12:23:43Z tandler $
+
+<biblio>
+	class File
+	file intro.bib
+</biblio>
+
+
+include Elsevier/JSS.pbib
+

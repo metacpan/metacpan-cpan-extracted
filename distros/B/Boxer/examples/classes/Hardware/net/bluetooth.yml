@@ -1,0 +1,15 @@
+classes:
+  - hw.acpi.full
+  - Admin.etc.functions
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include support for Bluetooth hardware
+      tweak:
+        - modernize logic of WiFi/Bluetooth radio on/off button
+  tweak:
+    - _setvar /target/etc/default/acpi-support WIRELESS_BLUETOOTH_SYNC true
+  pkg:
+    - bluez

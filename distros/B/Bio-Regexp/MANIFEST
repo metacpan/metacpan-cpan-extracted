@@ -1,0 +1,8 @@
+Changes
+lib/Bio/Regexp.pm
+lib/Bio/Regexp/AST.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

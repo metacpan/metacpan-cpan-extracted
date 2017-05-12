@@ -1,0 +1,4 @@
+#lineage	factor
+k__Bacteria;p__Proteobacteria	123
+k__Bacteria;p__Proteobacteria;c__Alphaproteobacteria;o__Rickettsiales;f__;g__Candidatus Pelagibacter	100
+k__Archaea;p__Euryarchaeota;c__Thermoplasmata	300

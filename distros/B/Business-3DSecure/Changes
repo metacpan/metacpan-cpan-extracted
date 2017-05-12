@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::3DSecure.
+
+0.01  Tue Jul 22 13:57:23 2008
+	- original version; created by h2xs 1.23 with options
+		-AX Business::3DSecure
+
+0.02  Mon Oct 13 2008
+        - First Public Release 

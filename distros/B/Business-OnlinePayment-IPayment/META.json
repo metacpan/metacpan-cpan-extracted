@@ -1,0 +1,48 @@
+{
+   "abstract" : "Checkout via Ipayment Silent Mode",
+   "author" : [
+      "Marco Pessotto <melmothx@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-OnlinePayment-IPayment",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::OnlinePayment" : "3",
+            "Crypt::SSLeay" : "0",
+            "Moo" : "1",
+            "URI" : "1",
+            "XML::Compile::SOAP" : "0",
+            "XML::Compile::WSDL11" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

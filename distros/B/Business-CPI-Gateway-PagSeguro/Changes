@@ -1,0 +1,44 @@
+Revision history for Business::CPI's driver for PagSeguro.
+
+0.904 2015-01-24T14:25:58Z
+    - Don't break when there are no results (query_transactions)
+
+0.903 2013-12-05T13:49:08Z
+    - Remove receiver_email attribute
+
+0.902 2013-11-28T12:18:04Z
+    - Update to latest version of Business::CPI
+
+0.901 2013-01-30T22:07:53Z
+    - Add Changes file
+    - Update version numbering to be like other CPI modules
+
+0.67  2013-01-21T23:14:19Z
+    - Fix a bug in the notify method
+
+0.66  2013-01-10T18:31:04Z
+    - Implement logging
+    - Create 'refunded' status
+
+0.65  2013-01-09T05:53:14Z
+    - Correctly format extra_amount for PagSeguro
+
+0.6   2013-01-08T22:54:52Z
+    - Convert CPI's default country format to PagSeguro's default country
+      format
+
+0.5   2013-01-08T18:22:26Z
+    - Use the address and shipping features from upstream
+
+0.4   2012-12-21T03:05:45Z
+    - Remove autodie dependency
+
+0.3   2012-12-16T03:02:53Z
+    - Retrieve more information when parsing a transaction
+
+0.2   2012-12-15T21:53:09Z
+    - Add versioning to every class
+    - Add the sponsor to the docs
+
+0.1   2012-11-24T18:43:10Z
+    - Initial release

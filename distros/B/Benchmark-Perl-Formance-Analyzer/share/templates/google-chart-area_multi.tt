@@ -1,0 +1,43 @@
+<html encoding="utf-8">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      // https://google-developers.appspot.com/chart/interactive/docs/gallery/areachart
+      google.load("visualization", "1", {packages:["corechart"]});
+
+[% FOREACH chunk IN chartlist %]
+      google.setOnLoadCallback(drawChart_[% chunk.number %]);
+      function drawChart_[% chunk.number %]() {
+        var data = google.visualization.arrayToDataTable([% chunk.json %]);
+        var options = {
+            title: '[% chunk.charttitle %]',
+            hAxis: {title: '[% x_key %]',  titleTextStyle: {color: '#333'}, slantedTextAngle: 45},
+            vAxis: {minValue: 0, title:'seconds (smaller is better)'},
+            pointSize: 4,
+            areaOpacity: [% areaOpacity %],
+            interpolateNulls: [% interpolateNulls %],
+            isStacked: [% isStacked %]
+        };
+
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div_[% chunk.number %]'));
+        chart.draw(data, options);
+      }
+[% END %]
+    </script>
+  </head>
+  <body>
+  <h1>Perl::Formance - [% querybundle %]</h1>
+  <ul>
+    <li><a href="raw-numbers.txt">Raw numbers</a> used on this page with their statistical description</li>
+    <li><a href="https://metacpan.org/pod/BenchmarkAnything::Evaluations">BenchmarkAnything::Evaluations</a> collecting the statistics</li>
+    <li><a href="https://metacpan.org/search?q=Benchmark%3A%3APerl%3A%3AFormance%3A%3APlugin%3A%3A&search_type=authors">Benchmark::Perl::Formance plugins</a> on CPAN</li>
+  </ul>
+
+[% FOREACH chunk IN chartlist %]
+    <a style="float:left;" href="[% chunk.outfile %]"><div id="chart_div_[% chunk.number %]" style="width: [% width %]px; height: [% height %]px;"></div></a>
+[% END %]
+  <h1>
+  </body>
+</html>

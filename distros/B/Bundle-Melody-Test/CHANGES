@@ -1,0 +1,9 @@
+Revision history for Bundle::Melody::Test:
+
+0.9.6a  Dec 09 2009
+    - Reformatted CONTENTS section for easier parsing
+    - Added Test::NoWarnings and Test:Warn
+
+0.9.6 	Nov 23 2009
+    - Initial release based on Melody 0.9.6  
+

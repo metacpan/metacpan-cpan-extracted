@@ -1,0 +1,9 @@
+appl: graphtest [
+]
+
+xygraph: graph [
+  prompt: "Graph type (? for list of types)"
+  help: "Graphics device"
+  param: "Y"
+  req: "Y"
+]

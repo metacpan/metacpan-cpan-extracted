@@ -1,0 +1,9 @@
+^\.
+build\b
+blib\b
+\.(?:swp|bak|o|c|bs)$
+^MYMETA\.
+^Makefile$
+^Makefile.old$
+^Debian
+^B-Hooks-OP-Check-EntersubForCV-

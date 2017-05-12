@@ -1,0 +1,46 @@
+{
+    "BenchmarkAnythingData" : [
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 27.34,
+            "comment"  : "float value",
+            "compiler" : "gcc",
+            "keyword"  : "affe"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 34.56789,
+            "comment"  : "another float value",
+            "compiler" : "icc",
+            "keyword"  : "zomtec"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 40,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 50,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 60,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 70,
+            "comment"  : "integer value",
+            "compiler" : "icc",
+            "keyword"  : "birne"
+        }
+    ]
+}

@@ -1,0 +1,67 @@
+{
+   "abstract" : "Translate DNA sequences",
+   "author" : [
+      "Kevin Galinsky <kgalinsky plus cpan at gmail dot com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Translator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "List::Compare" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::Util::AA" : "0.001000",
+            "Bio::Util::DNA" : "0.002000",
+            "Carp" : 0,
+            "Class::Accessor" : 0,
+            "Params::Validate" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Bio::Translator" : {
+         "file" : "lib/Bio/Translator.pm",
+         "version" : "v0.6.1"
+      },
+      "Bio::Translator::Table" : {
+         "file" : "lib/Bio/Translator/Table.pm",
+         "version" : 0
+      },
+      "Bio::Translator::Table::Pair" : {
+         "file" : "lib/Bio/Translator/Table.pm",
+         "version" : 0
+      },
+      "Bio::Translator::Utils" : {
+         "file" : "lib/Bio/Translator/Utils.pm",
+         "version" : 0
+      },
+      "Bio::Translator::Validations" : {
+         "file" : "lib/Bio/Translator/Validations.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.6.1"
+}

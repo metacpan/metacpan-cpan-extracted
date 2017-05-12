@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 15e8168ee8b454e7306b4c96540498975c436b8c Changes
+SHA1 200600c723c0ef2d973aa116ffa9c659d3a157b8 MANIFEST
+SHA1 bfd5da5c2298621cad461c512610e0c64a4f53d0 META.json
+SHA1 2bcf7698124ff754be37398781035496b3cd7315 META.yml
+SHA1 67a1a3463b7c71bf95328fd437ebd5c63f270c72 Makefile.PL
+SHA1 f9800a800b986354a93850acaff2fc3d43191c42 README
+SHA1 c82b0d8c12cbc3b41a0213b8e4c05a097a232e3f lib/Bundle/ExCore.pm
+SHA1 7f9780231788ca830a070030f70c147458d75962 lib/Bundle/ExCore/Perl5012.pm
+SHA1 ccd4eaaa27401eb7b17145c1a4c9da650a9f85d3 lib/Bundle/ExCore/Perl5018.pm
+SHA1 2ad284dd84d014e75286932fa1a2a4c16bb00a48 lib/Bundle/ExCore/Perl5020.pm
+SHA1 0f92629375a28782f4a17985549b949d123dbf69 t/00_load.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (Darwin)
+
+iQEcBAEBAgAGBQJVOL6zAAoJEGH3bZuRPycN1K4H/06uQ3y/dh0v9+HIckF+2CW4
+VO1wdx5osS6780L8IcYKli1KSjLs7QSOijfPc8KsPVQv2J4R1Q0pCgdVQHhDec6u
+uthqgJoY9EwJM6rG2+ca/vA8C10bfMGbdUE8GSQNNx6pc1+ecL9ow7PmMlUYEYVN
+pKsowHOyb7LaX65sbwKCS2EIImBo5JffT2bldTva8yB7rfA0d0visauU62J/6ArZ
+B1yj4LS3MfKALW9JcJRlFlsx/gbuUQrT06nm0yqJ8Nwy+kMt4ERKJ5MQuSRQefQ0
+DnEWLXYBvzFcWXUb3bj0WoDlUSDu+LFPWmBNnT296tOowGiBF3W9UzQFgcF/jSc=
+=CHNE
+-----END PGP SIGNATURE-----

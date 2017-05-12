@@ -1,0 +1,12 @@
+classes:
+  - Desktop.office.locale.AFRICA
+  - Desktop.office.locale.AMERICAS
+  - Desktop.office.locale.ASIA
+  - Desktop.office.locale.EUROPE
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include all LibreOffice locales
+  pkg:
+    - libreoffice-l10n-eo

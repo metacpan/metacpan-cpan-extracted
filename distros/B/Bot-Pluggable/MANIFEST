@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+examples/UberBot/Factoid.pm
+examples/UberBot/Joiner.pm
+examples/UberBot/Logger.pm
+examples/UberBot/OpBot.pm
+examples/UberBot/Seen.pm
+examples/uberbot.pl
+lib/Bot/Pluggable.pm
+t/00basic.t

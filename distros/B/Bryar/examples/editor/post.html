@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+<head>
+<title>editor</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="robots" content="noindex, nofollow">
+<script type="text/javascript" src="/fckeditor/fckeditor.js"></script>
+</head>
+
+<body>
+<form action="/cgi-bin/editor-submit" method="POST" style="margin: 2em;">
+<label for="title">Title: </label><input id="title" name="title">
+<label for="category">Category: </label><input id="category" name="category" size="6">
+<label for="pwd">Password: </label><input id="pwd" name="pwd" type="password" size="10">
+<label for="unpublished">Unpublished: <input type="checkbox" name="unpublished">
+<div style="margin-top: 1em" id="fckeditor"></div>
+</form>
+
+<script type="text/javascript">
+var div = document.getElementById('fckeditor');
+var fck = new FCKeditor('fckeditor');
+fck.Height = '500';
+fck.Width = '60%';
+
+var cfg = [
+	['DocType', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">'],
+	['ProcessHTMLEntities',		false],
+	['IncludeLatinEntities',	false],
+	['IncludeGreekEntities',	false],
+	['StartupFocus',		false],
+	['SourcePopup',			true],
+	['FirefoxSpellChecker',		true],
+	['BrowserContextMenuOnCtrl',	true],
+	['DisableFFTableHandles',	false],
+	['BodyClass',			'article'],
+	['EditorAreaCSS',		'/styles.css']
+];
+
+for (var i = 0; i < cfg.length; i++) {
+  fck.Config[cfg[i][0]] = cfg[i][1];
+}
+
+div.innerHTML = fck.CreateHtml();
+</script>
+
+</body>
+</html>

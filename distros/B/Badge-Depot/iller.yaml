@@ -1,0 +1,36 @@
+---
+doctype: dist
+
+header:
+  name: Badge-Depot
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.010000
+     - Moose::Role: 2.0000
+     - Types::Standard
+     - Types::URI
+     - MooseX::AttributeShortcuts
+     - namespace::autoclean
+  test:
+    requires:
+      - Moose: 2.0000
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Badge-Depot-*

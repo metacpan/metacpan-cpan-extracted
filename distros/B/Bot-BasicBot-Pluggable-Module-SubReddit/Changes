@@ -1,0 +1,8 @@
+Revision history for Bot-BasicBot-Pluggable-Module-SubReddit
+
+0.02	Sat Aug 16 10:33:36 BST 2014
+		Fixed missing pre-req for testing (thanks, CPANtesters)
+
+0.01    Sat Aug 16 02:01:40 BST 2014
+        First version, released on an unsuspecting world.
+

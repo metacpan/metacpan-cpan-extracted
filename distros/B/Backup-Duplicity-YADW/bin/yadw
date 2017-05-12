@@ -1,0 +1,227 @@
+#!/usr/bin/perl
+
+# PODNAME: yadw
+# ABSTRACT: Yet Another Duplicity Wrapper command line utility
+
+
+###### PACKAGES ######
+
+use Modern::Perl;
+use Getopt::Long;
+use Backup::Duplicity::YADW;
+use File::Basename;
+use Data::Dumper;
+
+###### CONSTANTS ######
+
+###### GLOBAL VARIABLES ######
+
+use vars qw(
+	$Verbose
+	$DryRun
+	$Command
+	$ConfFileName
+	$Full
+	$Conf
+	$Pid
+	$Yadw
+);
+
+###### MAIN PROGRAM ######
+
+parse_cmdline();
+run_command();
+
+###### END MAIN #######
+
+sub run_command {
+
+	my %args;
+
+	if ($ConfFileName) {
+		$args{conf_dir}  = dirname $ConfFileName;
+		$args{conf_file} = basename $ConfFileName;
+	}
+
+	if ($Verbose) {
+		$args{verbose} = 1;
+	}
+	
+	eval { $Yadw = Backup::Duplicity::YADW->new(%args); };
+	if ($@) {
+		if ( $Backup::Duplicity::YADW::ErrCode
+			 == Backup::Duplicity::YADW::PID_EXISTS() )
+		{
+			say STDERR "yadw is already running";
+			exit 0;
+		}
+		else {
+			die $@;
+		}
+	}
+
+	if ( $Command eq 'full' ) {
+		$Yadw->backup('full');
+	}
+	elsif ( $Command =~ /^inc/ ) {
+		$Yadw->backup('inc');
+	}
+	elsif ( $Command eq 'expire' ) {
+		$Yadw->expire();
+	}
+	elsif ( $Command eq 'verify' ) {
+		$Yadw->verify();
+	}
+	elsif ( $Command eq 'status' ) {
+		$Yadw->status();
+	}
+	else {
+		die "unhandled command";
+	}
+}
+
+sub parse_cmdline {
+
+	my @argv = @ARGV;
+
+	my $help;
+	my $rc = GetOptions(
+		"dry-run" => \$DryRun,
+		"verbose" => \$Verbose,
+		"c=s"     => \$ConfFileName,
+		"help|?"  => \$help
+
+	);
+
+	print_usage() if $help;
+
+	$DryRun = defined $DryRun ? '--dry-run' : '';
+
+	$Command = pop @ARGV;
+	print_usage("missing command") if !$Command;
+
+	if ( !defined $Verbose ) {
+		$Verbose = 1 if $ENV{VERBOSE};
+	}
+
+	if ( !$rc ) {
+		print_usage();
+	}
+
+	@ARGV = @argv;
+}
+
+sub print_usage {
+	print "\n$0\n"
+		. "\t[-c <conf file>]\n"
+		. "\t[-force]\n"
+		. "\t[-dry-run]\n"
+		. "\t[-verbose] (for this script, not duplicity)\n"
+		. "<command>\n" . "\n";
+
+	print "commands:\n"
+		. "\tfull\n"
+		. "\tinc\n"
+		. "\texpire\n"
+		. "\tverify\n"
+		. "\tstatus\n" . "\n";
+
+	exit 1;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yadw - Yet Another Duplicity Wrapper command line utility
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+  yadw full
+  yadw inc
+  yadw verify
+  yadw status
+  yadw expire
+  yadw restore /path/to/dir/or/file
+  
+  yadw -c /etc/yadw/extras.conf full
+  yadw -c /etc/yadw/extras.conf inc
+  ....
+
+=head1 NAME
+
+yadw - Yet Another Duplicity Wrapper command line utility
+
+=head1 VERSION
+
+version 0.11
+
+=head1 SAMPLE ETC FILES
+
+Sample config/cron scripts can be found in the "share" dir.  To find your 
+"share" dir run this:
+
+  perl '-MFile::ShareDir ":ALL"' -E 'say dist_dir("Backup-Duplicity-YADW")';
+
+=head1 CONFIGURATION
+
+To setup your system for backups I recommend these steps:
+
+1.  Login as root and install Backup::Duplicity::YADW if you have not done so
+already.
+
+2.  Install the default.conf:
+
+  mkdir /etc/yadw
+  cp <sharedir>/yadw/default.conf /etc/yadw
+  chmod 600 /etc/yadw/default.conf
+
+2.  Modify /etc/yadw/default.conf to your liking.
+
+3.  Run a manual full backup test.  This will also prime the pump so to speak
+for automated backups to run.
+
+  yadw full
+
+=head1 AUTOMATE
+
+1.  *AFTER* a successful manual full backup, install weekly cron to perform
+weekly full backups.
+
+  cp <sharedir>/cron.weekly/yadw_full_backup.sh /etc/cron.weekly
+
+2.  Install hourly cron for inc backups.
+
+  cp <sharedir>/cron.hourly/yadw_inc_backup.sh /etc/cron.hourly
+
+=head1 AUTHOR
+
+John Gravatt <john@gravatt.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by John Gravatt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 AUTHOR
+
+John Gravatt <john@gravatt.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by John Gravatt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

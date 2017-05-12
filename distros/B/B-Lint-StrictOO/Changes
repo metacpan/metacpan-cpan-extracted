@@ -1,0 +1,14 @@
+Revision history for B-Lint-StrictOO
+
+0.04      2011-01-12 01:16:28 PST8PDT
+    Use Dist::Zilla
+    No longer require File::Slurp
+    Tests pass on perl-5.12.2
+    Handle symbolic method calls
+
+0.02    2006-04-10
+        Improved &classes 
+        Removed deprecated defined %{...}
+
+0.01    2006-04-10
+

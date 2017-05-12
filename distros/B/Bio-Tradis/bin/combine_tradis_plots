@@ -1,0 +1,50 @@
+#!/usr/bin/env perl
+
+package Bio::Tradis::Bin::CombineTradisPlots;
+$Bio::Tradis::Bin::CombineTradisPlots::VERSION = '1.3.3';
+# ABSTRACT: Combine multiple plotfiles and generate updated statistics for the combined files
+
+# PODNAME: combine_tradis_plot
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+BEGIN { unshift( @INC, '/software/pathogen/internal/prod/lib/' ) }
+
+use Bio::Tradis::CommandLine::PlotCombine;
+
+Bio::Tradis::CommandLine::PlotCombine->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+combine_tradis_plot - Combine multiple plotfiles and generate updated statistics for the combined files
+
+=head1 VERSION
+
+version 1.3.3
+
+=head1 SYNOPSIS
+
+Takes a tab-delimited file with an ID as the first column followed by 
+a list of plotfiles to combine per row. The ID will be used to name the new
+plotfile and as an identifier in the stats file, so ensure these are unique.
+
+=head1 AUTHOR
+
+Carla Cummins <path-help@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

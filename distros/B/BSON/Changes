@@ -1,0 +1,208 @@
+Revision history for BSON
+
+v1.4.0    2017-03-16 18:00:04-04:00 America/New_York
+
+    [!!! Incompatible Changes !!!]
+
+    - Minimum Perl version bumped up to v5.10.1 for byte-order modifiers
+      for pack and unpack.
+
+    [Bugs]
+
+    - [PERL-694] - Tests fail on x86 (32-bit) without use64bitint perl
+
+    [New Feature]
+
+    - [PERL-751] - Support big-endian architectures
+
+v1.2.2    2016-10-27 17:51:52-04:00 America/New_York
+
+    [Changed]
+
+    - Removed Module::Runtime prerequisite and improved error messages
+      when no backends were loaded.
+
+    [Testing]
+
+    - Add testing for BSON::Regex flag ordering
+
+v1.2.1    2016-10-24 20:56:51-04:00 America/New_York
+
+    [Fixed]
+
+    - Detects (and throws error) during encoding for non-container types
+
+    - Fix BSON::Time for 32-bit Perls
+
+    [Changed]
+
+    - Switch to BSON::XS for optimized OID generation if available
+
+    - Always stringify plain scalars as a last resort in encoding
+
+    [Testing]
+
+    - Add test module to reset environment and hide XS
+
+v1.2.0    2016-08-17 15:51:50-04:00 America/New_York
+
+    [Added]
+
+    - Added dt_type support for Mango::BSON::Time
+
+    - Added 'from_epoch' constructor method to BSON::OID
+
+    [Documentation]
+
+    - Credited Sebastian Riedel for inspiration regarding helper functions
+
+    - Hash::Ordered is not yet supported
+
+v1.0.0    2016-07-06 12:39:38-04:00 America/New_York
+
+    [!!! Incompatible Changes !!!]
+
+    - Internal representation of BSON::Bool changed to make it a subclass
+      of boolean.pm for conistency with other "boolean" type classes on
+      CPAN.
+
+    - All BSON type wrapper classes are now immutable; accessors have
+      been changed to read-only.
+
+    [*** Deprecations ***]
+
+    - BSON::Binary deprecated in favor of the new BSON::Bytes module.
+
+    - BSON::Bool deprecated in favor of direct use of boolean.pm.
+
+    - BSON::ObjectID deprecated in favor of the new BSON::OID module.
+
+    - The 'ixhash' option is deprecated in favor of 'ordered' and the
+      resulting tied object is no longer guaranteed to be Tie::IxHash.
+      This will allow future optimization, as Tie::IxHash is extremely
+      slow.
+
+    [API]
+
+    - BSON module is now object-oriented, with an API and options directly
+      compatible with the MongoDB driver.  Options set as constructor
+      attributes apply to all encoding/decoding, unless options given to methods
+      override them.
+
+    - Added a method for inflation of MongoDB's extended JSON format to
+      BSON type wrapper objects.
+
+    [BSON types]
+
+    - Added new type wrappers to cover all BSON Types, including
+      forthcoming Decimal128 (but Decimal128 is still considered
+      'experimental' and subject to change).
+
+    - Rationalized/harmonized BSON type classes for compatibility with
+      pre-existing MongoDB BSON classes. Classes that could not be made to
+      interoperate are deprecated as listed above.
+
+    [Bug fixes]
+
+    - Fixed numerous encoding and decoding bugs revealed by greater test
+      coverage (e.g. fixes to UTF-8 encoding/decoding).
+
+    [Testing]
+
+    - Significantly improved test coverage, including tests using a
+      standardized BSON corpus.
+
+    - Skip threads tests before 5.8.5 because of problems with
+      weak references during global destruction.
+
+    - Require newer Path::Tiny with full-featured "basename" method.
+
+    [Prereqs]
+
+    - Bump boolean prereq to 0.45 to avoid conflicts between some versions
+      of JSON::XS and older boolean.pm releases that had read-only
+      singletons.
+
+    - Bump Moo prereq to 2.002004 to work around core sub shadowing
+      bug in generated constructor.
+
+    [~Internal Changes~]
+
+    - Pure-perl implementation split into a separate module to avoid
+      its load time in the future when an XS implementation becomes
+      available.
+
+    - Will prefer BSON::XS (when released) or fallback to BSON::PP;
+      PERL_BSON_BACKEND environment variable will override.
+
+v0.999.5  2016-06-29 11:31:51-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.4  2016-06-27 23:19:56-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.3  2016-06-23 00:44:37-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.2  2016-06-13 16:02:54-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.1  2016-06-08 16:03:23-04:00 America/New_York (TRIAL RELEASE)
+
+v0.999.0  2016-06-01 18:27:43-04:00 America/New_York (TRIAL RELEASE)
+
+0.16      2015-09-25 10:54:41-04:00 America/New_York
+
+    [CHANGES]
+
+    - Improved diagnostic output if integers are too big
+
+    [BUG FIXES]
+
+    - Improved OID counter thread-safety
+
+    - Fix tests for perls with long doubles
+
+    [OPTIMIZATION]
+
+    - BSON::ObjectId generation now ~ 1.9x faster
+
+0.13      2015-04-07 12:02:29-04:00 America/New_York (TRIAL RELEASE)
+
+    [BUG FIXES]
+
+    - Fix t/10-bson.t bug comparing floating point values; now using
+      Test::Number::Delta for comparison
+
+0.12      2015-04-06 16:11:59-04:00 America/New_York
+
+    [BUG FIXES]
+
+    - added decoding support for BSON type 0x06 (Javascript "undefined");
+      treated like type 0x0A (null value) and decoded as Perl undef
+
+    [OPTIMIZATION]
+
+    - Inlined most functions for 10-20% performance increase measured
+      on a sample of Twitter tweets.
+
+    [META]
+
+    - Switched repository to Dist::Zilla structure using @DAGOLDEN plugin
+      bundle and associated file layout
+
+0.11    2011-12-14
+        use Math::Int64 to address the 32-bit only Perl support
+
+0.06    2011-09-26
+        Lower the required Perl version to 5.8
+
+0.04    2011-08-04 17:30 PST
+        Add BSON::String type
+
+0.03    2011-08-02 14:00:00 PST
+        Fix regex parsing for Perl<5.14
+        Fix thread dependency in oid.t
+
+0.02    2011-07-25 19:10:00 PST
+        Fix spelling errors
+
+0.01    2011-07-22 16:45:00 PST
+        First version, released.
+

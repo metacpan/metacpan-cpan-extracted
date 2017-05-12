@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+package Bio::Roary::Main::GeneAlignmentFromNucleotides;
+$Bio::Roary::Main::GeneAlignmentFromNucleotides::VERSION = '3.8.0';
+# ABSTRACT: Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
+# PODNAME: protein_alignment_from_nucleotides
+
+
+use Cwd qw(abs_path); 
+BEGIN { unshift( @INC, abs_path('./lib') ) }
+BEGIN { unshift( @INC, abs_path('./t/lib') ) }
+use Bio::Roary::CommandLine::GeneAlignmentFromNucleotides;
+
+Bio::Roary::CommandLine::GeneAlignmentFromNucleotides->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+protein_alignment_from_nucleotides - Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
+
+=head1 VERSION
+
+version 3.8.0
+
+=head1 SYNOPSIS
+
+Take in multi-FASTA files of nucleotides and align each file with PRANK or MAFFT
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

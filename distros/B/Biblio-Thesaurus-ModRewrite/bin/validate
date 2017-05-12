@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $t1 = $ARGV[0];
+my $r = $ARGV[1];
+my $t2 = $ARGV[2];
+
+#print "t1 $t1 r $r t2 $t2\n";
+
+my $code = <<"EOF";
+$t1 \"$r\" $t2 ⇒ sub{ print ".. already exists!\\n"; }.
+$t1 'is-a' \$a ⇒ sub{ if(\"$r\" =~ m/is-a/i) { print ".. $t1 is already a \$a\\n" unless(\"$t2\" eq \$a);} }.
+$t1 \"$r\" \$a ∧ \$a \"$r\" $t2 ⇒ sub{ print ".. no need, $t1 $r \$a $r $t2\\n"; }.
+EOF
+
+my $obj = thesaurusLoad($ARGV[3]);
+$t = Biblio::Thesaurus::ModRewrite->new($obj);
+$t->process($code);

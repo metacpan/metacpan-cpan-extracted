@@ -1,0 +1,17 @@
+2014-07-14  0.04
+
+  Improved XS code (thanks to Ilya Chelpanov) [RT #96885].
+
+  Added support for more compiler / linker.
+
+2003-12-15  0.03
+
+  Added documentation.
+
+2003-12-10  0.02
+
+  Added tests.
+
+2003-12-08  0.01
+
+  First public release on CPAN.

@@ -1,0 +1,42 @@
+NAME
+
+    Bio::Tradis - Bio-Tradis contains a set of tools to analyse the output
+    from TraDIS analyses. For more information on the TraDIS method, see
+    http://genome.cshlp.org/content/19/12/2308
+
+VERSION
+
+    version 1.3.3
+
+SYNOPSIS
+
+    Bio-Tradis provides functionality to:
+
+      * detect TraDIS tags in a BAM file - Bio::Tradis::DetectTags
+
+      * add the tags to the reads - Bio::Tradis::AddTagsToSeq
+
+      * filter reads in a FastQ file containing a user defined tag -
+      Bio::Tradis::FilterTags
+
+      * remove tags - Bio::Tradis::RemoveTags
+
+      * map to a reference genome - Bio::Tradis::Map
+
+      * create an insertion site plot file - Bio::Tradis::TradisPlot
+
+    Most of these functions are available as standalone scripts or as perl
+    modules.
+
+AUTHOR
+
+    Carla Cummins <path-help@sanger.ac.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 3, June 2007
+

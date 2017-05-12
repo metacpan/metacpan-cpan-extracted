@@ -1,0 +1,159 @@
+from http://perl.about.com/compute/perl/library/nosearch/P073000.htm
+verified by http://www.beachnet.com/~hstiles/cardtype.html
+Card Type                         Prefix                           Length
+MasterCard                        51-55                            16
+VISA                              4                                13, 16
+American Express (AMEX)           34, 37                           15
+Diners Club/Carte Blanche         300-305, 36, 38                  14
+enRoute                           2014, 2149                       15
+Discover                          6011                             16
+JCB                               3                                16
+JCB                               2131, 1800                       15
+
+--
+
+from Neale Banks <neale@lowendale.com.au>
+According to a booklet I have from Westpac (an Aussie bank), a card number
+starting with 5610 or 56022[1-5] is a BankCard
+BankCards have exactly 16 digits.
+
+--
+
+from "Becker, Max" <Max.Becker@firstgate.com>
+It's mostly used in the UK and is either called "Switch" or "Solo".
+Card Type                         Prefix                           Length
+Switch                            various                          16,18,19
+Solo                              63, 6767                         16,18,19
+
+switch
+4903
+   0[2-9]
+   3[5-9]
+4911 
+   0[1-2]
+   7[4-9]
+   8[1-2]
+4936
+
+--
+
+from http://en.wikipedia.org/wiki/Credit_card_number#Prefixes
+As of November 8, 2004, MasterCard and Diner's club formed an alliance.
+Cards issued in Canada and the USA start with 55 and are treated as
+MasterCards worldwide. International cards use the 36 prefix and are
+treated as mastercards in Canada and the US, but are treated as Diner's
+Club cards elsewhere. Diner's club international's website makes no
+reference to old 38 prefix numbers, and they can be presumed reissued under
+the 55 or 36 BIN prefix.
+
+Effective October 1, 2006, the Discover Network will activate new Issuer
+Identification Numbers (IINs) to support a variety of card types and
+products. Additionally, Discover and China Union Pay (CUP) have
+established a strategic alliance and reciprocity agreement. As a result,
+IIN ranges from CUP will be enabled to facilitate the acceptance of CUP
+credit Cards on the Discover Network by October 1, 2006. CUP credit
+cards will be enabled on Discover Network with a 16-digit Card Number
+only. The updated IIN table is shown below.
+
+Minimum IIN             Maximum IIN             Product
+650000          650099          Consumer Debit
+650100          650199          Commercial Debit
+650200          650399          Stored Value
+650400          650599          Stored Value
+650600          650799          Consumer Credit
+650800          650999          Commercial Credit
+651000          659999          Reserved for Future Use
+
+        China Union Pay
+62212600                62292599                Credit
+
+Please ensure that your POS terminals, websites and any pertinent
+internal systems can accept these new IINs.
+
+--
+
+from http://en.wikipedia.org/wiki/Laser_(debit_card)#Technical
+Laser cards are prefixed with either "6304", "6706", "6771" or "6709", and
+may be between 16 and 19 characters in length.
+
+--
+
+from https://www.discovernetworkvar.com/pdf_docs/9-2_VAR_ALERT_Sep_2009.pdf
+Be sure to update your POS systems now with the following expanded Issuer
+Identification Number ("IIN") Ranges.  The IIN Range table listed below
+includes Diners Club International ("DCI") and other Issuers and Card
+programs that operate on Discover Network. These ranges are required for Card
+transaction routing and detailed in Release 9.2 of the Discover® Network
+Acquirer Operating Regulations and Technical Specifications:
+
+                     Start              End                 Issuing
+                                                            Network
+                     30000000           30599999            DCI
+                     30950000           30959999            DCI
+                     35280000           358999991           JCB
+                     36000000           369999992           DCI
+                     38000000           39999999            DCI
+                     60110000           60110999            Discover
+                                                            Network
+                     60112000           60114999            Discover
+                                                            Network
+                     60117400           60117499            Discover
+                                                            Network
+                     60117700           60117999            Discover
+                                                            Network
+                     60118600           60119999            Discover
+                                                            Network
+                     62212600           62292599            CUP
+                     62400000           62699999            CUP
+                     62820000           62889999            CUP
+                     64400000           65999999            Discover
+                                                            Network
+
+1 This IIN range (35280000 to 35899999) shall be enabled only by Merchant
+Processors in connection with Merchant relationships, POS Devices or otherw
+of the United States of America and the District of Columbia, Puerto Rico, th
+Northern Mariana Islands and Guam, subject to certain exceptions in Acquir
+applicable.
+2 The PAN length for this IIN Range (36000000 to 36999999) is 14 digits.
+
+--
+
+from SBH Israel / Nir Alfandari:
+Local Isracard: 8(-9?) digits
+
+From http://www.wysiwyg.co.il/Anatomy-of-CreditCard-Number-formats.asp#IsraCard-algorithm
+8-9 digits, non-LUHN validation
+
+From Erik Levinse:
+ i think it's like luhn, except instead of 212121... you put
++987654321 under the number you're validating, multiply each, and do mod 11 on
++the sum, instead of mod 10.
+
+
+--------------------
+
+From Jason Terry:
+
+ list of the IIN values that were given to us by Discover.  We manually tested a number from each end of the range to make sure B:CC worked.
+ 
+ 30000000-30599999 DCI
+ 30950000-30959999 DCI
+ 35280000-35899999 JCB * us only
+ 36000000-36999999 DCI * 14 digits
+ 38000000-39999999 DCI
+ 60110000-60110999 DN
+ 60112000-60114999 DN
+ 60117400-60117499 DN
+ 60117700-60117999 DN
+ 60118600-60119999 DN
+ 62212600-62292599 CUP
+ 62400000-62699999 CUP
+ 62820000-62889999 CUP
+ 64400000-65999999 DN
+
+---
+
+DCI = diner's, now discover everywhere
+JCB = treat JCB as discover inside the US
+DN = Discover Network
+CUP = China Union Pay, treat as Discover outside China

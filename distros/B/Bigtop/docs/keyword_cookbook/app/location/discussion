@@ -1,0 +1,28 @@
+=head1 USE
+
+The C<location> keyword is deprecated.  It was used to specify the base
+location for the application.  You should put a C<location> statement
+in the base_controller block to achieve this behavior.
+
+Note that if you use a C<location>, you probably need an C<app_rootp>
+config parameter in the app level C<config> block.  But, don't expect
+to use either of those with a stand alone server.  It doesn't play
+well with non-default paths.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<example> in these files:
+
+  docs/kids.bigtop
+  lib/GENKids.pm
+  lib/Kids.pm
+  lib/Kids/Child.pm
+
+Notice that this affects the CGI script, the stand alone server, and
+the httpd.conf.  The stand alone server probably won't work correctly
+with a non-default location (even if you put the location statement
+in the base_controller block).

@@ -1,0 +1,33 @@
+Blikistan - Create a blog from content in a wiki
+
+SYNOPSIS
+
+  print CGI::header();
+  my $b = Blikistan->new( rester => $r );
+  $b->print_blog;
+
+DESCRIPTION
+
+Blikistan is a simple shiv that takes content and configuration
+data from a Socialtext workspace, and generates a HTML blog
+using a template.
+
+Blikistan's unique design features a MagicEngine that can be 
+written in any language.  The MagicEngine fetches the blog
+config and blog posts using the Socialtext REST API.
+
+Blikistan wants to ultimately have several different MagicEngines,
+each in a different language so that blog authors have the choice
+of which language their blog is powered by.
+
+Blikistan is a blogging tool named after the small ex-Soviet country
+Blikistan. Blikistan (the software) features a magic engine which pulls
+all the blog configuration and postings from a Socialtext Wiki.
+Blikistan (the country) has a population of 32,768 people, and the
+population is fully literate. Blikistan's Government never meets in
+person, all communication and planning is done on a wiki.  Blikistan
+(the software) is the only blogging software that allows the blogger to
+choose which language their blog will be powered by. The Magic Engine
+can be implemented in any language using Perl's Inline modules. In
+Blikistan (the country) taxes are filed online using SocialCalc.
+Blikistan (both the country and software) is completely paperless.

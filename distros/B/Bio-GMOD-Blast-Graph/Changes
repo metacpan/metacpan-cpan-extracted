@@ -1,0 +1,25 @@
+0.06      2011-08-10 14:09:48 America/Los_Angeles
+
+ * fix a bit of invalid HTML (leto)
+
+0.05      2011-07-25 21:09:42 America/New_York
+
+ * add missing input field to silence javascript errors (leto)
+
+0.04      2011-04-15 15:08:14 America/Los_Angeles
+
+ * remove use of CGI.pm
+
+0.03      2011-04-14 13:01:54 America/Los_Angeles
+
+ * fixed 'all hits show' being printed at object instantiation time
+
+0.02      2011-04-13 15:21:55 America/Los_Angeles
+
+  * bug fixes to image path handling
+  * add support for an -fh argument for a filehandle to use for the
+    output
+
+0.01   2011-04-13 16:01:00 America/Los_Angeles
+
+  * initial CPAN release

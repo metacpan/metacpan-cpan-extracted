@@ -1,0 +1,436 @@
+
+=pod
+
+=head1 NAME
+
+BusyBird::Manual::Tutorial - Tutorial to use BusyBird
+
+=head1 Installation
+
+First you need C<gcc>, C<make>, C<curl> and C<cpanm> command.
+In Ubuntu Linux, for example, you can install them by
+
+    $ sudo apt-get install build-essential curl cpanminus
+
+These commands should be available in most other platforms, too.
+If you have trouble installing C<cpanm>, see L<App::cpanminus>.
+
+To install L<BusyBird>, type
+
+    $ cpanm -n BusyBird
+
+This may take time because it also installs many modules L<BusyBird> depends on.
+
+If you are new to C<cpanm>, set the following environment variables.
+
+    $ export PERL5LIB="$HOME/perl5/lib/perl5:$PERL5LIB"
+    $ export PATH="$HOME/perl5/bin:$PATH"
+
+These are necessary for perl to find the modules installed in C<~/perl5> directory.
+Be sure to write them in C<~/.profile>, too.
+
+=head1 Start BusyBird
+
+After installing L<BusyBird> successfully, type
+
+    $ busybird
+    Twiggy: Accepting connections at http://127.0.0.1:5000/
+
+Then, access the URL ( http://127.0.0.1:5000/ ) by your Web browser.
+If you can see the top page, congraturations! L<BusyBird> has successfully started.
+
+Note that if you already use the TCP port 5000, C<busybird> command fails with "Address already in use" error.
+In that case, try another port by C<-p> option.
+
+    $ busybird -p 4444
+
+You can see complete list of options by C<-h> option.
+
+    $ busybird -h
+
+=head1 Input Statuses
+
+By default, your L<BusyBird> instance has a timeline called "home", but the timeline has no status yet.
+It won't magically import statuses out of nowhere.
+You must input statuses to it.
+
+To input statuses, you can use L<BusyBird>'s Web API.
+
+    $ curl -d '{"text":"hello, world!"}' http://127.0.0.1:5000/timelines/home/statuses.json
+
+C<< POST /timelines/home/statuses.json >> endpoint inputs statuses to the "home" timeline.
+Statuses are in the HTTP request body, encoded in JSON.
+
+You can input more than one statuses by posting an array of statuses. Here is a bit more complicated example.
+
+    $ curl \
+      -d '[{"text":"Hello, Bob!", "user":{"screen_name":"Alice"}}, {"text":"Hello, Alice!", "user":{"screen_name":"Bob"}}]' \
+      http://127.0.0.1:5000/timelines/home/statuses.json
+
+This time, the statuses have C<user.screen_name> fields.
+L<BusyBird> renders this field as the person or object that created the status.
+
+=head2 Import RSS/Atom Feeds
+
+You now understand how to input statuses to L<BusyBird>, but it is boring to create statuses by hand.
+So let's import RSS/Atom feeds into L<BusyBird>. It's very easy!
+
+=over
+
+=item 1.
+
+Install another module L<BusyBird::Input::Feed>.
+
+    $ cpanm BusyBird::Input::Feed
+
+=item 2.
+
+Then, run L<busybird_input_feed> command bundled with the module.
+
+    $ busybird_input_feed https://metacpan.org/feed/recent -p http://127.0.0.1:5000/timelines/home/statuses.json
+
+=back
+
+After that, you can see the imported feed items (in this case, Perl modules recently uploaded) on L<BusyBird>.
+
+Try repeating the command above.
+You will see that L<BusyBird> only accepts the new statuses that are not yet in L<BusyBird>'s timeline.
+In a L<BusyBird> timeline, all statuses must have unique C<id> field.
+If you input a status that is already in the timeline, that status is ignored.
+
+This means you can repeat the above command without worrying about duplicate statuses.
+Register the command with C<cron>, then the L<BusyBird> timeline is automatically synchronized to
+the latest state of the feed.
+
+
+=head2 Import Statuses from Twitter
+
+Next, let's import statuses (tweets) from L<Twitter|https://twitter.com/> and view them on L<BusyBird>.
+That's a bit more tricky than importing feeds because it requires authentication.
+
+To import tweets from Twitter via its API, you have to get the B<tokens> first. Here is how to get the tokens.
+
+=over
+
+=item 1.
+
+Access L<https://apps.twitter.com/>.
+
+=item 2.
+
+"Sign in" with your Twitter account.
+
+=item 3.
+
+Click "Create New App" button.
+
+=item 4.
+
+Fill the form and click "Create your Twitter application".
+
+=item 5.
+
+Click "API Keys" tab.
+
+=item 6.
+
+Click "Create my access token" button at the bottom of the page.
+You may have to refresh the page to get the created token.
+
+=item 7.
+
+Now in "API Keys" page, you see four mysterious tokens:
+B<< API key >>, B<< API secret >>, B<< Access token >> and B<< Access token secret >>.
+
+=back
+
+The procedure above may be out of date. The point is to get the four OAuth tokens.
+
+B<< Make sure to keep the four tokens (especially the "secret" ones) secret >>. Those are like the username-password pair of your account.
+
+Now that you have access to Twitter API, let's write a script called C<"import.pl"> to import tweets.
+
+    ## File: import.pl
+    
+    use strict;
+    use warnings;
+    use Net::Twitter::Lite::WithAPIv1_1;
+    use JSON;
+    
+    my $nt = Net::Twitter::Lite::WithAPIv1_1->new(
+        consumer_key        => "API_KEY",
+        consumer_secret     => "API_SECRET",
+        access_token        => "ACCESS_TOKEN",
+        access_token_secret => "ACCESS_TOKEN_SECRET",
+        ssl                 => 1,
+    );
+    print encode_json $nt->home_timeline;
+
+Replace the four tokens above with yours.
+This simple script imports statuses from your home timeline, encodes them in JSON and prints them to STDOUT.
+
+To run the script, you need L<Net::Twitter::Lite> and L<JSON> modules, so install them.
+
+    $ cpanm Net::Twitter::Lite JSON
+
+OK, now you can run it.
+
+You can directly input statuses from Twitter to L<BusyBird>. No conversion is necessary.
+
+    $ perl import.pl | curl -d @- http://127.0.0.1:5000/timelines/home/statuses.json
+
+You'll see the Twitter statuses on "home" timeline.
+
+Just like RSS/Atom feeds, you can repeat the above command without worrying about duplicate statuses.
+If you are wondering how frequently you should run the command, L<Net::Twitter::Loader> may help.
+
+
+=head1 Acked/Unacked States of Statuses
+
+L<BusyBird> maintains read/unread states of individual statuses.
+
+If you read statuses in L<BusyBird> via a Web browser, those statuses are marked as "read".
+When new statuses are input to L<BusyBird>, it shows the number of those "unread" statuses.
+
+In the rest of the document and throughout L<BusyBird> API, we use the terms B<< "acked/unacked" >> instead of "read/unread".
+This is because we want to distinguish verbs from adjectives.
+The verb "ack" or "acknowledge" means "mark as read".
+
+=head1 Status Level
+
+L<BusyBird> renders statuses based on their status B<"levels">.
+
+The status level is an integer value to indicate the importance of the status.
+The higher the level is, the more important the status is.
+By default, all statuses are on level 0.
+
+To demonstrate status levels, let's improve the "import.pl" above.
+As a friendly person, you want to reply to strangers on Twitter, right?
+To do that, you have to watch "mentions timeline", too.
+
+    ## File: import2.pl
+    
+    use strict;
+    use warnings;
+    use Net::Twitter::Lite::WithAPIv1_1;
+    use JSON;
+    
+    my $nt = Net::Twitter::Lite::WithAPIv1_1->new(
+        consumer_key        => "API_KEY",
+        consumer_secret     => "API_SECRET",
+        access_token        => "ACCESS_TOKEN",
+        access_token_secret => "ACCESS_TOKEN_SECRET",
+        ssl                 => 1,
+    );
+    my $home = $nt->home_timeline;
+    my $mentions = $nt->mentions;
+    
+    foreach my $s (@$mentions) {
+        $s->{busybird}{level} = 1;
+    }
+    
+    print encode_json [@$mentions, @$home];
+
+The above script imports "home timeline" and "mentions timeline".
+The C<busybird.level> field of "mentions" statuses is set to 1.
+Then, it outputs both kinds of statuses to STDOUT.
+
+Like we did above, mixing multiple Twitter timelines into a single L<BusyBird> timeline is OK.
+L<BusyBird> sorts those statuses and renders them in chronological order.
+
+Let's save the above script as "import2.pl" and run it.
+
+    $ perl import2.pl | curl -d @- http://127.0.0.1:5000/timelines/home/statuses.json
+
+If you have ever been mentioned by someone, you'll see the statuses metioning you with the status level 1.
+
+Change the B<< level threshold >> by the buttons at the top-right corner.
+If you set to the threshold to "Lv. 1", it shows the "mention" statuses only, and hides everything else.
+That way, you can quickly review the mentions and reply to them.
+
+You can use arbitrary integer values for the status level (C<busybird.level> field), including negative values.
+
+=head1 Configuration
+
+So far, we use L<BusyBird> with its default configuration,
+but you can customize its behavior by writing a configuration file.
+
+L<BusyBird> configuration file is B<~/.busybird/config.psgi>.
+By default, it looks like:
+
+    use BusyBird;
+    timeline("home");
+    end;
+
+config.psgi is a Perl script, so you can write arbitrary Perl codes into it.
+However, here is the basic rule:
+B<< you must write your config between "use BusyBird;" and "end;" statements. >>
+Follow this rule unless you know what you are doing.
+
+=head2 Configure More Than One Timelines
+
+You can have more than one timelines in a single L<BusyBird> instance.
+
+To create a timeline, just add a line
+
+    timeline("foobar");
+
+which creates a timeline named "foobar".
+
+To input statuses to the "foobar" timeline, try
+
+    $ perl import2.pl | curl -d @- http://127.0.0.1:5000/timelines/foobar/statuses.json
+
+Timeline's names must be unique. So if you repeat calling C<timeline()> function with the same name,
+
+   timeline("foobar");
+   timeline("foobar");
+
+it creates only one timeline named "foobar".
+
+
+=head2 Configuration Parameters
+
+You can set various config parameters by C<set_config()> method.
+
+To set a B<< global config parameter, >> use C<< busybird->set_config(...) >>.
+
+    busybird->set_config(time_zone => "UTC");
+
+A global config parameter affects all timelines and the overall behavior of the L<BusyBird> instance.
+In the above example, status timestamps in all timelines are rendered in UTC time zone.
+
+C<set_config()> method accepts more than one key-value pairs.
+
+    busybird->set_config(
+        time_zone   => "+0900",
+        time_locale => "ja_JP"
+    );
+
+Some parameters are B<< per-timeline config parameters, >>
+which can be set to individual timelines.
+
+To set a per-timeline parameter, use C<< timeline(...)->set_config(...) >>.
+
+    busybird->set_config(time_zone => "UTC");
+    
+    timeline("foobar")->set_config(time_zone => "+0900");
+
+Per-timeline config parameters always take precedence over global ones.
+So, in the above example, statuses are renderred in "+0900" time zone only in the timeline "foobar".
+In other timelines, the time zone is "UTC".
+
+See L<BusyBird::Manual::Config> for the complete list of config parameters.
+
+=head1 Filters
+
+You can set B<< status filters >> to timelines.
+
+A status filter is a function that is executed when you input statuses into a timeline.
+You can modify the input statuses with the filter before they are stored into the timeline.
+
+    [ Statuses ] --HTTP POST--> [ Filter 1 ] --> [ Filter 2 ] --> ... --> [ Timeline ]
+
+By default, timelines have no filters. Statuses are directly input to them.
+
+To add a status filter to a timeline, use C<add_filter()> method.
+
+    timeline("home")->add_filter(sub {
+        my ($statuses) = @_;
+        foreach my $status (@$statuses) {
+            if($status->{text} =~ /\@my_name/) {
+                $status->{busybird}{level}++;
+            }
+        }
+        return $statuses;
+    });
+
+A status filter is just a subroutine reference in Perl.
+It is called like
+
+    $result_arrayref = $filter->($arrayref_of_statuses)
+
+where C<$arrayref_of_statuses> is an array-ref of input statuses.
+
+In the above example, the filter inspects each status's C<text> field.
+If it finds your screen name ("@my_name"), it increments the status's level, meaning that it's important.
+Then the filter returns the array of modified statuses.
+
+A timeline can have more than one filters.
+Those filters are executed in the order they are added, and the output of one filter becomes the input of the next filter.
+
+    timeline("home")->add_filter(sub {
+        my ($statuses) = @_;
+        foreach my $status (@$statuses) {
+            if($status->{text} =~ /\@my_name/) {
+                $status->{busybird}{level}++;
+            }
+        }
+        return $statuses;
+    });
+    timeline("home")->add_filter(sub {
+        my ($statuses) = @_;
+        return [grep { $_->{busybird}{level} > 4 } @$statuses];
+    });
+
+In the above example, the second filter extracts statuses whose level is higher than 4.
+
+Inspecting statuses one by one is a typical pattern in status filters.
+L<BusyBird::Filter> defines some functions useful for that purpose.
+
+See L<BusyBird::Timeline> and L<BusyBird::Filter> for more about status filters.
+
+=head2 Pre-defined Filter for Twitter
+
+We have a pre-defined status filter named L<BusyBird::Filter::Twitter> for statuses imported from Twitter.
+
+    timeline("home");
+    
+    use BusyBird::Filter::Twitter qw(:filter);
+    timeline("home")->add_filter(filter_twitter_all);
+
+It's not mandatory to use this filter, but we recommend it.
+The filter fixes a bug where the status text is HTML-escaped twice.
+
+For detail, see L<BusyBird::Filter::Twitter>.
+
+=head1 What's Next?
+
+For advanced and more detailed topics, see also the following documents.
+
+=over
+
+=item L<BusyBird::Manual::WebAPI>
+
+Reference manual of L<BusyBird> Web API, including endpoints that get, post or ack statuses.
+
+=item L<BusyBird::Manual::Status>
+
+Object structure of L<BusyBird> statuses.
+
+=item L<BusyBird::Manual::Config>
+
+Full list of configuration items.
+
+=item L<BusyBird::Filter>
+
+Functions useful when writing status filters.
+
+=item L<BusyBird::Main>
+
+The class of the object returned by C<busybird> keyword in config.psgi.
+
+=item L<BusyBird::Timeline>
+
+The class of the object returned by C<timeline(...)> keyword in config.psgi.
+It has various methods to manipuate statuses in it.
+
+=back
+
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+

@@ -1,0 +1,77 @@
+[%- WRAPPER wrapper %]
+[% FOREACH item IN items; incl = item.length == 1 ? "0$item" : item -%]
+[% wp = BLOCK %][% INCLUDE "t/var/patterns/wcp$incl" %][% END -%]
+[% repl = {
+    id = 'Id="wcp' _ item _ '.',
+    fr = 'From="wcp' _ item _ '.',
+    to = 'To="wcp' _ item _ '.',
+    } %]
+[% wp.replace('Id="WfPIMI_Subflow"','localsubflowid').replace('Activity Id="','Activity ' _ repl.id).replace('Transition Id="','Transition ' _ repl.id).replace('TransitionRef Id="','TransitionRef ' _ repl.id).replace('From="',repl.fr).replace('To="',repl.to).replace('localsubflowid','Id="WfPIMI_Subflow"') -%]
+[%# wp.replace('Id="','Id="wcp37.').replace('From="','From="wcp37.').replace('To="','To="wcp37.') %]
+[% END; END; RETURN %]
+
+[%- BLOCK wrapper # http://www.wfmc.org/2002/XPDL1.0 -%]
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+  xmlns:deprecated="http://www.wfmc.org/2004/XPDL2.0alpha"
+  xmlns:sitecorp="http://schemas.sitecorporation.com/bpm"
+  xmlns:tns="http://schemas.xmlsoap.org/tns/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes"
+  xmlns:fn="http://www.w3.org/2004/07/xpath-functions"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema" Id="[% id %]" Name="[% title %]">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+    <DataFields>
+        <DataField Id="WhereToGo" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+        <DataField Id="pathtaken" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue></InitialValue>
+        </DataField>
+    </DataFields>
+    <WorkflowProcesses>
+[% content %]
+        <WorkflowProcess AccessLevel="PRIVATE" Id="WfPIMI_Subflow" Name="WfPIMI Subflow">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-09-07 04:04:45</Created>
+                <Description>not to be instantiated directly, but used only as a subflow process</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <FormalParameters>
+                <FormalParameter Id="P1" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="P2" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="sbflw_act" Name="Subflow activity">
+                    <Description>This is a subflow</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>
+[% END %]

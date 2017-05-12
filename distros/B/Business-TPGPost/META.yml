@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-TPGPost
+version:      0.05
+version_from: lib/Business/TPGPost.pm
+installdirs:  site
+requires:
+    Business::TNTPost::NL:         0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

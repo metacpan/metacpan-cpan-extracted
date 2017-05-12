@@ -1,0 +1,303 @@
+#!/usr/bin/perl -w
+#
+# $Id: bbdb-export,v 0.6 2005/03/07 01:24:29 wu Exp $
+#
+
+#
+#
+# documentation at bottom of script
+#
+#
+use strict;
+
+our $VERSION = '0.015';
+
+
+#
+#_* config
+#
+
+# bbdb config
+my $bbdb_file = $ENV{"HOME"} . "/.bbdb";
+
+#
+#_* command line options
+#
+BEGIN
+{
+    use Getopt::Long;
+    use Pod::Usage;
+
+    use vars qw( $opt_help $opt_verbose
+                 $opt_ldap $opt_ldif $opt_vcard $opt_mailaliases
+                 $opt_bbdb $opt_outfile
+               );
+
+    unless (
+            GetOptions (
+                        '-ldap'      => \$opt_ldap,
+                        '-ldif'      => \$opt_ldif,
+                        '-vcard'     => \$opt_vcard,
+                        '-mailalias' => \$opt_mailaliases,
+                        '-bbdb=s'    => \$opt_bbdb,
+                        '-outfile=s' => \$opt_outfile,
+                        '-h|help'    => \$opt_help,
+                        '-v|verbose' => \$opt_verbose,
+                       )
+           ) { pod2usage( -exitval => 1, -verbose => 0 ) }
+
+    if ( $opt_help )
+    {
+        pod2usage( -exitval => 1, -verbose => 2 )
+    }
+
+}
+
+#
+#_* Libraries
+#
+use BBDB::Export;
+
+
+#
+#_* main
+#
+
+if ( $opt_ldif )
+{
+    require BBDB::Export::LDIF;
+
+    print "Initializing...\n";
+    my $exporter = BBDB::Export::LDIF->new(
+                                         {
+                                          bbdb_file   => $bbdb_file,
+                                          output_file => "export.txt",
+                                          dc          => "dc=geekfarm, dc=org",
+                                         }
+                                          );
+
+    print "Exporting...\n";
+    $exporter->export();
+}
+elsif ( $opt_ldap )
+{
+    require BBDB::Export::LDAP;
+
+    print "Initializing...\n";
+    my $exporter = BBDB::Export::LDAP->new(
+                                         {
+                                          bbdb_file   => $bbdb_file,
+                                          output_file => $opt_outfile || "export.txt",
+                                          dc          => "dc=geekfarm, dc=org",
+                                          ldappass    => "supersecret",
+                                         }
+                                          );
+
+    print "Exporting...\n";
+    $exporter->export();
+}
+elsif ( $opt_vcard )
+{
+    require BBDB::Export::vCard;
+
+    print "Initializing...\n";
+    my $exporter = BBDB::Export::vCard->new(
+                                          {
+                                           bbdb_file   => $bbdb_file,
+                                           output_dir  => $opt_outfile,
+                                          }
+                                           );
+
+    print "Exporting...\n";
+    $exporter->export();
+}
+elsif ( $opt_mailaliases )
+{
+    require BBDB::Export::MailAliases;
+
+    print "Initializing...\n";
+    my $exporter = BBDB::Export::MailAliases->new(
+                                                {
+                                                 bbdb_file   => $bbdb_file,
+                                                 output_file => $opt_outfile || "export.txt",
+                                                }
+                                                 );
+
+    print "Exporting...\n";
+    $exporter->export();
+}
+else
+{
+    pod2usage( -exitval => 1, -verbose => 2 );
+}
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ bbdb-export - export emacs bbdb info to ldif, or update in ldap.
+
+=head1 VERSION
+
+version 0.015
+
+=head1 SYNOPSIS
+
+ bbdb-export [-h[elp]] [-v[erbose]] <-ldap|-ldif|-mailalias>
+
+=head1 OPTIONS
+
+The following options are supported by this command
+
+=over 4
+
+=item -ldif
+
+Create a .ldif file.  LDIF is the LDAP Data Interchange Format.  It
+can be imported into an ldap server using, e.g. ldapadd, or into
+clients such as the Mac OS X Address Book.
+
+=item -ldap
+
+For every entry in the bbdb database, update the ldap entry to match
+the bbdb entry.  This is done by removing the entry using ldapdelete,
+and then adding it back using ldapadd.  Entries are processed one at a
+time, so if a failure occurs, the script will continue running.
+
+=item -mailalias
+
+Create a .mail_aliases file, useful for clients such as mutt.
+
+=item -vcard
+
+Create vcards.  The -out param controls the directory where the vCards
+should be written.
+
+=item -bbdb
+
+Specify location of .bbdb file.
+
+=item -out
+
+Specify location of file to be created.  If using -vCards, the
+directory where vcards should be written.  If using -ldap, this is a
+just a temporary file.
+
+=item -help
+
+Display documentation.
+
+=item -verbose
+
+Enable verbose output.  If you see errors running the command, -v will
+help determine which records are producting errors.
+
+=back
+
+=head1 DESCRIPTION
+
+Export your bbdb data to formats supported by BBDB::Export.
+
+=head1 HOW I USE THIS SCRIPT
+
+I run this script occasionally to update my ldap database with the
+latest data in my .bbdb.
+
+I'm running Mac OS X.  I installed openldap from fink and configured
+it (see link to ldap article in SEE ALSO section below).  I set up
+Apple's Address Book application to point at my LDAP server on
+localhost, so I can search through my contact list.  Also, in the
+apple mail program, it's possible to auto-complete names from my bbdb.
+
+I wasn't able to sync contacts from ldap directly to my palm.
+Instead, I had to export to a .ldif file, and then manually import the
+.ldif file into Address Book.  Then I could sync entries to my CLie.
+
+From there, I was able to sync the contacts to my palm desktop on
+windows so I could then sync to my mobile phone.
+
+=head1 PREREQUISITES
+
+- BBDB - perl module to read .bbdb file
+
+- Term::ANSIColor - colorized output
+
+- Pod::Usage - for embedded documentation
+
+=head1 BUGS OR OTHER GENERAL ANNOYANCES
+
+The first time you run this script using -LDAP, you will see lots of
+errors as it attempts to remove ldap records that don't actually
+exist.  Each time you add a new user, you will also see this error.
+You can usually just ignore any errors deleting users, as long as the
+add works.  The "Errors Encountered" total printed in the summary does
+not include the number of errors encountered deleting records.
+
+This script relies on the standard ldap schema, inetOrgPerson.
+Unfortunately it's a pretty limited schema that doesn't let you define
+many of the things you'd like.  Lots of fields in your client may not
+be supported.
+
+Also if you have things like font information in fields in your bbdb,
+the bbdb perl library may not like it.  This is not a bug in
+bbdb2ldap.pl, but in BBDB.pm.  The result is that your .bbdb will not
+be parsed, so you will get nada.  I have an idea about how to fix some
+of these problems, but haven't put together a patch for BBDB.pm yet.
+
+=head1 SEE ALSO
+
+- bbdb - an emacs mode for managing information about contacts
+
+- BBDB - perl module for parsing a .bbdb file
+
+- OpenLDAP - open source ldap implementation
+
+- http://www.onlamp.com/pub/a/onlamp/2003/03/27/ldap_ab.html - how to
+  set up ldap.
+
+- http://www.geekfarm.org - download bbdb2ldap.
+
+- PlannerMode - also on geekfarm.  A module for exporting emacs todo
+  lists and schedule info to other clients including palm.
+
+=head1 AUTHOR
+
+ wu <VVu@geekfarm.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2005, VVu@geekfarm.org
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+- Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+- Neither the name of the geekfarm.org nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*

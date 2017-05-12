@@ -1,0 +1,9 @@
+Makefile.PL
+README
+MANIFEST
+lib/Business/Shipping/UPS_XML/UserTag/upsxml_query.tag
+lib/Business/Shipping/UPS_XML/Parser.pm
+lib/Business/Shipping/UPS_XML.pm
+t/01-core.t
+t/packages.t
+INSTALL.interchange

@@ -1,0 +1,18 @@
+#!/usr/bin/perl -wT
+use strict;
+use lib qw(blib/lib lib ../blib/lib ../lib);
+use Bio::Das::Lite;
+use Data::Dumper;
+
+my $das = Bio::Das::Lite->new("http://www.ensembl.org/das/Homo_sapiens.GRCh37.reference");
+$das->timeout(10);
+print Dumper($das->features([
+			     {
+			      'segment'  => "21",
+			      'category' => 'null',
+			     },
+			     {
+			      'segment' => 'Y',
+			      'category' => 'null',
+			     }
+			    ]));

@@ -1,0 +1,67 @@
+Bio::SAGE::DataProcessing README
+
+#
+# Copyright (c) 2004 Scott Zuyderduyn <scottz@bccrc.ca>.
+# All rights reserved. This program is free software; you
+# can redistribute it and/or modify it under the same
+# terms as Perl itself.
+#
+# $Id: README,v 1.1.1.1 2004/05/24 02:52:55 scottz Exp $
+#
+
+BACKGROUND
+
+Serial analysis of gene expression (SAGE) is a molecular 
+technique for generating a near-global snapshot of a 
+cell population’s transcriptome.  Briefly, the technique 
+extracts short sequences at defined positions of 
+transcribed mRNA.  These short sequences are then paired 
+to form ditags.  The ditags are concatamerized to form 
+long sequences that are then cloned.  The cloned DNA is 
+then sequenced.  Bioinformatic techniques are then 
+employed to determine the original short tag sequences, 
+and to derive their progenitor mRNA.  The number of times
+a particular tag is observed can be used to quantitate
+the amount of a particular transcript.  The original 
+technique was described by Velculescu et al. (1995) and 
+utilized an ~14bp sequence tag.  A modified protocol 
+was introduced by Saha et al. (2002) that produced ~21bp 
+tags.
+
+PURPOSE
+
+This module facilitates the processing of SAGE data.  
+Specifically:
+
+  1. extracting ditags from raw sequence reads.
+  2. extracting tags from ditags, with the option to
+     exclude tags if the Phred scores (described by
+     Ewing and Green, 1998a and Ewing et al., 1998b)
+     do not meet a minimum cutoff value.
+  3. calculating descriptive values
+  4. statistical analysis to determine, where possible, 
+     additional nucleotides to extend the length of the 
+     SAGE tag (thus facilitating more accurate tag to 
+     gene mapping).
+
+Both regular SAGE (14mer tag) and LongSAGE (21mer tag) 
+are supported by this module.  Future protocols should
+be configurable with this module.
+
+REFERENCES
+
+  Velculescu V, Zhang L, Vogelstein B, Kinzler KW. (1995) 
+  Serial analysis of gene expression. Science. 270:484-487.
+
+  Saha S, Sparks AB, Rago C, Akmaev V, Wang CJ, Vogelstein B, 
+  Kinzler KW, Velculescu V. (2002) Using the transcriptome 
+  to annotate the genome. Nat. Biotechnol. 20:508-512.
+
+  Ewing B, Hillier L, Wendl MC, Green P. (1998a) Base-calling
+  of automated sequencer traces using phred. I. Accuracy
+  assessment. Genome Res. 8:175-185.
+
+  Ewing B, Green P. (1998b) Base-calling of automated
+  sequencer traces using phred. II. Error probabilities.
+  Genome Res. 8:186-194.
+

@@ -1,0 +1,78 @@
+[%#
+    Template for Backends table on TentMaker home page.
+    Expects these view.data parameters:
+
+    backends              - the backends hash built by
+                            Bigtop::Tentmaker::do_main
+%]
+<table class='bordered'>
+    <tr><th> Type </th>
+        <th> Backend </th>
+        <th style='width: 25%;'> What Does It Make? </th>
+        <th> Config Statements </th>
+    </tr>
+    [% backends = view.data.backends %]
+    [% FOREACH type_name IN backends.keys.sort %]
+        [% type_hash = backends.$type_name %]
+        [% FOREACH backend IN type_hash.keys.sort %]
+    <tr>
+          [% INCLUDE backend_module %]
+    </tr>
+        [% END %]
+    [% END %]
+</table>
+
+[% BLOCK backend_module %]
+<td valign='top'>[% type_name %] </td>
+
+<td valign='top'>
+  [% INCLUDE backend_and_checkbox %]
+</td>
+
+<td valign='top'>
+    [% FOREACH line IN type_hash.$backend.output %]
+        [% line.1 %]
+        [% UNLESS loop.last %]<br />[% END %]
+    [% END %]
+</td>
+
+<!-- STATEMENTS -->
+<td valign='top'>
+    <table>
+    [% FOREACH statement IN type_hash.$backend.keywords %]
+        [% NEXT IF statement.type == 'deprecated' %]
+        [% INCLUDE backend_statement
+                   statements = type_hash.$backend.statements %]
+    [% END %]
+    </table>
+</td>
+[% END %]
+
+[% BLOCK backend_and_checkbox %]
+<input type='checkbox' value='[% type_name %]::[% backend %]'
+       name='backend_[% type_name %]::[% backend %]'
+       [%- IF type_hash.$backend.in_use -%] checked='checked' [%- END -%]
+       onchange='javascript:update_tree(
+           "backend", "[% type_name %]::[% backend %]", this.checked
+       )'
+/>[% backend %]
+[% END %]
+
+[% BLOCK backend_statement %]
+<tr>
+<td> [% statement.keyword %] </td>
+<td>
+    [%
+        key            = statement.keyword
+        single_value   = statements.$key.0
+        values         = statements.$key
+    %]
+    [% INCLUDE input_boxes.ttc
+        name_prefix    = 'backend_'
+        method_group   = 'conf'
+        keyword_prefix = "$type_name::$backend::"
+    %]
+</td>
+<td> [% statement.descr %] </td>
+<tr>
+[% END %]

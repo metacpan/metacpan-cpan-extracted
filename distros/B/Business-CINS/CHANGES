@@ -1,0 +1,25 @@
+Version 1.13
+  04/02/02 - Am I stupid or something? Fixed the 1.12 fix to t/04-bad.t.
+
+Version 1.12
+  04/01/02 - Fixed error in test cases of t/04-bad.t. It was looking for the
+    string "not correct" from Algorith::LUHN, which changed it to "incoorect."
+    Test now looks for either string.
+
+Version 1.11
+  03/25/02 - Fixed error method to jive with with documentation by returning
+    "undef" when the CINS was valid.
+
+    Reset $ERROR to undef when is_valid is called and there is no problem.
+
+Version 1.10
+  03/12/02 - Completely fixed this module. It was horribly broken and couldn't
+    have validated a true CINS if its life depended on it.
+
+Version 1.00
+  11/18/01 - Added the error() method.
+
+Version 0.03
+  5/9/01 - Added t/06-acc.t test.
+
+  5/8/01 - Fixed documentation typo.

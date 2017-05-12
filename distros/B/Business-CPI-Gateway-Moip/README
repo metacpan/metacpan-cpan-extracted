@@ -1,0 +1,144 @@
+Business::CPI::Gateway::Moip.pm 
+
+Para efetuar pagamentos moip com perl
+** veja exemplo com Business:CPI em pay_business_cpi.sh
+
+use Data::Printer;
+use Business::CPI::Buyer::Moip;
+use Business::CPI::Cart::Moip;
+use Business::CPI::Gateway::Moip;
+
+my $cpi = Business::CPI::Gateway::Moip->new(
+    currency        => 'BRL',
+    sandbox         => 1,
+    token_acesso    => 'YC110LQX7UQXEMQPLYOPZ1LV9EWA8VKD',
+    chave_acesso    => 'K03JZXJLOKJNX0CNL0NPGGTHTMGBFFSKNX6IUUWV',
+    receiver_email  => 'teste@oemail.com.br',
+    receiver_label  => 'Nome Cliente ou Loja',
+    id_proprio      => 'ID_INTERNO_'.int rand(int rand(99999999)),
+
+);
+
+my $cart = $cpi->new_cart({
+    buyer => {
+        name               => 'Mr. Buyer',
+        email              => 'sender@andrewalker.net',
+        address_street     => 'Rua das Flores',
+        address_number     => '360',
+        address_district   => 'Vila Mariana',
+        address_complement => 'Ap 35',
+        address_city       => 'São Paulo',
+        address_state      => 'SP',
+        address_country    => 'Brazil',
+        address_zip_code   => '04363-040',
+        phone              => '11-9911-0022',
+        id_pagador         => 'O11O22X33X',
+    },
+    mensagens => [
+        'Produto adquirido no site X',
+        'Total pago + frete - Preço: R$ 144,10',
+        'Mensagem linha3',
+    ],
+    boleto => {
+        expiracao       => {
+            dias => 7,
+            tipo => 'corridos', #ou uteis
+        },
+        data_vencimento => '2012/12/30T24:00:00.0-03:00',
+        instrucao1      => 'Primeira linha de instrução de pagamento do boleto bancário',#OPT
+        instrucao2      => 'Segunda linha de instrução de pagamento do boleto bancário', #OPT
+        instrucao3      => 'Terceira linha de instrução de pagamento do boleto bancário',#OPT
+        logo_url        => 'http://www.nixus.com.br/img/logo_nixus.png',                 #OPT
+    },
+    formas_pagamento => [
+        'BoletoBancario',
+        'CartaoDeCredito',
+        'DebitoBancario',
+        'CartaoDeDebito',
+        'FinanciamentoBancario',
+        'CarteiraMoIP',
+    ],
+    url_retorno => 'http://www.url_retorno.com.br',
+    url_notificacao => 'http://www.url_notificacao.com.br',
+    entrega => {
+        destino => 'MesmoCobranca',
+        calculo_frete => [
+            {
+                tipo => 'proprio', #ou correios
+                valor_fixo => 2.30, #ou valor_percentual
+                prazo => {
+                    tipo  => 'corridos', #ou uteis
+                    valor => 2,
+                }
+            },
+            {
+                tipo             => 'correios',
+                valor_percentual => 12.30,
+                prazo => {
+                    tipo    => 'corridos',#ou uteis
+                    valor   => 2,
+                },
+                correios => {
+                    peso_total          => 12.00,
+                    forma_entrega       => 'Sedex10', #ou sedex sedexacobrar sedexhoje
+                    mao_propria         => 'PagadorEscolhe', #ou SIM ou NAO
+                    valor_declarado     => 'PagadorEscolhe', #ou SIM ou NAO
+                    aviso_recebimento   => 'PagadorEscolhe', # ou SIM ou NAO
+                    cep_origem          => '01230-000',
+                },
+            },
+            {
+                tipo => 'correios',
+                valor_percentual => 12.30,
+                prazo => {
+                    tipo    => 'corridos',#ou uteis
+                    valor   => 2,
+                },
+                correios => {
+                    peso_total          => 12.00,
+                    forma_entrega       => 'Sedex10', #ou sedex sedexacobrar sedexhoje
+                    mao_propria         => 'PagadorEscolhe', #ou SIM ou NAO
+                    valor_declarado     => 'PagadorEscolhe', #ou SIM ou NAO
+                    aviso_recebimento   => 'PagadorEscolhe', # ou SIM ou NAO
+                    cep_origem          => '01230-000',
+                },
+            },
+        ]
+    }
+},
+);
+
+my $item = $cart->add_item({
+    id          => 2,
+    quantity    => 1,
+    price       => 222,
+    description => 'produto2',
+});
+
+my $item = $cart->add_item({
+    id          => 1,
+    quantity    => 2,
+    price       => 111,
+    description => 'produto1',
+});
+
+my $res = $cpi->make_xml_transaction( $cart );
+\{
+    code    "SUCCESS",
+    id      201301231157322850000001500872,
+    token   "C2R0A1V3K0P132J3Q1C1S5M7R3N2P2N8B5L0Q0M0J05070U1W5K0P018D7T2"
+}
+
+Return on success:
+    {
+        code    "SUCCESS",
+        id      201301231157322850000001500872,
+        token   "C2R0A1V3K0P132J3Q1C1S5M7R3N2P2N8B5L0Q0M0J05070U1W5K0P018D7T2"
+    }
+
+Return on error:
+    {
+        code    "ERROR",
+        raw_error   "<ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="http://www.moip.com.br/ws/alpha/"><Resposta><ID>201301231158069350000001500908</ID><Status>Falha</Status><Erro Codigo="2">O valor do pagamento deverá ser enviado obrigator
+    iamente</Erro></Resposta></ns1:EnviarInstrucaoUnicaResponse>"
+    }

@@ -1,0 +1,9 @@
+classes:
+  - Service.web.uwsgi.python
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - include wiki service MoinMoin
+  pkg-auto:
+    - python-moinmoin

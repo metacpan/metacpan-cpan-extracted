@@ -1,0 +1,32 @@
+---
+abstract: "Business::CPI's PayPal driver"
+author:
+  - 'André Walker <andre@andrewalker.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-CPI-Gateway-PayPal
+provides:
+  Business::CPI::Gateway::PayPal:
+    file: lib/Business/CPI/Gateway/PayPal.pm
+    version: '0.905'
+  Business::CPI::Gateway::PayPal::IPN:
+    file: lib/Business/CPI/Gateway/PayPal/IPN.pm
+    version: '0.905'
+requires:
+  Business::CPI: '0.910'
+  Business::PayPal::NVP: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  LWP::UserAgent: '0'
+  Moo: '1.0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/andrewalker/p5-business-cpi-gateway-paypal.git
+version: '0.905'

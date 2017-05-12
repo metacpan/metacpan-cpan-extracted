@@ -1,0 +1,25 @@
+Bundle::WormBase
+=============================
+
+WormBase (http://www.wormbase.org/) is the online 
+database for the model organism C. elegans and 
+related nematodes.  This bundle contains the minimum
+required Perl modules for running a local installation
+of WormBase.
+
+To install via CPAN:
+
+$ perl -MCPAN -e 'install Bundle::WormBase'
+
+or by:
+
+% perl Makefile.PL
+% sudo make install
+
+For a full list of the modules which this bundle installs:
+
+% perldoc Bundle::WormBase
+
+Todd Harris
+harris@cshl.edu
+

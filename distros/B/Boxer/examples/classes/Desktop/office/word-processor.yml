@@ -1,0 +1,12 @@
+classes:
+  - Desktop.office
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice Writer
+  pkg:
+    - libreoffice-writer
+  pkg-avoid:
+    - libreoffice-java-common
+    - libreoffice-emailmerge

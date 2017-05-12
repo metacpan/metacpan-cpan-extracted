@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+
+<!--
+ #
+ # You must install BabelObjects and the Configurator Component to use
+ # this install file
+ #
+ # To install BabelObjects, download :
+ #  * ftp://ftp.cpan.org/id/k/KE/KERMAGO/BabelObjects-1.00.tar.gz
+ #  * ftp://ftp.cpan.org/id/k/KE/KERMAGO/BabelObjects-Component-Data-Configurator-1.00.tar.gz
+ #
+ # For more information about OpenInstaller, go to :
+ #  * http://www.BabelObjects.Org/html/en/project/application/openinstaller
+ #
+ # Jean-Christophe Kermagoret (jck@BabelObjects.Org)
+ #
+-->
+
+<!DOCTYPE bo [
+
+<!--
+  ############################################################
+  ## Part 1 : General information. Adapt it for your system ##
+  ############################################################
+-->
+
+  <!ENTITY bo_cache_conf ".." >
+
+]>
+
+<bo>
+
+<!--
+  ############################################################
+  ## Download section : Adapt it for the system from which 
+  ## you want do download RPMS.
+  ############################################################
+-->
+
+  <download>
+    <parameter>
+        <!-- The directory where resides the BO configuration files -->
+        <cfg>/var/cache/babelobjects/conf</cfg>
+    </parameter>
+    <parameter>
+        <!-- The ftp (only) host where to get RPMS -->
+        <host>ftp.babelo.org</host>
+    </parameter>
+    <parameter>
+        <!-- The login to use to login on the previous ftp server -->
+        <login>anonymous</login>
+    </parameter>
+    <parameter>
+        <!-- The password to use to login on the previous ftp server.
+             Default to -->
+        <passwd>''</passwd>
+    </parameter>
+    <parameter>
+        <!-- Directory where RPMS will be stored in RPMS -->
+        <cache_dir>/var/cache/babelobjects</cache_dir>
+    </parameter>
+    <parameter>
+        <bo_cache_conf>&bo_cache_conf;</bo_cache_conf>
+    </parameter>
+    <parameter>
+        <!-- Option to ask debug information only.
+             ''    : nodebug. YOU MUST PUT QUOTES OR THE PROGRAM WILL FAIL
+             debug : debugging -->
+        <loglevel>''</loglevel>
+    </parameter>
+  </download>
+
+<!--
+  ############################################################
+  ## Dynamic class section : Don't touch it
+  ############################################################
+-->
+
+  <classes>
+      <parameter>
+         <!-- The BabelObjects component to load when configurator tag is
+              encountered in the configuration files -->
+         <configurator>BabelObjects::Component::Data::Configurator</configurator>
+      </parameter>
+  </classes>
+
+<!--
+  ############################################################
+  ## RPMS to install and to upgrade
+  ############################################################
+-->
+
+  <rpms>
+    <!-- Rpms to upgrade. If the pointed version is installed, do nothing.
+         Otherwise, the installation program
+             * downloads it from the ftp server you gave
+             * stores it in the cache_dir/RPMS directory
+             * installs it
+    -->
+    <rpm>sample/test-1.0.0-4.i386.rpm</rpm>
+  </rpms>
+ 
+  <services>
+    <!--
+         The application you want to install. The application is just a name
+         to group a set of configuration and data files. For example, you can
+         have a mailserver application composed of 5 configuration files in
+         3 directories. You must have a directory with that name unde your 
+         bo_conf_directory. It permits to store configuration files in
+         a clean structure.
+
+         You can have as service element as you want. Each one with its own
+         set of files.
+    -->
+    <service>test</service>
+  </services>
+
+  <test>
+
+    <!--
+        A file element contains a default and a conf element.
+         * The default element is the path of your configuration source file.
+           Its name must end with '.default' or it will be ignored.
+         * The conf element is the path of your configuration target file.
+           Its name can be whatever you want.
+    -->
+
+    <file>
+      <default>../test/test.1.default</default>
+      <conf>../output/test.1.output</conf>
+    </file>
+
+    <file>
+      <default>../test/test.2.default</default>
+      <conf>../output/test.2.output</conf>
+    </file>
+
+    <file>
+      <default>../test/test.3.default</default>
+      <conf>../output/test.3.output</conf>
+    </file>
+
+    <!-- Parameter element are available for each file. -->
+
+    <parameter>
+        <hello>Hello World</hello>
+    </parameter>
+    <parameter>
+        <ok>It seems to work.</ok>
+    </parameter>
+
+  </test>
+
+</bo>

@@ -1,0 +1,22 @@
+Revision history for Perl extension Biblio-Refbase
+
+0.04    Oct 10, 2010
+
+        - Modernized distribution (no functional changes)
+        - Reverted to 2-level version number
+
+0.0.2   Dec 17, 2008
+
+        - FIX: workaround for failing 06-pod-coverage.t test on some
+          Perl 5.10 environments
+          (see http://www.perlmonks.org/?node_id=728434 for details)
+        - FIX: options 'view' and 'showlinks' in search method were ignored
+          (reported by Matthias Steffens)
+        - Added 'contribution_id' and 'where' options to search method
+        - Trap error message from refbase when SQL query is broken
+        - Added references to the pages 'Citation styles' and 'Table refs'
+          in the refbase documentation
+
+0.0.1   Nov 30, 2008
+
+        - Initial ALPHA release

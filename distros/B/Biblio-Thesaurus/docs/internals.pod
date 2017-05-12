@@ -1,0 +1,93 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+Biblio::Thesaurus internals
+
+=head1 ABSTRACT
+
+This POD documents the internals of the thesaurus object.
+
+=head1 DESCRIPTION
+
+The object itself is a reference to an hash table. We will call
+properties to each key. This way, the C<name> property is accessible
+using C<$obj->{name}>.
+
+Follows a section for each property accessible in the object.
+
+=head2 version
+
+The C<version> property is the Biblio::Thesaurus version for the
+module which created the object. This property value is the same of
+the current module version unless the object was created using the
+C<thesaurusRetrieve> constructor.
+
+=head2 baselang
+
+This property holds the name of the default language (relation name)
+for the thesaurus. If it is not defined, then this property returns an
+interrogation mark (C<?>).
+
+=head2 name
+
+When showing the thesaurus without a search term, the module shows the
+top for the thesaurus. This special term is stored in this
+attribute. Unless it is defined, the default top term is C<_top_>.
+
+=head2 inverses
+
+This property is a reference to an hash table. Keys are relation
+identifiers, and values are the respective inverse. Note that B<it is
+required> that each key is too a value, and vice-versa. This means
+than when defining C<A> is inverse of C<B> it should be added to the
+hash:
+
+  ( 'A' => 'B', 'B' => 'A' )
+
+=head2 externals
+
+To define external relations (relations not to terms) it should be
+added to the C<externals> property one more entry. This property is a
+reference to an hash table where keys are the external relation
+identifiers and values are ignored (use the natural 1 value).
+
+=head2 languages
+
+As in the C<externals> property, this one stores identifiers for
+language pseudo-relations. This property is a reference to an hash
+table where keys are the language identifiers and values are ignored
+(use the natural 1 value).
+
+=head2 descriptions
+
+This property holds a reference to an hash table which maps relation
+identifiers to relation descriptions. On multi-language thesaurus,
+descriptions in the base language are defined normally:
+
+  $obj->{descriptions}{RT} = "related term";
+
+Descriptions for different languages use a relation identifier, a
+space and a language identifier as in:
+
+  $obj->{descriptions}{'RT PT'} = "termo relacionado";
+
+=head2 defined
+
+This property holds a reference to a big hash table. It maps
+normalized terms on their non normalized version (how they appear in
+the ISO file). On multi-language thesaurus, it maps non-base language
+terms to the normalized base language terms.
+
+
+=head2 thesaurus
+
+This is not really the name of the property. For each language
+identifier the object contains a property with that name that holds
+the thesaurus in that specific language as it follows:
+
+
+
+
+
+=cut

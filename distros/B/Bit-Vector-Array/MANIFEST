@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bit-Vector-Array.t
+lib/Bit/Vector/Array.pm
+META.yml                                 Module meta-data (added by MakeMaker)

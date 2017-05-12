@@ -1,0 +1,104 @@
+#!perl
+
+use 5.10.1;
+use strict;
+use warnings;
+
+$|++;
+
+use Bot::Cobalt::DB;
+use Bot::Cobalt::Serializer;
+
+my($dbpath, $outpath);
+
+my $format = 'YAMLXS';
+
+use Getopt::Long;
+GetOptions(
+  help => sub {
+    say "Usage: $0 --database=PATH --output=PATH [ --format=TYPE ]";
+    exit 0
+  },
+  
+  'database=s' => \$dbpath,
+  'input=s'    => \$dbpath,
+  
+  'output=s'   => \$outpath,
+  
+  'format=s'   => \$format,
+);
+
+## Format check
+die "$format is not a valid export format; see perldoc Bot::Cobalt::Serializer"
+  unless Bot::Cobalt::Serializer->new->_check_if_avail($format);
+
+unless ($dbpath) {
+  print "Path to database to be exported: \n > ";
+  $dbpath = <STDIN>;
+  chomp($dbpath);
+}
+
+die "could not locate dbpath: $dbpath"
+  unless -f $dbpath;
+
+unless ($outpath) {
+  print "Output path: \n > ";
+  $outpath = <STDIN>;
+  chomp($outpath);
+}
+
+if (-f $outpath) {
+  print "Output path exists...\n";
+  print "Press ENTER to continue, Ctrl+C to exit. ";
+  <STDIN>;
+  print "\n";
+}
+
+my $db = Bot::Cobalt::DB->new(
+  file => $dbpath,
+);
+
+$db->dbopen(ro => 1) or die "dbopen failure";
+my $yaml = $db->dbdump($format) or die "dbdump failure";
+$db->dbclose;
+
+say "Writing $format to $outpath";
+
+open my $outfh, '>:encoding(UTF-8)', $outpath or die "open failed: $!";
+print $outfh $yaml;
+close $outfh;
+
+say "Done.";
+
+__END__
+=pod
+
+=head1 NAME
+
+cobalt2-dbdump - Export Bot::Cobalt::DB databases to YAML
+
+=head1 SYNOPSIS
+
+  cobalt2-dbdump --database=/path/to/db --output=exported.yml
+
+=head1 DESCRIPTION
+
+A simple frontend to the dbdump functionality found in L<Bot::Cobalt::DB>.
+
+Exports specified Bot::Cobalt::DB databases to YAML by default; the 
+B<--format> option can be used to specify any other format supported by 
+L<Bot::Cobalt::Serializer>:
+
+  cobalt2-dbdump --format=XML
+  cobalt2-dbdump --format=JSON --database=/path/to/db --output=out.json
+
+If the B<database> and/or B<output> options are not specified, the 
+user is prompted for appropriate paths.
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

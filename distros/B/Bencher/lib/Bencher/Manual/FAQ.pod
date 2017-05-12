@@ -1,0 +1,142 @@
+package Bencher::Manual::FAQ; # just to make PodWeaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: FAQ for Bencher
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bencher::Manual::FAQ - FAQ for Bencher
+
+=head1 VERSION
+
+This document describes version 1.028 of Bencher::Manual::FAQ (from Perl distribution Bencher), released on 2017-01-25.
+
+=head1 GENERAL
+
+=head2 What is Bencher?
+
+Bencher is a benchmark framework. It can be used to benchmark Perl code or
+external commands.
+
+=head2 Why should I use Bencher (instead of Benchmark, Dumbbench, ...)?
+
+The main point of Bencher is making your benchmark codes more reusable. Your
+benchmark codes are organized into participants and can be specified as
+templates. These codes then can be combined (permuted) with multiple datasets
+and can also be run using different perl versions and different module versions,
+all with specifying just a command-line option. You can select which
+participants or datasets or other permutation combinations to run. You can run
+the codes with the good ol' L<Benchmark.pm|Benchmark> or using the default
+L<Benchmark::Dumb>.
+
+The results are put into a table data structure and can be formatted, split,
+saved/sent to server, or post-processed in other ways.
+
+There are also tools available to chart the results, embed the results into your
+POD, and so on.
+
+=head2 How do I use Bencher?
+
+Bencher can be used via L<CLI|bencher> or as a C<Perl library|Bencher::Backend>.
+
+See also extra CLI's in L<App::BencherUtils>.
+
+=head2 What is a scenario?
+
+=head2 What is a participant?
+
+=head2 What is a dataset?
+
+=head1 BENCHMARKING PERL CODE
+
+=head2 How do I run a participant in a minimal environment?
+
+Normally when you benchmark a perl code using Bencher, it is run in the same
+process as Bencher framework (and the bencher CLI too, if you run Bencher from
+the CLI) itself. In some cases this is not desirable, for example you might want
+to run a perl code in absence of a module but said module is required and
+already loaded by Bencher.
+
+In these cases, you can use a "perl command-line" participant type instead of
+"perl code" so that your code is run in its own perl interpreter process. For
+example, instead of:
+
+ participants => [
+     # testing speed when no adapter has been configured
+     {code_template => 'state $log = do { require Log::Any; Log::Any->get_logger }; $log->trace("foo")'},
+ ]
+
+you write:
+
+ participants => [
+     # testing speed when no adapter has been configured
+     {perl_cmdline_template => ['-MLog::Any', '-e', 'my $log = Log::Any->get_logger; $log->trace("foo") for 1..1_000_000']},
+ ]
+
+Note that when using "perl command-line" participant, the overhead of starting
+the perl interpreter and compiling your script is included in the benchmark
+time, so you might want to make that overhead relatively small compared to the
+time of running your code (hence the million-times loop in the second example
+above).
+
+=head1 MULTIPLE PERLS
+
+=head1 MULTIPLE MODULE VERSIONS
+
+=head2 How do I permute module versions when I use "perl command-line" participant type?
+
+You can set module path in I<PERL5OPT> and permute using C<env_hashes>. Example:
+
+ env_hashes => [
+     {PERL5OPT=>"-Ipath1"},
+     {PERL5OPT=>"-Ipath2"},
+ ],
+ participants => [
+     {perl_cmdline => ['-e', 'do_something()']},
+ ],
+
+=head1 BENCHMARKING EXTERNAL COMMANDS
+
+=head1 BENCHMARKING PERL COMMANDS
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Bencher>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Bencher>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+C<Bencher::Manual::*>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,67 @@
+NAME
+
+    BingoX - Web application development framework
+
+DESCRIPTION
+
+    BingoX is an object oriented Web Application Framework written for mod_perl
+    meant to dramatically reduce the time required to build large dynamic,
+    database drive web sites and applications. BingoX is also a methodology for
+    building web sites and applications which enables groups of developers to
+    work together in a more consistent manner.
+
+INSTALLATION
+
+    To install BingoX, run the standard sequence:
+
+    perl Makefile.PL
+    make
+    make install
+
+NEW IN VERSION 1.92
+
+	Perl 5.6 compatible
+
+GETTING HELP
+
+	The BingoX project homepage is at
+    http://opensource.cnation.com/projects/BingoX/index.xpml
+
+    BingoX info can be found on Sourceforge at
+    http://www.sourceforge.com/projects/BingoX/
+
+    BingoX discussion groups are currently hosted on sourceforge at
+    <http://sourceforge.net/projects/BingoX/>.
+    To subscribe to the mailing list, go to
+	http://lists.sourceforge.net/mailman/listinfo/BingoX-general
+
+
+REPORTING BUGS
+
+    Report bugs to the <BingoX-general@lists.sourceforge.net> mailing
+    list.  To subscribe go to:
+    http://lists.sourceforge.net/mailman/listinfo/BingoX-general
+
+LICENSE
+
+    Copyright (C) 2000 Cnation
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+MAINTAINER
+
+    Cnation
+    mailto:opensource@cnation.com
+    http://opensource.cnation.com

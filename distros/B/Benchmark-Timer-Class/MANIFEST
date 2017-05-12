@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+Class.pm
+test.pl
+README
+examples/test1_original.pl
+examples/test1_timed.pl
+examples/TestC.pm

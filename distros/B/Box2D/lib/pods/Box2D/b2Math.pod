@@ -1,0 +1,274 @@
+
+=head1 NAME
+
+Box2D::b2Math - Vector and matrix functions.
+
+=head1 SYNOPSIS
+
+  my $dot_product = Box2D::b2Math::b2DotV2V2( $a, $b );
+  my cross_product = Box2D::b2Math::b2CrossV2V2( $a, $b );
+  my $distance = Box2D::b2Math::b2Distance( $a, $b );
+
+=head1 DESCRIPTION
+
+C<Box2D> includes a simple small vector and matrix module. This has
+been designed to suit the internal needs of C<Box2D> and the API. Some
+the members are exposed, so you may use them freely in your application.
+
+=head1 METHODS
+
+=head2 b2IsValid( $x )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x>
+
+=back
+
+Returns a C<bool>
+
+=head2 b2InvSqrt( $x )
+
+Compute the inverse square-root of a scalar. Approximate yet fast.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x>
+
+=back
+
+Returns a C<float32>
+
+=head2 b2Abs( $x )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$x>
+
+=back
+
+Returns a C<float32>
+
+=head2 b2DotV2V2( $a, $b )
+
+Compute the dot product of two vectors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<float32>
+
+=head2 b2CrossV2V2( $a, $b )
+
+Compute the cross product of two vectors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<float32>
+
+=head2 b2CrossV2S( $v, $s )
+
+Compute the cross product of a vector and a scalar.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$v>
+
+=item * C<float32> C<$s>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2CrossSV2( $s, $v )
+
+Compute the cross product of a scalar and a vector.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$s>
+
+=item * C<Box2D::b2Vec2> C<$v>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2MulM22V2( $M, $v )
+
+Multiply a matrix and a vector.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Mat22> C<$M>
+
+=item * C<Box2D::b2Vec2> C<$v>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2MulTM22V2( $M, $v )
+
+Multiply a matrix transpose and a vector.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Mat22> C<$M>
+
+=item * C<Box2D::b2Vec2> C<$v>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2AddV2V2( $a, $b )
+
+Add two vectors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2SubV2V2( $a, $b )
+
+Subtract one vector from another.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2MulSV2( $s, $v )
+
+Multiply a scalar and a vector.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$s>
+
+=item * C<Box2D::b2Vec2> C<$v>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 b2EqlV2V2( $a, $b )
+
+Are these vectors equal?
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<bool>
+
+=head2 b2Distance( $a, $b )
+
+Compute the distance between two vectors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<float32>
+
+=head2 b2DistanceSquared( $a, $b )
+
+Compute the square of the distance between two vectors.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$a>
+
+=item * C<Box2D::b2Vec2> C<$b>
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Vec2>
+
+=item * L<Box2D::b2Mat22>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

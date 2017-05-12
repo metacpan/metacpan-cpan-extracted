@@ -1,0 +1,50 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage 'pod2usage';
+
+Getopt::Long::Configure("bundling");
+GetOptions(
+    'a|all'         => \my $all,
+    'i|instantiate' => \my $inst,
+    'l|lib'         => \my $lib,
+    'h|?|help'      => \my $help,
+);
+
+if ($help) {
+    pod2usage(
+        -msg     => 'test',
+        -verbose => 1
+    );
+}
+
+pod2usage( -msg => "Please provide a configuration file\n" ) unless @ARGV;
+
+push @INC, 'lib' if $lib;
+
+use Beam::Wire;
+my $wire = Beam::Wire->new( file => $ARGV[0] );
+my $error_count = $wire->validate( $inst, $all );
+
+exit $error_count ? 1 : 0;
+
+=head1 NAME
+
+beam-wire - Validate Beam::Wire configuration files
+
+=head1 SYNOPSIS
+
+  Usage: beam-wire [options] configuration.file
+
+=head1 OPTIONS
+
+ -a, --all             Warn about all errors found instead of quitting after the first
+ -i, --instantiate     Attempt to instantiate all dependencies
+ -l, --lib             Add 'lib' to the path for checking dependency class names
+ -h, --help            Display this help
+ -?                    Display this help
+
+=cut

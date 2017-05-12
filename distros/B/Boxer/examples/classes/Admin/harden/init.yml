@@ -1,0 +1,23 @@
+classes:
+  - Admin.etc.track
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include hardening tools
+  pkg:
+  - e2fsck-static
+  - changetrack
+  - fail2ban
+  - harden
+  - monkeysphere
+  - rkhunter
+  - samhain
+  - sash
+  - sudo
+  - systraq
+  - unhide.rb
+  pkg-auto:
+  - samhain
+  - sash
+  - unhide.rb

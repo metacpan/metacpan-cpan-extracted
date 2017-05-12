@@ -1,0 +1,20 @@
+severity=1
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Date Author Revision
+
+[-InputOutput::RequireBriefOpen]
+
+[-Documentation::RequirePodSections]
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = warn die carp croak cluck confess goto exit assert
+
+[Variables::ProhibitPunctuationVars]
+allow = $- $+
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = t/perltidyrc
+
+[Documentation::PodSpelling]
+stop_words = Riester Tuebingen bgrep Fasta agrep Vmatch vmatch vsubseqselect online xdrop TODO perldoc Superclass superclass hashref regex API Manber Agrep TRE CDNA pre substring CLUSTALW CLUSTAL Bioperl accessors mutators evalue  GUUGle datapath tmppath execpath executables substrings showdesc qspeedup GUMISMATCHES EDITDISTANCE MAXHITS HXDROP EXDROP dna symlink filename filenames bioperl versa Needleman Wunsch FilterRemoveDuplicates ga gd dG maxhits substr

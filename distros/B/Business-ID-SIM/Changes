@@ -1,0 +1,43 @@
+Revision history for Business-ID-SIM
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-07-10 (PERLANCAR)
+
+	- Split pericmd CLI scripts to App-IndonesianNumberUtils to reduce
+	  dependencies on our dist.
+
+
+0.05     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - Add CLI script(s).
+
+
+0.04    2013-12-04 (SHARYANTO)
+
+        - No functional changes. Use Data::Clean::JSON 0.11's get_cleanser().
+
+
+0.03    2013-09-09 (SHARYANTO)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Replace old interface (validate_sim() + OO interface) with Rinci-based
+          parse_sim().
+
+
+0.02    2010-02-26 (SHARYANTO)
+
+        - Generate META.yml (using Dist::Zilla)
+
+
+0.01    2009-10-06 (SHARYANTO)
+
+        - First version, released on an unsuspecting world.

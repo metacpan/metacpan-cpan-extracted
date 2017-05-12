@@ -1,0 +1,2755 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./BioTeam-HOWTO-1-BIOSQL_files/filelist.xml">
+<title>MyGENBANK with mySQL: Rolling your own relational sequence database</title>
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>Chris Dagdigan</o:Author>
+  <o:Template>Normal</o:Template>
+  <o:LastAuthor>Chris Dagdigian</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>608</o:TotalTime>
+  <o:Created>2002-05-30T20:22:00Z</o:Created>
+  <o:LastSaved>2002-05-30T20:22:00Z</o:LastSaved>
+  <o:Pages>13</o:Pages>
+  <o:Words>3891</o:Words>
+  <o:Characters>22181</o:Characters>
+  <o:Lines>184</o:Lines>
+  <o:Paragraphs>44</o:Paragraphs>
+  <o:CharactersWithSpaces>27239</o:CharactersWithSpaces>
+  <o:Version>9.4402</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Courier;
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:0;
+	mso-generic-font-family:modern;
+	mso-font-format:other;
+	mso-font-pitch:fixed;
+	mso-font-signature:3 0 0 0 1 0;}
+@font-face
+	{font-family:Wingdings;
+	panose-1:5 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:2;
+	mso-generic-font-family:auto;
+	mso-font-pitch:variable;
+	mso-font-signature:0 268435456 0 0 -2147483648 0;}
+@font-face
+	{font-family:"MS Mincho";
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-alt:"\FF2D\FF33 \660E\671D";
+	mso-font-charset:128;
+	mso-generic-font-family:roman;
+	mso-font-format:other;
+	mso-font-pitch:fixed;
+	mso-font-signature:1 134676480 16 0 131072 0;}
+@font-face
+	{font-family:"\@MS Mincho";
+	panose-1:0 0 0 0 0 0 0 0 0 0;
+	mso-font-charset:128;
+	mso-generic-font-family:roman;
+	mso-font-format:other;
+	mso-font-pitch:fixed;
+	mso-font-signature:1 134676480 16 0 131072 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+h1
+	{mso-style-next:Normal;
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	page-break-after:avoid;
+	mso-outline-level:1;
+	font-size:11.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:"MS Mincho";
+	mso-font-kerning:0pt;}
+h3
+	{mso-style-next:Normal;
+	margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:-.25in;
+	margin-bottom:.0001pt;
+	mso-pagination:none;
+	page-break-after:avoid;
+	mso-outline-level:3;
+	mso-layout-grid-align:none;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	mso-bidi-font-size:12.0pt;
+	font-family:Arial;
+	mso-fareast-font-family:"Times New Roman";
+	color:black;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+p.MsoPlainText, li.MsoPlainText, div.MsoPlainText
+	{margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	mso-fareast-font-family:"Times New Roman";}
+pre
+	{margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:10.0pt;
+	font-family:"Courier New";
+	mso-fareast-font-family:"Courier New";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in .75in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:-2;
+	mso-list-type:simple;
+	mso-list-template-ids:433330380;}
+@list l0:level1
+	{mso-level-start-at:0;
+	mso-level-text:*;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	margin-left:0in;
+	text-indent:0in;}
+@list l1
+	{mso-list-id:17972428;
+	mso-list-type:hybrid;
+	mso-list-template-ids:691812016 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l1:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l2
+	{mso-list-id:138806552;
+	mso-list-type:hybrid;
+	mso-list-template-ids:537017418 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l2:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l3
+	{mso-list-id:274604915;
+	mso-list-template-ids:2107244632;}
+@list l3:level1
+	{mso-level-text:"%1\.0";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l3:level2
+	{mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.25in;}
+@list l3:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l3:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l3:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:2.75in;
+	mso-level-number-position:left;
+	margin-left:2.75in;
+	text-indent:-.75in;}
+@list l3:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:3.25in;
+	mso-level-number-position:left;
+	margin-left:3.25in;
+	text-indent:-.75in;}
+@list l3:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	margin-left:4.0in;
+	text-indent:-1.0in;}
+@list l3:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	margin-left:4.5in;
+	text-indent:-1.0in;}
+@list l3:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:5.25in;
+	mso-level-number-position:left;
+	margin-left:5.25in;
+	text-indent:-1.25in;}
+@list l4
+	{mso-list-id:892734380;
+	mso-list-template-ids:767215226;}
+@list l4:level1
+	{mso-level-text:"%1\.0";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l4:level2
+	{mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.25in;}
+@list l4:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l4:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l4:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:2.75in;
+	mso-level-number-position:left;
+	margin-left:2.75in;
+	text-indent:-.75in;}
+@list l4:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:3.25in;
+	mso-level-number-position:left;
+	margin-left:3.25in;
+	text-indent:-.75in;}
+@list l4:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	margin-left:4.0in;
+	text-indent:-1.0in;}
+@list l4:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	margin-left:4.5in;
+	text-indent:-1.0in;}
+@list l4:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:5.25in;
+	mso-level-number-position:left;
+	margin-left:5.25in;
+	text-indent:-1.25in;}
+@list l5
+	{mso-list-id:1062602041;
+	mso-list-template-ids:767215226;}
+@list l5:level1
+	{mso-level-text:"%1\.0";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l5:level2
+	{mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.25in;}
+@list l5:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l5:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l5:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:2.75in;
+	mso-level-number-position:left;
+	margin-left:2.75in;
+	text-indent:-.75in;}
+@list l5:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:3.25in;
+	mso-level-number-position:left;
+	margin-left:3.25in;
+	text-indent:-.75in;}
+@list l5:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	margin-left:4.0in;
+	text-indent:-1.0in;}
+@list l5:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	margin-left:4.5in;
+	text-indent:-1.0in;}
+@list l5:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:5.25in;
+	mso-level-number-position:left;
+	margin-left:5.25in;
+	text-indent:-1.25in;}
+@list l6
+	{mso-list-id:1497529953;
+	mso-list-template-ids:767215226;}
+@list l6:level1
+	{mso-level-text:"%1\.0";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l6:level2
+	{mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.25in;}
+@list l6:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l6:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l6:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:2.75in;
+	mso-level-number-position:left;
+	margin-left:2.75in;
+	text-indent:-.75in;}
+@list l6:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:3.25in;
+	mso-level-number-position:left;
+	margin-left:3.25in;
+	text-indent:-.75in;}
+@list l6:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	margin-left:4.0in;
+	text-indent:-1.0in;}
+@list l6:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	margin-left:4.5in;
+	text-indent:-1.0in;}
+@list l6:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:5.25in;
+	mso-level-number-position:left;
+	margin-left:5.25in;
+	text-indent:-1.25in;}
+@list l7
+	{mso-list-id:1498115195;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-651903452 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l7:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l8
+	{mso-list-id:1498230682;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1544416708 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l8:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l9
+	{mso-list-id:1539659083;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-683351664 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l9:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l10
+	{mso-list-id:1821386838;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1209847960 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l10:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l11
+	{mso-list-id:1831092633;
+	mso-list-template-ids:767215226;}
+@list l11:level1
+	{mso-level-text:"%1\.0";
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;}
+@list l11:level2
+	{mso-level-text:"%1\.%2";
+	mso-level-tab-stop:.75in;
+	mso-level-number-position:left;
+	margin-left:.75in;
+	text-indent:-.25in;}
+@list l11:level3
+	{mso-level-text:"%1\.%2\.%3";
+	mso-level-tab-stop:1.5in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l11:level4
+	{mso-level-text:"%1\.%2\.%3\.%4";
+	mso-level-tab-stop:2.0in;
+	mso-level-number-position:left;
+	text-indent:-.5in;}
+@list l11:level5
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5";
+	mso-level-tab-stop:2.75in;
+	mso-level-number-position:left;
+	margin-left:2.75in;
+	text-indent:-.75in;}
+@list l11:level6
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6";
+	mso-level-tab-stop:3.25in;
+	mso-level-number-position:left;
+	margin-left:3.25in;
+	text-indent:-.75in;}
+@list l11:level7
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7";
+	mso-level-tab-stop:4.0in;
+	mso-level-number-position:left;
+	margin-left:4.0in;
+	text-indent:-1.0in;}
+@list l11:level8
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8";
+	mso-level-tab-stop:4.5in;
+	mso-level-number-position:left;
+	margin-left:4.5in;
+	text-indent:-1.0in;}
+@list l11:level9
+	{mso-level-text:"%1\.%2\.%3\.%4\.%5\.%6\.%7\.%8\.%9";
+	mso-level-tab-stop:5.25in;
+	mso-level-number-position:left;
+	margin-left:5.25in;
+	text-indent:-1.25in;}
+@list l12
+	{mso-list-id:1902665915;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1246933982 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l12:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l13
+	{mso-list-id:1941790248;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-471438700 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l13:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l14
+	{mso-list-id:2026902235;
+	mso-list-type:hybrid;
+	mso-list-template-ids:275145008 67698703 67698713 67698715 67698703 67698713 67698715 67698703 67698713 67698715;}
+@list l14:level1
+	{mso-level-tab-stop:1.0in;
+	mso-level-number-position:left;
+	margin-left:1.0in;
+	text-indent:-.25in;}
+@list l15
+	{mso-list-id:2056082535;
+	mso-list-type:hybrid;
+	mso-list-template-ids:1442973350 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l15:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.25in;
+	mso-level-number-position:left;
+	margin-left:.25in;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l16
+	{mso-list-id:2146390680;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-1970886908 67698689 67698691 67698693 67698689 67698691 67698693 67698689 67698691 67698693;}
+@list l16:level1
+	{mso-level-number-format:bullet;
+	mso-level-text:\F0B7;
+	mso-level-tab-stop:.5in;
+	mso-level-number-position:left;
+	text-indent:-.25in;
+	font-family:Symbol;}
+@list l0:level1 lfo1
+	{mso-level-number-format:bullet;
+	mso-level-numbering:continue;
+	mso-level-text:•;
+	mso-level-tab-stop:none;
+	mso-level-number-position:left;
+	mso-level-legacy:yes;
+	mso-level-legacy-indent:0in;
+	mso-level-legacy-space:0in;
+	margin-left:0in;
+	text-indent:0in;
+	font-family:"Times New Roman";}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+</head>
+
+<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<h3 style='margin-left:0in'>BioTeam.Net HOWTO #1</h3>
+
+<h3 style='margin-left:0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></h3>
+
+<h3 align=center style='margin-left:0in;text-align:center'>“BioSQL with
+MySQL: </h3>
+
+<h3 align=center style='margin-left:0in;text-align:center'>Rolling your own
+relational sequence database”</h3>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Additional titles considered:<o:p></o:p></span></b></p>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='color:black;mso-list:l12 level1 lfo6;tab-stops:
+     list .5in'><span style='font-size:10.0pt;font-family:Arial'>“Oracle DBA
+     not required :)”</span><span style='font-family:Arial'><o:p></o:p></span></li>
+ <li class=MsoNormal style='color:black;mso-list:l12 level1 lfo6;tab-stops:
+     list .5in'><span style='font-size:10.0pt;font-family:Arial'>“Escape from
+     flatfile hell?” </span><span style='font-family:Arial'><o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial;color:black'>Summary:<o:p></o:p></span></b></p>
+
+<p class=MsoBodyText>A step-by-step diary written by a database novice
+describing how to use freely available tools and schemas from the Open
+Bioinformatics Foundation to create a MySQL-based relational database
+repository for biological sequence and annotation data.</p>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Author:</span></b><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'>Chris
+Dagdigian, <a href="mailto:dag@sonsorol.org">dag@sonsorol.org</a> </span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'><a
+href="http://bioteam.net/">http://BioTeam.net</a><o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Version:</span></b><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'>1.1
+- Last updated May 30, 2002 <o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Revision History:<o:p></o:p></span></b></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'>1.0;
+Original version – May 2002<o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:Arial;color:black'>1.1;
+Reader feedback and error corrections; first ‘complete’ revision – May 2002<o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-family:Arial;color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Acknowledgements:<o:p></o:p></span></b></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='color:black;mso-list:l16 level1 lfo17;tab-stops:
+     list .5in'><span style='font-size:10.0pt;font-family:Arial'>Open
+     Bioinformatics Foundation, <a href="http://www.open-bio.org/">http://www.open-bio.org</a><o:p></o:p></span></li>
+ <li class=MsoNormal style='color:black;mso-list:l16 level1 lfo17;tab-stops:
+     list .5in'><span style='font-size:10.0pt;font-family:Arial'>Bauer Center
+     for Genomics Research, Harvard University, <a
+     href="http://cgr.harvard.edu/">http://cgr.harvard.edu</a><o:p></o:p></span></li>
+</ul>
+
+<p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in;mso-list:l16 level1 lfo17;
+tab-stops:list .5in'><![if !supportLists]><span style='mso-bidi-font-size:10.0pt;
+font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='mso-bidi-font-size:10.0pt'>Keith Allen,
+PhD, Paradigm Genetics, USA<o:p></o:p></span></p>
+
+<p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in;mso-list:l16 level1 lfo17;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='mso-bidi-font-size:10.0pt'>Mark </span>Lambrecht,
+PhD - University of Leuven, Centre of Microbial and Plant Genetics, Belgium</p>
+
+<p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in;mso-list:l16 level1 lfo17;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]>Adam Witney, St. George’s Hospital Medical School,
+University of London, UK</p>
+
+<p class=MsoNormal style='margin-left:14.45pt'><span style='mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Additional Resources:<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Open Bio Database Access website, <a
+href="http://obda.open-bio.org/">http://obda.open-bio.org</a><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Open-bio-l mailing list, <a
+href="http://open-bio.org/mailman/listinfo/open-bio-l">http://open-bio.org/mailman/listinfo/open-bio-l</a><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Contents:</span></b><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Background &amp; purpose</span><span style='font-family:Arial;
+color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Assumptions</span><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>About the OBDA effort</span><span style='font-family:Arial;
+color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>About BioSQL</span><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>About Bioperl-db</span><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-21.55pt;mso-list:l0 level1 lfo1'><![if !supportLists]><span
+style='mso-bidi-font-family:Arial;color:black'>•<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Step-by-step guide</span><span style='font-family:Arial;
+color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>1.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Installing MySQL the lazy way (via RPM) and configuring</span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>2.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Installing perl interfaces to MySQL</span><span style='font-family:
+Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>3.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Installing Bundle::BioPerl via CPAN.pm</span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>4.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Installing BioPerl via CPAN.pm</span><span style='font-family:
+Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>5.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Downloading &amp; installing bioperl-db directly from the OBF CVS
+repository</span><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>6.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Downloading biosql-schema directly from the OBF CVS repository</span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>7.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Putting it all together: creating a biosql instance within MySQL</span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>8.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Loading a test protein dataset: SwissProt release 40</span><span
+style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>9.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-size:10.0pt;font-family:Arial;
+color:black'>Observations</span><span style='font-family:Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:1.0in;text-indent:-.25in;mso-list:l14 level1 lfo4;
+tab-stops:list 1.0in'><![if !supportLists]><span style='font-family:Arial;
+color:black'>10.<span style='font:7.0pt "Times New Roman"'> </span></span><![endif]><span
+style='font-size:10.0pt;font-family:Arial;color:black'><span
+style="mso-spacerun: yes"> </span>Next steps…</span><span style='font-family:
+Arial;color:black'><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:Arial;
+color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:Arial;
+color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-family:Arial;
+color:black'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>Background &amp; purpose<o:p></o:p></span></b></p>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>While working on an
+informatics/Bio-IT project at Harvard University’s new Bauer Center for
+Genomics Research (<a href="http://cgr.harvard.edu/">http://cgr.harvard.edu</a>)
+I met some people who were interested in storing sequence data into a
+relational database so they could avoid having to parse or index big flat text
+files.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>Knowing that (a) The Open
+Bioinformatics Foundation had started work on solution and (b) I am a complete
+and utter moron when it comes to relational databases I thought that it would
+be a fun experiment to document my efforts at building such a server starting
+with a bare-bones RedHat Linux 7.2 server.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>This document is essentially a
+diary of my experiences. It took me roughly a day to get to the point where I
+could load Swissprot into a biosql database via Jason Stajich’s
+load_seqdatabase.pl script.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>Another reason I wrote this is
+that as a member of the Open Bioinformatics Foundation board of directors I am
+well aware that our website(s) are horrific and that our documentation often
+lags behind the functionality of our code base. <o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>In particular the bioperl website
+gives little or no mention to “bioperl-db” and the related obda.open-bio.org
+website is totally devoid of any real information.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>In fact- one practically needs to
+be an existing developer on one of our existing projects to even know that this
+stuff exists.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>So- besides being a fun way to
+spend a day this is also a way for me to get myself more up to speed with the
+OBDA website and related work so that I can eventually help contribute to the
+website and project documentation efforts.<o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'>Comments/corrections/additions/flames
+regarding this document are welcome. Just send them along to me at <a
+href="mailto:dag@sonsorol.org">dag@sonsorol.org</a><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>Assumptions<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText style='margin-left:.25in;text-indent:-.25in;mso-list:
+l15 level1 lfo5;tab-stops:list .25in'><![if !supportLists]><span
+style='font-family:Symbol;mso-bidi-font-family:Arial'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial'>This document describes
+installing a biosql-compliant database on an x86-based server running RedHat
+7.2. <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.25in;text-indent:-.25in;mso-list:
+l15 level1 lfo5;tab-stops:list .25in'><![if !supportLists]><span
+style='font-family:Symbol;mso-bidi-font-family:Arial'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial'>Different hardware
+architectures or OS’s may require different install procedures. Specifically
+the server used for this process was a Dell PowerEdge 6450 system with dual
+Xeon CPUs, 4GB physical memory and the 2.4.18 linux kernel.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.25in;text-indent:-.25in;mso-list:
+l15 level1 lfo5;tab-stops:list .25in'><![if !supportLists]><span
+style='font-family:Symbol;mso-bidi-font-family:Arial'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial'>This document assumes
+the user has root access to the server system for the purposes of installing
+software and perl modules.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.25in;text-indent:-.25in;mso-list:
+l15 level1 lfo5;tab-stops:list .25in'><![if !supportLists]><span
+style='font-family:Symbol;mso-bidi-font-family:Arial'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial'>This document assumes
+at least basic knowledge of RPM packages and how to install them<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.25in;text-indent:-.25in;mso-list:
+l15 level1 lfo5;tab-stops:list .25in'><![if !supportLists]><span
+style='font-size:12.0pt;mso-bidi-font-size:10.0pt;font-family:Symbol;
+mso-bidi-font-family:Arial;mso-bidi-font-weight:bold'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial'>The process described
+here includes downloading code from the internet via anonymous CVS which some
+firewalls may not allow. Explaining the use of CVS-over-SSH is not within the
+scope of this document.</span><b><span style='font-size:12.0pt;mso-bidi-font-size:
+10.0pt;font-family:Arial'> <o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>About the Open Bio Database Access (OBDA) effort<o:p></o:p></span></b></p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>OBDA is standard developed by the <a
+href="http://www.open-bio.org/">Open Bioinformatics Foundation</a> to
+standardize the way all of the OBF-affiliated projects access sequence data
+resources. This includes local sequence resources (indexed flatfiles), remote
+databases (web accessible sequence resources), CORBA servers (implementing the <a
+href="http://www.biocorba.org/">BioCORBA/BSANE</a> specification) and
+relational databases using the <a
+href="http://cvs.open-bio.org/cgi-bin/viewcvs/viewcvs.cgi/biosql-schema/sql/?cvsroot=biosql">BioSQL</a>
+schema.</p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>The website for the OBDA effort will eventually be <a
+href="http://obda.open-bio.org/">http://obda.open-bio.org/</a> . At this time
+though the site is only online in template form. The OBF is actively soliciting
+people to take over the website and OBDA documentation efforts. </p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>The primary discussion forum for the OBDA effort is the
+“open-bio-l” mailing list. The list signup page is located at: <a
+href="http://open-bio.org/mailman/listinfo/open-bio-l">http://open-bio.org/mailman/listinfo/open-bio-l</a>
+. The list archives are online at <a
+href="http://open-bio.org/pipermail/open-bio-l/">http://open-bio.org/pipermail/open-bio-l/</a>.
+</p>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>About BioSQL<o:p></o:p></span></b></p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>The website and primary email discussion list for all
+things BioSQL related will be the ones listed above in the OBDA section.</p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>A BioSQL ER diagram in PDF form can be <a
+href="http://cvs.bioperl.org/cgi-bin/viewcvs/viewcvs.cgi/*checkout*/biosql-schema/doc/biosql-ERD.pdf?rev=HEAD&amp;cvsroot=biosql">downloaded
+directly</a> (PDF) from the OBF anonymous CVS server. A formatted listing of
+the tables described in the schema can be <a
+href="http://cvs.bioperl.org/cgi-bin/viewcvs/viewcvs.cgi/*checkout*/biosql-schema/doc/biosql.html?rev=HEAD&amp;cvsroot=biosql&amp;content-type=text/html">viewed
+online directly</a> (HTML) from the same server.</p>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>About BioPerl-db<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoBodyText>The bioperl-db project was started by Ewan Birney with
+major work contributed by Elia Stupka and continued support coming from the
+bioperl community.<span style="mso-spacerun: yes">  </span>Its purpose is a
+standalone sequence database with little external dependencies and tight
+integration with the bioperl distribution.<span style="mso-spacerun: yes"> 
+</span>Support for more databases and bindings in java and python by Biojava
+and Biopython projects are welcomed and encouraged.<span style="mso-spacerun:
+yes">  </span>All questions and comments should be directed to the bioperl list
+&lt;<a href="mailto:bioperl-l@bioperl.org">bioperl-l@bioperl.org</a>&gt; and
+more information can be found about the related projects at <a
+href="http://bio.perl.org">http://bio.perl.org</a> and <a
+href="http://www.open-bio.org.">http://www.open-bio.org.</a></p>
+
+<p class=MsoBodyText><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoBodyText>Bioperl-db is a standalone module located within the CVS
+code repository operated by the BioPerl Project. Anonymous CVS access and
+tarball downloads are available at <a href="http://cvs.bioperl.org/">http://cvs.bioperl.org</a>.
+Look in the bioperl repository for the “bioperl-db” module.</p>
+
+<span style='font-size:12.0pt;font-family:"Times New Roman";mso-fareast-font-family:
+"Times New Roman";mso-ansi-language:EN-US;mso-fareast-language:EN-US;
+mso-bidi-language:AR-SA'><br clear=all style='mso-special-character:line-break;
+page-break-before:always'>
+</span>
+
+<div style='border:none;border-bottom:solid windowtext 1.5pt;padding:0in 0in 1.0pt 0in'>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+<p class=MsoNormal style='border:none;mso-border-bottom-alt:solid windowtext 1.5pt;
+padding:0in;mso-padding-alt:0in 0in 1.0pt 0in'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+<p class=MsoPlainText><b><span style='font-size:12.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial'>Step by step guide</span></b><b><span style='font-size:12.0pt;
+mso-bidi-font-size:10.0pt;font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='mso-fareast-font-family:"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='mso-fareast-font-family:"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:"MS Mincho"'>Step 1 Install MySQL the
+lazy way (via RPM) and configure<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>While logged in as root I installed the following RedHat RPMS:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysqlclient9-3.23.22-6<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-3.23.41-1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-server-3.23.41-1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-devel-3.23.41-1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Arial;
+mso-fareast-font-family:"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The install was verified by issuing the following command:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><span style='mso-tab-count:1'>            </span># rpm –qa | grep
+mysql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysqlclient9-3.23.22-6<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-3.23.41-1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-server-3.23.41-1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='text-indent:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql-devel-3.23.41-1</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoBodyText><b><span style='mso-fareast-font-family:"MS Mincho"'>MySQL
+version warning:</span></b><span style='mso-fareast-font-family:"MS Mincho"'>
+Mark Lambrecht recommends the use of MySQL version 3.23 or later. When trying
+to install version 3.22 on an Alpha-based system he received errors relating to
+the creation of the “</span><span style='font-family:"Courier New"'>fattribute_to_feature</span>”
+table. <span style='mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>By default the RPM MySQL install puts sample configuration files
+into /usr/share/mysql/<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The base directory that the RPM MySQL install uses is
+/var/lib/mysql<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The global configuration file is kept at /etc/my.cnf<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>It is important to edit the configuration file at /etc/my.conf <b>BEFORE</b>
+starting the database for the first time particularly if you want (like me) to
+have the MySQL data files live somewhere other than /var/lib/mysql.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>In my case I wanted to do two main things to the global config
+file, (a) change the default location to the much larger /usr/local/ partition
+and (b) incorporate some of the config suggestions found in /usr/share/mysql/
+specific to large dedicated database servers. <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>WARNING</span></b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>; BioSQL databases can be very large. It may be wise to double
+check the size of your /var partition before continuing on with a totally
+default RPM-based install. The 1GB /var partition present on the Dell 6450
+server is far too small. As an example:<span style="mso-spacerun: yes"> 
+</span>The swissprot40 database is 307MB in size. When this dataset was loaded
+into MySQL the resulting database files and indices consumed roughly 399MB of
+disk space. <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoBodyText><b><span style='mso-fareast-font-family:"MS Mincho"'>NOTE</span></b><span
+style='mso-fareast-font-family:"MS Mincho"'>: Several BioSQL users have found
+that very large sequence records will greatly exceed some of the default
+settings that MySQL uses. In particular one may need to set the configuration
+value “</span><span style='font-family:"Courier New";mso-fareast-font-family:
+"MS Mincho"'>max_allowed_packet</span><span style='mso-fareast-font-family:
+"MS Mincho"'>” to a fairly high value (several megabytes at least). If you
+encounter any error messages that are similar to: “</span><span
+style='font-family:"Courier New"'>DBD::mysql::st execute failed: MySQL server
+has gone away…</span>” than it is likely that <span style='font-family:"Courier New"'>max_allowed_packet</span>
+needs to be set to a larger value. In an email post to the bioperl-l (<a
+href="http://bioperl.org/mailman/listinfo/bioperl-l">http://bioperl.org/mailman/listinfo/bioperl-l</a>)
+mailing list Keith Allen covers his experience with this problem in excellent
+detail. The full email message can be read at the following URL: <a
+href="http://bioperl.org/pipermail/bioperl-l/2002-May/007987.html">http://bioperl.org/pipermail/bioperl-l/2002-May/007987.html</a>
+</p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>After revising the value of max_allowed_packet to ‘3M’ due to
+feedback from Keith Allen (see above Note) the global configuration file
+/etc/my.conf now looks like this:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[mysqld]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>port=3306<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>datadir=/usr/local/mysql-database<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>socket=/usr/local/mysql-database/mysql.sock<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>skip-locking<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable= key_buffer=256M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+max_allowed_packet=3M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+table_cache=256<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+sort_buffer=1M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+record_buffer=1M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+myisam_sort_buffer_size=64M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+thread_cache=8<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+thread_concurrency=4<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>server-id= 1<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>tmpdir= /tmp/<span
+style='mso-tab-count:1'> </span><span style='mso-tab-count:1'>      </span><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><span
+style="mso-spacerun: yes">     </span><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[mysql.server]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>user=mysql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>basedir=/usr/lib<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[safe_mysqld]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>err-log=/var/log/mysqld.log<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>pid-file=/var/run/mysqld/mysqld.pid<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[mysqldump]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>quick<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable=
+max_allowed_packet=16M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[mysql]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>no-auto-rehash<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>safe-updates<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[isamchk]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= key_buffer=128M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= sort_buffer=128M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= read_buffer=2M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= write_buffer=2M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[myisamchk]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= key_buffer=128M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= sort_buffer=128M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= read_buffer=2M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>set-variable<span
+style='mso-tab-count:1'>      </span>= write_buffer=2M<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[mysqlhotcopy]<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>interactive-timeout<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Just in case I missed anything I decided to add a symbolic link
+back to /var/lib/mysql – this turns out to be important because my
+configuration file still has “basedir=/var/lib” which is a total mistake.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># cd /var/lib<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># ln -s
+/usr/local/mysql-database/ ./mysql</span><span style='font-family:Arial;
+mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Now we can start the MySQL datbase...<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>/etc/rc.d/init.d/mysql
+start<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Important!</span></b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'> Protect your database by setting a root MySQL password:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># mysqladmin -u
+root password 'xxxxxxx'<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>After installing, configuring, starting and enabling a root
+password it should be possible to logoff as root and re-login as a ‘normal’
+system user.<span style="mso-spacerun: yes">  </span><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>To test this I made the switch from root user to my normal 'dag'
+user account and confirmed that I can login as root to the mysql instance:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[dag@pe3
+scripts]$ mysql -u root -p<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Enter password:
+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Welcome to the
+MySQL monitor.<span style="mso-spacerun: yes">  </span>Commands end with ; or
+\g.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Your MySQL
+connection id is 8 to server version: 3.23.41-log<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Type 'help;' or
+'\h' for help. Type '\c' to clear the buffer.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt; exit<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Bye</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Success! We now have a working MySQL instance.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Step 2 Install the perl interfaces to MySQL <o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>In future steps we are going to use perl to help us talk to the
+MySQL database. In order to do this we need some additional perl modules
+installed. We need:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l13 level1 lfo7;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>DBI:: - The perl generic database interface<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l13 level1 lfo7;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>DBD::MySQL – The perl MySQL database driver module<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Given the lazy RPM install we previously did with the MySQL
+database it makes sense to install the preconfigured RPM versions of these
+modules that RedHat provides. The specific modules installed were:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l2 level1 lfo8;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho"'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='mso-fareast-font-family:"MS Mincho"'>perl-DBI-1.18-1.i386.rpm<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l2 level1 lfo8;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='mso-fareast-font-family:"MS Mincho"'>perl-DBD-MySQL-1.2216-4.i386.rpm</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Installation of these modules went smoothly. This was a welcome
+relief as given the still traumatic memories of spending days trying to get
+DBD::Oracle to install and work cleanly on Compaq Alphaservers and HP-UX
+machines.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Step 3 Install Bundle::BioPerl via CPAN.pm <o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Note: Skip this step if BioPerl is already on your system.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Some of the perl scripts needed to help load the database with
+sequence data we will be using in future steps are themselves dependent on the
+BioPerl distribution (<a href="http://bioperl.org/">http://bioperl.org/</a>)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>for critical functions such as sequence parsing etc. <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The BioPerl distribution itself has its own dependencies on Perl
+modules and other programs that may or may not be found by default on a system.
+These external dependencies are not required but if installed they will give
+the BioPerl distribution additional functionality and features.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The BioPerl people have created a special CPAN package called
+“Bundle::BioPerl” that can assist with downloading and automatically installing
+all of the CPAN resident modules that BioPerl likes to use. By itself
+Bundle::BioPerl is next to useless but when used with CPAN.pm it becomes very
+convenient.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>For the purposes of building a BioSQL database we don’t really
+care about all of the various external BioPerl dependencies enough to give
+special attention to the issue. The proper ‘lazy’ way then is just to fire up
+CPAN.pm and let it do all of the work. <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>People unfamiliar with the CPAN.pm module can read its
+documentation by issuing the system command ‘perldoc CPAN’.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>To fire up the CPAN module in shell mode issue the following
+command as root:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'># perl –MCPAN –e shell<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>If this is the first time that CPAN.pm has been used there will be
+an initial setup and configuration phase where CPAN configures itself to the
+local network environment. The user is also prompted to select from a list of
+available mirror sites.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>To install Bundle::BioPerl while in the CPAN shell environment:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>cpan&gt; install Bundle::BioPerl<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>That’s about it. The process may take some time depending on the
+speed of the server and available network connection.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>NOTE:<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>When attempting this for the first time the installation of
+Bundle::BioPerl completely failed because one of the perl modules<span
+style="mso-spacerun: yes">  </span>implementing SOAP functionality listed in
+the Bundle is apparently only distributed as a .ZIP archive rather than the
+more traditional tar.gz format.<span style="mso-spacerun: yes">  </span>The
+install process failed because CPAN.pm had not been configured to know where a
+suitable ‘unzip’ utility could be found. The solution was to exit from the CPAN
+shell, manually install the unzip rpm and then restart the CPAN shell.<span
+style="mso-spacerun: yes">  </span>Within the restarted CPAN shell environment
+the following command will make CPAN aware of the newly installed unzip
+utility:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>cpan&gt; o conf unzip<span
+style="mso-spacerun: yes">  </span>/usr/bin/unzip<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>cpan&gt; install Bundle::BioPerl</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Step 4 Install BioPerl via CPAN.pm<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Note: Skip this step if BioPerl is already on your system.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Now that the various helper modules and external dependencies of
+BioPerl have been installed it should now be possible to use the same CPAN.pm
+shortcut to automatically download and install the full BioPerl distribution.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Asking CPAN to install the ‘Bio::Seq’ module is enough to get it
+to download and install the full distribution:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>cpan&gt; install Bio::Seq<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>BioPerl is a very large distribution (possibly the single largest
+collection of related perl modules in the entire CPAN repository) – you may
+wish to download and manually install the full BioPerl distribution directly
+from <a href="http://bioperl.org/">http://bioperl.org/</a>.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Step 5 Download and install bioperl-db directly from the OBF CVS
+repository<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Getting the latest and greatest version of the bioperl-db
+distribution involves downloading straight from the public source code server
+located at <a href="http://cvs.open-bio.org/">http://cvs.open-bio.org/</a><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Instructions for downloading code via anonymous CVS are available
+on the cvs.open-bio.org website. Your firewall or local network configuration
+may not allow anonymous CVS connections to occur. See below for a workaround:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>How to use the web and avoid anonymous CVS altogether:<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>If a firewall or network gateway device blocks CVS connection
+attempts it should be possible to download code and full distributions directly
+from the <a href="http://cvs.open-bio.org/">http://cvs.open-bio.org/</a>
+website. The CGI gateway to the CVS repository has a nice feature entitled
+“Download Tarball”. When clicked the server will generate a fresh code checkout
+and will send it to your browser as a .tar.gz archive file which can be saved
+locally to disk. The files may all be named “cvs_root.tar.gz” so beware of
+potential file overwrite issues when downloading multiple files or codebases.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>How to checkout via anonymous:<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The anonymous CVS password is ‘cvs’<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Full instructions are available at <a
+href="http://cvs.open-bio.org/">http://cvs.open-bio.org</a><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Example session with output:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># cvs
+-d:pserver:cvs@cvs.open-bio.org:/home/repository/bioperl login<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>CVS password: <o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># <o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'># cvs
+-d:pserver:cvs@cvs.open-bio.org:/home/repository/bioperl co bioperl-db <o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating bioperl-db<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/BUGS<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/Changes<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/LICENSE<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/MANIFEST<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/MANIFEST.SKIP<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/Makefile.PL<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/README<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating bioperl-db/Bio<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating bioperl-db/Bio/DB<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+bioperl-db/Bio/DB/Annotation.pm<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-top:0in;margin-right:-.5in;margin-bottom:
+0in;margin-left:.5in;margin-bottom:.0001pt'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><b><i><span style='font-family:
+Courier;mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>&lt;FULL
+OUTPUT CUT FOR BREVITY&gt;<o:p></o:p></span></i></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Installing bioperl-db<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The bioperl-db distribution is in the standard CPAN-style format
+so installation is similar to any other external perl module:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Once the distribution is uncompressed and unpacked there are only
+three commands necessary:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'># perl Makefile.PL<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'># make<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'># make install</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>NOTE: This install will fail if the DBD:: and DBI::Mysql modules
+cannot be found.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Step 6 Download and install biosql-schema directly from the OBF
+CVS repository<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Reference the above discussion on anonymous CVS, firewalls and the
+ability to download tar archives directly from the <a
+href="http://cvs.open-bio.org/">http://cvs.open-bio.org/</a> website.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The OBDA schema for BioSQL databases lives in its own CVS code
+repository because its use spans many of the Open Bio projects and coding
+efforts.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The repository is called “biosql”, the module is called
+“biosql-schema”. The CVS root for the respository can be found at
+“/home/repository/biosql”.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Example anonymous CVS checkout session:<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[root@pe3]# cvs
+-d :pserver:cvs@cvs.open-bio.org:/home/repository/biosql login<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Logging in to
+:pserver:cvs@cvs.open-bio.org:2401/home/repository/biosql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>CVS password: <o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[root@pe3
+biosql]# cvs -d :pserver:cvs@cvs.open-bio.org:/home/repository/biosql checkout
+biosql-schema<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating biosql-schema<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating biosql-schema/doc<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/doc/README<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/doc/biosql-ERD.pdf<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/doc/biosql.html<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating biosql-schema/scripts<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/scripts/create_mysql_db.pl<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/scripts/transform_sql.pl<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating biosql-schema/sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/README<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/biopipelinedb-mysql.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/biosql-accelerators-pg.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/biosqldb-mysql.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/biosqldb-pg.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/biosqldb-views-pg.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/makefile<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server: Updating
+biosql-schema/sql/ontology<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/ontology/biosqldb-ontology-mysql.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>U
+biosql-schema/sql/ontology/biosqldb-ontology-pg.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>cvs server:
+Updating biosql-schema/t<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[root@pe3
+biosql]# <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The files found in the biosql-schema do not need to be installed
+or otherwise processed. We are going to use the scripts and documents found in
+this module directly.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:"MS Mincho"'>Step 7 – Putting it all
+together: creating a biosql instance within MySQL<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Inside the biosql-schema/scripts folder there is a perl script called
+&quot;create_mysqldb.pl&quot;. This script is just a helper script that
+automates the process of connecting to the datbase and issuing<span
+style="mso-spacerun: yes">  </span>the SQL statements that cause the proper
+database tables to be created. The script reads the actual SQL commands from
+the file found in biosql-schema/sql/biosql-mysqldb.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>After looking at how simple this script is I felt the need to
+bypass it completely and just perform the steps manually for curiosity sake.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Here is the output from creating an initial database named ‘biosql’:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[dag@pe3]$
+mysql -u root -p<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Enter password:
+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Welcome to the
+MySQL monitor.<span style="mso-spacerun: yes">  </span>Commands end with ; or
+\g.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Your MySQL
+connection id is 9 to server version: 3.23.41-log<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Type 'help;' or
+'\h' for help. Type '\c' to clear the buffer.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt;
+create database biosql;<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt; exit<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Bye</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Now that the database is created we need to connect to the
+database and issue the SQL commands contained in
+biosql-scheme/sql/biosqldb-mysql.sql file:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Within the mysql client interface we can use the command
+&quot;source&quot; to read in SQL statements from a file.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Here is the output from that process:<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[dag@pe3]$
+mysql -u root -p biosql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Enter password:
+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Welcome to the
+MySQL monitor.<span style="mso-spacerun: yes">  </span>Commands end with ; or
+\g.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Your MySQL
+connection id is 11 to server version: 3.23.41-log<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Type 'help;' or
+'\h' for help. Type '\c' to clear the buffer.<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt;
+source sql/biosqldb-mysql.sql<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 0
+rows affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Records: 0<span
+style="mso-spacerun: yes">  </span>Duplicates: 0<span style="mso-spacerun:
+yes">  </span>Warnings: <o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><i><span style='font-family:
+Arial;mso-fareast-font-family:"MS Mincho"'>&lt;snip - lots of boring output cut
+here...&gt; <o:p></o:p></span></i></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 1 row
+affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Query OK, 0
+rows affected (0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:1.0in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt;<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Now that we are still connected to datbase ‘biosql’ let us see
+what we created by issuing the command &quot;show tables;&quot;<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt; show
+tables;<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>+----------------------------+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+Tables_in_biosql<span style="mso-spacerun: yes">           </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>+----------------------------+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+biodatabase<span style="mso-spacerun: yes">                </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>| bioentry<span
+style="mso-spacerun: yes">                   </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+bioentry_direct_links<span style="mso-spacerun: yes">      </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+bioentry_qualifier_value<span style="mso-spacerun: yes">   </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+bioentry_reference<span style="mso-spacerun: yes">         </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>| bioentry_taxa<span
+style="mso-spacerun: yes">              </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+biosequence<span style="mso-spacerun: yes">                </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+cache_corba_support<span style="mso-spacerun: yes">        </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>| comment<span
+style="mso-spacerun: yes">                    </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>| dbxref<span
+style="mso-spacerun: yes">                     </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+dbxref_qualifier_value<span style="mso-spacerun: yes">     </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+location_qualifier_value<span style="mso-spacerun: yes">   </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+ontology_term<span style="mso-spacerun: yes">              </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+reference<span style="mso-spacerun: yes">            </span><span
+style="mso-spacerun: yes">      </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+remote_seqfeature_name<span style="mso-spacerun: yes">     </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+seqfeature<span style="mso-spacerun: yes">                 </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+seqfeature_location<span style="mso-spacerun: yes">        </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+seqfeature_qualifier_value |<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+seqfeature_relationship<span style="mso-spacerun: yes">    </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>|
+seqfeature_source<span style="mso-spacerun: yes">          </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>| taxa<span
+style="mso-spacerun: yes">                       </span>|<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>+----------------------------+<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>21 rows in set
+(0.00 sec)<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>mysql&gt; exit<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Bye</span><span
+style='font-family:Arial;mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Excellent! We have just created a BioSQL database within MySQL !<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><b><span style='font-size:11.0pt;mso-bidi-font-size:10.0pt;
+font-family:Arial;mso-fareast-font-family:"MS Mincho"'>Step 8 - Loading a test
+protein dataset (Swissprot) into the database<o:p></o:p></span></b></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Before tackling all of GenBank, a smaller dataset is probably a
+good idea as a test case to learn about the process of loading up the new
+biosql database with sequence data.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The dataset selected was SwissProt downloaded from <a
+href="ftp://ftp.ebi.ac.uk/pub/databases/swissprot/release/sprot40.dat">ftp://ftp.ebi.ac.uk/pub/databases/swissprot/release/sprot40.dat</a><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l9 level1 lfo11;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Total uncompressed size: 307MB<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in;text-indent:-.25in;mso-list:l9 level1 lfo11;
+tab-stops:list .5in'><![if !supportLists]><span style='font-family:Symbol;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>·<span
+style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span><![endif]><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Apparent number of sequence entries: 101,707 <o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The database loader script used was the<span style="mso-spacerun:
+yes">  </span>&quot;load_seqdatabase.pl&quot; script from the /scripts/ folder
+inside the bioperl-db distribution.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The script is pretty basic. There are some internal configuration
+settings inside the script that can be manually configured. Each of the
+configurable options can also be overridden by command line arguments.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>The basic syntax for the load_seqdatabase.pl script is as follows:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>./load_seqdatabase.pl &lt;options&gt;
+&lt;dataset identifier&gt; /path/to/data/file(s)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Some of the more important options and arguments that can be
+hard-coded into the perl script or passed via the command line are:<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>-h <span style='mso-tab-count:1'>      </span>(hostname
+of the mysql server)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>-sqldb (the name of the biosql database
+instance that was created)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>-dbuser (username to connect to MySQL
+with)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>-dbpass (MySQL user password)<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>-format (the format of the sequence
+datafile that is going to be read/loaded)</span><span style='font-family:Arial;
+mso-fareast-font-family:"MS Mincho"'><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>One of the key options needed is the “dataset identifier”. This
+identifier allows one to store many ‘biodatabases” inside the single BioSQL
+instance.<span style="mso-spacerun: yes">  </span><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Given that we are trying to load release 40 of the Swissprot
+dataset a logical identifier could be something like “swiss”, “swissprot”,
+“sprot” or “swissprot40” etc.<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'>Here we go…<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[dag@pe3
+biosql]$ ./load_seqdatabase.pl -host localhost -sqldb biosql -dbuser root
+-dbpass XXX -format swiss swissprot40 /n/data/mirrors/swissprot/sprot40.dat<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>Reading
+/n/data/mirrors/swissprot/sprot40.dat<o:p></o:p></span></p>
+
+<p class=MsoPlainText style='margin-left:.5in'><span style='font-family:Courier;
+mso-fareast-font-family:"MS Mincho";mso-bidi-font-family:Arial'>[dag@pe3
+biosql]$<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Courier;mso-fareast-font-family:
+"MS Mincho";mso-bidi-font-family:Arial'>Wow! It worked!<o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoPlainText><span style='font-family:Arial;mso-fareast-font-family:
+"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h1>Step 9 – Observations</h1>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial;mso-fareast-font-family:"MS Mincho"'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></b></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l7 level1 lfo9;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>Loading
+     Swissprot into the MySQL database took 2 hours and 10 minutes. The slow
+     speed is caused by the overhead of having to parse each entry into a
+     BioPerl sequence object prior to inserting it into the database. There is
+     much room for performance tuning; one approach may be to start an
+     internet-accessible repository where people can download pre-built
+     tab-delimited MySQL data files that can be bulk imported into a
+     biosql-compliant database very quickly.<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l7 level1 lfo9;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>The
+     size of sprot40.dat is 307MB <o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l7 level1 lfo9;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>After
+     swissprot was loaded the cumulative size of all the files inside
+     /var/lib/mysql/biosql/ was 399MB<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal style='margin-left:.25in'><span style='font-size:11.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<h1><span style='mso-fareast-font-family:"Times New Roman"'>Step 10 – What
+next?</span><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;mso-fareast-font-family:
+"Times New Roman"'><o:p></o:p></span></h1>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'>This document is a work in progress. Among the things I’d
+like to do next:<o:p></o:p></span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l1 level1 lfo10;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>Write
+     perl scripts to validate the information that was loaded into the database<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal style='margin-left:.25in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l1 level1 lfo10;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>Figure
+     out how to export/dump the database and see how quickly we can recreate
+     the database with these raw files instead of laboriously using BioPerl to
+     parse and load objects one at a time. Loading the database is slow and it
+     may be cool to package up tab-delimited biosql exports so that others can
+     load their own databases much faster.<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal style='margin-left:.25in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l1 level1 lfo10;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>Run
+     more time tests to see where things can be made faster<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal style='margin-left:.25in'><span style='font-size:10.0pt;
+mso-bidi-font-size:12.0pt;font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+<ul style='margin-top:0in' type=disc>
+ <li class=MsoNormal style='mso-list:l1 level1 lfo10;tab-stops:list .5in'><span
+     style='font-size:10.0pt;mso-bidi-font-size:12.0pt;font-family:Arial'>Start
+     trying to cram all of GenBank into a biosql database!<o:p></o:p></span></li>
+</ul>
+
+<p class=MsoNormal><span style='font-size:10.0pt;mso-bidi-font-size:12.0pt;
+font-family:Arial'><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></span></p>
+
+</div>
+
+</body>
+
+</html>

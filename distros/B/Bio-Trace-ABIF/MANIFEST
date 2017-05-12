@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+Makefile.PL
+README
+test.ab1
+test_broken.ab1
+lib/Bio/Trace/ABIF.pm
+t/00-load.t
+t/abif.t
+t/boilerplate.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

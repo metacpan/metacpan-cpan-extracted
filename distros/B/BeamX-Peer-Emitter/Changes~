@@ -1,0 +1,13 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+
+0.002     2016-11-22 15:14:02-05:00 America/New_York
+
+  [DIST FIX]
+
+    * don't claim BeamX::Peer namespace; just the included modules
+
+0.001     2016-11-22 15:54:12-05:00 America/New_York
+
+    * initial version

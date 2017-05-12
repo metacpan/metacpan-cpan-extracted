@@ -1,0 +1,28 @@
+Business/OnlinePayment/MerchantCommerce version 0.01
+====================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Business::OnlinePayment
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Tim McIntyre
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.

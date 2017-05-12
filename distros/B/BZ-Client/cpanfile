@@ -1,0 +1,42 @@
+requires "DateTime::Format::ISO8601" => "0";
+requires "DateTime::Format::Strptime" => "0";
+requires "DateTime::TimeZone" => "0";
+requires "Encode" => "0";
+requires "File::Spec" => "0";
+requires "HTTP::CookieJar" => "0";
+requires "HTTP::Tiny" => "0";
+requires "URI" => "0";
+requires "XML::Parser" => "0";
+requires "XML::Writer" => "0";
+requires "parent" => "0";
+requires "perl" => "v5.8.0";
+requires "strict" => "0";
+requires "warnings" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "Clone" => "0";
+  requires "Data::Dumper" => "0";
+  requires "DateTime" => "0";
+  requires "IO::Socket::SSL" => "0";
+  requires "Test::More" => "0";
+  requires "Test::RequiresInternet" => "0";
+  requires "Text::Password::Pronounceable" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "Module::Build" => "0.28";
+};
+
+on 'develop' => sub {
+  requires "Test::CPAN::Meta" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Kwalitee" => "1.21";
+  requires "Test::More" => "0.88";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Portability::Files" => "0";
+};

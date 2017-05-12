@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use strict;
+use warnings;
+
+use lib '../lib';
+
+use Bot::BasicBot::Pluggable;
+use Getopt::Long;
+
+my ($nick, $server, $chan, $port, $password);
+
+my $result = GetOptions(
+  "nick=s"     => \$nick,
+  "server=s"   => \$server,
+  "channel=s"  => \$chan,
+  "port=i"     => \$port,
+  "password=s" => \$password,
+);
+
+$nick   ||= $0;
+$server ||= 'irc.freenode.net';
+$port   ||= 6667;
+$chan   ||= 'bot-basicbot-test';
+
+my $bot = Bot::BasicBot::Pluggable->new(
+    channels => [ $chan ], # even more than one 
+    server   => $server,
+    port     => $port,
+    nick     => $nick,
+    quit_message => q(I'm going to kill -15 myself),
+    charset  => 'utf8',
+    #ssl      => 1,
+    #password => $password,
+);
+
+$bot->load('Spotify');
+$bot->run();

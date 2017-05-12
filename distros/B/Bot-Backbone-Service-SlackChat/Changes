@@ -1,0 +1,21 @@
+0.161950  2016-07-13 13:41:49-05:00 America/Chicago
+
+    * Added the on_channel_joined helper to make it easy to react when a bot is
+      invited to channels.
+    * Fixed an internal work around that depended on
+      https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues/4 being
+      fixed (which it was in the v0.04 release).
+    * Added a documentation of the caveat that Slack does not allow bot accounts
+      to invite themselves into channels.
+    * Added tests!
+
+0.161740  2016-06-22 19:57:20-04:00 America/New_York
+
+    * Added formatted Message Attachments (HT: @spazm)
+    * Fixed issues with incorrect URls for repo and issue tracker (HT: @InfinityGone)
+    * Fixed encoding issues when sending wide characters to Slack.
+
+0.160490  2016-02-18 10:28:56-06:00 America/Chicago
+
+    * Changed send_message to use Slack REST API rather than Slack RTM because
+      the API allows for message formatting, while RTM does not.

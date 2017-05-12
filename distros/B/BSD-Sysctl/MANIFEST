@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+Sysctl.pm
+Sysctl.xs
+TODO
+typemap
+eg/battery
+eg/benchmark
+eg/check_hv_store
+eg/fmt.c
+eg/geom_disks
+eg/iter
+eg/kernpid.c
+eg/mibble
+eg/show.c
+eg/sizeof.c
+eg/watch-open-files
+t/00-basic.t
+t/01-get.t
+t/02-set.t
+t/03-iterator.t
+META.json                                Module JSON meta-data (added by MakeMaker)

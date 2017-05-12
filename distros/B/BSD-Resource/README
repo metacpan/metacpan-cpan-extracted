@@ -1,0 +1,53 @@
+#
+# README
+#
+
+This Perl extension implements the BSD process resource limit functions
+
+	getrusage()	getrlimit()	setrlimit()
+
+and the BSD process priority functions.  These are available also via
+core Perl but here we do more tricks so that the PRIO_* are available.
+
+	getpriority()	setpriority()
+
+Also is provided
+
+	times()
+
+which provides the same functionality as the one in core Perl, only
+with better time resolution.
+
+To install read the INSTALL.
+
+Documentation is available in pod format in Resource.pm.
+
+-- 
+Jarkko Hietaniemi <jhi@iki.fi>
+2002-11-15
+---------------
+
+NOTE 0: Perl 5 is required. Also is required the same C compilation
+environment that was used to compile that Perl 5.
+
+NOTE 1: If your operating system does not support these BSD functions,
+Perl cannot help. In detailed terms: you _must_ have the C header file
+<sys/resource.h> *). If you do not, this package is of little use to you.
+
+NOTE 2: The header file alone is not enough: you must have library
+support also. The C compiler include paths (-I...) and library paths
+(-L...) and the attempted libraries (-l...) are listed in Makefile.PL.
+
+NOTE 3: You cannot set or get 64-bit rlimits for setrlimit()
+and getrlimit().  This is a limitation of Perl, it does not handle
+64 bit integers.
+
+NOTE 4: More caveats (vendors' sloppy support for these things,
+et alia)  in the Resource.pm inlined pod doc.
+
+---------------
+
+*) There is one exception to this on one platform. The terminally curious
+   can find out where.
+
+# eof

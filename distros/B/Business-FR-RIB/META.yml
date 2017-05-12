@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Business-FR-RIB
+version:            0.05
+abstract:           Verify French RIB (Relevé d'Identite Bancaire)
+author:
+    - Luc DIDRY (ldidry@cpan.org)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::CheckManifest:  0.9
+    Test::Pod:            0.18
+    Test::Pod::Coverage:  1.08
+    Test::Simple:         0.44
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

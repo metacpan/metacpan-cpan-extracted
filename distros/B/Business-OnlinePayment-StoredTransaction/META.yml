@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-OnlinePayment-StoredTransaction
+version:      0.01
+version_from: lib/Business/OnlinePayment/StoredTransaction.pm
+installdirs:  site
+requires:
+    Business::OnlinePayment:       2.01
+    Crypt::Blowfish:               2.09
+    Crypt::CBC:                    2.12
+    Crypt::OpenSSL::RSA:           0.21
+    Digest::MD5:                   2.33
+    MIME::Base64:                  3.01
+    Storable:                      2.12
+    Test::More:                    0.47
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

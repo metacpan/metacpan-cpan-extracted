@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:         Business-KontoCheck
+abstract:     check german and austrian bank account numbers
+version:      5.9
+author:
+   - Michael Plugge <m.plugge@hs-mannheim.de>
+license:      lgpl
+distribution_type: module
+installdirs:  site
+resources:
+    homepage: http://sourceforge.net/projects/kontocheck/
+    bugtracker: http://sourceforge.net/p/kontocheck/bugs/
+    MailingList: http://sourceforge.net/p/kontocheck/mailman/
+meta-spec:
+   version: 1.3
+   url: http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: ExtUtils::MakeMaker version 6.30

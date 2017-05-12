@@ -1,0 +1,10 @@
+dn: cn=company testcase, ou=addressbook, dc=geekfarm, dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: company testcase
+givenName: company
+sn: testcase
+ou: addressbook
+title: Intertech INC

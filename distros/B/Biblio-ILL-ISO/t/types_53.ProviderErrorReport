@@ -1,0 +1,10 @@
+$VAR1 = bless( {
+                 'transaction-id-problem' => bless( {
+                                                      'ENUMERATED' => 1,
+                                                      'ENUM_LIST' => {
+                                                                       'duplicate-transaction-id' => 1,
+                                                                       'unknown-transaction-id' => 3,
+                                                                       'invalid-transaction-id' => 2
+                                                                     }
+                                                    }, 'Biblio::ILL::ISO::TransactionIdProblem' )
+               }, 'Biblio::ILL::ISO::ProviderErrorReport' );

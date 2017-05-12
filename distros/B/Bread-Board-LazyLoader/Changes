@@ -1,0 +1,57 @@
+Revision history for Bread::Board::LazyLoader
+
+0.14 Thursday, Aug. 11th 2016
+
+- corrected error on legacy Bread::Board::LazyLoader::Obj class 
+
+0.12 Monday, Aug. 8th 2016
+
+- each evaluation of any file is performed in new "sandbox" package 
+- no_index section added to META.yml for deprecated packages 
+
+0.11 Tuesday, Aug. 2nd 2016
+
+- interface simplified to single function load_container
+- all other objects and classes deprecated
+
+0.10 Friday, Jan. 09th 2015
+
+- added docs and test for Bread::Board::LazyLoader::Supersite
+
+0.09 Wednesday, Jan. 07th 2015
+
+- corrected typo in Supersite (separator of modules should be ';' not ':')
+
+0.08 Monday, Dec. 29th 2014
+
+- more than one loader can modify a single container (loaders can be stacked)
+   in such case the next loader sees all changes applied by previous one
+   even in subcontainers
+- interface of Bread::Board::LazyLoader::Site reduced to single root method
+- Bread::Board::LazyLoader::Supersite allows more sites to be loaded
+
+0.07 Monday, Oct. 6th 2014 
+
+- added Module::Find into dependencies
+
+0.06 Tuesday, Sep. 23th 2014 
+
+- corrected tests
+
+0.05 Tuesday, Sep. 16th 2014 
+
+- added Bread::Board::LazyLoader::Site and Bread::Board::LazyLoader::Supersite modules
+
+0.04 Wednesday, Aug. 20th 2014 
+
+- added add_tree method
+
+0.03 Friday, Dec. 16th  2013 
+
+- corrected regular in test
+- the subs returned from building files are cached by default
+
+0.02 Tuesday, Nov. 19th  2013 
+
+- initial release
+

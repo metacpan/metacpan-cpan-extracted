@@ -1,0 +1,43 @@
+---
+abstract: 'TNT ExpressConnect interface'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Module::Build::SysPath: '0.13'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.3607'
+  Module::Build::SysPath: '0.13'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+keywords:
+  - TNT
+  - ExpressConnect
+  - shipping
+  - price
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-TNT-ExpressConnect
+provides:
+  Business::TNT::ExpressConnect:
+    file: lib/Business/TNT/ExpressConnect.pm
+    version: '0.02'
+  Business::TNT::ExpressConnect::SPc:
+    file: lib/Business/TNT/ExpressConnect/SPc.pm
+    version: '0.02'
+requires:
+  Config::INI::Reader: '0'
+  DateTime: '0'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  Path::Class: '0.04'
+  XML::Compile::Schema: '0'
+  XML::Compile::Util: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/meon/Business-TNT-ExpressConnect/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/meon/Business-TNT-ExpressConnect.git
+version: '0.02'

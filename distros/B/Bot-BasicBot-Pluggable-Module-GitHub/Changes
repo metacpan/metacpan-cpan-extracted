@@ -1,0 +1,28 @@
+Revision history for Bot-BasicBot-Pluggable-Module-GitHub
+
+0.04    2011-10-18
+        Bugfix: Issue change announcements crashed when a reopened issue was
+        encountered, causing other announcements to be repeated, as the
+        last-issues-state.json file wasn't updated.
+
+0.03    2011-10-15
+        Include ::Announce module in distribution.
+
+0.02    2011-10-07
+        [ BUG FIXES ]
+        Check for failure properly before attempting to announce a
+        commit.  (Previously we checked we got something non-false back; if we
+        asked for a commit that wasn't found, we get a hashref with an error
+        key, so check for that.)
+        
+        Auth info should be optional when using !setgithubproject.  Public
+        projects of course do not require auth, but due to a fuckup in the
+        regex, it would not recognise it otherwise.
+
+0.01    2011-10-05
+        About time this was released; it's proven itself in #dancer on
+        irc.perl.org, and internally at my workplace, and I figured it would be 
+        helpful to package them up and release them to CPAN for anyone else who
+        would find it useful.
+
+

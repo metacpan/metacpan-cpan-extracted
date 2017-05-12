@@ -1,0 +1,51 @@
+Bio-LITE-Taxonomy-NCBI-Gi2taxid
+
+The NCBI site offers a file to map gene and protein sequences (GIs) with their corresponding taxon of origin (Taxids). If you want to use this information inside a Perl script you will find that (given the high amount of sequences available) it is fairly inefficient to store this information in a regular hash. Only for creating such a hash you will need more than 10 GBs of system memory.
+
+This is a very simple module that has been designed to efficiently map NCBI GIs to Taxids with speed as the primary goal. It is designed to be able to process a high number of GIs very fast and with low memory usage. It is even faster than using a SQL database to retrieve the mappings or using a local DBHash.
+
+To achieve this, it uses a binary index that can be created with the function C<new_dict>. This index has to be created one time for each mapping file.
+
+The original mapping files can be downloaded from the NCBI site at the following address: L<ftp://ftp.ncbi.nih.gov/pub/taxonomy/>.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::LITE::Taxonomy::NCBI::Gi2taxid
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-LITE-Taxonomy-NCBI-Gi2taxid
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-LITE-Taxonomy-NCBI-Gi2taxid
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-LITE-Taxonomy-NCBI-Gi2taxid
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-LITE-Taxonomy-NCBI-Gi2taxid/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Miguel Pignatelli
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

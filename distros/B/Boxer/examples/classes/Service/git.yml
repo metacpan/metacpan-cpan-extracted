@@ -1,0 +1,11 @@
+classes:
+  - Service.web.apache
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include git service
+  pkg:
+    - gitweb
+    - git-daemon-sysvinit

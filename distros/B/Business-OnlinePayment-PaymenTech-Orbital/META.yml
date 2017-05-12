@@ -1,0 +1,25 @@
+---
+abstract: 'PaymenTech Orbital backend for Business::OnlinePayment'
+author:
+  - "Cory 'G' Watson <gphat@cpan.org>"
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-OnlinePayment-PaymenTech-Orbital
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Business::OnlinePayment: 0
+  Net::SSLeay: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.7

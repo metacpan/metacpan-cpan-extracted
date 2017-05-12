@@ -1,0 +1,5 @@
+$VAR1 = bless( {
+                 'cost-estimate' => bless( {
+                                             'generalstring' => '56.78'
+                                           }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::EstimateResults' );

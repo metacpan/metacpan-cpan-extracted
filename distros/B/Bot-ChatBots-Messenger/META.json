@@ -1,0 +1,75 @@
+{
+   "abstract" : "Messenger adapter for Bot::ChatBots",
+   "author" : [
+      "Flavio Poletti <polettix@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bot-ChatBots-Messenger",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Path::Tiny" : "0.096",
+            "Template::Perlish" : "1.52",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::ChatBots" : "0.006",
+            "IO::Socket::SSL" : "2.038",
+            "Mojolicious" : "7.10",
+            "Moo" : "2.002005",
+            "namespace::clean" : "0.27",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Mock::Quick" : "1.111",
+            "Path::Tiny" : "0.096",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/polettix/Bot-ChatBots-Messenger/issues"
+      },
+      "homepage" : "https://github.com/polettix/Bot-ChatBots-Messenger",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/polettix/Bot-ChatBots-Messenger.git",
+         "web" : "https://github.com/polettix/Bot-ChatBots-Messenger"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Flavio Poletti <flavio@polettix.it>"
+   ]
+}
+

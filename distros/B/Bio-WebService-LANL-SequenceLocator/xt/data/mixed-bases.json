@@ -1,0 +1,122 @@
+[
+   {
+      "query" : "sequence_1",
+      "query_sequence" : "SLYNTVAVLYYVHQR",
+      "base_type" : "amino acid",
+      "reverse_complement" : "0",
+      "alignment" : "\n Query SLYNTVAVLY YVHQR  15\n       :::::::.::  ::::    \n  HXB2 SLYNTVATLY CVHQR\n\n  ",
+      "hxb2_sequence" : "SLYNTVATLYCVHQR",
+      "similarity_to_hxb2" : "86.7",
+      "start" : "77",
+      "end" : "91",
+      "genome_start" : "1018",
+      "genome_end" : "1062",
+      "polyprotein" : "Gag",
+      "region_names" : [
+         "Gag",
+         "p17"
+      ],
+      "regions" : [
+         {
+            "cds" : "Gag",
+            "aa_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "15"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ]
+         },
+         {
+            "cds" : "p17",
+            "aa_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "aa_from_polyprotein_start" : null,
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "aa_from_query_start" : [
+               "1",
+               "15"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ]
+         }
+      ]
+   },
+   {
+      "query" : "sequence_2",
+      "query_sequence" : "TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG",
+      "base_type" : "nucleotide",
+      "reverse_complement" : "0",
+      "alignment" : "\n Query TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  45\n       :::::::::: :::::::::: :::::::::: :::::::::: ::::: \n  HXB2 TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  1062\n\n  ",
+      "hxb2_sequence" : "TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG",
+      "similarity_to_hxb2" : "100.0",
+      "start" : "229",
+      "end" : "273",
+      "genome_start" : "1018",
+      "genome_end" : "1062",
+      "polyprotein" : "Gag",
+      "region_names" : [
+         "Gag",
+         "p17"
+      ],
+      "regions" : [
+         {
+            "cds" : "Gag",
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "na_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ],
+            "na_from_query_start" : [
+               "1",
+               "45"
+            ],
+            "protein_translation" : "SLYNTVATLYCVHQR"
+         },
+         {
+            "cds" : "p17",
+            "aa_from_protein_start" : [
+               "77",
+               "91"
+            ],
+            "na_from_cds_start" : [
+               "229",
+               "273"
+            ],
+            "na_from_hxb2_start" : [
+               "1018",
+               "1062"
+            ],
+            "na_from_query_start" : [
+               "1",
+               "45"
+            ],
+            "protein_translation" : "SLYNTVATLYCVHQR"
+         }
+      ]
+   }
+]

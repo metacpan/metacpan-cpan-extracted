@@ -1,0 +1,51 @@
+The perl implementation can be installed as a CGI or FastCGI module.
+
+-------
+Warning
+-------
+
+You need a running BabelObjects installation. Go and install BabelObjects 
+on CPAN if you haven't already done it.
+
+--------
+Download
+--------
+
+Once you have installed all the prerequisites, just download and install the
+BabelObjects-Component-Data-Configurator component from CPAN
+
+------------
+Installation
+------------
+
+If you have the .tar.gz version :
+  tar xzvf BabelObjects-XX.YY.tar.gz
+  cd BabelObjects-XX.YY
+  perl Makefile.PL
+  make
+  make install
+
+There are no tests for the moment.
+
+-------------
+Configuration
+-------------
+
+This component waits for the following filesystem installation :
+
+
+-----
+Start
+-----
+
+Just launch the httpd server. For example, with the above configuration : 
+
+  root # apachectl start
+
+----
+Test
+----
+
+To test the installation, put test.bo in your html space. Go and visit it.
+
+Enjoy !

@@ -1,0 +1,44 @@
+=head1 NAME
+
+Bone::Easy - Perl module for generating pickup lines.
+
+=head1 SYNOPSIS
+
+  use Bone::Easy;
+
+  # I know you get this a lot, but what's a unholy fairy like you 
+  # doing in a mosque like this?
+  print pickup, "\n";
+
+=head1 DESCRIPTION
+
+Generates pickup-lines GUARANTEED to get something thrown in your face.
+
+
+=head1 AUTHOR
+
+Idea and ruleset by www.ontap.com
+Perl Code by Michael G Schwern <schwern@pobox.com>
+
+
+WHAT IS THIS?
+
+This is Bone::Easy, a perl module.  It is also "pickup" a simple command
+line wrapper.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+

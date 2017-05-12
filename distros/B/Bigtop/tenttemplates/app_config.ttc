@@ -1,0 +1,64 @@
+[%#
+    Template for App Config table on TentMaker home page.
+    Expects these parameters:
+
+    app_config_statements - hash for current app level config block built by
+                            Bigtop::TentMaker::compile_app_configs
+%]
+<div class='app_block'>
+<table id='app_config_table' class='bordered'>
+    <tr><th> Keyword </th>
+        <th> Value </th>
+        <th> Skip Accessor? </th>
+        <th> Delete Buttons </th>
+    </tr>
+    [% FOREACH statement IN view.data.app_config_statements %]
+      <tr id='app_config::row::[% statement.keyword %]'>
+        <td> [% statement.keyword %] </td>
+        <td>
+          <input type='text' name='app_conf_value::[% statement.keyword %]'
+               value='[% statement.value %]'
+               onblur='javascritp:update_tree(
+                   "app_conf_statement",
+                   "[% statement.keyword %]",
+                   this.value
+               )'
+          />
+        </td>
+        <td>
+            <input type='checkbox'
+                   value='app_config_box::[% statement.keyword %]'
+                   name='app_config_box::[% statement.keyword %]'
+                   [%- IF statement.no_accessor -%]checked='checked'[%- END -%]
+                   onchange='javascript:update_tree(
+                       "app_conf_accessor",
+                       "[% statement.keyword %]",
+                       this.checked
+                   )'
+            />
+        </td>
+        <td>
+            <button type='button'
+                    name='app_config_delete::[% statement.keyword %]'
+                    onclick='javascript:delete_app_config( this )' />
+              Delete
+            </button>
+        </td>
+      </tr>
+    [% END %][%# end of existing config statement rows %]
+    [%# add one row for the new statement button and keyword text input %]
+      <tr>
+        <td> <button type='button' name='app_config'
+                     onclick='javascript:add_app_config()' />
+                New Config Statement:
+             </button>
+        </td>
+        <td>
+             <input type='text' id='app_config_new' value='' />
+        </td>
+        <td>
+            <!-- place holder so the table cell borders look good -->
+        </td>
+      </tr>
+</table>
+</div>

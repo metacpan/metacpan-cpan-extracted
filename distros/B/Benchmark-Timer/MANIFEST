@@ -1,0 +1,41 @@
+CHANGES
+LICENSE
+MANIFEST
+Makefile.PL
+README
+delta.pl
+TODO
+
+# The module files
+lib/Benchmark/Timer.pm
+
+# Tests
+t/01_basic.t
+t/02_skip.t
+t/03_statistical.t
+t/04_reports.t
+t/99_errors.t
+t/pod.t
+
+# Module::Install extensions
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoLicense.pm
+inc/Module/Install/AutomatedTester.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Bugtracker.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/CheckOptional.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+# Private Module::Install extensions
+private-lib/Module/Install/PRIVATE/Enable_Verbose_CPAN_Testing.pm
+
+META.yml

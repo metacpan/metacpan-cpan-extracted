@@ -1,0 +1,38 @@
+=head1 NAME
+
+Business::BancaSella::Decode::Gateway - Uri decoding for return transaction info results from 
+Gateway compatibility online system payment.
+
+=head1 SYNOPSIS
+
+  use CGI;
+  use Business::BancaSella::Decode;
+ 
+  my $cgi 	= new CGI();
+  my $qs	= $cgi->query_string;
+  my $bs	= new Business::BancaSella::Decode::Gateway(
+								'query_string' => $qs);
+
+=head1 DESCRIPTION
+
+Decode the Banca Sella response url filling information about the payment 
+transaction in Business::BancaSella::Gateway property.
+
+=head1 METHODS
+
+=head2 new()
+
+Create a new istance of Business::BancaSella::Decode::Gateway object. 
+
+You must inizialize the "query_string" parameter with the query string contained
+in the uri used by Banca Sella response calling.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Gateway
+
+=cut

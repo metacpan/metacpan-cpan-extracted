@@ -1,0 +1,17 @@
+{
+    "server": "irc.perl.org",
+    "channels": [
+            "#bottest",
+        ],
+    "nick": "test_bot",
+    "username": "test_bot",
+    "plugins": [
+        {
+            "module": "Karma",
+            "config": {
+                "karma_change_response": 0,
+                "user_num_comments": 5,
+            },
+        },
+    ],
+}

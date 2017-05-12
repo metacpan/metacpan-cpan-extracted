@@ -1,0 +1,6 @@
+^MYMETA.yml$
+^.git
+lib/AvalaraConfig.pm
+MyProject.komodoproject
+.DS_Store
+Avalara.komodoproject

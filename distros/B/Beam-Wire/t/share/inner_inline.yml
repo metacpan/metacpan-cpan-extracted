@@ -1,0 +1,30 @@
+inline_container:
+    class: Beam::Wire
+    args:
+        config:
+            foo:
+                class: My::RefTest
+                args:
+                    got_ref: { $ref: bar }
+            bar:
+                class: My::ArgsTest
+                args:
+                    text: "Hello, World"
+
+service_container:
+    class: Beam::Wire
+    args:
+        services:
+            fizz: { $ref: fizz }
+            buzz: { $ref: buzz }
+
+fizz:
+    class: My::RefTest
+    args:
+        got_ref: { $ref: 'inline_container/bar' }
+
+buzz:
+    class: My::ArgsTest
+    args:
+        text: "Hello, Buzz"
+

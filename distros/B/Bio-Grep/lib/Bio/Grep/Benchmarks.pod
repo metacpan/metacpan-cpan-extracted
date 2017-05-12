@@ -1,0 +1,117 @@
+=head1 NAME
+
+Bio::Grep::Benchmarks - Bio::Grep Benchmarks
+
+=head1 DESCRIPTION
+
+A collection of quick and dirty benchmarks. 
+
+=head1 BENCHMARKS
+
+4 x Intel(R) Core(TM)2 Quad CPU Q9400  @ 2.66GHz, 4GB RAM. Fedora Linux 2.6.27.38-170.2.113.fc10.i686.PAE (kernel: 2.6.27.38-170.2.113.fc10.i686.PAE). Perl 5.10.0.0.
+
+TAIR8_cdna_20080412 (Arabidopsis CDNA Fasta file, 63MB). 
+
+Bio::Grep 0.10.6. 
+
+=head2 Database Generation
+
+Average over 2 iterations.
+
+  GUUGle         : 2.88 sec
+  Agrep/RE       : 10.69 sec
+  Vmatch (-pl 3) : 135.32 sec
+
+  
+=head2 Mismatches
+
+Query: C<ugacagaagagagugagcac> (revcom)
+
+Average over 20 iterations.
+
+=over
+
+=item B<No mismatches (exact matching):>
+
+  Vmatch           :  0.02 sec
+  Agrep (Wu-Manber):  0.22 sec
+  RE               :  1.66 sec
+  Vmatch (-online) :  3.80 sec
+  GUUGle           :  6.18 sec
+  Agrep (TRE)      : 10.22 sec
+
+Note that C<Vmatch> needs one slow run to load the suffix arrays in memory
+(Values are the average over 20 iterations). Also note that GUUGle
+allows GU mismatches.
+
+=item B<One mismatch:>
+
+  Vmatch           :  0.05 sec
+  Agrep (Wu-Manber):  0.98 sec
+  Vmatch (-online) :  3.85 sec
+  Agrep (TRE)      : 35.26 sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Two mismatches:>
+
+  Vmatch           :  0.12 sec
+  Agrep (Wu-Manber):  1.28 sec
+  Vmatch (-online) :  3.89 sec
+  Agrep (TRE)      : 43.48 sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Three mismatches:>
+
+  Vmatch           :  0.28 sec
+  Agrep (Wu-Manber):  1.57 sec
+  Vmatch (-online) :  4.01 sec
+  Agrep (TRE)      : 50.66 sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Four mismatches:>
+
+  Vmatch           :  0.93 sec
+  Agrep (Wu-Manber):  1.89 sec
+  Vmatch (-online) :  4.48 sec
+  Agrep (TRE)      : 57.43 sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Five mismatches:>
+
+  Agrep (Wu-Manber):  2.42 sec
+  Vmatch           :  3.95 sec
+  Vmatch (-online) :  6.85 sec
+  Agrep (TRE)      : 64.81 sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=back
+
+=head1 FEEDBACK
+
+The script that generated these benchmarks is available in the I<examples>
+directory of this distribution. 
+
+Please report any bugs, feature requests and benchmarks to
+C<bug-bio-grep@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+=head1 AUTHOR
+
+Markus Riester, E<lt>mriester@gmx.deE<gt>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007-2009 M. Riester.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

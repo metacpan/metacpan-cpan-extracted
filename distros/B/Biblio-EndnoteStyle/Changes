@@ -1,0 +1,48 @@
+$Id: Changes,v 1.12 2016/11/28 22:18:22 mike Exp $
+
+Revision history for Perl extension Biblio::EndnoteStyle.
+
+0.06  Mon Nov 28 22:17:19 GMT 2016
+	- Fix a POD error and a typo -- from
+	  https://rt.cpan.org/Public/Bug/Display.html?id=118948
+	  by Florian Schlichting <fsfs@debian.org>
+
+0.05  Thu Oct  4 01:07:14 BST 2007
+	- Field names may contain digits.
+	- Horrible but useful special case: when inserting a field
+	  called URL, if the value does not begin with a schema then
+	  "http://" is prepended.
+
+0.04  Wed Mar 14 11:14:57 GMT 2007
+	- Templates may now contain |-separated components consisting
+	  only of whitespace.  (That they couldn't previously was a
+	  bug.)
+	- Templates now correctly interpret backquotes surrounding a
+	  word for force its interpretation as a literal rather than a
+	  fieldname.
+	- Much better test-suite.
+
+0.03  Sat Feb 17 22:09:38 GMT 2007
+	- Downgrade "use 5.008" in lib/Biblio/EndnoteStyle.pm to
+	  5.006, to match what's specified in Makefile.PL.
+
+0.02  Fri Feb 16 01:16:32 GMT 2007
+	- Properly implement non-breaking space "¬", which was
+	  previously rendered as a literal.
+	- Tweak the rules so that a field that exists but is undefined
+	  in the data hash is treated as an absent field rather than a
+	  literal.
+	- Add debug() method to the formatter, causing compiled
+	  templates to be dumped to standard error.
+	- Add command-line script "bin/endnote-format", to allow the
+	  library to be simply exercised.
+	- Improvements to documentation.
+
+0.01  Mon Jan 22 22:03:12 2007
+	- original version; created by h2xs 1.23 with options
+		-X --name=Biblio::EndnoteStyle --compat-version=5.6.0 --omit-constant --skip-exporter --skip-ppport
+	- This release is functional but incomplete: many, many more
+	  test cases are needed, and adding these will no doubt
+	  require fixes to the code.  Nevertheless, the module is
+	  useful as it stands.
+

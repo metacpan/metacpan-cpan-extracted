@@ -1,0 +1,28 @@
+BSD-Socket-Splice
+=================
+
+The BSD::Socket::Splice module implements a Perl interface to OpenBSD
+socket splicing.  This allows zero-copy data transfer between TCP
+or UDP sockets.  At least an OpenBSD 4.9 kernel is required to use
+this feature.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires OpenBSD 4.9 and a C compiler.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2013 by Alexander Bluhm
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.2 or,
+at your option, any later version of Perl 5 you may have available.

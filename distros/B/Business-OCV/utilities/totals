@@ -1,0 +1,639 @@
+#!/usr/bin/perl -w
+# Extract a 'totals' summary for reconciliation.
+#
+# - read one or more OCV transaction log/s, creating totals summaries for 
+#   the given account/s and settlement day/s
+#   - note: you generally shouldn't use an active log (one which is still
+#     having entries appended). Buffering will very likely bite you.
+#
+# - the transaction log may contain entries for a number of different 
+#   transaction types: (requests) PURCHASE, REFUND, STATUS, PREAUTH, 
+#   COMPLETION; and RESPONSE. To extract the totals information, only
+#   the PURCHASE/REFUND and RESPONSE records are required and used by this
+#   program.
+#
+# - the OCV server's totals request 'offset' parameter is an integer number
+#   of days from the current period - however 'null' days are transparently
+#   skipped. Basically, this makes it difficult to be certain which offset
+#   you need to use to get a particular day. This program can use a date
+#   offset, but the offset is from today and does not skip 'null' days.
+#
+# - whilst this program uses the OCV module, it does not actually contact 
+#   the server so can be run "off-line"
+# - the OCV, and logs thereof, give monetary amounts as integer cents. To 
+#   avoid introducing any rounding errors, this is carried through here,
+#   the final division to dollars is done at output.
+#
+# Usage
+#
+# Generally:
+#    totals [options] <accountnum> <date> [<transaction log> ...]
+# Where <date> may be an integer offset from today.
+#
+# There is currently one option allowed, plus an '--' option terminator:
+#    --force   force - don't exit on errors
+#    --        stop looking for options
+#
+# There are at least three asynchronous processes affecting the transaction
+# logs:
+# - the bank cuts over to a new settlement date at some random time of day
+# - the transaction logs are rotated at some random time of day
+# - live transactions are initiated and completed at random times, and
+#   with random and potentially large durations (e.g. if manual intervention
+#   is required to complete/query a transaction).
+# To avoid such timing dependancies, it is advised that this filter be run
+# over a set of 'archived' logs, spanning at least a day either side of the
+# desired date (or more, if errors have occured).
+#
+#
+# Failure Modes
+#
+#  There are a couple of theoretical problems, none of which should occur
+# in day-to-day operation:
+#
+# - the transaction log is missing entries / has extra entries / is corrupt
+#
+#   A given transaction is expected to follow the following sequence:
+#
+#    1a) a PURCHASE, REFUND or COMPLETION request (w/ the amount)
+#    1b) zero or one RESPONSE responses (w/ settlement date and account no.)
+#
+#    2a) a STATUS request
+#    2b) zero or one RESPONSE responses
+#     ... repeat 2)
+#
+#   If the initial request (1a) is missing, it will not be possible to 
+# determine the totals and an error will be raised. Further, at least 
+# one RESPONSE message must be found for each PURCHASE/REFUND.
+#
+# - the transaction log contains duplicate Transaction References
+#
+#   This program assumes unique TxnRefs, if a duplicate PURCHASE or REFUND
+# message is encountered an error is raised.
+#
+# - account list is modified
+#
+#  Each transaction is completed against an OCV "account" (which maps
+# to a merchant ID/terminal ID and thence a bank account). If the OCV
+# server's accounts are modified, the transaction log/s must be divided
+# to extract the transactions using the old account list and those with
+# the new account list so as to disambiguate the accounts when generating
+# the totals.
+#  For each account, each unique merchant ID / terminal ID pair used is
+# written with the totals summary. Noting these details will both help
+# with the financial reconciliation and will also show any account |
+# [mt]ID mismatches. (Note that the test server (v1.15) does not return 
+# valid data in responses to STATUS requests).
+#
+# - card description/s modified
+#
+#  Each response message contains a card type code, plus a text description.
+# This program uses the code as the definitive value to allocate purchases 
+# and refunds against. It extracts the description, intended solely for 
+# easier human consumption of the card list, from the first instance of 
+# each code. If these descriptions change during a log span then the results 
+# will be erroneous.
+#
+# - transaction log is too big
+#
+#  This program keeps details about all transactions in memory, thus if
+# there are an excessive number of transactions in the given log file/s
+# memory may become exhausted. If this occurs, program behaviour is undefined
+# but I suspect/hope perl will exit with an appropriate error message.
+# (At a few tens of bytes per record, we're talking about a few million 
+# transactions for any reasonably configured modern system - not a terribly 
+# likely situation - like I said above, this is a theoretical issue :-)
+#
+#
+# Perl's Form Handling
+# 
+#  Perl purports to have useful inbuilt form handling facilities. Bah. After
+# screwing around with formline, etc for a while and getting it to do what I
+# wanted, I then found that it truncates numbers which don't fit. That is, 
+# if you want to handle all possible cases, all your numerical fields have 
+# to be log10(2^32|2^64) digits wide... As for me, I'll stick to printf.
+
+use strict;
+
+use Time::Local;
+
+use OCV;
+
+my ($basename) = ($0 =~ /([^\/]+)$/);
+
+my $DEBUG = $ENV{DEBUG} || 0;
+
+sub usage
+{
+	print STDERR @_, "\n\n" if @_;
+	print STDERR <<EOM;
+usage: $basename [options] <accountnum> <date> [<transaction log> ...]
+
+ <accountnum> is the desired account to summarise ('-' for all accounts)
+  - the account value is treated as an integer, thus '0001' == 1
+ <date> is the desired settlement date, and may be
+  - a string of the form [[yyyy|yy]mm]dd (e.g. '20000501', '0501', '01'), or
+  - a regular expression prefixed with '~' (e.g. '~^200005' to get all of May)
+  - an offset no. of days from now (0=today, -1=yesterday, etc), or 
+  - '-' for all available dates
+ <transaction log> is/are the OCV transaction log/s. Reads from STDIN if 
+ no files are given.
+
+ There is currently one option allowed, plus an '--' option terminator:
+    --force   force - don't exit on errors
+    --        stop looking for options
+
+ Note: the program requires the OCV module, however does not open a 
+ connection to the OCV server so may be run off-line if required.
+EOM
+	exit 1;
+}
+
+usage() unless @ARGV;
+
+# yes, yes, I should probably have used GetOpt...
+my %opt = ( force => 0 );
+{
+	my (@a, %o);
+	while ($_ = shift @ARGV)
+		{ last if $_ eq '--'; /^--(.*)/ ? $o{$1}++ : push @a, $_}
+	@ARGV = (@a, @ARGV);
+	usage("unknown option/s: " . join (', ', keys %o)) 
+		if grep {not exists $opt{$_}} keys %o;
+	%opt = %o;
+}
+warn "opt = " . join (', ', keys %opt) . "\n" if (%opt and $DEBUG > 2);
+
+my $account = shift;
+$account = undef if ($account and $account eq '-');
+
+my $date = shift;
+$date = undef if ($date and $date eq '-');
+
+# confirm arguments
+# - accept separators in date
+usage() if $account and $account !~ /^\d+$/;
+usage() if $date and $date !~ /^(-\d|(\d+[\/\-\.]?)+|~.*)$/;
+
+# filenames (shifted w/ each eof, see continue block in main loop below)
+my @f = @ARGV ? @ARGV : qw/-/;
+warn "Totals for account [" . (defined $account ? $account : '-') . "], " . 
+	"date [" . (defined $date ? $date : '-') . "], reading from:\n",
+	map {" $_\n"} @f if $DEBUG;
+
+# if 'date' is a string or +ve number, (try and) turn it into a date of the 
+# form 'yyyymmdd' (as used in the totals log for the settlement date)
+# - if it's zero or negative, it's an offset so convert to an actual date
+my $date_re = 0;
+if (defined $date)
+{
+	if ($date =~ /^~(.*)/)						# regexp
+	{
+		$date_re = 1;
+		$date = $1;	# remove '~'
+	}
+	elsif ($date =~ /^(\d+[\/\-\.]?)+$/)		# date string
+	{
+		my ($m, $y) = (localtime())[4, 5];	# get current month and year
+		$m++;		# month 0-11 -> 1-12
+		$y += 1900;	# add century to year
+
+		my @d = $date =~ 
+			/^\+?(?:(?:((?:19|20)?\d{2})[\-\/\.]?)?(\d{2})[\-\/\.]?)?(\d{2})$/;
+
+		die "invalid date: couldn't parse [$date]\n" unless @d == 3;
+
+		$d[0] = $y unless defined $d[0];
+		$d[0] += 2000 if ($d[0] >=  0 and $d[0] <  70);
+		$d[0] += 1900 if ($d[0] >= 70 and $d[0] < 100);
+
+		die "invalid date: couldn't parse [$date]\n" 
+			unless $d[0] >= 1969 and $d[0] < 2070;
+
+		$d[1] = $m unless defined $d[1];
+
+		die "invalid date: couldn't parse [$date]\n" 
+			unless $d[1] >= 1 and $d[1] <= 12;
+		die "invalid date: couldn't parse [$date]\n" 
+			unless $d[2] >= 1 and $d[2] <= 31;
+
+		$date = sprintf('%04d%02d%02d', @d);
+	}
+	elsif ($date =~ /^-\d+$/)					# offset
+	{
+		# a rough value for the offset date = midday today - 86400 * offset
+		# - things like daylight savings will throw this somewhat, 
+		#   so work from midday (assuming these discrepencies such 
+		#   as DST accumulate to less than 12 hours :-)
+		my @t = localtime();
+		$t[0] = $t[1] = 0; $t[2] = 12;	# noon today
+		@t = localtime(timelocal(@t) + $date * 86400);
+		$date = sprintf('%04d%02d%02d', $t[5]+1900, $t[4]+1, $t[3]);
+	}
+	else
+	{
+		die "incomprehensible date format\n";
+	}
+}
+
+my %summary;	# summary for each day (key = SettleDate)
+my %txn;		# transaction entries (key = TxnRef)
+my @error;		# list of errored TxnRefs which require manual correction
+my @warn;		# list of TxnRefs which require manual investigation
+
+$SIG{__WARN__} = sub { warn "$f[0] line $.: ", @_ };
+
+# read log file/s, using perl's builtin ARGV processing
+# - errors ($@) are picked up in the continue block below
+while (<>)
+{
+	$@ = '';
+
+	# extract prefix and Message from log entry
+	my ($p, $m) = OCV::parsetxnlog($_);
+	$@ = "error: OCV::parsetxnlog: $@", next unless ($p and $m);
+
+	# all transaction message types have a type and reference id
+	my $type = $m->Type;
+	$@ = "error: no message type found", next unless $type;
+
+	my $txnref = $m->TxnRef;
+	$@ = "error: no TxnRef found", next unless $txnref;
+
+	# 1) add purchase & refunds to scratch summary
+	#    - will be completed when response entry is found containing the
+	#     settlement date
+	#    - hang on to the account number too, as not all responses have it
+	# 2) add 'completed' entries to totals summary
+	if ($type == OCV::TT_TRANS_PURCHASE or $type == OCV::TT_TRANS_COMPLETION)
+	{
+		warn "$txnref PURCHASE\n" if $DEBUG > 1;
+		
+		$@ = "error: duplicate txn reference (PURCHASE): [$txnref]", next 
+			if (exists $txn{$txnref});
+
+		$txn{$txnref} = [$m->Amount, $m->AccountNum];
+	}
+	elsif ($type == OCV::TT_TRANS_REFUND)
+	{
+		warn "$txnref REFUND\n" if $DEBUG > 1;
+		$@ = "error: duplicate txn reference (REFUND): [$txnref]", next
+			if (exists $txn{$txnref});
+
+		$txn{$txnref} = [-$m->Amount, $m->AccountNum];
+	}
+	elsif ($type == OCV::TT_TRANS_RESPONSE)
+	{
+		warn "$txnref RESPONSE\n" if $DEBUG > 1;
+		# a RESPONSE can be received in response to a PURCHASE/REFUND
+		# or a STATUS
+		# - STATUS transactions are 'duplicates', and are ignored
+		# - completed transactions are marked by $txn{$txnref} == undef
+		#   - i.e. an totally unknown txn will not have a key in %txn, an
+		#     already processed txn will have $txn{$txnref} == undef, and
+		#     a transaction that is half-complete will have the amount + 
+		#     account number
+
+		# confirm purchase/refund request has been encountered
+		$@ = "error: RESPONSE for unknown transaction: [$txnref]", next
+			unless (exists $txn{$txnref});
+
+		warn "REQUEST found: " . (defined $txn{$txnref} ? 'yes' : 'no') . "\n"
+			if $DEBUG > 2;
+
+		# RESPONSE for completed transaction (e.g. from superfluous STATUS)
+		next unless defined $txn{$txnref};
+
+		# ok, extract the PURCHASE data (the amount) 
+		my ($amt, $a) = @{$txn{$txnref}};
+
+		# if the response is 'final', cross it off
+		# - server may have been busy, one or more RESPONSEs should be
+		#   forthcoming containing the final txn status
+		$txn{$txnref} = undef unless $m->Retry;
+
+		# extract the most-used fields once
+		# - excuse the abbreviated variable names, I'm a lazy typist :-)
+		my ($r, $d, $c) = ($m->Result, $m->SettleDate, $m->CardBin);
+
+		warn "SettleDate = $d\n" if $DEBUG == 2;
+		warn "SettleDate = $d, Result = $r, AccountNum = $a\n" if $DEBUG > 2;
+
+		# skip if we're after a specific account/date, and this isn't it
+		next if (defined $account and $a != $account);
+		next if (defined $date and $d !~ /$date/);
+
+		# what type of RESPONSE have I?
+		# - keep track of non approved transactions in 'metadata' keys
+		$summary{$a}{'results'} = {} unless ($summary{$a}{'results'});
+		if ($r == OCV::TRANS_DECLINED)
+		{
+			$summary{$a}{'results'}{'declined'}++;
+			next;
+		}
+		elsif ($r == OCV::TRANS_INPROGRESS)
+		{
+			$summary{$a}{'results'}{'inprogress'}++;
+			# warn, as this may indicate a problem (or may not :-)
+			$@ = "Txn [$txnref] InProgress";
+			next;
+		}
+		elsif ($r != OCV::TRANS_APPROVED)	# what else?
+		{
+			$summary{$a}{'results'}{'unknown'}++;
+			$@ = "unknown Result type: [$r]";
+			next;
+		}
+
+		# just for the heck of it, confirm the account numbers match
+		# - only 'approved' txns seem to have account numbers in the response
+		# - an account 'number' could conceivably be a string...
+		# - a further warning, if any, will override this one
+		$@ = "Account numbers mismatch! [$txnref]: [$a] vs. [" . 
+			$m->AccountNum . "]" unless $a eq $m->AccountNum;
+
+		warn "adding $txnref (STAN = " . $m->STAN . ") to summary\n" if $DEBUG;
+
+		# new account number?
+		$summary{$a}     = {} unless ($summary{$a});
+
+		# a given account will use one or more (merchant ID, terminal ID) pairs
+		# - save this 'meta-data' in a special key, to be presented with the
+		#   totals summary
+		$summary{$a}{'midtid'} = {} unless ($summary{$a}{'midtid'});
+		$_ = $m->MerchantID . ':' . $m->TerminalID;
+		$summary{$a}{'midtid'}{$_}++;
+
+		# new settlement date?
+		$summary{$a}{$d} = {} unless ($summary{$a}{$d});
+
+		# initialise new card structure?
+		unless ($summary{$a}{$d}{$c})
+		{
+			# for each card type (CardBin), store the:
+			#  - card description
+			#  - total purchase amount
+			#  - number of purchases
+			#  - total refund amount
+			#  - number of refunds
+			# (this is the same data+order as per the OCV account list response)
+			$summary{$a}{$d}{$c} = [$m->CardDesc, 0, 0, 0, 0];
+		}
+
+		# the txn amount should have been extracted from the request
+		# and placed in the txn hash (+ve amounts == purchase,
+		# -ve == refund)
+
+		if ($amt > 0) # purchase
+		{
+			$summary{$a}{$d}{$c}[2] ++;
+			$summary{$a}{$d}{$c}[1] += $amt;
+
+			# accrue summary data
+			$summary{'summary'}[2] ++;
+			$summary{'summary'}[1] += $amt;
+			$summary{$a}{'summary'}[2] ++;
+			$summary{$a}{'summary'}[1] += $amt;
+			$summary{$a}{$d}{'summary'}[2] ++;
+			$summary{$a}{$d}{'summary'}[1] += $amt;
+		}
+		else
+		{
+			$amt = -$amt;
+
+			$summary{$a}{$d}{$c}[4] ++;
+			$summary{$a}{$d}{$c}[3] += $amt;
+
+			# accrue summary data
+			$summary{'summary'}[4] ++;
+			$summary{'summary'}[3] += $amt;
+			$summary{$a}{'summary'}[4] ++;
+			$summary{$a}{'summary'}[3] += $amt;
+			$summary{$a}{$d}{'summary'}[4] ++;
+			$summary{$a}{$d}{'summary'}[3] += $amt;
+		}
+
+	}
+	elsif ($type == OCV::TT_TRANS_STATUS)
+	{
+		warn "$txnref STATUS\n" if $DEBUG > 1;
+		$@ = "notice: STATUS for unknown transaction: [$txnref]", next
+			unless (exists $txn{$txnref});
+	}
+	elsif ($type == OCV::TT_TRANS_PREAUTH)
+	{
+		warn "$txnref PREAUTH\n" if $DEBUG > 1;
+		$@ = "error: duplicate txn reference (PREAUTH): [$txnref]", next
+			if (exists $txn{$txnref});
+
+		# add to txn hash, as there is a RESPONSE due...
+		$txn{$txnref} = undef;
+	}
+	else
+	{
+		$@ = "error: unkown message type: [$type]";
+		next;
+	}
+}
+continue
+{
+	# check for errors/warnings
+	if ($@)
+	{
+		if ($@ =~ /^error:/i)
+		{
+			push (@error, ["$f[0]:$.", $@]);
+		}
+		else
+		{
+			push (@warn, ["$f[0]:$.", $@]);
+		}
+	}
+
+	# get filename and reset line numbering w/ each file
+	if (eof)	# test end of each @ARGV file (eof, *not* eof())
+	{
+		shift @f;
+		close ARGV;
+	}
+}
+
+print "\n";
+
+$SIG{__WARN__} = sub { warn @_ };
+
+# warn if no transactions have been seen
+# - the log file was empty?
+if ($DEBUG)
+{
+	warn "Warning: the given log file/s appear to be devoid of transactions!\n"
+ 		unless scalar %txn;
+}
+
+# add incomplete requests to suspect list
+# - i.e. I've seen a PURCHASE/REFUND/COMPLETION request but haven't
+#   seen a corresponding RESPONSE (approved or otherwise)
+push @error, map {['-', "incomplete transaction, no RESPONSE for [$_]"]} 
+	grep {defined $txn{$_}} keys %txn;
+
+# print warnings
+if (@warn)
+{
+	warn "Warning/s:\n";
+	foreach my $t (@warn) { warn "  @{$t}\n"; }
+}
+
+# exit on errors, unless 'force' option is given
+if (@error)
+{
+	warn "Error/s:\n";
+	foreach my $t (@error) { warn "  @{$t}\n"; }
+	exit 1 unless $opt{'force'};
+}
+
+# ok, print results
+
+sub commify
+# based on the "Perl Cookbook" recipe 2.17
+{
+	my $s;
+	return map
+	{
+		$s = reverse $_;
+		$s =~ s/(\w{3})(?=\w)(?!\w*\.)/$1,/g;
+		scalar reverse $s;
+	} @_;
+}
+
+sub print_summary
+# print a  totals summary for a given 'summary structure'
+# - [<unused>, AmtPurch, NumPurch, AmtRef, NumRef]
+{
+	my ($s) = @_;
+	my ($ptot, $pnum, $pavg, $rtot, $rnum, $ravg, $nett);
+
+	$ptot = sprintf '%.2f', ($s->[1] || 0) / 100;	# cents -> $
+	$pnum = $s->[2] || 0;
+	$pavg = sprintf '%.2f', $pnum ? $ptot / $pnum : 0;
+	$rtot = sprintf '%.2f', ($s->[3] || 0) / 100;	# cents -> $
+	$rnum = $s->[4] || 0;
+	$ravg = sprintf '%.2f', $rnum ? $rtot / $rnum : 0;
+	$nett = sprintf '%.2f', $ptot - $rtot;
+
+	$_ =<<'	.';	s/^\t//mg;
+	
+	  Purchases: Total amount $%8s  Count %3s (Avg. $%6s)
+	    Refunds: Total amount $%8s  Count %3s (Avg. $%6s)
+	  --------------------------------------------------------------
+	       Nett:              $%8s        %3s
+
+	.
+	printf $_, commify($ptot, $pnum, $pavg, $rtot, $rnum, $ravg, 
+		$nett, $pnum + $rnum);
+}
+
+
+my $s;
+# extract 'grand summary'
+$s = delete $summary{'summary'};
+
+my @a = sort keys %summary;
+
+unless (@a)	# no results
+{
+	print "There were no transactions for ";
+	print "Account [$account] " if defined $account;
+	if (defined $date)
+	{
+		$date_re ? 
+			print "Dates matching /$date/" :
+			printf ('Date [%4d-%02d-%02d]', unpack('A4A2A2', $date));
+	}
+	print "all Accounts and Dates" unless (defined $account or defined $date);
+	print ".\n\n";
+}
+
+# print 'grand summary' if more than one account has been extracted
+if (@a > 1)
+{
+	print '=' x 72 . "\n";
+	print "Summary - All Accounts\n";
+	print_summary($s);
+}
+
+foreach my $a (@a)	# for each account
+{
+	print '=' x 72 . "\n";
+
+	my $id = delete $summary{$a}{'midtid'};
+	my $results = delete $summary{$a}{'results'};
+
+	# account title
+	# - if only one date was requested, show it in the title
+	my $d = '';
+	if (defined $date)
+	{
+		$d = $date_re ? "/$date/" :
+			sprintf ('%4d-%02d-%02d', unpack('A4A2A2', $date));
+	}
+
+	$_ =<<"	.";	s/^\t//mg;
+
+	Totals for Account [$a] $d
+	------------------
+
+	Merchant:Terminal IDs:
+	.
+	print $_, map {"  $_ ($id->{$_})\n"} keys %{$id};
+
+	# extract 'account summary'
+	$s = delete $summary{$a}{'summary'};
+	print_summary($s);
+	print "\n";
+
+	# card output formats ('header', 'body', and 'footer')
+	# - these used to be formats before I gave up on them...
+	my $hfmt =<<'	.';	$hfmt =~ s/^\t//mg;
+	[%4d-%02d-%02d]                        Purchase          Refund
+	    Card Description     Code    Amount     No.    Amount     No.
+	    ---------------------------+-----------------+----------------
+	.
+	my $bfmt =<<'	.';	$bfmt =~ s/^\t//mg;
+	    %-20s (%s)   $%7s    %3s   $%7s    %3s
+	.
+	my $ffmt =<<'	.';	$ffmt =~ s/^\t//mg;
+	                                --------    ---   --------    --- 
+	                                $%7s    %3s   $%7s    %3s
+
+	.
+
+	foreach my $d (sort keys %{$summary{$a}})  # for each settlement date
+	{
+		printf $hfmt, unpack('A4A2A2', $d);
+
+		# extract 'date summary' (printed in 'footer')
+		$s = delete $summary{$a}{$d}{'summary'};
+
+		foreach my $c (sort keys %{$summary{$a}{$d}})	# for each card data
+		{
+			my @d = @{$summary{$a}{$d}{$c}};
+			$d[1] ||= 0;  $d[2] ||= 0; $d[3] ||= 0; $d[4] ||= 0;
+			$d[1] = sprintf '%.2f', $d[1]/100;
+			$d[3] = sprintf '%.2f', $d[3]/100;
+			printf $bfmt, $d[0], $c, @d[1,2,3,4];
+		}
+		$s->[1] ||= 0;  $s->[2] ||= 0; $s->[3] ||= 0; $s->[4] ||= 0; 
+		$s->[1] = sprintf '%.2f', $s->[1]/100;
+		$s->[3] = sprintf '%.2f', $s->[3]/100;
+		printf $ffmt, @{$s}[1,2,3,4];
+	}
+
+	map {$results->{$_} ||= 0} qw/declined inprogress/;
+	print "     Number of declined transactions: $results->{'declined'}\n";
+	#print "Number of 'in progress' transactions: $results->{'inprogress'}\n";
+}
+
+print '=' x 72 . "\n";
+print "\nDone.\n";
+
+

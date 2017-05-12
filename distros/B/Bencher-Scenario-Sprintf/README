@@ -1,0 +1,6 @@
+DESCRIPTION
+
+    This casual benchmarking shows no significant difference between the
+    two, which suggests the bottleneck is in another place (e.g. string
+    memory allocation).
+

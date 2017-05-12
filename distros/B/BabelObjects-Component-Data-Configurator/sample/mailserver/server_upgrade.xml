@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+  <rpms>
+    <rpm>RedHat/make-3.78.1-4.i386.rpm</rpm>
+    <rpm>RedHat/kernel-headers-2.2.14-6.1.1.i386.rpm</rpm>
+    <rpm>RedHat/glibc-devel-2.1.3-15.i386.rpm</rpm>
+    <rpm>RedHat/cpp-1.1.2-30.i386.rpm</rpm>
+    <rpm>RedHat/egcs-1.1.2-30.i386.rpm</rpm>
+    <rpm>RedHat/openssl-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssl-devel-0.9.5a-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-clients-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>RedHat/openssh-server-2.1.1p4-1.i386.rpm</rpm>
+    <rpm>openldap-2.0.7-2.i386.rpm</rpm>
+    <rpm>pam_ldap-65-1.i386.rpm</rpm>
+    <rpm>sendmail-8.11.0-2.i386.rpm</rpm>
+    <rpm>db-3.1.14-1.i386.rpm</rpm>
+    <rpm>cyrus-sasl-1.5.24-1.i386.rpm</rpm>
+    <rpm>cyrus-imapd-2.0.7-2.i386.rpm</rpm>
+    <rpm>cyrus-perl-imap-1.0-1.i386.rpm</rpm>
+    <rpm>ldapsdk-4.11-1.i386.rpm</rpm>
+  </rpms>
+ 

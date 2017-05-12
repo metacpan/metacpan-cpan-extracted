@@ -1,0 +1,21 @@
+ignore.txt
+Changes
+lib/Blitz.pm
+lib/Blitz/API.pm
+lib/Blitz/Exercise.pm
+lib/Blitz/Rush.pm
+lib/Blitz/Sprint.pm
+lib/Blitz/Validate.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/blitzobject.t
+t/blitzlogin.t
+t/blitzexecute.t
+t/blitzvalidate.t
+META.yml                                 Module meta-data (added by MakeMaker)

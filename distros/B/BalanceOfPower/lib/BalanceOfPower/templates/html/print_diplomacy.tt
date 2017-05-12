@@ -1,0 +1,34 @@
+<h3>DIPLOMACY</h3>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="well">
+        [% FOREACH r IN relationships %]
+        [% IF r.status == 'HATE' %]
+        [% INCLUDE fragments/linked_nation.tt n = r.destination( nation ) %]: [% r.status %]<br />
+        [% END %]
+        [% END %]
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well">
+        [% FOREACH r IN relationships %]
+        [% IF r.status == 'NEUTRAL' %]
+        [% INCLUDE fragments/linked_nation.tt n = r.destination( nation ) %]: [% r.status %]<br />
+        [% END %]
+        [% END %]
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="well">
+        [% FOREACH r IN relationships %]
+        [% IF r.status != 'NEUTRAL' AND r.status != 'HATE' %]
+        [% INCLUDE fragments/linked_nation.tt n = r.destination( nation ) %]: [% r.status %]<br />
+        [% END %]
+        [% END %]
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+0.5.3  2017-03-09  John Macdonald   Added '.' to legal VCF_Ref char values
+
+0.5.2  2017-01-08  John Macdonald   Removed trailing semi from info in VCF
+
+0.5.1  2016-04-21  John Macdonald   Added README file
+
+0.5.0  2016-04-21  John Macdonald   Initial CPAN release
+                                    - Fixed comment_pattern to work (renamed
+									  it from comment_pat to be consistent
+									  with name of pre_header_pattern)
+									- Doc fixes
+									- Moved ChangeLog into separate file
+									- Got rid of oddly named file that only
+									  contained the version info.
+
+0.4.7  2016-01-22  John Macdonald   Allow dual case in AnnovarInput ref/alt fields
+                                    - Add VCF::Full, starting to support VCF for non-Annovar uses
+                                    - Fixed to support nested filters
+
+0.4.5  2015-02-05  John Macdonald   - Check chr conversion in AsAnnovarInput variants
+
+0.4.4  2015-02-04  John Macdonald   - Good error message for wrong number of fields
+
+0.4.2  2015-01-02  John Macdonald   - Work correctly when there are no body lines
+
+0.4.1  2014-12-23  John Macdonald   - Catch aborts while trying to dump field in abort processing
+
+0.4.0  2014-12-18  John Macdonald   - Added initial VCF format (only AsAnnovarInput for now)
+
+0.0.1  2014-04-20  John Macdonald   - Initial code development.

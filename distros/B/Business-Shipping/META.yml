@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:         Business-Shipping
+version:      3.1.0
+version_from: lib/Business/Shipping.pm
+installdirs:  site
+author:       Daniel Browning <db@kavod.com>
+abstract:     Rates and tracking for UPS and USPS
+license:      perl
+requires:
+    Any::Moose:       0
+    Log::Log4perl:    0
+    Test::More:       0.4
+recommends:
+    CHI  0.39
+    Crypt::SSLeay     0
+    LWP::UserAgent    0
+    XML::DOM          0
+    XML::Simple       0
+    Date::Parse       0

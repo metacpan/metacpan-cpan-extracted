@@ -1,0 +1,132 @@
+=pod
+
+=head1 NAME
+
+Changes.txt : Change list for NEXPL package (Bio::NEXUS library and tools) 
+
+=head1 Description
+
+This file contains the changes and updates made to the files in the NEXPL package
+
+
+=head1 Details
+
+The following section contains the changes made - with recent changes in the top.
+
+=head2  Release 0.77, 0.78 (February, 2012, Arlin)
+
+=over
+
+=item 10.  Maintenance; minor changes in response to bugs 
+
+ Affected files:
+     - in nextool.pl, more robust processing of name-translation file 
+     - in several block parsers, fixed exception-handling for unknown commands
+     - other minor changes not recorded here (see cvs logs for files)
+
+=back
+
+=head2 Releases 0.74, 0.75 and 0.76 (September 2010, Arlin)
+
+=over
+
+=item 9.  Numerous changes in response to bugs, test errors, and test warnings.
+
+ Affected files:
+     - in t/nexus_add-otu-clone.t, fixed dependence on Test::Deeply
+     - in Util/Logger.pm, fixed incipient bug with UNIVERSAL::isa as function 
+     - in t/*.t, removed "use lib" directives (not good practice)
+     - in exec/tree2nex.pl fixed syntax error in output file 
+     - other changes not recorded here (see cvs logs for files)
+
+=back
+
+=head2 1st August 2006, Vivek Gopalan (gopalan@umbi.umd.edu)
+
+=over
+
+=item 8.  Reformatted the changes.txt and bugs.txt files to POD format.
+
+ Affected files:
+     - doc/changes.txt
+     - doc/bugs.txt
+
+=back
+
+=head2 30th July 2006, Vivek Gopalan (gopalan@umbi.umd.edu)
+
+=over
+
+=item 7. Moved all the contents of the pod directory to doc directory and removed the pod directory. Now all the documents related to the library are in the doc directory
+
+ Affected files:
+     - doc/About.pod
+     - doc/Installation.pod
+     - doc/Tutorial.pod
+     - doc/UserManual.pod
+
+=back
+
+=head2 29th July 2006, Vivek Gopalan (gopalan@umbi.umd.edu)
+
+=over
+
+=item 6. Removed orphan comment in NEXUS/Node.pm ( as indicated by the Test::Pod)
+
+=item 5. Added 'read' method to the NEXUS.pm file and modified 'read_file' arguments.
+
+ Affected files:
+     - Input options for NEXUS content as string to the library was added.
+
+=item 4. Added nex2text_tree.pl to the 'exec' directory.
+
+ Affected files:
+     - This script converts the newick-foramt in the NEXUS files into a string formatted tree structure.'nex2text_tree -h' for more options and help
+     - It also takes the horizontal width for the tree and vertical spacing between the OTUs as input parameters 
+
+=back
+
+=head2 28th July 2006, Vivek Gopalan (gopalan@umbi.umd.edu)
+
+=over
+
+=item 3. Created 't' subdirectory and added test scripts
+
+ Files affected are
+     - t/01_nexus.t
+     - t/02_wrong_format.t
+     - t/03_trees.t
+     - t/04_labels.t
+     - t/05_radical_whitespace.t 
+     - t/06_tree_parse.t
+     - t/09_todo.t
+     - t/11_podcoverage.t 
+     - t/10_perlpod.t
+     - t/data/01_basic.nex
+     - t/data/02_wrong_format.nex
+
+=item 2. Created 'pod' subdirectory and added templates for the documentation files
+
+ Affected files:
+     - pod/About.pod
+     - pod/Installation.pod
+     - pod/Tutorial.pod
+     - pod/UserManual.pod
+
+=item 1. Added missing documentation for the methods in the library ( as indicated by the Test::Pod::Coverage)
+
+ Affected files:
+     - NEXUS.pm (create_block, parse_comments,set_name,get_name,exclude_chars)
+     - NEXUS/Block.pm (remove_comments)
+     - NEXUS/CharactersBlock.pm (add_states_to_charstates,create_charstates,find_taxon,set_statelabels,write_matrix,write_matrix_info)
+     - NEXUS/HistoryBlock.pm (parse_matrix111, parse_nodelabels)
+     - NEXUS/Node.pm (clone,combine,get_total_length,printall,set_tu)
+     - NEXUS/SpanBlock(get_attributes,get_data,parse_add,parse_block,parse_method,parse_pair,rename_otus)
+     - NEXUS/Tree.pm (clone,exclude_subtree,get_tree_length,is_default,is_rooted,select_subtree,set_as_default,set_as_unrooted)
+     - NEXUS/TreesBlock.pm (write_tree)
+     - NEXUS/UnalignedBlock (find_taxon,write_matrix,write_matrix_info)
+     - NEXUS/WeightSet (parse_weights)
+
+=back
+=cut
+

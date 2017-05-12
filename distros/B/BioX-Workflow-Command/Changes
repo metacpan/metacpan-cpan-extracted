@@ -1,0 +1,31 @@
+Revision history for BioX-Workflow-Command
+
+2.0.10  2017-05-08 13:20:42 +04
+	- Removing orphan input check
+
+2.0.9  2017-05-08 13:02:46 +04
+	- Added in iterables
+	- Can now defined any_list
+	- And uterate through it using use_anys (pay attention to the s)
+
+2.0.8  2017-05-04 14:30:02 +04
+	- Cleaned up logging to create a table - no more wall of text!
+	- Fixed HPC meta to correctly overwrite global when global/local are arrayref of keys
+	- Follow symbolic links when looking for Samples
+	- Throw an error when making a directory fails
+
+2.0.7  2017-05-01 12:32:58 +04
+	- Added in chunking functionality
+
+2.0.6  2017-04-30 10:37:27 +04
+	- Bug fixes for backwards compatibility
+
+2.0.5  2017-04-30 09:31:44 +04
+	- Few changes to avoid collisions with previous BioX::Workflow
+
+2.0.4  2017-04-27 15:12:49 +04
+	- Removed extra cpanfile to clean up deps
+
+2.0.3  2017-04-27 12:02:29 +04
+        - Adding in auto_deps - automatically decide dependnecy from INPUT/OUTPUT
+        - Adding in use_timestamps - Decide select_rules by last modified time 

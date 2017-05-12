@@ -1,0 +1,17 @@
+Revision history for Perl extension Business::OnlinePayment::TCLink.
+
+1.03  Fri Jan 10 12:19:12 PST 2003
+        - now returns error_message with more useful messages
+
+1.02  Mon Nov  4 15:39:38 PST 2002
+	- bug fix so that ach/echeck transactions will work (thanks Ivan)
+
+1.01  Mon May 20 12:54:45 PDT 2002
+	- added generic "CC" credit card type
+	- order_number bug fixes
+	- now strips non-digits from certain fields
+	- prepends a "0" to expiration field if necessary
+
+1.00  Mon May 20 12:54:45 PDT 2002
+	- original version
+

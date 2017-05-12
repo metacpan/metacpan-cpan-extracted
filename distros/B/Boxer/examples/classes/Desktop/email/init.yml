@@ -1,0 +1,13 @@
+classes:
+  - Desktop
+  - x11
+parameters:
+  doc:
+    desktop-email:
+      headline:
+        - Desktop email
+      pkg:
+        - include Icedove email with sieve plugin
+  pkg:
+    - icedove
+    - xul-ext-sieve

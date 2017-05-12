@@ -1,0 +1,16 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+README
+example/br-node.pl
+example/mutex.conf
+example/README
+example/resource.pl
+lib/BrLock/SomePerlFunc.pm
+lib/BrLock/BrXML.pm
+lib/BrLock.pm
+t/BrLock.t
+t/BrXML.t
+t/SomePerlFunc.t
+META.yml                                 Module meta-data (added by MakeMaker)

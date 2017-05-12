@@ -1,0 +1,6 @@
+Revision history for Perl extension Bank::RMD.
+
+0.01  Wed Apr  5 19:09:15 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn Bank::RMD -b5.6.1
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+
+<!-- Go and see ../test/test.xml to see what do all the elements mean -->
+
+<!DOCTYPE bo [
+
+  <!ENTITY bo_base_conf "/usr/local/src/babelobjects/BabelObjects-Component-Data-Configurator-1.00/sample/mailserver/templates" >
+  <!ENTITY bo_cache_conf "/usr/local/src/babelobjects/BabelObjects-Component-Data-Configurator-1.00/sample/mailserver/templates" >
+  <!ENTITY openldap_conf_dir "/usr/local/openldap/etc/vecteurplus" >
+  <!ENTITY organization "Vecteur Plus" >
+  <!ENTITY country "Fr" >
+  <!ENTITY base "o=&organization;, c=&country;" >
+  <!ENTITY smtphost "svrmail2.vecteurplus.com" >
+  <!ENTITY mailhost "svrmail2.vecteurplus.com" >
+  <!ENTITY maildomain "vecteurplus.com" >
+
+  <!ENTITY conf_dir "/usr/local/babelobjects/conf" >
+  <!ENTITY rpms SYSTEM "./server_upgrade.xml" >
+  <!ENTITY services SYSTEM "./server_config.xml" >
+
+]>
+
+<bo>
+
+  <parameter>
+        <bo_base_config>&bo_base_conf;</bo_base_config>
+  </parameter>
+
+<!--
+  ############################################################
+  ## Download section : Adapt it for the system from which
+  ## you want do download RPMS.
+  ############################################################
+-->
+
+  <download>
+    <parameter>
+        <!-- The directory where resides the BO configuration files -->
+        <cfg>/var/cache/babelobjects/conf</cfg>
+    </parameter>
+    <parameter>
+        <!-- The ftp (only) host where to get RPMS -->
+        <host>ftp.babelo.org</host>
+    </parameter>
+    <parameter>
+        <!-- The login to use to login on the previous ftp server -->
+        <login>anonymous</login>
+    </parameter>
+    <parameter>
+        <!-- The password to use to login on the previous ftp server.
+             Default to -->
+        <passwd>''</passwd>
+    </parameter>
+    <parameter>
+        <!-- Directory where RPMS will be stored in RPMS -->
+        <cache_dir>/var/cache/babelobjects</cache_dir>
+    </parameter>
+    <parameter>
+        <bo_cache_conf>&bo_cache_conf;</bo_cache_conf>
+    </parameter>
+    <parameter>
+        <!-- Option to ask debug information only.
+             ''    : nodebug. YOU MUST PUT QUOTES OR THE PROGRAM WILL FAIL
+             debug : debugging -->
+        <loglevel>''</loglevel>
+    </parameter>
+  </download>
+
+  <classes>
+      <parameter>
+         <configurator>BabelObjects::Component::Data::Configurator</configurator>
+      </parameter>
+  </classes>
+
+  &rpms;
+  &services;
+
+</bo>

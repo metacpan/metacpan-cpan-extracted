@@ -1,0 +1,38 @@
+Revision history for Perl extension Brownie
+
+0.09
+        - use Selenium::Server, instead of Align::SeleniumRC (ikasam_a)
+        - experimental Brownie::DSL (Cside)
+        - can use external selenium server permanently (Cside)
+
+0.08
+        - support Selenium RemoteWebDriver (selenium-server) driver
+        - fixed syntax error on Session.pm
+
+0.07
+        - added missing dependency
+
+0.06
+        - remove Selenium (Remote / Selenium-Server) driver
+        - support Mechanize driver
+        - support local app w/ Plack::Runner
+
+0.05
+        - does not call clear() if file attachment field
+        - support input[not(@type)] as text field
+
+0.04
+        - added status_code() and response_headers() to driver I/F
+        - tests based on shared examples
+
+0.03
+        - refresh current_node every time
+
+0.02
+        - add eg/google.pl
+        - joining XPath
+        - use selenium driver native find_element()
+
+0.01
+        - original version
+        - implements selenium driver

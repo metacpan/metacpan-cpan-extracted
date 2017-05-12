@@ -1,0 +1,6 @@
+Revision history for Perl extension BIE::App::PacBio.
+
+0.01  Thu Nov 15 10:56:02 2012
+	- original version; created by h2xs 1.23 with options
+		-n BIE::App::PacBio -X
+

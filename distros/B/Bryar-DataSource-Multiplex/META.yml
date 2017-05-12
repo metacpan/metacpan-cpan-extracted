@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Bryar-DataSource-Multiplex
+version:            0.122
+abstract:           multiplex Bryar datasources
+author:
+    - Ricardo Signes <rjbs@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bryar:       2.8_01
+    Test::More:  0
+resources:
+    Repository:  http://github.com/rjbs/bryar-datasource-multiplex
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

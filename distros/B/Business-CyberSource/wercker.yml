@@ -1,0 +1,7 @@
+box: xenoterracide/perlbrew@0.0.2
+build:
+  steps:
+    - xenoterracide/perlbrew:
+        install: 5.20.2 5.18.4 5.16.3 5.14.4
+        cpanm: Dist::Zilla
+        exec: "dzil authordeps --missing | cpanm --quiet --notest"

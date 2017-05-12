@@ -1,0 +1,98 @@
+Revision history for BlueCoat::SGOS
+-----------------------------------
+
+0.45    2012-04-29 03:47
+------------------------
++ First version, released on an unsuspecting world.
+
+0.46    2010-04-29 04:04
+------------------------
++ Minor changes
+
+0.47    2010-04-29 04:24
+------------------------
++ Code cleanup
+
+0.90    2010-05-02 13:00
+------------------------
++ Minor fixes, speeling [sic] errors, more documentation.
+
+0.91    2010-05-05 22:55
+------------------------
++ Much better parsing of VPM-CPL and VPM-XML files.
++ Addition of vpmcpl() and vpmxml() methods to return respective data.
++ Update documentation, particularly around the sections that can
+  retrieved directly (e.g. "Licensing Statistics" and many
+  others).
++ Better unit testing.
++ Updated example script now includes date/time of the sysinfo.
+
+0.92    2010-05-06
+------------------------
++ Added more author-only unit tests.  Now up to 5,730 tests.
+
+0.93    2010-09-01
+------------------------
++ Added more author-only tests.
+
+0.94    2010-10-10
+------------------------
++ Refactored into BlueCoat::SGOS
+
+0.95    2011-11-11
+------------------------
++ Removed support and tests for SGOS 4.x.
++ Added a new get_sysinfo_from_data method to parse sysinfo that
+  already exists in a data structure.
++ Added an internal-only function to parse the last hardware
+  and software reboot times.
++ Parsing of the uptime is now also returned in seconds since
+  the epoch.
+
+1.00    2012-02-28
+------------------------
++ Updated methods to capture sysinfo data.  It is no longer necessary
+  to connect to the Blue Coat ProxySG to retrieve the realm name to
+  pass back to the LWP::UserAgent constructor.  Instead, the username
+  and password are passed directly to the initial connection to the
+  device.  This saves a round trip to the device.
++ Added a new method to send commands to the ProxySG.  It is name
+  send_command and takes a scalar containing commands to be run
+  on the ProxySG.
++ Updated the module to no longer automatically parse the sysinfo file.
+  This is necessary if you only want the sysinfo file.
++ Added a capture.pl example script to the examples directory.  This script
+  takes the sysinfo from a remote device and saves in on the local
+  filesystem with a timestamp.
++ Updated copyright.
+
+1.01    2012-07-09 19:22
+------------------------
++ Added the ability to use Build.PL to install the distribution, to be
+  more friendly for non-Unix systems.
++ Updated copyright to be GPL v2 only.
++ Testing is now more aggressive.
+
+1.02    2012-07-15 20:21
+------------------------
++ Updated documentation for send_command.  You're already in configuration mode,
+  so it's not necessary to use 'conf t' before running commands.
++ Updated prerequisite build modules (Test::NoWarnings).
+
+1.03    2012-07-19 22:22
+------------------------
++ Standardized test suites, using -T where possible.
+
+1.04    2013-03-16 18:02
+------------------------
++ Updated copyright.
++ Updated interface parsing to be less noisy.
++ Renamed test files.
+
+1.05    2013-03-18 18:02
+------------------------
++ Squashed bug 78469: fix returns with undef.
++ Squashed bug 78470: fix file open issues.
++ Squashed bug 78418: fix licensing in makefiles.
++ Changed tests to use TEST_AUTHOR environment variable.
+

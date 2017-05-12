@@ -1,0 +1,60 @@
+        <WorkflowProcess Id="wcp21a" Name="WCP21: Structured Loop (Pre-Test, while-loop)">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+                <Description>The Structured Loop pattern describes the possibility of executing an activity or sub-process repeatedly. This loop has either a pre-test or a post-test condition which means that the condition is either evaluated at the beginning or the end of a loop. The loop itself has a single entry point and a single exit point. [Aalst09].</Description>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="cycle" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B-C"/>
+                                    <TransitionRef Id="B-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-A" From="Start" To="A"/>
+                <Transition Id="A-B" From="A" To="B"/>
+                <Transition Id="B-C" From="B" To="C">
+                    <Condition Type="CONDITION">attribute('cycle') > 0</Condition>
+                </Transition>
+                <Transition Id="B-End" From="B" To="End">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="C-A" From="C" To="A"/>
+            </Transitions>
+        </WorkflowProcess>

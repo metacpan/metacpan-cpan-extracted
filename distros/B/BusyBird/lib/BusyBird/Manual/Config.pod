@@ -1,0 +1,387 @@
+=pod
+
+=head1 NAME
+
+BusyBird::Manual::Config - how to configure BusyBird
+
+=head1 SYNOPSIS
+
+In your ~/.busybird/config.psgi
+
+    use BusyBird;
+    
+    busybird->set_config(
+        timeline_list_per_page => 100,
+        time_zone => "UTC",
+        time_locale => "en_US",
+    );
+    
+    timeline("home")->set_config(
+        time_zone => "+0900"
+    );
+
+    end;
+
+=head1 DESCRIPTION
+
+
+=head2 Config File
+
+By default, L<BusyBird> reads the file C<~/.busybird/config.psgi> for configuration.
+If it doesn't exist, L<busybird> command automatically generates it.
+
+You can use an arbitrary config file by specifying it to L<busybird> command.
+
+    $ busybird another_config.psgi
+
+The configuration file is just a Perl script (actually it's L<PSGI> application script).
+Its basic structure is:
+
+    use BusyBird;
+
+    ## Your configuration here
+
+    end;
+
+Leave every statement L<busybird> command generated unless you know what you're doing.
+
+
+=head2 Create/Get Timelines
+
+To create a timeline, call C<timeline()> function.
+
+    timeline("timeline A");
+    timeline("timeline B");
+
+C<timeline()> function returns a L<BusyBird::Timeline> object.
+You can call its methods to manipulate the timeline.
+
+    my $timeline = timeline("timeline A");
+    $timeline->add({text => "Hello."});
+
+Timeline names are unique.
+If you call C<timeline()> the second time with the same timeline name,
+it just returns the existing timeline.
+
+=head2 Global and Per-Timeline Configurations
+
+Global config parameters are set by C<< busybird->set_config() >> method.
+
+    busybird->set_config(time_zone => "UTC");
+
+A global config parameter affects all timelines and the overall
+behavior of the BusyBird instance.
+
+Per-timeline config parameters are set by C<< timeline(...)->set_config() >> method.
+
+    busybird->set_config(time_zone => "UTC");
+    
+    timeline("foobar")->set_config(time_zone => "+0900");
+
+Per-timeline config parameters always take precedence over global ones. 
+Any per-timeline config parameter can be set as a global config parameter.
+
+
+=head2 Under the Hood
+
+Config parameters are stored in L<BusyBird::Main> and L<BusyBird::Timeline> objects.
+The keyword C<busybird> is a function that returns the singleton object of L<BusyBird::Main> class.
+See L<BusyBird/AS A MODULE> for detail.
+
+When L<BusyBird> needs some config parameters, it reads them by calling C<get_config()> and C<get_timeline_config()> methods
+on L<BusyBird::Main>.
+
+
+=head1 GLOBAL CONFIG PARAMETERS
+
+Below is the complete list of the global config parameters.
+
+Internally, those config parameters are accepted by L<BusyBird::Main>.
+
+=head2 C<default_status_storage> => BusyBird::StatusStorage OBJECT
+
+B<Default:> L<BusyBird::StatusStorage::SQLite> object at C<~/.busybird/statuses.sqlite3>
+
+A StatusStorage object used for Timelines by default.
+
+A StatusStorage is an object where timelines save their statuses.
+When a timeline is created by L<BusyBird::Main>'s C<timeline()> method, the default StatusStorage is used for the timeline.
+
+Note that the default StatusStorage object is referred to only when creating timelines via C<timeline()> method.
+Existing timelines are not affected by changing the default StatusStorage object.
+
+A StatusStorage object is an implementation of L<BusyBird::StatusStorage> interface.
+For example, the following modules can be used as StatusStorage.
+
+=over
+
+=item *
+
+L<BusyBird::StatusStorage::SQLite> - storage backed by SQLite database
+
+=item *
+
+L<BusyBird::StatusStorage::Memory> - storage in the process memory
+
+=back
+
+See each module's documentation for details.
+
+
+=head2 C<sharedir_path> => PATH
+
+B<Default:> sharedir in your BusyBird installation directory
+
+File path to "share" directory.
+
+"share" directory contains static files used by L<BusyBird>,
+which include HTML templates, JavaScript files and image files.
+
+See L<BusyBird::Manual::Config::Advanced> for an example to use this parameter.
+
+=head2 C<timeline_list_per_page> => INT
+
+B<Default:> 30
+
+Number of timelines shown in a single page of the timeline list.
+
+=head2 C<timeline_list_pager_entry_max> => INT
+
+B<Default:> 7
+
+Maximum number of page entries shown in the pagination of the timeline list page.
+
+=head1 PER-TIMELINE CONFIG PARAMETERS
+
+Below is the complete list of the per-timeline config parameters.
+
+Note that any of the per-timeline config parameters can be used as a global config parameter, too.
+
+Internally, those config parameters are accepted by L<BusyBird::Main> and L<BusyBird::Timeline>.
+
+=head2 C<time_zone> => TIMEZONE_STR
+
+B<Default:> C<"local">
+
+Timezone used to render status timestamps.
+C<TIMEZONE_STR> accepts various timezone names such as C<"UTC">, C<"America/Chicago">, C<"+0900">, C<"-0300">.
+See L<DateTime::TimeZone> and L<DateTime::TimeZone::Catalog> for the list of valid timezone names.
+
+You can set special value C<"local"> to C<TIMEZONE_STR>.
+This means the timezone of the local environment is used.
+
+=head2 C<time_format> => STRFTIME_FORMAT_STR
+
+B<Default:> C<"%x (%a) %X %Z">
+
+Format used to render status timestamps.
+The format string conforms to the C<strftime(3)> specification.
+
+=head2 C<time_locale> => LOCALE_STR
+
+B<Default:> C<LC_TIME> environment variable or C<"C">
+
+Locale used to render status timestamps.
+
+C<LOCALE_STR> is a valid locale string such as C<"en_US">, C<"ja_JP"> etc.
+
+=head2 C<post_button_url> => URL_STR
+
+B<Default:> C<"https://twitter.com/intent/tweet">
+
+Link URL attached to the "Post" button in the navigation bar.
+
+=head2 C<status_permalink_builder> => CODEREF($status)
+
+B<Default:> return C<< $status->{busybird}{status_permalink} >>, or build permalink to the status page of twitter.com, or return C<undef>
+
+Subroutine reference that is supposed to build permalink URL to the status.
+
+The builder subroutine reference is called with the status object, as in:
+
+    $url_str = $builder->($status)
+
+C<$url_str> is a string.
+If the result C<$url_str> is C<undef> or does not look like a valid URL, it is ignored.
+
+=head2 C<urls_entity_url_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<< $entity->{url} >>
+
+=head2 C<media_entity_url_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<< $entity->{url} >>
+
+=head2 C<user_mentions_entity_url_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> build URL to the user page of twitter.com
+
+=head2 C<hashtags_entity_url_builder> => CODEREF($text, $entity, $status)
+
+B<Default> build URL to the hashtag search page of twitter.com
+
+The above four configurations specify how L<Twitter Entities|https://dev.twitter.com/docs/platform-objects/entities>
+in a status object generate link URLs attached to the status text.
+
+The builder subroutine reference is called in the following way
+
+    $url_str = $builder->($text, $entity, $status)
+
+where C<$text> is the segment of status text the entity is attached to, C<$entity> is the Twitter Entity object,
+and C<$status> is the whole status object. C<$url_str> is a string.
+
+If the result C<$url_str> is C<undef> or does not look like a valid URL, it is ignored, i.e., the text is not linked.
+
+=head2 C<urls_entity_text_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<< $entity->{display_url} >>
+
+=head2 C<media_entity_text_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<< $entity->{display_url} >>
+
+=head2 C<user_mentions_entity_text_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<$text>
+
+=head2 C<hashtags_entity_text_builder> => CODEREF($text, $entity, $status)
+
+B<Default:> return C<$text>
+
+The above four configurations specify how L<Twitter Entities|https://dev.twitter.com/docs/platform-objects/entities>
+in a status object convert status texts to be displayed.
+
+The builder subroutine reference is called in the following way
+
+    $text_to_be_displayed = $builder->($text, $entity, $status)
+
+where C<$text> is the segment of status text the entity is attached to, C<$entity> is the Twitter Entity object,
+and C<$status> is the whole status object. C<$text_to_be_displayed> is a string.
+
+If C<$text_to_be_displayed> is C<undef>, the original C<$text> is used for display.
+
+If a C<*_entity_url_builder> subroutine reference returns non-URL for the C<$entity>,
+the text is not linked and the corresponding C<*_entity_text_builder> is not called.
+
+=head2 C<timeline_web_notifications> => STRING
+
+B<Default:> "simple"
+
+Specifies how L<Web Notifications|http://www.w3.org/TR/notifications/> are used in timeline views.
+
+If set to C<"simple">, number of new statuses are notified using Web Notifications.
+Setting it to any other value stops Web Notifications.
+
+=head2 C<hidden> => BOOL
+
+B<Default:> 0 (false)
+
+If set to true, the timeline is hidden from the timeline list.
+Hidden timelines are still accessible via Web API.
+
+=head2 C<attached_image_urls_builder> => CODEREF($status)
+
+B<Default:> return C<media_url> fields in Twitter Entities in C<< $status->{entities}{media} >> and C<< $status->{extended_entities}{media} >>.
+
+Subroutine reference that is supposed to return a list of URL strings to the images attached to the C<$status>.
+
+    @image_urls = $builder->($status)
+
+If it returns a string that doesn't look like a valid URL, that string is ignored.
+
+=head2 C<attached_image_max_height> => INT
+
+B<Default:> 360
+
+The maximum height of images attached to statuses (in pixels).
+If the original height is larger than this value, it shrinks the image and renders it.
+
+=head2 C<attached_image_show_default> => STRING
+
+B<Default:> C<"hidden">
+
+Specifies how attached images are rendered in a timeline.
+
+If set to C<"visible">, the attached images are visible by default.
+Setting it to any other value hides the attached images.
+
+=head2 C<acked_statuses_load_count> => INT
+
+B<Default:> C<20>
+
+The number of acked statuses loaded at once.
+
+This affects the number of acked statuses loaded at initialization and when you click the "More..." button.
+
+=head2 C<default_level_threshold> => INT
+
+B<Default:> C<0>
+
+The default level threshold for the timeline.
+
+=head1 EXAMPLES
+
+=head2 Customize Timestamps
+
+Status timestamps are rendered using C<time_zone>, C<time_format>, C<time_locale> parameters.
+By default L<BusyBird> guesses the "correct" config for your system.
+
+    busybird->set_config(
+        time_zone => 'America/Los_Angeles',
+        time_format => '%Y-%m-%d %A %H:%M:%S %Z',
+        time_locale => 'en_US',
+    );
+
+=head2 Expand URLs for Links in Statuses
+
+By default L<BusyBird> renders Twitter Entities in status objects just like Twitter does,
+but you can customize this behavior by changing C<*_entity_url_builder> and C<*_entity_text_builder> parameters.
+
+For example, Twitter truncates the displayed text for C<urls> and C<media> entites.
+If you want to see fully expanded URLs in statuses, do the following.
+
+    my $builder_expanded_url = sub {
+        my ($text, $entity) = @_;
+        return $entity->{expanded_url};
+    };
+    
+    busybird->set_config(
+        urls_entity_text_builder => $builder_expanded_url,
+        media_entity_text_builder => $builder_expanded_url,
+    );
+
+
+=head2 Storage File Location
+
+By default, L<BusyBird> stores statuses in the file C<~/.busybird/statuses.sqlite3>.
+
+To change the storage file location, change C<default_status_storage> global config parameter.
+
+    use BusyBird::StatusStorage::SQLite;
+    busybird->set_config(
+        default_status_storage => BusyBird::StatusStorage::SQLite->new(
+            path => "$ENV{HOME}/.busybird/another_statuses.sqlite3"
+        )
+    );
+
+The example uses C<~/.busybird/another_statuses.sqlite3> for the status storage.
+See L<BusyBird::StatusStorage::SQLite> for detail.
+
+Note that you should change C<default_status_storage> parameter B<< before you call C<timeline()> function. >>
+
+=head1 SEE ALSO
+
+=over
+
+=item L<BusyBird::Manual::Config::Advanced>
+
+Advanced topics about configuring L<BusyBird>.
+
+=back
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+

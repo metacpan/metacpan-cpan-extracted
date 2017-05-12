@@ -1,0 +1,20 @@
+<h3>WARS</h3>
+[% FOREACH w IN wars %]
+<h4>WAR [% w.name %]</h4>
+<p>
+[% FOREACH sw IN w.conflicts %]
+[% IF sw.node1_faction == 0 %]
+<span class="evidenced">[[% sw.army1 %]] [% INCLUDE fragments/linked_nation.tt n = sw.node1 %]</span> --&gt; [% INCLUDE fragments/linked_nation.tt n = sw.node2 %] [[% sw.army2 %]]
+[% ELSE %]
+[[% sw.army1 %]] [% INCLUDE fragments/linked_nation.tt n = sw.node1 %] --&gt; <span class="evidenced">[% INCLUDE fragments/linked_nation.tt n = sw.node2 %] [[% sw.army2 %]]</span>
+[% END %]
+<br />
+[% END %]
+</p>
+[% END %]
+<p>
+[% FOREACH cw IN civil_wars %][% INCLUDE fragments/linked_nation.tt n = cw %] is fighting civil war<br />
+[% END %]
+
+
+

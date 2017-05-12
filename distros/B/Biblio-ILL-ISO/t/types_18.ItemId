@@ -1,0 +1,36 @@
+$VAR1 = bless( {
+                 'item-type' => bless( {
+                                         'ENUMERATED' => 1,
+                                         'ENUM_LIST' => {
+                                                          'monograph' => 1,
+                                                          'serial' => 2,
+                                                          'other' => 3
+                                                        }
+                                       }, 'Biblio::ILL::ISO::ItemType' ),
+                 'author' => bless( {
+                                      'generalstring' => 'David Christensen'
+                                    }, 'Biblio::ILL::ISO::ILLString' ),
+                 'pagination' => bless( {
+                                          'generalstring' => '456'
+                                        }, 'Biblio::ILL::ISO::ILLString' ),
+                 'title' => bless( {
+                                     'generalstring' => 'My Book'
+                                   }, 'Biblio::ILL::ISO::ILLString' ),
+                 'held-medium-type' => bless( {
+                                                'ENUMERATED' => 1,
+                                                'ENUM_LIST' => {
+                                                                 'machine-readable' => 6,
+                                                                 'printed' => 1,
+                                                                 'audio-recording' => 5,
+                                                                 'microform' => 3,
+                                                                 'film-or-video-recording' => 4,
+                                                                 'other' => 7
+                                                               }
+                                              }, 'Biblio::ILL::ISO::MediumType' ),
+                 'call-number' => bless( {
+                                           'generalstring' => 'CHR001.1'
+                                         }, 'Biblio::ILL::ISO::ILLString' ),
+                 'publication-date' => bless( {
+                                                'generalstring' => '2003'
+                                              }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::ItemId' );

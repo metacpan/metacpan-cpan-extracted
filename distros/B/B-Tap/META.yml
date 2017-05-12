@@ -1,0 +1,48 @@
+---
+abstract: 'Inject tapping node to optree'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: B-Tap
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  B::Tap:
+    file: lib/B/Tap.pm
+    version: '0.15'
+  Devel::CallTrace::Result:
+    file: lib/Devel/CodeObserver.pm
+  Devel::CodeObserver:
+    file: lib/Devel/CodeObserver.pm
+    version: '0.15'
+requires:
+  B: '0'
+  B::Deparse: '0'
+  B::Tools: '0'
+  Try::Tiny: '0'
+  parent: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/tokuhirom/B-Tap/issues
+  homepage: https://github.com/tokuhirom/B-Tap
+  repository: git://github.com/tokuhirom/B-Tap.git
+version: '0.15'
+x_contributors:
+  - 'Brian Fraser <fraserbn@gmail.com>'

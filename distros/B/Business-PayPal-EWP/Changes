@@ -1,0 +1,23 @@
+Revision history for Perl extension Business::PayPal::EWP.
+
+0.01  Dec 06 2004
+	(isaac) original version; created by h2xs 1.23 with options
+			-X -b 5.6.1 -n Business::PayPal::EWP --use-new-tests
+
+0.02  Dec 07 2004
+	(isaac) Added cert_id to documentation
+	(isaac) Added const char * to local typemap (it's not in 5.6.0 on Darwin, at least)
+
+1.00  Sep 05 2007
+	(isaac) Fixed problem exporting SignAndEncrypt - ghenry@cpan.org
+	(isaac) Signed distribution
+
+1.01  Jul 02 2009
+	(tbusch) Fixed core dumps
+
+1.02  Jan 12 2010
+    (tbusch) Form items separated by newlines instead of commas
+
+1.03  Aug 24 2012
+    (tbusch) fixed double free issue (RT #6150, RT #48877)
+

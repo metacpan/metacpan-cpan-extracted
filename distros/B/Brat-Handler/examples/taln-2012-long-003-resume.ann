@@ -1,0 +1,28 @@
+T1	term 4 38	méthode d'extraction d'information
+T2	term 70 96	remplissage de formulaires
+T3	term 54 61	graphes
+T4	term 4 61	méthode d'extraction d'information fondée sur les graphes
+T5	term 106 160	systèmes d’extraction d’information sur des événements
+T6	term 106 141	systèmes d’extraction d’information
+T7	term 190 228	remplissage automatique de formulaires
+T8	term 244 273	informations sur un événement
+T9	term 294 313	texte non structuré
+T10	term 318 343	remplissage de formulaire
+T11	term 441 463	éléments d’information
+T12	term 480 489	événement
+T13	term 417 422	texte
+T14	term 592 613	segmentation du texte
+T15	term 592 627	segmentation du texte en événements
+T16	term 650 685	phrases relatives au même événement
+T17	term 633 685	sélectionner les phrases relatives au même événement
+A1	termVariant T17 Yes
+T18	term 727 748	phrases sélectionnées
+R1	variant_of Arg1:T17 Arg2:T18	
+T19	term 753 780	entités liées à l’événement
+T20	term 786 796	évaluation
+T21	term 822 847	corpus annoté de dépêches
+T22	term 822 835	corpus annoté
+T23	term 899 906	F-score
+T24	term 931 957	remplissage de formulaires
+T25	term 378 389	information
+T26	term 537 545	approche

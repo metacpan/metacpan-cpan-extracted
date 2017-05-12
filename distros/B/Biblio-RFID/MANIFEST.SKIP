@@ -1,0 +1,8 @@
+.git
+blib
+out
+docs
+pm_to_blib
+log
+log.print
+MANIFEST.bak

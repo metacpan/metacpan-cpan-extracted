@@ -1,0 +1,20 @@
+=head1 USE
+
+The C<app_dir> statement is deprecated.  As far as I can tell no one
+is using it.
+
+If you do use it, it will only affect initial generation with -c.
+Then it specifies the name of the build directory.  Normally the
+name of the build directory is taken from the app name as h2xs does it.
+
+Note that only a single path element is allowed.  You cannot specify
+depth as in 'under/here'.  For that you need the equally deprecated
+C<base_dir>.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Note that the build directory is called C<useless_dir> instead of C<Kids>.

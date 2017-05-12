@@ -1,0 +1,7 @@
+TYPEMAP
+hid_t   T_INT
+herr_t  T_INT
+
+TYPEMAP
+size_t  T_U_INT   
+  

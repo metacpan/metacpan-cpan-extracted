@@ -1,0 +1,14 @@
+Revision history for Bash-Completion-Plugins-pinto
+
+0.004     2016-01-08
+        - replace given/when with for/do [Mark Gardner]
+
+0.003     2012-09-04
+        - fix "uninitialized value" warning
+
+0.002     2012-08-30
+        - work with leading --root params
+
+0.001     2012-08-30
+        - bash completion for Pinto
+        - derived from Bash::Completion::Plugins::perlbrew by Rob Hoelz

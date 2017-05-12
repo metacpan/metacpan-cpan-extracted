@@ -1,0 +1,23 @@
+---
+abstract: 'rapid calculation of average pairwise difference (APD) for multiple sequence alignments'
+author:
+  - 'Joseph D. Baugher, PhD <jbaughe2@jhmi.edu>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-fastAPD
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008008'
+version: '1.10.0'

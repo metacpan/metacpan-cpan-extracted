@@ -1,0 +1,33 @@
+
+
+
+v1.0 15 December 2000 -- Module created
+
+v2.0 14 March 2002 -- Bundle updated to list Bioperl 1.0 dependencies
+
+v2.02 15 July 2002 -- Bundle updated to list Bioperl 1.0.2 dependencies
+
+v2.03/4 15 July 2002 -- bugfix; removed unnecessary dependency
+
+v2.05 24 March 2003 -- Bundle updated to reflect new dependencies for 1.2.1
+
+v2.1.4 12 December 2003 -- Update for Bioperl-1.4 release dependencies
+
+v2.1.5 12 April 2004 -- Added SVG::Graph to the bundle
+
+v2.1.6 17 October 2006 -- Updated for new BioPerl release by Nathan Haigh
+
+v2.1.7 17 November 2006 --  Bugfix, spelling errors & typos
+
+v2.1.8 18 November 2006 --  Potential typo, added space after HTTP::Request::Common 
+
+
+
+
+
+
+
+
+
+
+

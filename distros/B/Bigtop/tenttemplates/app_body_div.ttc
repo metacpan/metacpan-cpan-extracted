@@ -1,0 +1,695 @@
+[%#
+    Template for the App Body section of TentMaker home page.
+
+    Expects this top level key:
+    block - an array element from app_blocks array given to tenter.tt
+
+    Expects this to be in view.data
+    statements       - hash describing statements built by
+                       Bigtop::Parser::get_keyword_docs
+
+                       sequence, table, controller, or literals.
+    expanded_divs    - hash keyed by AST ident storing true if its div is open
+%]
+  <div class='app_block_[% block.type %]'
+       id='div_[% block.ident %]'>
+      
+      [% IF    block.type == 'sequence'   %]
+        [% type_label = 'Sequence' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( 
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %]
+            )
+        </legend>
+         <table>
+            <tr>
+                <td> Name: </td>
+                <td>
+                    <input type='text'
+                           id='app_block::[% block.ident %]'
+                           value='[% block.name %]'
+                           onblur='javascript:update_tree(
+                               "name",
+                               "sequence::[% block.ident %]",
+                               this.value
+                           )'
+                    />
+                </td>
+            </tr>
+        </table>
+      [% ELSIF    block.type == 'schema'   %]
+        [% type_label = 'Schema' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( 
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %]
+            )
+        </legend>
+         <table>
+            <tr>
+                <td> Name: </td>
+                <td>
+                    <input type='text'
+                           id='app_block::[% block.ident %]'
+                           value='[% block.name %]'
+                           onblur='javascript:update_tree(
+                               "name",
+                               "schema::[% block.ident %]",
+                               this.value
+                           )'
+                    />
+                </td>
+            </tr>
+        </table>
+      [% ELSIF block.type == 'table'      %]
+        [% type_label = 'Table' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( <a href='javascript:show_or_hide( "[% "hideable_$block.ident" %]" );'>
+                edit or hide</a> |  
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %]
+            )
+        </legend>
+        <table>
+              <tr>
+                <td> Name: </td>
+                <td>
+                    <input type='text'
+                           id='app_block::[% block.ident %]'
+                           value='[% block.name %]'
+                           onblur='javascript:update_tree(
+                               "name",
+                               "table::[% block.ident %]",
+                               this.value
+                           )'
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                  [% WRAPPER show_or_hide.ttc
+                     clickable_id          = "table_heading_$block.ident"
+                     element_under_control = "hideable_$block.ident"
+                     label                 = 'Close Edit'
+                     heading_level         = 'none'
+                     expanded = view.data.expanded_divs.${block.ident} || 0
+                  %]
+                    [% INCLUDE table_block %]
+                  [% END %] </td>
+            </tr>
+        </table>
+        </fieldset>
+
+      [% ELSIF block.type == 'controller' %]
+        [% IF block.controller_type == 'base_controller' %]
+          [% type_label = 'Base Controller' %]
+          <fieldset>
+          <legend>
+              [% type_label %]
+              ( <a href='javascript:show_or_hide( "[%-
+                  "hideable_$block.ident" %]" );'>
+                  edit or hide</a> |
+                  [%- INCLUDE delete_link.ttc
+                      name = "app_body_delete::$block.ident" %]
+              )
+          </legend>
+              [% WRAPPER show_or_hide.ttc
+                 clickable_id          = "controller_heading_$block.ident"
+                 element_under_control = "hideable_$block.ident"
+                 label                 = 'Close Edit'
+                 heading_level         = 'none'
+              %]
+                [% INCLUDE controller_block %]
+              [% END %] </td>
+          </fieldset>
+        [% ELSE %]
+          [% type_label = 'Controller' %]
+          <fieldset>
+          <legend>
+              [% type_label %] 
+              ( <a href='javascript:show_or_hide( "[%-
+                  "hideable_$block.ident" %]" );'>
+                  edit or hide</a> |  
+                  [%- INCLUDE delete_link.ttc
+                      name  = "app_body_delete::$block.ident" %]
+              )
+          </legend>
+           <table>
+              <tr>
+                  <td> Name: </td>
+                  <td>
+                      <input type='text'
+                             id='app_block::[% block.ident %]'
+                             value='[% block.name %]'
+                             onblur='javascript:update_tree(
+                                 "name",
+                                 "controller::[% block.ident %]",
+                                 this.value
+                             )'
+                      />
+                  </td>
+              </tr>
+              <tr><td> [% type_label %] Type: </td>
+                  <td>
+                      <select
+                          id='[% type_label %]::type_select::[% block.ident %]'
+                          onchange='javascript:type_change(
+                              "[% block.ident %]",
+                              this.value
+                          )'
+                      >
+                          <option value='stub'
+    [% IF block.controller_type == 'stub' %]selected='selected'[% END %]
+                          > stub     </option>
+
+                          <option value='AutoCRUD'
+    [% IF block.controller_type == 'AutoCRUD' %]selected='selected'[% END %]
+                          > AutoCRUD </option>
+
+                          <option value='CRUD'
+    [% IF block.controller_type == 'CRUD' %]selected='selected'[% END %]
+                          > CRUD     </option>
+
+                          <option value='hashref'
+    [% IF block.controller_type == 'hashref' %]selected='selected'[% END %]
+                          > hashref  </option>
+
+                          <option value='SOAP'
+    [% IF block.controller_type == 'SOAP' %]selected='selected'[% END %]
+                          > SOAP     </option>
+                      </select>
+                  </td>
+              </tr>
+              <tr>
+                  <td colspan='2'>
+                    [% WRAPPER show_or_hide.ttc
+                       clickable_id          = "controller_heading_$block.ident"
+                       element_under_control = "hideable_$block.ident"
+                       label                 = 'Close Edit'
+                       heading_level         = 'none'
+                       expanded = view.data.expanded_divs.${block.ident} || 0
+                    %]
+                      [% INCLUDE controller_block %]
+                    [% END %] </td>
+              </tr>
+          </table>
+        [% END %][%# controller sub type base_controller or not %]
+
+      [% ELSIF block.type == 'literal' %]
+        [% type_label = 'Literal' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( <a href='javascript:show_or_hide( "[%-
+                "hideable_$block.ident" %]" );'>
+                edit or hide</a> |  
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %]
+            )
+        </legend>
+         <table>
+            <tr><td> [% type_label %] Type: </td>
+                <td>
+                    <select
+                        id='[% type_label %]::type_select::[% block.ident %]'
+                        onchange='javascript:type_change(
+                            "[% block.ident %]",
+                            this.value
+                        )'
+                    >
+                        <option value='None'>- Not Set -</option>
+
+                        <option value='Location'
+  [% IF block.keyword == 'Location' %]selected='selected'[% END %]
+                        > Location     </option>
+
+                        <option value='HttpdConf'
+  [% IF block.keyword == 'HttpdConf' %]selected='selected'[% END %]
+                        > HttpdConf </option>
+
+                        <option value='SQL'
+  [% IF block.keyword == 'SQL' %]selected='selected'[% END %]
+                        > SQL     </option>
+
+                        <option value='PerlTop'
+  [% IF block.keyword == 'PerlTop' %]selected='selected'[% END %]
+                        > PerlTop     </option>
+
+                        <option value='PerlBlock'
+  [% IF block.keyword == 'PerlBlock' %]selected='selected'[% END %]
+                        > PerlBlock     </option>
+
+                        <option value='Conf'
+  [% IF block.keyword == 'Conf' %]selected='selected'[% END %]
+                        > Conf     </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td> String: </td>
+                <td>
+                    <textarea id='app_block::[% block.ident %]'
+                              cols='80' rows='7'
+                              onblur='javascript:update_tree(
+                                "literal",
+                                "[% block.ident %]",
+                                this.value
+                              )'
+                    >[% block.value %]</textarea>
+                </td>
+            </tr>
+        </table>
+
+      [% ELSIF block.type == 'join_table' %]
+        [% type_label = 'Join Table' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( <a href='javascript:show_or_hide( "[%-
+                "hideable_$block.ident" %]" );'>
+                edit or hide</a> |  
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %]
+            )
+        </legend>
+        <table>
+              <tr>
+                <td> Name: </td>
+                <td>
+                    <input type='text'
+                           id='app_block::[% block.ident %]'
+                           value='[% block.name %]'
+                           onblur='javascript:update_tree(
+                               "name",
+                               "table::[% block.ident %]",
+                               this.value
+                           )'
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                  [% WRAPPER show_or_hide.ttc
+                     clickable_id          = "join_table_heading_$block.ident"
+                     element_under_control = "hideable_$block.ident"
+                     label                 = 'Close Edit'
+                     heading_level         = 'none'
+                     expanded = view.data.expanded_divs.${block.ident} || 0
+                  %]
+                    [% INCLUDE join_table_block %]
+                  [% END %] </td>
+            </tr>
+        </table>
+        </fieldset>
+
+      [% ELSIF block.type == 'config' %]
+        [% type_label = 'Config Block' %]
+        <fieldset>
+        <legend>
+            [% type_label %] 
+            ( <a href='javascript:show_or_hide( "[%-
+                "hideable_$block.ident" %]" );'>
+                edit or hide</a> [% UNLESS block.name == 'base' %] |  
+                [%- INCLUDE delete_link.ttc
+                    name  = "app_body_delete::$block.ident" %] [% END %]
+            )
+        </legend>
+        <table>
+              <tr>
+                <td> Name: </td>
+                <td>
+[% IF block.name == 'base' %]
+                    base
+[% ELSE %]
+                    <input type='text'
+                           id='app_block::[% block.ident %]'
+                           value='[% block.name %]'
+                           onblur='javascript:update_tree(
+                               "name",
+                               "config::[% block.ident %]",
+                               this.value
+                           )'
+                    />
+[% END %]
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                  [% WRAPPER show_or_hide.ttc
+                     clickable_id          = "config_heading_$block.ident"
+                     element_under_control = "hideable_$block.ident"
+                     label                 = 'Close Edit'
+                     heading_level         = 'none'
+                     expanded = view.data.expanded_divs.${block.ident} || 0
+                  %]
+                    [% INCLUDE config_block %]
+                  [% END %] </td>
+            </tr>
+        </table>
+        </fieldset>
+
+      [% ELSE %][%# must be new %]
+      I don't know what to do:
+      <pre>
+      [% USE dumper %][% dumper.dump( block ) %]
+      </pre>
+      [% END %]
+
+      <br style='clear: both' />
+
+  </div>
+
+[% BLOCK table_block %]
+
+  [% INCLUDE table_statement_table
+             statements = block.body.statements %]
+  <br />
+
+<div id='quick_table::[% block.ident %]' class='quick_edit_div' >
+  [% INCLUDE quick_edit.ttc
+             fields      = block.body.fields
+             table_ident = block.ident   %]
+  <br />
+</div>
+
+  <div class='app_block_table_new' id="create_field_box">
+    <fieldset>
+    <legend>Create Field(s)</legend>
+    <table>
+      <tr><td> Name(s): </td>
+          <td>
+              <input type='text' id='new_field_[% block.ident %]' />
+          </td>
+          <td colspan='2'>
+              <button type='button'
+                      name='new_field_[% block.ident %]_create'
+                      onclick='javascript:create_field( "[% block.ident %]" )'
+              > Create </button>
+          </td>
+          <td> Hint: separate names with spaces to add many fields at once.
+          </td>
+      </tr>
+    </table>
+  </div>
+
+  <br />
+
+  <fieldset>
+    <legend>
+        Edit Field:
+        <select id='[% block.ident %]_fields'
+                onchange='javascript:expose_field( this )' >
+    </legend>
+            <option value='0'> - Select - </option>
+  [% FOREACH item IN block.body.fields %]
+    [% IF    item.type == 'field'     %]
+        <option value='[% block.ident %]::[% item.ident %]'
+                id='field_edit_option::[% item.ident %]'>
+            [% item.name %]
+        </option>
+    [% END %]
+  [% END %]
+      </select>
+      <div id='fields_for_[% block.ident %]' >
+  [% FOREACH item IN block.body.fields %]
+    [% IF    item.type == 'field'     %]
+      <div id='field_edit_[% item.ident %]' style='display: none'>
+      [% INCLUDE field_block.ttc %]
+      </div>
+    [% END %]
+    <!--<br />-->
+  [% END %]
+      </div>
+  </fieldset>
+
+<br />
+
+  <fieldset>
+    <legend>
+      Data Statements ( <a href='javascript:show_or_hide( "[%-
+                          "hideable_data_$block.ident" %]" );'>
+                          edit or hide</a> )
+    </legend>
+
+    [% WRAPPER show_or_hide.ttc
+       element_under_control = "hideable_data_$block.ident"
+       label                 = 'Close Edit'
+       heading_level         = 'none'
+    %]
+        [% INCLUDE data_div.ttc %]
+    [% END %]
+  </fieldset>
+
+[% END %][%# end table_block %]
+
+[% BLOCK table_statement_table %]
+  <table class='bordered'>
+    <tr>
+        <th> Keyword     </th>
+        <th> Value(s)    </th>
+        <th> Description </th>
+    </tr>
+  [% FOREACH table_statement IN view.data.statements.table.statements %]
+    [% keyword = table_statement.keyword %]
+    [% NEXT IF keyword == 'data' %]
+    <tr>
+        <td> [% keyword %] </td>
+        <td>
+            [% values       = statements.$keyword.get_unquoted_args
+               single_value = values.0 %]
+            [% INCLUDE input_boxes.ttc
+                       statement      = table_statement
+                       keyword_prefix = "$block.ident::"
+                       name_prefix    = "$block.ident::"
+                       id_prefix      = "$block.ident::"
+                       method_group   = 'table_statement'
+                       key            = keyword
+            %]
+        </td>
+        <td>
+            [% table_statement.descr %]
+        </td>
+    </tr>
+  [% END %]
+  </table>
+[% END %][%# end of table_statement_table %]
+
+[% BLOCK controller_block %]
+
+  [% INCLUDE controller_statement_table
+             statements = block.body.statements %]
+ 
+  <br />
+
+  <div class='app_block_controller_element'>
+    <fieldset>
+    <legend>Create Method</legend>
+    <table>
+      <tr><td> Name: </td>
+          <td>
+              <input type='text' id='new_method_[% block.ident %]' />
+          </td>
+          <td> Method Type: </td>
+          <td>
+            <select id='new_method_type_[% block.ident %]'>
+              <option value='stub'>          stub          </option>
+              <option value='main_listing'>  main_listing  </option>
+              <option value='AutoCRUD_form'> AutoCRUD_form </option>
+              <option value='CRUD_form'>     CRUD_form     </option>
+              <option value='hashref'>       hashref       </option>
+              <option value='base_links'>    base_links    </option>
+              <option value='links'>         links         </option>
+              <option value='SOAP'>          SOAP          </option>
+            </select>
+          </td>
+          <td colspan='2'>
+              <button type='button'
+                      name='new_method_[% block.ident %]_create'
+                      onclick='javascript:create_method( "[% block.ident %]" )'
+              > Create </button>
+          </td>
+          </tr>
+    </table>
+  </div>
+
+  <br />
+
+  <div class='app_block_controller_element'>
+    <fieldset>
+      <legend>Create Config Block</legend>
+    <table>
+      <tr><td> Name: </td>
+          <td>
+              <input type='text' id='new_controller_config_[% block.ident %]' />
+          </td>
+          <td colspan='2'>
+              <button type='button'
+                 name='new_controller_config_[% block.ident %]_create'
+                 onclick='javascript:create_controller_config(
+                    "[% block.ident %]"
+                 )'
+              > Create </button>
+          </td>
+      </tr>
+    </table>
+    </fieldset>
+  </div>
+
+  <br />
+
+  [% FOREACH controller_block IN block.body.blocks %]
+    [% IF controller_block.type == 'config' %]
+      [% INCLUDE controller_config_block.ttc
+            config_block = controller_block %]
+    [% ELSE %][%# must be a method %]
+      [% INCLUDE method_block.ttc
+            item = controller_block %]
+    [% END %]
+    <br />
+  [% END %]
+
+[% END %][%# end of controller_block %]
+
+[% BLOCK controller_statement_table %]
+[% ctype = block.controller_type %]
+  <table class='bordered'>
+    <tr>
+        <th> Keyword     </th>
+        <th> Value(s)    </th>
+        <th> Description </th>
+    </tr>
+  [% FOREACH controller_statement IN
+             view.data.statements.controller.statements %]
+    [% keyword = controller_statement.keyword %]
+    [% NEXT UNLESS controller_statement.controller_types.all
+            OR
+        controller_statement.controller_types.$ctype %]
+    <tr>
+        <td> [% keyword %] </td>
+        <td>
+            [% values       = statements.$keyword.get_unquoted_args
+               single_value = values.0 %]
+            [% INCLUDE input_boxes.ttc
+                       statement      = controller_statement
+                       keyword_prefix = "$block.ident::"
+                       name_prefix    = "$block.ident::"
+                       id_prefix      = "$block.ident::"
+                       method_group   = 'controller_statement'
+                       key            = keyword
+            %]
+        </td>
+        <td>
+            [% controller_statement.descr %]
+        </td>
+    </tr>
+  [% END %]
+  </table>
+[% END %][%# end of controller_statement_table %]
+
+[% BLOCK join_table_block %]
+
+  [% INCLUDE join_table_statement_table
+             statements = block.body.statements %]
+ 
+  <br />
+[% END %][%# end join_table_block %]
+
+[% BLOCK join_table_statement_table %]
+  <table class='bordered'>
+    <tr>
+        <th> Keyword     </th>
+        <th> Value(s)    </th>
+        <th> Description </th>
+    </tr>
+  [% FOREACH jt_statement IN view.data.statements.join_table.statements %]
+    [% keyword = jt_statement.keyword %]
+    [% NEXT IF keyword == 'data' %]
+    <tr>
+        <td> [% keyword %] </td>
+        <td>
+            [% values       = statements.$keyword.get_unquoted_args
+               single_value = values.0 %]
+            [% INCLUDE input_boxes.ttc
+                       statement      = jt_statement
+                       keyword_prefix = "$block.ident::"
+                       name_prefix    = "$block.ident::"
+                       method_group   = 'join_table_statement'
+                       key            = keyword
+            %]
+        </td>
+        <td>
+            [% jt_statement.descr %]
+        </td>
+    </tr>
+  [% END %]
+  </table>
+[% END %][%# end of join_table_statement_table %]
+
+[% BLOCK config_block %]
+<div class='app_block'>
+<table id='app_config_table_[% block.ident %]' class='bordered'>
+    <tr><th> Keyword </th>
+        <th> Value </th>
+        <th> Skip Accessor? </th>
+        <th> Delete Buttons </th>
+    </tr>
+    [% FOREACH statement IN block.statements %]
+      <tr id='app_config::row::[% block.ident %]::[% statement.keyword %]'>
+        <td> [% statement.keyword %] </td>
+        <td>
+          <input type='text'
+             name='app_conf_value::[% block_ident %]::[% statement.keyword %]'
+               value='[% statement.value %]'
+               onblur='javascritp:update_tree(
+                   "app_conf_statement",
+                   "[% block.ident %]::[% statement.keyword %]",
+                   this.value
+               )'
+          />
+        </td>
+        <td>
+            <input type='checkbox'
+             value='app_config_box::[% block.ident %]::[% statement.keyword %]'
+             name='app_config_box::[% block.ident %]::[% statement.keyword %]'
+                   [%- IF statement.no_accessor -%]checked='checked'[%- END -%]
+                   onchange='javascript:update_tree(
+                       "app_conf_accessor",
+                       "[% block.ident %]::[% statement.keyword %]",
+                       this.checked
+                   )'
+            />
+        </td>
+        <td>
+            <button type='button'
+name='app_config_delete::[% block.ident %]::[% statement.keyword %]'
+              onclick='javascript:delete_app_config( this )' >
+              Delete
+            </button>
+        </td>
+      </tr>
+    [% END %][%# end of existing config statement rows %]
+    [%# add one row for the new statement button and keyword text input %]
+      <tr>
+        <td> <button type='button' name='app_config_[% block.ident %]'
+                 onclick='javascript:add_app_config( "[% block.ident %]" )' >
+                New Config Statement:
+             </button>
+        </td>
+        <td>
+           <input type='text' id='app_config_new_[% block.ident %]' value='' />
+        </td>
+        <td>
+            <!-- place holder so the table cell borders look good -->
+        </td>
+      </tr>
+</table>
+</div>
+[% END %][%# end of config_block %]
+

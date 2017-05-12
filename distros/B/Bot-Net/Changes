@@ -1,0 +1,105 @@
+Revision history for Perl module Bot::Net
+
+0.1.0 Tue Oct 23 11:38:09 2007
+    * Fixed some issues remaining in parse_bot_command() of Bot::Net::Util.
+    * Added requirements for Data::Remember 0.07 to take advantage of new
+      features.
+    * Added a warning to parse_bot_command() to report when it is given an empty
+      string.
+    * Bot::Net->log() returns a logger using the application class name rather
+      than "Bot::Net" when given no arguments.
+    * IRC servers may now include peer configurations so that you can have
+      multiple servers working together in an single IRC network without any 
+      special customizations.
+    * Fixed missing requirements in Makefile.PL for POE::Component::IRC and
+      POE::Component::Server::IRC.
+    * The process reaper in Bot::Net::Test works better when children are reaped
+      at the end of a test run.
+    * Altered the reaper messages so they don't include the wheel ID anymore.
+    * Added support for the BOT_NET_CONFIG_PATH environment variable which
+      allows the person running the botnet script to select alternate locations
+      for the configuration files.
+    * Servers and bots spawned during testing by Bot::Net::Test will try to load
+      configuration files in t/etc first.
+    * Bot::Net::Log will also use BOT_NET_CONFIG_PATH when looking for the
+      log4perl.conf file for initializing Log::Log4perl.
+
+0.0.4 Sun Oct 14 18:55:51 2007
+    * Modified Bot::Net::Test so that it waits for a SERVER READY message from
+      all servers before starting bots and waits for a BOT READY message from all
+      bots before starting the test (rather than hoping a 2 second delay between
+      each phase will be good enough).
+    * Updated Bot::Net::Mixin::Server::IRC to report a SERVER READY message.
+    * Updated Bot::Net::Mixin::Bot::IRC to report a BOT READY message.
+    * Updated Bot::Net::Mixin::Bot::IRCD to report a BOT READY message (though
+      it's not actually necessary).
+    * Added a hack to Bot::Net::Log to autoflush STDOUT and STDERR to make
+      logging work for testing.
+
+0.0.3 Thu Oct 11 0:51:30 2007
+    * Fixed a missing semi-colon during the generation of the scaffolding's
+      Makefile.PL in Bot::Net::Script::Net.
+    * Refactored Bot::Net::Script::Server into a server creation script.
+    * Fixed several compile errors and bugs in the server and bot creation
+      scripts.
+    * Added the ability for mixins to generate a default configuration for a bot
+      or server via the default_configuration() hook.
+    * Added Bot::Net::Mixin::Bot::IRCD for creating server-side IRC bots that
+      run within the same process as server implementing
+      Bot::Net::Mixin::Server::IRC.
+    * Improved Bot::Net::Test so that it passes the current value of @INC to
+      fork-exec'd servers and bots by setting PERL5LIB in the environment.
+    * Fixed a number of warnings about undefined values.
+    * Added new tests for server-side bots via the ServerBotted bot in TestNet
+      and the AtoZ server-side IRC bot.
+
+0.0.2 Wed Oct 10 8:24:23 2007
+    * Improved Bot::Net::Script::Net to create the log4perl.conf correctly.
+    * Refactored Bot::Net::Script::Bot to create new bots rather than run them
+      which is taken care of by Bot::Net::Script::Run.
+    * Fixed Bot::Net::Script::Net so that it creates "t" directories in new bot
+      net applications.
+    * Improved Bot::Net::Bot to push Bot::Net::Object onto the caller's @ISA
+      during import.
+    * Split Bot::Net::Server into two modules: Bot::Net::Server and
+      Bot::Net::Mixin::Server::IRC, so it now more closely resembles the
+      relationship between Bot::Net::Bot and Bot::Net::Mixin::Bot::IRC.
+    * Added a new net.yml setting: ApplicationName
+    * Added a new set of states for handling graceful quits for bots and
+      servers via the "on bot quit" and "on bot server" states.
+    * Added better handling of total shutdown for bots and servers via the new
+      "on bot shutdown" and "on server shutdown" states.
+    * Added a default_configuration() method to allow mixins to help build a
+      generic base configuration for new bots and test bots.
+    * Added the ability to store the configuration in a package variable named
+      $CONFIG as an alternative to a YAML configuration file.
+    * Added Bot::Net::Test for helping built bot net application tests.
+    * Added a t/TestNet/t/count.t test to the framework.
+    * Some other clean-up, documentation updates, and minor fixes as well.
+
+0.0.1 Sun Oct 7 20:07:47 2007
+    * Initial release of Bot::Net.
+    * This is a refactoring of a tool I used internally to build a nice bot net
+      for synchronization. It still has some left overs from the old country
+      that need to be brought into the new system fully, but the new system
+      works and is superior to the old one.
+    * Bot::Net class as the central singleton.
+    * Bot::Net::Bot class as the main mixin implementation for building bots.
+    * Bot::Net::Config class to load and find configuration files.
+    * Bot::Net::Log class to handle loging via Log::Log4perl
+    * Bot::Net::Message class for encapsulating bot messages.
+    * Bot::Net::Mixin::Bot::IRC class for making IRC bots.
+    * Bot::Net::Mixin class for building mixins to add features to bots and
+      servers.
+    * Bot::Net::Object class to provide basic methods all over the place.
+    * Bot::Net::Script class for command-line interface.
+    * Bot::Net::Script::Bot class is broken (not fully refactored).
+    * Bot::Net::Script::Help class to provide CLI help.
+    * Bot::Net::Script::Net class to build scaffolding for Bot::Net apps.
+    * Bot::Net::Script::Run class to run bots and servers.
+    * Bot::Net::Script::Server class is broken (not fully refactored).
+    * Bot::Net::Server class to build IRC servers (not fully refactored).
+    * Bot::Net::Util class for miscellaneous stuff, currently contains a utility
+      for parsing bot commands.
+    * Comes with tests for dependencies, POD errors, and POD coverage.
+    * Comes with a test application that is not yet complete.

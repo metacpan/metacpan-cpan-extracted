@@ -1,0 +1,3 @@
+[%- FOREACH d IN  nationstats -%]
+[%- FILTER format('%-7s') -%][% d %][%- END -%]
+[% END %]

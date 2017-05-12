@@ -1,0 +1,19 @@
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] bgpmon-filter has started the log file.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Opening local port: 10.0.2.15:60000.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Successful! Listening for client connections on 60000.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Initializing BGPmon::Filter module.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Initialized the filter module.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Parsing prefixes.txt with BGPmon::Filter.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Parsed configuration file prefixes.txt.
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Total ASes parsed: 0
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Total addresses parsed: 0
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] total IPv4 prefixes after condensing: 1
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] total IPv6 prefixes after condensing: 0
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Total number of active filters:1
+2013-07-01 19:43:55 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Connecting to source: 129.82.138.26:50001
+2013-07-01 19:43:56 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Connected to BGPmon server.
+2013-07-01 19:43:56 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Starting reading thread.
+2013-07-01 19:43:56 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Starting parsing thread.
+2013-07-01 19:43:56 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Starting TCP listening thread.
+2013-07-01 19:43:56 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] bgpmon-filter is listening for connections.
+2013-07-01 19:43:57 GMT weikum-VirtualBox ./bgpmon_filter[10229]: [LOG_INFO] Accepted new connection from 10.0.2.15:41677.

@@ -1,0 +1,450 @@
+SYNOPSIS
+
+        use Business::AuthorizeNet::CIM;
+        use Data::Dumper;
+    
+        my $cim = Business::AuthorizeNet::CIM->new( login => $cfg{login}, transactionKey => $cfg{password} );
+    
+        my @ProfileIds = $cim->getCustomerProfileIds();
+        foreach my $id (@ProfileIds) {
+            my $d = $cim->getCustomerProfile($id);
+            print Dumper(\$d);
+        }
+
+DESCRIPTION
+
+    Authorize.Net Customer Information Manager (CIM) Web Services API for
+    http://developer.authorize.net/api/cim/, read
+    http://www.authorize.net/support/CIM_XML_guide.pdf for more details.
+
+ METHODS
+
+  CONSTRUCTION
+
+        my $cim = Business::AuthorizeNet::CIM->new(
+            login => $cfg{login},
+            transactionKey => $cfg{password}
+        );
+
+      * login
+
+      The valid API Login ID for the developer test or merchant account
+
+      * transactionKey
+
+      The valid Transaction Key for the developer test or merchant account
+
+      * debug
+
+      * test_mode
+
+      validationMode as testMode or liveMode
+
+      * test_host_only
+
+      use test api host and keep default validationMode
+
+      * ua_args
+
+      passed to LWP::UserAgent
+
+      * ua
+
+      LWP::UserAgent or WWW::Mechanize instance
+
+  createCustomerProfile
+
+    Create a new customer profile along with any customer payment profiles
+    and customer shipping addresses for the customer profile.
+
+        $cim->createCustomerProfile(
+            refId => $refId, # Optional
+    
+            # one of 'merchantCustomerId', 'description', 'email' is required
+            merchantCustomerId => $merchantCustomerId,
+            description => $description,
+            email => $email,
+    
+            customerType => $customerType, # Optional
+    
+            billTo => { # Optional, all sub items are Optional
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country,
+                phoneNumber => $phoneNumber,
+                faxNumber => $faxNumber
+            },
+    
+            # or it uses shipToList address as billTo
+            use_shipToList_as_billTo => 1,
+    
+            creditCard => { # required when the payment profile is credit card
+                cardNumber => $cardNumber,
+                expirationDate => $expirationDate, # YYYY-MM
+                cardCode => $cardCode,  # Optional
+            },
+    
+            bankAccount => { # required when the payment profile is bank account
+                accountType => $accountType, # Optional, one of checking, savings, businessChecking
+                routingNumber => $routingNumber,
+                accountNumber => $accountNumber,
+                nameOnAccount => $nameOnAccount,
+                echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
+                bankName   => $bankName, # Optional
+            },
+    
+            shipToList => {
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country,
+                phoneNumber => $phoneNumber,
+                faxNumber => $faxNumber
+            },
+    
+            # or it uses billTo address as shipToList
+            use_billTo_as_shipToList => 1,
+    
+        );
+
+  createCustomerPaymentProfileRequest
+
+    Create a new customer payment profile for an existing customer profile.
+    You can create up to 10 payment profiles for each customer profile.
+
+        $cim->createCustomerPaymentProfileRequest(
+            customerProfileId => $customerProfileId, # required
+    
+            refId => $refId, # Optional
+    
+            customerType => $customerType, # Optional
+            billTo => { # Optional, all sub items are Optional
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country,
+                phoneNumber => $phoneNumber,
+                faxNumber => $faxNumber
+            },
+    
+            creditCard => { # required when the payment profile is credit card
+                cardNumber => $cardNumber,
+                expirationDate => $expirationDate, # YYYY-MM
+                cardCode => $cardCode,  # Optional
+            },
+            bankAccount => { # required when the payment profile is bank account
+                accountType => $accountType, # Optional, one of checking, savings, businessChecking
+                routingNumber => $routingNumber,
+                accountNumber => $accountNumber,
+                nameOnAccount => $nameOnAccount,
+                echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
+                bankName   => $bankName, # Optional
+            },
+        );
+
+  createCustomerShippingAddressRequest
+
+    Create a new customer shipping address for an existing customer
+    profile. You can create up to 100 customer shipping addresses for each
+    customer profile.
+
+        $cim->createCustomerShippingAddressRequest(
+            customerProfileId => $customerProfileId, # required
+    
+            refId => $refId, # Optional
+    
+            firstName => $firstName,
+            lastName  => $lastName,
+            company   => $company,
+            address   => $address,
+            city      => $city,
+            state     => $state,
+            zip       => $zip,
+            country   => $country,
+            phoneNumber => $phoneNumber,
+            faxNumber => $faxNumber
+        );
+
+  createCustomerProfileTransaction
+
+    Create a new payment transaction from an existing customer profile.
+
+        $cim->createCustomerProfileTransaction(
+            'profileTransAuthCapture', # or others like profileTransAuthOnly
+    
+            refId => $refId, # Optional, reference id
+    
+            amount => $amount,
+            tax => { # Optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+            shipping => { # Optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+            duty => { # Optional
+                amount => $tax_amount,
+                name   => $tax_name,
+                description => $tax_description
+            },
+    
+            lineItems => [ { # Optional
+                itemId => $itemId,
+                name => $name,
+                description => $description,
+                quantity => $quantity,
+                unitPrice => $unitPrice,
+                taxable => $taxable,
+            } ],
+    
+            customerProfileId => $customerProfileId,
+            customerPaymentProfileId => $customerPaymentProfileId,
+            customerShippingAddressId => $customerShippingAddressId,
+    
+            extraOptions => $extraOptions, # Optional
+    
+            ### Only required for profileTransPriorAuthCapture: For Prior Authorization and CaptureTransactions
+            ### and profileTransRefund: For Refund Transactions
+            ### and profileTransVoid: For Void Transactions
+            transId => $transId,
+    
+            ### Only partly required for profileTransRefund: For Refund Transactions
+            creditCardNumberMasked => $creditCardNumberMasked,
+            bankRoutingNumberMasked => $bankRoutingNumberMasked,
+            bankAccountNumberMasked => $bankAccountNumberMasked,
+    
+            ### rest are not for profileTransPriorAuthCapture
+            order => { # Optional
+                invoiceNumber => $invoiceNumber,
+                description => $description,
+                purchaseOrderNumber => $purchaseOrderNumber,
+            },
+            taxExempt => 'true', # optional
+            recurringBilling => 'false', # optional
+            cardCode => $cardCode, # Required only when the merchant would like to use the Card Code Verification (CCV) filter
+            splitTenderId => $splitTenderId, # Required for second and subsequent transactions related to a partial authorizaqtion transaction.
+    
+            #### ONLY required for profileTransCaptureOnly: the Capture Only transaction type.
+            approvalCode => $approvalCode,
+        );
+
+    The first argument can be one of
+
+      * profileTransAuthOnly
+
+      For Authorization Only Transactions
+
+      * profileTransAuthCapture
+
+      For Authorization and Capture Transactions
+
+      * profileTransCaptureOnly
+
+      For Capture Only Transactions
+
+      * profileTransPriorAuthCapture
+
+      For Prior Authorization and CaptureTransactions
+
+      * profileTransRefund
+
+      For Refund Transactions
+
+      * profileTransVoid
+
+      For Void Transactions
+
+          $cim->createCustomerProfileTransaction(
+              'profileTransVoid', # or others like profileTransAuthOnly
+      
+              refId => $refId, # Optional, reference id
+      
+              customerProfileId => $customerProfileId,
+              customerPaymentProfileId => $customerPaymentProfileId,
+              customerShippingAddressId => $customerShippingAddressId,
+      
+              extraOptions => $extraOptions, # Optional
+      
+              transId => $transId,
+          );
+
+  deleteCustomerProfile
+
+    Delete an existing customer profile along with all associated customer
+    payment profiles and customer shipping addresses.
+
+        $cim->deleteCustomerProfile($customerProfileId);
+
+  deleteCustomerPaymentProfileRequest
+
+    Delete a customer payment profile from an existing customer profile.
+
+        $cim->deleteCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId);
+
+  deleteCustomerShippingAddressRequest
+
+    Delete a customer shipping address from an existing customer profile.
+
+        $cim->deleteCustomerShippingAddressRequest($customerProfileId, $customerAddressId);
+
+  getCustomerProfileIds
+
+    Retrieve all customer profile IDs you have previously created.
+
+        my @ProfileIds = $cim->getCustomerProfileIds;
+
+  getCustomerProfile
+
+    Retrieve an existing customer profile along with all the associated
+    customer payment profiles and customer shipping addresses.
+
+        $cim->getCustomerProfile($customerProfileId);
+
+  getCustomerPaymentProfileRequest
+
+    Retrieve a customer payment profile for an existing customer profile.
+    $unmaskExpirationDate is an optional boolean arg, if passed a true
+    value it will return the expiration date in YYYY-MM format, else it
+    will mask as XXXX.
+
+        $cim->getCustomerPaymentProfileRequest($customerProfileId, $customerPaymentProfileId, $unmaskExpirationDate);
+
+  getCustomerShippingAddressRequest
+
+    Retrieve a customer shipping address for an existing customer profile.
+
+        $cim->getCustomerShippingAddressRequest($customerProfileId, $customerAddressId);
+
+  getHostedProfilePageRequest
+
+    Get a token for use in a CIM hosted popup.
+
+        my $result = $cim->getHostedProfilePageRequest(
+            customerProfileID,
+        {
+            hostedProfileReturnUrl         => 'http://example.com/foo',
+            hostedProfileReturnUrlText     => 'Return home',
+            hostedProfilePageBorderVisible => 'true',
+            hostedProfileHeadingBgColor    => '#000',
+            hostedProfileIFrameCommunicatorUrl =>
+                'https://example.com/communicate',
+            hostedProfileValidationMode         => 'testMode',
+            hostedProfileBillingAddressRequired => 'true',
+            hostedProfileCardCodeRequired       => 'true',
+        }
+    
+        );
+        print $result->{token} if $result->{messages}->{resultCode} eq 'Ok';
+
+  updateCustomerProfile
+
+    Update an existing customer profile
+
+        $cim->updateCustomerProfile(
+            customerProfileId => $customerProfileId,
+    
+            refId => $refId, # Optional
+    
+            merchantCustomerId => $merchantCustomerId,
+            description => $description,
+            email => $email
+        );
+
+  updateCustomerPaymentProfile
+
+    Update a customer payment profile for an existing customer profile.
+
+        $cim->updateCustomerPaymentProfile(
+            customerProfileId => $customerProfileId,
+            customerPaymentProfileId => $customerPaymentProfileId,
+    
+            refId => $refId, # Optional
+    
+            customerType => $customerType, # Optional
+            billTo => { # Optional, all sub items are Optional
+                firstName => $firstName,
+                lastName  => $lastName,
+                company   => $company,
+                address   => $address,
+                city      => $city,
+                state     => $state,
+                zip       => $zip,
+                country   => $country,
+                phoneNumber => $phoneNumber,
+                faxNumber => $faxNumber
+            },
+    
+            creditCard => { # required when the payment profile is credit card
+                cardNumber => $cardNumber,
+                expirationDate => $expirationDate, # YYYY-MM
+                cardCode => $cardCode,  # Optional
+            },
+            bankAccount => { # required when the payment profile is bank account
+                accountType => $accountType, # Optional, one of checking, savings, businessChecking
+                routingNumber => $routingNumber,
+                accountNumber => $accountNumber,
+                nameOnAccount => $nameOnAccount,
+                echeckType => $echeckType, # Optionaal, one of CCD, PPD, TEL, WEB
+                bankName   => $bankName, # Optional
+            },
+        );
+
+  updateCustomerShippingAddress
+
+    Update a shipping address for an existing customer profile.
+
+        $cim->updateCustomerShippingAddress(
+            customerProfileId => $customerProfileId,
+            customerAddressId => $customerAddressId,
+    
+            refId => $refId, # Optional
+    
+            firstName => $firstName,
+            lastName  => $lastName,
+            company   => $company,
+            address   => $address,
+            city      => $city,
+            state     => $state,
+            zip       => $zip,
+            country   => $country,
+            phoneNumber => $phoneNumber,
+            faxNumber => $faxNumber
+        );
+
+  updateSplitTenderGroupRequest
+
+    Update the status of a split tender group (a group of transactions,
+    each of which pays for part of one order).
+
+        $cim->updateSplitTenderGroupRequest($splitTenderId, $splitTenderStatus);
+        # splitTenderStatus can be voided or completed.
+
+  validateCustomerPaymentProfile
+
+    Verify an existing customer payment profile by generating a test
+    transaction.
+
+        $cim->validateCustomerPaymentProfile(
+            customerProfileId => $customerProfileId,
+            customerPaymentProfileId => $customerPaymentProfileId,
+            customerShippingAddressId => $customerShippingAddressId,
+    
+            cardCode => $cardCode, # Optional
+        );
+

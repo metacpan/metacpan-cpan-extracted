@@ -1,0 +1,147 @@
+# $Id: Changes,v 1.17 2004/08/09 16:07:20 jay.powers Exp $
+Revision history for Perl extension Business::FedEx::DirectConnect.
+
+1.01  08/08/2004
+    - Numerous changes to the overall quality of the code.  Many
+      thanks to Roderick.
+    - Stricter rules when passing hash values into set_data
+      through the use of Tie::StrictHash.
+    - Better error capturing when parsing FedEx response.
+    - Per FedEx request removed the addresses to their API servers
+      Please contact FedEx for this information.
+      http://www.fedex.com/globaldeveloper/shipapi/
+      
+    - For any additional consulting services in regards to the use of this
+      module or any of FedEx's services please contact Vermonster LLC
+      http://vermonster.com/contact
+
+0.19 10/06/03
+        - Added a errcode function to hold the FedEx Error Code int
+        - Added a has_required function to check for FedEx required fields
+        
+0.18 08/13/03
+        - Line 133 warning for non numeric values
+        - Line 132 new regex for double hyphens (#-#-#)
+        
+0.17 06/18/03
+        - Removed the Account#, Meter# requirements in &transaction
+        - Wrong hash lookup for values with -'s in set_data line 49
+        
+0.16 06/18/03
+        - Fixed the example transaction
+        - Return true when there is no error in &transaction
+        
+0.15 06/10/03
+        - Changed _split_data regex to /s to allow . to match new lines
+                Need this for Ground Manifests
+                
+0.14 06/06/03
+        - Added hash exists look up for $FE_RE in set_data
+        
+0.12 04/12/2003
+    - Added new service 5002 "Track By Number, Destination, Ship Date, and Reference"
+        Hopefully FedEx will still support the original 5000 service for tracking
+    - Added new service 2025 "FedEx Locater" 
+        Allows you to find FedEx locations via phone, zip or address
+    - Added tags following most current FedEx documentation
+        1159 scan_description
+        1160 scan_location_city
+        1161 scan_location_state
+        1162 scan_date
+        1163 scan_time
+        1164 scan_location_country
+        1339 estimated_delivery_date
+        1340 estimated_delivery_time
+        1534 detail_scan_indicator
+        1535 paging_token
+        1536 number_of_relationships
+        1537 search_relationship_string
+        1538 search_relationship_type_code
+        1562 fedex_staffed_location_flag
+        1563 fedex_self_service_location_indicator
+        1564 fasc
+        1565 latest_express_dropoff_flag
+        1566 express_dropoff_after_time
+        1567 fedex_location_intersection_street_address
+        1568 distance
+        1569 hours_of_operation
+        1570 hours_of_operation_sat
+        1571 last_express_dropoff
+        1572 last_express_dropoff_sat
+        1573 express_service_flag
+        1574 location_count
+        1575 fedex_location_business_name
+        1576 fedex_location_business_type
+        1577 fedex_location_city
+        1578 fedex_location_state
+        1579 fedex_location_postal_code
+        1580 dangerous_goods_flag
+        1581 saturday_service_flag
+        1582 begin_date
+        1583 end_date
+        1584 tracking_groups
+        1718 package_type_description
+        3090 last_ground_dropoff
+        3091 last_ground_dropoff_sat
+        3092 ground_service_flag
+        
+0.11 03/22/2003
+    - Support for new service 2024 "Rate Available Services"
+    - Added field 99 "end_of_record" tag
+    - Added tags following most current FedEx documentation
+        1346 emerge_shipment_identifier
+        1347 emerge_merchant_identifier
+        1359 sed_legend_number
+        1399 aes_entry_number
+        1400 total_shipment_weight
+        1716 delivery_reattempt_date
+        1717 delivery_reattempt_time
+        2382 return_shipment_indicator
+        3035 ship_alert_fax_number
+        
+    - Removed tags following most current FedEx documentation
+        1166 deliver_to_cd
+        1169 trackstatus_cd
+        1170 pod_status_cd
+        1212 pod_status
+        1701 track_status
+        1702 proof_of_delivery_flag
+        1709 disp_exception
+        1710 cartage_agent
+        1718 packaging_alpha_type_description        
+        
+0.09 02/23/2003
+    - Removed debug syntax
+    
+0.08 02/08/2003
+        - Fixed parsing issue with FedEx data to allow for return values with dashes
+        - Thanks JTER
+        - Removed the FE_ER hash no need for this with ATOM server
+        - Fixes for Perl 5.8
+        
+0.06 01/12/2003
+    - syntax error?
+    
+0.05 10/15/2002
+    - Typo in one of the examples
+    - Added new transaction codes
+    - Allow for hyphenated transaction codes 1234-1 1234-2 ...
+    - Removed the 's' on trans 1201, 1202    
+    
+0.04 09/23/2002
+    - Fixed a few of the codes in Constants
+    - FedEx Transaction Error was not working properly
+    - checked for (99,"") request terminator when sending a transaction.
+    
+0.03 09/16/2002
+    - Regex bug on line 101. Thanks Wayne
+    - added a little more documentation
+    - UTI 3000 changed to FDXE
+
+0.02 09/05/2002
+    - Fixed a few syntax errors in Constants
+    - Also an error in the POD
+    
+0.01  Tue Sept  3 10:58:19 2002
+    - original version; created by h2xs 1.21 with options
+        -X -n Business::FedEx::DirectConnect

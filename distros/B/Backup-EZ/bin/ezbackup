@@ -1,0 +1,210 @@
+#!/usr/bin/env perl
+
+###### PACKAGES ######
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Data::Printer;
+use Devel::Confess 'color';
+use Backup::EZ;
+use File::ShareDir;
+use File::Spec;
+
+###### PACKAGE CONFIG ######
+
+Getopt::Long::Configure('no_ignore_case');
+
+###### CONSTANTS ######
+
+###### GLOBAL VARIABLES ######
+
+use vars qw($Conf $DryRun $Exclude $InstallCfg $InstallCron);
+
+###### MAIN PROGRAM ######
+
+parse_cmd_line();
+
+if ($InstallCfg) {
+	install_cfg();
+}
+elsif ($InstallCron) {
+	install_cron();
+}
+else {
+	main();
+}
+
+###### END MAIN #######
+
+sub install_cron {
+	my $cron_dir = "/etc/cron.$InstallCron";
+
+	my $ez_path = `which ezbackup`;
+	chomp $ez_path;
+
+	if ( !File::Spec->file_name_is_absolute($ez_path) ) {
+		$ez_path = File::Spec->rel2abs($ez_path);
+	}
+
+	my $cron_file = "$cron_dir/ezbackup";
+	print "installing $cron_file\n";
+
+	open my $fh, ">$cron_file" or die "failed to open $cron_file: $!";
+	print $fh "#!/bin/sh\n\n";
+	print $fh "nice $ez_path\n";
+	close $fh;
+
+	my_system("chmod 755 $cron_file");
+}
+
+sub install_cfg {
+	my $etc_dir  = "/etc/ezbackup";
+	my $dist_dir = File::ShareDir::dist_dir("Backup-EZ");
+
+	my_system("mkdir -p $etc_dir");
+	my_system("cp $dist_dir/ezbackup.conf $etc_dir");
+	my_system("cp $dist_dir/ezbackup_exclude.rsync $etc_dir");
+	my_system("chmod 644 $etc_dir/*");
+}
+
+sub my_system {
+	my $cmd = shift;
+	print "$cmd\n";
+	system($cmd);
+	die if $?;
+}
+
+sub main {
+	my $ez = Backup::EZ->new(
+							  conf         => $Conf,
+							  exclude_file => $Exclude,
+							  dryrun       => $DryRun
+	);
+	die if !$ez;
+
+	$ez->backup;
+}
+
+sub check_required {
+	my $opt = shift;
+	my $arg = shift;
+
+	print_usage("missing arg $opt") if !$arg;
+}
+
+sub parse_cmd_line {
+	my $help;
+
+	my $rc = GetOptions(
+						 "c=s"           => \$Conf,
+						 "e=s"           => \$Exclude,
+						 "dry-run"       => \$DryRun,
+						 "installcfg"    => \$InstallCfg,
+						 "installcron=s" => \$InstallCron,
+						 "help|?"        => \$help
+	);
+
+	print_usage("usage:") if $help;
+
+	#check_required( '-h', $Host );
+
+	if ($InstallCron) {
+		if (     $InstallCron ne 'hourly'
+			 and $InstallCron ne 'daily'
+			 and $InstallCron ne 'weekly'
+			 and $InstallCron ne 'monthly' )
+		{
+			die "invalid option for -installcron";
+		}
+	}
+
+	if ( !($rc) || ( @ARGV != 0 ) ) {
+		## if rc is false or args are left on line
+		print_usage("parse_cmd_line failed");
+	}
+}
+
+sub print_usage {
+	print STDERR "@_\n";
+
+	print "\n* Install default config files to /etc/ezbackup:\n\n"
+	  . "\t$0 -installcfg\n" . "\n\n";
+
+	print "* Install cron.X\n\n"
+	  . "\t$0 -installcron (hourly|daily|weekly|monthly)\n" . "\n\n";
+
+	print "* Run a backup:\n\n" 
+	  . "\t$0\n"
+	  . "\t\t[-c <conf file>]\n"
+	  . "\t\t[-e <rsync exclude file>]\n"
+	  . "\t\t[-dry-run]\n"
+	  . "\t\t[-?] (usage)\n" . "\n";
+
+	exit 1;
+}
+
+=head1 Backup-EZ
+
+Backup::EZ is backup software that is designed to be as easy to use
+as possible, yet provide a robust backup solution. I haven't been
+able to find an open-source backup solution that worked how I wanted
+it to. There are no shortage of options, but the ones I found store
+the data in a format that isn't straight-forward. With this, if you
+can use ls and rsync/scp, you can do a restore. No muss, no fuss,
+just works.
+
+POST INSTALLATION
+
+	1. configure ssh keys for your remote username
+		a. su - root
+		b. ssh-keygen -t rsa (skip if already in place)
+		c. ssh-copy-id USERNAME@YOURBACKUPHOST
+		d. verify you can auto-login
+	 		ssh root@YOURBACKUPHOST
+		e. exit
+		
+	2. identify (create if necessary) remote backup directory
+		example: /backups
+		
+	3. run "ezbackup -installcfg"
+		
+	4. edit /etc/ezbackup/ezbackup.conf and modify the TODO's with the
+		appropriate values
+
+	OPTIONAL
+	
+	5.  do a manual backup to get things started
+		 run: "ezbackup"
+
+	AUTOMATE
+		
+	6.  Setup cron to run ezbackup on a schedule.  You can do this manually
+		if you prefer or let ezbackup do it for you.  Run: 
+			"ezbackup -installcron daily" 
+				(or whatever freq you prefer in /etc/cron.*)	
+		
+RESTORE
+
+	There are a plethora of ways to restore files.  You could use scp,
+	rsync, cp via nfs, etc.  How to use these utilities is beyond the scope
+	of this document.  Here is one example with scp.
+	
+	1.  login to remote backup server
+	
+	2.  cd YOURDESTDIR
+	
+	3.  ls 
+	
+	4.  cd <the subdir of your choice>	
+
+	5.  pwd
+	
+	6.  open another terminal on the source host and login as the user that
+		performs backups
+	
+	7.  scp \
+		USERNAME@YOURBACKUPHOST:<DIR FROM STEP 5>/some/dir/you/want/to/restore \
+		<YOUR LOCAL DIR>
+
+=cut

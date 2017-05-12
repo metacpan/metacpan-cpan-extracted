@@ -1,0 +1,6 @@
+ 1.1 May 26, 2012
+-  Skip test on Strawberry Perl since that can't handle backtick.
+
+1.0
+-  Initial release
+

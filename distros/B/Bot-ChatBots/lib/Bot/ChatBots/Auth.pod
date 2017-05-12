@@ -1,0 +1,159 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Auth - Simple class for authorization
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Auth;
+
+   my $auth_obj = Bot::ChatBots::Auth->new(
+
+      # you can assign a name, used in log messages
+      name => 'my authorization object',
+
+      channels => {
+         blacklist => {
+            evil => 1, # whatever you set marks blacklisting
+         },
+         whitelist => {
+            good => 1, # any value goes, only key is considered
+         },
+      },
+
+      users => {
+         blacklist => {
+            fascist => 1,
+         },
+         whitelist => {
+            nice => 1,
+         },
+      },
+
+   );
+
+   my $tube_compatible_sub = $auth_obj->processor;
+
+=head1 DESCRIPTION
+
+This class provides you a simple authorization mechanism for blocking or
+allowing records based on specific internal fields.
+
+Two mechanisms are provided: I<blacklisting> and I<whitelisting>. These
+two mechanisms can be applied to either I<users> identifiers or to
+I<channel> identifiers.
+
+I<Blacklist>s are hash references whose keys mark elements that are
+blocked. I<Whitelist>s are hash references whose keys mark elements that
+are allowed. Most probably you will just want to use only one of the two,
+because:
+
+=over
+
+*
+
+whatever is blacklisted is blocked, even if it is then whitelisted;
+
+*
+
+if you pass any whitelist (even an empty one), everything not contained in
+it as a key is automatically blocked.
+
+=back
+
+It can make sense to use one mechanism with users and the other one with
+channels though.
+
+This module logs the operation on the log channel (acquired via
+L<Log::Any>) at the INFO level.
+
+
+=head1 METHODS
+
+This class composes role L<Bot::ChatBots::Role::Processor> to expose its
+L<Bot::ChatBots::Role::Processor/processor>. In addition, it also has the
+methods described in the following subsections.
+
+=head2 B<< channels >>
+
+   my $channels_hashref = $obj->channels;
+   $obj->channels(\%spec);
+
+Accessor for setting black/white lists for channel identifiers.
+
+=head2 B<< name >>
+
+   my $name = $obj->name;
+   $obj->name('Foo Bar');
+
+Accessor for the name, which appears in the logs.
+
+=head2 B<< new >>
+
+   my $auth = Bot::ChatBots::Auth->new(%args); # OR
+      $auth = Bot::ChatBots::Auth->new(\%args);
+
+Constructor. Accepted keys correspond to methods L</channels>, L</name>
+and L</users>.
+
+=head2 B<< process >>
+
+   my @outcome = $objet->process($record);
+
+Perform authorization on the provided input C<$record>. The output
+C<@outcome> will be empty if the authorization fails (due to blacklisting
+of whitelisting), otherwise it will contain C<$record>. This is compatible
+with L<Data::Tubes>.
+
+The input C<$record> will be analyzed for the following elements:
+
+=over
+
+=item *
+
+C<< $record->{sender}{id} >> is checked against L</users>;
+
+=item *
+
+C<< $record->{channel}{fqid} >> is checked against L</channels>. The key
+is assumed to hold the I<fully qualified> identifier for the channel (e.g.
+in Telegram it might be the type of chat and the chat identifier,
+separated by a slash character).
+
+=back
+
+The contents of those fields have to be filled in before this method is
+called, either by the specific protocol adapters or by a previous
+operation.
+
+
+=head2 B<< users >>
+
+   my $users_hashref = $obj->users;
+   $obj->users(\%spec);
+
+Accessor for setting black/white lists for user (sender) identifiers.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Data::Tubes>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

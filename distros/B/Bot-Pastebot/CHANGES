@@ -1,0 +1,113 @@
+==================================================
+Changes from 2013-10-11 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.600 at 2014-10-11 01:51:10 +0000
+------------------------------------------
+
+  Change: 12b0b0641d43d343ed9331cb78e1e93af27b75d3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-10-10 21:50:33 +0000
+
+    Add a .gitignore to skip counting release artifacts as dirty files. 
+
+  Change: 1f37b71bc9cdd9e15213125415eb2ed7967daf8b
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-10-10 21:47:09 +0000
+
+    Merge pull request #6 from willsheppard/master
+
+    Add troubleshooting point 
+
+  Change: 4562c6c28d7497fa85a9f76c59001ccd445780ee
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-10-10 21:46:14 +0000
+
+    Merge pull request #5 from willsheppard/patch-1
+
+    Fix typo: digets -> digits 
+
+  Change: ff6cd75d30b76c0245029734da26d209ae218189
+  Author: Will Sheppard <github@siteaboutnothing.com>
+  Date : 2014-09-04 11:24:58 +0000
+
+    Add troubleshooting point
+
+    "Pastebot is not sending any pastes to IRC" 
+
+  Change: 4d68bba16151cf5924dc56b59ecf6535a1b7b617
+  Author: Will Sheppard <github@siteaboutnothing.com>
+  Date : 2014-09-04 10:19:40 +0000
+
+    Fix typo: digets -> digits 
+
+  Change: 7508ee9878574757b84cb466ec9d5b37ad801606
+  Author: Zoffix <cpan@zoffix.com>
+  Date : 2013-07-13 14:43:32 +0000
+
+    [rt.cpan.org 41615] Don't rely on maxlength to prevent nickname
+    overflow. 
+
+  Change: bd83d0053c0ac3026445f5b7e831698398ffe3ce
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-13 14:35:13 +0000
+
+    Merge branch 'master' of github.com:rcaputo/bot-pastebot into gh 
+
+  Change: f7bfcf75c2d1fc664eb92224260e8d83b4f3b5a3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-13 14:19:55 +0000
+
+    Superficially document internal modules for Dist::Zilla's sake. 
+
+  Change: 6f05b1d3890abdb2267035fc264f8f8d8675f65d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-13 14:06:31 +0000
+
+    Initial conversion to Dist::Zilla. 
+
+  Change: 72af32a73aa826b1440474f562e96589bb51efe6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-13 13:55:06 +0000
+
+    Add an example configuration for web pastebin-only use. 
+
+  Change: 6472f72bbbca96ecd1d31aaafdbe908371b8f02e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-13 13:05:38 +0000
+
+    [rt.cpan.org 85315] Make cver optional.
+
+    Per Axel Beckert's recommendation, the IRC version string is made
+    optinoal and will default to the module's current version info. cver
+    can still be overridden in the .conf file, and all existing
+    installations will continue to work the way they always have. 
+
+  Change: cfdfcc47d3844912edd5f008353b9da5a208c129
+  Author: Don Seller <possum@cpan.org>
+  Date : 2013-07-13 12:30:57 +0000
+
+    [rt.cpan.org 41437] Add options for server passwords and SSL.
+
+    Applly Don Seller's patch from the RT ticket. 
+
+  Change: 9d733cc04f30c6094b9c9f864052cb038295f814
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-04 22:51:50 +0000
+
+    Merge pull request #4 from elmar/master
+
+    pastebot web page should return status 200 (instead of 500) on
+    success 
+
+  Change: d4a4147792780f68664606692ecbf8010fce0e65
+  Author: Elmar S. Heeb <elmar@heebs.ch>
+  Date : 2013-05-15 12:23:46 +0000
+
+    return the actual error value instead of the constant 1 from
+    _render_template 
+
+================================================
+Plus 8 releases after 2013-10-11 00:00:00 +0000.
+================================================

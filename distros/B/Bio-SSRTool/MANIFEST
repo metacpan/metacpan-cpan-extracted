@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Bio/SSRTool.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+scripts/ssrtool
+t/00-load.t
+t/01-find_ssrs.t
+t/boilerplate.t
+t/data/input.txt
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

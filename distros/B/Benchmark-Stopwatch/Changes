@@ -1,0 +1,19 @@
+CHANGES.
+
+0.05 - Thu Sep 12 09:20:00 BST 2007
+
+  * Fixed a syntax issue in timing.t that was causing 5.6.2 to panic.
+
+0.04 - Tue Sep 11 22:20:01 BST 2007
+
+   * Changed to MakeMaker
+
+0.03 - Tue Aug 22 16:21:16 BST 2006
+
+   * Added the 'as_data' method to allow others to access the data to do their
+     own formatting.
+
+0.02 - Tue Aug 22 12:03:31 BST 2006
+
+   * Changed 'total_time' so that it will return the time that the stopwatch
+     has been running for if the stopwatch has not been stopped.

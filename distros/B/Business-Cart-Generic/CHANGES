@@ -1,0 +1,58 @@
+Revision history for Perl extension Business::Cart::Generic.
+
+0.85  Fri May 18 13:59:00 2012
+	- Replace Locale::SubCountry with WWW::Scraper::Wikipedia::ISO3166::Database, for populating the
+		countries and subcountries (zones) tables. The big effects of this are:
+		o Country and subcountry (zone) data is much more up-to-date.
+		o Subcountries (zones) are in (more-or-less) latin characters. Native scripts are no longer used,
+			because I could not find a source to keep those script entries up-to-date.
+	- Stop shipping data/countries.csv, data/raw.countries.txt, data/raw.zones.txt and data/zones.csv.
+	- Stop shipping scripts/test.country.pl.
+
+0.84  Sat Aug 27 10:46:00 2011
+	- Add Plack::Middleware::ContentLength to *.psgi.
+	- Change web.page.tx to add /build/yui to the path to yui-min.js.
+	- Unreleased.
+
+0.83  Wed May 11 17:05:00 2011
+	  - No code changes.
+	  - Add POD to all modules which lacked it (21 in all).
+	  - Rename some method params which were mis-named.
+	  - Patch Build.PL and Makefile.PL to stop indexing of DBIx::Class-derived classes.
+	  - Fix abstract in Build.PL/Makefile.PL, by removing comment about GUI being limited to searches.
+
+0.82  Thu Apr 21 10:45:00 2011
+	- Implement online orders. This required many changes, including abandoning the countries/zones from
+	  osCommerce, and using those from Locale::SubCountry instead (to implement the onChange logic for the
+	  countries menu with less pain).
+	- Change code, and docs, so storing data into order_items table does not perform calculations, e.g. tax.
+	  Only perform calculations when reporting (outputting order items, totals).
+	- Split place.orders.pl into import.products.pl and place.orders.pl.
+	- Fix typo in dir name in $HOME/.perl/Business-Cart-Generic/ which used junk left over
+	  of copy-and-paste from Benchmark-Featureset-LocaleCountry. This is a doc fix only, in
+	  Business::Cart::Generic.
+	- Stop dropping temp product_* tables in Loader.populate_tables(), since that was interferring
+	  with the drop/create/populate/place.order cycle.
+	- Rename order.index.page.tx to export.order.index.page.tx, and order.page.tx to export.order.page.tx,
+	  to make room for online order templates.
+	- Add country to data/order.items.csv and data/tax.rates.csv, and rearrange order of columns in those files.
+	  This is to fix the problem where 2 zones in different countries have the same code, e.g. VIC.
+	  Change Database::Loader to match.
+	- Change auto-generated model in products table from (sprintf) SKU-%02i to SKU-%04i.
+	- Remove product and model columns from data/order.items.csv. They're redundant in demo data.
+	- Add online.order.page.(js,tx), for use by the Order tab. Add View::Order and Controller::Order to match.
+	- After searching for order, fix calculation of total price and tax.
+
+0.81  Tue Apr 12 11:07:00 2011
+	- Add use strict/warnings to various modules.
+	- Rename Change.ini to Changelog.ini.
+	- Rename output of scripts/export.orders.as.html.pl from order.html to orders.html.
+	- Clean up handing of HTML border option in templates.
+	- Fix drop table code to not log drop of log table.
+	- Remove redundant references to IO::Scalar.
+	- Make Build.PL and Makefile.PL run scripts/copy.config.pl.
+	- Expand docs to discuss config/.htbusiness.cart.generic.conf, and scripts/copy.config.pl.
+	  This section was missing from the docs in V 0.80.
+
+0.80  Sun Apr  3 14:04:41 2011
+	- Original version

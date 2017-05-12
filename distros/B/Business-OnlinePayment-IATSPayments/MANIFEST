@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+ignore.txt
+lib/Business/OnlinePayment/IATSPayments.pm
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/transaction.t
+t/transaction_decline.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

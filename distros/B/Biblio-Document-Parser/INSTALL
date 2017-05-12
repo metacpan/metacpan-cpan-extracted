@@ -1,0 +1,24 @@
+Installing Biblio::Document::Parser
+============================
+
+The easiest way to do this is like so:
+
+perl Build.PL
+./Build
+./Build install
+
+You can also optionally run './Build test', which will run a few checks on
+the modules.
+
+Requirements
+============
+
+The following modules are required for Biblio::Document::Parser to function correctly:
+
+- LWP::Simple, LWP::UserAgent (provided by libwww-perl)
+- HTML::HeadParser (provided by the HTML-Parser package)
+- File::Temp
+
+You may also need MIME::Base64, HTML::TagSet, and Digest::MD5.
+
+The most recent versions of these are located at http://www.cpan.org. 

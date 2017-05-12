@@ -1,0 +1,18 @@
+DESCRIPTION
+
+    Conclusion: Testing on my system (IPC::System::Options 0.24, perl:
+    5.22.0, CPU: Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores)) shows
+    the overhead to be ~40μs (0.04ms) so for benchmarking commands that
+    have overhead in the range of 10-100ms we normally don't need to worry
+    about the overhead of IPC::System::Option (0.04-0.4%) when we are using
+    default precision (~1%).
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 5:
+
+      Non-ASCII character seen before =encoding in '~40μs'. Assuming UTF-8
+

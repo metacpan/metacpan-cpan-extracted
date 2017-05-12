@@ -1,0 +1,16 @@
+-- Alignments between Helicobacter_pylori_26695 and Helicobacter_pylori_strain_J99
+
+
+-- BEGIN alignment [ +1 4262 - 4316 | -1 4522 - 4469 ]
+
+
+4262       gatttgaacttccgtttccaccgtgaaagggtggtatccttggccacta
+4469       gatttgaacccctgtaaccaccgtgaaagggtggtatcc.taaccacta
+                    ^^ ^  ^^                      ^ ^^      
+
+4311       gatgaa
+4517       gatgaa
+                 
+
+
+--   END alignment [ +1 4262 - 4316 | -1 4522 - 4469 ]

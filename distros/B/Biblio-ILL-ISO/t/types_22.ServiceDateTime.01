@@ -1,0 +1,7 @@
+$VAR1 = bless( {
+                 'date-time-of-this-service' => bless( {
+                                                         'date' => bless( {
+                                                                            'generalstring' => '20030623'
+                                                                          }, 'Biblio::ILL::ISO::ISODate' )
+                                                       }, 'Biblio::ILL::ISO::DateTime' )
+               }, 'Biblio::ILL::ISO::ServiceDateTime' );

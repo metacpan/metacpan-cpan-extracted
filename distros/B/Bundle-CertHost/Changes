@@ -1,0 +1,8 @@
+Revision history for Perl extension Bundle::CertHost.
+
+0.02  2009/02/08
+	- Update to use Task::CGI::Application and Task::Catalyst
+
+0.01  2009/01/30
+	- First draft
+

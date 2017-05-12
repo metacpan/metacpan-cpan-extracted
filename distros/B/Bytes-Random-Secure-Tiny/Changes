@@ -1,0 +1,38 @@
+Revision history for Bytes::Random::Secure::Tiny
+
+1.008 2015-07-08
+  - Shuffle handles empty arrayrefs more gracefully.
+  - Removed EGD support; use Bytes::Random::Secure if you need such
+    advanced support.
+
+1.007 2015-07-07
+  - Added a shuffle method.
+  - Documentation tweaks.
+
+1.006 2015-07-06
+  - Fixed the META_MERGE entry in Makefile.PL - the 'meta-spec' part was
+    in the wrong place, so the repo wasn't appearing in the metadata.
+  - The ABSTRACT_FROM was referring to the .pm file rather than the .pod
+
+1.005 2015-07-05
+  - Fixed a mistake in the SYNOPSIS. Improved description of string_from.
+
+1.004 2015-06-23
+  - Makefile.PL now requires Perl 5.8.
+  - _ranged_randoms returns an arrayref rather than array (microoptiomization)
+
+1.003 2015-06-22
+  - Fix POD formatting issue.
+  - Split POD into separate file.
+
+1.002 2015-06-21
+  - Set default seed to /dev/urandom, not /dev/random.
+
+1.001 2015-06-21
+  - Revert PP::irand to using sprintf.
+  - Fix dependency tests so Windows dependencies are tested.
+
+1.000 2015-06-20
+  - Initial CPAN release.
+  - Based on Bytes::Random::Secure, Crypt::Random::Seed,
+    and Math::Random::ISAAC

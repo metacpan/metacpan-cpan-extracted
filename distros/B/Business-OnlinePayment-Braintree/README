@@ -1,0 +1,135 @@
+NAME
+
+    Business::OnlinePayment::Braintree - Online payment processing through
+    Braintree
+
+VERSION
+
+    Version 0.020
+
+SYNOPSIS
+
+        use Business::OnlinePayment;
+    
+        $tx = new Business::OnlinePayment('Braintree',
+                                          merchant_id => 'your merchant id',
+                                          public_key => 'your public key',
+                                          private_key => 'your private key',
+                                         );
+    
+        $tx->test_transaction(1); # sandbox transaction for development and tests
+      
+        $tx->content(amount => 100,
+                     card_number => '4111 1111 1111 1111',
+                     expiration => '1212');
+    
+        $tx->submit();
+    
+        if ($tx->is_success) {
+            print "Card processed successfully: " . $tx->authorization . "\n";
+        } else {
+            print "Card was rejected: " . $tx->error_message . "\n";
+        }
+
+DESCRIPTION
+
+    Online payment processing through Braintree based on Net::Braintree.
+
+    The documentation for Net::Braintree is located at
+    https://www.braintreepayments.com/docs/perl.
+
+NOTES
+
+    This is supposed to cover the complete Braintree Perl API finally.
+
+METHODS
+
+ submit
+
+    Submits transaction to Braintree gateway.
+
+ sale $submit
+
+    Performs sale transaction with Braintree. Used both for settlement
+    ($submit is a true value) and authorization ($submit is a false value).
+
+ set_defaults
+
+    Sets defaults for the Braintree merchant id, public and private key.
+
+AUTHOR
+
+    Stefan Hornburg (Racke), <racke at linuxia.de>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-business-onlinepayment-braintree at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-OnlinePayment-Braintree.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::OnlinePayment::Braintree
+
+    You can also look for information at:
+
+      * Github issues (report bugs here)
+
+      https://github.com/interchange/Business-OnlinePayment-Braintree/issues
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Business-OnlinePayment-Braintree
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Business-OnlinePayment-Braintree
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Business-OnlinePayment-Braintree/
+
+ACKNOWLEDGEMENTS
+
+    Grant for the following enhancements (RT #88525):
+
+    billing address transmission
+
+    order number transmission
+
+    refund ability
+
+    added submit_for_settlement to complete the "sale" action
+
+    Peter Mottram for the following enhancements (GH #5):
+
+    Failure status
+
+      Set failure status from error codes provided by Braintree.
+
+    CVV
+
+      Pass cvv to Braintree.
+
+    Evan Brown (GH #7, #8):
+
+    Add support for post authorization action. Add support for the void
+    action and the card_token transaction result method.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2011-2016 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+
+    Net::Braintree
+

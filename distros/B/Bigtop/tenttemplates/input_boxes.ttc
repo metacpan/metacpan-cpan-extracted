@@ -1,0 +1,256 @@
+[%#
+    Template for handling all manner of statements in TentMaker templates.
+
+    Expects these parameters:
+
+    method_group         - the star in update_*_bool
+    name_prefix          - beginning of input element name, this must
+                           correspond to the TentMaker.pm update_* method.
+                           Used only for multiples and pairs.
+    id_prefix            - beginning of the input element id the AST ident
+                           should be part of this
+    keyword_prefix       - Used in front of the keyword when forming names
+                           and the callback parameter.  Include your own
+                           trailing double colon.
+    single_value         - initial value (singular) for all types
+                           ignored if statement.multiple is set
+    values               - initial values (plural) for text type when multiple
+                           is set
+    key                  - the keyword of this statement (same as
+                           statement.keyword below)
+    statement            - hash of legal statements whose keys are below
+
+    keys in the statement hash:
+
+    type                 - pick from: text, textarea, select, boolean,
+                           pair, or controlled_boolean
+    keyword              - statement's keyword
+    default              - what to use if boolean (or controlled_boolean)
+                           value is undefined
+
+    multiple             - indicates that more than one value or pair
+                           can be given for the keyword (think comma
+                           separated list).  Only applies to types text,
+                           select, and pair.
+
+    pair_labels          - Headings to put over pair entry text boxes.
+                           Only applies to type pair.
+
+    false                - the text of the false value for controlled_boolean
+                           if no value is given, 'undef' is used
+    true                 - similar to false, guess how they differ
+
+    options              - an array of hashes required for type selectone
+                           each hash has two keys: value and label
+
+    urgency              - fills in the * in class='urgency_*' this is
+                           used for color coding important fields
+                           choose from 0, 1, 3, 5, or 10 which are (roughly)
+                           white, lt. blue, green, orange, or red
+
+values are double qouted to prevent clashes with single
+quotes in the values
+
+-%]
+[%-   full_key     = "$keyword_prefix$key";
+     full_name    = "$name_prefix$key";
+     full_id      = "$id_prefix$key";       -%]
+
+[% IF    statement.type == 'textarea'           %]
+<textarea id='[% full_id %]'
+          cols='50' rows='6'
+          class='urgency_[% statement.urgency || 0 %]'
+    onblur='javascript:update_tree(
+        "[% method_group %]_text",
+        "[% full_key %]",
+        this.value
+    )'
+>
+    [% single_value || '' %]
+</textarea>
+[% ELSIF statement.type == 'boolean'            %]
+<input type='checkbox'
+       value='[% full_name %]'
+       id='[% full_id %]'
+       class='urgency_[% statement.urgency || 0 %]'
+       [%- IF single_value || statement.default == 'true' -%]
+       checked='checked'
+       [%- END -%]
+       onchange='javascript:update_tree(
+           "[% method_group %]_bool",
+           "[% full_key %]",
+           this.checked[% IF statement.quick_label || statement.refresh %],
+           "",
+           "full_edit"[% END %]
+       )'
+/>
+[% ELSIF statement.type == 'controlled_boolean' %]
+<input type='checkbox'
+       value='[% full_name %]'
+       id='[% full_id %]'
+       class='urgency_[% statement.urgency || 0 %]'
+       [%- IF single_value.defined -%]
+           [%- IF single_value == statement.true -%]
+                checked='checked'
+           [%- END -%]
+       [%- ELSIF statement.default == 'true' -%]
+           checked='checked'
+       [%- END -%]
+       onchange='javascript:update_tree(
+           "[% method_group %]_bool_controlled",
+           "[% full_key %]",
+           this.checked, "[% statement.false || 'undef' %]/"
+                       + "[% statement.true  || 'undef' %]"
+       )'
+/>
+[% ELSIF statement.type == 'text'               %]
+    [% IF statement.multiple %]
+        [% FOREACH element IN values %]
+            <input type='text'
+                name='[% full_name %]'
+                value="[% element %]"
+                class='urgency_[% statement.urgency || 0 %]'
+                onblur='javascript:update_multivalue(
+                    "[% method_group %]_text",
+                    "[% full_key %]",
+                    this[% IF statement.quick_label || statement.refresh %],
+                    "full_edit"[% END %]
+                )'
+            />
+            <br />
+        [% END %]
+        [% FOREACH extra_input IN [ 1..2 ] %]
+        <input type='text'
+            name='[% full_name %]'
+            value=''
+            class='urgency_[% statement.urgency || 0 %]'
+            onblur='javascript:update_multivalue(
+                "[% method_group %]_text",
+                "[% full_key %]",
+                this[% IF statement.quick_label || statement.refresh %],
+                "full_edit"[% END %]
+            )'
+        />
+        [% UNLESS loop.last %]<br />[% END %]
+        [% END %]
+    [% ELSE %]
+        <input type='text'
+            id='[% full_id %]'
+            value="[% single_value %]"
+            class='urgency_[% statement.urgency || 0 %]'
+            onblur='javascript:update_tree(
+                "[% method_group %]_text",
+                "[% full_key %]",
+                this.value[% IF statement.quick_label || statement.refresh %],
+                "",
+                "full_edit"[% END %]
+            )'
+        />
+    [% END %]
+[% ELSIF statement.type == 'select'             %]
+    <select [%- IF statement.multiple -%]multiple
+            name='[% full_name %]'
+            [%- ELSE -%]
+            id='[% full_id %]'
+            [%- END -%]
+            class='urgency_[% statement.urgency || 0 %]'
+            onchange='javascript:
+              myvalue = walk_selections( this );
+              update_tree(
+                "[% method_group %]_text",
+                "[% full_key %]",
+                myvalue
+              )'
+    >
+    [% FOREACH option IN statement.options %]
+        <option value='[% option.value %]'
+      [%- IF values.grep( option.value ).0 -%]selected='selected'[%- END -%]
+        >
+        [% option.label %]
+        </option>
+    [% END %][%# end of options loop %]
+    </select>
+[% ELSIF statement.type == 'pair' %]
+      <table id='[% full_name %]_input_table'>
+        <tr><th> [% statement.pair_labels.0 %] </th>
+            <th> [% statement.pair_labels.1 %]
+                 [% UNLESS statement.pair_required %]
+                    [optional]
+                 [% END %]
+            </th></tr>
+    [% FOREACH existing_value IN values %]
+      [% choice_parts = existing_value.split(' => ') %]
+      [% pair_urgency = statement.urgency || 0 %]
+      [% UNLESS statement.pair_required %]
+        [% pair_urgency = 0 %]
+      [% END %]
+        <tr><td>
+                <input
+                    type='text'
+                    name='[% full_name %]_key'
+                    value="[% choice_parts.0 %]"
+                    class='urgency_[% statement.urgency || 0 %]'
+                    onblur='javascript:update_pairs(
+                        "[% method_group %]_pair",
+                        "[% full_key %]",
+                        [% statement.multiple %],
+                        this
+                    )'
+                />
+            </td>
+            <td>[% quote_type = ( choice_parts.1.match( '"' ) ) ? "'" : '"' %]
+                <input
+                    type='text'
+                    name='[% full_name %]_value'
+                    value=[% quote_type %][% choice_parts.1 %][% quote_type %]
+                    class='urgency_[% pair_urgency %]'
+                    onblur='javascript:update_pairs(
+                        "[% method_group %]_pair",
+                        "[% full_key %]",
+                        [% statement.multiple %],
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+    [% END %]
+    [% IF statement.multiple OR values.length == 0 %]
+[%- pair_urgency = statement.urgency || 0 -%]
+[%- UNLESS statement.pair_required;
+        pair_urgency = 0;
+    END -%]
+        <tr><td>
+                <input
+                    type='text'
+                    name='[% full_name %]_key'
+                    class='urgency_[% statement.urgency || 0 %]'
+                    onblur='javascript:update_pairs(
+                        "[% method_group %]_pair",
+                        "[% full_key %]",
+                        [% statement.multiple %],
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='[% full_name %]_value'
+                    class='urgency_[% pair_urgency %]'
+                    onblur='javascript:update_pairs(
+                        "[% method_group %]_pair",
+                        "[% full_key %]",
+                        [% statement.multiple %],
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      [% END %]
+      </table>
+[% ELSE %]
+I don't know what to do with:
+<pre>
+[% USE dumper %][% dumper.dump( statement ) %]
+</pre>
+[% END %]

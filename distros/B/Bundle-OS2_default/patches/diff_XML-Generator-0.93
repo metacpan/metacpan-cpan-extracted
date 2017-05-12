@@ -1,0 +1,31 @@
+This patch reenables the t/DOM.t test (it was failing "with no output
+received"); and fixes one bug where it depended on the order of elements in
+a hash.
+
+Thanks,
+Ilya
+
+--- ./t/DOM.t.orig	Tue Jan 21 10:11:44 2003
++++ ./t/DOM.t	Tue Oct 14 02:05:04 2003
+@@ -9,7 +9,6 @@
+ 
+ BEGIN { 
+   print "1..0 # Skipped: XML::DOM not installed\n" and exit unless eval "use XML::DOM; 1";
+-  exit;
+ }
+ 
+ BEGIN { $| = 1; print "1..37\n"; }
+@@ -130,7 +130,12 @@ UNIVERSAL::isa($@, 'XML::DOM::DOMExcepti
+ print "ok 27\n";
+ 
+ $xml = $x->foo(['bar'], {'baz:foo' => 'qux', 'fob' => 'gux'});
+-$xml->toString eq '<bar:foo baz:foo="qux" bar:fob="gux"/>' or print "not ";
++my $xmls = $xml->toString;
++$xmls =~ s/^<//;
++$xmls =~ s/\/>$//;
++my @xmls = sort split ' ', $xmls;
++my @xmle = sort split ' ', 'bar:foo baz:foo="qux" bar:fob="gux"';
++"@xmls" eq "@xmle" or print "#got=`@xmls'\n#exp=`@xmle'\nnot ";
+ print "ok 28\n";
+ 
+ $x = new XML::Generator::DOM 'dtd' => [ 'foo', 'SYSTEM', '"http://foo.com/foo"' ];

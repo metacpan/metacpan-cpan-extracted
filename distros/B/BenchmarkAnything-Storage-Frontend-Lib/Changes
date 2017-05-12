@@ -1,0 +1,79 @@
+Revision history for BenchmarkAnything-Storage-Frontend-Lib
+
+0.021     2017-02-08
+        - pass through 'dbh_config' needed to support parallel execution
+
+0.020     2017-02-08
+        - pass through 'verbose' option to ::Backend::SQL
+
+0.019     2017-02-07
+        - require latest ::Backend::SQL
+
+0.018     2017-01-31
+        - Elasticsearch support
+
+0.017     2016-12-06
+        - test fixes [Kivanc Yazan]
+
+0.016     2016-03-04
+        - new function 'stats' - counters of points and metrics
+
+0.015     2016-03-02
+        - explicitely versioned dependencies declared
+
+0.014     2016-03-01
+        - shorter mysql user in boilerplate default config files
+
+0.013     2015-09-29
+        - re-upload due to META/provides freakup
+
+0.012     2015-09-28
+        - adapt tests to new BenchmarkAnything::Config behavior
+
+0.011     2015-09-28
+        - RT#107315 - replace File::Slurp with File::Slurper
+
+0.010     2015-09-24
+        - refactored away config handling and HTTP reporting into separate
+          libs
+        - declare 5.008 as minimum Perl version, let's see if we can hold
+          that promise
+
+0.009     2015-09-17
+        - adapt to renamed DB backend
+          (Tapper::Benchmark -> BenchmarkAnything::Storage::Backend::SQL)
+
+0.008     2015-09-11
+        - moved away data transformation code into better suited lib
+
+0.007     2015-09-10
+        - set cfg default to allow dzil pod coverage tests of dependent
+          libs
+
+0.006     2015-09-10
+        - INCOMPATIBLE CHANGE: Config keys completely restructure
+        - init_workdir(): set up initial ~/.benchmarkanything/
+
+0.005     2015-09-08
+        - optionally work against a HTTP/REST frontend now, like
+          provided by BenchmarkAnything::Storage::Frontend::HTTP.
+        - optionally skip schema validation
+        - support queueing as provided by Tapper::Benchmark
+        - better statistics details logging
+        - auto-connect in new()
+        - better db handle cleanup
+
+0.004     2015-09-01
+        - provide data transformation functions
+          suiting google chart api
+
+0.003     2015-08-28
+        - fix output format 'flat'
+        - better handling of uninitialized values
+
+0.002     2015-08-26
+        - allow different output formats, especially 'flat'
+
+0.001     2015-08-26
+        - initial release
+        - common functions for other storage frontend handling

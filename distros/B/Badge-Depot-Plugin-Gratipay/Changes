@@ -1,0 +1,16 @@
+Revision history for Badge-Depot-Plugin-Gratipay
+
+0.0102 2015-03-19T16:06:14Z CET
+ [Documentation]
+ - Added Task::Badge::Depot under see also.
+
+ [Requirements]
+ - Listed Types::URI as a prereq.
+
+0.0101 2015-03-05T23:17:57Z CET
+ [Documentation]
+ - Added link to github repo in pod.
+
+0.0100 2015-02-28T18:50:55Z CET
+ - Initial release
+

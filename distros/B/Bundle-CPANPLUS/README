@@ -1,0 +1,38 @@
+This is the README file for Bundle::CPANPLUS.
+
+Please refer to 'perldoc Bundle::CPANPLUS' after 
+installation for details.
+
+#####################################################################
+
+* Description
+
+Bundle::CPANPLUS
+
+    Bundle to install CPANPLUS and all it's dependencies
+    
+#####################################################################
+
+* Installation
+
+Bundle::CPANPLUS follows the standard perl module 
+install process
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module uses no C or XS parts, so no c-compiler is required.
+
+######################################################################
+
+AUTHOR
+    This module by Jos Boumans <kane@cpan.org>.
+
+COPYRIGHT
+    This module is copyright (c) 2005 Jos Boumans <kane@cpan.org>. All
+    rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.

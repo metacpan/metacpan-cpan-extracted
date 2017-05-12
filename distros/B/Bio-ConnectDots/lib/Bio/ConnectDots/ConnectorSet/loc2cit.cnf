@@ -1,0 +1,14 @@
+# example cnf file for DoTS
+
+name=loc2cit
+module=loc2cit
+version=20041102
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.ncbi.nih.gov/refseq/LocusLink/
+ftp_files=loc2cit
+
+label=LocusLink, dotset=LocusLink_ID
+label=PubMed, dotset=Publication_id

@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>../ConnectorQuery.pm</title>
+<link rel="stylesheet" href="cpan.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Base class for the query subclasses relating to ConnectorTables</p>
+<p>Allowable input formats for constraints are</p>
+<pre>
+  'data op constant AND ...' (note: op is optional)</pre>
+<pre>
+  or ARRAY of the following</pre>
+<pre>
+  'data op constant AND ...'
+  [&lt;data&gt; &lt;constant&gt;]
+  [&lt;data&gt; op &lt;constant&gt;]
+  {alias=&gt;'data op constant'
+   {
+    alias=&gt;[&lt;data&gt; &lt;constant&gt;]}
+   {
+     alias=&gt;[&lt;data&gt; op &lt;constant&gt;]}
+   {
+     alias=&gt;{columm=&gt;'data op constant'}, ...}
+   {
+     alias=&gt;{columm=&gt;[&lt;data&gt; &lt;constant&gt;]}, ...}
+   {
+     alias=&gt;{columm=&gt;[&lt;data&gt; op &lt;constant&gt;]}, ...}</pre>
+<p>or HASH containing any hash form where data is 
+</p>
+<pre>
+
+  alias or alias.label or alias.column.label</pre>
+<p>label is</p>
+<pre>
+  label_name or [label_name ...] or '*'
+   
+constant is</pre>
+<pre>
+  string or [string...]</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></h1>
+<p>Email <a href="mailto:dburdick@systemsbiology.org,">dburdick@systemsbiology.org,</a> <a href="mailto:natg@shore.net">natg@shore.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2005 Institute for Systems Biology (ISB). All Rights Reserved.</p>
+<p>This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+
+</body>
+
+</html>

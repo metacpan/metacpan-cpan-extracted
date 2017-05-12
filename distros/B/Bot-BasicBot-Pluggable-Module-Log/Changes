@@ -1,0 +1,31 @@
+2009-07-19 Mario Domgoergen <dom@math.uni-bonn.de>
+
+	* ignore_pattern gone wild because it defaulted to undef
+
+2009-07-12 Mario Domgoergen <dom@math.uni-bonn.de>
+
+	* Using new config interface of BBP
+	* New test to also ignore emotes matching filter pattern
+	* Update dependency on BBP
+	* Address information is now logged
+	* Logging bot replies with new replied interface
+
+2009-06-09 Mario Domgoergen <dom@math.uni-bonn.de>
+
+	* create a symlink to the current logfile
+
+2009-03-13 Mario Domgoergen <dom@math.uni-bonn.de>
+
+	* Wrong dependency on B:B:P, we need at least version 0.6 as
+	  the store sematic has changed
+
+2009-03-11 Mario Domgoergen <dom@math.uni-bonn.de>
+	
+	* Added testsuite t/01-basic.t (Coverage: 88.1%)
+	* Adjusted test names
+	* Added variable ignore_query
+	* React to emoted in priority 0
+
+2009-03-10 Mario Domgoergen <dom@math.uni-bonn.de>
+
+	* Added documentation

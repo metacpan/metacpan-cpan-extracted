@@ -1,0 +1,7 @@
+Revision history for Perl module Business::iDEAL::Adyen
+
+0.02 Feb  8 2009
+    - added DateTime to Makefile.PL, no code change
+
+0.01 Feb  2 2009
+    - original version

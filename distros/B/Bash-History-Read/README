@@ -1,0 +1,65 @@
+SYNOPSIS
+
+    From script:
+
+     use Bash::History::Read qw(parse_bash_history_file);
+    
+     my $res = parse_bash_history_file("$ENV{HOME}/.bash_history");
+
+    Sample result:
+
+     [
+       [undef, "some-command\n"],
+       [1446715184, "du -sm\n"],
+       [1446715190, "ls -l\n"],
+     ]
+
+    From the command-line:
+
+     % perl -MBash::History::Read -i.bak -e'each_hist {
+           $PRINT = 0 if $TS < time()-2*30*86400; # delete old entries
+           $PRINT = 0 if /foo/; # delete unwanted lines (e.g. matching some regex)
+           s/(mysql\s+-p)(\S+)/$1******/; # redact sensitive information
+       }' ~/.bash_history
+
+DESCRIPTION
+
+    This module provides utility routines to read entries from bash history
+    file (by default ~/.bash_history). The format of the history file is
+    dead simple: one line per entry, but when HISTTIMEFORMAT environment is
+    set, bash will print a timestamp line before each entry, e.g.:
+
+     #1374290613
+     ls -al
+     #1374290618
+     less myfile
+     #1374290635
+     ...
+
+    See each_hist for one routine to let you handle this format
+    conveniently.
+
+FUNCTIONS
+
+ parse_bash_history_file([ $path ]) => array
+
+    Parse entries from bash history file. If unspecified, $path will
+    default to HISTFILE environment variable or $HOME/.bash_history.
+
+    Return an array of entries, where each entry is <[$timestamp, $line]>
+    and $timestamp can be undef if entry does not have a timestamp.
+
+ each_hist { PERL_CODE }
+
+    Will read lines from the diamond operator (<>) and call Perl code for
+    each history entry. Can handle timestamp lines. This routine is
+    exported by default and is meant to be used from one-liners.
+
+    Inside the Perl code, $_ is locally set to the entry content, $TS is
+    locally set to the timestamp (and changes to this variable is ignored,
+    except when you undefine the variable, which will remove the timestamp
+    from output), $PRINT is locally set to 1. If $PRINT is still true by
+    the time the Perl code ends, the entry (along with its timestamp) will
+    be printed. So to remove a line, you can set $PRINT to 0 in your code.
+    To modify content, modify the $_ variable.
+

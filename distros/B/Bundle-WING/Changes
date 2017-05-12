@@ -1,0 +1,7 @@
+Revision history for Perl extension Bundle::WING.
+
+0.11  Thu Aug 23 12:22:17 2001
+	- (It's 0.11 to match the current WING release.)
+	- original version; created by h2xs 1.21 with options
+		-XA -n Bundle::WING
+

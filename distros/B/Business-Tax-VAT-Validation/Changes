@@ -1,0 +1,114 @@
+Revision history for Business::Tax::VAT::Validation
+
+1.11  13/03/2017
+    - Add get_last_response accessor, to return the last response we got
+      (pvoglhofer)
+
+1.10  26/10/2015
+    - David Precious (BIGPRESH) taking over maintainership - thanks to BPGN!
+    - Recognise new Irish VAT number format
+    - Recognise Croatia as an EU member state
+    - Documentation tweaks
+
+1.02  30/11/2012
+    - Fix POD typo; Thanks to Gregor Herrmann
+
+1.01  28/11/2012
+    - Fix POD UTF-8 Encoding issue
+
+1.00  25/03/2012
+    - This module now uses the VIES SOAP interface (instead of the HTML one)
+
+0.24  06/03/2012
+    - Fix traderName field required for EL and ES MS
+                     Update POST request fields 
+
+0.23  29/02/2012
+    - Fix regexp in _is_res_ok with multiline regexp (Bart Heupers)
+	
+0.22  04/10/2011
+    - Typo fix in POD error message #2 (Thanks to Martin H. Sluka)
+    - Minor POD fixes (BPGN)
+    - Fix subs args bug (performance fix) (BPGN)
+
+0.21  04/08/2009
+    - New error status 19: EU database too busy (Martin H. Sluka)
+
+0.20  Mon Aug 18 2008
+    - VIES HTML changes: now allowing multiples spaces (Thanks to Simon Williams, Benoît Galy & Raluca Boboia)
+    
+0.19  Tue, Apr 29 2008
+    - HU regexp: missing digit "9" added (Thanks to Simon Williams)
+    
+0.18  Thu Jan 03 2008
+    - BE regexp: from transitional 9-digit & 10-digit format to 10-digit new format 
+
+0.17  Thu Jan 04 14:09:27 2008
+    - BE regexp updated to new 10-digit format
+
+0.16  Fri Jul 13 23:13:00 2007
+    - Allowing spaces in regexps
+    - t/03_distant_check moved to distant_checks/. If you really need to perform all tests against the VIES DB, simply copy the test files into "t/" directory before running "make test".
+    
+0.15  Fri Jul 06 18:26:12 2007
+    - Added missing "keys" during $self->{members} constuction (Thanks to Dave O.)
+    - Corrected returned 0-1 error codes inversion
+    - Some POD improvements
+    - Improved tests: distant check + bad numbers local check
+
+0.14  Thu Jul 05 00:04:13 2007
+    - VIES interface changed $baseurl, and POST params were changed to lowercase. Added support for Bulgaria and Romania
+      (Thanks to  Kaloyan Iliev)
+    - New get_last_error_code method
+    - Updated regexps according to the actual VIES FAQ
+    - Some slight documentation improvements
+    - Improved tests: each regexp is tested accordind to FAQ
+
+0.13  Tue Jan 16 00:00:00 2007
+    - VIES interface changed "not found" layout
+    - (Thanks to Tom Kirkpatrick for this update)
+    
+0.12  Fri Nov 10 18:41:52 2006
+       - Makefile.PL: current YAML compliance (licence & version fields)
+
+0.11  Fri Nov 10 12:41:48 2006
+       - Minor bug allowing one forbidden character corrected in Belgian regexp.                                      # 
+         (Thanks to Andy Wardley for this report)
+       - added regexps property for external testing purposes
+       - POD CONSTRUCTOR. Some subs moved inside module.
+
+0.10  Thu Jul 20 0:00:00 2006
+        - Test::Pod to test suite added
+
+0.09  Thu Jun 20 09:28:32 2006
+        - Added local_check method: regexp only checkup, doesn't asks VIES
+
+0.08  Thu Jun 20 09:05:10 2006
+    - 9 and 2 digits transitional format for Belgium
+	- Added member_states property allowing you to retreive valid MS values
+	
+0.07  Thu May 25 14:55:19 2006
+        - Now we use "request" method not "simple request" in order to follow potential redirects
+          
+0.06  Thu May 25 14:44:14 2006
+        - Updating VIES base URL
+          (Thanks to Torsten Muller)
+
+0.05  Thu Jan 19 14:55:01 2006
+        - Adding support for proxy server.
+          (Thanks to Tom Kirkpatrick)
+
+0.04  Mon Nov 01 15:40:27 2004
+        - Adding support for the "Member service unavailable" VIES's error.
+
+0.03  Mon Nov 01 15:23:16 2004
+        - Adding support for the 10 new EU countries. This update also includes an extra error code if the server returned a time out error. 
+          (Thanx to Robert Alloway, www.servicecentre.co.uk)
+
+0.02  Mon Sep 29 23:49:00 2003
+        - Fix internal VAT checks: VAT numbers will be rejected if they contains non-numeric characters.
+          Now, internal checks are performed by country dependent regeps (thanx to Robert Alloway)
+        
+0.01  Wed Aug 06 17:40:40 2003
+	- original version; created by h2xs 1.22 with options -XA -n Business::Tax::VAT::Validation
+

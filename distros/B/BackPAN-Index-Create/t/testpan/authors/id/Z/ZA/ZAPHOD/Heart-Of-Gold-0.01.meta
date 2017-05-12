@@ -1,0 +1,15 @@
+---
+abstract: 'a spaceship'
+author:
+  - 'Zaphod Beeblebrox <zaphod@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'NEILB 1.0'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Heart-Of-Gold
+version: 0.01

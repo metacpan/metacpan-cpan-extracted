@@ -1,0 +1,11 @@
+#! /usr/bin/env perl
+use strict;
+use warnings FATAL => 'all';
+
+use Bio::SFF::Reader;
+use YAML;
+die 'No argument given' if not @ARGV == 2;
+my $reader = Bio::SFF::Reader->new(file => shift);
+
+my $entry = $reader->lookup(shift);# 'G8MFJLJ01A000I'
+print Dump($entry);

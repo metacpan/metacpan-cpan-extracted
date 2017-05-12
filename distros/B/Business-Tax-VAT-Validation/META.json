@@ -1,0 +1,51 @@
+{
+   "abstract" : "Validate EU VAT numbers against VIES",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-Tax-VAT-Validation",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : "1",
+            "LWP::UserAgent" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/Business-Tax-VAT-Validation/issues"
+      },
+      "homepage" : "https://github.com/bigpresh/Business-Tax-VAT-Validation/",
+      "repository" : {
+         "url" : "https://github.com/bigpresh/Business-Tax-VAT-Validation"
+      }
+   },
+   "version" : "1.11"
+}

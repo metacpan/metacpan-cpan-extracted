@@ -1,0 +1,11 @@
+classes:
+  - Desktop.office.locale.ZA
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice locales for Africa
+  pkg:
+    - libreoffice-l10n-dz
+    - libreoffice-l10n-om
+    - libreoffice-l10n-rw

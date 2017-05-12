@@ -1,0 +1,9 @@
+classes:
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - exclude OpenGL software rasterizers
+  pkg-avoid:
+    - libgl1-mesa-swx11

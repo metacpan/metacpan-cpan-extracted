@@ -1,0 +1,16 @@
+Revision history for Bryar-DataSource-Multiplex
+
+0.122   2009-01-16
+        add repo to dist
+
+0.121   2006-11-06
+        license
+        perl-critic tests
+
+0.12    2004-10-26 18:20
+        removed stupid leftover Dumper call
+        remembered to require DS class when searching one DS
+
+0.10    2004-10-22 18:00
+        readied for release
+

@@ -1,0 +1,32 @@
+%enc ISO_8859_1
+%baselang PT
+%languages EN
+%languages FR 
+%desc[EN] NT Narrower Term
+%desc[EN] BT Broader Term
+%desc NT Termo Específico
+%desc BT Termo Genérico
+%desc HAS Instâncias
+%desc IOF instância de 
+%inverse IOF HAS
+%top animal
+
+
+animal
+NT mamífero, doméstico, réptil
+EN animal
+
+mamífero
+HAS gato, leão
+
+leão
+EN lion
+
+gato
+EN cat
+FR chat
+BT doméstico
+
+sapo
+IOF réptil
+EN frog

@@ -1,0 +1,79 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2JointDef} class b2JointDef
+{
+
+b2JointDef();
+
+%{
+
+
+int
+b2JointDef::type( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->type = (b2JointType)SvNV( ST(1) );
+		}
+		RETVAL = (int)THIS->type;
+	OUTPUT:
+		RETVAL
+
+
+SV*
+b2BodyDef::userData ( ... )
+        PPCODE:
+		if ( items > 1 )
+			THIS->userData = (void *)new_data( ST(1) );
+		if ( !THIS->userData )
+			XSRETURN_EMPTY;
+		ST(0) = (SV *)THIS->userData;
+		XSRETURN(1);
+
+b2Body*
+b2JointDef::bodyA( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->bodyA = (b2Body*)stack_to_object( ST(1) );
+		}
+		RETVAL = THIS->bodyA;
+	OUTPUT:
+		RETVAL
+
+b2Body*
+b2JointDef::bodyB( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->bodyB = (b2Body*)stack_to_object( ST(1) );
+		}
+		RETVAL = THIS->bodyB;
+	OUTPUT:
+		RETVAL
+
+bool
+b2JointDef::collideConnected( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->collideConnected = (bool)SvNV( ST(1) );
+		}
+		RETVAL = THIS->collideConnected;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

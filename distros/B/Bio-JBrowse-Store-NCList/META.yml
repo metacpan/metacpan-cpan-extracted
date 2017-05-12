@@ -1,0 +1,180 @@
+---
+abstract: 'modules for formatting JSON nested containment lists for use with JBrowse'
+author:
+  - 'Robert Buels <rbuels@gmail.com>'
+build_requires:
+  Carp::Always: 0
+  Data::Dumper: 0
+  Exporter: 0
+  File::Next: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-JBrowse-Store-NCList
+requires:
+  Carp: 0
+  Fcntl: 0
+  File::Path: 0
+  File::Spec: 0
+  IO::File: 0
+  JSON: 2
+  List::Util: 0
+  POSIX: 0
+  PerlIO::gzip: 0
+  Scalar::Util: 0
+  Sort::External: 0
+  Storable: 0
+  base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Bio-JBrowse-Store-NCList
+  homepage: http://metacpan.org/release/Bio-JBrowse-Store-NCList
+  repository: http://github.com/gmod/bio-jbrowse-store-nclist
+version: 0.1
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@RBUELS/@Basic/GatherDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@RBUELS/@Basic/PruneCruft'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@RBUELS/@Basic/ManifestSkip'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@RBUELS/@Basic/MetaYAML'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@RBUELS/@Basic/License'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@RBUELS/@Basic/Readme'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@RBUELS/@Basic/ExtraTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@RBUELS/@Basic/ExecDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@RBUELS/@Basic/ShareDir'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@RBUELS/@Basic/MakeMaker'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@RBUELS/@Basic/Manifest'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@RBUELS/@Basic/TestRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@RBUELS/@Basic/ConfirmRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@RBUELS/@Basic/UploadToCPAN'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@RBUELS/MetaConfig'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@RBUELS/MetaJSON'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@RBUELS/PkgVersion'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@RBUELS/PodSyntaxTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@RBUELS/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@RBUELS/PodCoverageTests'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@RBUELS/MetaResources'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@RBUELS/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@RBUELS/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@RBUELS/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@RBUELS/AutoPrereqs'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@RBUELS/NextRelease'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300034
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300034
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300034
+x_authority: cpan:RBUELS

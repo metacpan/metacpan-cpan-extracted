@@ -1,0 +1,439 @@
+# hmmsearch :: search profile(s) against a sequence database
+# HMMER 3.0 (March 2010); http://hmmer.org/
+# Copyright (C) 2010 Howard Hughes Medical Institute.
+# Freely distributed under the GNU General Public License (GPLv3).
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# query HMM file:                  P00128.hmm
+# target sequence database:        ITAG2.3_proteins.fasta
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Query:       Alpha-amylase  [M=316]
+Accession:   PF00128.19
+Description: Alpha amylase, catalytic domain
+Scores for complete sequences (score includes all domains):
+   --- full sequence ---   --- best 1 domain ---    -#dom-
+    E-value  score  bias    E-value  score  bias    exp  N  Sequence           Description
+    ------- ------ -----    ------- ------ -----   ---- --  --------           -----------
+    1.8e-25   91.2   0.0    4.1e-25   90.0   0.0    1.5  1  Solyc04g078930.2.1 genomic_reference:SL2.40ch04 gene_region:
+      7e-24   86.0   0.7    2.9e-22   80.7   0.0    3.2  2  Solyc02g066950.2.1 genomic_reference:SL2.40ch02 gene_region:
+    1.1e-23   85.3   0.7    6.2e-14   53.3   0.1    3.4  3  Solyc07g014590.2.1 genomic_reference:SL2.40ch07 gene_region:
+    1.8e-23   84.6   0.0    5.5e-23   83.0   0.0    1.7  1  Solyc05g007070.2.1 genomic_reference:SL2.40ch05 gene_region:
+    4.5e-22   80.0   0.0    1.4e-21   78.4   0.0    1.7  1  Solyc03g095710.2.1 genomic_reference:SL2.40ch03 gene_region:
+    5.2e-19   70.0   0.5    1.2e-16   62.2   0.3    2.5  1  Solyc09g009190.2.1 genomic_reference:SL2.40ch09 gene_region:
+      8e-19   69.4   0.0    3.9e-18   67.1   0.0    1.9  1  Solyc04g082090.2.1 genomic_reference:SL2.40ch04 gene_region:
+    3.2e-17   64.1   0.0    1.8e-15   58.4   0.0    3.0  1  Solyc06g009220.2.1 genomic_reference:SL2.40ch06 gene_region:
+    3.2e-14   54.2   1.5    1.1e-11   45.9   1.1    2.5  1  Solyc04g082400.2.1 genomic_reference:SL2.40ch04 gene_region:
+    1.5e-11   45.5   0.2    5.8e-11   43.5   0.1    2.0  1  Solyc07g064830.2.1 genomic_reference:SL2.40ch07 gene_region:
+    6.3e-11   43.4   0.0    1.3e-08   35.8   0.0    2.9  3  Solyc09g064800.1.1 evidence_code:10F0H1E1IEG genomic_referen
+    6.7e-10   40.0   0.8      0.016   15.8   0.0    3.6  4  Solyc11g008050.1.1 evidence_code:10F0H1E1IEG genomic_referen
+  ------ inclusion threshold ------
+       0.19   12.3   0.1        0.6   10.6   0.1    1.7  1  Solyc10g007900.2.1 genomic_reference:SL2.40ch10 gene_region:
+       0.36   11.3   0.2        1.7    9.2   0.1    1.9  1  Solyc07g062510.2.1 genomic_reference:SL2.40ch07 gene_region:
+
+
+Domain annotation for each sequence (and alignments):
+>> Solyc04g078930.2.1  genomic_reference:SL2.40ch04 gene_region:61180605-61182663 transcript_region:SL2.40ch04:61180605.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   90.0   0.0   1.7e-28   4.1e-25       6     304 ..      27     325 ..      22     327 .. 0.73
+
+  Alignments for each domain:
+  == domain 1    score: 90.0 bits;  conditional E-value: 1.7e-28
+                         HGGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-.TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSC. CS
+       Alpha-amylase   6 iieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkid.pefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnp. 94 
+                         +i+  ++l + Gvt +wl P  +s  s  gY     +++d  +fG+ +++k+Li+++h++gik + D+V+NH + +++ ++  ++  +   
+  Solyc04g078930.2.1  27 LINLVPDLAKAGVTHVWLPPSSHSV-SPQGYMPGRLYDLDaSKFGNQQQLKTLIKALHDHGIKSVADIVINHRTADNKDSRGIYSIFEGGt 116
+                         6777899**************9988.89999998888887368*****************************9999988777777666554 PP
+
+                         CGGGBSEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHH.HHHHHHH------EETTGGGS---HHHHHHHH CS
+       Alpha-amylase  95 yrdyyiwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkk.vvkfwldkgvDGfRlDavkhiskefwkeftqa 184
+                         ++d  +w +         k+ ++ s+ + + ++    +++  pd+++ n+ v+kel + + ++  + g DG+R+D v  ++    k ++ +
+  Solyc04g078930.2.1 117 SDDRLDWGPS-----FICKNDTQYSDGTGNPDTG--LDFEPAPDIDHLNTRVQKELSDwMNWLKSEIGFDGWRFDFVRGYAPCITKIYMGN 200
+                         8888889866.....2222234466777777774..899*******************66656666669***********99999999887 PP
+
+                         HHHHTS----B-------HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCS....TTSB--SSHHHHHHHHHHHHHHSTC............ CS
+       Alpha-amylase 185 lneykeevftvgEvfgasdedarvdatesymeleslldfedfdlaekvke....ksqlksitakklkevlsktlselse............ 259
+                                 f vgE++++      +d +++y++ + ++++ ++  +   +     + +++      l+++++++l +l++            
+  Solyc04g078930.2.1 201 TS----PDFAVGELWNSLAY--GQDGKPEYNQDNHRNELVGWVKNAGRAVtafdFTTKG-----ILQAAVQEELWRLKDpngkppgmigvl 280
+                         77....4599******6533..3333333333333444444433332221111122222.....223333333333332223344577778 PP
+
+                         GGGEEB-SS-TTSHHHHHHTT-HHHHHHHHHHHHHT---EBEEE- CS
+       Alpha-amylase 260 deeqvtflenHDqeRvlsrfgddsaklklalallltlrGtpviYy 304
+                          +++vtf++nHD+   ++++   s+k+ +  a +lt++G+p ++y
+  Solyc04g078930.2.1 281 PRKAVTFIDNHDTGSTQNMWPFPSDKVMQGYAYILTHPGIPSVFY 325
+                         89*******************9999******************99 PP
+
+>> Solyc02g066950.2.1  genomic_reference:SL2.40ch02 gene_region:31778592-31790811 transcript_region:SL2.40ch02:31778592.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 ?   -0.8   0.8      0.74   1.8e+03     192     254 ..     280     342 ..     257     356 .. 0.66
+   2 !   80.7   0.0   1.2e-25   2.9e-22       7     304 ..     531     820 ..     529     830 .. 0.79
+
+  Alignments for each domain:
+  == domain 1    score: -0.8 bits;  conditional E-value: 0.74
+                         ---B-------HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCSTTSB--SSHHHHHHHHHHHH CS
+       Alpha-amylase 192 vftvgEvfgasdedarvdatesymeleslldfedfdlaekvkeksqlksitakklkevlsktl 254
+                         + + +E  ++s e++r+date++++ ++ +++e  +++++++  ++++ ++ ++++ + +  +
+  Solyc02g066950.2.1 280 ALQQEEEIKSSLEKMRKDATEKKKAASKAFKLELERMKTAIEAAKETARSQDEAYTRRCEALQ 342
+                         455556666678899999999999999999999999999988644444434344444444444 PP
+
+  == domain 2    score: 80.7 bits;  conditional E-value: 1.2e-25
+                         GGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCCGG CS
+       Alpha-amylase   7 ieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkidpefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpyrd 97 
+                          +K  +l + G+t++w+ P++es  +  gY  +d ++++  +G le++k  i+++h++++  + D+V NH    ++  +  ++  +     
+  Solyc02g066950.2.1 531 ANKAADLSRCGITSVWFPPPTESV-APQGYMPSDLYNLNSAYGSLEELKGCIEEMHNQDLLALGDVVLNHRCAHKQSPNGVWNIFG----G 616
+                         57888999****************.99*******************************************9888775444444333....2 PP
+
+                         GBSEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHH.HHHHHHH------EETTGGGS---HHHHHHHHHHH CS
+       Alpha-amylase  98 yyiwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkk.vvkfwldkgvDGfRlDavkhiskefwkeftqalne 187
+                            w ++          + + ++++ + +    + +   p +++++e v++ +kk + ++  d g DG+RlD v  +s   +ke+ +a+n 
+  Solyc02g066950.2.1 617 KLAWGPE--------AIVCDDPNFQGRGNPSSGDIFHAAPNIDHSQEFVRQDIKKwLNWLRNDVGFDGWRLDFVRGFSGAYVKEYIEASN- 698
+                         2334422........224566677766666556788999****************5555555556************************9. PP
+
+                         HTS----B-------HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCSTTSB--SS....HHHHHHHHHHHHHHSTC.....GGGEEB-SS- CS
+       Alpha-amylase 188 ykeevftvgEvfgasdedarvdatesymeleslldfedfdlaekvkeksqlksit....akklkevlsktlselse.....deeqvtflen 269
+                             +f +gE++++   +     +++++  + +++  + + +++++  +++k i      +++  +++ + + +        +++vtflen
+  Solyc02g066950.2.1 699 ---PAFSIGEYWDSLAYEGGNLCYNQDAHRQRIINWINATGGSSSAFDVTTKGILhsalHNQYWRLIDPQGKPT-GvmgwwPSRAVTFLEN 785
+                         ...69********9887777788888888888899888888888775333333332222444444444433333.246688899******* PP
+
+                         TTSHHHHHHTT-HHHHHHHHHHHHHT---EBEEE- CS
+       Alpha-amylase 270 HDqeRvlsrfgddsaklklalallltlrGtpviYy 304
+                         HD+   +  +   ++kl +  a +lt++Gtpvi+y
+  Solyc02g066950.2.1 786 HDTGSTQGHWPFPRDKLTQGYAYILTHPGTPVIFY 820
+                         **********************************9 PP
+
+>> Solyc07g014590.2.1  genomic_reference:SL2.40ch07 gene_region:4925611-4940909 transcript_region:SL2.40ch07:4925611..49
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   53.3   0.1   2.5e-17   6.2e-14       1      83 [.     243     350 ..     243     377 .. 0.84
+   2 !   14.5   0.0   1.6e-05     0.039     139     175 ..     383     420 ..     379     447 .. 0.80
+   3 !   13.8   0.0   2.6e-05     0.065     275     313 ..     582     622 ..     526     627 .. 0.70
+
+  Alignments for each domain:
+  == domain 1    score: 53.3 bits;  conditional E-value: 2.5e-17
+                         TT--HHGGGHHHHHH----EEEE---EE...............BGGTTGGG-ECEEEEE-TT-..........--HHHHHHHHHHHHCTT- CS
+       Alpha-amylase   1 GDlkGiieKLdYlkdlGvtaiwlsPife...............spqsyhgYditdykkidpef..........GtledfkeLiskahekgi 66 
+                         G + G+ eKLd lk+lGv+ i l+P  e               ++ + +gY + ++ +   ++          G  ++fk L+++ah++gi
+  Solyc07g014590.2.1 243 GTYLGVVEKLDHLKELGVNCIELMPCHEfneleyysynsvlgdYKFNFWGYSTVNFFSPMGRYssaglsncglGAINEFKYLVKEAHKRGI 333
+                         6778******************************98887766433399********998777655555555559***************** PP
+
+                         EEEEEE-TSBEETTSCC CS
+       Alpha-amylase  67 kvilDlVvNHtsdehew 83 
+                          vi+D+V+NHt++ +e+
+  Solyc07g014590.2.1 334 EVIMDVVFNHTAEGNEN 350
+                         ***********998776 PP
+
+  == domain 2    score: 14.5 bits;  conditional E-value: 1.6e-05
+                         B-TTSHHHHHHHHHHHHHHHH--.----EETTGGGS-- CS
+       Alpha-amylase 139 lnteneevvkelkkvvkfwldkg.vDGfRlDavkhisk 175
+                         +n +n+ v++ + + +++w+ +  vDGfR+D ++ +  
+  Solyc07g014590.2.1 383 FNCNNPIVRQFIVDCLRYWVTEMhVDGFRFDLASILTR 420
+                         7899***************98877*******9998776 PP
+
+  == domain 3    score: 13.8 bits;  conditional E-value: 2.6e-05
+                         HHHHTT-HHH..HHHHHHHHHHT---EBEEE---TT----- CS
+       Alpha-amylase 275 vlsrfgddsa..klklalallltlrGtpviYyGeEigmtgg 313
+                         ++s f ++    ++++ +  l+ ++G+p+iY G+E g t g
+  Solyc07g014590.2.1 582 FASIFVKKLRkrQMRNFFLCLMVSQGVPMIYMGDEYGHTKG 622
+                         33333333335578889999999**************8865 PP
+
+>> Solyc05g007070.2.1  genomic_reference:SL2.40ch05 gene_region:1652423-1664598 transcript_region:SL2.40ch05:1652423..16
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   83.0   0.0   2.2e-26   5.5e-23       7     303 ..     522     811 ..     518     814 .. 0.73
+
+  Alignments for each domain:
+  == domain 1    score: 83.0 bits;  conditional E-value: 2.2e-26
+                         GGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCCGG CS
+       Alpha-amylase   7 ieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkidpefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpyrd 97 
+                          +K   l +lG+++iwl P+++s  s  gY  +d ++++ ++G  +++k  ++k he gikv+ D+V NH   ++++ +  ++  +     
+  Solyc05g007070.2.1 522 HDKAAELSSLGFSVIWLPPPTDSV-SPEGYMPRDLYNLNSRYGSFDELKVTVKKFHEVGIKVLGDVVLNHRCASERNQNGIWNIFG----- 606
+                         67888899**************99.99*******************************************9888886333333222..... PP
+
+                         GBSEE.--ETTSSSBB-...TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHH.HHHHHHH------EETTGGGS---HHHHHHHH CS
+       Alpha-amylase  98 yyiwkdgkkepptnwks...lfggsaweddeeaqehkflkslpdlnteneevvkelkk.vvkfwldkgvDGfRlDavkhiskefwkeftqa 184
+                               g      nw +   + + + ++ + +    +++   p +++++e v+k + + ++++  + g DG+RlD v      fw  + ++
+  Solyc05g007070.2.1 607 ------G----RLNWDEravVADDPHFQGRGNKSSGDNFHAAPNIDHSQEFVRKDIREwLLWLREEIGYDGWRLDFVRG----FWGGYVKD 683
+                         ......1....222222223556666666666656789999*******999999999955544445558******9985....66666666 PP
+
+                         HHHHTS----B-------HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCSTTSB--SS...HHHHHHHHHHHHHHSTC......GGGEEB- CS
+       Alpha-amylase 185 lneykeevftvgEvfgasdedarvdatesymeleslldfedfdlaekvkeksqlksit...akklkevlsktlselse......deeqvtf 266
+                           e++e  f vgE++++   +  ++  ++++  + ++d  + + +++ +  +++k i    +++++ +  ++++  +        +++vtf
+  Solyc05g007070.2.1 684 YLEATEPYFAVGEFWDSLVYTYGEMDHNQDAHRQRIIDWINATNGTAGAFDVTTKGILhsaIERCEYWRLSDQKGKPPgvvgwwPSRAVTF 774
+                         666666789999999977665555555556666677777666655555532222222133355566555555555555687778889**** PP
+
+                         SS-TTSHHHHHHTT-HHHHHHHHHHHHHT---EBEEE CS
+       Alpha-amylase 267 lenHDqeRvlsrfgddsaklklalallltlrGtpviY 303
+                         +enHD+   +  +     k  +  a +lt++Gtp ++
+  Solyc05g007070.2.1 775 IENHDTGSTQGHWRFPGGKEMQGYAYILTHPGTPSVF 811
+                         ********9888888777899*************987 PP
+
+>> Solyc03g095710.2.1  genomic_reference:SL2.40ch03 gene_region:50338173-50341110 transcript_region:SL2.40ch03:50338173.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   78.4   0.0   5.7e-25   1.4e-21       6     304 ..      52     350 ..      47     352 .. 0.72
+
+  Alignments for each domain:
+  == domain 1    score: 78.4 bits;  conditional E-value: 5.7e-25
+                         HGGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-.TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCC.HHHHHHHTTSC CS
+       Alpha-amylase   6 iieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkid.pefGtledfkeLiskahekgikvilDlVvNHtsdehew.fkeslkskdnp 94 
+                         +i+  ++l   Gvt +wl P  +s  s  gY     +++d  +fG+ +++k+Li+++ ++gik + D+V+NH   +++     +   ++ +
+  Solyc03g095710.2.1  52 LINLVPDLAHAGVTHVWLPPSSHSV-SPQGYMPGRLYDLDaSKFGNQQELKALIKALRDYGIKSVADIVINHRCADKKDsRGIYCIFEGGT 141
+                         67778999*************9988.89999998888887368*****************************7666654144555555666 PP
+
+                         CGGGBSEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHH.HHHHHHH------EETTGGGS---HHHHHHHH CS
+       Alpha-amylase  95 yrdyyiwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkk.vvkfwldkgvDGfRlDavkhiskefwkeftqa 184
+                          +d  +w +         k+  + s+ + + ++    +++  pd+++ n  v+kel + + ++  + g DG+R+D v  ++ +  k ++ +
+  Solyc03g095710.2.1 142 TDDRLDWGPS-----FICKDDIQYSDGTGNLDT--GLDFEPAPDIDHLNIRVQKELSDwMNWLKSEIGFDGWRFDFVRGYAPNITKIYMGN 225
+                         8888889855.....222222335555555555..589********************66656666669************9999999988 PP
+
+                         HHHHTS----B-------..HHHHHHHHHHTTCSCS--BSHCHHHHHH.HHCSTTSB--SS.HHHHHHHHHHHHHHSTC......GGGEEB CS
+       Alpha-amylase 185 lneykeevftvgEvfgas..dedarvdatesymeleslldfedfdlae.kvkeksqlksit.akklkevlsktlselse......deeqvt 265
+                                 f vgE++++   ++d + d ++ ++ +e l+   +++ +  +++++ +++  + a + + +  k+ +  +        +++vt
+  Solyc03g095710.2.1 226 TS----PDFAVGEFWNSLayGQDGKPDYNQDNHRNE-LVGWVQNGGGAvTAFDFTTKGILQaAVEGELWRLKDSHGKPPgmigvlPQNAVT 311
+                         87....4599*****976443333444444444444.33333333222022222222222223333333222222222246666899**** PP
+
+                         -SS-TTSHHHHHHTT-HHHHHHHHHHHHHT---EBEEE- CS
+       Alpha-amylase 266 flenHDqeRvlsrfgddsaklklalallltlrGtpviYy 304
+                         f++nHD+   ++++   s+k+ +  a +lt++G+p+++y
+  Solyc03g095710.2.1 312 FIDNHDTGSTQNMWPFPSDKVMQGYAYILTHPGIPLVFY 350
+                         ***************9999******************99 PP
+
+>> Solyc09g009190.2.1  genomic_reference:SL2.40ch09 gene_region:2539818-2558047 transcript_region:SL2.40ch09:2539818..25
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   62.2   0.3     5e-20   1.2e-16      10     175 ..     370     510 ..     364     566 .. 0.77
+
+  Alignments for each domain:
+  == domain 1    score: 62.2 bits;  conditional E-value: 5e-20
+                         HHHHHH----EEEE---EEBGG.TTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCCGGGB CS
+       Alpha-amylase  10 LdYlkdlGvtaiwlsPifespq.syhgYditdykkidpefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpyrdyy 99 
+                         L+ +k+lG++a++++ i e ++ + +gY++t++ +   +fGt +d+k+Li+kahe gi v++D+V  H s++       l+  d   + +y
+  Solyc09g009190.2.1 370 LPRIKKLGYNAVQIMAIQEHSYyASFGYHVTNFFAPSSRFGTPDDLKSLIDKAHELGIVVLMDIVHSHASNNTLD---GLNMFDG-TDSCY 456
+                         7789***************5555*********************************************9998874...4443442.33333 PP
+
+                         SEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH--.----EETTGGGS-- CS
+       Alpha-amylase 100 iwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkkvvkfwldkg.vDGfRlDavkhisk 175
+                         +              + g   +++ +++           +n+ n ev ++l++ ++ wld+   DGfR+D v  +  
+  Solyc09g009190.2.1 457 F--------------HSGARGYHWMWDSR---------LFNYGNWEVLRYLLSNARWWLDEFkFDGFRFDGVTSMMY 510
+                         3..............23334455555552.........38999999*************9999*******9887654 PP
+
+>> Solyc04g082090.2.1  genomic_reference:SL2.40ch04 gene_region:63474186-63478355 transcript_region:SL2.40ch04:63474186.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   67.1   0.0   1.6e-21   3.9e-18       5     304 ..      38     327 ..      35     329 .. 0.76
+
+  Alignments for each domain:
+  == domain 1    score: 67.1 bits;  conditional E-value: 1.6e-21
+                         HHGGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCC CS
+       Alpha-amylase   5 GiieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkidpefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpy 95 
+                          +  K +++ + G+t+ wl P+ +s  +  gY  ++ ++++  +G ++ +++L++k++++ ++ + D+V+NH     +     ++ +d   
+  Solyc04g082090.2.1  38 NLDMKVPDIAKSGITTAWLPPVCHSL-APEGYLPQNLYSLNSSYGSEDLLNALLDKLKQYKVRGMADIVINHRVGTTQGHGGIYNRYD--- 124
+                         567899******************99.99*******************************************8877776222222222... PP
+
+                         GGGBSEE.--ETTSSSBB-TT--S..-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH--..----EETTGGGS---HHHHHH CS
+       Alpha-amylase  96 rdyyiwkdgkkepptnwkslfggs..aweddeeaqehkflkslpdlnteneevvkelkkvvkfwldkg..vDGfRlDavkhiskefwkeft 182
+                                      p  w ++   s    + ++ +   +++++ p +++++  v+k l + ++ wl+ +     fR+D +k ++++ +ke+ 
+  Solyc04g082090.2.1 125 -G----------IPMSWDEHAITSctGGRGNKST--GDNFNGFPNIDHTQSFVRKDLIDWMR-WLRSSvgFQDFRFDFAKGYASKYVKEYI 201
+                         .2..........2333433222220022223333..469********************664.6665534899***************999 PP
+
+                         HHHHHHTS----B-------HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCSTTSB--SSHHHHHHHHHHHHHHSTC........GGGEEB CS
+       Alpha-amylase 183 qalneykeevftvgEvfgasdedarvdatesymeleslldfedfdlaekvkeksqlksitakklkevlsktlselse........deeqvt 265
+                         +  +     +f vgE++++ + +     ++++   + +++  d   + +++  +++k i  +++k  + + +++  +         +++vt
+  Solyc04g082090.2.1 202 EGAK----PIFAVGEYWDTCNYKGSNLDYNQDSHRQRIINWIDGAGQLSTAFDFTTKAILQEAVKGEFWRLRDSKGKppgvlgwwPSRAVT 288
+                         9988....79********9988888888888888887888777665555554344444443333333333333222233588888899*** PP
+
+                         -SS-TTSHHHHHHTT-HHHHHHHHHHHHHT---EBEEE- CS
+       Alpha-amylase 266 flenHDqeRvlsrfgddsaklklalallltlrGtpviYy 304
+                         f++nHD+   +  +   s+++    a +lt++G+p ++y
+  Solyc04g082090.2.1 289 FIDNHDTGSTQAHWPFPSHHVMEGYAYILTHPGIPSVFY 327
+                         **************99999******************99 PP
+
+>> Solyc06g009220.2.1  genomic_reference:SL2.40ch06 gene_region:3155576-3182364 transcript_region:SL2.40ch06:3155576..31
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   58.4   0.0   7.1e-19   1.8e-15       1     311 [.     257     615 ..     257     621 .. 0.69
+
+  Alignments for each domain:
+  == domain 1    score: 58.4 bits;  conditional E-value: 7.1e-19
+                         TT--HHGGGHHHHHH----EEEE---EE.............BGG.TTGGG-ECEEEEE-TT-.....--...HHHHHHHHHHHHCTT-EEE CS
+       Alpha-amylase   1 GDlkGiieKLdYlkdlGvtaiwlsPife.............spq.syhgYditdykkidpef.....Gt...ledfkeLiskahekgikvi 69 
+                         G + G+ieK++ l +lGv+++ l P+fe              ++ + +gY + ++ +   ++     G      ++ke+++++h  gi vi
+  Solyc06g009220.2.1 257 GSYLGLIEKIPHLLELGVNTVELLPVFEfdelelqrrpnprDHMiNTWGYSTINFFAPMSRYascggGPvraSWELKEMVKALHGAGIEVI 347
+                         7788********************************8877633479****************6664222222458**************** PP
+
+                         EEE-TSBEETTSCCHHHHHHHTTSCCGGGBSEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH- CS
+       Alpha-amylase  70 lDlVvNHtsdehewfkeslkskdnpyrdyyiwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkkvvkfwldk 160
+                         lD+V+NHt+++++  +++ +s +  +++ y +      ++ n++   +  +++ + ++           +n + ++v++ +++ +++w+ +
+  Solyc06g009220.2.1 348 LDVVYNHTNEADDE-NPYTTSFRGIDNKVYYM------VDLNNN--AQLLNFSGCGNT-----------FNCNHPTVMELILESLRHWVTE 418
+                         **********9996.88888777665555542......222222..234556655555...........99************99999976 PP
+
+                         -.----EETTGGGS--..................................................-HHHHHHHHHHHHT.S----B---- CS
+       Alpha-amylase 161 g.vDGfRlDavkhisk..................................................efwkeftqalneyk.eevftvgEvf 199
+                           vDGfR+D ++ +                                                    e+  ++++++ +    ++ + g + 
+  Solyc06g009220.2.1 419 YhVDGFRFDLASVLCRgtdgtpinapplvkaisrdsvlsrckiiaepwdcgglylvgkfpnwdrwaEWNGKYRDDIRRFIkGDAGMKGNFA 509
+                         66************999999*9999999999999999999999999999999999999977733333333333333333333333333333 PP
+
+                         ---HHHHHHHHHHTTCSCS--BSHCHHHHHHHHCSTTSB--SSHHHHHHHHHHHHHHSTC...GGGEEB-SS-TTSHHHHHHTT-HHH... CS
+       Alpha-amylase 200 gasdedarvdatesymeleslldfedfdlaekvkeksqlksitakklkevlsktlselse...deeqvtflenHDqeRvlsrfgddsa... 284
+                               a+               + + +  ++v+ + +++ +t+++l ++ +k  ++  e   d  + +f  n   e   s+++ ++    
+  Solyc06g009220.2.1 510 TRIAGSADL------------YRVNKRKPYHSVNFVIAHDGFTLYDLVSYNNKHNDANGEggnDGCNDNFSWNCGIEGETSDANVNELrsr 588
+                         333333333............3333444444444444444455555555555444444443333334444444444443333333333444 PP
+
+                         HHHHHHHHHHT---EBEEE---TT--- CS
+       Alpha-amylase 285 klklalallltlrGtpviYyGeEigmt 311
+                         ++k+   +l+ ++Gtp++  G+E g t
+  Solyc06g009220.2.1 589 QMKNFHLALMVSQGTPMMLMGDEYGHT 615
+                         789999999999999999999999876 PP
+
+>> Solyc04g082400.2.1  genomic_reference:SL2.40ch04 gene_region:63662213-63669892 transcript_region:SL2.40ch04:63662213.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   45.9   1.1   4.3e-15   1.1e-11      10     197 ..     293     484 ..     287     579 .. 0.63
+
+  Alignments for each domain:
+  == domain 1    score: 45.9 bits;  conditional E-value: 4.3e-15
+                         HHHHHH----EEEE---EEBGG.TTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCCGGGB CS
+       Alpha-amylase  10 LdYlkdlGvtaiwlsPifespq.syhgYditdykkidpefGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpyrdyy 99 
+                         L+ +k  ++++++l+ i+e ++ + +gY++t++ ++  + G+ ed+k Li+kah+ g++v++D+V  H s++       l+         +
+  Solyc04g082400.2.1 293 LPRIKANNYNTVQLMAIMEHSYyGSFGYHVTNFFAVSSRSGNPEDLKYLIDKAHSLGLQVLVDVVHSHASNNVTD---GLN--------GF 372
+                         6668888999*********5555**********************************************999884...333........22 PP
+
+                         SEE.--ETTSSSBB-TT--S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH--.----EETTGGGS--..........-HHH CS
+       Alpha-amylase 100 iwkdgkkepptnwkslfggsaweddeeaqehkflkslpdlnteneevvkelkkvvkfwldkg.vDGfRlDavkhisk..........efwk 179
+                         ++ +g  ++         +s ++  e +  +++l++   +n+ n ev + l++ ++ wl++   DGfR+D +  +            +   
+  Solyc04g082400.2.1 373 DIGQG--SQ---------ESYFHAGERG--YHKLWDSRLFNYANWEVLRFLLSNLRWWLEEYnFDGFRFDGITSMLYvhhginmgftG--- 447
+                         32222..11.........2233333333..4455555678899999999999999999987679999999887765556666664442... PP
+
+                         HHHHHHHHHT...................S----B-- CS
+       Alpha-amylase 180 eftqalneyk...................eevftvgE 197
+                         ++++   e++                   +++ +++E
+  Solyc04g082400.2.1 448 NYNEYFSEATdvdavvylmlannlihkifPDATVIAE 484
+                         2222222222222444444444444444555555555 PP
+
+>> Solyc07g064830.2.1  genomic_reference:SL2.40ch07 gene_region:64039012-64053950 transcript_region:SL2.40ch07:64039012.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   43.5   0.1   2.3e-14   5.8e-11       5      75 ..     424     495 ..     422     619 .. 0.87
+
+  Alignments for each domain:
+  == domain 1    score: 43.5 bits;  conditional E-value: 2.3e-14
+                         HHGGGHHHHHH----EEEE---EEBGG.TTGGG-ECEEEEE-TT---HHHHHHHHHHHHCTT-EEEEEE-TS CS
+       Alpha-amylase   5 GiieKLdYlkdlGvtaiwlsPifespq.syhgYditdykkidpefGtledfkeLiskahekgikvilDlVvN 75 
+                         +i + L+ +k+ G++ai++  ++e ++    gY +t+++++  ++Gt +dfk+L+++ah  g+ v+l +V  
+  Solyc07g064830.2.1 424 FISKVLPHVKEAGYNAIQIIGVVEHKDyFTVGYRVTNFYAVSSRYGTPDDFKRLVDEAHGLGLLVFLEIVHS 495
+                         6778899*****************7755788************************************99954 PP
+
+>> Solyc09g064800.1.1  evidence_code:10F0H1E1IEG genomic_reference:SL2.40ch09 gene_region:57806545-57809145 transcript_r
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !   35.8   0.0   5.2e-12   1.3e-08       1      82 [.     378     466 ..     378     474 .. 0.88
+   2 ?    3.4   0.0     0.038        94     119     165 ..     471     516 ..     466     526 .. 0.85
+   3 ?    0.2   0.0      0.37   9.1e+02     285     314 ..     669     698 ..     651     700 .. 0.81
+
+  Alignments for each domain:
+  == domain 1    score: 35.8 bits;  conditional E-value: 5.2e-12
+                         TT--HHGGGHHHHHH----EEEE---EEBGGTTGGG-ECEEEEE-TT---HHH.......HHHHHHHHHCTT-EEEEEE-TSBEETTSC CS
+       Alpha-amylase   1 GDlkGiieKLdYlkdlGvtaiwlsPifespqsyhgYditdykkidpefGtled.......fkeLiskahekgikvilDlVvNHtsdehe 82 
+                         G ++Gi eK   lkdlGv+a  l Pif   +++  Y    + +  +++G   d       +k +++k+h++gi v+l +V+ Ht+++ +
+  Solyc09g064800.1.1 378 GTFSGISEKWHHLKDLGVNAMLLEPIFPFDEQKGPYYPWHFFSPGNMYGPSGDplsviksMKDMVKKLHANGIEVFLEVVFTHTAEDAP 466
+                         7899************************9989999**************865444444449************************9876 PP
+
+  == domain 2    score: 3.4 bits;  conditional E-value: 0.038
+                         S-CCEETTTTE-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH--.---- CS
+       Alpha-amylase 119 saweddeeaqehkflkslpdlnteneevvkelkkvvkfwldkg.vDGf 165
+                          +++++ ++   ++++ +  ln + + v++ +++ +++w+ +  +DGf
+  Solyc09g064800.1.1 471 DNFSYCIKGS--QDMNIQNALNCNYPIVQQMILDCLRHWVIEFhIDGF 516
+                         5677778885..69999*****************9999998878***9 PP
+
+  == domain 3    score: 0.2 bits;  conditional E-value: 0.37
+                         HHHHHHHHHHT---EBEEE---TT------ CS
+       Alpha-amylase 285 klklalallltlrGtpviYyGeEigmtggk 314
+                         ++++ l +l+ + G+pv   G+E g++ g 
+  Solyc09g064800.1.1 669 QVRNFLFILFISLGVPVLNMGDECGQSSGG 698
+                         6788889999999************98765 PP
+
+>> Solyc11g008050.1.1  evidence_code:10F0H1E1IEG genomic_reference:SL2.40ch11 gene_region:2256207-2264573 transcript_reg
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !    6.4   0.0    0.0046        11       8      63 ..      79     137 ..      74     139 .. 0.84
+   2 !   13.6   0.0   2.9e-05     0.073      53      82 ..     169     198 ..     167     236 .. 0.79
+   3 !   15.8   0.0   6.3e-06     0.016     151     200 ..     243     301 ..     222     326 .. 0.74
+   4 ?   -1.3   0.0         1   2.5e+03     219     274 ..     374     433 ..     349     442 .. 0.61
+
+  Alignments for each domain:
+  == domain 1    score: 6.4 bits;  conditional E-value: 0.0046
+                         GGHHHHHH----EEEE---EE...BGGTTGGG-ECEEEEE-TT---HHHHHHHHHHHHC CS
+       Alpha-amylase   8 eKLdYlkdlGvtaiwlsPife...spqsyhgYditdykkidpefGtledfkeLiskahe 63 
+                         ++L+ l + G+t + l P ++     +++h+   td++k++    + e+ ++Li+++++
+  Solyc11g008050.1.1  79 QHLKRLSNAGITHVHLLPTYQfagVEDEKHKWKYTDIEKLNSFPPDSEEQQALITAIQD 137
+                         789999***************76533399***********9988888888888887765 PP
+
+  == domain 2    score: 13.6 bits;  conditional E-value: 2.9e-05
+                         HHHHHHHHHHCTT-EEEEEE-TSBEETTSC CS
+       Alpha-amylase  53 dfkeLiskahekgikvilDlVvNHtsdehe 82 
+                         +f++++++++  g++v+lD+V+NH   + +
+  Solyc11g008050.1.1 169 EFRKMVQALNRIGLRVVLDVVYNHLHASGP 198
+                         799*********************987766 PP
+
+  == domain 3    score: 15.8 bits;  conditional E-value: 6.3e-06
+                         HHHHHHHHH--.----EETTGGGS--.......-HHHHHHHHHHHHT.S----B----- CS
+       Alpha-amylase 151 kkvvkfwldkg.vDGfRlDavkhisk.......efwkeftqalneyk.eevftvgEvfg 200
+                         ++ +k w+ +  +DGfR+D + hi k       +f++++ ++ n +    ++++gE ++
+  Solyc11g008050.1.1 243 LDDLKCWAVHYkIDGFRFDLMGHIMKrtmlkakSFLNSLSTEENGVDgSSIYIYGEGWD 301
+                         445666765545**************88866666666666666666599*******998 PP
+
+  == domain 4    score: -1.3 bits;  conditional E-value: 1
+                         --BSHCHHHHHHHHCSTTSB--SS..HHHHHHHHHHHHHHSTC...GGGEEB-SS-TTSHH CS
+       Alpha-amylase 219 slldfedfdlaekvkeksqlksit..akklkevlsktlselse...deeqvtflenHDqeR 274
+                            d  ++++a ++k+ + l++++    k +evl+++++ + +     e+v+++  HD+e 
+  Solyc11g008050.1.1 374 VSKDHIQVGMAANLKD-FVLTNCDgqEVKGSEVLMHDRKPVGYassPVETVNYVSAHDNET 433
+                         4455555555556654.22333332245556777777776555445789999999999975 PP
+
+>> Solyc10g007900.2.1  genomic_reference:SL2.40ch10 gene_region:2091468-2095251 transcript_region:SL2.40ch10:2091468..20
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 ?   10.6   0.1   0.00024       0.6      47     176 ..      55     228 ..      50     277 .. 0.66
+
+  Alignments for each domain:
+  == domain 1    score: 10.6 bits;  conditional E-value: 0.00024
+                         T---HHHHHHHHHHHHCTT-EEEEEE-TSBEETTSCCHHHHHHHTTSCCGGGBSE.E.-.....................-ETTSSSBB-. CS
+       Alpha-amylase  47 efGtledfkeLiskahekgikvilDlVvNHtsdehewfkeslkskdnpyrdyyiw.kdg.....................kkepptnwks. 114
+                          +G+++++k++i++a +k i++  Dl+    ++        +++++   +++++w  ++                     +k+  + + + 
+  Solyc10g007900.2.1  55 LYGDMKEMKKMIEEATSKPINLSHDLIWPRINPFIHK---TITNYG---KNCFVWiGPKpavlitepklirevltknyvyQKARGSPLSKl 139
+                         59*************************9888777664...333333...455555222245555555566655555444422222222223 PP
+
+                         .TT--S-CCEETTTTE...-SS-TTSEBB-TTSHHHHHHHHHHHHHHHH--.----EETTGGGS--......................- CS
+       Alpha-amylase 115 .lfggsaweddeeaqe...hkflkslpdlnteneevvkelkkvvkfwldkg.vDGfRlDavkhisk......................e 176
+                          + g +a e+d++a++    + +++l++l++  +++   ++++++ w +    DG  +D+  ++++                      e
+  Solyc10g007900.2.1 140 vISGLAAHEKDKWATHrriLNPAFHLDKLKHMLPAFKLTINEMLNTWKEVVsKDGTEIDVWPYLQTltsdaisrtafgsnyeegkkifE 228
+                         35566666666666666777888999999999999888888888888886668999999998888866666666666666655555552 PP
+
+>> Solyc07g062510.2.1  genomic_reference:SL2.40ch07 gene_region:62439678-62443172 transcript_region:SL2.40ch07:62439678.
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 ?    9.2   0.1   0.00067       1.7      48      74 ..      51      77 ..      45     275 .. 0.63
+
+  Alignments for each domain:
+  == domain 1    score: 9.2 bits;  conditional E-value: 0.00067
+                        ---HHHHHHHHHHHHCTT-EEEEEE-T CS
+       Alpha-amylase 48 fGtledfkeLiskahekgikvilDlVv 74
+                        +G+++df ++i++a++k +++  D+ +
+  Solyc07g062510.2.1 51 YGDMKDFSKMIKEANSKPMNLSNDITP 77
+                        9*******************9988765 PP
+
+
+
+Internal pipeline statistics summary:
+-------------------------------------
+Query model(s):                            1  (316 nodes)
+Target sequences:                      34727  (11990819 residues)
+Passed MSV filter:                      1793  (0.0516313); expected 694.5 (0.02)
+Passed bias filter:                      932  (0.0268379); expected 694.5 (0.02)
+Passed Vit filter:                        90  (0.00259164); expected 34.7 (0.001)
+Passed Fwd filter:                        14  (0.000403145); expected 0.3 (1e-05)
+Initial search space (Z):              34727  [actual number of targets]
+Domain search space  (domZ):              14  [number of targets reported over threshold]
+# CPU time: 1.27u 0.06s 00:00:01.33 Elapsed: 00:00:00.34
+# Mc/sec: 11144.41
+//

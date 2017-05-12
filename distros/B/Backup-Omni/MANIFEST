@@ -1,0 +1,27 @@
+Build.PL
+Changes
+ignore.txt
+lib/Backup/Omni.pm
+lib/Backup/Omni/Base.pm
+lib/Backup/Omni/Class.pm
+lib/Backup/Omni/Constants.pm
+lib/Backup/Omni/Exception.pm
+lib/Backup/Omni/Restore/Filesystem/Single.pm
+lib/Backup/Omni/Session/Filesystem.pm
+lib/Backup/Omni/Session/Messages.pm
+lib/Backup/Omni/Session/Monitor.pm
+lib/Backup/Omni/Session/Results.pm
+lib/Backup/Omni/Utils.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod.t
+test/test1.pl
+test/test2.pl
+test/test3.pl
+test/test4.pl
+test/test5.pl
+Makefile.PL
+META.yml

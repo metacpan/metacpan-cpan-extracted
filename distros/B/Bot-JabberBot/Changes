@@ -1,0 +1,9 @@
+Revision history for Perl extension Bot::JabberBot.
+
+0.02  Fri Jul 25 09:37:00 2003
+	- patch to fix bot looping to itself by Tom Hukins
+
+0.01  Tue Oct 15 19:46:21 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Bot::JabberBot
+

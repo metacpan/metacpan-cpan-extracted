@@ -1,0 +1,13 @@
+<SOFTPKG NAME="Bundle-PBib" VERSION="2,08,01,0">
+    <TITLE>Bundle-PBib</TITLE>
+    <ABSTRACT>Something like BibTeX, but written in perl and designed to be extensible in three dimensions: bibliographic databases (e.g. BibTeX, OpenOffice), document file formats (e.g. Word, RTF, OpenOffice), styles (e.g. ACM, IEEE)</ABSTRACT>
+    <AUTHOR>Peter Tandler &lt;pbib@tandlers.de&gt;</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Config-General" VERSION="2,18,0,0" />
+        <DEPENDENCY NAME="Data-Dumper" VERSION="2,12,0,0" />
+        <DEPENDENCY NAME="Bundle-DBI" VERSION="11,02,0,0" />
+        <DEPENDENCY NAME="Module-Build" VERSION="0,2604,0,0" />
+        <DEPENDENCY NAME="Cwd" VERSION="2,06,0,0" />
+        <CODEBASE HREF="PPM-Bundle-PBib-2.08.01.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

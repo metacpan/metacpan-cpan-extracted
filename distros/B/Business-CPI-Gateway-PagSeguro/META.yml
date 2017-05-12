@@ -1,0 +1,30 @@
+---
+abstract: "Business::CPI's PagSeguro driver"
+author:
+  - 'André Walker <andre@andrewalker.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-CPI-Gateway-PagSeguro
+provides:
+  Business::CPI::Gateway::PagSeguro:
+    file: lib/Business/CPI/Gateway/PagSeguro.pm
+    version: '0.904'
+requires:
+  Business::CPI: '0.910'
+  DateTime: '0'
+  LWP::Simple: '0'
+  Locale::Country: '0'
+  Moo: '1.0'
+  URI: '0'
+  XML::LibXML: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/andrewalker/p5-business-cpi-gateway-pagseguro.git
+version: '0.904'

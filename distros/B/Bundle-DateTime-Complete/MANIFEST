@@ -1,0 +1,6 @@
+MANIFEST
+README
+Changes
+lib/Bundle/DateTime/Complete.pm
+Makefile.PL
+META.yml

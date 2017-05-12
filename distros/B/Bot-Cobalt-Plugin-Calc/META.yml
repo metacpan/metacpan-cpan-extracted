@@ -1,0 +1,29 @@
+---
+abstract: 'Calculator plugin for Bot::Cobalt'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Cobalt-Plugin-Calc
+requires:
+  BSD::Resource: '0'
+  Bot::Cobalt: '0'
+  List::Objects::WithUtils: '2'
+  Math::Calc::Parser: '0'
+  POE: '1'
+  Storable: '0'
+  Time::HiRes: '0'
+  strictures: '2'
+resources:
+  repository: git://github.com/avenj/bot-cobalt-plugin-calc.git
+version: '0.004005'

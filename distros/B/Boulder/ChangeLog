@@ -1,0 +1,6 @@
+1999-12-02  Lincoln Stein  <lstein@cshl.org>
+
+	* Fixed parameter bug in File accessor for Boulder::Genbank.
+	* Documented  problems with flock() across NFS filesystems.
+	* Boulder::Genbank no longer "eats" the list of accession numbers
+	passed to it.

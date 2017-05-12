@@ -1,0 +1,52 @@
+[
+
+]
+config {
+    engine MP20;
+    template_engine TT;
+    Init Std {  }
+    Conf Gantry { conffile `docs/app.gantry.conf`; instance sample; }
+    HttpdConf Gantry { gantry_conf 1; }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Sample {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+        doc_rootp `/static` => no_accessor;
+        show_dev_navigation 1 => no_accessor;
+    }
+    config CGI {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        app_rootp `/cgi-bin/sample.cgi` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    controller AddressControl is AutoCRUD {
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title Address;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+        method do_alt_main is main_listing {
+            title Addresses;
+        }
+        uses Carp, Date::Calc;
+    }
+}

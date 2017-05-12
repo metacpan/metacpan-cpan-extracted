@@ -1,0 +1,22 @@
+#TODO: Stop install bash-completion or uuid-runtime when bug fixed in stable
+#FIXME: File bugreport about bash-completion and uuid-runtime not installed
+classes:
+  - Admin.apt.auto.functions
+parameters:
+  doc:
+    admin:
+      tweak:
+        - fix mark auto-installed essential packages + dependencies (bug#742977)
+  pkg:
+    - bash-completion
+    - uuid-runtime
+  pkg-auto:
+    - bash-completion
+    - grub-common
+    - isc-dhcp-common
+    - tasksel-data
+    - uuid-runtime
+  tweak:
+    - >
+      chroot /target apt-mark auto \
+        $(_pkganddeepdeps $(_pkgessentials) apt linux-image-*) || true

@@ -1,0 +1,97 @@
+#!/usr/local/bin/perl
+
+use strict 'vars';
+use LWP::UserAgent;
+use URI::Escape;
+use Getopt::Long;
+use strict;
+use constant GENBANK_URL=>"http://www.ncbi.nlm.nih.gov/htbin-post/Entrez/query?form=4&html=no";
+use constant CHUNKSIZE=>10000;
+my ($TERM,$AGE,$MAX,$DB,$VERBOSE,$BUFFER,$COUNT,$GOT,$GOT_TOTAL);
+
+GetOptions('max=i'  => \$MAX,
+	   'db=s'   =>\$DB,
+	   'age=i'  => \$AGE,
+	   'count'  => \$COUNT,
+	   'verbose!'=>\$VERBOSE) || die <<USAGE;
+Usage: $0 [options] <query string>
+Query GenBank for a list of accession numbers.  The query
+string should be in the form recognized by  NCBI\'s term parser. 
+See http://www.ncbi.nlm.nih.gov/Entrez/linking.html
+for examples.
+
+Options:
+       -db  <database> Database to search (n)
+       -max <max>      Max entries to return (100)
+       -age <days>     Only fetch accessions entered <days> ago
+       -verbose        Show brief description line
+       -count          Just retrieve the count that would be retrieved
+
+Database specifiers:
+  m  MEDLINE
+  p  Protein
+  n  Nucleotide
+  t  3-D structure
+  c  Genome
+Example search:
+  gb_search -verbose -db n 'Oryza sativa[Organism] AND EST[Keyword]'
+Some common field modifiers:
+  [All Fields]
+  [Accession]
+  [Author Name]
+  [Feature Key]
+  [Gene Name]
+  [Keyword]
+  [Organism]
+USAGE
+;
+
+$MAX ||= 100;
+$DB  ||= 'n';
+$DB = lc(substr($DB,0,1));  # first character, whatever it is
+$BUFFER = '';
+my $max = $MAX > CHUNKSIZE ? CHUNKSIZE : $MAX;
+
+$TERM = GENBANK_URL . "&db=$DB&dispmax=$max&term=" . uri_escape("@ARGV");
+$TERM .= "&relpubdate=$AGE" if $AGE > 0;
+$TERM .= "&Dopt=" . ($COUNT ? 'q' : 'd');
+$GOT_TOTAL=0;
+my $agent = LWP::UserAgent->new();
+
+while ($GOT_TOTAL < $MAX) {
+  $GOT = 0;
+  my $req   = HTTP::Request->new('GET' => "$TERM&dispstart=$GOT_TOTAL");
+  my $response = $agent->request($req,\&process_text);
+  die "Request failure: ",$response->status_line 
+    unless $response->is_success;
+  last if $GOT < CHUNKSIZE;
+  $GOT_TOTAL += $GOT;
+}
+exit 0;
+
+sub process_text ($$$) {
+  my ($chunk,$response,$protocol) = @_;
+  my ($position,$remainder);
+  $BUFFER .= $chunk;
+  if ($COUNT) {
+    print $1,"\n" if $BUFFER=~/^(\d+)\n/;
+    $GOT = $MAX;
+    return;
+  }
+  if ($VERBOSE) {
+    while ($BUFFER=~/^\s+\d+ (\w+)\n\n(.*)\ngi/mg) {
+      print "$1\t$2\n";
+      $position = pos($BUFFER);
+      $GOT++;
+    }
+  } else {
+    while ($BUFFER=~/^\s+\d+ (\w+)\n\n/mg) {
+      print "$1\n";
+      $GOT++;
+      $position = pos($BUFFER);
+    }
+  }
+  substr($BUFFER,0,$position) = '';
+  pos($BUFFER)=0;
+}
+

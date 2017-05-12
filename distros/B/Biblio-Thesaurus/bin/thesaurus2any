@@ -1,0 +1,106 @@
+#!/usr/bin/perl -s
+
+=head1 NAME
+
+thesaurus2any - translate thesaurus like notation to xml catalogue format
+
+=head1 SYNOPSYS
+
+  thesaurus2any -cat file > file.xml
+  thesaurus2any -thes file > file.the
+  thesaurus2any -tex file > file.tex
+
+=head1 DESCRIPTION
+
+translates a thesaurus file into XML catalogue format, or thesaurus format
+after completion, or to latex format.
+
+=head2 OPTIONS
+
+ -cat                XML catalogue format
+ -thes               thesaurus format
+ -tex                LaTeX format
+ -multi
+
+=cut
+
+# use lib qw(/home/jj/lib/perl5/);
+
+use Biblio::Thesaurus;
+use vars qw($thes $cat $tex $multi);
+
+if ($multi) {
+  $the = thesaurusMultiLoad(@ARGV);
+} else {
+  my $thesaurus = shift || die ("use: 	thesaurus2any filename\n");
+  $the = thesaurusLoadM($thesaurus);
+}
+
+#$the->addInverse('RT' , "RT");
+#$the->addInverse('POF' => "HAS");
+#$the->addInverse('about' => "citedIn");
+#$the->addInverse('needs' => "usedIn");
+#$the->addInverse('INST' => "IOF");
+#$the->addInverse('makes' => 'by');
+
+sub t2cat{
+my @rel= qw( about IOF needs usedin POF NT BT RT INST HAS makes by );
+my $corres={
+         about => [ "rel type='about'","/rel"],
+         POF =>   [ "rel type='POF'","/rel"],
+         makes => [ "rel type='RT'","/rel"],
+         by =>    [ "rel type='BT'","/rel"],
+         SN =>    [ "description","/description"],
+};
+
+for (@rel){$corres->{$_}=["rel type='$_'","/rel"];}
+
+  $mydetails = {
+     '-eachTerm' => 
+        sub{"<doc>\n  <title>$term</title>\n$_" .  
+            ($nott? "": "    <rel type='IOF'>termo thesaurus</rel>\n"). 
+            ($nott? "": "    <rel type='self'>$_c</rel>\n") .
+            "</doc>\n\n"},
+     '-end' => sub{"<catalogo>\n\n$_</catalogo>\n"} ,
+  };
+
+print "<?xml version='1.0' encoding='ISO-8859-1'?>\n",
+      $the->toXml($corres,$mydetails);
+}
+
+$names = { 
+  # 'NT' => "termo específico",
+  #         'BT' => "termo genérico",
+  #         'RT' => "termo associado",
+  #         'POF' => "parte de",
+  #         'HAS' => "partes",
+  #         'about' => "acerca de",
+  #         'needs' => "necessita de",
+  #         'usedin' => "usado em",
+  #         'IOF' => "instância de",
+  #         'INST' => "instâncias",
+  #	   'makes' => 'obras',
+  #  	   'by' => 'autor',
+  #           'USE' => "ver",
+  #           'USES' => "sinónimo",
+  #           'SN'  => "Descrição",
+        };
+
+$auxfile="/tmp/$$.out";
+
+sub t2the{ 
+  $the->save($auxfile) ; 
+  print `cat $auxfile` ;
+  unlink($auxfile);
+ }
+
+sub t2tex{
+  print $the->toTex(
+       {map {$_ => ["\\\\\\emph{$names->{$_}} -- ",""]} keys %$names },
+#       { -order => [qw{SN NT BT RT IOF HAS}] }
+  ) ; 
+}
+
+if   ($tex){t2tex();}
+elsif($cat){t2cat();}
+else       {t2the();}

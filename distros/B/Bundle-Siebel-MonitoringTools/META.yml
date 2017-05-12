@@ -1,0 +1,31 @@
+---
+abstract: 'bundle for installing all Perl dependencies for Siebel Monitoring Tools project'
+author:
+  - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.014004'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bundle-Siebel-MonitoringTools
+provides:
+  Bundle::Siebel::MonitoringTools:
+    file: lib/Bundle/Siebel/MonitoringTools.pm
+    version: '0.07'
+requires:
+  perl: '5.014004'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/glasswalk3r/siebel-monitoring-tools/issues
+  homepage: https://github.com/glasswalk3r/siebel-monitoring-tools
+  repository: https://github.com/glasswalk3r/siebel-monitoring-tools.git
+version: '0.07'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,26 @@
+_Inline/config
+_Inline/lib/auto/Bio/ECell_72c6/ECell_72c6.inl
+_Inline/lib/auto/Bio/ECell_72c6/ECell_72c6.pydat
+_Inline/lib/auto/Bio/ECell_8010/ECell_8010.inl
+_Inline/lib/auto/Bio/ECell_8010/ECell_8010.pydat
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Bio/ECell.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/_Inline/config
+t/_Inline/lib/auto/Bio/ECell_8010/ECell_8010.inl
+t/_Inline/lib/auto/Bio/ECell_8010/ECell_8010.pydat
+t/Bio-ECell.t

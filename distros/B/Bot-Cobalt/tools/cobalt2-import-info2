@@ -1,0 +1,102 @@
+#!perl
+
+# Cheap importer tool for darkbot6/cobalt1 info2 files.
+
+my $VERSION = '0.02';
+
+use 5.10.1;
+use strict;
+use warnings;
+
+use Time::HiRes qw/gettimeofday tv_interval/;
+
+use Bot::Cobalt::DB;
+
+use Bot::Cobalt::Utils qw/
+  glob_to_re_str
+  glob_to_re
+/;
+
+use IRC::Utils qw/decode_irc/;
+
+my $info2_path;
+my $output_path;
+my $verbose = 0;
+my $bench   = 0;
+use Getopt::Long;
+GetOptions(
+  'info2=s' => \$info2_path,
+  'dest=s'  => \$output_path,
+  'verbose!'   => \$verbose,
+  'benchmark!' => \$bench,
+  help => \&help,
+);
+
+sub help {
+  print(
+    "$0 $VERSION\n",
+    "Usage:\n $0 --info2=info2.db --dest=newinfo3.db\n"
+  );
+  exit 0
+}
+
+help() unless $info2_path and $output_path;
+
+die "Could not find $info2_path" unless -e $info2_path;
+
+open my $info2_fh, '<', $info2_path
+  or die "Could not open $info2_path: $!\n";
+my @info2db = <$info2_fh>;
+close $info2_fh;
+
+die "Empty info2db at $info2_path?\n" unless @info2db;
+
+my $info3ref;
+
+for my $line (@info2db) {
+  my @split = split ' ', decode_irc($line);
+  my $glob  = lc ( shift @split );
+  
+  ## Convert ?action -> ~action
+  $glob =~ s/^\?action/~action/;
+  
+  my $str   = join ' ', @split;
+  my $re = glob_to_re_str($glob);
+  ## Anchor:
+  $re = '^'.$re.'$';
+
+  unless ($glob && $re) {
+    warn "!! Missing element; glob: $glob  regex: $re";
+    next
+  }
+
+  say "$glob -> $re" if $verbose;
+
+  $info3ref->{$glob} = {
+    Regex => $re,
+    Response => $str,
+    AddedBy  => '-Imported',
+    AddedAt  => time,
+  };
+}
+
+my $count = scalar keys %$info3ref;
+say "Output path: $output_path";
+say "Pushing $count topics to Info3 DB";
+
+my $cdb = Bot::Cobalt::DB->new(
+  file => $output_path,
+);
+my $timer0 = [gettimeofday];
+$cdb->dbopen || die "failed to open db\n";
+for my $glob (keys %$info3ref) {
+  unless ( $cdb->put($glob, $info3ref->{$glob}) ) {
+    warn "!! db put failure for $glob";
+  }
+}
+$cdb->dbclose;
+my $interval = tv_interval($timer0);
+
+
+say "Done.";
+say $interval if $bench;

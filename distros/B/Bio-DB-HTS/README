@@ -1,0 +1,106 @@
+This is a Perl interface to the HTS Library. See http://htslib.org
+
+Bio::DB::HTS supports a wide range of install configurations, with two scripts - Build.PL and INSTALL.pl.
+
+For a list of the ways it can be used, with examples in action see
+https://github.com/Ensembl/Bio-DB-HTS/blob/master/scripts/build_options.sh
+(link to scripts/build_options.sh in the Bio::DB::HTS GitHub repo at https://github.com/Ensembl/Bio-DB-HTS)
+
+## ONE-STEP INSTALLATION (INSTALL.pl)
+
+In the root directory of this distribution you will find the script INSTALL.pl. Running this will download the latest released version of this module (from CPAN) and HTSlib (from GitHub) into a temporary directory, compile them, test and install Bio::DB::HTS. If you wish to install a version of Bio::DB::HTS downloaded (and possibly edited) from GitHub please use Build.PL as documented in the Multi-Step Installations section below.
+
+Simply run:
+```
+  perl INSTALL.pl
+```
+
+It will not install HTSlib at the system level - if desired this can be accomplished by changing into the downloaded htslib sub-directory and typing
+```
+  #These commands may need sudo...
+  #make and install the program
+  make install
+  #refresh the installed library listed
+  ldconfig
+```
+
+When invoked, Bio::DB::HTS will try to use HTSlib from its downloaded location. If this is removed it requires htslib to be installed on the system, or LD_LIBRARY_PATH (DYLD_LIBRARY_PATH on Mac OSX) should contain the directory containing libhts.so.
+
+Alternatively
+```
+  perl INSTALL.pl --static
+```
+will install a version of Bio::DB::HTS. Be aware that this option depends on your system supporting it, and upgrades to HTSlib will require a rebuild of Bio::DB::HTS.
+
+## MULTI-STEP INSTALLATIONS (Build.PL)
+
+You may require a more custom install e.g. a specific or customised version of HTSlib, HTSlib installed in a specific directory, or statically included, or Bio::DB::HTS installed in a specific location. Typically these will involve downloading, compiling and installing HTSlib first, followed by downloading compiling and installing Bio::DB:HTS.
+
+You can see various examples of installing HTSlib and then Bio::DB::HTS using Build.PL by examining scripts/build_options.sh
+
+### TROUBLESHOOTING
+
+If you encounter problems during compiling, you may need to edit
+Build.PL so that extra_compiler_flags matches the CFLAGS and DFLAGS
+settings in the HTSlib Makefile.  Here are some common problems:
+
+1. When building this module, you get an error like the following:
+relocation R_X86_64_32 against `a local symbol' can not be used when
+making a shared object; recompile with -fPIC
+
+To fix this, edit the Makefile in the Samtools distribution by adding
+"-fPIC" to the CFLAGS line. While you're at it, you may also wish to
+get rid of a bunch of unused variable warnings that appears under
+recent versions of gcc. The modified CFLAGS will look like this
+
+  CFLAGS= -g -Wall -Wno-unused -Wno-unused-result -O2 -fPIC #-m64 #-arch ppc
+
+Then do "make clean; make" in the Samtools directory to recompile the
+library. After this you should be able to build this module without
+errors.
+
+2. When building this module, you get an error about a missing math
+library.
+
+To fix this, follow the recipe in (1) except add -m64 to CFLAGS so it
+looks like this:
+
+  CFLAGS=	-g -Wall -O2 -fPIC #-m64 #-arch ppc
+
+3. Remote file access over https is possible using libcurl when compiling HTSlib
+
+   autoconf
+   ./configure --enable-libcurl
+
+
+4. "Failed to populate reference for id X" error message
+
+This is probably an indication that the CRAM Reference archive is unavailable.
+
+## TESTING AND CONTRIBUTING
+
+You can obtain the most recent development version of this module via
+its GitHub site at https://github.com/Ensembl/Bio-DB-HTS. Please
+feel free to submit bug reports, patches, etc. via GitHub.
+
+### AUTHOR
+
+Rishi Nag <rishi@ebi.ac.uk>
+based on Bio::DB::Sam by Lincoln Stein
+
+
+### COPYRIGHT
+
+Copyright [1999-2016] EMBL-European Bioinformatics Institute
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.

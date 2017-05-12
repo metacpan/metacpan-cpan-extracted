@@ -1,0 +1,8 @@
+.cvsignore
+lib/Bot/ICB.pm
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+eg/samplebot.pl
+t/test.t

@@ -1,0 +1,11 @@
+[%#
+    Template for generating divs containing app body blocks (including
+    literals).  Pass it the following parameters in view.data:
+
+        block      - the app_block_hashes output for the new block
+        statements - hash returned by Bigtop::Parser::get_keyword_docs
+%]
+[%# XXX this could be made to loop over a list of blocks delimiting them
+    in some way (say with illegal html, or a particular legal comment) %]
+[% INCLUDE app_body_div.ttc
+           block      = view.data.block %]

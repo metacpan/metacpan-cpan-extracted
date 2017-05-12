@@ -1,0 +1,12 @@
+[% IF c.user_exists %]
+<div id="basic_navigation">
+<table class="nav_links">
+<tr>
+<td><a href="[% c.uri_for('/logout') %]" title="Logout">Logout</a></td>
+<td><a href="[% c.uri_for('/change_password') %]" title="Change Password">Change Password</a></td>
+</tr>
+</table>
+</div>
+[% END %]
+
+

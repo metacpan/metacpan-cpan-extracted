@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Benchmark-Serialize
+version:            0.08
+abstract:           Benchmarks of serialization modules
+author:
+    - Peter Makholm <peter@makholm.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::Deep::NoTest:  0
+    Test::More:          0
+    UNIVERSAL::require:  0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/pmakholm/benchmark-serialize-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,65 @@
+{
+   "abstract" : "An object-oriented Perl toolkit for analyzing and manipulating phyloinformatic data.",
+   "author" : [
+      "Rutger Vos"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Phylo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "GD" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Math::CDF" : "0",
+            "Math::Random" : "0",
+            "PDF::API2" : "0",
+            "SVG" : "0",
+            "SWF::Builder" : "0",
+            "XML::LibXML" : "0",
+            "XML::Twig" : "0",
+            "XML::XML2JSON" : "0"
+         },
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rvosa/bio-phylo/issues"
+      },
+      "homepage" : "http://biophylo.blogspot.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/rvosa/bio-phylo.git"
+      },
+      "x_MailingList" : "mailto:bio-phylo@googlegroups.com"
+   },
+   "version" : "0.58"
+}

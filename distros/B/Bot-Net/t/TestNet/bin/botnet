@@ -1,0 +1,37 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+
+=head1 NAME
+
+botnet - A script to manage a Bot::Net application
+
+=head1 SYNOPSIS
+
+  bin/botnet help
+
+=head1 DESCRIPTION
+
+This is the main command used for building a L<Bot::Net> application and for helping to built the scaffolding and running that application.
+
+=cut
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Bot::Net;
+use Bot::Net::Script;
+
+Bot::Net::Script->dispatch;
+
+=head1 AUTHORS
+
+Andrew Sterling Hanenkamp C<< <hanenkamp@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2007 Boomer Consulting, Inc. All Rights Reserved.
+
+This program is free software and maybe modified and distributed under the same terms as Perl itself.
+
+=cut

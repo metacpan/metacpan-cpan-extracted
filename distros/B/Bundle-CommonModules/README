@@ -1,0 +1,40 @@
+Bundle-CommonModules version 1.03
+=================================
+
+Purpose of this module is to make automated installation of 
+common modules easier.
+
+To see the list of modules that will be installed, see the file:   Makefile.PL
+
+Feel free to change it if you want, or send  me a request at kevin@justanyone.com
+to do the same.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  ALL OF THEM !!!!!
+  
+  
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2011 by Kevin J. Rice, Prairie Grove, IL 60014 USA
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

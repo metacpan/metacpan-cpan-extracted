@@ -1,0 +1,404 @@
+NAME
+
+    Business::OnlinePayment::IPayment - Checkout via Ipayment Silent Mode
+
+VERSION
+
+    Version 0.08
+
+DESCRIPTION
+
+    This module provides an interface for online payments via gateway,
+    using the IPayment silent mode (https://ipayment.de).
+
+    It supports payments, capture and reverse operations, and vault-related
+    functions.
+
+SYNOPSIS
+
+      use Business::OnlinePayment::IPayment;
+      my %account = (
+                     accountid => 99999,
+                     trxuserid => 99998,
+                     trxpassword => 0,
+                     adminactionpassword => '5cfgRT34xsdedtFLdfHxj7tfwx24fe',
+                     app_security_key => 'testtest',
+                     wsdl_file => $wsdl_file,
+                     success_url => 'http://example.net/checkout-payment',
+                     failure_url => 'http://example.net/checkout-success',
+                     hidden_trigger_rul => 'http://example.net/trigger',
+                    );
+      
+      
+      my $secbopi = Business::OnlinePayment::IPayment->new(%account);
+      $secbopi->transaction(transactionType => 'preauth',
+                            trxAmount => 5000);
+      # see Business::OnlinePayment::IPayment::Transaction for available options
+    
+      $response = $ua->post('https://ipayment.de/merchant/99999/processor/2.0/',
+                            { ipayment_session_id => $secbopi->session_id,
+                              addr_name => "Mario Pegula",
+                              silent => 1,
+                              cc_number => "4111111111111111",
+                              cc_checkcode => "",
+                              cc_expdate_month => "02",
+                              trx_securityhash => $secbopi->trx_securityhash,
+                              cc_expdate_year => "2014" });
+      
+      
+
+ ACCESSORS
+
+  Fixed values (accountData and processorUrls)
+
+    The following attributes should and can be set only in the constructor,
+    as they are pretty much fixed values.
+
+    wsdl_file
+
+      The name of th WSDL file. It should be a local file.
+
+    accountid
+
+      The Ipayment account id (the one put into the CGI url). Integer.
+
+    trxuserid
+
+      The application ID, you can in your ipayment configuration menu read
+      using Anwendung > Details. Integer
+
+    trxpassword
+
+      For each application, there is an application password which
+      automatically ipayment System is presented. The password consists of
+      numbers. You will find the application password in your ipayment
+      Anwendungen > Details
+
+      This is not the account password!
+
+    adminactionpassword
+
+      The admin password.
+
+      This is not the account password!
+
+    app_security_key
+
+      If this attribute is set, we will (and shall) send a checksum for the
+      parameters.
+
+      Without this, we are opened to tampering
+
+    accountData
+
+      Accessor to retrieve the hash with the account data details. The
+      output will look like this:
+
+       accountData => {
+                       accountid => 99999,
+                       trxuserid => 99999,
+                       trxpassword =>0,
+                       adminactionpassword => '5cfgRT34xsdedtFLdfHxj7tfwx24fe'}
+
+    success_url
+
+      Mandatory (for us) field, where to redirect the user in case of
+      success.
+
+      CGI-Name: redirect_url
+
+      In silent mode, the parameters are always passed by GET to the
+      script. (no need to redirect_action)
+
+    failure_url
+
+      Mandatory (for us) field, where to redirect the user in case of
+      failure.
+
+      CGI Name: silent_error_url Data type: String
+
+      This URL is more in case of failure of ipayment system with the error
+      information and parameters using the GET method. This URL must point
+      to a CGI script that can handle the paramaters.
+
+    hidden_trigger_url
+
+      Optional url for the hidden trigger.
+
+    processorUrls
+
+      Return the hashref with the defined urls
+
+  error
+
+    This accessors point to a XML::Compile::SOAP backtrace. The object is
+    quite large and deeply nested, but it's there just in case we need it.
+
+  debug
+
+    Every call to session id stores the trace into this attribute.
+
+  trx_obj
+
+    Attribute to hold a Business::OnlinePayment::IPayment::Transaction
+    object
+
+  transaction
+
+    Constructor for the object above. All the argument are passed verbatim
+    to the Business::OnlinePayment::IPayment::Transaction constructor, then
+    the object is stored.
+
+ METHODS
+
+    session_id
+
+      This is the main method to call. The session is not stored in the
+      object, because it can used only once. So calling session_id will
+      send the data to the SOAP service and retrieve the session key.
+
+    raw_response_hash
+
+      Debug for the arguments passed to IPayment::Return;
+
+    capture($ret_trx_number, $amount, $currency, $opts)
+
+      Charge an amount previously preauth'ed. $amount and $currency are
+      optional and may be used to charge partial amounts. $amount and
+      $currency follow the same rules of trxAmount and trxCurrency of
+      Business::OnlinePayment::IPayment::Transaction (no decimal, usually
+      multiply by 100).
+
+      The last optional argument should be a hashref with additional
+      parameters to pass to transactionData (notably shopperId).
+
+    datastorage_op($datastorage_id)
+
+      After calling transaction, if you have a valid datastorage id, you
+      may want to use that instead of creating a session and use the form.
+
+      This method will do a SOAP request to the Ipayment server, using the
+      transaction details provided in the call to transaction, and do the
+      requested operation. So far it's supported preauth and auth. The
+      capture and other operations should be done via its own method (which
+      don't require the datastorage, but simply the previous transaction's
+      id).
+
+    expire_datastorage($id)
+
+      Given the storage id passed as argument, expire it. Keep in mind that
+      expiring it multiple times returns always true, so the return code is
+      not really interesting.
+
+      It returns 0 if the storage didn't exist.
+
+    reverse($ret_trx_number)
+
+      Release the amount previously preauth'ed, passing the original
+      transaction number. No partial amount can be released, and will
+      succeed only if no charging has been done.
+
+    refund($ret_trx_number, $amount, $currency, $opts)
+
+      Refund the given amount. Please note that we have to pass the
+      transaction number of the capture, not the preauth one.
+
+      The last optional argument should be a hashref with additional
+      parameters to pass to transactionData (notably shopperId).
+
+ SOAP specification
+
+      Name: createSession
+      Binding: ipaymentBinding
+      Endpoint: https://ipayment.de/service/3.0/
+      SoapAction: createSession
+      Input:
+        use: literal
+        namespace: https://ipayment.de/service_v3/binding
+        message: createSessionRequest
+        parts:
+          accountData: https://ipayment.de/service_v3/extern:AccountData
+          transactionData: https://ipayment.de/service_v3/extern:TransactionData
+          transactionType: https://ipayment.de/service_v3/extern:TransactionType
+          paymentType: https://ipayment.de/service_v3/extern:PaymentType
+          options: https://ipayment.de/service_v3/extern:OptionData
+          processorUrls: https://ipayment.de/service_v3/extern:ProcessorUrlData
+      Output:
+        use: literal
+        namespace: https://ipayment.de/service_v3/binding
+        message: createSessionResponse
+        parts:
+          sessionId: http://www.w3.org/2001/XMLSchema:string
+      Style: rpc
+      Transport: http://schemas.xmlsoap.org/soap/http
+      
+
+ SECURITY
+
+    trx_securityhash
+
+      If we have a security key, we trigger the hash generation, so we can
+      double check the result.
+
+      CGI Name: trx_securityhash Data type: string, maximum 32 characters
+
+      Security hash of CGI command concatenating Id, amount, currency,
+      password, Transaction Security Key (should be set in the
+      configuration menu using ipayment). The hash is trxuser_id,
+      trx_amount, trx_currency, trxpassword and the transaction security
+      key.
+
+        md5_hex($trxuser_id . $trx_amount . $trx_currency . $trxpassword . $sec_key); 
+      
+        perl -e 'use Digest::MD5 qw/md5_hex/;
+                      print  md5_hex("99998" . 5000 . "EUR" . 0 .  "testtest"), "\n";'
+        # => then in the form
+        <input type="hidden" name="trx_securityhash"
+               value="db4812171baef817dec0cd56c0f5c8cd">
+
+ UTILITIES
+
+  get_response_obj($rawuri) or get_response_obj(%params)
+
+    To be sure the transaction happened as aspected, we have to check this
+    back. Expected hash:
+
+    Success:
+
+      'ret_transtime' => '08:42:05',       'ret_transtime' => '08:42:03',
+      'ret_errorcode' => '0',              'ret_errorcode' => '0',
+      'redirect_needed' => '0',            'redirect_needed' => '0',
+      'ret_transdate' => '14.03.13',       'ret_transdate' => '14.03.13',
+      'addr_name' => 'Mario Pegula',       'addr_name' => 'Mario Rossi',
+      'trx_paymentmethod' => 'VisaCard',   'trx_paymentmethod' => 'AmexCard',
+      'ret_authcode' => '',                'ret_authcode' => '',
+      'trx_currency' => 'EUR',             'trx_currency' => 'EUR',
+      'ret_url_checksum' => 'md5sum',
+      'ret_param_checksum' => 'md5sum',
+      'ret_ip' => '88.198.37.147',         'ret_ip' => '88.198.37.147',
+      'trx_typ' => 'preauth',              'trx_typ' => 'preauth',
+      'ret_trx_number' => '1-83443831',    'ret_trx_number' => '1-83443830',
+      'ret_status' => 'SUCCESS',           'ret_status' => 'SUCCESS',
+      'trx_paymenttyp' => 'cc',            'trx_paymenttyp' => 'cc',
+      'trx_paymentdata_country' => 'US',
+      'trx_amount' => '5000',              'trx_amount' => '1000',
+      'ret_booknr' => '1-83443831',        'ret_booknr' => '1-83443830',
+      'trxuser_id' => '99998',             'trxuser_id' => '99999',
+      'trx_remoteip_country' => 'DE'       'trx_remoteip_country' => 'DE'
+
+    Returns a Business::OnlinePayment::IPayment::Response object, so you
+    can call ->is_success on it.
+
+    This is just a shortcut for
+
+      Business::OnlinePayment::IPayment::Response->new(%params);
+
+    with my_security_key and my_userid inherited from the fixed values of
+    this class.
+
+  ipayment_cgi_location
+
+    Returns the correct url where the customer posts the CC data, which is
+    simply: https://ipayment.de/merchant/<Account-ID/processor/2.0/>
+
+ Additional information
+
+  country
+
+    Country code of the cardholder of the current
+    Business::OnlinePayment::IPayment::Transaction object
+
+    Being these information transaction specific, if a transaction has not
+    been initiated, the method will not do anything nor will return
+    anything.
+
+    UK will be translated to GB, and EI to IE.
+
+TESTING
+
+    Test credit card numbers can be found here:
+    https://ipayment.de/technik/cc_testnumbers.php4.
+
+AUTHOR
+
+    Marco Pessotto, <melmothx at gmail.com>
+
+BUGS
+
+    Please report any bugs or feature requests to
+    bug-business-onlinepayment-ipayment at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-OnlinePayment-IPayment.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::OnlinePayment::IPayment
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-OnlinePayment-IPayment
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Business-OnlinePayment-IPayment
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Business-OnlinePayment-IPayment
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Business-OnlinePayment-IPayment/
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Stefan Hornburg (Racke) racke@linuxia.de for the initial
+    code, ideas and support.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2013-2014 Marco Pessotto.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a
+    copy of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by
+    the Package. If you institute patent litigation (including a
+    cross-claim or counterclaim) against any party alleging that the
+    Package constitutes direct or contributory patent infringement, then
+    this Artistic License to you shall terminate on the date that such
+    litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

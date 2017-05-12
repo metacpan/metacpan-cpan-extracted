@@ -1,0 +1,8 @@
+<h3>MILITARY RANGE ANALYSIS</h3>
+[% FOREACH ne IN near %]
+<h4>[% INCLUDE fragments/linked_nation.tt n = ne.nation %]</h4>
+<p>
+   Relations: <span class="[% ne.relation.status_html_class %]">[% ne.relation.status %]</span><br />
+   In range because: [% INCLUDE fragments/in_range_reason.tt reason = ne %]<br /> 
+</p>
+[% END %]

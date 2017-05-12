@@ -1,0 +1,10 @@
+beagle_wrap.c
+beagle.pm
+lib/Bio/Phylo/Beagle.pm
+lib/Bio/Phylo/BeagleOperation.pm
+lib/Bio/Phylo/BeagleOperationArray.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/test_simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

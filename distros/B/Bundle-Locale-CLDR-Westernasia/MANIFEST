@@ -1,0 +1,5 @@
+Build.PL
+lib/Bundle/Locale/CLDR/Westernasia.pm
+MANIFEST			This list of files
+META.yml
+META.json

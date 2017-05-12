@@ -1,0 +1,9 @@
+package Bugle;
+
+=head1 NAME
+
+Bugle - placeholder
+
+=head1 SYNOPSIS
+
+Coming soon.

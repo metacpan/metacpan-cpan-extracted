@@ -1,0 +1,94 @@
+Changes file for Business::DK::FI
+
+0.09 2016-12-11 Maintenance release, update not required
+
+- Addressed some Kwalitee issue and specified use of Scalar::Util explicitly
+- Bumped Perl version requirement to 5.6.0
+
+
+0.08 2015-08-13 Maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.07 2014-08-18 Maintenance release, update not required
+
+- Updated license to be Artistic 2.0
+
+- Specified Perl version requirement
+
+- Aligned version in package/modules files in lib in the
+  distribution
+
+- Added changes.t automatic assertion of the integrity of the
+  Changes file, see also BDKFI-22
+
+  https://logiclab.jira.com/browse/BDKFI-23
+
+
+0.06 2013-07-31 Bug fix release, update recommended see below
+
+- Update only necessary if you are using an older Perl
+  demonstrating this particular problem
+
+- Qualifying use of Readonly more explicitly in an attempt to
+  address report on failing test described in BDKFI-22
+
+  https://logiclab.jira.com/browse/BDKFI-22
+
+
+0.05 2013-07-29 Maintenance release, update not required see below
+
+- Fixed up Changes file as part of my Questhub quest adhering to
+  the standard described in: CPAN::Changes::Spec [BDKFI-21]
+
+  Quest:
+  http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/BDKFI-21
+
+
+0.04 2011-12-03 Bug fix release, update recommended
+
+- Update recommended for users of 32-bit perl
+
+- Bug fix release re-addressing previous attempts at fixing bug
+  (see 0.03). The issue seemed to be one of architecture and
+  where I have only developed on 64-bit enabled platforms using
+  64-bit enabled perl I could not replicate the issue, which was
+  related to Perl's sprintf on 32-bit perl. I now use string
+  indications (s) instead of signed integer (d) and it seems to
+  work.
+
+  http://logicLAB.jira.com/browse/BDKFI-20
+
+
+0.03 2011-11-23 Bug fix release, update recommended see below
+
+- Bug fix release, update only necessary if you are using an
+  older Perl demonstrating this particular problem
+
+- Attempt at addressing failing tests, reported by CPAN testers.
+  I have not been able to replicate the errors locally, but have
+  implemented a new strategy for addressing the same problem
+  [BDK-17]
+
+  http://logicLAB.jira.com/browse/BDKFI-17
+
+
+0.02 2011-04-30 Maintenance release, update not required
+
+- Addressed some issues with Perl::Critic tests, introducing
+  dependency on Try::Tiny
+
+- Addressed issue with t/critic.t test being run even without
+  Test::Perl::Critic being installed, updated to contemporary
+  boilerplate [BDKFI-16]
+
+  http://logicLAB.jira.com/browse/BDKFI-16
+
+
+0.01 2011-04-22
+
+- Initial release

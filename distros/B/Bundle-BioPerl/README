@@ -1,0 +1,51 @@
+Bundle::BioPerl - A bundle to install external CPAN modules used by BioPerl
+
+Version 1.00  - 2000-12-14
+Version 2.00  - 2002-03-15 
+Version 2.02  - 2002-07-15
+Version 2.04  - 2002-12-17
+Version 2.05  - 2003-05-20
+Version 2.1.4 - 2003-12-20
+Version 2.1.5 - 2004-04-20
+Version 2.1.6 - 2006-10-17
+Version 2.1.7 - 2006-11-17 (Thanks to: victor.de.jager@nbic.nl for finding typos in 2.1.6))
+Version 2.1.8 - 2006-11-18 Just to be safe, added extra space char after HTTP::Request::Common 
+Version 2.1.9 - 2014-01-15 Move to GitHub
+
+Bundled by: Chris Dagdigian <dag@sonsorol.org>, Chris Fields <cjfields@cpan.org>
+
+This is not a module that people generally need to download
+and install locally. This Bundle is meant to live on CPAN so
+that people can use CPAN.pm magic to automagically download and
+install modules.
+
+The syntax for doing this would be something like:
+$ perl -MCPAN -e 'install Bundle::BioPerl'
+
+However if you really want to...
+
+To install this Bundle file locally:
+
+perl Makefile.PL
+make install
+
+Then, for a full list of the modules which this bundle
+installs, use:
+
+perldoc Bundle::BioPerl
+
+Finally, to install the modules which the bundle lists:
+
+perl -MCPAN -e 'install Bundle::BioPerl'
+
+This bundle gathers together all of the CPAN hosted external
+modules for BioPerl.
+
+Comments/Suggestions: 
+Chris Dagdigian, <dag@sonsorol.org>
+
+
+
+
+
+

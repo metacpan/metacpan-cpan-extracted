@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::ISSN.
+
+0.91 - Wed Aug  6 06:30:10 2008
+	* module now maintained by brian d foy
+	* modernized, fully tested, and fixed RT #38174
+
+0.20  Tue Feb  9 11:09:41 1999
+	- 1st version

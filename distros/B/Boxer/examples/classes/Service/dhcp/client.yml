@@ -1,0 +1,9 @@
+classes:
+  - Service
+parameters:
+  doc:
+    service:
+      pkg:
+        - include DHCP client service
+  pkg:
+    - isc-dhcp-client

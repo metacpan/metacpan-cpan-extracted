@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2d4cefa5e6d593c76375ead5832859760428cdaa Changes
+SHA1 74691820ccfbe0727ac5e69702729cadb6dd3c79 MANIFEST
+SHA1 b124051f40efb4d9f23ef390159b5ae9e722efb6 META.json
+SHA1 618366a4bf183b165a2ff93a15479c06bb6a9137 META.yml
+SHA1 b657741b5deafe777b5d823eb8107f352a8a106a Makefile.PL
+SHA1 9011ae0c81154a3cf9751600afd80563c1c18ce5 README
+SHA1 952cd72f451514b6a7d1233084ba434f54561d66 Splice.xs
+SHA1 a200571e2c3cca82b239f3a00c9800e463b94670 lib/BSD/Socket/Splice.pm
+SHA1 075e952c63274922f43e7638b6b43f26ad1aa128 ppport.h
+SHA1 2e6d46a724d72bec8870627f83278af9f1177bf2 t/BSD-Socket-Splice.t
+SHA1 1ae0da66c353ecf65e483839624d9a3679421057 t/SO_SPLICE.t
+SHA1 0ac0386d71b0a35a2ef79c1dd10970d55d3ab5d8 t/benchmark.t
+SHA1 61242ea21c4c934fa02064e9581619374bc74ccb t/geterror.t
+SHA1 4ef42322c39188485e6da3f8eab32dc2785b7197 t/getsplice.t
+SHA1 524d87cd31cd55442ac1185c760bc6c0aca4cb2b t/setsplice.t
+SHA1 9528f3e5a52c0fb541fe57231262ebdf8869d223 t/splice.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJU+m1/AAoJEMX0g63e6GOAy+0QAKHkqQrGDzM5ZtzjtvIsQ6nD
+Qjla/qgD1y6YhuYpe3bo1MViSXXSeZbkilVHlQT967iILA3DMYffNiLz2oI7C/W9
+0feO7b0Ey78E2rHbxmvRFyvDSlFe71l36hYVHk8Fb+da/tHHL8PTAebqWvjMHYKv
+L8m/Wlc2q0zT3v8r6xXU/wCv7ir3K7gRa3TpDkr10E7sVgyGSPKpJmyeBngkBCt+
+oy2NRvDwcA2pJGkBK7ezWYuPQud1Dz9tjmmQbISkq9l9i7WGVLIJupSJWyFwdQ05
+PhLPLULe1Nmam8IZ8qPLNlAACsS1H2MvToKJNWOhMO5uRa5TF9XAFyue1K/eo7OE
+w8in8Cg++wQxJ4E1PAvuC2+XNVVJSez4pxQqpnmc2Hr3QjyyeyuopkbzHDtVKgp6
+T8OCIlcsdWJcBnEGOQ2Q+/Ef8xUG/D1ofYPRsvA5fsbDmPhlm8JMymOnOr5rpmkK
+KcKzTtkb2jhCkW9xksyV1A8mkuI7sJgwPOM/TuShjEkfxLfTCjRR6qUT1ZEX45VZ
+v3n12+zzF0ex/WnToXbnxC5an1ZXu8HowCcZ2HWenlnXt3R1KCnaNUxUbGm92z3M
+0apDEKvJgNTLjfc0/qStPoA9GbFXRGzJ8P/4NcWwMz5EpiaeIPCS/TEJuaYea2wt
+39+8nczZ2i3pbA3AsIgh
+=hEYo
+-----END PGP SIGNATURE-----

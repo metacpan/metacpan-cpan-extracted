@@ -1,0 +1,9 @@
+Revision history for BusyBird-Input-Lingr
+
+0.02    2014-08-17
+        - No implementation change.
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.01    2014-07-29
+        First version, released on an unsuspecting world.
+

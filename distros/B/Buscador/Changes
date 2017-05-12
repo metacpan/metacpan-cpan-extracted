@@ -1,0 +1,58 @@
+0.10 - February 8th 2005 - muttley
+
+Initial release to let people play around with it.
+ 
+0.09 - February 3rd 2005 - muttley
+
+Implement using scrubbed HTML as default view where approriate.
+
+0.08 - August 13th 2004 - muttley
+
+Changes so that you can use the email address and/or name where
+appropriate for /entity/view, /name/view and /address/view and also the
+list name for/list/view
+
+
+0.07 - August 2nd 2004 - muttley
+
+Change so that instead of writing a Buscador::Config file you centrally 
+install and write a buscador.config file
+
+
+0.06 - July 28th 2004 - muttley
+
+Split stuff into seperate modules rathe rthan one massive Buscador.pm
+
+
+0.05 - July 28th 2004 - muttley
+
+Add Atom feeds for various things
+
+
+0.04 - July 28th 2004 - muttley
+
+Clean up Date stuff
+
+
+0.03 - July 18th 2004 - muttley
+
+Add in ability to do 
+                                                                                       
+        /buscador/date/list/2004/07/01/                                                 
+        /buscador/date/list/2004/07/                                                    
+        /buscador/date/list/2004/   
+
+
+0.02 - July 15th 2004 - muttley
+
+Add threads pages - normal and lurker style views
+
+
+0.01 - Jul 15th 2004 - muttley
+
+Initial import of all Simon's stuff.
+
+
+
+
+

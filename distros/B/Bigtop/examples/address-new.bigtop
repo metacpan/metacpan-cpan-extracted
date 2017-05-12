@@ -1,0 +1,139 @@
+config {
+    engine CGI;
+    template_engine TT;
+    Init Std {  }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { gen_root 1; with_server 1; flex_db 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Apps::Address {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    table address {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field name {
+            is varchar;
+            label Name;
+            html_form_type text;
+            html_form_optional 0;
+        }
+        field street {
+            is varchar;
+            label Street;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        foreign_display `%name`;
+        field city {
+            is varchar;
+            label City;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        field state {
+            is varchar;
+            label State;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        field zip {
+            is varchar;
+            label Zip;
+            html_form_type text;
+            html_form_optional 1;
+            html_form_constraint `qr{^\d{5}$}`;
+        }
+        field country {
+            is varchar;
+            label Country;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        field email {
+            is varchar;
+            label Email;
+            html_form_type text;
+            html_form_optional 1;
+        }
+        field phone {
+            is varchar;
+            label Phone;
+            html_form_type text;
+            html_form_optional 1;
+        }
+    }
+    controller Address is AutoCRUD {
+        controls_table address;
+        rel_location address;
+        text_description address;
+        page_link_label Address;
+        method do_main is main_listing {
+            cols name, street;
+            header_options Add;
+            row_options Edit, Delete;
+            title Address;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`;
+        }
+    }
+    table birth {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field name {
+            is varchar;
+            label Name;
+            html_form_type text;
+        }
+        field family {
+            is int4;
+            label Family;
+            refers_to address;
+            html_form_type select;
+        }
+        field birthday {
+            is date;
+            label Birthday;
+            html_form_type text;
+            date_select_text `Popup Calendar`;
+        }
+        foreign_display `%name`;
+    }
+    controller Birth is AutoCRUD {
+        controls_table   birth;
+        rel_location     birthday;
+        uses             Gantry::Plugins::Calendar;
+        text_description birthdays;
+        page_link_label `Birth Days`;
+        method do_main is main_listing {
+            title `Birth Day`;
+            cols name, family, birthday;
+            header_options Add;
+            row_options Edit, Delete;
+        }
+        method form is AutoCRUD_form {
+            form_name birthday_form;
+            all_fields_but id;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? 'Edit' : 'Add'`,
+                javascript => `$self->calendar_month_js( 'birthday_form' )`;
+        }
+    }
+}

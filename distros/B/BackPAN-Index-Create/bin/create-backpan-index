@@ -1,0 +1,128 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use BackPAN::Index::Create qw(create_backpan_index);
+use Getopt::Long qw(GetOptions);
+
+my $releases_only = 0;
+my $basedir;
+my $output_file;
+my $sort_order;
+my $argref;
+
+GetOptions(
+    'basedir|b=s'       => \$basedir,
+    'releases-only|r'   => \$releases_only,
+    'output|o=s'        => \$output_file,
+    'order=s'           => \$sort_order,
+);
+
+if (!$basedir) {
+    die "$0: you must specify the top directory of your BackPAN with -basedir or -b\n";
+}
+
+$argref = { basedir => $basedir, releases_only => $releases_only };
+$argref->{output} = $output_file if $output_file;
+$argref->{order}  = $sort_order  if $sort_order;
+
+create_backpan_index($argref);
+
+exit 0;
+
+=head1 NAME
+
+create-backpan-index - create an index for a local BackPAN mirror
+
+=head1 SYNOPSIS
+
+ create-backpan-index   -basedir E<lt>pathE<gt>
+                      [ -releases-only | -r ]
+                      [ -output E<lt>filenameE<gt> | -o E<lt>filenameE<gt> ]
+                      [ -order dist | age | author ]
+
+=head1 DESCRIPTION
+
+B<create-backpan-index> will generate an index for a local BackPAN mirror.
+The basic usage is:
+
+ % create-backpan-index -basedir /usr/local/backpan \
+                        -releases-only              \
+                        -o backpan-index.txt
+
+
+The script supports the following arguments.
+
+=head2 -basedir path
+
+Specifies the path to the top of your BackPAN repository.
+
+=head2 -releases-only | -r
+
+By default the index will contain all files in your BackPAN
+repository. With this option, the index will only include
+the release tarballs / zip files.
+
+=head2 -output filename | -o filename
+
+The path to write the index in. If not specified, the index will
+be written to standard output.
+
+=head2 -order dist | age | author
+
+Specifies in what order the files should be included in the index.
+There are three options:
+
+=over 4
+
+=item * dist
+
+Order by distribution, and then by increasing date. This means you
+can process the index dist by dist, and for a given dist you'll see
+them in order from oldest dist to most recent.
+This is the default ordering.
+
+This makes most sense when used with the C<-releases-only> option.
+
+=item * age
+
+Order by age of the file. If you generate the full index 
+(ie not just release tarballs), then you'll see all files
+from oldest to most recent, regardless of what distribution they
+come from.
+
+=item * author
+
+Ordered by author name (the author who did the release),
+and then by the release file name.
+This means that within each author you'll see all files
+associated with a particular release togethr.
+
+=back
+
+=head1 SEE ALSO
+
+L<BackPAN::Index::Create> - the module that provides the functionality for this script.
+
+L<BackPAN::Index> - an interface to an alternate BackPAN index.
+
+L<CPAN Testers BackPAN|http://backpan.cpantesters.org> -
+one of the BackPAN mirrors. It provides four different indexes
+that are generated using this module. The script used to generate
+these can be found in the C<examples> directory of this distribution.
+
+=head1 REPOSITORY
+
+L<https://github.com/neilbowers/BackPAN-Index-Create>
+
+=head1 AUTHOR
+
+Neil Bowers E<lt>neilb@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Neil Bowers <neilb@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,20 @@
+Changes
+ignore.txt
+lib/Business/Colissimo.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-control-key.t
+t/02-barcodes.t
+t/03-images.t
+t/04-logos.t
+t/05-countries.t
+t/06-limits.t
+t/07-level.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

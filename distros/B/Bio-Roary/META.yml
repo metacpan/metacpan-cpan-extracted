@@ -1,0 +1,54 @@
+---
+abstract: 'Create a pan genome'
+author:
+  - 'Andrew J. Page <ap13@sanger.ac.uk>'
+build_requires:
+  Data::Dumper: 0
+  Env::Path: 0
+  Test::Files: 0
+  Test::Most: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-Roary
+requires:
+  Array::Utils: 0
+  Bio::Perl: 0
+  Bio::SeqIO: 0
+  Bio::Tools::GFF: 0
+  Bio::TreeIO: 0
+  Cwd: 0
+  Exception::Class: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find::Rule: 0
+  File::Grep: 0
+  File::Path: 0
+  File::Slurper: 0
+  File::Spec: 0
+  File::Temp: 0
+  File::Which: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Graph: 0
+  Graph::Writer::Dot: 0
+  List::Util: 0
+  Log::Log4perl: 0
+  Moose: 0
+  Moose::Role: 0
+  POSIX: 0
+  PerlIO::utf8_strict: 0
+  Text::CSV: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://www.sanger.ac.uk/
+  repository: https://github.com/sanger-pathogens/Roary.git
+version: 3.8.0
+x_serialization_backend: 'YAML::Tiny version 1.51'

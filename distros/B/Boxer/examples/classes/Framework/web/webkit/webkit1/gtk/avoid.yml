@@ -1,0 +1,9 @@
+classes:
+  - Framework.base
+parameters:
+  doc:
+    framework:
+      pkg:
+        - exclude WebKit GTK+ 1.0 library (used for maybe-risky PAC proxy parsing)
+  pkg-avoid:
+    - libwebkitgtk-1.0-0

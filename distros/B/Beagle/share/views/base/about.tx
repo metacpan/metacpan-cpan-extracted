@@ -1,0 +1,10 @@
+: include "/header.tx";
+
+<div class="profile">
+
+<div class="description">
+<: $info.body_html |raw :>
+</div>
+
+</div>
+: include "/footer.tx";

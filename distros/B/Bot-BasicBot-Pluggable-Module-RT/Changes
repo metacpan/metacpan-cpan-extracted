@@ -1,0 +1,4 @@
+0.20      2011-02-06 16:13:40 Europe/Paris
+        . fixed documentation
+        . moved to Dist::Zilla
+        . cleanup

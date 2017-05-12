@@ -1,0 +1,177 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10a" Name="WCP10: Arbitrary Cycles I">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="Join1" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="Join2" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B process will loop to activity B and otherwise it'll go to activity D</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="Split1" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split1-Join1"/>
+                                    <TransitionRef Id="Split1-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to C process will loop to activity C and otherwise it'll go to activity E</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="Split2" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split2-Join2"/>
+                                    <TransitionRef Id="Split2-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-Join1" Name="Transition" From="A" To="Join1"/>
+                <Transition Id="Join1-B" Name="Transition" From="Join1" To="B"/>
+                <Transition Id="B-Join2" Name="Transition" From="B" To="Join2"/>
+                <Transition Id="Join2-C" Name="Transition" From="Join2" To="C"/>
+                <Transition Id="C-Split1" Name="Transition" From="C" To="Split1"/>
+                <Transition Id="Split1-Join1" Name="Transition" From="Split1" To="Join1">
+                    <Condition Type="CONDITION">attribute('repeatBC')</Condition>
+                </Transition>
+                <Transition Id="Split1-D" Name="Transition" From="Split1" To="D"/>
+                <Transition Id="D-Split2" Name="Transition" From="D" To="Split2"/>
+                <Transition Id="Split2-Join2" Name="Transition" From="Split2" To="Join2">
+                    <Condition Type="CONDITION">attribute('repeatCD')</Condition>
+                </Transition>
+                <Transition Id="Split2-E" Name="Transition" From="Split2" To="E"/>
+            </Transitions>
+        </WorkflowProcess>
+
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10r" Name="WCP10: Arbitrary Cycles (routing)">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="Join" Name="XOR-Join">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="JoinSplit" Name="XOR-XOR">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="JoinSplit-Join"/>
+                                    <TransitionRef Id="JoinSplit-Split"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="Split" Name="XOR-Split">
+                    <Description>Just press 'Complete' button</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="Split-JoinSplit"/>
+                                    <TransitionRef Id="Split-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-Join" Name="Transition" From="Start" To="Join"/>
+                <Transition Id="Join-JoinSplit" Name="Transition" From="Join" To="JoinSplit"/>
+                <Transition Id="JoinSplit-Join" Name="Transition" From="JoinSplit" To="Join">
+                    <Condition Type="CONDITION">attribute('repeat1')</Condition>
+                </Transition>
+                <Transition Id="JoinSplit-Split" Name="Transition" From="JoinSplit" To="Split"/>
+                <Transition Id="Split-JoinSplit" Name="Transition" From="Split" To="JoinSplit">
+                    <Condition Type="CONDITION">attribute('repeat2')</Condition>
+                </Transition>
+                <Transition Id="Split-End" Name="Transition" From="Split" To="End"/>
+            </Transitions>
+        </WorkflowProcess>

@@ -1,0 +1,190 @@
+{
+   "abstract" : "perl for the design of synthetic chromosomes",
+   "author" : [
+      "Sarah Richardson <smrichardson@lbl.gov>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-BioStudio",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bio::GeneDesign" : "5",
+            "Bio::Root::Root" : "0",
+            "DBD::SQLite" : "1.48",
+            "Exception::Class" : "1.38",
+            "Readonly" : "2",
+            "Text::Diff" : "1.3",
+            "Time::Format" : "1.11",
+            "URI::Escape" : "1.59",
+            "YAML::Tiny" : "1.5",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::BioStudio" : {
+         "file" : "lib/Bio/BioStudio.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Analyze::ArbitraryFeatures" : {
+         "file" : "lib/Bio/BioStudio/Analyze/ArbitraryFeatures.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Analyze::ProteinCodingGenes" : {
+         "file" : "lib/Bio/BioStudio/Analyze/ProteinCodingGenes.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Analyze::RestrictionEnzymes" : {
+         "file" : "lib/Bio/BioStudio/Analyze/RestrictionEnzymes.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::BLAST" : {
+         "file" : "lib/Bio/BioStudio/BLAST.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Cairo" : {
+         "file" : "lib/Bio/BioStudio/Cairo.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Chromosome" : {
+         "file" : "lib/Bio/BioStudio/Chromosome.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Chunk" : {
+         "file" : "lib/Bio/BioStudio/Chunk.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::CodonJuggling" : {
+         "file" : "lib/Bio/BioStudio/CodonJuggling.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::DB" : {
+         "file" : "lib/Bio/BioStudio/DB.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::DB::MySQL" : {
+         "file" : "lib/Bio/BioStudio/DB/MySQL.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::DB::SQLite" : {
+         "file" : "lib/Bio/BioStudio/DB/SQLite.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Diff" : {
+         "file" : "lib/Bio/BioStudio/Diff.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Diff::Difference" : {
+         "file" : "lib/Bio/BioStudio/Diff/Difference.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Exceptions" : {
+         "file" : "lib/Bio/BioStudio/Exceptions.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Foswiki" : {
+         "file" : "lib/Bio/BioStudio/Foswiki.pm",
+         "version" : "1.06"
+      },
+      "Bio::BioStudio::GBrowse" : {
+         "file" : "lib/Bio/BioStudio/GBrowse.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Git" : {
+         "file" : "lib/Bio/BioStudio/Git.pm",
+         "version" : "1.06"
+      },
+      "Bio::BioStudio::Marker" : {
+         "file" : "lib/Bio/BioStudio/Marker.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::Mask" : {
+         "file" : "lib/Bio/BioStudio/Mask.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Megachunk" : {
+         "file" : "lib/Bio/BioStudio/Megachunk.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::PCRTagging" : {
+         "file" : "lib/Bio/BioStudio/PCRTagging.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::Parallel" : {
+         "file" : "lib/Bio/BioStudio/Parallel.pm",
+         "version" : "3.00"
+      },
+      "Bio::BioStudio::Repository" : {
+         "file" : "lib/Bio/BioStudio/Repository.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::RestrictionEnzyme" : {
+         "file" : "lib/Bio/BioStudio/RestrictionEnzyme.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::RestrictionEnzyme::Seek" : {
+         "file" : "lib/Bio/BioStudio/RestrictionEnzyme/Seek.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::RestrictionEnzyme::Select" : {
+         "file" : "lib/Bio/BioStudio/RestrictionEnzyme/Select.pm",
+         "version" : "2.10"
+      },
+      "Bio::BioStudio::RestrictionEnzyme::Store" : {
+         "file" : "lib/Bio/BioStudio/RestrictionEnzyme/Store.pm",
+         "version" : "2.1"
+      },
+      "Bio::BioStudio::SeqFeature::Amplicon" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Amplicon.pm"
+      },
+      "Bio::BioStudio::SeqFeature::CDSVariant" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/CDSVariant.pm"
+      },
+      "Bio::BioStudio::SeqFeature::Chunk" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Chunk.pm"
+      },
+      "Bio::BioStudio::SeqFeature::Codon" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Codon.pm"
+      },
+      "Bio::BioStudio::SeqFeature::Custom" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Custom.pm"
+      },
+      "Bio::BioStudio::SeqFeature::Megachunk" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Megachunk.pm"
+      },
+      "Bio::BioStudio::SeqFeature::ProposedDeletion" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/ProposedDeletion.pm"
+      },
+      "Bio::BioStudio::SeqFeature::RestrictionSite" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/RestrictionSite.pm"
+      },
+      "Bio::BioStudio::SeqFeature::Tag" : {
+         "file" : "lib/Bio/BioStudio/SeqFeature/Tag.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ]
+   },
+   "version" : "2.11"
+}

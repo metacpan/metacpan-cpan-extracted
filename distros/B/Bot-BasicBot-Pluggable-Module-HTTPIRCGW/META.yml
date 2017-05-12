@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bot-BasicBot-Pluggable-Module-HTTPIRCGW
+version:      0.012
+version_from: lib/Bot/BasicBot/Pluggable/Module/HTTPIRCGW.pm
+installdirs:  site
+requires:
+    LWP::UserAgent:                2.033
+    Test::Simple:                  0.44
+    URI::Escape:                   3.28
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

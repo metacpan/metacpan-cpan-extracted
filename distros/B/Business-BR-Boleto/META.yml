@@ -1,0 +1,29 @@
+---
+abstract: 'A system to generate Brazilian Boletos'
+author:
+  - 'Blabos de Blebe <blabos@cpan.org>'
+build_requires:
+  Test::Most: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-BR-Boleto
+requires:
+  Const::Fast: '0.014'
+  DateTime: '1.12'
+  Exporter: '5.70'
+  List::Util: '1.38'
+  Locale::Currency::Format: '0'
+  MAD::Loader: '3.001000'
+  Moo: '1.006000'
+  PDF::API2: '0'
+  Try::Tiny: '0.22'
+resources:
+  bugtracker: https://github.com/blabos/Business-BR-Boleto/issues
+  repository: https://github.com/blabos/Business-BR-Boleto
+version: '0.000002'

@@ -1,0 +1,78 @@
+/* 
+To create the database, run this file through psql like so:
+prompt> psql -f 0_createTables.postgresql bgpmon_db bgpmon_db_user 
+*/
+
+drop schema if exists cpm cascade;
+create schema cpm;
+
+create table cpm.lists (
+  dbid SERIAL PRIMARY KEY,
+  name char(255) UNIQUE NOT NULL
+);
+
+create table cpm.domains (
+  dbid SERIAL PRIMARY KEY,
+  domain char(255) UNIQUE NOT NULL
+);
+
+create table cpm.prefixes (
+  dbid SERIAL PRIMARY KEY,
+  prefix cidr NOT NULL,
+  watch_more_specifics boolean NOT NULL,
+  watch_covering boolean NOT NULL,
+  list_dbid int references cpm.lists(dbid),
+  UNIQUE(prefix,list_dbid)
+);
+
+create table cpm.search_paths (
+  dbid SERIAL PRIMARY KEY,
+  path char(255) NOT NULL,
+  param_domain_dbid int references cpm.domains(dbid),
+  param_prefix_dbid int references cpm.prefixes(dbid),
+  UNIQUE(path,param_domain_dbid,param_prefix_dbid)
+);
+
+create table cpm.authoritative_for (
+  prefix_dbid int references cpm.prefixes(dbid) NOT NULL,
+  domain_dbid int references cpm.domains(dbid) NOT NULL,
+  PRIMARY KEY(prefix_dbid,domain_dbid)
+);
+
+create table cpm.search_using (
+  prefix_dbid int references cpm.prefixes(dbid) NOT NULL,
+  search_path_dbid int references cpm.search_paths(dbid) NOT NULL,
+  PRIMARY KEY(prefix_dbid,search_path_dbid)
+);
+
+create table cpm.named_as (
+  prefix_dbid int references cpm.prefixes(dbid) NOT NULL,
+  domain_dbid int references cpm.domains(dbid) NOT NULL,
+  PRIMARY KEY(prefix_dbid,domain_dbid)
+);
+
+/* create functions */
+CREATE FUNCTION cpm.pref_del() RETURNS trigger AS $$
+    BEGIN
+        DELETE FROM cpm.authoritative_for WHERE prefix_dbid = OLD.dbid ;
+        DELETE FROM cpm.named_as WHERE prefix_dbid = OLD.dbid ;
+        DELETE FROM cpm.search_using WHERE prefix_dbid = OLD.dbid ;
+        RETURN OLD;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER pref_del_m2m
+BEFORE DELETE ON cpm.prefixes
+    FOR EACH ROW EXECUTE PROCEDURE cpm.pref_del();
+
+CREATE FUNCTION cpm.list_del() RETURNS trigger AS $$
+    BEGIN
+        DELETE FROM cpm.prefixes WHERE list_dbid = OLD.dbid ;
+        RETURN OLD;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER list_del_m2m
+BEFORE DELETE ON cpm.lists 
+    FOR EACH ROW EXECUTE PROCEDURE cpm.list_del();
+

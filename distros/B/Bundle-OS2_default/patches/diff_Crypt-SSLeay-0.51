@@ -1,0 +1,21 @@
+--- ./Makefile.PL-pre	Mon Apr 21 21:38:06 2003
++++ ./Makefile.PL	Sun Oct 12 19:01:08 2003
+@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
+ use File::Basename qw(dirname basename);
+ use Getopt::Long;
+ use vars qw($opt_default);
++use Config;
+ 
+ &GetOptions("default", \$opt_default);
+ 
+@@ -16,6 +17,10 @@ chdir($currdir) || die("can't change to 
+ my @POSSIBLE_SSL_DIRS = qw(/usr/local/openssl /usr/local/ssl /local/ssl /opt/ssl /usr/local /local /usr);
+ if($^O eq 'MSWin32') {
+     unshift(@POSSIBLE_SSL_DIRS, 'c:/openssl');
++}
++if(exists $ENV{C_INCLUDE_PATH}) {
++    unshift(@POSSIBLE_SSL_DIRS,
++	    map "$_/..", split /\Q$Config{path_sep}/, $ENV{C_INCLUDE_PATH});
+ }
+ 
+ my @CANDIDATE;

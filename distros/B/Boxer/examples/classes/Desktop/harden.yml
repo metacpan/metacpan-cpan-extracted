@@ -1,0 +1,4 @@
+classes:
+  - Desktop.email.harden
+  - Desktop.tools.harden
+  - Desktop.web.harden

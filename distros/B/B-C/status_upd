@@ -1,0 +1,299 @@
+#!/usr/bin/perl -w
+# status_upd [-suqftad] [ 1.26 | path ]
+# process perlall maketest logfiles:
+#  `perl$ver Makefile.PL && make test > log.test-$platform-$ver; make clean`
+# and find and sort by FAIL/TODO and platform+version
+
+use strict;
+use Data::Dumper;
+use Getopt::Long;
+use Set::Object qw(reftype);
+
+sub help {
+  print <<EOF;
+status_upd -fqd [ 1.32 | path ]
+
+OPTIONS:
+ -q quiet
+ -f fail only
+ -t todo only
+ -d no unify dumps
+ -a all, do not skip too old logs
+ -s sort by test  (ignored)
+ -u update STATUS (ignored)
+ -h help
+EOF
+  exit;
+}
+
+my $logs = "log.test-*-5.*";
+my $dir = ".";
+my $STATUS = "./STATUS";
+
+chdir ".." if ! -d "t" and -d "../t";
+chdir "../.." if ! -d "t" and -d "../../t";
+my ($sortbytest, $update, $quiet, $failonly, $todoonly, $noskip, $nodump, $help);
+Getopt::Long::Configure ("bundling");
+GetOptions ("sort|s"   => \$sortbytest, #ignored
+	    "update|u" => \$update,     #ignored
+	    "quiet|q"  => \$quiet,
+	    "fail|f"   => \$failonly,
+	    "todo|pass|t" => \$todoonly,
+	    "all|a"    => \$noskip,
+	    "dump|d"   => \$nodump,
+	    "help|h"   => \$help);
+
+help if $help;
+
+for (@ARGV) {
+  -d "t/reports/$_" and $dir = "t/reports/$_";
+  -d "$_" and $dir = $_;
+}
+
+# read stdout lines from a grep command and
+# prints and return a string of the sorted
+# results and a hash for further processing.
+sub status {
+  my $h = shift;
+  my @g = @_;
+  my $s = "";
+  my %h = %$h;
+  my $prefix = '';
+  my $oldprefix = '';
+  my $skipped = 0;
+  while (@g) {
+    if ($g[0] =~ /^--/) {
+      $oldprefix = $prefix if $prefix;
+      $prefix = '';
+      shift @g;
+      next;
+    }
+    my $file = shift @g;
+    my $failed = shift @g;
+    my $ctime = 0;
+    unless ($prefix) {
+      my ($f) = $file =~ m{(log.test-.*?)-t/};
+      ($prefix) = $file =~ m{log.test-(.*?)-t/};
+      if ($prefix and $oldprefix ne $prefix) {
+	#$prefix =~ s/ATGRZ.+?-/cygwin-/;
+        $ctime = -f $f ? sprintf("%0.3f", -C $f) : 0;
+	print "\n$prefix: age=$ctime" unless $quiet;
+        if ($ctime > 1.5 and !$noskip) {
+          $skipped = 1;
+          print " skipped: too old" unless $quiet;
+          $s .= "\n$prefix:\n" unless $quiet;
+        } else {
+          $s .= "\n$prefix:\n";
+          $skipped = 0;
+        }
+        print "\n" unless $quiet;
+      }
+    }
+    next unless $prefix;
+    next unless $file;
+    chomp $file;
+    ($file) = $file =~ m{log.test-.*-(t/[\w\.]+\s?)};
+    next unless $file;
+    $file =~ s{\s*$}{};
+    $file =~ s{^\s*}{};
+    $failed =~ s{^.+(Failed tests?:?)}{$1}i;
+    $failed =~ s{^.+TODO passed:}{TODO passed:};
+    chomp $failed;
+    $failed =~ s/(\d)-(\d)/$1..$2/g;
+    my $f = $failed;
+    $f =~ s{^Failed tests?:?\s*(.+)$}{$1}i;
+    $f =~ s{^TODO passed:\s*}{};
+    $f =~ s/ //g;
+    my $c = "$file\t" if $failed;
+    $c .= "\t" if length($file) < 8;
+    $c .= "$failed\n";
+    $h{$prefix}->{$file} = $f;
+    next if $skipped;
+    print "$c" unless $quiet;
+    $s .= $c;
+  }
+  print "\n" unless $quiet;
+  [ $s, \%h ];
+}
+
+# split into platform, version, [feature]
+# debian-squeeze-amd64-5.10.1-nt => ("debian-squeeze-amd64", "5.10", "nt")
+sub platform_version_split {
+  local $_ = shift;
+  my ($p,$v,$f) = m/^(.+)-(5\.[\d\.]+)([-dnt]+)?$/;
+  $f =~ s/^-// if $f; # d, d-nt, nt or empty
+  $v =~ s/(\d\.\d+)\.\d+/$1/ if $v;
+  return ($p,$v,$f);
+}
+
+sub h_size($) { scalar keys %{$_[0]} }
+sub split_tests($) {
+  my $t = shift;
+  map {
+    if (/(\d+)\.\.(\d+)/) {
+      ($1 .. $2)
+    } else {
+      $_
+    }
+  } split /,\s*/, $t;
+}
+
+sub in_both ($$) {
+  # only the elements on both lists
+  my %h1 = map { $_ => 1 } @{$_[0]};
+  my %h2 = map { $_ => 1 } @{$_[1]};
+  for (keys %h1) {
+    my $e = $h1{$_};
+    undef $h1{$_} unless $h2{$e};
+  }
+  sort keys %h1;
+}
+
+# every
+sub all_common {
+  my $h = shift;		# platform_version -> test_file -> test_no_failed
+  my $result = shift;		# skip already deleted results, initially empty
+  my (%tests);
+  if (@_ == 1) {
+    delete $h->{$_[0]}->{''};
+    return $h->{$_[0]};
+  }
+  # init with shortest list, sort hash by least number of keys
+  my @p = sort { h_size($h->{$a}) <=> h_size($h->{$b}) } @_;
+  my $pivot = $p[0];
+  my $pivotset = Set::Object->new(keys %{$h->{$pivot}});
+  for ($pivotset->members) {
+    if (my $k = $h->{$pivot}->{$_}) {
+      $tests{$_} = Set::Object->new(split_tests($k));
+    }
+  }
+  for my $p (@_) {		# check for common keys (in every)
+    my $c = $pivotset * Set::Object->new(keys %{$h->{$p}});
+    for ($c->members) {
+      if ($_ and exists $tests{$_}) {
+	$result->{$_} = $result->{$_} ? $tests{$_} * $result->{$_} : $tests{$_};
+        $result->{$_} = $result->{$_} * Set::Object->new( split_tests($h->{$p}->{$_}) )
+          if $result->{$_}->members;
+        $result->{$_} = $result->{$_}->members;# status_upd -f -q -d
+      }
+      delete $result->{$_} unless $result->{$_};
+    }
+  }
+  delete $result->{''};
+  return $result;
+}
+
+# XXX FIXME does not work yet
+sub unify_results {
+  my $h = shift; 	# platform_version -> file -> failed
+  my $name = shift; 	# todo or fail
+  # first check for common results in files, all platforms
+  my @platforms = keys %$h;
+  my $result = all_common($h, {}, @platforms);
+  if (%$result) {
+    print Data::Dumper->Dump([$result],["common_$name"]);
+
+    # initialize for next round: delete already common found
+    for my $p (@platforms) {
+      for (keys %{$h->{$p}}) {
+        if ($result->{$_} and $result->{$_} ne $h->{$p}->{$_}) { # strip out common tests
+	  my $both = Set::Object->new(split_tests $h->{$p}->{$_})
+                   - Set::Object->new($result->{$_});
+          if ($both->members) {
+            $h->{$p}->{$_} = join(",", $both->members);
+          } else {
+            undef $h->{$p}->{$_};
+          }
+        }
+      }
+    }
+  }
+
+  my $h_sav = $h;
+  # ignore the platform for now. we don't have any platform issues.
+  # check for all pairs version - feature the shortest commons
+  # 1. sort by versions (ignore platform + features) *-v-*
+  # ignore older devel versions (5.11), just blead
+  my %versions;
+  for (@platforms) {
+    my ($p,$v,$f) = platform_version_split($_);
+    push @{$versions{$v}}, ($_) if $v;
+  }
+  for my $v (sort keys %versions) {
+    if ($v !~ /^5\.(7|9|11)$/) { # skip 5.11, 5.9, 5.7, but not blead (5.13 currently)
+      my $v1 = all_common($h, $result, @{$versions{$v}});
+      if (%$v1) {
+        print Data::Dumper->Dump([$v1],["v$v $name"]);
+      }
+    }
+  }
+
+  # 2. sort by feature (ignore platform + version) *-*-f
+  $h = $h_sav;
+  my %feat;
+  for (@platforms) {
+    my ($p,$v,$f) = platform_version_split($_);
+    $f = "" unless $f;
+    push @{$feat{$f}}, ($_);
+  }
+  for my $f (sort keys %feat) {
+    my $f1 = all_common($h, $result, @{$feat{$f}});
+    if (%$f1) {
+      print Data::Dumper->Dump([$f1],["feature $f $name"]);
+    }
+  }
+}
+
+my $dlogs = $dir eq '.' ? "$logs" : "$dir/$logs";
+my $cmd = 'grep -a -i "tests" ' . $dlogs . " | grep -v t/CORE";
+#print "$cmd\n" unless $quiet;
+my %h;
+my %h_sav = %h;
+if (my @g = `$cmd`) {
+  for my $file (@g) {
+    my $prefix;
+    if (($prefix) = $file =~ m{log.test-(.*?):}) {
+      ($file) = $file =~ m/(log.test-.*?):/;
+      my $ctime = -f $file ? sprintf("%0.3f", -C $file) : 0;
+      if ($ctime < 1.5 or $noskip) {
+        $h{$prefix}->{''} = '';
+      }
+    }
+  }
+} else {
+  die "no $logs found\n";
+}
+
+if (!$todoonly) {
+  my $cmd = 'grep -a -B1 -i "Failed test" ' . $dlogs . " | grep -v t/CORE";
+  print "$cmd\n" unless $quiet;
+  if (my @g = `$cmd`) {
+    my $failed = status(\%h, @g);
+    print $failed->[0] if $nodump and $quiet;
+    my $failedu = unify_results($failed->[1], "fail") unless $nodump;
+  }
+}
+%h = %h_sav;
+if (!$failonly) {
+  my $cmd = 'grep -a -B1 -i "TODO passed" ' . $dlogs . " | grep -v t/CORE";
+  print "\n$cmd\n" unless $quiet;
+  if (my @g = `$cmd`) {
+    my $todo = status(\%h, @g);
+    print $todo->[0] if $nodump and $quiet;
+    my $todou = unify_results($todo->[1], "todo_pass") unless $nodump;
+  }
+}
+
+# XXX TODO: update the TEST STATUS section in "./STATUS"
+if ($update) {
+  die "file not found $STATUS\n" unless -e $STATUS;
+  die "-u update STATUS not yet implemented\n";
+  # sort away platforms
+}
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 2
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=2:

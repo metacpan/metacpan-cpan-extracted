@@ -1,0 +1,24 @@
+---
+name: Bot-BasicBot-Pluggable-Module-VieDeMerde
+version: 0.2
+author:
+  - 'Olivier Schwander <iderrick@cpan.org>'
+abstract: VieDeMerde plugin for BasicBot::Pluggable
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  Bot::BasicBot::Pluggable: 0
+  WWW::VieDeMerde: 0.21
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Bot::BasicBot::Pluggable::Module::VieDeMerde:
+    file: lib/Bot/BasicBot/Pluggable/Module/VieDeMerde.pm
+    version: 0.2
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

@@ -1,0 +1,15 @@
+$got_data = {
+          'timestamp' => '2005-03-05T10:44:59-0600',
+          'net' => [
+                     'simple@domain.com'
+                   ],
+          'notes' => 'some dude',
+          'phone' => {
+                       'mobile' => '(555) 444-3333'
+                     },
+          'creation-date' => '2005-03-05T10:44:59-0600',
+          'last' => 'testcase',
+          'full' => 'simple testcase',
+          'first' => 'simple',
+          'company' => 'acme'
+        };

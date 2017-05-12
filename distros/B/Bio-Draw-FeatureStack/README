@@ -1,0 +1,43 @@
+Bio-Draw-FeatureStack version 0.03
+==================================
+
+FeatureStack creates GD images of vertically stacked gene models to facilitate visual comparison
+of gene structures. Compared genes can be clusters of orthologous genes,
+gene family members, or any other genes of interest. FeatureStack takes an array of BioPerl
+feature objects as input, projects them onto a common coordinate space, flips features 
+from the negative strand (optional), left-aligns them by start coordinates (optional), sets a 
+fixed intron size (optional), removes unwanted transcripts (optional), and then draws the 
+so transformed features with a user-specified glyph. Internally, this transformation is
+achieved by cloning all input features into Bio::Graphics::Feature objects before the
+features get rendered by the specified glyph. Output images can be generated in SVG 
+(scalable vectorized image) or PNG (rastered image) format. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Bio::Graphics
+  Bio::Graphics::Glyph::decorated_gene
+  GD::SVG (version 0.32)
+  Test::Exception
+  
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Christian Frech
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

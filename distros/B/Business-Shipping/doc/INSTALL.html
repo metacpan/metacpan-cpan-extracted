@@ -1,0 +1,118 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>INSTALL - How to install Business::Shipping</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:db@lx4.(none)" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<ul>
+
+		<li><a href="#getting_started">Getting Started</a></li>
+		<li><a href="#choosing_your_bundle">Choosing your bundle</a></li>
+	</ul>
+
+	<li><a href="#cpan_installation">CPAN INSTALLATION</a></li>
+	<li><a href="#manual_installation">MANUAL INSTALLATION</a></li>
+	<li><a href="#all_required_modules">All required modules</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>INSTALL - How to install Business::Shipping</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>
+</p>
+<h2><a name="getting_started">Getting Started</a></h2>
+<p>Be sure to read the &quot;GETTING STARTED&quot; section of the README, because some 
+services (e.g. online tracking requests) require that the user signup for a 
+username and password.</p>
+<p>
+</p>
+<h2><a name="choosing_your_bundle">Choosing your bundle</a></h2>
+<p>If you would like to use UPS and USPS, install <a href="#bundle_business_shipping"><code>Bundle::Business::Shipping</code></a>. 
+However, you may opt instead to install the required modules for only one:</p>
+<ul>
+<li><strong><a name="bundle_business_shipping_ups_offline" class="item"><code>Bundle::Business::Shipping::UPS_Offline</code></a></strong>
+
+</li>
+<li><strong><a name="bundle_business_shipping_ups_online" class="item"><code>Bundle::Business::Shipping::UPS_Online</code></a></strong>
+
+</li>
+<li><strong><a name="bundle_business_shipping_usps_online" class="item"><code>Bundle::Business::Shipping::USPS_Online</code></a></strong>
+
+</li>
+<li><strong><a name="bundle_business_shipping" class="item"><code>Bundle::Business::Shipping</code></a></strong>
+
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="cpan_installation">CPAN INSTALLATION</a></h1>
+<p>Note that the XML::DOM uses XML::Parser, and XML::Parser uses Expat.  Therefore,
+you may need to install Expat before XML::Parser will install.</p>
+<p>All shippers:</p>
+<pre>
+ perl -MCPAN -e 'install Bundle::Business::Shipping'</pre>
+<p>UPS_Online only:</p>
+<pre>
+ perl -MCPAN -e 'install Bundle::Business::Shipping::UPS_Offline'</pre>
+<p>UPS_Offline only:</p>
+<pre>
+ perl -MCPAN -e 'install Bundle::Business::Shipping::UPS_Offline'</pre>
+<p>USPS_Online only:</p>
+<pre>
+ perl -MCPAN -e 'install Bundle::Business::Shipping::USPS_Online'</pre>
+<p>
+</p>
+<hr />
+<h1><a name="manual_installation">MANUAL INSTALLATION</a></h1>
+<p>Be sure to install all required modules before installing.  After unpacking the 
+tarball, execute the following:</p>
+<pre>
+ perl Makefile.PL [--use_defaults=&lt;1|0&gt;]
+ make
+ make test
+ make install</pre>
+<p>
+</p>
+<hr />
+<h1><a name="all_required_modules">All required modules</a></h1>
+<p>Each Bundle lists the required modules for each shipper type.  Here is the 
+combined list for all shippers:</p>
+<pre>
+ Business::Shipping::DataFiles (any)
+ CHI (0.39)
+ Any::Moose (any)
+ Config::IniFiles (any)
+ Crypt::SSLeay (any)
+ Getopt::Mixed (any)
+ Log::Log4perl (any)
+ LWP::UserAgent (any)
+ XML::DOM (any)
+ XML::Simple (2.05)</pre>
+
+</body>
+
+</html>

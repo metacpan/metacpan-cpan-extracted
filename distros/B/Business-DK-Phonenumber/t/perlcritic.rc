@@ -1,0 +1,27 @@
+
+# $Id$
+
+severity = 1
+verbose = 9
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|LICENSE|COPYRIGHT
+script_sections = NAME|VERSION|SYNOPSIS|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|INCOMPATIBILITIES|BUGS AND LIMITATIONS|TEST AND QUALITY|TODO|SEE ALSO|BUG REPORTING|AUTHOR|LICENSE|COPYRIGHT
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Id
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+
+[-ValuesAndExpressions::RequireNumberSeparators]
+
+[-Documentation::RequirePodLinksIncludeText]

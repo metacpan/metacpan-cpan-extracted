@@ -1,0 +1,6 @@
+Revision history for Perl extension Bundle::DataMint.
+
+0.00  Mon May  5 12:32:15 2003
+	- original version; created by h2xs 1.2 with options
+		-c -X -n Bundle::DataMint
+

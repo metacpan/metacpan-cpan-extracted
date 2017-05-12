@@ -1,0 +1,66 @@
+{
+   "abstract" : "map read to genome with bwa and soap",
+   "author" : [
+      "Yan Xueqing <yanxueqing621@163.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BioX-Map",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::ShareDir" : "0",
+            "File::Which" : "0",
+            "FindBin" : "0",
+            "IO::All" : "0",
+            "IPC::Run" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "0",
+            "MooX::Cmd" : "0",
+            "MooX::Options" : "0",
+            "Parallel::ForkManager" : "0",
+            "Types::Standard" : "0",
+            "lib" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Test::File::ShareDir" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.0.12"
+}
+

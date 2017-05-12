@@ -1,0 +1,236 @@
+Country	Country Code
+Albania	AL
+Algeria	DZ
+American Samoa	AS
+Andorra	AD
+Anguilla	AI
+Antigua	AG
+Argentina	AR
+Aruba	AW
+Australia	AU
+Austria	AT
+Azores	AP
+Bahamas	AS
+Bahrain	BH
+Bangladesh	BD
+Barbados	BB
+Barbuda	BC
+Belgium	BE
+Belize	BZ
+Belorus	BY
+Benin	BJ
+Bermuda	BM
+Bolivia	BO
+Bonaire	BL
+Botswana	BW
+Brazil	BR
+British Virgin Islands 	VG
+Brunei	BN
+Bulgaria	BG
+Burkina Faso	BF
+Burundi	BI
+Cambodia	KH
+Cameroon	CM
+Canada	CA
+Canary Islands	CE
+Cape Verde Islands 	CV
+Cayman Islands	KY
+Central African Republic 	CF
+Chad	TD
+Channel Islands	NN
+Chile	CL
+China, Peoples Republic of 	CN
+Christmas Island	CX
+Cocos Islands	CC
+Colombia	CO
+Congo	CG
+Cook Islands	CK
+Costa Rica	CR
+Croatia	HR
+Curacao	CB
+Cyprus	CY
+Czech Republic	CZ
+Denmark	DK
+Djibouti	DJ
+Dominica	DM
+Dominican Republic 	DO
+Ecuador	EC
+Egypt	EG
+El Salvador	SV
+England	EN
+Equitorial Guinea 	GQ
+Eritrea	ER
+Estonia	EE
+Ethiopia	ET
+Faeroe Islands	FO
+Fiji	FJ
+Finland	FI
+France	FR
+French Guiana	GF
+French Polynesia	PF
+Gabon	GA
+Gambia	GM
+Germany	DE
+Ghana	GH
+Gibraltar	GI
+Greece	GR
+Greenland	GL
+Grenada	GD
+Guadeloupe	GP
+Guam	GU
+Guatemala	GT
+Guinea	GN
+Guinea-Bissau	GW
+Guyana	GY
+Haiti	HT
+Holland	HO
+Honduras	HN
+Hong Kong	HK
+Hungary	HU
+Iceland	IS
+India	IN
+Indonesia	ID
+Iran	IR
+Ireland	IE
+Israel	IL
+Italy	IT
+Ivory Coast (Cote d'Ivoire) 	CI
+Jamaica	JM
+Japan	JP
+Jordan	JO
+Kazakhstan	KZ
+Kenya	KE
+Kiribati	KI
+Korea, South	KR
+Kosrae	KO
+Kuwait	KW
+Kyrgyzstan	KG
+Laos	LA
+Latvia	LV
+Lebanon	LB
+Lesotho	LS
+Liberia	LR
+Liechtenstein	LI
+Lithuania	LT
+Luxembourg	LU
+Macau	MO
+Macedonia	MK
+Madagascar	MG
+Madeira	ME
+Malawi	MW
+Malaysia	MY
+Maldives	MV
+Mali	ML
+Malta	MT
+Marshall Islands	MH
+Martinique	MQ
+Mauritania	MR
+Mauritius	MU
+Mexico	MX
+Micronesia	FM
+Monaco	MC
+Montserrat	MS
+Morocco	MA
+Mozambique	MZ
+Myanmar	MM
+Namibia	NA
+Nepal	NP
+Netherlands	NL
+Netherlands Antilles 	AN
+Nevis	NV
+New Caledonia	NC
+New Zealand	NZ
+Nicaragua	NI
+Niger	NE
+Nigeria	NG
+Niue	NU
+Norfolk Island	NF
+Northern Ireland	NB
+Northern Mariana Islands 	MP
+Norway	NO
+Oman	OM
+Pakistan	PK
+Palau	PW
+Panama	PA
+Papua New Guinea	PG
+Paraguay	PY
+Peru	PE
+Philippines	PH
+Poland	PL
+Ponape	PO
+Portugal	PT
+Puerto Rico	PR
+Qatar	QA
+Reunion	RE
+Romania	RO
+Rota	RT
+Russia	RU
+Rwanda	RW
+Saba	SS
+Saipan	SP
+Saudi Arabia	SA
+Scotland	SF
+Senegal	SN
+Seychelles	SC
+Sierra Leone	SL
+Singapore	SG
+Slovak Republic	SK
+Slovenia	SI
+Solomon Islands	SB
+South Africa	ZA
+Spain	ES
+Sri Lanka	LK
+St. Barthelemy	NT
+St. Christopher	SW
+St. Croix	SX
+St. Eustatius	EU
+St. John	UV
+St. Kitts	KN
+St. Lucia	LC
+St. Maarten	MB
+St. Martin	TB
+St. Thomas	VL
+St. Vincent and the Grenadines 	VC
+Sudan	SD
+Suriname	SR
+Swaziland	SZ
+Sweden	SE
+Switzerland	CH
+Syria	SY
+Tahiti	TA
+Taiwan	TW
+Tajikistan	TJ
+Tanzania	TZ
+Thailand	TH
+Tinian	TI
+Togo	TG
+Tonga	TO
+Tortola	TL
+Trinidad &amp; Tobago 	TT
+Truk	TU
+Tunisia	TN
+Turkey	TR
+Turks and Caicos Islands 	TC
+Tuvalu	TV
+U.S. Virgin Islands 	VI
+Uganda	UG
+Ukraine	UA
+Union Island	UI
+United Arab Emirates 	AE
+United Kingdom	GB
+United States 	US
+Uruguay	UY
+Uzbekistan	UZ
+Vanuatu	VU
+Venezuela	VE
+Vietnam	VN
+Virgin Gorda	VR
+Wake Island	WK
+Wales	WL
+Wallis and Futuna Islands 	WF
+Western Samoa	WS
+Yap	YA
+Yemen	YE
+Zaire	ZR
+Zambia	ZM
+Zimbabwe	ZW

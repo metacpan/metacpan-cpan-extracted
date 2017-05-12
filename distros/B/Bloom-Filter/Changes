@@ -1,0 +1,31 @@
+Revision history for Perl module Bloom::Filter
+
+1.2 2014-03-08T21:30:00+0100 XAERXESS
+
+ - fixed GPL version in metadata
+ - included LICENSE file in MANIFEST
+
+1.1 2014-02-28T16:00:00+0100 XAERXESS
+
+ - Grzegorz Rożniecki (XAERXESS) has taken over maintenance
+ - RT #67716: used Digest::SHA instead of Digest::SHA1
+ - updated revision history in Changes (as per CPAN::Changes::Spec)
+ - cleaned up documentation
+ - moved Filter.pm to lib/Bloom/Filter.pm
+ - tweaked Makefile.PL
+
+1.0 2007-02-10T14:28:50-08:00
+
+ - RT #6852: big speedup by Dmitriy Ryaboy
+
+0.03 2004-07-20T18:41:01-08:00
+
+ - minor changes
+
+0.02 2004-03-27T12:10:11-08:00
+
+ - first public version on CPAN
+
+0.01 2004-03-26T10:45:51-08:00
+
+ - original version; created by h2xs 1.21 with options -XPA Filter

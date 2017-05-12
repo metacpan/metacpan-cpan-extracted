@@ -1,0 +1,85 @@
+running benchmarks with sets of size 100 and 100
+
+delete:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  3349/s          --        -93%        -94%
+Set::Object 45997/s       1274%          --        -17%
+Set::Tiny   55350/s       1553%         20%          --
+
+difference:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  1745/s          --        -90%        -95%
+Set::Object 17066/s        878%          --        -50%
+Set::Tiny   33811/s       1837%         98%          --
+
+insert:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  3759/s          --        -94%        -95%
+Set::Object 62877/s       1573%          --        -10%
+Set::Tiny   69818/s       1757%         11%          --
+
+intersection:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  1659/s          --        -86%        -88%
+Set::Object 12217/s        636%          --        -11%
+Set::Tiny   13653/s        723%         12%          --
+
+invert:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  2488/s          --        -80%        -91%
+Set::Object 12560/s        405%          --        -54%
+Set::Tiny   27307/s        998%        117%          --
+
+is_disjoint:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar   786/s          --        -93%        -94%
+Set::Object 11821/s       1404%          --        -12%
+Set::Tiny   13398/s       1605%         13%          --
+
+is_equal:
+                Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar   1571/s          --        -98%        -99%
+Set::Object  77422/s       4828%          --        -37%
+Set::Tiny   123675/s       7772%         60%          --
+
+is_proper_subset:
+                 Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar    1584/s          --       -100%       -100%
+Set::Object 1097492/s      69188%          --        -11%
+Set::Tiny   1238753/s      78106%         13%          --
+
+is_proper_superset:
+                 Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar    1614/s          --       -100%       -100%
+Set::Object  778425/s      48117%          --        -37%
+Set::Tiny   1226609/s      75878%         58%          --
+
+is_subset:
+                Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar   1544/s          --        -98%        -99%
+Set::Object  84620/s       5381%          --        -34%
+Set::Tiny   129153/s       8265%         53%          --
+
+is_superset:
+                Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar   1570/s          --        -98%        -99%
+Set::Object  76119/s       4748%          --        -38%
+Set::Tiny   122530/s       7704%         61%          --
+
+new:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  3491/s          --        -94%        -95%
+Set::Object 62877/s       1701%          --        -11%
+Set::Tiny   70969/s       1933%         13%          --
+
+symmetric_difference:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  2765/s          --        -57%        -87%
+Set::Object  6399/s        131%          --        -69%
+Set::Tiny   20958/s        658%        228%          --
+
+union:
+               Rate Set::Scalar Set::Object   Set::Tiny
+Set::Scalar  1558/s          --        -91%        -94%
+Set::Object 17454/s       1020%          --        -37%
+Set::Tiny   27568/s       1669%         58%          --

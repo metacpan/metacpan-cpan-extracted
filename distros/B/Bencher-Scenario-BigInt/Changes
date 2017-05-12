@@ -1,0 +1,21 @@
+0.03    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.02    2017-01-25 (PERLANCAR)
+
+        - [Bugfix] Fix double quoting.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.15) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=requires.
+
+
+0.01    2016-01-31 (PERLANCAR)
+
+        - First release.

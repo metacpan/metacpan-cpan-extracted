@@ -1,0 +1,30 @@
+2001-11-04 19:25   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, Wombat.pm: bump version number
+
+2001-10-25 17:45   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog: sync
+
+2001-10-25 17:03   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: add memory cache prerequisites
+
+2001-07-27 05:36   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: use reasonable version number and package name
+
+2001-07-25 09:02   Brian Moseley <bcm@maz.org>
+
+	* Wombat.pm: add Apache::Request
+
+2001-07-25 03:57   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, Wombat.pm: Initial revision
+
+2001-07-25 03:57   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, ChangeLog, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	README, Wombat.pm: imported apache connector
+

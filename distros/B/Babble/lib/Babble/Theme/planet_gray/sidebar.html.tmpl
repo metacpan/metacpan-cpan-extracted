@@ -1,0 +1,63 @@
+<div id="sidebar">
+
+[%- IF meta_about_text -%]
+[% meta_about_text %]
+[%- ELSE -%]
+<p>This collection is powered by
+<a href="http://bonehunter.rulez.org/Babble.phtml">Babble</a>,
+run by <a href="mailto:[% meta_owner_email %]">[% meta_owner %]</a>.
+</p>
+[%- END %]
+
+<p>
+Last updated: [% last_update %]
+</p>
+
+[% UNLESS template_knob_no_sources -%]
+<h2>Subscriptions</h2>
+
+<ul>
+[% FOREACH item = collection.documents -%]
+<li> <a href="[% item.id %]">[% item.name %]</a>
+     <a href="[% item.link %]">(feed)</a> </li>
+[% END -%]
+</ul>
+[%- END %]
+
+[% IF meta_feed_text -%]
+[%- meta_feed_text -%]
+[%- ELSIF meta_feed_link -%]
+<h2>Feeds</h2>
+<p>
+[% meta_title %] provides its aggregated feeds in
+<a href="[% meta_feed_link %]">RSS 1.0</a>.
+</p>
+[%- END %]
+
+[% IF template_knob_planetarium -%]
+<h2>Planetarium</h2>
+<ul>
+[% FOREACH planet = planetarium -%]
+<li> <a href="[% planet.url %]">[% planet.name %]</a> </li>
+[% END -%]
+</ul>
+[%- END %]
+
+[% IF template_knob_datebar -%]
+<h2>Datebar</h2>
+<ul>
+[%- myhead = "1970-01-01" -%]
+[% FOREACH item = my_collection -%]
+  [%- IF myhead != item.date_date -%]
+    [%- myhead = item.date_date -%]
+    <li> <a href="#[% item.date_date %]">[% item.date_date %]</a> </li>
+  [%- END -%]
+[% END -%]
+</ul>
+[%- END %]
+
+</div>
+
+[%#
+arch-tag: 50fa453b-ffe5-4802-ae6a-ba09c9c477dc
+%]

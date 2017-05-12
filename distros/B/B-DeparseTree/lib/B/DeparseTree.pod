@@ -1,0 +1,120 @@
+=pod
+
+=for comment
+This file located in the distribution. But it is also found in a Github wiki:
+https://github.com/rocky/p5-B-DeparseTree/wiki/DeparseTree.pod
+where we can immediately see the results and others can contribute.
+
+=begin html
+
+<a href="https://travis-ci.org/rocky/p5-B-DeparseTree"><img src="https://travis-ci.org/rocky/p5-B-DeparseTree.png"></a>
+
+=end html
+
+=head1 Name
+
+B::DeparseTree
+
+=head2 Synopsis
+
+    use B::DeparseTree;
+    my $deparse = B::DeparseTree->new();
+
+    # create a coderef "none"
+    sub none() { return };
+
+    # Get full depars tree after deparsing
+    $deparse->coderef2info(\&none);
+
+    # returns:
+    # \ {
+    #    body        [
+    #    [0] {
+    #        body    [
+    #            [0] {
+    #                cop      B::COP=SCALAR(0x1c8cc78)  {
+    #                    Parents       B::OP
+    #                     ...
+    #                },
+    #                op       LISTOP=SCALAR(0x20fe600)
+    #                parent   12857296,
+    #                text     "",
+    #                texts    [],
+    #                type     "nextstate"
+    #            },
+    #            [1] {
+    #                cop      B::COP=SCALAR(0x1c8cc78)
+    #                op       B::LISTOP  {
+    #                    ...
+    #                    Parents       B::BINOP
+    #                ...
+    #            }
+    #        ...
+    #   sep         "",
+    #        text        "() {
+    #            return;
+    #       }",
+    #   texts       [
+    #      [0] "() ",
+    #      [1] "{
+    #      ",
+    #      [2] "
+    #        return;",
+    #      [3] "
+    #      }"
+    #    ],
+    #   type "sub"
+    # ...
+
+
+    # Now show the text for what was deparsed. Note
+    # The subroutine name is missing so we fill that in:
+    print("none", $dp->{text}, "\n");
+
+    none() {
+      return;
+    }
+
+    # We can print text for some part of the tree such as that LISTOP:
+
+    print $dp->{body}[0]->{body}[1]->{text}, "\n";  # prints "return";
+
+    # We can print results of op address you know about or may have found out about
+    # from a prior deparse:
+
+    my $dp2 = $deparse->coderef2info(\&none, 0x20fe600); # see above for that hex addr
+
+
+=head2 Description
+
+Perl's L<B::Deparse> but we save abstract tree information and associate
+that with Perl text fragments.  These are fragments accessible by OP
+address. With this, in Perl you can determine get exactly where you in
+a program with granularity finer that at a line number boundary.
+
+Uses for this could be in stack trace routines like L<Carp>. It is used
+in the L<deparse |https://metacpan.org/pod/Devel::Trepan::Deparse>
+command extension to L<Devel::Trepan>.
+
+=head2 See also:
+
+=over  4
+
+=item *
+
+L<B::Devel::Trepan::Deparse> for a L<Devel::Trepan> plugin that uses this
+
+=item *
+
+L<B::Deparse> for deparsing without keeping tree information around
+
+=item *
+
+L<B::Callsite> for one way to get opcode locations on the call stack
+
+=item *
+
+L<Exact Perl location with B::Deparse (and Devel::Callsite) |http://blogs.perl.org/users/rockyb/2015/11/exact-perl-location-with-bdeparse-and-develcallsite.html> for
+more information.
+
+=back

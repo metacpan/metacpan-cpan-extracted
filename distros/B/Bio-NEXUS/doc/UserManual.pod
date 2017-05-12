@@ -1,0 +1,476 @@
+=pod
+
+=head1 NAME
+
+Bio::NEXUS User Manual - Programming the Perl API for NEXUS files
+
+=head1 DESCRIPTION
+
+This User Manual explains the motivation for developing the Bio::NEXUS library, 
+the principles underlying its organization, and its use in developing software for 
+evolutionary informatics.  This manual also provides information on how 
+to use two demonstration tools that come with the package, B<nexplot.pl> 
+(for visualizing character data and trees) and B<nextool.pl> (for manipulating 
+character data and trees).
+
+=head1 Quick Start 
+
+=head2 0.1 Install 
+
+If you have CPAN, the automatic install is easiest (just be sure you  invoke 
+the command with adequate permission to install at the default system or user 
+level, e.g., on Mac OSX, use "sudo" before the following commands):
+
+	$ perl -MCPAN -e "install Bio::NEXUS"
+
+or use the manual method of downloading the package, unpacking, then the 
+following: 
+
+	$ perl Makefile.PL
+	$ make 
+	$ make test
+	$ make install
+
+
+For further details and options, see the Installation document. 
+
+=head2 0.2 Quickies 
+
+**Under Construction**
+
+=head3 nextool quickies 
+
+To reroot a tree using 'S_Pombe' as an outgroup (if your file contains one tree):
+
+	$ nextool.pl my_nexus_file.nex output.nex reroot 'S_Pombe'
+
+To completely remove some taxa from a file, while maintaining the integrity of remaining phylogeny:
+
+	$ nextool.pl my_nexus_file.nex output.nex exclude otu human_gene1 chimp_gene1 mouse_gene2
+
+To define a set of taxa (sets can be colored in plots: see nexplot quickie):
+
+	$ nextool.pl my_nexus_file.nex output.nex makesets byotus mammals = [human_gene1 mouse_gene2] plants = [maize_gene1 maize_gene2]
+
+=head3 nexplot quickies
+
+To produce a postscript plot of the tree and alignment from your file (first tree and first alignment are used by default, if files contain multiple trees or alignments):
+
+	$ nexplot.pl my_nexus_file.nex > pretty_plot.ps
+
+To plot only the phylogeny in the postscript file:
+
+	$ nexplot.pl -t my_nexus_file.nex > pretty_tree.ps
+
+To apply coloring to sets you have already defined (called "mammals" and "plants") in your NEXUS file (coloring affects both portions of the tree and rows in the alignment):
+
+	$ nexplot.pl -U "mammals red plants green" my_nexus_file > colored_plot.ps
+
+=head3 quickie script using Bio::NEXUS
+
+Here is an example of how Bio::NEXUS can be used to read in a NEXUS file, perhaps created by ClustalW, and add a tree to the file.  Note that taxa need to be named the same way in the NEXUS file and in the tree string (although a translate() method exists to change names in the file).
+
+=for comment Tom, 
+the formatting below is not working out very well. looks bad. 
+in POD, use a space or tab before a paragraph to format it as code (like <pre> except its indented)
+
+ #!/usr/bin/perl -w
+ use strict;
+ use Bio::NEXUS;
+ my $nexus         = new Bio::NEXUS("./clustal_output/gene_family.nex");
+ my $newick        = "(human_gene1,(chimp_gene,(yeast_gene,(human_gene2,mouse_gene))))";
+ my $outgroup      = "yeast_gene";
+ my $trees_block   = new Bio::NEXUS::TreesBlock();
+ 	$trees_block->add_tree_from_newick($newick, "simple_tree");
+ my $tree_object   = $trees_block->get_tree("simple_tree");
+ 	$tree_object->reroot($outgroup);
+ 	$nexus->add_block($trees_block);
+ 	$nexus->write("gene_family_with_tree.nex");
+
+B<Discussion> Here we need to explain the steps.  also I think this code can be simplified 
+by removing the unneeded variables such as $outgroup (just use "yeast_gene" as the arg to 
+the reroot method).  If we call this B<add_tree.pl> and run it (after first displaying the 
+content of the input file), the output is as follows 
+
+ > cat clustal_gen_family.nex
+ #NEXUS
+ BEGIN DATA;
+ dimensions ntax=5 nchar=25;
+ format missing=?
+ symbols="ABCDEFGHIKLMNPQRSTUVWXYZ"
+ interleave datatype=PROTEIN gap= -; 
+ matrix
+ A           IKKGANLFKTRCAQCHTVEKDGGNI
+ B           LTKGAKLFTTRCAQCHTLEGDGGNI
+ C           STKGAKLFETRCKQCHTVENGGGHV
+ D           LKKGEKLFTTRCAQCHTLKEGEGNL
+ E           LKKGEKLFTTRCAQCHTLKEGEGNL
+ ;
+ end;
+  > perl add_tree.pl
+  Read in Data Block (deprecated), creating Characters Block instead . . .
+  > cat gene_family_with_tree.nex
+ #NEXUS
+ BEGIN TAXA;
+         DIMENSIONS ntax=5;
+         TAXLABELS  human_gene1 human_gene2 yeast_gene mouse_gene chimp_gene;
+ END;
+ BEGIN CHARACTERS;
+         DIMENSIONS ntax=5 nchar=25;
+         FORMAT datatype=PROTEIN " gap=- abcdefghiklmnpqrstuvwxyz missing=? symbols=" interleave;
+         MATRIX
+         human_gene1     IKKGANLFKTRCAQCHTVEKDGGNI
+         human_gene2     LKKGEKLFTTRCAQCHTLKEGEGNL
+         yeast_gene      STKGAKLFETRCKQCHTVENGGGHV
+         mouse_gene      LKKGEKLFTTRCAQCHTLKEGEGNL
+         chimp_gene      LTKGAKLFTTRCAQCHTLEGDGGNI
+         ;
+ END;
+ BEGIN ;
+         TREE simple_tree = (human_gene1,(chimp_gene,(yeast_gene,(human_gene2,mouse_gene)inode4)inode3)inode2)root;
+ END;
+
+=head2 0.3 Going further: should you be using nexplot.pl, nextool.pl and Bio::NEXUS?  
+
+**Under Construction**
+
+You may find this package useful if you desire to:  
+
+=over
+
+=item * use scripts or commands to manipulate gene or protein alignments with trees 
+
+=item * use scripts or commands to manipulate classical character data with trees 
+
+=item * generate custom views of your molecular or other character data and trees 
+
+=item * develop wrappers for existing tools that don't use NEXUS but should 
+
+=item * maintain integrity of complex data sets (e.g., multiple trees, constraints, notes)
+
+=item * write scripts to link together tools into an evolutionary analysis pipeline
+
+=item * develop new Perl tools that will use NEXUS as input or output
+
+=back
+
+By contrast, this package may not help you directly if your main problem is to: 
+
+=over
+
+=item * find methods to compute numeric results of an evolutionary model
+
+=item * integrate with BioPerl (we are working on this, via BioPerl, but its a separate branch)
+
+=item * find the best tree for your data
+
+=back
+
+If you are uncertain about whether to use Bio::NEXUS, read further or contact the authors.  See the Tutorial document for further code examples.  For a more extensive explanation of Bio::NEXUS, read this User Manual. 
+
+=head1 Chapter 1 : Introduction
+
+=head2 1.1. Overview
+
+**Under Construction**
+
+Genome analysis is increasingly dependent on comparative methods of
+analysis.  Even at the earliest stages of genome annotation, bits of a
+new genome sequence are searched against known sequences to mine clues 
+useful in "functional" inferences (where does the gene start?  where
+are the introns?  what does it do?).  Often these inferences are based 
+on BLAST search results. 
+
+Though it is not widely appreciated, there already exists a 
+sophisticated methodological framework for comparative analysis,
+developed over the past 40 years by systematists and evolutionary 
+biologists, in which differences are interpreted according to
+probabilistic models of evolutionary divergence on a branching tree.  
+The basic methods and concepts of comparative evolutionary biology, 
+originally developed for morphological characters, can be applied 
+B<directly> to any kind of character (discrete or continuous, 
+so long as it fits the L</"2.1. The Character-State Data Model">). 
+
+In the ongoing quest to improve the accuracy and reliability of
+functional inferences, it is B<inevitable> that the
+bioinformatics/genomics community will come to rely on these more 
+sophisticated methods.  This transition will require automatable tools
+for phylogenetic analysis and character reconstruction (which
+already exist to a large degree), portable and flexible formats for 
+data exchange, infrastructure to facilitate integration, and better 
+education about how to integrate probabilistic evolutionary 
+reasoning into genome interpretation.  
+
+=for comment the link is L<http://www.ncbi.nlm.nih.gov/entrez/query.fcgi?cmd=Retrieve&db=PubMed&list_uids=11975335&dopt=Abstract> 
+
+The NEXUS file format of Maddison, Swofford & Maddison, 1997 
+(I<Systematic Biology> 46:590-621) 
+was developed to facilitate the communication and storage of data for comparative 
+analysis.  
+
+=head2 Bio::NEXUS: an Object-oriented Perl API for the NEXUS file format
+
+**Under Construction**
+
+Developing Perl support for NEXUS is a natural way to facilitate evolutionary analysis.  
+Because of its convenience, flexibility and power, Perl has become the glue language 
+of bioinformatics.  NEXUS is a powerful and flexible format, used in dozens of 
+evolutionary analysis applications for which simplistic formats like FASTA are 
+unacceptable.  Combining the two makes it easy to develop wrappers for existing 
+software and to glue together separate procedures into automated pipelines. 
+
+Several years of work in our research group led to the development of a NEXUS 
+applications programming interface or "API" in Perl which we call "Bio::NEXUS" for 
+"NEXUS Perl Library".   
+Along with the library modules in Bio::NEXUS, the Bio::NEXUS package described here 
+includes documentation as well as two demonstration applications, 
+B<nexplot.pl> and B<nextool.pl>.  The Bio::NEXUS library is the middle 
+layer of the L<http://www.molevol.org/nexplorer> Nexplorer server, 
+which provides a graphical interface for browsing and manipulating sequence 
+family data, showcasing the methods in Bio::NEXUS.  The graphical rendering 
+framework used in Nexplorer is the same as that used in nexplot.pl.  
+
+A beta version of the package was released in 2004.  As of 2006, we are 
+uploading the package to CPAN.  
+
+In terms of the big picture, what is currently missing from this project is 
+data IO from other formats and streams.  Our future plans include integrating 
+more fully with BioPerl and with the CIPRES services architecture, to provide 
+access to other file formats commonly used in bioinformatics, as well as to 
+online services and databases. 
+
+=head1 Chapter 2. NEXUS, Bio::NEXUS, and the Character-State Data Model
+
+=head2 2.1. The Character-State Data Model
+
+**Under Construction**
+
+The NEXUS format conveys data organized according to the 
+B<character state data model>, in which the features of
+B<operational taxonomic units (OTUs)> (e.g., species, individuals, genes, genomes, etc.) 
+are observable B<states> of underlying homologous
+B<characters>.  For instance, in a protein sequence alignment, proteins are the OTUs, 
+alignment columns are characters, and amino acids (or gaps) are states.  
+
+=begin html
+
+    <img src="http://www.molevol.org/camel/images/KOG0011_cdat.jpg" alt="character-state data model"  width="100%"  />
+
+=end html
+
+=head2 2.2  Evolutionary analysis 
+
+**Under Construction**
+
+In evolutionary analysis, it is typical to consider differences as 
+the result of B<state transitions> by which common ancestral states diverge 
+along the branches of a B<tree>, according to some model of change.  This is what makes evolutionary 
+analysis so potent.  Without the tree-based connection between differences and 
+models of change, we can interpret similarities and differences 
+in the search for patterns, but the results are often difficult to relate 
+in a precise way to mechanistic hypotheses or to questions about causal factors.  
+With evolutionary analysis, we can turn questions about the significance of 
+similarities and differences into well posed questions about the rates or 
+probabilities of different types of changes over time.  
+
+=head2 2.3. The NEXUS File Format Standard 
+
+**Under Construction**
+
+=head3 Syntax
+
+The NEXUS file is, in a sense, a text representation of the character-state data model.  
+Thus it provides a means to represent a tree using the Newick standard (L<http://evolution.gs.washington.edu/phylip/newicktree.html>).  
+The syntactic structure of a NEXUS file is as follows: 
+
+=begin text
+
+#NEXUS
+begin < blockname >;
+    < command > [ < modifiers > ] < arguments >;
+    [ < another_command_with_args >; ]
+end;
+[ < another_block_with_commands > ]
+
+=end text
+
+Each of the pre-defined types of public blocks may appear only once.
+The TAXA block is the only necessary block.  There are some
+restrictions on the ordering of blocks, and on the ordering of
+commands within a block.  
+
+Application-specific "private" blocks are also possible.  NEXUS 
+keywords are not case-sensitive.  We put names of BLOCKS in upper case here for 
+mnemonic purposes.
+
+=head3 Blocks
+
+=head4 Some important blocks
+
+=begin html
+
+<table border=2>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>TAXA</td><td>specifies OTUs in data set</td></tr> 
+<tr><td>CHARACTERS</td><td>specifies characters</td></tr> 
+<tr><td>SETS</td><td>assigns names to sets of characters or OTUs</td></tr> 
+<tr><td>ASSUMPTIONS</td><td>specifies assumptions for an analysis</td></tr> 
+<tr><td>CODONS</td><td>specifies codons and their genetic codes</td></tr> 
+<!-- extra row 
+<tr><td></td><td></td></tr> 
+-->
+</table>
+
+=end html
+
+=head4 Some important commands
+
+=begin html
+
+<table border=2>
+<tr><th>Name</th><th>Block</th><th>Description</th></tr>
+<tr><td>CharLabels</td><td>CHARACTERS</td><td>label for a character (column)</td></tr> 
+<tr><td>StateLabels</td><td>CHARACTERS</td><td>label for a state (the type 
+ of an instance of a character)</td></tr> 
+<tr><td>CharStateLabels</td><td>CHARACTERS</td><td>combined label for a character 
+ and its states</td></tr> 
+<tr><td>CharSet</td><td>SETS</td><td>give a name to some set of chars</td></tr> 
+<tr><td>TaxSet</td><td>SETS</td><td>give a name to some set of OTUs</td></tr> 
+<tr><td>GeneticCode</td><td>CODONS</td><td>specify a genetic code</td></tr> 
+<tr><td>CodeSet</td><td>CODONS</td><td>associate a code with a CharSet or TaxSet</td></tr> 
+<tr><td>Tree</td><td>TREES</td><td>specify a <a href="http://evolution.genetics.washington.edu/phylip/newicktree.html">Newick</a> tree</td></tr> 
+<!-- extra row 
+<tr><td></td><td></td><td></td></tr> 
+-->
+</table>
+
+=end html
+
+=head2 2.4. Examples of how NEXUS files are used in current software 
+
+**Under Construction**
+
+mrbayes
+paup
+mesquite
+nexplorer
+
+=head2 2.5.  Bio::NEXUS Objects 
+
+**Under Construction**
+
+The structure of a Bio::NEXUS object reflects the structure of a NEXUS file to the extent that it is logical.  Like a NEXUS file, a Bio::NEXUS object is merely a container for blocks.  Therefore, almost all manipulation or retrieval of data from a NEXUS object starts by getting some block:
+
+	$trees_block = $nexus->get_block('trees');
+
+In some cases, blocks too are little more than containers (e.g. TREES, CHARACTERS, ASSUMPTIONS).  In other cases, once you have the block, you have everything you need to access or manipulate data:
+
+	$dist = $distance_block->get_distance_between('Homo_sapiens','Pan_troglodytes');
+
+or
+
+	@taxa = @{ $taxa_block->get_taxlabels() };
+
+NEXUS
+
+=head2 2.4. Manipulation objects 
+
+**Under Construction**
+
+=over 4
+
+=item 1.  Collection
+
+asdfasdfa
+
+=item 2.  BLOCK objects
+
+asdfasdfa
+
+=item 3 Tree objects
+
+asdfasdfa
+
+=back
+
+=head1 Chapter 3: Using Bio::NEXUS library
+
+=head2 3.1. Selecting subset of the data
+
+**Under Construction**
+
+=head2 3.2. Manipulating data
+
+**Under Construction**
+
+=head2 3.3. Plotting data in different format.
+
+**Under Construction**
+
+=head1 Chapter 4: Demonstration applications: nexplot.pl, nextool.pl, and Nexplorer 
+
+=head2 4.1. Using nextool.pl
+
+**Under Construction**
+
+Nextool (nextool.pl) is self-documenting.  To see the options, type one of these: 
+
+	$ <path>/nextool.pl -h 
+	$ perldoc <path>/nextool.pl
+
+If nextool.pl is installed in your executable path, you do not need to specify the 
+path. 
+
+=head2 4.2. Using nexplot.pl
+
+**Under Construction**
+
+Nexplot (nexplot.pl) is self-documenting.  To see the options, type one of these: 
+
+	$ <path>/nexplot.pl -h 
+	$ perldoc <path>/nexplot.pl
+
+If nexplot.pl is installed in your executable path, you do not need to specify the 
+path. B<nexplot.pl>, particularly when combined with B<nextool.pl>, provides a 
+flexible and convenient way to generate customized
+publication-quality views of character data in a phylogenetic context.  In particular, 
+B<nexplot.pl> has a variety of settings, and can generate output in PostScript, 
+which means that the graphic elements all have infinite resolution.  To
+summarize, the advantages are: 
+
+=over
+
+=item * output is publication-quality
+
+=item * output format can be converted to other formats for multiple uses
+
+=item * graphics are infinitely scalable
+
+=item * layout is customizable
+
+=item * data input format is standardized (NEXUS)
+
+=back
+
+=head2 4.3. Using Nexplorer
+
+**Under Construction**
+
+Nexplorer is a web-based application providing a convenient graphical interface 
+for phylogenetic browsing and manipulation of sequence family data sets (or other 
+character data sets).  Nexplorer provides only a subset of the capabilities of 
+nexplot.pl and nextool.pl, but it is much easier to use, especially for beginners.  
+
+The L<http://www.molevol.org/nexplorer>Nexplorer web site (located at 
+www.molevol.org/nexplorer) provides documentation, including tutorial exercises.  
+
+In order to use Nexplorer, you must either supply your own NEXUS file, or use one 
+of the data files provided (several thousand, mostly sequence families).  
+
+=head1 AUTHOR
+
+Tom Hladish 
+Arlin Stoltzfus
+
+
+

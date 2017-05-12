@@ -1,0 +1,44 @@
+README
+------
+
+This is BikePower, a re-port of the original "bike_power" program by
+Ken Roberts and Mark Grennan.
+
+From the original description:
+
+  This is a computer program called "bike_power", which calculates power
+  output and power consumption for bicycling. You give it things like
+  riding speed, body weight, hill grade, and wind speed. The program
+  prints out a table with power output and power consumption, broken out
+  in various ways.
+
+Requirements                                                          
+
+You need a modern perl (e.g. perl5.004 but older versions may work
+too). If you want to use the Tk interface (and that's the only reason
+why bother with this module), you need also Tk402.202. The modules
+Data-Dumper (anyway standard in perl5.005) and Tk-Pod are optional.
+All of these may be found at a CPAN site, e.g.
+ftp://ftp.cs.tu-berlin.de/pub/lang/perl/CPAN/.
+
+Installation
+
+perl Makefile.PL
+make
+make test
+make install
+
+Programs                                        
+
+* bikepwr - a command line tool, similar to the original bike_pwr
+* tkbikepwr - perl/Tk-interface for BikePower
+
+Module BikePower.pm                                                     
+
+The API is quite unstable, so there is no documentation yet.      
+
+Author
+
+Send comments, bug reports & fixes, suggestions to Slaven Rezic
+(eserte@cs.tu-berlin.de). 
+

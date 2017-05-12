@@ -1,0 +1,19 @@
+#NEXUS
+
+BEGIN TAXA;
+	DIMENSIONS ntax=5;
+	TAXLABELS  Alpha Beta Gamma Delta Epsilon;
+END;
+
+BEGIN DISTANCES;
+	DIMENSIONS ntax=5;
+	FORMAT triangle=lower diagonal labels;
+	MATRIX
+	Alpha	0.000
+	Beta	1.000	0.000
+	Gamma	2.000	2.000	0.000
+	Delta	3.000	3.000	0.000	0.000
+	Epsilon	3.000	3.000	3.000	1.000	0.000
+	;
+END;
+

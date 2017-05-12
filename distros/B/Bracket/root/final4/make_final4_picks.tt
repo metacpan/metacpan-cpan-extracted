@@ -1,0 +1,15 @@
+[% page_title = "Edit Final 4 Picks - Men's Basketball - NCAA Tournament " _ c.config.year %]
+
+<div class="container">
+
+    <h1><span style="color:green;">Make</span> Final Four picks for player 
+    [% player.first_name %] [% player.last_name %]</h1>
+    <h2>Men's Basketball - NCAA Tournament [% c.config.year %]</h2>
+
+
+	[% INCLUDE 'final4/start_form.tt' %]
+	[% INCLUDE 'final4/bracket.tt' %]
+	[% INCLUDE 'final4/end_form.tt' %]
+	</form> 
+
+</div>

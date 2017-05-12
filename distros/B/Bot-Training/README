@@ -1,0 +1,45 @@
+NAME
+
+    Bot::Training - Plain text training material for bots like Hailo and
+    AI::MegaHAL
+
+SYNOPSIS
+
+        use Bot::Training;
+        use File::Slurp qw< slurp >;
+    
+        my $bt = Bot::Training->new;
+    
+        # Plugins I know about. Install Task::Bot::Training for more:
+        my @plugins = $bt->plugins
+    
+        # Get the plugin object of a .trn file (which is just a plain text
+        # file). These all work just as well:
+        my $hal = $bt->file('megahal');
+        my $hal = $bt->file('MegaHAL');
+        my $hal = $bt->file('Bot::Training::MegaHAL');
+    
+        # Get all lines in the file with File::Slurp:
+        my @test = split /\n/, slurp($hal->file);
+
+DESCRIPTION
+
+    Markov bots like Hailo and AI::MegaHAL are fun. But to get them working
+    you either need to train them on existing training material or make
+    your own.
+
+    This module provides a pluggable way to install already existing
+    training files via the CPAN. It also comes with a command-line
+    interface called bot-training.
+
+AUTHOR
+
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

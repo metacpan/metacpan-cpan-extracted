@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Men's Basketball - NCAA Tournament 2009</title>
+<style type="text/css"> 
+</style> 
+</head>
+<body>
+[% USE Dumper %]
+region points
+[% Dumper.dump(points_for) %]
+
+<div style="font-size: 108%;"> Men's Basketball - NCAA Tournament 2009</div>
+<div class="points">Total Points: [% total_points %]</div>
+<div>
+<a href="[% c.uri_for('/all') %]">All Players Home</a>
+</div>
+
+[% INCLUDE 'nav/view_links.tt' %]
+
+
+</body>
+</html>

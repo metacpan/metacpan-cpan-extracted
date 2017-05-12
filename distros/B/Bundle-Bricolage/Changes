@@ -1,0 +1,102 @@
+Revision history for Perl module Bundle::Bricolage.
+
+1.11.0 2008-10-05T22:20:24
+       - Added new modules required for Bricolage 1.11.1:
+         + mod_perl 1.30
+         + Test::File::Contents 0.02
+         + Test::Class 0.04
+         + Params::CallbackRequest 1.16
+         + DateTime 0.21
+         + DateTime::TimeZone 0.2601
+         + Text::Diff
+         + Text::Diff::HTML 0.02
+         + Text::WordDiff
+         + Scalar::Util
+       - Removed Bundle::libnet.
+
+1.10.0  2006-02-05T03:20:08
+      - Added new modules required for Bricolage 1.9.1:
+        + List::Util
+        + List::MoreUtils
+        + Text::LevenshteinXS
+      - Removed Text::Soundex.
+      - Removed HTTP::BrowserDetect.
+      - Added URI::Escape
+
+1.9.0  2005-08-17T23:35:49
+      - Added new modules required for Bricolage 1.9.0:
+        + Test::File::Contents.
+        + DateTime
+        + DateTime::TimeZone
+        + Data::UUID
+
+1.8.4
+       - Added Term::ReadPassword.
+
+1.8.3  2005-03-18T05:58:44
+       - Added Test::MockModule.
+
+1.8.2  2004-09-11T21:10:02
+       - Now requires version 1.22 or later of DBD::Pg.
+
+1.8.1  2004-07-08T05:39:64
+       - Added Safe.pm.
+
+1.8.0  2004-05-03T23:46:36
+       - Updated for Bricolage 1.8.0, with several new modules added.
+       - Removed Apache::ConfigFile, which is no longer needed by Bricolage.
+       - Removed HTML::Template, which is now optional.
+       - Removed Parse::RecDescent, which is not used directly by Bricolage,
+         but by HTML::Template.
+
+1.6.1  Tue Aug 26 18:08:42 2003
+       - Switched to Module::Build.
+       - Reorganized distribution layout to better reflect Perl standard.
+       - Added POD tests.
+
+1.6.0  Tue Apr 29 08:46:12 2003
+       - Updated for Bricolage 1.6.0, with some new modules added.
+       - Restored HTML::Mason to the list, now that 1.6.0 requires
+         Mason 1.16 or later.
+
+1.4.1  Thu Sep  5 01:30:41 2002
+       - Removed HTML::Mason. It will be added back in once Bricolage has
+         been ported to Mason 1.1x.
+
+1.4.0  Wed Sep 04 04:33:32 2002
+       - Updated for Bricolage 1.4.0, with some new modules added.
+       - Updated the Bricolage URL.
+
+1.3.4  Tue Jun 04 02:22:52 2002
+       - Moved the Description above the contents so that they're easier to
+         see when reading the documentation.
+
+1.3.3  Tue Jun 04 02:13:14 2002
+       - Added Cache::Mmap.
+       - Added my name and email to Makefile.PL.
+
+1.3.2  Wed May 08 15:52:09 2002
+       - Added Apache::SizeLimit.
+       - Require SOAP::Lite 0.55 to take advantage of the recent security fix.
+
+1.3.1  Thu Feb 28 18:12:40 2002
+       - Removed MD5 module.
+       - Require Apache::Session 1.54.
+
+1.3.0  Thu Feb 14 13:18:28 2002
+       - Added modules required for SOAP support.
+
+1.2.3  Fri Feb 08 21:14:03 2002
+       - Added Changes file.
+       - Added newly required Apache::ConfigFile module.
+       - Added test.pl
+
+1.2.2  Mon Feb 05 03:25:00 2002
+       - Added Error.pm to the list of modules in the bundle, as it is
+         required by Cache::Cache 0.99.
+
+1.2.1  Fri Jan 13 01:33:00 2002
+       - Fixed broken bundle - 1.2.0 didn't work at all!
+
+1.2.0  Tue Jan 10 00:00:00 2002
+       - Initial Public Release.

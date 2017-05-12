@@ -1,0 +1,9 @@
+classes:
+  - Desktop.chat
+parameters:
+  doc:
+    desktop-chat:
+      pkg:
+        - include chat client Pidgin
+  pkg:
+    - pidgin

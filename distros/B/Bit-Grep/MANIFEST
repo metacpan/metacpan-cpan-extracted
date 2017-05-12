@@ -1,0 +1,12 @@
+benchmarks/grep.pl
+benchmarks/sum.pl
+Changes
+Grep.xs
+lib/Bit/Grep.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Bit-Grep.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

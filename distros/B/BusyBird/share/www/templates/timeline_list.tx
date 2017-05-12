@@ -1,0 +1,91 @@
+: ## Arguments: timeline_unacked_counts_json, page_list, last_page (begin with 0), cur_page (begin with 0), page_path (func)
+: cascade wrapper_navbar { }
+
+<: macro pagination -> { -:>
+<:- if $last_page > 0 { -:>
+<ul class="bb-timeline-page-list pagination">
+  <li><a href="<: $page_path(0) :>">&laquo;</a></li>
+  <: if $cur_page == 0 { :><li class="disabled"><a href="#"><: } else { :><li><a href="<: $page_path($cur_page -1) :>"><: } :>&lt;</a></li>
+  <:- for $page_list -> $page { :>
+  <li<: if $page == $cur_page { :> class="active"<: } :>><a href="<: $page_path($page) :>"><: $page + 1 :></a></li>
+  <:- } ## for :>
+  <: if $cur_page == $last_page { :><li class="disabled"><a href="#"><: } else { :><li><a href="<: $page_path($cur_page +1) :>"><: } :>&gt;</a></li>
+  <li><a href="<: $page_path($last_page) :>">&raquo;</a></li>
+</ul>
+<:- } ## if $last_page -:>
+<: } ## macro pagination -:>
+
+: around content -> {
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-8 col-sm-offset-2 bb-main-column">
+      <: pagination() :>
+      <table id="bb-timeline-list" class="table table-striped">
+        <thead><tr>
+            <td>Name</td><td>Total</td><td>Per-Level</td>
+        </tr></thead>
+        <tbody>
+          <:- for $timeline_unacked_counts_json -> $timeline_entry { :>
+          <tr data-bb-init-counts="<: $timeline_entry.counts_json :>">
+            <td><a href="<: path('/timelines/' ~ uri_escape($timeline_entry.name)) :>/"><span class="glyphicon glyphicon-list"></span> <span class="bb-timeline-name"><: $timeline_entry.name :></span></a></td>
+            <td class="bb-timeline-unacked-counts-total-cell"></td>
+            <td class="bb-timeline-unacked-counts-levels-cell"><ul class="list-unstyled"></ul></td>
+          </tr>
+          <:- } ## for :>
+        </tbody>
+      </table>
+      <: pagination() :>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="<: path('/static/jquery.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/bootstrap/js/bootstrap.min.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/spin.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/q.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/busybird.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/timeline_list.js') :>"></script>
+<script type="text/javascript">
+"use strict";
+
+var getTotalUnackedCount = function() {
+    var total = 0;
+    $("td.bb-timeline-unacked-counts-total-cell").each(function() {
+        total += parseInt($(this).text(), 10);
+    });
+    return total;
+};
+
+$(function() {
+    var poller = new bb.UnackedCountsPoller({
+        apiBase: "<: script_name() | js :>"
+    });
+    var notification = new bb.Notification({
+        scriptName: "<: script_name() | js :>"
+    });
+    var updateFavicon = function() {
+        notification.setFaviconAlert(getTotalUnackedCount() > 0);
+    };
+    $("#bb-timeline-list tbody tr").each(function() {
+        var $row = $(this);
+        var renderer = new bb.UnackedCountsRenderer({
+            domTotal:  $row.find(".bb-timeline-unacked-counts-total-cell").get(0),
+            domLevels: $row.find(".bb-timeline-unacked-counts-levels-cell ul").get(0),
+        });
+        var counts = $row.data("bbInitCounts");
+        var name = $row.find(".bb-timeline-name").text();
+        renderer.show(counts);
+        poller.addTimeline({
+            timelineName: name,
+            initialUnackedCounts: counts,
+            callback: function(received_counts) {
+                renderer.show(received_counts);
+                updateFavicon();
+            }
+        });
+    });
+    poller.start();
+    updateFavicon();
+});
+</script>
+: } ## around content

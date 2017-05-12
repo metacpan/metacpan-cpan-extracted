@@ -1,0 +1,16 @@
+#nexus
+begin TAXA;
+	dimensions ntax=3;
+	taxlabels taxon_1, taxon_2, taxon_3;
+end;
+
+begin characters;
+	dimensions nchar=3;
+	format
+		tokens;
+		charlabels red green blue black;
+	matrix
+		taxon_1	red green green 
+		taxon_2 red blue green
+		taxon_3	blue blue green;
+end;

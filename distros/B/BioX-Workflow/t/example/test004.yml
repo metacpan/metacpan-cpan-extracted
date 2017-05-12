@@ -1,0 +1,15 @@
+---
+global:
+    - indir: t/example/data/raw/test004
+    - outdir: t/example/data/processed/test004
+    - file_rule: (.csv)$
+rules:
+    - backup:
+        process: cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.csv
+    - grep_VARA:
+        process: |
+            echo "Working on {$self->{indir}}/{$sample}.csv"
+            grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv
+    - grep_VARB:
+        process: |
+            grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv

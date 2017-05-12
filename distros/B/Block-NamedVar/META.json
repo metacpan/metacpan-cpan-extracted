@@ -1,0 +1,58 @@
+{
+   "abstract" : "Named variables for grep and map, for with multiple named list elements.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Block-NamedVar",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Fennec" : "2.017"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Declare::Parser" : "0.014"
+         }
+      }
+   },
+   "provides" : {
+      "Block::NamedVar" : {
+         "file" : "lib/Block/NamedVar.pm",
+         "version" : "0.009"
+      },
+      "Block::NamedVar::ForLike" : {
+         "file" : "lib/Block/NamedVar/ForLike.pm"
+      },
+      "Block::NamedVar::MapLike" : {
+         "file" : "lib/Block/NamedVar/MapLike.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Block-NamedVar/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Block-NamedVar"
+      }
+   },
+   "version" : "0.009"
+}

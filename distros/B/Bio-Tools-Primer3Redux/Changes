@@ -1,0 +1,46 @@
+Revision history for Bio-Tools-Primer3Redux
+
+0.09      2011-06-10 23:02:48 America/Chicago
+
+ * Add Bio::Root::Version as 'requires', not 'build_requires'; this
+   will change to Bio::Root::Root at some future point (cjfields)
+
+0.08      2011-06-08 22:02:09 America/Chicago
+
+ * Catch instance where executable isn't present (fails due to recent
+   changes in WrapperBase API); adjust skipped test count (cjfields)
+
+0.07      2011-06-07 22:06:28 America/Chicago
+
+ * Changes to allow running w/o a defined sequence template to check
+   existing primers, add PRIMER_TASK method (fschwach)
+
+0.06      2011-06-07 21:51:44 America/Chicago
+
+ * Module::Build doesn't support test_requires, so pushing req to
+   build_requires and changing to Test::Most (andk)
+
+0.05      2011-05-21 22:24:48 America/Chicago
+
+ * Fix skipped test count
+ * Requires BioPerl 1.6.900 or higher
+
+0.04      2011-05-19 09:09:11 America/Chicago
+
+ * Add methods 'errors' and 'warnings' so one can catch errors or
+   warnings primer3 produces in the Result object (fschwach)
+
+0.03      2011-05-16 22:39:27 America/Chicago
+
+ * Fix test count, skip tests if there isn't an executable (to be
+   changed when parsing is pulled out)
+
+0.02      2011-05-16 12:45:03 America/Chicago
+
+ * Fix test count, in case an older version of BioPerl is used
+   (fschwach)
+ * Small updates to Build.PL
+
+0.01      2011-04-29 15:46:42 America/Chicago
+
+ * initial version

@@ -1,0 +1,21 @@
+#cnf file for homologene, make sure put dotset ID in label
+name=homologene
+module=homologene
+version=37.2
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=10090, dotset=Gene_ID
+label=4932, dotset=Gene_ID
+label=4896, dotset=Gene_ID
+label=7165, dotset=Gene_ID
+label=6239, dotset=Gene_ID
+label=9606, dotset=Gene_ID
+label=10116, dotset=Gene_ID
+label=5833, dotset=Gene_ID
+label=7227, dotset=Gene_ID
+label=3702, dotset=Gene_ID

@@ -1,0 +1,13 @@
+Revision history for Biblio-Thesaurus-ModRewrite
+
+0.03    Jul 11, 2011
+        + fix dependecies
+        + cleanup examples
+
+0.02    Jan 19, 2009
+        + improve documentation
+        + add prereq to Makefile.PL
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

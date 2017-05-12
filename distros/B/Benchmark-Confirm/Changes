@@ -1,0 +1,41 @@
+Revision history for Perl extension Benchmark::Confirm
+
+1.00    Tue Apr  7 00:40:28 JST 2015
+    [NO CODE CHANGES]
+        - fix the awful versioning
+
+0.04    Wed Jun 26 08:42:13 JST 2013
+    [NEW FEATURE]
+        - If you specify TAP option, the benchmark results are be valid TAP.
+        - If you specify no_plan option, you can add more tests with benchmarks.
+        Thank you, tobyink.
+    [ENHANCEMENT]
+        - removed the space which is no need
+
+0.031   Sun Jun 23 20:15:02 JST 2013
+    [NO CODE CHANGES]
+        - support cpanfile
+
+0.03    Tue May 28 07:33:48 JST 2013
+    [BUG FIX]
+        - call import method with loading Test::More
+    [ENHANCEMENT]
+        - added coveralls.io badge
+        - include META.json in git repository
+        - added configure_requires in Build.PL
+        - fixed version number
+
+0.23 Tue May 28 06:38:09 JST 2013
+    [NO CODE CHANGES]
+        - Switch back to Module::Build
+
+0.22 2013-04-13T10:55:58Z
+    [NO CODE CHANGES]
+        - released by Minilla
+
+0.02 2013-04-13T10:42:39Z
+    [NO CODE CHANGES]
+        - minilized
+
+0.01    Thu Mar 21 23:56:37 JST 2013
+        - original version

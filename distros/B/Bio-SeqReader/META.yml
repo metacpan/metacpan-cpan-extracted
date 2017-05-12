@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Bio-SeqReader
+version:             0.1.3
+abstract:            Classes for reading sequence data.
+license:             ~
+author:              
+    - jac <jac_at_cpan_dot_org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

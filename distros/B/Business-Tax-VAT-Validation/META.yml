@@ -1,0 +1,27 @@
+---
+abstract: 'Validate EU VAT numbers against VIES'
+author:
+  - 'David Precious <davidp@preshweb.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-Tax-VAT-Validation
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: '1'
+  LWP::UserAgent: '1'
+resources:
+  bugtracker: https://github.com/bigpresh/Business-Tax-VAT-Validation/issues
+  homepage: https://github.com/bigpresh/Business-Tax-VAT-Validation/
+  repository: https://github.com/bigpresh/Business-Tax-VAT-Validation
+version: '1.11'

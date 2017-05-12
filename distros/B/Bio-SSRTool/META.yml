@@ -1,0 +1,26 @@
+---
+abstract: 'The great new Bio::SSRTool!'
+author:
+  - 'Ken Youens-Clark <kclark@cpan.org>'
+build_requires:
+  Module::Build: 0.4003
+  Test::Exports: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-SSRTool
+provides:
+  Bio::SSRTool:
+    file: lib/Bio/SSRTool.pm
+    version: 0.04
+requires:
+  IO::Scalar: 0
+  perl: 5.006
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+version: 0.04

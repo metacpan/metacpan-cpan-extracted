@@ -1,0 +1,10 @@
+Revision history for Bread::Board::Svc
+
+0.02 Tuesday, Aug. 23th  2016
+
+- minor correction to pass installation on 5.12
+
+0.01 Friday, Aug. 12th  2016
+
+- initial release from internal stuff
+

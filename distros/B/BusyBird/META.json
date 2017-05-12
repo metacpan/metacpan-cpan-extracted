@@ -1,0 +1,127 @@
+{
+   "abstract" : "a multi-level Web-based timeline viewer",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BusyBird",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc",
+         "share",
+         "benchmark"
+      ],
+      "file" : [
+         "README.pod",
+         "README.md"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Async::Queue" : "0.02",
+            "Async::Selector" : "1.03",
+            "Async::Selector::Aggregator" : "1.02",
+            "BusyBird::DateTime::Format" : "0.04",
+            "CPS" : "0.15",
+            "Cache::Memory::Simple" : "1.01",
+            "Carp" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "Data::Diver" : "0",
+            "Data::UUID" : "0",
+            "DateTime" : "0.70",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "DateTime::TimeZone" : "1.42",
+            "Encode" : "0",
+            "Exporter" : "5.57",
+            "File::Copy" : "0",
+            "File::HomeDir" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "Future::Q" : "0.040",
+            "JSON" : "0",
+            "JavaScript::Value::Escape" : "0",
+            "List::Util" : "1.24",
+            "POSIX" : "0",
+            "Plack" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Request" : "0",
+            "Plack::Runner" : "0",
+            "Pod::Usage" : "0",
+            "Router::Simple" : "0",
+            "SQL::Maker" : "1.19",
+            "SQL::QueryMaker" : "0.03",
+            "Scalar::Util" : "1.24",
+            "Storable" : "2.27",
+            "Test::Builder" : "0",
+            "Test::Fatal" : "0.006",
+            "Test::More" : "0.98",
+            "Text::Xslate" : "1.60",
+            "Tie::IxHash" : "0",
+            "Time::HiRes" : "1.9720",
+            "Try::Tiny" : "0.10",
+            "Twiggy" : "0",
+            "URI::Escape" : "0",
+            "autovivification" : "0.14",
+            "parent" : "0",
+            "perl" : "v5.8.0",
+            "sort" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "BusyBird::DateTime::Format" : "0.04",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "Encode" : "0",
+            "File::Temp" : "0.19",
+            "FindBin" : "0",
+            "HTML::TreeBuilder" : "5",
+            "HTML::TreeBuilder::XPath" : "0.12",
+            "HTTP::Request" : "6.00",
+            "JSON" : "0",
+            "Plack::Test" : "0",
+            "Storable" : "0",
+            "Test::Builder" : "0",
+            "Test::Fatal" : "0",
+            "Test::Memory::Cycle" : "1.04",
+            "Test::MockObject" : "1.09",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0.98",
+            "Test::Warn" : "0.24"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/busybird/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/busybird.git",
+         "web" : "https://github.com/debug-ito/busybird"
+      }
+   },
+   "version" : "0.12"
+}

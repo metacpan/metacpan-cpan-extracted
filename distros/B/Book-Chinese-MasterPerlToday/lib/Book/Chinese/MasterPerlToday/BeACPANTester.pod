@@ -1,0 +1,241 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::BeACPANTester - Be a CPAN Tester
+
+=head1 DESCRIPTION
+
+本章主要描述如何配置 CPAN 和成为一个 CPAN 测试者。
+
+=head2 配置 CPAN
+
+当你安装 Perl 完毕之后，在命令行状态下输入
+
+    $ cpan
+
+会出现类似如下的东西
+
+    E:\Fayland\chinese-perl-book>cpan
+    
+    cpan shell -- CPAN exploration and modules installation (v1.94)
+    ReadLine support enabled
+    
+    
+    cpan>
+
+这将表明您已经成功安装了 CPAN 模块。
+
+=over 4
+
+=item * 配置 CPAN
+
+在 cpan> 模式下输入
+
+    cpan> o conf init
+
+将重新配置 CPAN 设置
+
+    cpan> o conf urllist
+    urllist
+        0 [http://cpan.strawberryperl.com/]
+        1 [http://www.cpan.org/]
+
+    cpan> o conf urllist unshift http://cpan.perl.org/
+    cpan> o conf urllist
+    urllist
+        0 [http://cpan.perl.org/]
+        1 [http://cpan.strawberryperl.com/]
+        2 [http://www.cpan.org/]
+
+可以快速控制模块远程网址。
+
+=item * 安装模块
+
+    cpan> install Moose
+
+将开始安装或者升级模块。
+
+=item * 重载索引
+
+    cpan> reload index
+
+cpan 默认缓存 index, 这样每次 install 模块的时候可以直接从索引文件构造出远程地址。有时候如果你发现你安装的模块不是最新版本时，可以使用 reload index 来强制更新索引。
+
+=item * 搜寻模块
+
+    cpan> m /Catalyst.*?Trait/
+    Module    Catalyst::TraitFor::Log::Audio (RJURNEY/Catalyst-TraitFor-Log-Audio-0.02.tar.gz)
+    Module  = Catalyst::TraitFor::Model::DBIC::Schema::Caching (MSTROUT/Catalyst-Model-DBIC-Schema-0.26.tar.gz)
+    Module  < Catalyst::TraitFor::Model::DBIC::Schema::QueryLog (FAYLAND/Catalyst-TraitFor-Model-DBIC-Schema-QueryLog-0.02.tar.gz)
+    Module  = Catalyst::TraitFor::Model::DBIC::Schema::Replicated (MSTROUT/Catalyst-Model-DBIC-Schema-0.26.tar.gz)
+    Module    Catalyst::TraitFor::Request::ProxyBase (VEEP/Catalyst-TraitFor-Request-ProxyBase-0.000003.tar.gz)
+    Module  < CatalystX::Component::Traits (BOBTFISH/CatalystX-Component-Traits-0.08.tar.gz)
+    6 items found
+
+更多搜索选项请使用帮助
+
+    cpan> h
+
+=item * 安装老版本或测试版本模块
+
+有时候安装某个模块完毕之后可能发现出错，想安装回原来的模块。或者您的脚本只能运行在老版本的某个模块之上。或者你想测试某个新版本的模块。请尝试如下步骤
+
+首先打开该模块老版本的 CPAN 页面如 L<http://search.cpan.org/~mramberg/Catalyst-Runtime-5.7015/>，然后查看 Download 的链接如 L<http://search.cpan.org/CPAN/authors/id/M/MR/MRAMBERG/Catalyst-Runtime-5.7015.tar.gz>
+
+    cpan> install MRAMBERG/Catalyst-Runtime-5.7015.tar.gz
+
+或者直接命令行下
+
+    $> cpan MRAMBERG/Catalyst-Runtime-5.7015.tar.gz
+
+都会安装该版本模块而非最新的模块。
+
+=item * 安装某个本地或远程地址的包
+
+有时候某个包不在 CPAN 上，但是你想通过 cpan 简化安装的话，请安装 L<pip>。安装之后：
+
+    $> pip http://fayland.org/CPAN/Book-Chinese-MasterPerlToday-0.01.tar.gz
+    # 或者
+    $> pip Local-Package.tar.gz
+
+=item * 测试无法通过，但是我想强制安装
+
+    cpan> force install Catalyst
+
+或者在命令行：
+
+    $> perl -MCPAN -e 'force("install", "Foorum");'
+
+=item * 我想手工运行 perl Makefile.PL
+
+    cpan> look DBIx::Class
+
+=back
+
+在安装过程中您将可能遇到以下问题：
+
+=over 4
+
+=item * Win32 下没有 make
+
+如果您安装的是 ActivePerl, 那建议你简单下载 nmake L<http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe>
+
+个人建议您安装 Strawberry Perl L<http://strawberryperl.com/>, Strawberry Perl 自带 dmake
+
+=item * 我没有权限写公用目录，或者，我想拥有自己的安装目录
+
+请阅读 L<local::lib> 文档很简单而且很好用，推荐。
+
+=back
+
+=head2 CPAN 测试者
+
+成为一个 CPAN 测试者是对 Perl 社区最快速的贡献办法之一。
+
+    cpan> install CPAN::Reporter
+    cpan> reload cpan
+    cpan> o conf init test_report
+
+这就是成为一个 CPAN 测试者您所需要的所有动作。
+
+=head2 minicpan
+
+    cpan> install CPAN::Mini
+
+L<CPAN::Mini> 主要用于创建一个本地最小的 CPAN 镜像。它可以加速你的 CPAN 模块安装，或者可以让你在离线情况下安装 CPAN 模块。
+
+相关参考文章有
+
+=over 4
+
+=item * L<http://www.stonehenge.com/merlyn/LinuxMag/col42.html>
+
+=item * L<http://www.fayland.org/journal/minicpan.html>
+
+=item * L<http://perladvent.org/2004/5th/>
+
+=back
+
+=head2 CPAN 相关网站
+
+=over 4
+
+=item * L<http://search.cpan.org/>
+
+查找 CPAN 模块最好的地方。建议订阅 RSS
+
+=item * L<http://cpan.uwinnipeg.ca/>
+
+如果打不开 search.cpan
+
+=item * L<http://cpants.perl.org/>
+
+很多很好的服务类如 L<http://cpants.perl.org/dist/used_by/Moose>
+
+=item * L<http://www.cpantesters.org/>
+
+CPAN 测试者网站
+
+=item * L<http://cpanratings.perl.org/>
+
+=item * L<https://rt.cpan.org/>
+
+报告模块 bug，patch 或者建议，一般请不要用 email 私下和作者联系，请尽量使用 RT
+
+=item * L<http://annocpan.org/>
+
+=item * L<http://backpan.cpan.org/>
+
+寻找老版本或过期版本模块
+
+=item * L<http://cpantools.com/>
+
+=item * L<http://hexten.net/cpan-faces/>
+
+=item * L<http://perladvent.org/>
+
+The Perl Advent Calendar, 年度模块介绍
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<CPAN>
+
+=item * L<CPAN::Reporter>
+
+=item * L<CPAN::Reporter::FAQ>
+
+=back
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

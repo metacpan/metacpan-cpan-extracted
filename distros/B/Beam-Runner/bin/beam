@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+our $VERSION = '0.009';
+# PODNAME: beam
+# ABSTRACT: Discover and run services from container files
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     beam run <container> <service> [<args...>]
+#pod     beam list
+#pod     beam list <container>
+#pod     beam help <container> <service>
+#pod     beam help
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This command allows you to execute runnable objects configured in
+#pod container files. It also allows listing of container files, listing of
+#pod runnable objects inside container files, and viewing documentation
+#pod associated with those objects to help in running them.
+#pod
+#pod For help with building a container file, see L<the Beam::Wire
+#pod documentation|Beam::Wire>.
+#pod
+#pod =head1 ARGUMENTS
+#pod
+#pod =head2 container
+#pod
+#pod A container file to load. This file will be found in one of the
+#pod L</BEAM_PATH> directories. The file extension (C<.yml>, C<.json>,
+#pod etc...) is optional.
+#pod
+#pod =head2 service
+#pod
+#pod The name of a runnable object in the container. The object must consume
+#pod the L<Beam::Runnable> role and implement the C<run()> method.
+#pod
+#pod =head2 args
+#pod
+#pod Any arguments will be given to the C<service>'s C<run()> method.
+#pod
+#pod =head1 ENVIRONMENT VARIABLES
+#pod
+#pod =head2 BEAM_PATH
+#pod
+#pod A colon-separated list of paths to search for container files.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Beam::Runner>, L<Beam::Wire>
+#pod
+#pod =cut
+
+use strict;
+use warnings;
+use Beam::Runner::Command;
+exit Beam::Runner::Command->run( @ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+beam - Discover and run services from container files
+
+=head1 VERSION
+
+version 0.009
+
+=head1 SYNOPSIS
+
+    beam run <container> <service> [<args...>]
+    beam list
+    beam list <container>
+    beam help <container> <service>
+    beam help
+
+=head1 DESCRIPTION
+
+This command allows you to execute runnable objects configured in
+container files. It also allows listing of container files, listing of
+runnable objects inside container files, and viewing documentation
+associated with those objects to help in running them.
+
+For help with building a container file, see L<the Beam::Wire
+documentation|Beam::Wire>.
+
+=head1 ARGUMENTS
+
+=head2 container
+
+A container file to load. This file will be found in one of the
+L</BEAM_PATH> directories. The file extension (C<.yml>, C<.json>,
+etc...) is optional.
+
+=head2 service
+
+The name of a runnable object in the container. The object must consume
+the L<Beam::Runnable> role and implement the C<run()> method.
+
+=head2 args
+
+Any arguments will be given to the C<service>'s C<run()> method.
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 BEAM_PATH
+
+A colon-separated list of paths to search for container files.
+
+=head1 SEE ALSO
+
+L<Beam::Runner>, L<Beam::Wire>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

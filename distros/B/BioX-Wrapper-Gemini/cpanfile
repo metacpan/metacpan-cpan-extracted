@@ -1,0 +1,21 @@
+requires 'Cwd';
+requires 'DateTime';
+requires 'File::Basename';
+requires 'File::Find::Rule';
+requires 'File::FindLib';
+requires 'File::Path';
+
+requires 'BioX::Wrapper';
+requires 'Moose';
+requires 'Data::Dumper';
+requires 'List::Compare';
+requires 'MooseX::Getopt';
+requires 'MooseX::Getopt::Usage';
+requires 'MooseX::Getopt::Usage::Role::Man';
+requires 'MooseX::Getopt::Meta::Attribute::NoGetopt';
+
+# requires 'Some::Module', 'VERSION';
+
+on test => sub {
+    requires 'Test::More', '0.96';
+};

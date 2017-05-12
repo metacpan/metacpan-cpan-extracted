@@ -1,0 +1,10 @@
+
+Revision history for Perl extension Business::OnlinePayment::IATSPayments.
+
+0.02  Sat Feb 15 12:45:24 PST 2014
+        - trim spaces from authorization (TRANSACTIONID)
+        - return numeric IATS error message as result_code
+
+0.01  unreleased
+        - original version.  the world might suspect something's afoot.
+

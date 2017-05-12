@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+use strict;
+
+# this is a testing version of tentmaker which uses the checkout source
+# versions of the templates instead of the installed ones.
+
+BEGIN {
+    eval { require Gantry::Server; };
+    if ( $@ ) {
+        my $msg = "\n  You need to install Gantry, rerun Bigtop's Build.PL,\n"
+                . "  and reinstall Bigtop before using tentmaker.\n\n";
+
+        die $msg;
+    }
+}
+
+# This one works mostly:
+use lib '../lib', '../../srcgantry/lib';
+# If you need control over details like keyword registration order, try
+# something more like this:
+#use lib '/home/pcrow/Bigtop/lib', '../../srcgantry/lib';
+
+use File::Spec;
+use Getopt::Long;
+use Gantry::Server;
+use IO::Prompt;
+
+use Bigtop::TentMaker qw{ -Engine=CGI -TemplateEngine=TT };
+use Bigtop::TentMakerPath;
+use Bigtop::ScriptHelp::Style;
+
+$SIG{ INT } = \&trap_int;
+
+my $port = 8080;
+my $new_app_name;
+my $add_bigtop_file;
+my $style;
+
+GetOptions(
+    'port|p=s'  => \$port,
+    'new|n=s'   => \$new_app_name,
+    'add|a=s'   => \$add_bigtop_file,
+    'style|s=s' => \$style,
+    'help|h'    => \&help,
+);
+
+my $action_flags = 0;
+$action_flags++ if $new_app_name;
+$action_flags++ if $add_bigtop_file;
+
+if ( $action_flags > 1 ) {
+    die "--new and --add are incompatible\n";
+}
+
+if ( $new_app_name and not Bigtop::ScriptHelp::valid_ident( $new_app_name ) ) {
+    die "--new requires valid package name, '$new_app_name' is invalid.\n";
+}
+
+if ( $add_bigtop_file and not -f $add_bigtop_file ) {
+    die "--add requires valid input file,\n"
+        .   "   couldn't read '$add_bigtop_file': $!\n";
+}
+
+# You could do this with a Damianism:
+#my $file = ( $new_app_name )    ? ''
+#         : ( $add_bigtop_file ) ? $add_bigtop_file
+#         :                        shift || '';
+           
+# set the file name
+my $file;
+
+if    ( $new_app_name    ) { $file = '';               }
+elsif ( $add_bigtop_file ) { $file = $add_bigtop_file; }
+else                       { $file = shift || '';      } 
+
+#my $template_path = File::Spec->catfile(
+#        Bigtop::TentMakerPath->get_template_path(), 'tenttemplates'
+#);
+
+my $cgi = Gantry::Engine::CGI->new(
+    {
+        config => {
+            root         => '../tenttemplates',
+            file         => $file,
+        },
+        locations => {
+            '/', 'Bigtop::TentMaker'
+        }
+    }
+);
+
+my $server = Gantry::Server->new( $port );
+$server->set_engine_object( $cgi );
+
+my $space     = ' ';
+my $ascii_art = join $space, @ARGV;
+$ascii_art    =~ s/^\s+//;
+$ascii_art    =~ s/\s+$//;
+
+my $script_help_style = Bigtop::ScriptHelp::Style->get_style( $style );
+
+eval {
+    Bigtop::TentMaker->take_performance_hit(
+            $script_help_style, $file, $ascii_art, $new_app_name
+    );
+};
+if ( $@ and $file =~ /^\d+$/ ) {
+    die "usage: tentmaker [--port 8089] [options] [file]\n";
+}
+elsif ( $@ ) {
+    die "$@\n";
+}
+
+$server->run();
+
+sub trap_int {
+
+    # see if there are changes
+    exit unless Bigtop::TentMaker->dirty();
+
+    @ARGV = (); # IO::Prompt uses @ARGV, don't let it
+
+    my $response = '';
+    my $prompt   = "\n\nYou hit CTRL-C, would you like to save changes? ";
+    
+    while ( length $response == 0 ) {
+        $response = prompt $prompt;
+        $response =~ s/\W+|\s+//gms;
+        $response =~ s/A//;
+        $prompt   = "\nPlease answer yes or no.";
+    }
+
+    if ( $response =~ /^y/i ) {
+        my $file = Bigtop::TentMaker->get_file() || 'tmp.bigtop';
+
+        open my $OUTPUT, '>', $file or die "I couldn't write the changes\n";
+        print $OUTPUT Bigtop::TentMaker->deparsed();
+        close $OUTPUT;
+
+        print STDERR "Saved $file\n";
+    }
+    exit;
+}
+
+sub help {
+    print <<"EO_HELP";
+    If you already have a bigtop file and don't need new tables:
+        tentmaker filename.bigtop
+
+    If you already have a bigtop file but need new tables:
+        tentmaker -a filename.bigtop 'new_table->old_table'
+
+    If you are starting from scratch:
+        tentmaker -n AppName [ 'table_list->including_relationships' ]
+
+    If you don't want port 8080:
+    add -p your_port_number to any of the above (for example):
+        tentmaker -p 8192 filename.bigtop
+EO_HELP
+    exit;
+}
+
+=head1 NAME
+
+tentmaker - browser based bigtop file editor
+
+=head1 USAGE
+
+    tentmaker [ --port=8192 ] [ file ]
+
+Or, to name a new app with optional table layout:
+
+    tentmaker --new AppName [table...|ascii_art]
+
+Or, to augment an existing bigtop file:
+
+    tentmaker --add file.bigtop table...|ascii_art
+
+See L<ASCII ART> below for what ascii art can be.
+
+=head1 DESCRIPTION
+
+This script is a simple web server.  Tell it what file you want to
+edit (or start from scratch) and an optional port (defaults to 8080).
+Point your browser to that port and edit away.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --port (or -p)
+
+Specifies a port for the server.  Defaults to 8080.
+
+=item --new (or -n)
+
+Allows you to specify the name of the app and optionally its table
+relationships.  Requires a name for the app.  Allows a list of tables
+to create or L<ASCII Art>.
+
+=item --add (or -a)
+
+Allows you to augment an existing bigtop file prior to editing it.
+Requires a bigtop file name.  Allows a list of tables to create or
+L<ASCII Art>.  Any relationships specified in ASCII art will be
+applied, even if they refer to existing tables.
+
+=item --style (or -s)
+
+Defaults to Original.  Specifies which Bigtop::ScriptHelp::Style:: module
+will handle extra command line arguements and standard input.  See your
+Style module's docs for details.  For historical reasons, the Original
+style is described below.
+standard in 
+
+=back
+
+=head1 ASCII Art
+
+Both --new and --add allow you to specify a list of tables or ASCII
+art.  The ASCII art option allows you to quickly note relationships between
+tables with simple operators.
+
+Note well: Since the relationship operators use punctuation that your
+shell probably loves, you must surround the art with single quotes.
+
+It is easiest to understand the options by seeing an example.  So, suppose
+we have a four table data model describing a bit of our personnel process:
+
+    +-----------+       +----------+
+    |    job    |<------| position |
+    +-----------+       +----------+
+          ^
+          |
+    +-----------+       +----------+
+    | job_skill |------>|  skill   |
+    +-----------+       +----------+
+
+First, you'll be happy to know that bigtop's ASCII art is simpler to draw
+than the above.
+
+What our data model shows is that each position refers to a job (description),
+each job could require many skills, and each skill could be associated with
+many jobs.  The last two mean that job and skill share a many-to-many
+relationship.
+
+Here's how to specify this data model in bigtop ASCII art:
+
+    bigtop --new HR 'job<-position job<->skill'
+
+This indicates a foreign key from position to job and an implied
+table, called job_skill, to hold the many-to-many relationship between
+job and skill.
+
+There are four art operators:
+
+=over 4
+
+=item <->
+
+Many-to-many.  A new table will be made with foreign keys to each operand
+table.  Each operand table will have a has_many relationship.  Note
+that your Model backend may not understand these relationships.  At the
+time of this writing only Model GantryDBIxClass did, by luck it happens
+to be the default.
+
+=item ->
+
+The first table has a foreign key pointing to the second.
+
+=item <-
+
+The second table has a foreign key pointing to the first.  This is really
+a convenience synonymn for ->, but the tables are put into generated SQL
+in their overall order of appearance.
+
+=item -
+
+The two tables have a one-to-one relationship.  Each of them will have
+a foreign key pointing to the other.
+
+=back
+
+=head1 AUTHOR
+
+Phil Crow <crow.phil@gmail.com>
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (C) 2006 by Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

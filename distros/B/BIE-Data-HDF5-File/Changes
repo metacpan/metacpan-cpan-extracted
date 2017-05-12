@@ -1,0 +1,6 @@
+Revision history for Perl extension BIE::Data::HDF5::File.
+
+0.01  Mon Dec  3 13:50:08 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n BIE::Data::HDF5::File
+

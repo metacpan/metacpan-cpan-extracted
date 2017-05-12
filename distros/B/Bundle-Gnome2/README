@@ -1,0 +1,24 @@
+Bundle::Gnome2 - CPAN Bundle for the Gtk2 and Gnome2 modules.
+
+Version 0.01 - 2003-10-17
+Bundled by: Gavin Brown <gavin.brown@uk.com>
+
+To install this Bundle file locally:
+
+	perl Makefile.PL
+	make install
+
+Then, for a full list of the modules which this bundle
+installs, use:
+
+	perldoc Bundle::Gnome2
+
+Finally, to install the Gnome2 modules which the bundle lists:
+
+	perl -MCPAN -e 'install Bundle::Gnome2'
+
+This bundle gathers together those Gnome2-related modules on CPAN,
+including the Gtk2 and Glib modules.
+
+--
+$Id: README,v 1.1.1.1 2003/10/17 14:57:21 jodrell Exp $

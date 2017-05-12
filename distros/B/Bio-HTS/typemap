@@ -1,0 +1,8 @@
+TYPEMAP
+htsFile*     T_PTROBJ
+tbx_t*       T_PTROBJ
+hts_itr_t*   T_PTROBJ
+bcf_srs_t*   T_PTROBJ
+bcf_hdr_t*   T_PTROBJ
+bcf1_t*      T_PTROBJ
+

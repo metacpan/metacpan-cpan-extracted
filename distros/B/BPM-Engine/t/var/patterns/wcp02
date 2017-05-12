@@ -1,0 +1,56 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp2" Name="WCP2+3: Parallel Split and Synchronization">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>A Parallel Split is a distinct point in a business process where a single branch is divided into two or more parallel branches which are executed concurrently [Aalst09]. A Synchronization is a distinct point in a business process where two or more different branches are merged into one single branch. It is called Synchronization because it expects all merged branches to be completed before going ahead with the process [Aalst09].</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B"/>
+                                    <TransitionRef Id="A-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="AND"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" Name="Transition" From="A" To="B"/>
+                <Transition Id="A-C" Name="Transition" From="A" To="C"/>
+                <Transition Id="B-D" Name="Transition" From="B" To="D"/>
+                <Transition Id="C-D" Name="Transition" From="C" To="D"/>
+            </Transitions>
+        </WorkflowProcess>

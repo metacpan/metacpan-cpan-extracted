@@ -1,0 +1,21 @@
+# Blosxom::Debug test plugin
+
+package testplugin;
+
+use strict;
+
+use Blosxom::Debug debug_level => $ENV{BLOSXOM_DEBUG_LEVEL};
+
+sub start {
+  # debug(1, "Error level 1");
+  # debug(2, "Error level 2");
+  # debug(3, "Error level 3");
+  # debug(4, "Error level 4");
+  ## debug(1, "Error level 1, commented out);
+  1;
+}
+
+1;
+
+# vim:ft=perl
+

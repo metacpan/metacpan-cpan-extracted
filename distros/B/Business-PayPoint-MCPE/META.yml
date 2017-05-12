@@ -1,0 +1,32 @@
+---
+abstract: 'PayPoint: Merchant Card Payment Engine'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: 0.96
+configure_requires:
+  Module::Build::Tiny: 0.035
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-PayPoint-MCPE
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/fayland/perl-Business-PayPoint-MCPE/issues
+  homepage: https://github.com/fayland/perl-Business-PayPoint-MCPE
+  repository: https://github.com/fayland/perl-Business-PayPoint-MCPE.git
+version: 0.01

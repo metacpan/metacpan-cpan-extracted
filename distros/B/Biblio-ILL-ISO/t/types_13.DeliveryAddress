@@ -1,0 +1,35 @@
+$VAR1 = bless( {
+                 'electronic-address' => bless( {
+                                                  'telecom-service-identifier' => bless( {
+                                                                                           'generalstring' => 'SMTP'
+                                                                                         }, 'Biblio::ILL::ISO::ILLString' ),
+                                                  'telecom-service-address' => bless( {
+                                                                                        'generalstring' => 'DChristens@gov.mb.ca'
+                                                                                      }, 'Biblio::ILL::ISO::ILLString' )
+                                                }, 'Biblio::ILL::ISO::SystemAddress' ),
+                 'postal-address' => bless( {
+                                              'street-and-number' => bless( {
+                                                                              'generalstring' => '1525 First Street South'
+                                                                            }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'region' => bless( {
+                                                                   'generalstring' => 'MB'
+                                                                 }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'postal-code' => bless( {
+                                                                        'generalstring' => 'R7A 7A1'
+                                                                      }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'extended-postal-delivery-address' => bless( {
+                                                                                             'generalstring' => 'Unit 200'
+                                                                                           }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'city' => bless( {
+                                                                 'generalstring' => 'Brandon'
+                                                               }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'country' => bless( {
+                                                                    'generalstring' => 'CANADA'
+                                                                  }, 'Biblio::ILL::ISO::ILLString' ),
+                                              'name-of-person-or-institution' => bless( {
+                                                                                          'name-of-institution' => bless( {
+                                                                                                                            'generalstring' => 'Manitoba Public Library Services'
+                                                                                                                          }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                        }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' )
+                                            }, 'Biblio::ILL::ISO::PostalAddress' )
+               }, 'Biblio::ILL::ISO::DeliveryAddress' );

@@ -1,0 +1,28 @@
+Bundle::Net::Frame
+==================
+
+This is a bundle of Net::Frame related modules.
+
+INSTALLATION
+
+To install this module, please use the CPAN shell or better yet CPANPLUS.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl v5.6.1
+
+GETTING HELP
+
+A mailing list is available for all questions concerning Net::Frame::*.
+Here is the link:
+http://lists.gomor.org/mailman/listinfo/netframe
+
+COPYRIGHT AND LICENSE
+
+You may distribute this module under the terms of the Artistic license.
+See LICENSE.Artistic file in the source distribution archive.
+
+Copyright (c) 2006-2015, Patrice <GomoR> Auffret
+

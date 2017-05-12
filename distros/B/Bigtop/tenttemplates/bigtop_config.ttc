@@ -1,0 +1,51 @@
+[%#
+    Template for Bigtop Config section of tenter.tt home page.
+    Expects these view.data parameters:
+
+    engine                - the name of the engine pick from MP13, MP20, or CGI
+    tempate_engine        - the name of the template engine pick from
+                            TT or Default
+    app                   - the application portion of the AST, used to
+                            retrieve various things (like statements)
+    statements            - same as passed to tenter.tt
+    top_level_configs     - from calling get_top_level_configs on an AST
+%]
+<table>
+  <tr>
+      <td>Application Name:</td>
+      <td> <input onblur='javascript:update_tree(
+                      "std", "appname", this.value
+                  )'
+                  type='text'
+                  value='[% view.data.app.get_name %]'></td>
+  </tr>
+[% FOREACH statement IN view.data.statements.config.statements %]
+   [% selected_value = [ view.data.top_level_configs.${statement.keyword} ] %]
+  <tr>
+    <td> [% statement.label %]:
+    </td>
+    <td>
+        [% INCLUDE input_boxes.ttc
+                keyword_prefix = ''
+                name_prefix    = ''
+                id_prefix      = ''
+                method_group   = 'top_config'
+                key            = statement.keyword
+                values         = selected_value
+                single_value   = selected_value.0
+        %]
+    </td>
+<!--
+    <td>
+      <pre>[% USE dumper; dumper.dump( statement ) %]
+      </pre>
+    </td>
+-->
+  </tr>
+[% END %]
+</table>
+
+<!--
+      <pre>[% dumper.dump( view.data.top_level_configs ) %]
+      </pre>
+-->

@@ -1,0 +1,119 @@
+-=( How to install Buscador )=-
+
+
+It's a slightly involved process at the moment. This will change.
+
+-------------------------------------
+1) Download the tar ball
+-------------------------------------
+
+from 
+
+http://cvs.simon-cozens.org/viewcvs.cgi/buscador/?cvsroot=Email
+
+and unpack it in a web accessible directory.
+
+-------------------------------------
+2) Install the prerequisites. 
+-------------------------------------
+
+You can check by running 
+
+% perl Makefile.PL
+
+Consider making a Bundle::Buscador for us. Or a PAR archive or something.
+
+There are quite a lot.
+
+Part of the problem, and the reason why you'll get bizarre requests to
+install GD, Graphviz, XML::Writer and Spreadsheet::ParseExcel is because
+Email::Store uses Class::DBI::DATA::Schema which uses SQL::Translator
+which has insane dependencies. Complain to the authors of
+SQL::Translator not us.
+
+http://rt.cpan.org/NoAuth/Bug.html?id=7004
+
+Some users have said they've had test errors from 
+
+Class::DBI::AsForm
+Apache::Request
+Mail::ListDetector
+Email::MIME
+
+we're harassing authors where appropriate as we speak.
+
+-------------------------------------
+3) Add in the Apache Config
+-------------------------------------
+
+I added this into my virtual host config
+
+   <Location /buscador>
+        PerlSetEnv PERL5LIB /virtual/thegestalt.org/www/html/buscador/demo
+        PerlHandler Buscador
+        #PerlInitHandler Apache::StatINC
+   </Location>
+
+StatINC allows me to develop without restarting Apache every time.
+
+-------------------------------------
+4) Initialise the directory
+-------------------------------------
+
+Change to 
+
+    /virtual/thegestalt.org/www/html/buscador/demo
+
+(or wherever you put in step 3) and run
+
+    % buscador -init
+
+Which will copy a load of template files and create a buscador.config file.
+
+-------------------------------------
+5) Edit the config file
+-------------------------------------
+
+Mine looks like
+
+    uri        = http://thegestalt.org/buscador/demo
+    image_uri  = http://thegestalt.org/buscador/images
+    dsn        = dbi:SQLite2:email.db
+
+I keep my image files in a seperate place because it's faster.
+
+-------------------------------------
+6) Set up the DB
+-------------------------------------
+
+Simply be in your Buscador directory and do
+
+    % buscador -setup
+
+the buscador command line tool will automatically pick up the details 
+from your buscador.config file.
+
+-------------------------------------
+7) Import mails
+-------------------------------------
+
+Again, be in your buscador directory and do 
+
+    % buscador <folder[s]>
+
+and it will import. You can also cat a single mail into it which is useful
+for setting up as an alias.
+
+-------------------------------------
+8) Restart apache
+-------------------------------------
+
+Err, that should be it.
+
+
+
+
+
+
+
+

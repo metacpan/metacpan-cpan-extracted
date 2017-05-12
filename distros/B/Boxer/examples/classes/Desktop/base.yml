@@ -1,0 +1,7 @@
+classes:
+  - x11
+parameters:
+  doc:
+    desktop:
+      headline:
+        - Desktop

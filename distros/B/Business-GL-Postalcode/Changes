@@ -1,0 +1,29 @@
+Changes file for Business::GL::Postalcode
+
+0.05 2015-08-20 Bug fix release, update not required
+
+- Minor bug when Readonly prerequisite was not listed properly
+
+
+0.04 2015-08-18 Maintenance release, update not required
+
+- Migrated to Dist::Zilla from Module::Build
+
+
+0.03 2014-08-15 Feature release, update recommended
+
+- Added missing method get_all_cities
+
+
+0.02 2014-08-08 Maintence release, update not required
+
+- Added perl requirement to Build.PL
+
+- Added new accessor: num_of_digits_in_postalcode
+
+
+0.01 2014-08-06 Initial release
+
+- Implementing the following features:
+
+    - Data container for postalcodes from Greenland (GL)

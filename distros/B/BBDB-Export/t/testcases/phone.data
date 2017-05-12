@@ -1,0 +1,14 @@
+$got_data = {
+          'timestamp' => '2005-03-05T10:28:11-0600',
+          'full' => 'phone testcase',
+          'last' => 'testcase',
+          'company' => '',
+          'first' => 'phone',
+          'phone' => {
+                       'work' => '(333) 333-3333',
+                       'fax' => '(555) 555-5555',
+                       'mobile' => '(444) 444-4444',
+                       'home' => '(222) 222-2222'
+                     },
+          'creation-date' => '2005-03-05T10:28:11-0600'
+        };

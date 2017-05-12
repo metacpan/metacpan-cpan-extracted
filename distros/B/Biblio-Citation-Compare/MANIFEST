@@ -1,0 +1,9 @@
+README
+MANIFEST
+Changes
+Makefile.PL
+lib/Biblio/Citation/Compare.pm
+t/01-sameWork.t
+t/02-editions.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,97 @@
+        <WorkflowProcess Id="wcp8" Name="WCP8: Multiple Merge">
+            <ProcessHeader>
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>The Multi-Merge pattern describes the convergence two or more parallel branches into one single branch. Special about this pattern is that each enablement of an incoming branch results in the activation of the proceeding activity within the business process [Aalst09]. Much like the 'Simple Merge' pattern, the "Multi-Merge" (XOR-merge, Uncontrolled Merge) gateway passes on any flow from its ingoing edges without performing synchronization. The two patterns differ in whether the inbound flow is supposed to be exclusive (Simple Merge) or not (Multi-Merge).</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <DataFields>
+                <DataField Id="common" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'common data'</InitialValue>
+                </DataField>
+                <DataField Id="sbflw1data" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'sbflw1 data'</InitialValue>
+                </DataField>
+            </DataFields>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="A" Name="[+]">
+                    <Description>you have option to change the value of variable whereToGo. If you set it to B, C or D process will follow to activity B, C or D. If you set it to AB, BA, AC, CA, BC, CB, ABC, BCA, ... it will follow to all of the activities mentioned in the variable value</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="AND">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B"/>
+                                    <TransitionRef Id="A-C"/>
+                                    <TransitionRef Id="A-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="E" Name="[x]">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-A" From="Start" To="A"/>
+                <Transition Id="A-B" From="A" To="B">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('B')</Condition>
+                </Transition>
+                <Transition Id="A-C" From="A" To="C">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('C')</Condition>
+                </Transition>
+                <Transition Id="A-D" From="A" To="D">
+                    <Condition Type="CONDITION">attribute('WhereToGo').search('D')</Condition>
+                </Transition>
+                <Transition Id="B-E" From="B" To="E"/>
+                <Transition Id="C-E" From="C" To="E"/>
+                <Transition Id="D-E" From="D" To="E"/>
+                <Transition Id="E-End" From="E" To="End"/>
+            </Transitions>
+        </WorkflowProcess>

@@ -1,0 +1,34 @@
+Bayonne-Libexec version 0.06
+============================
+
+This module is meant for use with GNU Bayonne 2, the voice telephony
+application server of the GNU Project.  The Bayonne Libexec module supports writing 
+perl applications which are either launched under the GNU Bayonne 2 "Libexec" 
+function, or that are complete telephony applications written in perl and 
+started under the Bayonne 2 script system.  This module is only usable with
+Bayonne 2, and has no other known use.
+
+INSTALLATION
+
+To install these modules type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires and is used in conjunction with a Bayonne 2 telephony server.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005-2006 by David Sugar, Tycho Softworks
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

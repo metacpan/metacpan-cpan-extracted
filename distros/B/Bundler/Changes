@@ -1,0 +1,10 @@
+# v0.0.28
+- first version for CPAN
+
+# v0.0.29
+- changes in install logic, see pod doc of Bundler
+- improved documentation
+
+# v0.0.30
+- bug fix for '0' version install mode
+- small fixes in pod

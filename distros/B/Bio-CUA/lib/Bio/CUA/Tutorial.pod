@@ -1,0 +1,258 @@
+package Bio::CUA::Tutorial;
+
+=pod
+
+=head1 NAME
+
+Bio::CUA::Tutorial - A tutorial on using the programs of Bio-CUA
+
+=head1 VERSION
+
+Version 1.1 - workable with all distributions of Bio-CUA-1.xx
+
+=head1 DESCRIPTION
+
+This is a tutorial on how to use the accompanying programs in the
+distribution. The three programs are:
+	
+	cai_codon.pl
+	tai_codon.pl
+	cub_seq.pl
+
+If running any program without giving parameters, it will show a brief
+usage information.
+
+To learn how to write new programs using the modules in the
+distribution, read the documentation of the following modules:
+	
+	L<Bio::CUA::CUB::Builder>
+	L<Bio::CUA::CUB::Calculator>
+	L<Bio::CUA::Summarizer>
+
+One can also read the source code of the accompanying programs to
+learn how to use the provided modules.
+
+=head1 DATA
+
+All the data used in this tutorial are downloadable from
+L<https://github.com/fortune9/CUA/blob/master/examples.tar.gz>. 
+
+After downloading it, one can uncompress it. Under Linux-like systems,
+uncompress it using
+	
+	tar -xzf examples.tar.gz
+
+This will result in one folder F<examples>, under which are folders
+F<data> and F<output>. The F<data> folder contains the input data
+while the F<output> contains the output which can be compared with the
+new output to make sure the programs work correctly.
+
+=head1 EXAMPLE
+
+In this tutorial, I will use the sequences and other data from
+the fruitfly I<Drosophila melanogaster> as an example to show how to
+compute all the codon usage bias (CUB) metrics. For data availability,
+see L</DATA>.
+
+=head2 Codon-level metrics
+
+First, we will calculate the CAI, tAI, and Fop at the codon level,
+that is, which codons are preferred over others.
+
+=over
+
+=item CAI - Codon Adaptation Index
+
+# calculate CAI using the top 200 highly expressed genes
+
+  cai_codon.pl -i data/longest_cds.dmel_5_57.fa -e \
+  data/RPKM_S2_cells.tsv -s 200 -o codon_CAI.S2_cell
+
+Here F<data/longest_cds.dmel_5_57.fa> contains the sequences of the
+longest CDS for each gene in the fruitfly genome in I<fasta> format.
+F<data/RPKM_S2_cells.tsv> contains the mRNA expression values for all
+the genes in
+L<RPKM|https://wiki.nci.nih.gov/pages/viewpage.action?pageId=71439191>
+format. The option I<-s> is to select what genes in the
+mRNA-expression file to be used as reference set, here top I<200> highly
+expressed genes. The option <-o> is to direct the output to the file
+F<codon_CAI.S2_cell>.
+
+=item tAI - tRNA adaptation index
+
+# calculate codons' tAI using tRNA copy numbers to approximate the
+tRNA abundance
+
+  tai_codon.pl -t data/dmel_r5.tRNA_copy_number -o \
+  codon_tAI.dmel_r5
+
+The file F<data/dmel_r5.tRNA_copy_number> contains the tRNA copy
+number for each anticodon. Check the file for the format. One can
+download the tRNA copy number information from the database
+L<GtRNAdb|http://gtrnadb.ucsc.edu/> and then summrize the copy number
+for each anticodon.
+
+=item Fop - frequency of optimal codons
+
+The optimal codons can be defined using different criteria. Here I
+classify codons with tAI > 0.4 optimal codons.
+
+Under Linux, one can run the following command
+  
+  gawk '$2 > 0.40' codon_tAI.dmel_r5 >optimal_codons.dmel_r5
+
+to filter optimal codons from the above tAI output.
+
+=item ENC - effective number of codons
+
+Codon-level ENC does not exist.
+
+=back
+
+=head2 Sequence-level metrics
+
+With the above codon-level metrics, one can compute sequence-level CUB
+values.
+
+To calculate CAI, tAI, Fop, and ENC for all the CDS sequences, run
+
+  cub_seq.pl -s data/longest_cds.dmel_5_57.fa -t \
+  codon_tAI.dmel_r5 -c codon_CAI.S2_cell -f optimal_codons.dmel_r5 \
+  -e enc -o CUB_metrics.dmel_r5.tsv
+
+Note we use the options I<-t>, I<-c>, I<-f>, and I<-e> to specify the
+needed parameters for calculating tAI, CAI, Fop, and ENC, respectively.
+
+=head2 CAI and ENC variants
+
+=head3 CAI variants
+
+I devise two variants of CAI to fix the shortcoming of the standard
+CAI. Their calculations are below.
+
+=over
+
+=item mCAI
+
+# calculate codons' CAI using the top 200 highly expressed genes with
+RSCUs B<normalized by the expected RSCUs under even usage>.
+
+  cai_codon.pl -i data/longest_cds.dmel_5_57.fa -e \
+  data/RPKM_S2_cells.tsv -s 200 -o codon_CAI.by_mean.S2_cell -m mean
+
+The difference from the standard CAI is adding option I<-m mean>
+to ask all RSCUs are normalized by the expected RSCUs to get CAIs.
+RSCU stands for Relative Synonymous Codon Usage.
+
+=item bCAI
+
+# calculate codons' CAI using the top 200 highly expressed genes with
+RSCUs normalized by the RSCUs from the 1000 most lowly expressed
+genes
+
+  cai_codon.pl -i data/longest_cds.dmel_5_57.fa -e \
+  data/RPKM_S2_cells.tsv -s 200 -o codon_CAI.by_background.S2_cell \
+  -b 1000
+
+The option I<-b 1000> asks for using the bottom 1000 lowly expressed
+genes to normalize RSCUs before calculating CAIs.
+
+=back
+
+The sequence-level mCAI and bCAI can be computed by specifying the
+codon-level output. For example, for bCAI, we can run
+
+  cub_seq.pl -s data/longest_cds.dmel_5_57.fa -c
+  codon_CAI.by_background.S2_cell -o CAI_by_background.dmel_r5.tsv
+  --lite
+
+Note I feed the option I<-c> the codon-level bCAI file
+F<codon_CAI.by_background.S2_cell>. I also use the option I<--lite>
+to suppress the program to compute other auxiliary information.
+
+=head3 ENC variants
+
+Including the standard ENC, thare are four variants, defined by whether
+nucleotide compositions are corrected and on how missing F values are
+estimated, as shown below:
+
+  __________________________________________________________
+  Metric  | Correct nucleotide |  Estimate missing F values
+          |    composition?    |  using the original method?
+  ----------------------------------------------------------
+  ENC     |       No	       |            Yes
+  ENC_r	  |       No           |            No
+  ENCp    |       Yes          |            Yes
+  ENCp_r  |       Yes          |            No
+  ----------------------------------------------------------
+
+To calculate these ENC variants, specifying the corresponding names in
+lower case to the option I<-e> of I<cub_seq.pl>. For example,
+the command
+
+  cub_seq.pl -s data/longest_cds.dmel_5_57.fa -e encp,encp_r \
+  -b data/intron_base_comp.dmel_r5.tsv \
+  -o ENC_corrected_GC.dmel_r5.tsv  --lite
+
+calculates I<ENCp> and I<ENCp_r> for all the sequences, and the option
+I<-b> specifies the file containing base composition from which the
+expected codon frequencies of each analyzed sequence is computed.
+
+=head1 AUTHOR
+
+Zhenguo Zhang, C<< <zhangz.sci at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-bio-cua at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bio-CUA>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-CUA>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Bio-CUA>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Bio-CUA>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Bio-CUA/>
+
+=back
+
+=head1 CITATION
+
+Zhenguo Zhang, I<CUA: a Flexible and
+Comprehensive Codon Usage Analyzer> (In preparation)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Zhenguo Zhang.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see L<http://www.gnu.org/licenses/>.
+
+=cut
+
+1;
+

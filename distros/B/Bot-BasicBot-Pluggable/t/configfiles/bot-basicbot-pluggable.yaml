@@ -1,0 +1,17 @@
+---
+server: irc.example.com
+port: 6668
+nick: botbot
+channel:
+  - baz
+  - quux
+store: 
+  type: Memory
+charset: ascii
+module:
+  - Loader
+  - Karma
+settings:
+  Auth:
+    password_admin: truhe
+loglevel: fatal

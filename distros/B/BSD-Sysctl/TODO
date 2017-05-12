@@ -1,0 +1,26 @@
+TODO list for BSD::Sysctl
+
+4. Offer a tie interface?
+   tie my $loadavg, 'BSD::Sysctl', 'vm.loadavg', {offset=>0};
+   while(1) {
+       print "$loadavg\n";
+       sleep 1;
+   }
+
+5. Offer functions that fetch popular values directly (e.g.
+pagefree(), representing vm.vmtotal's "number of vm pages free"
+value.
+
+7. Deal with bsd-sysctl.pl in a cleverer way (insert the
+contents into Sysctl.pm when copying to blib/lib.
+
+8. Add Makefile rules to deal with changes to mibfmt.map
+
+9. eg/mib_scan.pl reports that a number of more obscure
+variables are not fetched correctly. The failures need
+to be diagnosed.
+
+10. Obtain access to NetBSD and OpenBSD platforms.
+
+11. Remember to tweak the kern.ipc.maxsockbuf test when
+support for other platforms is added.

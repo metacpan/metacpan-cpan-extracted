@@ -1,0 +1,190 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+
+use IO::Prompter;
+use Term::ANSIColor;
+use File::Path 'make_path';
+use BalanceOfPower::Utils qw(get_year_turns compare_turns prev_turn next_turn);
+use BalanceOfPower::World;
+use Data::Dumper;
+
+
+my $stubbed_player = 0;
+my $logs = 0;
+my $new = 1;
+my $noserver = 0;
+
+my $first_year = 1970;
+my $init_years_web = 1;
+
+my $world;
+my $commands;
+
+my $mode = shift @ARGV;
+
+if(! $mode)
+{
+    $mode = 'new';
+}
+elsif($mode eq 'devel')
+{
+   say "DEVELOPEMENT MODE";
+   $stubbed_player = 1;
+   $logs = 1;
+   $mode = 'new';
+}
+elsif($mode eq 'fastdev')
+{
+   say "DEVELOPEMENT MODE";
+   $stubbed_player = 1;
+   $logs = 0;
+   $mode = 'new';
+}
+elsif($mode eq 'refresh-nosrv')
+{
+    $mode = 'refresh';
+    $noserver = 1;
+}
+
+if($mode eq 'new')
+{
+    $world = BalanceOfPower::World->new( first_year => $first_year, log_active => $logs );
+    $world->init_random("nations-v2.txt", "borders-v2.txt");
+    $world->dice_log($logs);
+    $commands = $world->build_commands();
+    my $auto_years;
+    if($stubbed_player)
+    {
+        $auto_years = 0;
+        $commands->set_player("Player One");
+    }
+    else
+    {
+        $commands->welcome();
+        $auto_years = $commands->set_auto_years();
+        $auto_years = 0 if($auto_years < 0);
+        $commands->input_player();
+    }
+    $world->autopilot($first_year, $first_year+$auto_years);
+    $commands->welcome_player();
+    $commands->interact();
+}
+elsif($mode eq 'load')
+{
+    my $file = shift @ARGV;
+    $world = BalanceOfPower::World->load_world($file);
+    $world->dice_log($logs);
+    $commands = $world->build_commands();
+    my $active_player = $world->players->[0];
+    $commands->set_player($active_player->name);
+    $commands->interact(0);
+}
+elsif($mode eq 'webgen')
+{
+    my $game = shift @ARGV;
+    my $world = load_game($game);
+    my $new = 0;
+    if(! $world)
+    {
+        my $site_root = $ENV{'BOP_SITE_ROOT'};
+        my $website = $ENV{'BOP_WEBSITE'};
+        my $admin_password = shift @ARGV;
+        my $log_dir = "$game-logs";
+        my $file = "$game.dmp";
+        make_path($log_dir);
+        if(! $admin_password)
+        {
+            die "Admin password needed on game init";
+        }
+        $world = BalanceOfPower::World->new( admin_password => $admin_password, 
+                                             first_year => $first_year, 
+                                             log_active => $logs, 
+                                             savefile => $file );
+        $world->site_root($site_root);
+        $world->api_url($website);
+        $world->set_log_dir($log_dir);
+        $new = 1;
+    }
+    die "Server unreachable" if(! $world->server_available);
+    if($new)
+    {
+        $world->init_random("nations-v2.txt", "borders-v2.txt");
+        $commands = $world->build_commands();
+        say "Initialization: first year: $first_year";
+        foreach my $y ( $first_year ..  $first_year + $init_years_web)
+        {
+            foreach my $t (get_year_turns($y))
+            {
+                $world->generate_whole_turn($game, $t);
+                say "Initialization: $t generated";
+            }
+        }
+        $world->pre_decisions_elaborations(next_turn($world->current_year));
+    }
+    say "Elaborating... " . $world->current_year;
+    $world->generate_web_interactive_turn($game);
+    $world->build_meta_statics($game);
+    say $world->current_year . " ready to be played";
+    $world->dump_all();
+}
+elsif($mode eq 'refresh')
+{
+    my $game = shift @ARGV;
+    my $world = load_game($game);
+    die "Nothing to refresh" if(! $world);
+    say "Server not involved" if($noserver);
+    if(! $noserver)
+    {
+        die "Server unreachable" if(! $world->server_available);
+    }
+    say "Refreshing... " . $world->current_year;
+    say "Site root is " . $world->site_root;
+    $world->collect_api_data($game) if (! $noserver);
+    $world->build_pre_statics($game);
+    $world->build_post_statics($game, prev_turn($world->current_year));
+    $world->build_meta_statics($game);
+    say $world->current_year . " refreshed";
+}
+elsif($mode eq 'clean')
+{
+    my $game = shift @ARGV;
+    my $window = shift @ARGV;
+    my $world = load_game($game);
+    die "Nothing to clean" if(! $world);
+    $world->clean_statics($game, $window);
+}
+elsif($mode eq 'drystock')
+{
+    my $game = shift @ARGV;
+    my $window = shift @ARGV;
+    my $world = load_game($game);
+    die "Drystock impossible" if(! $world);
+    die "Server unreachable" if(! $world->server_available);
+    $world->manage_stock_orders($game);
+    $world->execute_stock_orders(1);
+}
+
+
+sub load_game
+{
+    my $game = shift;
+    my $site_root = $ENV{'BOP_SITE_ROOT'};
+    my $website = $ENV{'BOP_WEBSITE'};
+    my $file = "$game.dmp";
+    my $log_dir = "$game-logs";
+    make_path($log_dir);
+    if(-e $file)
+    {
+        $world = BalanceOfPower::World->load_world($file);
+        $world->site_root($site_root);
+        $world->api_url($website);
+        $world->set_log_dir($log_dir);
+        return $world;
+    }
+    else 
+    {
+        return undef;
+    }
+}

@@ -1,0 +1,11 @@
+Revision history for Bio::RNA::RNAaliSplit
+
+0.03    Fri Mar 03 2017
+	- initial release
+        - packaged for distribution as Perl module
+
+0.04	Sun Mar 12 2017
+	- fixed an error in MANIFEST; File::ShareDir::Install v0.11 is now
+	  shipped with the distribution
+	- strict depencency on ViennaRNA >=v2.3.4 
+	- use Test::Prereq for dependency testing

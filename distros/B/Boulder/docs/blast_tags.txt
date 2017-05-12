@@ -1,0 +1,466 @@
+       TAGS USED IN BOULDER REPRESENTATION OF BLAST/FAST OUTPUT
+			    July 28, 1998
+			   Lincoln D. Stein
+
+Last modified: November 6, 1998
+
+INTRODUCTION
+------------
+
+The boulder format is used by the quickblast program and other tools
+to run and parse the output of the BLAST and FAST family of sequence
+similarity searching tools.  This document describes the tags that are
+expected in the boulder stream from BLAST and BLAST-like searches.
+
+DEFINED TAGS
+------------
+
+1. Information about the program
+
+Blast_program
+	The name of the algorithm used to run the analysis.  Possible
+	values include:
+
+	blastn
+	blastp
+	blastx
+	tblastn
+	tblastx
+	fasta3
+	fastx3
+	fasty3
+	tfasta3
+	tfastx3
+	tfasty3
+
+Blast_version
+	This gives the version of the program in whatever form appears
+	on the banner page, e.g. "2.0a19-WashU".
+
+Blast_program_date
+	This gives the date at which the program was compiled, if and
+	only if it appears on the banner page.
+
+2. Information about the run
+
+Blast_run_date
+	This gives the date and time at which the similarity analysis
+	was run, in the format "Fri Jul  6 09:32:36 1998"
+
+Blast_parms
+	This points to a subrecord containing information about the
+	algorithm's runtime parameters.  The following subtags are
+	used.  Others may be added in the future:
+
+	Hspmax		the value of the -hspmax argument
+	Expectation	the value of E
+	Matrix		the matrix in use, e.g. BLOSUM62
+	Ctxfactor	the value of the -ctxfactor argument
+	Gapall		The value of the -gapall argument
+
+3. Information about the query sequence and subject database
+
+Blast_query
+	The identifier for the search sequence, as defined by the
+	FASTA format.  This will be the first set of non-whitespace
+	characters following the ">" character.
+
+Blast_db
+	Unix filesystem path to the subject database.
+
+Blast_db_title
+	The title of the subject database.
+
+4. The search results
+
+Blast_hits
+	This represents a list of BLAST (or FAST) hits on the query
+	sequence.  There may be zero, one, or many such tags, each
+	one corresponding to a hit on the subject database.  Each of
+	these tags will contain one or more Hsp (high-scoring segment
+	tags). 
+
+	Blast_hits points to a boulder subrecord containing the
+	following subtags:
+
+	Name	The name of the sequence that was hit.
+
+	Length	The total length of the sequence that was hit
+
+	Signif	The significance of the hit.  If there are multiple
+		HSPs in the hit, this will be the most significant
+		(smallest) value.
+
+	Identity The percent identity of the hit.  If there are
+		multiple HSPs, this will be the one with the
+		highest percent identity.
+
+	Expect	The expectation value for the hit.  If there are
+		multiple HSPs, this will be the lowest expectation
+		value in the set.
+
+	Hsps	One or more sub-sub-tags, pointing to a nested record
+		containing information about each high-scoring segment
+		pair (HSP).  See section (5) below.
+
+5. The Hsp records
+
+Each Blast_hit tag will have at least one, and possibly several Hsp
+tags, each corresponding to a high-scoring segment pair (HSP).  These
+records contain detailed information about the hit, including the
+alignments.  Tags are as follows:
+
+Signif		
+	The significance (P value) of this HSP.
+
+Bits		
+	The number of bits of significance.
+
+Expect
+	Expectation value for this HSP
+
+Identity
+	Percent identity
+	
+Positives
+	Percent positive matches
+
+Score
+	The Smith-Waterman alignment score
+
+Orientation
+	"plus" or "minus", only present for nucleotide matches
+
+Strand
+	Depending on algorithm used, indicates
+	complementarity of match and possibly  the
+	reading frame.  This is copied out of the blast report.
+	Possibilities include:
+
+	"Plus / Minus" "Plus / Plus" -- blastn algorithm
+	"+1 / -2" "+2 / -2"	     -- blastx, tblastx
+
+Query_start
+	Position at which the HSP starts in the query sequence
+	(1-based indexing).
+
+Query_end
+	Position at which the HSP stops in the query sequence.
+
+Subject_start
+	Position at which the HSP starts in the subject (target)
+	sequence.
+
+Subject_end
+	Position at which the HSP stops in the subject (target)
+	sequence.
+
+Query, Subject, Alignment
+	These three tags contain strings which, together, create the
+	gapped alignment of the query sequence with the subject
+	sequence.
+
+EXAMPLES
+--------
+
+1. A BLASTN run
+
+Here is the output from a typical blastn (nucleotide->nucleotide)
+run.  Long lines have been truncated.  Note also that the percent sign 
+(%) is escaped in the usual way.  It will be unescaped when reading
+the boulder stream back in.
+
+Blast_run_date=Fri Nov  6 14:40:41 1998
+Blast_db_date=2:40 PM EST Nov 6, 1998
+Blast_parms={
+  Hspmax=10
+  Expectation=10
+  Matrix=+5,-4
+  Ctxfactor=2.00
+}
+Blast_program_date=05-Feb-1998
+Blast_db= /usr/tmp/quickblast18202aaaa
+Blast_version=2.0a19-WashU
+Blast_query=BCD207R
+Blast_db_title= test.fasta
+Blast_query_length=332
+Blast_program=blastn
+Blast_hits={
+  Signif=3.5e-74
+  Expect=3.5e-74,
+  Name=BCD207R
+  Identity=100%25
+  Length=332
+  Hsps={
+    Subject=GTGCTTTCAAACATTGATGGATTCCTCCCCTTGACATATATATATACTTTGGGTTCCCGCAA...
+    Signif=3.5e-74
+    Length=332
+    Bits=249.1
+    Query_start=1
+    Subject_end=332
+    Query=GTGCTTTCAAACATTGATGGATTCCTCCCCTTGACATATATATATACTTTGGGTTCCCGCAA...
+    Positives=100%25
+    Expect=3.5e-74,
+    Identity=100%25
+    Query_end=332
+    Orientation=plus
+    Score=1660
+    Strand=Plus / Plus
+    Subject_start=1
+    Alignment=||||||||||||||||||||||||||||||||||||||||||||||||||||||||||...
+  }
+}
+=
+
+2. A BLASTP run
+
+Here is the output from a typical blastp (protein->protein)
+run.  Long lines have again been truncated.
+
+Blast_run_date=Fri Nov  6 14:37:23 1998
+Blast_db_date=2:36 PM EST Nov 6, 1998
+Blast_parms={
+  Hspmax=10
+  Expectation=10
+  Matrix=BLOSUM62
+  Ctxfactor=1.00
+}
+Blast_program_date=05-Feb-1998
+Blast_db= /usr/tmp/quickblast18141aaaa
+Blast_version=2.0a19-WashU
+Blast_query=YAL004W
+Blast_db_title= elegans.fasta
+Blast_query_length=216
+Blast_program=blastp
+Blast_hits={
+  Signif=0.95
+  Expect=3.0,
+  Name=C28H8.2
+  Identity=30%25
+  Length=51
+  Hsps={
+    Subject=HMTVEFHVTSQSW---FGFEDHFHMIIR-AVNDENVGWGVRYLSMAF
+    Signif=0.95
+    Length=46
+    Bits=15.8
+    Query_start=100
+    Subject_end=49
+    Query=HLTQD-HGGDLFWGKVLGFTLKFNLNLRLTVNIDQLEWEVLHVSLHF
+    Positives=52%25
+    Expect=3.0,
+    Identity=30%25
+    Query_end=145
+    Orientation=plus
+    Score=45
+    Subject_start=7
+    Alignment=H+T + H     W    GF   F++ +R  VN + + W V ++S+ F
+  }
+}
+Blast_hits={
+  Signif=0.99
+  Expect=4.7,
+  Name=ZK896.2
+  Identity=24%25
+  Length=340
+  Hsps={
+    Subject=FSGKFTTFVLNKDQATLRMSSAEKTAEWNTAFDSRRGFF----TSGNYGL...
+    Signif=0.99
+    Length=101
+    Bits=22.9
+    Query_start=110
+    Subject_end=243
+    Query=FWGKVLGFTL-KFNLNLRLTVNIDQLEWEVLHVSLHFWVVEVSTDQTLSVE...
+    Positives=41%25
+    Expect=4.7,
+    Identity=24%25
+    Query_end=210
+    Orientation=plus
+    Score=65
+    Subject_start=146
+    Alignment=F GK   F L K    LR++      EW     S   +     T     +...
+  }
+}
+Blast_hits={
+  Signif=0.99
+  Expect=4.9,
+  Name=F15H9.1
+  Identity=31%25
+  Length=426
+  Hsps={
+    Subject=LTLFIWIIACGFNNTQPLSYEENIQRLESCGKILPEESSNSITKSKYF...
+    Signif=0.99
+    Length=66
+    Bits=23.2
+    Query_start=141
+    Subject_end=77
+    Query=VSLHFWVVEVSTDQT--LSVENGIRRIHS-SLILSSITNQSFSVSESDKR...
+    Positives=45%25
+    Expect=4.9,
+    Identity=31%25
+    Query_end=206
+    Orientation=plus
+    Score=66
+    Subject_start=4
+    Alignment=++L  W++    + T  LS E  I+R+ S   IL   ++ S + S+...
+  }
+}
+Blast_hits={
+  Signif=0.99
+  Expect=5.3,
+  Name=D1007.9
+  Identity=19%25
+  Length=160
+  Hsps={
+    Subject=DFEIGILEKGFWAALRENTNVQQKFEITDRKMHNFMIFTAEKLKKKN...
+    Signif=0.99
+    Length=78
+    Bits=21.1
+    Query_start=135
+    Subject_end=129
+    Query=EWEVLHVSLHFWV-VEVSTDQTLSVENGIRRIHSSLILSS--ITNQSFS...
+    Positives=51%25
+    Expect=5.3,
+    Identity=19%25
+    Query_end=212
+    Orientation=plus
+    Score=60
+    Subject_start=49
+    Alignment=++E+  +   FW  +  +T+     E   R++H+ +I ++  +  +...
+  }
+}
+Blast_hits={
+  Signif=9999
+  Expect=5.5,
+  Name=T08E11.4
+  Identity=36%25
+  Length=299
+  Hsps={
+    Subject=LDSPCTETMNQKTFMLNHTVQNVSNIKERGIYTTNVE
+    Length=36
+    Bits=18.0
+    Query_start=22
+    Subject_end=165
+    Query=IESTTTQVENQDVFFLTLLVQTVSN-GSGGRFVNNTQ
+    Positives=48%25
+    Expect=5.5,
+    Identity=35%25
+    Query_end=57
+    Orientation=plus
+    Score=51
+    Subject_start=129
+    Alignment=++S  T+  NQ  F L   VQ VSN    G +  N +
+  }
+  Hsps={
+    Subject=LQCEKKHFDSKDWSIEVELVLTLKSSNG-QRL--SFTASSTLNEPA...
+    Length=55
+    Bits=17.2
+    Query_start=134
+    Subject_end=239
+    Query=LEWEVLHVSLHFWVVEVSTDQTLSVENGIRRIHSSLILSSITNQSFSV...
+    Positives=45%25
+    Expect=5.5,
+    Identity=36%25
+    Query_end=188
+    Orientation=plus
+    Score=49
+    Subject_start=187
+    Alignment=L+ E  H     W +EV    TL   NG +R+  S   SS  N+...
+  }
+}
+Blast_hits={
+  Signif=1.00
+  Expect=6.4,
+  Name=K03H1.7
+  Identity=22%25
+  Length=88
+  Hsps={
+    Subject=MGQSFSSSFNAKQTSSSTPQKSTKTPTCSDPRSPSQDIERTPIQVK...
+    Signif=1.00
+    Length=84
+    Bits=18.7
+    Query_start=1
+    Subject_end=88
+    Query=MGVT-SGGLNFKDTVFNEQQRDIESTTT---QVENQDVFFLTLLVQTVS...
+    Positives=44%25
+    Expect=6.4,
+    Identity=22%25
+    Query_end=84
+    Orientation=plus
+    Score=53
+    Subject_start=1
+    Alignment=MG + S   N K T  +  Q+  ++ T    +  +QD+    + V...
+  }
+}
+Blast_hits={
+  Signif=1.00
+  Expect=8.3,
+  Name=Y67D8A_380.c
+  Identity=41%25
+  Length=47
+  Hsps={
+    Subject=TLLDAVSSDGSGADVEASGEDVQT
+    Signif=1.00
+    Length=24
+    Bits=14.4
+    Query_start=38
+    Subject_end=44
+    Query=TLLVQTVSNGSGGRFVNNTQDIQT
+    Positives=58%25
+    Expect=8.3,
+    Identity=41%25
+    Query_end=61
+    Orientation=plus
+    Score=41
+    Subject_start=21
+    Alignment=TLL    S+GSG     + +D+QT
+  }
+}
+Blast_hits={
+  Signif=1.00
+  Expect=8.9,
+  Name=C06A5.2
+  Identity=26%25
+  Length=214
+  Hsps={
+    Subject=TSGKKNKYKFKYGQIDQQELSINNDKTEYLENAQ---LTKLMSHADVR...
+    Signif=1.00
+    Length=100
+    Bits=21.1
+    Query_start=4
+    Subject_end=207
+    Query=TSGGLN---FKDTVFNEQQRDIESTTTQ-VENQDVFFLTLLVQ--TVSNG...
+    Positives=50%25
+    Expect=8.9,
+    Identity=26%25
+    Query_end=103
+    Orientation=plus
+    Score=60
+    Subject_start=106
+    Alignment=TSG  N   FK    ++Q+  I +  T+ +EN     LT L+    V...
+  }
+}
+Blast_hits={
+  Signif=1.00
+  Expect=9.5,
+  Name=Y71F9B_275.b
+  Identity=26%25
+  Length=264
+  Hsps={
+    Subject=IKYGVISYENVKQDLLDWRWIYISGRLHKPVLEVIKPRQDMCDLVTENRR...
+    Signif=1.00
+    Length=85
+    Bits=21.5
+    Query_start=119
+    Subject_end=190
+    Query=LKFNLNLRLTVNIDQLEWEVLHVS--LHFWVVEVSTDQT----LSVENGIRRI...
+    Positives=46%25
+    Expect=9.5,
+    Identity=26%25
+    Query_end=203
+    Orientation=plus
+    Score=61
+    Subject_start=98
+    Alignment=+K+ +     V  D L+W  +++S  LH  V+EV   +     L  EN ...
+  }
+}
+=

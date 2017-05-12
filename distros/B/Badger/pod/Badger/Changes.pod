@@ -1,0 +1,380 @@
+=head1 NAME
+
+Badger::Changes - Summary of changes in the Badger toolkit
+
+=head1 CHANGES
+
+This document contains a brief overview of what has changed between
+successive version of the Badger toolkit.
+
+Badger is now considered to be mature, stable, reliable, and unlikely to
+change significantly in future versions.
+
+=head2 Version 0.12 - 12th December 2016
+
+Added some tests for YAML modules in 3 test scripts that were failing.
+
+=head2 Version 0.11 - 11th December 2016
+
+Fix for missing file in distribution.
+
+=head2 Version 0.10 - 11th December 2016
+
+Added L<Badger::Comparable>, L<Badger::Date>, L<Badger::Duration>, L<Badger::Filter>,
+L<Badger::Progress>, L<Badger::Workplace>, L<Badger::Workspace>
+and L<Badger::Config::Filesystem>.
+
+Refactored parts of L<Badger::Config>.
+
+Changed L<Badger::Base> L<message()|Badger::Base/message()> method to allow
+message formats to be defined in C<$self->{ messages }> when C<$self> is a
+blessed hash object.
+
+Added L<no_config()|Badger::Hub/no_config()> method to L<Badger::Hub>.
+
+Fixed a bug in the L<auto_can|Badger::Class::Methods/auto_can()> feature
+of L<Badger::Class::Methods> which prevented it from working with subclasses.
+
+Fixed a bug in L<Badger::Debug> L<dump_ref()|Badger::Debug/dump_ref()>
+to make it directly call other C<dump_XXX()> functions instead of relying on
+inheritance of those methods through C<$self>.
+
+Added L<plurality()|Badger::Utils/plurality()>,
+L<inflect()|Badger::Utils/inflect()>,
+L<list_each()|Badger::Utils/list_each()>,
+L<hash_each()|Badger::Utils/hash_each()>,
+L<extend()|Badger::Utils/extend()>,
+L<merge()|Badger::Utils/merge()>,
+L<split_to_list()|Badger::Utils/split_to_list()>,
+L<join_uri()|Badger::Utils/join_uri()> and
+L<resolve_uri()|Badger::Utils/resolve_uri()>,
+to L<Badger::Utils>.
+
+Added additional delegate hooks to L<Badger::Utils> to load utility functions
+in L<Badger::Filesystem>, L<Badger::Timestamp>, L<Badger::Duration>,
+L<Badger::Logic> and L<Badger::URL>.
+
+Squashed a non-numerical warning in L<Badger::Timestamp>.
+
+Added the L<UTF8|Badger::Constants/UTF8>, L<JSON|Badger::Constants/JSON>
+and L<YAML|Badger::Constants/YAML> constants to L<Badger::Constants>.
+
+Fixed L<Badger::Codec::YAML> to work better with L<YAML::XS> and
+L<Badger::Codec::JSON> to work better with L<JSON::XS>.
+
+Fixed a typo/bug in the L<Badger::Factory/type_args()> method which was
+returning the wrong argument list.
+
+Fixed a parser bug in L<Badger::Logic>.
+
+Fixes to silence warnings in perl 5.22.
+
+=head2 Version 0.09 - 8th February 2012
+
+Added L<Badger::Codec::Timestamp>. Changed L<Badger::Timestamp> to numify
+values to remove leading zeroes (e.g. 2012/04/20 now yields a month of 4
+instead of 04).
+
+Fixed some obscure bugs in the module loading code in L<Badger::Class> and
+related modules that could potentially cause unpredictable results on
+case insensitive file systems (e.g. Apple's HFS with default settings).
+
+Added the L<restat()|Badger::Filesystem::Path/restat()> method to
+L<Badger::Filesystem::Path>.
+
+Added documentation for various methods that was missing.  Temporary
+disabled the Pod::Coverage tests on AUTOMATED_TESTING systems.  We know
+there's still stuff to do.
+
+Added SLASH to Badger::Constants
+
+=head2 Version 0.08 - 13th January 2012
+
+Restored the C<$VERSION> variable to L<Badger.pm|Badger> rather than using
+the C<version> import hook in L<Badger::Class> which confused PAUSE.
+
+Changed L<Badger::Test::Manager> to detect undefined results.
+
+Merged Michael Grubb's bug fix for L<Badger::Base>:
+L<https://github.com/abw/Badger/pull/1>
+
+Fixed some minor documentation issues.
+
+=head2 Version 0.07 - 2nd January 2012
+
+Added L<Badger::Storage>, L<Badger::Storage::Memory>.
+and L<Badger::Storage::Filesystem>.
+
+Added L<Badger::Codec::TT>.
+
+Added the L<permissions()|Badger::Filesystem::Path/permissions()> method to
+L<Badger::Filesystem::Path>. Added
+L<temp_directory()|Badger::Filesystem/temp_directory()> and
+L<temp_file()|Badger::Filesystem/temp_file()> methods to
+L<Badger::Filesystem>. Also changed the L<Path()|Badger::Filesystem/Path()>,
+L<File()|Badger::Filesystem/File()> and L<Dir()|Badger::Filesystem/Dir()>
+functions to short-circuit and return if passed a single object that is
+already of the expected type.
+
+Added some extra comparison methods to L<Badger::Timestamp>
+(L<not_equal()|Badger::Timestamp/not_equal()>,
+(L<not_before()|Badger::Timestamp/not_before()> and
+L<not_after()|Badger::Timestamp/not_after()>) and overloaded
+these and other methods onto the C<==>, C<!=>, C<E<lt>>, C<E<gt>>, C<E<lt>=>
+and C<E<gt>=> operators.
+
+Added the L<export_before()|Badger::Exporter/export_before()> and
+L<export_after()|Badger::Exporter/export_after()> methods to
+L<Badger::Exporter>.
+
+Added the L<if_env|Badger::Test/if_env> import hook and
+C<-a|Badger::Test/all()> option to L<Badger::Test> to make it easier to
+define tests that don't get run unless a particular environment variable
+is set (e.g. for Pod coverage/kwalitee tests that you only want to run
+if either of the C<RELEASE_TESTING> or C<AUTOMATED_TESTING> environment
+variables is set).
+
+Added the L<random_name()|Badger::Utils/random_name()>,
+L<camel_case()|Badger::Utils/camel_case()> and
+L<permute_fragments()|Badger::Utils/permute_fragments()> functions to
+L<Badger::Utils>. Also add some extra debugging code to
+L<params()|Badger::Utils/params()> and
+L<self_params()|Badger::Utils/self_params()> to catch any attempt to pass an
+odd number of arguments.
+
+Changed the L<Badger::Factory> module to use
+L<permute_fragments()|Badger::Utils/permute_fragments()> on the module path
+when specified as a single string. Also added the
+L<default()|Badger::Factory/default()> and
+L<names()|Badger::Factory/names()> methods along with their corresponding
+package variable magic.
+
+Added the L<debug_callers()|Badger::Debug/debug_callers()>,
+L<debugf()|Badger::Debug/debugf()> and L<debug_at()|Badger::Debug/debug_at()>
+methods to L<Badger::Debug>.
+
+Added the L<alias()|Badger::Class/alias()> method to
+L<Badger::Class>.
+
+Added the L<auto_can()|Badger::Class::Methods/auto_can()> method to
+L<Badger::Class::Methods>.
+
+Changed the L<Badger::Class::Config> module to store the configuration scheme
+in C<$CONFIG_SCHEMA> instead of C<$CONFIG>.
+
+Added the L<Badger::Codec::HTML> module which defines the C<html> codec.
+
+Changed the L<throw()|Badger::Base/throw()> method in L<Badger::Base> to
+pass the exception type to L<exception()|Badger::Base/exception()>.
+
+Changed the L<try()|Badger::Base/try()> method in L<Badger::Base> to
+preserve the list/scalar calling context and to handle false but defined
+values.
+
+Cleaned up and generalised the L<Badger::Hub> module.  The Badger-specific
+data has now been moved into L<Badger::Hub::Badger>.  The C<configure()>
+method is now called L<construct()|Badger::Hub/construct()>.
+
+=head2 Version 0.06
+
+Added L<copy_file()|Badger::Filesystem/copy_file()> and
+L<move_file()|Badger::Filesystem/move_file()> to L<Badger::Filesystem> and
+L<copy()|Badger::Filesystem/copy()> and L<move()|Badger::Filesystem/move()>
+methods to L<Badger::Filesystem::File>.
+
+Added L<chmod_path()|Badger::Filesystem/chmod_path()> to L<Badger::Filesystem>
+and L<chmod()|Badger::Filesystem::Path/chmod()> to L<Badger::Filesystem::Path>.
+
+Added L<Bin()|Badger::Filesystem/Bin()> to L<Badger::Filesystem>.
+
+Added the L<encoding()|Badger::Filesystem::File/encoding()> method to
+L<Badger::Filesystem::File> for specifying the encoding of a file, along
+with the L<utf8()|Badger::Filesystem::File/utf8()>,
+L<bytes()|Badger::Filesystem::File/bytes()>,
+L<crlf()|Badger::Filesystem::File/crlf()> and
+L<raw()|Badger::Filesystem::File/raw()> methods for enabling different
+encoding layers.
+
+Added the L<codec()|Badger::Filesystem::File/codec()> method to
+L<Badger::Filesystem::File> for specifying a serialisation codec to use in
+conjunction with the new  L<data()|Badger::Filesystem::File/data()> method.
+
+Added L<Badger::Timestamp>. This is returned by the new
+L<created()|Badger::Filesystem::Path/created()>,
+L<accessed()|Badger::Filesystem::Path/accessed()> and
+L<modified()|Badger::Filesystem::Path/modified()> methods in
+L<Badger::Filesystem::Path>.
+
+Added L<Badger::Logic>.
+
+Added L<Badger::Log> and L<Badger::Log::File>.
+
+Added L<numlike()|Badger::Utils/numlike()> to L<Badger::Utils>
+as an alias for C<looks_like_number>.  It's the numerical counterpart
+to L<textlike()|Badger::Utils/textlike()> and is significantly easier
+to type.
+
+Added L<debug_msg()|Badger::Base/debug_msg()> to L<Badger::Base>. Also added
+the C<Badger::Base::Trial> class definition for use with the
+L<try()|Badger::Base/try()> method.
+
+Added L<lib|Badger/lib> import hook to L<Badger>.
+
+Added L<bclass|Badger::Class/bclass> as an alias for
+L<class|Badger::Class/class> in L<Badger::Class>.
+
+Changed L<Badger::Class::Config> to maintain the order of configuration
+parameters where possible (i.e. when expressed as a list ref rather than
+a hash ref).  Also added C<target:var> fallback which looks in the target
+object or hash ref for the variable.  This allows options to default to
+the values set by preceeding options.
+
+Changed L<Badger::Codec::JSON> to use L<JSON::XS> if available.
+
+Mr T is now using Badger 0.06 in production code and is happy to report that
+everything seems to be working rather well.  Anyone for a game of tennis?
+
+=head2 Version 0.05 - 23rd December 2008
+
+Refactored L<Badger::Factory>.
+
+Added support to L<Badger::Exporter> for the C<=> pseudo-sigil which can be
+used to create constants on the fly.
+
+    package Badger::Example;
+    use Badger::Class
+        exports => {
+            tags => {
+                math => {
+                    e   => '=2.718',
+                    pi  => '=3.142',
+                    phi => '=1.618',
+                },
+            }
+        };
+
+    package main;
+    use Badger::Example ':math';
+
+    print e;            # 2.718
+    print pi;           # 3.142
+    print phi;          # 1.618
+
+Mr T is starting to feel rather confident about building a production system
+based on Badger v0.05.
+
+=head2 Version 0.04 - 2nd December 2008
+
+Added the L<throw_msg()|Badger::Base/throw_msg()> method to L<Badger::Base>.
+
+Added L<init_method|Badger::Class/init_method> hook to L<Badger::Class> and
+L<initialiaser()|Badger::Class/initialiaser()> to L<Badger::Class::Methods>.
+
+Changed L<Badger::Exception> L<match_type()|Badger::Exception/match_type()>
+method to accept a list or hash reference, or a string of whitespace delimited
+exception types.
+
+Changed L<Badger::Factory> to pass C<$name> as an argument to various methods.
+Also passes arguments to load() (required for Template::TT2::Plugins)
+Also modified L<item()|Badger::Factory/item()> to accept a non-textlike
+type argument which bypasses the module lookup.
+
+Moved a whole bunch of stuff out of L<Badger::Class> into C<Badger::Class::*>
+modules.
+
+Added L<Badger::Class::Config> for simple configuration.
+
+Added L<hash()|Badger::Methods/hash()> method to L<Badger::Methods> and
+L<hash_methods|Badger::Class|hash_methods> hook to L<Badger::Class>.
+
+Added L<trace()|Badger::Exception/trace> hook and related paraphernalia to
+L<Badger::Exception>. Added the C<-t> / C<--trace> command line options to
+L<Badger::Test> to enable it when running tests.  Also added C<-h> / C<--help>
+options.
+
+Added L<Codec()|Badger::Codecs/Codec()> exportable subroutine to
+L<Badger::Codecs>.
+
+Added L<Badger::Codec::URL>.  It's similar to L<Badger::Codec::URI>,
+but slightly different.  See the TT uri/url filters for the reason.
+
+Changed the L<prototype()|Badger::Prototype/prototype()> method in
+L<Badger::Prototype> to accept a single C<undef> value to clear any current
+prototype. Also added the L<has_prototype()|Badger::Prototype/has_prototype()>
+method.
+
+Mr T is looking on the bright side about the possibility of building a
+production system based on Badger v0.04, but still advises caution.
+
+=head2 Version 0.03 - 7th October 2008
+
+Added delegate loaders to L<Badger>.  This provides some semantic sugar
+for loading a bunch of different C<Badger::*> modules in one go.
+
+    use Badger
+        Filesystem  => 'FS $Bin',
+        Codecs      => 'storable base64',
+        Debug       => {
+            modules => 'My::Module',
+        };
+
+Added L<different()|Badger::Test::Manager/different()> to
+L<Badger::Test::Manager>.
+
+Added L<textlike()|Badger::Utils/textlike()> to L<Badger::Utils>
+
+Added the L<overload|Badger::Class/overload>
+L<as_text|Badger::Class/as_text> and
+L<is_true|Badger::Class/is_true> import hooks and related method to
+L<Badger::Class>.  These delegate to the C<overload> module.
+
+Added the L<print|Badger::Filesystem::File/print()> method to
+L<Badger::Filesystem::File>.
+
+Added support for
+L<dynamic root directories|Badger::Filesystem::Virtual/"virtual root directories">
+to L<Badger::Filesystem::Virtual>.
+
+Added the L<defaults|Badger::Class/defaults> and L<aliases|Badger::Class/aliases>
+hooks to L<Badger::Class>, implemented by L<Badger::Class::Defaults> and
+L<Badger::Class::Aliases>, respectively.  There are still experimental.
+
+Fixed up some stat handling in L<Badger::Filesystem> to help with subclassing
+in L<Badger::Filesystem::Virtual>
+
+Mr T pities the fool that attempts to builds a production system based on
+Badger version 0.03 without first evaluating it carefully and reading the
+documentation.
+
+=head2 Version 0.02 - 6th September 2008
+
+L<Badger::Class> got the L<vars|Badger::Class/vars()> method and hook
+for declaring and defining variables.
+
+L<Badger::Utils> gained the ability to load and export functions from
+L<Scalar::Util>, L<List::Util>, L<List::MoreUtils>, L<Hash::Util> and
+L<Digest::MD5>.
+
+Various documentation updates.
+
+Mr T admires the tenacity of anyone attempting to build a production system
+based on Badger v0.02 and hopes they have a thorough test suite.
+
+=head2 Version 0.01 - 27th August 2008
+
+This was the first release version.
+
+Mr T pities the fool who builds a production system based on Badger v0.01.
+
+=head1 AUTHOR
+
+Andy Wardley  E<lt>abw@wardley.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008-2013 Andy Wardley.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

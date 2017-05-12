@@ -1,0 +1,24 @@
+<h3>RANKING</h3>
+<div class="row">
+<table id="rankingdata" class="table table-bordered" cellspacing="0" width="100%">
+<thead>
+<tr>
+    <th>Player</th>
+    <th>Total Value</th>
+    <th>Money</th>
+    <th>Mission points</th>
+</tr>
+</thead>
+<tbody>
+[% FOREACH p IN players %]
+<tr class="[% p %]">
+<td>[% p %]</td>
+<td>[% players_data.$p.total_value %]</td>
+<td>[% players_data.$p.money %]</td>
+<td>[% players_data.$p.points %]</td>
+</tr>
+[% END %]
+</tbody>
+</table>
+<p class="text-muted">If you don't see your player here wait for the next turn or a data refresh</p>
+</div>

@@ -1,0 +1,41 @@
+=head1 USE
+
+If both your stub and its generated controller module needs to load a
+module, include a C<uses> statement in your controller's block.
+
+C<uses> takes a comma separated list of modules to use.  If you want
+to control their import lists, use pairs.  For example, this will use
+the modules with default importing:
+
+    uses Your::Module, Some::Other::Module;
+
+Add pairs to get the imports of your dreams:
+
+    uses Your::Module => `qw( :everything :and then some )`;
+
+Note that the value will be used literally to produce this:
+
+    use Your::Module qw( :everything :and then some );
+
+So, qw is a good choice (as it usually is).
+
+See also C<gen_uses> and C<stub_uses> which only add use statements
+to one of the modules.
+
+The C<plugins> keyword is the way to load Gantry plugin modules from
+the C<Gantry::Plugins::> namespace.
+
+Note that nothing is every added to a stub once it is made, so C<uses>
+statements added after stub generation are equivalent to C<gen_uses>
+statements as far as bigtop is concerned, but they could still serve
+as documentation.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Look for C<Exotic> in both C<lib/Kids/Child.pm> and C<lib/Kids/GEN/Child.pm>.
+Notice how C<Your::Module> lists imports explicitly.  If you don't provide a
+list, all of the C<@EXPORT> items will be explicitly listed.

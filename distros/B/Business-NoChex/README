@@ -1,0 +1,15 @@
+Business::NoChex
+
+A simple OO interface to the NoChex e-payment system.
+
+The module allows easy verification of payments automatically on your
+server via the NoCHex APC interface.
+
+The NoChex server can be instructed to call a specific URI with a POST
+operation whenever a payment is received on an account. This module 
+provides a method for validating the data and utility mehtods for
+accessing the values provided.
+
+Templates suitable for Template::Toolkit are also provided and a test
+script suitable for testing the operation and an example script of a typical 
+barebones use are also included.

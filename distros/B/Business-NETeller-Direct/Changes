@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::NETeller::Direct.
+
+0.01  Tue Aug  5 15:52:57 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Business::NETeller::Direct
+

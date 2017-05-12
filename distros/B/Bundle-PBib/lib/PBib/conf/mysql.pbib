@@ -1,0 +1,20 @@
+/* $Id: mysql.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * mysql configuration
+ *
+ */
+
+
+<biblio>
+	dbms mysql
+	quote-column-name 0
+	supports-lower 0
+</biblio>
+
+/*
+ * $Log: mysql.pbib,v $
+ * Revision 1.1  2003/06/16 09:10:54  tandler
+ * some new config files
+ * - default.pbib contains config that was previously directly in the perl source
+ *
+ */

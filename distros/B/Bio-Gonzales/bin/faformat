@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use 5.010;
+use Carp;
+
+use Bio::Gonzales::Seq::IO qw/faiterate/;
+use Bio::Gonzales::Seq::Filter qw/clean_pep_seq clean_dna_seq clean_rna_seq/;
+
+use Pod::Usage;
+use Getopt::Long;
+
+my %opt = (clean => '');
+GetOptions( \%opt, 'clean=s' ) or pod2usage(2);
+
+pod2usage( -exitval => 0, -verbose => 2 ) if ( $opt{help} );
+
+my $clean_fun;
+
+if ( $opt{clean} =~ /^p/i ) {
+  $clean_fun = \&clean_pep_seq;
+} elsif ( $opt{clean} =~ /^r/i ) {
+  $clean_fun = \&clean_rna_seq;
+} else {
+  $clean_fun = \&clean_dna_seq;
+}
+
+my $io = faiterate( \*STDIN );
+
+my $str;
+while ( my $so = $io->() ) {
+  if ( $opt{clean} ) {
+    $clean_fun->($so);
+  }
+  print $so->all_pretty;
+}

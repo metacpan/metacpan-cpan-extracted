@@ -1,0 +1,26 @@
+---
+abstract: 'Bitcoin Core API RPCs'
+author:
+  - 'Wesley Hinds <wesley.hinds@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bitcoin-RPC-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::RPC::Client: '0.93'
+  Moo: '1.001'
+  perl: '5.006'
+resources:
+  repository: https://github.com/whindsx/Bitcoin-RPC-Client 
+version: '0.05'

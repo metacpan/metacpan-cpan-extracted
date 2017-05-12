@@ -1,0 +1,13 @@
+This directory explains the statements you can put in the Bigtop
+config section:
+
+    config {
+        # this directory's statements here
+    }
+    app Name {
+    }
+
+If you are trying to figure out config blocks that go inside the
+app block look in docs/keyword_cookbook/app_config.  But note
+that app config blocks don't have specific statements, so the
+docs there are set up differently (as a single file).

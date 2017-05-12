@@ -1,0 +1,27 @@
+Mailing list is:
+
+   http://lists.danga.com/mailman/listinfo/brackup
+
+Rules:
+
+   http://danga.com/commit.bml
+
+SVN is now here, not on sixapart:
+
+   http://brackup.googlecode.com/svn/trunk/
+
+Overall, we now use Google code hosting:
+
+   http://code.google.com/p/brackup/
+   http://code.google.com/p/brackup/issues/list
+
+If you submit a patch to the mailing list, please use this:
+
+   http://codereview.appspot.com/
+
+It's a web-based code review tool, and it has command-line tools you
+can download to automate the uploads.  Send the codereview issue URL
+to the mailing list.
+
+
+   

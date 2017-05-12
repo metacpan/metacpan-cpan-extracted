@@ -1,0 +1,34 @@
+$VAR1 = bless( {
+                 'SEQUENCE' => [
+                                 bless( {
+                                          'ENUMERATED' => 1,
+                                          'ENUM_LIST' => {
+                                                           'loan' => 1,
+                                                           'estimate' => 4,
+                                                           'responder-specific' => 5,
+                                                           'locations' => 3,
+                                                           'copy-non-returnable' => 2
+                                                         }
+                                        }, 'Biblio::ILL::ISO::ILLServiceType' ),
+                                 bless( {
+                                          'ENUMERATED' => 2,
+                                          'ENUM_LIST' => {
+                                                           'loan' => 1,
+                                                           'estimate' => 4,
+                                                           'responder-specific' => 5,
+                                                           'locations' => 3,
+                                                           'copy-non-returnable' => 2
+                                                         }
+                                        }, 'Biblio::ILL::ISO::ILLServiceType' ),
+                                 bless( {
+                                          'ENUMERATED' => 3,
+                                          'ENUM_LIST' => {
+                                                           'loan' => 1,
+                                                           'estimate' => 4,
+                                                           'responder-specific' => 5,
+                                                           'locations' => 3,
+                                                           'copy-non-returnable' => 2
+                                                         }
+                                        }, 'Biblio::ILL::ISO::ILLServiceType' )
+                               ]
+               }, 'Biblio::ILL::ISO::ILLServiceTypeSequence' );

@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Biblio::Citation::Parser 1.10 Documentation - Required Software</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Required Software</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#what_software_does_biblio__citation__parser_need">What software does Biblio::Citation::Parser need?</a></li>
+	<ul>
+
+		<li><a href="#perl_modules">Perl Modules</a></li>
+		<li><a href="#installing_perl_modules">Installing Perl Modules</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="what_software_does_biblio__citation__parser_need">What software does Biblio::Citation::Parser need?</a></h1>
+<p>
+</p>
+<h2><a name="perl_modules">Perl Modules</a></h2>
+<dl>
+<dt><strong><a name="item_uri"><strong>URI</strong></a></strong><br />
+</dt>
+<dd>
+URI is required for the OpenURL encoding functions in Biblio::Citation::Parser::Utils.
+</dd>
+<p></p>
+<dt><strong><a name="item_text_3a_3aunidecode"><strong>Text::Unidecode</strong></a></strong><br />
+</dt>
+<dd>
+Used by Biblio::Citation::Parser::Citebase to allow for matching on unicode strings.
+</dd>
+<p></p>
+<dt><strong><a name="item_openurl"><strong>URI::OpenURL</strong> (Optional)</a></strong><br />
+</dt>
+<dd>
+If you wish to create valid OpenURLs, URI::OpenURL provides a set of functions for this purpose. The metadata produced by Biblio::Citation::Parser can be used with this module.
+</dd>
+<p></p>
+<dt><strong><a name="item_lite"><strong>SOAP::Lite</strong> (Optional)</a></strong><br />
+</dt>
+<dd>
+This module is required if you wish to use the ParaCite web services, but optional otherwise. This requires several other modules, which are available in the soap subdirectory
+of <a href="http://paracite.eprints.org/files/perlmods/.">http://paracite.eprints.org/files/perlmods/.</a>
+</dd>
+<p></p></dl>
+<p>There are also some dependencies for the above modules, including MIME::Base64, HTML::TagSet, and Digest::MD5. The latest versions of these can be obtained from <a href="http://www.cpan.org/">http://www.cpan.org/</a></p>
+<p>
+</p>
+<h2><a name="installing_perl_modules">Installing Perl Modules</a></h2>
+<p>This describes the way to install a simple perl module, some require a bit more effort. We will use the non-existent FOO module as an example.</p>
+<dl>
+<dt><strong><a name="item_unpack_the_archive_3a">Unpack the archive:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % tar xfvz FOO-5.2.34.tar.gz</pre>
+</dd>
+<dt><strong><a name="item_enter_the_directory_this_creates_3a">Enter the directory this creates:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % cd FOO-5.2.34</pre>
+</dd>
+<dt><strong><a name="item_run_the_following_commands_3a">Run the following commands:</a></strong><br />
+</dt>
+<dd>
+<pre>
+ % perl ./Build.PL
+ % ./Build
+ % ./Build test
+ % ./Build install</pre>
+</dd>
+</dl>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - Required Software</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

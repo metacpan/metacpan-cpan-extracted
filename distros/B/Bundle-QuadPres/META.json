@@ -1,0 +1,55 @@
+{
+   "abstract" : "A bundle to install external CPAN modules used by Quad-Pres",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bundle-QuadPres",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Config::IniFiles" : "0",
+            "Data::Dumper" : "0",
+            "Error" : "0",
+            "File::Find" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Links::Localize" : "0",
+            "MIME::Types" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bundle::QuadPres" : {
+         "file" : "lib/Bundle/QuadPres.pm",
+         "version" : "v0.8.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/quad-pres"
+      }
+   },
+   "version" : "v0.8.5"
+}

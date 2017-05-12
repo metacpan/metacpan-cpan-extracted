@@ -1,0 +1,11 @@
+Revision history for Perl extension Biblio::Thesaurus::SQLite.
+
+0.10	Bug release
+	- This time I used 'make dist' to make my distribution :) n000b
+
+0.09	First public release
+
+0.01  Tue Nov 29 17:10:24 2005
+	- original version; created by h2xs 1.23 with options
+		-A -X -c Biblio::Thesaurus::SQLite
+

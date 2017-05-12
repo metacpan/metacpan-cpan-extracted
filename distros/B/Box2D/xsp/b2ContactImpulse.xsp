@@ -1,0 +1,25 @@
+
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2ContactImpulse} class b2Contact
+{
+
+%{
+
+float32
+b2ContactImpulse::normalImpulses( index )
+	int index
+	CODE:
+		RETVAL = THIS->normalImpulses[index];
+	OUTPUT:
+		RETVAL
+
+%}
+
+};

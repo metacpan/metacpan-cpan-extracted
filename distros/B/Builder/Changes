@@ -1,0 +1,42 @@
+Revision history for Builder
+
+0.06    Sun December 16th 2012
+    * Amended t/builder_xml_pretty.t
+      - Test got hit by hash randomisation change at 5.17.6 (for perl 5.18) :(
+      - Fixed by just removing multiple attributes from test :)
+
+
+0.05	Sat March 6, 2010
+    * Minor tidying up
+      - Build.PL now has repo meta tag
+	
+
+0.04    Fri January 16, 2009
+    * Opps... Needed IO::WrapTie as well in builder_xml_output.t test  ;-(
+      - IO::WrapTie from IO::Stringy 2.110 package added in t/lib
+      
+
+0.03    Tues January 13, 2009
+    * Test builder_xml_output.t now uses IO::Scalar (in t/lib) so passes on 5.6.*
+      - IO::Scalar from IO::Stringy 2.110 package used in t/lib
+      
+
+0.02    Thurs January 1, 2009
+    * Updated test suite & docs.  Minor additions/fixes for new tests to work!
+      - CDATA now fixed
+      - block() method now expects hashref for 2nd arg (ie. named options)
+      - block() named arg changed from qualifiedAttrib to qualified_attr
+      - added builder_xml_pretty.t & builder_xml_output.t
+      - B::XML - added open_newline, close_newline & pre_indent args
+      - Added empty tags, eg. <br />  (tag can be defined with empty_tag arg)
+      - Oh and Happy New Year!
+       
+
+0.01    Weds November 26, 2008
+    * First ever version on CPAN
+      - Also my first ever CPAN module!
+      - Its a stripped back version as I get use to CPAN ropes
+      - Source code will be on GitHub (using git is also another first for me!)
+      - So will be merging back some newer changes from SVN over next few versions
+      - Including adding back in CSS module
+

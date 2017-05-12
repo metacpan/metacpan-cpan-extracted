@@ -1,0 +1,88 @@
+<html>
+<head>
+<title><: _( $info.title ) :><: $title ? ( ': ' ~ _($title) ) : '' :></title>
+<link href="<: $prefix :><: $info.avatar || 'favicon.ico' :>" rel="apple-touch-icon" />
+<link href="<: $prefix :><: $info.avatar || 'favicon.ico' :>" rel="icon" />
+
+<link rel="alternate" type="application/rss+xml" title="<: $name :> - RSS" href="<: $prefix :>feed" />
+
+: if system_file_exists( 'css/' ~ $info.layout ~ '/main.css' ) {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/<: $info.layout :>/main.css" />
+: } else {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/main.css" />
+: }
+
+: if system_file_exists( 'css/' ~ $info.layout ~ '/print.css' ) {
+<link rel="stylesheet" type="text/css" media="print" href="<: $prefix :>system/css/<: $info.layout :>/print.css" />
+: } else {
+<link rel="stylesheet" type="text/css" media="print" href="<: $prefix :>system/css/base/print.css" />
+: }
+
+: if system_file_exists( 'css/' ~ $info.layout ~ '/' ~ $info.theme ~ '.css' ) {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/<: $info.layout :>/<: $info.theme :>.css" />
+: } elsif system_file_exists( 'css/base/' ~ $info.theme ~ '.css' ) {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/<: $info.theme :>.css" />
+: } else {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/orange.css" />
+: }
+
+<script type="text/javascript" src="<: $prefix :>system/js/base/prettify.js"></script>
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/prettify.css" />
+
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.js"></script>
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.hoverIntent.js"></script>
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.cookie.js"></script>
+<script type="text/javascript" src="<: $prefix :>system/js/base/beagle.js"></script>
+
+: if $admin {
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.terminal.js"></script>
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/jquery.terminal.css" />
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.form.js"></script>
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/markitup_set.css" />
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/markitup_skin.css" />
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.markitup.js"></script>
+<script type="text/javascript" src="<: $prefix :>system/js/base/jquery.markitup.set.js"></script>
+<script type="text/javascript" src="<: $prefix :>system/js/base/beagle-admin.js"></script>
+
+: if system_file_exists( 'css/' ~ $info.layout ~ '/admin.css' ) {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/<: $info.layout :>/admin.css" />
+: } else {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/admin.css" />
+: }
+
+: }
+
+: if $info.style {
+<link rel="stylesheet" type="text/css" href="<: $prefix :><: $info.style :>" />
+: }
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<script type="text/javascript">
+$( function() {
+beagleInit( { admin: 1 } );
+: if $admin {
+    beagleAdminInit( { } );
+: }
+
+});
+</script>
+
+: for $css -> $item {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/<: $item :>" />
+: }
+
+: for $js -> $item {
+<script type="text/javascript" src="<: $prefix :>system/<: $item :>"></script>
+: }
+
+</head>
+<body>
+
+<div class="hidden name"><: $name :></div>
+
+: if template_exists( 'menu.tx' ) {
+: include 'menu.tx';
+: }
+: include 'container.tx';
+

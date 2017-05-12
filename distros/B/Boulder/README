@@ -1,0 +1,34 @@
+This is Boulder version 1.15.
+
+Boulder provides a simple stream-oriented format for transmitting data
+objects between one or more processes.  It does not provide for the
+serialization of Perl objects the way FreezeThaw or Data::Dumper do,
+but it does provide the advantage of being language independent.
+
+In addition to a stream-oriented interface, Boulder comes with a
+simple record-oriented database-oriented interface, Boulder::Store,
+which provides query and search capabilities comparable to many flat
+file DBMS systems.
+
+At the MIT Genome Center, Boulder is used for many interprocess
+communication tasks, as well as an abstract database interface for
+several large databases, including GenBank.
+
+To install, run the following commands:
+
+	% perl Makefile.PL
+	% make
+	% make test (optional)
+	% make install
+
+If any of the tests fail, run "make test TEST_VERBOSE=1" and note
+which subtests fail.  Note that you will need the DB_File module
+installed in order to take advantage of the Boulder::Store database
+functions.
+
+Please see the documentation, Boulder.pod, and the various .pm files
+for more information.  See the eg/ directory for some practical
+examples.
+
+Lincoln Stein
+12/02/98

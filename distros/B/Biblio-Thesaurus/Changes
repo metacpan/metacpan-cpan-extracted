@@ -1,0 +1,194 @@
+Revision history for Perl extension Biblio::Thesaurus.
+
+0.43 Fri Jun  8 17:34:05 WEST 2012 - r11219
+     - Fixed pod encoding issues.
+     - Moved some scripts to examples folder.
+
+0.42 Sat Jul 23 20:08:26 WEST 2011
+     - Removed stupid script from the module.
+
+0.41 Sat Jul 23 19:32:45 WEST 2011
+     - Nothing relevant. Makefile.PL tweak.
+
+0.40 Sat Feb 26 18:14:13 WET 2011
+     - Yet another missing file in MANIFEST
+
+0.39 Fri Feb 25 21:17:41 WET 2011
+     - Added missing file to MANIFEST
+
+0.38 Fri Feb 25 17:59:59 2011
+     - Fixed multiload (I hope). Added respective test.
+
+0.37 Tue Nov 09 21:56:00 2010
+     - Added toHash method to export tree of relations;
+     - Some more // for down-translation method that was issuing many
+       warnings on undefined values.
+
+0.36 Sun Sep 12 11:25:00 2010
+     - Require 5.10 (just one //=, but more later, I expect);
+
+0.35 Fri Sep 10 19:33:00 2010
+     - Fixed encoding support.
+
+0.34 Fri Sep 10 15:22:00 2010
+     - added method to export thesaurus in Json format
+
+0.33 Fri Oct 03 17:07:00 2008
+     - Fixed bug in function terms;
+
+0.32 Fri Sep 05 14:43:00 2008
+     - Added parser robustness;
+     - Fixed Thesaurus2TeX;
+
+0.31 Mon Aug 04 21:10:00 2008
+     - Stupid Mac extended attributes. Now fixed.
+
+0.30 Mon Aug 04 18:01:02 2008
+     - added 'deleteRelation' method;
+     - added extra functionality to 'hasRelation' method;
+
+0.29 Thu Jul 10 18:20:00 2008
+    - removed all references to $', $` and $& (opefully a speed boost);
+    - corrected a bug referring to the baselang without being in uppercase;
+    - default baselang changed from ? to _;
+    - support for multiple external relations with same relation identifier
+    - fix transitive-closure not to enter endless loops;
+    - fix thesaurusTranslate to treat correctly external relations;
+    - added 'hasRelation' method;
+
+0.28 Wed May 30 14:43:00 2007
+     - Added %enc encoding command;
+     - Bug fixes;
+
+0.27 Wed Jul 20 21:13:00 2005
+     - Forgot to add thesaurus2TMX to the MANIFEST file. Sorry
+
+0.26 Wed Jul 20  8:26:00 2005
+     - Added XML::TMX optional dependency to install thesaurus2TMX
+       script
+
+0.25 Sat Apr  2 16:12:00 2005
+     - Added some utility string to be installed;
+     - Support for multiline terms;
+     - Multi-line continuations are handled better;
+
+0.24 Thu Mar 24 21:48:00 2005
+     - Added some information missing on the POD;
+     - New README file;
+
+0.23 Wed Nov 10 10:44:00 2004
+     - Corrected bug dumping ISO thesaurus with external
+	  relationships;
+
+0.22 Sat Nov 06 16:54:00 2004
+     - Corrected a test to run under Windows
+
+0.21 Mon Oct 25 21:42:00 2004
+     - Moved Thesaurus.pm to lib/Biblio/Thesaurus.pm
+     - Added some forgoten examples;
+
+0.20 Mon Oct 25 21:29:00 2004
+     - Added tests for thesaurus union;
+     - Corrected bug on thesaurus union;
+     - Corrected bug on C<<terms>> method;
+
+0.19 Wed Sep 29 17:25:00 2004
+     - Added pod and pod-coverage tests;
+     - Improved documentation;
+     - Removed some redundant code;
+
+0.18 Wed Sep 29 16:25:00 2004
+     - Fixed problem with new 'append' function on CGI
+
+0.17 Fri Oct 31 10:11:12 2003
+	- Bug fixes
+
+0.16 Somewhere in 2003
+	- Use references
+
+0.15 Fri Sep 15 02:03:04 2002
+	- Renamed to Biblio-Thesaurus
+	- More options to navigate method (level1hide)
+	- Ignore repeated terms;
+	- Removed Library::MLang dependency;
+
+0.14 Sat May 31 08:09:10 2002
+	- Added more options to navigate method (level2hide,
+          level2size, scriptname)
+	- Removed some warnings sent to STDOUT;
+
+0.13 Thu Dec 19 02:03:04 2001
+	- Added the no title and the expand options to the navigate
+          method;
+
+0.12  Wed Dec 01 02:03:04 2001
+	- More tests
+	- Some bug fixes
+
+0.11  Fri Nov 02 08:32:99 2001
+	- Bug fixes
+	- Added some error handling when loading ISOs
+	- Type case maintained
+	- More structure for multi-lingue thesaurus
+	- Added some more tests
+
+0.10  Sat Sep 08 21:59:59 2001
+	- extern class definition;
+	- transitive closure function;
+	- depthfirst function;
+	- navigate function with custom expansion;
+	- auto-completion after ISO load;
+	- language class definition;
+	- navigation method restructured for language usage;
+	- navigation method does not require script name, anymore;
+	- description command support multi-language;
+	- renamed languages and setLanguages commands to
+	  interfaceLanguages and interfaceSetLanguages;
+	- corrected bug on autocomplete function;
+	- top command added
+
+0.09  Fri Jan 19 20:01:10 2001
+	- Methods renamed without the thesaurus preffix;
+	- thesaurusStore function renamed to storeOn;
+	- thesaurusDump function renamed to save;
+	- Function getHTMLTop;
+	- i18n documentation;
+	- dt and full_dt functions (see pod...).
+
+0.08  Sun Jan  7 16:49:19 2001
+	- Multi-language support.
+
+0.07  Fri Jan  5 11:10:09 2001
+	- Documentation in English.
+
+0.06  Thu Jan  4 20:46:13 2001
+	- Renamed to be included under Library modules.
+
+0.05  Fri Dec 29 17:58:00 2000
+	- Corrected HTML generated code;
+	- Better documentation;
+	- Bug-fixes.
+
+0.04  Wed Dec 27 17:12:28 2000
+	- Functions:
+	  > thesaurusEdit;
+	  > thesaurusNavigate.
+	- bug-fixes.
+
+0.03  Wed Dec 27 10:00:00 2000
+	- Functions:
+	  > thesaurusAddTerm;
+	  > thesaurusAddRelations;
+	  > thesaurusDeleteTerm.
+
+0.02  Tue Dec 26 15:36:09 2000
+	- Functions:
+	  > thesaurusLoad;
+	  > thesaurusComplete;
+	  > thesaurusGetHTMLTerm;
+          > thesaurusDumpHTML;
+          > thesaurusAddInverse;
+          > thesaurusDump.
+
+0.01  Tue Nov 28 15:51:04 2000
+	- original version; created by h2xs 1.19.

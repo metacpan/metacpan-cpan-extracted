@@ -1,0 +1,21 @@
+=head1 USE
+
+The C<page_link_label> places the page's URL into the navigation links.
+If you don't include a C<page_link_label>, the page will not be reachable
+from default naviagation links.  You'll need some other way for users
+to get to it.
+
+=head1 THE EXAMPLE
+
+When you try to build the example with:
+
+    bigtop -c example.bigtop all
+
+change to the Kids directory and start app.server (note that you might
+need to build the sqlite database first).  Hit the base url:
+
+    http://localhost:8080/
+
+And notice the Child link there.  If you click on that link, it will
+take you to the Child controller's page.  There you should see the
+dev navigation pull down menu, which will also include Child.

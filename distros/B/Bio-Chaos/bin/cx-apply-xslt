@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# TODO: allow other xslt processors; eg xalan
+if (system("which xsltproc > /dev/null")) {
+    print <<EOM
+You need xsltproc (part of libxslt) for this.
+
+See http://www.fruitfly.org/chaos-xml
+
+[This script can easily be modified so that other xslt processors can
+be used; eg java Xalan. I believe xsltproc to be the fastest. If you would
+like this script to be extended to use a different xslt processor, please
+email cjm at fruitfly dot org
+
+EOM
+;
+    exit 1;
+}
+my $xsl = shift @ARGV;
+my @files = ();
+while ($ARGV[0] && $ARGV[0] !~ /^\-(.+)/) {
+    push(@files, shift @ARGV);
+}
+
+if (!$xsl) {
+    print "You must specify an XSLT logical name!\n";
+    exit 1;
+}
+if (!@files) {
+  @files = ('-');
+}
+
+# if CHAOS_HOME is set then this specifies the location of the xslt dir
+#  if it is not set, assume we are using an installed version of cx-perl,
+#  in which case, the xslts will be located along with the perl modules
+my $xslt_file;
+my $CHAOS_HOME = $ENV{CHAOS_HOME};
+if ($CHAOS_HOME) {
+    # env var takes precedence;
+    # developers should use this
+    $xslt_file = "$CHAOS_HOME/xsl/$xsl.xsl";
+}
+
+# default location is with perl modules
+if (!$xslt_file || !-f $xslt_file) {
+    # user-mode; xsl will be wherever the CX modules are installed
+    require "Bio/Chaos/ChaosGraph.pm";
+    my $dir = $INC{'Bio/Chaos/ChaosGraph.pm'};
+    $dir =~ s/ChaosGraph\.pm/xsl/;
+    $xslt_file = "$dir/$xsl.xsl";
+}
+
+if (!-f $xslt_file) {
+    print <<EOM
+I expected to find a file: "$xslt_file"
+
+You may need to download the XSLT files from the cx-dev distribution;
+see
+
+  http://www.fruitfly.org/chaos-xml/xsl
+
+Set the env var CHAOS_HOME to point to the directory containing the "xml"
+directory
+
+EOM
+;
+    exit 1;
+}
+system("xsltproc @ARGV $xslt_file @files");
+exit 0;
+
+sub usage {
+    print <<EOM
+cx-apply-xslt XSLT-NAME [XML FILE...] [XSLTPROC-OPTIONS...]
+
+examples
+
+  cx-apply-xslt cx-chado-to-chaos CG16983.chado.xml
+
+EOM
+  ;
+}

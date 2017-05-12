@@ -1,0 +1,11 @@
+Revision history for Perl extension BLOB.
+
+1.01  2008-05-22 03:02
+        - Completed the function interface (requested by Adam Kennedy)
+        - Documented the object interface (requested by Adam Kennedy)
+        - Made 5.0 compatible by removing "our"
+        - Made unit tests 5.0 compatible by removing Test::More dependency
+        - Improved tests
+
+1.00  2008-05-20 22:54
+        - Initial CPAN release

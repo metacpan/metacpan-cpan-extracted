@@ -1,0 +1,35 @@
+
+severity = 1
+
+verbose = 8
+
+#------------------------------------------------------------------------------
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|SYNOPSIS|VERSION|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|TEST AND QUALITY|QUALITY AND CODING STANDARD|BUGS AND LIMITATIONS|BUG REPORTING|TODO|SEE ALSO|AUTHOR|COPYRIGHT|LICENSE
+script_sections = NAME|SYNOPSIS|VERSION|DESCRIPTION|SUBROUTINES AND METHODS|DIAGNOSTICS|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES|TEST AND QUALITY|QUALITY AND CODING STANDARD|BUGS AND LIMITATIONS|BUG REPORTING|TODO|SEE ALSO|AUTHOR|COPYRIGHT|LICENSE
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#REF: http://logiclab.jira.com/wiki/display/OPEN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-Subroutines::RequireArgUnpacking]
+#Params::Validate
+
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+
+[-Variables::ProhibitPunctuationVars]
+
+[-Documentation::RequirePodLinksIncludeText]
+
+[-ValuesAndExpressions::RequireNumberSeparators]
+
+[-RegularExpressions::RequireDotMatchAnything]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-RegularExpressions::RequireLineBoundaryMatching]
+
+[-CodeLayout::RequireTidyCode]

@@ -1,0 +1,51 @@
+[Export quote Russia *TRICKED* ] 50
+[Government strenght Russia] 70
+[Export quote Germany *TRICKED* ] 50
+[Government strenght Germany] 100
+[Export quote Italy *TRICKED* ] 50
+[Government strenght Italy] 100
+[Export quote France *TRICKED* ] 50
+[Government strenght France] 70
+[Side for friendship between Russia and Germany] 1
+[Random factor for friendship between Russia and Germany [floor: 25]] 22
+[Side for friendship between Russia and Italy] 0
+[Random factor for friendship between Russia and Italy [floor: 25]] 16
+[Side for friendship between Russia and France] 1
+[Random factor for friendship between Russia and France [floor: 25]] 23
+[Side for friendship between Germany and Italy] 1
+[Random factor for friendship between Germany and Italy [floor: 35]] 19
+[Side for friendship between Germany and France] 0
+[Random factor for friendship between Germany and France [floor: 35]] 9
+[Side for friendship between Italy and France] 1
+[Random factor for friendship between Italy and France [floor: 35]] 8
+[Starting production0 Russia *TRICKED* ] 20
+[Starting production1 Russia *TRICKED* ] 20
+[Starting production2 Russia *TRICKED* ] 20
+[Starting production3 Russia *TRICKED* ] 20
+[Starting production0 Germany *TRICKED* ] 30
+[Starting production1 Germany *TRICKED* ] 30
+[Starting production2 Germany *TRICKED* ] 30
+[Starting production3 Germany *TRICKED* ] 30
+[Starting production0 Italy *TRICKED* ] 30
+[Starting production1 Italy *TRICKED* ] 30
+[Starting production2 Italy *TRICKED* ] 30
+[Starting production3 Italy *TRICKED* ] 30
+[Starting production0 France *TRICKED* ] 10
+[Starting production1 France *TRICKED* ] 10
+[Starting production2 France *TRICKED* ] 10
+[Starting production3 France *TRICKED* ] 10
+[Crisis generation: choosing hate] <<array>>, first result: BalanceOfPower::Relations::Friendship=HASH(0x3bad270)
+[Crisis generation: choosing crisis] <<array>>, Array empty
+[Crisis action choose] 6
+[Crisis generation: choosing hate] <<array>>, first result: BalanceOfPower::Relations::Friendship=HASH(0x3bad270)
+[Crisis generation: choosing crisis] <<array>>, Array empty
+[Crisis action choose] 1
+[Crisis generation: choosing hate] <<array>>, first result: BalanceOfPower::Relations::Friendship=HASH(0x3bad270)
+[Crisis generation: choosing crisis] <<array>>, Array empty
+[Crisis action choose] 9
+[Crisis generation: choosing hate] <<array>>, first result: BalanceOfPower::Relations::Friendship=HASH(0x3bad270)
+[Crisis generation: choosing crisis] <<array>>, Array empty
+[Crisis action choose] 5
+[Crisis generation: choosing hate] <<array>>, first result: BalanceOfPower::Relations::Friendship=HASH(0x3b94eb0)
+[Crisis generation: choosing crisis] <<array>>, Array empty
+[Crisis action choose] 4

@@ -1,0 +1,72 @@
+Revision history for BioX-Map
+
+0.0.12 2016-06-03T03:43:45
+ [Yan Xueqing]
+ - Add parallel support for compare app
+ - Auto commited by dzil with version 0.0.11 at 03-Jun-2016
+ - Add support for fastq.gz and fq.gz
+ - Auto commited by dzil with version 0.0.10 at 26-May-2016
+ - Fixed genome file not exist
+
+0.0.11 2016-06-03T03:32:15Z
+ [Yan Xueqing]
+ - Add support for fastq.gz and fq.gz
+ - Auto commited by dzil with version 0.0.10 at 26-May-2016
+ - Fixed genome file not exist
+
+0.0.10 2016-05-26T05:55:42Z
+ [Yan Xueqing]
+ - Fixed genome file not exist
+
+0.0.9 2016-05-26T05:33:41Z
+ [Yan Xueqing]
+ - Fixed parameter document
+
+0.0.8 2016-05-26T05:25:32Z
+ [Yan Xueqing]
+ - Add print consumed time
+
+0.0.7 2016-05-26T03:59:32Z
+ - No changes found
+
+0.0.6 2016-05-26T03:51:53Z
+ - No changes found
+
+0.0.5 2016-05-26T03:50:39Z
+ - No changes found
+
+0.0.4 2016-05-26T03:49:07Z
+ [Yan Xueqing]
+ - Add pod text for biox_map
+
+0.0.3 2016-05-26T03:10:18Z
+ - No changes found
+
+0.0.2 2016-05-26T02:27:46Z
+ [Yan Xueqing]
+ - Add another test fq file
+ - Modified error information
+ - Remove path of samplename in summary file
+ - Add '' for infile and outfile parameter
+ - Fixed output path error and fastq file check error
+ - Add MapCompare module
+ - Add default suffix for bwa and soap
+
+0.0.1 2016-05-25T11:48:08Z
+ [Yan Xueqing]
+ - Auto commited by dzil with version 0.0.1 at 25-May-2016
+ - Add some pod text to pass dzil test
+ - Remove some test
+ - Add execute file
+ - Add CLIS compare module
+ - Add pod text to pass dzil test
+ - Modified return value
+ - Add CLIS mapping module
+ - Add clis module
+ - Modified attribute
+ - Add outdir paramter and Fixed bwa run failure
+ - Add test data and mapping tool
+ - Add test file for BioX-Map
+ - Add biox-map module
+ - Initialize gitrepo with `dzil new`
+

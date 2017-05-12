@@ -1,0 +1,497 @@
+<prospectOutput>
+<threading source="SOMA_HUMAN.fa" template="1alu">
+<pdbcode>1alu</pdbcode>
+<pdbchain> </pdbchain>
+<templateName>1alu</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>157</tempLen>
+   <rawScore>-1054.75</rawScore>
+   <mutationScore>-2699.00</mutationScore>
+   <singletonScore>-676.71</singletonScore>
+   <pairwiseCore>-5566.10</pairwiseCore>
+   <pairwiseFull>-5660.50</pairwiseFull>
+   <gapPenalty>1634.40</gapPenalty>
+   <ssfit>686.56</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.00</radiusOfGyration>
+   <svmScore>6.643</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1alu">
+<seq>LTSSERIDKQIRYILDGISALRKETCNKSNMCENLNLPKMAEKDGCFQSGFNEETCLVKIITGLLEFEVYLEYLQNRFESSEEQARAVQMSTKVLIQFLQKKAKNLDAITTPDPTTNASLLTKLQAQNQWLQDMTTHLILRSFKEFLQSSLRALRQM</seq>
+</templateSeq>
+<alignment size="247">
+<target_ss>                                                                                                                                                                                                                                                                            </target_ss>
+<target>MATGSRTSL------LLAFGL------------LC----LPWL--QEG---SAFP--TIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISL-LLIQSWLEPVQFL--RSVFANSLVYGASDSNVYDLLKDLEEGIQT--------LMGRLEDGSPRTGQ---------IFKQTYSKFDTNSHNDDALLKNYGLLYCFR--KDMDKVETFLRIVQCRSVEGSCGF</target>
+<align>...  |  :      :|  |:            .|    || .   :|   | |   |  | ::    .|              || | |:  |    .|||      |       |  |..        . .|  .||       |||  :.                   |.| : | |        |. :|.       |         | : ..  |          |         |  : |                     </align>
+<template>LTSSER--IDKQIRYILD-GISALRKETCNKSNMCENLNLPKMAEKDGCFQSGFNEETC-LVKII-TGLL--------------EF-EVYL--E----YLQN-R----F------ESSEEQARA------VQMSTKVLI-------QFLQKKA-------------------KNL-DAITTPDPTTNASLLTKLQA----QNQWLQDMTTHLILR-SFKEF----------LQS-----SLRALRQM---------------------</template>
+<template_ss>llhhhh  hhhhhhhhhh hhhhhhhhhhhhhllllllllllllhhhllllllllhhhh hhhhh hhhh              hh hhhh  h    hhhh h    l      lllhhhhhh      hhhhhhhhh       hhhhhhl                   lll lllllllhhhhhhhhhhhhl    llhhhhhhhhhhhhh hhhhh          hhh     hhhhhlll                     </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>41</nident>
+   <nalign>247</nalign>
+   <nmatched>106</nmatched>
+   <alignFreq>16.60</alignFreq>
+   <templateFrom>19</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>184</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>1</targetFrom> <targetFromChar>M</targetFromChar>
+   <targetTo>196</targetTo> <targetToChar>M</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1bgc">
+<pdbcode>1bgc</pdbcode>
+<pdbchain> </pdbchain>
+<templateName>1bgc</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>158</tempLen>
+   <rawScore>-1085.02</rawScore>
+   <mutationScore>-2620.00</mutationScore>
+   <singletonScore>-696.20</singletonScore>
+   <pairwiseCore>-2969.80</pairwiseCore>
+   <pairwiseFull>-4840.40</pairwiseFull>
+   <gapPenalty>1492.80</gapPenalty>
+   <ssfit>738.38</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.01</radiusOfGyration>
+   <svmScore>4.832</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1bgc">
+<seq>SLPQSFLLKCLEQVRKIQADGAELQERLCAAHKLCHPEELMLLRHSLGIPQAPLSSCSSQSLQLRGCLNQLHGGLFLYQGLLQALAGISPELAPTLDTLQLDVTDFATNIWLQMEDLGAAPAMPTFTSAFQRRAGGVLVASQLHRFLELAYRGLRYLA</seq>
+</templateSeq>
+<alignment size="250">
+<target_ss>                                                                                                                                                                                                                                                                     </target_ss>
+<target>MATGSRTSL----LLAFGLLCLPWLQ----EGSAFPTIPLSRLFDNAMLRAHRL-HQLAFDTYQEFEEAYIPKE-----QKYSFLQNPQTSL--CFSESIPTPSNREETQQKSNLELLR--ISLL--LIQSW--LEPVQF---LRSV------FANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSP-----------RTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVE--GSCGF</target>
+<align>       ||    ||     ||  .     :|.        ||       ||:| |               | |             ||..|  | |.|:         | :  |  |.  : |   |:|.   : | .    | ..      ||         .|.:     .|:     .|     .|           |.|                        |.|      . :   || :   | .        </align>
+<template>-------SLPQSFLLK----CLEQVRKIQADGAEL----QERLCA-----AHKLCH---------------PEELMLLRHSLGI---PQAPLSSCSSQSL---------QLRGCLNQLHGGLFLYQGLLQALAGISP-ELAPTLDTLQLDVTDFA---------TNIW---LQMED-----LG----AAPAMPTFTSAFQRRAG------------------------GVLVA--SQLHR---FLELAY-RGLRYLA----</template>
+<template_ss>       lllhhhhhh    hhhhhhhhhhhhhhh    hhhhhh     hhllll               hhhhhllhhhhll   lllllhhhlllll         lhhhhhhhhhhhhhhhhhhhhhllllll llhhhhhhhhhhhhhhh         hhhh   hhhhh     hl    llllllllllhhhhhhh                        hhhhh  hhhhh   hhhhhh hhhhhll    </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>42</nident>
+   <nalign>250</nalign>
+   <nmatched>114</nmatched>
+   <alignFreq>16.80</alignFreq>
+   <templateFrom>9</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>173</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>8</targetFrom> <targetFromChar>S</targetFromChar>
+   <targetTo>213</targetTo> <targetToChar>G</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1lki">
+<pdbcode>1lki</pdbcode>
+<pdbchain> </pdbchain>
+<templateName>1lki</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>172</tempLen>
+   <rawScore>-1361.52</rawScore>
+   <mutationScore>-2858.00</mutationScore>
+   <singletonScore>-830.67</singletonScore>
+   <pairwiseCore>-4716.00</pairwiseCore>
+   <pairwiseFull>-4487.90</pairwiseFull>
+   <gapPenalty>1524.00</gapPenalty>
+   <ssfit>803.15</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.08</radiusOfGyration>
+   <svmScore>5.192</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1lki">
+<seq>NATCAIRHPCHGNLMNQIKNQLAQLNGSANALFISYYTAQGEPFPNNVEKLCAPNMTDFPSFHGNGTEKTKLVELYRMVAYLSASLTNITRDQKVLNPTAVSLQVKLNATIDVMRGLLSNVLCRLCNKYRVGHVDVPPVPDHSDKEAFQRKKLGCQLLGTYKQVISVVVQAF</seq>
+</templateSeq>
+<alignment size="237">
+<target_ss>                                                                                                                                                                                                                                                                         </target_ss>
+<target>MATGSRTSLLLAFGLLCL---PWLQEGSAFPTIPLSRLFDNAMLRAHRLHQL---------AFDTYQEFEEAYIPKE-QKYSFLQNPQTSLCFSESIPT----PS---NREETQQKSNL-ELLRISLLLIQSWLEPVQFLRSVFAN-------------SL---VYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFD---TNSHND-DAL-LKNYGLLYC-----FRKDMDKV-ETFLRIVQCRSVEGSCGF</target>
+<align>                |    |    |          | .   ::   | ||         ..  |    |.. |   .|          ||     |     ||   |  |   |. | || |.           | .| .  .|             ||   .    .. . |..: |   :  .. || .   | | .        |      | | :|   |  |   |     .:  .  | ..|               </align>
+<template>-------------NATCAIRHPC--HGN---------LMNQ--IK-NQLAQLNGSANALFISY--YTAQGEPF-PNNVEK----------LC----APNMTDFPSFHGNGTE---KTKLVELYRM-----------VAYLSASLTNITRDQKVLNPTAVSLQVKL----NATI-DVMRGL---LSNVLCRLCNKY-RVGHV--------DVPPVPDHSDKEAFQRKKLG---CQLLGTYKQVISVVVQAF---------------</template>
+<template_ss>             leehhhllll  lll         hhhh  hh hhhhhhhhhhhhhhhhh  hhhhllll hhhhhh          hl    lllllllllllllllh   hhhhhhhhhh           hhhhhhhhhhhhhhhhhhllllhhhhhhh    hhhh hhhhhh   hhhhhhhhhhll lllee        llllllllllllhhhhhhhh   hhhhhhhhhhhhhhhlll               </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>43</nident>
+   <nalign>237</nalign>
+   <nmatched>124</nmatched>
+   <alignFreq>18.14</alignFreq>
+   <templateFrom>9</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>180</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>14</targetFrom> <targetFromChar>G</targetFromChar>
+   <targetTo>202</targetTo> <targetToChar>F</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1huw">
+<pdbcode>1huw</pdbcode>
+<pdbchain> </pdbchain>
+<templateName>1huw</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>166</tempLen>
+   <rawScore>-6048.04</rawScore>
+   <mutationScore>-6643.00</mutationScore>
+   <singletonScore>-583.42</singletonScore>
+   <pairwiseCore>-5235.60</pairwiseCore>
+   <pairwiseFull>-9072.60</pairwiseFull>
+   <gapPenalty>103.20</gapPenalty>
+   <ssfit>1075.18</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>1.81</radiusOfGyration>
+   <svmScore>1.512</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1huw">
+<seq>FPTIPLSRLADNAWLRADRLNQLAFDTYQEFEEAYIPKEQIHSFWWNPQTSLCPSESIPTPSNKEETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEALLKNYGLLYCFNKDMSKVSTYLRTVQCRSVEGSCGF</seq>
+</templateSeq>
+<alignment size="191">
+<target_ss>                                                                                                                                                                                                                         </target_ss>
+<target>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</target>
+<align>                          ||||||||| ||| ||| || |||||||||||||||||||  ||  ||||||| |||||||||:|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||                         |||||||||||| ||| || |.|| ||||||||||||</align>
+<template>--------------------------FPTIPLSRLADNAWLRADRLNQLAFDTYQEFEEAYIPKEQIHSFWWNPQTSLCPSESIPTPSNKEETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLE-------------------------ALLKNYGLLYCFNKDMSKVSTYLRTVQCRSVEGSCGF</template>
+<template_ss>                          lllllhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhllhhhhhhhhhlllllllllllllllllhhhhhlllhhhhhhhhhhhhhllllhhhhhhhhhhhllllllllllhhhhhhhhhhhhhhhhhhhl                         lhhhhhhhhhhhhhhhhhhhhhhhhhhhhllllllll</template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>151</nident>
+   <nalign>191</nalign>
+   <nmatched>166</nmatched>
+   <alignFreq>79.06</alignFreq>
+   <templateFrom>1</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>191</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>27</targetFrom> <targetFromChar>F</targetFromChar>
+   <targetTo>217</targetTo> <targetToChar>F</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1f6fa">
+<pdbcode>1f6f</pdbcode>
+<pdbchain>a</pdbchain>
+<templateName>1f6fa</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>183</tempLen>
+   <rawScore>-2312.27</rawScore>
+   <mutationScore>-3527.00</mutationScore>
+   <singletonScore>-721.39</singletonScore>
+   <pairwiseCore>-3560.90</pairwiseCore>
+   <pairwiseFull>-5436.20</pairwiseFull>
+   <gapPenalty>984.00</gapPenalty>
+   <ssfit>952.12</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.04</radiusOfGyration>
+   <svmScore>5.617</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1f6fa">
+<seq>AQHPPYCRNQPGKCQIPLQSLFDRATTVANYNSKLAGEMVNRFDEQYVINCHTSSITTPNSKAEAINTEDKILFKLVISLLHSWDEPLHHAVTELANPALLTKAQEIKEKAKVLVDGVEVIQKRIHPGEKNEPYPVWSEQSSLTSQDENVRRVAFYRLFHCLHRDSSKIYTYLRILKCRLTSC</seq>
+</templateSeq>
+<alignment size="229">
+<target_ss>                                                                                                                                                                                                                                                         </target_ss>
+<target>MATGSRTSLLLAFGLLCLPWLQEGSAFP---TIPLSRLFDNAMLRAHRL----HQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREE---TQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLL---KDLEE-------GIQTLMGRLEDG---SPRTGQIFKQTYSKFDTNS---HNDD-----ALLKNYGLLYCFRKDMDKVETFLRIVQCR-SVEGSCGF</target>
+<align>                  |:       |    |||  |||    ||  .      || :    |:| |.                | . ||.||  : |   |. |    | :: : |: || ||.    .  ||.            ||    :: |       |.. :  |:  |    |         |. .   |     |:     |    | |  | .:|  |. |.|||. || .   ||  </align>
+<template>------------------PYCRNQ---PGKCQIPLQSLFD----RATTVANYNSKLAGEMVNRFDEQYVIN--------------CHTSSITTPNSKAEAINTEDK---ILFKLVISLLHSWDEPLHHAVTELANP-----------ALLTKAQEIKEKAKVLVDGVEVIQKRIHPGEKNEP---------YPVWSEQSSLTSQDENVRRVAF---YRLFHCLHRDSSKIYTYLRILKCRLT---SC--</template>
+<template_ss>                  hhhlll   lllllllhhhhhh    hhhhhhhhhhhhhhhhhhhhhllllll              lhhhhllllllhhhhhhllhh   hhhhhhhhhhhllhhhhhhhhhhhhll           hhhhhhhhhhhhhhhhhhhhhhhhhhhllllllll         llllhhhhhhhlllhhhhhhhh   hhhhhhhhhhhhhhhhhhhhhhhhhl   ll  </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>55</nident>
+   <nalign>229</nalign>
+   <nmatched>147</nmatched>
+   <alignFreq>24.02</alignFreq>
+   <templateFrom>5</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>197</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>19</targetFrom> <targetFromChar>P</targetFromChar>
+   <targetTo>215</targetTo> <targetToChar>C</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1cnt3">
+<pdbcode>1cnt</pdbcode>
+<pdbchain>3</pdbchain>
+<templateName>1cnt3</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>146</tempLen>
+   <rawScore>-1009.54</rawScore>
+   <mutationScore>-2620.00</mutationScore>
+   <singletonScore>-542.24</singletonScore>
+   <pairwiseCore>-3337.50</pairwiseCore>
+   <pairwiseFull>-2802.60</pairwiseFull>
+   <gapPenalty>1420.80</gapPenalty>
+   <ssfit>731.90</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.10</radiusOfGyration>
+   <svmScore>7.016</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1cnt3">
+<seq>PHRRDLCSRSIWLARKIRSDLTALTESYVKHQGLWSELTEAERLQENLQAYRTFHVLLARLLEDQQVHFTPTEGDFHQAIHTLLLQVAAFAYQIEELMILLEYKIPRNEADGGGLFEKKLWGLKVLQELSQWTVRSIHDLRFISSH</seq>
+</templateSeq>
+<alignment size="237">
+<target_ss>                                                                                                                                                                                                                                                          </target_ss>
+<target>MATGSRTSLLLAFGLLC---LPWL-----QEGSAFPTIPLSRLFDNAMLR----------AHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQ-FLRSV--FANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRT----GQIFKQTYSKFDTNSHNDDALLKNYGL--LYCFRKDMDK--VETF--LRIV--QCRSVEGSCGF</target>
+<align>     |         ||   : ||      :        |. | : . .:          | || .    .|  |    :.:      |.. |    |     ||.  :                    . ...   |  |  ||    |             :||    ||  ||   ||     | :|     |              :||  |     :.    | .   || .             </align>
+<template>---PHRRD-------LCSRSI-WLARKIRSD--------LTALTE-SYVKHQGLWSELTEAERLQE-NLQAYRTF-HVLLAR-----LLEDQQVH--F-----TPTEGD--------------------FHQAIHTLLLQVAAFA----Y------------QIEE----LMILLEYKIPRNEADGGGLFEK---KL-------------WGLKVL----QELSQWTVRSIHDLRFISSH----------</template>
+<template_ss>   lllll       lhhhhh hhhhhhhhh        hhhhhh hhhhhhlllllllhhhhhhh hhhhhhhh hhhhhh     hhhhhhhl  l     llllhh                    hhhhhhhhhhhhhhhh    h            hhhh    hhhhllllllllllllllhhhh   hh             hhhhhh    hhhhhhhhhhhhhhhhhhhl          </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>39</nident>
+   <nalign>237</nalign>
+   <nmatched>113</nmatched>
+   <alignFreq>16.46</alignFreq>
+   <templateFrom>11</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>182</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>4</targetFrom> <targetFromChar>G</targetFromChar>
+   <targetTo>207</targetTo> <targetToChar>Q</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1ax8">
+<pdbcode>1ax8</pdbcode>
+<pdbchain> </pdbchain>
+<templateName>1ax8</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>130</tempLen>
+   <rawScore>-835.86</rawScore>
+   <mutationScore>-2544.00</mutationScore>
+   <singletonScore>-464.28</singletonScore>
+   <pairwiseCore>-4885.50</pairwiseCore>
+   <pairwiseFull>-6119.20</pairwiseFull>
+   <gapPenalty>1531.20</gapPenalty>
+   <ssfit>641.22</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>1.91</radiusOfGyration>
+   <svmScore>8.807</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1ax8">
+<seq>IQKVQDDTKTLIKTIVTRINDILDFIPGLHPILTLSKMDQTLAVYQQILTSMPSRNVIQISNDLENLRDLLHVLAFSKSCHLPEASGLETLDSLGGVLEASGYSTEVVALSRLQGSLQDMLWQLDLSPGC</seq>
+</templateSeq>
+<alignment size="215">
+<target_ss>                                                                                                                                                                                                                                                        </target_ss>
+<target>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNA--MLRA--HRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRI--SLLLIQSWLE--PVQFLRSV--FANSLVYGASDSNVYDLLK--------DLEE--GIQTL--MGR-LEDGSPRTGQIFKQTYSKFDTNSHNDD--AL--LKNYGLLYCFRKDMDKVETFL-RIVQCRSVE---GSCGF</target>
+<align>                               : :. |..  .::.   |:  :  |        .||          |         | |              | :.  .| . |  |   |    | |   .| |       |. |||.         | |  |:.||  .|  ||     .|      ||         :  ||  |   | |     ||      |  :      :   | |  </align>
+<template>-------------------------------IQKVQDDTKTLIKTIVTRINDI-LD--------FIP-----GL--HP---------ILT--------------LSKMDQTLAVYQQILTSMPS---RNVIQISNDL------ENLRDLLHVLAFSKSCHLPEASGLETLDSLGGVLE----ASG------YST--------EVVALSRLQ--GSL----QDM------LWQL------DLSPG-C--</template>
+<template_ss>                               lhhhhhhhhhhhhhhhhhhhhl ll        lll     ll  ll         lll              hhhhhhhhhhhhhhhhllll   hhhhhhhhhh      hhhhhhhhhhhhhlllllllllllllhhhhhhhhl    ell      elh        hhhhhhhhh  hhh    hhh      hhhh      hhlll l  </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>42</nident>
+   <nalign>215</nalign>
+   <nmatched>99</nmatched>
+   <alignFreq>19.53</alignFreq>
+   <templateFrom>3</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>146</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>32</targetFrom> <targetFromChar>L</targetFromChar>
+   <targetTo>215</targetTo> <targetToChar>C</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1evsa">
+<pdbcode>1evs</pdbcode>
+<pdbchain>a</pdbchain>
+<templateName>1evsa</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>163</tempLen>
+   <rawScore>-1336.38</rawScore>
+   <mutationScore>-3087.00</mutationScore>
+   <singletonScore>-772.63</singletonScore>
+   <pairwiseCore>-3467.00</pairwiseCore>
+   <pairwiseFull>-3133.20</pairwiseFull>
+   <gapPenalty>1778.40</gapPenalty>
+   <ssfit>744.85</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.24</radiusOfGyration>
+   <svmScore>4.343</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1evsa">
+<seq>GSCSKEYRVLLGQLQKQTDLMQDTSRLLDPYIRIQGLDVPKLREHCRERPGAFPSEETLRGLGRRGFLQTLNATLGCVLHRLADLEQRLPKAQDLERSGLNIEDLEKLQMARPNILGLRNNIYCMAQLLDNASDAFQRKLEGCRFLHGYHRFMHSVGRVFSKW</seq>
+</templateSeq>
+<alignment size="259">
+<target_ss>                                                                                                                                                                                                                                                                      </target_ss>
+<target>MATGSRTSLLLAFGLLC------LPWLQEGSAFPTIPL----------SRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLC------FSESIPTPSNREETQQKSNLELLR-ISLLLIQSWLEPVQ--FLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDAL--LK----N-YGL---LYCFRKDMDKV-ETFLRIVQ-CRSVEG------SCG--F</target>
+<align>   ||           |      |  | .        |          ||| | . :   |:  |  |          ||      |       |      |      ||  |||        || :               || .    .|  |        .|. | :        ||   |:      |     :    | : |  |     |  ||   :||    .|   :.| | .. || . |      | |  |</align>
+<template>---GS-----------CSKEYRVL--LGQ--------LQKQTDLMQDTSRLLD-PYI---RIQGL--DV---------PK------LREH----CRERPGAF------PS--EET--------LRGLG-----------RRGFLQT-LNATL--GC-------VLHRLAD--------LEQRLPK-----AQ---DLERSGLNIEDLEKLQMARPNILGLRNNIYCMAQLLDNASDAFQRKLEGCRFLHGYHRFMHSVGRVF</template>
+<template_ss>   ll           llllhhhh  hhh        hhhhhhhhllhhhlhh hhh   hhlll  ll         hh      hhll    llllllll      ll  hhh        hhhll           hhhhhhh hhhhh  hh       hhhhhhh        hhhllll     hh   hhhhhlllhhhhhhhhhhhhhhhhhhhhhhhhhhhllllllhhhhhhhhhhhhhhhhhhhhhhhhhh</template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>52</nident>
+   <nalign>259</nalign>
+   <nmatched>115</nmatched>
+   <alignFreq>20.08</alignFreq>
+   <templateFrom>4</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>184</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>4</targetFrom> <targetFromChar>G</targetFromChar>
+   <targetTo>217</targetTo> <targetToChar>F</targetToChar>
+</alignmentInfo>
+
+</threading>
+<threading source="SOMA_HUMAN.fa" template="1f45b">
+<pdbcode>1f45</pdbcode>
+<pdbchain>b</pdbchain>
+<templateName>1f45b</templateName>
+<settings>
+   <pairwise>no</pairwise>
+   <secondaryStructure>no</secondaryStructure>
+   <useProfile>no</useProfile>
+   <alignmentType>global_local</alignmentType>
+</settings>
+<scoreInfo>
+   <seqLen>217</seqLen>
+   <tempLen>133</tempLen>
+   <rawScore>-979.75</rawScore>
+   <mutationScore>-2532.00</mutationScore>
+   <singletonScore>-407.56</singletonScore>
+   <pairwiseCore>-1659.40</pairwiseCore>
+   <pairwiseFull>-1989.50</pairwiseFull>
+   <gapPenalty>1370.40</gapPenalty>
+   <ssfit>589.41</ssfit>
+   <anchormatch>0.00</anchormatch>
+   <nanchor>0.0</nanchor>
+   <nmrBackbone>0.0</nmrBackbone>
+   <pairConstrn>0.0</pairConstrn>
+   <npair>0</npair>
+   <pairViolate>0.0</pairViolate>
+   <zscore>-999.00</zscore>
+   <radiusOfGyration>2.23</radiusOfGyration>
+   <svmScore>4.971</svmScore>
+</scoreInfo>
+<targetSeq name="SOMA_HUMAN.fa">
+<seq>MATGSRTSLLLAFGLLCLPWLQEGSAFPTIPLSRLFDNAMLRAHRLHQLAFDTYQEFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYCFRKDMDKVETFLRIVQCRSVEGSCGF</seq>
+</targetSeq>
+<templateSeq src="1f45b">
+<seq>QNLLRAVSNMLQKARQTLEFYPCSTVEACLPLELTKNESCTSFITNGSSFMMALCLSSIYEDLKMYQVEFKTMNAKLLMDPKRQIFLDQNMLAVIDELMQALYKTKIKLCILLHAFRIRAVTIDRVMSYLNAS</seq>
+</templateSeq>
+<alignment size="249">
+<target_ss>                                                                                                                                                                                                                                                                  </target_ss>
+<target>MATGSRTSLL--LAFGLL-----------------CLP-----------WLQEGSAFPTIP--LSRLFDNAMLRAHRLHQLAFDTYQ-EFEEAYIPKEQKYSFLQNPQTSLCFSESIPTPSNREETQQKSNLELLRISLLLIQSWLEPVQFLRSVFANSLVYGASDSNVYDLLKDLEEGIQTLMGRLEDGSPRTGQIFKQTYSKFDTNSHNDDALLKNYGLLYC-----FRK---DMDKVETFLRIVQCRSVEGSCGF</target>
+<align>        ||  ..  .|                 |||           .:  ||.|  ..  || :.:.  |:           || ||         |   | .|                                             | .|   |     | |:  .: :|   .|               :.|   .|           :|   |  |     ||     .|:| ..|          |   </align>
+<template>------QNLLRAVS-NMLQKARQTLEFYPCSTVEACLPLELTKNESCTSFITNGSSF-MMALCLSSIYED--LKM----------YQVEFKTM----NAK--LLMDPK--------------------------------------------RQIF---L-----DQNMLAVIDEL---MQ--------------ALYK---TK-----------IK---L--CILLHAFRIRAVTIDRVMSYL--------NAS---</template>
+<template_ss>      lhhhhhhh hhhhhhhhhhhhllllhhhhllehhhhhlllllllelllllh hhhhhhhhhhhh  hhh          hhhhhhhh    hhh  hlllll                                            llll   h     hhhhhhhhhhh   hh              hllh   hh           hh   h  hhhhhhhhhhhhhhhhhhhhh        hll   </template_ss>
+</alignment>
+<alignmentInfo>
+   <nident>37</nident>
+   <nalign>249</nalign>
+   <nmatched>92</nmatched>
+   <alignFreq>14.86</alignFreq>
+   <templateFrom>20</templateFrom>  <templateFromChar> </templateFromChar>
+   <templateTo>197</templateTo>  <templateToChar> </templateToChar>
+   <targetFrom>7</targetFrom> <targetFromChar>T</targetFromChar>
+   <targetTo>214</targetTo> <targetToChar>S</targetToChar>
+</alignmentInfo>
+
+</threading>
+</prospectOutput>

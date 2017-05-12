@@ -1,0 +1,144 @@
+==================================================
+Changes from 2012-12-18 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.5 at 2013-12-18 00:32:10 +0000
+----------------------------------------
+
+  Change: 8d605986cbc55c75e207ab4f598da0034821edbc
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-18 13:31:55 +0000
+
+    fixed CPAN testers report for 5.10.0
+    http://www.cpantesters.org/cpan/report/9384bd1c-63ed-11e3-bd14-e3bee4
+    621ba3 
+
+----------------------------------------
+version 0.4 at 2013-12-09 20:53:56 +0000
+----------------------------------------
+
+  Change: 17f93e9eff3aa4a72016bb9a7a6ef7741494560b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-12-10 09:53:56 +0000
+
+    perl 5.18 changes, only print in debug 
+
+----------------------------------------
+version 0.3 at 2013-05-08 03:15:20 +0000
+----------------------------------------
+
+  Change: 1599b6a27432db44c80bd0e3fcf3ac0ce579a2fe
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-08 15:15:20 +0000
+
+    fixed rounding for some perl versions 
+
+  Change: 271a5607f477dd07f5fe5b96020530798318d3b2
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:18:54 +0000
+
+    create GPG signed tags 
+
+  Change: b09d06e745494b6992f1c8a353b565cbdd20c7e1
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:14:15 +0000
+
+    v0.2 
+
+----------------------------------------
+version 0.2 at 2013-05-02 16:13:46 +0000
+----------------------------------------
+
+  Change: fcf819d649ee9ca5c1240474301751e209a140f3
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 04:13:46 +0000
+
+    got versioning working with Perl::Critic 
+
+  Change: 8e929b1a41b80af8d3ca52c7682ca81cf5e34b43
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 03:33:28 +0000
+
+    removed VERSION stufff, it's auto generated and inserted 
+
+  Change: 5fdb15bf4978b5383900c3764c4ad1164263ffe4
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 02:52:21 +0000
+
+    fixed pod syntax 
+
+  Change: 79d25b2f3f777c1282bf306b504930dbb9ba0b07
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 02:47:08 +0000
+
+    fixed even more pod stuff for dzil 
+
+  Change: cef673646d90af4a3c2cfab131bf09d9bc58acb9
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 02:15:58 +0000
+
+    fixed versioning 
+
+  Change: aaf2729274f712d02dc5014c34aad7b9bcb7674f
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 02:11:17 +0000
+
+    more dist.ini tuning, fixed version 
+
+  Change: 8a6d6122292be9ee4e97345fc5db94a3c88d7238
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 02:00:35 +0000
+
+    v0.1 
+
+----------------------------------------
+version 0.1 at 2013-05-02 13:24:33 +0000
+----------------------------------------
+
+  Change: 0226911bc2f0b3fde01a40bba82bc5e70a61f82b
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-03 01:24:33 +0000
+
+    fixed typo in dist.ini, added README.pod 
+
+  Change: 817341dd46b5151dafa9f3562da1b18d543bc5d5
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 17:40:54 +0000
+
+    added github config 
+
+  Change: e847c0f8e01400611d7e46c5b673195ca90482bf
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 16:30:30 +0000
+
+    wrote proper tests 
+
+  Change: 99650c72b6286ba3d266ded7841f9169f9ba8bec
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 16:30:08 +0000
+
+    do not reset tax after calculate(), return only $item that was added,
+    add default quantity of 1 unless given 
+
+  Change: 2dca60e89d18c9ffcabb4051d13c92d0fc6bddea
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 15:12:16 +0000
+
+    added non-working test 
+
+  Change: 1f75a0e23751eb6dcdae4a8b636b87867c0f1e36
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 15:11:11 +0000
+
+    perl critic fix 
+
+  Change: dcc77a03f69398d2fef16c6c59ca23e7e02154ba
+  Author: Tobias Kirschstein <lev@ideegeo.com>
+  Date : 2013-05-02 14:15:36 +0000
+
+    initial release 
+
+================
+End of releases.
+================

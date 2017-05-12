@@ -1,0 +1,208 @@
+#!perl -w
+
+use strict;
+use Buscador::Root;
+use Email::Folder;
+use File::NCopy;
+use Sys::Hostname;
+use utf8;
+use Text::Unidecode;
+
+$|++;
+    
+
+
+
+goto SKIP unless @ARGV;
+# die "You must pass in at least one argument\n" unless @ARGV;
+
+# we may be asked to init or setup first
+
+if ($ARGV[0] =~ /-init/) {
+    init();
+    exit 0;
+} elsif ($ARGV[0] =~ /-where/) {
+    print "$0\n";
+    exit 0;
+}
+
+
+SKIP:
+
+require Buscador::Config; 
+require Email::Store;
+require Email::Store::Mail;
+
+Buscador::Config->import;
+Email::Store->import(Buscador::Config->dsn);
+
+# hmm there's no arguments ... check to see there's anything on STDIN
+unless (@ARGV) {
+    my $data = join '', <>;
+    # chomp out From_ lines from naughty MTAs
+    $data =~ s/^From .+$//m;
+    Email::Store::Mail->store($data);    
+    exit 0;
+}    
+
+
+if ($ARGV[0] =~ /-setup/)  {            
+    print "Setting up ... "; 
+    Email::Store->setup;
+    print " done\n";
+    shift;
+} 
+
+# nothing to do now
+exit 0 unless @ARGV;
+
+
+
+print "Preparing to import ...\n"; 
+
+foreach my $folder (@ARGV) {
+    print "\nImporting $folder\n";
+
+    my $f =  Email::MIMEFolder->new($folder);
+    unless ( $f ) {
+        print "\t FAILED!\n";
+        next;
+    }
+    while (my $message = $f->next_message) 
+    {
+        print "\tStoring ",unidecode($message->header('subject'))," - ", $message->header('message-id')," ...";
+        Email::Store::Mail->store($message->as_string);
+        print "\n";
+    }
+
+}
+
+END: print "\n...Finished\n";
+
+
+# copy all the files across and generate a config file
+sub init {
+    
+# find our hostname (almost certainly wrong but it gives people an idea)
+my $host = hostname;
+
+print "Copying files from $root ... ";    
+# and get ready to copy ...
+my $file = File::NCopy->new( recursive => 1 );
+
+# copy over the chrome and templates dirctory
+$file->copy("$root/chrome",".")          or die "Couldn't copy chrome across from $root/chrome\n";
+$file->copy("$root/templates",".")    or die "Couldn't copy templates across from $root/templates\n";
+
+print "done\n";
+
+print "Generating sample config file ... ";
+# now create a sample config file
+open (FILE, ">buscador.config") || die "Couldn't write sample buscador.config : $!\n";
+print FILE << "EOC";
+
+# what our database should be
+dsn       = dbi:SQLite:email.db
+
+# the url where buscador will be installed
+uri       = http://www.${host}/buscador
+
+# and the url where the images are going to be
+image_uri = http://www.${host}/buscador/chrome
+
+EOC
+close (FILE);
+print "done\n";
+
+print << "EOH";
+
+All files have been copied over successfully and a sample config file
+has been written. You should check this over and make any necessary
+changes.
+
+After that add something like this to your httpd.conf file
+
+    <Location /buscador>
+        SetHandler perl-script
+        PerlRequire Buscador
+    </Location>
+
+If you do want to retain the default and use an SQLite database then it
+should be noted that the web server needs write permissions to the file
+email.db and to this directory for locking.
+
+You will then need to import some mails into your database using
+something like the buscador-import utility
+
+    % buscador -setup
+
+and then for any mail folders you want to import
+
+    % buscador /path/to/mail/folder
+
+Or you can cat mails into buscador-import in order to add them. 
+This is useful as an entry into an alias file
+
+    my_archiver: "|/path/to/buscador"
+
+You can find out where buscador-import is located by doing
+
+    buscador -where
+
+EOH
+
+# TODO
+# check permissions?
+
+}
+
+
+package Email::MIMEFolder;
+use base 'Email::Folder';
+use Email::MIME;
+sub bless_message { Email::MIME->new($_[1]) };
+1;
+
+
+__END__
+
+=head1 NAME
+
+buscador - setup and import emails into a Buscador system
+
+=head1 USAGE
+
+Change to the directory with your buscador.config file in it.
+
+If you haven't already done so, do this
+
+    % buscador -setup
+
+Then for every email folder you wish to import do
+
+    % buscador /path/to/folder
+
+Or alternatively you can cat a mail into it
+
+    % cat email.txt | buscador
+
+This is useful for mail alias files.
+
+    my_archiver: "|/path/to/buscador"
+
+You can find out where buscador-import is located by doing
+
+    buscador -where
+
+=head1 AUTHOR
+
+Simon Wistow <simon@thegestalt.org>
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright 2004, Simon Wistow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

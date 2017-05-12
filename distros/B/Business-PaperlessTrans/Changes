@@ -1,0 +1,20 @@
+Revision history for Business-PaperlessTrans
+0.002000  2013-07-19
+	[API]
+	- migrate to using MooseY::RemoteHelper::Role::Client, this is a slightly
+	  different but standard client interface
+	[BUGS]
+	- fix bug that would have prevented this from working due to wrong dist
+	  name in ShareDir code
+	[MISC]
+	- migrate to using MooseY::RemoteHelper::MessagePart
+
+0.001004  2013-06-06
+	- extract from the original Businesss::OnlinePayment::PaperlessTrans
+	  distribution as it removed this code
+
+0.001001  2013-05-24
+	- fix dependency on MooseX::Types::CreditCard 0.002
+
+0.001000  2013-05-21
+	- initial release

@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+use strict;
+
+
+use lib qw( lib );
+
+use Bigtop::Example::Billing qw{ -Engine=CGI -TemplateEngine=TT };
+
+use Getopt::Long;
+use Gantry::Server;
+use Gantry::Engine::CGI;
+
+my $dbd    = 'SQLite';
+my $dbuser = '';
+my $dbpass = '';
+my $dbname = 'app.db';
+
+GetOptions(
+    'dbd|d=s'     => \$dbd,
+    'dbuser|u=s'  => \$dbuser,
+    'dbpass|p=s'  => \$dbpass,
+    'dbname|n=s'  => \$dbname,
+    'help|h'      => \&usage,
+);
+
+my $dsn = "dbi:$dbd:dbname=$dbname";
+
+my $cgi = Gantry::Engine::CGI->new( {
+    config => {
+        dbconn => $dsn,
+        dbuser => $dbuser,
+        dbpass => $dbpass,
+        template_wrapper => 'genwrapper.tt',
+        root => 'html',
+    },
+    locations => {
+        '/' => 'Bigtop::Example::Billing',
+        '/status' => 'Bigtop::Example::Billing::Status',
+        '/company' => 'Bigtop::Example::Billing::Company',
+        '/customer' => 'Bigtop::Example::Billing::Customer',
+        '/lineitem' => 'Bigtop::Example::Billing::LineItem',
+        '/invoice' => 'Bigtop::Example::Billing::Invoice',
+    },
+} );
+
+my $port = shift || 8080;
+
+my $server = Gantry::Server->new( $port );
+$server->set_engine_object( $cgi );
+
+print STDERR "Available urls:\n";
+foreach my $url ( sort keys %{ $cgi->{ locations } } ) {
+    print STDERR "  http://localhost:${port}$url\n";
+}
+print STDERR "\n";
+
+$server->run();
+
+sub usage {
+    print << 'EO_HELP';
+usage: app.server [options] [port]
+    port defaults to 8080
+
+    options:
+    -h  --help    prints this message and quits
+    -d  --dbd     DBD to use with DBI (like Pg or mysql),
+                  defaults to sqlite
+    -u  --dbuser  database user, defaults to the empty string
+    -p  --dbpass  database user's password defaults to the empty string
+    -n  --dbname  database name defaults to app.db
+
+EO_HELP
+
+    exit 0;
+}
+
+=head1 NAME
+
+app.server - A generated server for the Billing app
+
+=head1 SYNOPSIS
+
+    usage: app.server [options] [port]
+
+port defaults to 8080
+
+=head1 DESCRIPTION
+
+This is a Gantry::Server based stand alone server for the Billing
+app.  It was built to use an SQLite database called app.db.  Use the following
+command line flags to change database connection information (all of
+them require a value):
+
+=over 4
+
+=item --dbd (or -d)
+
+The DBD for your database, try SQLite, Pg, or mysql.  Defaults to SQLite.
+
+=item --dbuser (or -u)
+
+The database user name, defaults to the empty string.
+
+=item --dbpass (or -p)
+
+The database user's password, defaults to the empty string.
+
+=item --dbname (or -n)
+
+The name of the database, defaults to app.db.
+
+=back
+
+=cut
+

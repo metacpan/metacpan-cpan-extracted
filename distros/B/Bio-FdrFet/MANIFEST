@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Bio-FdrFet.t
+lib/Bio/FdrFet.pm
+Fdr-Fet-Manuscript.pdf
+t/HIV-loci-pval.inp
+t/example_pathways.txt
+t/results.detail.user
+t/results.detail.intersection
+t/results.detail.union
+t/results.detail.genes
+t/results.pathway.user
+t/results.pathway.intersection
+t/results.pathway.union
+t/results.pathway.genes
+fdr-fet.pl
+generate_tests.sh
+META.yml                                 Module meta-data (added by MakeMaker)

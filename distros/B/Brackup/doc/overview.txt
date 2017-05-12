@@ -1,0 +1,37 @@
+Originally posted to:
+  <http://brad.livejournal.com/2205732.html>
+
+There are lots of ways to store files on the net lately:
+
+-- Amazon S3 is the most interesting,
+-- Google's rumored GDrive is surely soon coming
+-- Apple has .Mac
+
+I want to back up to them. And more than one. So first off, abstract
+out net-wide storage.... my backup tool (wsbackup) isn't targetting
+one. They're all just providers.
+
+Also, don't trust sending my data in cleartext, and having it stored
+in cleartext, so public key encryption is a must. Then I can run
+automated backups from many hosts, without much fear of keys being
+compromised.
+
+Don't want people being able to do size-analysis, and huge files are a pain anyway, so big files are cut into chunks.
+
+Files stored on Amazon/Google are of form:
+
+-- meta files: backup_rootname-yyyymmddnn.meta, encrypted (YAML?) file mapping relative paths from backup directory root to the stat() information, original SHA1, and array of chunk keys (SHA1s of encrypted chunks) that comprise the file.
+
+-- [sha1ofencryptedchunk].chunk -- content being <= ,say, 20MB chunk of encrypted data.
+
+Then every night different hosts/laptops recurse directory trees,
+consult a stat() cache (on, say, inode number, mtime, size, whatever)
+and do SHA1 calculations on changed files, lookup rest from cache, and
+build the metafile, upload any new chunks, encrypt the metafile,
+upload the metafile.
+
+Result:
+
+-- I can restore any host from any point in time, with Amazon/Google
+   storing all my data, and only paying $0.15 cents/GB-month.
+

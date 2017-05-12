@@ -1,0 +1,57 @@
+{
+   "abstract" : "Configure and query the Brocade SDN controller.",
+   "author" : [
+      "lwp <pruiklw@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Brocade-BSC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Carp::Assert" : "0.21",
+            "Clone" : "0",
+            "Data::Walk" : "1",
+            "Exporter" : "0",
+            "HTTP::Status" : "0",
+            "JSON" : "2.9",
+            "LWP" : "6.08",
+            "Readonly" : "2",
+            "Regexp::Common" : "2013031301",
+            "URI::Escape" : "0",
+            "XML::Parser" : "2.44",
+            "YAML" : "1.15",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.4"
+}

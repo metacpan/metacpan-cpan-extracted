@@ -1,0 +1,83 @@
+Changes Blio
+
+2.003   2015-01-04T23:11:11
+    - feed encoding issues (Thomas Klausner)
+    - allow dashes in urls (Thomas Klausner)
+    - remove all html from teaser (Thomas Klausner)
+    - fixed single-image scope bug (Thomas Klausner)
+    - also hanlde png (Thomas Klausner)
+    - added TODO for --fold-- (Thomas Klausner)
+    - added primary_image method (Thomas Klausner)
+    - added list_image to Node (Thomas Klausner)
+    - refactored image_by_name/index (Thomas Klausner)
+    - removed AUTHOR/COPYRIGHT (handled by distzilla) (Thomas Klausner)
+    - link to my article (Gabor Szabo)
+
+
+2.002   2013-05-02T16:07:26+0200
+    - lots of new features etc, first CPAN release just in time
+      for Linuxwochen Wien 2013 - http://linuxwochen.at
+
+
+2.001   2011-06-22 23:25:03
+    - complete rewrite on modern Perl
+
+
+1.002   2010-05-02 00:04:07
+    - microblog
+
+
+1.001   2008-11-13 22:00:50
+    - moved to git
+
+
+2006-2007
+---------
+various stuff
+
+2005-06-21
+----------
+d: * rewrote quite a lot (again
+
+
+2005-04-09
+----------
+* cat/nodes datastructure changed
+* rewrote collect
+
+
+2005-04-08
+----------
+* changed examples structure
+
+
+2005-03-10
+----------
+* a lot
+* began with build
+
+
+2005-02-04
+----------
+* some more paths etc
+* actually register nodes
+* moved make_outdir into collect (less fuzz this way)
+* Finally made up my mind on what exactly is a node
+* added code to support this
+
+
+2005-02-03
+----------
+* more test/example data
+* more tests,methods and docs
+
+
+2005-02-02
+----------
+* more tests
+* teardown test env after testing
+* set basedir in example/blio.yaml to dir it actually is located
+* renamed test files (to make place for tests that don't need the test env)
+* set up test environment during testing
+* imported into svn
+

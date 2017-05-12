@@ -1,0 +1,70 @@
+Revision history for perl module Business::CompanyDesignator
+
+0.12   2016-06-22
+    * Update split_designator to require punct or space after lead regex.
+
+0.11   2016-04-01
+    * Update split_designator to handle multiple spaces and leading commas in designators.
+
+0.10   2015-12-09
+    * Add allow_embedded => 1|0 parameter to skip_designator.
+
+0.09   2015-12-08
+    * Refactor split_designator to skip matches if no regexes found.
+    * Workaround perls < 5.14 not having XPosixPunct regex char class.
+    * Update split_designator to support multi-value 'lang' args via arrayref.
+    * Fix SplitResult short_name not being set if no designator.
+
+0.08   2015-12-01
+    * Update split_designator to support 'lead' designators in dataset.
+    * Add CompanyDesignator::SplitResult class and unit tests.
+    * Update CompanyDesignator::split_designator to return a SplitResult object in scalar context.
+    * Update CompanyDesignator to accept/use lang argument to split_designator.
+    * Sync company_designator.yml with upstream.
+
+0.07   2015-11-19
+    * Add a couple more test cases (US N.A.).
+    * Sync bundled company_designator.yml with upstream.
+
+0.06   2014-07-28
+    * Bump min YAML requirement to 0.71 to fix problems loading utf8.
+
+0.0501 2014-02-07
+    * Add ASC LLC test case to t10/good.yml.
+    * Sync bundled company_designator.yml with upstream.
+
+0.05   2013-12-07
+
+    * Bump perl version requirement to 5.010001 (thanks Andreas Koenig).
+    * Sync bundled company_designator.yml with upstream.
+
+0.04   2013-11-14
+
+    * Remove symlinks from tarball for windows compatibility.
+
+0.03   2013-10-15
+
+    * Fix bad race condition where abbr_long_map aliases could get NFDed.
+    * Add missing dependencies to Makefile.PL.
+    * Make Changes file CPAN::Changes::Spec-compatible.
+
+0.02   2013-10-09
+
+    * Fill out perldocs in B::CD and B::CD::Record.
+    * Refactor and simplify regex assembly code.
+    * Add Business::CompanyDesignator->record() and records() methods.
+    * Add Business::CompanyDesignator::Record and unit tests.
+    * Refactor split_designator, pulling out shared _split_designator_result.
+
+0.01   2013-09-28
+
+    * Allow optional trailing commas after periods, and escape () properly.
+    * Change strip_designator to split_designator, handle capturing trailing content.
+    * Update to allow random whitespace after periods in designators.
+    * Add regexp variants without unicode diacritics to catch misspellings.
+    * Add Unicode::Normalize magic to Business::CompanyDesignator.
+    * Add install_share to Makefile.PL; make regex comparisons case-insensitive.
+    * Rename designator_regex() to regex(); add test data to t/10_strip_designator.t.
+    * Add pattern maps, workaround Regexp::Assemble quantifier bugs.
+    * Initial import.
+

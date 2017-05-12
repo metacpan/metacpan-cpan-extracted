@@ -1,0 +1,39 @@
+Revision history for Bio::Util::DNA
+
+0.2.2 May 10 2011
+  - Namespace change
+  - Migrate to git
+
+0.2.1 Nov 18 2009
+  - Added unrollDNA method
+
+0.2.0 Nov 17 2009
+  - Relabeled constants
+  - Removed synonyms
+
+0.1.10 Nov 17 2009
+  - Added more synonyms
+
+0.1.9 Nov 17 2009
+  - Added %degenerate_hierarchy
+  - Made %degenerate_map more readable
+
+0.1.8 Apr 15 2009
+  - Added rev_comp as shortcut for reverse_complement
+  - Put use version on same line as $VERSION declared
+  - Added META.yml so make dist would work
+
+0.1.7 Mar 19 2009
+  - Added @nucs and @degens
+
+0.1.6 Mar 19 2009
+  - cleanDNA doesn't work on sequence passed; returns a reference to the
+    cleaned sequence. This lets you pass in strings without the program
+    failing
+
+0.1.5 Mar 18 2009
+  - Removed camelCase to make it more_perlish.
+
+0.1.0
+  - Initial version. cleanDNA, randomDNA and reverseComplement functions, as
+    well as commonly used variables defined.  

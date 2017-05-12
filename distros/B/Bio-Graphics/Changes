@@ -1,0 +1,366 @@
+Revision history for Perl extension Bio::Graphics.
+2.40
+   - Add CGI as a requirement as it is not part of core perl distributions, post-5.21
+   - Add Bio::Coordinate::Pair as a requirement (now released separately from BioPerl core)
+
+2.39
+   - Turn off image-based regression tests becuase libgd has started to produce visually-identical
+     images that are different at the byte level.
+	
+2.38
+   - If left labeling requested and the selected font size is larger than the available height,
+     then go to smallest available font (gdTinyFont).
+
+2.37
+   - Merge fix for incorrect parsing of feature_file sections (issue #6)
+   - Added decorated_transcript glyph
+   - Added nathanweeks fix for broken heatmap glyph
+
+2.36
+   - Fix regression in glyph parent_feature() method so that it once again returns
+     the parent of the current feature.
+   - Remove recommended prerequisite of Bio::SCF, which is hardly used now.
+
+2.35
+   - Change Glyph/segments.pm to work with both variants of CIGAR strings.	
+   - Workaround for broken useFontConfig() support in versions of GD prior to 2.50.
+   - Fix "gdTinyFont doesn't support height() method error in xyplot".
+
+2.34 Thu May 16 15:42:25 CDT 2013
+    - Fixed silent crashes when rendering with the GD::SVG class.
+
+2.33 Fri Feb 22 15:58:10 EST 2013
+    - Add truetype support. Enable by passing -truetype=>1 to Bio::Graphics::Panel->new()
+
+2.32 Mon Dec 10 05:47:45 EST 2012
+   - Clean up appearance of crossbox to avoid odd black bar in the middle.
+
+2.32 Mon Dec 10 05:47:45 EST 2012
+   - Clean up appearance of crossbox to avoid odd black bar in the middle.
+
+2.31 Tue Sep 25 22:39:43 EDT 2012
+   - Fix infinite loop when drawing wiggle_xyplots with z-score scaling
+     over regions that do not vary much.
+
+2.30
+    - Added the glyph for FlyBase's "stacked wiggle" plot (fb_shmiggle.pm) as well as a utility script for preparing the data (index_cov_files.pl).
+
+2.29
+    - Fixes for Bio::Graphics::Wiggle to prevent crash when the "bottom" keystyle selected.
+    - Add ability to obtain Bio::Graphics::Wiggle features directly from the 
+    Bio::Graphics::Wiggle::Loader without creating an intermediate gff3 file.
+
+2.28
+    - Fixes to restore density plot functionality in hybrid_plot and vista_plot.
+    - Fix handling of Bio::Graphics::Wiggle files in xyplots.
+
+2.27
+    - Fix handling of code ref subs to allow for option=>\&Packagename::functionname.
+
+2.26
+    - Support for normalizing quantitative plots across entire track.
+    - Support for transparency within tracks, allowing features to overlap.
+    - Support for -color_series and -color_cycle options (see Bio::Graphics::Panel)
+      which cycle dynamically among a fixed series of background colors.
+
+2.25
+    - Deprecate xyplot "histogram" subtype and default to "boxes".
+    - Add xyplot overlay feature.
+    - Fix gene glyph so that it collapses appropriately when bump explicitly
+      set to 0.
+    - Highlighting now works on features contained within groups.
+
+2.24
+    - In feature file configuration sections, allow a tag to contain ":".
+  
+2.23
+    - Workaround a problem in BioPerl 1.069 which prevents FeatureFile from rendering
+      properly. Fixed in 1.06902 and higher.
+    - Fix issue which caused the track bgcolor property to be ignored in some cases.
+
+2.22
+     - Changed package "Math" to "Bio::Graphics::Math" to avoid CPAN namespace
+       collisions.
+
+2.21
+     - Changed almost all occurrences of attributes() into eval{$feature->get_tag_values()}
+       to achieve compatibility with Bio::SeqFeatureI. One exception is in spectrogram glyph,
+       which depends on the non-standard behavior of attributes() when called with no args.
+ 
+2.20
+     - Fixed the various "wiggle" glyphs so that scale is always drawn even if no data is to be
+       shown in selected region.
+
+2.19
+     - Made "record_label_positions" default to "true" for wiggle_density plot. This activates
+       a fixed-position floating label when density plots are being shown in GBrowse.
+     - Fixed a bug in wiggle_xyplot that prevented plot from being drawn in SVG renderings.
+
+2.18
+     - Made handling of min/max scale calculations consistent across all xyplot glyphs and their derivatives.
+     - Added following autoscale options to wiggle_xyplot and wiggle_whiskers: "z-score" to rescale data such
+       that mean is zero and values are standard deviation-fold change; and "clipped_global" to scale to
+       global mean +/- some number of standard deviations indicated by "z_score_bounds".
+     - Added "z_score_bounds" option to wiggle_xyplot and wiggle_whiskers to control how many standard
+       deviations to show.
+       
+
+2.17
+     - In segments glyph, fixed bleedover of "deletion" color when a deletion is followed by an insertion.
+     - In segments glyph, fixed the display of inserted bases such that they will not bleed into a
+       preceding deletion.
+     - In segments glyph, fixed the mismatch color highlighting when the alignment is to the negative
+       strand.
+     - In segments glyph, fixed the default colors for mismatch, insertion and deletion.
+     - In segments glyph, fixed treatment of soft clipping as an "insertion"; this will avoid the insertion
+       color from appearing at the ends of soft-clipped reads.
+     - In gene glyph, fixed occasional linking of two neighboring transcripts.
+     
+2.16
+     - Distinguish between "chromosome" and "global" autoscaling in the xyplot and density glyphs.
+       Global autoscaling only works when underlying database is bigwig.
+     - Regularized options which select glyph subtypes with an option named "glyph_subtype".
+
+2.15
+     - Fixed documentation bug: sort_order options to sort by feature length should be
+       "longest" and "shortest" rather than "longer and "shorter".
+     - Improved layout algorithm, achieving speedup of ~4x on busy tracks.
+     - Fixed font color problems when displaying multiple alignments at DNA level in
+       the segments glyph.
+     - Fixed problem of DNA alignment indels disappearing from view when they span entire region.
+     - Fixed problem of mismatch and indel colors leaking off ends of feature arrows.
+
+2.14
+     - Fixes to the way that "fast bump" works so that tracks never fast bump.
+       This fixes problems when using groups to simulate subtracks, and the
+       groups are of different heights.
+     - The group glyph will now add the group labels to the list of track keys
+       stored in the panel and retrieved from the call to $panel->key_boxes().
+
+2.13
+     - Changed default namespace for callbacks to make them portable across freeze/thaw
+       cycles.
+
+2.12 Tue Aug 31 10:42:06 EDT 2010
+     - Created a read_pairs glyph that contains the settings most often used for SAM paired end reads/mate pairs;
+       this fixes the mate-pairs overlap bug.
+     - xyplot glyph now obeys "flip" setting.
+
+2.11 Tue Jun 29 15:37:03 EDT 2010
+     - Cleaned up stylesheet-based rendering of features when the main glyph has a type of
+     "hat" and subfeatures overlap with each other.  This occurred when rendering certain
+     DAS sources.
+
+2.10 Mon May 24 13:58:26 PDT 2010
+     - Fixed a long-standing but rarely-seen bug in layout algorithm that
+       caused some features to be displaced downward further than they should
+       be.
+     - Added support for labeling groups (on the left side). This is used by
+       GBrowse to create subtracks.
+
+2.09 Fri May 14 11:46:51 EDT 2010
+     - Fixed Bio::Graphics::FeatureFile cached callbacks so that they are evaluated
+       in the same package as they were when the file was originally evaluated and cached.
+
+2.08 Thu May 13 17:06:29 EDT 2010
+     - Fixed Bio::Graphics::FeatureFile init_code so that it is reinvoked when retrieving a 
+       cached copy of parsed featurefiles.
+
+2.07 Sun May  9 11:56:10 EDT 2010
+     - Added FeatureFile->cachedir argument to help with GBrowse tests.
+
+2.06 Wed May  5 00:51:00 EDT 2010
+     - Segments glyph now displays correct mismatch color for sequences that begin or end with soft clips.
+     - Indels displayed in correct color when indel begins or ends outside current visible region.
+
+2.05 Identical to 2.04.
+
+2.04 Sun Apr 18 17:26:01 EDT 2010
+     - Segments glyph now smarter about fetching reference sequence; this improves performance
+       on multiple alignments.
+     - -show_mismatch option now takes following arguments: 0 (false), "always", "base level" (draw only
+       when DNA is in view), or a number, in which case mismatches will only be drawn when the length
+       of the window is <= that number. For compatibility, a value of "1" is the same as "base level."
+     - Fixed display of protein sequence in genes when -draw_protein is true.
+     - Fixed display of long deletions in segments glyph base-pair alignments to avoid drop-out of
+       sequence from the right end of the alignment following deleted region.
+     - Fixed display of insertions in segments glyph base-pair alignments so that the length
+       of the deletion is displayed when there is more than one digit of length.
+     - Fixed Wiggle loader routine to handle statistics on chromosomes that have a 
+       combination of fixed and variable step declarations.
+
+2.03 Fri Mar 26 16:32:02 EDT 2010
+     - Bad CPAN upload. Do not use.
+
+2.02 Sun Mar 14 18:44:04 EDT 2010
+     - Added a wiggle_whiskers glyph that works nicely with BigWig and
+       BigBed data.
+     - Fixed processed_transcript (and gene) glyphs so that thin UTRs are more attractive.
+     - Fixed the behavior of transcript arrows to be more customizable and not to get
+       too large.
+     - Segments glyph now shows mismatches when zoomed out and -show_mismatches is true.
+     - Added an -indel_color option to segments glyph to show indels in a different color
+       from simple nucleotide substitutions.
+     - Added a -mismatch_only option to segments glyph that only shows mismatching base
+       pairs when zoomed in.
+
+2.01 Thu Feb 25 16:46:08 EST 2010
+     - Fixed display of alignments that have hard-clipping in their CIGAR strings.
+
+2.00 Wed Jan 20 11:12:13 EST 2010
+     - Added the "cross" glyph for DAS compatibility.
+     - Fixed the triangle glyph so that DAS stylesheets can set orientation
+       properly.	
+     - Fixed wiggle_xyplot/density documentation of smoothing options.  
+     - Turn off sampling from wiggle loader by default (turn it on with --sample option).
+     - Multiple sequence alignment code in the segments glyph has been updated to deal with
+       the Samtools case of both reference DNA and target reporting minus strand alignments.
+     - It felt like time to go to 2.00.
+
+1.995 Wed Jan  6 10:06:17 EST 2010
+      - Fixed the gene glyph so that non-SO genes (gene=>exon without an intervening transcript)
+        display properly. Otherwise the exons were bumping.
+      - Added support for "featureRGB" and "featureScore" special color names. This provides
+        an additional level of UCSC graphics compatibility.
+
+1.994 Thu Dec 10 10:07:19 EST 2009
+      - The GFF3 Gap attribute (which contains a CIGAR string) is now supported in the segments
+      glyph. Set -split_on_cigar=>1 when creating the track in order to activate this feature.
+
+1.993 Thu Dec  3 06:36:06 EST 2009
+      - Fixed issue which caused GD::SVG rendering of xyplot glyph to show scale
+      but no values under some circumstances.
+
+1.992 Wed Nov 18 13:06:07 EST 2009
+      - Fixed issue in which the connector vanishes when zoomed in to
+        the region between two parts (such as the region between two
+        exons)
+
+1.991 Mon Nov 16 09:20:18 EST 2009
+      - CPAN upload failed due to lack of $VERSION in hybrid_plot. Uploaded again.
+1.99 Mon Nov 16 08:15:23 EST 2009  
+     - Segments glyph now handles indels for features that have CIGAR strings.
+1.982 Wed Aug 26 17:57:43 EDT 2009
+     - Fixed DAS stylesheet support so that Ensembl and Dazzle sources both work
+       properly.	 
+1.981 Wed Aug 19 15:21:31 EDT 2009
+     - Peter Ruzanov fixed bug in wiggle_xyplot that caused histogram to go to background
+       color under some circumstances.
+1.98 Mon Jul  6 09:48:58 EDT 2009
+     - Documented -feature_limit in the Panel docs as well as in Glyph.
+     - Fixed bug in wiggle_xyplot that caused an ugly 1-pixel rectangle to be drawn
+       in the case of a zero-height data value.
+1.97 Thu Jul  2 15:22:21 EDT 2009
+     - Added "feature_limit" option to put a cap on the maximum number of features that a 
+     track will attempt to display. This only works correctly if features are added one at a
+     time with add_feature().
+1.96 Thu Jun  4 17:49:57 EDT 2009
+     - Added "hat" and "hidden" glyphs, and changed way that the "line" glyph works in order to
+     support DAS 1.5.
+1.95 Sat May 30 18:07:21 EDT 2009
+     - In the substitution pattern rules, $id is replaced with the
+     output of either the feature_id or primary_id methods depending 
+     on which one is implemented.
+     - The image.pm glyph will now render into SVG if a sufficiently-current
+     GD::SVG module is available.
+     - Some fixes to the segments glyph to work better with Bio::DB::Bam
+     rendering at the base pair level.
+     - The glyph_help.pl script can now create SVGs.
+1.94 Wed Apr 29 05:59:02 EDT 2009
+     - Added a "fast" bumping option suitable for very dense tracks in which
+       all features have identical height. Activate it using -bump=>3 or
+       -bump=>'fast'.
+     - Fixed division by zero error in xyplot glyph when min_score==max_score.
+1.93 Thu Apr  2 18:20:35 EDT 2009
+     - Many fixes to ideograph glyph to be more stable.
+     - Fixed minor display issues involving bumping and directional arrows.
+     - Continued documenting glyphs. About 75% done.
+1.92 Tue Mar 31 00:38:16 EDT 2009
+     - Added documentation system for glyphs, but only half the glyphs are documented this way so far.
+     - Bug fixes for GBrowse on Windows.
+1.91 Tue Mar 17 09:54:02 EDT 2009
+     - wiggle_density now supports local scaling
+     - wiggle loader now defaults to clipping at 2 stdev
+     - adjusted default smoothing parameters to do less smoothing
+1.90 Sun Mar 15 01:11:28 EDT 2009
+     - Optimized Bio::Graphics::Wiggle to sample directly from disk when the desired visualization
+       size is significantly (less than 100 fold) smaller than the length of the region to
+       be sampled.
+1.88 Sat Mar 14 23:31:46 EDT 2009
+     -Cleaned up calculation of min and max values for scaling and introduced the "autoscale" option.
+1.87 Sat Mar 14 20:56:47 EDT 2009
+     -Fixed bug in xyplot visualization.
+1.86 Sat Mar 14 12:22:50 EDT 2009
+     -Improved performance of wiggle xyplot drawing about 5-fold
+     -Added minor ticks to xyplots
+1.83 Fri Jan  9 20:44:41 MST 2009
+     - Made #include directive case-insensitive.
+1.80 December 2008
+     - Split off from Bio::Perl after a 6-year hiatus.
+1.05 Fri Apr 12 20:53:42 EDT 2002
+	- Version 1.04 had a fatal bug.  Do not use.  1.05 fixes this
+	and is identical to BioPerl 1.01.
+1.04 Fri Apr 12 08:20:35 EDT 2002
+	- Take advantage of optimizations in Bio::DB::GFF::Feature so don't
+	have to retrieve subfeatures at low magnifications (when you can't
+	see 'em anyway).
+1.03 Fri Apr 12 00:26:12 EDT 2002
+	- Fixes to handle case of a transcript glyph that is zoomed in so
+	far that only an intron shows (no exons).
+1.02 Sun Mar 31 16:19:35 EST 2002
+	- Make the Bio::Graphics::Feature objects more-or-less compatible with
+		Bio::SeqFeatureI and Bio::LocationI.  Slightly difficult because
+		this is a moving target.
+	- Minor bugfixes to support Generic Genome browser version 1.37
+	
+0.98 Fri Feb 22 14:02:11 EST 2002
+	-Fixed up the scale so that numbers don't (or shouldn't)
+	overlap.
+
+0.97 Mon Feb 18 22:04:57 EST 2002
+	-Added the "dna" glyph, which supports display of raw DNA and a GC
+	content histogram.
+
+0.96 Fri Jan 11 13:23:03 EST 2002
+	-Added support for displaying heterogeneous features, such as WABA similarities.
+
+0.95 Thu Jan  3 08:50:01 EST 2002  (LS)
+	-Removed generic genome browser from project, it is now part of
+	 Generic-Genome-Browser.
+
+0.92 Sat Dec  8 23:28:19 EST 2001  (LS)
+	-Fixed up key glyph so that it correctly tracks what appears on screen
+	-Fixed wormbase_transcript glyph so that it uses the skinny arrow when 
+	 there isn't enough room to show the filled arrow.
+
+0.91 Sun Nov 18 22:59:14 EST 2001  (LS)
+	-Modified Feature.pm to accept vanilla GFF format.
+	-Fixed Panel.pm so that empty tracks (height zero) do not take
+	 up space in the map.
+
+0.90  Sun Nov 18 21:46:46 EST 2001  (LS)
+	- Added the gbrowse genome browser script and supporting files
+	- Added a wormbase_transcript glyph for Wormbase's curated/uncurated genes.
+
+0.85  Mon Oct  1 16:41:57 EDT 2001  (LS)
+	- Changed all instances of stop() to end() so that BioSeqFeatureI is supported
+	  correctly.
+
+0.82  Fri Jul 20 10:36:57 EDT 2001  (LS)
+	- Removed perl 5.6'isms.
+	- Added appropriate documentation to Feature.
+
+0.81  Tue Jun 12 09:30:10 EDT 2001  (LS)
+	- Messed up sourceforge upload, so bumping version no
+		to clean up.
+
+0.80  Tue Jun 12 09:10:15 EDT 2001  (LS)
+	- Basically functional
+	- examples in eg/
+	- Bio::Graphics::Panel documentation complete,
+		other documentation incomplete
+
+0.01  Tue Jun  5 07:26:52 2001  (LS)
+	- original version; created by h2xs 1.20 with options
+		-n Bio::Graphics -A
+

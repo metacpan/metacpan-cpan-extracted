@@ -1,0 +1,42 @@
+2015-06-21 14:02:47,543 INFO Running 3 steps with concurrence of 1...
+2015-06-21 14:02:47,568 INFO 
+2015-06-21 14:02:47,570 INFO --- 0. Running (timestamped): /home/guests/jir2004/workflow/output/backup/test1.csv <- /home/guests/jir2004/workflow/test1.csv
+2015-06-21 14:02:47,592 INFO --- 0: /home/guests/jir2004/workflow/output/backup/test1.csv <- /home/guests/jir2004/workflow/test1.csv -> done in 0.02s
+2015-06-21 14:02:47,597 INFO 
+2015-06-21 14:02:47,598 INFO --- 1. Running (timestamped): /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test1.csv
+2015-06-21 14:02:47,612 INFO --- 1: /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test1.csv -> done in 0.01s
+2015-06-21 14:02:47,614 INFO 
+2015-06-21 14:02:47,615 INFO --- 2. Running (timestamped): /home/guests/jir2004/workflow/output/grep_varb/test1.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv
+2015-06-21 14:02:47,626 INFO --- 2: /home/guests/jir2004/workflow/output/grep_varb/test1.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv -> done in 0.01s
+2015-06-21 14:02:47,628 INFO Done (3 steps run).
+2015-06-21 14:16:00,147 INFO Running 3 steps with concurrence of 1...
+2015-06-21 14:16:00,177 INFO 
+2015-06-21 14:16:00,181 INFO --- 1. Running (timestamped): /home/guests/jir2004/workflow/output/backup/test2.csv <- /home/guests/jir2004/workflow/test2.csv
+2015-06-21 14:16:00,216 INFO --- 1: /home/guests/jir2004/workflow/output/backup/test2.csv <- /home/guests/jir2004/workflow/test2.csv -> done in 0.03s
+2015-06-21 14:16:00,221 INFO 
+2015-06-21 14:16:00,222 INFO --- 3. Running (timestamped): /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test2.csv
+2015-06-21 14:16:00,244 INFO --- 3: /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test2.csv -> done in 0.02s
+2015-06-21 14:16:00,246 INFO 
+2015-06-21 14:16:00,246 INFO --- 5. Running (timestamped): /home/guests/jir2004/workflow/output/grep_varb/test2.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv
+2015-06-21 14:16:00,258 INFO --- 5: /home/guests/jir2004/workflow/output/grep_varb/test2.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv -> done in 0.01s
+2015-06-21 14:16:00,259 INFO Done (3 steps run).
+2015-06-21 14:16:15,961 INFO Running 6 steps with concurrence of 1...
+2015-06-21 14:16:15,992 INFO 
+2015-06-21 14:16:15,993 INFO --- 0. Running (timestamped): /home/guests/jir2004/workflow/output/backup/test1.csv <- /home/guests/jir2004/workflow/test1.csv
+2015-06-21 14:16:16,016 INFO --- 0: /home/guests/jir2004/workflow/output/backup/test1.csv <- /home/guests/jir2004/workflow/test1.csv -> done in 0.02s
+2015-06-21 14:16:16,021 INFO 
+2015-06-21 14:16:16,022 INFO --- 1. Running (timestamped): /home/guests/jir2004/workflow/output/backup/test2.csv <- /home/guests/jir2004/workflow/test2.csv
+2015-06-21 14:16:16,035 INFO --- 1: /home/guests/jir2004/workflow/output/backup/test2.csv <- /home/guests/jir2004/workflow/test2.csv -> done in 0.01s
+2015-06-21 14:16:16,037 INFO 
+2015-06-21 14:16:16,037 INFO --- 2. Running (timestamped): /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test1.csv
+2015-06-21 14:16:16,051 INFO --- 2: /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test1.csv -> done in 0.01s
+2015-06-21 14:16:16,053 INFO 
+2015-06-21 14:16:16,053 INFO --- 3. Running (timestamped): /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test2.csv
+2015-06-21 14:16:16,066 INFO --- 3: /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv <- /home/guests/jir2004/workflow/output/backup/test2.csv -> done in 0.01s
+2015-06-21 14:16:16,068 INFO 
+2015-06-21 14:16:16,069 INFO --- 4. Running (timestamped): /home/guests/jir2004/workflow/output/grep_varb/test1.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv
+2015-06-21 14:16:16,080 INFO --- 4: /home/guests/jir2004/workflow/output/grep_varb/test1.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test1.grep_VARA.csv -> done in 0.01s
+2015-06-21 14:16:16,082 INFO 
+2015-06-21 14:16:16,082 INFO --- 5. Running (timestamped): /home/guests/jir2004/workflow/output/grep_varb/test2.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv
+2015-06-21 14:16:16,160 INFO --- 5: /home/guests/jir2004/workflow/output/grep_varb/test2.grep_VARA.grep_VARB.csv <- /home/guests/jir2004/workflow/output/grep_vara/test2.grep_VARA.csv -> done in 0.08s
+2015-06-21 14:16:16,163 INFO Done (6 steps run).

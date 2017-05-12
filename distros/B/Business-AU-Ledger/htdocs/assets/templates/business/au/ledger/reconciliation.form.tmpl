@@ -1,0 +1,14 @@
+<table align="center">
+<tr>
+<td>Opening balance:</td><td><input type="text" name="opening_balance" id="opening_balance" size="12" value="" /></td>
+<td></td>
+</tr>
+<tr><td colspan="4"><hr /></td></tr>
+<tr>
+<td>Month</td><td>Balance</td><td>Receipts</td><td>Difference</td>
+</tr>
+<tmpl_loop name=month_loop><tr><td><tmpl_var name=name></td>
+<td><input type="text" name="balance_<tmpl_var name=__counter__>" id="balance_<tmpl_var name=__counter__>" size="12" value="" /></td>
+<td><tmpl_var name=receipt></td><td><tmpl_var name=difference></td></tr>
+</tmpl_loop>
+</table>

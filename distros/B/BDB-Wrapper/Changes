@@ -1,0 +1,133 @@
+Revision history for Perl extension BDB::Wrapper.
+
+0.49 Sun Mar/28/2013
+     	 - added txn=>1 and transaction=>1 options to use /tmp/txn_data directory for transaction's home directory
+
+0.48 Tue Jan/22/2013 3:00
+	- Modification of the document for cds_lock
+
+0.47 Sun Jan/20/2013 13:57
+	- Modification for transaction
+
+0.46 Mon Oct 08 12:50:00
+	- Modified document for pod
+
+0.45 Mon Oct 08 01:00:00
+	- Bug fix for SIG{ALRM}
+
+0.44
+	- Just modifiction of document not related to functions
+
+0.43
+	- Skipped for bug
+
+0.42 Wed Jan 12 06:50:00
+	- Improved how to use wait limitation
+
+0.41 Tue Jan 11 01:50:00
+	- Added error explanation
+
+0.40 Sun Jan 09 21:52:00
+	- Adjust option of create_read_hash_ref to create_read_dbh
+
+0.39 Tue Dec 06 03:10:00
+	- Made this available for files without .bdb
+
+0.38 Sun Dec 06 03:55:00
+	- Updated document
+
+0.37 Sun Dec 06 02:41:00
+	- Updated document
+
+0.36 Sun Dec 06 02:20:00
+	- Made BerkeleyDB's constants available directly
+
+0.35 Sun Dec 05 23:50:00
+	- Updated document
+
+0.34 Sun Dec 05 22:00:00
+	- Updated document
+
+0.33 Sun Dec 05 19:00:00
+	- Added clear_bdb_home()
+	- Added support of transaction
+
+0.31 Mon Aug 16 05:00:00
+	- Added record_error($msg) which records error to /tmp/bdb_error.log
+
+0.31 Wed Jul 21 16:47:00 2010
+	- Fixed the bug of rmkdir($bdb_dir) for create_write_dbh
+
+0.29 Thu Dec 03 09:40:00 2009
+	- Fixed the bug of Cachesize in create_env()
+
+0.28 Wed Dec 03 19:30:00 2009
+	- Updated document for CPAN
+
+0.27 Wed Dec 03 18:30:00 2009
+	- make test removes bdb files and home directories created by itself
+
+0.26 Wed Dec 02 15:30:00 2009
+	- Added LockDetect function to create_env();
+	- Added cache and no_lock option to create_env() and create_write_dbh(). It will overwrite the value specified in new()
+	- Updated the example code
+	- Added the comment which method is not recommended one now.
+
+0.25 Fri Aug 07 17:10:00 2009
+	- Bug fix about no_env option of create_write_dbh
+
+0.24 Sun Nov 30 13:00:00 2008
+	- {'bdb'=>$bdb} option became available for create_write_dbh and so on.
+
+0.23 Sat Nov 01 22:00:00 2008
+	- new api get_bdb_home($BDB) was added.
+
+0.22 Mon Oct 27 23:00:00 2008
+	- create_write_dbh now can creates bdb without mkdir for bdb.
+	- modified the behavior of how to remove dead lock
+
+0.21 Mon Oct 20 23:00:00 2008
+	- Added dependency of BerkeleyDB.pm to Makefile.PL
+
+0.20 Sun Oct 19 03:00:00 2008
+	- Fixed the bug of {'sort_num'=>1}
+	- Fixed the behaviour about how to react to the dead lock
+	- Removed the part which creates the warning "Use of uninitialized value in string"
+
+0.18  Sat Sep 06 04:30:00 2008
+        - no_log parameter was added for new BDB::Wrapper({'no_log'=>1 or 0(default)})
+If you set {'no_lock'=>1}, the control of concurrent access will not be used. So the lock files are also not created.
+
+0.17  Fri Sep 05 07:00:00 2008
+        - cache parameter was added for new BDB::Wrapper({'cache'=>$CACHE_SIZE})
+If you set {'cache'=>$CACHE_SIZE}, you can allocate cache memory of the specified bytes for using bdb files.
+
+0.16  Mon Jul 01 10:00:00 2008
+	- Document was modified.
+
+0.15  Mon Jul 01 07:00:00 2008
+	- Document was modified.
+
+0.14  Mon Jul 01 03:00:00 2008
+	- Document was modified.
+
+0.13  Mon Jun 30 20:00:00 2008
+	- new method now supports 'wait' option for specifing the time in which dead lock will be removed.
+	- Document was modified.
+
+0.12  Tue Jun 24 16:00:00 2008
+	- create_read_dbh, create_read_hash_ref now have the unlock function for dead lock
+	- Potential bug was fixed.
+	- Document was modified.
+
+0.11  Tue Jun 17 23:00:00 2008
+	- sort, sort_num and reverse_num is now available for btree.
+	- Document was modified.
+
+0.10  Mon Jun 09 18:40:00 2008
+	- sort_code_ref, reverse and reverse_cmp is now available for btree.
+	- minor bug was fixed.
+
+0.01  Wed Apr 16 07:17:14 2008
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.6.0 -n BDB::Wrapper

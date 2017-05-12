@@ -1,0 +1,34 @@
+Bio/ConnectDots version 1.0.0
+================================
+
+Connect the Dots is a general data integration framework targeted 
+at translating biological identifiers across multiple transitive databases.
+It uses a small query language so that users can easily join database sources
+(like Unigene, Swissprot, etc) and then create translation tables for 
+the identifiers and fields in those databases. Parsers for most biological
+databases are included. See docs/ConnectDots.html for usage details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  DBD::Pg
+  Class::AutoClass
+  File::Path 
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2005 Institute for Systems Biology (ISB). All Rights Reserved.
+                                                                                                                                                             
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

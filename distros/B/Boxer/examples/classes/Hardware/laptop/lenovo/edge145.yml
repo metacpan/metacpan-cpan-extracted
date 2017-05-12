@@ -1,0 +1,9 @@
+classes:
+  - Hardware.motherboard.amd.e1-2500
+  - Hardware.nic.broadcom.sta
+  - Hardware.laptop
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include support for Lenovo Edge 145 laptop

@@ -1,0 +1,41 @@
+$Id: README,v 1.69 2001/04/20 19:04:34 Exp $
+
+------------------------------
+What BOC-Directory-Bookmark Is
+------------------------------
+
+BOC is a shortcut for BabelObjects-Component.
+
+BOC-Directory-Bookmark is a component that makes available 2 BO tags :
+  * $(Bookmark.Folders) that shows folders for the user and the parent folder
+    provided on the http request
+  * $(Bookmark.Urls) that shows the urls for that folder
+
+-----
+Usage
+-----
+
+The Http request can be called with 2 parameters :
+  * user, to tell the bookmark's owner we want to browse
+  * folder, to tell the folder we want to browse
+
+----
+Demo
+----
+
+To see this component in action, go to :
+
+http://www.BabelObjects.Org/html/common/demo/bo/test_bookmark.be?user=jck
+
+---------------------
+Documentation Roadmap
+---------------------
+
+  * INSTALL : how to install this package
+  * CONFIGURATION : how to configure this component to suit your system
+  * TODO : what will be done next
+  * BUGS : no bugs, just features :-) Tell me.
+
+Thanks for reading!
+
+-- Jean-Christophe Kermagoret / jck@BabelObjects.Org / www.BabelObjects.Org

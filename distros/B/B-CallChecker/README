@@ -1,0 +1,31 @@
+NAME
+
+B::CallChecker - custom B-based op checking for subroutines
+
+DESCRIPTION
+
+This module allows pure Perl code to attach a magical annotation to a Perl
+subroutine, resulting in resolvable calls to that subroutine being mutated
+at compile time by arbitrary Perl code.  The ops of the subroutine call
+are manipulated via the B system.  Despite coding in Perl, the programmer
+must be aware of implementation details normally only encountered in XS.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

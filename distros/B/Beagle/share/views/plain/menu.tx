@@ -1,0 +1,20 @@
+<div id="menu">
+: include '_wedge.tx' { template => 'menu_start.tx' };
+
+: include 'admin/head.tx';
+: include 'names.tx';
+: include 'width.tx';
+
+<a class="menu" href="<: $prefix :>archives"><: _('archives') :></a>
+<a class="menu" href="<: $prefix :>tags"><: _('tags') :></a>
+
+: if !$static {
+<a class="menu" href="<: $prefix :>search"><: _('search') :></a>
+: }
+
+<a class="menu" href="<: $prefix :>about"><: _('about') :></a>
+<a class="menu" href="<: $prefix :>"><: _('home') :></a>
+
+: include '_wedge.tx' { template => 'menu_end.tx' };
+
+</div>

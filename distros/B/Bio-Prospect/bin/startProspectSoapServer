@@ -1,0 +1,29 @@
+#! /usr/bin/env perl
+
+#-------------------------------------------------------------------------------
+# NAME startProspectSoapServer
+# PURPOSE: start a SOAP::Transport::HTTP::Daemon that dispatches to 
+#          a Bio::Prospect::SoapServer object
+# USAGE: startProspectSoapServer
+#
+# $Id: startProspectSoapServer,v 1.7 2003/11/18 19:45:46 rkh Exp $
+#-------------------------------------------------------------------------------
+
+use SOAP::Transport::HTTP;
+use Bio::Prospect::Init;
+use File::Temp;
+use strict;
+use warnings;
+
+use vars qw( $VERSION );
+$VERSION = sprintf( "%d.%02d", q$Revision: 1.7 $ =~ /(\d+)\.(\d+)/ );
+
+
+my $daemon = new SOAP::Transport::HTTP::Daemon(
+  LocalAddr => $Bio::Prospect::Init::SOAP_SERVER_HOST,
+  LocalPort => $Bio::Prospect::Init::SOAP_SERVER_PORT
+);
+$daemon->dispatch_to( 'Bio::Prospect::SoapServer' );
+$daemon->options({compress_threshold => 0});
+print "Prospect Soap Server started at ", $daemon->url, " ...\n";
+$daemon->handle();

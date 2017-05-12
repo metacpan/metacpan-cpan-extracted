@@ -1,0 +1,21 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Add Input'; %]
+
+<p><h2>Select the input type:</h2></p>
+
+<form name="inputs" action="cpm_workflow.cgi" method="GET">
+  <input type="hidden" name="action" value="addinput"/> 
+  <input type="hidden" name="list" value="[% LIST %]"/>
+  <select name="type">
+    <!--<option value="ticker">Stock Ticker</option>
+    <option value="company">Company Name</option>-->
+    <option value="domain">Domain Name</option>
+  </select>
+  
+  <p>
+    <input type="button" value="Back" onClick="history.go(-1);">
+    &nbsp 
+    <input type="submit" value="Continue"/>
+  </p>
+</form>
+
+[% INCLUDE footer.html %]

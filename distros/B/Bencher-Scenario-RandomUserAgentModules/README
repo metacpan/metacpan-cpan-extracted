@@ -1,0 +1,6 @@
+SEE ALSO
+
+    Modules that are not yet included in this benchmark:
+    Faker::Provider::UserAgent (dependency cannot be installed and has
+    compile-time errors).
+

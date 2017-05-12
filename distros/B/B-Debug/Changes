@@ -1,0 +1,237 @@
+-*- change-log -*-
+
+1.24 2016-12-11 rurban
+	* add 5.25.6 support: split optimization
+
+1.23 2015-01-25 rurban
+        * again being hit by EUMM not being able to do parallel cpansign
+
+1.22 2014-10-12 rurban
+	* add 5.21.5 support: changed test, from blead for split optim.,
+	  added METHOP
+	* print 0x00000000 as 0x0
+	* add -d -MOd=Debug support
+	* README: fixed copyright date
+
+1.21 2014-08-05 rurban
+	* add missing META.json to MANIFEST (RT#97722 by KENTNL)
+
+1.20 2014-08-03 rurban
+	* avoid exists on an array element (aaron crane)
+
+1.19 2013-11-07 rurban
+	* install into site (again) since 5.12
+        * support lexical subs, NAME instead of GV.
+        * fix double SV FLAGS
+        * fix wrong xpv_cur, add xpv_len
+
+1.18 2012-08-17 rurban
+	* support new B::PADLIST (experimentally on blead)
+
+1.17 2011-11-25 rurban
+	* FSF address change
+
+1.16 2010-09-16 rurban
+	* fix test 9 on Win32, shell quoting
+
+1.15 2010-09-12 rurban
+	* fix sv->GvFLAGS => gv->GvFLAGS
+	* fixes for 5.8.0 (COP->io) and 5.6.1 (GV->SAFENAME)
+	* fix $have_B_Flags_extra warning
+
+1.14 2010-09-11 rurban
+	* Remove qw(...) as parentheses deprecated warnings.
+	  (PERL#77758 by Paul Johnson)
+
+1.13 2010-09-09 rurban
+	* print name of op_type
+	* print ppaddr consistent with other op addr
+	* fix cop_io
+	* omit cv->OUTSIDE_SEQ for 5.6
+	* fix NULL specials
+	* fix NV assertion for CV
+	* stabilize tests for space in runperl path
+	* fix t/debug.t test 7
+
+1.12 2010-02-10 rurban
+	* remove archlib installation cruft, and use the proper PM rule.
+	By Todd Rinaldo (toddr)
+
+1.11 2008-07-14 rurban
+	* avoid B::Flags in CORE tests not to crash on old XS in @INC
+
+1.10 2008-06-28 rurban
+	* require 5.006; Test::More not possible in 5.00505
+	* our => my
+
+1.09 2008-06-18 rurban
+	* minor META.yml syntax fix
+	* 5.8.0 ending nextstate test failure: be more tolerant
+	* PREREQ_PM Test::More
+
+1.08 2008-06-17 rurban
+	* support 5.00558 - 5.6.2
+
+1.07 2008-06-16 rurban
+	* debug.t: fix strawberry perl quoting issue
+
+1.06 2008-06-15 rurban
+	* added B::Flags output
+	* dual-life CPAN as B-Debug-1.06 and CORE. Removed from B-C-1.04_20
+	* protect scalar(@array) if tied arrays leave out FETCHSIZE
+	* special Makefile INST_ARCHLIB hack to install into ARCHLIB for
+	the default perl @INC searchorder
+
+1.05_03 2008-04-16 rurban
+	* ithread fixes in B::AV
+	* B-C-1.04_15
+
+B-C-1.04_09 2008-02-24 rurban
+	* support 5.8 (import Asmdata)
+
+1.05_02 2008-02-21 rurban
+	* added _printop
+	* B-C-1.04_08 and CORE
+
+1.05_01 2008-02-05 rurban
+	* 5.10 fix for op->seq
+	* B-C-1.04_04 
+
+===================================================================
+Maybe Relevant Changes from CORE
+
+For the exact Changes see
+  http://public.activestate.com/cgi-bin/perlbrowse/b/ext/B/B/Debug.pm
+  http://public.activestate.com/cgi-bin/perlbrowse/b/ext/B/t/debug.t
+
+Gurusamy Sarathy <gsar@cpan.org>  2000-12-17 22:49:13
+    Subject: [ID 20000928.002] perlcc & ByteCode.pm option mismatch
+    Did not apply cleanly, manual intervention was needed.
+
+    Subject: [ID 20001003.006] B::Debug not -w clean
+
+    Test harness update to sync with the new perlcc,
+    from Simon Cozens.
+
+Nick Ing-Simmons <nick@ing-simmons.net>  1999-01-02 10:04:02
+    Integrate ext/B changes from //depot/cfgperl
+    'copy in' ext/B/B.xs
+    	(@2460..) 'merge in' ext/B/B/C.pm ext/B/B/CC.pm
+    	ext/B/B/Stackobj.pm (@2524..)
+
+Nick Ing-Simmons <nick@ing-simmons.net>  1999-01-02 10:04:02
+    @2491 Integrate ext/B changes from //depot/cfgperl
+
+Nick Ing-Simmons <nick@ing-simmons.net>  1998-12-20 14:21:29
+    Save _all_ GV's which have SV, AV or HV set.
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-22 02:08:00
+    fix up B modules for PL_* changes
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-07-21 18:13:16
+    Compiler docs for 5.005
+    Message-Id: <199807211713.SAA20735@sable.ox.ac.uk>
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-22 01:29:09
+    s/PL_sv/PL_bytecode_sv/ etc., so we have unique, case-insensitive
+    names
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-21 07:12:00
+    fix bytecode.pl with moved var names
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-20 09:38:39
+    complete s/foo/PL_foo/ changes (all escaped cases identified with
+    brute force search script).  Result builds and passes all tests on
+    Solaris.  win32 and PERL_OBJECT are still untested.
+
+Nick Ing-Simmons <nick@ing-simmons.net>  1998-07-18 13:53:03
+    PL_ prefix to all perlvars, part1
+       Builds and passes all tests at one limit i.e. -DPERL_GLOBAL_STRUCT
+
+Ilya Zakharevich <ilya@math.ohio-state.edu>  1998-07-15 06:10:36
+    Minor improvements to perlcc
+    Message-Id: <199807151010.GAA11270@monk.mps.ohio-state.edu>
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-15 10:01:41
+    add stub docs for ext/B, other minor tweaks
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-07-09 05:37:48
+    get it building again on win32
+
+Stephen McCamant <alias@mcs.com>  1998-06-22 21:19:43
+    Inheritance of B:: classes
+    Message-Id: <m0yoIgR-000EP2C@alias-2.pr.mcs.net>
+
+Ed Peschko <epeschko@den-mdev1>  1998-04-29 21:02:36
+    [ PATCH 5.004_64 ] Integrated regression tests for compiler
+    added perlcc.PL
+
+Charles Bailey <bailey@newman.upenn.edu>  1998-03-02 01:48:27
+	Miscellaneous minor fixes
+
+Spider Boardman <spider@orb.nashua.nh.us>  1998-03-01 02:02:47
+	Almost OK: 5.004_61 (threads, perlio)
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-02-26 03:56:19
+    [win32] various cleanups so that B can be built as "just another extension"
+     - export symbols needed for building B
+     - bset_obj_store() is needed by byterun(), so define it there instead
+       of at B.xs, and export it
+     - freadpv() is only used in B.xs, so move it there
+     - byte*.h are now included by perl.h
+     - regenerate embed*.h
+
+Gurusamy Sarathy <gsar@cpan.org>  1998-02-22 02:40:56
+    [win32] get compiler building under win32 (needed Makefile.PL
+    hacks that could be applicable to other platforms)
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-25 17:44:34
+	More compiler tweaks.
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-20 18:23:47
+    Remove compiler files from their old lib/B locations. The compiler
+    now builds by default (without the byteperl executable so far) and
+    seems to work at least minimally.
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-20 18:05:33
+    Move lib/B/... and lib/[BO].pm over to where they should be,
+    under ext/B.
+    
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-20 17:54:58
+    Start getting compiler to work when built with the core.
+    [Still won't work as of this change.]
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-20 16:42:13
+
+	* Merge perlext/Compiler/... into mainline. Some files move to
+    ext/B/..., some to lib/B/..., O.pm and B.pm go in lib and some
+    move to the base perl directory (e.g. headers). Will need some
+    cleaning up before it builds properly, I would guess.
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-20 16:39:38
+	* [compiler] Win32 changes from Sarathy, tweaked slightly by me.
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1998-02-17 17:50:50
+	* Assorted changes to the compiler
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1997-12-17 10:59:40
+	* Fix typo in compiler B/C.pm.
+
+Alpha5 Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1997-12-10 18:33:53
+	* Start overhauling compiler. It was working at least minimally
+    right up until the final tweak of B.xs to add threadsv_names
+    at which point building it provokes a seg fault in perl while
+    doing the xsubpp :-(.
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1997-09-03 12:31:48
+	* Make compiler build/work with devel 5.005
+
+Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1997-07-05 11:58:05  
+	* Change %lx to %x in B::CV::save to prevent some CV
+    fields becoming 0 in the init section. Add missing
+    write_back in B::Stackobj::Padsv::load_double to fix
+    test 22 of op/my.t.
+
+a4 Malcolm Beattie <mbeattie@sable.ox.ac.uk>  1997-05-03 14:47:06  
+	* initial check in of compiler
+	from version Alpha a3 to a4

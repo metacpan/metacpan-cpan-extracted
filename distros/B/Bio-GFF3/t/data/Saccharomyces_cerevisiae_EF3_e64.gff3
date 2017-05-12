@@ -1,0 +1,8 @@
+##gff-version 3
+# test gff3 below is malformed, with two differently-typed lines with the same ID
+XIII	protein_coding	gene	229734	230813	.	-	.	ID=YML021C;Name=UNG1;Name=YML021C
+XIII	protein_coding	mRNA	229734	230813	.	-	.	ID=YML021C;Name=UNG1;Parent=YML021C
+XIII	protein_coding	start_codon	230811	230813	.	-	0	ID=start_codon:YML021C:1;Parent=YML021C
+XIII	protein_coding	exon	229734	230813	.	-	.	ID=exon:YML021C:1;Parent=YML021C
+XIII	protein_coding	CDS	229734	230813	.	-	0	ID=CDS:YML021C:1;Parent=YML021C
+XIII	protein_coding	stop_codon	229734	229736	.	-	0	ID=stop_codon:YML021C:1;Parent=YML021C

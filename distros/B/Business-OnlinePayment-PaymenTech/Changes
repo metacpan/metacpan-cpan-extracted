@@ -1,0 +1,27 @@
+Revision history for Business-OnlinePayment-PaymenTech
+
+2.05    Mon Jan 14 19:07:14 PST 2013
+        - pass AVScountryCode
+
+2.04    Mon Oct 11 17:30:00 PDT 2010
+        - Always send expiration date as MMYY
+
+2.03    Sun Jan 24 13:19:29 PST 2010
+        - Truncate all request fields to their maximum lengths
+        - doc: in synopsis example, move merchant_id/terminal_id from content
+          call to new constructor, and add currency.  also indent the example
+          code so it formats properly
+        - Rework result handling: show ProcStatusMsg/StatusMsg if present even
+          when HTTP status != 200, decode parameters like StatusMsg that come
+          through as a hashref with length and content
+
+2.02    Wed Jan 13 18:40:06 PST 2010
+        - Add B:OP, B:OP:HTTPS and XML::Simple to Makefile.PL PREREQ_PM
+          (closes: CPAN#53646)
+        - Add t/boilerplate.t to MANIFEST
+
+2.01    Sun Nov 29 12:59:44 PST 2009
+        Added support for MarkForCapture and Reversal transactions.
+
+2.00    Wed Oct  7 09:25:34 PDT 2009
+        Complete rewrite to use the XML interface directly.

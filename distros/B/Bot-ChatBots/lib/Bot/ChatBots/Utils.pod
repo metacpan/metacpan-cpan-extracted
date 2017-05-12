@@ -1,0 +1,125 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Utils - Utility functions for Bot::ChatBots
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots qw< load_module resolve_module >;
+
+   resolve_module('Duh');        # returns 'Bot::ChatBots::Duh'
+   resolve_module('^Duh');       # returns 'Duh'
+   resolve_module('+Duh');       # ditto, least surprise principle
+   resolve_module('^Foo::Bar');  # returns 'Foo::Bar'
+   resolve_module('Foo::Bar');   # returns 'Bot::ChatBots::Foo::Bar'
+   resolve_module('::Foo::Bar'); # ditto, loud about needing prefix
+
+   # transform $something using resolve_module, load it and return
+   # the loaded class name
+   load_module($something);
+
+=head1 DESCRIPTION
+
+This module provides a few utilities for ease your way while building
+stuff with Bot::ChatBots.
+
+Nothing is exported by default.
+
+=head1 FUNCTIONS
+
+=head2 B<< load_module >>
+
+   my $module_name = load_module($module_name_spec);
+
+Transforms the input C<$module_name_spec> via L</resolve_module>, then
+loads the result using L<Module::Runtime/use_module> and returns the
+loaded module name. This can be useful for doing things like this:
+
+   # load Bot::ChatBots::Auth and create an instance
+   my $auth = load_module('Auth')->new(users => {whitelist => {1 => 1}});
+
+=head2 B<< pipeline >>
+
+   my $tube = pipeline($atube); # OR
+      $tube = pipeline(@specifications); # OR
+      $tube = pipeline(\%opts, @specifications); # OR
+      $tube = pipeline(@specifications, \%opts);
+
+Smart wrapper around L<Data::Tubes/pipeline>.
+
+If a single argument is provided and it is a sub reference, it is
+considered to be a tube itself and returned directly. In this case, no
+call to L<Data::Tubes/pipeline> is done (and L<Data::Tubes> is then not
+required).
+
+In all other cases L<Data::Tubes> is required as a dependency.
+
+Arguments C<@specifications> must be either tubes (i.e. sub references) or
+definitions that can be transformed into tubes (see L<Data::Tubes> for the
+details). You can pass options with a hash reference either as the first
+or the last parameter.
+
+One option that you can pass is C<prefix>, which sets the prefix for
+automatic resolution of names. This resolution is done via
+L</resolve_module> and does not rely upon L<Data::Tubes>' own mechanism.
+These C<\%opts> are anyway passed down to L<Data::Tubes> if you want to
+set additional supported options. By default, C<%opts> is considered an
+empty hash.
+
+=head2 B<< resolve_module >>
+
+   my $module_name = resolve_module($spec); # OR
+      $module_name = resolve_module($spec, $prefix);
+
+Transform an input C<$spec> string into a module name. Parameter
+C<$prefix> is optional and defaults to C<Bot::ChatBots>. The
+transformation rules are as follows:
+
+=over
+
+*
+
+if C<$spec> starts with a caret C<^> or a plus sign C<+>, the C<$spec> is
+returned after the initial character is removed. These two characters are
+aliased to cope with a long tradition of using C<+> for this (although in
+other contexts C<+> means I<add>, which naturally translates into I<add
+a prefix> in my very humble opinion), ELSE
+
+
+*
+
+C<$spec> is pre-pended with C<::> (unless it already has them) and C<$prefix .
+$spec> is returned. (You might want to explicitly put the C<::> in front of
+your sub-module name to document the fact that you actually want the prefix to
+be added, otherwise you can just let C<resolve_module> put that for you).
+
+=back
+
+The net result is that the C<$prefix> is used in the default case (i.e. no
+initial special character), but you can start with C<::> if you want to
+document the prefixing or start with C<^> (or C<+>) if you want to skip
+prefixing. See L</SYNOPSIS> for some examples.
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>, L<Module::Runtime>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

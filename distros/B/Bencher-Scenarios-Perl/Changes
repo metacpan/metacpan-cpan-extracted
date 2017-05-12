@@ -1,0 +1,23 @@
+Revision history for Bencher-Scenarios-Perl
+
+0.04    2016-03-15 (PERLANCAR)
+
+        - Add scenarios: Perl::5200Perf_return, Perl::5220Perf_length.
+
+
+0.03    2016-03-13 (PERLANCAR)
+
+	- Use proper way to list perls of perlbrew, by using
+	  App::perlbrew's installed_perls().
+
+
+0.02    2016-01-07 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with more perl versions.
+
+
+0.01    2016-01-07 (PERLANCAR)
+
+        - First release.

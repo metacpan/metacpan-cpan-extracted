@@ -1,0 +1,37 @@
+=head1 NAME
+
+Business::BancaSella::Decode - Parent class for the decoding uri system
+
+=head1 SYNOPSIS
+
+For GestPay payment system use something like:
+
+  use Business::BancaSella::Decode;
+  my $enc = new Business::BancaSella::Decode(type=>'gestpay',...);
+
+See Business::BancaSella::Decode::Gestpay for other informations.
+
+For Gateway payment system use something like:
+
+  use Business::BancaSella::Decode;
+  my $enc = new Business::BancaSella::Decode(type=>'gateway',...);
+
+See Business::BancaSella::Decode::Gateway for other informations.
+
+=head1 DESCRIPTION
+
+Implements different Banca Sella system payment. 
+Currently supported "GestPay" online system payment and "Gateway compatibility"
+online payment. Version minor 0.06 supports the old "Gateway" online system
+payment dismetted in Dicember 2001 because it doesn't support EURO currency.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Decode::Gestpay
+  Business::BancaSella::Decode::Gateway
+
+=cut

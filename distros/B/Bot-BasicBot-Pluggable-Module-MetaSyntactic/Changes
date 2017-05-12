@@ -1,0 +1,32 @@
+Revision history for Bot-BasicBot-Pluggable-Module-MetaSyntactic
+
+1.004 Wed Jun 26 2013
+        [ENHANCEMENTS]
+        - fixed a bug that prevented to request items from categories
+          with a dash (-) in their name
+        - fixed a bug that caused an infinite loop when filtering
+          results for non-existing items
+        [DOCUMENTATION]
+        - documented the filtering capability
+
+1.003 Mon Apr 22 2013
+        [ENHANCEMENTS]
+        - add support for filtering results using a regular expression
+
+1.002 Wed Apr 17 2013
+        [ENHANCEMENTS]
+        - add a README file
+        - throw an error when asked for a non-existing theme/category
+          combination
+        - give the total number of themes when answering 'themes?'
+        - enforce the limit when asked for all items in a theme
+
+1.001 Sat Apr 13 2013
+        [I STILL DON'T MASTER DIST::ZILLA]
+        - add a Changes file
+        - mention prior art in the documentation: Bot::MetaSyntactic
+
+1.000 Sat Apr 13 2013
+        [YET ANOTHER METASYNTACTIC BOT]
+        - this module enhances the metasyntactic experience provided
+          by Bot::MetaSyntactic

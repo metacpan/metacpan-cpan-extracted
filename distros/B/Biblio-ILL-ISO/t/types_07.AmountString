@@ -1,0 +1,3 @@
+$VAR1 = bless( {
+                 'PrintableString' => '$123.45'
+               }, 'Biblio::ILL::ISO::AmountString' );

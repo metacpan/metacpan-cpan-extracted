@@ -1,0 +1,76 @@
+LOCUS       AB019558     1644 bp    mRNA            ROD       20-JUN-2000
+DEFINITION  Mus musculus mRNA for parkin, complete cds.
+ACCESSION   AB019558
+VERSION     AB019558.1  GI:5456929
+KEYWORDS    parkin.
+SOURCE      Mus musculus skeletal muscle cDNA to mRNA.
+  ORGANISM  Mus musculus
+            Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi;
+            Mammalia; Eutheria; Rodentia; Sciurognathi; Muridae; Murinae; Mus.
+REFERENCE   1  (sites)
+  AUTHORS   Kitada,T., Asakawa,S., Minoshima,S., Mizuno,Y. and Shimizu,N.
+  TITLE     Molecular cloning, gene expression, and identification of a
+            splicing variant of the mouse parkin gene
+  JOURNAL   Mamm. Genome 11, 417-421 (2000)
+REFERENCE   2  (bases 1 to 1644)
+  AUTHORS   Shimizu,N., Kitada,T. and Asakawa,S.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (08-NOV-1998) to the DDBJ/EMBL/GenBank databases.
+            Nobuyoshi Shimizu, Keio University School of Medicine, Department
+            of Molecular Biology; 35 Shinanomachi, Shinjuku-ku, Tokyo 160-8582,
+            Japan (E-mail:shimizu@dmb.med.keio.ac.jp,
+            Tel:81-3-3351-2370(ex.2720), Fax:81-3-3351-2370)
+FEATURES             Location/Qualifiers
+     source          1..1644
+                     /organism="Mus musculus"
+                     /db_xref="taxon:10090"
+                     /tissue_type="skeletal muscle"
+     CDS             71..1465
+                     /codon_start=1
+                     /product="parkin"
+                     /protein_id="BAA82404.1"
+                     /db_xref="GI:5456930"
+                     /translation="MIVFVRFNSSYGFPVEVDSDTSILQLKEVVAKRQGVPADQLRVI
+                     FAGKELPNHLTVQNCDLEQQSIVHIVQRPRRRSHETNASGGDEPQSTSEGSIWESRSL
+                     TRVDLSSHTLPVDSVGLAVILDTDSKRDSEAARGPVKPTYNSFFIYCKGPCHKVQPGK
+                     LRVQCGTCKQATLTLAQGPSCWDDVLIPNRMSGECQSPDCPGTRAEFFFKCGAHPTSD
+                     KDTSVALNLITSNRRSIPCIACTDVRSPVLVFQCNHRHVICLDCFHLYCVTRLNDRQF
+                     VHDAQLGYSLPCVAGCPNSLIKELHHFRILGEEQYTRYQQYGAEECVLQMGGVLCPRP
+                     GCGAGLLPEQGQRKVTCEGGNGLGCGFVFCRDCKEAYHEGDCDSLLEPSGATSQAYRV
+                     DKRAAEQARWEEASKETIKKTTKPCPRCNVPIEKNGGCMHMKCPQPQCKLEWCWNCGC
+                     EWNRACMGDHWFDV"
+BASE COUNT      406 a    450 c    452 g    336 t
+ORIGIN      
+        1 ggaggctcgg gcgggcgcca gtgcccgcgt aggtccttct cgacccgcag ccaccacccg
+       61 cccggtgacc atgatagtgt ttgtcaggtt caactccagc tatggcttcc cagtggaggt
+      121 cgattctgac accagcatct tgcagctcaa ggaagtggtt gctaagcgac agggggttcc
+      181 agctgaccag ctgcgtgtga tttttgccgg gaaggagctt ccgaatcacc tgacggttca
+      241 aaactgtgac ctggaacaac agagtattgt acacatagta cagagaccac ggaggagaag
+      301 tcatgaaaca aatgcatctg gaggggacga accccagagc acctcagagg gctccatatg
+      361 ggagtccagg agcttgacac gagtggacct gagcagccat accctgccgg tggactctgt
+      421 ggggctggcg gtcattctgg acacagacag taagagggat tcagaagcag ccagaggtcc
+      481 agttaaaccc acctacaaca gctttttcat ctactgcaaa ggcccctgcc acaaggtcca
+      541 gcctggaaag ctccgagttc agtgtggcac ctgcaaacaa gcaaccctca ccttggccca
+      601 gggcccatct tgctgggacg atgtcttaat tccaaaccgg atgagtggtg agtgccagtc
+      661 tccagactgc cctggaacca gagctgaatt tttctttaaa tgtggagcac acccaacctc
+      721 agacaaggac acgtcggtag ctttgaacct gatcaccagc aacaggcgca gcatcccttg
+      781 catagcgtgc acagatgtca ggagccctgt cctggtcttc cagtgtaacc accgtcacgt
+      841 gatctgtttg gactgtttcc acttgtattg tgtcacaaga ctcaacgatc ggcagtttgt
+      901 ccacgatgct caacttggct actccctgcc gtgtgtagct ggctgtccca actccctgat
+      961 taaagagctc catcacttca ggatccttgg agaagagcag tacactaggt accagcagta
+     1021 tggggccgag gaatgcgtgc tgcaaatggg aggtgtgctg tgcccccgtc ctggctgtgg
+     1081 agctggactg ctacctgaac agggccagag gaaagtcacc tgcgaagggg gcaacggcct
+     1141 gggctgcggg tttgttttct gccgggactg taaggaagca taccatgaag gggattgcga
+     1201 ctcactgctc gaaccctcag gagccacttc tcaggcctac agggtggaca aaagagccgc
+     1261 tgagcaagct cgctgggagg aggcctccaa ggaaaccatc aagaagacca ccaagccttg
+     1321 tcctcgctgc aacgtgccaa ttgaaaaaaa cggaggatgt atgcacatga agtgtcctca
+     1381 gccccagtgc aagctggagt ggtgctggaa ctgtggctgt gagtggaacc gagcctgcat
+     1441 gggagatcac tggtttgacg tgtagagaga gatgtcactt ggccctggac gcacaacctc
+     1501 aagggaaact ccgaagattc ctaccttcct tagccatttc ttcttctcga tgcatataag
+     1561 cacataaatg cgcacacaca aacacaggct gcagattaca gaagcagccc ctagatcctt
+     1621 tctagggcac ccacagaaaa ccac
+//
+
+
+
+

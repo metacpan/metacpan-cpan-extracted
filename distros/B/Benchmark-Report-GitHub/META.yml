@@ -1,0 +1,37 @@
+---
+abstract: 'submit a benchmark report from Travis-CI to GitHub wiki'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Benchmark-Report-GitHub
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Benchmark::Report::GitHub:
+    file: lib/Benchmark/Report/GitHub.pm
+    version: '0.002'
+requires:
+  perl: '5.006'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Benchmark-Report-GitHub/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Report-GitHub
+  homepage: https://metacpan.org/release/Benchmark-Report-GitHub
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-benchmark-report-github.git
+version: '0.002'

@@ -1,0 +1,10 @@
+Revision history for Bot::Training::MegaHAL
+
+0.02 2010-05-01 21:26:15
+
+    - Re-release due to Makefile.PL breakage caused by Dist::Zilla
+      FAIL: http://github.com/rjbs/dist-zilla/commit/2e47b6c205
+
+0.01 2010-03-27 18:23:36
+
+    - Initial and buggy version

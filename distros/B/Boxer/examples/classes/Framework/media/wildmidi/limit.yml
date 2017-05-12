@@ -1,0 +1,11 @@
+classes:
+  - Framework.media.base
+parameters:
+  bug:
+    - 612509
+  doc:
+    framework:
+      pkg:
+        - exclude MIDI patches
+  pkg-avoid:
+    - freepats

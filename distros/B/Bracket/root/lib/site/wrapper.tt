@@ -1,0 +1,11 @@
+[%- IF template.name.match('\.(css|js|txt)');
+     debug("Passing page through as text: $template.name");
+     content;
+   ELSIF no_wrapper;
+     debug("Passing page through as text: $template.name");
+     content;
+   ELSE;
+     debug("Applying HTML page layout wrappers to $template.name\n");
+     content WRAPPER lib/site/html.tt;
+   END;
+-%]

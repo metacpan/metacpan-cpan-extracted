@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% "INFLUENCES" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FOREACH i IN influences %][% FILTER collapse %]
+[% i.print %]
+[% END %]
+[% END %]

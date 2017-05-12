@@ -1,0 +1,63 @@
+Classes and nodes usable by Boxer
+=================================
+
+Classes and nodes are YAML files parsed by reclass.  See reclass
+documentation for more info on its syntax and structure.
+
+Additional syntax needed for parsing by Boxer is covered below.
+
+
+Classes
+-------
+
+Lowercase classes are reusable, (relatively) objective core classes.
+Never include documentation, and avoid pkg-auto or pkg-avoid items.
+
+Capital classes (first letter uppercase) and their subclasses are
+subjective high-level bundles.  Always include documentation.
+
+
+Nodes
+-----
+
+Nodes should only use capital classes, to have all actions documented.
+
+
+Parameters
+----------
+
+doc: Documentation
+doc-headline: Headline for a group of classes
+doc-pkg: Description of purpose of pkg lists in this class
+doc-tweak: Description of purpose of tweak in this class
+
+pkg: Packages to install
+pkg-auto: Packages to mark auto-installed if installed
+pkg-avoid: Packages to remove
+
+tweak: Tweaks to apply after package actions
+
+
+Packages
+--------
+
+Packages are binary packages registered in APT.
+
+One way to resolve package lists for classes is to to try mark most
+possible packages on an actual system as auto-installed (e.g. hit "M"
+with aptitude in fullscreen mode), and then dump the list of remaining
+manually installed packages with "apt-mark showmanual".
+
+
+Tweaks
+------
+
+Tweaks are code snippets executed by a POSIX shell.
+
+Avoid ${...} (reclass use it for parameter interpolation), e.g. by
+adding dummy quotes like this: "dpkg-query -Wf='$''{Depends}\n' foo".
+
+Write tweaks for use with debian-installer, using either of below which
+will be stripped when generating script target:
+  * "chroot /target "
+  * "/target/"

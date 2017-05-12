@@ -1,0 +1,52 @@
+Bio::GenBankParser
+
+This module is meant to be a stand-alone parser for GenBank records.
+It is not related to the BioPerl project and has not ties to or
+requirements of it.  This module uses Parse::RecDescent grammar that
+is intended to be more easily extensible than the common method of
+using regular expressions.  Please feel free to use and modify the
+grammar and submit bugs, patches and enhancements back to the author.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::GenBankParser
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-GenBankParser
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-GenBankParser
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-GenBankParser
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-GenBankParser
+
+PROJECT HOME/SOURCE
+
+The project's home and Subversion repository are kindly hosted by
+Google Code:
+
+    http://code.google.com/p/perl-genbank-parser/
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 Ken Youens-Clark
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

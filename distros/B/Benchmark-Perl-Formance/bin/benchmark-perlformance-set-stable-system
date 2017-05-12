@@ -1,0 +1,232 @@
+#! /usr/bin/perl
+# PODNAME: benchmark-perlformance-set-stable-system
+# ABSTRACT: CPU scaling utility for Benchmark::Perl::Formance
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use File::Basename "basename";
+
+my $SET = 1;
+
+my $PROC_RANDOMIZE_VA_SPACE = "/proc/sys/kernel/randomize_va_space";
+my $PROC_DROP_CACHES        = "/proc/sys/vm/drop_caches";
+
+my $SCALE_FREQ_MIN          = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq";
+my $SCALE_FREQ_MAX          = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq";
+my $SCALE_FREQ_MAX_GLOB     = "/sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq";
+my $SCALE_FREQ_AVAIL        = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies";
+
+my $INFO_FREQ_MAX           = "/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq";
+
+sub proc_value
+{
+        my ($file, $value) = @_;
+
+        return undef if ! -e $file;
+
+        my $orig;
+        if (open (my $PROCFILE, "<", $file)) {
+                local $/ = undef;
+                $orig = <$PROCFILE>;
+                close $PROCFILE;
+        }
+        chomp $orig if defined $orig;
+
+        if ($SET && defined $value) {
+                if (open (my $PROCFILE, ">", $file)) {
+                        print $PROCFILE $value;
+                        close $PROCFILE;
+                }
+        }
+
+        return $orig;
+}
+
+sub set {
+        my $hi  = shift || 0;
+
+        my $orig;
+
+        $orig->{aslr}          = proc_value ($PROC_RANDOMIZE_VA_SPACE, $hi ? 2 : 0); # 2 isn't really high but the usual secure value
+        $orig->{freq_min}      = proc_value ($SCALE_FREQ_MIN);
+        $orig->{info_freq_max} = proc_value ($INFO_FREQ_MAX);
+        $orig->{freq_avail}    = [ split " ", proc_value($SCALE_FREQ_AVAIL) ];
+
+        my $new_max = $hi ? $orig->{info_freq_max} : $orig->{freq_min};
+        $orig->{freq_max}{$_} = proc_value ($_, $new_max) foreach glob $SCALE_FREQ_MAX_GLOB;
+
+        if ($SET) {
+                proc_value ($PROC_DROP_CACHES, 1);
+        }
+
+        print Dumper($orig);
+}
+
+sub restore {
+        my $VAR1;
+        my $orig;
+        my $input;
+
+        { local $/; $input = <STDIN> }
+        $orig = eval $input;
+        
+        my $freq_max = $orig->{freq_max};
+
+        proc_value ($PROC_RANDOMIZE_VA_SPACE, $orig->{aslr});
+        proc_value ($_, $freq_max->{$_}) foreach keys %$freq_max;
+}
+
+sub usage {
+    print STDERR "Usage:\n";
+    print STDERR "  @{[basename $0]} list\n";
+    print STDERR "  @{[basename $0]} lo      > ORIG_VALUES_FILE\n";
+    print STDERR "  @{[basename $0]} hi      > ORIG_VALUES_FILE\n";
+    print STDERR "  @{[basename $0]} restore < ORIG_VALUES_FILE\n";
+}
+
+sub main {
+    my $mode = shift || "";
+
+    if ($mode !~ /^list|hi|lo|restore$/) {
+        usage();
+        exit 1;
+    }
+
+    if ($mode eq 'list') {
+        $SET = 0;
+        set(0);
+    } elsif ($mode eq 'hi') {
+        set(1);
+    } elsif ($mode eq 'lo') {
+        set(0);
+    } elsif ($mode eq 'restore') {
+        restore();
+    }
+}
+
+main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+benchmark-perlformance-set-stable-system - CPU scaling utility for Benchmark::Perl::Formance
+
+=head1 SYNOPSIS
+
+Usage:
+
+  $ bin/benchmark-perlformance-set-stable-system list
+  $ bin/benchmark-perlformance-set-stable-system lo      > ORIG_VALUES_FILE
+  $ bin/benchmark-perlformance-set-stable-system hi      > ORIG_VALUES_FILE
+  $ bin/benchmark-perlformance-set-stable-system restore < ORIG_VALUES_FILE
+
+It needs root permissions to actually change the cpu settings, so run
+it with C<sudo>.
+
+=head1 ABOUT
+
+This is an utility to be used from inside benchmark-perlformance in
+order to prepare a system as stable as possible, but can also be used
+on its own.
+
+Tries to stabilize a system via:
+
+=over 4
+
+=item * Setting max frequency of all cpus to the minimal possible cpu frequency (so the system can't scale down further unexpectedly, e.g. when it gets hot).
+
+=item * Disabling address space randomization (ASLR) (https://wiki.ubuntu.com/Security/Features)
+
+=item * Drop caches (http://linux-mm.org/Drop_Caches)
+
+=item * Classical disk sync
+
+=back
+
+=head1 COMMANDS
+
+=over 4
+
+=item * list
+
+Prints the current values to STDOUT, in a format readable by the
+C<reset> command.
+
+=item * lo
+
+Scales down a system to lowest possible frequency, disables ASLR,
+flushes caches, calls 'sync'.
+
+Prints the original values to STDOUT, in a format readable by the
+C<reset> command.
+
+=item * hi
+
+This tries to be the complement to C<lo>.
+
+Scales up the system to highest possible frequency (but enables ASLR
+again which is not really a fast setting).
+
+Prints the original values to STDOUT, in a format readable by the
+C<reset> command.
+
+This isn't recommended for getting stable benchmark values because a
+scaled-up system might be forced to scale down automatically by the
+cpu when it gets too hot, or scale up to turbo mode.
+
+=item * restore
+
+Restores the original values, as read from STDIN in a format as
+produced by the other commands.
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 proc_value
+
+Get or set value in C</proc> or C</sys> filesystem.
+
+=head2 set($hi)
+
+Set the requested stabilization mode. If parameter C<$hi> is true then
+it sets the max allowed frequency to the maximum (command C<hi>),
+otherwise to the lowest possible value (command C<lo>).
+
+This sub prints out the original values to STDOUT via Data::Dumper,
+like it is expected by the C<restore> command.
+
+=head2 reset
+
+Resets the cpu stabilization to the original values.
+
+It reads these values from STDIN as Data::Dumper format like provided
+by the set() function.
+
+=head2 usage
+
+Prints out usage help text.
+
+=head2 main
+
+The main function. Reads arguments and calls respective functions.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

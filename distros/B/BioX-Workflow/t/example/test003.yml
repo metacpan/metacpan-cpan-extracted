@@ -1,0 +1,29 @@
+---
+global:
+    - indir: t/example/data/raw/test003
+    - outdir: t/example/data/processed/test003
+    - ROOT: t/example/data/processed/test003
+    - file_rule: (sample.*)$
+    - by_sample_outdir: 1
+    - find_by_dir: 1
+    - LOCAL_VAR: "This should be overwritten"
+rules:
+    - backup:
+        local:
+            - LOCAL_VAR: "my_local_var"
+            - analysis_dir: "{$self->ROOT}/analysis"
+        process: |
+            echo "{$self->LOCAL_VAR}" && \
+            echo {$self->analysis_dir} && \
+            cp {$self->indir}/{$sample}.csv {$self->outdir}/{$sample}.csv
+    - grep_VARA:
+        local:
+            - LOCAL_VAR: "my_local_new_var"
+        process: |
+            echo "{$self->LOCAL_VAR}" && \
+            echo "Working on {$self->{indir}}/{$sample}.csv"
+            grep -i "VARA" {$self->indir}/{$sample}.csv >> {$self->outdir}/{$sample}.grep_VARA.csv
+    - grep_VARB:
+        process: |
+            echo "{$self->LOCAL_VAR}" && \
+            grep -i "VARB" {$self->indir}/{$sample}.grep_VARA.csv >> {$self->outdir}/{$sample}.grep_VARA.grep_VARB.csv

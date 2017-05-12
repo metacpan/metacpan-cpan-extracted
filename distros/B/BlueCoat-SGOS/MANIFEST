@@ -1,0 +1,20 @@
+Build.PL
+Changes
+examples/cmd.pl
+examples/cpl.pl
+examples/inventory.pl
+examples/networkinfo.pl
+examples/sections.pl
+examples/sysinfo-capture.pl
+lib/BlueCoat/SGOS.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+t/000_load.t
+t/300_file_sysinfo.t
+t/sysinfos/ProxySG-4006060000--20090307-165730UTC.sysinfo
+t/sysinfos/public.parameters
+SIGNATURE                                Public-key signature (added by MakeMaker)

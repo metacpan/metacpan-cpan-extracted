@@ -1,0 +1,22 @@
+classes:
+  - Desktop.email
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include Icedove locales for Asia (UN M.49 definition)
+  pkg:
+    - icedove-l10n-ar
+    - icedove-l10n-bn-bd
+    - icedove-l10n-he
+    - icedove-l10n-id
+    - icedove-l10n-ja
+    - icedove-l10n-ko
+    - icedove-l10n-pa-in
+    - icedove-l10n-ru
+    - icedove-l10n-si
+    - icedove-l10n-ta-lk
+    - icedove-l10n-tr
+    - icedove-l10n-vi
+    - icedove-l10n-zh-cn
+    - icedove-l10n-zh-tw

@@ -1,0 +1,773 @@
+Revision history for Perl extension Bigtop.
+
+0.38 Sat Jul 10 17:02:39 CDT 2010 for CPAN distribution
+    - Corrected various pod flaws.
+    - Added a gaurd so the full bigtop test is skipped if there are spaces
+      in the path.  This finishes my work on making Bigtop work on cygwin.
+
+0.37 Fri Jul 09 12:25:26 CDT 2010
+    - Add missing UNIQUE constraint generation for Postgres, MySQL, and SQLite.
+
+0.36
+    - Corrected instructions for users of --mysql_help bigtop script flag.
+
+0.35 Thurs Sept 3 11:26:00 CDT 2009
+    - Always include PluginNamespace in app use statement since its now
+      used by gantry as the namespace for all plugins except the engine.
+
+0.34
+    - Added table level block extra_sql so models could take custom queries
+      into account.  None of the shipping backend models know what to do
+      with these yet.  Nor, does tentmaker know about them.
+    - Corrected bug which formed illegal table names for three way joins
+      requested during kickstart.
+    - Suppressed foreign_display generation during kickstart if your table
+      has no columns for it to display.
+
+0.33 Sat Jul 11 10:16:26 CDT 2009
+    - Added ability to specify fields as being unique.
+    - Added gantry backend counterpart to gantry commit r1451:
+            * Skip querying of foreign tables unless a foreign key is actually
+              used on the form. This gives a huge speed increase when dealing
+              with foreign tables with many rows.
+    - Added html_form_fieldset keyword to fields. This allows you to specify
+      the fieldset to group a field into.
+    - Corrected several tests so they can pass when Gantry is not installed.
+    - Corrected some documentation related to kickstart syntax.
+    - Refactored Kickstart.pm so you can easily subclass it to control
+      what columns are placed in tables during kickstart.
+    - Backends now fire in the order they are listed, except that Init
+      backends are run again after the others (so they can build manifests).
+    - Moved build directory validation from parser to Init:: modules.
+      Default is in Init::Std.  This allows non-CPAN style builds if you
+      have your own Init:: module.
+    - Moved instructional messages from bigtop script to style files
+      (default is in Kickstart.pm).  This means exotic build styles can
+      now print their own messages.
+    - Added DB2 SQL backend.
+    - Fixed (I hope) an ordering bug in DBIx::Class model backend when
+      using InflateColumn::DateTime.
+    - Changed grammar to permit schemas in join table names.  However,
+      Model backends may not yet know what to do when schemas are present.
+
+0.32 not released to CPAN
+    - Fixed long standing bug which prevented join_tables from having
+      multiple data statements.
+
+0.31 Wed Jun 11 09:37:05 CDT 2008 (Not released to CPAN)
+    - Added foreign key creation for join_tables at the request of
+      Stewart Heckenberg.  (Currently PostgreSQL only.)
+    - Added add_columns field statement to support arbitrary entries in
+      calls to it for DBIx::Class usrs (notably Kevin Esteb).
+      To use it well, also add extra_components `InflateColumn::DateTime`;
+      or something similar to the Model backend block in the top level config
+      section.
+    - Updated Gantry backend control module to work with JSON 2.x as some
+      things have changed with its API. Tests were also updated to reflect
+      this change.
+    - Added pseudo column support
+        - see docs/keyword_cookbook/field/pseudo_value for documentation
+    - Update to allow labels to have single quotes in them without having
+      to be escaped.
+
+0.30 Tue Aug 14 17:15:11 CDT 2007
+    - fix DBIx::Class paging routine in the generated do_main subroutines.
+    - gen_root no longer creates duplicate root config vars, in fact it
+      is completely ignored.  By default, all appropriate backends make
+      a root whenever you don't make one yourself.
+    - fixed bug with literal GantryLocations which ignored them unless
+      you already had a controller level config block.
+
+0.29 Fri Jun 22 09:23:20 CDT 2007
+    - absolute paths are now used for conf file specification to aid CGIs
+      you should still remove explicit conf files and use the default
+      /etc/gantry.conf for production environments
+    - CGI scripts are now confed according to the config CGI {} block
+    - limit_by no longer causes a warning when no limit parameters is used
+    - added where_terms keyword for main listing methods
+    - added accessor keyword for table fields, to rename default DBIx accessor
+    - corrected app.server so dbpass is not always set to dbuser's value
+      thanks to Tim Allwine for pointing out the bug.
+    - Stub base modules no longer use their children.
+    - bigtop no longer prints instructions when no_gen tells it not to build
+    - kickstart syntax no longer treats id, created, and modified as a group
+      which is left out whenever you mention one of them.  Now you are
+      responsible for any that you do mention and the others are still made.
+    - when you have html_form_options, your stub model gets enough pod for
+      its tests to pass (as long as the field is in before the stub is made)
+    - bigtop with -c no longer litters on the disk if the list of things to
+      build doesn't list any valid backend types (or the word all).
+    - schema_base_class methods get POD to keep coverage tests happy
+    - tests liter less
+
+0.28 Fri May 11 14:55:26 CDT 2007
+    - added controller_config_block.ttc to MANIFEST
+
+0.27 Thu May 10 09:10:22 CDT 2007
+    - added skipinvalid flag to json converter. ( skips the orm row )
+    - added orm row to do_main data
+    - added gantry conf to generation when using kickstart file
+    - added permissions keyword controller hashref method type
+    - added support for controller_config
+
+        method controller_config is hashref {
+            literal `mykey => 'somevalue'`;
+            authed_methods 
+                do_delete => ``;
+            permissions `crudcrud-r--` => admin;
+        }
+    - added support for Gantry's new row and table level permissions new
+      keywords in main listing methods:
+          header_option_perms `Special Add` => create;
+          row_option_perms `Exotic Edit` => update, `See Details` => retrieve;
+    - Change tentmaker so it uses bigtop keywords instead of labels for
+      easier movement between it an hand editing (and to consolidate book
+      chapters, eventually).
+    - tentmaker now allows you to enter import lists on all uses statements.
+    - added controller level plugins keyword (not for base controllers,
+      keep using bigtop config plugins keyword for them)
+    - fixed generated default page hit tests to use top level plugins keyword
+    - put a guard around t/bigtop/01_twotable.t so it won't be run if it
+      can't find the Gantry templates
+    - improved error message and reported line when a method block has no type
+    - moved from single quotes to q!! for legends on formsets, setting an
+      example for all users to not embed ' or " quotes in bigtop strings,
+      to reduce the risk of quote conflict with HTML quoting in tentmaker
+    - controller level configs now place any init and accessor methods in GEN
+    - taught tentmaker to think of the app level config blocks as
+      app body blocks (the App Config tab went away)
+    - taught tentmaker to handle controller level config blocks
+    - generated controller modules now use warnings
+    - fixed javascript so data statement values are properly URL escaped
+      by tentmaker (now you can include non-word chars in the values).
+    - switched default apps made with bigtop and tentmaker to new developer
+      navigation drop down menus
+    - tentmaker reports a better error when you forget the -n flag
+    - users can now supply their own default bigtop file as a TT template
+      called ./bigtopdef or ~/.bigtopdef for use with -n in bigtop
+      and tentmaker.  To revert to orignal default set environment var
+      BIGTOP_REAL_DEF to a true value
+    - corrected some generated POD so POD tests can pass
+
+0.26 Thu Mar 29 12:34:08 CDT 2007
+    - modified CRUD to call from in the GEN by default
+    - modified CRUD to execute standard add/edit/delete on db
+    - added "plugins" to config block. Plugins defined will transfer to the
+      app.server, app.cgi and httpd.conf
+    - All GEN base modules now have a namespace method.  When you use the
+      new plugins keyword, you get a bonus -PluginNamespace in your full use.
+    - Added html_form_hint field keyword.  Hints show up on form.tt below
+      labels usually in grey italics.  (Thanks Tim.)
+    - Generated app.servers now use the Gantry Static plugin so they can
+      serve CSS and other static content.  URI /static maps to ./html dir.
+    - Corrected ASCII art style so it wouldn't ignore solo tables.
+      Changed to calling ASCII art 'kickstart sytnax'.
+    - kickstart descriptions can now come from a file:
+        bigtop -n AppName file.art
+    - There is a new table keyword refered_to_by which generates a has_many
+      call in the model class.
+    - Both bigtop and tentmaker now generate add refered_to_by statements
+      for all foreign keys.
+    - There are new kickstart operators *> and <*.  Example invoice*>task,
+      reads "invoice has many tasks."  These are currently synonyms for
+      <- and ->, but they may deviate in the future.
+    - Corrected various bugs with new kickstart features.
+    - limit_by now appends the parent row id to the end of all header
+      options.
+    - Generated do_main's now call foreign_display only when the attribute
+      for the foreign key in the row object is true.  This prevents fatal
+      errors when foreign keys are optional, but appear on main listings.
+    - main_listing methods now support order_by to control row ordering.
+    - app.server's now get show_dev_navigation set to 1.
+    - Corrected one test and removed another so changes to Gantry's
+      sample_wrapper.tt no longer cause failures.
+    - CRUD forms are now generated into the GEN file, so they can be
+      regened as the model changes.  Check out Gantry::Utils::FormMunger
+      for a convenient way to alter them in an overriden method.
+    - Initial Changes file now has the bigtop version number.
+    - vim syntax file is current again and their is now a script
+      to create the file, so it shouldn't get out of date
+      (unless I forget to run the script)
+    - There is a new doc generated from Bigtop::Keywords.  It is called
+      Bigtop/Docs/AutoKeywords.pod.  It superscedes most of
+      Bigtop::Docs::Syntax and all of Bigtop::Docs::Keywords.
+    - There is a new doc generated from the backends.  It is called
+      Bigtop/Docs/AutoBackends.pod.  It covers some of the same ground as
+      Bigtop::Docs::Syntax.
+    - There are new keywords: for fields: html_form_class, searchable
+      for main_listing methods: livesearch, json.
+      See Bigtop/Docs/AutoKeyword.pod.
+    - You can now have secondary config blocks.  Each named block makes a
+      config file or Gantry::Conf instance.  Named blocks get the unnamed
+      config info, unless they override it.  Also works for controller
+      level config blocks.  Remember that CGIs can only use controller
+      configs if they use the Conf Gantry backend.
+    - tentmaker now draws all Bigtop Config statements except app name
+      directly from Keywords.
+    Pointed out by Stas Bekman :
+    - Changed a test to use $^X instead of 'perl' to run perl.  This
+      avoids problems when two perls are on a box.
+    - Corrected TentMaker.pm change_conf which failed on some 5.8.8 installs
+      (not including mine).  Perl's $# was forcing scalar context on its arg
+      if that arg was an array expanded into a list.
+    - Changed app.cgi and app.server to use $^X instead of assuming
+      /usr/bin/perl
+    - Stop Server, Save As (and it's file name box) are no longer on the
+      first tentmaker tab.  They are next to the title, so they are
+      always on the page (though scrolling up may still be required).
+    - Made other cosmetic changes to tentmaker to reduce scrolling.
+    - The bigtop source dump is now hidden by default.  Click the link
+      to show (and/or hide) it.
+    - Bigtop's Build.PL now uses the most recent install location for
+      tentmaker templates as the default on re-install.
+    - tentmaker now asks again if you answer 'would you like to save changes?'
+      with up arrow.
+    - app.server, app.cgi will always include -Engine=CGI ignoring the
+      requested engine (this is the only engine they can run with).
+    - Repealed changes put in to work around a particular HTTP::Server::Simple
+      version bug that prematurely unescaped URL elements.  This corrects
+      various problems like tentmaker failing when you try to remove
+      a constraint.
+    - Entering blank (or all whitespace) values for app level statements
+      no longer makes statements (so they can't be broken any more).
+    - Bad Things no longer happen when you save in tentmaker and try to keep
+      working.
+    - The term kickstart is now integrated into Bigtop and its docs to
+      refer to command line (or file) descriptions of the data model.
+    - The backends tab in tentmaker looks a lot better.
+    Thanks to Stas for using tentmaker and bigtop enough to generate
+    requests for these and for sending in those requests.
+
+0.25 Thu Feb 15 11:12:12 CST 2007
+    - added hints to the form field properties
+    - Increased Test::Files build requires version number to 0.13 in Build.PL.
+      Without that some tests fail for lack of file_filter_ok.
+    - Made the bigtop test's file test stripper more aggressive.  It now
+      eats author lines since they are rarely the same.  (Are you Phil Crow?)
+    - Updated lots of docs.
+    - Changed generated root path to html:html/templates to facilitate use
+      of Gantry's Static plugin with generated stand alone servers.
+
+0.24 Wed Feb 14 12:50:24 CST 2007
+    - Taking advantage of Test::Files new (as of 0.13) file_filter_ok, I
+      removed that last year dependent test.
+    - Fixed Control and Model backends so they can handle new refers_to
+      values.  This was fatal to any bigtop file with refers_to table => col.
+
+0.23 Tue Feb 13 16:10:32 CST 2007
+    - Finally moved all Docs modules from .pm to .pod so the PAUSE indexer
+      will know they are docs and not code files.
+    - tentmaker now updates field names in the expanded edit box when they
+      are changed in the quick edit table.
+    - ASCII art now supports declaring a column optional in HTML forms and/or
+      giving it a default value:  tbl(+optional_col,col_with_default=12).
+      These may be combined: tbl(+opt_w_def=value).  Note: All defaults must
+      be strings or numbers and cannot contain spaces, colons, commas, equals,
+      etc.
+    - SQL backends now make genuine foreign keys from the new pair form of
+      refers_to: refers_to table_name => col_name.
+    - There are two new keywords for REFERENCES clauses: on_delete and
+      on_update.  Using them will add ON DELETE and or ON UPDATE clause(s)
+      to the end of generated REFERENCES statements.  These do not apply
+      to SQLite, since it doesn't honor them.
+    - Both bigtop and tentmaker now use SQL foreign keys for all script help
+      styles.
+    - Fixed bug which prevented tentmaker from displaying paired values
+      containing double quotes.  Tried not to make things worse in the process.
+
+0.22 Thu Feb  8 14:25:30 CST 2007
+    - Calling tentmaker with -a and a missing or unreadable file is now fatal.
+    - tentmaker now trims leading and trailing space from ASCII art before
+      using it.
+    - Extra fields in join tables now show up in the model, not just in SQL.
+    - ASCII art now supports field names and types, try:
+      bigtop -n Address 'child(name,birth_date:date)->family(names,email)'
+      works with -a and -n in bigtop and tentmaker.
+    - You can design your own ASCII art replacement.  See
+      Bigtop::ScriptHelp::Style for details.  Use -s YourStyle to access it.
+      Bigtop::ScriptHelp::Style::Pg8Live is an example.
+    - There is a -s style for postgres 8:
+        bigtop -n AppName -s Pg8Live 'dbi:Pg:dbname=adb' user pass [ schema ]
+      it supports column types, defaults, primary keys (including multi-col),
+      foreign keys (single col only).  Schema defaults to public.  All tables
+      must live in the same schema.  No join_tables are ever made.
+
+0.21 Mon Jan 22 09:56:44 CST 2007
+    - Added data statements and field blocks as legal join table constructs.
+      tentmaker does not know about them.
+    - bigtop --create now gives the same advice that bigtop --new does.
+      Both also try to build your SQLite database if that makes sense.
+    - Corrected default generated tests so their root path is html/templates.
+    - Init Std's Build.PL uses the new Gantry::Build (minimum Gantry: 3.46).
+    - Deparser works as cleanly for join tables as for regular tables.
+    - tentmaker now does some magic when fields are deleted.  It removes
+      them from foreign_displays, fields or all_fields_but lists, and
+      main listing cols lists.
+    - Added model methods NAME_display for non-foreign key fields whose
+      values are selected from html_form_options.
+    - Taught generated do_mains to use NAME_display methods to show
+      the same labels users chose on forms for non-foreign select fields.
+    - Taught bigtop and tentmaker about Gantry Control's new
+      html_form_raw_html statement.
+    - There is a new main_listing method keyword: limit_by.  It is the name
+      of a foreign key column.  If a parameter is passed to do_main, only
+      rows associated with that foreign key value appear.  No paramater
+      yields old behavior.  See examples/kids.bigtop.
+    - tentmaker now allows data statement editing for regular tables
+    - Attempted to address HTTP::Server::Simple's new behavior of unencoding
+      slashes in URL elements.  More work is needed here (leading slashes
+      in values are still lost, for some versions of HTTP::Server::Simple).
+    - Added keywords and generation for Gantry's new (mod_perl 2 only)
+      SOAP plugin.
+
+0.20 Thu Dec  7 13:50:02 CST 2006
+    - Corrected bug in many-to-many generation for DBIx::Class.
+    - Corrected doubling of quotes on deparse when there are colons and
+      other unsafe characters (it worked if you only had colons).
+    - Corrected bug which prevented rel_location from showing for AutoCRUD
+      controllers.
+    - Corrected conflict between where genwrapper.tt was generated and
+      where Build.PL expected it to be during install.
+    - Moved Billing-Finished example under Bigtop::Example:: namespace
+      so the CPAN indexer knows who it belongs to.
+    - tentmaker got a -h help message.
+    - tentmaker no longer looks under every rock for backends, making it
+      start much faster.  It only looks under the path where Bigtop.pm lives.
+    - Corrected generated CRUD's do_edit so it doesn't expect you to be
+      using Class::DBI.
+    - tentmaker's Stop Server confirmation now respects Cancel.
+
+0.19 Wed Nov  8 12:31:31 CST 2006
+    Highlights:
+    * table names can now have schema prefixes: sch.tbl
+    * t/10_run.t is now gen output (not a stub any more)
+    * tables can have 0, 1, or more primary key columns
+    * support for improved Gantry::Conf
+    * all init files except MANIFEST are now stubs
+    * main listings can now be paged (instead of showing all rows)
+    * one controller can be of type base controller to control AppName.pm
+    * tentmaker has a stop server button, use it an never be fooled by
+      javascript into thinking the server is up when its not
+
+    * Added support for table names with schema prefixes and schema blocks
+      (but only Postgres really has these).
+    - Removed Model Gantry backend.  It (and the models themselves) are
+      not really maintained and it was starting to show.
+    * Changed Gantry Control backend so it updates t/10_run.t instead of
+      considering it a stub (it now agrees with various docs).
+    - Added skip_test controller statement, use it to opt out of t/10_run.t.
+    * Attempted to add support for tables with no primary key and
+      tables with multi-column primary keys.  The SQL works, but I haven't
+      tried an app with these features.
+    * Converted to new Gantry::Conf style.  Choose the Conf Gantry backend,
+      supply your instance there, then check Use Gantry::Conf in CGI Gantry
+      or HttpdConf Gantry.
+    - Added support for Gantry's new html_form_type display and its cousin
+      html_form_foreign.  display fields are shown on the input form as
+      plain text (not in input elements).
+    - Cosmetic improvements to generated Changes and README files.
+    * All the plain files Init Std generates are now stubs except MANIFEST.
+      no_gens for each file are now unneeded except for MANIFEST.
+    - Added a stop server button to tentmaker.  If you shut down that way,
+      the browser will prevent you from trying to use the deceased server.
+    - Stopped generating use_clean_dates for CRUD object constructors since
+      it is superceeded by default cleaning of params.  (Use
+      turn_off_clean_params => 1 and use_clean_dates => 1 for the old way.)
+    - Suppressed javascript errors in tentmaker when changes could have
+      cascaded but didn't.
+    * Added paging to main listings upon request.  Use rows or paged_conf
+      method statements to enable it.
+    * There is now a:
+        controller is base_controller { ... }
+      block so you can put methods into the base module.  There are two
+      method types specially designed for it: base_links (a do_main with
+      nav links to other pages) and links (a site_links method other
+      controllers, or their templates, use to generate nav links).
+      But, you can use these for one table/one controller apps.
+    - tentmaker now only displays input boxes for controller and method
+      statements if the type of method or controller understands the
+      statement.  TODO: Changing types requires a manual refresh.
+    - Corrected a critical and long standing bug with the urgency color
+      of tentmaker created join tables.  Everyone will be happy to know
+      that both table boxes are now red.
+    - Added gen_uses and stub_uses statements for controllers.  You can
+      still use uses to put the use statement in both.  None of these
+      alter an existing stub.
+
+0.18 Wed Oct  4 15:07:47 CDT 2006
+    - Corrected fatal bug in -a flag for scripts when the bigtop file had an
+      existing join table.
+    - Corrected test bug which depended on the load order of backends by
+      tentmaker.
+    - Corrected fatal error with bigtop -n which created unparsable bigtop
+      code when foreign key targets had underscores.
+    Thanks to Paul Espinosa for noticing these bugs.
+
+0.17 Mon Oct  2 09:50:12 CDT 2006
+    - There is a new Backend: Conf Gantry.  It makes files ready for
+      immediate deployment to /etc/gantry.d when /etc/gantry.conf has an
+      include /etc/gantry.d/*.conf.
+    - Corrected tentmaker error which did not allow proper creation of new
+      config variables.
+    - Added html_form_default_value as a legal field statement.  Gantry form
+      templates already understood it.  It's now in tentmaker's quick edit.
+    - Several statements now pretty print (a little bit) on deparse.
+    - Improved maintainability of AJAX expected response test files.
+    - Corrected Postgres SQL backend's datetime type.
+
+0.16 Mon Sep 25 09:57 CDT 2006
+    - Added a field set label to default form methods.
+    - Corrected tentmaker error which caused tentmaker to dump its Quick
+      Edit box when new fields were made.
+    - Converted many tentmaker tests to check the AJAX response rather
+      than just the deparsed tree, this would have caught the previous error.
+
+0.15 Thu Sep 21 12:29:17 CDT 2006
+    Highlights:
+        many-to-many support for DBIx::Class
+        ASCII art for specifying table relationships try:
+            bigtop -n AppName 'pos->job job<->skill'
+        augment an existing bigtop file with bigtop and tentmaker flags
+        Gantry controllers now have (a few) generated page hit tests
+        tentmaker...
+            has a new Field Quick Edit box for its most common edits
+            allows multiple fields to be made at once
+            has much more magic to save even more time
+        stand alone servers have flags to change database connection info
+
+    - Added support for three way joins (many to many) relationships
+      for dbix class models.
+    * Added ASCII art input to bigtop script, try this:
+        bigtop -n AppName 'pos->job job<->skill'
+      You get four tables: pos, job, skill, and job_skill with a reference
+      column in pos storing a job id and a many-to-many between job and skill.
+    * Added --add flag (aka -a) to bigtop script:
+        bigtop -a docs/yourapp.bigtop 'app->pos resume<->app'
+      adds app and resume tables and controllers plus a resume_app joining
+      table.
+    * Applied --new and --add flags to tentmaker in exactly the way
+      they apply to bigtop (they even share the implementation code which is
+      factored out into Bigtop::ScriptHelp).
+    - Comments are preserved on deparse, meaning they will survive a
+      trip through tentmaker.  This also facilitates the --add flag.
+      One caveat: if you have blank lines or split long statements across
+      lines, comments below that point will be shifted down in the output,
+      but at least they won't be summarily deleted.
+    - Corrected the error message when app level block names are omitted.
+    * Expanded generated stand alone servers so you can change database
+      DBDs, names, user names, and/or passwords with command line flags.
+      Editing the generated app.server makes it easy to change the defaults
+      (then you should turn probably off generation of it).
+    - Sequences are no longer generated by default.
+    - Navigation links are now generated in the site_links method of the
+      base module.
+    - Defaults now always call the database app.db.
+    - Base modules now come in stub and GEN pieces so their nav links
+      can be regenerated.
+    - DBIx::Class schema modules are now split into stub and GEN pieces
+      so the GEN piece can be regened when new tables are added to the
+      data model.
+    * When you change the name of table in tentmaker, the controller now
+      updates its controls_table statement (but not its own name).  Foreign
+      keys pointing to the table have their refers_to statements updated
+      (but not their own names).
+    * When you change the name of a field in tentmaker, it now walks the
+      parse tree updating that name wherever it occurs (including: the
+      label of the field, the cols of the controller's main_listing,
+      the controller's form method, and the foreign_display).
+    * The Gantry Control backend now makes more tests.  There are pod
+      and pod coverage tests (which require have Test::Pod and
+      Test::Pod::Coverage).  There is also a file of run tests which use
+      Gantry::Server to test front page hits of each generated controller.
+    * tentmaker now has a quick edit box with a row for each field allowing
+      one small place to modify a lot of important data.  Any field keyword
+      will show in the box, if it's Bigtop::Keywords entry has a quick_label.
+    * tentmaker now allows multiple fields to be constructed at once, simply
+      separate them with spaces in the Name(s) box.
+    * When a field's SQL type becomes date or it has date_select_text
+      set on it in tentmaker, everything is done to make the Gantry
+      easy date scheme work.
+    - Gantry stub controllers finally inherit from their gen modules.  This
+      allows overriding gen methods without hastle and easier use of plugins
+      provided by the framework (which are themselves mixins).
+    - Killing the tentmaker now prompts to ask if you want to save changes.
+    - Corrected long standing (but unnoticed) bug which would build in
+      the wrong directory when base_dir is used without app_dir.
+    - Added controller level config block support to deparser so they
+      can pass undisturbed (save whitespace normalization) through tentmaker.
+    - Simplified the abstract syntax tree and standardized the naming of
+      various elements in it.
+
+0.14 Wed Aug 16 16:20 CDT 2006
+    Highlights:
+    1. Quicker app generation in two ways.
+        Way 1 (if you have sqlite installed):
+            bigtop --new App table1 table2
+            cd App
+            # create database 
+            # populate database from docs/schema.yourdb
+            ./app.server
+
+        Way 2:
+            tentmaker
+            on app body tab create table1 and table2
+            save as file.bigtop
+            bigtop --create file.bigtop
+            cd Sample
+            sqlite app.db < docs/schema.sqlite
+            ./app.server
+    2. DBIx::Class support
+    3. All around better defaults
+
+    - Changed the full use default, moving it from true for Gantry controllers
+      to being true for Gantry HttpdConf.
+    - Converted to DBIx::Class (was Class::DBI::Sweet) for tentmaker default.
+    - Corrected error that left Gantry AutoCRUD forms for DBIx::Class
+      failing to pass the schema object to get_form_selections.
+    - Added instance keyword to HttpdConf Gantry backend, which works
+      like the same keyword in the CGI Gantry backend.  Both of them allow
+      you to get the proper GantryConfInstance definition for use with
+      Gantry::Conf.
+    - Added conffile keyword to HttpdConf Gantry and CGI Gantry backends.
+      Use it with instance to specify a replacement for /etc/gantry.conf.
+    - Continued deprecation of methods called _form by adding a warning
+      when you use that name for a CRUD or AutoCRUD form in your bigtop file.
+    - Added gen_root keyword for CGI Gantry, HttpdConf Gantry, and
+      Conf General backends to take advantage of Gantry's new Init module,
+      which keeps track of root paths for us.  Only the app root path is
+      needed adding gen_root inserts one with relative path html.
+    - SiteLook GantryDefault now has a default gantry_wrapper formed
+      from Gantry::Init::base_root . '/sample_wrapper.tt'
+    - Fixed bug in mysql and sqlite backends.  They no longer generate
+      create sequence statements.
+    - Added optional tables to bigtop --new.  If you supply them you get
+      a running app immediately after generation (but remember to make
+      the database before trying to run it).
+    - Silenced warnings from MySQL and SQLite SQL backends when the input
+      has sequence blocks, which they ignore.
+    - Started using the getpwuid approach of h2xs when no author info is
+      available.
+    - Base modules now have do_mains showing links to all the pages which
+      have page_link_labels.  All controllers generated by bigtop --new
+      have those labels, so out of the box apps have good do_mains.
+    - Greatly improved defaults in tentmaker, among the changes:
+        author is omitted so it can be generated in the manner of h2xs
+        SiteLook GantryDefault backend no longer has a gantry_wrapper path
+        making a table now automatically makes a corresponding controller
+        auto-made controllers have:
+            statements: controls_table, rel_location, text_description,
+                        page_link_label
+            methods: do_main, form
+        making a sequence now automatically makes a table and a controller
+        auto-made tables have sequence statements
+      All this means that by starting tentmaker and creating only a table
+      on the app_body tab, you can save and get a running app in 3 steps.
+    - Removed Class::DBI specific generated code from Control Gantry backend
+      (it was a set of skeletons to use with Gantry::Plugins::CRUD).
+      Now you get comments telling you what to do, you do it for your ORM.
+    - Added site_links methods to base modules.
+    - Corrected TentMaker module to be less unix specific.
+    - Dropped blib/lib from use lib statements in app.server.
+    - Removed CDBI specific code from crud methods, now you just get comments
+      suggesting what you need to do.
+    - Added advice message to bigtop when you create a default app.
+      It tells you how to start the app.
+
+0.13 Fri Jun  9 08:08:16 CDT 2006
+    - Made it possible for compatible backends of the same type to all
+      generate.  For instance, this allows you to generate all types of SQL
+      schema at once.  Note that most backends still can't work together
+      since they want to write the same file (like models and controllers).
+    - Converted authors app level keyword to allow name => user@example.com.
+    - Since the above change left the app level keyword email unused,
+      I changed it to contact_us which now makes a CONTACT US POD section 
+      in the base module with whatever you want to appear there.
+    - Added docs to Bigtop::Keywords explaining how to add your own keywords.
+    - Tried to hide the AST package statements from the PAUSE indexer
+      without hiding them during vim folding.
+    - Added pair_required to Bigtop::Keywords keys so we can support things
+      like Gantry main listing header_options.
+    - Added config level model_base_class keyword to each Model backend.
+      This allows you to control it once for all tables, but still lets
+      individual tables override it with their own table level model_base_class.
+    - Corrected the javascript error that was preventing screen updates for
+      App Body block deletions.  There is a remaining problem: the visible
+      whitespace gap sometimes grows with each deletion (this affects only
+      the on screen appearance, so it is completely consmetic).
+    - Added POD to generated model modules.  It should be enough to silence
+      POD tests.
+
+0.12 Tue May 23 10:58:22 CDT 2006
+    - Added create_makefile_pl => 'passthrough', to Build.PL so users relying
+      on make (aka CPAN shell users) can install without so much hastle.
+    - Corrected images links in the tentmaker tutorial (thanks Krassi).
+    - Added support for DBIx::Class.
+    - Updated MANIFEST and made it agree with what is checked into svn.
+
+0.11 Wed May 17 12:48:11 CDT 2006
+    - Added skips so gantry controller tests won't fail when
+      Gantry::Plugins::AutoCRUD is not installed.
+    - Added Bigtop::Docs::TentTut a screen shot laden tour of app building
+      with tentmaker.
+    - Added a backend to make SQL for MySQL.
+
+0.10 Fri May 12 14:50 CDT 2006
+    - Added Test::Files to build_requires list.
+    - Added a backend to make SQL for SQLite.
+    - Added a --help message to bigtop script.
+
+0.09 Wed May 10 10:41:49 CDT 2006
+    - Improved Build.PL so it won't try to install tentmaker templates
+      without Gantry.
+
+0.08 Wed May 10 07:47:23 CDT 2006
+    - Improved the usability of tentmaker (I hope) by putting former tooltips
+      into boxes which are always visible and expanding and clarifying the
+      text in those tips.
+    - Changed the name of the generated default wrapper to genwrapper.tt
+      so that users of bigtop never again see the wrapper.tt which ships
+      with gantry.
+    - Added support for app level literals to tentmaker.
+
+0.07 Fri May  5 15:39:16 CDT 2006
+    - Added server_port statement to CGI Gantry backend so you can
+      decide on a test server port in advance.
+    - Removed two unitialized value warnings from GantryDefault Sitelook
+      backend.
+    - Factored backend loading out of gen_from_string so other Bigtop::Parser
+      routines can share it (think parse_string).
+    - Corrected syntax errors in generated CRUD helper methods.
+    - Added TentMaker.
+    - Implemented deparser (first draft) to support TentMaker.
+    - Moved all backends into the Backend namespace.
+    - Added documentation methods to all backends, so TentMaker can describe
+      what they do for its users.
+    - Factored out grammar from Bigtop::Parser and had Parse::RecDescent
+      precompile it.  This results in almost a four fold speed savings
+      in the test suite.  It should give a similar savings to invocations
+      of bigtop and tentmaker.
+    - Made generated stand alone server accept its port from the command line.
+    - Added blib/lib and lib to the stand alone server's path.
+    - Made table_element_blocks and field_statements optional.
+
+0.06 Thu Mar 23 08:26:46 CST 2006
+    - Added use_clean_dates to the options generated for crud constructor
+      calls when a controller's type is CRUD.
+    - Corrected CRUD do_add, do_edit, and do_delete so they call CRUD
+      methods through the correct object. 
+    - Made CGI backend respect literal PerlTop statement, so you can put
+      use libs into the top of the generated CGI script just as you do
+      in the top of the <Perl> block of httpd.conf for mod_perl.
+    - Added explicit import list option to uses statements in controller
+      blocks generated by Gantry Control backend.
+    - Improved error messages when block names or keywords in the
+      grammar (like literal) are misspelled.
+    - Made literal types into bonifide keywords of app_literal and
+      controller_literal type, so better error messages result when
+      the keywords are misspelled and better docs exist about who
+      defined which literal type.
+    - Changed set_vars block keyword to config to make it more independent
+      of mod_perl.  set_vars is retained as a synoym for legacy bigtop
+      files, but is no longer documented for use (expect a mention
+      in the Syntax doc, where it is marked deprecated).
+    - Added html_form_constraint as a field statement which Control
+      backends should use to supply Data::FormValidator constraints.
+    - Made the Gantry Control backend respect html_form_constraint.
+    - Made vim folding optional in the bigtop.syntax file.  To get it,
+          let bigtop_fold=1
+      in your .vimrc file.
+    - Added skip_config statement to Bigtop::HttpdConf::Gantry backend,
+      so you can still get httpd.conf locations, but have your conf
+      in some other place (like a Gantry::Conf Config::General flat file).
+      If you still need a PerlSetVar like GantryConfInstance, use a
+      literal statement.
+    - Added Bigtop::Conf::General to write Config::General style conf files.
+    - Gantry base modules now have their init commented out if it would
+      only defer to Gantry.pm via SUPER.
+    - Added with_server statement to Bigtop::CGI::Gantry which makes
+      a Gantry::Server based stand alone server for the app.
+      Using it saves configuring apache.
+    - Added new lines after literals which don't end in whitespace.
+    - Added support for Gantry::Conf to the CGI Gantry backend (use
+      the instance keyword).
+
+0.05 Wed Feb  1 14:15:33 CST 2006
+    - Added support for new Gantry::Utils::Model
+    - Removed no_accessor set vars from init methods at the app level.
+    - Removed no_accessor set vars from init methods at the controller level.
+    - Removed int as a shorthand for int4 in postgres backends.
+    - Added model_base_class keyword at the table level and made
+      Bigtop::Model::GantryCDBI pay attention to it.
+    - Made Bigtop::Model::Gantry pay attention to model_base_class.
+    - Corrected models made by Bigtop::Model::Gantry to conform to the
+      current (experimental) Gantry::Utils::Model.
+    - Fixed CRUD_form method type in Gantry control generation so it
+      include the row (fished out of $data)
+    - Filled in get_quoted_columns method in B::M::G.
+    - Added PerlTop literal block so use libs can appear in <Perl>
+      blocks before the first use statement.
+    - Fixed B::M::Gantry to use fully qualified foreign table names when
+      fetching foreign objects.
+    - Made bigtop script delete _Inline (if its in the current directory)
+      by default and added a flag (--keep_inline or -k) for keeping it.
+    - Greatly expanded the amount of code generated for Gantry::Plugins::CRUD.
+      Users get this extra code by setting the controller type with is CRUD.
+    - Changed from mixin to inheritence scheme for cdbi models.
+
+0.04 Tue Jan  3 16:04:56 CST 2006
+    - Made extra_args behave as Bigtop::Control::Gantry's docs say it should.
+    - Cleaned handling and error messages surrounding base_dir and app_dir
+      config statements.
+    - Documented --create's treatement of base_dir and app_dir.
+    - Added -c as an abbreviation for --create.
+    - Added not_for keyword for table fields, made the cdbi model pay
+      attention to it, so we can have a non-key id fields in the database,
+      but leave it out of the model (which would choke on it).
+    - Added not_for keyword for tables, made cdbi model pay attention to it,
+      so we can support users who like to edit GEN modules.
+    - Made postgres SQL backend respect not_for keyword on tables, allowing
+      models to be made for tables that will be created with something other
+      than the generated schema.sql.
+    - Added generation of CRUD_forms for the recently added
+      Gantry::Plugins::CRUD.
+    - Added --new as an option to bigtop script.  It makes the directory
+      structure for a new app from scratch.
+    - Made Bigtop::Control::Gantry respect method level no_gen.
+    - Added literal statement at app level and made Postgres backend
+      honor it.
+    - Made Gantry::HttpdConf honor literal statement at app level.
+    - Added literal statement at controller level and made Gantry::HttpdConf
+      honor it.
+    - Renamed app level url to location.
+    - Renamed controller level url to rel_location and introduced the new
+      controller level location.  The former are relative to the app location
+      while the latter are absolute.
+    - Added controller level set_vars block.  Made B::HttpdConf::Gantry
+      and B::Control::Gantry backends honor it.
+    - Added col_labels to Gantry main_listing methods in B::C::Gantry.
+
+0.03 Tue Dec 13 08:59:34 CST 2005
+    - Made corrections pointed out by using bigtop to make a second,
+      more complex app.
+    - Changed the name of the generation script to simply bigtop.
+    - Added vim syntax highlighting file to distribution.
+    - Made the gantry control generator quieter (it no longer tells
+      you about every file it decides not to overwrite).
+    - Made the cdbi model generator quieter (it no longer tells
+      you about every file it decides not to overwrite).
+    - Made it legal to define a controller with an empty block.
+    - Discarded GENed controllers that have nothing in them and kept all
+      references to them out of the corresponding stub.
+    - Added --create flag to bigtop script and now ignore (with a warning)
+      base_dir and app_dir in bigtop files when the new flag is not used.
+
+0.02  Fri Oct 28 07:37:37 CDT 2005
+    - Made all the corrections pointed out by using bigtop to
+      make a production app.
+    - Expanded (or wrote) documentation of the modules.
+
+0.01  Thu Sep 15 09:05:07 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn WADL
+    - manually converted to use Module::Build
+

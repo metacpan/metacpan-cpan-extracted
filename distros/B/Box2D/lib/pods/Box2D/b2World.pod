@@ -1,0 +1,194 @@
+
+=head1 NAME
+
+Box2D::b2World - Manages all aspects of the simulation.
+
+=head1 SYNOPSIS
+
+  my $world = Box2D::b2World->new( $gravity, $doSleep );
+
+=head1 DESCRIPTION
+
+The C<Box2D::b2World> class contains the bodies and joints. It manages
+all aspects of the simulation and allows for asynchronous queries (like
+AABB queries and ray-casts). Much of your interactions with Box2D will
+be with a C<Box2D::b2World> object.
+
+=head1 METHODS
+
+=head2 new( $gravity, $doSleep )
+
+Construct a world object.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$gravity> - the world gravity vector.
+
+=item * C<bool> C<$doSleep> - improve performance by not simulating inactive
+bodies.
+
+=back
+
+Returns a C<Box2D::b2World>
+
+=head2 ClearForces()
+
+Call this after you are done with time steps to clear the forces.
+You normally call this after each call to Step, unless you are
+performing sub-steps. By default, forces will be automatically cleared,
+so you don't need to call this function.
+
+See also: SetAutoClearForces
+
+=head2 CreateBody( $def )
+
+Create a rigid body given a definition. No reference to the definition
+is retained.
+
+Warning: This function is locked during callbacks.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2BodyDef> C<$def>
+
+=back
+
+Returns a C<Box2D::b2Body>
+
+=head2 CreateJoint( $def )
+
+Create a joint to constrain bodies together. No reference to the
+definition is retained. This may cause the connected bodies to cease
+colliding.
+
+Warning: This function is locked during callbacks.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2JointDef> C<$def>
+
+=back
+
+Returns a C<Box2D::b2Joint>
+
+=head2 DestroyBody( $body )
+
+Destroy a rigid body given a definition. No reference to the definition
+is retained. This function is locked during callbacks.
+
+Warning: This automatically deletes all associated shapes and joints.
+This function is locked during callbacks.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body> C<$body>
+
+=back
+
+=head2 GetGravity()
+
+Get the global gravity vector.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 RayCast( $callback, $point1, $point2 )
+
+Ray-cast the world for all fixtures in the path of the ray. Your
+callback controls whether you get the closest point, any point, or
+n-points. The ray-cast ignores shapes that contain the starting point.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2RayCastCallback> C<$callback> - a user implemented
+callback class.
+
+=item * C<Box2D::b2Vec2> C<$point1> - the ray starting point
+
+=item * C<Box2D::b2Vec2> C<$point2> - the ray ending point
+
+=back
+
+=head2 SetContactListener( $listener )
+
+Register a contact event listener. The listener is owned by you and
+must remain in scope.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2ContactListener> C<$listener>
+
+=back
+
+=head2 SetGravity( $gravity )
+
+Change the global gravity vector.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$gravity>
+
+=back
+
+=head2 Step( $timeStep, $velocityIterations, $positionIterations )
+
+Take a time step. This performs collision detection, integration, and
+constraint solution.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$timeStep> - the amount of time to simulate, this should
+not vary.
+
+=item * C<int32> C<$velocityIterations> - for the velocity constraint solver.
+
+=item * C<int32> C<$positionIterations> - for the position constraint solver.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Vec2>
+
+=item * L<Box2D::b2BodyDef>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2RayCastCallback>
+
+=item * L<Box2D::b2ContactListener>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

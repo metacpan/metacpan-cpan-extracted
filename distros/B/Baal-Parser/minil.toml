@@ -1,0 +1,4 @@
+name = "Baal-Parser"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

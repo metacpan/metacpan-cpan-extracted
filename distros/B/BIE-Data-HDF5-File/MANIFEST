@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/BIE-Data-HDF5-File.t
+lib/BIE/Data/HDF5/File.pm

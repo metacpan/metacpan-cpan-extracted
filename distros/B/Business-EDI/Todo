@@ -1,0 +1,11 @@
+TODO list for Perl module Business::EDI
+
+- Extend Spec-driven approach to smaller objects: Data Elements, Composites, etc.
+- I18n
+- Lots of docs
+- Spec "Line" package/objects
+
+Long Term:
+- input and output of actual EDI files
+- a strict/validation mode
+- Add X12 codes to messages: http://en.wikipedia.org/wiki/X12_EDIFACT_Mapping

@@ -1,0 +1,21 @@
+Revision history for B-OPCheck
+
+0.32      2016-07-03 17:48:00Z
+  - use correct macro for the existence of op_sibling (perl 5.25.1+)
+
+0.31      2016-06-13 05:27:37Z
+  - use ppport.h to handle removal of op_sibling in perl 5.25.1
+  - remove redundant Perl_check_t definition (RT#57356)
+
+0.30      2015-09-09 02:06:45Z
+  - modernize the tooling
+
+0.29      2009-09-15 06:04:28Z
+  - Require ExtUtils::Depends 0.302 to properly work on Win32+gcc
+    (Alexandr Ciornii).
+
+0.28      2009-08-10 05:01:13Z
+  - Ship with a real changelog
+  - Declare dependency on Scope::Guard and XSLoader.
+  - Fix some compiler warnings.
+  - Upgrade ppport.h from 3.13 to 3.19.

@@ -1,0 +1,45 @@
+BioX-CLPM version 0.0.1
+
++Mass spectrometry coupled with chemical crosslinking is an efficient
+method to study protein - protein interactions.
++Mass spectra of cross-linked peptides contain m/z values of crosslinked
+species as well as peptide fragments that are not cross-linked.
+Thus, finding cross-linked species from this mass spectra is like
+finding needles from hay-stack.
++Few programs have attempted to find cross-linked species from
+mass spectra, but they are lacking few or more desired
+functionalities.
++Newer version of CLPM is improvement over the previous one to
+provide an all-inclusive tool to analyze mass spectra of all kinds of
+cross-linked data.
++CLPM is an ongoing effort to include more and more functionalities
+for analysis of chemical cross-linking data.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Nathan Crabtree, MidSouth Bioinformatics Center
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

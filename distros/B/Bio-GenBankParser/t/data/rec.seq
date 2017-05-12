@@ -1,0 +1,440 @@
+LOCUS       AB000001                 660 bp    DNA     linear   PLN 12-SEP-2002
+DEFINITION  Rhizoctonia solani genes for 18S rRNA, 5.8S rRNA, 28S rRNA, partial
+            and complete sequence, isolate:#1.
+ACCESSION   AB000001
+VERSION     AB000001.1  GI:1754539
+PROJECT     GenomeProject:18357
+KEYWORDS    .
+SOURCE      Rhizoctonia solani
+  ORGANISM  Rhizoctonia solani
+            Eukaryota; Fungi; Dikarya; Basidiomycota; Agaricomycotina;
+            Agaricomycetes; Cantharellales; Ceratobasidiaceae; Thanatephorus.
+REFERENCE   1
+  AUTHORS   Kuninaga,S., Natsuaki,T., Takeuchi,T. and Yokosawa,R.
+  TITLE     Sequence variation of the rDNA ITS regions within and between
+            anastomosis groups in Rhizoctonia solani
+  JOURNAL   Curr. Genet. 32 (3), 237-243 (1997)
+   PUBMED   9339350
+REFERENCE   2  (bases 1 to 660)
+  AUTHORS   Kuninaga,S.
+  TITLE     Direct Submission
+  JOURNAL   Submitted (19-DEC-1996) Shiro Kuninaga, Health Sciences University
+            of Hokkaido, General Education; 1757 Kanazawa, Tohbetsu, Hokkaido
+            061-02, Japan (E-mail:kuninaga@hoku-iryo-u.ac.jp,
+            Tel:81-1332-3-1211, Fax:81-1332-3-1276)
+FEATURES             Location/Qualifiers
+     source          1..660
+                     /organism="Rhizoctonia solani"
+                     /mol_type="genomic DNA"
+                     /strain="AG-3"
+                     /isolate="#1"
+                     /db_xref="taxon:456999"
+                     /dev_stage="22 day-old seedlings (14 days after
+                     inoculation with Bradyrhizobium japonicum strain USDA110)"
+                     /clone_lib="Soybean Shoot cDNA Library"
+                     /note="Organ: Autoregulated shoots; Vector: lambda ZAPII;
+                     Double stranded cDNAs were synthesized by the method of
+                     Gubler and  Hoffman (1983), using a cDNA synthesis kit
+                     (Amersham Life Science Inc.)  and then ligated to an EcoRI
+                     adaptor (Amersham). cDNA library was  constructed in
+                     lambda ZAPII vector using lambda ZAPII/EcoRI/Gigapack II
+                     cloning kit (Stratagene)"
+     rRNA            <1..6
+                     /product="18S ribosomal RNA"
+     rRNA            229..383
+                     /product="5.8S ribosomal RNA"
+     rRNA            656..>660
+                     /product="28S ribosomal RNA"
+     CDS             join(1677..1980,2158..2630,2729..3580)
+                     /gene="PHT5"
+                     /codon_start=1
+                     /product="inorganic phosphate transporter"
+                     /protein_id="BAA24280.1"
+                     /db_xref="GI:2780345"
+                     /translation="MAKKGKEVLNALDAAKTQMYHFTAIVIAGMGFFTDAYDLFSISL
+                     VTKLLGRIYYHVDSSKKPGTLPPNVAAAVNGVAFCGTLAGQLFFGWLGDKLGRKKVYG
+                     ITLMLMVLCSLGSGLSFGHSANGVMATLCFFRFWLGFGIGGDYPLSATIMSEYANKKT
+                     RGAFIAAVFAMQGFGILAGGIVSLIVSSTFDHAFKAPTYEVDPVGSTVPQADYVWRIV
+                     LMFGAIPALLTYYWRMKMPETARYTALVARNTKQAASDMSKVLQVDLIAEEEAQSNSN
+                     SSNPNFTFGLFTREFARRHGLHLLGTTTTWFLLDIAYYSSNLFQKDIYTAIGWIPAAE
+                     TMNAIHEVFTVSKAQTLIALCGTVPGYWFTVAFIDILGRFFIQLMGFIFMTIFMFALA
+                     IPYDHWRHRENRIGFLIMYSLTMFFANFGPNATTFVVPAEIFPARLRSTCHGISAASG
+                     KAGAIVGAFGFLYAAQSSDSEKTDAGYPPGIGVRNSLLMLACVNFLGIVFTLLVPESK
+                     GKSLEEISREDEEQSGGDTVVEMTVANSGRKVPV"
+BASE COUNT      163 a    172 c    196 g    188 t   10 others
+ORIGIN      
+        1 aattttaatg aagagtttgg ttgtagctgg cccattaatt taggcatgtg cacacctttc
+       61 tctttcatcc catacacacc tgtgaacttg tgagacagat ggggaattta tttattgttt
+      121 ttttttgtaa tataaagatg ataagtcatt gaacccttct gtctactcaa ctcatataaa
+      181 ctcaatttat tttaaaatga atgtaatgga tgtaacgcat ctaatactaa gtttcaacaa
+      241 cggatctctt ggctctcgca tcgatgaaga acgcagcgaa atgcgataag taatgtgaat
+      301 tgcagaattc agtgaatcat cgaatctttg aacgcacctt gcgctccttg gtattccttg
+      361 gagcatgcct gtttgagtat catgaaatct tcaaaatcaa gtcttttgtt aattcaattg
+      421 gctttgactt tggtattgga ggtctttgca gcttcacacc tgctcctctt tgtacattag
+      481 ctggatctca gtgttatgct tggttccact cagcgtgata agttatctat cgctgaggac
+      541 actgtaaaaa ggtggccaag gtaaatgcag atgaaccgct tctaatagtc cattgacttg
+      601 gacaatattt ttatgatctg atctcaaatc aggtaggact acccgctgaa cttaagcata
+//
+LOCUS       YSCPLASM                6318 bp    DNA     circular PLN 18-OCT-2007
+DEFINITION  Saccharomyces cerevisiae 2 micron circle plasmid, complete
+            sequence.
+ACCESSION   J01347 L00321 L00322 L00323 L00324 M10185 M11111 M11593
+            M14239-M14245 M14253-M14259 M14591-M14598 V01323
+VERSION     J01347.1  GI:172190
+KEYWORDS    DNA-binding protein; Rep-1 protein; Rep-2 protein; circular;
+            complete genome; d protein; plasmid; protein FLP; recombinase;
+            repeat region.
+SOURCE      Saccharomyces cerevisiae (baker's yeast)
+  ORGANISM  Saccharomyces cerevisiae
+            Eukaryota; Fungi; Dikarya; Ascomycota; Saccharomyceta;
+            Saccharomycotina; Saccharomycetes; Saccharomycetales;
+            Saccharomycetaceae; Saccharomyces.
+REFERENCE   1  (bases 1 to 1022)
+  AUTHORS   Hindley,J. and Phear,G.A.
+  TITLE     Sequence of 1019 nucleotides encompassing one of the inverted
+            repeats from the yeast 2 micrometer plasmid
+  JOURNAL   Nucleic Acids Res. 7 (2), 361-375 (1979)
+   PUBMED   386282
+REFERENCE   2  (bases 1 to 6318)
+  AUTHORS   Hartley,J.L. and Donelson,J.E.
+  TITLE     Nucleotide sequence of the yeast plasmid
+  JOURNAL   Nature 286 (5776), 860-865 (1980)
+   PUBMED   6251374
+REFERENCE   3  (bases 3891 to 3990)
+  AUTHORS   Broach,J.R., Guarascio,V.R. and Jayaram,M.
+  TITLE     Recombination within the yeast plasmid 2mu circle is site-specific
+  JOURNAL   Cell 29 (1), 227-234 (1982)
+   PUBMED   6286142
+REFERENCE   4  (bases 3881 to 4020)
+  AUTHORS   McLeod,M., Volkert,F. and Broach,J.
+  TITLE     Components of the site-specific recombination system encoded by the
+            yeast plasmid 2-micron circle
+  JOURNAL   Cold Spring Harb. Symp. Quant. Biol. 49, 779-787 (1984)
+   PUBMED   6397322
+REFERENCE   5  (bases 670 to 732)
+  AUTHORS   Andrews,B.J., Proteau,G.A., Beatty,L.G. and Sadowski,P.D.
+  TITLE     The FLP recombinase of the 2 micron circle DNA of yeast:
+            interaction with its target sequences
+  JOURNAL   Cell 40 (4), 795-803 (1985)
+   PUBMED   3879971
+REFERENCE   6  (bases 5570 to 5605)
+  AUTHORS   Babineau,D., Vetter,D., Andrews,B.J., Gronostajski,R.M.,
+            Proteau,G.A., Beatty,L.G. and Sadowski,P.D.
+  TITLE     The FLP protein of the 2-micron plasmid of yeast. Purification of
+            the protein from Escherichia coli cells expressing the cloned FLP
+            gene
+  JOURNAL   J. Biol. Chem. 260 (22), 12313-12319 (1985)
+   PUBMED   2995370
+REFERENCE   7  (sites)
+  AUTHORS   Gronostajski,R.M. and Sadowski,P.D.
+  TITLE     Determination of DNA sequences essential for FLP-mediated
+            recombination by a novel method
+  JOURNAL   J. Biol. Chem. 260 (22), 12320-12327 (1985)
+   PUBMED   2995371
+REFERENCE   8  (sites)
+  AUTHORS   Sutton,A. and Broach,J.R.
+  TITLE     Signals for transcription initiation and termination in the
+            Saccharomyces cerevisiae plasmid 2 micron circle
+  JOURNAL   Mol. Cell. Biol. 5 (10), 2770-2780 (1985)
+   PUBMED   3915534
+REFERENCE   9  (sites)
+  AUTHORS   Gronostajski,R.M. and Sadowski,P.D.
+  TITLE     The FLP recombinase of the Saccharomyces cerevisiae 2 microns
+            plasmid attaches covalently to DNA via a phosphotyrosyl linkage
+  JOURNAL   Mol. Cell. Biol. 5 (11), 3274-3279 (1985)
+   PUBMED   2427927
+REFERENCE   10 (bases 667 to 739)
+  AUTHORS   Senecoff,J.F., Bruckner,R.C. and Cox,M.M.
+  TITLE     The FLP recombinase of the yeast 2-micron plasmid: characterization
+            of its recombination site
+  JOURNAL   Proc. Natl. Acad. Sci. U.S.A. 82 (21), 7270-7274 (1985)
+   PUBMED   2997780
+REFERENCE   11 (sites)
+  AUTHORS   McLeod,M., Craft,S. and Broach,J.R.
+  TITLE     Identification of the crossover site during FLP-mediated
+            recombination in the Saccharomyces cerevisiae plasmid 2 microns
+            circle
+  JOURNAL   Mol. Cell. Biol. 6 (10), 3357-3367 (1986)
+   PUBMED   3540590
+COMMENT     On Feb 10, 2004 this sequence version replaced gi:4182.
+            [8]  sites; mRNA CAP sites and poly-adenylation sites. [9]  sites;
+            FLP binding.
+            [7]  sites; FLP cleavage.
+            [11]  sites; FLP-mediated recombination crossover site. Draft entry
+            and clean copy sequence for [5] kindly provided by J.Senecoff,
+            24-JAN-1986.
+            Yeast 2 micron plasmid contains two 599 bp inverted repeats
+            separated by a large unique (UL) and a small unique (US) region.
+            During recombination the UL and US regions invert producing two
+            sequence forms that differ in the orientation of one unique region
+            relative to the other.  The A form is presented below. FLP is the
+            only 2-micron circle-encoded protein needed for specific site
+            recombination between the IRs of 2-micron circle.  The minimal size
+            of the recombination site required for efficient FLP
+            recombinase-catalyzed recombination in vitro is no more than 28 bp,
+            which includes parts of two 13 bp inverted repeats (positions
+            690-702 and 711-723) and all of an 8 bp spacer (703-710) [5].  The
+            FLP recombinase cleaves the DNA at the boundaries of the spacer and
+            becomes covalently linked to the spacer DNA [5],[9].  The
+            efficiency of the recombination is reduced if the spacer in a
+            recombinant site is increased or decreased by 1 bp, while the
+            spacer in the second site is unaltered [5].  Recombination between
+            two sites with identical 1-base pair additions or deletions is
+            relatively unaffected, suggesting that pairing of sequences in the
+            spacer regions is important in FLP-promoted recombination events
+            [5].  The sequence asymmetry utilized by the recombinase to
+            determine the orientation of the site is located uniquely within
+            the spacer region. Another 13 bp direct repeat, is found at
+            positions 676-688 [5].  FLP-mediated recombination involving two
+            FLP sites that are inverted with respect to each other results in
+            inversion of the DNA sequences between the sites [4].  If the
+            participating recombination sites are in direct orientation, FLP
+            promotes only the excision of the intervening DNA sequences [4].
+            The Rep 1 and Rep proteins are involved plasmid partitioning and
+            protein stability.
+            A start codon in phase with the Rep1 coding region is located at
+            positions 1966-1964.  Two CAP sites for Rep1 mRNA are located
+            beyond the 'atg' codon (position 2008) at positions 2004 and 2005.
+            Complete source information:
+            Yeast (S.cerevisiae, strain A364A D5) DNA, clones pJDB71 [1],
+            p82-6B [2], CV20 [3], pMMD2 [4], pGP20 [5], pJFS166 [10].
+FEATURES             Location/Qualifiers
+     source          1..6318
+                     /organism="Saccharomyces cerevisiae"
+                     /mol_type="genomic DNA"
+                     /strain="A364A"
+                     /db_xref="taxon:4932"
+                     /clone="pJDB71, p82-6B, CV20, pMMD2, pGP20, pJFS166"
+                     /plasmid="2 micron circle plasmid"
+     mRNA            join(5549..6318,1..545)
+                     /product="Flp mRNA"
+     CDS             join(5570..6318,1..523)
+                     /codon_start=1
+                     /product="recombinase (FLP)"
+                     /protein_id="AAB59340.1"
+                     /db_xref="GI:172191"
+                     /translation="MPQFGILCKTPPKVLVRQFVERFERPSGEKIALCAAELTYLCWM
+                     ITHNGTAIKRATFMSYNTIISNSLSFDIVNKSLQFKYKTQKATILEASLKKLIPAWEF
+                     TIIPYYGQKHQSDITDIVSSLQLQFESSEEADKGNSHSKKMLKALLSEGESIWEITEK
+                     ILNSFEYTSRFTKTKTLYQFLFLATFINCGRFSDIKNVDPKSFKLVQNKYLGVIIQCL
+                     VTETKTSVSRHIYFFSARGRIDPLVYLDEFLRNSEPVLKRVNRTGNSSSNKQEYQLLK
+                     DNLVRSYNKALKKNAPYSIFAIKNGPKSHIGRHLMTSFLSMKGLTELTNVVGNWSDKR
+                     ASAVARTTYTHQITAIPDHYFALVSRYYAYDPISKEMIALKDETNPIEEWQHIEQLKG
+                     SAEGSIRYPAWNGIISQEVLDYLSSYINRRI"
+     exon            1..545
+     conflict        157..160
+                     /citation=[1]
+                     /replace=""
+     conflict        289..290
+                     /citation=[1]
+                     /replace=""
+     repeat_region   341..939
+                     /note="IR2"
+     conflict        464..466
+                     /citation=[1]
+                     /replace=""
+     conflict        558
+                     /citation=[1]
+                     /replace=""
+     conflict        561
+                     /citation=[1]
+                     /replace=""
+     conflict        622..624
+                     /citation=[1]
+                     /replace=""
+     conflict        642
+                     /citation=[1]
+                     /replace=""
+     conflict        665..666
+                     /citation=[1]
+                     /replace=""
+     misc_binding    673..722
+                     /note="FLP recombinase binding site A [9]"
+                     /bound_moiety="FLP recombinase"
+     misc_recomb     702..703
+     conflict        793..794
+                     /citation=[1]
+                     /replace=""
+     mRNA            complement(836..2038)
+                     /note="Rep1 mRNA (alt.)"
+     mRNA            complement(836..2019)
+                     /note="Rep1 mRNA (alt.)"
+     mRNA            complement(836..2017)
+                     /note="Rep1 mRNA (alt.)"
+     mRNA            complement(836..2010)
+                     /note="Rep1 mRNA (alt.)"
+     mRNA            complement(836..2005)
+                     /note="Rep1 mRNA (alt.)"
+     mRNA            complement(836..2004)
+                     /note="Rep1 mRNA (alt.)"
+     CDS             complement(887..2008)
+                     /codon_start=1
+                     /product="Rep 1 protein"
+                     /protein_id="AAB59341.1"
+                     /db_xref="GI:172192"
+                     /translation="MNGERLLACIKQCIMQHFQPMVYDESRCVIETTRGTFPVPDNYK
+                     KYKTLAFAFVGHVLNTDDTPVIEKELDWPDPALVYNTIVDRIINHPELSQFISVAFIS
+                     QLKATIGEGLDINVKGTLNRRGKGIRRPKGVFFRYMESPFVNTKVTAFFSYLRDYNKI
+                     ASEYHNNTKFILTFSCQAYWASGPNFSALKNVIRCSIIHEYISKFVEREQDKGHIGDQ
+                     ELPPEEDPSRELNNVQHEVNSLTEQDAEADEGLWGEIDSLCEKWQSEAEDQTEAEIIA
+                     DRIIGNSQRMANLKIRRTKFKSVLYHILKELIQSQGTVKVYRGSSFSHDSIKISLHYE
+                     EQHITAVWVYLTVKFEEHWKPVDVEVEFRCKFKERKVDG"
+     mRNA            2254..2861
+                     /note="D mRNA (alt.; 5' end +/- 3 bp)"
+     mRNA            2254..2841
+                     /note="D mRNA (alt.; 5' end +/- 3 bp)"
+     CDS             2271..2816
+                     /codon_start=1
+                     /product="D protein"
+                     /protein_id="AAB59342.1"
+                     /db_xref="GI:172193"
+                     /translation="MPYKTAIDCIEELATQCFLSKLTDDDVSTFRRVCSKENDIIKLA
+                     LRIPRTIDYTSILRLLYDTLPLRSLSFNEALPLFCYSIDPAQQRQCDLRFYLRDVVKL
+                     ARPRKRLEMQKALLQWLPSLLSDVTLQLLNDIRIRFEEIQPNIRQTVLQIYDRTCYPS
+                     LNFEHPNLGVFPETDSIFEPV"
+     repeat_region   3714..4312
+                     /note="IR1"
+     misc_binding    3930..3979
+                     /note="FLP-recombinase binding site B [9]"
+                     /bound_moiety="FLP recombinase"
+     misc_recomb     3941..3942
+     mRNA            complement(4108..5223)
+                     /note="REP2 mRNA (minor alt.)"
+     mRNA            complement(4108..5212)
+                     /note="REP2 mRNA (minor alt.)"
+     mRNA            complement(4108..5198)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5197)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5196)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5195)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5184)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5183)
+                     /note="REP2 mRNA (major alt.)"
+     mRNA            complement(4108..5182)
+                     /note="REP2 mRNA (major alt.)"
+     CDS             complement(4308..5198)
+                     /codon_start=1
+                     /product="Rep 2 protein"
+                     /protein_id="AAB59343.1"
+                     /db_xref="GI:172194"
+                     /translation="MDDIETAKNLTVKARTAYSVWDVCRLFIEMIAPDVDIDIESKRK
+                     SDELLFPGYVIRPMESLTTGRPYGLDSSAEDSSVSSDSSAEVILPAAKMVKERFDSIG
+                     NGMLSSQEASQAAIDLMLQNNKLLDNRKQLYKSIAIIIGRLPEKDKKRATEMLMRKMD
+                     CTQLLVPPAPTEEDVMKLVSVVTQLLTLVPPDRQAALIGDLFIPESLKDIFNSFNELA
+                     AENRLQQKKSELEGRTEVNHANTNEEVPSRRTRSRDTNARGAYKLQNTITEGPKAVPT
+                     KKRRVATRVRGRKSRNTSRV"
+     exon            5549..6318
+     old_sequence    5583
+                     /citation=[2]
+ORIGIN      
+        1 gaattctgaa ccagtcctaa aacgagtaaa taggaccggc aattcttcaa gcaataaaca
+       61 ggaataccaa ttattaaaag ataacttagt cagatcgtac aataaagctt tgaagaaaaa
+      121 tgcgccttat tcaatctttg ctataaaaaa tggcccaaaa tctcacattg gaagacattt
+      181 gatgacctca tttctttcaa tgaagggcct aacggagttg actaatgttg tgggaaattg
+      241 gagcgataag cgtgcttctg ccgtggccag gacaacgtat actcatcaga taacagcaat
+      301 acctgatcac tacttcgcac tagtttctcg gtactatgca tatgatccaa tatcaaagga
+      361 aatgatagca ttgaaggatg agactaatcc aattgaggag tggcagcata tagaacagct
+      421 aaagggtagt gctgaaggaa gcatacgata ccccgcatgg aatgggataa tatcacagga
+      481 ggtactagac tacctttcat cctacataaa tagacgcata taagtacgca tttaagcata
+      541 aacacgcact atgccgttct tctcatgtat atatatatac aggcaacacg cagatatagg
+      601 tgcgacgtga acagtgagct gtatgtgcgc agctcgcgtt gcattttcgg aagcgctcgt
+      661 tttcggaaac gctttgaagt tcctattccg aagttcctat tctctagaaa gtataggaac
+      721 ttcagagcgc ttttgaaaac caaaagcgct ctgaagacgc actttcaaaa aaccaaaaac
+      781 gcaccggact gtaacgagct actaaaatat tgcgaatacc gcttccacaa acattgctca
+      841 aaagtatctc tttgctatat atctctgtgc tatatcccta tataacctac ccatccacct
+      901 ttcgctcctt gaacttgcat ctaaactcga cctctacatc aacaggcttc caatgctctt
+      961 caaattttac tgtcaagtag acccatacgg ctgtaatatg ctgctcttca taatgtaagc
+     1021 ttatctttat cgaatcgtgt gaaaaactac taccgcgata aacctttacg gttccctgag
+     1081 attgaattag ttcctttagt atatgataca agacactttt gaactttgta cgacgaattt
+     1141 tgaggttcgc catcctctgg ctatttccaa ttatcctgtc ggctattatc tccgcctcag
+     1201 tttgatcttc cgcttcagac tgccattttt cacataatga atctatttca ccccacaatc
+     1261 cttcatccgc ctccgcatct tgttccgtta aactattgac ttcatgttgt acattgttta
+     1321 gttcacgaga agggtcctct tcaggcggta gctcctgatc tcctatatga cctttatcct
+     1381 gttctctttc cacaaactta gaaatgtatt catgaattat ggagcaccta ataacattct
+     1441 tcaaggcgga gaagtttggg ccagatgccc aatatgcttg acatgaaaac gtgagaatga
+     1501 atttagtatt attgtgatat tctgaggcaa ttttattata atctcgaaga taagagaaga
+     1561 atgcagtgac ctttgtattg acaaatggag attccatgta tctaaaaaat acgcctttag
+     1621 gccttctgat accctttccc ctgcggttta gcgtgccttt tacattaata tctaaaccct
+     1681 ctccgatggt ggcctttaac tgactaataa atgcaaccga tataaactgt gataattctg
+     1741 ggtgatttat gattcgatcg acaattgtat tgtacactag tgcaggatca ggccaatcca
+     1801 gttctttttc aattaccggt gtgtcgtctg tattcagtac atgtccaaca aatgcaaatg
+     1861 ctaacgtttt gtatttctta taattgtcag gaactggaaa agtccccctt gtcgtctcga
+     1921 ttacacacct actttcatcg tacaccatag gttggaagtg ctgcataata cattgcttaa
+     1981 tacaagcaag cagtctctcg ccattcatat ttcagttatt ttccattaca gctgatgtca
+     2041 ttgtatatca gcgctgtaaa aatctatctg ttacagaagg ttttcgcggt ttttataaac
+     2101 aaaactttcg ttacgaaatc gagcaatcac cccagctgcg tatttggaaa ttcgggaaaa
+     2161 agtagagcaa cgcgagttgc attttttaca ccataatgca tgattaactt cgagaaggga
+     2221 ttaaggctaa tttcactagt atgtttcaaa aacctcaatc tgtccattga atgccttata
+     2281 aaacagctat agattgcata gaagagttag ctactcaatg ctttttgtca aagcttactg
+     2341 atgatgatgt gtctactttc aggcgggtct gtagtaagga gaatgacatt ataaagctgg
+     2401 cacttagaat tccacggact atagactata ctagtatact ccgtctactg tacgatacac
+     2461 ttccgctcag gtccttgtcc tttaacgagg ccttaccact cttttgttac tctattgatc
+     2521 cagctcagca aaggcagtgt gatctaagat tctatcttcg cgatgtagta aaactagcta
+     2581 gaccgagaaa gagactagaa atgcaaaagg cacttctaca atggctgcca tcattattat
+     2641 ccgatgtgac gctgcagctt ctcaatgata ttcgaatacg ctttgaggag atacagccta
+     2701 atatccgaca aactgtttta cagatttacg atcgtacttg ttacccatca ttgaattttg
+     2761 aacatccgaa cctgggagtt ttccctgaaa cagatagtat atttgaacct gtataataat
+     2821 atatagtcta gcgctttacg gaagacaatg tatgtatttc ggttcctgga gaaactattg
+     2881 catctattgc ataggtaatc ttgcacgtcg catccccggt tcattttctg cgtttccatc
+     2941 ttgcacttca atagcatatc tttgttaacg aagcatctgt gcttcatttt gtagaacaaa
+     3001 aatgcaacgc gagagcgcta atttttcaaa caaagaatct gagctgcatt tttacagaac
+     3061 agaaatgcaa cgcgaaagcg ctattttacc aacgaagaat ctgtgcttca tttttgtaaa
+     3121 acaaaaatgc aacgcgagag cgctaatttt tcaaacaaag aatctgagct gcatttttac
+     3181 agaacagaaa tgcaacgcga gagcgctatt ttaccaacaa agaatctata cttctttttt
+     3241 gttctacaaa aatgcatccc gagagcgcta tttttctaac aaagcatctt agattacttt
+     3301 ttttctcctt tgtgcgctct ataatgcagt ctcttgataa ctttttgcac tgtaggtccg
+     3361 ttaaggttag aagaaggcta ctttggtgtc tattttctct tccataaaaa aagcctgact
+     3421 ccacttcccg cgtttactga ttactagcga agctgcgggt gcattttttc aagataaagg
+     3481 catccccgat tatattctat accgatgtgg attgcgcata ctttgtgaac agaaagtgat
+     3541 agcgttgatg attcttcatt ggtcagaaaa ttatgaacgg tttcttctat tttgtctcta
+     3601 tatactacgt ataggaaatg tttacatttt cgtattgttt tcgattcact ctatgaatag
+     3661 ttcttactac aatttttttg tctaaagagt aatactagag ataaacataa aaaatgtaga
+     3721 ggtcgagttt agatgcaagt tcaaggagcg aaaggtggat gggtaggtta tatagggata
+     3781 tagcacagag atatatagca aagagatact tttgagcaat gtttgtggaa gcggtattcg
+     3841 caatatttta gtagctcgtt acagtccggt gcgtttttgg ttttttgaaa gtgcgtcttc
+     3901 agagcgcttt tggttttcaa aagcgctctg aagttcctat actttctaga gaataggaac
+     3961 ttcggaatag gaacttcaaa gcgtttccga aaacgagcgc ttccgaaaat gcaacgcgag
+     4021 ctgcgcacat acagctcact gttcacgtcg cacctatatc tgcgtgttgc ctgtatatat
+     4081 atatacatga gaagaacggc atagtgcgtg tttatgctta aatgcgtact tatatgcgtc
+     4141 tatttatgta ggatgaaagg tagtctagta cctcctgtga tattatccca ttccatgcgg
+     4201 ggtatcgtat gcttccttca gcactaccct ttagctgttc tatatgctgc cactcctcaa
+     4261 ttggattagt ctcatccttc aatgctatca tttcctttga tattggatca taccctagaa
+     4321 gtattacgtg attttctgcc ccttaccctc gttgctactc tccttttttt cgtgggaacc
+     4381 gctttagggc cctcagtgat ggtgttttgt aatttatatg ctcctcttgc atttgtgtct
+     4441 ctacttcttg ttcgcctgga gggaacttct tcatttgtat tagcatggtt cacttcagtc
+     4501 cttccttcca actcactctt tttttgctgt aaacgattct ctgccgccag ttcattgaaa
+     4561 ctattgaata tatcctttag agattccggg atgaataaat cacctattaa agcagcttga
+     4621 cgatctggtg gaactaaagt aagcaattgg gtaacgacgc ttacgagctt cataacatct
+     4681 tcttccgttg gagctggtgg gactaataac tgtgtacaat ccatttttct catgagcatt
+     4741 tcggtagctc tcttcttgtc tttctcgggc aatcttccta ttattatagc aatagatttg
+     4801 tatagttgct ttctattgtc taacagcttg ttattctgta gcatcaaatc tatggcagcc
+     4861 tgacttgctt cttgtgaaga gagcatacca tttccaatcg aatcaaacct ttccttaacc
+     4921 atcttcgcag caggcaaaat tacctcagca ctggagtcag aagatacgct ggaatcttct
+     4981 gcgctagaat caagaccata cggcctaccg gttgtgagag attccatggg ccttatgaca
+     5041 tatcctggaa agagtagctc atcagactta cgtttactct ctatatcaat atctacatca
+     5101 ggagcaatca tttcaataaa cagccgacat acatcccaga cgctataagc tgtacgtgct
+     5161 tttaccgtca gattcttggc tgtttcaatg tcgtccattt tggttttctt ttaccagtat
+     5221 tgttcgtttg ataatgtatt cttgcttatt acattataaa atctgtgcag atcacatgtc
+     5281 aaaacaactt tttatcacaa gatagtaccg caaaacgaac ctgcgggccg tctaaaaatt
+     5341 aaggaaaagc agcaaaggtg catttttaaa atatgaaatg aagataccgc agtaccaatt
+     5401 attttcgcag tacaaataat gcgcggccgg tgcatttttc gaaagaacgc gagacaaaca
+     5461 ggacaattaa agttagtttt tcgagttagc gtgtttgaat actgcaagat acaagataaa
+     5521 tagagtagtt gaaactagat atcaattgca cacaagatcg gcgctaagca tgccacaatt
+     5581 tggtatatta tgtaaaacac cacctaaggt gcttgttcgt cagtttgtgg aaaggtttga
+     5641 aagaccttca ggtgagaaaa tagcattatg tgctgctgaa ctaacctatt tatgttggat
+     5701 gattacacat aacggaacag caatcaagag agccacattc atgagctata atactatcat
+     5761 aagcaattcg ctgagtttcg atattgtcaa taaatcactc cagtttaaat acaagacgca
+     5821 aaaagcaaca attctggaag cctcattaaa gaaattgatt cctgcttggg aatttacaat
+     5881 tattccttac tatggacaaa aacatcaatc tgatatcact gatattgtaa gtagtttgca
+     5941 attacagttc gaatcatcgg aagaagcaga taagggaaat agccacagta aaaaaatgct
+     6001 taaagcactt ctaagtgagg gtgaaagcat ctgggagatc actgagaaaa tactaaattc
+     6061 gtttgagtat acttcgagat ttacaaaaac aaaaacttta taccaattcc tcttcctagc
+     6121 tactttcatc aattgtggaa gattcagcga tattaagaac gttgatccga aatcatttaa
+     6181 attagtccaa aataagtatc tgggagtaat aatccagtgt ttagtgacag agacaaagac
+     6241 aagcgttagt aggcacatat acttctttag cgcaaggggt aggatcgatc cacttgtata
+     6301 tttggatgaa tttttgag
+//

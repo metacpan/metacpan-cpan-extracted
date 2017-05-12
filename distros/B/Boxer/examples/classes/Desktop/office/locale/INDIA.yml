@@ -1,0 +1,21 @@
+# languages (and in paranthesis: locales, and scripts when exceptional)
+# union: Hindi(hi,devanagari) English(en-GB)
+# 8th Schedule additions: Assamese(as) Bengali(bn) Bodo(brx) Dogri(doi)
+#   Gujarati(gu) Kannada(kn) Kashmiri(ks,persian/perso-arabic)
+#   Konkani(kok) Maithili(mai,tirhuta) Malayalam(ml)
+#   Manipuri/Meitei/Meithei(mni) Marathi(mr) Nepali(ne) Oriya(or)
+#   Punjabi(pa,gurmukhi/shahmukhi) Sanskrit(sa)
+#   Santali(sat,ol chiki/ol cemet) Sindhi(sd,khudabadi,landa) Tamil(ta)
+#   Telugu(te) Urdu(ur)
+# state only: Garo(grt) Khasi(kha) Kokborok(trp/ria/tpe/usi/xtr) Mizo(lus)
+# as bn en-gb gu hi ml mr or pa-in ta te
+classes:
+  - Desktop.office
+parameters:
+  doc:
+    desktop-office:
+      pkg:
+        - include LibreOffice locales for official languages of India
+  pkg:
+    - libreoffice-l10n-in
+    - libreoffice-l10n-en-gb

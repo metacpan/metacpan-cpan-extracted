@@ -1,0 +1,12 @@
+Revision history for Perl extension Business::PL::NIP.
+
+0.01  Sun Dec 25 2014
+	- original version
+
+0.02 Mon Jun 1 2015
+    - removed OOP interface, documentation improvements.
+
+0.03 Sat Dec 5 2015
+    - don't die on invalid NIP number, return undef instead.
+
+

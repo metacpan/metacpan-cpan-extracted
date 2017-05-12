@@ -1,0 +1,40 @@
+Revision history for Perl module Bundle::BricolagePlus.
+
+1.11.0 2008-10-05T22:20:24
+       - Added new modules that can be used with Bricolage 1.11.1:
+         + DBD::mysql
+         + mod_perl2
+         + Apache2::Request
+         + Apache2::SizeLimit
+         + Net::SSH2
+       - Removed modules that are no longer used in Bricolage 1.11.1:
+         + Devel::Profiler
+         + Net::SFTP
+
+1.10.0 2006-02-05T03:23:45
+       - No changes, just updated the version number to correspond with
+         the latest stable release of Bricolage.
+
+1.9.0  2005-08-17T23:35:49
+       - Added PHP::Interpreter.
+       - Removed Text::Levenshtein
+
+1.8.1  2005-03-18T06:04:31
+       - Updated Template Toolkit required version to 2.14.
+
+1.8.0  2004-05-03T23:46:36
+       - Updated for Bricolage 1.8.0, with some new modules added.
+
+1.6.1  Tue Aug 26 18:12:37 2003
+       - Switched to Module::Build.
+       - Reorganized distribution layout to better reflect Perl standard.
+       - Added POD tests.
+
+1.6.0  Tue Apr 29 08:46:12 2003
+       - Updated for Bricolage 1.6.0, with some new modules added.
+
+1.4.1  Thu Sep  5 01:30:41 2002
+       - Added Net::FTPServer.
+
+1.4.0  Wed Sep 04 04:33:32 2002
+       - Initial Public Release.

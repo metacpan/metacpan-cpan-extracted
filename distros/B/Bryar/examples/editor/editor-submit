@@ -1,0 +1,79 @@
+#!/usr/bin/perl -T
+
+use warnings;
+use strict;
+
+use CGI;
+use Fcntl;
+
+my $password = 'here goes the password';
+my $basedir = '/var/www/blog/';
+my $baseurl = 'http://blog.example.org/';
+
+##############################################################################
+my $query = new CGI;
+
+my $pwd = $query->param('pwd') || '';
+fatal('Bad password.') if $pwd ne $password;
+
+my $title = $query->param('title');
+fatal('Missing title.') if not $title;
+
+my $text = $query->param('fckeditor');
+fatal('Missing text.') if not $text;
+$text =~ s/\r//g;
+
+my $postfile;
+if ($query->param('unpublished')) {
+	$postfile = $basedir . 'unpublished/';
+} else {
+	$postfile = $basedir . 'data/';
+}
+
+my $posturl = $baseurl;
+
+my $category = $query->param('category') || '';
+$category =~ /^([a-z]+)/;
+$postfile .= $1 . '/' if $1;
+$posturl  .= $1 . '/' if $1;
+
+my $postid = new_post_id($basedir);
+$postfile .= "$postid.txt";
+$posturl .= "id_$postid";
+
+sysopen(POST, $postfile, O_WRONLY | O_CREAT | O_EXCL)
+	or fatal("sysopen($postfile): $!");
+print POST "$title\n$text\n";
+close POST;
+
+print "Content-Type: text/plain\n"
+	. "Status: 303 See Other\n"
+	. "Location: $posturl\n"
+	. "\n"
+	. "OK (posted as $posturl)\n";
+
+exit 0;
+
+##############################################################################
+# XXX there is a small race here...
+sub new_post_id {
+	my ($dir) = @_;
+
+	my @files = (
+		glob("$dir/data/*.txt"),
+		glob("$dir/data/*/*.txt"),
+		glob("$dir/unpublished/*.txt"),
+		glob("$dir/unpublished/*/*.txt"),
+	);
+	@files = sort { $a <=> $b } map { /.+\/([0-9]+)\.txt$/ } @files;
+	my $id = pop(@files) || 0;
+	return $id + 1;
+}
+
+sub fatal {
+	print "Status: 500 program error\n"
+		. "Content-Type: text/plain\n\n"
+		. "$_[0]\n";
+	exit 0;
+}
+

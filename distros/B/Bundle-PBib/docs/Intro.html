@@ -1,0 +1,329 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Intro - The PBib Input Document Format and Styles</title>
+<link rel="stylesheet" href="Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Intro - The PBib Input Document Format and Styles</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#introduction">INTRODUCTION</a></li>
+	<li><a href="#pbib_input_document_format">PBib Input Document Format</a></li>
+	<ul>
+
+		<li><a href="#pbib_fields">PBib Fields</a></li>
+		<ul>
+
+			<li><a href="#examples">Examples</a></li>
+		</ul>
+
+		<li><a href="#pbib_field_options">PBib Field Options</a></li>
+	</ul>
+
+	<li><a href="#pbib_styles">PBib Styles</a></li>
+	<ul>
+
+		<li><a href="#custom_styles">Custom Styles</a></li>
+	</ul>
+
+	<li><a href="#pbib_reference_types">PBib Reference Types</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>PBib Intro - The PBib Input Document Format and Styles</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        perl pbib.pl I&lt;filename&gt;
+        pbib I&lt;filename&gt;
+        PBibTk.pl I&lt;filename&gt;</pre>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="introduction">INTRODUCTION</a></h1>
+<p>This is a short introduction to the <a href="#pbib_input_document_format">PBib Input Document Format</a> and provided <a href="#pbib_styles">PBib Styles</a>. You may first want to read <a href="././blib/html/site/lib/PBib/PBib.html#quick_start">QUICK START in the PBib::PBib manpage</a> how to get pbib running.</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="pbib_input_document_format">PBib Input Document Format</a></h1>
+<p>
+</p>
+<h2><a name="pbib_fields">PBib Fields</a></h2>
+<p>In your document, there can be three types of fields that are 
+interpreted by PBib.</p>
+<dl>
+<dt><strong><a name="item_%5b%5breference%5d%5d_or_%5b%5bref_1%5d%2c_%5bref_"><strong>[[<em>reference</em>]] or [[<em>ref 1</em>], [<em>ref 2</em>]]</strong></a></strong><br />
+</dt>
+<dd>
+A reference to some material, paper, document, whatever ... (BibTeX' \cite{...}). You can also cite several references within the 
+same field.
+</dd>
+<dd>
+<p>The references are identified with their ``CiteKey'' which is specified 
+in the bibliography database. It depends on the database type, how 
+the CiteKey is specified. BibTeX places the CiteKey before listing 
+other fields (see also <a href="#pbib_reference_types">PBib Reference Types</a> below):</p>
+</dd>
+<dd>
+<pre>
+        @inproceedings{BEACH-ConnecTables,
+           author = {Peter Tandler and Thorsten Prante and Christian M{\&quot;u}ller-Tomfelde and Norbert Streitz and Ralf Steinmetz},
+           title = {ConnecTables: Dynamic Coupling of Displays for the Flexible Creation of Shared Workspaces},
+           booktitle = {Proceedings of 14th Annual ACM Symposium on User Interface and Software Technology (UIST'01)},
+           location = {Orlando, Florida, USA},
+           pages = {11--20},
+           publisher = {ACM Press, New York, NY},
+           month = {Nov. 11-14},
+           year = {2001},
+           url = {<a href="http://ipsi.fraunhofer.de/ambiente/publications/">http://ipsi.fraunhofer.de/ambiente/publications/</a>},
+        }</pre>
+</dd>
+<dd>
+<p>In this example ``BEACH-ConnecTables'' is the CiteKey (while ``@inproceedings'' is the CiteType). This paper can be referenced in
+the text as [[BEACH-ConnecTables]].</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b%7b%7d%5d_or_%5b%7b%93authors%94_like_%91%25tan"><strong>[{}] or [{“Authors” LIKE ‘%Tandler%’}]</strong></a></strong><br />
+</dt>
+<dd>
+The list of references, which may include filters. The filters are
+specified as a subset of SQL's ``where'' clause syntax. Not all bibliography database formats support filters.
+</dd>
+<p></p>
+<dt><strong><a name="item_%5b%3c_some_comment_%5d_or_%5b%23_some_todo_marker"><strong>[&lt; <em>some comment</em> </strong>] or [# <em>some todo marker</em> #]&gt;</a></strong><br />
+</dt>
+<dd>
+This can be used for placing comments in the input document while
+writing. It is formatted by PBib or removed (if PBib is run in the 
+``final'' mode).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h3><a name="examples">Examples</a></h3>
+<pre>
+        One major property of ubiquitous computing environments 
+        is the heterogeneity of the available devices. In order 
+        to provide a “coherent user experience” [[EasyLiving-Technologies], [Roomware-NextGeneration]], 
+        the “system must have a deeper understanding of the 
+        physical space” [[EasyLiving-Technologies], p. 3].</pre>
+<pre>
+        References
+        [{}]</pre>
+<pre>
+        Peter’s References
+        [{“Authors” LIKE ‘%Seitz%’ or “Authors” LIKE ‘%Tandler%’}]
+        
+        [&lt; add some more detailed example here &gt;]
+        [## I think I should clarify this! ##]</pre>
+<p>
+</p>
+<h2><a name="pbib_field_options">PBib Field Options</a></h2>
+<p>You can add options to PBib fields that control how a <a href="#pbib_styles">style</a> 
+formats the field. Options are 
+specified at the beginning of a field, starting with a colon.</p>
+<p><em>Please note:</em> Not all styles support all options. Not all options 
+can be combined.</p>
+<pre>
+        [ :I&lt;option1&gt; :I&lt;option2&gt; ... | [I&lt;references&gt;] ]</pre>
+<dl>
+<dt><strong><a name="item_%3ainline"><strong>:inline</strong></a></strong><br />
+</dt>
+<dd>
+Styles that use the authors' names to generate the reference, 
+are instructed to inline the author's name in the text. For example, the Label Style ``Name'' generates ``Tandler (2001)'' instead of 
+``(Tandler, 2001)'' if the inline option is given. This can be used
+if the authors name is used as part of a sentence, e.g. ``Tandler (2001) introduced the idea of ...'' can be written ``[ :inline |
+[BEACH-ConnecTables]] introduced the idea of ...''.
+</dd>
+<dd>
+<pre>
+        [:inline|[COAST-Model]]
+        [:inline|[COAST-Model], p. 4]
+        [ : inline :   etal  = 5  |  [COAST-Model], p. 3]</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_%3anoauthor"><strong>:noauthor</strong></a></strong><br />
+</dt>
+<dd>
+The author's name is suppressed. The Label Style ``Name'' only outputs the year, e.g. ``[ :noauthor | [BEACH-ConnecTables]]'' generates ``(2001)''. Use this, if you have mentioned the author's name already 
+in the text yourself, e.g. ``Tandler [ :noauthor | [BEACH-ConnecTables]] introduced ...''.
+</dd>
+<p></p>
+<dt><strong><a name="item_%3anoparens"><strong>:noparens</strong></a></strong><br />
+</dt>
+<dd>
+The parentheses around the reference are suppressed, e.g. ``Tandler, 2001'' instead of ``(Tandler, 2001)''. You can use this if you place the 
+reference inside parentheses yourself.
+</dd>
+<p></p></dl>
+<p><em>Hint:</em> You can process this introduction (i.e. the text you are just reading) with pbib to get an idea of 
+how the fields are formatted. (Be sure to change to the <em>docs</em> directory so that PBib finds the right <em>local.pbib</em> configuration file.</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="pbib_styles">PBib Styles</a></h1>
+<p>To specify which style should be used for a document, the easiest way is to use one of the predefined styles from the <em>styles</em> directory. For a document <em><em>filename.ext</em></em> PBib searches for a PBib style file called <em><em>filename</em>.pbib</em> or <em><em>filename.ext</em>.pbib</em>. In this file you can include the predefined style with the <code>include</code> statement, e.g. <code>include styles/IEEE/TR.pbib</code>.</p>
+<p>
+</p>
+<h2><a name="custom_styles">Custom Styles</a></h2>
+<p>There are two ways of defining custom styles. Adding PBib Style classes (which requires writing perl code) and combining the PBib styles in a custom way. Here, a very brief introduction for the later is given.</p>
+<p>PBib styles are combined from four sub-styles, that each is configured by a couple of configuration entries. The sub-styles are:</p>
+<dl>
+<dt><strong><a name="item_style"><strong>Bibliography Style</strong> (<code>bib</code>)</a></strong><br />
+</dt>
+<dd>
+The overall style for the list of references.
+</dd>
+<p></p>
+<dt><strong><strong>Bibliography Item Style</strong> (<code>item</code>)</strong><br />
+</dt>
+<dd>
+The style to format each entry (item) within the list of references.
+</dd>
+<p></p>
+<dt><strong><strong>Label Style</strong> (<code>label</code>)</strong><br />
+</dt>
+<dd>
+The label for references, used both at the citation and the list of references.
+</dd>
+<p></p>
+<dt><strong><strong>Reference Style</strong> (<code>ref</code>)</strong><br />
+</dt>
+<dd>
+The style to format the reference (citation) within the text.
+</dd>
+<p></p></dl>
+<p>For now, please look at the provided styles in the <em>styles</em> directory and the perl style classes 
+<a href="././blib/lib/PBib/BibliographyStyle.html">PBib::BibliographyStyle</a>, 
+<a href="././blib/html/site/lib/PBib/BibItemStyle.html">PBib::BibItemStyle</a>,
+<a href="././blib/lib/PBib/LabelStyle.html">PBib::LabelStyle</a>, and
+<a href="././blib/lib/PBib/ReferenceStyle.html">PBib::ReferenceStyle</a>.</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="pbib_reference_types">PBib Reference Types</a></h1>
+<p>PBib supports the reference types as BibTeX and bp, with some additions / modifications.</p>
+<p>Please, take a look at <em>docs/CiteTypes.sxc</em> for more information.
+(<em>Note:</em> The reference types are implemented in class <a href="././blib/html/site/lib/PBib/BibItemStyle.html">PBib::BibItemStyle</a>.)</p>
+<dl>
+<dt><strong><a name="item_article"><strong>article</strong></a></strong><br />
+</dt>
+<dd>
+[[BEACH-AppModel+FW]]
+</dd>
+<p></p>
+<dt><strong><a name="item_book"><strong>book</strong></a></strong><br />
+</dt>
+<dd>
+[[BuildAppFWs], [Carroll-HCIMillennium]]
+</dd>
+<p></p>
+<dt><strong><a name="item_booklet"><strong>booklet</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_inbook"><strong>inbook</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_incollection"><strong>incollection</strong></a></strong><br />
+</dt>
+<dd>
+[[Roomware-NextGeneration], [Multimodal-UI-Design]]
+</dd>
+<p></p>
+<dt><strong><a name="item_inproceedings%2c_conference"><strong>inproceedings, conference</strong></a></strong><br />
+</dt>
+<dd>
+[[COAST-Model], [BEACH-ConnecTables]]
+</dd>
+<p></p>
+<dt><strong><a name="item_journal"><strong>journal</strong></a></strong><br />
+</dt>
+<dd>
+[[CACM.CFW], [CACM.OOFW]]
+</dd>
+<p></p>
+<dt><strong><a name="item_manual"><strong>manual</strong></a></strong><br />
+</dt>
+<dd>
+[[COAST-Overview], [VisualWorks-UsersGuide]]
+</dd>
+<p></p>
+<dt><strong><a name="item_thesis%2c_masterthesis%2c_phdthesis"><strong>thesis, masterthesis, phdthesis</strong></a></strong><br />
+</dt>
+<dd>
+[[BEACH-ContextMaker], [Jacobsen-SoftwareModelling], [Nowack-Structures+Interactions], [Schilit-PhDThesis]]
+</dd>
+<p></p>
+<dt><strong><a name="item_misc"><strong>misc</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_proceedings"><strong>proceedings</strong></a></strong><br />
+</dt>
+<dd>
+[[UIST01], [HUC00]]
+</dd>
+<p></p>
+<dt><strong><a name="item_report"><strong>report</strong></a></strong><br />
+</dt>
+<dd>
+[[Gaia-AppModel], [Groupware-Architectures]]
+</dd>
+<dd>
+<p>with new label (RepType): [[Pebbles-Amulet]]</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_unpublished%2c_email"><strong>unpublished, email</strong></a></strong><br />
+</dt>
+<dt><strong><a name="item_url%2c_web"><strong>url, web</strong></a></strong><br />
+</dt>
+<dd>
+[[COAST-Homepage], [VisualWorks-Homepage], [SMART-Homepage], [iRoom-Homepage], [Pebbles-Homepage]]
+</dd>
+<p></p>
+<dt><strong><a name="item_talk%2c_speech%2c_slides"><strong>talk, speech, slides</strong></a></strong><br />
+</dt>
+<dd>
+[[BEACH-ConnecTables-slides], [BEACH-SyncCollaboration-slides]]
+</dd>
+<p></p>
+<dt><strong><a name="item_patent"><strong>patent</strong></a></strong><br />
+</dt>
+<dd>
+[[Cooltown-EmbeddedWebAccess]]
+</dd>
+<p></p>
+<dt><strong><a name="item_avmatierial%2c_video%2c_cdrom%2c_poster"><strong>avmatierial, video, cdrom, poster</strong></a></strong><br />
+</dt>
+</dl>
+<p><a href="#__index__"><small>__top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Intro - The PBib Input Document Format and Styles</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

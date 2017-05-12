@@ -1,0 +1,8 @@
+Business::AU::Ledger ToDo List
+
+o Replace DBIx::Simple?
+
+o Replace Data::FormValidator with Data::Verifier.
+
+o Re-design method of associating objects with modules.
+	This means fixing build_select() in View::Base.

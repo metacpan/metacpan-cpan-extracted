@@ -1,0 +1,21 @@
+@import "orange.css";
+
+html, body {
+    background-color: #f0f3ff;
+}
+
+h3.title { 
+    background-color: #d2dff1;
+}
+
+h3.menu {
+    background-color: #d0d0e0;
+}
+
+.hover > div.glance {
+    background-color: #ddf;
+}
+
+div.hover > ul {
+    background-color: #e0e3ee;
+}

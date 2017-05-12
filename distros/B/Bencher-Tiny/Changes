@@ -1,0 +1,19 @@
+Revision history for Bencher-Tiny
+
+0.003   2016-10-20 (PERLANCAR)
+
+        - Rename dist from Bencher-BPM to Bencher-Tiny. Script also renamed from
+          bencher-bpm to bencher-tiny.
+
+
+0.002   2016-10-20 (PERLANCAR)
+
+        - Rename --time to --timethese which is clearer. Add --cmpthese for
+          completeness sake.
+
+        - Tweak some stuffs.
+
+
+0.001   2016-10-20 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,89 @@
+name=GSEprobe
+module=gse_probe
+version=20041124
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+#label=ProbeID, dotset=ProbeID
+label=PlatformID, dotset=PlatformID
+label=AccessionID, dotset=Sequence_ID
+label=ALIASES, dotset=Gene_Name
+label=ANNOTATION, dotset=Gene_Description
+label=ARCHIVAL, dotset=Other
+label=BLAST, dotset=Other
+label=BLOCK, dotset=Other
+label=CHROMOSOMAL, dotset=Gene_Location
+label=CHROMOSOME, dotset=Gene_Location
+label=CLASSIFICATION, dotset=Gene_Function
+label=CLONE_ID, dotset=Sequence_ID
+label=COLUMN, dotset=Platform_Location
+label=CONTROL_TYPE, dotset=Other
+label=COORDINATE, dotset=Platform_Location
+label=DESC, dotset=Gene_Description
+label=DESCRIPTION, dotset=Gene_Description
+label=DIA., dotset=Other
+label=DOT, dotset=Sequence_ID
+label=E-VALUE, dotset=Other
+label=EC, dotset=Gene_Function
+label=ENSEMBL, dotset=Gene_ID
+label=GB_ACC, dotset=Sequence_ID
+label=GB_LIST, dotset=Sequence_ID
+label=GENE, dotset=Gene_Name
+label=GENE_NAME, dotset=Gene_Name
+label=GENE_SYM, dotset=Gene_Name
+label=GENE_SYMBOL, dotset=Gene_Name
+label=GENMAPP_PATHWAY, dotset=Pathway_Name
+label=GENOME, dotset=Gene_Location
+label=GI, dotset=Sequence_ID
+label=GO_BIO_PROCESS, dotset=Gene_Function
+label=GO_CELL_COMPONENT, dotset=Gene_Function
+label=GO_MOLEC_FUNCTION, dotset=Gene_Function
+label=GO_MOL_FUNCTION, dotset=Gene_Function
+label=ID, dotset=ProbeID
+label=IDENTIFIER_SOURCE, dotset=Source_ID
+label=INTERPRO, dotset=Gene_Function
+label=IPR_DOMAIN, dotset=Gene_Function
+label=LLREPPROTACC, dotset=Sequence_ID
+label=LOCUSLINK, dotset=Gene_ID
+label=LOCUS_LINK, dotset=Gene_ID
+label=MAP, dotset=Gene_Location
+label=MAP_LOC, dotset=Gene_Location
+label=MAP_LOCATION, dotset=Gene_Location
+label=MGI, dotset=Gene_ID
+label=NAME, dotset=Gene_Name
+label=OMIM, dotset=Gene_Function
+label=ORGANISM, dotset=Organism
+label=OTHER_ACC, dotset=Sequence_ID
+label=PATHWAY, dotset=Gene_Function
+label=PEN, dotset=Other
+label=PROTEOME_BIO_FUNC, dotset=Gene_Function
+label=PROTEOME_CELL_ROLE, dotset=Gene_Function
+label=PROTEOME_MOL_LOC, dotset=Gene_Function
+label=PROTEOME_ORG_ROLE, dotset=Gene_Function
+label=PROTEOME_SUB_LOC, dotset=Gene_Function
+label=REFSEQ, dotset=Sequence_ID
+label=REPRESENTATIVE, dotset=Other
+label=ROW, dotset=Platform_Location
+label=RZPD_ID, dotset=Sequence_ID
+label=SEQDERIVEDFROM, dotset=Sequence_ID
+label=SEQUENCE, dotset=Sequence
+label=SEQUENCE_TYPE, dotset=Sequence_Type
+label=SPECIES, dotset=Organism
+label=SPOT_ID, dotset=ProbeID
+label=SP_ACC, dotset=Sequence_ID
+label=SWISSPROT, dotset=Gene_ID
+label=SWISS_PROT, dotset=Gene_ID
+label=SYMBOL, dotset=Gene_Name
+label=TARGET, dotset=Gene_ID
+label=TIGR_ID, dotset=Gene_ID
+label=TITLE, dotset=Gene_Name
+label=TRANS, dotset=Other
+label=TRANSCRIPT, dotset=Other
+label=UNIGENE, dotset=Gene_ID
+label=UNIGENE_ID, dotset=Gene_ID
+label=X, dotset=Platform_Location
+label=Y, dotset=Platform_Location

@@ -1,0 +1,27 @@
+Copyright (c) 2003 Ivan Kohler
+Copyright (c) 2007 Freeside Internet Services, Inc.
+All rights reserved. This program is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::PayflowPro, a Business::OnlinePayment
+back end module for PayPal Payflow Pro.  It is only useful if you have
+a merchant account with PayPal Payment Services:
+  https://www.paypal.com/cgi-bin/webscr?cmd=_payflow-gateway-overview-outside
+
+As of 0.07, this module communicates with the Payflow gateway directly and no
+longer requires the Payflow Pro SDK.  Thanks to Phil Lobbes for this great
+work.
+
+The Payflow API that this module interfaces with is not yet an officially
+supported service and is still subject to change.  At this time, you need to
+contact payflowintegrator@paypal.com for a certification ID to connect and run
+transactions using this module.
+
+Based on Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+Currently maintained by Ivan Kohler <ivan-payflowpro@420.am> and Phil Lobbes
+<phil at perkpartners.com>.
+
+Business::OnlinePayment is a generic interface for processing payments
+through online credit card processors, online check acceptance houses,
+etc.  (If you like buzzwords, call it an "multiplatform
+ecommerce-enabling middleware solution").

@@ -1,0 +1,23 @@
+0.03  Sat Mar 25 02:11:51 PST 2006
+	- Include final 0.02 changelog
+	- Actually bump the version number this time
+	- Switch from GET to POST, as per old 1.5 prerelease from Michael
+	  Lehmkuhl <michael@electricpulp.com> 
+	- Don't check expiration for ECHECK and refunds
+	- For the unsupported "void" action, return is_success 0 and error
+	  msg suggesting "credit" action, instead of croaking.  This way the
+	  "try void first, if it fails, try credit" idiom will work.
+	- tests: enable check.t and add crypt_check.t and {crypt_}bad_check.t
+	- update with new test account
+	- s/CHECK/ECHECK/, DOH
+	- move "payee" to a new() option, that makes more sense?
+	- use '00000000' for check # if one is missing then.  what else to do
+	  for recurring transactions?
+
+0.02  Mon Sep 13 17:14:29 2004
+	- update test account with new PIN
+	- customer_id => merchant_trace_nbr
+
+0.01  Wed Aug 25 23:27:55 2004
+        - original version; created by ivan 1.0
+

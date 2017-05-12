@@ -1,0 +1,5 @@
+$VAR1 = bless( {
+                 'name-of-institution' => bless( {
+                                                   'generalstring' => 'Manitoba Public Library Services'
+                                                 }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' );

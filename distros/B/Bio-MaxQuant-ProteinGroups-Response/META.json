@@ -1,0 +1,46 @@
+{
+   "abstract" : "Analyze MQ proteinGroups for differential responses",
+   "author" : [
+      "Jimi <j@0na.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.88, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-MaxQuant-ProteinGroups-Response",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "2.09",
+            "IO::File" : "1.14",
+            "Math::SigFigs" : "1.09",
+            "Statistics::Reproducibility" : "0.06",
+            "Text::CSV" : "1.32",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

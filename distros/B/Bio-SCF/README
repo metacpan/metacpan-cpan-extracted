@@ -1,0 +1,15 @@
+The Perl SCF module allows you to read and update (in a restricted
+way) SCF chromatographic sequence files. It is an interface to Roger
+Staden's io-lib. See the installation directions for further
+instructions.
+
+ - This software is free.  You can use it under the terms of the Perl
+   Artistic License Please.  Please see DISCLAIMER for limitations of
+   warranty, the academic citation policy and other legalese.
+
+Support is available by writing to Lincoln Stein <lstein@cshl.edu>.
+
+Lincoln Stein
+lstein@cshl.org
+January 30, 2006
+

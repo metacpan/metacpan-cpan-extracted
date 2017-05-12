@@ -1,0 +1,18 @@
+Copyright uncertain at this time; based on code API code provided without
+clear licensing... assuming that can be resolved:
+
+Business::OnlinePayment conversion copyright (c) 2006 Ivan Kohler
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::PPIPayMover, an Business::OnlinePayment
+backend module for PPI PayMover.  It is only useful if you have a merchant
+account with PPI Paymover: http://www.ppipaymover.com/
+
+Ivan Kohler <ivan-ppipaymover@420.am>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+

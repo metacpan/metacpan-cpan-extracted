@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl -wT
+use lib "lib";
+use Bio::Das::Lite;
+use Data::Dumper;
+$Bio::Das::Lite::DEBUG = 0;
+print STDERR "VERSION=",$Bio::Das::Lite::VERSION, "\n";
+
+my $das = Bio::Das::Lite->new({
+	'dsn'        => 'http://das.sanger.ac.uk/das',
+});
+
+my $ref = $das->dsns();
+my @all = map { "http://das.sanger.ac.uk/das/$_->{'source'}" } map { @{$ref->{$_}} } keys %{$ref};
+
+$das->dsn(\@all);
+
+print Dumper($das->stylesheet());
+#print Dumper($bdl->features("1:1,50000000"));

@@ -1,0 +1,8 @@
+CHADO_HOME = ~/chado
+CHADO_XSL = chado-expand-macros chado-insert-macros
+
+check: $(patsubst %,diff-%,$(CHADO_XSL))
+
+diff-%: 
+	diff xsl/$*.xsl $(CHADO_HOME)/chado-xml/xsl/$*.xsl
+

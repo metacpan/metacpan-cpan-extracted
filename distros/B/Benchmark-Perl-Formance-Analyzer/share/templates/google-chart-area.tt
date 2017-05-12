@@ -1,0 +1,33 @@
+<html encoding="utf-8">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      // https://google-developers.appspot.com/chart/interactive/docs/gallery/areachart
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([% RESULTMATRIX %]);
+        var options = {
+            title: '[% title %]',
+            hAxis: {title: '[% x_key %]',  titleTextStyle: {color: '#333'}, slantedTextAngle: 45},
+            vAxis: {minValue: 0, title:'seconds (smaller is better)'},
+            pointSize: 4,
+            areaOpacity: [% areaOpacity %],
+            interpolateNulls: [% interpolateNulls %],
+            isStacked: [% isStacked %]
+        };
+
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <ul>
+        <li>Benchmark code: <a href="https://metacpan.org/pod/[% modulename %]">[% modulename %]</a></li>
+    </ul>
+    <div id="chart_div" style="width: [% width %]px; height: [% height %]px;"></div>
+  </body>
+</html>

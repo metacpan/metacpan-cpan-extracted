@@ -1,0 +1,32 @@
+# languages (and in paranthesis: locales, and scripts when exceptional)
+# union: Hindi(hi,devanagari) English(en-GB)
+# 8th Schedule additions: Assamese(as) Bengali(bn) Bodo(brx) Dogri(doi)
+#   Gujarati(gu) Kannada(kn) Kashmiri(ks,persian/perso-arabic)
+#   Konkani(kok) Maithili(mai,tirhuta) Malayalam(ml)
+#   Manipuri/Meitei/Meithei(mni) Marathi(mr) Nepali(ne) Oriya(or)
+#   Punjabi(pa,gurmukhi/shahmukhi) Sanskrit(sa)
+#   Santali(sat,ol chiki/ol cemet) Sindhi(sd,khudabadi,landa) Tamil(ta)
+#   Telugu(te) Urdu(ur)
+# state only: Garo(grt) Khasi(kha) Kokborok(trp/ria/tpe/usi/xtr) Mizo(lus)
+# as bn-in en-gb gu-in hi-in kn mai ml mr or ta te
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for official languages of India
+  pkg:
+    - iceweasel-l10n-as
+    - iceweasel-l10n-bn-in
+    - iceweasel-l10n-en-gb
+    - iceweasel-l10n-gu-in
+    - iceweasel-l10n-hi-in
+    - iceweasel-l10n-kn
+    - iceweasel-l10n-mai
+    - iceweasel-l10n-ml
+    - iceweasel-l10n-mr
+    - iceweasel-l10n-or
+    - iceweasel-l10n-pa-in
+    - iceweasel-l10n-ta
+    - iceweasel-l10n-te

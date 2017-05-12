@@ -1,0 +1,21 @@
+$VAR1 = bless( {
+                 'delivery-time' => bless( {
+                                             'generalstring' => '235959'
+                                           }, 'Biblio::ILL::ISO::ISOTime' ),
+                 'e-delivery-description' => bless( {
+                                                      'generalstring' => 'Just a dummy'
+                                                    }, 'Biblio::ILL::ISO::ILLString' ),
+                 'name-or-code' => bless( {
+                                            'generalstring' => 'MSG ID: 1001'
+                                          }, 'Biblio::ILL::ISO::ILLString' ),
+                 'e-delivery-details' => bless( {
+                                                  'e-delivery-address' => bless( {
+                                                                                   'telecom-service-identifier' => bless( {
+                                                                                                                            'generalstring' => 'SMTP'
+                                                                                                                          }, 'Biblio::ILL::ISO::ILLString' ),
+                                                                                   'telecom-service-address' => bless( {
+                                                                                                                         'generalstring' => 'bob@hope.com'
+                                                                                                                       }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                 }, 'Biblio::ILL::ISO::SystemAddress' )
+                                                }, 'Biblio::ILL::ISO::EDeliveryDetails' )
+               }, 'Biblio::ILL::ISO::ElectronicDeliveryService' );

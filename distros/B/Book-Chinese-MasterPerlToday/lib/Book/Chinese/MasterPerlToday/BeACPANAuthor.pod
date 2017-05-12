@@ -1,0 +1,726 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::BeACPANAuthor - Be a CPAN Author
+
+=head1 DESCRIPTION
+
+本章主要描述如何成为一个 CPAN 贡献者
+
+您有一个非常好的模块，您想与整个 Perl 社区分享。最好的方式是将您的模块上传到 CPAN，本章将描述如何打包，上传您的模块和一些 CPAN 社区约定俗成的惯例。
+
+=head2 PAUSE
+
+上传模块到 CPAN 之前，您首先需要到 PAUSE L<http://pause.perl.org/> 申请一个帐号。通常帐号会在一周之内被批准（因为是志愿者自愿维护和批准整个 PAUSE 网站，所以有点慢）。
+
+上传模块将在您通过帐号批准之后，登录 PAUSE 网站，然后点击左侧的 'Upload a file to CPAN' 来上传您的打包文件。
+
+=head2 如何选择一个模块名
+
+为了更好更清晰地组织 CPAN 上的所有包，您需要准确的命名您的模块。
+
+通常请不要给你的模块取最顶层的名字（不带 :: 的包名），和谐的做法是置于某个顶层命名空间下。（当然，如果您觉得您的包将非常有用和流行的话，使用顶层名字也是可以的。）
+
+=over 4
+
+=item * Acme:: 
+
+大部分（非全部）的 Acme:: 模块是给人取乐，不成熟或试验的代码，不建议使用在 product 环境的代码。
+
+=item * Algorithm::
+
+算法模块
+
+=item * Alien::
+
+外部程序安装文件
+
+=item * Apache::
+
+Apache mod_perl 相关文件
+
+=item * App::
+
+带有可运行脚本的包
+
+=item * Archive::
+
+=item * Audio::
+
+=item * Authen::
+
+=item * B::
+
+perl5 core 相关模块
+
+=item * Bio::
+
+=item * Bundle::
+
+老式模块合集文件，建议使用 Task::
+
+=item * Business::
+
+国家商业相关模块。类如信用卡，在线支付，身份证等相关
+
+=item * Cache::
+
+=item * Catalyst::, CatalystX::
+
+=item * CGI::
+
+=item * Class::
+
+=item * Crypt::
+
+=item * Data::
+
+=item * Date::, DateTime::
+
+=item * DBIx::
+
+DBI 扩展模块
+
+=item * Devel::
+
+perl -d 相关模块
+
+=item * Digest::
+
+=item * Email::, Mail::
+
+邮件相关
+
+=item * ExtUtils::
+
+模块安装相关工具
+
+=item * File::
+
+文件操作相关
+
+=item * Finance::
+
+银行，股票等
+
+=item * Games::
+
+=item * Geo::
+
+地理位置相关
+
+=item * Graph::, Graphics::
+
+=item * HTML::
+
+=item * HTTP::
+
+=item * Image::
+
+=item * Inline::
+
+=item * IO::
+
+=item * IPC::
+
+=item * JavaScript::, JS::, JSON::
+
+=item * Jifty::
+
+=item * Language::
+
+=item * Lingua::
+
+自然语言相关模块
+
+=item * Log::
+
+=item * Math::
+
+=item * Module::
+
+模块操作相关
+
+=item * MooseX::
+
+=item * Net::
+
+网络相关（参考 WWW::）
+
+=item * Padre::
+
+=item * Pod::, POD::
+
+=item * POE::
+
+=item * Proc::
+
+=item * Regex::
+
+=item * RT::
+
+=item * Search::
+
+=item * SQL::
+
+=item * Statistics::
+
+=item * Task::
+
+模块合集文件，类似 Bundle::, 推荐。
+
+=item * Template::
+
+=item * Test::
+
+测试模块
+
+=item * Text::
+
+=item * URI::
+
+=item * WebServices::
+
+=item * Win32::
+
+=item * WWW::
+
+=back
+
+如果你还是无法找到准确的地方来放您的模块，建议去 comp.lang.perl.modules 新闻组咨询。
+
+=head2 如何打包模块
+
+通常我们不会将一个（或多个) pm 文件直接上传到 PAUSE，默认的规则是打包成 .tar.gz 然后再上传。
+
+=head3 h2xs
+
+    > h2xs -AX -n Book::Chinese
+
+L<h2xs> 是最古老的创建新模块的工具。请参阅 h2xs 命令帮助。
+
+不建议使用。
+
+=head3 L<Module::Starter>
+
+    > cpan Module::Starter
+
+安装 L<Module::Starter> 完毕之后，perl bin 目录将有一个 L<module-starter> 可执行文件。
+
+    > module-starter --module=Book::Chinese::MasterPerlToday --author="Fayland Lam" --email=fayland@gmail.com
+
+默认使用 L<ExtUtils::MakeMaker> 作为 builder，可以后面再带 '--mb' 使用 L<Module::Build> 或者带 '--mi' 来使用 L<Module::Install> 作为 builder 引擎。
+
+L<ExtUtils::MakeMaker> 是最古老和使用最广的 builder 模块。它需要和 make 配合来打包模块。
+
+    > perl Makefile.PL
+    > make
+    > make manifest
+    > make test
+    > make dist
+    > make realclean
+
+L<Module::Build> 是用来代替 L<ExtUtils::MakeMaker> 的。它不需要 make，可用 Perl 来完成打包工作。
+
+    > perl Build.PL
+    > perl Build
+    > perl Build manifest
+    > perl Build test
+    > perl Build dist
+    > perl Build realclean
+
+L<Module::Install> 的打包方法和 L<ExtUtils::MakeMaker> 一样（需要 make 配合）。但不同之处在于：
+
+=over 4
+
+=item * 可扩展，拥有丰富的插件
+
+=item * 当 make dist 的时候，所有的 Module::Install 和它的插件文件将被放入 inc 目录随包一起打包成 .tar.gz 文件。
+
+=back
+
+个人建议使用 L<Module::Build> 或 L<Module::Install>
+
+=head3 L<Dist::Zilla>
+
+    > cpan Dist::Zilla
+
+安装 L<Dist::Zilla> 完毕之后，perl bin 目录下将有一个 dzil 的可执行文件。
+
+    > dzil new Book::Chinese::MasterPerlToday
+
+dzil 通过 C<dist.ini> 来控制整个过程。
+
+    > dzil test
+    > dzil dist
+    > dzil clean
+
+dzil 跟 L<ExtUtils::MakeMaker>，L<Module::Build>，L<Module::Install> 或 L<Module::Starter> 都不同。
+
+=over 4
+
+=item * dzil 是 distribution builder 而不是 installer。这是跟 Module::Install 的最大区别。
+
+=item * dzil 的 installer 还是可以选择用 ExtUtils::MakeMaker 或 Module::Build。
+
+=item * dzil 的优点在于你只需要专注于你所要开发的代码，而不用关心 MANIFEST，Makefile.PL，Build.PL 版本或者多余的 POD 代码（如 AUTHOR，COPYRIGHT & LICENSE）。
+
+=item * dzil 因为基于 L<Moose> 所以它的代码高度可扩展，插件很容易写。
+
+=back
+
+=head2 包的组成
+
+一个包通常包括
+
+=over 4
+
+=item * Makefile.PL, Build.PL
+
+你必须拥有其中之一或者二者都有。建议是永远有 Makefile.PL，使用 Module::Build 可以在 Build.PL 里设置
+
+    create_makefile_pl => 'traditional'
+
+=item * lib/Book/Chinese/MasterPerlToday.pm
+
+主模块。主模块里你最好有 $VERSION
+
+=item * t/
+
+测试目录。建议最起码有一个 00-load.t 来测试主模块的语法是合格的。
+
+=item * README, Changes, INSTALL
+
+所有的文件都是可选的。但是 Changes 和 README 是建议拥有的。
+
+=item * MANIFEST, META.yml, MANIFEST.SKIP
+
+这些文件一般可以通过 make manifest 和 make dist (或 perl Build manifest，perl Build dist) 来生成。
+
+=back
+
+=head2 如何编写测试
+
+本段落仅仅描述如何简单地编写测试和验证测试，更多跟详尽的内容，建议参考《Perl Testing 程序高手秘笈》。本书 China-pub，当当和卓越均可购买，由盛春(chunzi)和蒋永清(joe jiang)翻译。
+
+最简单和使用最广泛的测试模块当属 L<Test::More>，建议阅读的有
+
+=over 4
+
+=item * L<Test::Tutorial>
+
+=item * L<prove>
+
+=back
+
+一个简单的测试文件如下 (eg/BeACPANAuthor/01-basic.t)
+
+    #!/usr/bin/perl
+    
+    use strict;
+    use warnings;
+    use Test::More tests => 3;
+    
+    ok(1, 'true value');
+    cmp_ok( 1+1, '==', 2, '1+1=2');
+    use_ok('Test::More');
+    
+    1;
+
+测试所写的 .t 文件跟普通的 Perl 文件一样，你可以使用 perl 01-basic.t 来运行它。比如：
+
+    E:\Fayland\chinese-perl-book\eg\BeACPANAuthor>perl 01-basic.t
+    1..3
+    ok 1 - true value
+    ok 2 - 1+1=2
+    ok 3 - use Test::More;
+
+prove 仅仅是在 perl 输出结果的基础上进行总结
+
+    E:\Fayland\chinese-perl-book\eg\BeACPANAuthor>prove 01-basic.t
+    01-basic.t .. ok
+    All tests successful.
+    Files=1, Tests=3,  0 wallclock secs ( 0.08 usr +  0.00 sys =  0.08 CPU)
+    Result: PASS
+
+L<Test::More> 遵从 L<TAP> (The Test Anything Protocal) 格式，而 prove 能解析所有遵从 TAP 格式的输出（可以是其他语言写的）。
+
+=head3 测试 Tip
+
+=over 4
+
+=item * skip_all
+
+    eval "use Test::Pod 1.14";
+    plan skip_all => 'Test::Pod 1.14 required' if $@;
+    plan skip_all => 'set TEST_POD to enable this test' unless $ENV{TEST_POD};
+
+你不能要求你的测试者安装某个模块（如果要求，放到 requires 或 test_requires 里），但你可以选择在没有安装的时候跳过该测试。
+
+=back
+
+=head2 FAQ 和建议
+
+=over 4
+
+=item * MANIFEST.SKIP
+
+C<MANIFEST.SKIP> 不是必须的文件。它的意义在于你 make dist 或者 perl Build dist 的时候忽略目录下的哪些文件。比如你使用版本库，一般需要忽略版本库文件。所以 .SKIP 里含有
+
+    \B\.git\b
+    \B\.svn\b
+    \B\.cvsignore$
+
+一般只有在你的 .t 生成某些临时文件，或者你不想将你的一些私有文件包含在 dist 里的时候，将它们加进 MANIFEST.SKIP，可以使用正则。
+
+=item * meta resources
+
+L<http://search.cpan.org/> 在 dist 的主页上是否显示 Repository （如 L<http://search.cpan.org/dist/WWW-Contact/> ） 是由 META.yml 来控制。
+
+而我们一般使用 Makefile.PL 或者 Build.PL 来生成 META.yml。
+
+=over 4
+
+=item * Build.PL (Module::Build)
+
+  meta_merge     => {
+    resources => {
+      homepage => 'http://sourceforge.net/projects/module-build',
+      bugtracker =>
+        'http://rt.cpan.org/NoAuth/Bugs.html?Dist=Module-Build',
+      MailingList => 'mailto:module-build@perl.org',
+      repository  => 'http://svn.perl.org/modules/Module-Build/'
+    }
+  },
+
+将类似上面的东西传进 Module::Build->new，参考 L<http://search.cpan.org/dist/Module-Build/Build.PL>。
+
+=item * Makefile.PL (ExtUtils::MakeMaker)
+
+    META_MERGE      => {
+        resources => {
+            license     =>      'http://dev.perl.org/licenses/',
+            homepage    =>      'http://makemaker.org',
+            bugtracker  =>      'http://rt.cpan.org/NoAuth/Bugs.html?Dist=ExtUtils-MakeMaker',
+            repository  =>      'http://github.com/schwern/extutils-makemaker',
+            MailingList =>      'makemaker@perl.org',
+        },
+    },
+
+将类似上面的东西传进 WriteMakefile，参考 L<http://search.cpan.org/dist/ExtUtils-MakeMaker/Makefile.PL>。
+
+=item * Makefile.PL (Module::Install)
+
+    repository 'http://svn.ali.as/cpan/trunk/Module-Install';
+    homepage 'http://homepage/';
+    bugtracker 'http://bugtracker/';
+
+将类似上面的东西直接写进 Makefile.PL。
+
+=item * dist.ini (Dist::Zilla)
+
+    [MetaResources]
+    repository = http://github.com/rjbs/dist-zilla
+
+=back
+
+如果你使用一些版本库控制的话，有自动的寻找 repository 的模块。Module::Install 有 L<Module::Install::Repository>, Dist::Zilla 有 L<Dist::Zilla::Plugin::Repository>
+
+=item * 不被 PAUSE 索引
+
+如果你有一些内部私有或没有 POD 的 package 不想被 PAUSE 索引到，可以：
+
+    package     # hidden from PAUSE
+        DBD::Switch::dr;
+
+=item * dev 版本
+
+    our $VERSION = '0.01_01';
+
+在版本里使用 _01 _02 等所生成的包不会被 CPAN 索引记录，但会显示成 B<DEVELOPER RELEASE>
+
+该情况在模块改动大的时候比较有用，先发布一个或多个 dev 版本以供测试。然后去掉 _XX 正式发布。
+
+=item * 修复 World-writable files 错误？
+
+该错误一般发生在 Win32 下。解决方法有三：
+
+一是用最新版的 L<Module::Build>
+
+二是使用该脚本来修复 L<http://perlmonks.org/index.pl?node_id=731935>
+
+三是用非 Win32 系统打包。
+
+=item * 头像
+
+CPAN 使用 L<Gravatar::URL> 调用 L<http://gravatar.com> 上的公用图片。您可以在 http://gravatar.com 上使用你的 CPAN 公开邮件注册并且上传图像。
+
+=back
+
+=head2 CPAN 作者
+
+跟踪 Perl 高手的足迹和阅读他们的代码。
+
+根据首字母排序：
+
+=over 4
+
+=item * ADAMK L<http://search.cpan.org/~ADAMK/>
+
+Adam Kennedy 是 CPAN 最多产的作者之一。L<File::HomeDir>，L<IPC::Run>，L<Perl::Dist>，L<pip>，L<PPI> 等等。
+
+=item * AUTRIJUS L<http://search.cpan.org/~AUTRIJUS/>
+
+=item * AUDREYT L<http://search.cpan.org/~AUDREYT/>
+
+☻ 唐鳳 ☺, 国人的骄傲（台湾）。Perl6 pugs 的开发者。L<Locale::Maketext::Lexicon>, L<Module::Install>, L<PAR> 的发起者
+
+=item * CHROMATIC L<http://search.cpan.org/~CHROMATIC/>
+
+chromatic, L<Modern::Perl>.
+
+=item * DROLSKY L<http://search.cpan.org/~DROLSKY/>
+
+Dave Rolsky, L<Moose>, L<DateTime> 和 L<HTML::Mason> 的开发者和维护者。
+
+=item * FLORA L<http://search.cpan.org/~FLORA/>
+
+Florian Ragwitz, L<Catalyst>, L<Moose> 的作者之一
+
+=item * GAAS L<http://search.cpan.org/~GAAS/>
+
+Gisle Aas, L<Digest::MD5>, L<Digest::SHA1>, L<HTML::Parser>, L<LWP>, L<URI>
+
+=item * JESSE L<http://search.cpan.org/~JESSE/>
+
+Jesse Vincent, 来自 Best Practical Solutions, L<Jifty>, RT, L<CommitBit> 等
+
+=item * JROCKWAY L<http://search.cpan.org/~JROCKWAY/>
+
+Jonathan Rockway, L<Catalyst>, L<Moose> 等新技术的使用者。
+
+=item * MIYAGAWA L<http://search.cpan.org/~MIYAGAWA/>
+
+Tatsuhiko Miyagawa, L<Plagger>, L<Web::Scraper>, L<XML::Atom>, Template-Plugin-*, 
+
+=item * MSCHWERN L<http://search.cpan.org/~MSCHWERN/>
+
+Michael G Schwern, L<ExtUtils::MakeMaker>, L<Test::More>, L<Time::y2038>, L<URI::Find>
+
+=item * MSTROUT L<http://search.cpan.org/~MSTROUT/>
+
+Matt S Trout, L<DBIx::Class>, L<Catalyst>, L<Devel::REPL>, L<local::lib>, L<Reaction>
+
+=item * NUFFIN L<http://search.cpan.org/~NUFFIN/>
+
+יובל קוג'מן (Yuval Kogman), Catalyst n 多 Plugin 和 n 多 MooseX 的作者。L<Moose> 的作者之一。L<KiokuDB> 的发起者
+
+=item * OVID L<http://search.cpan.org/~OVID/>
+
+Curtis "Ovid" Poe, L<Class::Sniff>, L<HTML::TokeParser::Simple>, L<Test::Aggregate>, L<Test::Most>
+
+=item * PERIGRIN L<http://search.cpan.org/~PERIGRIN/>
+
+Chris Prather, L<JSON::Any>, L<Task::Kensho>
+
+=item * PETDANCE L<http://search.cpan.org/~PETDANCE/>
+
+Andy Lester, L<ack>, L<File::Next>, L<Test::Harness>, L<WWW::Mechanize>
+
+=item * RJBS L<http://search.cpan.org/~RJBS/>
+
+Ricardo SIGNES, Email 模块最多的作者。L<Dist::Zilla>, L<Email::Sender>
+
+=item * SMUELLER L<http://search.cpan.org/~SMUELLER/>
+
+Steffen Müller, L<Class::XSAccessor>, L<PAR>
+
+=item * SRI L<http://search.cpan.org/~SRI/>
+
+Sebastian Riedel, L<Catalyst> 创建者，L<Maypole> 维护者，L<Mojo> 创建者
+
+=item * SARTAK L<http://search.cpan.org/~SARTAK/>
+
+Shawn M Moore, 来自 Best Practical Solutions, Moose 核心开发者
+
+=item * STEVAN L<http://search.cpan.org/~STEVAN/>
+
+Stevan Little, L<Moose> 的原始作者。L<Class::C3>, L<JSORB>
+
+=item * SZABGAB L<http://search.cpan.org/~SZABGAB/>
+
+גאבור סבו - Gábor Szabó, L<Padre>
+
+=item * TIMB L<http://search.cpan.org/~TIMB/>
+
+Tim Bunce, L<DBI>, L<Devel::NYTProf>
+
+=item * More
+
+建议订阅 L<http://search.cpan.org/recent> 的 RSS 以便跟踪 CPAN 最新模块。
+
+=back
+
+大陆（和香港） Perl CPAN 作者，参考 L<Acme::CPANAuthors::Chinese>
+
+首字母排序：
+
+=over 4
+
+=item * AGENT L<http://search.cpan.org/~AGENT/>
+
+agentzh (章亦春)，大陆最牛的 Perler 之一，L<OpenResty> 的源码值得学习
+
+=item * ALEXE L<http://search.cpan.org/~ALEXE/>
+
+Alexe, 运营自己的公司（以 Perl 为主）。
+
+=item * CHAOSLAW L<http://search.cpan.org/~CHAOSLAW/>
+
+王晓哲，smth Perl 版主力
+
+=item * CHENYR L<http://search.cpan.org/~CHENYR/>
+
+Chen Yirong (春江)
+
+=item * CHUNZI L<http://search.cpan.org/~CHUNZI/>
+
+chunzi, 译有《Perl Testing 程序高手秘笈》
+
+=item * CNANGEL L<http://search.cpan.org/~CNANGEL/>
+
+李俊良
+
+=item * DONGXU L<http://search.cpan.org/~DONGXU/>
+
+Dongxu Ma
+
+=item * FAYLAND L<http://search.cpan.org/~FAYLAND/>
+
+Fayland 林，本书作者
+
+=item * FOOLFISH L<http://search.cpan.org/~FOOLFISH/>
+
+钱宇/Qian Yu
+
+=item * HGNENG L<http://search.cpan.org/~HGNENG/>
+
+黄冠能
+
+=item * HOOWA L<http://search.cpan.org/~HOOWA/>
+
+孙冰
+
+=item * ISLUE L<http://search.cpan.org/~ISLUE/>
+
+胡海麟
+
+=item * JOEJIANG L<http://search.cpan.org/~JOEJIANG/>
+
+蒋永清，译有《Perl Testing 程序高手秘笈》
+
+=item * JWU L<http://search.cpan.org/~JWU/>
+
+=item * MAIN L<http://search.cpan.org/~MAIN/>
+
+吴健源
+
+=item * JZHANG L<http://search.cpan.org/~JZHANG/>
+
+张军
+
+=item * KAILI L<http://search.cpan.org/~KAILI/>
+
+李凯
+
+=item * LAOMOI L<http://search.cpan.org/~LAOMOI/>
+
+xiaoshengcaicai
+
+=item * NSNAKE L<http://search.cpan.org/~NSNAKE/>
+
+徐昊
+
+=item * PANGJ L<http://search.cpan.org/~PANGJ/>
+
+Jeff Pang
+
+=item * PANYU L<http://search.cpan.org/~PANYU/>
+
+PAN YU
+
+=item * QJZHOU L<http://search.cpan.org/~QJZHOU/>
+
+Qing-Jie Zhou
+
+=item * RANN L<http://search.cpan.org/~RANN/>
+
+灿烂微笑 / Ran Ningyu
+
+=item * REDICAPS L<http://search.cpan.org/~REDICAPS/>
+
+woshini
+
+=item * ROOTKWOK L<http://search.cpan.org/~ROOTKWOK/>
+
+☰郭樂聰☷ ☯βαggiσ☯
+
+=item * SAL L<http://search.cpan.org/~SAL/>
+
+Sal Zhong (仲伟祥)
+
+=item * SUNNAVY L<http://search.cpan.org/~SUNNAVY/>
+
+孙海军，来自 Best Practical Solutions, L<Shipwright> 维护者
+
+=item * SUNTONG L<http://search.cpan.org/~SUNTONG/>
+
+Tong Sun
+
+=item * SWANSUN L<http://search.cpan.org/~SWANSUN/>
+
+swansun huang
+
+=item * XUERON L<http://search.cpan.org/~XUERON/>
+
+Xueron Nee
+
+=item * YEWENBIN L<http://search.cpan.org/~YEWENBIN/>
+
+叶文彬，smth Perl 版主力
+
+=back
+
+=head1 SEE ALSO
+
+L<Book::Chinese::MasterPerlToday::BeACPANTester>
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

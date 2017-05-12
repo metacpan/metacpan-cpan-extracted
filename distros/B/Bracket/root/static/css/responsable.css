@@ -1,0 +1,162 @@
+/*begin our styles*/
+ 
+body {
+    font: 1em 'PT Sans', sans-serif;
+    /* color: #1c1c1c; */
+}
+ 
+p,
+ul {
+    margin: 0 0 1.5em;
+}
+ 
+ul {
+    list-style: disc;
+    padding: 0 0 0 20px;
+}
+ 
+/*header*/
+ 
+header {
+    background: darkblue; /* #1c1c1c; */
+    padding: 10px 10px;
+}
+ 
+        /*shorter clearfix http://nicolasgallagher.com/micro-clearfix-hack/*/
+        header:before,
+        header:after {
+            content:"";
+            display:table;
+        }
+         
+        header:after {
+            clear:both;
+        }
+         
+        /* For IE 6/7 (trigger hasLayout) */
+        header {
+            zoom:1;
+        }
+ 
+h1.logo a {
+    color: #d8d8d8;
+    text-decoration: none;
+    font-weight: bold;
+/*    text-transform: uppercase; */
+    font-size: 20px;
+/*    line-height: 22px; */
+    float: left;
+    letter-spacing: 0.2em;
+}
+ 
+a.to_nav {
+    float: right;
+    color: #fff;
+    background: #4e4e4e;
+    text-decoration: none;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 22px;
+    height: 22px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
+ 
+a.to_nav:hover,
+a.to_nav:focus {
+    color: #1c1c1c;
+    background: #ccc;
+}
+
+/*navigation*/ 
+
+#primary_nav ul {
+	  float: left;
+    list-style: none;
+    background: darkblue; /* #1c1c1c; */
+    padding: 3px 3px;
+}
+ 
+#primary_nav li a {
+    display: block;
+    padding: 10px 10px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    letter-spacing: 0.1em;
+    line-height: 1.66em;
+    height: 1.66em;
+    border-bottom: 1px solid #383838;
+}
+ 
+#primary_nav li:last-child a {
+    border-bottom: none;
+}
+ 
+#primary_nav li a:hover,
+#primary_nav li a:focus {
+    color: #1c1c1c;
+    background: #ccc;
+}
+ 
+/*footer*/
+ 
+footer {
+    font-family: 'PT Serif', serif;
+    font-style: italic;
+    text-align: center;
+    font-size: 14px;
+}
+
+.secondary {
+	display: none;
+}
+
+@media only screen and (min-width: 36em) {
+ 
+    a.to_nav {
+        display: none;
+    }
+
+    .secondary {
+      display: block;
+    }
+
+    #body {
+        position: relative;
+        width: 100%;
+        margin: auto;
+    }
+     
+    #primary_nav {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: none;
+    }
+     
+    #primary_nav li {
+        display: inline;
+    }
+     
+    #primary_nav li a {
+        float: left;
+        border: none;
+        padding: 0 10px;
+        -webkit-border-radius: 2px;
+        -moz-border-radius: 2px;
+        border-radius: 2px;
+    } 
+}
+
+@media only screen and (min-width: 48em) {
+    #content {
+        font-size: 1.33em;
+    }
+}

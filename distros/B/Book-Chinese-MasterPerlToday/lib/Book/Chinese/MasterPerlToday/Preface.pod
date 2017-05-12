@@ -1,0 +1,56 @@
+=encoding utf8
+
+=head1 NAME
+
+Book::Chinese::MasterPerlToday::Preface - 前言
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item *
+
+本书含有错误。请不要指责水平有限的作者。谢绝谩骂，欢迎指正。
+
+=item *
+
+本书将很快过期。阅读模块自带的 POD 永远是最好的办法。
+
+=item *
+
+本书并不适用于 Perl 新手。关于 Perl 语法的介绍请参阅其他 Perl 书籍。
+
+=item *
+
+本书最近更新和例子都可以在 L<http://github.com/fayland/chinese-perl-book> 中找到。
+
+=back
+
+=head1 AUTHOR
+
+Fayland Lam, C<< <fayland at gmail.com> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2009 Fayland Lam
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

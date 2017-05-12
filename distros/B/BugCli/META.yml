@@ -1,0 +1,16 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         BugCli
+version:      0.2
+version_from: BugCli.pm
+installdirs:  site
+requires:
+    Config::Tiny:                  0
+    DBIx::SQLEngine:               0
+    FileHandle:                    0
+    Getopt::Std:                   0
+    Term::ANSIColor:               0
+    Term::Shell:                   0
+    Text::Table:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.13

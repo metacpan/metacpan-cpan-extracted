@@ -1,0 +1,23 @@
+Changelog for Beam-Minion
+
+0.003     2017-04-28 01:26:54-05:00 America/Chicago
+
+    [Fixed]
+
+    - Missing BEAM_MINION environment variable now shows a more friendly
+      error message
+
+    [Added]
+
+    - Added some basic getting started documentation in preparation for
+      writing some tutorials
+
+0.002     2017-01-15 14:15:44-06:00 America/Chicago
+
+    [Fixed]
+
+    - Updated prereq versions to have all the features we need
+
+0.001     2017-01-13 20:01:57-06:00 America/Chicago
+
+    - Initial release

@@ -1,0 +1,33 @@
+---
+abstract: 'Alipay payment'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.027
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-Alipay
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Digest::MD5: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/fayland/perl-Business-Alipay/issues
+  homepage: https://github.com/fayland/perl-Business-Alipay
+  repository: https://github.com/fayland/perl-Business-Alipay.git
+version: 0.01

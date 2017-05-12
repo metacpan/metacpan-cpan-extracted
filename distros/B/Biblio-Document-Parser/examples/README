@@ -1,0 +1,8 @@
+Example Descriptions 
+====================
+
+NB: These examples will only work once the Perl module is installed
+(see INSTALL for more information).
+
+parsing/			- Examples using the ParaTools API
+parsing/docparser.pl		  - Takes a filename or URL as an argument, and (hopefully!) displays parsed references.

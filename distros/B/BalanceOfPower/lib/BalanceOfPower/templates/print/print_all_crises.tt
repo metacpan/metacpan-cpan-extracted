@@ -1,0 +1,6 @@
+[% USE ANSIColor 'color' %]
+[% "CRISES" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% i = 0 %]
+[% FOREACH c IN crises %][% IF wars.$i == 1 %][% "$c.node1 <-> $c.node2 $c.print_grey_crisis_bar" | color 'red' 'bold' %][% ELSE %][% c.node1 %] <-> [% c.node2 %] [% c.print_grey_crisis_bar %][% END %][% i = i + 1 %]
+[% END %]

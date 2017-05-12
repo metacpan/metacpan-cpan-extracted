@@ -1,0 +1,47 @@
+=head1 NAME
+
+Business::BancaSella::Ric::FileFast - Extract One-Time-Password from an 
+improved ASCII file 
+
+=head1 SYNOPSIS
+
+  use Business::BancaSella::Ric;
+  
+  my $ric = new Business::BancaSella::Ric::FileFast(file => 'filePath/filename.ric');
+  my $otp = $ric->extract;
+
+=head1 DESCRIPTION
+
+This module extract an One-Time-Password from an ASCII file. 
+The file isn't in the standard Banca Sella ASCII file but in an improved version
+that you can create using prepare(source_file) method where source_file
+is the original standard Banca Sella ASCII file. This object is
+more faster in search and extract than Business::BancaSella::Ric::File.
+
+=head1 METHODS
+
+=head2 file()
+
+Set or get the file path where are stored One-Time passwords.
+
+=head2 extract()
+
+Return and delete the first OTP from the file.
+
+=head2 prepare(source_file)
+
+Format and correctly append passwords from a standard Banca Sella Ric file into
+output file.
+
+
+=head1 AUTHOR
+
+Marco Gazerro <gazerro@open2b.com>
+
+
+=head1 SEE ALSO
+
+Business::BancaSella::Ric::File
+Business::BancaSella::Ric::Mysql
+
+=cut

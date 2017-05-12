@@ -1,0 +1,17 @@
+CHANGES
+features/creating_invoices.feature
+features/pairing.feature
+features/retrieving_invoices.feature
+features/step_definitions/helpers.pl
+features/step_definitions/invoice_steps.pl
+features/step_definitions/pairing_steps.pl
+GUIDE.md
+lib/Business/OnlinePayment/BitPay/Client.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/client.t
+t/cukes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

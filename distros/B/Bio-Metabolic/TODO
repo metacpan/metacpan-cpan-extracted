@@ -1,0 +1,25 @@
+This file contains the TODO milestones for Bio::Metabolic.
+
++ => Met
+- => Not met
+
+
+- Matrix caclulations in Bio::Metabolic::MatrixOps need more tests
+  (t/06matrixops)
+
+- Some important matrix calculations have to be incorporated, such as
+        - check whether a network's stoichiometry allows for the
+	  interconversion of given substrates.
+        - determine a minimal set of extrernal metabolites
+
+- Permanent storage of the data has to be achieved. I am not sure yet how to
+  incorporate this. I have several routines that fiddle around with a MySQL
+  database. However, they are all a bit shaky and inefficient.
+
+- Interfaces to available metabolic databases, especially KEGG
+
++ So far the module depends on Math::Symoblic. In many cases a symbolic
+  representation of the reaction rates etc. is not needed (i.e. if only
+  stoichiometric properties are investigated). I plan to lump all these
+  methods into one package that can be loaded separately.
+  DONE! These methods are now in Bio::Metabolic::Dynamics

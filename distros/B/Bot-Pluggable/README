@@ -1,0 +1,15 @@
+Bot::Pluggable
+==============
+
+Bot::Pluggable is NOT and IRC bot.
+
+It is a pluggable IRC bot framework.
+
+In basic terms it lets you write modules to handle IRC
+requests/responses without worrying about how the actual
+bot code is going to get run. It is based on
+POE::Component::IRC::Object, and therefore gives you
+access to the full power of POE, but leaves POE mostly
+out of the way if you don't want to use it.
+
+An example bot is in examples/

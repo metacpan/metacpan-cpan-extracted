@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         Id="tasks" Name="Task Samples">
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+            <DataFields>
+                <DataField Id="common" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'common data'</InitialValue>
+                </DataField>
+            </DataFields>
+    <WorkflowProcesses>
+
+
+        <WorkflowProcess Id="tasks" Name="tasks">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="test1_ok" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="test2_ok" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="run_test2" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'C'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+
+            <Participants>
+                <Participant Id="Sales" Name="Sales">
+                    <ParticipantType Type="ROLE"/>
+                </Participant>
+            </Participants>
+
+            <Activities>
+
+<!-- Send -->
+                <Activity Id="send1" Name="Send 1">
+                  <Implementation>
+                    <Task>
+                      <TaskSend Implementation="WebService">
+                          <Message Id="1" Name="msg" From="me" To="you" FaultName="error">
+                              <ActualParameters>
+                                  <ActualParameter>common</ActualParameter>
+                                  <ActualParameter>sbflw1data</ActualParameter>
+                              </ActualParameters>
+                          </Message>
+                          <WebServiceOperation OperationName="send_task">
+                              <Service ServiceName="api.example.com/wfcs" PortName="80">
+                                  <EndPoint EndPointType="Service">
+                                      <ExternalReference xref="IN" location="http://example.com/wfcs" namespace="http://example.com/wfcs"/>
+                                  </EndPoint>
+                              </Service>
+                          </WebServiceOperation>
+                          <WebServiceFaultCatch FaultName="throws">
+                              <Message Id="5"/>
+                              <TransitionRef Id="6"/>
+                          </WebServiceFaultCatch>
+                      </TaskSend>          
+                    </Task>
+                  </Implementation>
+                </Activity>
+                <Activity Id="send2" Name="Send 2">
+                  <Implementation>
+                    <Task>
+                        <TaskSend Implementation="WebService">
+                            <Message Id="1" Name="msg" From="me" To="you" FaultName="error">
+                              <ActualParameters>
+                                  <ActualParameter>common</ActualParameter>
+                                  <ActualParameter>sbflw1data</ActualParameter>
+                              </ActualParameters>
+                            </Message>
+                            <WebServiceOperation OperationName="send">
+                                <Partner PartnerLinkId="internal.Debug" RoleType="MyRole"/>
+                                
+                            </WebServiceOperation>
+                        </TaskSend>
+                    </Task>
+                  </Implementation>
+                </Activity>
+<!-- Receive -->
+                <Activity Id="receive" Name="Receive">
+                  <Implementation>
+                    <Task>
+                      <TaskReceive Instantiate="1" Implementation="WebService">
+                          <Message Id="2" Name="msg2" From="you" To="me" FaultName="throw">
+                              <DataMappings/>
+                          </Message>
+                          <WebServiceOperation OperationName="receive_task">
+                              <Partner PartnerLinkId="466" RoleType="PartnerRole"/>
+                          </WebServiceOperation>
+                      </TaskReceive>
+                    </Task>
+                  </Implementation>
+                </Activity>
+<!-- Service -->
+                <Activity Id="service1" Name="Service 1">
+                    <Description />
+                    <Implementation> 
+                        <Task> 
+                            <TaskService Implementation="WebService">
+                                <MessageIn Id="7" Name="msg" From="Bob" To="Alice" FaultName="error">
+                                    <ActualParameters>
+                                        <ActualParameter ScriptType="tt" ScriptVersion="1.0" ScriptGrammar="http://www.daisy.org/pipeline/gui">common</ActualParameter>
+                                        <ActualParameter>sbflw1data</ActualParameter>
+                                    </ActualParameters>
+                                </MessageIn>
+                                <MessageOut Id="8">
+                                    <DataMappings> 
+                                        <DataMapping Formal="subprocParam1" Direction="OUT"> 
+                                            <Actual>ParProcFieldName</Actual> 
+                                            <TestValue>'This subprocess has not been invoked'</TestValue> 
+                                        </DataMapping> 
+                                    </DataMappings>
+                                </MessageOut>
+                                <WebServiceOperation OperationName="service_task">
+                                    <Service ServiceName="Flow::Handler::Queue::SQS" PortName="80">
+                                        <EndPoint EndPointType="Service">
+                                            <ExternalReference
+                                              xref="GET"
+                                              location="http://aws.amazon.com/yourqueue"
+                                              namespace="http://example.com/wfcs"
+                                              />
+                                        </EndPoint>
+                                    </Service>
+                                </WebServiceOperation>
+                                <WebServiceFaultCatch FaultName="throws">
+                                    <Message Id="5">
+                                        <DataMappings> 
+                                            <DataMapping Formal="subprocParam1" Direction="OUT"> 
+                                              <Actual>ParProcFieldName</Actual> 
+                                              <TestValue>'This subprocess has not been invoked'</TestValue> 
+                                          </DataMapping> 
+                                        </DataMappings>
+                                    </Message>
+                                    <TransitionRef Id="6"/>
+                                </WebServiceFaultCatch>
+                            </TaskService>
+                        </Task> 
+                    </Implementation> 
+                </Activity>
+
+
+                <Activity Id="service2" Name="Service 2">
+                  <Implementation>
+                    <Task>
+                      <TaskService Implementation="Other">
+                          <MessageIn Id="3" Name="m3" From="you" To="me" FaultName="MyBad"/>
+                          <MessageOut Id="4" Name="m4" From="me" To="you" FaultName="ServerMadeABooBoo"/>
+                          <WebServiceOperation OperationName="service_task">
+                              <Partner PartnerLinkId="466" RoleType="PartnerRole"/>
+                          </WebServiceOperation>
+                          <WebServiceFaultCatch FaultName="throws">
+                              <Message Id="5"/>
+                              
+                              <TransitionRef Id="6"/>
+                          </WebServiceFaultCatch>
+                     </TaskService>
+                    </Task>
+                  </Implementation>
+                </Activity>
+
+<!-- User -->
+                <Activity Id="user" Name="User 1">
+                  <Description />
+                  <Implementation>
+                    <Task>
+                        <TaskUser>
+                            <Performers>
+                                <Performer>Sales</Performer>
+                            </Performers>
+                            <MessageIn Id="7"/>
+                            <MessageOut Id="8"/>
+                            <WebServiceOperation OperationName="user_task">
+                                <Partner PartnerLinkId="466" RoleType="PartnerRole"/>
+                            </WebServiceOperation>
+                        </TaskUser>
+                    </Task>
+                  </Implementation>
+                </Activity>  
+<!-- Manual -->
+                <Activity Id="manual" Name="manual">
+                    <Implementation>
+                        <Task>
+                            <TaskManual>
+                            <Performers>
+                                <Performer>Sales</Performer>
+                            </Performers>
+                            </TaskManual>
+                        </Task>
+                    </Implementation>
+                </Activity>
+<!-- Script -->
+                <Activity Id="script" Name="Script">
+                    <Implementation> 
+                        <Task> 
+                            <TaskScript>
+                                <Script ScriptType="tt"><![CDATA[
+                                    IF amount > 100;
+                                        process_instance.attribute(customer_type => 'whale');
+                                    ELSE;
+                                        process_instance.attribute('customer_type', 'normal');
+                                    END
+                                ]]></Script>
+                            </TaskScript>
+                        </Task> 
+                    </Implementation> 
+                </Activity>
+
+            </Activities>
+            <Transitions>
+                <Transition Id="send1-send2" From="send1" To="send2"/>
+                <Transition Id="send2-receive" From="send2" To="receive"/>
+                <Transition Id="receive-service1" From="receive" To="service1"/>
+                <Transition Id="service1-service2" From="service1" To="service2"/>
+                <Transition Id="service2-user" From="service2" To="user"/>
+                <Transition Id="user-manual" From="user" To="manual"/>
+                <Transition Id="manual-script" From="manual" To="script"/>
+            </Transitions>
+        </WorkflowProcess>
+
+
+
+        <WorkflowProcess Id="tasks1" Name="tasks1">
+            <ProcessHeader/>
+            <DataFields>
+                <DataField Id="common2" IsArray="0">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'I0'</InitialValue>
+                </DataField>
+            </DataFields>
+            <Activities>
+                <Activity Id="A" Name="A">
+                  <Implementation>
+                    <No/>
+                  </Implementation>
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'A2'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="Start">
+                          <Target>common</Target>
+                          <Expression>'A1'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Activity>
+                <Activity Id="B" Name="B">
+                  <Implementation>
+                    <No/>
+                  </Implementation>
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'B2'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" From="A" To="B">
+                  <Assignments>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'T2'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="End">
+                          <Target>common</Target>
+                          <Expression>'T3'</Expression>
+                      </Assignment>
+                      <Assignment AssignTime="Start">
+                          <Target>common</Target>
+                          <Expression>'T1'</Expression>
+                      </Assignment>
+                  </Assignments>
+                </Transition>
+            </Transitions>
+            <Assignments>
+                <Assignment AssignTime="End">
+                    <Target>common</Target>
+                    <Expression>'P2'</Expression>
+                </Assignment>
+                <Assignment AssignTime="Start">
+                    <Target>common</Target>
+                    <Expression>'P0'</Expression>
+                </Assignment>
+                <Assignment AssignTime="Start">
+                    <Target>common</Target>
+                    <Expression>'P1'</Expression>
+                </Assignment>
+            </Assignments>
+        </WorkflowProcess>
+
+    </WorkflowProcesses>
+</Package>

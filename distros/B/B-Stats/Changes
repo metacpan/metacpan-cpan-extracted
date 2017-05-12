@@ -1,0 +1,46 @@
+-*- change-log -*-
+
+0.09	2014-08-08 rurban
+	* fix Stats.xs for 5.6. no -Dv on 5.6, combine with -Dt instead
+	* fix c_minus for 5.6. Needed to seperate $t Dump.
+	* add missing Changes to MANIFEST
+
+0.08	2014-06-06 rurban
+	* fix overhead subtraction, and count OPCLASS at the end
+	  just -E0 is still wrong, i.e. still gives the -E overhead
+	* initialize empty B::Stats::Minus before overhead calc
+	* change -fOP to -fBASEOP, -fPVOP to -fPVOP_OR_SVOP for consistency
+	* add 3 missing op classes BASEOP_OR_UNOP FILESTATOP LOOPEXOP
+	  (thanks bulk88 for issue #5)
+	* print error on -t,-r, i.e. without -c and -e stats
+
+0.07	2014-05-19 rurban
+	* fix runtime stats (-r) to be meaningful/accurate, fixed various bugs (bulk88)
+        * fixed initially computed B::Stats::Minus (windows quoting issue)
+        * document new functions rcount_all() and reset_rcount()
+
+0.06	2014-05-13 rurban
+	* Win32 fixes by bulk88
+	* stabilize B::Stats::Minus creation
+	* replace each in walksymtable by foreach
+
+0.05	2012-05-02 rurban
+	* protect against empty B::Stats::Minus::overhead key warnings,
+	when more op types are loaded at END than at COMPILE time.
+
+0.04	2011-12-12 rurban
+	* use run-time not begin-time %INC on -r or -e for files and lines.
+	* fixed empty END runops loops caused by format
+	* implemented -l<logfile> and -f<filter>
+	* check for 2x import()'ed
+
+0.03	2011-12-12 rurban
+	* forgot to add c_minus and lib/B/Stats/Minus.pm to MANIFEST
+
+0.02	2011-12-09 rurban
+	* added generated B::Stats::Minus to substract our own overhead
+	* implemented switch bundling
+	* added t/exact.t to test B::Stats::Minus
+
+0.01	2011-12-06 rurban
+	* First release as B-Stats-0.01

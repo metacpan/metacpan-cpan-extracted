@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+README
+CHANGES
+lib/WWW/Scraper/Response/News.pm
+lib/WWW/Scraper/CNN.pm
+eg/SearchJobs.pl
+prereqinst.pl
+t/t.t
+test.pl

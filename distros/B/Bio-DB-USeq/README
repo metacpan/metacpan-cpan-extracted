@@ -1,0 +1,91 @@
+Bio::DB::USeq - An adaptor for parsing USeq data files
+
+INTRODUCTION
+
+Bio::DB::USeq is a BioPerl style adaptor for reading useq files. Useq files are 
+compressed, indexed, binary data files supporting modern bioinformatic datasets, 
+including genomic points, scores, and intervals. As such, they can be used as a 
+replacement for text Wig and BED file formats. They may be used natively by the 
+Integrated Genome Browser (IGB) and DAS/2 servers.
+
+USeq files are typically half the size of corresponding bigBed and bigWig files, 
+due to a compact internal format and lack of internal zoom data. This adaptor, 
+however, can still return statistics across different zoom levels in the same 
+manner as big files, albeit at a cost of calculating these in realtime.
+
+More information about the format can be found at 
+http://useq.sourceforge.net/useqArchiveFormat.html. 
+
+Useq files may be generated using tools in the USeq package, available at 
+http://useq.sourceforge.net. They may be generated from native Bar files,
+text Wig files, text Bed files, and UCSC bigWig and bigBed file formats.
+
+
+COMPATIBILITY
+
+The adaptor follows most conventions of other BioPerl-style Bio::DB 
+adaptors. Observations or features in the useq file archive are 
+returned as SeqFeatureI compatible objects. 
+
+Coordinates consumed and returned by the adaptor are 1-based, consistent 
+with BioPerl convention. This is not true of the useq file itself, which 
+uses the interbase coordinate system.
+
+Unlike wig and bigWig files, useq file archives support stranded data, 
+which can make data collection simpler for complex experiments.
+
+GBrowse compatibility is fully supported. It will work with the segments 
+glyph for intervals, the wiggle_xyplot glyph for displaying mean scores, 
+and the wiggle_whiskers glyph for displaying detailed statistics. For 
+stranded quantitative data sets, two graphs will be generated for each 
+strand.  
+
+
+
+LIMITATIONS
+
+This adaptor is read only. USeq files in general are not modified or 
+written, although chromosome specific statistics may be written to 
+the metadata for persistence.
+
+No support for genomic sequence is included. Users who need access to 
+genomic sequence should seek an alternative BioPerl adaptor, such as 
+Bio::DB::Fasta.
+
+Useq files do not have the concept of type, primary_tag, or source 
+attributes, as expected with GFF-based database adaptors. However, 
+special feature types are supported, including binned wiggle 
+and summary features, for data access.
+
+
+
+INSTALLATION
+
+Bio::DB::USeq requires the installation of BioPerl and Archive::Zip.
+
+Install Bio::DB::USeq using the standard incantation.
+    
+    perl ./Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+IMPLEMENTATION
+
+Read the Bio::DB::USeq POD documentation for usage, API details, and 
+GBrowse configuration.
+
+The included script, USeqInfo.pl, provides basic information about 
+USeq archives, including metadata, chromosome information, and genome-wide
+score statistics. It also demonstrates a practical application of using 
+the Bio::DB::USeq module. 
+
+To see a practical implementation of Bio::DB::USeq for use in data 
+analysis, see the collection of scripts in the Bio::ToolBox package, 
+available from your local CPAN mirror and at 
+https://github.com/tjparnell/biotoolbox.
+
+
+
+

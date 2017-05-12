@@ -1,0 +1,9 @@
+classes:
+  - Service.web.apache
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - install web service uWSGI
+  pkg:
+    - uwsgi

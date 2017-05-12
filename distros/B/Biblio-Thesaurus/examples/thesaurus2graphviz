@@ -1,0 +1,97 @@
+#!/usr/bin/perl -s
+
+use strict;
+use warnings;
+
+our ($shape,$h,$r,$of,$t);
+my %par=();
+my %nodepar=();
+my %grel=(NT=>1);        ## graph relations
+$par{rankdir}=1    if $h;
+$nodepar{shape}=$shape if $shape;
+if($r){for(split(/,/,$r)){$grel{$_}=1}}
+
+$of||="png";
+
+use Biblio::Thesaurus;
+use GraphViz;
+
+my $filename = shift;
+my $the = thesaurusLoad($filename);
+
+my $TERMS;
+my $NTS;
+
+$the->downtr( { -default => sub {            ## term rel @terms
+                    return if $rel eq "SN";
+                    $TERMS->{$term}++;
+                    if (defined $grel{$rel}) {
+                        for (@terms) {
+                            my $ttt = $_ || "??";
+                            next if (defined $t and $t ne $term or $t ne $ttt); 
+                            push @$NTS, [$term,  $ttt];
+                        }
+                    }
+                }
+              });
+
+my $g = GraphViz->new(%par);
+my $i = 0;
+
+for (keys %$TERMS) {
+    $i++;
+    $g->add_node("ID$i", label => $_,%nodepar);
+    $TERMS->{$_} = "ID$i";
+}
+
+for my $ramo (@$NTS) {
+    $g->add_edge($TERMS->{$ramo->[0]},
+                 $TERMS->{$ramo->[1]});
+}
+
+print $g->as_png  if $of eq "png";
+print $g->as_svg  if $of eq "svg";
+print $g->as_text if $of eq "text";
+print $g->as_ps   if $of eq "ps";
+print $g->as_imap if $of eq "imap";
+
+
+__END__
+
+=head1 NAME
+
+thesaurus2graphviz - draw a biblio::thesaurus graph
+
+=head1 SYNOPSIS
+
+ thesaurus2graphviz [-shape=... -h] file.the > _.png
+
+=head1 DESCRIPTION
+
+=head2 Option
+
+ -h        Horizontal mode (-rankdir=1 from graphviz)
+
+ -shape=circle   ('record', 'plaintext', 'ellipse', 'circle', 'egg', 
+       'triangle', 'box', 'diamond', 'trapezium', 'parallelogram', 'house', 
+       'hexagon', 'octagon')
+
+ -r=INST,PART      graph relation = {NT, INST, PART }
+        default graph relation = {NT}
+
+ -of=svg   output format (def:png)
+
+ -t=term   show only "term" and his neighbours
+
+=head1 AUTHOR
+
+Albero Simoes
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      
+

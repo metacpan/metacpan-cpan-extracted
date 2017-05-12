@@ -1,0 +1,58 @@
+{
+   "abstract" : "Read USeq archive database files",
+   "author" : [
+      "Timothy Parnell <parnell.tj@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-DB-USeq",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "1.30",
+            "Bio::Root::Version" : "1.0069001",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::DB::USeq" : {
+         "file" : "lib/Bio/DB/USeq.pm",
+         "version" : "0.23"
+      },
+      "Bio::DB::USeq::Feature" : {
+         "file" : "lib/Bio/DB/USeq.pm"
+      },
+      "Bio::DB::USeq::Iterator" : {
+         "file" : "lib/Bio/DB/USeq.pm"
+      },
+      "Bio::DB::USeq::Segment" : {
+         "file" : "lib/Bio/DB/USeq.pm"
+      },
+      "Bio::DB::USeq::Summary" : {
+         "file" : "lib/Bio/DB/USeq.pm"
+      },
+      "Bio::DB::USeq::Wiggle" : {
+         "file" : "lib/Bio/DB/USeq.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.23"
+}

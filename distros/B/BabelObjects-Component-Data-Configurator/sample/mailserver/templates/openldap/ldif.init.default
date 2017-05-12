@@ -1,0 +1,79 @@
+dn: $(CONFIGURATOR.BASE)
+objectclass: organization
+o: $(CONFIGURATOR.ORGANIZATION)
+
+dn: cn=root, $(CONFIGURATOR.BASE)
+objectclass: person
+cn: root
+sn: root
+
+dn: cn=Mail Account Server, $(CONFIGURATOR.BASE)
+userpassword: test
+objectclass: person
+cn: Mail Account Server
+sn: account
+
+dn: cn=Mail Alias Server, $(CONFIGURATOR.BASE)
+userpassword: test
+objectclass: person
+cn: Mail Alias Server
+sn: alias
+
+dn: ou=People, $(CONFIGURATOR.BASE)
+objectclass: organizationalUnit
+ou: People
+
+dn: ou=Mail Account, $(CONFIGURATOR.BASE)
+objectclass: organizationalUnit
+ou: Mail Account
+
+dn: ou=Mail Alias, $(CONFIGURATOR.BASE)
+objectclass: organizationalUnit
+ou: Mail Alias
+
+dn: cn=test,ou=People, $(CONFIGURATOR.BASE)
+owner: cn=test, ou=People, $(CONFIGURATOR.BASE)
+givenname: PLEIAD
+sn: Test
+userpassword: test
+objectclass: top
+objectclass: newPerson
+webmailuserdata: <?xml version='1.0'?><!DOCTYPE chapter SYSTEM "/juste/un/test.dtd"
+ [ <!ENTITY plainEntity "FOO entity"> <!ENTITY systemEntity SYSTEM "xmltest2.xml"> ]> 
+ <APP>
+  <WEBMAIL>
+  <SMTPHOST>$(CONFIGURATOR.SMTPHOST)</SMTPHOST>
+  <MAILHOST>$(CONFIGURATOR.MAILHOST)</MAILHOST> 
+  <PROTOCOL>imap</PROTOCOL>
+  <LOGIN>test</LOGIN>
+  <USERPASSWORD>test</USERPASSWORD>
+  <FROM>test@$(CONFIGURATOR.MAILDOMAIN)</FROM>
+  <MBOX>INBOX</MBOX>
+  <SENTFOLDER>Envoyes</SENTFOLDER> 
+  </WEBMAIL>
+ </APP>  
+cn: test
+
+dn: uid=postadm,ou=Mail Account,$(CONFIGURATOR.BASE)
+userpassword: test
+domain: $(CONFIGURATOR.MAILDOMAIN)
+objectclass: top
+objectclass: mailaccount
+uid: postadm
+
+dn: uid=test,ou=Mail Account,$(CONFIGURATOR.BASE)
+userpassword: test
+domain: $(CONFIGURATOR.MAILDOMAIN)
+objectclass: top
+objectclass: mailaccount
+uid: test
+flag: 1
+mailserver: $(CONFIGURATOR.MAILHOST)
+
+dn: alias=test@$(CONFIGURATOR.MAILDOMAIN),ou=Mail Alias,$(CONFIGURATOR.BASE)
+domain: $(CONFIGURATOR.MAILDOMAIN)
+alias: test@$(CONFIGURATOR.MAILDOMAIN)
+forward: test
+objectclass: top
+objectclass: mailalias
+

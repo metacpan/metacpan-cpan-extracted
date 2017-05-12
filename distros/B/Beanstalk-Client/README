@@ -1,0 +1,49 @@
+Beanstalk::Client provides a Perl API to the beanstalkd server by Keith Rarick
+
+You can obtain the server from
+
+  http://xph.us/software/beanstalkd/
+
+AVAILABILITY
+
+The latest version of this library is available from the Comprehensive Perl
+Archive Network (CPAN). To find a CPAN site near you see:
+
+    http://search.cpan.org/~gbarr/Beanstalk-Client/
+
+A git repository is available at
+
+    https://github.com/gbarr/perl-beanstalk-client
+
+INSTALLATION
+
+Installation can be performed using the CPAN shell
+
+  perl -MCPAN -e shell
+
+or manually with
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of libnet in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL INSTALL_BASE=~/perl
+
+SUPPORT
+
+Questions about how to use this library and any bug reports should
+be sent to me at <gbarr@pobox.com>. 
+
+COPYRIGHT
+
+  © 2008 Graham Barr. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Share and Enjoy!

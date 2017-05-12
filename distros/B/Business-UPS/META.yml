@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Business-UPS
+version:            2.01
+abstract:           A UPS Interface Module
+author:
+    - Justin Wheeler <upsmodule@datademons.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Test::More:           0
+requires:
+    LWP::UserAgent:  0
+    Test::More:      0
+resources:
+    homepage:    http://wiki.github.com/toddr/business-ups
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/toddr/business-ups/tree/master
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

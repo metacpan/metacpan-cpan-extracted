@@ -1,0 +1,5 @@
+
+$package = 'package4';
+
+my $lexical = 'lexical4';
+

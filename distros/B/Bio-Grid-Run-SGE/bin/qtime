@@ -1,0 +1,2 @@
+#!/bin/sh
+ls | xargs grep "comp.time" | perl -ne '/^(.*?)\.l\d+\.\d+:comp.time:.*\((\d+)\)$/; $num{$1}++; $time{$1}+=$2; END { while(($i, $t) = each %time) { printf "%s: %.2fm\n", $i, $t/($num{$i}*60)}}'

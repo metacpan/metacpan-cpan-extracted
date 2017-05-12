@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bot-Jabbot
+version:      0.41
+version_from: lib/Bot/Jabbot.pm
+installdirs:  site
+requires:
+    AnyEvent:                      5.202
+    AnyEvent::XMPP:                0.51
+    Class::MOP:                    0
+    Config::Any:                   0
+    Data::Localize:                 0.00010
+    Encode:                        0
+    Test::More:                    0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

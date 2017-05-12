@@ -1,0 +1,33 @@
+Bot-BasicBot-Pluggable-Module-MetaSyntactic
+
+Bot::BasicBot::Pluggable::Module::MetaSyntactic module is a frontend to
+the Acme::MetaSyntactic module which will let you pick metasyntactical
+variables names while chatting over IRC.
+
+This module takes inspiration in some of its behaviour and messages. from
+the first IRC metasyntactic bot: Bot::MetaSyntactic.
+
+Example session:
+
+    <BooK> meta foo
+    <meta> plugh
+    <BooK> meta foo 2
+    <meta> quux grault
+    <BooK> meta foo/fr 0
+    <meta> test2 chose test3 bidon bidule pipo tutu tata machin truc chouette titi toto test1
+    <BooK> meta themes?
+    <meta> 161 themes available: abba afke alice all_in_the_family alphabet amber antlers any asterix barbapapa barbarella batman beatles bee_gees ben_and_jerry bible booze bottles browser buffy buzzwords calvin camelidae candyland care_bears charlies_angels chess cluedo colors colours compass constellations
+    <meta> ..contrade contributors counting_rhyme counting_to_one crypto currency daleks dancers debian dilbert discworld doctor_who donmartin dune dwarves elements errno evangelion evangelist fabeltjeskrant facecards famous_five fawlty_towers flintstones foo french_presidents garbage garfield gems good_omens
+    <meta> ..groo haddock hhgg iata icao invasions jabberwocky jamesbond jelly_belly jerkcity kodokan legobatman legoharrypotter legoindianajones legolotr legopiratesofthecaribbean linux loremipsum lotr lucky_luke magic8ball magicroundabout magma mars metro michelin monty_spam muses nehi nethack nis
+    <meta> ..nobel_prize norse_mythology noughts_and_crosses octothorpe olympics opcodes oulipo pantagruel pasta pause_id peanuts pgpfone phonetic pie planets pm_groups pokemon pooh pop2 pop3 pornstars pumpkings punctuation pynchon python quantum regions reindeer renault robin roman scooby_doo screw_drives
+    <meta> ..services shadok shou_dou_qi simpsons sins smtp smurfs sodor southpark soviet space_missions sql stars state_flowers summerwine swords tarot teletubbies thunderbirds tld tmnt tokipona tour_de_france trigan unicode us_presidents userfriendly vcs viclones vim wales_towns weekdays willy_wonka yapc
+    <meta> ..zodiac
+    <BooK> meta categories? jamesbond
+    <meta> Categories for jamesbond: actors films firearms girls novels novels/benson novels/fleming novels/gardner vehicles vehicles/aircraft 
+              vehicles/cars vehicles/motorcycles vehicles/other vehicles/ships villains
+    <BooK> meta categories? shadok
+    <meta> Theme shadok does not have any categories
+    <BooK> meta zlonk
+    <meta> No such theme: zlonk
+    <BooK> meta foo/de 3
+    <meta> No such theme/category: foo/de

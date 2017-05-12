@@ -1,0 +1,51 @@
+Business-BR-CEP version 0.01
+
+This module tests for correct CEP numbers (Brazilian ZIP Code)
+
+USAGE EXAMPLE
+
+    use Business::BR::CEP qw( test_cep cep_type cep_region );
+    
+    print 'ok!' if test_cep( '13165-000' );
+
+    print 'invalid cep' unless cep_type( $cep ) eq 'logradouro';
+
+    use List::MoreUtils qw( any );
+    print 'address mismatch!'
+      unless any { $_ eq $given_state } cep_region( $cep );
+
+
+
+INSTALLATION
+
+To automatically install this module:
+
+  cpan Business::BR::CEP
+
+or, if you have cpanm
+
+  cpanm Business::BR::CEP
+
+
+Alternatively, to manually install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Estante Virtual
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the Perl 5 programming language itself.

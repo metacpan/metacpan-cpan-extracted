@@ -1,0 +1,41 @@
+--- #YAML:1.0
+name:               Bryar
+version:            4.0
+abstract:           A modular and extensible blog publishing platform
+author:
+	- "Marco d'Itri <md@linux.it>"
+	- David Cantrell <david@cantrell.org.uk>
+	- Simon Cozens <simon@simon-cozens.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Calendar::Simple:    0
+    DateTime:            0
+    Digest::MD5:         0
+    File::Find::Rule:    0.09
+    HTTP::Date:          0
+    Template:            2
+    Template::Provider::Encoding 0
+    Time::Piece:         1
+    UNIVERSAL::require:  0
+optional_features:
+    sitemaps:
+        description: Support generation of Google sitemaps.
+        requires:
+            WWW::Google::SiteMap: 0
+    modperl:
+        description: Support for Apache and mod_perl
+        requires:
+            Apache: 0
+no_index:
+    directory:
+        - examples
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

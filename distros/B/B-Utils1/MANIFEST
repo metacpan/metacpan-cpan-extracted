@@ -1,0 +1,45 @@
+.gitignore
+BUtils1.h
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+Utils1.xs
+lib/B/Utils1.pm
+lib/B/Utils1/Install/IFiles.pm
+lib/B/Utils1/OP.pm
+ppport.h
+t/10use.t
+t/11export.t
+t/20all_starts.t
+t/21all_roots.t
+t/22anon_subs.t
+t/30parent.t
+t/31oldname.t
+t/32kids.t
+t/33ancestors.t
+t/34descendants.t
+t/35siblings.t
+t/36previous.t
+t/37stringify.t
+t/40walk.t
+t/41walkfilt.t
+t/42all.t
+t/43allfilt.t
+t/44optrep.t
+t/50carp.t
+t/51croak.t
+t/regression_walkallops_filtered.t
+t/z_kwalitee.t
+t/z_manifest.t
+t/z_meta.t
+t/z_perl_minimum_version.t
+t/z_pod-coverage.t
+t/z_pod.t
+t/z_ppport.t
+t/z_version.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

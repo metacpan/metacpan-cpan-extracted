@@ -1,0 +1,315 @@
+#NEXUS
+[File created by TreeBASE:  1/29/01  22:21:22]
+[Matrix accession#: M799]
+BEGIN DATA;
+DIMENSIONS  NTAX=35 NCHAR=136;
+
+[!This data set was downloaded from TreeBASE, a prototype relational database of phylogenetic knowledge. TreeBASE has been supported by the NSF, Harvard University, and UC Davis. Please do not remove this acknowledgment from the Nexus file. 
+TreeBASE © 1994-2001.
+
+Study reference: 
+Pryer, K. M., H. Schneider, A. R. Smith, R. Cranfill, P. G. Wolf, J. S. Hunt, S. D. Sipes. 2001. Horsetails and ferns are a monophyletic group and the closest living relatives to seed plants. Nature, 409: 618-622.
+
+Study accession number = S543
+Matrix accession number = M799
+]
+FORMAT SYMBOLS = " 0 1 2 3 4 " MISSING = ? GAP = # INTERLEAVE  ;
+CHARLABELS
+	[1]	'Sporophyte_with_microphylls'	[2]	'Sporophyte_with_megaphylls'	[3]	'Leaf_ptyxis'	[4]	'Fertile_and_sterile_leaf_differentiation'
+	[5]	'Blade_dissection'	[6]	'Dromy_at_base_of_blade'	[7]	'Leaf_architecture'	[8]	'Primary_blade_vein_form'	[9]	'Vein_orders'
+	[10]	'Vein_fusion'	[11]	'Blade_scales'	[12]	'Pulvini'	[13]	'Pneumathodes'	[14]	'Blade_or_leaf_articulation'
+	[15]	'Adaxial_outline_of_petiole_and_rachis'	[16]	'Sclerenchyma_fibers'	[17]	'Epipetiolar_branches'	[18]	'Petiole_stele_number'	[19]	'Xylem_configuration_in_petiole'
+	[20]	'Leaf_vascular_bundle'	[21]	'Leaf_traces'	[22]	'Intercalary_meristem'	[23]	'Independent_branched_sporophyte_with_multiple_sporangia'	[24]	'Position_of_protoxylem'
+	[25]	'Shoot_symmetry'	[26]	'Mature_shoot_stele_type'	[27]	'Vascular_stele_cycles'	[28]	'Vascular_cambium_in_shoot'	[29]	'shoot_indumentum'
+	[30]	'Shoot_indumentum_type'	[31]	'Loxomataceae_type_hairs'	[32]	'Stem_sclerenchyma'	[33]	'Axillary_buds'	[34]	'Short_shoots'
+	[35]	'Shoot_with_extensive_system_of_lacunae'	[36]	'Root'	[37]	'Rhizomorphs'	[38]	'Root_origin'	[39]	'Root_branching'
+	[40]	'Lateral_root_origin_in_endodermis'	[41]	'Root_hairs'	[42]	'Root_hair_structure'	[43]	'Rhizodermis_cells'	[44]	'Root_pith'
+	[45]	'Number_of_protoxylem_poles_in_root'	[46]	'Aerenchyma_in_root_cortex'	[47]	'Inner_root_cortex'	[48]	'Outer_root_cortex'	[49]	'Cells_of_innermost_cell_layer_of_root_cortex'
+	[50]	'Apical_meristem'	[51]	'Endodermal_cells'	[52]	'Xylem_and_phloem_differentiation'	[53]	'Primary_xylem_bordered_pits'	[54]	'Companion_cells'
+	[55]	'Sieve_cells_with_refractive_spherules'	[56]	'Guard_mother_cell_division'	[57]	'Origin_of_cells_surrounding_guard_cells'	[58]	'Mucilage_producing_hairs'	[59]	'Sori'
+	[60]	'Sorus_outline'	[61]	'Sporangial_or_soral_position'	[62]	'Soral_or_sporangial_maturation'	[63]	'No._sporangia_per_sorus'	[64]	'Sorus_with_paraphyses'
+	[65]	'False_indusium'	[66]	'True_indusium'	[67]	'Attachment_of_true_indusia_relative_to_sorus'	[68]	'Opening_of_true_indusia'	[69]	'Synangium'
+	[70]	'Receptacle'	[71]	'Sporangial_shape'	[72]	'Sporangial_wall_thickness'	[73]	'Sporangia_stalk_length'	[74]	'Sporangia_stalk_width'
+	[75]	'Spore_output_per_sporangium'	[76]	'Annulus'	[77]	'Annulus_aspect'	[78]	'Annulus_span'	[79]	'Orientation_of_sporangial_dehiscence'
+	[80]	'Mechanism_of_sporangial_dehiscence'	[81]	'Sporogenesis'	[82]	'Seeds'	[83]	'Monoplastidic_meiosis'	[84]	'Megaspore_tetrad'
+	[85]	'Spore_laesura'	[86]	'Acrolamella_or_floats'	[87]	'Perine'	[88]	'Perine_prominence'	[89]	'Perine_surface'
+	[90]	'exine_structure'	[91]	'Exine_surface'	[92]	'Pseudoendospore'	[93]	'Paraexospore'	[94]	'Spore_wall_development'
+	[95]	'Tapetum_type'	[96]	'Harmomegathic_character_of_spores_or_pollen'	[97]	'Spores_chlorophyllous'	[98]	'Spore_germination_pattern'	[99]	'Gametophyte_form'
+	[100]	'Gametophyte_with_clubshaped_hairs_of_Gleichenia_type'	[101]	'Gametophyte_with_bristle_like_hairs'	[102]	'Obligate_mycorrhizae_in_gametophytes'	[103]	'Dependent_gametophyte'	[104]	'Gametangia_distribution'
+	[105]	'Paraphyses_between_gametangia'	[106]	'Antheridium_position'	[107]	'Number_of_antheridial_wall_cells'	[108]	'Antheridial_operculum'	[109]	'Apical_cell_in_antheridia'
+	[110]	'Antheridial_stalk'	[111]	'Spermatogenous_cell_arrangement'	[112]	'Number_of_sperm_cells'	[113]	'Pollen_tube'	[114]	'Sperm_flagellae'
+	[115]	'Basal_body_position'	[116]	'Bicentriolar_centrosomes'	[117]	'Centrioles'	[118]	'Monoplastidic_sperm_cells'	[119]	'Nascent_sperm_cells'
+	[120]	'Nuclei_per_microgametophyte'	[121]	'Archegonium_position'	[122]	'No._archegonial_neck_tiers'	[123]	'Neck_canal_cell'	[124]	'Megagametophyte'
+	[125]	'Product_of_fertilization'	[126]	'First_divison_of_zygote'	[127]	'Embyro_orientation'	[128]	'Suspensor'	[129]	'Foot'
+	[130]	'Embryo_development'	[131]	'Life_span'	[132]	'One_photosynthetic_leaf_at_a_given_time'	[133]	'Lignin'	[134]	'Flavonoids'
+	[135]	'Proanthocyanidins'	[136]	'Chloroplast_inversion'
+;
+STATELABELS
+	1  'absent' 'present',
+	2  'absent' 'present',
+	3  'erect' 'circinate' 'circinate_but_folded' 'conduplicate',
+	4  'monomorphic' 'hemidimorphic' 'dimorphic',
+	5  'simple' 'compound',
+	6  'catadromous' 'anadromous' 'isodromous',
+	7  'monopodial' 'sympodial' 'Gleichenia-type',
+	8  'solitary_or_unbranched' 'dichotomous_or_isotomous' 'non_dichotomous_or_anisotomous',
+	9  'one' 'two_or_more',
+	10  'nonanastomosing' 'anastomosing',
+	11  'absent' 'present',
+	12  'absent' 'present',
+	13  'absent' 'present_scattered' 'present_lines_patches',
+	14  'absent' 'present',
+	15  'convex_to_flattened' 'sulcate',
+	16  'absent' 'present',
+	17  'absent' 'present',
+	18  'monostele->polystele' 'monostele' 'distele->monostele' 'polystele' 'distele',
+	19  'C,_U,_V,_O,_*,_arc)' 'solid_*,_T,_*' 'X_(sometimes_becoming_V)' '3_arcs' 'polycyclic',
+	20  'amphicribal' 'collateral',
+	21  'mesarch' 'endarch',
+	22  'absent' 'present',
+	23  'absent' 'present',
+	24  'exarch' 'mesarch' 'endarch',
+	25  'radial' 'dorsiventral' 'both',
+	26  'eustele' 'protostele' 'ectophloic_siphonostele' 'solenostele' 'dictyostele',
+	27  'monocyclic' 'polycyclic',
+	28  'absent' 'present',
+	29  'absent' 'present',
+	30  'hairs' 'scales',
+	31  'absent' 'present',
+	32  'absent' 'present',
+	33  'absent' 'present',
+	34  'absent' 'present',
+	35  'absent' 'present',
+	36  'absent' 'present',
+	37  'absent' 'present',
+	38  'allorhizic' 'homorhizic',
+	39  'dichopodial' 'monopodial',
+	40  'absent' 'present',
+	41  'absent' 'present',
+	42  'non-septate' 'septate',
+	43  'undifferentiated' 'differentiated',
+	44  'absent' 'present',
+	45  '1-18' '1-6_(rarely_9)' '2.',
+	46  'absent' 'present' 'present_with_septae',
+	47  'parenchymatous' 'sclerenchymatous',
+	48  'parenchymatous' 'sclerenchymatous',
+	49  'not_differentiated' 'differentiated',
+	50  'single_apical_cell' 'complex',
+	51  'primary' 'secondary' 'tertiary',
+	52  'absent' 'present',
+	53  'scalariform' 'circular' 'conifer-type',
+	54  'absent' 'present',
+	55  'absent' 'present',
+	56  'diameristic' 'parameristic' 'anomomeristic',
+	57  'perigenous' 'mesogenous' 'mesoperigenous',
+	58  'absent' 'present',
+	59  'absent' 'present',
+	60  'roundish' 'elongate',
+	61  'abaxial' 'adaxial',
+	62  '±_simultaneous' 'gradate' 'mixed',
+	63  'few_(<12)' 'many',
+	64  'absent' 'present',
+	65  'absent' 'present',
+	66  'absent' 'present',
+	67  'lateral' 'basal' 'central',
+	68  'introrse' 'extrorse' 'suprasoral' 'circumsoral' 'none',
+	69  'none' 'wholly_or_partly_fused',
+	70  'none_or_flat' 'convex' 'columnar_to_elongate',
+	71  'reniform' 'globose_to_elongate',
+	72  'eusporangiate' 'leptosporangiate',
+	73  'sessile_to_short' 'long',
+	74  'more_than_6_cell_rows_wide' '4_to_6' '1_to_3',
+	75  '1000_or_more' '100-999' 'fewer_than_100',
+	76  'absent' 'present',
+	77  'apical' 'lateral' 'oblique_to_transverse' 'vertical_to_slightly_oblique',
+	78  'continuous_bow' 'interrupted_bow' 'restricted_patch',
+	79  'longitudinal' 'transverse',
+	80  'ectokinetic' 'endokinetic',
+	81  'homosporous' 'heterosporous',
+	82  'absent' 'present',
+	83  'present' 'absent',
+	84  'monolete' 'tetrahedral' 'linear',
+	85  'linear' 'triradiate' 'circular' 'sulcate',
+	86  'absent' 'present',
+	87  'absent' 'present',
+	88  'not_prominent' 'prominent,_not_cavate' 'prominent,_cavate',
+	89  '(nearly)_smooth' 'sculptured',
+	90  '2-layers_(blechnoid)' '3-layers' '5-layers',
+	91  '(nearly)_smooth' 'sculptured',
+	92  'absent' 'present',
+	93  'absent' 'present',
+	94  'centripetal' 'centrifugal',
+	95  'parietal' 'plasmodial',
+	96  'maximum_size_in_water' 'maximum_size_in_sucrose_concentrations',
+	97  'no' 'yes',
+	98  'equatorial' 'polar' 'amorphous',
+	99  'tuberous' 'filamentous' 'cordate-thalloid_to_elongate-thalloid' 'reduced',
+	100  'absent' 'present',
+	101  'absent' 'present',
+	102  'absent' 'present',
+	103  'no' 'to_megaspore,_endosporic' 'to_sporophyte',
+	104  'non-terminal' 'terminal',
+	105  'absent' 'present',
+	106  'embedded' 'exposed',
+	107  'more_than_5' '3-5',
+	108  'absent' 'lateral-circular' 'terminal-circular' 'triangular' 'pore',
+	109  'absent' 'present',
+	110  'absent' 'present',
+	111  'blocks' 'random' 'single',
+	112  'more_than_1000' '100-999' '16-64' '2-15',
+	113  'absent' 'suspended' 'penetrating',
+	114  'biflagellate' '3-20' '30-100' '1000-10000',
+	115  'side_by_side' 'anterior-posterior' 'continuous',
+	116  'absent' 'present',
+	117  'sperm_mother_cell' 'sperm_mother_cell_progenitor',
+	118  'absent' 'present',
+	119  'paired' 'not_paired',
+	120  '5_or_more' '4.' '3.',
+	121  'embedded' 'partially_exposed' 'fully_exposed',
+	122  'more_than_6' '1-5_(rarely)_6',
+	123  'multinucleate' 'binucleate',
+	124  'large,_completely_cellular' 'large,_apical_part_with_egg_free-nuclear' 'eight-nucleate',
+	125  'diploid_zygotes' 'diploid_zygote_plus_triploid_endosperm',
+	126  'horizontal' 'vertical' 'free-nuclear_phase',
+	127  'exoscopic' 'endoscopic' 'prone',
+	128  'absent' 'present',
+	129  'large,_tapering' 'large,_bulbous' 'small,_bulbous' 'absent',
+	130  'derived_from_single_uninucleate_cell' 'derived_from_several_free_nuclei',
+	131  'Gametophyte_dominant' 'co-dominant' 'Sporophyte_dominant',
+	132  'absent' 'present',
+	133  'absent' 'present',
+	134  'absent' 'present',
+	135  'absent' 'present',
+	136  'absent' 'present',
+
+;
+
+MATRIX
+
+'Austrobaileya'     01320?02110001010401111200011001100101100001000001211111100?10?0????10100000??0111123020021000?10230
+'Anthoceros'        00???????????????????00?0???0??0?0?00????????????0?0???2000????00???00102000??0000011000??1000000?20
+'Angiopteris'       0110100210111000034000110410110000010011010100000001(01)0120111000000??11100000??0000011010011101100220
+'Tmesipteris'       01000??00?0000?0011??0112200100000000????????????001(01)012001010000???10100000??0000?00010011101100100
+'Sphagnum'          00???????????????????00?0???0??0?0?00????????????0?0???2000????00???00102000??0000011010??1000000?20
+'Selaginella'       10???????????????????01011000??1?001100?000111???0011002000?10?00???00000000??00100110(01)0001010000?30
+'Salvinia'          01011?0211000000011000111100100000000????????????00100102010?110011202111220???010111111100101100130
+'Pteridium'         0110100210002011130000111310100100010011000020100011001020110210110100111221311000111011100101100120
+'Psilotum'          01010??00?0000?00????0102200100100000????????????001(01)012001010000???10100000??0000?00010011101100100
+'Polytrichum'       00???????????????????00?0???0??0?0?00????????????0?0???2000????00???00102000??000001?010??1000000?10
+'Plagiogyria'       01121?021000201101000011040010010001001100002001001100102111021000??00111121301000111011100101100120
+'Pinus'             01020?000?0001010311111200011001110101100001000001112012000?10?0????00100000??0111123020021000010230
+'Phanerosorus'      011010{01}1100000?1010000111310100100010011000010010011001020100000012200110121211000111010110101100220
+'Osmunda'           01111002100000110100001102001001000100110000200100010012010?00?00???00110111120000111010011101101120
+'Ophioglossum'      01010?02110000000301001202001000000100??1?01100000011012001?10?00???10100000??0000?11010011101100100
+'Marsilea'          01111?0211000001010000111300100100010011000022100011001020100100011402111220???010111111100101100130
+'Marchantia'        00???????????????????00?0???0??0?0?00????????????0?0?????00????00???00102000??0000011000??1000000?20
+'Marattia'          0110100210111000034000110410110000010011010100000001(01)0120111001000??11100000??0000000010011101100220
+'Lygodium'          011110021000000101100011110010010001001100(01)0201010110010200?00?01???00110111001000111010001101100120
+'Isoetes'           10???????????????????01001010??0?001100?0000110001011002000?10?00???00000000??0010011010001010000?30
+'Hymenophyllum'     0110110210000001011000111100100100010011000020100011001??0100110????021101112010001110100111011010(12)0
+'Huperzia'          10???????????????????01001000??1?001000?001110???1011002000?10?00???00000000??0000?11010001000000200
+'Haplomitrium'      00???????????????????00?0???0??0?0?00????????????0?0?????00????00???00102000??0000011000??1000000?00
+'Gnetum'            01320?02110001010301111200011001110101100001000001111011200?10?0????10100000??001112?020021000010230
+'Gleichenia'        011010221010000101000011110011010001001100001001001100102010000000??00110111201000111010010101100021
+'Ginkgo'            01320??1100001010311001200011001110101100001000001112012000?10?0????00100000??01111230200210000?0230
+'Equisetum_2'       010?0??00?0000?00110001122001001001100110011110100011011101??0000???00100000??0000?12010001101101200
+'Equisetum_1'       010?0??00?0000?00110001122001001001100110011110100011011101??0000???00100000??0000?12010001101101200
+'Dicksonia'         0110110210002001033000110400100100010011000020100011001(01)20100111111101111121301000111010001101100020
+'Danaea'            0112100210111001034000111410110100010011010100000001(01)0120111001000??11100000??0000000010011101100220
+'Cycas'             01221?02100000010300001200011001000101100001000001111012000?00?0????00100000??00111230200210000?0230
+'Cyathea'           01101002101020110330001104(01)011010001001100002010001100102010011(01)0(01)1(13)0111012130100011101(01)(01)0(01)101100020
+'Chloranthus'       01320?02110001010401111200011001100101100001000001211111100?10?0????10100000??0111123020021000?10230
+'Botrychium'        01011102100000000301001(12)020(01)1000000100??1?0110000001(12)012001?10?00???00100000??0000?11010011101100100
+'Blechnum'          011(02)11021010001103000011(01)400110100010011000020100011001020110210010000111221311000100012(01)00101100120
+
+
+'Austrobaileya'     00200?1???232??1?0120??2121130201111
+'Anthoceros'        0000010001000000010011000100100?0000
+'Angiopteris'       0000000300110221?0100110001010101101
+'Tmesipteris'       01000101001102?1?010111000001010110?
+'Sphagnum'          0001010011000010011021000000100?0010
+'Selaginella'       00110?1???110110011001100011102?1100
+'Salvinia'          00100?1???12022110100110012020201101
+'Pteridium'         00000112001202211010111001202020111?
+'Psilotum'          01000101001102?1?0101110000010101101
+'Polytrichum'       0001110011000010011021000000000?0000
+'Plagiogyria'       00000101001202211010101001202020110?
+'Pinus'             00200?1???232??1?01001?0021131201111
+'Phanerosorus'      00000101001202211010101001202010110?
+'Osmunda'           0000010300120221?0101010012020101101
+'Ophioglossum'      0100000300110221?010101000001011110?
+'Marsilea'          00100?1???12022110101110012020201101
+'Marchantia'        0000010001000010010021000000100?0100
+'Marattia'          0000000300110221?0100110001010101101
+'Lygodium'          000001120012022110101110012020201101
+'Isoetes'           00110?1???110110011001100011102?1100
+'Hymenophyllum'     000001030012022110101010012020101101
+'Huperzia'          0101(01)00000110010011000000011101?1100
+'Haplomitrium'      0000010001000010010021000000100?0100
+'Gnetum'            00200?1???232??1?01101?1021130201111
+'Gleichenia'        00000101001202211010101001202010110?
+'Ginkgo'            00200?1???231321?0100110021131201111
+'Equisetum_2'       000001030011022100101110000020101101
+'Equisetum_1'       000001030011022100101110000020101101
+'Dicksonia'         000001010012022110101010012020201101
+'Danaea'            0000000300110221?010011000101010110?
+'Cycas'             00200?1???231321?0100110021131201111
+'Cyathea'           100001010012022110101010012020201101
+'Chloranthus'       00200?1???232??1?0120??2121130201111
+'Botrychium'        0100000300110221?010101000(01)010111101
+'Blechnum'          00000114001202211010111001202020111?
+;
+END;
+
+BEGIN ASSUMPTIONS;
+CHARSET morph = 1 - 136 ; 
+ OPTIONS DEFTYPE = unord PolyTcount = MINSTEPS ; 
+ TYPESET * weighted = unord: 1 - 136 ; 
+ END;
+BEGIN TREEBASE;
+END;
+
+BEGIN TREES;
+
+[! 1 trees. TreeBASE accession#: Tree1706 ]
+	TRANSLATE
+		1	'Hymenophyllum',
+		2	'Austrobaileya',
+		3	'Ophioglossum',
+		4	'Phanerosorus',
+		5	'Haplomitrium',
+		6	'Angiopteris',
+		7	'Equisetum_1',
+		8	'Equisetum_2',
+		9	'Plagiogyria',
+		10	'Selaginella',
+		11	'Tmesipteris',
+		12	'Polytrichum',
+		13	'Chloranthus',
+		14	'Botrychium',
+		15	'Gleichenia',
+		16	'Anthoceros',
+		17	'Marchantia',
+		18	'Dicksonia',
+		19	'Pteridium',
+		20	'Blechnum',
+		21	'Lygodium',
+		22	'Marattia',
+		23	'Marsilea',
+		24	'Psilotum',
+		25	'Salvinia',
+		26	'Huperzia',
+		27	'Sphagnum',
+		28	'Cyathea',
+		29	'Isoetes',
+		30	'Osmunda',
+		31	'Danaea',
+		32	'Ginkgo',
+		33	'Gnetum',
+		34	'Pinus',
+		35	'Cycas',
+	;
+	TREE 'MP_tree' =  [&R] ((((((((1,((((((18,28),9),(19,20)),(23,25)),21),(4,15))),30),(7,8)),(31,(6,22))),((24,11),(3,14))),(((35,(32,34)),(2,13)),33)),((29,10),26)),((17,5),(12,27)),16);
+
+
+END;

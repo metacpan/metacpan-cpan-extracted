@@ -1,0 +1,68 @@
+{
+   "abstract" : "Fetch shipping costs for Canada Post",
+   "author" : [
+      "Justin Wheeler",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-CanadaPost",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "LWP" : 0,
+            "strict" : 0,
+            "vars" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "perl" : "5.004",
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Business::CanadaPost" : {
+         "file" : "lib/Business/CanadaPost.pm",
+         "version" : "1.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-business-canadapost at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Business-CanadaPost"
+      },
+      "homepage" : "http://search.cpan.org/dist/Business-CanadaPost/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Business-CanadaPost.git",
+         "web" : "https://github.com/yanick/Business-CanadaPost"
+      }
+   },
+   "version" : "1.06",
+   "x_authority" : "cpan:YANICK"
+}
+

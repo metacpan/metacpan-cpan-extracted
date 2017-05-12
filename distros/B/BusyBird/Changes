@@ -1,0 +1,112 @@
+Revision history for Perl module BusyBird
+
+0.12    2014-12-08
+        - No functional changes.
+        [PACKAGING]
+        - Now it requires Exporter 5.57, because we import the import() function instead of inheritance.
+        - Now it requires perl 5.8.0 (previously it was 5.10.0, but in fact I didn't use any feature in 5.10.0).
+        - Now it requires autovivification 0.14 for bug fix of RT#99458.
+          It drops dependency on EV.
+
+0.11    2014-10-22
+        [ENHANCEMENTS]
+        - Now it renders "busybird.user_permalink" field as the link URL for the user.
+          This is an experimental feature for now.
+
+0.10    2014-10-15
+        [ENHANCEMENTS]
+        - Web API: add "only_statuses" query parameter to GET /timelines/{timeline}/statues.json
+        - Add per-timeline config params: "acked_statuses_load_count" and "default_level_threshold".
+        - Now it warns you when you give unknown config parameters.
+        [DOCUMENTATION]
+        - BusyBird::SafeData is now public class. End-users are free to use it.
+        [PACKAGING]
+        - Drop dependency on Test::Exception. Use Test::Fatal instead.
+        - Add dependency on EV. This is necessary to avoid a bug in autovivification
+          ( https://rt.cpan.org/Public/Bug/Display.html?id=99458 )
+
+0.09    2014-09-28
+        [BUG FIX]
+        - Now it is more tolerant of statuses with unusual structure.
+        - Now Text::Xslate's warnings are reported through BusyBird::Log.
+        [API CHANGE]
+        - The default attached_image_urls_builder now ignores Twitter Entities
+          whose 'type' field is set to NOT 'photo'. This change makes it robust
+          to future changes in Twitter API. I think this change is backword-compatible in most cases.
+        - Refactoring and API revision of BusyBird::Main::PSGI::View.
+        [PACKAGING]
+        - Add 'Data::Diver' to dependency.
+
+0.08    2014-09-15
+        [ENHANCEMENT]
+        - Now it renders image URLs attached to statuses.
+          To configure how the attached images should be rendered,
+          set "attached_image_*" config parameters.
+        [UI CHANGE]
+        - Revise HTML mark-ups and CSS. Visually it makes little difference.
+        [DOCUMENTATION]
+        - Make it a little more friendly to non-Perl users.
+
+0.07    2014-08-17
+        [PACKAGING]
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.06    2014-08-14
+        [API CHANGE]
+        - Timeline and StatusStorage: now contains() method accepts status objects with no "id" field.
+          They are always treated as "not contained". Previously the contains() method croaked when
+          ID-less statuses were passed. This behavior has been changed.
+        [BUG FIX]
+        - Now BusyBird::Filter exports functions only by request. Previously they were automatically exported.
+        [ENHANCEMENT]
+        - Add "hidden" per-timeline config parameter.
+        - Add filter_grep() function to BusyBird::Filter.
+        - Add make_tracking() function to BusyBird::Util.
+
+0.05    2014-08-13
+        [BUG FIX]
+        - Fix test t/WebAPI.t. It failed when consecutive acks occurred at different timestamps.
+        [ENHANCEMENT]
+        - StatusStorage::SQLite enhancements.
+        - Add get_timeline_names() method.
+        - Re-implement contains() method. This boosts its performance at about 350%.
+        - Use SQL::Maker's strict mode with SQL::QueryMaker. This prevents unexpected query
+          injection in form of complex data structure (often as JSON strings).
+          This also improves performance a little.
+        [DOCUMENTATION]
+        - Fix Util.pm: sort_statuses() signature was wrong.
+
+0.04    2014-07-28
+        [BUG FIX]
+        - Timelines whose name contains "/" could be created and installed, but were not accessible
+          via HTTP. Now those timelines can be created, but cannot be installed in Main object.
+          (gh #3)
+        [ENHANCEMENT]
+        - Add create_timeline() method to BusyBird::Main.
+        [PACKAGING]
+        - BusyBird::DateTime::Format now has a separate distribution. This makes it easier
+          to develop and release input/filter modules that use the Format module.
+
+0.03    2014-07-24
+        [UI CHANGE]
+        - Use Web Notifications to notify new statuses.
+          To disable this feature, set "timeline_web_notifications" config parameter to "off"
+          (or anything other than "simple"). (gh #2 thanks to Keisuke Minami)
+        - Add favicon.
+        - Remove horizontal paddings around statuses in small screens. (gh #1)
+        [DOCUMENTATION]
+        - Minor fixes.
+
+0.02    2014-06-18
+        [BUG FIX]
+        - Fix test (t/StatusStorage_SQLite.t) so BSD systems can pass it.
+        - Drop dependency on CPS::Functional from cpanfile.
+        [UI CHANGE]
+        - All controls in timeline navbar should now fit in 320px width screen.
+        - Now it doesn't set the status permalink to Twitter if the status's ID is not an integer.
+        [DOCUMENTATION]
+        - Add "QUICK START" section.
+        - Install BusyBird under user's home directory.
+
+0.01    2014-06-15
+        - First version, released on an unsuspecting world.

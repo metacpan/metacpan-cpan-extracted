@@ -1,0 +1,4 @@
+classes:
+  - Framework.pkg.apt.cli.aptitude
+  - Admin.apt.popcon
+  - Admin.apt.tools

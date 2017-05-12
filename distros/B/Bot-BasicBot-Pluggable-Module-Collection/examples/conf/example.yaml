@@ -1,0 +1,33 @@
+server:   irc.example.net
+port:     6667
+nick:     bbpbot_
+username: bbpbot_
+charset:  utf-8
+store:
+  type:  Bot::BasicBot::Pluggable::Store::DBI
+  dsn:   dbi:SQLite:bbpbot.db
+  table: bbpbot
+modules:
+  - module: commands
+  - module: Seen
+  - module: Infobot
+  - module: Title
+  - module: LivedoorWeather
+  - module: LivedoorFortune
+  - module: GoodBad
+  - module: Wikipedia
+  - module: GoogleTranslate
+  - module: Alexa
+  - module: PathtraqPageCounter
+  - module: HatenaKeyword
+  - module: YourAvHost
+  - module: TranslateBabelfish
+  - module: Favtape
+  - module: ExciteTranslator
+  - module: DomainHacks
+  - module: Sixamo
+    config:
+      sixamo_path: '/home/dann/tools/sixamo/sixamo.rb'
+      dictionary_dir: '/home/dann/tools/sixamo/data_directory'
+channels:
+  - #bbpbot-test

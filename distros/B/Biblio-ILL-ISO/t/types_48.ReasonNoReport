@@ -1,0 +1,7 @@
+$VAR1 = bless( {
+                 'ENUMERATED' => 2,
+                 'ENUM_LIST' => {
+                                  'permanent' => 2,
+                                  'temporary' => 1
+                                }
+               }, 'Biblio::ILL::ISO::ReasonNoReport' );

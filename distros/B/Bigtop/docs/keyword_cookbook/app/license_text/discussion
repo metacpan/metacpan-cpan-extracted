@@ -1,0 +1,28 @@
+=head1 USE
+
+The C<license_text> keyword allows you to specify the copyright
+license for your project.  If you omit the keyword, you get the
+standard Perl 5.8.6 license text (which h2xs produced for that version
+of Perl).
+
+As with many other app statements, you probably want to have a C<.bigtopdef>
+file in your home directory to specify them.  C<.bigtopdef> is used by
+both tentmaker and bigtop when they are invoked with the -n flag.  If
+you have a C<.bigtopdef>, it may contain anything, so long as it is a
+valid bigtop file.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<Reserved> in these files:
+
+    README
+    docs/example.bigtop
+    lib/GENKids.pm
+    lib/Kids.pm
+    lib/Kids/Child.pm
+    lib/Kids/GENModel.pm
+    lib/Kids/Model.pm

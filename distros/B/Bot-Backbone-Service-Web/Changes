@@ -1,0 +1,6 @@
+0.142250  2014-08-13 09:50:00 America/Chicago
+
+    * Initial release.
+    * Web::LinkTitle fetches the title or description of links pasted into chat
+      and reports them to the chat.
+    * No tests. I know. I'm evil.

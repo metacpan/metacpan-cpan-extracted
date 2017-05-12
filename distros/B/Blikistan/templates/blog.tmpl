@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<link rel="stylesheet" href="http://awesnob.com/textpattern/css.php?s=default" type="text/css" media="screen" />
+	<title>Awesnob!</title>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-149255-1";
+urchinTracker();
+</script>
+</head>
+<body>
+<div id="container">
+
+<!-- head -->
+<div id="head">
+<h1><a rel="home" href="[% site_base %]">[% site_title %]</a></h1>
+<h2>[% site_tagline %]</h2>
+
+</div>
+
+<!-- left -->
+<div id="sidebar-1">
+[% FOR l IN sidebar_links %]
+    <p class="linklist"><a href="[% l.href %]" title="[% l.title %]">[% l.name %]</a><br />
+[% END %]
+[% email %]
+</div>
+
+<!-- right -->
+<div id="sidebar-2">
+  <img src="[% side_image.src %]" alt="[% side_image.alt %]"/><br />
+  <form action="[% rester.server %][% rester.workspace %]/index.cgi" method="get">
+    <p>Search<br />
+      <input type="text" name="search_term" value="" size="15" />
+      <input type="hidden" name="action" value="search" />
+    </p>
+  </form>
+
+  <p><a href="[% rester.server %]/noauth/feed/workspace[% rester.workspace %]?category=Recent%20Changes">RSS Feed</a></p>
+  [% sidebar_extra %]
+</div>
+
+<!-- center -->
+<div id="content">
+    [% FOR post IN posts %]
+	<h3><a rel="bookmark" href="[% post.permalink %]">[% post.title %]</a> - [% post.date %]</h3>
+        [% post.content %]
+        <p class="comments_invite"><a href="[% post.permalink %]">Comment here</a> | <a href="[% post.permalink %]">Edit this post here</a></p>
+        <div align="center"><img src="http://awesnob.com/images/1.gif" style="height:1px;width:400px" class="divider" alt="" /></div>
+    [% END %]
+</div>
+
+<!-- footer -->
+<div id="foot">All posts come from <a href="[% rester.server %][% rester.workspace %]/index.cgi?action=category_display;category=[% post_tag %];tag=/[% post_tag %]">this wiki</a></div>
+
+</div>
+
+</body>
+</html>

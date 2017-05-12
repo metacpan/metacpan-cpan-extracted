@@ -1,0 +1,52 @@
+Revision history for Business-GoCardless
+
+0.16     2016-09-29
+        - Clarify the version of the GoCardless API this dist works with
+
+0.15     2016-09-28
+        - Fix is_pre_authorization and is_subscription in B::G::Webhook
+          as previously they were the wrong way around
+
+0.14     2016-05-22
+        - Kwalitee improvements
+
+0.13     2016-05-17
+        - Transfer repo from G3S to Humanstate
+
+0.12     2015-10-21
+        - Move github repo to Humanstate org
+
+0.11     2015-04-02
+        - Documentation clarification regarding which API version this lib
+          is for (as GoCardless are working on Basic v2 BETA and Pro APIs)
+
+0.10     2014-12-01
+        - Documentation and distribution tweaks
+
+0.09     2014-09-17
+        - Document the confirmation of webhooks
+
+0.08     2014-09-16
+        - POD updates
+
+0.07     2014-09-16
+        - Add Webhook support (https://developer.gocardless.com/#webhook-overview)
+
+0.06     2014-09-10
+        - Replace use of TryCatch with Try::Tiny in tests
+
+0.05     2014-09-06
+        - Kwalitee improvements in distribution
+
+0.04     2014-09-06
+        - fix test failures for checking JSON boolean values
+
+0.03     2014-09-04
+        - Correct links in perldoc
+
+0.02     2014-09-04
+        - Remove dependency on Mojo::JSON in a couple of tests
+        - Fix use of undef as an ARRAY in Utils::normalize_params
+
+0.01     2014-09-04
+        - First release

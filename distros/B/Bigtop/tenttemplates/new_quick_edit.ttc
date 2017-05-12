@@ -1,0 +1,11 @@
+[%#
+    Template for generating divs containing quick edit blocks.
+    Pass it the following parameters in view.data:
+
+        table_ident - ident of table whose fields we want to quick edit
+        fields      - array of the fields in that table
+        statements  - hash returned by Bigtop::Parser::get_keyword_docs
+%]
+[% INCLUDE quick_edit.ttc
+           table_ident = view.data.table_ident
+           fields      = view.data.fields %]

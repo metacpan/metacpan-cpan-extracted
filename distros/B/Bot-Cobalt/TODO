@@ -1,0 +1,18 @@
+testing:
+  - Dynamic context add / rehash / !server connect
+  - !server disconnect
+
+bin/:
+
+  - langset update tool
+
+::Plugins:
+
+  - Plugins::Extras::BanMgr
+    Channel ban manager plugin
+
+  - Plugins::ChanMgr
+    Online channels.conf manager
+
+  - Plugins::Extras::Logger
+    Configurable log-to-file plugin

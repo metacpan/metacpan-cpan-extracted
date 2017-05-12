@@ -1,0 +1,131 @@
+=pod
+
+=head1 NAME
+
+Bot::Cobalt::Manual::Plugins::Config - Cobalt config file primer
+
+=head1 DESCRIPTION
+
+This document is a very brief overview aimed at plugin authors in need 
+of a quick reference to plugin configuration files loaded via Config 
+directives.
+
+L<Bot::Cobalt> configuration files are written in YAML. 
+L<http://yaml.org/spec/1.1/>
+
+Mostly, you will see hash structures like this:
+
+  $ cat etc/plugins/mine/myplugin.conf
+  ---
+  ## config for MyPlugin
+  ## RequiredLevels: hash specifying access levels for commands:
+  RequiredLevels:
+    cmd_ensnackulate: 2
+    cmd_refrobulate: 1
+
+...which would be converted, upon load, into a 
+L<Bot::Cobalt::Conf::File::PerPlugin> object.
+
+(These structures would normally be accessed by plugins via the Core's 
+L<Bot::Cobalt::Core::Role::EasyAccessors/"get_plugin_cfg"> method or 
+L<Bot::Cobalt::Core::Sugar/"plugin_cfg"> -- see 
+L<Bot::Cobalt::Manual::Plugins> for details.)
+
+See L<Bot::Cobalt::Manual::Plugins::Dist> for details on embedding 
+configuration files installable via L<cobalt2-plugin-installcf>.
+
+=head2 Indentation
+
+Indentation builds nested structures; 2 spaces is the standard for 
+L<Bot::Cobalt> configuration files:
+
+  Opts:
+    SomeOpt: 1
+    OtherOpts:
+      ThisElement: "Some string"
+
+=head2 Boolean values
+
+Many configuration options, especially in the core plugin set, are 
+simple boolean true/false:
+
+  ## Example of a boolean true or false
+  ## if UseSSL is commented out, 0, or ~ (undef), it is "false"
+  ## true if 1 or some other positive value like a string ("Yes")
+  UseSSL: 1
+  
+  ## ...just as valid for a simple boolean check:
+  UseSSL: "Yes please!"
+
+=head2 Strings
+
+  SomeString: A string
+
+Strings can be quoted:
+
+  SomeString: "A string"
+
+For example:
+
+  SomeNum: 176.100    ## Numeric 176.1
+  SomeNum: "176.100"  ## String "176.100"
+
+Within double-quotes, special characters can be escaped C-style.
+
+=head2 Block literals
+
+A block literal might look something like this:
+
+  ## newlines preserved:
+  ThisDoc: |
+    Some text here.
+    And even more text here.
+    Perhaps some more!
+
+  ## newlines folded:
+  ThisDoc: >
+    <p>Some literal html</p>
+    <p>More of it</p>
+
+=head2 Hashes
+
+  MyHash:
+    Scalar_item: "a scalar"
+    Another_Hash:
+      Item_one: 1
+      Item_two: "String"
+
+Item_two would be available via MyHash->{Another_Hash}->{Item_two}.
+
+
+=head2 Lists
+
+A list/array looks something like this:
+
+  MyList:
+    - An item
+    - Another item
+
+  ## a deeply nested structure:
+  MyUsers:
+    - JoeUser
+    - Bobby
+    - Another list
+    - SomeHash:
+        One_Item: 1
+        Another_item: "Some string"
+
+(In this example, Another_item would be available via 
+MyUsers[3]->{Another_item})
+
+=head1 SEE ALSO
+
+L<http://yaml.org/spec/1.1/>
+
+L<YAML::XS>
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+=cut

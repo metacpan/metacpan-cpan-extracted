@@ -1,0 +1,16 @@
+lib/Bio/PhyloTastic.pm
+lib/Bio/PhyloTastic/BabelPhysh.pm
+lib/Bio/PhyloTastic/DateLife.pm
+lib/Bio/PhyloTastic/PhyleMerge.pm
+lib/Bio/PhyloTastic/PruneOMatic.pm
+lib/Bio/PhyloTastic/TaxTractor.pm
+lib/Bio/PhyloTastic/TNRS.pm
+Makefile.PL
+MANIFEST			This list of files
+README.txt
+script/phylotastic.PL
+t/perl-critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

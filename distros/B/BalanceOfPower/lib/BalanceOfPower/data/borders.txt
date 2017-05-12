@@ -1,0 +1,43 @@
+Italy,Switzerland
+Italy,France
+France,Spain
+France,Belgium
+France,Germany
+France,Switzerland
+United Kingdon,Belgium
+United Kingdon,France
+United Kingdom,Netherlands
+Russia,Finland
+Russia,Norway
+Germany,Netherlands
+Germany,Belgium
+Germany,Switzerland
+Finland,Norway
+Finland,Sweden
+Sweden,Norway
+Portugal,Spain
+Denmark,Germany
+Denmark,Sweden
+Denmark,Norway
+Austria,Switzerland
+Austria,Germany
+Austria,Italy
+Czech Republic,Slovakia
+Czech Republic,Germany
+Czech Republic,Austria
+Slovakia,Austria
+Slovenia,Czech Republic
+Slovenia,Italy
+Slovenia,Austria
+Slovenia,Hungary
+Hungary,Slovakia
+Hungary,Austria
+Poland,Germany
+Poland,Czech Republic
+Poland,Slovakia
+Poland,Russia
+Turkey,Greece
+Bulgaria,Turkey
+Bulgaria,Greece
+Albania,Greece
+

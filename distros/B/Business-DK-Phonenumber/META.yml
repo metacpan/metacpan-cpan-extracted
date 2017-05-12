@@ -1,0 +1,41 @@
+---
+abstract: 'Danish telephone number validator/formatter'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  Data::FormValidator: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Taint::Runtime: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Prereq::Build: '0'
+  Test::Taint: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-DK-Phonenumber
+provides:
+  Business::DK::Phonenumber:
+    file: lib/Business/DK/Phonenumber.pm
+    version: '0.10'
+  Class::Business::DK::Phonenumber:
+    file: lib/Class/Business/DK/Phonenumber.pm
+    version: '0.10'
+  Data::FormValidator::Constraints::Business::DK::Phonenumber:
+    file: lib/Data/FormValidator/Constraints/Business/DK/Phonenumber.pm
+    version: '0.10'
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/jonasbn/bdkphn/issues
+  repository: git://github.com/jonasbn/bdkphn.git
+version: '0.10'

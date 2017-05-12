@@ -1,0 +1,16 @@
+bin/analyze.pl
+bin/find_chars.pl
+bin/update.pl
+CHANGELOG
+config/DataTools.ini
+data/canzones.zip
+data/usrates.zip
+data/uszones.zip
+data/wwrates.zip
+data/wwzones.zip
+lib/Business/Shipping/DataTools.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00.load.t

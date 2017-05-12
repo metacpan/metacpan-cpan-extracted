@@ -1,0 +1,25 @@
+The first chunk is cosmetic only; the second one avoids an infinite loop if
+the install of Module::Build fails.
+
+--- ./Makefile.PL-pre	Fri Nov 14 05:55:04 2003
++++ ./Makefile.PL	Sun Dec 14 17:15:52 2003
+@@ -7,8 +7,7 @@
+ 	('  Install Module::Build now from CPAN?', 'y');
+       
+       unless ($yn =~ /^y/i) {
+-	warn " *** Cannot install without Module::Build.  Exiting ...\n";
+-	exit 1;
++	die " *** Cannot install without Module::Build.  Exiting ...\n";
+       }
+ 
+       require Cwd;
+@@ -19,7 +18,8 @@
+       my $cwd = Cwd::cwd();
+       my $makefile = File::Spec->rel2abs($0);
+       
+-      CPAN::Shell->install('Module::Build::Compat');
++      CPAN::Shell->install('Module::Build::Compat')
++	or die " *** Cannot install without Module::Build.  Exiting ...\n";
+       
+       chdir $cwd or die "Cannot chdir() back to $cwd: $!";
+       exec $^X, $makefile, @ARGV;  # Redo now that we have Module::Build

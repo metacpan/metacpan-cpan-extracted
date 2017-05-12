@@ -1,0 +1,54 @@
+---
+abstract: 'BioPerl-Network - package for biological networks'
+author:
+  - 'BioPerl Team <bioperl-l@bioperl.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BioPerl-Network
+provides:
+  Bio::Network::Edge:
+    file: lib/Bio/Network/Edge.pm
+    version: 0
+  Bio::Network::IO:
+    file: lib/Bio/Network/IO.pm
+    version: 0
+  Bio::Network::IO::dip_tab:
+    file: lib/Bio/Network/IO/dip_tab.pm
+    version: 0
+  Bio::Network::IO::psi10:
+    file: lib/Bio/Network/IO/psi10.pm
+    version: 0
+  Bio::Network::IO::psi25:
+    file: lib/Bio/Network/IO/psi25.pm
+    version: 0
+  Bio::Network::IO::psi::intact:
+    file: lib/Bio/Network/IO/psi/intact.pm
+    version: 0
+  Bio::Network::Interaction:
+    file: lib/Bio/Network/Interaction.pm
+    version: 0
+  Bio::Network::Node:
+    file: lib/Bio/Network/Node.pm
+    version: 0
+  Bio::Network::ProteinNet:
+    file: lib/Bio/Network/ProteinNet.pm
+    version: 0
+recommends:
+  XML::Twig: 3.22
+requires:
+  Bio::Root::Version: 1.006901
+  Graph: 0.86
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.006902

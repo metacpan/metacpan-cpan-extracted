@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Biblio::Citation::Parser 1.10 Documentation - ParaCite Web Service</title>
+<link rel="stylesheet" href="epdocs.css" type="text/css" />
+<link rev="made" href="mailto:root@scampi.ecs.soton.ac.uk" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - ParaCite Web Service</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#the_paracite_web_service">The ParaCite Web Service</a></li>
+	<li><a href="#using_the_web_service_from_perl">Using the Web Service from Perl</a></li>
+	<li><a href="#web_service_examples">Web Service Examples</a></li>
+	<li><a href="#web_service_structures">Web Service Structures</a></li>
+	<ul>
+
+		<li><a href="#paracitesearchresult">ParaciteSearchResult</a></li>
+		<li><a href="#resultelement">ResultElement</a></li>
+		<li><a href="#metadata">Metadata</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="the_paracite_web_service">The ParaCite Web Service</a></h1>
+<p>The Biblio::Citation::Parser package includes several examples that demonstrate the ParaCite web service, as well as the WSDL definition file. This section explains the web service, and gives an introduction to using it.</p>
+<p>As ParaCite is written entirely in Perl, there are obvious issues if you wish to use Java, PHP, or another language. The ParaCite web services provides an interface into the reference parsing features of ParaCite, while remaining language agnostic.</p>
+<p>
+</p>
+<hr />
+<h1><a name="using_the_web_service_from_perl">Using the Web Service from Perl</a></h1>
+<p>To access the web service from Perl requires the SOAP::Lite module (see Required Software). Once this is present, this is all that is required to connect to the web service:</p>
+<pre>
+ my $service = SOAP::Lite
+        -&gt; service(&quot;<a href="http://paracite.eprints.org/paracite.wsdl&quot">http://paracite.eprints.org/paracite.wsdl&quot</a>;);</pre>
+<p>Three functions are now available from the <code>$service</code> variable:</p>
+<dl>
+<dt><strong><a name="item_doopenurlconstruct"><strong>doOpenURLConstruct($reference, $baseurl)</strong></a></strong><br />
+</dt>
+<dd>
+This returns an OpenURL, prefixed by the base URL if one is provided.
+</dd>
+<p></p>
+<dt><strong><a name="item_doreferenceparse"><strong>doReferenceParse($reference, $baseurl)</strong></a></strong><br />
+</dt>
+<dd>
+This returns a hash containing the metadata in the reference, and an OpenURL formed using the metadata and the base URL.
+</dd>
+<p></p>
+<dt><strong><a name="item_doparacitesearch"><strong>doParaciteSearch($reference, $baseurl)</strong></a></strong><br />
+</dt>
+<dd>
+This returns an hash containing 'resultElements' (an array of search results), and 'metadata' (a hash of metadata).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="web_service_examples">Web Service Examples</a></h1>
+<p>The following code parses a reference, and stores the metadata in <code>$metadata</code> and the OpenURL in <code>$openurl</code>:</p>
+<pre>
+ use SOAP::Lite;
+ my $service = SOAP::Lite
+        -&gt; service(&quot;<a href="http://paracite.eprints.org/paracite.wsdl&quot">http://paracite.eprints.org/paracite.wsdl&quot</a>;);
+ my $base_url = &quot;<a href="http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot">http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot</a>;;
+ my $result = $service 
+        -&gt; doReferenceParse(&quot;Jewell, M (2002) Example&quot;, $base_url);
+ my $metadata = $result-&gt;{metadata};
+ my $openurl = $result-&gt;{openURL};</pre>
+<p>If you do not want the metadata, and just want a link to an OpenURL resolver, the following will do that:</p>
+<pre>
+ use SOAP::Lite;
+ my $service = SOAP::Lite
+        -&gt; service(&quot;<a href="http://paracite.eprints.org/paracite.wsdl&quot">http://paracite.eprints.org/paracite.wsdl&quot</a>;);
+ my $base_url = &quot;<a href="http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot">http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot</a>;;
+ my $open_url = $service
+        -&gt; doOpenURLConstruct(&quot;Jewell, M (2002) Example&quot;, $base_url);
+ 
+Finally, this example uses the doParaciteSearch method to get the first match on a reference:</pre>
+<pre>
+ use SOAP::Lite;
+ my $service = SOAP::Lite
+        -&gt; service(&quot;<a href="http://paracite.eprints.org/paracite.wsdl&quot">http://paracite.eprints.org/paracite.wsdl&quot</a>;);
+ my $base_url = &quot;<a href="http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot">http://paracite.eprints.org/cgi-bin/openurl.cgi?&quot</a>;;
+ my $query = &quot;Harnad, Stevan (1995) The PostGutenberg Galaxy.&quot;;
+ my $result = $service 
+        -&gt; doParaciteSearch($query, $base_url);
+ my $first_result = $result-&gt;{resultElements}-&gt;[0];
+ print &quot;First result is: &quot;.$first_result-&gt;{URL}.&quot;\n&quot;;</pre>
+<p>The web service automatically adds Google, Scirus, and Vivissimo as resources to the search request, so if no resources match the publication or subject these will be used as fall-backs.</p>
+<p>
+</p>
+<hr />
+<h1><a name="web_service_structures">Web Service Structures</a></h1>
+<p>Most of the Paracite structures have been modelled very closely on the Google web service structures to allow some degree of standardisation. Some additions have been made, and some fields are not yet used, but these may change in future versions.</p>
+<p>
+</p>
+<h2><a name="paracitesearchresult">ParaciteSearchResult</a></h2>
+<dl>
+<dt><strong><a name="item_resultelements">resultElements</a></strong><br />
+</dt>
+<dd>
+This is an array of resources, along with the search URLs associated with them. See the ResultElement description later in this section.
+</dd>
+<p></p>
+<dt><strong><a name="item_estimatedtotalresultscount">estimatedTotalResultsCount</a></strong><br />
+</dt>
+<dd>
+This returns the number of items in the resultElements array.
+</dd>
+<p></p>
+<dt><strong><a name="item_estimateisexact">estimateIsExact</a></strong><br />
+</dt>
+<dd>
+This currently always returns 1.
+</dd>
+<p></p>
+<dt><strong><a name="item_searchquery">searchQuery</a></strong><br />
+</dt>
+<dd>
+This contains the original reference.
+</dd>
+<p></p>
+<dt><strong><a name="item_openurl">openURL</a></strong><br />
+</dt>
+<dd>
+This contains the OpenURL represented by the reference metadata (prefixed by base URL if one is supplied).
+</dd>
+<p></p>
+<dt><strong><a name="item_metadata">metadata</a></strong><br />
+</dt>
+<dd>
+This is a Metadata object (see later in this section).
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="resultelement">ResultElement</a></h2>
+<dl>
+<dt><strong><a name="item_url">URL</a></strong><br />
+</dt>
+<dd>
+This is a URL that searches the current resource for the reference.
+</dd>
+<p></p>
+<dt><strong><a name="item_template">template</a></strong><br />
+</dt>
+<dd>
+This contains the template of the matching resource interface that was used to generate the search URL.
+</dd>
+<p></p>
+<dt><strong><a name="item_name">name</a></strong><br />
+</dt>
+<dd>
+The name of the resource (e.g. Google).
+</dd>
+<p></p>
+<dt><strong><a name="item_description">description</a></strong><br />
+</dt>
+<dd>
+Some more information about the resource.
+</dd>
+<p></p>
+<dt><strong><a name="item_tollfree">tollfree</a></strong><br />
+</dt>
+<dd>
+A boolean value that is true if the results can be viewed without cost.
+</dd>
+<p></p>
+<dt><strong><a name="item_fulltext">fulltext</a></strong><br />
+</dt>
+<dd>
+A boolean value that is true if a resulting article from this resource will have the full text available.
+</dd>
+<p></p>
+<dt><strong><a name="item_stratum">stratum</a></strong><br />
+</dt>
+<dd>
+An integer representing the stratum in which this resource lies. A complete list of the strata is available at <a href="http://paracite.eprints.org/cgi-bin/views/viewstrata.cgi">http://paracite.eprints.org/cgi-bin/views/viewstrata.cgi</a>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="metadata">Metadata</a></h2>
+<p>All of the fields in Metadata are valid fields in OpenURL metadata. See Table 1 at <a href="http://www.sfxit.com/openurl/openurl.html">http://www.sfxit.com/openurl/openurl.html</a> for a complete list.</p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Biblio::Citation::Parser 1.10 Documentation - ParaCite Web Service</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

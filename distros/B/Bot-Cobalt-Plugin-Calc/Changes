@@ -1,0 +1,39 @@
+Revision history for Perl module Bot::Cobalt::Plugin::Calc
+
+0.004005 2016-04-26
+
+  - Silence warnings in addition to trapping exceptions wrt setrlimit
+
+  - Packaging; switch to 'cpanfile' dependency list
+
+0.004004 2016-04-19
+
+  - Silence setrlimit with regards to missing symbols
+
+0.004003 2015-04-11
+
+  - Bump memory limit for worker procs
+
+0.004002 2015-04-10
+
+  - Minor optimizations & more verbose Session test
+
+0.004001 2015-04-09
+
+  - Use worker processes with rlimits & timeouts to perform calculations
+
+0.003001 2015-03-22
+
+  - Kill custom parser in favor of Math::Calc::Parser
+
+  - Cleanups
+
+  - Packaging improvements
+
+0.002 2012-05-23
+
+  - Test improvements.
+
+0.001 2012-05-23
+
+  - Initial release.

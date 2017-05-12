@@ -1,0 +1,21 @@
+bin/translate_fasta.pl
+Build.PL
+Changes
+lib/Bio/Translator.pm
+lib/Bio/Translator/Table.pm
+lib/Bio/Translator/Utils.pm
+lib/Bio/Translator/Validations.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-translate.t
+t/04-custom.t
+t/21-codons.t
+t/22-regex.t
+t/23-find.t
+t/24-nonstop.t
+t/25-getORF.t
+t/26-getCDS.t

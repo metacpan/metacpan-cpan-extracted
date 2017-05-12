@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% "MILITARY RANGE ANALYSIS FOR $nation" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% FOREACH n IN near %]
+[% FILTER color 'yellow' %]# [% n.nation %][% END %]
+   Relations: [% n.relation.colored_status %]
+   In range because: [% INCLUDE fragments/in_range_reason.tt reason = n %] 
+[% END %]

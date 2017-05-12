@@ -1,0 +1,51 @@
+-------------
+Prerequisites
+-------------
+
+Bookmarks you want to visit must be stored in the following structure :
+
+$ROAMING_DIR/user1/bookmarks
+$ROAMING_DIR/user2/bookmarks
+
+where $ROAMING_DIR is the directory where you want to store the bookmarks.
+
+This structure is used as well by the mod_roaming module you can install. It's
+not needed for the BOC-Directory-Bookmark component to run, but it makes
+the whole much powerful. Mod_roaming permits to use the Netscape roaming
+feature : preferences, bookmarks, ... can be stored on a browser. It makes
+your life easier if you are nomad.
+
+-------------
+Configuration
+-------------
+
+  1. Update the $ROAMING_DIR variable in Bookmark.pm to suit you need.
+     /home/roaming is a good choice.
+
+  2. Add in the classes.xml file in BabelObjects configuration directory the
+     name of the class to call the BOC-Directory-Component :
+
+     <classes>
+      <parameter>
+         <bookmark>BabelObjects::Component::Directory::Bookmark</bookmark>
+      </parameter>
+     </classes>
+
+-----
+Start
+-----
+
+Start the httpd server. With Apache, type :
+
+  root # apachectl start
+
+----
+Test
+----
+
+To test the installation, copy sample/test_bookmark.bo in your html space.
+Go and visit it with the parameters corresponding to the user you create.
+For example, http://yourserver/test_bookmark.bo?user=user1 for the bookmark
+stored under $ROAMING_DIR/user1/bookmarks
+ 
+Enjoy !

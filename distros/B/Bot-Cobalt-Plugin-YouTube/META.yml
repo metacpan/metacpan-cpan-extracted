@@ -1,0 +1,25 @@
+---
+abstract: 'YouTube plugin for Bot::Cobalt'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-Cobalt-Plugin-YouTube
+requires:
+  Bot::Cobalt: 0
+  Carp: 0
+  HTML::TokeParser: 3.69
+  HTTP::Request: 0
+  perl: v5.12.1
+  strictures: 2
+resources:
+  repository: git://github.com/avenj/bot-cobalt-plugin-youtube.git
+version: 0.003001

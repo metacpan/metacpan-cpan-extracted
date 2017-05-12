@@ -1,0 +1,95 @@
+NAME
+    Business::TW::Invoice::U420 - Print Taiwan Unified Invoice with U420
+    printer
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+    Business::TW::Invoice::U420->init_printer; my $u420 =
+    Business::TW::U420->new ({ heading => [ DateTime->now->ymd, '', 'order:
+    #232', ''], lines_total => 35, lines_available => 18, lines_stamp => 5,
+    fh => \*STDOUT });
+
+    $u420->println("123123") for 1..30; $u420->cut;
+
+    # to actually print to the printer, run: # perl your-program.pl > COM1
+
+DESCRIPTION
+    This module generates commands for the "Epson RP-U420 invoice" printer
+    for printing the Unified Invoice in Taiwan.
+
+    You must install the driver and printer processor properly before you
+    can use the module.
+
+    You can define multiple lines of headers that will appear on each page
+    of the printed invoices, and when you do println the module does all the
+    necessary paging and stamping for you.
+
+METHODS
+  new
+  init_printer
+  feed( $lines )
+    Feed $lines lines, default is 1.
+
+  stamp
+    Make the printer stamp on the invoice. note that you generally don't
+    want to call this method directly, due to the stamp positioning. When
+    you call "cut", the module automatically detects the correct place to
+    stamp for the next invoice.
+
+  cut
+    feed the current invoice and cut, as well as stamping on the next
+    invoice.
+
+  print
+    Low level print function.
+
+  println
+    Print a line on the invoice. Does all the paging logic here.
+
+AUTHOR
+    Chia-liang Kao, "<clkao at clkao.org>"
+
+  TODO
+    *   Split the device control parts into "Device::Serial::U420" for
+        generic use and keep the paging/stamping logic here
+
+    *   Tests
+
+    *   Add footer support
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-business-tw-invoice-u420 at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-TW-Invoice-U420
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::TW::Invoice::U420
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Business-TW-Invoice-U420>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Business-TW-Invoice-U420>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-TW-Invoice-U420>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Business-TW-Invoice-U420>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 AIINK co., ltd, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

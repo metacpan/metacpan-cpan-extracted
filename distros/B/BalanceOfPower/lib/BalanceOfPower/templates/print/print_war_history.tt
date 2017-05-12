@@ -1,0 +1,11 @@
+[% USE ANSIColor 'color' %]
+[% "WAR HISTORY" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+[% FOREACH wn IN war_names %][% wnname = wn.name %]
+[% "### WAR $wnname" | color 'yellow' %]
+[% FOREACH w IN wars.$wnname %]
+[% "$w.node1 => $w.node2" | color 'white' 'bold' %]
+*** War started in [% w.start_date %] ***
+[% FOREACH t IN w.get_turn_tags %][% FOREACH ev IN w.events.$t %] [% IF t != 'START' %][% t %]: [% END %][% ev %]
+[% END %][% END %]*** War ended in [% w.end_date %] ***
+[% END %][% END %]

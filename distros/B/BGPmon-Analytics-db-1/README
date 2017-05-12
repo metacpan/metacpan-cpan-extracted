@@ -1,0 +1,85 @@
+BGPmon-Analytics-db version 1.01
+================================
+
+The BGPmon Analytics Database module includes the source and scripts
+necessary to set up a BGP-tracking database in Postgres and to populate it
+from BGPmon output.  It is a set of scripts, not a module to be imported 
+into other packages.
+
+INSTALLATION
+
+Please Note: If other BGPmon DB tools have previously been installed it is
+likely that the bgpmon_db_user and bgpmon_db have already been created. 
+If that is the case, skip to step 6.
+
+This package depends on being able to connect to a postgres installation.
+The following instructions will help prepare that installation, installation
+procedures may vary across platforms.
+1. Install Postgresql (sudo apt-get install postgresql)
+2. Create the database user bgpmon_db_user (sudo -u postgres createuser)
+3. Create the database bgpmon_db 
+     (sudo -u postgres createdb --owner bgpmon_db_user bgpmon_db)
+4. Give a user other than root or postgres access to the database
+     (should include web user):
+   Edit /etc/postgresql/8.1/main/pg_hba.conf to give specific users access
+   Refer to postres documentation for assitance editing the pg_hba.conf file
+5. Restart postgres
+6. Create the PPH schema
+> cd bin
+> psql -f bgpmon_analytics_db_0_pphTables.psql bgpmon_db bgpmon_db_user
+> psql -f bgpmon_analytics_db_1_pphFunctions.psql bgpmon_db bgpmon_db_user
+> psql -f bgpmon_analytics_db_2_pphQueryFuncs.psql bgpmon_db bgpmon_db_user
+7. In order for the modules to access the scripts a password should be set
+   on the bgpmon_cpm_user role. (alter role bgpmon_db_user password 'passwd';)
+   This password needs to be saved in lib/BGPmon/CPM/DB.pm
+   make test will fail if this is not completed
+8. Build and install
+> perl Makefile.PL (add PREFIX=/other/than/default if desired)
+> make
+> make test (optional)
+> make install (use sudo if doing a root install)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PostgreSQL 8.4 or higher, with PL/pg SQL installed
+  BGPmon::Fetch
+  BGPmon::Configure
+  BGPmon::Translator::XFB2PerlHash::Simple
+  BGPmon::Log
+  Data::Dumper
+  POSIX
+  Cwd
+  Getopt::Long
+
+COPYRIGHT AND LICENCE
+Copyright (c) 2012 Colorado State University
+
+    Permission is hereby granted, free of charge, to any person
+    obtaining a copy of this software and associated documentation
+    files (the "Software"), to deal in the Software without
+    restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or
+    sell copies of the Software, and to permit persons to whom
+    the Software is furnished to do so, subject to the following
+    conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+    OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+
+
+  Authors: Jason Bartlett
+           Cathie Olschanowsky
+  Date: 15 August 2012
+        9 January 2013
+

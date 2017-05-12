@@ -1,0 +1,22 @@
+---
+abstract: 'Utilities for dealing with bank card number (ISO/IEC 7812)'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0.96
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-BankCard
+requires:
+  perl: 5.010000
+resources:
+  homepage: http://metacpan.org/dist/Business-BankCard/
+  repository: http://github.com/sharyanto/perl-Business-BankCard
+version: 0.01

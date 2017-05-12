@@ -1,0 +1,15 @@
+---
+abstract: 'C"Pogle's Wood"hip'
+author:
+  - 'Pogle <pogle@bowers.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'NEILB 1.0'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Wood-Pogle
+version: 0.001

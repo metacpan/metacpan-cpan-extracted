@@ -1,0 +1,63 @@
+Revision history for Box2D
+
+0.07    06/04/2012
+        Weaken tests due to precision (t/25-b2transform.t) [jtpalmer]
+
+0.06    05/01/2012
+        Implemented b2PolygonShape::Set [FROGGS]
+        Updated documentation [jtpalmer]
+        Added radar example [jtpalmer]
+        Replaced use of 'parent' with 'base' [jtpalmer]
+        Weaken tests due to precision [jtpalmer]
+
+0.05    27/08/2011
+        Added b2RayCastCallback and PerlRayCastCallback [jtpalmer]
+        Changes to b2Vec2 [jtpalmer]
+        Added operator overloading to b2Vec2 [jtpalmer]
+        Added b2Math [jtpalmer]
+        Additions to b2Shape [jtpalmer]
+        Added b2MassData [jtpalmer]
+        Added b2AABB [jtpalmer]
+        Added b2RayCastInput, b2RayCastOutput [jtpalmer]
+        Updated meta resources with github info [jtpalmer]
+
+0.04    26/07/2011
+        Added pendulum example [jtpalmer, zpmorgan]
+        Added breakable example [jtpalmer]
+        Added b2ContactImpulse [jtpalmer]
+        Added b2WeldJoint and tests [jtpalmer]
+        Added b2PulleyJoint, tests and example [jtpalmer]
+        Added b2PrismaticJoint and test [jtpalmer]
+        Added b2MouseJoint, tests and example [jtpalmer]
+        Added b2LineJoint and tests [jtpalmer]
+        Added b2GearJoint and tests [jtpalmer]
+        Added b2FrictionJoint and tests [jtpalmer]
+        Added b2RevoluteJoint, tests and example [jtpalmer]
+        Added b2DistanceJoint, tests [jtpalmer]
+        Added b2Filter, b2FixtureDef::filter and tests [jtpalmer]
+        Added b2PolygonShape::SetAsEdge [jtpalmer]
+        Fixed b2JointDef::body[AB] [jtpalmer]
+
+0.03    19/06/2011
+        weaken tests due to precision  (t/02-b2math.t) [FROGGS]
+        added Alien::Box2D to configure_requires  [FROGGS]
+
+0.02    16/06/2011
+        using Alien::Box2D 0.103 (no cmake) [FROGGS]
+        Added get and set gravity [kthakore]
+        Added other copy right ppl [kthakore]
+        Fixed b2Body::GetTransform and added tests [jtpalmer]
+        Added b2Mat22, b2Transform and tests [jtpalmer]
+        Fixed b2Body::GetLinearVelocity and added tests [jtpalmer]
+        Added b2FixtureDef::restitution and tests [jtpalmer]
+        Can pass subroutines... we have an observer pattern [kthakore]
+        Using b2Contact to do a simple userdata carry over of scalar stuff in example [kthakore]
+        Replace b2CircleShape::SetRadius with b2Shape::m_radius [jtpalmer]
+        Formatting and comment changes [jtpalmer]
+        Added b2CircleShape, tests and example [jtpalmer]
+        added early_include for solaris to inject sys/vnode.h [FROGGS]
+
+0.01    19/05/2011
+        First version, released on an unsuspecting world.
+        Added basic set of classes
+        Added perl contact listeners

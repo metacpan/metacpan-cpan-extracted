@@ -1,0 +1,23 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::AliG - IRC bot that translates phrases
+    from English to Ali G
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+        use Bot::BasicBot::Pluggable::Module;
+
+DESCRIPTION
+    This is an IRC bot that translates phrases from English to Ali G. The
+    keyword alig triggers the translation.
+
+AUTHOR
+    William Wolf <throughnothing@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by William Wolf.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

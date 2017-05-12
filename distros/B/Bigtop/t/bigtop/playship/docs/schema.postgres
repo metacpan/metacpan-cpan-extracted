@@ -1,0 +1,18 @@
+CREATE TABLE family (
+    id SERIAL PRIMARY KEY,
+    name varchar,
+    street varchar,
+    city varchar,
+    created TIMESTAMP WITH TIME ZONE,
+    modified TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE child (
+    id SERIAL PRIMARY KEY,
+    name varchar,
+    birth_day date,
+    created TIMESTAMP WITH TIME ZONE,
+    modified TIMESTAMP WITH TIME ZONE,
+    family int4 REFERENCES family(id)
+);
+

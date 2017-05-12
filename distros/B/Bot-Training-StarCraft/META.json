@@ -1,0 +1,38 @@
+{
+   "abstract" : "Provide F<starcraft.trn> via L<Bot::Training>",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "build_requires" : {
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Test::More" : "0"
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.31",
+      "File::ShareDir::Install" : "0.03"
+   },
+   "generated_by" : "Dist::Zilla version 2.101170",
+   "license" : "perl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : 1.4
+   },
+   "name" : "Bot-Training-StarCraft",
+   "no_index" : {},
+   "recommends" : {},
+   "requires" : {
+      "Any::Moose" : "0",
+      "Bot::Training::Plugin" : "0",
+      "perl" : "5.010"
+   },
+   "resources" : {
+      "Ratings" : "http://cpanratings.perl.org/d/Bot-Training-StarCraft",
+      "bugtracker" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Bot-Training-StarCraft",
+      "homepage" : "http://search.cpan.org/dist/Bot-Training-StarCraft/",
+      "license" : "http://dev.perl.org/licenses/",
+      "repository" : "http://github.com/avar/bot-training-starcraft"
+   },
+   "version" : "0.02"
+}
+

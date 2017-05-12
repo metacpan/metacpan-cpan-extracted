@@ -1,0 +1,99 @@
+#!/perl
+use strict;
+use warnings;
+use 5.010;
+
+use Business::UPS::Tracking::Commandline;
+use Text::SimpleTable;
+
+#$Business::UPS::Tracking::CHECKSUM = 0;
+
+=encoding utf8
+
+=head1 NAME
+
+ups_tracking - Access UPS tracking webservice from the commandline
+
+=head1 SYNOPSIS
+
+B<ups_tracking> [options]
+
+ Options:
+    --verbose                           Be verbose
+    --config                            UPS tracking webservice access config file
+    --help                              Display help text
+    
+    --TrackingNumber                    Shipment tracking number
+    --ShipperNumber                     Shipper UPS customernumber
+    --ShipmentIdentificationNumber      Shipment identification number
+    --ReferenceNumber                   Shipment reference number
+    --ShipmentType                      Shipment type ["01" - Small shipment (Default), "02" - Freight ]
+    --PickupDateRangeBegin              Shipment pickup date range begin
+    --PickupDateRangeEnd                Shipment pickup date range end
+    --DestinationPostalCode             Shipment destination postal code
+    --DestinationCountryCode            Shipment destination country code
+    --OriginPostalCode                  Shipment origin postal code
+    --OriginCountryCode                 Shipment origin country code
+
+=head1 DESCRIPTION
+
+This is the command-line program to use L<Business::UPS::Tracking>. See the
+L<Business::UPS::Tracking>, L<Business::UPS::Tracking::Request> and 
+L<Business::UPS::Tracking::Commandline> documentation for more details.
+
+In order to use this tool you need to obtain a "Tracking WebService" 
+license key. See L<http://www.ups.com/e_comm_access/gettools_index> for more
+information. 
+
+The license data needs to be stored in the UPS tracking webservice access
+config file, which should be located at ~/.ups_tracking
+
+ <?xml version="1.0"?>
+ <UPS_tracing_webservice_config>
+    <AccessLicenseNumber>1CFFED5A5E91B17</AccessLicenseNumber>
+    <UserId>myupsuser</UserId>
+    <Password>secret</Password>
+ </UPS_tracing_webservice_config>
+
+=cut
+
+binmode 'STDOUT',':utf8';
+
+eval { 
+    Business::UPS::Tracking::Commandline->new_with_options->execute; 
+};
+if ( my $e = Exception::Class->caught ) {
+    if (ref $e) {
+        say ".============================================================================.";
+        say "| An error occured while processing your request                             |";
+        my $table = Text::SimpleTable->new(16,55);
+        given ($e) {
+            when ( $_->isa('Business::UPS::Tracking::X::HTTP') ) {
+                $table->row('Type','HTTP error');
+                $table->row('Message',$e->full_message);
+                $table->row('URI',$e->http_response->request->uri );
+            }
+            when ( $_->isa('Business::UPS::Tracking::X::UPS') ) {
+                $table->row('Type','UPS error');
+                $table->row('Message',$e->full_message);
+                $table->row('UPS Error Code',$e->code );
+                $table->row('Severirty',$e->severity );
+            }
+            when ( $_->isa('Business::UPS::Tracking::X::XML') ) {
+                $table->row('Type','XML error');
+                $table->row('Message',$e->message);
+                $table->row('XML',$e->xml );
+            }
+            default {
+                $table->row('Type','Internal error');
+                $table->row('Message',$e->message);
+            }
+        }
+        say $table->draw;
+    } else {
+        say $e;
+    }
+
+}
+
+1;

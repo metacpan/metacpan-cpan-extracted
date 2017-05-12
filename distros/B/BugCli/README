@@ -1,0 +1,12 @@
+NAME
+       BugCli - Command line interface for BugZilla server
+
+SYNOPSIS
+        >  bugcli
+        >  bugcli command
+        >  bugcli "command1 ; command2 ; command with params"
+
+DESCRIPTION
+       This little baby is a tool for people who make tons of bugfixes each
+       day, want to do it more efficently, i.e. do not use the freaking
+       browser!

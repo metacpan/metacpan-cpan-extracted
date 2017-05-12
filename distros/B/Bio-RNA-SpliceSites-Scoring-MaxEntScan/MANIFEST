@@ -1,0 +1,13 @@
+Changes
+lib/Bio/RNA/SpliceSites/Scoring/MaxEntScan.pm
+lib/Bio/RNA/SpliceSites/Scoring/me2x5.pm
+lib/Bio/RNA/SpliceSites/Scoring/me2x3acc.pm
+lib/Bio/RNA/SpliceSites/Scoring/splice5sequences.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

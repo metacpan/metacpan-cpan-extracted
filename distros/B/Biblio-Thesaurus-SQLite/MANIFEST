@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Biblio-Thesaurus-SQLite.t
+t/Basic.t
+t/db_simple
+lib/Biblio/Thesaurus/SQLite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,7 @@
+query_sequence,base_type,reverse_complement,genome_start,genome_end,polyprotein,start,end,region_names,similarity_to_hxb2,alignment,hxb2_sequence
+SLYNTVAVLYYVHQR,"amino acid",0,1018,1062,Gag,77,91,"Gag p17",86.7," Query SLYNTVAVLY YVHQR  15
+       :::::::.::  ::::    
+  HXB2 SLYNTVATLY CVHQR",SLYNTVATLYCVHQR
+TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG,nucleotide,0,1018,1062,Gag,229,273,"Gag p17",100.0," Query TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  45
+       :::::::::: :::::::::: :::::::::: :::::::::: ::::: 
+  HXB2 TCATTATATA ATACAGTAGC AACCCTCTAT TGTGTGCATC AAAGG  1062",TCATTATATAATACAGTAGCAACCCTCTATTGTGTGCATCAAAGG

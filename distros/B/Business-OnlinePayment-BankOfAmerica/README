@@ -1,0 +1,27 @@
+Copyright (c) 2001 Ivan Kohler.  All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+This is Business::OnlinePayment::BankOfAmerica, a Business::OnlinePayment
+backend module for Bank of America eStores.  It is only useful if you
+have a merchant account with Bank of America eStores:
+http://www.bofa.com/merchantservices/index.cfm?template=merch_ic_estores_ov.cfm
+
+This module implements the interface documented in:
+
+http://www.bankofamerica.com/merchantservices/index.cfm?template=merch_ic_estores_developer.cfm
+
+The settlement API is documented at
+https://manager.bamart.com/welcome/SettlementAPI.pdf
+
+It based on Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+
+There are additional tests in t2/ that may be useful to you once you have a
+merchant_id, login and password.
+
+Ivan Kohler <ivan-bofa@420.am>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").

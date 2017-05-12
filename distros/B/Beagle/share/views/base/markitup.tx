@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+: if system_file_exists( 'css/' ~ $info.layout ~ '/markitup_preview.css' ) {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/<: $info.layout :>/markitup_preview.css" />
+: } else {
+<link rel="stylesheet" type="text/css" href="<: $prefix :>system/css/base/markitup_preview.css" />
+: }
+</head>
+<body>
+
+<: $content | raw :>
+
+</body>
+</html>

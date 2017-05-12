@@ -1,0 +1,28 @@
+
+[% BLOCK nochex_link %]
+  [%# nochex graphical payment link %]
+  <a href=https://www.nochex.com/nochex.dll/checkout?email=[% payment.to_email %]&amount=[% payment.amount %]&description=[% payment.description %]><img src='http://support.nochex.com/images/logobuy.gif' border=0 alt='Pay by NOCHEX'></a>
+[% END %]
+
+[% BLOCK nochex_form %]
+<form action="https://www.nochex.com/nochex.dll/checkout" method="post"> 
+  <table>
+    <tr>
+      <td> Your NoChex Email address</td>
+      <td><input type="text" name="email" size="30">[% payment.from_email %]</td>
+    </tr>
+    <tr>
+      <td>Amount</td>
+      <td><input type="text" name="amount" size="8" value="[% payment.amount %]></td> 
+    </tr>
+    <tr>
+      <td>Comments:</td> 
+      <td><textarea rows="6" name="description" cols="30">[% payment.description %]</textarea></td>   
+    </tr>
+  <table>
+  <input type="hidden" name="logo" value="[% logo %]">
+  <input type="hidden" name="returnurl" value="[% returnurl %]">
+  <input type="hidden" name="ordernumber" value="[% payment.order_id %]">
+  <input type="submit" value="Pay by NOCHEX"> 
+</form> 
+[% END %]

@@ -1,0 +1,26 @@
+---
+abstract: 'First Data Global Gateway e4 backend for Business::OnlinePayment'
+author:
+  - 'Ivan Kohler <ivan-firstdataglobalgateway@420.am>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-FirstDataGlobalGateway
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3.01'
+  Data::Dumper: '0'
+  SOAP::Lite: '0'
+  Test::More: '0'
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

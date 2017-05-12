@@ -1,0 +1,83 @@
+######################################################################
+    WWW::Mechanize::Retry 0.03
+######################################################################
+
+NAME
+    Buffalo::G54 - Limited scraping API for Buffalo WBR2-G54 routers
+
+SYNOPSIS
+        use Buffalo::G54;
+
+DESCRIPTION
+    This module implements a limited API to control a Buffalo WBR2-G54
+    router by scraping its Web interface.
+
+  METHODS
+    Currently, only the following methods are implemented:
+
+    "my $buf = Buffalo::G54->new()"
+        Constructor.
+
+    "$buf->connect(...)"
+        Connects to the router's Web interface, takes the following key
+        value pairs:
+
+            ip       => "192.168.0.1",
+            user     => "root",
+            password => "topsecret!",
+
+        Returns 1 if the router's Web interface responded properly, and
+        "undef" otherwise.
+
+    "$buf->version()"
+        Ask the router for the version of its firmware. Returns something
+        like "WBR2-G54 Ver.2.21" if successful, or "undef" on failure.
+
+            http://192.168.0.1/advance/advance-admin-system.htm
+
+    "$buf->reboot()"
+        Reboot the router.
+
+    "$buf->wireless($status)"
+        Switch the router's wireless network on or off -- or query its
+        status.
+
+        To query the status of the router's wireless network, call
+        "wireless()" without parameters:
+
+              # Returns "on" or "off"
+            my $status = $buf->wireless();
+
+        It will return "on" or "off", or "undef" if an error occurred.
+
+              # Switch wireless off if it's on
+            if($buf->wireless() eq "on") {
+                $buf->wireless("off");
+            }
+
+        To switch the wireless network on or off, pass a $status value of
+        "on" or "off" to the "wireless()" method.
+
+        Note that switching the wireless network on and off requires having
+        set up the wireless network in the first place. "wireless()" is just
+        going to toggle the on/off switch, it doesn't configure the SSID,
+        encryption and other important settings.
+
+    "$buf->dhcp($status)"
+        Turns the DHCP server on or off or queries its status:
+
+            $buf->dhcp("on");
+            $buf->dhcp("off");
+
+            if($buf->dhcp() eq "on") {
+                print "dhcp is on!\n";
+            }
+
+LEGALESE
+    Copyright 2006 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2006, Mike Schilli <cpan@perlmeister.com>
+

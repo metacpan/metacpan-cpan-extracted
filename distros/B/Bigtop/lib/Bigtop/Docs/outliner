@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+use strict; use warnings;
+
+my $depth  = 0;
+my $indent = ' ' x 4; # four spaces
+
+LINE:
+while ( <> ) {
+    next unless /^=/;
+
+    if ( /^=over/ ) {
+        $depth++;
+        next LINE;
+    }
+    elsif ( /^=back/ ) {
+        $depth--;
+        next LINE;
+    }
+
+    s/=item //;
+
+    print $indent x $depth . $_;
+}

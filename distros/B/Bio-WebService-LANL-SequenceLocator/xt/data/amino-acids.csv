@@ -1,0 +1,4 @@
+query_sequence,base_type,reverse_complement,genome_start,genome_end,polyprotein,start,end,region_names,similarity_to_hxb2,alignment,hxb2_sequence
+MGGDMKDNW,"amino acid",0,7635,7661,gp160,471,479,"gp160 gp120",77.8," Query MGGDMKDNW  9
+        ::::.:::     
+  HXB2 GGGDMRDNW",GGGDMRDNW

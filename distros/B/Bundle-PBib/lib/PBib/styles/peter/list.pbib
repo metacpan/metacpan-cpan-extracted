@@ -1,0 +1,39 @@
+/* $Id: list.pbib 25 2005-09-17 21:45:54Z tandler $
+ */
+/*
+<<include ../styles/Elsevier/JSS.pbib>>
+<item>
+	include-label   1
+	includeAnnote   1
+	includeURL   1
+	label-separator   {tab}
+</item>
+<label>
+	class CiteKey
+	etal   10
+	forcekey   1
+	unique   1
+</label>
+<ref>
+	prefix r
+</ref>
+*/
+
+<item>
+	class ACM
+	include-label   0
+	includeAnnote   1
+	includeURL   1
+	keywordStyle   Abbrev
+	etal	-1
+</item>
+<label>
+	class CiteKey
+	etal   3
+	forcekey   1
+	unique   1
+</label>
+<ref>
+	class BookmarkLink
+	final   0
+</ref>

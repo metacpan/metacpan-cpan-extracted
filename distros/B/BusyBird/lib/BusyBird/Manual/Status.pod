@@ -1,0 +1,167 @@
+=pod
+
+=head1 NAME
+
+BusyBird::Manual::Status - Status object specification
+
+=head1 SYNOPSIS
+
+    use JSON;
+    
+    my $status = decode_json(<<'STATUS');
+    {
+        "id": "http://api.example.com/2291",
+        "created_at": "Thu Jan 03 02:24:43 +0000 2013",
+        "text": "sample status",
+        "user": {
+            "screen_name": "debug_ito",
+            "profile_image_url": "http://img.example.com/user/debug_ito.png",
+            "name": "Toshio Ito"
+        },
+        "busybird": {
+            "level": 0,
+            "acked_at": "Thu Jan 03 14:44:12 +0900 2013",
+            "status_permalink" : "http://example.com/status/2291",
+            "user_permalink": "http://example.com/user/debug_ito"
+        }
+    }
+    STATUS
+
+
+=head1 DESCRIPTION
+
+This is the specification of a status object handled by L<BusyBird> (especially L<BusyBird::StatusStorage> and
+L<BusyBird::Timeline>).
+
+A status object is just a hash reference (or an Object in JSON format). It should be serializable to
+JSON and deserializable from JSON.
+
+
+=head1 FIELDS
+
+The following fields in a status object is used by BusyBird.
+
+Note that the following list uses JSON for key notation.
+For example, C<busybird.acked_at> field is C<< $status->{busybird}{acked_at} >> in Perl
+(NOT C<< $status->{"busybird.acked_at"} >>).
+
+Status object can have fields that are not listed in this page.
+L<BusyBird> tries to keep such fields untouched.
+
+=head2 C<busybird.acked_at>
+
+The timestamp string at which the status is acked.
+If this field does not exist or it's C<null>, the status is unacked.
+
+The timestamp string must be parsable by L<BusyBird::DateTime::Format>.
+
+=head2 C<busybird.level>
+
+The level of the status. Level must be an integer. It may be positive or negative.
+
+If not set, it is considered as 0.
+
+=head2 C<busybird.original.id>
+
+The original ID of the status.
+You should set this field when you somehow convert status ID.
+
+ID conversion is necessary when you import statuses from multiple sources with their own ID spaces,
+and you want to avoid ID conflict between them.
+L<BusyBird::Filter::Twitter> does such conversion, for example.
+
+If this field is set, L<BusyBird> uses this field if necessary, e.g., when it builds permalink to the status.
+
+=head2 C<busybird.status_permalink>
+
+If set, this string is used for the permalink URL of the status.
+
+To further customize status permalinks, see C<status_permalink_builder> of L<BusyBird::Manual::Config>.
+
+=head2 C<busybird.user_permalink>
+
+B<Experimental>.
+
+If set, this string is used for the permalink URL for the user.
+
+
+=head2 C<created_at>
+
+The timestamp string at which the status is created.
+
+The timestamp string must be parsable by L<BusyBird::DateTime::Format>.
+
+To customize the way L<BusyBird> renders this timestamp,
+see C<time_zone>, C<time_format>, C<time_locale> of L<BusyBird::Manual::Config>.
+
+=head2 C<entities>
+
+Object containing L<Twitter Entities|https://dev.twitter.com/docs/platform-objects/entities>.
+
+Twitter Entities are objects annotating the status text.
+Currently L<BusyBird> reads the following fields to create hyperlinks in the text.
+
+=over
+
+=item *
+
+C<entities.hashtags>
+
+=item *
+
+C<entities.media>
+
+=item *
+
+C<entities.urls>
+
+=item *
+
+C<entities.user_mentions>
+
+=back
+
+To customize the way it renders those hyperlinks and annotated texts,
+see C<*_entitiy_url_builder> and C<*_entity_text_builder> of L<BusyBird::Manual::Config>.
+
+In addition to annotating the text, L<BusyBird> renders images specified in C<entities.media>.
+
+=head2 C<extended_entities.media>
+
+Twitter embeds additional media entities under C<extended_entities.media> field.
+The structure of this field is basically the same as C<entities.media>.
+
+L<BusyBird> renders images specified C<extended_entities.media> field, too.
+
+=head2 C<id>
+
+ID of the status. ID may be an arbitrary string.
+
+Status ID must be unique in a timeline.
+If you try to input a status whose ID already exists in the timeline, the input status is ignored.
+
+=head2 C<retweeted_status>
+
+Nested status object that is the original retweeted status.
+
+If this field is set, L<BusyBird> considers the status containing this field is a retweet.
+It then renders the status in C<retweeted_status> field and who retweeted this.
+
+=head2 C<text>
+
+Status text string. The body of the status.
+
+=head2 C<user.profile_image_url>
+
+URL string of the icon image of the person who created this status.
+
+=head2 C<user.screen_name>
+
+Name of the person who created this status.
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+=cut
+

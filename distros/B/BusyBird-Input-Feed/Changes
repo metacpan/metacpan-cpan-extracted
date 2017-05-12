@@ -1,0 +1,23 @@
+Revision history for BusyBird-Input-Feed
+
+0.05    2014-09-15
+        - Fix documentation. No changes to the code.
+
+0.04    2014-09-15
+        [ENHANCEMENT]
+        - Now it extracts image URLs from feed items.
+          "image_max_num" option controls this behavior.
+        - busybird_input_feed executable now has --level option.
+
+0.03    2014-08-17
+        [PACKAGING]
+        - migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.02    2014-07-28
+        [BUG FIX]
+        - Fix -p option of busybird_input_feed.
+          It did not take the argument, silly.
+
+0.01    2014-07-28
+        First version, released on an unsuspecting world.
+

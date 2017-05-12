@@ -1,0 +1,103 @@
+[%#
+    Produces a single quick edit table.
+    Parameters:
+
+        table_ident - the table which owns all the fields
+        fields      - array of fields for this table
+
+        view.data needs at least these keys (like do_main provides):
+
+            statements
+%]
+  <fieldset>
+    <legend>Field Quick Edit</legend>
+  <table class='bordered' >
+    <tr>
+        <th> Column Name </th>
+      [% FOREACH statement IN view.data.statements.field.statements %]
+      [% IF statement.quick_label %]
+        <th>
+            [% statement.quick_label %]
+            <br />
+            [% n_of_fields     = 0
+               n_of_set_fields = 0 %]
+            [% IF statement.type == 'boolean' %]
+                [%# count the checked boxes %]
+                [% FOREACH field IN fields %]
+                  [% NEXT UNLESS field.type == 'field' %]
+                  [% NEXT IF     field.name == 'id'    %]
+                  [% n_of_fields = n_of_fields + 1 %]
+                  [% IF field.statements.${statement.keyword}.get_first_arg %]
+                    [% n_of_set_fields = n_of_set_fields + 1 %]
+                  [% END %] 
+                [% END %]
+            <input type='checkbox'
+                   name='quick_all_[% statement.keyword %]_[% table_ident %]'
+                   [% IF n_of_set_fields == n_of_fields %]
+                   checked='checked'
+                   [% END %]
+                   onchange='javascript:quick_all(
+                        "[% table_ident %]",
+                        "[% statement.keyword %]",
+                        this.checked
+                   )'
+            />
+            [% END %]
+        </th>
+      [% END %]
+      [% END %]
+    </tr >
+    [% FOREACH field IN fields %]
+      [% NEXT UNLESS field.type == 'field'     %]
+      [% NEXT IF field.name == 'id' %]
+    <tr id='quick_row::[% field.ident %]'>
+      <td>
+        <input type='text' id='field_name_quick::[% field.ident %]'
+               value='[% field.name %]'
+               onblur='javascript:update_tree(
+                    "name",
+                    "field::[% field.ident %]",
+                    this.value
+               )'
+        />
+      </td>
+      [% FOREACH statement IN view.data.statements.field.statements %]
+        [% IF statement.quick_label %]
+      <td style='text-align: center' >
+          [% IF statement.type == 'boolean' %]
+        <input type='checkbox'
+               id='quick_[% statement.keyword %]_[% field.ident %]'
+               value='[% field.statements.${statement.keyword}.get_first_arg %]'
+               [% IF field.statements.${statement.keyword}.get_first_arg %]
+               checked='checked'
+               [% END %]
+               onchange='javascript:update_tree(
+                    "field_statement_bool",
+                    "[% field.ident %]::[% statement.keyword %]",
+                    this.checked,
+                    "",
+                    "quick_edit"
+               )'
+        />
+          [% ELSE %]
+        <input type='text'
+               id='quick_[% statement.keyword %]_[% field.ident %]'
+               value='[% field.statements.${statement.keyword}.get_first_arg %]'
+               onblur='javascript:update_tree(
+                    "field_statement_text",
+                    "[% field.ident %]::[% statement.keyword %]",
+                    this.value,
+                    "",
+                    "quick_edit"
+               )'
+        />
+          [% END %]
+      </td>
+        [% END %]
+      [% END %]
+    </tr>
+    [% END %]
+  </table>
+  <br />
+  <button type='button' > Apply Quick Edit </button>
+  </fieldset>

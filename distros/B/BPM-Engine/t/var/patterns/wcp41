@@ -1,0 +1,30 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp41" Name="WCP41+42: Thread Split and Merge">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description></Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A" StartQuantity="2">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="B" Name="B" CompletionQuantity="2">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" Name="Transition" From="A" To="B" Quantity="2"/>
+            </Transitions>
+        </WorkflowProcess>
+
+        
+
+

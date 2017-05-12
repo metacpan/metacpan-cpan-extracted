@@ -1,0 +1,6 @@
+Revision history for Perl extension Bio::Tools::DNAGen.
+
+0.01  Fri Apr  4 22:03:54 2003
+	- original version; created by h2xs 1.21 with options
+		-A Bio::Tools::DNAGen
+

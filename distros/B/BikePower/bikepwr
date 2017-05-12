@@ -1,0 +1,130 @@
+#!/usr/local/bin/perl
+# -*- perl -*-
+
+#
+# $Id: bikepwr,v 1.3 1998/05/22 19:03:06 eserte Exp $
+# Author: Slaven Rezic
+#
+# Copyright (C) 1997 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: eserte@cs.tu-berlin.de
+# WWW:  http://user.cs.tu-berlin.de/~eserte/
+#
+
+use BikePower;
+use Getopt::Long;
+
+Getopt::Long::config('no_ignore_case');
+$ini = 1;
+if (!GetOptions
+    (
+     'help|H|h'        => \$help,
+     'output|O'        => \$output_expl,
+     'power|P=f'       => \$power,
+     'consumption|C=f' => \$consumption,
+     'parameters|D!'   => \$parameters,
+     'imperial|I!'     => \$imperial,
+     'A1|A=f'          => \$A1,
+     'A2|a=f'          => \$A2,
+     'Ac|ac=f'         => \$A_c,
+     'basal|b=f'       => \$BM,
+     'humaneff|ec=f'   => \$ec,
+     'driveeff|ed=f'   => \$ed,
+     'grade|g=f'       => \$g,
+     'incr|i=f'        => \$i,
+     'entries|n=i'     => \$n,
+     'rollfric|r=f'    => \$r,
+     'temp|t=f'        => \$t,
+     'velocity|vm=f'   => \$vm,
+     'wind|vw=f'       => \$vw,
+     'crosswind|vwc!'  => \$vwc,
+     'weight|wc=f'     => \$wc,
+     'bikeweight|wm=f' => \$wm,
+     'ini!'            => \$ini,
+    )) { $help++ }
+
+if ($help) {
+    print <<EOF;
+bike_pwr [options]
+    -h = display this message
+    -O = explanation of output table headings
+    -P = power in Watts (program solves for velocity)
+    -C = consumption in Calories/hour (program solves for velocity)
+    +D = prints display of the parameters.
+    -I = English units (velocity in mph, weight and force in lb)
+    -A = linear coefficient of air resistance (A1).
+    -a = quadratic coefficient of air resistance (A2).
+    -b = basal metabolism rate [Watts per kg]
+   -ec = efficieny of the human cycling
+   -ed = efficency of the bicycle drivetrain
+    -g = grade of hill = vertical_rise / odometer_distance
+    -i = increment in output table
+    -n = number of entries in output table
+    -r = coefficient of rolling friction
+    -t = Temp of the air
+   -vm = first velocity in output table
+   -vw = velocity of the wind (- for tail, otherwise for headwind, ).
+  -vwc = the wind given is a cross wind.
+   -wc = weight of cyclist
+   -wm = weight of machine and clothing
+-noini = prevent loading of ini file
+
+EOF
+    exit 0;
+}
+
+my $bp = new BikePower
+  ((!$ini ? ('-no-ini' => 1) : ()),
+   'imperial'    => $imperial,
+   'A1'          => $A1,
+   'A2'          => $A2,
+   'A_c'         => $A_c,
+   'BM_rate'     => $BM,
+   'E'           => $ec,
+   'T'           => $ed,
+   'G'           => $g,
+   'V_incr'      => $i,
+   'P_incr'      => $i,
+   'C_incr'      => $i,
+   'N_entry'     => $n,
+   'R'           => $r,
+   'T_a'         => $t,
+   'first_V'     => $vm,
+   'H'           => (defined $vw ? $vw*$BikePower::m_s__per__km_h : undef),
+   'cross_wind'  => $vwc,
+   'Wc'          => $wc,
+   'Wm'          => $wm,
+   'first_P'     => $power,
+   'first_C'     => $consumption,
+   'given'       => ($power ? 'P' : $consumption ? 'C' : 'v'),
+  );
+
+if ($output_expl) {
+    print <<EOF;
+kph    = velocity [kilometers per hour].
+mph    = velocity [miles per hour].
+F_kg   = total force resisting forward motion [kilograms].
+F_lb   = total force resisting forward motion [lb = pounds].
+P_a    = power output to overcome air resistance [Watts].
+P_r    = power output to overcome rolling friction [Watts].
+P_g    = power output to climb grade [Watts].
+P_t    = power loss due to drivetrain inefficiency [Watts].
+P      = P_a + P_r + P_g = total power output [Watts].
+hp     = total power output [horsepower].
+heat   = C - (P + BM) = power wasted due to human inefficiency [Watts].
+BM     = basal metabolism [Watts].
+C      = total power consumption [Watts].
+kJ/hr  = total power consumption [kilo-Joules per hour].
+Cal/hr = total power consumption [dietary Calories per hour].
+
+EOF
+}
+
+if ($parameters) {
+    $bp->display_parameters();
+}
+$bp->output;
+
+exit 0;

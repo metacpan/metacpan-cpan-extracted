@@ -1,0 +1,51 @@
+NAME
+    Bundle::Pgreet - A bundle to install all required Perl modules for
+    Penguin Greetings
+
+SYNOPSIS
+    "perl -MCPAN -e 'install Bundle::Pgreet'"
+
+CONTENTS
+    Apache::Htpasswd - For ecard website access control
+
+    CGI - Included in 5.8.0, but perhaps not latest version
+
+    CGI::Carp - ditto
+
+    CGI::SpeedyCGI - SpeedyCGI interface
+
+    Config::General - Configuration file access modules
+
+    Date::Pcalc - To test if ecard send date is reasonable
+
+    Digest::MD5 - To compute unique IDs for state/data file names
+
+    Embperl - Embed Perl into HTML
+
+    Log::Dispatch - Syslog and other logging facilities.
+
+    MIME::Lite - For creating Multipart MIME email
+
+    String::Checker - Tools to compare CGI fields to expectations
+
+    I18N::AcceptLanguage - Module for internationalization support
+
+DESCRIPTION
+    This bundle will install all the Perl modules needed by the Penguin
+    Greetings (pgreet) web-based ecard application. For more information on
+    Penguin Greetings visit the SourceForge website at:
+    http://pgreet.sourceforce.net/
+
+COPYRIGHT
+    Copyright (c) 2003-2005 Edouard Lagache
+
+    This software is released under the GNU General Public License, Version
+    2. For more information, see the COPYING file included with this
+    software or visit: http://www.gnu.org/copyleft/gpl.html
+
+AUTHOR
+    Edouard Lagache <pgreetdev@canebas.org>
+
+VERSION
+    1.0.0
+

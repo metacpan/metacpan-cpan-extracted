@@ -1,0 +1,15 @@
+=head1 USE
+
+C<PerlBlock> literals dump output into the Perl block in
+C<docs/httpd.conf> files, which are used for mod_perl deployment.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Look for C<Exotic::Module> in docs/httpd.conf.
+
+See how the example so cleverly controls indentation so readers never
+have to know the output was generated?

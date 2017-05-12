@@ -1,0 +1,8 @@
+Revision history for Bio-Tools-Run-Qcons
+
+0.112881  2011-10-15 18:38:58 America/Argentina/Buenos_Aires
+    - Prefer core module IPC::Cmd over File::Which (Chad Davis)
+    - Minor doc fixes
+
+0.112880  2011-10-15 14:23:40 America/Argentina/Buenos_Aires
+    - Initial release to CPAN

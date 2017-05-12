@@ -1,0 +1,16 @@
+sudo: false
+
+language: perl
+
+perl:
+    - "5.22"
+    - "5.20"
+    - "5.18"
+    - "5.16"
+    - "5.14"
+    - "5.12"
+    - "5.10"
+
+install:
+    - cpanm Module::Install::Repository Module::Install::AuthorTests
+    - PERL_MM_USE_DEFAULT=1 cpanm --installdeps .

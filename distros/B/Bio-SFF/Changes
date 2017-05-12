@@ -1,0 +1,28 @@
+Revision history for Bio-SFF
+
+0.007     2013-07-25 15:59:50 Europe/Amsterdam
+          Fixed various precedence issues
+
+0.006     2013-04-02 13:10:27 Europe/Amsterdam
+          Made compatible recent Moo/Method::Generate::Accessor
+
+0.005     2012-04-13 12:05:11 Europe/Amsterdam
+          use FileHandle instead of IO::Handle, for perl<5.12 compatibility
+
+0.004     2011-12-20 14:36:50 Europe/Amsterdam
+          Explicitly load IO::File for perl<5.14 compatibility
+
+0.003     2011-12-19 15:16:46 Europe/Amsterdam
+          Added support for indices
+          Restructured into a sequential and a random-access reader
+          Added unit tests
+          Added more examples
+          Fixed reset()
+          Rename number_of_flows to number_of_flows_per_read
+
+0.002     2011-11-30 15:11:36 Europe/Amsterdam
+          Made input checking for file argument more robust
+
+0.001     2011-11-18 16:59:00 Europe/Amsterdam
+          Initial release
+

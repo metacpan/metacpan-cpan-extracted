@@ -1,0 +1,9 @@
+classes:
+  - Service.web
+parameters:
+  doc:
+    service-web:
+      pkg:
+        - install web service Apache2
+  pkg:
+    - apache2-mpm-worker

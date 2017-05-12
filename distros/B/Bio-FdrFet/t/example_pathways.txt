@@ -1,0 +1,1345 @@
+4677	GO:0006418 	 tRNA aminoacylation for protein translation 
+3735	GO:0006418 	 tRNA aminoacylation for protein translation 
+7453	GO:0006418 	 tRNA aminoacylation for protein translation 
+6301	GO:0006418 	 tRNA aminoacylation for protein translation 
+2058	GO:0006418 	 tRNA aminoacylation for protein translation 
+6897	GO:0006418 	 tRNA aminoacylation for protein translation 
+5917	GO:0006418 	 tRNA aminoacylation for protein translation 
+4141	GO:0006418 	 tRNA aminoacylation for protein translation 
+1615	GO:0006418 	 tRNA aminoacylation for protein translation 
+7407	GO:0006418 	 tRNA aminoacylation for protein translation 
+3035	GO:0006418 	 tRNA aminoacylation for protein translation 
+2193	GO:0006418 	 tRNA aminoacylation for protein translation 
+833	GO:0006418 	 tRNA aminoacylation for protein translation 
+9255	GO:0006418 	 tRNA aminoacylation for protein translation 
+2968	GO:0006418 	 tRNA aminoacylation for protein translation 
+23395	GO:0006418 	 tRNA aminoacylation for protein translation 
+10667	GO:0006418 	 tRNA aminoacylation for protein translation 
+3376	GO:0006418 	 tRNA aminoacylation for protein translation 
+#N/A	GO:0006418 	 tRNA aminoacylation for protein translation 
+2617	GO:0006418 	 tRNA aminoacylation for protein translation 
+23438	GO:0006418 	 tRNA aminoacylation for protein translation 
+8565	GO:0006418 	 tRNA aminoacylation for protein translation 
+51520	GO:0006418 	 tRNA aminoacylation for protein translation 
+5859	GO:0006418 	 tRNA aminoacylation for protein translation 
+55699	GO:0006418 	 tRNA aminoacylation for protein translation 
+79587	GO:0006418 	 tRNA aminoacylation for protein translation 
+55157	GO:0006418 	 tRNA aminoacylation for protein translation 
+51067	GO:0006418 	 tRNA aminoacylation for protein translation 
+54938	GO:0006418 	 tRNA aminoacylation for protein translation 
+10352	GO:0006418 	 tRNA aminoacylation for protein translation 
+55152	GO:0006418 	 tRNA aminoacylation for protein translation 
+79731	GO:0006418 	 tRNA aminoacylation for protein translation 
+80222	GO:0006418 	 tRNA aminoacylation for protein translation 
+54976	GO:0006418 	 tRNA aminoacylation for protein translation 
+4677	GO:0004812 	 aminoacyl-tRNA ligase activity 
+3735	GO:0004812 	 aminoacyl-tRNA ligase activity 
+7453	GO:0004812 	 aminoacyl-tRNA ligase activity 
+6301	GO:0004812 	 aminoacyl-tRNA ligase activity 
+2058	GO:0004812 	 aminoacyl-tRNA ligase activity 
+16	GO:0004812 	 aminoacyl-tRNA ligase activity 
+6897	GO:0004812 	 aminoacyl-tRNA ligase activity 
+5917	GO:0004812 	 aminoacyl-tRNA ligase activity 
+4141	GO:0004812 	 aminoacyl-tRNA ligase activity 
+1615	GO:0004812 	 aminoacyl-tRNA ligase activity 
+7407	GO:0004812 	 aminoacyl-tRNA ligase activity 
+3035	GO:0004812 	 aminoacyl-tRNA ligase activity 
+2193	GO:0004812 	 aminoacyl-tRNA ligase activity 
+833	GO:0004812 	 aminoacyl-tRNA ligase activity 
+2968	GO:0004812 	 aminoacyl-tRNA ligase activity 
+23395	GO:0004812 	 aminoacyl-tRNA ligase activity 
+10667	GO:0004812 	 aminoacyl-tRNA ligase activity 
+3376	GO:0004812 	 aminoacyl-tRNA ligase activity 
+11232	GO:0004812 	 aminoacyl-tRNA ligase activity 
+#N/A	GO:0004812 	 aminoacyl-tRNA ligase activity 
+2617	GO:0004812 	 aminoacyl-tRNA ligase activity 
+23438	GO:0004812 	 aminoacyl-tRNA ligase activity 
+8565	GO:0004812 	 aminoacyl-tRNA ligase activity 
+51520	GO:0004812 	 aminoacyl-tRNA ligase activity 
+5859	GO:0004812 	 aminoacyl-tRNA ligase activity 
+55699	GO:0004812 	 aminoacyl-tRNA ligase activity 
+79587	GO:0004812 	 aminoacyl-tRNA ligase activity 
+55157	GO:0004812 	 aminoacyl-tRNA ligase activity 
+51067	GO:0004812 	 aminoacyl-tRNA ligase activity 
+54938	GO:0004812 	 aminoacyl-tRNA ligase activity 
+10352	GO:0004812 	 aminoacyl-tRNA ligase activity 
+55152	GO:0004812 	 aminoacyl-tRNA ligase activity 
+79731	GO:0004812 	 aminoacyl-tRNA ligase activity 
+80222	GO:0004812 	 aminoacyl-tRNA ligase activity 
+80755	GO:0004812 	 aminoacyl-tRNA ligase activity 
+54976	GO:0004812 	 aminoacyl-tRNA ligase activity 
+1571	GO:0005783 	 endoplasmic reticulum 
+1548	GO:0005783 	 endoplasmic reticulum 
+5337	GO:0005783 	 endoplasmic reticulum 
+23399	GO:0005783 	 endoplasmic reticulum 
+821	GO:0005783 	 endoplasmic reticulum 
+7184	GO:0005783 	 endoplasmic reticulum 
+9761	GO:0005783 	 endoplasmic reticulum 
+389168	GO:0005783 	 endoplasmic reticulum 
+6418	GO:0005783 	 endoplasmic reticulum 
+6746	GO:0005783 	 endoplasmic reticulum 
+5034	GO:0005783 	 endoplasmic reticulum 
+5476	GO:0005783 	 endoplasmic reticulum 
+11014	GO:0005783 	 endoplasmic reticulum 
+5589	GO:0005783 	 endoplasmic reticulum 
+6134	GO:0005783 	 endoplasmic reticulum 
+284393	GO:0005783 	 endoplasmic reticulum 
+7803	GO:0005783 	 endoplasmic reticulum 
+813	GO:0005783 	 endoplasmic reticulum 
+10550	GO:0005783 	 endoplasmic reticulum 
+3915	GO:0005783 	 endoplasmic reticulum 
+3303	GO:0005783 	 endoplasmic reticulum 
+7009	GO:0005783 	 endoplasmic reticulum 
+10960	GO:0005783 	 endoplasmic reticulum 
+10525	GO:0005783 	 endoplasmic reticulum 
+5351	GO:0005783 	 endoplasmic reticulum 
+6319	GO:0005783 	 endoplasmic reticulum 
+10134	GO:0005783 	 endoplasmic reticulum 
+10768	GO:0005783 	 endoplasmic reticulum 
+1718	GO:0005783 	 endoplasmic reticulum 
+6745	GO:0005783 	 endoplasmic reticulum 
+9403	GO:0005783 	 endoplasmic reticulum 
+3895	GO:0005783 	 endoplasmic reticulum 
+6734	GO:0005783 	 endoplasmic reticulum 
+10945	GO:0005783 	 endoplasmic reticulum 
+811	GO:0005783 	 endoplasmic reticulum 
+22872	GO:0005783 	 endoplasmic reticulum 
+6386	GO:0005783 	 endoplasmic reticulum 
+5479	GO:0005783 	 endoplasmic reticulum 
+27230	GO:0005783 	 endoplasmic reticulum 
+10970	GO:0005783 	 endoplasmic reticulum 
+387522	GO:0005783 	 endoplasmic reticulum 
+6748	GO:0005783 	 endoplasmic reticulum 
+6184	GO:0005783 	 endoplasmic reticulum 
+440272	GO:0005783 	 endoplasmic reticulum 
+723972	GO:0005783 	 endoplasmic reticulum 
+23646	GO:0005783 	 endoplasmic reticulum 
+23519	GO:0005783 	 endoplasmic reticulum 
+5954	GO:0005783 	 endoplasmic reticulum 
+8396	GO:0005783 	 endoplasmic reticulum 
+10857	GO:0005783 	 endoplasmic reticulum 
+9867	GO:0005783 	 endoplasmic reticulum 
+5355	GO:0005783 	 endoplasmic reticulum 
+10456	GO:0005783 	 endoplasmic reticulum 
+4043	GO:0005783 	 endoplasmic reticulum 
+3710	GO:0005783 	 endoplasmic reticulum 
+6238	GO:0005783 	 endoplasmic reticulum 
+10961	GO:0005783 	 endoplasmic reticulum 
+4714	GO:0005783 	 endoplasmic reticulum 
+653566	GO:0005783 	 endoplasmic reticulum 
+6721	GO:0005783 	 endoplasmic reticulum 
+10423	GO:0005783 	 endoplasmic reticulum 
+23478	GO:0005783 	 endoplasmic reticulum 
+5621	GO:0005783 	 endoplasmic reticulum 
+79073	GO:0005783 	 endoplasmic reticulum 
+23471	GO:0005783 	 endoplasmic reticulum 
+4259	GO:0005783 	 endoplasmic reticulum 
+5955	GO:0005783 	 endoplasmic reticulum 
+10598	GO:0005783 	 endoplasmic reticulum 
+56681	GO:0005783 	 endoplasmic reticulum 
+22883	GO:0005783 	 endoplasmic reticulum 
+10483	GO:0005783 	 endoplasmic reticulum 
+23463	GO:0005783 	 endoplasmic reticulum 
+8733	GO:0005783 	 endoplasmic reticulum 
+8720	GO:0005783 	 endoplasmic reticulum 
+3638	GO:0005783 	 endoplasmic reticulum 
+3460	GO:0005783 	 endoplasmic reticulum 
+10175	GO:0005783 	 endoplasmic reticulum 
+2181	GO:0005783 	 endoplasmic reticulum 
+7163	GO:0005783 	 endoplasmic reticulum 
+10280	GO:0005783 	 endoplasmic reticulum 
+10299	GO:0005783 	 endoplasmic reticulum 
+6446	GO:0005783 	 endoplasmic reticulum 
+7157	GO:0005783 	 endoplasmic reticulum 
+4725	GO:0005783 	 endoplasmic reticulum 
+79022	GO:0005783 	 endoplasmic reticulum 
+1717	GO:0005783 	 endoplasmic reticulum 
+79888	GO:0005783 	 endoplasmic reticulum 
+1727	GO:0005783 	 endoplasmic reticulum 
+1634	GO:0005783 	 endoplasmic reticulum 
+11231	GO:0005783 	 endoplasmic reticulum 
+10519	GO:0005783 	 endoplasmic reticulum 
+2180	GO:0005783 	 endoplasmic reticulum 
+1956	GO:0005783 	 endoplasmic reticulum 
+2131	GO:0005783 	 endoplasmic reticulum 
+2132	GO:0005783 	 endoplasmic reticulum 
+23645	GO:0005783 	 endoplasmic reticulum 
+2052	GO:0005783 	 endoplasmic reticulum 
+224	GO:0005783 	 endoplasmic reticulum 
+6400	GO:0005783 	 endoplasmic reticulum 
+25800	GO:0005783 	 endoplasmic reticulum 
+7450	GO:0005783 	 endoplasmic reticulum 
+8985	GO:0005783 	 endoplasmic reticulum 
+50999	GO:0005783 	 endoplasmic reticulum 
+267	GO:0005783 	 endoplasmic reticulum 
+9415	GO:0005783 	 endoplasmic reticulum 
+3703	GO:0005783 	 endoplasmic reticulum 
+10523	GO:0005783 	 endoplasmic reticulum 
+10558	GO:0005783 	 endoplasmic reticulum 
+3028	GO:0005783 	 endoplasmic reticulum 
+4256	GO:0005783 	 endoplasmic reticulum 
+22862	GO:0005783 	 endoplasmic reticulum 
+6890	GO:0005783 	 endoplasmic reticulum 
+6720	GO:0005783 	 endoplasmic reticulum 
+1595	GO:0005783 	 endoplasmic reticulum 
+1861	GO:0005783 	 endoplasmic reticulum 
+9632	GO:0005783 	 endoplasmic reticulum 
+9871	GO:0005783 	 endoplasmic reticulum 
+6722	GO:0005783 	 endoplasmic reticulum 
+9817	GO:0005783 	 endoplasmic reticulum 
+10897	GO:0005783 	 endoplasmic reticulum 
+2531	GO:0005783 	 endoplasmic reticulum 
+2182	GO:0005783 	 endoplasmic reticulum 
+10237	GO:0005783 	 endoplasmic reticulum 
+1545	GO:0005783 	 endoplasmic reticulum 
+3423	GO:0005783 	 endoplasmic reticulum 
+10613	GO:0005783 	 endoplasmic reticulum 
+1739	GO:0005783 	 endoplasmic reticulum 
+3156	GO:0005783 	 endoplasmic reticulum 
+9217	GO:0005783 	 endoplasmic reticulum 
+6782	GO:0005783 	 endoplasmic reticulum 
+11161	GO:0005783 	 endoplasmic reticulum 
+3304	GO:0005783 	 endoplasmic reticulum 
+5352	GO:0005783 	 endoplasmic reticulum 
+9926	GO:0005783 	 endoplasmic reticulum 
+3709	GO:0005783 	 endoplasmic reticulum 
+8813	GO:0005783 	 endoplasmic reticulum 
+4864	GO:0005783 	 endoplasmic reticulum 
+10282	GO:0005783 	 endoplasmic reticulum 
+5770	GO:0005783 	 endoplasmic reticulum 
+3459	GO:0005783 	 endoplasmic reticulum 
+8974	GO:0005783 	 endoplasmic reticulum 
+10682	GO:0005783 	 endoplasmic reticulum 
+6786	GO:0005783 	 endoplasmic reticulum 
+9780	GO:0005783 	 endoplasmic reticulum 
+51763	GO:0005783 	 endoplasmic reticulum 
+10162	GO:0005783 	 endoplasmic reticulum 
+22908	GO:0005783 	 endoplasmic reticulum 
+10427	GO:0005783 	 endoplasmic reticulum 
+6845	GO:0005783 	 endoplasmic reticulum 
+2542	GO:0005783 	 endoplasmic reticulum 
+4189	GO:0005783 	 endoplasmic reticulum 
+5279	GO:0005783 	 endoplasmic reticulum 
+10330	GO:0005783 	 endoplasmic reticulum 
+54788	GO:0005783 	 endoplasmic reticulum 
+4938	GO:0005783 	 endoplasmic reticulum 
+7466	GO:0005783 	 endoplasmic reticulum 
+9852	GO:0005783 	 endoplasmic reticulum 
+10269	GO:0005783 	 endoplasmic reticulum 
+857	GO:0005783 	 endoplasmic reticulum 
+9900	GO:0005783 	 endoplasmic reticulum 
+7869	GO:0005783 	 endoplasmic reticulum 
+27429	GO:0005783 	 endoplasmic reticulum 
+10059	GO:0005783 	 endoplasmic reticulum 
+9052	GO:0005783 	 endoplasmic reticulum 
+9517	GO:0005783 	 endoplasmic reticulum 
+10952	GO:0005783 	 endoplasmic reticulum 
+9197	GO:0005783 	 endoplasmic reticulum 
+1388	GO:0005783 	 endoplasmic reticulum 
+9695	GO:0005783 	 endoplasmic reticulum 
+3998	GO:0005783 	 endoplasmic reticulum 
+729030	GO:0005783 	 endoplasmic reticulum 
+6811	GO:0005783 	 endoplasmic reticulum 
+22920	GO:0005783 	 endoplasmic reticulum 
+2286	GO:0005783 	 endoplasmic reticulum 
+8624	GO:0005783 	 endoplasmic reticulum 
+10016	GO:0005783 	 endoplasmic reticulum 
+9743	GO:0005783 	 endoplasmic reticulum 
+5663	GO:0005783 	 endoplasmic reticulum 
+1588	GO:0005783 	 endoplasmic reticulum 
+7162	GO:0005783 	 endoplasmic reticulum 
+23480	GO:0005783 	 endoplasmic reticulum 
+6252	GO:0005783 	 endoplasmic reticulum 
+27095	GO:0005783 	 endoplasmic reticulum 
+819	GO:0005783 	 endoplasmic reticulum 
+79053	GO:0005783 	 endoplasmic reticulum 
+9694	GO:0005783 	 endoplasmic reticulum 
+5320	GO:0005783 	 endoplasmic reticulum 
+3162	GO:0005783 	 endoplasmic reticulum 
+8694	GO:0005783 	 endoplasmic reticulum 
+4925	GO:0005783 	 endoplasmic reticulum 
+596	GO:0005783 	 endoplasmic reticulum 
+3708	GO:0005783 	 endoplasmic reticulum 
+9933	GO:0005783 	 endoplasmic reticulum 
+10908	GO:0005783 	 endoplasmic reticulum 
+412	GO:0005783 	 endoplasmic reticulum 
+9600	GO:0005783 	 endoplasmic reticulum 
+7428	GO:0005783 	 endoplasmic reticulum 
+10954	GO:0005783 	 endoplasmic reticulum 
+23011	GO:0005783 	 endoplasmic reticulum 
+1774	GO:0005783 	 endoplasmic reticulum 
+22846	GO:0005783 	 endoplasmic reticulum 
+22926	GO:0005783 	 endoplasmic reticulum 
+11015	GO:0005783 	 endoplasmic reticulum 
+8459	GO:0005783 	 endoplasmic reticulum 
+1203	GO:0005783 	 endoplasmic reticulum 
+3291	GO:0005783 	 endoplasmic reticulum 
+4258	GO:0005783 	 endoplasmic reticulum 
+6253	GO:0005783 	 endoplasmic reticulum 
+27067	GO:0005783 	 endoplasmic reticulum 
+79071	GO:0005783 	 endoplasmic reticulum 
+3995	GO:0005783 	 endoplasmic reticulum 
+5664	GO:0005783 	 endoplasmic reticulum 
+9088	GO:0005783 	 endoplasmic reticulum 
+11322	GO:0005783 	 endoplasmic reticulum 
+10484	GO:0005783 	 endoplasmic reticulum 
+9746	GO:0005783 	 endoplasmic reticulum 
+341	GO:0005783 	 endoplasmic reticulum 
+5287	GO:0005783 	 endoplasmic reticulum 
+22845	GO:0005783 	 endoplasmic reticulum 
+3283	GO:0005783 	 endoplasmic reticulum 
+54575	GO:0005783 	 endoplasmic reticulum 
+9619	GO:0005783 	 endoplasmic reticulum 
+4033	GO:0005783 	 endoplasmic reticulum 
+6715	GO:0005783 	 endoplasmic reticulum 
+491	GO:0005783 	 endoplasmic reticulum 
+9482	GO:0005783 	 endoplasmic reticulum 
+4690	GO:0005783 	 endoplasmic reticulum 
+5653	GO:0005783 	 endoplasmic reticulum 
+5743	GO:0005783 	 endoplasmic reticulum 
+6891	GO:0005783 	 endoplasmic reticulum 
+4118	GO:0005783 	 endoplasmic reticulum 
+9183	GO:0005783 	 endoplasmic reticulum 
+10536	GO:0005783 	 endoplasmic reticulum 
+7357	GO:0005783 	 endoplasmic reticulum 
+662	GO:0005783 	 endoplasmic reticulum 
+4939	GO:0005783 	 endoplasmic reticulum 
+79090	GO:0005783 	 endoplasmic reticulum 
+2781	GO:0005783 	 endoplasmic reticulum 
+1573	GO:0005783 	 endoplasmic reticulum 
+5281	GO:0005783 	 endoplasmic reticulum 
+55973	GO:0005783 	 endoplasmic reticulum 
+9883	GO:0005783 	 endoplasmic reticulum 
+338	GO:0005783 	 endoplasmic reticulum 
+7444	GO:0005783 	 endoplasmic reticulum 
+5742	GO:0005783 	 endoplasmic reticulum 
+11005	GO:0005783 	 endoplasmic reticulum 
+538	GO:0005783 	 endoplasmic reticulum 
+5110	GO:0005783 	 endoplasmic reticulum 
+7957	GO:0005783 	 endoplasmic reticulum 
+4306	GO:0005783 	 endoplasmic reticulum 
+5277	GO:0005783 	 endoplasmic reticulum 
+9986	GO:0005783 	 endoplasmic reticulum 
+10675	GO:0005783 	 endoplasmic reticulum 
+2677	GO:0005783 	 endoplasmic reticulum 
+3290	GO:0005783 	 endoplasmic reticulum 
+590	GO:0005783 	 endoplasmic reticulum 
+487	GO:0005783 	 endoplasmic reticulum 
+9488	GO:0005783 	 endoplasmic reticulum 
+1586	GO:0005783 	 endoplasmic reticulum 
+79868	GO:0005783 	 endoplasmic reticulum 
+10125	GO:0005783 	 endoplasmic reticulum 
+10439	GO:0005783 	 endoplasmic reticulum 
+218	GO:0005783 	 endoplasmic reticulum 
+2326	GO:0005783 	 endoplasmic reticulum 
+4547	GO:0005783 	 endoplasmic reticulum 
+8630	GO:0005783 	 endoplasmic reticulum 
+1040	GO:0005783 	 endoplasmic reticulum 
+4036	GO:0005783 	 endoplasmic reticulum 
+1543	GO:0005783 	 endoplasmic reticulum 
+957	GO:0005783 	 endoplasmic reticulum 
+1577	GO:0005783 	 endoplasmic reticulum 
+11001	GO:0005783 	 endoplasmic reticulum 
+2330	GO:0005783 	 endoplasmic reticulum 
+1852	GO:0005783 	 endoplasmic reticulum 
+444	GO:0005783 	 endoplasmic reticulum 
+27233	GO:0005783 	 endoplasmic reticulum 
+1047	GO:0005783 	 endoplasmic reticulum 
+1384	GO:0005783 	 endoplasmic reticulum 
+9487	GO:0005783 	 endoplasmic reticulum 
+1056	GO:0005783 	 endoplasmic reticulum 
+338324	GO:0005783 	 endoplasmic reticulum 
+1551	GO:0005783 	 endoplasmic reticulum 
+13	GO:0005783 	 endoplasmic reticulum 
+1576	GO:0005783 	 endoplasmic reticulum 
+3242	GO:0005783 	 endoplasmic reticulum 
+7148	GO:0005783 	 endoplasmic reticulum 
+5298	GO:0005783 	 endoplasmic reticulum 
+57834	GO:0005783 	 endoplasmic reticulum 
+7555	GO:0005783 	 endoplasmic reticulum 
+2329	GO:0005783 	 endoplasmic reticulum 
+7098	GO:0005783 	 endoplasmic reticulum 
+3284	GO:0005783 	 endoplasmic reticulum 
+2134	GO:0005783 	 endoplasmic reticulum 
+288	GO:0005783 	 endoplasmic reticulum 
+10715	GO:0005783 	 endoplasmic reticulum 
+1592	GO:0005783 	 endoplasmic reticulum 
+1733	GO:0005783 	 endoplasmic reticulum 
+23205	GO:0005783 	 endoplasmic reticulum 
+8775	GO:0005783 	 endoplasmic reticulum 
+2328	GO:0005783 	 endoplasmic reticulum 
+7363	GO:0005783 	 endoplasmic reticulum 
+4051	GO:0005783 	 endoplasmic reticulum 
+66002	GO:0005783 	 endoplasmic reticulum 
+3818	GO:0005783 	 endoplasmic reticulum 
+64714	GO:0005783 	 endoplasmic reticulum 
+9468	GO:0005783 	 endoplasmic reticulum 
+8608	GO:0005783 	 endoplasmic reticulum 
+1554	GO:0005783 	 endoplasmic reticulum 
+7380	GO:0005783 	 endoplasmic reticulum 
+#N/A	GO:0005783 	 endoplasmic reticulum 
+398	GO:0005783 	 endoplasmic reticulum 
+9023	GO:0005783 	 endoplasmic reticulum 
+9563	GO:0005783 	 endoplasmic reticulum 
+6716	GO:0005783 	 endoplasmic reticulum 
+10317	GO:0005783 	 endoplasmic reticulum 
+2538	GO:0005783 	 endoplasmic reticulum 
+2081	GO:0005783 	 endoplasmic reticulum 
+48	GO:0005783 	 endoplasmic reticulum 
+1121	GO:0005783 	 endoplasmic reticulum 
+9370	GO:0005783 	 endoplasmic reticulum 
+7367	GO:0005783 	 endoplasmic reticulum 
+10786	GO:0005783 	 endoplasmic reticulum 
+6780	GO:0005783 	 endoplasmic reticulum 
+23457	GO:0005783 	 endoplasmic reticulum 
+4923	GO:0005783 	 endoplasmic reticulum 
+3601	GO:0005783 	 endoplasmic reticulum 
+9420	GO:0005783 	 endoplasmic reticulum 
+728160	GO:0005783 	 endoplasmic reticulum 
+10195	GO:0005783 	 endoplasmic reticulum 
+1581	GO:0005783 	 endoplasmic reticulum 
+1579	GO:0005783 	 endoplasmic reticulum 
+5046	GO:0005783 	 endoplasmic reticulum 
+8560	GO:0005783 	 endoplasmic reticulum 
+23275	GO:0005783 	 endoplasmic reticulum 
+80168	GO:0005783 	 endoplasmic reticulum 
+1564	GO:0005783 	 endoplasmic reticulum 
+623	GO:0005783 	 endoplasmic reticulum 
+489	GO:0005783 	 endoplasmic reticulum 
+5033	GO:0005783 	 endoplasmic reticulum 
+3140	GO:0005783 	 endoplasmic reticulum 
+1544	GO:0005783 	 endoplasmic reticulum 
+10400	GO:0005783 	 endoplasmic reticulum 
+3060	GO:0005783 	 endoplasmic reticulum 
+10130	GO:0005783 	 endoplasmic reticulum 
+871	GO:0005783 	 endoplasmic reticulum 
+1549	GO:0005783 	 endoplasmic reticulum 
+6683	GO:0005783 	 endoplasmic reticulum 
+64816	GO:0005783 	 endoplasmic reticulum 
+120227	GO:0005783 	 endoplasmic reticulum 
+5861	GO:0005783 	 endoplasmic reticulum 
+51754	GO:0005783 	 endoplasmic reticulum 
+1528	GO:0005783 	 endoplasmic reticulum 
+23155	GO:0005783 	 endoplasmic reticulum 
+150776	GO:0005783 	 endoplasmic reticulum 
+23544	GO:0005783 	 endoplasmic reticulum 
+1572	GO:0005783 	 endoplasmic reticulum 
+2741	GO:0005783 	 endoplasmic reticulum 
+4988	GO:0005783 	 endoplasmic reticulum 
+23491	GO:0005783 	 endoplasmic reticulum 
+81542	GO:0005783 	 endoplasmic reticulum 
+554	GO:0005783 	 endoplasmic reticulum 
+4121	GO:0005783 	 endoplasmic reticulum 
+10505	GO:0005783 	 endoplasmic reticulum 
+1562	GO:0005783 	 endoplasmic reticulum 
+5740	GO:0005783 	 endoplasmic reticulum 
+1558	GO:0005783 	 endoplasmic reticulum 
+56988	GO:0005783 	 endoplasmic reticulum 
+1553	GO:0005783 	 endoplasmic reticulum 
+9524	GO:0005783 	 endoplasmic reticulum 
+8879	GO:0005783 	 endoplasmic reticulum 
+5764	GO:0005783 	 endoplasmic reticulum 
+22800	GO:0005783 	 endoplasmic reticulum 
+581	GO:0005783 	 endoplasmic reticulum 
+5611	GO:0005783 	 endoplasmic reticulum 
+5140	GO:0005783 	 endoplasmic reticulum 
+7146	GO:0005783 	 endoplasmic reticulum 
+171423	GO:0005783 	 endoplasmic reticulum 
+2222	GO:0005783 	 endoplasmic reticulum 
+7415	GO:0005783 	 endoplasmic reticulum 
+9601	GO:0005783 	 endoplasmic reticulum 
+57515	GO:0005783 	 endoplasmic reticulum 
+1650	GO:0005783 	 endoplasmic reticulum 
+1314	GO:0005783 	 endoplasmic reticulum 
+6185	GO:0005783 	 endoplasmic reticulum 
+54499	GO:0005783 	 endoplasmic reticulum 
+5862	GO:0005783 	 endoplasmic reticulum 
+54732	GO:0005783 	 endoplasmic reticulum 
+23385	GO:0005783 	 endoplasmic reticulum 
+9218	GO:0005783 	 endoplasmic reticulum 
+116138	GO:0005783 	 endoplasmic reticulum 
+60481	GO:0005783 	 endoplasmic reticulum 
+284119	GO:0005783 	 endoplasmic reticulum 
+6892	GO:0005783 	 endoplasmic reticulum 
+7070	GO:0005783 	 endoplasmic reticulum 
+23710	GO:0005783 	 endoplasmic reticulum 
+26580	GO:0005783 	 endoplasmic reticulum 
+5447	GO:0005783 	 endoplasmic reticulum 
+7095	GO:0005783 	 endoplasmic reticulum 
+23071	GO:0005783 	 endoplasmic reticulum 
+3992	GO:0005783 	 endoplasmic reticulum 
+10492	GO:0005783 	 endoplasmic reticulum 
+10006	GO:0005783 	 endoplasmic reticulum 
+7327	GO:0005783 	 endoplasmic reticulum 
+123	GO:0005783 	 endoplasmic reticulum 
+6307	GO:0005783 	 endoplasmic reticulum 
+11196	GO:0005783 	 endoplasmic reticulum 
+488	GO:0005783 	 endoplasmic reticulum 
+2137	GO:0005783 	 endoplasmic reticulum 
+9554	GO:0005783 	 endoplasmic reticulum 
+6713	GO:0005783 	 endoplasmic reticulum 
+7991	GO:0005783 	 endoplasmic reticulum 
+10749	GO:0005783 	 endoplasmic reticulum 
+1201	GO:0005783 	 endoplasmic reticulum 
+50814	GO:0005783 	 endoplasmic reticulum 
+8818	GO:0005783 	 endoplasmic reticulum 
+51014	GO:0005783 	 endoplasmic reticulum 
+10488	GO:0005783 	 endoplasmic reticulum 
+2010	GO:0005783 	 endoplasmic reticulum 
+9374	GO:0005783 	 endoplasmic reticulum 
+23037	GO:0005783 	 endoplasmic reticulum 
+1798	GO:0005783 	 endoplasmic reticulum 
+11236	GO:0005783 	 endoplasmic reticulum 
+30844	GO:0005783 	 endoplasmic reticulum 
+2135	GO:0005783 	 endoplasmic reticulum 
+84272	GO:0005783 	 endoplasmic reticulum 
+51141	GO:0005783 	 endoplasmic reticulum 
+9562	GO:0005783 	 endoplasmic reticulum 
+27348	GO:0005783 	 endoplasmic reticulum 
+1066	GO:0005783 	 endoplasmic reticulum 
+972	GO:0005783 	 endoplasmic reticulum 
+5283	GO:0005783 	 endoplasmic reticulum 
+26190	GO:0005783 	 endoplasmic reticulum 
+2861	GO:0005783 	 endoplasmic reticulum 
+8824	GO:0005783 	 endoplasmic reticulum 
+51752	GO:0005783 	 endoplasmic reticulum 
+10026	GO:0005783 	 endoplasmic reticulum 
+26002	GO:0005783 	 endoplasmic reticulum 
+23169	GO:0005783 	 endoplasmic reticulum 
+49855	GO:0005783 	 endoplasmic reticulum 
+10597	GO:0005783 	 endoplasmic reticulum 
+57157	GO:0005783 	 endoplasmic reticulum 
+2890	GO:0005783 	 endoplasmic reticulum 
+23127	GO:0005783 	 endoplasmic reticulum 
+25956	GO:0005783 	 endoplasmic reticulum 
+8115	GO:0005783 	 endoplasmic reticulum 
+84720	GO:0005783 	 endoplasmic reticulum 
+328	GO:0005783 	 endoplasmic reticulum 
+1522	GO:0005783 	 endoplasmic reticulum 
+8774	GO:0005783 	 endoplasmic reticulum 
+51257	GO:0005783 	 endoplasmic reticulum 
+1580	GO:0005783 	 endoplasmic reticulum 
+7108	GO:0005783 	 endoplasmic reticulum 
+4653	GO:0005783 	 endoplasmic reticulum 
+23509	GO:0005783 	 endoplasmic reticulum 
+8529	GO:0005783 	 endoplasmic reticulum 
+11283	GO:0005783 	 endoplasmic reticulum 
+7841	GO:0005783 	 endoplasmic reticulum 
+2852	GO:0005783 	 endoplasmic reticulum 
+8435	GO:0005783 	 endoplasmic reticulum 
+10555	GO:0005783 	 endoplasmic reticulum 
+23562	GO:0005783 	 endoplasmic reticulum 
+63941	GO:0005783 	 endoplasmic reticulum 
+57142	GO:0005783 	 endoplasmic reticulum 
+5213	GO:0005783 	 endoplasmic reticulum 
+23305	GO:0005783 	 endoplasmic reticulum 
+26103	GO:0005783 	 endoplasmic reticulum 
+51124	GO:0005783 	 endoplasmic reticulum 
+6309	GO:0005783 	 endoplasmic reticulum 
+401562	GO:0005783 	 endoplasmic reticulum 
+10720	GO:0005783 	 endoplasmic reticulum 
+2327	GO:0005783 	 endoplasmic reticulum 
+5730	GO:0005783 	 endoplasmic reticulum 
+23193	GO:0005783 	 endoplasmic reticulum 
+23204	GO:0005783 	 endoplasmic reticulum 
+3309	GO:0005783 	 endoplasmic reticulum 
+23190	GO:0005783 	 endoplasmic reticulum 
+11328	GO:0005783 	 endoplasmic reticulum 
+729316	GO:0005783 	 endoplasmic reticulum 
+125061	GO:0005783 	 endoplasmic reticulum 
+90411	GO:0005783 	 endoplasmic reticulum 
+92140	GO:0005783 	 endoplasmic reticulum 
+23225	GO:0005783 	 endoplasmic reticulum 
+22937	GO:0005783 	 endoplasmic reticulum 
+286451	GO:0005783 	 endoplasmic reticulum 
+23213	GO:0005783 	 endoplasmic reticulum 
+64764	GO:0005783 	 endoplasmic reticulum 
+23392	GO:0005783 	 endoplasmic reticulum 
+253782	GO:0005783 	 endoplasmic reticulum 
+23505	GO:0005783 	 endoplasmic reticulum 
+831	GO:0005783 	 endoplasmic reticulum 
+201562	GO:0005783 	 endoplasmic reticulum 
+91289	GO:0005783 	 endoplasmic reticulum 
+23241	GO:0005783 	 endoplasmic reticulum 
+6272	GO:0005783 	 endoplasmic reticulum 
+8760	GO:0005783 	 endoplasmic reticulum 
+10802	GO:0005783 	 endoplasmic reticulum 
+137886	GO:0005783 	 endoplasmic reticulum 
+83989	GO:0005783 	 endoplasmic reticulum 
+259230	GO:0005783 	 endoplasmic reticulum 
+90993	GO:0005783 	 endoplasmic reticulum 
+254531	GO:0005783 	 endoplasmic reticulum 
+206358	GO:0005783 	 endoplasmic reticulum 
+5681	GO:0005783 	 endoplasmic reticulum 
+57613	GO:0005783 	 endoplasmic reticulum 
+115817	GO:0005783 	 endoplasmic reticulum 
+80055	GO:0005783 	 endoplasmic reticulum 
+402055	GO:0005783 	 endoplasmic reticulum 
+362	GO:0005783 	 endoplasmic reticulum 
+54898	GO:0005783 	 endoplasmic reticulum 
+64131	GO:0005783 	 endoplasmic reticulum 
+129080	GO:0005783 	 endoplasmic reticulum 
+91543	GO:0005783 	 endoplasmic reticulum 
+23426	GO:0005783 	 endoplasmic reticulum 
+130	GO:0005783 	 endoplasmic reticulum 
+10595	GO:0005783 	 endoplasmic reticulum 
+1559	GO:0005783 	 endoplasmic reticulum 
+478	GO:0005783 	 endoplasmic reticulum 
+9073	GO:0005783 	 endoplasmic reticulum 
+1589	GO:0005783 	 endoplasmic reticulum 
+11045	GO:0005783 	 endoplasmic reticulum 
+1812	GO:0005783 	 endoplasmic reticulum 
+23109	GO:0005783 	 endoplasmic reticulum 
+388714	GO:0005783 	 endoplasmic reticulum 
+51614	GO:0005783 	 endoplasmic reticulum 
+27315	GO:0005783 	 endoplasmic reticulum 
+10554	GO:0005783 	 endoplasmic reticulum 
+23256	GO:0005783 	 endoplasmic reticulum 
+51179	GO:0005783 	 endoplasmic reticulum 
+9919	GO:0005783 	 endoplasmic reticulum 
+56926	GO:0005783 	 endoplasmic reticulum 
+1557	GO:0005783 	 endoplasmic reticulum 
+3913	GO:0005783 	 endoplasmic reticulum 
+387521	GO:0005783 	 endoplasmic reticulum 
+113612	GO:0005783 	 endoplasmic reticulum 
+26101	GO:0005783 	 endoplasmic reticulum 
+9709	GO:0005783 	 endoplasmic reticulum 
+23420	GO:0005783 	 endoplasmic reticulum 
+442171	GO:0005783 	 endoplasmic reticulum 
+1565	GO:0005783 	 endoplasmic reticulum 
+26778	GO:0005783 	 endoplasmic reticulum 
+29927	GO:0005783 	 endoplasmic reticulum 
+23585	GO:0005783 	 endoplasmic reticulum 
+51604	GO:0005783 	 endoplasmic reticulum 
+51109	GO:0005783 	 endoplasmic reticulum 
+27173	GO:0005783 	 endoplasmic reticulum 
+10652	GO:0005783 	 endoplasmic reticulum 
+6747	GO:0005783 	 endoplasmic reticulum 
+79188	GO:0005783 	 endoplasmic reticulum 
+55666	GO:0005783 	 endoplasmic reticulum 
+51465	GO:0005783 	 endoplasmic reticulum 
+10113	GO:0005783 	 endoplasmic reticulum 
+51144	GO:0005783 	 endoplasmic reticulum 
+28972	GO:0005783 	 endoplasmic reticulum 
+79001	GO:0005783 	 endoplasmic reticulum 
+51399	GO:0005783 	 endoplasmic reticulum 
+64834	GO:0005783 	 endoplasmic reticulum 
+51283	GO:0005783 	 endoplasmic reticulum 
+3163	GO:0005783 	 endoplasmic reticulum 
+54884	GO:0005783 	 endoplasmic reticulum 
+51290	GO:0005783 	 endoplasmic reticulum 
+58477	GO:0005783 	 endoplasmic reticulum 
+64423	GO:0005783 	 endoplasmic reticulum 
+54982	GO:0005783 	 endoplasmic reticulum 
+79139	GO:0005783 	 endoplasmic reticulum 
+51026	GO:0005783 	 endoplasmic reticulum 
+29880	GO:0005783 	 endoplasmic reticulum 
+51128	GO:0005783 	 endoplasmic reticulum 
+56886	GO:0005783 	 endoplasmic reticulum 
+55851	GO:0005783 	 endoplasmic reticulum 
+51703	GO:0005783 	 endoplasmic reticulum 
+51009	GO:0005783 	 endoplasmic reticulum 
+79956	GO:0005783 	 endoplasmic reticulum 
+79174	GO:0005783 	 endoplasmic reticulum 
+51107	GO:0005783 	 endoplasmic reticulum 
+64215	GO:0005783 	 endoplasmic reticulum 
+64374	GO:0005783 	 endoplasmic reticulum 
+79087	GO:0005783 	 endoplasmic reticulum 
+64222	GO:0005783 	 endoplasmic reticulum 
+79709	GO:0005783 	 endoplasmic reticulum 
+10585	GO:0005783 	 endoplasmic reticulum 
+30001	GO:0005783 	 endoplasmic reticulum 
+51293	GO:0005783 	 endoplasmic reticulum 
+54963	GO:0005783 	 endoplasmic reticulum 
+29095	GO:0005783 	 endoplasmic reticulum 
+56983	GO:0005783 	 endoplasmic reticulum 
+60561	GO:0005783 	 endoplasmic reticulum 
+64778	GO:0005783 	 endoplasmic reticulum 
+11253	GO:0005783 	 endoplasmic reticulum 
+54872	GO:0005783 	 endoplasmic reticulum 
+55014	GO:0005783 	 endoplasmic reticulum 
+23753	GO:0005783 	 endoplasmic reticulum 
+64285	GO:0005783 	 endoplasmic reticulum 
+9451	GO:0005783 	 endoplasmic reticulum 
+26984	GO:0005783 	 endoplasmic reticulum 
+55214	GO:0005783 	 endoplasmic reticulum 
+26470	GO:0005783 	 endoplasmic reticulum 
+29097	GO:0005783 	 endoplasmic reticulum 
+4969	GO:0005783 	 endoplasmic reticulum 
+55080	GO:0005783 	 endoplasmic reticulum 
+53407	GO:0005783 	 endoplasmic reticulum 
+55151	GO:0005783 	 endoplasmic reticulum 
+79644	GO:0005783 	 endoplasmic reticulum 
+55757	GO:0005783 	 endoplasmic reticulum 
+60559	GO:0005783 	 endoplasmic reticulum 
+54972	GO:0005783 	 endoplasmic reticulum 
+29940	GO:0005783 	 endoplasmic reticulum 
+79603	GO:0005783 	 endoplasmic reticulum 
+55849	GO:0005783 	 endoplasmic reticulum 
+23556	GO:0005783 	 endoplasmic reticulum 
+51167	GO:0005783 	 endoplasmic reticulum 
+57333	GO:0005783 	 endoplasmic reticulum 
+64788	GO:0005783 	 endoplasmic reticulum 
+79651	GO:0005783 	 endoplasmic reticulum 
+55650	GO:0005783 	 endoplasmic reticulum 
+60681	GO:0005783 	 endoplasmic reticulum 
+79589	GO:0005783 	 endoplasmic reticulum 
+2055	GO:0005783 	 endoplasmic reticulum 
+55850	GO:0005783 	 endoplasmic reticulum 
+6399	GO:0005783 	 endoplasmic reticulum 
+54344	GO:0005783 	 endoplasmic reticulum 
+79796	GO:0005783 	 endoplasmic reticulum 
+10390	GO:0005783 	 endoplasmic reticulum 
+55704	GO:0005783 	 endoplasmic reticulum 
+55033	GO:0005783 	 endoplasmic reticulum 
+9489	GO:0005783 	 endoplasmic reticulum 
+64132	GO:0005783 	 endoplasmic reticulum 
+23682	GO:0005783 	 endoplasmic reticulum 
+64084	GO:0005783 	 endoplasmic reticulum 
+51435	GO:0005783 	 endoplasmic reticulum 
+79152	GO:0005783 	 endoplasmic reticulum 
+79669	GO:0005783 	 endoplasmic reticulum 
+79070	GO:0005783 	 endoplasmic reticulum 
+64840	GO:0005783 	 endoplasmic reticulum 
+54920	GO:0005783 	 endoplasmic reticulum 
+55176	GO:0005783 	 endoplasmic reticulum 
+6785	GO:0005783 	 endoplasmic reticulum 
+10313	GO:0005783 	 endoplasmic reticulum 
+757	GO:0005783 	 endoplasmic reticulum 
+54863	GO:0005783 	 endoplasmic reticulum 
+10087	GO:0005783 	 endoplasmic reticulum 
+844	GO:0005783 	 endoplasmic reticulum 
+29929	GO:0005783 	 endoplasmic reticulum 
+55733	GO:0005783 	 endoplasmic reticulum 
+56894	GO:0005783 	 endoplasmic reticulum 
+10998	GO:0005783 	 endoplasmic reticulum 
+64167	GO:0005783 	 endoplasmic reticulum 
+50507	GO:0005783 	 endoplasmic reticulum 
+10170	GO:0005783 	 endoplasmic reticulum 
+80124	GO:0005783 	 endoplasmic reticulum 
+56603	GO:0005783 	 endoplasmic reticulum 
+79845	GO:0005783 	 endoplasmic reticulum 
+8778	GO:0005783 	 endoplasmic reticulum 
+53829	GO:0005783 	 endoplasmic reticulum 
+56605	GO:0005783 	 endoplasmic reticulum 
+79974	GO:0005783 	 endoplasmic reticulum 
+80235	GO:0005783 	 endoplasmic reticulum 
+29802	GO:0005783 	 endoplasmic reticulum 
+64699	GO:0005783 	 endoplasmic reticulum 
+57338	GO:0005783 	 endoplasmic reticulum 
+79966	GO:0005783 	 endoplasmic reticulum 
+79608	GO:0005783 	 endoplasmic reticulum 
+9227	GO:0005783 	 endoplasmic reticulum 
+10858	GO:0005783 	 endoplasmic reticulum 
+80267	GO:0005783 	 endoplasmic reticulum 
+57158	GO:0005783 	 endoplasmic reticulum 
+51302	GO:0005783 	 endoplasmic reticulum 
+55304	GO:0005783 	 endoplasmic reticulum 
+9381	GO:0005783 	 endoplasmic reticulum 
+550	GO:0005783 	 endoplasmic reticulum 
+54905	GO:0005783 	 endoplasmic reticulum 
+55711	GO:0005783 	 endoplasmic reticulum 
+29954	GO:0005783 	 endoplasmic reticulum 
+64175	GO:0005783 	 endoplasmic reticulum 
+10826	GO:0005783 	 endoplasmic reticulum 
+29974	GO:0005783 	 endoplasmic reticulum 
+406991	GO:0005783 	 endoplasmic reticulum 
+81579	GO:0005783 	 endoplasmic reticulum 
+83445	GO:0005783 	 endoplasmic reticulum 
+81567	GO:0005783 	 endoplasmic reticulum 
+81537	GO:0005783 	 endoplasmic reticulum 
+81562	GO:0005783 	 endoplasmic reticulum 
+54576	GO:0005783 	 endoplasmic reticulum 
+80329	GO:0005783 	 endoplasmic reticulum 
+80739	GO:0005783 	 endoplasmic reticulum 
+81555	GO:0005783 	 endoplasmic reticulum 
+50833	GO:0005783 	 endoplasmic reticulum 
+57818	GO:0005783 	 endoplasmic reticulum 
+665	GO:0005783 	 endoplasmic reticulum 
+55341	GO:0005783 	 endoplasmic reticulum 
+11160	GO:0005783 	 endoplasmic reticulum 
+728866	GO:0005783 	 endoplasmic reticulum 
+6646	GO:0005783 	 endoplasmic reticulum 
+9409	GO:0005783 	 endoplasmic reticulum 
+83696	GO:0005783 	 endoplasmic reticulum 
+124583	GO:0005783 	 endoplasmic reticulum 
+92579	GO:0005783 	 endoplasmic reticulum 
+54431	GO:0005783 	 endoplasmic reticulum 
+9367	GO:0005783 	 endoplasmic reticulum 
+93210	GO:0005783 	 endoplasmic reticulum 
+57171	GO:0005783 	 endoplasmic reticulum 
+220972	GO:0005783 	 endoplasmic reticulum 
+158747	GO:0005783 	 endoplasmic reticulum 
+114112	GO:0005783 	 endoplasmic reticulum 
+285203	GO:0005783 	 endoplasmic reticulum 
+54681	GO:0005783 	 endoplasmic reticulum 
+57665	GO:0005783 	 endoplasmic reticulum 
+29956	GO:0005783 	 endoplasmic reticulum 
+55379	GO:0005783 	 endoplasmic reticulum 
+1718	GO:0016126 	 sterol biosynthetic process 
+2224	GO:0016126 	 sterol biosynthetic process 
+1717	GO:0016126 	 sterol biosynthetic process 
+1727	GO:0016126 	 sterol biosynthetic process 
+51706	GO:0016126 	 sterol biosynthetic process 
+1595	GO:0016126 	 sterol biosynthetic process 
+3156	GO:0016126 	 sterol biosynthetic process 
+11161	GO:0016126 	 sterol biosynthetic process 
+10682	GO:0016126 	 sterol biosynthetic process 
+4597	GO:0016126 	 sterol biosynthetic process 
+10654	GO:0016126 	 sterol biosynthetic process 
+4598	GO:0016126 	 sterol biosynthetic process 
+3158	GO:0016126 	 sterol biosynthetic process 
+3422	GO:0016126 	 sterol biosynthetic process 
+3157	GO:0016126 	 sterol biosynthetic process 
+9023	GO:0016126 	 sterol biosynthetic process 
+5563	GO:0016126 	 sterol biosynthetic process 
+2222	GO:0016126 	 sterol biosynthetic process 
+6307	GO:0016126 	 sterol biosynthetic process 
+6713	GO:0016126 	 sterol biosynthetic process 
+50814	GO:0016126 	 sterol biosynthetic process 
+5562	GO:0016126 	 sterol biosynthetic process 
+7108	GO:0016126 	 sterol biosynthetic process 
+6309	GO:0016126 	 sterol biosynthetic process 
+51422	GO:0016126 	 sterol biosynthetic process 
+2229	GO:0016126 	 sterol biosynthetic process 
+23560	GO:0016126 	 sterol biosynthetic process 
+51700	GO:0016126 	 sterol biosynthetic process 
+1571	GO:0005789 	 endoplasmic reticulum membrane 
+1548	GO:0005789 	 endoplasmic reticulum membrane 
+5337	GO:0005789 	 endoplasmic reticulum membrane 
+23399	GO:0005789 	 endoplasmic reticulum membrane 
+821	GO:0005789 	 endoplasmic reticulum membrane 
+7184	GO:0005789 	 endoplasmic reticulum membrane 
+9761	GO:0005789 	 endoplasmic reticulum membrane 
+6746	GO:0005789 	 endoplasmic reticulum membrane 
+11014	GO:0005789 	 endoplasmic reticulum membrane 
+10550	GO:0005789 	 endoplasmic reticulum membrane 
+10960	GO:0005789 	 endoplasmic reticulum membrane 
+6319	GO:0005789 	 endoplasmic reticulum membrane 
+10134	GO:0005789 	 endoplasmic reticulum membrane 
+1718	GO:0005789 	 endoplasmic reticulum membrane 
+6745	GO:0005789 	 endoplasmic reticulum membrane 
+3895	GO:0005789 	 endoplasmic reticulum membrane 
+6734	GO:0005789 	 endoplasmic reticulum membrane 
+10945	GO:0005789 	 endoplasmic reticulum membrane 
+22872	GO:0005789 	 endoplasmic reticulum membrane 
+6386	GO:0005789 	 endoplasmic reticulum membrane 
+27230	GO:0005789 	 endoplasmic reticulum membrane 
+387522	GO:0005789 	 endoplasmic reticulum membrane 
+6748	GO:0005789 	 endoplasmic reticulum membrane 
+6184	GO:0005789 	 endoplasmic reticulum membrane 
+23646	GO:0005789 	 endoplasmic reticulum membrane 
+8396	GO:0005789 	 endoplasmic reticulum membrane 
+10857	GO:0005789 	 endoplasmic reticulum membrane 
+9867	GO:0005789 	 endoplasmic reticulum membrane 
+5355	GO:0005789 	 endoplasmic reticulum membrane 
+3710	GO:0005789 	 endoplasmic reticulum membrane 
+6238	GO:0005789 	 endoplasmic reticulum membrane 
+4714	GO:0005789 	 endoplasmic reticulum membrane 
+653566	GO:0005789 	 endoplasmic reticulum membrane 
+6721	GO:0005789 	 endoplasmic reticulum membrane 
+10423	GO:0005789 	 endoplasmic reticulum membrane 
+23478	GO:0005789 	 endoplasmic reticulum membrane 
+79073	GO:0005789 	 endoplasmic reticulum membrane 
+23471	GO:0005789 	 endoplasmic reticulum membrane 
+4259	GO:0005789 	 endoplasmic reticulum membrane 
+22883	GO:0005789 	 endoplasmic reticulum membrane 
+10483	GO:0005789 	 endoplasmic reticulum membrane 
+23463	GO:0005789 	 endoplasmic reticulum membrane 
+8733	GO:0005789 	 endoplasmic reticulum membrane 
+8720	GO:0005789 	 endoplasmic reticulum membrane 
+3638	GO:0005789 	 endoplasmic reticulum membrane 
+10175	GO:0005789 	 endoplasmic reticulum membrane 
+2181	GO:0005789 	 endoplasmic reticulum membrane 
+10280	GO:0005789 	 endoplasmic reticulum membrane 
+10299	GO:0005789 	 endoplasmic reticulum membrane 
+79022	GO:0005789 	 endoplasmic reticulum membrane 
+1717	GO:0005789 	 endoplasmic reticulum membrane 
+79888	GO:0005789 	 endoplasmic reticulum membrane 
+1727	GO:0005789 	 endoplasmic reticulum membrane 
+1634	GO:0005789 	 endoplasmic reticulum membrane 
+11231	GO:0005789 	 endoplasmic reticulum membrane 
+2180	GO:0005789 	 endoplasmic reticulum membrane 
+2131	GO:0005789 	 endoplasmic reticulum membrane 
+2132	GO:0005789 	 endoplasmic reticulum membrane 
+2052	GO:0005789 	 endoplasmic reticulum membrane 
+224	GO:0005789 	 endoplasmic reticulum membrane 
+6400	GO:0005789 	 endoplasmic reticulum membrane 
+50999	GO:0005789 	 endoplasmic reticulum membrane 
+267	GO:0005789 	 endoplasmic reticulum membrane 
+9415	GO:0005789 	 endoplasmic reticulum membrane 
+3703	GO:0005789 	 endoplasmic reticulum membrane 
+10558	GO:0005789 	 endoplasmic reticulum membrane 
+6890	GO:0005789 	 endoplasmic reticulum membrane 
+6720	GO:0005789 	 endoplasmic reticulum membrane 
+1595	GO:0005789 	 endoplasmic reticulum membrane 
+9632	GO:0005789 	 endoplasmic reticulum membrane 
+9871	GO:0005789 	 endoplasmic reticulum membrane 
+10897	GO:0005789 	 endoplasmic reticulum membrane 
+2531	GO:0005789 	 endoplasmic reticulum membrane 
+2182	GO:0005789 	 endoplasmic reticulum membrane 
+10237	GO:0005789 	 endoplasmic reticulum membrane 
+1545	GO:0005789 	 endoplasmic reticulum membrane 
+10613	GO:0005789 	 endoplasmic reticulum membrane 
+1739	GO:0005789 	 endoplasmic reticulum membrane 
+3156	GO:0005789 	 endoplasmic reticulum membrane 
+9217	GO:0005789 	 endoplasmic reticulum membrane 
+11161	GO:0005789 	 endoplasmic reticulum membrane 
+9926	GO:0005789 	 endoplasmic reticulum membrane 
+3709	GO:0005789 	 endoplasmic reticulum membrane 
+8813	GO:0005789 	 endoplasmic reticulum membrane 
+10282	GO:0005789 	 endoplasmic reticulum membrane 
+5770	GO:0005789 	 endoplasmic reticulum membrane 
+10682	GO:0005789 	 endoplasmic reticulum membrane 
+6786	GO:0005789 	 endoplasmic reticulum membrane 
+9780	GO:0005789 	 endoplasmic reticulum membrane 
+10162	GO:0005789 	 endoplasmic reticulum membrane 
+22908	GO:0005789 	 endoplasmic reticulum membrane 
+10427	GO:0005789 	 endoplasmic reticulum membrane 
+6845	GO:0005789 	 endoplasmic reticulum membrane 
+2542	GO:0005789 	 endoplasmic reticulum membrane 
+5279	GO:0005789 	 endoplasmic reticulum membrane 
+7466	GO:0005789 	 endoplasmic reticulum membrane 
+10269	GO:0005789 	 endoplasmic reticulum membrane 
+27429	GO:0005789 	 endoplasmic reticulum membrane 
+9517	GO:0005789 	 endoplasmic reticulum membrane 
+10952	GO:0005789 	 endoplasmic reticulum membrane 
+9197	GO:0005789 	 endoplasmic reticulum membrane 
+1388	GO:0005789 	 endoplasmic reticulum membrane 
+9695	GO:0005789 	 endoplasmic reticulum membrane 
+3998	GO:0005789 	 endoplasmic reticulum membrane 
+2286	GO:0005789 	 endoplasmic reticulum membrane 
+10016	GO:0005789 	 endoplasmic reticulum membrane 
+9743	GO:0005789 	 endoplasmic reticulum membrane 
+5663	GO:0005789 	 endoplasmic reticulum membrane 
+23480	GO:0005789 	 endoplasmic reticulum membrane 
+6252	GO:0005789 	 endoplasmic reticulum membrane 
+79053	GO:0005789 	 endoplasmic reticulum membrane 
+920	GO:0005789 	 endoplasmic reticulum membrane 
+8694	GO:0005789 	 endoplasmic reticulum membrane 
+596	GO:0005789 	 endoplasmic reticulum membrane 
+3708	GO:0005789 	 endoplasmic reticulum membrane 
+10908	GO:0005789 	 endoplasmic reticulum membrane 
+412	GO:0005789 	 endoplasmic reticulum membrane 
+9600	GO:0005789 	 endoplasmic reticulum membrane 
+23011	GO:0005789 	 endoplasmic reticulum membrane 
+10479	GO:0005789 	 endoplasmic reticulum membrane 
+22926	GO:0005789 	 endoplasmic reticulum membrane 
+11015	GO:0005789 	 endoplasmic reticulum membrane 
+4258	GO:0005789 	 endoplasmic reticulum membrane 
+5130	GO:0005789 	 endoplasmic reticulum membrane 
+6253	GO:0005789 	 endoplasmic reticulum membrane 
+79071	GO:0005789 	 endoplasmic reticulum membrane 
+3995	GO:0005789 	 endoplasmic reticulum membrane 
+5664	GO:0005789 	 endoplasmic reticulum membrane 
+9088	GO:0005789 	 endoplasmic reticulum membrane 
+11322	GO:0005789 	 endoplasmic reticulum membrane 
+9746	GO:0005789 	 endoplasmic reticulum membrane 
+22845	GO:0005789 	 endoplasmic reticulum membrane 
+3283	GO:0005789 	 endoplasmic reticulum membrane 
+54575	GO:0005789 	 endoplasmic reticulum membrane 
+9619	GO:0005789 	 endoplasmic reticulum membrane 
+4033	GO:0005789 	 endoplasmic reticulum membrane 
+6715	GO:0005789 	 endoplasmic reticulum membrane 
+5743	GO:0005789 	 endoplasmic reticulum membrane 
+6891	GO:0005789 	 endoplasmic reticulum membrane 
+9183	GO:0005789 	 endoplasmic reticulum membrane 
+3294	GO:0005789 	 endoplasmic reticulum membrane 
+7357	GO:0005789 	 endoplasmic reticulum membrane 
+662	GO:0005789 	 endoplasmic reticulum membrane 
+2705	GO:0005789 	 endoplasmic reticulum membrane 
+1573	GO:0005789 	 endoplasmic reticulum membrane 
+5281	GO:0005789 	 endoplasmic reticulum membrane 
+55973	GO:0005789 	 endoplasmic reticulum membrane 
+9883	GO:0005789 	 endoplasmic reticulum membrane 
+5742	GO:0005789 	 endoplasmic reticulum membrane 
+11005	GO:0005789 	 endoplasmic reticulum membrane 
+4306	GO:0005789 	 endoplasmic reticulum membrane 
+5277	GO:0005789 	 endoplasmic reticulum membrane 
+9986	GO:0005789 	 endoplasmic reticulum membrane 
+10675	GO:0005789 	 endoplasmic reticulum membrane 
+2677	GO:0005789 	 endoplasmic reticulum membrane 
+3290	GO:0005789 	 endoplasmic reticulum membrane 
+487	GO:0005789 	 endoplasmic reticulum membrane 
+9488	GO:0005789 	 endoplasmic reticulum membrane 
+1586	GO:0005789 	 endoplasmic reticulum membrane 
+10125	GO:0005789 	 endoplasmic reticulum membrane 
+2326	GO:0005789 	 endoplasmic reticulum membrane 
+1040	GO:0005789 	 endoplasmic reticulum membrane 
+1543	GO:0005789 	 endoplasmic reticulum membrane 
+1577	GO:0005789 	 endoplasmic reticulum membrane 
+11001	GO:0005789 	 endoplasmic reticulum membrane 
+2330	GO:0005789 	 endoplasmic reticulum membrane 
+444	GO:0005789 	 endoplasmic reticulum membrane 
+27233	GO:0005789 	 endoplasmic reticulum membrane 
+1047	GO:0005789 	 endoplasmic reticulum membrane 
+9487	GO:0005789 	 endoplasmic reticulum membrane 
+1551	GO:0005789 	 endoplasmic reticulum membrane 
+13	GO:0005789 	 endoplasmic reticulum membrane 
+1576	GO:0005789 	 endoplasmic reticulum membrane 
+7148	GO:0005789 	 endoplasmic reticulum membrane 
+57834	GO:0005789 	 endoplasmic reticulum membrane 
+2329	GO:0005789 	 endoplasmic reticulum membrane 
+7098	GO:0005789 	 endoplasmic reticulum membrane 
+3284	GO:0005789 	 endoplasmic reticulum membrane 
+2134	GO:0005789 	 endoplasmic reticulum membrane 
+10715	GO:0005789 	 endoplasmic reticulum membrane 
+1592	GO:0005789 	 endoplasmic reticulum membrane 
+1733	GO:0005789 	 endoplasmic reticulum membrane 
+2328	GO:0005789 	 endoplasmic reticulum membrane 
+7363	GO:0005789 	 endoplasmic reticulum membrane 
+4051	GO:0005789 	 endoplasmic reticulum membrane 
+66002	GO:0005789 	 endoplasmic reticulum membrane 
+3818	GO:0005789 	 endoplasmic reticulum membrane 
+8608	GO:0005789 	 endoplasmic reticulum membrane 
+1554	GO:0005789 	 endoplasmic reticulum membrane 
+7380	GO:0005789 	 endoplasmic reticulum membrane 
+9023	GO:0005789 	 endoplasmic reticulum membrane 
+6716	GO:0005789 	 endoplasmic reticulum membrane 
+2538	GO:0005789 	 endoplasmic reticulum membrane 
+2081	GO:0005789 	 endoplasmic reticulum membrane 
+840	GO:0005789 	 endoplasmic reticulum membrane 
+7367	GO:0005789 	 endoplasmic reticulum membrane 
+10786	GO:0005789 	 endoplasmic reticulum membrane 
+23457	GO:0005789 	 endoplasmic reticulum membrane 
+3601	GO:0005789 	 endoplasmic reticulum membrane 
+9420	GO:0005789 	 endoplasmic reticulum membrane 
+728160	GO:0005789 	 endoplasmic reticulum membrane 
+10195	GO:0005789 	 endoplasmic reticulum membrane 
+1581	GO:0005789 	 endoplasmic reticulum membrane 
+1579	GO:0005789 	 endoplasmic reticulum membrane 
+8560	GO:0005789 	 endoplasmic reticulum membrane 
+80168	GO:0005789 	 endoplasmic reticulum membrane 
+1564	GO:0005789 	 endoplasmic reticulum membrane 
+489	GO:0005789 	 endoplasmic reticulum membrane 
+1544	GO:0005789 	 endoplasmic reticulum membrane 
+10400	GO:0005789 	 endoplasmic reticulum membrane 
+1549	GO:0005789 	 endoplasmic reticulum membrane 
+64816	GO:0005789 	 endoplasmic reticulum membrane 
+120227	GO:0005789 	 endoplasmic reticulum membrane 
+1528	GO:0005789 	 endoplasmic reticulum membrane 
+150776	GO:0005789 	 endoplasmic reticulum membrane 
+23544	GO:0005789 	 endoplasmic reticulum membrane 
+1572	GO:0005789 	 endoplasmic reticulum membrane 
+81542	GO:0005789 	 endoplasmic reticulum membrane 
+1562	GO:0005789 	 endoplasmic reticulum membrane 
+5740	GO:0005789 	 endoplasmic reticulum membrane 
+1558	GO:0005789 	 endoplasmic reticulum membrane 
+56988	GO:0005789 	 endoplasmic reticulum membrane 
+1553	GO:0005789 	 endoplasmic reticulum membrane 
+9524	GO:0005789 	 endoplasmic reticulum membrane 
+8879	GO:0005789 	 endoplasmic reticulum membrane 
+581	GO:0005789 	 endoplasmic reticulum membrane 
+7146	GO:0005789 	 endoplasmic reticulum membrane 
+2222	GO:0005789 	 endoplasmic reticulum membrane 
+57515	GO:0005789 	 endoplasmic reticulum membrane 
+1650	GO:0005789 	 endoplasmic reticulum membrane 
+6185	GO:0005789 	 endoplasmic reticulum membrane 
+54499	GO:0005789 	 endoplasmic reticulum membrane 
+5862	GO:0005789 	 endoplasmic reticulum membrane 
+54732	GO:0005789 	 endoplasmic reticulum membrane 
+116138	GO:0005789 	 endoplasmic reticulum membrane 
+60481	GO:0005789 	 endoplasmic reticulum membrane 
+6892	GO:0005789 	 endoplasmic reticulum membrane 
+26580	GO:0005789 	 endoplasmic reticulum membrane 
+5447	GO:0005789 	 endoplasmic reticulum membrane 
+7095	GO:0005789 	 endoplasmic reticulum membrane 
+23071	GO:0005789 	 endoplasmic reticulum membrane 
+3992	GO:0005789 	 endoplasmic reticulum membrane 
+6307	GO:0005789 	 endoplasmic reticulum membrane 
+488	GO:0005789 	 endoplasmic reticulum membrane 
+2137	GO:0005789 	 endoplasmic reticulum membrane 
+9554	GO:0005789 	 endoplasmic reticulum membrane 
+9526	GO:0005789 	 endoplasmic reticulum membrane 
+6713	GO:0005789 	 endoplasmic reticulum membrane 
+7991	GO:0005789 	 endoplasmic reticulum membrane 
+50814	GO:0005789 	 endoplasmic reticulum membrane 
+8818	GO:0005789 	 endoplasmic reticulum membrane 
+51014	GO:0005789 	 endoplasmic reticulum membrane 
+10488	GO:0005789 	 endoplasmic reticulum membrane 
+1798	GO:0005789 	 endoplasmic reticulum membrane 
+11236	GO:0005789 	 endoplasmic reticulum membrane 
+2135	GO:0005789 	 endoplasmic reticulum membrane 
+51141	GO:0005789 	 endoplasmic reticulum membrane 
+26190	GO:0005789 	 endoplasmic reticulum membrane 
+2861	GO:0005789 	 endoplasmic reticulum membrane 
+51752	GO:0005789 	 endoplasmic reticulum membrane 
+10026	GO:0005789 	 endoplasmic reticulum membrane 
+26002	GO:0005789 	 endoplasmic reticulum membrane 
+23169	GO:0005789 	 endoplasmic reticulum membrane 
+2890	GO:0005789 	 endoplasmic reticulum membrane 
+25956	GO:0005789 	 endoplasmic reticulum membrane 
+84720	GO:0005789 	 endoplasmic reticulum membrane 
+9570	GO:0005789 	 endoplasmic reticulum membrane 
+51257	GO:0005789 	 endoplasmic reticulum membrane 
+1580	GO:0005789 	 endoplasmic reticulum membrane 
+7108	GO:0005789 	 endoplasmic reticulum membrane 
+8529	GO:0005789 	 endoplasmic reticulum membrane 
+11283	GO:0005789 	 endoplasmic reticulum membrane 
+7841	GO:0005789 	 endoplasmic reticulum membrane 
+2852	GO:0005789 	 endoplasmic reticulum membrane 
+8435	GO:0005789 	 endoplasmic reticulum membrane 
+63941	GO:0005789 	 endoplasmic reticulum membrane 
+#N/A	GO:0005789 	 endoplasmic reticulum membrane 
+57142	GO:0005789 	 endoplasmic reticulum membrane 
+23305	GO:0005789 	 endoplasmic reticulum membrane 
+26103	GO:0005789 	 endoplasmic reticulum membrane 
+51124	GO:0005789 	 endoplasmic reticulum membrane 
+6309	GO:0005789 	 endoplasmic reticulum membrane 
+10720	GO:0005789 	 endoplasmic reticulum membrane 
+2327	GO:0005789 	 endoplasmic reticulum membrane 
+23190	GO:0005789 	 endoplasmic reticulum membrane 
+729316	GO:0005789 	 endoplasmic reticulum membrane 
+92140	GO:0005789 	 endoplasmic reticulum membrane 
+375056	GO:0005789 	 endoplasmic reticulum membrane 
+23225	GO:0005789 	 endoplasmic reticulum membrane 
+22937	GO:0005789 	 endoplasmic reticulum membrane 
+64764	GO:0005789 	 endoplasmic reticulum membrane 
+253782	GO:0005789 	 endoplasmic reticulum membrane 
+831	GO:0005789 	 endoplasmic reticulum membrane 
+201562	GO:0005789 	 endoplasmic reticulum membrane 
+91289	GO:0005789 	 endoplasmic reticulum membrane 
+6272	GO:0005789 	 endoplasmic reticulum membrane 
+10802	GO:0005789 	 endoplasmic reticulum membrane 
+90993	GO:0005789 	 endoplasmic reticulum membrane 
+254531	GO:0005789 	 endoplasmic reticulum membrane 
+5681	GO:0005789 	 endoplasmic reticulum membrane 
+80055	GO:0005789 	 endoplasmic reticulum membrane 
+54898	GO:0005789 	 endoplasmic reticulum membrane 
+64131	GO:0005789 	 endoplasmic reticulum membrane 
+91543	GO:0005789 	 endoplasmic reticulum membrane 
+130	GO:0005789 	 endoplasmic reticulum membrane 
+10595	GO:0005789 	 endoplasmic reticulum membrane 
+1559	GO:0005789 	 endoplasmic reticulum membrane 
+1589	GO:0005789 	 endoplasmic reticulum membrane 
+1812	GO:0005789 	 endoplasmic reticulum membrane 
+23109	GO:0005789 	 endoplasmic reticulum membrane 
+388714	GO:0005789 	 endoplasmic reticulum membrane 
+51614	GO:0005789 	 endoplasmic reticulum membrane 
+27315	GO:0005789 	 endoplasmic reticulum membrane 
+23256	GO:0005789 	 endoplasmic reticulum membrane 
+51179	GO:0005789 	 endoplasmic reticulum membrane 
+9919	GO:0005789 	 endoplasmic reticulum membrane 
+56926	GO:0005789 	 endoplasmic reticulum membrane 
+1557	GO:0005789 	 endoplasmic reticulum membrane 
+387521	GO:0005789 	 endoplasmic reticulum membrane 
+113612	GO:0005789 	 endoplasmic reticulum membrane 
+26101	GO:0005789 	 endoplasmic reticulum membrane 
+9709	GO:0005789 	 endoplasmic reticulum membrane 
+23420	GO:0005789 	 endoplasmic reticulum membrane 
+1565	GO:0005789 	 endoplasmic reticulum membrane 
+29927	GO:0005789 	 endoplasmic reticulum membrane 
+51604	GO:0005789 	 endoplasmic reticulum membrane 
+51109	GO:0005789 	 endoplasmic reticulum membrane 
+27173	GO:0005789 	 endoplasmic reticulum membrane 
+6747	GO:0005789 	 endoplasmic reticulum membrane 
+51465	GO:0005789 	 endoplasmic reticulum membrane 
+10113	GO:0005789 	 endoplasmic reticulum membrane 
+51144	GO:0005789 	 endoplasmic reticulum membrane 
+28972	GO:0005789 	 endoplasmic reticulum membrane 
+79001	GO:0005789 	 endoplasmic reticulum membrane 
+64834	GO:0005789 	 endoplasmic reticulum membrane 
+51283	GO:0005789 	 endoplasmic reticulum membrane 
+54884	GO:0005789 	 endoplasmic reticulum membrane 
+51290	GO:0005789 	 endoplasmic reticulum membrane 
+58477	GO:0005789 	 endoplasmic reticulum membrane 
+54982	GO:0005789 	 endoplasmic reticulum membrane 
+79139	GO:0005789 	 endoplasmic reticulum membrane 
+29880	GO:0005789 	 endoplasmic reticulum membrane 
+51128	GO:0005789 	 endoplasmic reticulum membrane 
+55851	GO:0005789 	 endoplasmic reticulum membrane 
+51703	GO:0005789 	 endoplasmic reticulum membrane 
+51009	GO:0005789 	 endoplasmic reticulum membrane 
+79956	GO:0005789 	 endoplasmic reticulum membrane 
+51107	GO:0005789 	 endoplasmic reticulum membrane 
+64215	GO:0005789 	 endoplasmic reticulum membrane 
+79087	GO:0005789 	 endoplasmic reticulum membrane 
+10585	GO:0005789 	 endoplasmic reticulum membrane 
+30001	GO:0005789 	 endoplasmic reticulum membrane 
+60561	GO:0005789 	 endoplasmic reticulum membrane 
+11253	GO:0005789 	 endoplasmic reticulum membrane 
+54872	GO:0005789 	 endoplasmic reticulum membrane 
+64285	GO:0005789 	 endoplasmic reticulum membrane 
+9451	GO:0005789 	 endoplasmic reticulum membrane 
+26984	GO:0005789 	 endoplasmic reticulum membrane 
+26470	GO:0005789 	 endoplasmic reticulum membrane 
+55080	GO:0005789 	 endoplasmic reticulum membrane 
+53407	GO:0005789 	 endoplasmic reticulum membrane 
+55151	GO:0005789 	 endoplasmic reticulum membrane 
+79644	GO:0005789 	 endoplasmic reticulum membrane 
+60559	GO:0005789 	 endoplasmic reticulum membrane 
+54972	GO:0005789 	 endoplasmic reticulum membrane 
+79603	GO:0005789 	 endoplasmic reticulum membrane 
+23556	GO:0005789 	 endoplasmic reticulum membrane 
+64788	GO:0005789 	 endoplasmic reticulum membrane 
+79651	GO:0005789 	 endoplasmic reticulum membrane 
+55650	GO:0005789 	 endoplasmic reticulum membrane 
+2055	GO:0005789 	 endoplasmic reticulum membrane 
+55850	GO:0005789 	 endoplasmic reticulum membrane 
+54344	GO:0005789 	 endoplasmic reticulum membrane 
+79796	GO:0005789 	 endoplasmic reticulum membrane 
+10390	GO:0005789 	 endoplasmic reticulum membrane 
+64132	GO:0005789 	 endoplasmic reticulum membrane 
+64084	GO:0005789 	 endoplasmic reticulum membrane 
+51435	GO:0005789 	 endoplasmic reticulum membrane 
+79152	GO:0005789 	 endoplasmic reticulum membrane 
+79669	GO:0005789 	 endoplasmic reticulum membrane 
+64840	GO:0005789 	 endoplasmic reticulum membrane 
+55176	GO:0005789 	 endoplasmic reticulum membrane 
+6785	GO:0005789 	 endoplasmic reticulum membrane 
+10313	GO:0005789 	 endoplasmic reticulum membrane 
+29929	GO:0005789 	 endoplasmic reticulum membrane 
+55733	GO:0005789 	 endoplasmic reticulum membrane 
+10998	GO:0005789 	 endoplasmic reticulum membrane 
+64167	GO:0005789 	 endoplasmic reticulum membrane 
+50507	GO:0005789 	 endoplasmic reticulum membrane 
+10170	GO:0005789 	 endoplasmic reticulum membrane 
+56603	GO:0005789 	 endoplasmic reticulum membrane 
+56605	GO:0005789 	 endoplasmic reticulum membrane 
+80235	GO:0005789 	 endoplasmic reticulum membrane 
+158160	GO:0005789 	 endoplasmic reticulum membrane 
+64699	GO:0005789 	 endoplasmic reticulum membrane 
+57338	GO:0005789 	 endoplasmic reticulum membrane 
+79966	GO:0005789 	 endoplasmic reticulum membrane 
+79608	GO:0005789 	 endoplasmic reticulum membrane 
+9227	GO:0005789 	 endoplasmic reticulum membrane 
+10858	GO:0005789 	 endoplasmic reticulum membrane 
+57158	GO:0005789 	 endoplasmic reticulum membrane 
+51302	GO:0005789 	 endoplasmic reticulum membrane 
+55304	GO:0005789 	 endoplasmic reticulum membrane 
+9381	GO:0005789 	 endoplasmic reticulum membrane 
+550	GO:0005789 	 endoplasmic reticulum membrane 
+54905	GO:0005789 	 endoplasmic reticulum membrane 
+55711	GO:0005789 	 endoplasmic reticulum membrane 
+29954	GO:0005789 	 endoplasmic reticulum membrane 
+23780	GO:0005789 	 endoplasmic reticulum membrane 
+83445	GO:0005789 	 endoplasmic reticulum membrane 
+81537	GO:0005789 	 endoplasmic reticulum membrane 
+81562	GO:0005789 	 endoplasmic reticulum membrane 
+54576	GO:0005789 	 endoplasmic reticulum membrane 
+81555	GO:0005789 	 endoplasmic reticulum membrane 
+57818	GO:0005789 	 endoplasmic reticulum membrane 
+11160	GO:0005789 	 endoplasmic reticulum membrane 
+728866	GO:0005789 	 endoplasmic reticulum membrane 
+6646	GO:0005789 	 endoplasmic reticulum membrane 
+9409	GO:0005789 	 endoplasmic reticulum membrane 
+124583	GO:0005789 	 endoplasmic reticulum membrane 
+92579	GO:0005789 	 endoplasmic reticulum membrane 
+9367	GO:0005789 	 endoplasmic reticulum membrane 
+93210	GO:0005789 	 endoplasmic reticulum membrane 
+57171	GO:0005789 	 endoplasmic reticulum membrane 
+54681	GO:0005789 	 endoplasmic reticulum membrane 
+29956	GO:0005789 	 endoplasmic reticulum membrane 
+55379	GO:0005789 	 endoplasmic reticulum membrane 
+10728	GO:0008610 	 lipid biosynthetic process 
+7167	GO:0008610 	 lipid biosynthetic process 
+6319	GO:0008610 	 lipid biosynthetic process 
+1718	GO:0008610 	 lipid biosynthetic process 
+47	GO:0008610 	 lipid biosynthetic process 
+2224	GO:0008610 	 lipid biosynthetic process 
+1717	GO:0008610 	 lipid biosynthetic process 
+5571	GO:0008610 	 lipid biosynthetic process 
+5564	GO:0008610 	 lipid biosynthetic process 
+1727	GO:0008610 	 lipid biosynthetic process 
+4706	GO:0008610 	 lipid biosynthetic process 
+9415	GO:0008610 	 lipid biosynthetic process 
+4047	GO:0008610 	 lipid biosynthetic process 
+51706	GO:0008610 	 lipid biosynthetic process 
+1595	GO:0008610 	 lipid biosynthetic process 
+64746	GO:0008610 	 lipid biosynthetic process 
+3156	GO:0008610 	 lipid biosynthetic process 
+11161	GO:0008610 	 lipid biosynthetic process 
+10682	GO:0008610 	 lipid biosynthetic process 
+4597	GO:0008610 	 lipid biosynthetic process 
+27339	GO:0008610 	 lipid biosynthetic process 
+10654	GO:0008610 	 lipid biosynthetic process 
+4598	GO:0008610 	 lipid biosynthetic process 
+79071	GO:0008610 	 lipid biosynthetic process 
+3995	GO:0008610 	 lipid biosynthetic process 
+5091	GO:0008610 	 lipid biosynthetic process 
+672	GO:0008610 	 lipid biosynthetic process 
+3158	GO:0008610 	 lipid biosynthetic process 
+3422	GO:0008610 	 lipid biosynthetic process 
+5743	GO:0008610 	 lipid biosynthetic process 
+3294	GO:0008610 	 lipid biosynthetic process 
+5742	GO:0008610 	 lipid biosynthetic process 
+8540	GO:0008610 	 lipid biosynthetic process 
+3157	GO:0008610 	 lipid biosynthetic process 
+3292	GO:0008610 	 lipid biosynthetic process 
+10715	GO:0008610 	 lipid biosynthetic process 
+27306	GO:0008610 	 lipid biosynthetic process 
+9023	GO:0008610 	 lipid biosynthetic process 
+3293	GO:0008610 	 lipid biosynthetic process 
+8560	GO:0008610 	 lipid biosynthetic process 
+80168	GO:0008610 	 lipid biosynthetic process 
+5563	GO:0008610 	 lipid biosynthetic process 
+6916	GO:0008610 	 lipid biosynthetic process 
+5740	GO:0008610 	 lipid biosynthetic process 
+9524	GO:0008610 	 lipid biosynthetic process 
+2222	GO:0008610 	 lipid biosynthetic process 
+60481	GO:0008610 	 lipid biosynthetic process 
+3992	GO:0008610 	 lipid biosynthetic process 
+6307	GO:0008610 	 lipid biosynthetic process 
+50814	GO:0008610 	 lipid biosynthetic process 
+5562	GO:0008610 	 lipid biosynthetic process 
+7108	GO:0008610 	 lipid biosynthetic process 
+6309	GO:0008610 	 lipid biosynthetic process 
+401562	GO:0008610 	 lipid biosynthetic process 
+5730	GO:0008610 	 lipid biosynthetic process 
+31	GO:0008610 	 lipid biosynthetic process 
+2194	GO:0008610 	 lipid biosynthetic process 
+253782	GO:0008610 	 lipid biosynthetic process 
+27349	GO:0008610 	 lipid biosynthetic process 
+7923	GO:0008610 	 lipid biosynthetic process 
+54898	GO:0008610 	 lipid biosynthetic process 
+5565	GO:0008610 	 lipid biosynthetic process 
+32	GO:0008610 	 lipid biosynthetic process 
+51422	GO:0008610 	 lipid biosynthetic process 
+2229	GO:0008610 	 lipid biosynthetic process 
+23560	GO:0008610 	 lipid biosynthetic process 
+51144	GO:0008610 	 lipid biosynthetic process 
+51170	GO:0008610 	 lipid biosynthetic process 
+64834	GO:0008610 	 lipid biosynthetic process 
+80142	GO:0008610 	 lipid biosynthetic process 
+51102	GO:0008610 	 lipid biosynthetic process 
+23417	GO:0008610 	 lipid biosynthetic process 
+79603	GO:0008610 	 lipid biosynthetic process 
+54995	GO:0008610 	 lipid biosynthetic process 
+2055	GO:0008610 	 lipid biosynthetic process 
+79152	GO:0008610 	 lipid biosynthetic process 
+53947	GO:0008610 	 lipid biosynthetic process 
+6785	GO:0008610 	 lipid biosynthetic process 
+55301	GO:0008610 	 lipid biosynthetic process 
+158160	GO:0008610 	 lipid biosynthetic process 
+51700	GO:0008610 	 lipid biosynthetic process 
+79966	GO:0008610 	 lipid biosynthetic process 
+55711	GO:0008610 	 lipid biosynthetic process 
+55825	GO:0008610 	 lipid biosynthetic process 
+29956	GO:0008610 	 lipid biosynthetic process 
+1718	GO:0006695 	 cholesterol biosynthetic process 
+2224	GO:0006695 	 cholesterol biosynthetic process 
+1717	GO:0006695 	 cholesterol biosynthetic process 
+1727	GO:0006695 	 cholesterol biosynthetic process 
+10449	GO:0006695 	 cholesterol biosynthetic process 
+4047	GO:0006695 	 cholesterol biosynthetic process 
+2539	GO:0006695 	 cholesterol biosynthetic process 
+1595	GO:0006695 	 cholesterol biosynthetic process 
+3156	GO:0006695 	 cholesterol biosynthetic process 
+10682	GO:0006695 	 cholesterol biosynthetic process 
+4597	GO:0006695 	 cholesterol biosynthetic process 
+10654	GO:0006695 	 cholesterol biosynthetic process 
+4598	GO:0006695 	 cholesterol biosynthetic process 
+3158	GO:0006695 	 cholesterol biosynthetic process 
+3422	GO:0006695 	 cholesterol biosynthetic process 
+1080	GO:0006695 	 cholesterol biosynthetic process 
+3157	GO:0006695 	 cholesterol biosynthetic process 
+7555	GO:0006695 	 cholesterol biosynthetic process 
+5563	GO:0006695 	 cholesterol biosynthetic process 
+2222	GO:0006695 	 cholesterol biosynthetic process 
+50814	GO:0006695 	 cholesterol biosynthetic process 
+5562	GO:0006695 	 cholesterol biosynthetic process 
+7108	GO:0006695 	 cholesterol biosynthetic process 
+5578	GO:0006695 	 cholesterol biosynthetic process 
+2229	GO:0006695 	 cholesterol biosynthetic process 
+23560	GO:0006695 	 cholesterol biosynthetic process 
+29881	GO:0006695 	 cholesterol biosynthetic process 

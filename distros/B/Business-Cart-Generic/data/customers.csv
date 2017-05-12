@@ -1,0 +1,3 @@
+"status","type","address_id","gender","title","dob","given_names","surname","username","password"
+Active,Customer,1,Male,Mr,1950-06-21,Ron,Savage,ron,seekrit
+Active,Customer,2,Female,Ms,1997-07-06,Zoe,Savage,zoe,woof

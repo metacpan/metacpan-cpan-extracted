@@ -1,0 +1,15 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Domain Name Prefixes'; %]
+
+<p>Found [% NUM %] Critical Prefixes for [% DOMAIN %] Domain Name</p>
+
+[% INCLUDE table.tt %]
+  
+<form action="cpm_workflow.cgi" method="get">
+<input type="hidden" name="action" value="submit">
+
+<input type="button" value="Back" onclick="history.go(-1)">
+<input type="submit" value="Submit"/>
+
+</form>
+
+[% INCLUDE footer.html %]

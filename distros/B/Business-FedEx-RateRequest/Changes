@@ -1,0 +1,61 @@
+Revision history for Perl extension Business::FedEx::RateRequest.
+
+______________________________________
+1.00 Sun Feb 02 2014
+
+* Fedex without warning changed the return xml document. The elements with versionized name spaces were changed to generic tags.
+What was <v9:RateReplyDetails> is now <RateReplyDetails> 
+
+______________________________________
+0.97 Mon April 02 2012
+
+* Added timestamp to the xlm request.
+
+* Also added 'dst_residential' and 'insured_value' to the optional args. 
+
+'dst_residential' can either be 'true' or 'false'. This significantly effects the 
+the rates. The default is 'false'
+
+* Improved error reporting if no valid rates are returned an err_msg is set to the
+returned 'faultstring' from FedEx
+
+______________________________________
+0.95 Mon Feb 07 2011
+
+Bug fixes and new functionality contributed by Kyle Albritton.
+
+----- Changes -----
+* Replaced "â" with "-" on ship notes.  The soft-hyphen "â" character was imported from a cut-n-paste from 
+FedEx documentation but print problems where encountered on some browsers. 
+
+* Added functionality to include the ability to specify dropoff_type which significantly influences rates. 
+
+* Added notes to documentation on allowable parameters in METHODS item $obj->get_rates(%hash):
+
+Valid weight_units values are LB, KG.
+Valid size_units are IN, CM.
+Valid dropoff_types are REGULAR_PICKUP, BUSINESS_SERVICE_CENTER, DROP_BOX, REQUEST_COURIER, STATION.
+
+----- Bug Fixes ----- 
+* Fixed inconsistent key names on arguments and xml entries so that size and weight units work
+
+______________________________________
+0.94 Sat Nov 13 2010
+
+Fixed bug, a search and replace error that prevented the cost from being parsed.  
+
+______________________________________
+0.92 Sat Oct 30
+
+Added Tags and Notes. Attempted to align ServiceTypes with notes. I could not exercise
+each of these ServiceTypes so there may be missing notes. 
+
+______________________________________
+0.90  Fri Oct 22 19:57:59 2010
+	- original version; created by h2xs 1.23 with options
+		-X -n Business::FedEx::RateRequest
+
+
+
+
+

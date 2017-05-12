@@ -1,0 +1,60 @@
+---
+abstract: 'A set of modules to interact with HP DataProtector'
+author:
+  - 'Kevin L. Esteb <kesteb\@wsipc.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Backup-Omni
+provides:
+  Backup::Omni:
+    file: lib/Backup/Omni.pm
+    version: 0.02
+  Backup::Omni::Base:
+    file: lib/Backup/Omni/Base.pm
+    version: 0.01
+  Backup::Omni::Class:
+    file: lib/Backup/Omni/Class.pm
+  Backup::Omni::Constants:
+    file: lib/Backup/Omni/Constants.pm
+    version: 0.01
+  Backup::Omni::Exception:
+    file: lib/Backup/Omni/Exception.pm
+  Backup::Omni::Restore::Filesystem::Single:
+    file: lib/Backup/Omni/Restore/Filesystem/Single.pm
+    version: 0.01
+  Backup::Omni::Session::Filesystem:
+    file: lib/Backup/Omni/Session/Filesystem.pm
+    version: 0.01
+  Backup::Omni::Session::Messages:
+    file: lib/Backup/Omni/Session/Messages.pm
+    version: 0.01
+  Backup::Omni::Session::Monitor:
+    file: lib/Backup/Omni/Session/Monitor.pm
+    version: 0.01
+  Backup::Omni::Session::Monitor::Device:
+    file: lib/Backup/Omni/Session/Monitor.pm
+  Backup::Omni::Session::Monitor::Object:
+    file: lib/Backup/Omni/Session/Monitor.pm
+  Backup::Omni::Session::Results:
+    file: lib/Backup/Omni/Session/Results.pm
+    version: 0.01
+  Backup::Omni::Utils:
+    file: lib/Backup/Omni/Utils.pm
+    version: 0.01
+requires:
+  Badger: 0.09
+  DateTime: 0.78
+  DateTime::Format::Strptime: 1.52
+  Params::Validate: 0.95
+  Try::Tiny: 0.11
+  perl: 5.008008
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

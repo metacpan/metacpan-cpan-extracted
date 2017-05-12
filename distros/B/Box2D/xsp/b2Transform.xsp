@@ -1,0 +1,70 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Transform} class b2Transform
+{
+
+void SetIdentity();
+
+%{
+
+b2Transform*
+b2Transform::new( position, R )
+	b2Vec2* position
+	b2Mat22* R
+	CODE:
+		RETVAL = new b2Transform( *position, *R );
+	OUTPUT:
+		RETVAL
+
+float32
+b2Transform::GetAngle()
+	CODE:
+		RETVAL = THIS->GetAngle();
+	OUTPUT:
+		RETVAL
+
+void
+b2Transform::Set( position, angle )
+	b2Vec2* position
+	float32 angle
+	CODE:
+		THIS->Set( *position, angle );
+
+b2Vec2*
+b2Transform::position( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if( items > 1 )
+		{
+			b2Vec2* v = (b2Vec2 *)stack_to_object( ST(1) );
+			THIS->position = *v;
+		}
+		RETVAL = &(THIS->position);
+	OUTPUT:
+		RETVAL
+
+b2Mat22*
+b2Transform::R( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Mat22";
+	CODE:
+		if( items > 1 )
+		{
+			b2Mat22* R = (b2Mat22 *)stack_to_object( ST(1) );
+			THIS->R = *R;
+		}
+		RETVAL = &(THIS->R);
+	OUTPUT:
+		RETVAL
+
+%}
+
+};

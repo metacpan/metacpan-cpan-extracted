@@ -1,0 +1,22 @@
+Revision history for Perl extension Business::UPC.
+
+0.05  Mon Jan  5 17:07:00 2004
+	- added 'as_upc_a_nocheck' to return UPC value without check digit
+
+0.04  Tue May  6 15:11:44 2003
+	- applied patch submitted on rt.cpan.org to avoid warnings
+	- renumbered tests
+
+0.03
+	- minor changes to check digit calculations
+	- added additional tests
+	- not released to CPAN
+
+0.02  Wed Nov  4 14:16:00 1998
+	- complete enough to release on my web site now...
+	- more detailed documentation required, but
+		synopses are there...
+
+0.01  Wed Nov  4 11:01:38 1998
+	- original version; created by h2xs 1.18
+

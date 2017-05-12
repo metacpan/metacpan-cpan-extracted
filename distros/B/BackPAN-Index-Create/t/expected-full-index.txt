@@ -1,0 +1,7 @@
+#FORMAT 1
+authors/id/Z/ZA/ZAPHOD/Heart-Of-Gold-0.01.meta 1399110691 326
+authors/id/Z/ZA/ZAPHOD/Heart-Of-Gold-0.01.readme 1399110713 31
+authors/id/P/PO/POGLE/Wood-Pogle-0.001.meta 1399111341 320
+authors/id/P/PO/POGLE/Wood-Pogle-0.001.readme 1399111357 13
+authors/id/Z/ZA/ZAPHOD/Heart-Of-Gold-0.01.tar.gz 1399111170 7863
+authors/id/P/PO/POGLE/Wood-Pogle-0.001.tar.gz 1399111421 7815

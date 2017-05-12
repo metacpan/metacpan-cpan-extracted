@@ -1,0 +1,56 @@
+Bio::Das::Lite
+==============
+
+Bio::Das::Lite is an implementation of the BioDas protocol, http://biodas.org/
+for the retrieval of biological data from XML sources over HTTP.
+
+Bio::Das::Lite is designed as a lightweight and more forgiving alternative to
+the client/retrieval/parsing components of Bio::Das. Bio::Das::Lite itself is
+not a drop-in replacement for Bio::Das but it can be subclassed to do so.
+
+
+NOTE
+Results are returned hashed against the query URL which caused them.
+This means that sometimes you receive more results than you might expect
+(number of sources * number of segments)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+WWW::Curl
+HTTP::Response
+English
+Carp
+Readonly
+
+Please note that some elements of HTTP proxy support require that WWW::Curl has been built from a minimum version of the libcurl C library:
+  authenticating proxies: 7.19.1
+  noproxy (proxy exclusion lists): 7.19.4
+If you have an earlier version installed, you will not be able to use these features of Bio::Das::Lite. Regular proxy support should be unaffected.
+
+
+BUGS
+
+To report bugs please log them against rt.cpan.org.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 by Roger Pettett, Genome Research Ltd.
+http://www.sanger.ac.uk/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

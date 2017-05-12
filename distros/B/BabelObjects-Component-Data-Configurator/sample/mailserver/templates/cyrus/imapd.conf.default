@@ -1,0 +1,6 @@
+configdirectory: /opt/var/imap
+defaultpartition: default
+partition-default: /opt/var/spool/imap
+admins: postadm
+hashimapspool: true
+sasl_pwcheck_method: PAM

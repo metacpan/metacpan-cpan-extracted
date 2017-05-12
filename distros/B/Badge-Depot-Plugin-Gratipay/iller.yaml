@@ -1,0 +1,30 @@
+---
+doctype: dist
+
+header:
+  name: Badge-Depot-Plugin-Gratipay
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.010001
+     - Moose: 2.0000
+     - Badge::Depot
+     - namespace::autoclean
+     - Types::Standard
+     - Types::URI
+
+plugins:
+ - +config: Author::CSSON
+
+ - +add_plugin: TravisYML
+   +before: Git::Tag
+   perl_version: 5.10.1 5.14 5.20
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+
+ - +remove_plugin: Splint

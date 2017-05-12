@@ -1,0 +1,76 @@
+---
+name: B-XPath
+version: 0.01
+author:
+  - 'chromatic <chromatic@wgz.org>'
+abstract: search Perl optrees with XPath syntax
+license: perl
+build_requires:
+  Class::XPath: 0
+  Scalar::Util: 0
+  Test::More: 0
+provides:
+  B::XPath:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::BINOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::COP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::GV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::IV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::LISTOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::LOGOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::LOOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::NULL:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::NV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::Node:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::OP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::PADOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::PV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::PVMG:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::PVNV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::PVOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::RV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::SV:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::SVOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+  B::XPath::UNOP:
+    file: lib/B/XPath.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

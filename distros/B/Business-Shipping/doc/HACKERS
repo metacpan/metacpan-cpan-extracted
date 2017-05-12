@@ -1,0 +1,23 @@
+Intended audience: developers who wish to modify Business::Shipping.
+
+Patches are welcome. Style and guidlines are enfoced with Perl::Critic, with one
+caveat: string eval in a few modules to allow for runtime loading of shipper 
+modules (excluded in t/perlcriticrc). PerlTidy is used:
+
+ find .  -name '*.t'  \
+     -or -name '*.pm' \
+     -or -name '*.PL' \
+     -exec perltidy -pbp -b -nst -nse -pt=2 -sbt=2 {} \;
+
+Devel::Cover shows very little test coverage. That is a goal for improvement.
+
+ cover -test
+
+Some of the code is for backwards-compatibility only.
+
+The reason that the version is specified the same in every module is only to 
+help in those rare circumstances where partial module installations exist in 
+@INC so that old versions are mixed with new versions, as described here:
+http://perlmonks.org/?node_id=634884
+
+

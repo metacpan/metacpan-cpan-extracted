@@ -1,0 +1,10 @@
+$VAR1 = bless( {
+                 'ENUMERATED' => 4,
+                 'ENUM_LIST' => {
+                                  'protocol-version-not-supported' => 4,
+                                  'mistyped-APDU' => 2,
+                                  'badly-structured-APDU' => 3,
+                                  'unrecognized-APDU' => 1,
+                                  'other' => 5
+                                }
+               }, 'Biblio::ILL::ISO::GeneralProblem' );

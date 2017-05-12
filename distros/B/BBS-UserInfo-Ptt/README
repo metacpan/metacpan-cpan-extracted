@@ -1,0 +1,22 @@
+BBS-UserInfo-Ptt
+
+This module provides a way to access user information on PTT-style
+system.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Gea-Suan Lin
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

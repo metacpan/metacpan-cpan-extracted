@@ -1,0 +1,29 @@
+NAME
+    Bot::Twatterhose - Consume the Twitter firehose and babble to Twitter
+    with Hailo
+
+SYNOPSIS
+        # Consume 500 tweets and twat one based on those
+        twatterhose --username someuser --password somepass --brain twatterhose.brn --limit 500
+
+        # Put this in cron, wait a few years and a cult will have formed
+        # around your bot:
+        */30 * * * * (sleep $(($RANDOM % 3600))) && twatterhose --username someuser --password somepass --brain ~/twatterhose.brn
+
+DESCRIPTION
+    Uses the twitter streaming API
+    <http://apiwiki.twitter.com/Streaming-API-Documentation> to get tweets
+    from the firehose, feeds those to Hailo and tweets a random permutation
+    of the previous input to Twitter.
+
+    The author is trying to start a religion larger than L. Ron Hubbard's.
+
+AUTHOR
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

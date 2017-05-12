@@ -1,0 +1,73 @@
+---
+abstract: 'An interface to the BackPAN index'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  Test::Compile: 0.11
+  Test::More: 0.90
+configure_requires:
+  Module::Build: 0.340201
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BackPAN-Index
+provides:
+  BackPAN::Index:
+    file: lib/BackPAN/Index.pm
+    version: 0.42
+  BackPAN::Index::Database:
+    file: lib/BackPAN/Index/Database.pm
+    version: 0
+  BackPAN::Index::Dist:
+    file: lib/BackPAN/Index/Dist.pm
+    version: 0
+  BackPAN::Index::File:
+    file: lib/BackPAN/Index/File.pm
+    version: 0
+  BackPAN::Index::IndexFile:
+    file: lib/BackPAN/Index/IndexFile.pm
+    version: 0
+  BackPAN::Index::Release:
+    file: lib/BackPAN/Index/Release.pm
+    version: 0
+  BackPAN::Index::Role::AsHash:
+    file: lib/BackPAN/Index/Role/AsHash.pm
+    version: 0
+  BackPAN::Index::Role::HasCache:
+    file: lib/BackPAN/Index/Role/HasCache.pm
+    version: 0
+  BackPAN::Index::Role::Log:
+    file: lib/BackPAN/Index/Role/Log.pm
+    version: 0
+  BackPAN::Index::Schema:
+    file: lib/BackPAN/Index/Schema.pm
+    version: 0
+  BackPAN::Index::Types:
+    file: lib/BackPAN/Index/Types.pm
+    version: 0
+  Parse::BACKPAN::Packages:
+    file: lib/Parse/BACKPAN/Packages.pm
+    version: 0.40
+requires:
+  App::Cache: 0.37
+  Archive::Extract: 0
+  CLASS: 1.00
+  CPAN::DistnameInfo: 0.09
+  DBD::SQLite: 1.25
+  DBIx::Class: 0.08109
+  LWP::Simple: 0
+  Mouse: 0.64
+  Path::Class: 0.17
+  URI: 1.54
+  autodie: 0
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=BackPAN-Index
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/acme/parse-backpan-packages
+version: 0.42

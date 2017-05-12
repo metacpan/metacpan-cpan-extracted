@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Bot/Babelfish.pm
+script/babelbot
+t/00load.t
+t/00prereq.t
+t/01api.t
+t/distchk.t
+t/podcover.t
+t/pod.t
+t/portfs.t

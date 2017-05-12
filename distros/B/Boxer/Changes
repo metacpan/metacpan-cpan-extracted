@@ -1,0 +1,151 @@
+Boxer
+=====
+
+Created:      2013-02-12
+Home page:    <https://metacpan.org/release/Boxer>
+Home page:    <https://wiki.debian.org/Boxer>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Boxer>
+Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
+
+v1.1.5	2017-01-24
+
+ [ Bug Fixes ]
+ - Fix chomp tweak lines.
+
+ [ Documentation ]
+ - Add some TODOs.
+ - Fix usage description for compose subcommand.
+
+ [ Packaging ]
+ - Run perlcritic with tidyall, and test both (not only perlcritic) in
+   TEST_AUTHOR mode.
+ - Use version with modern assignment. Extend copyright to current year.
+
+ [ Other ]
+ - Add Boxer::File::WithSkeleton class.
+ - Add World and Part classes, with unit test.
+ - Consistently use namespace::clean in modules. Order use by
+   pragma/non-Moo/Moo/cleanup and (roughly) by specificity.
+ - Drop unusued code in Boxer::CLI.
+ - Modernize to use perl v5.14, utf8, and strictures 2.
+ - Stop handle __PKGAUTOLIST__ in data (deprecated since 0.004).
+ - Stop skip undefined args in Task::Serialize (needed only for
+   Task::Classify).
+ - Stop use MooX::Types::MooseLike::Base.
+
+v1.1.4	2016-05-02
+
+ [ Bug Fixes ]
+ - Fix have current dir be default nodedir (as originally intended and
+   documented in boxer pod): Do XDG data_dirs lookup only on datadir,
+   leaving datadir undefined by default).
+
+v1.1.3	2016-05-02
+
+ [ Bug Fixes ]
+ - Fix use File::ShareDir.
+
+v1.1.2	2016-04-30
+
+ - Use File::ShareDir (not File::ShareDir::ProjectDistDir, strongly
+   discouraged by author). Thanks to Karen Etheridge (RT#114079).
+
+v1.1.1	2016-04-12
+
+ - Use Log::Any::Adapter::Screen (not obsolete predecessor
+   Log::Any::Adapter::ScreenColoredLevel).
+
+v1.1.0	2015-11-29
+
+ [ Bug Fixes ]
+ - Fix unescape \n and ${ for shellscript.
+ - Fix use apt-get (automated) or apt (interactive, on recent releases) in
+   skeleton scripts and notes (aptitude is not always available).
+
+ [ Documentation ]
+ - Add TODO on resolving named suites from relative ones.
+ - Extend copyright to cover current year.
+
+ [ Other ]
+ - Added: Pass node to skeleton files (and use in boilerplate, replacing
+   bogus DebianParl boilerplate.
+ - Added: Pass suite to skeleton files, and set as variable in shellscript
+   and preseed file late_script.
+ - Fix drop all hardcoded data from default skeleton files.
+ - Support empty packagelist.
+ - Tidy Boxer::Types.
+
+v1.0.0	2015-11-21
+
+ [ Bug Fixes ]
+ - Fix avoid Boxer::Task::Serialize spewing garbage when warning about
+   empty lists.
+ - Fix suppress failure to mark package auto-installed.
+
+ [ Documentation ]
+ - Rewrite INSTALL to use Debian boxer package.
+
+ [ Other ]
+ - Added: Implement --nonfree option for subcommand compose.
+ - Croak (not die) on broken input.
+ - Fixate suite in preseed file (resolved package list is suite-specific).
+ - Improve coercion and error messages for input paths.
+ - Release as stable, using semantic versioning.
+ - Sync example data with boxer-data.
+ - Tidy whitespace.
+ - Use MooX::Role::Logger (not MooX::Log::Any) and
+   Log::Any::Adapter::ScreenColoredLevel.
+
+0.004	2014-11-24
+
+ [ Bug Fixes ]
+ - Fix only warn (not die) on unresolved auto-markings, avoidance or
+   tweaks.
+
+ [ Documentation ]
+ - Add some TODOs.
+
+ [ Other ]
+ - Adjust example class set: Use reclass 1.4 ABI, and drop broken Printing
+   class.
+ - Adjust help output of Compose command to describe correct default
+   locations.
+ - Deprecate expansion of __PKGAUTOLIST__ in tweaklist.
+ - Move initial shell code for tweaklist out to skeleton file.
+ - Sort doc sections by explicit list (and alphabetically only as
+   fallback).
+ - Use Template::Tiny.
+
+0.003	2014-10-19
+
+ [ Documentation ]
+ - Update INSTALL file and pod synopsis slightly.
+
+ [ Packaging ]
+ - Fix copyright coverage to include current year.
+ - Fix require MooX::Log::Any.
+ - Require IPC::System::Simple.
+ - Tighten Moo requirement to at least 1.001000 (older are untested with
+   Type::Tiny).
+
+ [ Other ]
+ - Add --suite option (and drop it as 2nd argument) in compose command,
+   allowing multiple nodes instead.
+ - Added: Handle nodes, classes and skeleton files with separate options in
+   compose command.
+ - Added: Include builting skeleton files, and ship with example classes
+   and nodes.
+ - Explicitly use IPC::System::Simple (already implicitly used via autodie
+   + system() call).
+ - Refactor to strip undefined args handed over internally - a.k.a. coerce
+   Undef to default, to permit callers to sloppily pass App::Cmd options
+   as-is.
+
+0.002	2014-10-19
+
+ [ Packaging ]
+ - Fix all references to distribution name.
+   Toby Inkster++
+ - Fix time of initial release.
+
+0.001	2014-10-18	Initial release.

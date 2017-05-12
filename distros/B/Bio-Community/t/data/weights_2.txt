@@ -1,0 +1,3 @@
+#desc	weight
+Lumpy skin disease virus	100
+Hepatitis C virus	300

@@ -1,0 +1,147 @@
+Bio-Grep version 0.10.6
+=======================
+
+Bio-Grep is a collection of Perl modules for searching in DNA and protein
+sequences. It supports different back-ends, most importantly some (enhanced) 
+suffix array implementations. Currently, there is no suffix array tool that
+works in all scenarios (for example whole genome, protein and RNA data). 
+Bio::Grep provides a common API to the most popular tools. This way, you 
+can easily switch or combine tools.
+
+
+DEPENDENCIES
+
+This module requires these other modules, libraries and programs:
+
+
+  Bioperl 1.4 http://bioperl.org/Core/Latest/index.shtml
+    (You will need "Core" and "Run") Be sure that you have all
+    required modules installed. You don't need to worry about this if 
+    you follow all installation steps in the Bioperl Documentation 
+    (for example you will need some XML modules. Bundle::BioPerl 
+    will install them).
+    Works with Bioperl 1.6
+    
+  EMBOSS (ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-latest.tar.gz)
+
+
+  The back-ends:
+  
+  You need at least one of them. Vmatch is always a good choice. Agrep is
+  the best choice if you allow many mismatches in short sequences, if you
+  want to search in Fasta files with relatively short sequences (e.g
+  transcript databases) and if you are only interested in which sequences
+  the approximate match was found. Its performance is in this case 
+  amazing. If you want the exact positions, choose vmatch. If you want 
+  nice alignments, choose vmatch too (EMBOSS can automatically align the 
+  sequence and the query in the agrep back-end, but then vmatch is faster). 
+  Filters require exact positions, so you can't use them with agrep. 
+  This may change in a future version or not.
+  GUUGle is the best choice if you have RNA queries (counts GU as no mismatch)
+  and if you are interested in only exact matches.
+
+  RE (perldoc perlre) for Perl regular expressions. A slow sliding window
+      algorithm that searches all sequences for the specified regular
+      expression. Compared to suffix arrays this is really slow for (nearly)
+      perfect matches and large databases but requires no additional software.
+      Currently it stores all hits of one sequence in memory. So this could be
+      a problem for Fasta files with huge sequences (For example whole
+      chromosomes as one sequence).
+
+  Vmatch (http://vmatch.de/) for the Vmatch back-end. Commercial software.
+    The Vmatch tests assume that vmatch is in your path (You
+    can later specify a path to vmatch that is not in your path. 
+    The tests will fail but the module should work if the 
+    specified path to vmatch is correct.). 
+ 
+  Agrep (http://www.tgries.de/agrep/) for the Agrep back-end. There
+    are packages for some Linux distributions available (Debian:
+    apt-get install agrep). Fink has some packages for Mac OS X.
+    Ebuilds for Gentoo are available, too. As for Vmatch, Agrep 
+    tests assume that agrep is in your path. 
+    The TRE-agrep (http://laurikari.net/tre/) is much slower but has
+    more features and less limitations. 
+
+  GUUGle (http://bibiserv.techfak.uni-bielefeld.de/guugle/)
+    A suffix array implementation for RNA sequences. Only allows search
+    for exact matches. It is very memory efficent and needs no precalculated
+    suffix arrays. Open Source.
+
+  ...and other Perl modules. You will get a warning about missing
+  modules when you run the make command. A lot of dependencies, we know,
+  but most of them are standard software in bioinformatics. So please
+  check if some of them are already installed on your workstation.
+
+
+INSTALLATION
+
+To install this module type the following (AFTER the installation of
+the software in the "Dependecies"-section):
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Alternatively, to install it "the old way", you can use the following
+commands:
+
+   perl Makefile.PL
+   make
+   make test 
+   make install
+
+
+DOCUMENTATION
+
+
+1. Tutorials
+------------
+
+bgrep is an example implementation. The source code is well documented, so
+maybe it is a good starting point.
+
+A not yet comprehensive cookbook is available in perldoc Bio::Grep::Cookbook.
+Please contribute recipes if you can!
+
+
+2. Performance
+--------------
+
+2.1 Vmatch
+
+
+*  Try $sbe->settings->showdesc(200) if you don't need upstream or downstream
+   regions. This makes the parser get all data directly out of vmatch output.
+   Otherwise the parser will call vsubseqselect for every search result.
+
+*  Try $sbe->settings->online(1) if you allow many mismatches.
+
+
+3. FAQ
+------
+
+- Is it possible to get the coordinates of the hit out of the alignment?
+  Yes. $res->alignment->get_seq_by_pos(1)->...
+
+  see perldoc Bio::SimpleAlign
+
+
+BUGS
+
+Please report any bugs, recipes for the cookbook or feature requests to
+C<bug-bio-grep@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007-2009 by M. Riester.
+
+Based on Weigel::Search v0.13, Copyright (C) 2005-2006 by Max Planck 
+Institute for Developmental Biology, Tuebingen.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

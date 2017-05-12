@@ -1,0 +1,12 @@
+[%#
+    Template for block delete buttons.  Pass these parameters:
+
+        name  - the name of the button (usually app_body_delete::ident_4)
+        label - what follows Delete on the button label
+%]
+<button type='button'
+        name='[% name %]'
+        onclick='javascript:delete_block( this )'
+        style='float: right'>
+  Delete [% label %]
+</button>

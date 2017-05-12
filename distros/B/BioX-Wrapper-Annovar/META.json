@@ -1,0 +1,78 @@
+{
+   "abstract" : "A wrapper around the annovar annotation pipeline",
+   "author" : [
+      "Jillian Rowe, C<< <jillian.e.rowe at gmail.com> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.027, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BioX-Wrapper-Annovar",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BioX::Wrapper" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "File::Basename" : "0",
+            "File::Find::Rule" : "0",
+            "File::FindLib" : "0",
+            "File::Path" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Moose" : "0",
+            "MooseX::Getopt" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/jir2004/biox-wrapper-annovar/issues"
+      },
+      "homepage" : "https://bitbucket.org/jir2004/biox-wrapper-annovar",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git@bitbucket.org:jir2004/biox-wrapper-annovar.git",
+         "web" : "https://bitbucket.org/jir2004/biox-wrapper-annovar"
+      }
+   },
+   "version" : "0.40",
+   "x_contributors" : [
+      "Jillian Rowe <jir2004@qatar-med.cornell.edu>"
+   ]
+}
+

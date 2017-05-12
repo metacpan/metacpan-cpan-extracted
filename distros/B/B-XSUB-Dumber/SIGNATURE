@@ -1,0 +1,30 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8d2c5b5da251b1ecc97b48b4f7778e4db3b1d9fc Dumber.xs
+SHA1 5e8dfbdd0444f5aae0e1aab5c9ca3b2c9b87213b MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 7882caab30232b51ca046868294a85c15760e541 META.yml
+SHA1 a27371b35962b15dc93bf0eb17f4913b14039cc5 Makefile.PL
+SHA1 d520fb0a6bf79db616e54c1d5d0b5ab0d5719154 lib/B/XSUB/Dumber.pm
+SHA1 d9c761dec60019d82f57027bf7a3fd5e735fc9bb t/scalar_util.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFIl1jLVCwRwOvSdBgRAjctAJ4pAtJs6p8Hbj8nwX0eeRk6pPmYdwCaA+ZV
+r1oewZtH4DLwd4jAynBgKFk=
+=4ROV
+-----END PGP SIGNATURE-----

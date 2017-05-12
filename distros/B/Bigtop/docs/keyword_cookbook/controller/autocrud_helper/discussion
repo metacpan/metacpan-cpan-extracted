@@ -1,0 +1,16 @@
+=head1 USE
+
+The C<autocrud_helper> keyword is not very useful.  If your controller uses
+DBIx::Class and C<Gantry::Plugins::AutoCRUD>, use this to override the
+default AutoCRUD helper with one you write yourself.  The default
+helper is C<Gantry::Plugins::AutoCRUDHelper::DBIxClass> and your helper
+must provide the same API.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<NonStandard> in lib/Kids/Child.pm.
+Note that you must write and install C<ORM::NonStandard>.

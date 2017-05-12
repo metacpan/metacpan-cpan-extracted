@@ -1,0 +1,93 @@
+NAME
+    Benchmark::Report::GitHub - submit a benchmark report from Travis-CI to
+    GitHub wiki
+
+SYNOPSIS
+    Let's call this `t/benchmarking.pl`.
+
+       #!/usr/bin/env perl
+       use strict;
+       use warnings;
+       use Benchmark::Report::GitHub;
+   
+       my $gh = Benchmark::Report::GitHub->new_from_env;
+   
+       $gh->add_benchmark(
+          "Simple benchmark", -1, {
+             implementation1 => sub { ... },
+             implementation2 => sub { ... },
+          },
+       );
+   
+       $gh->add_benchmark(
+          "Some other benchmark", -1, {
+             implementation1 => sub { ... },
+             implementation2 => sub { ... },
+             implementation3 => sub { ... },
+          },
+       );
+   
+       print $gh->publish, "\n";
+
+    And in your `.travis.yml`:
+
+       env:
+         global:
+           - GH_NAME=username
+           - GH_EMAIL=your@email.address
+           - secure: "..."   # GH_TOKEN
+       after_success: perl -Ilib t/benchmarking.pl
+
+DESCRIPTION
+    After a successful Travis build, this module will `git pull` your
+    project's GitHub wiki, run some benchmarks and output them as markdown,
+    and then `git push` the wiki contents back to GitHub.
+
+  Constructors
+    `new(%attributes)`
+    `new_from_env`
+
+  Attributes
+    `travis_repo_slug`
+        (e.g. "tobyink/p5-type-tiny")
+
+    `gh_name`
+    `gh_email`
+    `gh_token`
+
+  Methods
+    `add_benchmark($name, $times, \%implementations)`
+    `publish(%options)`
+        The supported options (all of which will be picked up from the
+        environment, or a sane default provided if omitted) are:
+
+        `perl_version`
+        `build_number`
+        `build_id`
+        `job_number`
+        `job_id`
+        `page`
+        `index_page`
+        `page_title`
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Report-GitHub>.
+
+SEE ALSO
+    Benchmark, <http://travis-ci.org/>, <http://github.com/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

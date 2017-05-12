@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Pod::Usage;
+use Getopt::Long;
+use Bio::Phylo::Util::Logger ':levels';
+use Bio::Phylo::Forest::DBTree;
+
+# process command line arguments
+my $verbosity = WARN;
+my ( $nodes, $names, $dbfile );
+GetOptions(
+	'nodes=s'  => \$nodes,
+	'names=s'  => \$names,
+	'dbfile=s' => \$dbfile,
+	'verbose+' => \$verbosity,
+	'help'     => sub { pod2usage() },
+	'man'      => sub { pod2usage(1) },		
+);
+if ( not $names or not $nodes or not $dbfile ) {
+	pod2usage();
+}
+
+=head1 NAME
+
+megatree-ncbi-loader - Loads the NCBI taxonomy dump into a database
+
+=head1 SYNOPSIS
+
+    megatree-ncbi-loader -nodes <file> -names <file> -d <file> [-vhm]
+
+=head1 OPTIONS
+
+=over
+
+=item B<< -no <file> >> or B<< -nodes <file> >>
+
+Location of the C<nodes.dmp> file from the NCBI taxonomy dump, i.e. as contained in the
+archive located here as of 2017-02-03: L<ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdmp.zip>
+
+=item B<< -na <file> >> or B<< -names <file> >>
+
+Location of the C<names.dmp> file from the NCBI taxonomy dump, i.e. as contained in the
+archive located here as of 2017-02-03: L<ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdmp.zip>
+
+=item B<< -d <file> >> or B<< -dbfile <file> >>
+
+Location of a database file, compatible with sqlite3, which will be produced. This file
+can not yet exist. If it does, an error message will be emitted and the program will quit.
+
+=item B<-v> or B<-verbose>
+
+Optional.
+
+With this option, more feedback messages are written during processing. This option can be
+used multiple times, which increases the verbosity further.
+
+=item B<-h> or B<-help>
+
+Optional.
+
+Prints help message / documentation.
+
+=item B<-m> or B<-man>
+
+Optional.
+
+Prints manual page. Additional information is available in the documentation, i.e.
+C<perldoc megatree-ncbi-loader>
+
+=back
+
+=head1 DESCRIPTION
+
+This program produces a database file from the NCBI taxonomy dump. Such a database 
+provides much quicker random access to the taxonomy tree then by processing the flat 
+files. The example trees that are referred to by the release of 
+L<Bio::Phylo::Forest::DBTree> have been produced in this way. They can be accessed by an 
+API that is compatible with L<Bio::Phylo>, but much more scalable. An
+example of such API usage is presented by the L<megatree-pruner> script.
+
+=cut
+
+# instantiate helper objects
+my $log = Bio::Phylo::Util::Logger->new(
+	'-level' => $verbosity, 
+	'-style' => 'simple',
+	'-class' => [
+		'main',
+		'Bio::Phylo::Forest::DBTree::Result::Node'
+	]
+);
+my $megatree = Bio::Phylo::Forest::DBTree->connect($dbfile);
+my $dbh  = $megatree->dbh;
+my $sthi = $dbh->prepare("insert into node(id,parent,length) values(?,?,?)");
+my $sthu = $dbh->prepare("update node set name = ? where id = ?");	
+$dbh->{'AutoCommit'} = 1;	
+$dbh->begin_work;	
+
+# insert topology
+{
+	$log->info("going to insert topology");
+	my $i = 0;
+	
+	open my $fh, '<', $nodes or die $!;
+	while(<$fh>) {
+		chomp;
+		my ( $id, $parent ) = split /\t\|\t/, $_;
+		$sthi->execute($id,$parent,1);
+		$log->info("inserted node $i") unless ++$i % 1000;
+	}
+}
+
+# insert names
+{
+	$log->info("going to insert names");
+	my $i = 0;	
+	open my $fh, '<', $names or die $!;
+	while(<$fh>) {
+		chomp;		
+		my ( $id, $name, $discard, $type ) = split /\t\|\t/, $_;
+		if ( $type eq 'scientific name	|' ) {			
+			$sthu->execute($name,$id);
+			$log->info("inserted name $i ($name)") unless ++$i % 1000;
+		}
+	}
+}
+
+# done
+$log->info("going to compute indexes");
+$megatree->get_root->_index;
+$dbh->commit;

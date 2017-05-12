@@ -1,0 +1,10 @@
+Changes
+lib/Bit/Vector/Minimal.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1.t
+t/pod-coverage.t
+t/pod.t

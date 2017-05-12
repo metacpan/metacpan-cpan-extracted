@@ -1,0 +1,53 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2Vec2} class b2Vec2
+{
+
+b2Vec2( float32 x, float32 y );
+
+void SetZero();
+
+void Set( float32 x_, float32 y_ );
+
+float32 Length();
+
+float32 LengthSquared();
+
+float32 Normalize();
+
+bool IsValid();
+
+%{
+
+float32
+b2Vec2::x( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->x = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->x;
+	OUTPUT:
+		RETVAL
+
+float32
+b2Vec2::y( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->y = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->y;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

@@ -1,0 +1,40 @@
+Business-OnlinePayment-ElavonVirtualMerchant version 0.03
+=========================================================
+
+This module provides an interface to the Elavon (formerly Nova Information
+Systems) Virtual Merchant real-time payment gateway from applications
+using the Business::OnlinePayment API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Business::OnlinePayment::HTTPS
+
+TESTING
+
+You can test against the Elavon demo server by setting the environment variables:
+
+  ELAVON_SERVER=demo.myvirtualmerchant.com
+  ELAVON_PATH=/VirtualMerchantDemo/process.do (The path is not the same as on the live server.)
+  ELAVON_ACCOUNT and ELAVON_USERID will be the user ID allocated to you by Elavon's internet support group.
+  ELAVON_PASSWORD will be the PIN for that user set when you log into the demo server control panel.
+  DEBUG can be set to a variety of values. 0 suppresses most information, while 10 gives you a lot of information about what's being sent and received. This can reveal that you don't have Crypt::SSLeay installed, or your login credentials are wrong.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 by Richard Siddall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

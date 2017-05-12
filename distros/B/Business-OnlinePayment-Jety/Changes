@@ -1,0 +1,32 @@
+Revision history for Business-OnlinePayment-Jety
+
+0.09    Mon Aug 15 18:50:43 PDT 2011
+        - POD updates
+        - CPAN upload
+
+0.08    Fri Mar 19 00:22:40 PDT 2010
+        - Add "credit" as a synonym for "void".
+
+0.07    Wed Mar 10 21:27:53 PST 2010
+        - Add _info support.
+        - Fix incorrect use of order_number instead of authorization.
+
+0.06    Wed Feb 17 19:49:45 PST 2010
+        - Add get_returns method.
+
+0.05    unreleased
+        - add a full timestamp to the 'ref' autogeneration to avoid collisions
+
+0.04    Fri Nov  6 15:34:48 PST 2009
+        - Really use 111-1111-1111 if no phone number is provided.
+        - Require description (programdesc).
+
+0.03    Fri Nov  6 13:32:06 PST 2009
+        - Don't default programdesc to our real phone number.
+
+0.02    Fri Nov  6 11:45:48 PST 2009
+        - Use 111-111-1111 if no phone number is provided.
+
+0.01    Wed Oct 21 21:38:52 PDT 2009
+        First version, released on an unsuspecting world.
+

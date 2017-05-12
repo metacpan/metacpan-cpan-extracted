@@ -1,0 +1,11 @@
+Build
+_build
+blib
+.svn
+Makefile
+t/test.db
+emailstore-index
+.db
+testmails/
+buscador.config
+sanitise_mails

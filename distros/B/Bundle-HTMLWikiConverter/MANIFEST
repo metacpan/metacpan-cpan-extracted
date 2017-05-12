@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Bundle/HTMLWikiConverter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

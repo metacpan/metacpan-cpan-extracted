@@ -1,0 +1,64 @@
+Revision history for Best
+
+0.15    2012-12-07
+        Distro cleanups.
+
+0.14    2011-10-26
+        Drop Build.PL from the distribution; it is no longer supported
+        by Module::Install. Thanks to Gregor Herrmann for the report.
+        Document new home for real.
+
+0.13    2011-10-25
+        Misc distro cleanups.
+          Clarify license is MIT
+          Update Module::Install
+          Document new home for source
+
+0.12    2009-01-18
+        Preload mro in tests, unbreaking them in bleadperl (thanks,
+        nothingmuch for the fix).
+
+0.11    2006-12-14
+        Fixed single method imports. Thanks to Tatsuhiko Miyagawa for
+        the report.
+
+0.10    2006-09-30
+        Doc fixes and cleanups.
+
+0.09    2006-09-30
+        [REDACTED]
+
+0.08    2006-09-30
+        Added features:
+          Arbitrary code substitutable for modules
+          Minimum version checking
+          Pre-loading validation
+          Post-loading validation
+          Per-module import lists
+        Generated templated tests
+        Fix "no viable module" message to report all encountered
+        errors, not just the one from the last module.
+
+0.07    2006-08-29
+        POD fix.
+
+0.06    2006-06-30
+        Use parens around args to carp, which was broken in bleadperl.
+        Thanks to Martin 'Kingpin' Thurn for the report. Closes
+        http://rt.cpan.org/Public/Bug/Display.html?id=20205
+
+0.05    2006-06-28
+        Add C<which> method to query which alternative succeeded.
+
+0.04    2006-06-27
+        Doc fix.
+
+0.03    2006-06-27
+        Doc fix.
+
+0.02    2006-06-27
+        Don't shove debugging routines to main::
+
+0.01    2006-06-25
+        First version, released on an unsuspecting world.
+

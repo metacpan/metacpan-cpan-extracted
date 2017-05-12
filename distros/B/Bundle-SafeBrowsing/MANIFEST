@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/Bundle-SafeBrowsing.t
+t/pod.t
+lib/Bundle/SafeBrowsing.pm
+META.yml                                 Module meta-data (added by MakeMaker)

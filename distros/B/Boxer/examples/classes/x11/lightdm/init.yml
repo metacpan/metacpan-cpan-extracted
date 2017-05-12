@@ -1,0 +1,7 @@
+classes:
+  - x11
+parameters:
+  pkg:
+    - lightdm
+  pkg-auto:
+    - xserver-xorg

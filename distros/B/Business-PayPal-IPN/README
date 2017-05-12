@@ -1,0 +1,243 @@
+NAME
+    Business::PayPal::IPN - Perl extension that implements PayPal IPN v1.5
+
+SYNOPSIS
+      use Business::PayPal::IPN;
+
+      my $ipn = new Business::PayPal::IPN() or die Business::PayPal::IPN->error();
+
+      if ( $ipn->completed ) {
+        # ...
+      }
+
+ABSTRACT
+    Business::PayPal::IPN implements PayPal IPN version 1.5. It validates
+    transactions and gives you means to get notified of payments to your
+    PayPal account. If you don't already know what PayPal IPN is this
+    library may not be for you. Consult with respective manuals provided by
+    PayPal.com, http://www.paypal.com/.
+
+  WARNING
+
+    *$Revision: 1.6 $* of Business::PayPal::IPN supports version 1.5 of the
+    API. This was the latest version as of Tuesday, August 19, 2003.
+    Supported version number is available in
+    "$Business::PayPal::IPN::SUPPORTEDV" global variable. If PayPal
+    introduces new response variables, Business::PayPal::IPN automatically
+    supports those variables thanks to AUTOLOAD. For any further updates,
+    you can contact me or send me a patch.
+
+PAYPAL IPN OVERVIEW
+    As soon as you receive payment to your PayPal account, PayPal posts the
+    transaction details to your specified URL, which you either configure in
+    your PayPal preferences, or in your HTML forms' "notify_url" hidden
+    field.
+
+    When the payment details are received from, supposedly, PayPal server,
+    your application should check with the PayPal server to make sure it is
+    indeed a valid transaction, and that PayPal is aware of it. This can be
+    achieved by re-submitting the transaction details back to
+    https://www.paypal.com/cgi-bin/webscr and check the integrity of the
+    data.
+
+    If the transaction is valid, PayPal will respond to you with a single
+    string "VERIFIED", and you can proceed safely. If the transaction is not
+    valid, you will receive "INVALID", and you can log the request for
+    further investigation.
+
+    So why this verification step is necessary? Because it is very easy for
+    others to simulate a PayPal transaction. If you do not take this step,
+    your program will be tricked into thinking it was a valid transaction,
+    and may act the way you wouldn't want it to act. So you take extra step
+    and check directly with PayPal and see if such a transaction really
+    happened
+
+    Business::PayPal::IPN is the library which encapsulates all the above
+    complexity into this compact form:
+
+      my $ipn = new Business::PayPal::IPN() or die Business::PayPal::IPN->error();
+
+      # if we come this far, we're guaranteed it was a valid transaction.
+      if ( $ipn->completed() ) {
+        # means the funds are already in our paypal account.
+
+      } elsif ( $ipn->pending() ) {
+        # the payment was made to your account, but its status is still pending
+        # $ipn->pending() also returns the reason why it is so.
+
+      } elsif ( $ipn->denied() ) {
+        # the payment denied
+
+      } elsif ( $ipn->failed() ) {
+        # the payment failed
+
+      }
+
+PREREQUISITES
+    *   LWP - to make HTTP requests
+
+    *   Crypt::SSLeay - to enable LWP perform https (SSL) requests. If for
+        any reason you are not able to install Crypt::SSLeay, you will need
+        to update $Business::PayPal::IPN::GTW to proper, non-ssl URL.
+
+METHODS
+    *   "new()" - constructor. Validates the transaction and returns IPN
+        object. Optionally you may pass it query and ua options. query
+        denotes the CGI object to be used. ua denotes the user agent object.
+        If ua is missing, it will use LWP::UserAgent by default. If the
+        transaction could not be validated, it will return undef and you
+        should check the error() method for a more detailed error string:
+
+          $ipn = new Business::PayPal::IPN() or die Business::PayPal::IPN->error();
+
+    *   "vars()" - returns all the returned PayPal variables and their
+        respective values in the form of a hash.
+
+          my %paypal = $ipn->vars();
+          if ( $paypal{payment_status} eq 'Completed' ) {
+            print "Payment was made successfully!";
+          }
+
+    *   "query()" - can also be accessed via "cgi()" alias, returns
+        respective query object
+
+    *   "response()" - returns HTTP::Response object, which is the response
+        returned while verifying transaction through PayPal. You normally
+        never need this method. In case you do for any reason, here it is.
+
+    *   "user_agent()" - returns user agent object used by the library to
+        verify the transaction. Name of the agent is
+        "Business::PayPal::IPN/#.# (libwww-perl/#.##)".
+
+    Business::PayPal::IPN supports all the variables supported by PayPal IPN
+    independent of its version. To access the value of any variable, use the
+    corresponding method name. For example, if you want to get the first
+    name of the user who made the payment ('first_name' variable):
+
+      my $fname = $ipn->first_name()
+
+    To get the transaction id ('txn_id' variable)
+
+      my $txn = $ipn->txn_id()
+
+    To get payment type ('payment_type' variable)
+
+      $type = $ipn->payment_type()
+
+    and so on. For the list of all the available variables, consult IPN
+    Manual provided by PayPal Developer Network. You can find the link at
+    the bottom of http://www.paypal.com.
+
+    In addition to the above scheme, the library also provides convenience
+    methods such as:
+
+    *   "status()" - which is a shortcut to "payment_status()"
+
+    *   "completed()" - returns true if "payment_status" is "Completed".
+
+    *   "failed()" - returns true if "payment_status" is "Failed".
+
+    *   "pending()" - returns true if "payment_status" is "Pending". Return
+        value is also the string that explains why the payment is pending.
+
+    *   "denied()" - returns true if "payment_status" is "Denied".
+
+RETURN VALUES OF METHODS
+    Methods can return 1, 0 or undefined as well as any other true value.
+    The distinction between 0 (which is false) and undefined (which is also
+    false) is important:
+
+      $ipn->completed eq undef and print "Not relevant for this transaction type";
+      $ipn->completed == 1 and print "Transaction was completed";
+      $ipn->completed == 0 and print "Transaction was NOT completed";
+
+    In other words, methods return undef indicating this variable is not
+    relevant for this transaction type ("txn_type"). A good example for such
+    transactions is "subscr_signup" transaction, that do not return any
+    "payment_status" nor "txn_id" variables. Methods return 0 (zero)
+    indicating failure. They return 1 (one) or any other true value
+    indicating success.
+
+DEBUGGING
+    If for any reason your PayPal IPN solutions don't work as expected, you
+    have no other choice but debugging the process. Although it sounds
+    complex, it really is not.All you need to do is get your IPN script to
+    dump Business::PayPal::IPN object into a file and investigate to see
+    what exactly is happening. For this reason, we provide "dump()" method
+    which does just that:
+
+    *   "dump([$filename] [,$indent])" - for dumping Business::PayPal::IPN
+        object. If used without any arguments, simply returns the object as
+        Perl data structure. If filename is passed as the first argument,
+        object is dumped into the file. The second argument, if present,
+        should be a value between 1 and 3 to indicate how well indented the
+        dump file should be. For debugging purposes, I believe 2 is enough,
+        but go ahead and try out for yourself to compare differences.
+
+      Note that the object is dumped only once to the same file. So after investigating the dump,
+      you may need to remove the file or dump to another file instead.
+
+    Interpreting the dump file may seem tricky, since it is relatively big
+    file. But you don't need to understand everything in it. Simply look for
+    the attribute called "_PAYPAL_VARS". It is a hashref that keeps all the
+    variables returned from PayPal server. These are also the methods that
+    are available through Business::PayPal::IPN object.
+
+    You can also investigate the content of "response" attribute. It holds
+    the HTTP::Response object. Look for the "_content" attribute of this
+    object. This is what was returned from PayPal.com in response to your
+    request. Ideally, this should hold "VERIFIED". "INVALID" is also
+    explainable though :-).
+
+    Before you do any "dumping" around, include the following lines on top
+    of your IPN script if you haven't done so already. This will ensure that
+    when PayPal.com calls your IPN script, all the warnings and error
+    messages, if any, will be saved in this file.
+
+      use CGI::Carp 'carpout';
+      BEGIN {
+        open(LOG, '>>path/to/error.log') && carpout(\*LOG);
+      }
+
+VARIABLES
+    Following global variables are available:
+
+    *   $Business::PayPal::IPN::GTW - gateway url to PayPal's Web Script.
+        Default is "https://www.paypal.com/cgi-bin/webscr", which you may
+        not want to change. But it comes handy while testing your
+        application through a PayPal simulator.
+
+    *   $Business::PayPal::IPN::SUPPORTEDV - supported version of PayPal's
+        IPN API. Default value is "1.5". You can modify it before creating
+        ipn object (as long as you know what you are doing. If not don't
+        touch it!)
+
+    *   $Business::PayPal::IPN::VERSION - version of the library
+
+AUTHOR
+    Sherzod B. Ruzmetov <sherzodr@cpan.org>
+
+CREDITS
+    Following people contributed to this library with their patches and
+    suggestions. It's very possible that list is not complete. Help me with
+    it.
+
+    Brian Grossman
+        Fixes in the source code. pathces/brian-grososman.
+
+    Thomas J Mather
+        Documentation fixes. patches/thomas-mather.patch
+
+COPYRIGHT AND LICENSE
+    Copyright 2003 by Sherzod B. Ruzmetov.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    THIS LIBRARY IS PROVIDED WITH THE USEFULNESS IN MIND, BUT WITHOUT EVEN
+    IMPLIED GUARANTEE OF MERCHANTABILITY NOR FITNESS FOR A PARTICULAR
+    PURPOSE. USE IT AT YOUR OWN RISK.
+
+REVISION
+    $Revision: 1.6 $
+

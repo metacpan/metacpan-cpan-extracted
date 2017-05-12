@@ -1,0 +1,42 @@
+Revision history for Perl extension Barcode::Code128.
+
+1.00  Fri Mar  5 18:43:06 1999
+        - original version; created by h2xs 1.18
+
+1.01  Mon Jul 19 03:06:31 1999
+        - Apply bugfix to fix problems where input ends in zeroes
+
+1.10  Tue Oct 26 11:07:10 1999
+        - Generate PNG instead of GIF files
+
+1.11  Fri Oct 29 22:26:12 1999
+        - Fix bug in test script
+
+2.00  Mon May 28 14:54:21 2001
+        - Changes suggested by Lance Held <lheld@nanogen.com>:
+          * Add $preferred_code option to encode() to allow user to specify a
+            preference of e.g. code B
+          * Modify _encodable to not be so eager to switch to code C
+        - Make GD optional; support either GIF or PNG (Add gd_image
+          and gif methods)
+        - Add scale option to gif, png, gd_image
+        - Alter gd_image to use options
+        - Update diagnostics section to match same sequence they appear in code
+        - Add font_align option (courtesy Gavin Brock <gavin.brock@nssmb.com>)
+        - Add transparent_text option
+
+2.01  Tue Jul 17 13:07:04 PDT 2007
+        - Change AUTOLOAD to not try to call destroy()
+          As suggested in http://rt.cpan.org/Public/Bug/Display.html?id=14850
+
+2.20  Tue Mar 29 11:51:38 CDT 2011
+        - Fixed tests to avoid failures, upgrade tests to Test::More
+          (courtesy Mark A. Stratman <stratman@gmail.com>)
+        - Remove conditional support for GIF/PNG as all new versions
+          since 2004 of GD should support both
+
+2.21  Mon Sep 24 12:10:29 PDT 2012
+        - Redesign tests to use Test::More and to be more tolerant of
+          how different versions of GD encode images
+          (thanks to Lukas Mueller <lam87@cornell.edu>)
+        - Add PREREQ_PM to Makefile.PL

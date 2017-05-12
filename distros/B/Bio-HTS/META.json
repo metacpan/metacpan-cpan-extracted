@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl interface to htslib. Currently only tabix is supported",
+   "author" : [
+      "Alex Hodgkins"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-HTS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "1.46",
+            "Mouse" : "2.004002",
+            "Try::Tiny" : "0.22",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::HTS" : {
+         "file" : "lib/Bio/HTS.pm",
+         "version" : "v0.0.1"
+      },
+      "Bio::HTS::File" : {
+         "file" : "lib/Bio/HTS/File.pm"
+      },
+      "Bio::HTS::Logger" : {
+         "file" : "lib/Bio/HTS/Logger.pm"
+      },
+      "Bio::HTS::Tabix" : {
+         "file" : "lib/Bio/HTS/Tabix.pm"
+      },
+      "Bio::HTS::Tabix::Iterator" : {
+         "file" : "lib/Bio/HTS/Tabix/Iterator.pm"
+      },
+      "Bio::HTS::VCF" : {
+         "file" : "lib/Bio/HTS/VCF.pm"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

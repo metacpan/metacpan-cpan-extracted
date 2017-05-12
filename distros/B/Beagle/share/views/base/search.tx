@@ -1,0 +1,19 @@
+: include "header.tx";
+
+: if not $results_only {
+<div id="search" class="search">
+<form name="search" action="<: $prefix:>search" >
+<input type="text" name="query" value="<: $query :>" />
+</form>
+</div>
+: }
+
+<div class="results">
+: if $search_only {
+: include "_tags.tx";
+: } else {
+: include "_search_result.tx";
+: }
+</div>
+
+: include "footer.tx";

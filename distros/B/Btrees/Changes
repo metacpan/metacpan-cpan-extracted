@@ -1,0 +1,15 @@
+Revision history for Perl extension Btrees.
+
+... #3 change 19157 edit on 2001/08/21 by ron@slb_ron (xtext)
+
+        For Btrees, give credit where credit due.
+
+... #2 change 7941 edit on 2001/01/15 by ron@slb_ron (xtext)
+
+        Incorporated Btrees into address selection for memory fragment
+        allocation.
+
+... #1 change 7886 add on 2001/01/15 by ron@slb_ron (xtext)
+
+        Added Btrees for an O(N) to log2N speedup for list data that must
+        remain unique over the list.

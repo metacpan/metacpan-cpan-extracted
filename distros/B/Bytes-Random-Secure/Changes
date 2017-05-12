@@ -1,0 +1,182 @@
+Revision history for Bytes::Random::Secure
+
+0.29 2015-07-12
+  - Added a shuffle method available via the OO user interface.
+  - Added a SEE ALSO POD section that mentions Bytes::Random::Secure::Tiny
+
+0.28 2013-11-21
+  - Removed silly micro-optimization that was responsible for generating a
+    warning in Perl versions prior to 5.18.
+
+0.27 2013-10-06
+  - Merged pull request from David Steinbrunner: specifying meta-spec
+    so metadata can be seen/used.
+  - Fixed t/05-kwalitee.t to work with latest revisions on Test::Kwalitee.
+
+0.26 2012-06-22
+  - Improved a test comment in t/27....t.  Removed a comment paragraph that
+    isn't relevant now that the timing has been removed.
+  - POD edits.
+  - POD spelling corrections (closes RT#86326).
+  - Add "FORK AND THREAD SAFETY section to CAVIATS.
+
+0.25 2012-02-23
+  - Removed the speed test / fall-back from t/27-fips140-1.t; it's unnecessary,
+    and could cause divide by zero errors on really fast systems.
+
+0.24 2012-02-22
+  - Added a small explanation of Test::Warn optional dependency to the
+    DEPENDENCIES section of the POD.  Most of the explanation is in the
+    INSTALLATION section.
+  - Added t/27-fips140-1.t: Code taken directly from Dana Jacobsen's
+    Crypt::Random::TESHA2 module's test suite.  This test implements the
+    FIPS 140-1 tests.  See http://csrc.nist.gov/publications/fips/fips1401.htm
+  - Removed "slow" tests from t/20-functions.t: The FIPS-140 tests are superior
+    and make the older slow tests unnecessary.
+
+0.23 2012-02-11
+  - Clarified the (small) magnitude of the performance issues surrounding
+    random_string_from() (MODULO BIAS section of POD). (DANAJ's suggestion.)
+  - Added a test for _closest_divisor().
+  - Added a POD section discussing ISAAC's strengths.
+  - Increased SEED_MAX bits from 512 (arbitrary) to 8192 (theoretical
+    max for ISAAC).  Added explanation to POD, and adjusted tests.
+  - Minor corrections in # code comments (accuracy).
+  - Added irand() object method per Dana Jacobsen's request and
+    code contribution.
+  - POD and tests for irand().
+  - Test::Warn is now an optional dependency.  By ensuring that Test::Warn is
+    installed, the module has 100% test coverage (per Devel::Cover).
+
+0.22 2013-01-29
+  - Implement suggestions from Dana Jacobsen (Unicode tests, specify minimum 
+    versions for dependencies, document installation on older Perls).
+  - POD correction -- Removed reference to config_seed.
+  - POD: Added INSTALLATION section to address issues with older Perls.
+  - POD: Clarified "CAVEATS" with discussion of Unicode support in pre-5.8.9.
+  - Added t/23-string_from_unicode.t to test Unicode on Perl 5.8.9+.
+  - Added a Unicode example to examples/random_from.pl.
+  - Set a CONFIGURE_REQUIRES to pull in a recent ExtUtils::MakeMaker.
+  - Set minimum versions on some Core modules from which we're using newer
+    features, or which behaved badly in old 5.6.x-contemporary versions.
+    
+0.21 2013-01-24
+  - All functions and methods will now throw an exception if the byte-count
+    parameter is passed something that doesn't look like an integer >= 0.
+  - examples/*.pl updated to demonstrate new features.
+  - Remove silly check for "bag" strings longer than 2**32.
+  - Eliminate a line of unreachable code from _closest_divisor().
+  - Test coverage is now 100%.
+
+0.20 2013-01-24
+  - This is a major release.  Much thanks to Dana Jacobson for his ideas,
+    suggestions, code reviews, and for writing Crypt::Random::Seed.
+  - Major refactoring / rewrite.
+  - Built an OO base layer over which the functions interface is a thin wrapper.
+  - OO interface exposed publically.
+  - Documented all functions. (POD)
+  - removed config_seed() (never publically released).
+  - Seed defaults for both interfaces are 256 bits.
+  - Major enhancements to test suite. (Coverage is 99.3%)
+  - ALL OF THE FOLLOWING CHANGES ARE FROM (UNRELEASED) 0.13:
+  - * Compatible with Perl 5.6.
+  - * Dropped Crypt::Random::Source dependency in favor of Crypt::Random::Seed.
+  - * Seeding is lazy.
+  - * Minimum seed size: 2-longs (64 bits).  Maximum, 16 longs (512 bits).
+  - * Documented how to configure seeding.
+
+0.13 2013-01-15 (Never released)
+  - POD clarification, enhancement.
+  - Improved backwards compatibility support for Perl v5.6.x.
+  - Eliminated Crypt::Random::Source dependency in favor of Crypt::Random::Seed;
+    Thanks to Dana Jacobsen for creating that light-weight and powerful tool.
+  - Added some seed tests.
+  - Made Test::Pod::Coverage a 'RELEASE_TESTING' only test.
+  - Made seeding and RNG-instantiation "lazy" so that
+    "use Bytes::Random::Secure;" only drains system entropy if random bytes are
+    actually requested.  (Thanks again to Dana Jacobsen for the idea).
+  - Modified _seed() to pass seed configuration through to Crypt::Random::Seed's
+    constructor.
+  - Added a config_seed() class method to facilitate configuration of
+    the Crypt::Random::Seed object used in seeding the ISAAC algorithm.
+  - Minimum seed size set to 2-longs, max to 16-longs (default).
+  - Documented how to configure the seeding, and explained why it might be
+    useful to do so (drain less system entropy).
+  - Added META.* tests.
+
+0.12 2012-12-09
+  - Applied rewrite of random_bytes() from Dana Jacobsen, that improves
+    performance while at the same time making better use of the 32 bit random
+    value returned by ISAAC.
+  - POD fixes/tweaks.
+
+0.11 2012-12-05
+  - Fixed a few issues where v0.10 broke compatibility with Perls older than
+    v5.10. (Removed // operator.)
+  - POD improvements.
+  - Added a few entries in MANIFEST.SKIP.
+  
+0.10 2012-12-04
+  - Better handling of random_bytes() (no parameter passed): Now defaults to
+    zero bytes explicitly, so we don't get "uninitialized values" warnings.
+  - Added random_string_from($bag,$length) function.
+  - Added tests for no param list, as well as for new random_string_from()
+    function and its support functions.
+  - POD enhancements.
+  - Removed bytes pragma; it wasn't necessary, and prevented support for
+    unicode code points in random_string_from()'s bag.
+
+0.09 2012-11-02
+  - "Changes" is now CPAN::Changes::Spec compliant.
+  - Added t/09-changes.t to verify spec compliance.
+
+0.08 2012-10-28
+  - Added an example in the ./examples/ directory.
+  - Added a minimum Perl version to the distribution metadata.
+
+0.07 2012-09-23
+  - Refined t/20-functionality.t's approach toward verifying bytes seem well
+    behaved.
+  - Corrected a couple of POD problems.
+  - Note: Under Moose the test suite generates a few warnings.  Not sure what
+    the best solution will be (they're harmless but annoying).
+
+0.06 2012-09-21
+  - Fixed the optionality of t/21-bytes_random_tests.t.
+  - Documented the install process in README.
+
+0.05 2012-09-20
+  - POD revisions: Better details on dependencies, minimizing bloat, and 
+    Win32-specific requirements.
+  - 21-bytes_random_tests.t is now optional, because Statistics::Basic will 
+    fail to install in some environments due to a problem in one of its 
+    dependencies (Number::Format).
+
+0.04 2012-09-19
+  - Added t/21-bytes_random_tests.t, which is an adaptation of the test suite
+    for the Bytes::Random module.
+  - Added a BUILD_REQUIRES dependency to accommodate the Bytes::Random tests.
+
+0.03 2012-09-18
+  - POD enhancements, explaining the dependency chain, and how to minimize
+    the Any::Moose impact by ensuring Mouse is installed.
+  - Removed syntax that was only valid for newer versions of Perl.  We should
+    be 5.6.x compatible now.
+  - Placed the random number factory in a closure, making it only accessable
+    by the accessor random_bytes().
+  - Added some tests for seed generation since we took that functionality 
+    away from Math::Random::Secure when we removed it from our list of
+    dependencies in v0.02.
+  - Added a Win32 test to Makefile.PL so that a Windows-only dependency will
+    be included if necessary.
+
+0.02 2012-09-17
+  - Removed Math::Random::Secure dependency.
+  - Added Math::Random::ISAAC and Crypt::Random::Source dependencies (they
+    were already dependencies of Math::Random::Secure, so we're actually a
+    little lighter-weight now).
+  - POD enhancements: Explain Math::Random::ISAAC::XS plugin, explain
+    dependency chain, and explain why it gets a whole lot worse under Windows.
+
+0.01 2012-09-06
+  - Initial CPAN release.

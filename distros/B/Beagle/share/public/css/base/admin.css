@@ -1,0 +1,232 @@
+div.admin, div.admin-list {
+    margin-top: 3%;
+    font-family: monospace;
+}
+
+div.admin label {
+    float: left;
+    width: 32%;
+    margin-left: 1%;
+    margin-top: 1%;
+    text-align: right;
+}
+
+div.admin input, div.admin select {
+    margin-left: 1%;
+    margin-top: 1%;
+    float: left;
+}
+
+div.admin input {
+    min-width: 20em;
+}
+
+div.admin div.textarea {
+    float: left;
+    width: 80%;
+    margin-left: 22%;
+}
+
+div.admin div.textarea textarea {
+    margin-left: 1%;
+    padding: .2em;
+}
+
+div.admin div.textarea > textarea {
+    border: #3c769d 3px solid;
+    margin-top: 1%;
+    width: 70%;
+	height: 375px;
+}
+
+div.admin div.yes, div.admin div.no {
+    float: left;
+    margin-right: 3%;
+    text-align: left;
+    margin-left: 2%;
+}
+
+div.admin input[type=checkbox] {
+    width: 5%;
+    min-width: 5%;
+    float: left;
+}
+
+div.admin input[type=submit] {
+    width: 10%;
+    min-width: 10%;
+    margin-right: 5%;
+    margin-left: 3%;
+}
+
+div.admin-links {
+    float: right;
+}
+
+div.admin-list ul {
+    list-style-type: none;
+    margin-top: 1%;
+    margin-right: 1%;
+    margin-bottom: 1%;
+    padding: 0;
+    display: block;
+}
+
+div.admin-list li {
+    margin-top: 0.5%;
+    margin-right: 1%;
+    height: 1em;
+    padding: 0.5%;
+}
+
+div.admin-list div.type {
+    width: 10%;
+    margin-left: 1%;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    float: left;
+    margin-bottom: 1%;
+}
+
+div.admin-list div.id {
+    width: 35%;
+    margin-left: 1%;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap;
+    float: left;
+    margin-bottom: 1%;
+}
+
+div.admin-list div.summary {
+    margin-left: 1%;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 35%;
+    float: left;
+    margin-bottom: 1%;
+}
+
+
+div.admin-list div.view {
+    float: left;
+    margin-left: 1%;
+    margin-bottom: 1%;
+}
+
+div.admin-list div.edit {
+    float: left;
+    margin-left: 1%;
+    margin-bottom: 1%;
+}
+
+div.admin-list div.delete {
+    float: left;
+    margin-left: 1%;
+    margin-bottom: 1%;
+}
+
+div.admin form {
+    margin-bottom: 2%;
+}
+
+div.admin a.image {
+    width: 10%;
+}
+
+div.admin a.attachment img {
+    height: 40px;
+    margin-top: -10px;
+}
+
+div.admin a.attachment {
+    float: left;
+    margin-right: 20px;
+    margin-left: 2px;
+    margin-top: 1%;
+}
+
+form.create-comment {
+    min-width: 40em;
+    max-width: 70em;
+    margin-left: 3em;
+    margin-right: 2em;
+    height: 18em;
+}
+
+form.create-comment label {
+    float: left;
+    width: 32%;
+    margin-left: 1%;
+    margin-top: 1%;
+    text-align: right;
+}
+
+form.create-comment input[type=text] {
+    margin-left: 1%;
+    margin-top: 1%;
+    float: left;
+    min-width: 20em;
+}
+
+form.create-comment div.textarea {
+    margin-top: 2%;
+    display: block;
+}
+
+form.create-comment textarea {
+    width: 80em;
+    height: 20ex;
+    margin-top: 2%;
+}
+
+div.submit {
+    text-align: right;
+    display: block;
+}
+
+form.create-comment input[type=submit] {
+    margin-top: 1%;
+}
+
+div.wrapper {
+    width: 100%;
+    float: left;
+    margin-top: 1%;
+    height: 2em;
+}
+
+div.textarea {
+    margin-top: 1%;
+}
+
+#term {
+    border-radius: 1em !important;
+    border: 1px solid black;
+    height: 80%;
+    overflow-y: auto;
+    margin-top: 3%;
+}
+
+#term * {
+    font-size: 18px !important;
+}
+
+input.attach-more {
+    min-width: 2em !important;
+}
+
+div.create-entry {
+    display: inline;
+}
+
+div.create-entry > ul {
+    padding: 0.25em;
+}
+
+div.admin-links a {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+

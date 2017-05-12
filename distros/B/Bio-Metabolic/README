@@ -1,0 +1,47 @@
+Bio::Metabolic version 0.06
+===========================
+
+This module is inteded to provide methods and objects to represent biochemical
+reaction networks in Perl.
+
+So far the functionality is very basic, but it is inteded to include many
+different features (see TODO).
+
+The module consists of the following submodules (list likely to grow):
+
+Bio::Metabolic::Substrate          - representation of biochemical compounds
+
+Bio::Metabolic::Substrate::Cluster - representation of a group of biochemical
+                                     compounds
+
+Bio::Metabolic::Reaction           - representation of biochemical reactions
+
+Bio::Metabolic::Network            - representation of biochemical reaction
+                                     networks
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SEE ALSO
+
+The development takes place on Sourceforge at
+http://sourceforge.net/projects/bio-metabolic
+
+Please send your suggestions, inquiries, and feedback to
+bio-metabolic-support at lists dot sourceforge dot net. Feel free to
+subscribe to the developers mailing list:
+bio-metabolic-develop at lists dot sourceforge dot net
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Oliver Ebenhöh
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

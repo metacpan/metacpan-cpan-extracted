@@ -1,0 +1,9 @@
+dn: cn=aka testcase, ou=addressbook, dc=geekfarm, dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: aka testcase
+givenName: aka
+sn: testcase
+ou: addressbook

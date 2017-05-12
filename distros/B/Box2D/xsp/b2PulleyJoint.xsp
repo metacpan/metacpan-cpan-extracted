@@ -1,0 +1,71 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2PulleyJoint} class b2PulleyJoint : public %name{Box2D::b2Joint} b2Joint
+{
+
+float32 GetReactionTorque(float32 inv_dt);
+
+float32 GetLength1();
+
+float32 GetLength2();
+
+float32 GetRatio();
+
+%{
+
+b2Vec2*
+b2PulleyJoint::GetAnchorA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorA());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJoint::GetAnchorB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetAnchorB());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJoint::GetReactionForce(inv_dt)
+	float32 inv_dt
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetReactionForce(inv_dt));
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJoint::GetGroundAnchorA()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetGroundAnchorA());
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2PulleyJoint::GetGroundAnchorB()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = new b2Vec2(THIS->GetGroundAnchorB());
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

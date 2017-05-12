@@ -1,0 +1,330 @@
+#!/usr/bin/perl
+
+package Bottarga;
+
+use warnings;
+use strict;
+use utf8;
+use Config::IniFiles;
+use base qw(Bot::BasicBot);
+use constant INIFILE => '.bottargarc';
+use constant SERVER => 'server';
+use constant KARMA => 'karmas';
+use constant IDLEYAWN => 3600;
+use constant OPPED => 'operaio';
+use Time::HiRes;
+use LWP;
+use JSON::XS;
+#use Data::Dumper;
+
+my $sborropippo = 0;
+-f INIFILE or die(INIFILE.' not found!');
+my $conf = Config::IniFiles->new(-file => INIFILE, -allowempty => 1);
+my $key = $conf->val('google', 'key');
+my $cx = $conf->val('google', 'cx');
+my $day = (localtime(time))[3];
+
+my @pranzonauti = ();
+
+my @pongs = (
+	'ma dici a me? Ehi con chi stai parlando? Dici a me?',
+	'c\'è qualcun altro qui? Stai parlando con me?',
+	'non nominare il nome di Dio invano',
+	'tutti con me c\'avete oggi??',
+	'dimmi, stavo sognando tua cuggina',
+	'devo dire a tutti quanto sei bravo col flauto salato?',
+	'vai a giocare a mosca cieca sull\'autostrada, su',
+	'toh un bug, indovina git blame chi sta indicando?',
+	'ma non eri morto?',
+	'vuoi lavorare sul conf_upgrade?',
+	'sei mai stato a Rozzano?',
+	'non mi piace che mi si facciano i fari',
+	'ti cercavano quelli dell\'H&R',
+	'magna, zitto, nte fa vedè',
+	'riusciresti a farti revertare anche il revert di un bug',
+	'sai che ho una malattia che mi fa venire un\'emiparesi del dito medio?',
+	'ma che ooooh',
+	'ma è possibile? portanna..',
+);
+
+my @quits = (
+	'non sentiremo la sua mancanza',
+	'-1',
+	'sono sempre i peggiori che se ne vanno',
+	'chi è che continua ad andar avanti e indrio con chela porta lì?',
+	'addio, adesso insegna agli angeli a scrivere bug',
+	'ne rimarrà soltanto uno'
+);
+
+my @autokarmas = (
+	'ogni scarrafone è bello a mamma sua',
+	'cos\'è, un tentativo di autoerotismo finito male?',
+	'mi fa piacere sapere che c\'è qualcuno che ti apprezza: tu',
+);
+
+my @greets = (
+	'ecco $nick, il cottolengo è al completo',
+	'$nick: pranzonauti te salutant',
+	'$nick: in questo canale non c\'è spazio per tutti e due',
+	'$nick: buongiollo!',
+	'sembrava una giornata di merda. e poi è arrivato $nick',
+	'sento una variazione nella forza',
+	'e benvenutii, a sti frocionii',
+);
+
+my @hellos = (
+	'e mo so cazzi vostri',
+	'buongiollo!',
+	'ciao sfigati!',
+	'qui dentro c\'è la più grande concentrazione di nerd/mq',
+);
+
+my @yawns = (
+	'yawn',
+	'ifdown -a',
+	'vi hanno rediretto in /dev/null?',
+	'dove sono le mie pillole? aiuto, qui fa tanto freddo e ci sono i lupi',
+	'growl',
+);
+
+my @kickwords = (
+	'windows|siamo programmatori, non bimbiminkia',
+	'vegan|gli amici degli animali sono miei nemici',
+	'cloud|si dice SERVER, o al limite clown',
+	'aranzulla|sappiamo già come cambiare la password di MSN, grazie',
+);
+
+my @karmachuck = (
+	'sqrt(-1)',
+	'4294967295',
+	'(unsigned int)-1',
+	'0/0',
+	'UINT_MAX'
+);
+
+my @offese = (
+	'sei talmente brutto che sembri un quadro d\'arte moderna, te ne rendi conto?',
+	'i tuoi genitori hanno anche figli normali?',
+	'la parte migliore dello schizzo da cui sei nato è colata tra le chiappe di tua madre ed ha macchiato il materasso!',
+	'Quanto sei alto? Prima non facevano pile di merda così alte!',
+	'Io scommetto che tu sei uno di quegli ingrati che lo mette in culo a qualche poveraccio senza usargli la cortesia di menarglielo davanti per sdebitarsi! Ti terrò d\'occhio!',
+	'Se possono trarre la penicillina da del pane ammuffito, sicuramente potranno tirare fuori qualcosa da te.',
+	'sei utile come un paio di mutande in un porno',
+	'sei simpatico come un grappolo di emorroidi',
+	'sei utile come la R di Marlboro',
+	'sei utile come una forchetta col brodo',
+	'non sapresti fare nemmeno un cerchio con un bicchiere',
+	'la tua intelligenza è paragonabile a quella di una farfalla che si bruca le ali appena uscita dal bozzolo',
+	'sei simpatico come un crash del browser a metà pugnetta',
+	'no, non ti offendo. la natura è già stata cattiva con te',
+	'sei così sfigato che metti il dito nel pagliaio ti pungi con l\'ago',
+	'stanotte ti ho sognato mentre ti salutavo dall’alto: eri bello, abbronzato e immerso nell\'acqua, poi ho tirato lo scarico e sei sparito',
+	'mi presti la tua faccia che devo fa una figura di merda?',
+	'il tuo contributo all\'umanità è pari a quello dello zero nella somma',
+	'il tuo contributo all\'umanità è pari a quello dell\'uno nella moltiplicazione',
+	'hai la testa per tenere separare le orecchie',
+);
+
+my @replies = (
+	'dvt|https://en.wikipedia.org/wiki/DVT',
+	'balchin|peter bashism',
+	'yaps|Yet Another Piece of Shit?',
+	'adb|http://www.adb.org/',
+	'swisscom|Shitcom',
+	'hostapd|OSTIAPD!',
+	'broadcom|Prodcom',
+	'conf|conf_upgrade??',
+	'upgrade|conf_upgrade??',
+	'porco|http://40.media.tumblr.com/78149a40447fedbfcd02f035a9538ec5/tumblr_o1bc3aYwTA1rn12nzo1_1280.jpg',
+	'dio|http://40.media.tumblr.com/78149a40447fedbfcd02f035a9538ec5/tumblr_o1bc3aYwTA1rn12nzo1_1280.jpg',
+	'blinda|antani, blinda la supercazzola brematurata con doppio scappellamento a destra?',
+	'scappellamento|tarapia tapioco come se fosse antani con la supercazzola brematurata, con lo scappellamento a destra',
+	'brematurata|tarapia tapioco! brematurata la supercazzola o scherziamo?',
+	'brematura|ma no, aspetti, mi porga l\'indice, ecco lo alzi così, guardi, guardi, guardi, lo vede il dito, lo vede che stuzzica, e brematura anche?',
+	'supercazzola|senza contare che la supercazzola prematurata ha perso i contatti col tarapia tapioco',
+	'antani|scusi, noi siamo in quattro, come se fosse antani anche per lei soltanto in due oppure in quattro anche scribai con cofandina',
+);
+
+sub getKarma {
+	my $nick = shift;
+	$conf->AddSection(KARMA);
+	my $karma = $conf->val(KARMA, $nick);
+	$karma = 0 if (!defined $karma);
+	return $karma;
+}
+
+sub incKarma {
+	my $nick = shift;
+	$conf->SectionExists(KARMA) or $conf->AddSection(KARMA);
+	my $karma = $conf->val(KARMA, $nick, 0);
+	$conf->newval(KARMA, $nick, $karma + 1);
+	$conf->RewriteConfig();
+}
+
+sub type {
+	Time::HiRes::usleep(rand(500000) + 300000);
+	my ($self, @message) = @_;
+	$self->say(@message);
+	$self->schedule_tick(IDLEYAWN);
+}
+
+sub userquit {
+	my ($self, $message) = @_;
+	foreach my $chan (keys $self->{IRCOBJ}->{STATE}->{Chans}) {
+		$self->type(channel => $chan, body => $quits[rand @quits]);
+	}
+}
+
+sub chanpart {
+	my ($self, $message) = @_;
+	$self->type(channel => $message->{channel}, body => $quits[rand @quits]);
+}
+
+sub findreply {
+	my $msg = shift;
+	foreach my $k (@replies) {
+		my @tuple = split('\|', $k);
+		if ($msg =~ /\b$tuple[0]\b/i) {
+			return $tuple[1];
+		}
+	}
+}
+
+sub said {
+	my ($self, $message) = @_;
+	if($message->{channel} eq 'msg') {
+		if ($message->{body} =~ /^!say (.+)/) {
+			foreach my $chan (keys $self->{IRCOBJ}->{STATE}->{Chans}) {
+				$self->type(channel => $chan, body => $1);
+			}
+		}
+		return undef;
+	}
+	foreach my $k (@kickwords) {
+		my @tuple = split('\|', $k);
+		if ($message->{body} =~ /$tuple[0]/i) {
+			$self->{IRCOBJ}->yield(kick => $message->{channel} => $message->{who} => $tuple[1]);
+			return undef;
+		}
+	}
+	# messages to me
+	if (defined $message->{address} && $message->{address} eq $self->{nick}) {
+		if ($message->{body} =~ /^(offendi|insulta) (.*)$/) {
+			if($1 eq $self->{nick}) {
+				$self->type(channel => $message->{channel}, body => 'dottore, chiami un dottore!');
+			} elsif (defined $self->{IRCOBJ}->{STATE}->{Chans}->{uc($message->{channel})}->{Nicks}->{uc($1)}) {
+				$self->type(channel => $message->{channel}, who => $1, address => $1, body => $offese[rand @offese]);
+			} else {
+				$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => 'non si parla male degli assenti, escluse le ex');
+			}
+		} elsif ($message->{body} eq 'pranzo' || $message->{body} eq 'mangio') {
+			if(!grep(/$message->{who}/, @pranzonauti)) {
+				push @pranzonauti, $message->{who};
+			}
+			$self->type(channel => $message->{channel}, body => 'ok');
+		} elsif ($message->{body} eq 'salto') {
+			if(@pranzonauti) {
+				my $i = 0;
+				$i++ until $pranzonauti[$i] eq $message->{who};
+				splice(@pranzonauti, $i, 1);
+			}
+			$self->type(channel => $message->{channel}, body => 'finocchio');
+		} elsif ($message->{body} eq 'chi mangia?' || $message->{body} eq 'chi pranza?') {
+			if(@pranzonauti) {
+				$self->type(channel => $message->{channel}, body => join(', ', @pranzonauti));
+				$self->type(channel => $message->{channel}, body => "per un totale di ".@pranzonauti." pranzonauti");
+			} else {
+				$self->type(channel => $message->{channel}, body => 'niente manciare, niente pere, per i prossimi 20 ciorni');
+			}
+		} elsif ($message->{body} =~ /^(.*)\?$/) {
+			if($sborropippo) {
+				$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => 'le seghe');
+			} else {
+				my $ua = LWP::UserAgent->new;
+				$ua->agent('Bottarga');
+				my $req = HTTP::Request->new(GET => "https://www.googleapis.com/customsearch/v1?key=$key&cx=$cx&hl=it&num=1&q=$1");
+				my $res = $ua->request($req);
+				if ($res->is_success) {
+					my $json = decode_json($res->content);
+					if (defined $json->{items}[0]->{link}) {
+						$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => $json->{items}[0]->{link});
+					} else {
+						$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => 'boh');
+					}
+				}
+			}
+		} else {
+			$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => $pongs[rand @pongs]);
+		}
+	} elsif ($message->{body} =~ /^karma (.+)/) {
+		$self->type(channel => $message->{channel}, body => "$1 ha karma ".getKarma(lc($1)));
+	} elsif ($message->{body} =~ /(.+)\+\+$/) {
+		if (defined $self->{IRCOBJ}->{STATE}->{Chans}->{uc($message->{channel})}->{Nicks}->{uc($1)}) {
+			if ($1 eq $message->{who}) {
+				my $msg = $autokarmas[rand @autokarmas];
+				$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => $msg);
+			} else {
+				incKarma(lc($1));
+			}
+		} else {
+			$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => "non vedo $1 nella lista degli invitati");
+		}
+	} elsif (findreply($message->{body})) {
+		$self->type(channel => $message->{channel}, body => findreply($message->{body}));
+	} elsif ($message->{body} =~ /[wl]an/i) {
+		my @reti = ('LAN', 'WAN');
+		$self->type(channel => $message->{channel}, body => 'da '.$reti[rand @reti].' a '.$reti[rand @reti]);
+	} elsif (defined $message->{body} && $message->{body} =~ /\b$self->{nick}\b/i) {
+		$self->type(channel => $message->{channel}, who => $message->{who}, address => $message->{who}, body => $pongs[rand @pongs]);
+	} elsif ($message->{body} eq '!karmas') {
+		$self->type(channel => $message->{channel}, body => 'Karma list:');
+		foreach my $k ($conf->Parameters(KARMA)) {
+			$self->type(channel => $message->{channel}, body => "$k:".$conf->val(KARMA, $k));
+		}
+		$self->type(channel => $message->{channel}, body => 'ChuckNorris:'.$karmachuck[rand @karmachuck]);
+	} elsif ($message->{body} =~ /!sborropippo (.*)/) {
+		if($1 eq 'off') {
+			$sborropippo = 0;
+		} elsif($1 eq 'on') {
+			$sborropippo = 1;
+		}
+	}
+	$self->schedule_tick(IDLEYAWN);
+	return undef;
+}
+
+sub chanjoin {
+	my ($self, $message) = @_;
+	if ($message->{who} eq OPPED) {
+		$self->{IRCOBJ}->yield(mode => $message->{channel} => '+o' => $message->{who});
+	} elsif ($message->{who} eq $self->{nick}) {
+		my $hello = $hellos[rand @hellos];
+		$self->type(channel => $message->{channel}, body => $hello);
+	} else {
+		my $greet = $greets[rand @greets];
+		$greet =~ s/\$nick/$message->{who}/g;
+		$self->type(channel => $message->{channel}, body => $greet);
+	}
+	return undef;
+}
+
+sub tick {
+	my ($self, $message) = @_;
+	my $newday = (localtime(time))[3];
+	if($newday != $day) {
+		$day = $newday;
+		@pranzonauti = ();
+	}
+	foreach my $chan (keys %{$self->{IRCOBJ}->{STATE}->{Chans}}) {
+		$self->type(channel => $chan, body => $yawns[rand @yawns]);
+	}
+}
+
+Bottarga->new(
+	server		=> $conf->val(SERVER, 'hostname'),
+	port		=> $conf->val(SERVER, 'port'),
+	channels	=> [$conf->val(SERVER, 'channel')],
+	nick		=> $conf->val(SERVER, 'nick'),
+	username	=> $conf->val(SERVER, 'username'),
+	name		=> $conf->val(SERVER, 'name'),
+)->run();

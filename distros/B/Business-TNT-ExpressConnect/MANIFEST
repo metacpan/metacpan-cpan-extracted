@@ -1,0 +1,20 @@
+Build.PL
+Changes
+etc/tnt-expressconnect.ini.sample
+lib/Business/TNT/ExpressConnect.pm
+lib/Business/TNT/ExpressConnect/SPc.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+share/tnt-expressconnect/xsd/pricing/v3/commonDefinitions.xsd
+share/tnt-expressconnect/xsd/pricing/v3/commonDefinitions.xsd.orig
+share/tnt-expressconnect/xsd/pricing/v3/PriceRequestIN.xsd
+share/tnt-expressconnect/xsd/pricing/v3/PriceRequestIN.xsd.orig
+share/tnt-expressconnect/xsd/pricing/v3/PriceResponseOUT.xsd
+share/tnt-expressconnect/xsd/pricing/v3/PriceResponseOUT.xsd.orig
+t/01_Business-TNT-ExpressConnect.t
+t/tdata/single_international.xml
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

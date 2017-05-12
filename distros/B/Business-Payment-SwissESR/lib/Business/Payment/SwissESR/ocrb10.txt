@@ -1,0 +1,70 @@
+Some remarks to the METAFONT-Definitions for OCR-B fonts:
+---------------------------------------------------------
+
+  1. This information was developed by
+
+     Norbert Schwarz
+     Ruhr-Universitaet Bochum
+     Rechenzentrum
+     Postfach 10 21 48
+     D-4630 Bochum 1
+     West Germany
+
+     EARN:  P920021@DBORUB01
+     
+     Norbert/Schwarz/ruhr-uni-bochum/de
+
+          
+  2. To my knowledge, the original typeface for OCR-B was developed by
+     Adrian Frutiger.  In Germany there even exists an industrial
+     standard - DIN ????? - that describes the typefaces.  Based on such
+     material the input has been developed.  I cannot speak to the legal
+     consequences of these.
+     
+     As far as the digitization in METAFONT input which I have
+     developed, you may freely use, modify, and/or distribute any of
+     these files or the resulting fonts, without limitation.  A previous
+     release of ocr-b only granted rights for non-commercial use; that
+     restriction is now lifted.
+     
+  3. It is tested that the generated output is machine readable.
+     The tests are done with a 300 dpi laser engine.
+     
+  4. As this work has been done with an early METAFONT version
+     and testing was the main purpose, there was no further
+     development in defining good points with respect to pixels etc.
+     Low resolution devices may give problems.
+     
+  5. There are two main files:
+  
+     OCRBDEF  MF     33454  12.11.86  11:02
+     OCRBMAC  MF      8152   8.09.89  19:51
+  
+     The first one contains the path definitions for all the
+     characters, the second one contains the operating macros.
+     
+  6. Driver files:
+
+     The file OCRB10.MF is the main driver file for the 
+     original OCR-B font, all other files contain variant
+     for illustrating purposes.
+
+     OCRB10   MF       776  12.11.86  11:06
+
+     OCRB10S  MF       774  12.11.86  11:06   sharp corners
+     OCRB10L  MF       770  12.11.86  11:05   slanted
+
+     OCRB10G  MF       778  12.11.86  11:05   outline, slanted
+     OCRB10F  MF       770  12.11.86  11:05   outline
+
+     OCRB10E  MF       784  12.11.86  11:04   negative, sharp corners
+     OCRB10X  MF       777  12.11.86  11:06   negative
+
+     some smaller sizes:
+     
+     OCRB5    MF       776  12.11.86  11:07
+     OCRB6    MF       776  12.11.86  11:07
+     OCRB7    MF       776  12.11.86  11:08
+     OCRB8    MF       776  12.11.86  11:08
+     OCRB9    MF       776  12.11.86  11:08
+     

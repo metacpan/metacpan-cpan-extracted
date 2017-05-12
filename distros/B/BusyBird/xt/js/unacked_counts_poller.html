@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>UnackedCountsPoller tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="spinner"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="./sinon.js"></script>
+    <script src="./uri.js"></script>
+    <script src="../../share/www/static/q.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script src="../../share/www/static/timeline_list.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+var is = strictEqual;
+
+var removeUnderscoreQuery = function(url) {
+    return url.replace(/\&_=[0-9]+/, "");
+};
+
+var FakeCountsServer = function() {
+    var self = this;
+    self.fakexhr = sinon.useFakeXMLHttpRequest();
+    self.pending_request = null;
+    self.request_arrived = Q.defer();
+    self.fakexhr.onCreate = function(req) {
+        if(defined(self.pending_request)) {
+            throw "Request arrived while there is already a pending request.";
+        }
+        self.pending_request = req;
+        self.request_arrived.resolve();
+    };
+};
+
+FakeCountsServer.prototype = {
+    restore: function() { this.fakexhr.restore(); },
+    waitForRequest: function() { return this.request_arrived.promise; },
+    getRequestURL: function() {
+        if(!defined(this.pending_request)) {
+            throw "getRequestURL fails: No pending request";
+        }
+        return removeUnderscoreQuery(this.pending_request.url);
+    },
+    respond: function(timeline_unacked_counts) {
+        if(!defined(this.pending_request)) {
+            throw "respond fails: No pending request";
+        }
+        this.pending_request.respond(
+            200, {},
+            JSON.stringify({"error": null, "unacked_counts": timeline_unacked_counts})
+        );
+        this.pending_request = null;
+        this.request_arrived = Q.defer();
+    }
+};
+
+asyncTest("single timeline, default init counts", function() {
+    var server = new FakeCountsServer();
+    var poller = new bb.UnackedCountsPoller({apiBase: "/apptop"});
+    var received_counts_defer = Q.defer();
+    poller.addTimeline({
+        timelineName: "hoge",
+        callback: function(unacked_counts) {
+            received_counts_defer.resolve(unacked_counts);
+        }
+    });
+    poller.start();
+    server.waitForRequest().then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_hoge=0", "first request URL OK");
+        server.respond({"hoge": {"total": 10, "1": 5, "-1": 5}});
+        return received_counts_defer.promise;
+    }).then(function(received_counts) {
+        deepEqual(received_counts, {"total": 10, "1": 5, "-1": 5}, "first received OK");
+        received_counts = Q.defer();
+        return server.waitForRequest();
+    }).then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_hoge=10", "second request URL OK");
+    }).fail(function(error) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + error);
+    }).then(function() {
+        server.restore();
+        start();
+    });
+});
+
+asyncTest("multiple timelines", function() {
+    var server = new FakeCountsServer();
+    var poller = new bb.UnackedCountsPoller({apiBase: "/apptop"});
+    var received_counts_defers = [];
+    $.each(["zero", "one", "two", "three"], function(i, name) {
+        var init_counts = {total : (i+1)};
+        init_counts[i+1] = i+1;
+        received_counts_defers.push(Q.defer());
+        poller.addTimeline({
+            timelineName: name,
+            callback: function(unacked_counts) {
+                received_counts_defers[i].resolve(unacked_counts);
+            },
+            initialUnackedCounts: init_counts
+        });
+    });
+    var resetReceivedCountsDefers = function(received_index_list) {
+        var received_index_map = {};
+        $.each(received_index_list, function(i, val) {
+            received_index_map[val] = 1;
+        });
+        $.each(received_counts_defers, function(i, defer) {
+            if(received_index_map[i]) {
+                ok(!defer.promise.isPending(), "defer " + i + "should be resolved");
+            }else {
+                ok(defer.promise.isPending(), "defer " + i + "should be pending");
+            }
+        });
+        received_counts_defers = $.map(received_counts_defers, function() { return Q.defer(); });
+    }
+    poller.start();
+    server.waitForRequest().then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_zero=1&tl_one=2&tl_two=3&tl_three=4", "first request OK");
+        server.respond({"zero": {"total": 0}});
+        return received_counts_defers[0].promise;
+    }).then(function(unacked_counts_zero) {
+        deepEqual(unacked_counts_zero, {"total": 0}, "response for zero OK");
+        resetReceivedCountsDefers([0]);
+        return server.waitForRequest();
+    }).then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_zero=0&tl_one=2&tl_two=3&tl_three=4", "second request OK");
+        server.respond({
+            "one": { "2": 3, "0": 2, "-4": 5, "total": 10 },
+            "two": {  "4": 3, "1": 2, "total": 5 }
+        });
+        return received_counts_defers[1].promise;
+    }).then(function(unacked_counts_one) {
+        deepEqual(unacked_counts_one, { "2": 3, "0": 2, "-4": 5, "total": 10 }, "response for one OK");
+        return received_counts_defers[2].promise;
+    }).then(function(unacked_counts_two) {
+        deepEqual(unacked_counts_two, {"4": 3, "1": 2, "total": 5}, "response for two OK");
+        resetReceivedCountsDefers([1,2]);
+        return server.waitForRequest();
+    }).then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_zero=0&tl_one=10&tl_two=5&tl_three=4", "third request OK");
+        server.respond({
+            "three": { "0": 5, "total": 5 },
+        });
+        return received_counts_defers[3].promise;
+    }).then(function(unacked_counts_three) {
+        deepEqual(unacked_counts_three, {"0": 5, "total": 5}, "response for three (0 => 5, total => 5) OK");
+        resetReceivedCountsDefers([3]);
+        return server.waitForRequest();
+    }).then(function() {
+        is(server.getRequestURL(), "/apptop/updates/unacked_counts.json?level=total&tl_zero=0&tl_one=10&tl_two=5&tl_three=5", "fourth request OK");
+    }).fail(function(error) {
+        ok(false, "should not fail");
+        ok(true, "reason: " + error);
+    }).then(function() {
+        server.restore();
+        start();
+    });
+});
+
+    </script>
+  </body>
+</html>

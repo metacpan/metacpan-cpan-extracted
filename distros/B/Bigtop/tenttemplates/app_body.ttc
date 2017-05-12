@@ -1,0 +1,49 @@
+[%#
+    Template for the App Body section of TentMaker home page.
+
+    Expects these parameters:
+
+    statements            - hash describing statements built by
+                            Bigtop::Parser::get_keyword_docs
+    app_blocks            - hash describing these app level constructs:
+                            sequences, tables, controllers, and literals.
+%]
+[%# first allow a way for new blocks to be created %]
+<div class='app_block_new' >
+    <fieldset>
+    <legend>Create</legend>
+    <table>
+        <tr>
+            <td> Name: </td>
+            <td>
+                <input type='text' id='new_app_block_name'/>
+            </td>
+            <td> Type: </td>
+            <td>
+                <select id='new_app_block_type'>
+                    <option value='table'>      Table      </option>
+                    <option value='controller'> Controller </option>
+                    <option value='base_controller'> Base Controller </option>
+                    <option value='literal'>    Literal    </option>
+                    <option value='join_table'> Join Table </option>
+                    <option value='schema'>     Schema (Postgres only)</option>
+                    <option value='config'>     Config Block </option>
+<!--                <option value='sequence'>   Sequence   </option> -->
+                </select>
+            </td>
+            <td colspan='2'>
+                <button type='button'
+                        name='new_app_block_create'
+                        onclick='javascript:create_app_block()'
+                > Create </button>
+            </td>
+        </tr>
+    </table>
+    </fieldset>
+</div>
+<br/>
+[% FOREACH block IN view.data.app_blocks %]
+
+  [% INCLUDE app_body_div.ttc %]
+  <br /> [%# put some space between blocks %]
+[% END %]

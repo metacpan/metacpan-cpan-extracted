@@ -1,0 +1,28 @@
+---
+abstract: 'perl bunlder, inspired by ruby bundler'
+author:
+  - 'Alexey Melezhik / melezhik@gmail.com'
+build_requires: {}
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bundler
+provides:
+  Bundler:
+    file: lib/Bundler.pm
+    version: v0.0.30
+  CPANPLUS::Shell::Default::Plugins::Bundler:
+    file: lib/CPANPLUS/Shell/Default/Plugins/Bundler.pm
+    version: 0
+requires:
+  CPAN::Version: 0
+  Test::More: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.0.30

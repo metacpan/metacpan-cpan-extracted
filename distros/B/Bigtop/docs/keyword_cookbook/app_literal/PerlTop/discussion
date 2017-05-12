@@ -1,0 +1,26 @@
+=head1 USE
+
+C<PerlTop> literals dump output to multiple files.  For C<docs/httpd.conf>
+files, used for mod_perl deployment, its output goes at the top of the Perl
+block -- before any other statements, except the shebang.
+
+For CGI scripts and stand alone servers, the output goes directly after
+the use strict at the top of the scripts.
+
+This literal is particularly useful for specifying alternate lib paths
+as shown in the example.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Look for C<exotic>:
+
+    app.cgi
+    app.server
+    docs/httpd.conf
+
+Notice that clever indentation is more useful for httpd.conf than for
+scripts.

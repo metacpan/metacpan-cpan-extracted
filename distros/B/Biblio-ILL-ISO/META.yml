@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Biblio-ILL-ISO
+version:      0.06
+version_from: lib/Biblio/ILL/ISO/ISO.pm
+installdirs:  site
+requires:
+    Convert::ASN1:                 0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.13

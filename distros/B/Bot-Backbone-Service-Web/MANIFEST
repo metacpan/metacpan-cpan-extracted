@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Bot/Backbone/Service/Web.pm
+lib/Bot/Backbone/Service/Web/LinkTitle.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

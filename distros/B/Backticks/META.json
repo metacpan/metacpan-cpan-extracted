@@ -1,0 +1,49 @@
+{
+   "abstract" : "Use `backticks` like objects!",
+   "author" : [
+      "Anthony Kilna <anthony@kilna.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Backticks",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ISA" : "0",
+            "Filter::Simple" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Backticks" : {
+         "file" : "lib/Backticks.pm",
+         "version" : "v1.0.9"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.9"
+}

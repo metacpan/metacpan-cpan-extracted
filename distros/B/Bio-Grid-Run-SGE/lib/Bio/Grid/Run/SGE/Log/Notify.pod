@@ -1,0 +1,48 @@
+=encoding utf8
+
+=head1 NAME
+
+Bio::Grid::Run::SGE::Log::Notify - get notified if a job finishes
+
+=head1 DESCRIPTION
+
+This guide helps you to set up job notifications for L<Bio::Grid::Run::SGE>
+
+To get job notifiations, create a global config file
+F<$HOME/.bio-grid-run-sge.conf.yml>. It might be wise to restrict reading
+permission, as you might use it to store account details (email, jabber,
+twitter, etc.) for job notifiations.
+
+  chmod 600 ~/.bio-grid-run-sge.conf
+
+
+=head3 Notifications via passwordless SMTP server
+
+Example contents:
+
+    ---
+    notify:
+      mail:
+        dest: person.in.charge@example.com
+        smtp_server: smtp.example.com
+
+=head3 Notifications via jabber account
+
+Beware: You need a jabber account first.
+
+    ---
+    notify:
+      jabber:
+        jid: grid-report@jabber.example.com/grid_report
+        password: ...
+        dest: person-in-charge@jabber.example.com
+
+=head3 Notifications via custom script
+
+    ---
+    notify:
+      script: /path/to/script.sh
+
+=head1 SEE ALSO
+
+L<See more information on global configuration|Bio::Grid::Run::SGE::Config>

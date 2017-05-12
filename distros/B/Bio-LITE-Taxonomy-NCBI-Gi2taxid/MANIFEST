@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Bio/LITE/Taxonomy/NCBI/Gi2taxid.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/Gi2taxid.t
+t/depTax.t
+t/data/dict.in
+t/data/dict.bin
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

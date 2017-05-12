@@ -1,0 +1,26 @@
+---
+abstract: "Business::CPI's Mercado Pago driver"
+author:
+  - 'Thiago Rondon <thiago@aware.com.br>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-CPI-Gateway-MercadoPago
+provides:
+  Business::CPI::Gateway::MercadoPago:
+    file: lib/Business/CPI/Gateway/MercadoPago.pm
+    version: 0.102
+requires:
+  Business::CPI: 0.903
+  Moo: 1.0
+  URI: 0
+  perl: 5.008
+resources:
+  repository: git://github.com/thiagorondon/p5-business-cpi-gateway-mercadopago.git
+version: 0.102

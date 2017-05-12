@@ -1,0 +1,64 @@
+ID   AB030700   standard; RNA; ROD; 314 BP.
+XX
+AC   AB030700;
+XX
+SV   AB030700.1
+XX
+DT   05-AUG-1999 (Rel. 60, Created)
+DT   22-DEC-1999 (Rel. 62, Last updated, Version 2)
+XX
+DE   Rattus norvegicus uk mRNA for uridine kinase, partial cds.
+XX
+KW   uridine kinase.
+XX
+OS   Rattus norvegicus (Norway rat)
+OC   Eukaryota; Metazoa; Chordata; Craniata; Vertebrata; Euteleostomi; Mammalia;
+OC   Eutheria; Rodentia; Sciurognathi; Muridae; Murinae; Rattus.
+XX
+RN   [1]
+RP   1-314
+RA   Yaoi T., Yuh I., Fushiki S.;
+RT   ;
+RL   Submitted (01-AUG-1999) to the EMBL/GenBank/DDBJ databases.
+RL   Takeshi Yaoi, Kyoto Prefectural University of Medicine, Department of
+RL   Dynamic Pathology; Kawaramachi-Hirokoji, Kamigyo-ku, Kyoto, Kyoto 602-8566,
+RL   Japan (E-mail:tyaoi@koto.kpu-m.ac.jp, Tel:81-75-251-5849,
+RL   Fax:81-75-251-5849)
+XX
+RN   [2]
+RA   Yuh I., Yaoi T., Watanabe S., Okajima S., Hirasawa Y., Fushiki S.;
+RT   "Up-regulated uridine kinase gene identified by RLCS in the ventral horn
+RT   after crush injury to rat sciatic nerves";
+RL   Biochem. Biophys. Res. Commun. 266:104-109(1999).
+XX
+DR   SPTREMBL; Q9QYG8; Q9QYG8.
+XX
+FH   Key             Location/Qualifiers
+FH
+FT   source          1..314
+FT                   /db_xref="taxon:10116"
+FT                   /sequenced_mol="cDNA to mRNA"
+FT                   /sex="male"
+FT                   /organism="Rattus norvegicus"
+FT                   /dev_stage="adult"
+FT                   /strain="SD"
+FT                   /tissue_type="spinal cord"
+FT   CDS             <1..>314
+FT                   /codon_start=1
+FT                   /db_xref="SPTREMBL:Q9QYG8"
+FT                   /transl_table=1
+FT                   /gene="uk"
+FT                   /product="uridine kinase"
+FT                   /protein_id="BAA83085.1"
+FT                   /translation="KLFVDTDADTRLSRRVLRDISERGRDLEQILSQYITFVKPAFEEF
+FT                   CLPTKKYADVIIPRGADNLVAINLIVQHIQDILNGGLSKRQTNGYLNGYTPSRKRQASE
+FT                   S"
+XX
+SQ   Sequence 314 BP; 82 A; 81 C; 80 G; 71 T; 0 other;
+     aagcttttcg tggacaccga tgcagatacc cgtctgtctc gcagagtttt gagggacatc        60
+     agtgaaagag ggagggacct tgagcagatt ttatctcagt acattacatt cgtgaaacct       120
+     gccttcgagg agttctgctt gccaacaaag aaatatgctg atgtgatcat tcctagaggt       180
+     gcagacaatc tcgtggccat caacctcatc gtgcagcata tacaggacat cctgaacggc       240
+     gggctctcca agcggcagac gaacggctat ctcaacggct ataccccttc ccgcaagagg       300
+     caggcgtcag agtc                                                         314
+//

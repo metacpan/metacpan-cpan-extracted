@@ -1,0 +1,27 @@
+version 1.0200 - September 17, 2015
+ * Added max_weight attribute to box types so that boxes span based upon weight. Defaults to 1000.
+
+version 1.0100 - September 11, 2015
+ * Added new sort algorithm: sort_items_by_z_desc_A
+ * Integration with Travis (cakirke)
+ * Fixed hash key sorting (cakirke)
+ * Fixes for Kwalitee errors (openstrike)
+
+version 1.0001 - September 28, 2014
+ * Declaired Data::GUID dependency.
+
+version 1.0000 - June 23, 2014
+ * No longer a wrapper of a web service. Exposed code behind the web service as it's own public module.
+
+version 0.0501 - Novemver 6, 2012
+ * Fix some cosmetic problems.
+ * Added some parameter validation for the shipping_options method.
+
+version 0.0500 - November 6, 2012
+ * NOT backwards compatible.
+ * Now works asynchronously.
+ * Add SSL to web service.
+ * Add shipping_options method which returns USPS postage rate calculations.
+
+version 0.0400 - October 25, 2012
+ * First public release to web service.

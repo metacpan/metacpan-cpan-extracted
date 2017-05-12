@@ -1,0 +1,726 @@
+$VAR1 = {
+          'area' => '17.796',
+          'res1' => {
+                      'number' => '41',
+                      'name' => 'GLN'
+                    },
+          'res2' => {
+                      'number' => '47',
+                      'name' => 'PRO'
+                    }
+        };
+$VAR2 = {
+          'area' => '11.347',
+          'res1' => {
+                      'number' => '41',
+                      'name' => 'GLN'
+                    },
+          'res2' => {
+                      'number' => '41',
+                      'name' => 'GLN'
+                    }
+        };
+$VAR3 = {
+          'area' => '0.028',
+          'res1' => {
+                      'number' => '41',
+                      'name' => 'GLN'
+                    },
+          'res2' => {
+                      'number' => '46',
+                      'name' => 'SER'
+                    }
+        };
+$VAR4 = {
+          'area' => '5.639',
+          'res1' => {
+                      'number' => '45',
+                      'name' => 'GLN'
+                    },
+          'res2' => {
+                      'number' => '90',
+                      'name' => 'TYR'
+                    }
+        };
+$VAR5 = {
+          'area' => '0.372',
+          'res1' => {
+                      'number' => '45',
+                      'name' => 'GLN'
+                    },
+          'res2' => {
+                      'number' => '41',
+                      'name' => 'GLN'
+                    }
+        };
+$VAR6 = {
+          'area' => '10.987',
+          'res1' => {
+                      'number' => '46',
+                      'name' => 'GLY'
+                    },
+          'res2' => {
+                      'number' => '90',
+                      'name' => 'TYR'
+                    }
+        };
+$VAR7 = {
+          'area' => '15.843',
+          'res1' => {
+                      'number' => '46',
+                      'name' => 'GLY'
+                    },
+          'res2' => {
+                      'number' => '101',
+                      'name' => 'PHE'
+                    }
+        };
+$VAR8 = {
+          'area' => '42.835',
+          'res1' => {
+                      'number' => '47',
+                      'name' => 'LEU'
+                    },
+          'res2' => {
+                      'number' => '101',
+                      'name' => 'PHE'
+                    }
+        };
+$VAR9 = {
+          'area' => '1.018',
+          'res1' => {
+                      'number' => '47',
+                      'name' => 'LEU'
+                    },
+          'res2' => {
+                      'number' => '99',
+                      'name' => 'PHE'
+                    }
+        };
+$VAR10 = {
+           'area' => '16.545',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR11 = {
+           'area' => '9.605',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '39',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR12 = {
+           'area' => '4.657',
+           'res1' => {
+                       'number' => '48',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR13 = {
+           'area' => '1.398',
+           'res1' => {
+                       'number' => '48',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR14 = {
+           'area' => '42.719',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR15 = {
+           'area' => '9.009',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '92',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR16 = {
+           'area' => '0.309',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR17 = {
+           'area' => '8.193',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR18 = {
+           'area' => '0.899',
+           'res1' => {
+                       'number' => '61',
+                       'name' => 'LYS'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR19 = {
+           'area' => '2.426',
+           'res1' => {
+                       'number' => '62',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR20 = {
+           'area' => '13.773',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR21 = {
+           'area' => '7.003',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR22 = {
+           'area' => '17.178',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR23 = {
+           'area' => '16.370',
+           'res1' => {
+                       'number' => '64',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR24 = {
+           'area' => '6.343',
+           'res1' => {
+                       'number' => '64',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR25 = {
+           'area' => '10.764',
+           'res1' => {
+                       'number' => '65',
+                       'name' => 'LYS'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR26 = {
+           'area' => '15.971',
+           'res1' => {
+                       'number' => '97',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '46',
+                       'name' => 'SER'
+                     }
+         };
+$VAR27 = {
+           'area' => '4.827',
+           'res1' => {
+                       'number' => '97',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR28 = {
+           'area' => '0.182',
+           'res1' => {
+                       'number' => '103',
+                       'name' => 'THR'
+                     },
+           'res2' => {
+                       'number' => '58',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR29 = {
+           'area' => '29.383',
+           'res1' => {
+                       'number' => '105',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '58',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR30 = {
+           'area' => '8.754',
+           'res1' => {
+                       'number' => '105',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '49',
+                       'name' => 'LEU'
+                     }
+         };
+$VAR31 = {
+           'area' => '3.108',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR32 = {
+           'area' => '4.615',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '49',
+                       'name' => 'LEU'
+                     }
+         };
+$VAR33 = {
+           'area' => '10.002',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '39',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR34 = {
+           'area' => '9.605',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '39',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR35 = {
+           'area' => '10.002',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '39',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR36 = {
+           'area' => '11.347',
+           'res1' => {
+                       'number' => '41',
+                       'name' => 'GLN'
+                     },
+           'res2' => {
+                       'number' => '41',
+                       'name' => 'GLN'
+                     }
+         };
+$VAR37 = {
+           'area' => '0.372',
+           'res1' => {
+                       'number' => '45',
+                       'name' => 'GLN'
+                     },
+           'res2' => {
+                       'number' => '41',
+                       'name' => 'GLN'
+                     }
+         };
+$VAR38 = {
+           'area' => '15.971',
+           'res1' => {
+                       'number' => '97',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '46',
+                       'name' => 'SER'
+                     }
+         };
+$VAR39 = {
+           'area' => '0.028',
+           'res1' => {
+                       'number' => '41',
+                       'name' => 'GLN'
+                     },
+           'res2' => {
+                       'number' => '46',
+                       'name' => 'SER'
+                     }
+         };
+$VAR40 = {
+           'area' => '3.108',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR41 = {
+           'area' => '16.545',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR42 = {
+           'area' => '17.796',
+           'res1' => {
+                       'number' => '41',
+                       'name' => 'GLN'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR43 = {
+           'area' => '4.827',
+           'res1' => {
+                       'number' => '97',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '47',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR44 = {
+           'area' => '4.615',
+           'res1' => {
+                       'number' => '106',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '49',
+                       'name' => 'LEU'
+                     }
+         };
+$VAR45 = {
+           'area' => '8.754',
+           'res1' => {
+                       'number' => '105',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '49',
+                       'name' => 'LEU'
+                     }
+         };
+$VAR46 = {
+           'area' => '29.383',
+           'res1' => {
+                       'number' => '105',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '58',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR47 = {
+           'area' => '0.182',
+           'res1' => {
+                       'number' => '103',
+                       'name' => 'THR'
+                     },
+           'res2' => {
+                       'number' => '58',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR48 = {
+           'area' => '10.987',
+           'res1' => {
+                       'number' => '46',
+                       'name' => 'GLY'
+                     },
+           'res2' => {
+                       'number' => '90',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR49 = {
+           'area' => '5.639',
+           'res1' => {
+                       'number' => '45',
+                       'name' => 'GLN'
+                     },
+           'res2' => {
+                       'number' => '90',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR50 = {
+           'area' => '9.009',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '92',
+                       'name' => 'TYR'
+                     }
+         };
+$VAR51 = {
+           'area' => '16.370',
+           'res1' => {
+                       'number' => '64',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR52 = {
+           'area' => '8.193',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR53 = {
+           'area' => '13.773',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR54 = {
+           'area' => '2.426',
+           'res1' => {
+                       'number' => '62',
+                       'name' => 'TYR'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR55 = {
+           'area' => '0.899',
+           'res1' => {
+                       'number' => '61',
+                       'name' => 'LYS'
+                     },
+           'res2' => {
+                       'number' => '97',
+                       'name' => 'VAL'
+                     }
+         };
+$VAR56 = {
+           'area' => '17.178',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR57 = {
+           'area' => '10.764',
+           'res1' => {
+                       'number' => '65',
+                       'name' => 'LYS'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR58 = {
+           'area' => '6.343',
+           'res1' => {
+                       'number' => '64',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '98',
+                       'name' => 'PRO'
+                     }
+         };
+$VAR59 = {
+           'area' => '7.003',
+           'res1' => {
+                       'number' => '63',
+                       'name' => 'ASN'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR60 = {
+           'area' => '42.719',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR61 = {
+           'area' => '6.734',
+           'res1' => {
+                       'number' => '48',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR62 = {
+           'area' => '1.051',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '99',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR63 = {
+           'area' => '15.843',
+           'res1' => {
+                       'number' => '46',
+                       'name' => 'GLY'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR64 = {
+           'area' => '42.835',
+           'res1' => {
+                       'number' => '47',
+                       'name' => 'LEU'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR65 = {
+           'area' => '0.309',
+           'res1' => {
+                       'number' => '49',
+                       'name' => 'TRP'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };
+$VAR66 = {
+           'area' => '1.398',
+           'res1' => {
+                       'number' => '48',
+                       'name' => 'GLU'
+                     },
+           'res2' => {
+                       'number' => '101',
+                       'name' => 'PHE'
+                     }
+         };

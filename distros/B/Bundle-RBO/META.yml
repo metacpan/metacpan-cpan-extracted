@@ -1,0 +1,49 @@
+---
+abstract: "A bundle to install all of RBO's favorite modules"
+author:
+  - 'Robert Bohne <rbo@cpan.org>'
+  - 'Robert Bohne <rbo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bundle-RBO
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  App::Ack: 0
+  App::cpanminus: 0
+  DBI: 0
+  DBIx::Class: 0
+  DBIx::Class::ResultSet::HashRef: 0
+  DBIx::Class::Schema::Loader: 0
+  DateTime: 0
+  Dist::Zilla::PluginBundle::RBO: 0
+  IO::All: 0
+  JSON: 0
+  LWP: 0
+  Module::Build: 0
+  Module::Install: 0
+  Moose: 0
+  Template: 0
+  Template::Provider::FromDATA: 0
+  Term::ReadLine::Gnu: 0
+  YAML: 0
+  local::lib: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: https://github.com/rbo/Bundle-RBO.git
+    web: https://github.com/rbo/Bundle-RBO
+version: 0.00001

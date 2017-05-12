@@ -1,0 +1,28 @@
+Business-OnlinePayment-PaymenTech is a Business::OnlinePayment 
+module for processing credit card payments through the Chase 
+Paymentech Orbital Gateway.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Business::OnlinePayment::PaymenTech
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2010 Mark Wells
+Copyright (C) 2009-2010 Freeside Internet Services, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

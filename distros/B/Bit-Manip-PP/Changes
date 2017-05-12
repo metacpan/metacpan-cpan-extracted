@@ -1,0 +1,56 @@
+Revision history for Bit-Manip-PP
+
+1.06    2017-03-28
+        - no functional or doc changes
+        - missed doing an s/x/y/g for the Appveyor update in 1.05
+
+1.05    2017-03-28
+        - no functional or documentation changes
+        - implemented integration with Appveyor CI (Windows testing)
+
+1.04    2017-02-10
+        - bit_set(), bit_clr(), bit_toggle(), bit_on() and bit_off() can now all
+          accept the $data parameter as a value, or a reference to the scalar.
+          If passed-by-value, we still return the modified data to keep
+          consistent with previous functionality. If passed-by-reference, we'll
+          modify $data directly by reference, and return 0 upon success
+        - added _ref() and tests for it. This is used for allowing scalar refs
+          to be sent in, in place of a scalar for $data
+        - added Travis CI and Coveralls integration, added tests to reach 100%
+          coverage
+        - correct an erroneous include of Bit::Manip in t/45-bit_clr.t
+
+1.03    2017-02-10
+        - instead of importing "import" from Exporter, we now just use it as a
+          base class. This fixes CPAN Testers failures on 5.6.2
+        - we now require a minimum of 7.10 of ExtUtils::MakeMaker for the same
+          reason as above
+        - fixed incorrect statement in POD (closes #2)
+
+1.02    2017-02-09
+        - added bit_clr(), clears a set of bits
+        - removed erroneous call to 'defined' (part of #2)
+        - performance enhancement (change grep() to a check with tr//)
+          (closes #2) (thanks to Larry Leszcynski for pointing out both issues)
+
+1.01    2017-01-27
+        - removed erroneous "use feature 'say';" from t/40, as it was causing
+          CPAN Testers to fail on < v5.10.x
+
+1.00    2017-01-25
+        - fixed issue in bit_set() that leading zeroes in a binary string
+          weren't populating properly
+
+0.01    2017-01-25
+        - First version, released on an unsuspecting world
+        - ported bit_count()
+        - ported bit_mask()
+        - bit_bin() ported
+        - ported __check_lsb(), __check_msb(), __check_value()
+        - ported bit_get()
+        - ported bit_set()
+        - ported bit_toggle()
+        - ported bit_on()
+        - ported bit_off()
+
+

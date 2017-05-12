@@ -1,0 +1,24 @@
+MANIFEST
+Makefile.PL
+README
+CHANGES
+prereqinst.pl
+Harness.pm
+Harness/Constants.pm
+Harness/Handler.pm
+Harness/Trace.pm
+Harness/TraceHighRes.pm
+Harness/Values.pm
+Harness/ValuesHighRes.pm
+t/t.t
+t/benchmark.Trace.xml
+t/benchmark.TraceHighRes.xml
+t/benchmark.Values.xml
+t/benchmark.ValuesHighRes.xml
+t/lib/TestServer.pm
+xsd/Trace.xsd
+xsd/TraceHighRes.xsd
+xsd/Values.xsd
+xsd/ValuesHighRes.xsd
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

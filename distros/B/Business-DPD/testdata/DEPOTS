@@ -1,0 +1,95 @@
+#Filename: DEPOTS
+#Version: 20090105
+#Expiration: 20090503
+#Hash: 8eb0738f2db68185f8be781dc76aab34bef9c9cb
+#Reference: http://extranet.dpd.de/georoute/references_dpd_20090105.txt
+#Fields: GeoPostDepotNumber|IATALikeCode|GroupID|Name1|Name2|Address1|Address2|PostCode|CityName|ISO-Alpha2CountryCode|Phone|Fax|Mail|WEB|
+#Key: GeoPostDepotNumber|
+0010|||Betriebsgesellschaft DPD Deutscher||Die Marck 4||00010|Moersdorf|DE|+49-(0) 3 64 28-6 82-0|+49-(0) 3 64 28-6 82-19|hubleitung@hub10.dpd.de||
+0012|||DPD GeoPost (Deutschland) GmbH||Inselallee||01723|Kesselsdorf|DE|+49-(0) 3 52 04-654-0|+49-(0) 3 52 04/60-500|info@depot101.dpd.de||
+0013|||DPD GeoPost (Deutschland) GmbH||Europastrasse 1||31275|Lehrte|DE|+49-(0) 51 32-8230-0|+49-(0) 51 32-8230-160|vorname.nachname@depot130.dpd.net||
+0014|||DPD GeoPost (Deutschland) GmbH||Bahnwiesenweg 20||34281|Gudensberg|DE|+49-(0) 56 03-9 31-0|+49-(0) 56 03-9 31-1 25|hub14@depot134.dpd.de||
+0015|||Betriebsgesellschaft DPD Deutscher||Otto-Hahn-Strasse 5||59423|Unna|DE|+49-(0) 23 03-8 88-0|+49-(0) 23 03-8 88-31|||
+0016|||Betriebsgesellschaft DPD Deutscher||Obernburger Strasse 45||00016|Aschaffenburg|DE|+49-(0) 60 21-86 08-0|+49-(0) 60 21-86 08-39|||
+0017|||DPD GeoPost (Deutschland) GmbH||Carl-Benz-Str. 17/1||71634|Ludwigsburg|DE|+49-(0) 71 41-30 03-4 10|+49-(0) 71 41-30 03-4 79|||
+0019|||PCQ Beteiligungs- und Logistik GmbH||Duisburger Strasse 24||90451|Nuernberg|DE|+49-(0)9 11-64 91 00-5|+49-(0)9 11-6 49 86 85|||
+0111|BER|GPDE|Berlin|Chronopost International Deutschlan|Tempelhofer Damm 1-7||12101|Berlin|DE|+49-(0)30-410002-0|+49-(0)30-410002-22|customerserviceber@chronopost.de||
+0112|||Deutscher Paket Dienst Zeitfracht G||Marzahner Strasse 22||13053|Berlin-Hohenschoenhausen|DE|+49-(0) 30-98 60 92-0|+49-(0) 30-98 60 92-22|Kundendienst@depot110.dpd.de||
+0114||GPDE|DPD GeoPost (Deutschland) GmbH||Magdeburger Strasse 7||14641|Wustermark|DE|+49-(0)3 32 34-20-0|+49-(0)3 32 34-20-1 14|info@depot114.dpd.de||
+0115||GPDE|DPD GeoPost (Deutschland) GmbH||Eichenweg 3||15749|Mittenwalde|DE|+49-(0)3 37 64-2 51-0|+49-(0)3 37 64-2 51-1 52|info@depot115.dpd.de||
+0117||GPDE|Deutscher Paket Dienst Altentreptow||Gewerbehof 16||17087|Altentreptow|DE|+49-(0) 39 61-2 71-2 00|+49-(0) 39 61-2 71-2 90|verkauf@depot117.dpd.de||
+0118||GPDE|TM Logistik GmbH||Friedrichshoehe 1||18198|Kritzmow/OT Gross Schwass|DE|||||
+0119||GPDE|DPD GeoPost (Deutschland) GmbH||Gewerbeallee 11||19089|Crivitz|DE|+49-(0) 38 63-54 02-0|+49-(0) 38 63-33 38-36|info@depot119.dpd.net||
+0120||GPDE|DPD GeoPost (Deutschland) GmbH||Neue Wollkaemmereistrasse 2||21107|Hamburg|DE|+49-(0) 40-756689-0|+49-(0) 40-756689-180|info@depot120.dpd.de||
+0121||GPDE|Felz & Schorr GmbH||Bessemerstr. 12||21339|Lueneburg|DE|+49-(0) 41 31-38 02-01|+49-(0) 41 31-38 02-03|Manuela.Felz@depot121.dpd.de||
+0122||GPDE|DPD GeoPost (Deutschland) GmbH||August-Borsig-Strasse 11||24783|Osterroenfeld|DE|+49-(0) 43 31-4371-360|+49-(0) 43 31-4371-399|mailbox@depot122.dpd.de||
+0123||GPDE|Paket Logistic Lubeca GmbH||Spenglerstrasse 21||23556|Luebeck|DE|+49-(0)4 51-8 99 48-13|+49-(0)4 51-89 14-19|Iris.Hammermann@depot123.dpd.de||
+0124||GPDE|DPD GeoPost (Deutschland) GmbH||Liebigstrasse 15||24941|Flensburg|DE|+49-(0)4 61-2+933-310|+49-(0)4 61-16833-399|mailbox@depot124.dpd.de||
+0125||GPDE|Peters Logistik GmbH||Muehlenweg 131||22844|Norderstedt-Harksheide|DE|+49-(0) 40-5 30 55-8 41|+49-(0) 40-5 30 55-8 43|Uta.Pape@depot125.dpd.de||
+0126||GPDE|DPD GeoPost (Deutschland) GmbH||Rudolf-Diesel-Strasse 21||26670|Uplengen-Juebberde|DE|+49-(0) 49 56-92 83 - 0|+49-(0) 49 56-92 83-80|info@depot127.dpd.de||
+0127||GPDE|Bernd Eilers Logistik GmbH||Rudolf-Diesel-Strasse 21||26670|Uplengen-Juebberde|DE|+49-(0) 49 56-92 83 - 0|+49-(0) 49 56-92 83-80|info@depot127.dpd.de||
+0128||GPDE|DPD GeoPost (Deutschland) GmbH||Ludwig-Erhard-Strasse 7||28197|Bremen|DE|+49-(0)4 21-596 595-100|+49-(0)4 21-596 595-101|info@depot128.dpd.de||
+0129||GPDE|IBLO Transport GmbH||Meyerhof-Ahrsen||29699|Bomlitz|DE|+49-(0) 42 62-95 56-0|+49-(0) 42 62-95 56-79|info@depot129.dpd.de||
+0130||GPDE|DPD GeoPost (Deutschland) GmbH||Europastrasse 1||00130|Lehrte|DE|+49-(0) 51 32-8230-0|+49-(0) 51 32-8230-160|info@depot130.dpd.de||
+0132||GPDE|Marrek + Koennecker GmbH||Salzuflener Strasse 102-104||32602|Vlotho|DE|+49-(0) 57 33-91 16-0|+49-(0) 57 33-91 16-66|info@depot132.dpd.de||
+0134||GPDE|DPD GeoPost (Deutschland) GmbH||Bahnwiesenweg 20||34281|Gudensberg|DE|+49-(0) 56 03-9 31-0|+49-(0) 56 03-9 31-1 25|info@depot134.dpd.de||
+0135||GPDE|DPD GeoPost (Deutschland) GmbH||Didierstrasse 42||00135|Staufenberg-Mainzlar|DE|+49-(0) 64 06-91 15-0|+49-(0) 64 06-91 15-49|info@depot135.dpd.de||
+0136||GPDE|DPD GeoPost (Deutschland) GmbH||Schaffeld 6||36119|Neuhof-Dorfborn|DE|+49-(0) 66 55-96 99-0|+49-(0) 66 55-96 99-96|info@depot136.dpd.de||
+0137||GPDE|DPD GeoPost (Deutschland) GmbH||Klosteracker 5||37176|Noerten-Hardenberg|DE|+49-(0) 55 03-80 09-0|+49-(0) 55 03-80 09-99|info@depot137.dpd.de||
+0138||GPDE|PKD Paket-Kurier-Dienst GmbH||Carl-Zeiss-Weg 3||38239|Salzgitter|DE|+49-(0) 53 41-22 00-0|+49-(0) 53 41-22 00-33|info@depot138.dpd.de||
+0139||GPDE|DPD GeoPost (Deutschland) GmbH||Am Knuehl 9||39326|Hermsdorf|DE|+49-(0)3 92 06-6 53-0|+49-(0)3 92 06-6 53-10|Info@depot139.dpd.de||
+0140||GPDE|DPD GeoPost (Deutschland) GmbH||Am Roehrenwerk 9||47259|Duisburg|DE|+49-(0)2 03-99 88-0|+49-(0)2 03-99 88-1 00|info@depot147.dpd.de||
+0141||GPDE|DPD GeoPost (Deutschland) GmbH||Opelstr. 5||41836|Hueckelhoven|DE|+49-(0) 24 33-4 41-0|+49-(0) 24 33-4 41-1 09|info@depot147.dpd.de||
+0142||GPDE|DPD GeoPost (Deutschland) GmbH||Porschestrasse 20||00142|Wuppertal|DE|+49-(0)2 02-2 60 91-0|+49-(0)2 02-2 60 91-55|info@depot142.dpd.de||
+0143|GDK|GPDE|GDSK Agent| Gesellschaft der Schnellkuriere Gm|Dieselstrasse 27||49076|Osnabrueck|DE|+49-(0)541-912 22-0|+49-(0)541-912 22-55|gdsk@gdsk.de||
+0144||GPDE|DPD GeoPost (Deutschland) GmbH||Luxemburger Stra?e 14||48455|Bad Bentheim|DE|+49-(0) 59 24-78 77-0|+49-(0) 59 24-78 77-70|service@depot144.dpd.de||
+0145||GPDE|DPD GeoPost (Deutschland) GmbH||Am Stadthafen 16||45356|Essen|DE|+49-(0)2 01-8 35 97-0|+49-(0)2 01-8 35 97-19|info@depot145.dpd.de||
+0146||GPDE|DPD GeoPost (Deutschland) GmbH||Werrastrasse 12||45768|Marl|DE|+49-(0) 23 65 69 91-0 ||||
+0147||GPDE|DPD GeoPost (Deutschland) GmbH||Am Roehrenwerk 9||47259|Duisburg|DE|+49-(0)2 03-99 88-0|+49-(0)2 03-99 88-1 00|info@depot147.dpd.de||
+0148||GPDE|DPD GeoPost (Deutschland) GmbH||Weseler Strasse 567 a||48163|Muenster|DE|+49-(0)2 51-7 49 79-0|+49-(0)2 51-7 49 79-24|info@depot148.dpd.de||
+0149||GPDE|DPD GeoPost (Deutschland) GmbH||Im Gewerbepark 10||49326|Melle|DE|+49-(0)5422-9210-0|+49-(0)5422-9210-490|info@depot149.dpd.de||
+0150||GPDE|DPD GeoPost (Deutschland) GmbH||Europaallee||50226|Frechen|DE|+49-(0) 22 34-18 10-0|+49-(0) 22 34-18 10-5 03 99|info@depot150.dpd.de||
+0152||GPDE|DPD GeoPost (Deutschland) GmbH||Europaallee||50226|Frechen|DE|+49-(0) 22 34-18 10-0|+49-(0) 22 34-18 10-5 03 99|info@depot150.dpd.de||
+0153||GPDE|DPD GeoPost (Deutschland) GmbH||Borsigstrasse 2||59609|Anroechte|DE|+49-(0) 29 47-97 60-0|+49-(0) 29 47-97 60-80|depotleitung@depot153.dpd.de||
+0154||GPDE|DPD GeoPost (Deutschland) GmbH||Gewerbegebiet||54518|Sehlem|DE|+49-(0) 65 08-1 89-0|+49-(0) 65 08-16 27|info@depot154.dpd.de||
+0156||GPDE|DPD GeoPost (Deutschland) GmbH||Im Metternicher Feld 32||56072|Koblenz|DE|+49-(0)2 61-9 22 62-0|+49-(0)2 61-9 22 62-16|info@depot156.dpd.de||
+0157||GPDE|DPD GeoPost (Deutschland) GmbH||Oberhausener Strasse 9||57234|Wilnsdorf|DE|+49-(0) 27 39-8 06-0|+49-(0) 27 39-8 06-45|info@depot157.dpd.de||
+0158||GPDE|DPD GeoPost (Deutschland) GmbH||Spannstiftstr. 23||58119|Hagen|DE|+49-(0) 23 34-5 00-0|+49-(0) 23 34-5 00-4 45|info@depot158.dpd.de||
+0159||GPDE|DPD GeoPost (Deutschland) GmbH||Schleiferstr. 7||59425|Unna|DE|+49-(0) 23 03-6 74-0|+49-(0) 23 03-6 74-3 85|depotleitung@depot159.dpd.de||
+0160|||Deutscher Paket Dienst Zeitfracht G||Kelsterbacher Str. 64||00160|Raunheim|DE|+49-(0) 61 42-2 02-0|+49-(0) 61 42-2 02-1 34|kundendienst@depot160.dpd.de||
+0161||GPDE|Chronopost Deutschland||Kelsterbacher Strasse 64||65479|Raunheim|DE|+49-(0) 61 42-7 93 08-0|+49-(0) 61 42-7 93 08-29|||
+0162|FRA|GPDE|Frankfurt|Chronopost International Deutschlan|Kelsterbacher Str. 64||65479|Raunheim|DE|+49-(0)2 03-99 88-0|+49-(0)2 03-99 88-1 00|customerservicefra@chronopost.de||
+0163||GPDE|DPD GeoPost (Deutschland) GmbH||Auhofstr. 25||63741|Aschaffenburg|DE|+49-(0) 60 21-4 43 94-0|+49-(0) 60 21-4 43 94-39|Zentrale@depot163.dpd.de||
+0165|||Deutscher Paket Dienst Zeitfracht G||Kelsterbacher Str. 64||00165|Raunheim|DE|+49-(0) 61 42-2 02-0|+49-(0) 61 42-2 02-1 34|kundendienst@depot160.dpd.de||
+0166||GPDE|DPD GeoPost (Deutschland) GmbH||Suedstrasse 51||66386|St. Ingbert|DE|+49-(0) 68 94-89 07-0|+49-(0) 68 94-66 54|info@depot166.dpd.de||
+0167||GPDE|DPD GeoPost (Deutschland) GmbH||Mittelrheinstr. 19||67550|Worms|DE|+49-(0) 62 42-9 09-01|+49-(0) 62 42-9 09-1 49|info@depot167.dpd.de||
+0168||GPDE|DPD GeoPost (Deutschland) GmbH||Mittelrheinstrasse 19||00168|Worms|DE|+49-(0)  6 2  42-9 09-01|+49-(0)  6 2  42-9 09-1 49|info@depot167.dpd.de||
+0169||GPDE|DPD GeoPost (Deutschland) GmbH||Suedstrasse 51||66386|St. Ingbert|DE|+49-(0) 68 94-89 07-0|+49-(0) 68 94-66 54|info@depot166.dpd.de||
+0170||GPDE|DPD GeoPost (Deutschland) GmbH||Carl-Benz-Str. 17||00170|Ludwigsburg|DE|+49-(0) 71 41-30 03-0|+49-(0) 71 41-30 03-9 99|Depotleitung@depot171.dpd.de||
+0171||GPDE|DPD GeoPost (Deutschland) GmbH||Carl-Benz-Str. 17||00171|Ludwigsburg|DE|+49-(0) 71 41-30 03-0|+49-(0) 71 41-30 03-9 99|Depotleitung@depot171.dpd.de||
+0172||GPDE|DPD GeoPost (Deutschland) GmbH||Wertstrasse 4||73240|Wendlingen|DE|+49 (0) 7024 80990-0|+49-(0) 70 22-30 03-39|info@depot172.dpd.de||
+0173||GPDE|DPD GeoPost (Deutschland) GmbH||Carl-Benz-Str. 17||71634|Ludwigsburg|DE|+49-(0) 71 41-30 03-0|+49-(0) 71 41-30 03-9 99|Depotleitung@depot171.dpd.de||
+0174||GPDE|DPD GeoPost (Deutschland) GmbH||Pfaffenstrasse 31||00174|Heilbronn|DE|+49-(0) 71 31-2 92-0|+49-(0) 71 31-2 92-15|verkauf@depot174.dpd.de||
+0175||GPDE|DPD GeoPost (Deutschland) GmbH||Siemensstrasse 1||00175|Malsch|DE|+49-(0) 72 46-9 11-0|+49-(0) 72 46-9 11-1 50|kundendienst@depot176.dpd.de||
+0176||GPDE|DPD GeoPost (Deutschland) GmbH||Siemensstrasse 1||00176|Malsch|DE|+49-(0) 72 46-9 11-0|+49-(0) 72 46-9 11-1 50|kundendienst@depot176.dpd.de||
+0177||GPDE|DPD GeoPost (Deutschland) GmbH||In Rammelswiesen 20||78056|Villingen-Schwenningen|DE|+49-(0) 77 20-80 99-8 00|+49-(0) 77 20-80 99-9 00|info@depot178.dpd.de||
+0178||GPDE|DPD GeoPost (Deutschland) GmbH||In Rammelswiesen 20||78056|Villingen-Schwenningen|DE|+49-(0) 77 20-80 99-8 00|+49-(0) 77 20-80 99-9 00|info@depot178.dpd.de||
+0179||GPDE|DPD GeoPost (Deutschland) GmbH||Blankreutestr. 5||79108|Freiburg|DE|+49-(0) 761 888 585 00|+49-(0) 761 888 585 99|info@depot179.dpd.de||
+0180|||DPD Systemlogistik GmbH & Co. KG||Ludwig-Erhard-Str. 12||00180|Neufahrn|DE|+49-(0) 81 65-9 42-0|+49-(0) 81 65-9 42-3 77|info@depot180.dpd.de||
+0181|MUC|GPDE|Munich|Chronopost International Deutschlan|Am Pfanderling 1||85778|Haimhausen|DE|+49-(0) 81 33-9185-6|+49-(0) 81 33-9185-74|customerservicemuc@chronopost.de||
+0182|||DPD Systemlogistik GmbH & Co. KG||Buergermeister-Graf-Ring 12||82538|Geretsried - Gelting|DE|+49-(0) 81 71-43 33-0|+49-(0) 81 71-43 33-10|info@depot182.dpd.de||
+0183||GPDE|CHRONOPOST Express International||||82538|Geretsried - Gelting|DE|||||
+0184|||DPD Systemlogistik GmbH & Co. KG||Braeuackerring 1||00184|Obing|DE|+49-(0) 86 24-89 67-0|+49-(0) 86 24-89 67-99|info@depot184.dpd.de||
+0185||GPDE|DPD GeoPost (Deutschland) GmbH||Siemensstrasse 1||00176|Malsch|DE|+49-(0) 72 46-9 11-0|+49-(0) 72 46-9 11-1 50|kundendienst@depot176.dpd.de||
+0186|||DPD Systemlogistik GmbH & Co. KG||Kalterer Str. 11||86165|Augsburg|DE|+49-(0)8 21-7 94 00-0|+49-(0)8 21-7 94 00-62|info@depot186.dpd.de||
+0187|||DPD Systemlogistik GmbH & Co. KG||Memminger Str. 140||87439|Kempten|DE|+49-(0)8 31-5 92 14-0|+49-(0)8 31-5 92 14-39|info@depot187.dpd.de||
+0188|||DPD Systemlogistik GmbH & Co. KG||Memminger Str. 140||00188|Kempten|DE|+49-(0)8 31-5 92 14-0|+49-(0)8 31-5 92 14-39|info@depot187.dpd.de||
+0189||GPDE|DPD GeoPost (Deutschland) GmbH||Ernst-Abbe-Strasse 5||89231|Neu-Ulm|DE|+49-(0)7 31-97 54-1|+49-(0)7 31-97 54-4 00|info@depot189.dpd.de||
+0190||GPDE|DPD GeoPost (Deutschland) GmbH||Hamburger Str. 2||90451|Nuernberg|DE|+49-(0)9 11-6 41 35-0|+49-(0)9 11-6 41 35-1 50|zentrale190@depot190.dpd.de||
+0191||GPDE|DPD GeoPost (Deutschland) GmbH||Duisburger Strasse 24||00191|Nuernberg|DE|+49-(0) 9 11-6 41 35-0|+49-(0)9 11-6 41 35-1 50|zentrale190@depot190.dpd.de||
+0193||GPDE|DPD GeoPost (Deutschland) GmbH||Am Langwiesfeld 11||93083|Obertraubling|DE|+49-(0) 94 01-60 09-0|+49-(0) 94 01-60 09-30|maria.kazyk@depot193.dpd.de||
+0194||GPDE|Karl Doubeck GmbH & Co. KG||Gunskirchener Str. 2||94491|Hengersberg|DE|+49-(0) 99 01-9 49 06-0|+49-(0) 99 01-9 49 06-9|info@depot194.dpd.de||
+0195||GPDE|DPD GeoPost (Deutschland) GmbH||Raiffeisenstrasse 11||95191|Leupoldsgruen|DE|+49-(0) 92 92-9 61-0|+49-(0) 92 92-9 61-1 50|depot@depot195.dpd.de||
+0196||GPDE|DPD GeoPost (Deutschland) GmbH||Birkleite 4||96237|Ebersdorf|DE|+49-(0) 95 62-40 32-0|+49-(0) 95 62-40 32-50|depotleitung@depot196.dpd.de||
+0197||GPDE|DPD GeoPost (Deutschland) GmbH||Friedrich-Koenig-Strasse 45||97080|Wuerzburg|DE|+49-(0)9 31-3 04 26-0|+49-(0)9 31-3 04 26-40|zentrale197@depot197.dpd.de||
+0199||GPDE|DPD GeoPost (Deutschland) GmbH||Steinbruechenstrasse 15||99428|Nohra|DE|+49-(0) 36 43-24 65-0|+49-(0) 36 43-24 65-20|info@depot199.dpd.de||

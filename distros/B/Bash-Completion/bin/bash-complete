@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: bash-completion magic script
+package
+  bashComplete;
+
+use strict;
+use warnings;
+use App::BashComplete;
+exit(App::BashComplete->new->run(@ARGV));
+
+__END__
+=pod
+
+=head1 NAME
+
+bashComplete - bash-completion magic script
+
+=head1 VERSION
+
+version 0.008
+
+=head1 AUTHOR
+
+Pedro Melo <melo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Pedro Melo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+

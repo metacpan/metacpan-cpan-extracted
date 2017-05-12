@@ -1,0 +1,2050 @@
+   <entrySet level="1" version="1" xmlns="net:sf:psidev:mi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="net:sf:psidev:mi http://psidev.sourceforge.net/mi/xml/src/MIF.xsd">
+     <entry>
+       <source releaseDate="2006-01-06">
+         <names>
+           <shortLabel>European Bioinformatics Institute</shortLabel>
+         </names>
+         <bibref>
+           <xref>
+             <primaryRef db="pubmed" id="14681455"/>
+           </xref>
+         </bibref>
+         <xref>
+           <primaryRef db="psi-mi" id="MI:0469"/>
+         </xref>
+         <attributeList>
+           <attribute name="postalAddress">Wellcome Trust Genome Campus, Hinxton, Cambridge, CB10 1SD, United Kingdom</attribute>
+           <attribute name="url">http://www.ebi.ac.uk</attribute>
+         </attributeList>
+       </source>
+       <experimentList>
+         <experimentDescription id="EBI-444248">
+           <names>
+             <shortLabel>cohlberg-1995-1</shortLabel>
+             <fullName>Neurofilament protein heterotetramers as assembly intermediates.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="7721855"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-444248" secondary="cohlberg-1995-1"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>affinity chrom</shortLabel>
+               <fullName>affinity chromatography technologies</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0004"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="exp-modification">The components of the interaction (complex) were separated by electrophoretic native gel in 2M urea</attribute>
+             <attribute name="author-list">Cohlberg JA., Hajarian H., Tran T., Alipourjeddi P., Noveen A.</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-640823">
+           <names>
+             <shortLabel>polyak-1996-3</shortLabel>
+             <fullName>The P58 cellular inhibitor complexes with the interferon-induced, double-stranded RNA-dependent protein kinase, PKR, to regulate its autophosphorylation and activity.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="8576172"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-640823" secondary="polyak-1996-3"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>coip</shortLabel>
+               <fullName>coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0019"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Polyak SJ., Tang N., Wambach M., Barber GN., Katze MG.</attribute>
+             <attribute name="exp-modification">Radiolabelled proteins detected by autoradiography</attribute>
+             <attribute name="figure-legend">4C</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-620398">
+           <names>
+             <shortLabel>faulstich-1996-1</shortLabel>
+             <fullName>Architecture of coatomer: molecular characterization of delta-COP and protein interactions within the complex.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="8858162"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-620398" secondary="faulstich-1996-1"/>
+             <secondaryRef db="newt" id="10116" secondary="rat"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="figure-legend">table 2</attribute>
+             <attribute name="exp-modification">directed two hybrid screen</attribute>
+             <attribute name="author-list">Faulstich D., Auerbach S., Orci L., Ravazzola M., Wegchingel S., Lottspeich F., Stenbeck G., Harter C., Wieland FT., Tschochner H.</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-640818">
+           <names>
+             <shortLabel>polyak-1996-2</shortLabel>
+             <fullName>The P58 cellular inhibitor complexes with the interferon-induced, double-stranded RNA-dependent protein kinase, PKR, to regulate its autophosphorylation and activity.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="8576172"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-640818" secondary="polyak-1996-2"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>anti bait coip</shortLabel>
+               <fullName>anti bait coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0006"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Polyak SJ., Tang N., Wambach M., Barber GN., Katze MG.</attribute>
+             <attribute name="exp-modification">Radiolabelled proteins detected by autoradiography</attribute>
+             <attribute name="figure-legend">3</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-307796">
+           <names>
+             <shortLabel>ching-2000-1</shortLabel>
+             <fullName>Cloning of three novel neuronal Cdk5 activator binding proteins.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10721722"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-307796" secondary="ching-2000-1"/>
+             <secondaryRef db="newt" id="10116" secondary="rat"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="4932">
+             <names>
+               <shortLabel>yeast</shortLabel>
+               <fullName>Saccharomyces cerevisiae</fullName>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>two hybrid</shortLabel>
+               <fullName>two hybrid</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0018"/>
+               <secondaryRef db="pubmed" id="10967325"/>
+               <secondaryRef db="pubmed" id="12634794"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>nucleotide sequence</shortLabel>
+               <fullName>nucleotide sequence identification</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0078"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="contact-email">bcyching@ust.hk</attribute>
+             <attribute name="author-list">Ching YP., Qi Z., Wang JH.</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-698495">
+           <names>
+             <shortLabel>klein-2005-1</shortLabel>
+             <fullName>AlFx affects the formation of focal complexes by stabilizing the Arf-GAP ASAP1 in a complex with Arf1.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="16223492"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-698495" secondary="klein-2005-1"/>
+             <secondaryRef db="newt" id="10090" secondary="mouse"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>cosedimentation</shortLabel>
+               <fullName>cosedimentation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0027"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Klein S., Franco M., Chardin P., Luton F.</attribute>
+             <attribute name="contact-email">luton@ipmc.cnrs.fr</attribute>
+             <attribute name="exp-modification">In vitro complex formation on liposomes. Purified proteins were incubated in presence of a sucrose-loaded phospholipid liposome preparation. After liposome sedimentation, the fraction bound to liposomes were quantified after SDS-PAGE and sypro staining by densitometry. Negative control corresponds to proteins incubated alone.</attribute>
+             <attribute name="figure-legend">fig 1</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-620513">
+           <names>
+             <shortLabel>faulstich-1996-2</shortLabel>
+             <fullName>Architecture of coatomer: molecular characterization of delta-COP and protein interactions within the complex.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="8858162"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-620513" secondary="faulstich-1996-2"/>
+             <secondaryRef db="newt" id="10116" secondary="rat"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>anti bait coip</shortLabel>
+               <fullName>anti bait coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0006"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="figure-legend">Figure 6</attribute>
+             <attribute name="exp-modification">Immunoprecipitation of in vitro-co-transcribed proteins. 35Met labeled samples were separated by SDS PAGE and proteins were visualized by autoradiography.</attribute>
+             <attribute name="author-list">Faulstich D., Auerbach S., Orci L., Ravazzola M., Wegchingel S., Lottspeich F., Stenbeck G., Harter C., Wieland FT., Tschochner H.</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-698555">
+           <names>
+             <shortLabel>klein-2005-2</shortLabel>
+             <fullName>AlFx affects the formation of focal complexes by stabilizing the Arf-GAP ASAP1 in a complex with Arf1.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="16223492"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-698555" secondary="klein-2005-2"/>
+             <secondaryRef db="newt" id="10090" secondary="mouse"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+           </xref>
+           <hostOrganism ncbiTaxId="10036">
+             <names>
+               <shortLabel>mesau-bhk21</shortLabel>
+               <fullName>Mesocricetus auratus, Cells from kidneys of five unsexed, one-day-old hamsters</fullName>
+             </names>
+             <cellType>
+               <names>
+                 <shortLabel>bhk-21</shortLabel>
+                 <fullName>Cells from kidneys of five unsexed, one-day-old hamsters</fullName>
+               </names>
+               <xref>
+                 <primaryRef db="cabri" id="ACC 61"/>
+               </xref>
+             </cellType>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>anti tag coip</shortLabel>
+               <fullName>anti tag coimmunoprecipitation</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0007"/>
+               <secondaryRef db="pubmed" id="7708014"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0113"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Klein S., Franco M., Chardin P., Luton F.</attribute>
+             <attribute name="contact-email">luton@ipmc.cnrs.fr</attribute>
+             <attribute name="figure-legend">fig 2</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-457218">
+           <names>
+             <shortLabel>gu-2004-1</shortLabel>
+             <fullName>Identification of the region in Cdc42 that confers the binding specificity to activated Cdc42-associated kinase.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="15123659"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-457218" secondary="gu-2004-1"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>pull down</shortLabel>
+               <fullName>pull down</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0096"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>western blot</shortLabel>
+               <fullName>western blot</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0113"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Gu Y., Lin Q., Childress C., Yang W.</attribute>
+           </attributeList>
+         </experimentDescription>
+         <experimentDescription id="EBI-349875">
+           <names>
+             <shortLabel>rea-2000-1</shortLabel>
+             <fullName>Regulation of chromatin structure by site-specific histone H3 methyltransferases.</fullName>
+           </names>
+           <bibref>
+             <xref>
+               <primaryRef db="pubmed" id="10949293"/>
+             </xref>
+           </bibref>
+           <xref>
+             <primaryRef db="intact" id="EBI-349875" secondary="rea-2000-1"/>
+             <secondaryRef db="newt" id="4896" secondary="schpo"/>
+             <secondaryRef db="newt" id="10090" secondary="mouse"/>
+             <secondaryRef db="newt" id="9913" secondary="bovin"/>
+             <secondaryRef db="newt" id="9606" secondary="human"/>
+           </xref>
+           <hostOrganism ncbiTaxId="-1">
+             <names>
+               <shortLabel>in vitro</shortLabel>
+             </names>
+           </hostOrganism>
+           <interactionDetection>
+             <names>
+               <shortLabel>radiolabeled methyl</shortLabel>
+               <fullName>methyltransferase radiometric assay</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0516"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionDetection>
+           <participantDetection>
+             <names>
+               <shortLabel>predetermined</shortLabel>
+               <fullName>predetermined participant</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0396"/>
+               <secondaryRef db="pubmed" id="7940758"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </participantDetection>
+           <attributeList>
+             <attribute name="author-list">Rea S., Eisenhaber F., O&apos;Carroll D., Strahl BD., Sun ZW., Schmid M., Opravil S., Mechtler K., Ponting CP., Allis CD., Jenuwein T.</attribute>
+           </attributeList>
+         </experimentDescription>
+       </experimentList>
+       <interactorList>
+         <proteinInteractor id="EBI-444343">
+           <names>
+             <shortLabel>nfm_bovin</shortLabel>
+             <fullName>Neurofilament triplet M protein</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O77788" secondary="nfm_bovin" version="SP_47"/>
+             <secondaryRef db="interpro" id="IPR006821" secondary="filament_DNA_bd"/>
+             <secondaryRef db="interpro" id="IPR001664" secondary="IF"/>
+             <secondaryRef db="interpro" id="IPR002957" secondary="Keratin_I"/>
+             <secondaryRef db="intact" id="EBI-444343" secondary="nfm_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>SYTLDSLGNPSAYRRVTETRSSFSRISGSPSSGFRSQSWSRGSPSTVSSSYKRSALAPRLTYSSAMLSSAESSLDFSQSSSLLDGGSGPGGDYKLSRSNEKEQIQGLNDRFAGYIEKVHYLEQQNKEIEAEIQALRQKQASHAQLGDAYDQEIRELRATLEMVNHEKAQVQLDSDHLEEDIHRLKERFEEEARLRDDTEAAIRALRKDIEESSLVKVELDKKVQSLQDEVAFLRSNHEEEVADLLAQIQASHIIVERKDYLKTDISTALKEIRSQLESHSDQNMHQAEEWFKCRYAKLTEAAEQNKEAIRSAKEEIAEYRRQLQSKSIELESVRGTKESLERQLSDIEERHNHDLSSYQDTIQQLENELRGTKWEMARHLREYQDLLNVKMALDIEIAAYRKLLEGEETRFSTFAGSITGPLYTHRQPSIAISSKIQKTKVEAPKLKVQHKFVEEIIEETKVEDEKSEMEEALTAITEELAVSVKEEVKEEEAEEKEEKEEAEEEVVAAKKSPVKATAPELKEEEGEKEEEEGQEEEEEEEEAAKSDQAEEGGSEKEGSSEKEEGEQEEEGETEAEGEGEEAAAEAKEEKKMEEKAEEVAPKEELAAEAKVEKPEKAKSPVAKSPTTKSPTAKSPEAKSPEAKSPTAKSPTAKSPVAKSPTAKSPEAKSPEAKSPTAKSPTAKSPAAKSPAPKSPVEEVKPKAEAGAEKGEQKEKVEEEKKEAKESPKEEKAEKKEEKPKDVPEKKKAESPVKAESPVKEEVPAKPVKVSPEKEAKEEEKPQEKEKEKEKVEEVGGKEEGGLKESRKEDIAINGEVEGKEEEQETKEKGSGGEEEKGVVTNGLDVSPGDEKKGGDKSEEKVVVTKMVEKITSEGGDGATKYITKSVTVTQKVEEHEETFEEKLVSTKKVEKVTSHAIVKEVTQSD</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-444335">
+           <names>
+             <shortLabel>nfl_bovin</shortLabel>
+             <fullName>Neurofilament triplet L protein</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P02548" secondary="nfl_bovin" version="SP_47"/>
+             <secondaryRef db="interpro" id="IPR006821" secondary="Filament_head"/>
+             <secondaryRef db="interpro" id="IPR001664" secondary="IF"/>
+             <secondaryRef db="uniprotkb" id="P79127" secondary="nfl_bovin" version="SP_47"/>
+             <secondaryRef db="intact" id="EBI-444335" secondary="nfl_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>SSFSYEPYYSTSYKRRYVETPRVHISSVRSGYSTARSAYSSYSAPVSSSLSVRRSYSSSSGSLMPSLESLDLSQVAAISNDLKSIRTQEKAQLQDLNDRFASFIERVHELEQQNKVLEAELLVLRQKHSEPSRFRALYEQEIRDLRLAAEDATNEKQALQGEREGLEETLRNLQARYEEEVLSREDAEGRLMEARKGADEAALARAELEKRIDSLMDEIAFLKKVHEEEIAELQAQIQYAQISVEMDVSSKPDLSAALKDIRAQYEKLAAKNMQNAEEWFKSRFTVLTESAAKNTDAVRAAKDEVSESRRLLKAKTLEIEACRGMNEALEKQLQELEDKQNADISAMQDTINKLENELRTTKSEMARYLKEYQDLLNVKMALDIEIAAYRKLLEGEETRLSFTSVGSLTTGYTQSSQVFGRSAYGGLQTSSYLMSARSFPSYYTSHVQEEQIEVEETIEAAKAEEAKDEPPSEGEAEEEEKEKEEAEAEAEAEAEAEAEEEEGAQEEEAAKEDAEEAKEEEGGEGEEAEETKEAEEEEKKDEGAGEEQATKKKD</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-640793">
+           <names>
+             <shortLabel>dnjc3_bovin</shortLabel>
+             <fullName>DnaJ homolog subfamily C member 3</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q27968" secondary="dnjc3_bovin" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR001623" secondary="DnaJ_N"/>
+             <secondaryRef db="interpro" id="IPR001440" secondary="TPR"/>
+             <secondaryRef db="interpro" id="IPR011990" secondary="TPR-like_helical"/>
+             <secondaryRef db="intact" id="EBI-640793" secondary="dnjc3_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MVAPGSVTSRLGSVFPFLLVLVDLQYEGAECGVNADVEKHLELGKKLLAAGQLADALSQFHAAVDGDPDNYIAYYRRATVFLAMGKSKAALPDLTKVIELKMDFTAARLQRGHLLLKQGKLDEAEDDFKKVLKSNPSENEEKEAQSQLVKSDEMQRLRSQALDAFESSDFTAAITFLDKILEVCVWDAELRELRAECFIKEGEPRKAISDLKASSKLKNDNTEAFYKISTLYYELGDHELSLSEVRECLKLDQDHKRCFAHYKQVKKLNKLIESAEELIKEGRYTDAISKYESVMKTEPGVHEYTIRSKERICHCFSKDEKPVEAIRVCSEVLQVEPDNVNALKDRAEAYLIEEMYDEAIQDYETAQEHNENDQQIREGLEKAQRLLKQSQRRDYYKILGVKRNAKKQEIIKAYRKLALQWHPDNFQNEEEKKKAEKKFIDIAAAKEVLSDPEMRKKFDDGEDPLDAESQQGGGGNPFHRSWNSWQGFSPFSSGGPFRFKFHFN</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-640775">
+           <names>
+             <shortLabel>e2ak2_human</shortLabel>
+             <fullName>Interferon-induced, double-stranded RNA-activated protein kinase</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P19525" secondary="e2ak2_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0003725" secondary="F:double-stranded RNA binding"/>
+             <secondaryRef db="go" id="GO:0004694" secondary="F:eukaryotic translation initi"/>
+             <secondaryRef db="go" id="GO:0008601" secondary="F:protein phosphatase type 2A "/>
+             <secondaryRef db="go" id="GO:0008285" secondary="P:negative regulation of cell "/>
+             <secondaryRef db="go" id="GO:0006468" secondary="P:protein amino acid phosphory"/>
+             <secondaryRef db="interpro" id="IPR001159" secondary="Ds_RNA_bd"/>
+             <secondaryRef db="interpro" id="IPR000719" secondary="Prot_kinase"/>
+             <secondaryRef db="interpro" id="IPR008271" secondary="Ser_thr_pkin_AS"/>
+             <secondaryRef db="intact" id="EBI-640775" secondary="e2ak2_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MAGDLSAGFFMEELNTYRQKQGVVLKYQELPNSGPPHDRRFTFQVIIDGREFPEGEGRSKKEAKNAAAKLAVEILNKEKKAVSPLLLTTTNSSEGLSMGNYIGLINRIAQKKRLTVNYEQCASGVHGPEGFHYKCKMGQKEYSIGTGSTKQEAKQLAAKLAYLQILSEETSVKSDYLSSGSFATTCESQSNSLVTSTLASESSSEGDFSADTSEINSNSDSLNSSSLLMNGLRNNQRKAKRSLAPRFDLPDMKETKYTVDKRFGMDFKEIELIGSGGFGQVFKAKHRIDGKTYVIKRVKYNNEKAEREVKALAKLDHVNIVHYNGCWDGFDYDPETSDDSLESSDYDPENSKNSSRSKTKCLFIQMEFCDKGTLEQWIEKRRGEKLDKVLALELFEQITKGVDYIHSKKLIHRDLKPSNIFLVDTKQVKIGDFGLVTSLKNDGKRTRSKGTLRYMSPEQISSQDYGKEVDLYALGLILAELLHVCDTAFETSKFFTDLRDGIISDIFDKKEKTLLQKLLSKKPEDRPNTSEILRTLTVWKKSPEKNERHTC</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620400">
+           <names>
+             <shortLabel>copa_bovin</shortLabel>
+             <fullName>Coatomer alpha subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q27954" secondary="copa_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR006692" secondary="Coatomer_WDAD"/>
+             <secondaryRef db="interpro" id="IPR010714" secondary="COPI_C"/>
+             <secondaryRef db="interpro" id="IPR001680" secondary="WD40"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-620400" secondary="copa_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MLTKFETKSARVKGLSFHPKRPWILTSLHNGVIQLWDYRMCTLIDKFDEHDGPVRGIDFHKQQPLFVSGGDDYKIKVWNYKLRRCLFTLLGHLDYIRTTFFHHEYPWILSASDDQTIRVWNWQSRTCVCVLTGHNHYVMCAQFHPSEDLVVSASLDQTVRVWDISGLRKKNLSPGAVESDVRGITGVDLFGTTDAVVKHVLEGHDRGVNWAAFHPTMPLIVSGADDRQVKIWRMNESKAWEVDTCRGHYNNVSCAVFHPRQELILSNSEDKSIRVWDMSKRTGVQTFRRDHDRFWVLAAHPNLNLFAAGHDGGMIVFKLERERPAYAVHGNMLHYVKDRFLRQLDFNSSKDVAVMQLRSGSKFPVFSMSYNPAENAVLLCTRASNLENSTYDLYTIPKDADTQNPDAPEGKRSSGLTAVWVARNRFAVLDRMHSLLIKNLKNEITKKVQVPNCDEIFYAGTGNLLLRDAESITLFDVQQKRTLASVKISKVKYVIWSADMSHVALLAKHAIVICNRKLEALCNIHENIRVKSGAWDESGVFIYTTSNHIKYAVTTGDYGIIRTLDLPIYVTRVKGNNVYCLDRECRPRVLTIDPTEFKFKLALINRKYDEVLHMVRNAKLVGQSIIAYLQKKGYPEVALHFVKDEKTRFSLALECGNIEIALEAAKALDDKNCWEKLGEVALLQGNHQIVEMCYQRTKNFDKLSFLYLITGNLEKLRKMMKIAEIRKDMSGHYQNALYLGDVSERVRILKNCGQKSLAYLTAATHGLDEEAESLKETFDPEKETIPDIDPNAKLLQPPAPIMPLDTNWPLLTVSKGFFEGSIASKGKGGALAADIDIDTVGTEGWGEDAELQLDEDGFVEATEGLGDDALGKGQEEGGGWDVEEDLELPPELDIPPGAAGGAEDGFFVPPTKGTSPTQIWCNNSQLPVDHILAGSFETAMRLLHDQVGVTQFGPYKQLFLQTYARGRTTYQALPCLPSMYGYPNRNWKDAGLKNGVPAVGLKLNDLIQRLQLCYQLTTVGKFEEAVEKFRSILLSVPLLVVDNKQEIAEAQQLITICREYIVGLSMETERKKLPKETLEQQKRICEMAAYFTHSNLQPVHMILVLRTALNLFFKLKNFRTAAAFARRLLELGPKPEVAQQTRKILSACEKNPTDAYQLNYDMHNPFDICAASYRPIYRGKPVEKCPLSGACYSPEFKGQICKVTTVTEIGKDVIGLRISPLQFR</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620411">
+           <names>
+             <shortLabel>copb2_bovin</shortLabel>
+             <fullName>Coatomer beta&apos; subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P35605" secondary="copb2_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR006692" secondary="Coatomer_WDAD"/>
+             <secondaryRef db="interpro" id="IPR001680" secondary="WD40"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-620411" secondary="copb2_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>PLRLDIKRKLTARSDRVKSVDLHPTEPWMLASLYNGSVCVWNHETQTLVKTFEVCDLPVRAAKFVARKNWVVTGADDMQIRVFNYNTLERVHMFEAHSDYIRCIAVHPTQPFILTSSDDMLIKLWDWDKKWSCSQVFEGHTHYVMQIVINPKDNNQFASASLDRTIKVWQLGSSSPNFTLEGHEKGVNCIDYYSGGDKPYLISGADDRLVKIWDYQNKTCVQTLEGHAQNVSCASFHPELPIIITGSEDGTVRIWHSSTYRLESTLNYGMERVWCVASLRGSNNVALGYDEGSIIVKLGREEPAMSMDANGKIIWAKHSEVQQANLKAMGDAEIKDGERLPLAVKDMGSCEIYPQTIQHNPNGRFVVVCGDGEYIIYTAMALRNKSFGSAQEFAWAHDSSEYAIRESNSVVKIFKNFKEKKSFKPDFGAESIYGGFLLGVRSVNGLAFYDWENTELIRRIEIQPKHIFWSDSGELVCIATEESFFILKYLSEKVLAAQETHEGVTEDGIEDGFEVLGEIQEIVKTGLWVGDCFIYTSSVNRLNYYVGGEIVTIAHLDRTMYLLGYIPKDNRLYLGDKELNIVSYSLLVSVLEYQTAVMRRDFSMADKVLPTIPKEQRTRVAHFLEKQGFKQQALTVSTDPEHRFELALQLGELKIAYQLAVEAESEQKWKQLAELAISKCPFGLAQECLHHAQDYGGLLLLATASGNASMVNKLAEGAERDGKNNVAFMSYFLQGKLDACLELLIRTGRLPEAAFLARTYLPSQVSRVVKLWRENLSKVNQKAAESLADPTEYENLFPGLKEAFVVEEWVKETHADLWPAKQYPLVTPNEERNVMEEAKGFQPSRSAAQQELDGKPASPTPVIVTSQTANKEEKSLLELEVDLDNLEIEDIDTTDINLDEDILDD</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620432">
+           <names>
+             <shortLabel>copd_bovin</shortLabel>
+             <fullName>Coatomer delta subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P53619" secondary="copd_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR008968" secondary="AP50"/>
+             <secondaryRef db="interpro" id="IPR001392" secondary="Clathrn_med"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-620432" secondary="copd_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MVLLAAAVCTKAGKAIVSRQFVEMTRTRIEGLLAAFPKLMNTGKQHTFVETESVRYVYQPMEKLYMVLITTKNSNILEDLETLRLFSRVIPEYCRALEENEISEHCFDLIFAFDEIVALGYRENVNLAQIRTFTEMDSHEEKVFRAVRETQEREAKAEMRRKAKELQQARRDAERQGKKAPGFGGFGSSTVSGGSTTSMITETIIETDKPKVAPAPARPSGPSKALKLGAKGKEVDNFVDKLKSEGENIISSNMGKRTSEATKVHAPPINMESVHMKIEEKITLTCGRDGGLQNMELHGMIMLRISDDKFGRIRLHVENEDKKGVQLQTHPNVDKKLFTAESLIGLKNPEKSFPVNSDVGVLKWRLQTTEESFIPLTINCWPSESGNGCDVNIEYELQEDNLELNDVVITIPLPSGVGAPVIGEIDGEYRHDSRRNTLEWCLPVIDAKNKSGSLEFSIAGQPNDFFPVQVSFISKKNYCNIQVTKVTQVDGNSPVRFSTETTFLVDKYEIL</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620442">
+           <names>
+             <shortLabel>copz1_bovin</shortLabel>
+             <fullName>Coatomer zeta-1 subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P35604" secondary="copz1_bovin" version="SP_47"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR000804" secondary="Clat_adaptor_s"/>
+             <secondaryRef db="intact" id="EBI-620442" secondary="copz1_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MEALILQPSLYTVKAILILDNDGDRLFAKYYDDTYPSVKEQKAFEKNIFNKTHRTDSEIALLEGLTVVYKSSIDLYFYVIGSSYENELMLMTVLNCLFDSLSQMLRKNVEKRALLENMEGLFLAVDEIVDGGVILESDPQQVVHRVALRGEDVPLTEQTVSQVLQSAKEQIKWSLLR</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620457">
+           <names>
+             <shortLabel>cope_bovin</shortLabel>
+             <fullName>Coatomer epsilon subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q28104" secondary="cope_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR006822" secondary="Coatomer_E"/>
+             <secondaryRef db="interpro" id="IPR011990" secondary="TPR-like_helical"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-620457" secondary="cope_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>APPAPGPASGGSGEVDELFDVKNAFYIGSYQQCINEAQRVKPSSPERDVERDVFLYRAYLAQRKYGVVLDEIKPSSAPELQAVRMFAEYLASHSRRDAIVAELDREMSRSVDVTNTTFLLMAASIYFYDQNPDAALRTLHQGDSLECMAMTVQILLKLDRLDLARKELKKMQDQDEDATLTQLATAWVSLAAGGEKLQDAYYIFQEMADKCSPTLLLLNGQAACHMAQGRWEAAEGVLQEALDKDSGHPETLINLVVLSQHLGKPPEVTNRYLSQLKDAHRSHPFIKEYRAKENDFDRLVLQYAPSA</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-620488">
+           <names>
+             <shortLabel>copb_rat</shortLabel>
+             <fullName>Coatomer beta subunit</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P23514" secondary="copb_rat" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0030126" secondary="C:COPI vesicle coat"/>
+             <secondaryRef db="go" id="GO:0005798" secondary="C:Golgi vesicle"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0006891" secondary="P:intra-Golgi transport"/>
+             <secondaryRef db="go" id="GO:0006890" secondary="P:retrograde transport, Golgi "/>
+             <secondaryRef db="interpro" id="IPR002553" secondary="Adaptin_N"/>
+             <secondaryRef db="interpro" id="IPR011989" secondary="ARM-like"/>
+             <secondaryRef db="interpro" id="IPR011710" secondary="DUF1606"/>
+             <secondaryRef db="intact" id="EBI-620488" secondary="copb_rat"/>
+           </xref>
+           <organism ncbiTaxId="10116">
+             <names>
+               <shortLabel>rat</shortLabel>
+               <fullName>Rattus norvegicus</fullName>
+             </names>
+           </organism>
+           <sequence>MTAAENVCYTLINVPMDSEPPSEISLKNDLEKGDVKSKTEALKKVIIMILNGEKLPGLLMTIIRFVLPLQDHTIKKLLLVFWEIVPKTTPDGRLLHEMILVCDAYRKDLQHPNEFIRGSTLRFLCKLKEAELLEPLMPAIRACLEHRHSYVRRNAVLAIYTIYRNFENLIPDAPELIHDFLVNEKDASCKRNAFMMLIHADQDRALDYLSTCIDQVQTFGDILQLVIVELIYKVCHANPSERARFIRCIYNLLQSSSPAVKYEAAGTLVTLSSAPTAIKAAAQCYIDLIIKESDNNVKLIVLDRLVELKEHPAHERVLQDLVMDILRVLSTPDLEVRKKTLQLALDLVSSRNVEELVIVLKKEVIKTNNVSEHEDTDKYRQLLVRTLHSCSVRFPDMAANVIPVLMEFLSDSNEAAAADVLEFVREAIQRFDNLRMLIVEKMLEVFHAIKSVKIYRGALWILGEYCSTKEDIQSVMTEVRRSLGEIPIVESEIKKEAGELKPEEEITVGPVQKLVTEMGTYATQSALSSSRPTKKEEDRPPLRGFLLDGDFFVAASLATTLTKIALRYVALVQEKKKQNSFVAEAMLLMATILHLGKSSLPKKPITDDDVDRISLCLKVLSECSPLMNDIFNKECRQSLSQMLSAKLEEEKLSQKKESEKRNVTVQPDDPISFMQLTAKNEMNCKEDQFQLSLLAAMGNTQRKEAADPLASKLNKVTQLTGFSDPVYAEAYVHVNQYDIVLDVLVVNQTSDTLQNCTLELATLGDLKLVEKPSPLTLAPHDFANIKANVKVASTENGIIFGNIVYDVSGAASDRNCVVLSDIHIDIMDYIQPATCTDAEFRQMWAEFEWENKVTVNTNVTDLNDYLQHILKSTNMKCLTPEKALSGYCGFMAANLYARSIFGEDALANVSIEKPVHQGPDAAVTGHIRIRAKSQGMALSLGDKINLSQKKTSL</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-307814">
+           <names>
+             <shortLabel>cd5r1_bovin</shortLabel>
+             <fullName>Cyclin-dependent kinase 5 activator 1 precursor</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q28199" secondary="cd5r1_bovin" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR004944" secondary="CDK5_activator"/>
+             <secondaryRef db="uniprotkb" id="Q28865" secondary="cd5r1_bovin" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q29462" secondary="cd5r1_bovin" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-307814" secondary="cd5r1_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MGTVLSLSPSYRKATLFEDGAATVGHYTAVQNSKNAKDKNLKRHSIISVLPWKRIVAVSAKKKNSKKVQPNSSYQNNITHLNNENLKKSLSCANLSTFAQPPPAQPPAPPASQLSGSQTGVSSSVKKAPHPAVSSAGTPKRVIVQASTSELLRCLGEFLCRRCYRLKHLSPTDPVLWLRSVDRSLLLQGWQDQGFITPANVVFLYMLCRDVISSEVGSDHELQAVLLTCLYLSYSYMGNEISYPLKPFLVESCKEAFWDRCLSVINLMSSKMLQINADPHYFTQVFSDLKNESGQEDKKRLLLGLDR</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-307800">
+           <names>
+             <shortLabel>ck5p1_rat</shortLabel>
+             <fullName>CDK5 regulatory subunit associated protein 1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9JLH6" secondary="ck5p1_rat" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0042808" secondary="F:neuronal Cdc2-like kinase bi"/>
+             <secondaryRef db="go" id="GO:0007420" secondary="P:brain development"/>
+             <secondaryRef db="go" id="GO:0008283" secondary="P:cell proliferation"/>
+             <secondaryRef db="go" id="GO:0045736" secondary="P:negative regulation of CDK a"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="P:regulation of neuron differe"/>
+             <secondaryRef db="interpro" id="IPR006638" secondary="Elp3"/>
+             <secondaryRef db="interpro" id="IPR006463" secondary="MiaB_methiolase"/>
+             <secondaryRef db="interpro" id="IPR007197" secondary="Radical_SAM"/>
+             <secondaryRef db="interpro" id="IPR002792" secondary="TRAM"/>
+             <secondaryRef db="interpro" id="IPR005839" secondary="UPF0004"/>
+             <secondaryRef db="go" id="GO:0019887" secondary="F:protein kinase regulator act"/>
+             <secondaryRef db="intact" id="EBI-307800" secondary="ck5p1_rat"/>
+           </xref>
+           <organism ncbiTaxId="10116">
+             <names>
+               <shortLabel>rat</shortLabel>
+               <fullName>Rattus norvegicus</fullName>
+             </names>
+           </organism>
+           <sequence>MHPLQRVFRAQRLSAPLTSMCWVLLRTFRAHNSTSCPDPEGKSSEGVQKDFSSRLATGPTFQHFLRSASVPQEKPSSPEVEDPPPYLSGDELLGRQRKVYLETYGCQMNVNDTEIAWSILQKSGYLRTSNLQEADVILLVTCSIREKAEQTIWNRLHQLKVLKAKRPRSRVPLRIGILGCMAERLKGEILNREKMVDLLAGPDAYRDLPRLLAVVESGQQAANVLLSLDETYADIMPVQTSPSATSAFVSIMRGCDNMCSYCIVPFTRGRERSRPVASILDEVRKLSEQGLKEVTLLGQNVNSFRDNSEVQFSSTGSANLSRGFTTNYKPKQGGLRFSHLLDQVSRIDPEMRIRFTSPHPKDFPDEVLQLIRERHNICKQIHLPAQSGSSRVLEAMRRGYSREAYVALVHHIREAIPGVGLSSDFITGFCGETEDDHLQTVSLLREVQYNTGFLFAYSMRQKTRAYHRLKDDVPEEVKLRRLEELITVFREEASKVNATSVGCTQLVLVEGFSKRSTTDLCGRNDANLKVIFPDAEVEDITDPGLKVRAQPGDYVLVKIISASSQTLKGHILCRTTMKDSSMNCLT</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-307832">
+           <names>
+             <shortLabel>ck5p2_rat</shortLabel>
+             <fullName>CDK5 regulatory subunit associated protein 2</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9JLH5" secondary="ck5p2_rat" version="SP_47"/>
+             <secondaryRef db="go" id="GO:0005856" secondary="C:cytoskeleton"/>
+             <secondaryRef db="go" id="GO:0042808" secondary="F:neuronal Cdc2-like kinase bi"/>
+             <secondaryRef db="go" id="GO:0007420" secondary="P:brain development"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="P:regulation of neuron differe"/>
+             <secondaryRef db="intact" id="EBI-307832" secondary="ck5p2_rat"/>
+           </xref>
+           <organism ncbiTaxId="10116">
+             <names>
+               <shortLabel>rat</shortLabel>
+               <fullName>Rattus norvegicus</fullName>
+             </names>
+           </organism>
+           <sequence>MAPKSASETPVLSGTDVDSLSCDSTSSATSPSCMPCLVAGRHLWASKSGHHMLCLIEDYDALYKQISWGQTLLAKMDIQTQEALSPTSQKLGPKASFSVPLSKFLSSMNTAKLILEKASRLLKLFWRVSVPTNGQCSLHCDQIGEMKAEITKLHKKLFEQEKKLQNTAKLLQQSKHQEKIIFDQLVITHQVLRKARGNLELRPRAAHPGTSSPSRPGS</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-307845">
+           <names>
+             <shortLabel>ck5p3_rat</shortLabel>
+             <fullName>CDK5 regulatory subunit associated protein 3</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9JLH7" secondary="ck5p3_rat" version="SP_47"/>
+             <secondaryRef db="go" id="GO:0042808" secondary="F:neuronal Cdc2-like kinase bi"/>
+             <secondaryRef db="go" id="GO:0007420" secondary="P:brain development"/>
+             <secondaryRef db="go" id="GO:0008283" secondary="P:cell proliferation"/>
+             <secondaryRef db="go" id="GO:0000079" secondary="P:regulation of CDK activity"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="P:regulation of neuron differe"/>
+             <secondaryRef db="interpro" id="IPR008491" secondary="DUF773"/>
+             <secondaryRef db="intact" id="EBI-307845" secondary="ck5p3_rat"/>
+           </xref>
+           <organism ncbiTaxId="10116">
+             <names>
+               <shortLabel>rat</shortLabel>
+               <fullName>Rattus norvegicus</fullName>
+             </names>
+           </organism>
+           <sequence>MQDHQHVPIDIQTSKLLDWLVDRRHCNLKWQSLVLTIREKINTAIQDMPESQEIAQLLSGSYIHYFHCLRIVDLLKGTEASTKNIFGRYSSQRMKDWQEIISLYEKDNTYLVELSSLLVRNVNYEIPSLKKQIAKCQQLQQDYSRKEEEGQAGAAEMREQFYHSCKQYGITGDNVRRELLALVKDLPSQLAEIGAGAQSLGEAIDLYQACVEFVCDSPTEQVLPMLRYVQPKGNSTVYEWRTGTEPSVVERPQLEDPPEQVQEDEIDWGDFGLEAVSDSGNIISAETPGIDWGISLESESKDAGADKIDWGDNAVASEITVLETGTEAPEGVARGSDALTLLEYPETRNQFIDELMELEIFLSQRAVEMSEEADILSVSQFQLAPAILQGQTKEKMLSLVSTLQHLIGQLTSLDLQHLFMILASPRYVDRVTELLQQKLKQSQLLALKKDLMVEKQQEALQEQAALEPKLDLLLEKTRELQKLIEADISKRYNGRPVNLMGTSV</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-449051">
+           <names>
+             <shortLabel>arf1_bovin</shortLabel>
+             <fullName>ADP-ribosylation factor 1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P84080" secondary="arf1_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005886" secondary="C:plasma membrane"/>
+             <secondaryRef db="go" id="GO:0003924" secondary="F:GTPase activity"/>
+             <secondaryRef db="go" id="GO:0005057" secondary="F:receptor signaling protein a"/>
+             <secondaryRef db="interpro" id="IPR006688" secondary="ARF"/>
+             <secondaryRef db="interpro" id="IPR006689" secondary="ARF/SAR"/>
+             <secondaryRef db="interpro" id="IPR001806" secondary="Ras_trnsfrmng"/>
+             <secondaryRef db="interpro" id="IPR005225" secondary="Small_GTP"/>
+             <secondaryRef db="uniprotkb" id="P10947" secondary="arf1_bovin" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="P32889" secondary="arf1_bovin" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR003579" secondary="GTPase_Rab"/>
+             <secondaryRef db="interpro" id="IPR006687" secondary="SAR1_GTP_bd"/>
+             <secondaryRef db="intact" id="EBI-449051" secondary="arf1_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>GNIFANLFKGLFGKKEMRILMVGLDAAGKTTILYKLKLGEIVTTIPTIGFNVETVEYKNISFTVWDVGGQDKIRPLWRHYFQNTQGLIFVVDSNDRERVNEAREELMRMLAEDELRDAVLLVFANKQDLPNAMNAAEITDKLGLHSLRHRNWYIQATCATSGDGLYEGLDWLSNQLRNQK</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-698498">
+           <names>
+             <shortLabel>ddef1_mouse</shortLabel>
+             <fullName>130-kDa phosphatidylinositol 4,5-biphosphate-dependent ARF1 GTPase-activating protein</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9QWY8" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR002110" secondary="ANK"/>
+             <secondaryRef db="interpro" id="IPR001164" secondary="ArfGAP"/>
+             <secondaryRef db="interpro" id="IPR000108" secondary="Neu_cyt_fact_2"/>
+             <secondaryRef db="interpro" id="IPR001849" secondary="PH"/>
+             <secondaryRef db="interpro" id="IPR011993" secondary="PH_type"/>
+             <secondaryRef db="interpro" id="IPR001452" secondary="SH3"/>
+             <secondaryRef db="uniprotkb" id="O08612" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q80TG8" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q80UV6" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q99LV8" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9Z2B6" secondary="ddef1_mouse" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-698498" secondary="ddef1_mouse"/>
+           </xref>
+           <organism ncbiTaxId="10090">
+             <names>
+               <shortLabel>mouse</shortLabel>
+               <fullName>Mus musculus</fullName>
+             </names>
+           </organism>
+           <sequence>MRSSASRLSSFSSRDSLWNRMPDQISVSEFIAETTEDYNSPTTSSFTTRLHNCRNTVTLLEEALDQDRTALQKVKKSVKAIYNSGQDHVQNEENYAQVLDKFGSNFLSRDNPDLGTAFVKFSTLTKELSTLLKNLLQGLSHNVIFTLDSLLKGDLKGVKGDLKKPFDKAWKDYETKFTKIEKEKREHAKQHGMIRTEITGAEIAEEMEKERRLFQLQMCEYLIKVNEIKTKKGVDLLQNLIKYYHAQCNFFQDGLKTADKLKQYIEKLAADLYNIKQTQDEEKKQLTALRDLIKSSLQLDPKEVGGLYVASRANSSRRDSQSRQGGYSMHQLQGNKEYGSEKKGFLLKKSDGIRKVWQRRKCAVKNGILTISHATSNRQPAKLNLLTCQVKPNAEDKKSFDLISHNRTYHFQAEDEQDYIAWISVLTNSKEEALTMAFRGEQSTGENSLEDLTKAIIEDVQRLPGNDICCDCGSSEPTWLSTNLGILTCIECSGIHREMGVHISRIQSLELDKLGTSELLLAKNVGNNSFNDIMEANLPSPSPKPTPSSDMTVRKEYITAKYVDHRFSRKTCASSSAKLNELLEAIKSRDLLALIQVYAEGVELMEPLLEPGQELGETALHLAVRTADQTSLHLVDFLVQNCGNLDKQTSVGNTVLHYCSMYGKPECLKLLLRSKPTVDIVNQNGETALDIAKRLKATQCEDLLSQAKSGKFNPHVHVEYEWNLRQDEMDESDDDLDDKPSPIKKERSPRPQSFCHSSSISPQDKLALPGFSTPRDKQRLSYGAFTNQIFASTSTDLPTSPTSEAPPLPPRNAGKGPTGPPSTLPLGTQTSSGSSTLSKKRPPPPPPGHKRTLSDPPSPLPHGPPNKGAIPWGNDVGPSSSSKTANKFEGLSQQASTSSAKTALGPRVLPKLPQKVALRKTETSHHLSLDRTNIPPETFQKSSQLTELPQKPPLGELPPKPVELAPKPQVGELPPKPGELPPKPQLGDLPPKPQLSDLPPKPQMKDLPPKPQLGDLLAKSQAGDVSAKVQPPSEVTQRSHTGDLSPNVQSRDAIQKQASEDSNDLTPTLPETPVPLPRKINTGKNKVRRVKTIYDCQADNDDELTFIEGEVIIVTGEEDQEWWIGHIEGQPERKGVFPVSFVHILSD</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-457220">
+           <names>
+             <shortLabel>ack2_bovin</shortLabel>
+             <fullName>Activated CDC42 kinase 2</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O02742" secondary="ack2_bovin" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR000095" secondary="PAKbox/Rhobndng"/>
+             <secondaryRef db="interpro" id="IPR000719" secondary="Prot_kinase"/>
+             <secondaryRef db="interpro" id="IPR001452" secondary="SH3"/>
+             <secondaryRef db="interpro" id="IPR001245" secondary="Tyr_pkinase"/>
+             <secondaryRef db="interpro" id="IPR008266" secondary="Tyr_pkinase_AS"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-457220" secondary="ack2_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>MQPEEGTGWLLELLSEVQLQQYFLRLRDDLNVTRLSHFEYVKNEDLEKIGMGRPGQRRLWEAVKRRKAMCKRKSWMSKVFSGKRLEAEFPPHHSQSTFRKTSPTPGGSAGEGSLQSLTCLIGEKDLHLFEKLGDGSFGVVRRGEWDAPSGKTVSVAVKCLKPDVLSQPEAMDDFIREVNAMHSLDHRNLIRLYGVVLTPPMKMVTELAPLGSLLDRLRKHQGHFLLGTLSRYAVQVAEGMGYLEAKRFIHRDLAARNLLLATRDLVKIGDFGLMRALPQNDDHYVMQEHRKVPFAWCAPESLKTRTFSHASDTWMFGVTLWEMFTYGQEPWIGLNGSQILHKIDKEGERLPRPEDCPQDIYNVMVQCWAHKPEDRPTFVALRDFLLEAQPTDMRALQDFEEPDKLHIQMNDVITVIEGRAENYWWRGQNTRTLCVGPFPRNVVTSVAGLSAQDISQPLQNSFIHTGHGDSDPRHCWGFPDKIDELYLGNPMDPPDLLSVELSTSRPTQHLGRVKREPPPRPPQPAIFTQKPTYDPVSEDQDPLSSDFKKLGLRKPGLPRGLWLAKPSARVPGTKAGRGGGEVTLIDFGEEPVVPAPRPCAPSLAQLAMDACSLLDKTPPQSPTRALPRPLHPTPVVDWDARPLPPPPAYDDVAQDEDDFEVCSINSTLVGAGVSAEPSQGETNYAFVPEPARLLPPAGGQPVPPTPEWGQATQLGPNRRDLPGAAAGMHAAATGPAWLSGPLTQPWG</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-81752">
+           <names>
+             <shortLabel>cdc42_human</shortLabel>
+             <fullName>Cell division control protein 42 homolog</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P60953" secondary="cdc42_human" version="SP_49"/>
+             <secondaryRef db="interpro" id="IPR003578" secondary="GTPase_Rho"/>
+             <secondaryRef db="interpro" id="IPR001806" secondary="Ras_trnsfrmng"/>
+             <secondaryRef db="interpro" id="IPR005225" secondary="Small_GTP"/>
+             <secondaryRef db="uniprotkb" id="P21181" secondary="cdc42_human" version="SP_49"/>
+             <secondaryRef db="uniprotkb" id="P25763" secondary="cdc42_human" version="SP_49"/>
+             <secondaryRef db="uniprotkb" id="Q7L8R5" secondary="cdc42_human" version="SP_49"/>
+             <secondaryRef db="go" id="GO:0005737" secondary="C:cytoplasm"/>
+             <secondaryRef db="go" id="GO:0030175" secondary="C:filopodium"/>
+             <secondaryRef db="go" id="GO:0003924" secondary="F:GTPase activity"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0007015" secondary="P:actin filament organization"/>
+             <secondaryRef db="go" id="GO:0007163" secondary="P:establishment and/or mainten"/>
+             <secondaryRef db="go" id="GO:0030225" secondary="P:macrophage differentiation"/>
+             <secondaryRef db="go" id="GO:0005886" secondary="C:plasma membrane"/>
+             <secondaryRef db="interpro" id="IPR003579" secondary="GTPase_Rab"/>
+             <secondaryRef db="interpro" id="IPR003577" secondary="GTPase_Ras"/>
+             <secondaryRef db="intact" id="EBI-81752" secondary="cdc42_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MQTIKCVVVGDGAVGKTCLLISYTTNKFPSEYVPTVFDNYAVTVMIGGEPYTLGLFDTAGQEDYDRLRPLSYPQTDVFLVCFSVVSPSSFENVKEKWVPEITHHCPKTPFLLVGTQIDLRDDPSTIEKLAKNKQKPITPETAEKLARDLKAVKYVECSALTQRGLKNVFDEAILAALEPPETQPKRKCCIF</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-79764">
+           <names>
+             <shortLabel>h31_bovin</shortLabel>
+             <fullName>Histone H3.1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="P68432" secondary="h31_bovin" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR007124" secondary="Hist_TAF"/>
+             <secondaryRef db="interpro" id="IPR007125" secondary="Histone_core_D"/>
+             <secondaryRef db="interpro" id="IPR000164" secondary="Histone_H3"/>
+             <secondaryRef db="uniprotkb" id="P02295" secondary="h31_bovin" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="P02296" secondary="h31_bovin" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="P16106" secondary="h31_bovin" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="intact" id="EBI-79764" secondary="h31_bovin"/>
+           </xref>
+           <organism ncbiTaxId="9913">
+             <names>
+               <shortLabel>bovin</shortLabel>
+               <fullName>Bos taurus</fullName>
+             </names>
+           </organism>
+           <sequence>ARTKQTARKSTGGKAPRKQLATKAARKSAPATGGVKKPHRYRPGTVALREIRRYQKSTELLIRKLPFQRLVREIAQDFKTDLRFQSSAVMALQEACEAYLVGLFEDTNLCAIHAKRVTIMPKDIQLARRIRGERA</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-349968">
+           <names>
+             <shortLabel>suv91_human</shortLabel>
+             <fullName>Histone-lysine N-methyltransferase, H3 lysine-9 specific 1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O43463" secondary="suv91_human" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0000794" secondary="C:condensed nuclear chromosome"/>
+             <secondaryRef db="go" id="GO:0005634" secondary="C:nucleus"/>
+             <secondaryRef db="go" id="GO:0003682" secondary="F:chromatin binding"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="F:histone lysine N-methyltrans"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0000067" secondary="P:DNA replication and chromoso"/>
+             <secondaryRef db="go" id="GO:0006325" secondary="P:establishment and/or mainten"/>
+             <secondaryRef db="interpro" id="IPR000953" secondary="Chromo"/>
+             <secondaryRef db="interpro" id="IPR003616" secondary="PostSET"/>
+             <secondaryRef db="interpro" id="IPR007728" secondary="Pre-SET"/>
+             <secondaryRef db="interpro" id="IPR001214" secondary="SET"/>
+             <secondaryRef db="interpro" id="IPR003606" secondary="Zn2-binding"/>
+             <secondaryRef db="go" id="GO:0042054" secondary="F:histone methyltransferase ac"/>
+             <secondaryRef db="go" id="GO:0008757" secondary="F:S-adenosylmethionine-depende"/>
+             <secondaryRef db="interpro" id="IPR011381" secondary="H3-K9_me_transf"/>
+             <secondaryRef db="uniprotkb" id="Q53G60" secondary="suv91_human" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q6FHK6" secondary="suv91_human" version="SP_48"/>
+             <secondaryRef db="intact" id="EBI-349968" secondary="suv91_human"/>
+           </xref>
+           <organism ncbiTaxId="9606">
+             <names>
+               <shortLabel>human</shortLabel>
+               <fullName>Homo sapiens</fullName>
+             </names>
+           </organism>
+           <sequence>MAENLKGCSVCCKSSWNQLQDLCRLAKLSCPALGISKRNLYDFEVEYLCDYKKIREQEYYLVKWRGYPDSESTWEPRQNLKCVRILKQFHKDLERELLRRHHRSKTPRHLDPSLANYLVQKAKQRRALRRWEQELNAKRSHLGRITVENEVDLDGPPRAFVYINEYRVGEGITLNQVAVGCECQDCLWAPTGGCCPGASLHKFAYNDQGQVRLRAGLPIYECNSRCRCGYDCPNRVVQKGIRYDLCIFRTDDGRGWGVRTLEKIRKNSFVMEYVGEIITSEEAERRGQIYDRQGATYLFDLDYVEDVYTVDAAYYGNISHFVNHSCDPNLQVYNVFIDNLDERLPRIAFFATRTIRAGEELTFDYNMQVDPVDMESTRMDSNFGLAGLPGSPKKRVRIECKCGTESCRKYLF</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-302230">
+           <names>
+             <shortLabel>suv91_mouse</shortLabel>
+             <fullName>Histone-lysine N-methyltransferase, H3 lysine-9 specific 1</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O54864" secondary="suv91_mouse" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR000953" secondary="Chromo"/>
+             <secondaryRef db="interpro" id="IPR003616" secondary="PostSET"/>
+             <secondaryRef db="interpro" id="IPR007728" secondary="Pre-SET"/>
+             <secondaryRef db="interpro" id="IPR001214" secondary="SET"/>
+             <secondaryRef db="interpro" id="IPR003606" secondary="Zn2-binding"/>
+             <secondaryRef db="uniprotkb" id="Q9JLC7" secondary="suv91_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9JLP8" secondary="suv91_mouse" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005677" secondary="C:chromatin silencing complex"/>
+             <secondaryRef db="go" id="GO:0005720" secondary="C:nuclear heterochromatin"/>
+             <secondaryRef db="go" id="GO:0018024" secondary="F:histone-lysine N-methyltrans"/>
+             <secondaryRef db="go" id="GO:0008276" secondary="F:protein methyltransferase ac"/>
+             <secondaryRef db="go" id="GO:0006342" secondary="P:chromatin silencing"/>
+             <secondaryRef db="go" id="GO:0006323" secondary="P:DNA packaging"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="interpro" id="IPR011381" secondary="H3-K9_me_transf"/>
+             <secondaryRef db="intact" id="EBI-302230" secondary="suv91_mouse"/>
+           </xref>
+           <organism ncbiTaxId="10090">
+             <names>
+               <shortLabel>mouse</shortLabel>
+               <fullName>Mus musculus</fullName>
+             </names>
+           </organism>
+           <sequence>MAENLKGCSVCCKSSWNQLQDLCRLAKLSCPALGVSKKNLYDFEVEYLCDYKKIREQEYYLVKWRGYPDSENTWEPRQNLKCIRVLKQFHKDLERELVRRHRRSKPPRHLDPNLANYLVQKAKQRRALQRWEQELNAKRSHLGRITVENEVDLDGPPRSFVYINEYRVGEGITLNQVAVGCECQDCLLAPTGGCCPGASLHKFAYNDQGQVRLKAGQPIYECNSRCCCGYDCPNRVVQKGIRYDLCIFRTNDGRGWGVRTLEKIRKNSFVMEYVGEIITSEEAERRGQIYDRQGATYLFDLDYVEDVYTVDAAYYGNISHFVNHSCDPNLQVYNVFIDNLDERLPRIAFFATRTIWAGEELTFDYNMQVDPVDMESTRMDSNFGLAGLPGSPKKRVRIECKCGTTACRKYLF</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-354657">
+           <names>
+             <shortLabel>clr4_schpo</shortLabel>
+             <fullName>Histone-lysine N-methyltransferase, H3 lysine-9 specific</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="O60016" secondary="clr4_schpo" version="SP_48"/>
+             <secondaryRef db="interpro" id="IPR000953" secondary="Chromo"/>
+             <secondaryRef db="interpro" id="IPR003616" secondary="PostSET"/>
+             <secondaryRef db="interpro" id="IPR007728" secondary="Pre-SET"/>
+             <secondaryRef db="interpro" id="IPR001214" secondary="SET"/>
+             <secondaryRef db="interpro" id="IPR003606" secondary="Zn2-binding"/>
+             <secondaryRef db="uniprotkb" id="O74565" secondary="clr4_schpo" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="F:histone lysine N-methyltrans"/>
+             <secondaryRef db="go" id="GO:0008168" secondary="F:methyltransferase activity"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0030702" secondary="P:chromatin silencing at centr"/>
+             <secondaryRef db="go" id="GO:0000183" secondary="P:chromatin silencing at ribos"/>
+             <secondaryRef db="go" id="GO:0030466" secondary="P:chromatin silencing at silen"/>
+             <secondaryRef db="go" id="GO:0006348" secondary="P:chromatin silencing at telom"/>
+             <secondaryRef db="go" id="GO:0016571" secondary="P:histone methylation"/>
+             <secondaryRef db="go" id="GO:0030989" secondary="P:horsetail movement"/>
+             <secondaryRef db="go" id="GO:0008104" secondary="P:protein localization"/>
+             <secondaryRef db="go" id="GO:0030422" secondary="P:RNA interference, production"/>
+             <secondaryRef db="go" id="GO:0045141" secondary="P:telomere clustering"/>
+             <secondaryRef db="intact" id="EBI-354657" secondary="clr4_schpo"/>
+           </xref>
+           <organism ncbiTaxId="4896">
+             <names>
+               <shortLabel>schpo</shortLabel>
+               <fullName>Schizosaccharomyces pombe</fullName>
+             </names>
+           </organism>
+           <sequence>MSPKQEEYEVERIVDEKLDRNGAVKLYRIRWLNYSSRSDTWEPPENLSGCSAVLAEWKRRKRRLKGSNSDSDSPHHASNPHPNSRQKHQHQTSKSVPRSQRFSRELNVKKENKKVFSSQTTKRQSRKQSTALTTNDTSIILDDSLHTNSKKLGKTRNEVKEESQKRELVSNSIKEATSPKTSSILTKPRNPSKLDSYTHLSFYEKRELFRKKLREIEGPEVTLVNEVDDEPCPSLDFQFISQYRLTQGVIPPDPNFQSGCNCSSLGGCDLNNPSRCECLDDLDEPTHFAYDAQGRVRADTGAVIYECNSFCSCSMECPNRVVQRGRTLPLEIFKTKEKGWGVRSLRFAPAGTFITCYLGEVITSAEAAKRDKNYDDDGITYLFDLDMFDDASEYTVDAQNYGDVSRFFNHSCSPNIAIYSAVRNHGFRTIYDLAFFAIKDIQPLEELTFDYAGAKDFSPVQSQKSQQNRISKLRRQCKCGSANCRGWLFG</sequence>
+         </proteinInteractor>
+         <proteinInteractor id="EBI-354674">
+           <names>
+             <shortLabel>suv92_mouse</shortLabel>
+             <fullName>Histone-lysine N-methyltransferase, H3 lysine-9 specific 2</fullName>
+           </names>
+           <xref>
+             <primaryRef db="uniprotkb" id="Q9EQQ0" secondary="suv92_mouse" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0005720" secondary="C:nuclear heterochromatin"/>
+             <secondaryRef db="go" id="GO:0008276" secondary="F:protein methyltransferase ac"/>
+             <secondaryRef db="interpro" id="IPR000953" secondary="Chromo"/>
+             <secondaryRef db="interpro" id="IPR003616" secondary="PostSET"/>
+             <secondaryRef db="interpro" id="IPR007728" secondary="Pre-SET"/>
+             <secondaryRef db="interpro" id="IPR001214" secondary="SET"/>
+             <secondaryRef db="uniprotkb" id="Q9CUK3" secondary="suv92_mouse" version="SP_48"/>
+             <secondaryRef db="uniprotkb" id="Q9JLP7" secondary="suv92_mouse" version="SP_48"/>
+             <secondaryRef db="go" id="GO:0000785" secondary="C:chromatin"/>
+             <secondaryRef db="go" id="GO:0003682" secondary="F:chromatin binding"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="F:histone lysine N-methyltrans"/>
+             <secondaryRef db="go" id="GO:0005515" secondary="F:protein binding"/>
+             <secondaryRef db="go" id="GO:0006333" secondary="P:chromatin assembly or disass"/>
+             <secondaryRef db="go" id="GO:0006338" secondary="P:chromatin remodeling"/>
+             <secondaryRef db="go" id="GO:0007140" secondary="P:male meiosis"/>
+             <secondaryRef db="interpro" id="IPR011381" secondary="H3-K9_me_transf"/>
+             <secondaryRef db="intact" id="EBI-354674" secondary="suv92_mouse"/>
+           </xref>
+           <organism ncbiTaxId="10090">
+             <names>
+               <shortLabel>mouse</shortLabel>
+               <fullName>Mus musculus</fullName>
+             </names>
+           </organism>
+           <sequence>MATARAKARGSEAGARCHRAPGPPPRPKARRTARRRRAETLTARRSRPSAGERRAGSQRAWSGAPRAAVFGDECARGALFKAWCVPCLVSLDTLQELCRKEKLTCKSIGITKRNLNNYEVEYLCDYKVAKGVEYYLVKWKGWPDSTNTWEPLRNLRCPQLLRQFSDDKKTYLAQERKCKAVNSKSLQPAIAEYIVQKAKQRIALQRWQDYLNRRKNHKGMIFVENTVDLEGPPLDFYYINEYRPAPGISINSEATFGCSCTDCFFDKCCPAEAGVVLAYNKKQQIKIQPGTPIYECNSRCRCGPECPNRIVQKGTQYSLCIFKTSNGCGWGVKTLVKIKRMSFVMEYVGEVITSEEAERRGQFYDNKGITYLFDLDYESDEFTVDAARYGNVSHFVNHSCDPNLQVFSVFIDNLDTRLPRIALFSTRTINAGEELTFDYQMKGSGEASSDSIDHSPAKKRVRTQCKCGAETCRGYLN</sequence>
+         </proteinInteractor>
+       </interactorList>
+       <interactionList>
+         <interaction>
+           <names>
+             <shortLabel>nfl-nfm-1</shortLabel>
+             <fullName>complex between NFL and NFM detected by electrophorectic native gel in urea 2M</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-444248"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-444343"/>
+               <role>neutral</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-444335"/>
+               <role>neutral</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-444354" secondary="nfl-nfm-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">NFL also form a complex with NFH</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>eif2ak2-dnajc3-3</shortLabel>
+             <fullName>Interaction between EIF2AK2 (PKR) and DNAJC3 identified by coimmunoprecipitation</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-640823"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640793"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640775"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-640826" secondary="eif2ak2-dnajc3-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">eIF2AK2 in vitro activated by heparin.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>eif2ak2-dnajc3-5</shortLabel>
+             <fullName>Interaction between EIF2AK2 (PKR) and DNAJC3 identified by coimmunoprecipitation</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-640823"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640793"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640775"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-679333" secondary="eif2ak2-dnajc3-5"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">eIF2AK2 in vitro activated by heparin.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copa-copb2-1</shortLabel>
+             <fullName>Y2H: Interaction between bovin COP alpha and bovin COP beta 2</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620400"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620411"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620420" secondary="copa-copb2-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copd-copz1-1</shortLabel>
+             <fullName>Y2H: interaction between bovon COP delta and bovin COP zeta</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620432"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620442"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620451" secondary="copd-copz1-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copd-copz1-2</shortLabel>
+             <fullName>Y2H: interaction between bovon COP delta and bovin COP zeta</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620442"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620432"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620454" secondary="copd-copz1-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copa-cope-1</shortLabel>
+             <fullName>Y2H: interaction between bovon COP alpha and bovin COP epsilon</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620457"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620400"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620466" secondary="copa-cope-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copa-cope-2</shortLabel>
+             <fullName>Y2H: interaction between bovin COP alpha and bovin COP epsilon</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620457"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620400"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620471" secondary="copa-cope-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copb-copd-1</shortLabel>
+             <fullName>Y2H: interaction between COP delta and  COP beta</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620488"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620432"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620501" secondary="copb-copd-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copb-copd-2</shortLabel>
+             <fullName>Y2H: interaction between COP delta and  COP beta</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620398"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620432"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620488"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620506" secondary="copb-copd-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>eif2ak2-dnajc3-2</shortLabel>
+             <fullName>Interaction between EIF2AK2 (PKR) and DNAJC3 identified by coimmunoprecipitation</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-640818"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640793"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-640775"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-640806" secondary="eif2ak2-dnajc3-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">eIF2AK2 in vitro activated by heparin.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>cdk5rap1-cdk5r1-1</shortLabel>
+             <fullName>Interaction between CDK5RAP1 and CDK5R1 detected by Y2H</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-307796"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307814"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307800"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-307828" secondary="cdk5rap1-cdk5r1-1"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="regulation of neuron different"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>cdk5rap2-cdk5r1-1</shortLabel>
+             <fullName>Interaction between CDK5RAP2 and CDK5R1 detected by Y2H</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-307796"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307814"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307832"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-307840" secondary="cdk5rap2-cdk5r1-1"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="regulation of neuron different"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>cdk5rap3-cdk5r1-1</shortLabel>
+             <fullName>Interaction between CDK5RAP3 and CDK5R1 detected by Y2H</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-307796"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307814"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-307845"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-307855" secondary="cdk5rap3-cdk5r1-1"/>
+             <secondaryRef db="go" id="GO:0045664" secondary="regulation of neuron different"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">0.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>arf1-ddef1-1</shortLabel>
+             <fullName>myristoylated Arf1 and ARFGAP ASAP1complex formation on the membrane surface in presence of AlFx</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-698495"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-449051"/>
+               <role>neutral</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-698498"/>
+               <role>neutral</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>direct interaction</shortLabel>
+               <fullName>direct interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-698541" secondary="arf1-ddef1-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">liposome sedimentation: only 27% of myr-Arf1 GDP and 34% of ASAP1 PZA fragment were recovered in the pelleted membrane fraction if alone. The addition of AlFx did not change the sedimentation properties of each proteins. When mixed together in presence of AlFx, both PZA and and myr-Arf1 translocated to membrane fraction within the same proportion 74% and 83% respectively.</attribute>
+             <attribute name="stimulation">AlFx (Aluminum fluoride) stabilize the complex formation between Arf1-GDP and PZA fragment of ASAP1 by mimicking activated form of Arf1, Arf1-GDP-AlFx.</attribute>
+             <attribute name="comment">Both proteins are purified to homogeneity. Myristoylated Arf1 was produced by co-expressing in E. coli the yeast N-myristoyl-transferase.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copa-cope-3</shortLabel>
+             <fullName>Cop IP: interaction between bovin COP alpha (bait) and bovin COP epsilon (prey)</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620513"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620457"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620400"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620515" secondary="copa-cope-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>copb-copd-3</shortLabel>
+             <fullName>CoIP:  interaction between COP delta (bait) and  COP beta (prey)</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-620513"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620488"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-620432"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-620529" secondary="copb-copd-3"/>
+           </xref>
+           <attributeList>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>arf1-ddef1-2</shortLabel>
+             <fullName>in vivo  Arf1 and ARFGAP ASAP1complex formation in presence of AlFx</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-698555"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-449051"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-698498"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>direct interaction</shortLabel>
+               <fullName>direct interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0407"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-698561" secondary="arf1-ddef1-2"/>
+           </xref>
+           <attributeList>
+             <attribute name="stimulation">AlFx (Aluminum fluoride) stabilize the complex formation between Arf1-GDP and ASAP1 by mimicking activated form of Arf1, Arf1-GDP-AlFx.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>cdc42-ack2-1</shortLabel>
+             <fullName>GST pull-down : bait = GST human cdc42, prey=  bovin ACK2</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-457218"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-457220"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-81752"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>physical interaction</shortLabel>
+               <fullName>physical interaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0218"/>
+               <secondaryRef db="pubmed" id="14755292"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-457219" secondary="cdc42-ack2-1"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">36-68 region of the CRIB binding region of cdc42 confers binding specificity to ACK2</attribute>
+             <attribute name="comment">cdc42 is GTP (GTPgammaS) loaded for interaction with ACK2</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>suvar39h1-p16105-1</shortLabel>
+             <fullName>Interaction detected by methylation reaction.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-349875"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-79764"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-349968"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>methylation</shortLabel>
+               <fullName>methylation reaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0213"/>
+               <secondaryRef db="resid" id="AA0061"/>
+               <secondaryRef db="resid" id="AA0062"/>
+               <secondaryRef db="resid" id="AA0063"/>
+               <secondaryRef db="resid" id="AA0064"/>
+               <secondaryRef db="resid" id="AA0234"/>
+               <secondaryRef db="resid" id="AA0065"/>
+               <secondaryRef db="resid" id="AA0066"/>
+               <secondaryRef db="resid" id="AA0272"/>
+               <secondaryRef db="resid" id="AA0067"/>
+               <secondaryRef db="resid" id="AA0068"/>
+               <secondaryRef db="resid" id="AA0069"/>
+               <secondaryRef db="resid" id="AA0070"/>
+               <secondaryRef db="resid" id="AA0071"/>
+               <secondaryRef db="resid" id="AA0072"/>
+               <secondaryRef db="resid" id="AA0073"/>
+               <secondaryRef db="resid" id="AA0074"/>
+               <secondaryRef db="resid" id="AA0075"/>
+               <secondaryRef db="resid" id="AA0076"/>
+               <secondaryRef db="go" id="GO:0043414"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-350122" secondary="suvar39h1-p16105-1"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="histone lysine N-methyltransfe"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">SUVAR39H1 was myc-tagged. C terminal region of SUVAR39H1 is necessary for interaction (AA118-412).</attribute>
+             <attribute name="resulting-ptm">H3 is methylated.</attribute>
+             <attribute name="comment">Reaction observed in the presence of SAM as methyl-group donor.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>suvar39h1-p16105-2</shortLabel>
+             <fullName>Interaction detected by methylation reaction.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-349875"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-302230"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-79764"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>methylation</shortLabel>
+               <fullName>methylation reaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0213"/>
+               <secondaryRef db="resid" id="AA0061"/>
+               <secondaryRef db="resid" id="AA0062"/>
+               <secondaryRef db="resid" id="AA0063"/>
+               <secondaryRef db="resid" id="AA0064"/>
+               <secondaryRef db="resid" id="AA0234"/>
+               <secondaryRef db="resid" id="AA0065"/>
+               <secondaryRef db="resid" id="AA0066"/>
+               <secondaryRef db="resid" id="AA0272"/>
+               <secondaryRef db="resid" id="AA0067"/>
+               <secondaryRef db="resid" id="AA0068"/>
+               <secondaryRef db="resid" id="AA0069"/>
+               <secondaryRef db="resid" id="AA0070"/>
+               <secondaryRef db="resid" id="AA0071"/>
+               <secondaryRef db="resid" id="AA0072"/>
+               <secondaryRef db="resid" id="AA0073"/>
+               <secondaryRef db="resid" id="AA0074"/>
+               <secondaryRef db="resid" id="AA0075"/>
+               <secondaryRef db="resid" id="AA0076"/>
+               <secondaryRef db="go" id="GO:0043414"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-354640" secondary="suvar39h1-p16105-2"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="histone lysine N-methyltransfe"/>
+           </xref>
+           <attributeList>
+             <attribute name="resulting-ptm">Methylation of histone H3.</attribute>
+             <attribute name="comment">SAM necessary for reaction.</attribute>
+             <attribute name="comment">Suvar39h1 (AA 82-412) was GST-tagged. C terminal region of Suv39h1 (AA 221-412)is necessary for interaction.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>suvar39h1-p16106-3</shortLabel>
+             <fullName>Interaction detected by methylation reaction.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-349875"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-79764"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-349968"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>methylation</shortLabel>
+               <fullName>methylation reaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0213"/>
+               <secondaryRef db="resid" id="AA0061"/>
+               <secondaryRef db="resid" id="AA0062"/>
+               <secondaryRef db="resid" id="AA0063"/>
+               <secondaryRef db="resid" id="AA0064"/>
+               <secondaryRef db="resid" id="AA0234"/>
+               <secondaryRef db="resid" id="AA0065"/>
+               <secondaryRef db="resid" id="AA0066"/>
+               <secondaryRef db="resid" id="AA0272"/>
+               <secondaryRef db="resid" id="AA0067"/>
+               <secondaryRef db="resid" id="AA0068"/>
+               <secondaryRef db="resid" id="AA0069"/>
+               <secondaryRef db="resid" id="AA0070"/>
+               <secondaryRef db="resid" id="AA0071"/>
+               <secondaryRef db="resid" id="AA0072"/>
+               <secondaryRef db="resid" id="AA0073"/>
+               <secondaryRef db="resid" id="AA0074"/>
+               <secondaryRef db="resid" id="AA0075"/>
+               <secondaryRef db="resid" id="AA0076"/>
+               <secondaryRef db="go" id="GO:0043414"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-354650" secondary="suvar39h1-p16106-3"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="histone lysine N-methyltransfe"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">AA 82-412 of SUV39H1 was GST tagged. SAM required for reaction.</attribute>
+             <attribute name="resulting-ptm">H3 is methylated.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>clr4-p16106-1</shortLabel>
+             <fullName>Interaction detected by methylation reaction.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-349875"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-79764"/>
+               <role>prey</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-354657"/>
+               <role>bait</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>methylation</shortLabel>
+               <fullName>methylation reaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0213"/>
+               <secondaryRef db="resid" id="AA0061"/>
+               <secondaryRef db="resid" id="AA0062"/>
+               <secondaryRef db="resid" id="AA0063"/>
+               <secondaryRef db="resid" id="AA0064"/>
+               <secondaryRef db="resid" id="AA0234"/>
+               <secondaryRef db="resid" id="AA0065"/>
+               <secondaryRef db="resid" id="AA0066"/>
+               <secondaryRef db="resid" id="AA0272"/>
+               <secondaryRef db="resid" id="AA0067"/>
+               <secondaryRef db="resid" id="AA0068"/>
+               <secondaryRef db="resid" id="AA0069"/>
+               <secondaryRef db="resid" id="AA0070"/>
+               <secondaryRef db="resid" id="AA0071"/>
+               <secondaryRef db="resid" id="AA0072"/>
+               <secondaryRef db="resid" id="AA0073"/>
+               <secondaryRef db="resid" id="AA0074"/>
+               <secondaryRef db="resid" id="AA0075"/>
+               <secondaryRef db="resid" id="AA0076"/>
+               <secondaryRef db="go" id="GO:0043414"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-354670" secondary="clr4-p16106-1"/>
+             <secondaryRef db="go" id="GO:0046974" secondary="histone lysine N-methyltransfe"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">SAM necessary for the reaction. CLR4 GST tagged.</attribute>
+             <attribute name="resulting-ptm">Methylation of histone H3.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+         <interaction>
+           <names>
+             <shortLabel>suv39h2-p16106-1</shortLabel>
+             <fullName>interaction detected by methylation reaction.</fullName>
+           </names>
+           <experimentList>
+             <experimentRef ref="EBI-349875"/>
+           </experimentList>
+           <participantList>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-354674"/>
+               <role>bait</role>
+             </proteinParticipant>
+             <proteinParticipant>
+               <proteinInteractorRef ref="EBI-79764"/>
+               <role>prey</role>
+             </proteinParticipant>
+           </participantList>
+           <interactionType>
+             <names>
+               <shortLabel>methylation</shortLabel>
+               <fullName>methylation reaction</fullName>
+             </names>
+             <xref>
+               <primaryRef db="psi-mi" id="MI:0213"/>
+               <secondaryRef db="resid" id="AA0061"/>
+               <secondaryRef db="resid" id="AA0062"/>
+               <secondaryRef db="resid" id="AA0063"/>
+               <secondaryRef db="resid" id="AA0064"/>
+               <secondaryRef db="resid" id="AA0234"/>
+               <secondaryRef db="resid" id="AA0065"/>
+               <secondaryRef db="resid" id="AA0066"/>
+               <secondaryRef db="resid" id="AA0272"/>
+               <secondaryRef db="resid" id="AA0067"/>
+               <secondaryRef db="resid" id="AA0068"/>
+               <secondaryRef db="resid" id="AA0069"/>
+               <secondaryRef db="resid" id="AA0070"/>
+               <secondaryRef db="resid" id="AA0071"/>
+               <secondaryRef db="resid" id="AA0072"/>
+               <secondaryRef db="resid" id="AA0073"/>
+               <secondaryRef db="resid" id="AA0074"/>
+               <secondaryRef db="resid" id="AA0075"/>
+               <secondaryRef db="resid" id="AA0076"/>
+               <secondaryRef db="go" id="GO:0043414"/>
+             </xref>
+           </interactionType>
+           <xref>
+             <primaryRef db="intact" id="EBI-354688" secondary="suv39h2-p16106-1"/>
+             <secondaryRef db="go" id="GO:0018024" secondary="histone-lysine N-methyltransfe"/>
+           </xref>
+           <attributeList>
+             <attribute name="comment">SAM necessary for this reaction. Suv39h2 GST tagged.</attribute>
+             <attribute name="resulting-ptm">Methylation of histone H3.</attribute>
+             <attribute name="kd">1.0</attribute>
+           </attributeList>
+         </interaction>
+       </interactionList>
+     </entry>
+   </entrySet>

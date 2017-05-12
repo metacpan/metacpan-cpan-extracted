@@ -1,0 +1,27 @@
+Revision history for Perl extension Benchmark::Featureset::StopwordLists.
+
+1.03  Sun Aug 16 14:22:00 2015
+	- Rename module (change case) back to Benchmark::Featureset::StopwordLists, since CPAN
+		complained.
+	- Add repository on github to Makefile.PL:
+		https://rt.cpan.org/Public/Dist/Display.html?Name=Benchmark-Featureset-StopwordLists
+
+1.02  Wed Feb 18 16:32:00 2015
+	- Rename CHANGES to Changes as per CPAN::Spec::Changes.
+	- Update pre-reqs. Lingua::EN::StopwordLists is now V 1.01.
+	- Add repository https://github.com/ronsavage/Benchmark-Featureset-StopwordLists.git
+	- Rename module Benchmark::Featureset::StopwordLists (capital 'W').
+		This matches Lingua::EN::StopwordList.
+	- Replace Hash::FieldHash with Moo and Types::Standard.
+	- Add scripts/stopwordlists.report.sh (useful only to me).
+
+1.02  Fri Aug 14 17:44:00 2015
+	- Treat return value from Lingua::StopWords::getStopWords('en') as a hashref.
+
+
+1.01  Mon Aug 20 12:50:00 2012
+	- Greatly expand the list of modules excluded.
+	- Clarify the reasons for inclusion/exclusion.
+
+1.00  Fri Aug 17 17:01:00 2012
+	- Original version

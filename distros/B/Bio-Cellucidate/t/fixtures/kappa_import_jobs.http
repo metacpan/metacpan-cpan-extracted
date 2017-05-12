@@ -1,0 +1,13 @@
+HTTP/1.1 200 OK
+Connection: close
+Date: Fri, 12 Feb 2010 05:38:07 GMT
+Content-Type: application/xml; charset=utf-8
+Cache-Control: private, max-age=0, must-revalidate
+
+<?xml version="1.0" encoding="UTF-8"?>
+<kappa-import-job>
+  <error nil="true"></error>
+  <id type="integer">14</id>
+  <progress type="float">0.0</progress>
+  <status>queued</status>
+</kappa-import-job>

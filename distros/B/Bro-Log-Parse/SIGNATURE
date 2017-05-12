@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 d6540e75cf812c4e6c543e5cee6e6d74a984e9d4 CHANGES
+SHA1 85e75fe9a300710c97cb5a375f6d965b689650ff LICENSE
+SHA1 141d8569a3e96acbdcc39c8284cc6894ab148fa7 MANIFEST
+SHA1 32d4cda6ffd553f933c1e0f8da6b4ab8c4c4609c META.yml
+SHA1 67bbcb99905affda7ca7957328ce9cd172ab6cd4 Makefile.PL
+SHA1 aa7ba9aba253795d42055e088b8cab9a271d5f7c README
+SHA1 a8832f1497ea859a5d2d6e838863ed6ecc6750a8 README.pod
+SHA1 4e8a728f843befc71b0716749a31a6a4b1a37f86 dist.ini
+SHA1 31cac187a1d3cf6a9a1337ee0a926650476d0d41 lib/Bro/Log/Parse.pm
+SHA1 a8832f1497ea859a5d2d6e838863ed6ecc6750a8 lib/Bro/Log/Parse.pod
+SHA1 3673c13307af4a54d932ac07245b3bbd8727ff24 logs/ssl.log
+SHA1 b000e794544312572fb9563ee7bccd7773fdefe4 logs/sslx509.log
+SHA1 2d85ac530e59d6f08e9c7630025247420ba87f3c logs/x509.json
+SHA1 e34dd2c3916c314339bc542a49551134942ee6dc logs/x509.log
+SHA1 8f1d82954245f3aacc633f3ce7c8d4deca47f58e t/01-basic.t
+SHA1 0653eaf2f8fee606b76b5c614c90cd87bb9591a9 t/02-diamond.t
+SHA1 9ba0b8792f259c385dd0b16bdda8e1eae0da4c9b t/03-fh.t
+SHA1 8775d7476009373abce94b6c9a300f6d59747f42 t/04-hash.t
+SHA1 e2b89c65301565ba45a138d6d893da1f7247fd7a t/05-accessors.t
+SHA1 c1ae622310a6e0b796d9802c334154a94c292085 t/06-concat-files.t
+SHA1 ab4e4065a53e3925bb65076180e5c4102e9dc1ed t/07-empty-as-undef.t
+SHA1 36e871a5720f937387b30783710cbb71a618f24d t/08-json.t
+SHA1 ce27cf46a1f5eb3761e669ff3bc4431057628e46 t/author-pod-coverage.t
+SHA1 88cea9987d9fb6fab5ec1f4b0b37cb85785603d3 t/author-pod.t
+SHA1 3ec6171779122b0bdc69937c283be11b2a15dd89 t/author-signature.t
+SHA1 1adbb87b82439774707503353460ef02e44c9f9f t/author-spelling.t
+SHA1 87ae1710eab5533906b39498896b7a3c92eef4af t/author-version.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iQIcBAEBCgAGBQJWAzCoAAoJECOZ8Wl8E8ZdrIkP/ivRYGL575qCS1oTLapgD/AL
+Kv5+hH1AF14o7AEnMhQllaUrDrgicJpZdW+zOeNHwQCcIZxkecwbEdO8sRuwj6t6
+tAwJb9wJxxnP6SJRsv4Upr7ofzg+yFuGc1iNm3n5cPgCgKPw/FBJcqhnFJtb/Xcj
+EFFlAQtcWYQlVp5QD34q4LMSZIgYgbw4JSU9BdedW/VOBb1EGBWiqkf+4IymrZAY
+aCzUwq1xxFOtTXh77eR/GnCbvDuI3+N7SylnCJuJSK6btv054DUPPuIQAFkZBBkE
+okgdKhL3qoLSSNQ7+ZT95esWE9gG71OcFENwdYslBfbnQRFUM0FX3CftNrRd3WA5
+i6iBNdrlYsn2ut5AY0DgjToJMahkYtybDCEa75Sky6OegkmO0BklYAnoCezpK8AO
+EBJs8l0cir/sw1+FO02pPbMiaU2virtOWVxRhA7ZWGOL4qqOXmN+nO+H4ClPHcOx
+wQBb91ixWRinOvMgCy9Yu1ESrqN4vR5VsHeO9Cirb8DHuHEw5Yqt6hKKZj1MZkuE
+esnxtOoz4mdwolV2/HI7Z3L6EuYXXAV5Uo25uTSDsrt0dTYlxww3paY9+Fi6xv3M
+OZG2X2JZbYwk7fkFAqWvyZOYJLhbcCfVHpn95E9AnZ8PC5qxGVCd0P5LolA8wm6R
+ou1aufLs8bTNVC7SjTtp
+=4bmX
+-----END PGP SIGNATURE-----

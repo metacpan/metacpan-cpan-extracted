@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+# vim: softtabstop=4 tabstop=4 shiftwidth=4 ft=perl expandtab smarttab
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Path qw/ mkpath /;
+
+my ( %fields, $hostname, $service_desc, $service_out, $help, $verbose );
+
+my $queue_dir    = '/var/spool/nagios/notify-by-bugzilla';
+my $command_file = '/var/spool/nagios/nagios.cmd';
+
+sub enqueue_event {
+
+    # check we have everything
+    for my $field (qw( HOSTNAME OBJECT )) {
+        die "Missing $field field\n" unless $fields{$field}
+    }
+
+    # Writing content of %fields as key=value for cron job to process later
+    my $filename = sprintf(
+            "$queue_dir/n2b-%s_%u_%s_%u.txt",
+            $fields{OBJECT},
+            ($fields{SERVICEPROBLEMID} || $fields{HOSTPROBLEMID}),
+            $fields{NOTIFICATIONTYPE},
+            time());
+
+    my $fd;
+
+    open( $fd, '>', $filename ) or die 'Failed to open queue file: ' . $!;
+
+    while ( ( my $k, my $v ) = each %fields ) {
+
+        # "=" can't occur in the keyname, and "\n" can't occur anywhere.
+        # (Nagios follows this already, so I think we're safe)
+        print $fd "$k=$v\n";
+    }
+
+    print $fd 'UNIXTIME=' . time();
+
+    close $fd;
+}
+
+GetOptions(
+    'field|f=s%'     => \%fields,
+    'command-file=s' => \$command_file,
+    'queue-dir=s'    => \$queue_dir,
+    'help'           => \$help,
+) or pod2usage();
+
+if ($help or 0 == scalar keys %fields) {
+    # avoid perl loading Pod::Usage until we actually want it
+    eval 'use Pod::Usage; pod2usage($help ? 0 : 2);1';
+    die $@ if $@; # pass on any problems
+}
+
+# This function automatically terminates the program on things like permission
+# errors.
+mkpath($queue_dir);
+
+enqueue_event();
+
+__END__
+
+=head1 NAME
+
+    notify-by-bugzilla-enqueue - drop notice of a nagios alarm to a queue directory
+
+=head1 SYNOPSIS
+
+    notify-by-bugzilla-enqueue -f HOSTNAME=foo.syd \
+                               -f NOTIFICATIONTYPE=[PROBLEM,RECOVERY,etc.] \
+                               -f SERVICEDESC="service name" \
+                               -f SERVICEOUTPUT="message" \
+                               -f HOSTNOTIFICATIONID=1234 \
+                               -f SERVICENOTIFICATIONID=1234 \
+                               [options]
+
+    -f FIELD, --field=FIELD         Any variable in form of key=value
+    --command-file                  Should be Nagios $COMMANDFILE$
+    --queue-dir                     Directory where notices should saved in
+    --help                          Display this help message
+
+=head1 DESCRIPTION
+
+This script drops a notice in a queue that should be serviced by a cron job.
+The details are saved in the file in form of key=value where no newline or
+'=' character is allowed in key or value string.
+
+=cut
+

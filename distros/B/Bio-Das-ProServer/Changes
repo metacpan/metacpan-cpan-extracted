@@ -1,0 +1,56 @@
+Revision history for Bio::Das::ProServer.
+
+2.20	First release supporting DAS 1.6 spec
+
+2.11	Probably the last release on the DAS 1.53 spec
+
+2.10	Various perlcritic bugfixes. Lots of patches from Andy wrt. authenticated requests
+
+2.8
+
+	Migrated to proserver.svn.sf.net Removed non-core modules
+	(SourceAdaptors & Transports). Those previously distributed as
+	part of the ProServer repository will still be available on
+	cvs.sanger.ac.uk
+
+	Added support for authentication, with two methods provided:
+	IP address and remote HTTP authority.
+
+	Added builtin support for Simple Interaction Format files.
+
+	Added strict_boundaries config option to turn on Andy's new
+	feature-is-within-bounds checks, retaining
+	backwards-compatible behaviour.
+
+2.7
+
+	Support for sources, interaction, volmap calls + documentation
+	from Andy
+
+2.6
+
+	Structure & alignment patches from Andreas Documentation about
+	data structures in SourceAdaptor.pm
+
+2.57
+
+	dsn.xsl support, more output on startup, Transport::* version
+	dumping on the homepage
+
+2.53
+
+	Basic XSL support
+
+2.5
+
+	Added response_ settings for modifying XML & HTML responses
+	Added tests, POD and generally cleaned up a bit
+
+2.04
+
+	Improved access logging (See B::D::PS::Config::logformat)
+
+2.0
+
+	New eg/proserver implementation based on POE rather than
+	HTTP::Daemon with custom process handling.

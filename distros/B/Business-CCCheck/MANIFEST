@@ -1,0 +1,11 @@
+Changes	
+MANIFEST
+Makefile.PL
+lib/Business/CCCheck.pm
+lib/Business/CCCheck/CardID.pm
+README
+t/all.t
+t/cardtype.t
+t/old_parity.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

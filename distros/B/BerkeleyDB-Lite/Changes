@@ -1,0 +1,51 @@
+Revision history for Perl extension BerkeleyDB::Lite.
+
+1.1 Sat Aug  7 11:47:38 EDT 2004
+	incrementkeys rewritten to fix spurious warnings
+
+1.02 Wed Jul 28 08:25:51 EDT 2004
+	Added public functions: sync() and syncall()
+	Hopefully these functions will help stability.
+	added sync to DESTROY method for server use
+
+Fri Jul 16 22:29:06 EDT 2004
+	Sleepycat is out to get me.  Until further notice, the server
+	option to the constructor should not be used.
+
+	>> You should be aware that the RPC server creates the environment
+	>> that it opens in TDS mode.  The fact that your CDS application
+	>> is able to attach to the environment is a bug that is fixed in
+	>> release 4.3.  One cannot mix different server modes in the
+	>> same environment.
+
+1.01 Sun Jul 11 10:05:15 EDT 2004
+	Bug fix:  croak prevented R/O mode for non-owners
+		(my bad for duplicating Btree and Hash scalars constructor)	
+
+0.10 Wed Jun 23 16:35:18 EDT 2004
+	Upgrade minor rev:  Application seems stable.
+	Bug fix:  croak prevented R/O mode for non-owners
+
+0.05 Mon Jul  7 23:42:20 EDT 2003
+	Added public function closeall() to access the END procedure.
+
+0.041 Wed Jun 25 18:11:27 EDT 2003
+	Changed returned structure of dosearch
+	Changed matchingkeys, matchingvalues, searchset
+
+0.04	Renamed BerkeleyDB::Tie to BerkeleyDB::Lite
+	Added %dbreg registry
+
+0.03	Added uniquepairs (experimtental)
+	Added uniquekeys
+	Added subclass property
+	Added recover option to envsetup (experimental)
+
+0.02	Added BerkeleyDB::Lite::Btree::Lexical
+	Added BerkeleyDB::Lite::Btree lexical constructor
+	Added rootdir property
+	changed filter_store_value in new to handle non-refs
+
+0.01  Tue Feb 18 10:31:08 2003
+	- original version; created by h2xs 1.21 with options
+		-A -P -X BerkeleyDB::Lite

@@ -1,0 +1,18 @@
+abstract: A Baseball Statistics Module
+author: 'Victor Hsieh, C<< <victor at cpan.org> >>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Baseball-Sabermetrics
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+recommends:
+  Data::Serializer: 0.29
+  HTML::TableExtract: 2.08
+  LWP::UserAgent: 2.33
+version: 0.03

@@ -1,0 +1,5 @@
+[% IF no_javascript != 1 %]
+[% FOREACH javascript IN javascripts -%]
+<script src="[% javascript %]" type="text/javascript"></script>
+[% END -%]
+[% END %]

@@ -1,0 +1,6 @@
+Blosxom-IncludePluginConfig-*
+.bzr
+blib
+pm_to_blib
+MANIFEST.bak
+Makefile.old

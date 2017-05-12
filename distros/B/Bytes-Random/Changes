@@ -1,0 +1,13 @@
+Revision history for Perl extension Bytes::Random.
+
+0.02  2009-05-31
+  - Fixed bugs listed in #rt-46440 which caused some problems
+    with the bytes that were generated.
+  - Converted to Module::Install.
+  - Applied patches supplied by the intrepid hacker DAXIM (daxim@cpan.org).
+  - Thanks DAXIM!
+
+0.01  Wed May 27 10:58:26 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn Bytes::Random
+

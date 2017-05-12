@@ -1,0 +1,217 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use 5.010;
+use Carp;
+
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper;
+use Bio::Gonzales::Seq::Filter::DuplicateSeqs;
+use Bio::Gonzales::Seq::IO qw(faiterate);
+
+our ( $help, $filter, $eval );
+GetOptions( "help|h|?" => \$help, "filter|f" => \$filter, "eval|e=s" => \$eval )
+  or pod2usage( -verbose => 2 );
+pod2usage( -verbose => 2, -noperldoc => 1 ) if $help;
+
+our @files = @ARGV;
+die "no fasta files supplied, try '$0 --help' for help" unless ( @files > 0 );
+for (@files) {
+  die "this is not a file, try '$0 --help' for help" unless ( -f $_ );
+}
+
+#flush output text imediately
+local $| = 1;
+
+my $counter = 0;
+
+print STDERR "Finding duplicates";
+
+our $dup_seq = Bio::Gonzales::Seq::Filter::DuplicateSeqs->new;
+
+$dup_seq->normalizer(
+  sub {
+    local $_ = $_[0]->seq;
+    eval $eval;
+    return $_;
+  }
+) if ( defined $eval );
+
+for my $file (@files) {
+  $dup_seq->namespace($file) if ( @files > 1 );
+  my $fit = faiterate($file);
+
+  while ( my $so = $fit->() ) {
+    $dup_seq->add_seq($so);
+
+    print STDERR "." if $counter++ % 100 == 0;
+  }
+}
+
+print STDERR "\n";
+
+#filter out unique seqs
+#my @deleted_seqs = map { delete $eq{$_} if ( @{ $eq{$_} } < 2 ) } keys %eq;
+my @deleted_seqs = @{ $dup_seq->seq_groups_wo_duplicates };
+
+print STDERR "Writing to stdout";
+
+#print unique ids if filter is active
+if ($filter) {
+  for my $del_seq_objs (@deleted_seqs) {
+    print_filtered($del_seq_objs);
+    print STDERR "." if $counter++ % 100 == 0;
+  }
+}
+
+#calculate also some statistics
+my $num_identical_seqs = $dup_seq->num_duplicate_seqs;
+my $num_unique_seqs    = $dup_seq->num_groups_w_duplicates;
+
+#my %stats;
+#update_stats($seq_objs, ...)
+for my $seq_objs ( @{ $dup_seq->seq_groups_w_duplicates } ) {
+  if ($filter) {
+    print_filtered($seq_objs);
+  } else {
+    print_ids($seq_objs);
+  }
+  print STDERR "." if $counter++ % 100 == 0;
+}
+
+print STDERR "\n";
+
+#init only if needed
+our $seq_writer;
+
+sub print_filtered {
+  my ($seq_objs) = @_;
+
+  $seq_writer = Bio::SeqIO->new(
+    -format => 'fasta',
+    -fh     => \*STDOUT,
+  ) unless ($seq_writer);
+
+  return unless ($seq_objs);
+
+  $seq_writer->write_seq($seq_objs->[0] );
+}
+
+#FIXME better statistics
+#sub update_stats {
+  #my ($seq_objs, $stats, $is_duplicated) = @_;
+
+  #my %tmp_stat;
+  #if($is_duplicated) {
+    ## count number of duplicated sequences per namespace
+    #$tmp_stat
+  #}
+
+  #for my $so ( @{$seq_objs} ) {
+    #$stats{$so->info->{namespace}} //= { };
+    #if($is_duplicated) {
+
+    #}
+    #print "\t" if ( not $first );
+    #say stringify_seq_obj($seq_obj);
+    #undef $first;
+  #}
+
+#}
+
+sub print_ids {
+  my ($seq_objs) = @_;
+
+  my $first = 1;
+  for my $seq_obj ( @{$seq_objs} ) {
+    print "\t" if ( not $first );
+    say stringify_seq_obj($seq_obj);
+    undef $first;
+  }
+}
+
+sub stringify_seq_obj {
+  my ($so) = @_;
+
+  return join "\t", ( $so->id, ( $so->desc // "" ), ( $so->info->{namespace} // "" ) );
+}
+
+say STDERR
+  "Found a total number of $num_identical_seqs identical sequences, which can be reduced to $num_unique_seqs. ";
+say STDERR ( $num_identical_seqs - $num_unique_seqs ) . " sequences redundant.";
+
+__END__
+
+=head1 NAME
+
+fafind-eq-seq - find equal sequences
+
+=head1 SYNOPSIS
+
+    ./fafind-eq-seq [--help] [--eval 'perlcode'] <file1> [<file2> ... <fileN>] >file_with_results.txt
+
+    ./fafind-eq-seq [--help] [--eval 'perlcode'] --filter <file1> [<file2> ... <fileN>] >file_with_only_unique_seqs.fasta
+
+=head1 DESCRIPTION
+
+Find identical / equal sequences in a given set of fasta files. Info messages
+go to standard error (stderr), results to standard output (stdout).
+
+The result output of F<file_with_results.txt> consists of lines following the pattern
+
+    <ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+    <ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+    <ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+    <TAB><ID> <DESCRIPTION><TAB><FILE>
+
+whereas each unindented line and the following <TAB>-indented lines mark one
+group of identical sequences.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--filter>
+
+Do not print the groups but the sequences in fasta format instead. Duplicated
+sequences are omitted. The resulting fasta output is not checked for identical
+ids, etc.
+
+I<Synonyms:> B<-f>
+
+=item B<--help>
+
+Display this message.
+
+I<Synonyms:> B<-?>, B<-h>
+
+=item B<--eval>
+
+Manipulate input sequences on the fly. The current sequence string is set to
+C<$_>.
+
+This doesn't change the actual output sequence, e.g. on filtering.
+
+Can be very handy for comparing aa-sequences from two different files, at
+which one file uses * as stop codon and the other file not:
+
+    ./fafind-eq-seq --eval 's/\*$//' <file1> <file2> >file_with_results.txt
+
+I<Synonyms:> B<-e>
+
+=back
+
+=head1 AUTHOR
+
+jw bargsten, C<< <joachim.bargsten at wur.nl> >>
+
+=cut

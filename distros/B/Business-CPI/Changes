@@ -1,0 +1,122 @@
+Revision history for Perl module Business::CPI.
+
+0.924 2015-02-13T16:50:24Z
+    - Make Money type accept negative amounts
+
+0.923 2015-01-06T15:34:07Z
+    - Add LWP::UserAgent dependency
+
+0.922 2014-11-05T17:52:30Z
+    - Create most_recent_request attribute in base gateway
+
+0.921 2014-10-28T16:03:20Z
+    - Add is_* methods to EmptyLogger
+
+0.920 2014-10-23T19:49:39Z
+    - Drop deprecated author dependency, thanks to sergeyromanov
+    - Add error and user_agent attributes
+
+0.919 2014-09-22T18:13:06Z
+    - Update Type::Tiny version requirement
+    - Remove coercions where coercions are not necessary in Exception class
+
+0.918 2014-07-11T19:42:12Z
+    - Create Exception type attribute
+
+0.917 2014-06-16T16:54:33Z
+    - Add gateway_fee attribute to the Cart role
+    - Create Status and Exception roles and base classes
+
+0.916 2014-04-01T17:20:49Z
+    - Replace MooX::Types::MooseLike with Types::Tiny
+
+0.915 2014-02-11T18:29:18Z
+    - Add List::Util dependency
+    - Add shipping attribute to the Cart role
+    - Add get_total_shipping and get_total_amount methods to the Cart role
+    - Add has_shipping and has_shipping_additional predicates to the Item role
+    - Minor documentation adjustments
+
+0.914 2014-01-30T19:43:56Z
+    - Use Money type for receivers "fixed_amount"
+
+0.913 2014-01-22T17:01:27Z
+    - Remove pay_gateway_fee default value (0)
+
+0.912 2014-01-22T16:41:28Z
+    - Add defaults to Money types in the Cart role
+    - Add pay_gateway_fee key to the Receiver role
+
+0.911 2013-12-09T03:16:54Z
+    - Documentation fixes (regarding receiver_id)
+
+0.910 2013-12-05T13:54:49Z
+    - Create Receivers role and class
+    - Remove receiver_email attribute in favor of receiver_id
+
+0.909 2013-11-28T12:15:12Z
+    - TRIAL release
+    - Rework entire project organization: move all classes to the ::Base
+      namespace, and move all logic to roles.
+    - Create Util class
+    - Create and use a decent type system
+
+0.908 2013-11-26T07:39:11Z
+    - Add id and gateway_id attributes for the cart, and make some of the other
+      attributes rw
+    - General optimizations while adding items to the cart, and allow only
+      simple hashrefs (not blessed)
+    - Be stricter about phone numbers
+    - Make description and quantity optional
+    - Create helper method `new_account` to build Account objects
+
+0.907 2013-11-25T17:13:12Z
+    - Rename birthday to birthdate
+
+0.906 2013-11-20T00:46:15Z
+    - Create new attributes in Account class: login, registration_date,
+      full_name, gateway_id, is_business_account.
+
+0.905 2013-11-19T03:42:55Z
+    - Fix and improve tests
+    - Remove Business::BR::CNPJ from Business::CPI::Account::Business. It was
+      left there by mistake
+    - Set _gateway attribute as 'ro' and required in a few classes
+
+0.904 2013-11-18T19:45:02Z
+    - Create Account classes
+    - Add Test::Exception and DateTime dependencies
+    - Improve documentation
+
+0.903 2013-01-30T21:47:30Z
+    - Create Changes file
+
+0.902 2013-01-30T02:33:54Z
+    - Allow gateways to implement custom Cart classes
+    - Explicitly require Class::Load 0.20 and Moo 1.0
+
+0.901 2013-01-22T17:54:50Z
+    - Allow gateways to implement custom Buyer classes
+    - Document notify method
+
+0.5   2013-01-10T11:22:40Z
+    - Implement logging
+    - Remove List::Util dependency
+    - Remove name attribute
+
+0.4   2013-01-09T00:30:41Z
+    - Explicitly require Perl 5.8 or higher
+    - Define version in Business::CPI::Types
+
+0.3   2013-01-08T17:50:43Z
+    - Add several new attributes for:
+        - Cart (discount, taxes, handling)
+        - Buyer (address data)
+        - Item (shipping data)
+
+0.2   2012-12-15T21:48:43Z
+    - Set versioning in every file
+    - Add sponsors in the docs
+
+0.1   2012-11-24T18:34:43Z
+    - Initial version

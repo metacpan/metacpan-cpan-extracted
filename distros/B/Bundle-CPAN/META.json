@@ -1,0 +1,50 @@
+{
+   "abstract" : "Bundle to optimize the behaviour of CPAN.pm",
+   "author" : [
+      "Andreas Koenig"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150002",
+   "keywords" : [
+      "CPAN",
+      "module",
+      "module installation"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bundle-CPAN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/andk/cpanpm/tree/master/related/Bundle-CPAN",
+      "repository" : {
+         "url" : "git://github.com/andk/cpanpm.git"
+      }
+   },
+   "version" : "1.862"
+}

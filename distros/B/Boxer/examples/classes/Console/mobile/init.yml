@@ -1,0 +1,7 @@
+classes:
+  - Console
+parameters:
+  doc:
+    console-mobile:
+      headline:
+        - Console mobile

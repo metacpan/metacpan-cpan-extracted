@@ -1,0 +1,28 @@
+0.005   2017-02-02 (PERLANCAR)
+
+	- Add expected result to check participants.
+
+
+0.004   2017-02-02 (PERLANCAR)
+
+	- Add participant: Sort::Key::Natural [GH#1].
+
+
+0.003   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.002   2017-01-19 (PERLANCAR)
+
+	- Add participants: Sort::Naturally::XS::nsort,
+	  Sort::Naturally::XS::ncmp, Sort::Naturally::ncmp.
+
+
+0.001   2016-12-12 (PERLANCAR)
+
+        - First release.

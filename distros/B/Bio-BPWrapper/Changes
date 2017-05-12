@@ -1,0 +1,21 @@
+Revision history for Bio::BPWrappers
+
+1.04 2016-06-02:
+
+- revise bioaln documentation
+- force at least Perl 5.10 on CPAN install
+
+1.03 2016-06-01:
+
+- Make behavior the same across more Platforms:
+  use a bundled Getopt::Long. This addresses
+  the majority of install problems we see on CPAN
+- Revise bioseq doc
+
+1.01 2016-05-26:
+
+- First CPAN release.
+
+1.0  2015-02-10:
+
+- First release. contains two utilities with tests: bioseq & bioaln.

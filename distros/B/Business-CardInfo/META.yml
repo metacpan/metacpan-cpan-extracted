@@ -1,0 +1,22 @@
+---
+abstract: 'Get/Validate data from credit & debit cards'
+author:
+  - 'Simon Elliott <cpan@papercreatures.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300001, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-CardInfo
+requires:
+  Moose: 0
+  Test::Role: 0
+resources:
+  bugtracker: https://github.com/purge/Business-CardInfo/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/purge/Business-CardInfo
+version: 0.12

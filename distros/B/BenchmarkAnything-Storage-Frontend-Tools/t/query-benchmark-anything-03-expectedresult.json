@@ -1,0 +1,30 @@
+[
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 60,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 50,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 40,
+            "comment"  : "integer value",
+            "compiler" : "gcc",
+            "keyword"  : "birne"
+        },
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "VALUE"    : 27.34,
+            "comment"  : "float value",
+            "compiler" : "gcc",
+            "keyword"  : "affe"
+        }
+]

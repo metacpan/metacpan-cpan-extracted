@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xsd:element name="Order">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Items">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="Item" maxOccurs="unbounded">
+								<xsd:complexType>
+									<xsd:attribute name="itemNumber" type="xsd:integer" use="required"/>
+									<xsd:attribute name="itemQty" type="xsd:integer" use="required"/>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="accountNumber" type="xsd:integer" use="required"/>
+			<xsd:attribute name="totalAmount" type="xsd:float" use="required"/>
+			<xsd:attribute name="emailAddress" type="xsd:string" use="required"/>
+			<xsd:attribute name="orderType" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:NMTOKEN">
+						<xsd:enumeration value="PO"/>
+						<xsd:enumeration value="Credit"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="cardType" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:NMTOKEN">
+						<xsd:enumeration value="MC-VISA"/>
+						<xsd:enumeration value="Discover"/>
+						<xsd:enumeration value="AMEX"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

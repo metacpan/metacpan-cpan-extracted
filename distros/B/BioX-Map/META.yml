@@ -1,0 +1,42 @@
+---
+abstract: 'map read to genome with bwa and soap'
+author:
+  - 'Yan Xueqing <yanxueqing621@163.com>'
+build_requires:
+  Data::Dumper: 0
+  Module::Build: 0.3601
+  Test::File::ShareDir: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 1.00
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BioX-Map
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: 0
+  Cwd: 0
+  File::ShareDir: 0
+  File::Which: 0
+  FindBin: 0
+  IO::All: 0
+  IPC::Run: 0
+  Modern::Perl: 0
+  Moo: 0
+  MooX::Cmd: 0
+  MooX::Options: 0
+  Parallel::ForkManager: 0
+  Types::Standard: 0
+  lib: 0
+version: 0.0.12

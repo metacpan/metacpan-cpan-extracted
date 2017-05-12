@@ -1,0 +1,55 @@
+0.08    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.07    2016-03-13 (PERLANCAR)
+
+	- Add scenario: Exporters::Exporting.
+
+	- Add participant: Xporter.
+
+
+0.06    2016-03-13 (PERLANCAR)
+
+	- Specify minimum version for PERLANCAR::Exporter::Lite.
+
+	- [doc] Remove SYNOPSIS so automatic Synopsis from
+	  DZP:Bencher::Scenario can be added.
+
+
+0.05    2016-03-12 (PERLANCAR)
+
+        - Add participants: Exporter::Lite, PERLANCAR::Exporter::Lite.
+
+        - Rename dist from Bencher-Scenario-Exporters to
+          Bencher-Scenarios-Exporters.
+
+
+0.04    2016-01-05 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Bencher::Scenario
+          (0.02) which shows sample benchmark results in POD.
+
+
+0.03    2015-12-23 (PERLANCAR)
+
+	- Rename dist from BS-StartupExporters to BS-Exporters.
+
+
+0.02    2015-12-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Update summary.
+
+
+0.01    2015-12-20 (PERLANCAR)
+
+        - First release.

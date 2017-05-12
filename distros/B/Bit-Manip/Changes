@@ -1,0 +1,31 @@
+Revision history for Bit-Manip
+
+1.03    2017-02-01
+        - added bit_clr() (per PerlMonks discussion), clears selected bits
+        - changed $bits param name to $nbits in code and POD as it makes it less
+          ambiguous as to what we mean by the arg
+        - added t/45 for testing bit_clr()
+
+1.02    2016-01-27
+        - removed erroneous "use feature 'say';" from test files, as it was
+          causing Testers to break on versions < v5.10.x
+
+1.01    2016-01-25
+        - somehow I missed adding POD for the changes in bit_set()
+
+1.00    2016-01-25
+        - removed string.h include as we don't use it
+        - LSB can now be equal to MSB to allow getting a single bit
+        - fix issue where bit_set() was not updating bits if a leading zero was
+          sent in. We now require a 'bits' param (fixes #1)
+
+0.02    2017-01-25
+        - added in EXPORT_OK POD section
+        - code tidying in the XS file
+        - changed all instances of "first" to msb and "last" to lsb for
+          params
+        - added bit_mask() returns the bit mask given a number of bits and LSB
+
+0.01    2017-01-24
+        First version, released on an unsuspecting world.
+

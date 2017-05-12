@@ -1,0 +1,11 @@
+[% USE ANSIColor 'color' %]
+[% "CARGO" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+Goods: [% goods %]
+Luxury: [% luxury %]
+Arms: [% arms %]
+Tech: [% tech %]
+Culture: [% culture %]
+
+Available space: [% free %]

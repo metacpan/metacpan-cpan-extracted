@@ -1,0 +1,39 @@
+#!/usr/local/bin/perl -w
+
+use lib './blib/lib','../blib/lib';
+
+package AGPServer;
+
+use strict;
+use Bio::Das::AGPServer::Config;
+use Bio::Das::AGPServer::SQLStorage::CSV::DB;
+use Bio::Das::AGPServer::SQLStorage::MySQL::DB;
+use Bio::Das::AGPServer::SQLStorage;
+use Bio::Das::AGPServer::Daemon;
+use vars qw($DEBUG $CFG);
+
+$| = 1;
+$DEBUG = 1;
+
+
+my $config = Bio::Das::AGPServer::Config->new();
+$CFG->{$config->dsn()} = $config;
+
+
+if (lc($config->backend()) eq 'csv'){
+    my $storage = Bio::Das::AGPServer::SQLStorage::CSV::DB->new($config);
+    my $server  = Bio::Das::AGPServer::Daemon->new($storage);
+    $server->handle();
+    
+} elsif ( lc ($config->backend()) eq 'mysql'){
+    my $storage = Bio::Das::AGPServer::SQLStorage::MySQL::DB->new($config);
+    my $server  = Bio::Das::AGPServer::Daemon->new($storage);
+    $server->handle();
+} else {
+    die "Unknown data backend storage type!\n";
+}
+
+
+
+
+

@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bio-MAGE-Utils
+version:      20030502.0
+version_from: 
+installdirs:  site
+requires:
+    Tie::IxHash:                   1.21
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

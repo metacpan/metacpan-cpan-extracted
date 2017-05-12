@@ -1,0 +1,83 @@
+#!/usr/local/bin/perl -w -I../blib/lib
+
+#
+# Copyright (C) 1998, David Muir Sharnoff
+#
+
+use strict;
+use BSD::Ipfwgen;
+use IO::Handle;
+
+us qw(
+	140.174.82.0/24 
+	207.33.232.0/22 
+	207.33.184.0/22 
+	207.33.240.0/21 
+	209.157.64.0/19 
+	140.174.154.0/24 
+	207.33.66.0/24 
+	209.66.121.0/24
+    );
+symmetric qw(
+	140.174.82.0/27
+	140.174.82.32/27
+    );
+
+
+count_by_interface();
+
+no_looping();
+no_spoofing_us();
+no_spoofing_by_us();
+no_leaf_spoofing();
+
+to_me_rules <<'';
+	=skipto nfs-ok udp from 140.174.82.0/26 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok udp from 209.66.121.0/28 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok udp from 209.157.69.248/29 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 140.174.82.0/26 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 209.66.121.0/28 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 209.157.69.248/29 to any 111,2049 # portmap, NFS
+	=deny tcp from any to any 111,2049
+	=label nfs-ok
+	=skipto radius-ok udp from 207.33.185.2 to any 1645,1646 # RADIUS
+	=skipto radius-ok udp from 207.33.242.1 to any 1645,1646
+	=deny udp from any to any 1645,1646
+	=label radius-ok
+
+to_net_rules ('=host:mac84', <<'');
+	=skiprule tcp from 140.174.82.32/27 to =host:mac84 6000 # mac 84
+	=deny tcp from any to =host:mac84 6000
+
+from_net_rules ('=host:iaconfig.dial.idiom.com', <<'');
+	=skipto passover-iaconfig tcp from any to =host:iaconfig.idiom.com 80
+	=skipto passover-iaconfig udp from any to 140.174.82.0/24 53
+	=skipto passover-iaconfig icmp from any to =host:iaconfig.idiom.com
+	=deny all from =host:iaconfig.dial.idiom.com to any
+	=label passover-iaconfig
+
+generate qw(INSECURE DEFAULT-ACCEPT);
+
+__END__
+
+PING #rule '=skipto DONELOOP all from 140.174.37.22 to 209.66.121.18 out via ethb17';  XXXX
+
+# radius
+proto_passonly(udp, 1645, <<'');
+	207.33.185.2 to 209.157.69.25
+	140.174.82.35 to 140.174.82.33
+	207.33.242.1 to 207.33.242.2
+
+proto_denyonly(udp, 1645, <<'');
+	207.33.185.2 to 209.157.69.25
+	140.174.82.35 to 140.174.82.33
+	207.33.242.1 to 207.33.242.2
+
+proto_passdeny(tcp, 6000, <<'', <<'');
+	SELF to 140.174.82.34
+
+	any to 140.174.82.34
+
+hostlimit(iaconfig, <<'', <<'')
+	
+

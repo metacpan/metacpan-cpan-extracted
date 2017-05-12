@@ -1,0 +1,18 @@
+---
+abstract: 'export data from The Insidious Big Brother Database.'
+author:
+  - 'Alex White <VVu@geekfarm.org>'
+generated_by: 'Dist::Zilla version 1.092680'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BBDB-Export
+requires:
+  BBDB: 0
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 0
+  Term::ANSIColor: 0
+  Test::More: 0
+  Text::vFile::asData: 0
+version: 0.015

@@ -1,0 +1,21 @@
+gene:
+  orf_classification:
+    fast_growth: purple
+    Essential: red
+    Verified: darkblue
+    Uncharacterized: lightblue
+    transposable_element: darkgreen
+    pseudogene: lightgreen
+    Dubious: grey
+    Hypothetical: grey
+  default: darkblue
+
+intron: 
+  default: maroon
+
+UTR: 
+  default: black
+
+transposable_element:
+  default: green
+

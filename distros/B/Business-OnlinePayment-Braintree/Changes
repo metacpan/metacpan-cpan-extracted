@@ -1,0 +1,68 @@
+Revision history for Business::OnlinePayment::Braintree
+
+0.020 Wed Apr 20 15:06:12 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for the void action and the card_token transaction
+      result method (GH #8, Evan Brown).
+
+0.010 Mon Mar  9 09:19:07 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for post authorization action (GH #7, Evan Brown)
+
+0.006 Thu May  1 07:25:24 2014 CEST
+
+    [BUG FIXES]
+
+    * Cope with failures that do not return transaction method
+      (GH #6, Peter Mottram).
+
+0.005 Tue Apr 29 08:59:14 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Set failure status from error codes provided by Braintree
+      (GH #5, Peter Mottram).
+    * Pass cvv to Braintree (GH #5, Peter Mottram).
+
+0.004 Sat Jan  4 12:56:48 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Pass merchant_account_id through to Braintree (GH #1).
+    * Get rid of slash inside expiration value (GH #1).
+    * Set authorization and order number value after successful payment
+      action (GH #1).
+
+    [DOCUMENTATION]
+
+    * Add note about location of Net::Braintree documentation.
+    * Adjust notes, copyright year and bugtracker URL.
+
+0.003 Thu Dec 26 19:15:09 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Support for credit (refund) and normal authorization (sale) action 
+    * Add billing address and order number transmission
+      (both RT #88525, Grant)
+
+    [BUG FIXES]
+
+    * Execute POD tests only during release testing.
+    * Split expiration date into month and year.
+
+0.0002  Wed Dec 28 21:32:42 2011 CET
+
+    [BUG FIXES]
+
+    * Move extra parameters (merchant_id, private_key, public_key) to constructor (#71257).
+
+0.0001  Tue Sep 13 14:06:34 2011 CEST
+
+    * Initial release
+
+

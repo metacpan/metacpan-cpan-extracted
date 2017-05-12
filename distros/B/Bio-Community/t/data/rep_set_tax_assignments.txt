@@ -1,0 +1,9 @@
+344	 k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Propionibacteriaceae; g__Propionibacterium; s__acnes	2e-125	1042485	96.58	263	9	0	1	263	909	647
+345	 k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Propionibacteriaceae; g__Propionibacterium; s__acnes	5e-138	1042485	95.67	300	13	0	1	300	878	579
+346	 k__Bacteria; p__Firmicutes; c__Bacilli; o__; f__; g__; s__	8e-134	1064834	99.59	245	1	0	1	245	909	665
+347	 k__Bacteria; p__Proteobacteria; c__Gammaproteobacteria; o__Pseudomonadales; f__Pseudomonadaceae; g__Pseudomonas; s__	2e-103	959954	98.99	198	2	0	103	300	718	521
+340	 k__Bacteria; p__Proteobacteria; c__Gammaproteobacteria; o__Pseudomonadales; f__Moraxellaceae; g__Acinetobacter; s__	6e-150	219826	97.33	300	8	0	1	300	913	614
+341	 k__Bacteria; p__Proteobacteria; c__Gammaproteobacteria; o__Pseudomonadales; f__Pseudomonadaceae; g__; s__	5e-138	219804	99.22	256	2	0	1	256	917	662
+342	 k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Clostridiaceae; g__; s__	3e-124	306248	93.94	297	18	0	1	297	901	605
+343	 k__Bacteria; p__Firmicutes; c__Bacilli; o__Lactobacillales; f__Streptococcaceae; g__Streptococcus; s__pseudopneumoniae	2e-103	392335	98.99	198	2	0	103	300	798	601
+

@@ -1,0 +1,10 @@
+classes:
+  - Console.mobile
+parameters:
+  doc:
+    console-mobile:
+      pkg:
+        - include SyncEvolution console tool and http service
+  pkg:
+    - syncevolution
+    - syncevolution-http

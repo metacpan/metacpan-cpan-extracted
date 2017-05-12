@@ -1,0 +1,46 @@
+Business::LCCN helps users parse and output Library of Congress
+Control Number (LCCN) codes.
+
+LCCN is a numbering system used to catalog United Satates Library of
+Congress records. The identifier is commonly used by libraries to
+uniquely identify books published in the United States, and the
+associated metadata.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Business::LCCN
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-LCCN
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Business-LCCN
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Business-LCCN
+
+    Search CPAN
+        http://search.cpan.org/dist/Business-LCCN
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Anirvan Chatterjee
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

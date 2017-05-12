@@ -1,0 +1,116 @@
+Revision history for BankAccount::Validator::UK
+
+0.28  2017-01-28T20:35:00:+01:00
+      - Addition of new sorting codes. (v4.10)
+      - Updated the valacdos.txt dated 6th Mar'2017.
+      - Added support for Charity Bank, Contis Financial Services, Starling Bank and Tesco Bank.
+      - Removed support for HSBC.
+
+0.27  2016-12-04T19:00:00:+01:00
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.26  2016-11-29T12:20:00:+01:00
+      - Addition of new sorting codes. (v4.00)
+      - Updated the valacdos.txt dated 9th Jan'2017.
+
+0.25  2016-06-04T11:45:00:+01:00
+      - Addition of new sorting codes. (v3.90)
+      - Removal of sorting codes 400194 - 400195 (v3.90)
+      - Tidied up unit test scripts.
+
+0.24  2016-02-05T14:20:00:+01:00
+      - Updated the valacdos.txt dated 15th Feb'2016.
+      - Updated Copyright year information in the pod.
+
+0.23  2015-11-28T02:50:00:+01:00
+      - Added key 'provides' to the Makefile.PL script.
+
+0.22  2015-11-09T12:35:00:+01:00
+      - Updated the valacdos.txt dated 7th Dec'2015.
+
+0.21  2015-10-12T11:20:00:+01:00
+      - Updated the valacdos.txt dated 26th Oct'2015.
+
+0.20  2015-08-13T10:20:00:+01:00
+      - Updated link to the VOCALINK site as well the link to the PDF document
+      describing the "Modulus Checking".
+
+0.19  2015-07-29T12:00:00:+01:00
+      - Updated the valacdos.txt dated 20th Jul'2015.
+      - Added support for the following banks:
+        - Hoares Bank
+        - HSBC
+        - Metro Bank
+        - Unity Trust Bank
+        - Yorkshire Bank
+
+0.18  2015-03-19T16:48:00:+01:00
+      - Added LICENSE file.
+
+0.17  2015-03-01T08:30:00:+01:00
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+      - Updated description of method is_valid() in the pod document.
+
+0.16  2015-02-24T17:20:00:+01:00
+      - Tidied up pod document.
+
+0.15  2015-02-24T10:15:00:+01:00
+      - Updated document v3.20 valid from 23rd Mar'2015.
+      - Added support for "Orwell Union Ltd.".
+      - Splitted "Lloyds TSB" into two separate entities "Llyods" and "TSB".
+      - Removed support for "Hoares Bank", "HSBC" and "Yorkshire Bank".
+
+0.14  2015-01-16T14:50:15+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.13  2014-10-28T13:30:25+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+
+0.12  2014-10-23T23:48:10+01:00
+      - Made the package File::ShareDir::Install pre-requisite in the Makefile.PL file.
+
+0.11  2014-10-19T09:07:08+01:00
+      - Minor cosmetic changes to pod document.
+
+0.10  2014-10-18T15:50:10+01:00
+      - Updated valacdos.txt file dated 6th Oct'2014.
+
+0.09  2014-10-18T15:27:39+01:00
+      - Extracted the rule to separate files i.e. valacdos.txt and scsubtab.txt.
+      - Copied the rule files in a shared folder of the distribution.
+      - Make use of 'autodie' module.
+
+0.08  2014-08-30T02:20:00+01:00
+      - Added key "META_MERGE" key on condition (ExUtils::MakeMake->VERSION(6.46).
+
+0.07  2014-08-16T09:50:18+01:00
+      - Added section "REPOSITORY" to the pod document.
+      - Added key "META_MERGE" to Makefile.PL file.
+
+0.06  2014-08-09T01:40:30+01:00
+      - Updated Copyright year details.
+
+0.05  2014-08-08T23:25:09+01:00
+      - Removed Build.PL script.
+      - Updated README file.
+
+0.04  2014-07-31T09:10:25+01:00
+      - Fixed the typo in the sample code in pod document.
+      - Minor tidied up.
+      - Added new test.
+
+0.03  2014-07-20T22:20:20+01:00
+      - Updated the rule v3.0 dated 24th Feb'2014.
+      - Also Moo'ed the package.
+
+0.02  2012-06-27T12:13:14+01:00
+      - Refactored method BankAccount::Validator::UK::Rule::get_rules().
+      - Added missing method get_trace(), silly me.
+      - Fixed the POD example for method get_trace().
+      - Added unit test for method get_trace().
+
+0.01  2012-05-21T11:53:11+01:00
+      - First version released.

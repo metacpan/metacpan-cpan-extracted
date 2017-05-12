@@ -1,0 +1,40 @@
+Revision history for Perl module Business::ISMN
+
+1.131 2016-12-05T19:16:19Z
+	* Remove the prereq test, which I'll do locally instead of everywhere.
+
+1.13 - 2014-11-28
+	* Reqire a recent Tie::Cycle. Some CPAN testers picked up a ghost
+	version somehow.
+
+1.12 - 2014-11-21
+	* RT #100506 : Fix package name
+	* Modernize distro
+
+1.11 - 2007-10-25
+	* distro adjustments. no big whoop.
+
+1.10 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+1.08 - 2006-06-05
+	* fix-ups to dist. No need to upgrade.
+
+1.07 - 2006-05-18
+	* cleanups for distro and kwalitee. no need to upgrade.
+
+1.6 - 2005-03-08
+	* Added a POD coverage test and fixed up the problems it found
+
+1.5 - 2004-09-16
+	* distro cleanups: no need to upgrade
+
+1.2 - 2002-10-09
+	* cleaned up distribution---no code changes
+
+1.2 - 2002-09-09
+	* fixed checksum routine
+
+1.1 - 2002-09-09
+	* first version of Business::ISMN

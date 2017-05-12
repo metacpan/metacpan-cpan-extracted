@@ -1,0 +1,20 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Add Domain Name'; %]
+
+<p><h2>Enter domain name:</h2></p>
+
+<form action="cpm_workflow.cgi" method="GET">
+  <input type="hidden" name="action" value="adddomain" /> 
+  <input type="hidden" name="list" value="[% LIST %]"/>
+  <input type="value" name="domain" namesize=20><br>
+  <p><h2>-OR-<br>enter a list of domains (one per line)</h2></p>
+  <textarea name="domainlist" COLS=40 ROWS=6></textarea>
+<p>For example: www.anz.com</p>
+  
+  <p>
+    <input type="button" value="Back" onClick="history.go(-1);">
+    &nbsp
+    <input type="submit" value = "Submit"/>
+  </p>
+</form>    
+
+[% INCLUDE footer.html %]

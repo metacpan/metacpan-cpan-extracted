@@ -1,0 +1,23 @@
+To install this module, cd to the directory that contains this INSTALL
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+
+TROUBLESHOOTING
+
+If you get the error message:
+
+t/00parse_gb_to_chaos....NOK 3# Failed test 3 in t/00parse_gb_to_chaos.t 
+
+You are probably not using a new enough version of bioperl. Use the
+one supplied on www.fruitfly.org/chaos-xml

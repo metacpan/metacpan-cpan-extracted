@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Bot-BasicBot-Pluggable-Module-Spotify
+version:            0.01
+abstract:           Show relevant information when a Spotify URI is detected in a channel
+author:
+    - Edoardo Sabadelli <edoardo@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Bot::BasicBot::Pluggable:  0
+    Net::Spotify:         0
+    Test::More:           0
+    XML::TreePP:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

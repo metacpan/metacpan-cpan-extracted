@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+#Copyright (c) 2011 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use Carp;
+use File::Spec;
+use Getopt::Std;
+our ( $opt_w, $opt_v, $opt_W );
+getopts('wv') or HELP_MESSAGE();
+
+my ( $dir, $file_regex ) = @ARGV;
+HELP_MESSAGE() unless ( $dir && $file_regex );
+
+unless ($opt_w) {
+  print STDERR "DRY RUN\n";
+  print STDERR "showing first 10 files to delete\n" unless($opt_v);
+  print STDERR "---\n";
+}
+my $n = 0;
+opendir( my $dh, $dir ) || die "can't opendir >$dir< $!";
+for ( readdir($dh) ) {
+  if (/^$file_regex$/) {
+    if ($opt_w) {
+      if ($opt_v) {
+        print " " if ( $n > 0 );
+        print $_;
+      }
+      unlink File::Spec->catfile( $dir, $_ );
+    } else {
+      print "$_\n";
+      last if ( $n >= 10 && !$opt_v);
+    }
+  }
+  $n++;
+}
+closedir $dh;
+if ($opt_w || $opt_v) {
+  print "\n" if($opt_v);
+  print STDERR "deleted $n files\n";
+}
+
+sub HELP_MESSAGE {
+  print STDERR <<EOM;
+usage: rmrex [OPTIONS] <directory> <file_regex>
+
+options:
+    -w   Do not simulate, delete files.
+    -v   Verbose, show files that were/would be deleted.
+
+Deletes files in <directory> that match to the perl regular expression <file regex>.
+Standard mode is dry run, so to actually delete files, you have to use the '-w'
+switch.
+EOM
+  exit;
+}

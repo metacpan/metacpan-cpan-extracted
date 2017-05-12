@@ -1,0 +1,12 @@
+<div style="font-size: 108%;"> Men's Basketball - NCAA Tournament [% c.config.year %]</div>
+<div class="points">Lower Seed Check</div>
+<div>
+<a href="[% c.uri_for('/all') %]">All Players Home</a>
+</div>
+
+<table summary="lower seed check">
+<tr><th>Game</th><th>Team</th><th>Seed</th><th>Round</th><th>Lower Seed</th></tr>
+[% FOREACH pick IN played_games %]
+	<tr><td>[% pick.game.id %]</td><td>[% pick.pick.name %]</td><td>[% pick.pick.seed %]</td><td>[% pick.game.round %]</td><td>[% pick.game.lower_seed %]</td></tr>
+[% END %]
+</table>

@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::OnlinePayment::WorldPay.
+
+0.01  Tue May 26 08:46:50 2009
+	- original version; created by h2xs 1.23 with options
+		-AX -n Business::OnlinePayment::WorldPay
+

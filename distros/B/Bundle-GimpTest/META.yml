@@ -1,0 +1,34 @@
+---
+abstract: "A bundle to install external CPAN modules used by GIMP's"
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bundle-GimpTest
+provides:
+  Bundle::GimpTest:
+    file: lib/Bundle/GimpTest.pm
+    version: v0.2.2
+requires:
+  Digest::MD5: 0
+  Getopt::Long: 0
+  IO::All: 0
+  Net::SeedServe: 0
+  String::ShellQuote: 0
+  Time::HiRes: 0
+  YAML: 0
+  perl: 5.008
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://bitbucket.org/shlomif/gimp-test-suite
+version: v0.2.2

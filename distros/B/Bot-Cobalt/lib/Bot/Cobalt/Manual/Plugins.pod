@@ -1,0 +1,1480 @@
+=pod
+
+=head1 NAME
+
+Bot::Cobalt::Manual::Plugins - Bot::Cobalt plugin authoring reference
+
+=head1 DESCRIPTION
+
+This POD attempts to be a reasonably complete guide to writing 
+L<Bot::Cobalt> plugins.
+
+For a quick-start guide, try L<Bot::Cobalt::Manual::Plugins::Tutorial>.
+
+Refer to L</SEE ALSO> for other relevant documentation, such as instructions
+on packaging up your plugin for installation.
+
+Plugin authors likely want to at least read the L<Bot::Cobalt::IRC> POD.
+
+=head1 PLUGIN FUNDAMENTALS
+
+=head2 A basic plugin outline
+
+  package Bot::Cobalt::Plugin::User::MyPlugin;
+  
+  ## Import some helpful sugar:
+  use Bot::Cobalt;
+
+  ## Import useful constants and utilities:
+  use Bot::Cobalt::Common;
+  
+  ## Minimalist object constructor:
+  sub new { bless {}, shift }
+  
+  ## Called when we are loaded:
+  sub Cobalt_register {
+    ## Handlers receive $self and $core as first two args:
+    ##  $self is "this object"
+    ##  $core gives us access to core attributes and methods
+    ##  (Since we have Bot::Cobalt, core() is the same thing.)
+    my ($self, $core) = splice @_, 0, 2;
+    
+    ## Register to only receive public msg events
+    ## (We could also register for a list or 'all')
+    ## Uses register() sugar from Bot::Cobalt
+    register( $self, 'SERVER',
+      'public_msg'
+    );
+    
+    ## Log that we're here now:
+    logger->info("Registered");
+
+    ## Always return an Object::Pluggable::Constants value from an 
+    ## event handler.
+    ##
+    ## (Importing Bot::Cobalt::Common will pull _NONE and _ALL in)
+    ## See "Returning proper values" under "Handling events"
+    ## 
+    ## PLUGIN_EAT_NONE is the most common:
+    return PLUGIN_EAT_NONE
+  }
+  
+  ## Called when we are unloaded:
+  sub Cobalt_unregister {
+    my ($self, $core) = splice @_, 0, 2;
+
+    . . . do some clean up, perhaps . . .
+    
+    logger->info("Unregistering; bye!");
+
+    return PLUGIN_EAT_NONE
+  }
+  
+  ## Syndicated events become prefixed with 'Bot_' when dispatched
+  sub Bot_public_msg {
+    my ($self, $core) = splice @_, 0, 2;
+
+    ## Receives a Bot::Cobalt::IRC::Message::Public object:
+    my $msg     = ${ $_[0] };
+
+    my $context  = $msg->context;
+    my $as_array = $msg->message_array;
+
+    . . . do something with message @$as_array . . .
+
+    return PLUGIN_EAT_NONE 
+  }
+  
+  1;  ## perl modules end in '1'
+
+
+=head2 Module paths and configuration
+
+=head3 plugins.conf
+
+C<plugins.conf> is YAML in the following structure:
+
+  ---
+  MyPlugin:
+    Module: Bot::Cobalt::Plugin::User::MyPlugin
+    Config: plugins/mine/myplugin.conf
+    ## Enable to skip runtime auto-loading:
+    #NoAutoLoad: 1
+    ## Optional, overrides Config: file:
+    Opts:
+      Level: 2
+
+Configuration files specified in 'Config: ' are expected to be valid 
+B<YAML1.0>. You can read more about YAML at L<http://www.yaml.org> -- 
+for the most part, the basics are fairly self-explanatory.
+See L<Bot::Cobalt::Manual::Plugins::Config> for more about simple YAML 
+syntax for plugin configuration files.
+
+
+=head3 Accessing plugin configuration
+
+The normal way to access a plugin's configuration structure is via the 
+core method B<get_plugin_cfg> (or 
+L<Bot::Cobalt::Core::Sugar/plugin_cfg>):
+
+  ## Our $self object or our alias must be specified:
+  my $plug_cf = core()->get_plugin_cfg( $self );
+  
+  ## ... or with Bot::Cobalt sugar:
+  use Bot::Cobalt;
+  my $plug_cf = plugin_cfg($self);
+
+See also: L</"Core methods">
+
+These accessors will return the B<opts> hash from the plugin's 
+configuration object. The per-plugin configuration object itself is a 
+L<Bot::Cobalt::Conf::File::PerPlugin> and can be accessed via the core's 
+L<Bot::Cobalt::Conf::File::Plugins> instance:
+
+  my $plug_alias  = core()->get_plugin_alias( $self );
+  my $plug_cf_obj = core()->cfg->plugins->plugin( $plug_alias );
+
+  my $module = $plug_cf_obj->module;
+  
+  my $opts = $plug_cf_obj->opts;
+  ## Same as:
+  my $opts = plugin_cfg( $self );
+
+See the documentation for L<Bot::Cobalt::Conf::File::PerPlugin> for more 
+details.
+
+=head2 Handling events
+
+Plugins are event driven.
+
+A plugin will (usually at load-time) register to receive some set of 
+events, which are pushed through the plugin pipeline by the Cobalt core 
+(with help from L<POE::Component::Syndicator> and L<Object::Pluggable>).
+
+Pipeline priority is initially chosen via B<Priority:> 
+directives in C<plugins.conf>; however, online plugin loads/unloads 
+can alter the pipeline order. If your plugin needs to have a 
+certain priority in the pipeline, you are likely 
+going to want to spend some quality time reading the L<Object::Pluggable> 
+and especially L<Object::Pluggable::Pipeline> documentation. The methods 
+described regarding pipeline manipulation are available via C<core()>.
+
+
+=head3 Registering for events
+
+Registering for events typically happens at plugin load-time; in other 
+words, inside C<Cobalt_register>:
+
+  my ($self, $core) = @_;
+
+  ## Using Bot::Cobalt sugar:
+  register( $self, 'SERVER', 
+      'chan_sync',
+      'public_msg',
+  );
+
+  ## Same thing without sugar:
+  $core->plugin_register( $self, 'SERVER',
+      'chan_sync',
+      'public_msg',
+  );
+
+=head3 Event handlers
+
+Events from IRC and internal events are classified as 'SERVER' events.
+Syndicated SERVER event handlers are prefixed with 'Bot_':
+
+  sub Bot_some_event {
+    my ($self, $core) = splice @_, 0, 2;
+    my $deref_first_arg = ${ $_[0] };
+
+    . . .
+  }
+
+The arguments passed to event handlers are always references.
+(Sometimes, they're references to references, such as a hashref.
+If you don't know what that means, it's time to stop here and read 
+L<perlreftut> & L<perlref>)
+
+=head3 Sending events
+
+Events can be broadcast to the plugin pipeline via either the Core 
+method B<send_event>:
+
+  $core->send_event( $event, @args );
+
+... or via exported sugar from L<Bot::Cobalt::Core::Sugar> 
+(B<broadcast>):
+
+  use Bot::Cobalt;
+  
+  broadcast $event, @args;
+
+=head3 Returning proper values
+
+The plugin system is a pipeline, usually beginning with 
+the L<Bot::Cobalt::IRC> plugin. Events will be handed on down the 
+pipeline, B<unless> a handler for a syndicated event returns a 
+B<PLUGIN_EAT_ALL> or B<PLUGIN_EAT_PLUGIN> value.
+
+Your Bot_* event handlers should return an 
+L<Object::Pluggable::Constants> value. The two commonly used values are:
+
+=head4 PLUGIN_EAT_NONE
+
+Allow the event to continue to pass through the pipeline.
+
+This is the most common return value for event handlers
+
+=head4 PLUGIN_EAT_ALL 
+
+Eat the event, removing it from the plugin pipeline.
+
+Typically you might return PLUGIN_EAT_ALL on self-syndicated events
+(that is to say, events the plugin intends for itself to handle, 
+such as a L<Bot::Cobalt::Plugin::WWW> response, timed event, event-aware 
+loop as described in L</"ADVANCED CONCEPTS">, etc).
+
+This can also be useful when there is a good reason to terminate an 
+event's lifetime; for example, implementing a plugin that loads itself 
+at the front of the pipeline and restricts outgoing events based on 
+some criteria.
+
+=head1 USING IRC
+
+=head2 Receiving IRC events
+
+See L<Bot::Cobalt::IRC> for a complete list of IRC events and their 
+event syntax.
+
+=head3 Understanding server context
+
+IRC-driven events come with a 'server context' attached, mapping 
+the server's configured "name" to server state information and allowing a 
+plugin to make sure responses get to the right place.
+
+For example, when receiving a public message:
+
+  sub Bot_public_msg {
+    my ($self, $core) = splice @_, 0, 2;
+
+    ## Get this message's server context
+    my $msg     = ${ $_[0] };    
+    my $context = $msg->context;
+    
+    ## ... later, when sending a response ...
+    my $channel = $msg->channel;
+
+    broadcast( 
+      'message',   ## send_event 'message'
+      $context,    ## make sure it goes to the right server
+      $channel,    ## destination channel on specified context
+      $response,   ## some response string
+    );
+  }
+
+IRC-related events always come from or are sent to a specific context.
+
+Each context also has a L<Bot::Cobalt::IRC::Server> object; it 
+can be used to retrieve context-specific metadata such as connected 
+status and the named server's announced casemapping. 
+See L</get_irc_server>.
+
+=head3 Messages
+
+The most common use-case for an IRC bot is, of course, responding to 
+messages.
+
+Incoming messages are handled by B<Bot_public_msg> and B<Bot_private_msg> 
+plugin event handlers. (If they are prefixed by our CmdChar, they'll 
+I<also> trigger a Bot_public_cmd_ event -- see L</"Commands">, below).
+
+A _msg event is passed a context and a L<Bot::Cobalt::IRC::Message> object:
+
+  sub Bot_public_msg {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    my $msg     = ${ $_[0] };
+    
+    my $context  = $msg->context;
+    my $channel  = $msg->channel;
+    my $src_nick = $msg->src_nick;
+    
+    . . .
+    
+    return PLUGIN_EAT_NONE
+  }
+
+See L<Bot::Cobalt::IRC::Event>, L<Bot::Cobalt::IRC::Message> and 
+L<Bot::Cobalt::IRC::Message::Public> for the complete 
+documentation regarding message object methods. The most 
+commonly-used message methods are:
+
+=head4 target
+
+The (first-seen) destination of the message.
+
+=head4 channel
+
+If a message appears to have been delivered to a channel, the B<channel> 
+method will return the same value as B<target> -- otherwise it will 
+return an empty string.
+
+=head4 src_nick
+
+The nickname of the sender.
+
+=head4 src_user
+
+The username of the sender.
+
+=head4 src_host
+
+The hostname of the sender.
+
+=head4 message
+
+The original, unparsed message text.
+
+=head4 stripped
+
+The color/formatting-stripped message text.
+
+=head4 message_array
+
+The content of the message as an array, split on white space.
+
+=head4 message_array_sp
+
+Similar to B<message_array>, except spaces are preserved, including 
+leading spaces.
+
+Note that a '/ME' is a CTCP ACTION and not handled by _msg handlers.
+For that, you'll need to catch B<Bot_ctcp_action>, which carries 
+essentially the same syntax.
+
+Additionally, a '/NOTICE' is not a _msg. B<Bot_got_notice> also carries 
+the same syntax.
+
+B<< See L<Bot::Cobalt::IRC> for more details. >>
+
+=head3 Commands
+
+A L<Bot::Cobalt> instance has a B<CmdChar>, usually defined in 
+I<etc/cobalt.conf>.
+When any user issues a command prefixed with the bot's CmdChar, the event 
+B<public_cmd_$CMD> is broadcast in place of a B<public_msg> event.
+
+  <JoeUser> !shorten http://www.cobaltirc.org/dev/bots
+  ## -> event 'Bot_public_cmd_shorten'
+
+The command is automatically lowercased before being transformed into an event.
+
+A plugin can register to receive commands in this format:
+
+  ## in Cobalt_register, usually:
+  register( $self, 'SERVER',
+    ## register to receive the 'shorten' command:
+    'public_cmd_shorten',
+  );
+  
+  ## handler for same:
+  sub Bot_public_cmd_shorten {
+    my ($self, $core) = splice @_, 0, 2;
+    my $msg = ${ $_[0] };
+    
+    ## since this is a command, our message_array is shifted
+    ## the command will be stripped
+    my $args = $msg->message_array;
+    
+    . . . 
+    
+    ## if this command is "ours" we might want to eat it:
+    return PLUGIN_EAT_ALL
+  }
+
+
+It's important to note that B<< $msg->message_array >> is shifted leftwards 
+in B<public_cmd_> handlers; it won't contain the CmdChar-prefixed 
+command. B<< $msg->message_array_sp >> remains unchanged, as do the 
+B<message> and B<stripped> strings.
+
+=head3 Other events
+
+Most of the typical instances of "stuff going on" on IRC are 
+reported by the core IRC module.
+
+The documentation for all events parsed and re-broadcast from IRC 
+is available via the L<Bot::Cobalt::IRC> POD.
+
+=head2 Sending IRC events
+
+L<Bot::Cobalt::IRC> receives the following commonly-used events:
+
+=head3 Sending messages
+
+=head4 message
+
+The B<message> event triggers an IRC PRIVMSG to either a channel 
+or user.
+
+The arguments specify the server context, target (user or channel), and 
+string, respectively:
+
+  broadcast( 'message',
+    $context, $target, $string
+  );
+
+The message will be sent after being processed by any B<Outgoing_message> 
+handlers in the pipeline. See L<Bot::Cobalt::IRC> for more about Outgoing_* 
+handlers.
+
+=head4 notice
+
+B<notice> operates essentially the same as L</message>, except 
+a NOTICE is sent (rather than PRIVMSG).
+
+Event arguments are the same.
+
+=head4 action
+
+B<action> sends a CTCP ACTION rather than a normal PRIVMSG or 
+NOTICE string.
+
+Event arguments are the same as L</message> and L</notice>.
+
+
+=head3 Channel-related commands
+
+The following common IRC commands are handled.
+
+Like any other interaction, they are sent as events:
+
+  ## (attempt to) join a channel on $context:
+  broadcast( 'join', $context, $channel );
+
+=over
+
+=item *
+
+B<join>
+
+=item *
+
+B<part>
+
+=item *
+
+B<mode>
+
+=item *
+
+B<kick>
+
+=item *
+
+B<topic>
+
+=back
+
+See L<Bot::Cobalt::IRC> for event argument syntax and details.
+
+
+=head3 Accessing the IRC component directly
+
+The IRC backend for the core distribution is L<POE::Component::IRC>,
+more specifically the L<POE::Component::IRC::State> subclass.
+
+L<POE::Component::IRC> is a very mature and complete IRC framework.
+
+If your plugin does any kind of IRC-related heavy lifting, you will 
+almost certainly want to consult the documentation for 
+L<POE::Component::IRC> and L<POE::Component::IRC::State>.
+
+
+=head4 Obtaining the IRC component
+
+You can retrieve the IRC component object for direct access via the 
+core's get_irc_obj method. Expects a server context:
+
+  sub Bot_public_msg {
+    my ($self, $core) = @_;
+    my $msg     = ${$_[0]};
+    my $context = $msg->context;
+    
+    my $irc = $core->get_irc_obj($context);
+    . . .
+  }
+
+See L<POE::Component::IRC> and L<POE::Component::IRC::State> for 
+details on using the IRC Component object directly.
+
+=head1 USING THE CORE
+
+=head2 Core methods
+
+The Cobalt core provides various convenience accessors and methods for 
+plugins.
+
+The object reference to the Cobalt core object is referred to here 
+as C<$core>.
+
+L<Bot::Cobalt::Core> is actually an instanced singleton; it can be retrieved 
+from any loaded plugin via B<instance>:
+
+  require Bot::Cobalt::Core;
+  
+  my $core = Bot::Cobalt::Core->instance;
+
+... or 'use Bot::Cobalt' and thereby import the 
+L<Bot::Cobalt::Core::Sugar> wrappers:
+
+  use Bot::Cobalt;
+  
+  my $irc_obj = core()->get_irc_object($context);
+
+See the documentation for L<Bot::Cobalt::Core::Sugar> for the complete 
+list of exported wrappers.
+
+=head3 Attributes
+
+=head4 Provided
+
+The B<Provided> hash allows plugins to declare that some functionality 
+or event provided by the plugin is available (for example, the 
+B<< $core->Provided->{www_request} >> element is boolean true if 
+L<Bot::Cobalt::Plugin::WWW> is registered).
+
+This is useful when your plugin provides some event interface usable 
+by other plugins, or when the presence of this plugin may alter 
+another plugin's behavior.
+
+A plugin should declare its Provided functionality at register-time:
+
+  sub Cobalt_register {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    ## ... register for events, etc ...
+  
+    ## declare that 'tasty_snacks' functionality is available
+    ## this example does nothing if it's already defined (//):
+    $core->Provided->{tasty_snacks} //= 1;
+    
+    return PLUGIN_EAT_NONE
+  }
+
+The core has no way of automatically knowing that this functionality 
+disappears when your plugin does. You should delete the Provided element 
+in your _unregister:
+
+  sub Cobalt_unregister {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    delete $core->Provided->{tasty_snacks};
+    
+    $core->log->info("Bye!");
+    return PLUGIN_EAT_NONE
+  }
+
+Some plugins use this to share simple bits of state information in 
+addition to their advisory nature; for example, L<Bot::Cobalt::Plugin::RDB> 
+shares the number of items in the 'main' RDB via the integer value of 
+B<< $core->Provided->{randstuff_items} >>.
+
+Therefore, when attempting to determine whether a specific piece of 
+functionality is available, it may be advisable to check for 'defined' 
+status instead of boolean value:
+
+  if ( defined $core->Provided->{randstuff_items} ) {
+    ## we have RDB.pm
+  }
+
+Since plugin load order is generally not guaranteed and plugins may 
+be dynamically (un)loaded, it is good practice to only check for 
+B<Provided> functionality in the narrowest possible scope; that is to 
+say, directly prior to execution of the dependent code, rather than at 
+plugin register-time.
+
+=head4 Servers
+
+B<< $core->Servers >> is a hashref keyed on server "context" name; see 
+L</"Understanding server context">.
+
+You should probably be using L</get_irc_server>.
+
+  ## Iterate all contexts:
+  for my $context ( keys %{ $core->Servers } ) {
+    . . .
+  }
+
+The values are L<Bot::Cobalt::IRC::Server> objects.
+
+=head4 var
+
+Returns the path to the current VAR dir, typically used for log files, 
+databases, or other potentially dynamic data.
+
+Plugins should typically dump serialized data and place databases in a 
+path under C<< $core->var >>.
+
+=head4 version
+
+Returns the current L<Bot::Cobalt::Core> version.
+
+=head4 detached
+
+Returns a boolean value indicating whether or not this Cobalt instance 
+is attached to a terminal or daemonized.
+
+
+=head3 Configuration-related methods
+
+=head4 get_channels_cfg
+
+Retrieves per-context channel configuration from C<channels.conf>:
+
+  my $chan_cf = $core->get_channels_cfg( $context );
+
+The server context must be specified.
+
+Returns an empty hash if there is no channel configuration for this 
+server context.
+
+=head4 get_core_cfg
+
+Retrieves the 'core' configuration object 
+(L<Bot::Cobalt::Conf::File::Core>), representing the "cobalt.conf" 
+configuration values:
+
+  my $core_cf = $core->get_core_cfg();
+  my $lang    = $core_cf->language;
+
+See L<Bot::Cobalt::Conf::File::Core> for more details.
+
+=head4 get_plugin_cfg
+
+Retrieves the configuration hash for a specific plugin:
+
+  my $plug_cf = $core->get_plugin_cfg( $self ) || {};
+
+Either the plugin's $self object or its current alias must be 
+specified.
+
+  $core->log->warn("Missing config!")
+    unless $core->get_plugin_cfg($self);
+
+If you 'use Bot::Cobalt' you can make use of the exported B<plugin_cfg> 
+wrapper (see L<Bot::Cobalt::Core::Sugar>):
+
+  logger->warn("Missing config!")
+    unless plugin_cfg($self);
+
+=head4 get_plugin_alias
+
+Retrieve a plugin object's alias
+
+Your plugin's $self object can be specified to get the current plugin 
+alias, for example:
+
+  my $plugin_alias = $core->get_plugin_alias($self);
+
+A wrapper is provided if you use 'Bot::Cobalt' (see 
+L<Bot::Cobalt::Core::Sugar>):
+
+  my $plugin_alias = plugin_alias($self);
+
+=head3 IRC-related methods
+
+=head4 get_irc_casemap
+
+Retrieves the CASEMAPPING rules for the specified server context, 
+which should be one of I<rfc1459>, I<strict-rfc1459>, I<ascii> :
+
+  my $casemapping = $core->get_irc_casemap( $context );
+
+The server's casemapping is usually declared in ISUPPORT (numeric 
+005) upon connect and can be used to establish whether or not the 
+character sets {}|^ are equivalent to []\~ -- see L</"IRC CAVEATS"> 
+below for more information.
+
+This can be used to feed the C<lc_irc/uc_irc/eq_irc> functions from 
+L<IRC::Utils> (or L<Bot::Cobalt::Common> and determine issues like 
+nickname equivalency:
+
+  use Bot::Cobalt::Common;
+  my $casemapping = $core->get_irc_casemap( $context );
+  my $irc_lower = lc_irc($nickname, $casemapping);
+  my $is_eqal   = eq_irc($old, $new, $casemapping);
+
+=head4 get_irc_obj
+
+  my $irc = $core->get_irc_obj( $context );
+
+Retrieve the L<POE::Component::IRC> object for a specified context, which 
+is likely to actually be a L<POE::Component::IRC::State> instance.
+
+This can be used to query or post events to the IRC component directly.
+
+See the L<POE::Component::IRC> and L<POE::Component::IRC::State> docs for 
+more on interacting directly with the IRC component.
+
+=head4 get_irc_server
+
+  my $server_state = $core->get_irc_server( $context );
+
+Can also be called via B<get_irc_context>.
+
+Retrieves the appropriate L<Bot::Cobalt::IRC::Server> object from 
+B<<$core->Servers>>.
+
+A server context must be specified.
+
+See L<Bot::Cobalt::IRC::Server> for details on methods that can be called 
+against server context objects.
+
+=head3 Auth-related methods
+
+The Core provides access to a L<Bot::Cobalt::Core::ContextMeta::Auth> 
+object; methods can be called to determine user authorization levels. 
+These are the most commonly used methods; see 
+L<Bot::Cobalt::Core::ContextMeta> and 
+L<Bot::Cobalt::Core::ContextMeta::Auth> for more.
+
+=head4 level
+
+Retrieves the user's authorized level (or '0' for unauthorized users).
+
+Requires a context and a nickname:
+
+  ## inside a msg or command handler, f.ex:
+  my ($self, $core) = splice @_, 0, 2;
+  my $msg     = ${ $_[0] };
+  my $context = $msg->context;
+  my $nick    = $msg->src_nick;
+  my $level   = $core->auth->level($context, $nick);
+
+Auth levels are fairly flexible; it is generally a good idea for your 
+plugin to provide some method of configuring required access levels, 
+either via a configuration file or a B<Opts> directive in 
+C<plugins.conf>.
+
+=head4 username
+
+Retrieves the "username" for an authorized user (or empty list if the user 
+is not currently authorized).
+
+Requires a context and a nickname, similar to L</level>:
+
+  my $username = core()->auth->username($context, $nick);
+  unless ($username) {
+    ## this user isn't authorized
+  }
+
+=head3 Logging
+
+The Cobalt core provides a B<log> method that writes to the LogFile 
+specified in cobalt.conf (and possibly STDOUT, if running with --nodetach).
+
+This is actually a L<Bot::Cobalt::Logger> instance, so all methods found 
+there 
+apply. Typically, plugins should log to B<info>, B<warn>, or B<debug>:
+
+  core()->log->info("An informational message");
+  
+  core()->log->warn("Some error occured");
+
+  core()->log->debug("some verbose debug output for --debug");
+
+A plugin should at least log to B<info> when it is registered or 
+unregistered; that is to say, inside B<Cobalt_register> and 
+B<Cobalt_unregister> handlers.
+
+=head3 Timers
+
+Core timers live in B<< core()->TimerPool >>; if need be, you can 
+access the timer pool directly. It is a hash keyed on timer ID.
+
+Timer methods are provided by the L<Bot::Cobalt::Core::Role::Timers> role.
+Each individual timer is a L<Bot::Cobalt::Timer> object; if you plan to 
+manipulate a created timer, you'll likely want to consult that POD.
+
+Typically most plugins will only need the following functionality; this 
+only covers the hash-based interface to 
+L<Bot::Cobalt::Core::Role::Timers/timer_set>, so review the aforementioned 
+documentation if you'd like to use the object interface instead.
+
+=head4 timer_set
+
+Set up a new timer for an event or message.
+
+  ## Object interface:
+  core()->timer_set( $timer_object );
+
+  ## Hash interface:
+  core()->timer_set( $delay, $ev_hash );
+  core()->timer_set( $delay, $ev_hash, $id );
+
+Returns the timer ID on success, boolean false on failure.
+
+Expects at least a delay (in seconds) and a hashref specifying what to 
+do when the delay has elapsed.
+
+  ## New 60 second 'msg' timer with a random unique ID:
+  ## Send $string to $channel on $context
+  ## (A triggered 'msg' timer broadcasts a 'message' event)
+  my $id = $core->timer_set( 60,
+    {
+      ## The type of timer; 'msg', 'action' or 'event':
+      Type => 'msg',
+
+      ## This is a 'msg' timer; we need to know what to send
+      ## 'action' carries the same syntax
+      Context => $context,
+      Target  => $channel,
+      Text    => $string,
+    }
+  );
+
+Here's the same timer, but using the pure object syntax:
+
+  use Bot::Cobalt::Timer;
+  $core->timer_set(
+    Bot::Cobalt::Timer->new(
+      core    => $core,
+      context => $context,
+      target  => $channel,
+      text    => $string,
+      type    => 'msg',
+      delay   => 60
+    );
+  );
+
+If no B<Type> is specified, I<event> is assumed:
+
+  ## Trigger event $event in $secs with (optional) @args:
+  my $id = $core->timer_set( $secs,
+    {
+      Event => $event,
+      Args  => [ @args ],
+    }
+  );
+  
+  ## ... same thing, but object interface:
+  my $id = $core->timer_set(
+    Bot::Cobalt::Timer->new(
+      core  => $core,
+      event => $event,
+      args  => \@args,
+    );
+  );
+
+You can tags packages with your plugin's B<Alias>, if you'd like; 
+if an Alias is set, you'll be able to clear all timers by alias via 
+L</timer_del_alias> or retrieve them via L</timer_get_alias>:
+
+  ## Alias-tagged timer
+  my $id = $core->timer_set( $secs,
+    {
+      Event => $event,
+      Args  => [ @args ],
+      ## Safely retrieve our $self object's plugin alias:
+      Alias => $core->get_plugin_alias( $self ),
+    },
+  );
+
+(The L<Bot::Cobalt::Timer> object interface uses the B<alias> attribute.)
+
+Additionally, L<Bot::Cobalt::Plugin::PluginMgr> automatically tries to clear 
+plugin timers for unloaded plugins; this only works for Alias-tagged timers.
+Without a specified Alias, a timer is essentially considered ownerless -- 
+it will happily fire at their scheduled time even if the issuing plugin 
+is gone.
+
+By default, a random timer ID is chosen (and returned).
+
+You can also specify an ID:
+
+  ## Set a timer with specified ID 'MyTimer'
+  ## Will overwrite any preexisting timers with the same ID
+  $core->timer_set( 
+    $secs,
+    { Event => $event, Args => [ @args ] },
+    'MyTimer'
+  );
+
+(The L<Bot::Cobalt::Timer> object interface uses the B<id> attribute.)
+
+This can be used for resetting timers you've already set; grab the ID 
+returned by a C<timer_set()> call and reset it to change the event or delay.
+
+You may want C<timestr_to_secs> from L<Bot::Cobalt::Utils> for easy 
+conversion of human-readable strings into seconds. This is, of course, 
+included by default if you C<< use L<Bot::Cobalt::Common> >>.
+
+If you need better accuracy, you'll need to use your own alarm()/delay() 
+calls to L<POE::Kernel>; the timer pool is checked every second or so.
+
+Arguments specified in the B<Args> array reference or B<args> object 
+attribute will be relayed to plugin event handlers just like any other 
+event's parameters:
+
+  sub Bot_some_timed_event {
+    ## Called by a timer_set() timer
+    my ($self, $core) = splice @_, 0, 2;
+    my $firstarg = ${ $_[0] };
+    my $second   = ${ $_[1] };
+  }
+
+=head4 timer_del
+
+Delete a timer by ID.
+
+  my $deleted = $core->timer_del( $id );
+
+Returns the deleted timer object, or nothing if there was no such 
+ID.
+
+The returned result (if there is one) can be fed back to L</timer_set> 
+if needed; it will be a L<Bot::Cobalt::Timer> object:
+
+  ## hang on to this timer for now:
+   my $postponed = $core->timer_del( $id ) ;
+
+  ## . . . situation changes . . .
+   $postponed->delay(60);
+  
+   if ( $core->timer_set( $postponed ) ) {
+     ## readding postponed timer successful
+   }
+
+=head4 timer_del_alias
+
+Delete all timers owned by the specified alias:
+
+  my $plugin_alias  = $core->plugin_get_alias( $self );
+  my $deleted_count = $core->timer_del_alias( $plugin_alias );
+
+Only works for timers tagged with their Alias; see L</timer_set>.
+Timers with no Alias tag are considered essentially "ownerless" and left 
+to their own devices; they'll fail quietly if the timed event was handled 
+by an unloaded plugin.
+
+This is also called automatically by the core plugin manager 
+(L<Bot::Cobalt::Plugin::PluginMgr>) when a plugin is unloaded.
+
+=head4 timer_get_alias
+
+Find out which active timerIDs are owned by the specified alias:
+
+  my $plugin_alias  = $core->plugin_get_alias( $self );
+  my @active_timers = $core->timer_get_alias( $plugin_alias );
+
+=head4 timer_get
+
+Retrieve the L<Bot::Cobalt::Timer> for this active timer (or undef if not 
+found).
+
+  my $this_timer = $core->timer_get($id);
+
+
+=head2 Syndicated core events
+
+These are events sent by L<Bot::Cobalt::Core> when various core states 
+change.
+
+You should probably return PLUGIN_EAT_NONE on all of these, unless 
+you are absolutely sure of what you are doing.
+
+=head3 Plugin related events
+
+=head4 Bot_plugins_initialized
+
+Broadcast when the initial plugin load has completed at start-time.
+
+Carries no arguments.
+
+=head4 Bot_plugin_error
+
+Broadcast when the syndicator reports an error from a plugin.
+
+The only argument is the error string reported by 
+L<POE::Component::Syndicator>.
+
+These messages are also logged to 'warn' by default.
+
+=head3 Timer related events
+
+=head4 Bot_executed_timer
+
+Broadcast whenever a timer ID has been executed.
+
+The only argument is the timer ID.
+
+=head4 Bot_deleted_timer
+
+Broadcast whenever a timer ID has been deleted.
+
+The first argument is the timer ID.
+
+The second argument is the removed L<Bot::Cobalt::Timer> object.
+
+=head3 Ignore related events
+
+=head4 flood_ignore_added
+
+Broadcast by L<Bot::Cobalt::IRC> when a temporary anti-flood ignore has 
+been placed.
+
+Arguments are the server context name and the mask that was added, 
+respectively.
+
+=head4 flood_ignore_deleted
+
+Broadcast by L<Bot::Cobalt::IRC> when a temporary anti-flood ignore has 
+expired and been removed.
+
+Arguments are the same as L</flood_ignore_added>.
+
+
+=head1 PLUGIN DESIGN TIPS
+
+=head2 Useful tools
+
+=head3 Bot::Cobalt
+
+Importing L<Bot::Cobalt> via 'use Bot::Cobalt' brings in the 
+L<Bot::Cobalt::Core::Sugar> functions.
+
+These provide simple syntax sugar for accessing the L<Bot::Cobalt::Core> 
+singleton and common methods such as B<send_event>; consult the 
+L<Bot::Cobalt::Core::Sugar> documentation for details.
+
+=head3 Bot::Cobalt::Common
+
+L<Bot::Cobalt::Common> is a simple exporter that will pull in common constants 
+and utilities from L<Object::Pluggable::Constants>, L<IRC::Utils>, and 
+L<Bot::Cobalt::Utils>.
+
+Additionally, C<use Bot::Cobalt::Constant> will enable the B<strict> and 
+B<warnings> pragmas.
+
+This is provided as a convenience for plugin authors; rather than importing 
+from a goodly handful of modules, you can simply:
+
+  use Bot::Cobalt::Common;
+
+Declaring strict and warnings explicitly are still good practice.
+
+See L<Bot::Cobalt::Common> for details.
+
+=head3 Bot::Cobalt::DB
+
+L<Bot::Cobalt::DB> provides an easy object-oriented interface to storing 
+and retrieving Perl data structures to/from BerkeleyDB via L<DB_File>.
+
+Useful when a plugin has some persistent data it needs to 
+keep track of, but storing it in memory and serializing to/from disk is 
+too expensive.
+
+  use Bot::Cobalt::DB;
+
+  # new object for this db, creating it if it doesn't exist:
+  $db = Bot::Cobalt::DB->new(
+    file => $some_db_path,
+  );
+
+  # open and lock the db:
+  $db->dbopen || return "database open failed!";
+
+  # 'put' some data structure in the db:
+  my $ref = { Some => [ 'Data', 'Structure' ] };
+  $db->put('MyKey', $ref);
+  
+  # 'get' some other data structure:
+  my $other_data = $db->get('OtherKey');
+  
+  # close/unlock db:
+  $db->dbclose;
+
+See L<Bot::Cobalt::DB> for complete usage information.
+
+=head3 Bot::Cobalt::Serializer
+
+It is often useful to serialize arbitrary data structures to some 
+standardized format. Serialization formats such as B<JSON> and B<YAML> 
+are convenient for "speaking" to other networked applications, sharing 
+data, or saving persistent data to disk in an easily-retrievable format.
+
+L<Bot::Cobalt> comes with a simple object oriented frontend to some common 
+serialization formats, as well as built-in file operations for "freezing" 
+and "thawing" data to/from files on disk:
+
+  use Bot::Cobalt::Serializer;
+
+  ## create a JSON serializer:
+  my $jsify = Bot::Cobalt::Serializer->new( Format => 'JSON' );
+
+  ## serialize a perl hash:
+  my $ref = { Some => { Deep => [ 'Structure' ] } };
+  my $json = $jsify->freeze($ref);
+
+See L<Bot::Cobalt::Serializer>.
+
+
+=head3 Bot::Cobalt::Utils
+
+L<Bot::Cobalt::Utils> provides a functional-style interface to various tools 
+useful in effective plugin authoring.
+
+Tools include flexible (bcrypt-enabled) password hashing and comparison 
+functions, string formatting with arbitrary variable replacement rules, 
+Cobalt-style glob syntax tools, color/format interpolation, and others.
+
+  ## Import all Bot::Cobalt::Utils funcs:
+  use Bot::Cobalt::Utils qw/ :ALL /;
+
+See L<Bot::Cobalt::Utils>.
+
+=head3 IRC::Utils
+
+L<IRC::Utils> is a very useful module covering many basic IRC-related 
+tasks, such as host normalization / matching and casemapping-aware IRC 
+uppercase/lowercase tools.
+
+It is used extensively by both L<Bot::Cobalt> and 
+L<POE::Component::IRC> and therefore guaranteed to be available for use.
+
+See L<IRC::Utils> for upstream's documentation.
+
+
+=head3 Bot::Cobalt::Plugin::WWW
+
+It's fairly common to want to make some kind of HTTP request from an 
+IRC bot. The most common Perl method of speaking HTTP is 
+L<LWP::UserAgent> -- which will block the plugin pipeline until the 
+request is complete.
+
+L<Bot::Cobalt::Plugin::WWW>, if loaded, dispatches HTTP requests 
+asynchronously via L<POE::Component::Client::HTTP> and returns 
+L<HTTP::Response> responses to the plugin pipeline:
+
+  ## build a request object via HTTP::Request
+  use HTTP::Request;
+
+  ## a simple GET, see HTTP::Request docs for more info:
+  my $request = HTTP::Request->new( 'GET', $url );
+
+  ## push it to www_request with a response event:
+  broadcast( 'www_request',
+    $request,
+    'myplugin_resp_recv',
+
+     ## you can include a reference containing args
+     ## (or a scalar, if you like)
+     ##
+     ## here's an example args arrayref telling our handler 
+     ## where to send responses:
+     [ $context, $channel, $nickname ],
+  );
+  
+  ## handle a response when one is received:
+  sub Bot_myplugin_resp_recv {
+    my ($self, $core) = splice @_, 0, 2;
+
+    ## if the request was successful, $_[0] is a ref to the 
+    ## decoded content from HTTP::Response
+    ## (otherwise, it is the HTTP status message)
+    my $content  = ${ $_[0] };
+
+    ## $_[1] is the HTTP::Response object, see perldoc HTTP::Response
+    my $response = ${ $_[1] };
+
+    ## $_[2] is whatever argument ref was provided in www_request
+    my $argref   = ${ $_[2] };
+
+    ## in our example above, it was some contextual info:
+    my ($context, $channel, $nickname) = @$argref;
+
+    if ($response->is_success) {
+      ## . . . do something with the response . . .
+    } else {
+      ## request failed (see HTTP::Response)
+    }
+  
+    ## eat this event, we're the only handler:
+    return PLUGIN_EAT_ALL
+  }
+
+When a response is received, it will be pushed to the plugin pipeline 
+as the specified SERVER event.
+
+If the plugin is available, B<< $core->Provided->{www_request} >> will be 
+boolean true:
+
+  my $request = HTTP::Request->new( . . . );
+  if ($core->Provided->{www_request}) {
+    ## send www_request event like above
+    . . .   
+  } else {
+    ## no async available, error out or use LWP or something:
+    my $ua = LWP::UserAgent->new(
+      timeout => 5,
+      max_redirect => 0,
+    );
+    my $response = $ua->request($request);
+    my $content = $response->content;
+  }
+
+
+=head2 Retrieving $core
+
+It may be necessary or convenient to use L<Bot::Cobalt::Core> methods from 
+outside of a syndicated event handler.
+
+If your plugin imports L<Bot::Cobalt> via 'use Bot::Cobalt', the 
+C<core()> function will retrieve the instanced L<Bot::Cobalt::Core>; 
+for example:
+
+  core()->auth->level( . . . )
+
+See L<Bot::Cobalt::Core::Sugar> for details on functions exported when 
+you 'use Bot::Cobalt'.
+
+If you don't want to use the sugary functions and 
+would rather make method calls directly, L<Bot::Cobalt::Core> is an 
+instanced singleton; loaded plugins can always 
+retrieve the running L<Bot::Cobalt::Core> via the B<instance> method:
+
+  sub my_routine {
+    my ($self, @args) = @_;
+    
+    require Bot::Cobalt::Core;
+    croak "No Core instance available"
+      unless Bot::Cobalt::Core->has_instance;
+    my $core = Bot::Cobalt::Core->instance;
+  }
+
+
+=head2 Non-reloadable plugins
+
+By default, a plugin can be unloaded/reloaded at any time, typically via 
+the L<Bot::Cobalt::Plugin::PluginMgr> !plugin administrative interface.
+
+If a plugin is marked as being unreloadable, plugin managers such as the 
+included L<Bot::Cobalt::Plugin::PluginMgr> will recognize it as such and 
+refuse to unload or reload the plugin once it is loaded.
+
+=head3 Declaring non-reloadable status
+
+A plugin can declare itself as not being reloadable with a simple 
+method returning boolean true:
+
+sub NON_RELOADABLE { 1 }
+
+=head1 ADVANCED CONCEPTS
+
+=head2 Breaking up lengthy loops
+
+Cobalt operates in an event loop -- implying that any piece of 
+code that blocks for any significant length of time is holding up 
+the rest of the loop:
+
+  sub Bot_some_event {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    my @items = long_list_of_items();
+    
+    BIGLOOP: for my $item (@items) {
+      do_work_on($item);
+    }
+    ## everything else stops until BIGLOOP is done
+  }
+
+Instead, you can break the loop into event handlers and yield back to 
+the event loop, cooperatively multitasking with other events.
+
+The below example processes a large list of items, pushing remaining 
+items back to the 'worker' event handler after iterating 100 items.
+
+  sub Cobalt_register {
+    ## ... initialization...
+    ## ... register for myplugin_start_work, myplugin_do_work
+  }
+
+  ## Some event that starts a long-running loop:
+  sub Bot_myplugin_start_work {
+    my ($self, $core) = splice @_, 0, 2;
+    
+    my @items = long_list_of_items();
+        
+     ## begin _do_work
+     ## pass our @items to it, for example:
+    $core->send_event( 'myplugin_do_work', [ @items ] );
+    
+    return PLUGIN_EAT_ALL   
+  }
+  
+  sub Bot_myplugin_do_work {
+    my ($self, $core) = splice @_, 0, 2;
+    
+     ## our remaining items:
+    my $itemref = ${ $_[0] };
+    my @items = @$itemref;
+    
+     ## maximum number of elements to process before yield:
+    my $max_this_run = 100;
+    while (@items && --$max_this_run != 0) {
+      my $item = shift @items;
+      ## ... do some work on $item ...
+    }
+
+     ## if there's any items left, push them and yield:
+    if (@items) {
+      $core->send_event( 'myplugin_do_work', [ @items ] );
+    } else {
+      ## no items left, we are finished
+      ## tell pipeline we're done, perhaps:
+      $core->send_event( 'myplugin_finished_work' );
+    }
+
+    return PLUGIN_EAT_ALL
+  }
+
+For more fine-grained control, consider running your own POE::Session; 
+see L</"Spawning your own POE::Session">, below.
+
+
+=head2 Spawning your own POE::Session
+
+There's nothing preventing you from spawning your own L<POE::Session>; 
+your session will run within Cobalt's L<POE::Kernel> instance and POE 
+event handlers will work as-normal.
+
+Motivations for doing so include fine-grained timer control, integration 
+with POE bits such as the POE::Component and POE::Wheel namespaces
+. . . and the fact that POE is pretty great ;-)
+
+It's worth noting that many POE Components use B<get_active_session> to 
+determine where to send responses. It may sometimes be necessary to use 
+intermediary "proxy" methods to ensure a proper destination session is 
+set in the POE::Component in use.
+See L<Bot::Cobalt::Plugin::WWW> source for an example of a plugin that uses 
+its own POE::Session and does this (when issuing HTTP requests to 
+L<POE::Component::Client::HTTP>).
+
+=head2 Manipulating plugin pipeline order
+
+L<Object::Pluggable> allows you to manipulate the plugin pipeline order; 
+that is to say, the order in which events will hit plugins.
+
+For example, when writing a plugin such as an input filter, it can be useful to move 
+your plugin towards the top of the plugin pipeline:
+
+  ## With 'use Bot::Cobalt':
+  core->pipeline->bump_up( plugin_alias($self) );
+
+See L<Object::Pluggable::Pipeline> for details.
+
+Plugin managers are not required to take any special consideration of a 
+plugin's previous position in the case of a plugin (re)load.
+
+=head1 IRC CAVEATS
+
+=head2 IRC casemapping rules
+
+Determining whether or not nicknames and channels are equivalent on IRC 
+is not as easy as it looks.
+
+Per the RFC (L<http://tools.ietf.org/html/rfc1459#section-2.2>):
+
+  the characters {}| are
+  considered to be the lower case equivalents of the characters []\,
+  respectively
+
+This set ( {}| == []\ ) is called B<strict-rfc1459> and identified as such in 
+a server's I<ISUPPORT CASEMAPPING=> directive.
+
+More often, servers use the set commonly identified as B<rfc1459>:
+
+  ## rfc1459 lower->upper case change: {}|^ == []\~
+  $value =~ tr/a-z{}|^/A-Z[]\\~/;
+
+Some servers may use normal ASCII case rules; they will typically announce 
+B<ascii> in I<CASEMAPPING=>.
+
+L<Bot::Cobalt::IRC> will attempt to determine and save a server's CASEMAPPING value 
+at connect time. Some broken server configurations announce junk in 
+I<CASEMAPPING> and their actual valid casemapping ruleset in I<CHARSET>; 
+L<Bot::Cobalt::IRC> will fall back to I<CHARSET> if I<CHARSET> is a valid casemap 
+but I<CASEMAPPING> is invalid. If all else fails, B<rfc1459> is used.
+
+The saved value can be used to feed C<eq_irc> and friends from L<IRC::Utils> and
+determine nickname/channel equivalency.
+
+See L</get_irc_casemap> and L<IRC::Utils>
+
+
+=head2 Character encodings
+
+IRC doesn't come with a lot of guarantees regarding character encodings.
+
+Hopefully, you are getting either CP1252 or UTF-8.
+
+The L<IRC::Utils> POD contains an excellent discussion of the general 
+problem; see L<IRC::Utils/ENCODING>.
+
+L<IRC::Utils/decode_irc> is included if you 'use Bot::Cobalt::Common'.
+
+
+=head1 SEE ALSO
+
+L<Bot:Cobalt::IRC> covers events handled and emitted by the IRC plugin.
+
+L<Bot::Cobalt::Manual::Plugins::Tutorial> contains a simple walk-through 
+tutorial on plugin writing.
+
+L<Bot::Cobalt::Manual::Plugins::Config> describes configuration files used by
+plugins.
+
+L<Bot::Cobalt::Manual::Plugins::Dist> covers packaging your module for
+installation.
+
+L<Bot::Cobalt::Core::Sugar> describes functional sugar imported when you 
+C<use Bot::Cobalt;>.
+
+Plugin authors may also be interested in using L<Bot::Cobalt::Utils>.
+
+You can view the full documentation at 
+L<http://www.metacpan.org/release/Bot-Cobalt>.
+
+=head2 Relevant CPAN documentation
+
+L<Bot::Cobalt::Core> and L<Bot::Cobalt::IRC> are mostly a lot of sugar 
+over the following very useful CPAN modules:
+
+=over
+
+=item *
+
+L<IRC::Utils>
+
+=item *
+
+L<POE::Component::IRC> and L<POE::Component::IRC::State>
+
+=item *
+
+L<POE::Component::Syndicator>
+
+
+=back
+
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+http://www.cobaltirc.org
+
+
+=cut

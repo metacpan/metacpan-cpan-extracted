@@ -1,0 +1,23 @@
+0.03
+    Continue to improve docs - Document other (hidden) features!?
+    Add more tests - more complicated sub/loop tests (see my original example dir) - also other from older tests
+     - (More checks on mixed content of subs, text & objects)
+    Bring git (GitHub) up-to-date with latest version in my SVN
+     - Above includes CSS module
+     - Putting back in comments & <? ?> tags - And helpers
+     - DocTypes &  DTD <!ELEMENT>
+    Add subs saving to Builder::XML (benchmark first)
+    Create Builder::HTML & Builder::HTML::Validated
+    Refactor! Refactor! Refactor!
+    Nick tests from XML::Writer & XML::Generator and amend for Builder::XML
+    Fix order of attributes? (ie. document workaround)
+    
+    # from Builder::XML....
+    # Builder::Declare (for Builder func import)
+    * building subs (for speed).   Lets do benchmarking before attempting this!
+    * XML::Entities    (option to decode on reading data & to encode on way out)
+    * AUTOLOAD & DESTROY tags - solution?
+    * test B::XML __render__ does work on local stack only (done this?  certainly needs more stringent tests)
+    
+    # doesnt work...   $xm->p( 'one', $xm->span( 'two' ), 'and three' );
+    # only works if $xm-> is first parameter ( __say__ workaround )

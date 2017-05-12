@@ -1,0 +1,33 @@
+$VAR1 = bless( {
+                 'SEQUENCE' => [
+                                 bless( {
+                                          'system-id' => bless( {
+                                                                  'person-or-institution-symbol' => bless( {
+                                                                                                             'institution-symbol' => bless( {
+                                                                                                                                              'generalstring' => 'MBOM'
+                                                                                                                                            }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                           }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                                                }, 'Biblio::ILL::ISO::SystemId' )
+                                        }, 'Biblio::ILL::ISO::SendToListType' ),
+                                 bless( {
+                                          'system-id' => bless( {
+                                                                  'person-or-institution-symbol' => bless( {
+                                                                                                             'institution-symbol' => bless( {
+                                                                                                                                              'generalstring' => 'MWPL'
+                                                                                                                                            }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                           }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                                                }, 'Biblio::ILL::ISO::SystemId' ),
+                                          'account-number' => bless( {
+                                                                       'generalstring' => 'PLS001'
+                                                                     }, 'Biblio::ILL::ISO::AccountNumber' ),
+                                          'system-address' => bless( {
+                                                                       'telecom-service-identifier' => bless( {
+                                                                                                                'generalstring' => 'SMTP'
+                                                                                                              }, 'Biblio::ILL::ISO::ILLString' ),
+                                                                       'telecom-service-address' => bless( {
+                                                                                                             'generalstring' => 'pls@gov.mb.ca'
+                                                                                                           }, 'Biblio::ILL::ISO::ILLString' )
+                                                                     }, 'Biblio::ILL::ISO::SystemAddress' )
+                                        }, 'Biblio::ILL::ISO::SendToListType' )
+                               ]
+               }, 'Biblio::ILL::ISO::SendToListTypeSequence' );

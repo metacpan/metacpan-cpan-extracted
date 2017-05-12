@@ -1,0 +1,2 @@
+* Removed Digest::SHA1, replaced with Digest::SHA.  Digest::SHA1 remains
+  in Bundle::InterchangeKitchenSink.

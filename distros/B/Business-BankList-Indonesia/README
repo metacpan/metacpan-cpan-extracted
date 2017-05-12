@@ -1,0 +1,12 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    This module contains list of banks/financial institutions in Indonesia.
+    Data source is currently at: https://github.com/sharyanto/gudangdata
+    (table/idn_bank).
+
+SEE ALSO
+
+    Business::BankList
+

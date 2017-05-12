@@ -1,0 +1,11 @@
+config {
+    engine          CGI;
+    template_engine TT;
+    Init Std {}
+}
+app Addresses {
+    sequence address_seq {}
+    table address {
+        sequence address_seq;
+    }
+}

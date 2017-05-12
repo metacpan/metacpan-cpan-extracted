@@ -1,0 +1,151 @@
+=head1 NAME
+
+Brackup::Manual::Overview - how Brackup works, and how to use it
+
+=head1 Quick Start Guide
+
+=head2 Setup your config file
+
+Run B<brackup> to initialize your config file.  You'll see:
+
+   $ brackup
+   Error:
+     Your config file needs tweaking.
+     I put a commented-out template at: /home/bradfitz/.brackup.conf
+
+   brackup --from=[source_name] --to=[target_name] [--output=<backup_metafile.brackup>]
+   brackup --help
+
+Now, go edit your config file:
+
+   $ $EDITOR ~/.brackup.conf
+
+Tweak as appropriate.
+
+For details on what's tweakable, see L<Brackup::Root> (a "source"), or
+L<Brackup::Target> (a destination).
+
+=head2 Do a backup
+
+Now that you've got a source and target named, run a backup.  I like
+watching it all happen with the --verbose (or -v) option:
+
+  $ brackup --from=myhome --to=amazon -v
+
+=head2 What just happened?
+
+Let's look around at what just happened.
+
+First, you'll notice a file named, by default,
+"myhome-yyyymmdd.brackup" in your current directory.  Go look at it.
+It describes the state of the tree (the "root", or "source") that you
+just backed up.  You might want to keep this file.  Although, if you
+don't, it's also stored on the target (in this case, Amazon), so it's
+not critical.  (You can always re-download lost .brackup files with
+L<brackup-target>)
+
+You might also notice two SQLite files at:
+
+   $SOURCE_ROOT/.brackup-digest.db
+   $HOME/.brackup-target-amazon.invdb
+
+These are the L<Brackup::DigestCache> and
+L<Brackup::InventoryDatabase> files, both of which make future
+incremental backups fast.
+
+=head1 Incremental backups
+
+Incremental backups are essentially free, only storing new chunks,
+even if you rearrange your directory tree or rename all your files.
+Brackup doesn't use the I<name> of your files to decide what's new in
+an incremental backup, only the contents.
+
+For two back-to-back backups, with no data changes in-between, the
+only cost of an incremental backup is that another metafile (*.brackup) is
+produced, which is proportional in size to the I<number of files>
+you're backing up (not the size of the files).
+
+Another good side-effect of storing backups based on their digests is
+that multiple, duplicate files on your source are only stored on the
+target once.  (but yes, they're restored to all original locations)
+
+=head1 Using encryption
+
+Brackup supports backing up with public key encryption, using GNU
+Privacy Guard (GnuPG).  One of the great advantage of using public key
+encryption is that your machines doing backups only need your public
+key, so you can run automated backups from hosts which are on the
+public Internet and might be get compromised, without worrying about
+your private key getting stolen.  (however, you'd still worry about
+your machine getting compromised for lots of other reasons...)
+
+In any case, you encrypt files I<to yourself>, and this is a property
+on a backup source (see L<Brackup::Root>).  For example, in my config
+file, I have:
+
+  [SOURCE:bradhome]
+  ...
+  path = /home/bradfitz/
+  gpg_recipient = 5E1B3EC5
+  ...
+
+Where 5E1B3EC5 corresponds to the key signature for myself as seen in:
+
+  $ gpg --list-keys
+  ...
+  pub   1024D/5E1B3EC5 2006-03-20
+  uid                  Brad Fitzpatrick <brad@danga.com>
+  ....
+
+While you backup automatically without a human present, a restore from
+encryption requires an interactive session for you to enter your
+private key's passphrase into gpg-agent.
+
+To create a new key, run:
+
+  $ gpg --gen-key
+
+But really, you should go read a gpg manual first.  Notably, B<backing
+up your gpg private key is very important!>.  If you lose the disk
+with your files which also contain your private key, your encrypted backups on
+Amazon won't do you much good, since you'll have no way to decrypt them.
+I recommend burning your private key to a CD, as well as printing it out
+on paper.  (Worst case you can type it back in, or use OCR.)  Export with:
+
+  $ gpg --export-secret-keys --armor
+
+You can encrypt to multiple keys by providing multiple C<gpg_recipient> 
+lines; any of the keys provided will be able to decrypt the backups.
+
+=head1 Restores
+
+To do a restore, you'll need your *.brackup file handy.  If you lost
+it, you can re-download it from your backup target with
+L<brackup-target>.  Then run:
+
+   brackup-restore --from=foo.brackup --to=<dir> --all
+
+For more options, see:
+
+   brackup-restore --help
+
+=head1 Number of backups to keep
+
+To free space on your target you can remove old backups. There are two steps
+to do this:
+
+   brackup-target <target> prune
+   brackup-target <target> gc
+
+The first command will look for backup metafiles in your target and remove the
+oldest ones according to the I<keep_backups> option you specified in the config
+file. Thus, if you have, say, 15 backups stored and I<keep_backups> is set to 10
+then I<prune> will remove the oldest 5 backups.
+
+The second command will remove from your target the orphaned chunks that are no
+more referenced by any metafile. This will free some space while preserving chunks
+that are still referenced by recent backups.
+
+=head1 SEE ALSO
+
+L<Brackup>

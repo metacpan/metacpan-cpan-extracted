@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Bio::ConnectDots::DB -- Database adapter for 'connect-the-dots'</title>
+<link rel="stylesheet" href="cpan.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#appendix">APPENDIX</a></li>
+	<ul>
+
+		<li><a href="#constructors">Constructors</a></li>
+		<li><a href="#methods_to_manage_database">Methods to manage database</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Bio::ConnectDots::DB -- Database adapter for 'connect-the-dots'</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Bio::ConnectDots::DB;</pre>
+<pre>
+  my $db=new Bio::ConnectDots::DB
+    (-database=&gt;'test',-host=&gt;'socks',-user=&gt;'ngoodman',-password=&gt;'secret');</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This class manages database connections and encapsulates all database
+access for 'connect-the-dots'.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></h1>
+<p>Email <a href="mailto:dburdick@systemsbiology.org,">dburdick@systemsbiology.org,</a> <a href="mailto:natg@shore.net">natg@shore.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2005 Institute for Systems Biology (ISB). All Rights Reserved.</p>
+<p>This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix">APPENDIX</a></h1>
+<p>The rest of the documentation describes the methods.</p>
+<p>
+</p>
+<h2><a name="constructors">Constructors</a></h2>
+<pre>
+ Title   : new
+ Usage   : $db=new Bio::ConnectDots::DB
+             (-database=&gt;'test',-host=&gt;'socks',-user=&gt;'ngoodman',-password=&gt;'secret');</pre>
+<pre>
+ Function: Connects to database</pre>
+<pre>
+ Args    : -database =&gt; name of PostgreSQL database to use
+           -host =&gt; hostname of PostgreSQL database server
+           -server =&gt; synonym for host
+           -user =&gt; name of PostgreSQL user
+           -password =&gt; password of PostgreSQL user</pre>
+<pre>
+           -ext_directory =&gt; directory for temporary files used for loading and fetching data
+              default /usr/tmp/&lt;user&gt;, eg, /usr/tmp/ngoodman
+           -load_save =&gt; controls whether load files are saved after use.  Helpful
+              for debugging
+              default - files not saved
+              'all' -- files are saved
+              'last' -- only last file is saved
+           -load_chunksize =&gt; number of Dots loaded at a time.  Tuning parameter.
+              default 100000</pre>
+<pre>
+ Returns : Bio::ConnectDots::DB object</pre>
+<p>
+</p>
+<h2><a name="methods_to_manage_database">Methods to manage database</a></h2>
+<pre>
+ Title   : exists
+ Usage   : print &quot;Database exists&quot; if $db-&gt;exists
+ Function: Tells whether the 'connect-the-dots' database exists
+ Returns : boolean</pre>
+<pre>
+ Title   : drop
+ Usage   : $db-&gt;drop;
+ Function: Drop all 'connect-the-dots' tables
+ Returns : Nothing
+ Note    : Only drops the built-in tables, not the ones created by queries</pre>
+<pre>
+ Title   : create
+ Usage   : $db-&gt;create;
+ Function: Create all 'connect-the-dots' tables
+ Returns : Nothing</pre>
+<pre>
+ Title   : analyze
+ Usage   : $db-&gt;analyze;
+ Function: Run ANALYZE TABLE on all built-in 'connect-the-dots' tables
+ Returns : Nothing</pre>
+
+</body>
+
+</html>

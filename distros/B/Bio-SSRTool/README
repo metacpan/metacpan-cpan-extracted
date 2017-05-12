@@ -1,0 +1,42 @@
+Bio-SSRTool
+
+This is a simple tool that has long been hosted at Gramene.org for 
+finding simple sequence repeats (SSRs) in FASTA-format sequence data.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::SSRTool
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bio-SSRTool
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bio-SSRTool
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bio-SSRTool
+
+    Search CPAN
+        http://search.cpan.org/dist/Bio-SSRTool/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Ken Youens-Clark
+
+This program is released under the following license: GPL
+

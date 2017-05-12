@@ -1,0 +1,54 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2MassData} class b2MassData
+{
+
+b2MassData();
+
+%{
+
+float32
+b2MassData::mass( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->mass = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->mass;
+	OUTPUT:
+		RETVAL
+
+b2Vec2*
+b2MassData::center( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->center = *(b2Vec2*)stack_to_object( ST(1) );
+		}
+		RETVAL = &(THIS->center);
+	OUTPUT:
+		RETVAL
+
+float32
+b2MassData::I( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->I = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->I;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

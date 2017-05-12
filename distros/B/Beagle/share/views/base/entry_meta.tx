@@ -1,0 +1,43 @@
+: if template_exists( $entry.type ~ '_entry_meta.tx' ) {
+:   include $entry.type ~ '_entry_meta.tx';
+: } else {
+<div class="meta">
+: include '_wedge.tx' { template => 'entry_meta_start.tx' };
+
+: if ( $entry.author ) {
+  <div class="author" title="<: _('author') ~ ' ' ~ $entry.author :>" >
+    <: email_name($entry.author) :>
+  </div>
+: }
+
+  <div class="date" title="<: _('created date') ~ ' ' ~ $entry.created :>" >
+    <: $entry.created_string :>
+  </div>
+
+  <div class="tags" title="<: _('tags') :>">
+    <a href="<: $prefix :>tag/<: $entry.type :>"><: _($entry.type) :></a>
+: for $entry.tags -> $tag {
+    <a href="<: $prefix :>tag/<: $tag :>"><: $tag :></a>
+: }
+  </div>
+
+  <div class="extra">
+: for $entry.extra_meta_fields_in_web_view -> $field {
+: if $entry[$field] && not ( $entry.type == 'review' && $field == 'work_link' ) {
+:   if match( $entry[$field], '^https?://' ) {
+    <span title="<: _($entry[$field]) :>">
+    <a href="<: $entry[$field] :>"><: _(canonicalize_name($field)) :></a>
+:   } else {
+    <span title="<: _(canonicalize_name($field)) :>">
+    <: $entry[$field] :>
+:   }
+    </span>
+: } }
+  </div>
+
+: include 'utility.tx';
+
+: include '_wedge.tx' { template => 'entry_meta_end.tx' };
+</div>
+
+: }

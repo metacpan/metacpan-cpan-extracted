@@ -1,0 +1,12 @@
+This module provides tools for building classes of readers and writers
+for files that use tab separated fields with named typed fields.
+
+Readers and writers use objects that have methods for accessing the
+fields (using the field name as the method name).
+
+Provided are a few (which will become more over time) definitions
+for some files used in Bio-Informatics.
+
+This module was being used internally at BoutrosLab and is being supported
+by BoutrosLab.  Contact email: BoutrosLabSoftware@oicr.on.ca for further
+info, feature requests, or bug reports.

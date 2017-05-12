@@ -1,0 +1,14 @@
+.*
+*.$$$
+*.bak
+newrefs-*.txt
+*.bib
+util.prt
+MAKEFILE
+*.pdf
+*.log
+*.blg
+*.bbl
+*.aux
+*.bix
+conf-test.pbib

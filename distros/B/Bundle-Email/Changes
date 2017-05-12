@@ -1,0 +1,20 @@
+Revision history for Perl extension Bundle::Email
+
+0.044     2009-01-16
+          deprecation notice
+          add repo info
+
+0.043 Tue Feb 27 2007
+  - fix synopsis, which previously had the wrong name
+
+0.040 Tue Aug  1 2006
+  - fix abstract, which previously had the wrong name
+
+0.03  Tue Feb 15 2005
+	- Removing braindead pass-through Build.PL file
+
+0.02  Wed Oct  6 2004
+	- Adding Email::Send::Test
+
+0.01  Fri Oct  1 2004
+	- original version

@@ -1,0 +1,22 @@
+name=GSEsample
+module=gse_sample
+version=20041124
+source_version=
+source_date=
+download_date=
+comment=
+ftp=
+ftp_files=
+
+label=SampleID, dotset=SampleID
+label=Status, dotset=Status
+label=Title, dotset=SampleTitle
+label=Type, dotset=SampleType
+label=PubMedID, dotset=Publication_ID
+label=Link, dotset=Link
+label=Description, dotset=Description
+label=Keyword, dotset=Keyword
+label=Organism, dotset=Organism
+label=Lot, dotset=Lot
+label=PlatformID, dotset=PlatformID
+label=TargetSource, dotset=TargetSource

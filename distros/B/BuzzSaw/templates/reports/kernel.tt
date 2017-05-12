@@ -1,0 +1,45 @@
+[%- USE wrap -%]
+
+[%- FILTER wrap(72) -%]
+
+[%- SET full_count = events.size -%]
+
+During the period since [% params.item('start').strftime('%H:%M:%S %A %e %B %Y') %] until [% params.item('end').strftime('%H:%M:%S %A %e %B %Y') %] [% full_count %] kernel syslog entries have been seen which may require attention.
+
+[% SET panic_hosts = results.item('panic').keys;
+   SET panic_count = panic_hosts.size -%]
+SERIOUS: Kernel Panic ([% panic_count %])
+================================
+
+[% FOREACH host IN panic_hosts.sort -%]
+* [% host %]
+[% END %]
+
+[% SET oops_hosts = results.item('oops').keys;
+   SET oops_count = oops_hosts.size -%]
+SERIOUS: Kernel Oops ([% oops_count %])
+================================
+
+[% FOREACH host IN oops_hosts.sort -%]
+* [% host %]
+[% END %]
+
+[% SET oom_hosts = results.item('oom').keys;
+   SET oom_count = oom_hosts.size -%]
+IMPORTANT: Out-Of-Memory ([% oom_count %])
+================================
+
+[% FOREACH host IN oom_hosts.sort -%]
+* [% host %]
+[% END %]
+
+[% SET segfault_hosts = results.item('segfault').keys;
+   SET segfault_count = segfault_hosts.size -%]
+MINOR: Segmentation Fault ([% segfault_count %])
+================================
+
+[% FOREACH host IN segfault_hosts.sort -%]
+* [% host %]
+[% END %]
+
+[% END %]

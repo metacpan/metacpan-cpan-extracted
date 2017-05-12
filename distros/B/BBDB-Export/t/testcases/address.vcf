@@ -1,0 +1,8 @@
+begin:vcard
+version:3.0
+fn:address testcase
+n:testcase;address;;;
+adr;type=home:;;1234 north street;san francisco;CA;94123;
+adr;type=work:;5555 dowtown street;p.o. box 99999;minneapolis;MN;55411;US
+adr;type=cabin:;;;;sun city;MIND;00001;Cloud
+end:vcard

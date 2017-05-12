@@ -1,0 +1,34 @@
+---
+abstract: 'Benchmarking with statistical confidence'
+author:
+  - '-2001 Andrew Ho.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  URI::Escape: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: gpl2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Benchmark::Timer
+name: Benchmark-Timer
+no_index:
+  delta.pl: []
+  directory:
+    - inc
+    - private-lib
+    - t
+requires:
+  Time::HiRes: 0
+  perl: '5.005'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Benchmark-Timer
+  homepage: https://github.com/coppit/benchmark-timer/
+  license: http://opensource.org/licenses/gpl-2.0.php
+  repository: https://github.com/coppit/benchmark-timer.git
+version: '0.7107'

@@ -1,0 +1,36 @@
+Revision history for Perl extension Business::WebMoney.
+
+0.11  Mon Jun  7 13:27:34 MSD 2010
+	- WebMoney root certificate updated
+0.09  Tue Jul 24 15:26:34 MSD 2009
+0.08  Tue Jul 14 00:06:32 MSD 2009
+	- HTTPS timeouts reimplemented using SIGALRM
+
+	- Bugfix release - Bareword "POSIX::LC_ALL" not allowed while "strict subs" in use
+
+0.08  Tue Jul 14 00:06:32 MSD 2009
+	- HTTPS timeouts reimplemented using SIGALRM
+
+0.07  Wed Feb 18 00:59:00 2009
+	- Exdended semi-manual test added
+	- Bugfix with utf8 support
+
+0.06  Thu Dec 18 16:00:00 2008
+	- old XML::LibXML workaround
+
+0.05  Thu Dec 18 15:00:00 2008
+	- bytes::length
+
+0.04  Thu Dec 18 06:07:57 2008
+	- Business::WebMoney::Exchanger added
+
+0.03  Thu Dec 18 06:07:57 2008
+	- mistypes in the description
+
+0.02  Tue Dec 16 19:29:14 2008
+	- pod syntax fixed
+
+0.01  Sat Dec 13 09:56:05 2008
+	- original version; created by h2xs 1.23 with options
+		-AXc --skip-exporter --skip-ppport --skip-autoloader -b 5.8.0 -n Business::WebMoney
+

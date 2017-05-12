@@ -1,0 +1,12 @@
+^MYMETA.yml$
+^.git
+.sw[op]$
+^MANIFEST.bak$
+^Makefile$
+^_build
+^blib
+^pm_to_blib
+.tar.gz$
+Bot-BasicBot-Pluggable-Module-Gitbot-*
+^Build$
+^.shipit$

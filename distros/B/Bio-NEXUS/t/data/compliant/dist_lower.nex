@@ -1,0 +1,24 @@
+#nexus
+[This file provided by Paul Lewis, from the NCL test suite. ]
+
+begin taxa;
+  dimensions ntax=8;
+  taxlabels taxon_1 taxon_2 taxon_3 taxon_4 taxon_5 taxon_6 taxon_7 taxon_8;
+end;
+
+[!
+************************************************
+* Non-interleaved, lower-triangular, diagonals *
+************************************************
+]
+begin distances;
+  matrix
+    taxon_1    0
+    taxon_2    1   0
+    taxon_3    2   3   0
+    taxon_4    4   5   6   0
+    taxon_5    7   8   9  10   0
+    taxon_6   11  12  13  14  15   0
+    taxon_7   16  17  18  19  20  21   0
+    taxon_8   22  23  24  25  26  27  28   0;
+end;

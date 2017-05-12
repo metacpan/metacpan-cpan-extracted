@@ -1,0 +1,34 @@
+#NEXUS
+
+BEGIN TAXA;
+      dimensions ntax=8;
+      taxlabels A B C D E F G H;  
+END;
+
+BEGIN CHARACTERS;
+      dimensions nchar=6;
+      format datatype=protein missing=? gap=-;
+      charlabels one two three four five six;
+      matrix
+A     WITH-B
+B     WITH-A
+C     WITH-D
+D     WITH-C
+E     WITH-F
+F     WITH-E
+G     WITH-H
+H     WITH-G;
+END;
+
+BEGIN TREES;
+      translate 
+		1	A,
+		2	B,
+		3	C,
+		4	D,
+		5	E,
+		6	F,
+		7	G,
+		8	H;
+       tree bush_translate = (((1:1,2:1):1,(3:1,4:1):1):1,((5:1,6:1):1,(7:1,8:1):1):1);
+END;

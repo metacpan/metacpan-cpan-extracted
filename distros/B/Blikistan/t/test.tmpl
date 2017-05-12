@@ -1,0 +1,12 @@
+[% title %]
+
+Posts:
+[% FOR p IN posts -%]
+  title: [% p.title %]
+  content: [% p.content %]
+  permalink: [% p.permalink %]
+  date: [% p.date %]
+[% END -%]
+
+username=[% rester.username %]
+password=[% rester.password %]

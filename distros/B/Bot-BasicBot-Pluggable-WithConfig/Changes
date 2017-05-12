@@ -1,0 +1,11 @@
+Revision history for Perl extension Bot::BasicBot::Pluggable::WithConfig
+
+0.03 Sun Nov 16 16:20:12 2008
+	* changed configuration format. See POD.
+	* fix the bug to load config for module correctly
+
+0.02 Sun Nov  9 16:20:12 2008
+	* added bot script
+
+0.01 Sun Nov  9 03:38:12 2008
+	* original version

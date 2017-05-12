@@ -1,0 +1,10 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+%package{Box2D};
+
+

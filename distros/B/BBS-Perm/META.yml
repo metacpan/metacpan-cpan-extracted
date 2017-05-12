@@ -1,0 +1,26 @@
+---
+abstract: 'a BBS client based on vte'
+author:
+  - 'sunnavy <sunnavy@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BBS-Perm
+requires:
+  Expect: 0
+  File::Slurp: 0
+  File::Which: 0
+  Gnome2::Vte: 0
+  IO::Pty: 0
+  IO::Stty: 0
+  IP::QQWry: 0
+  Regexp::Common: 0
+  UNIVERSAL::moniker: 0
+  YAML::Syck: 0
+version: 1.01

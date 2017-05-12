@@ -1,0 +1,10 @@
+classes:
+  - Console.media.audio.alsa
+  - Desktop.media
+parameters:
+  doc:
+    desktop-media:
+      pkg:
+        - include simple ALSA volume control Volti
+  pkg:
+    - volti

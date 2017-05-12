@@ -1,0 +1,10 @@
+{
+    "comment": "Example for missing VALUE",
+    "BenchmarkAnythingData" : [
+        {
+            "NAME"     : "benchmarkanything.test.metric",
+            "compiler" : "gcc",
+            "keyword"  : "affe"
+        }
+    ]
+}

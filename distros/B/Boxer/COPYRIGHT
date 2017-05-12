@@ -1,0 +1,271 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Boxer
+Upstream-Contact: Jonas Smedegaard (JONASS) <jonass@cpan.org>
+Source: https://metacpan.org/release/Boxer
+
+Files: INSTALL
+ LICENSE
+ TODO
+ doc/boxer.svg
+ examples/README
+ examples/classes/Admin/apt/auto/all.yml
+ examples/classes/Admin/apt/auto/core.yml
+ examples/classes/Admin/apt/auto/functions.yml
+ examples/classes/Admin/apt/init.yml
+ examples/classes/Admin/apt/popcon.yml
+ examples/classes/Admin/apt/tools/changes.yml
+ examples/classes/Admin/apt/tools/init.yml
+ examples/classes/Admin/auto.yml
+ examples/classes/Admin/backup/init.yml
+ examples/classes/Admin/backup/remote.yml
+ examples/classes/Admin/base.yml
+ examples/classes/Admin/disk/lvm.yml
+ examples/classes/Admin/etc/functions.yml
+ examples/classes/Admin/etc/track.yml
+ examples/classes/Admin/harden/account/init.yml
+ examples/classes/Admin/harden/account/strong.yml
+ examples/classes/Admin/harden/init.yml
+ examples/classes/Admin/harden/trustweb.yml
+ examples/classes/Admin/init.yml
+ examples/classes/Console/compression.yml
+ examples/classes/Console/editor/init.yml
+ examples/classes/Console/editor/vim.yml
+ examples/classes/Console/filemanager.yml
+ examples/classes/Console/init.yml
+ examples/classes/Console/mail/init.yml
+ examples/classes/Console/mail/list/init.yml
+ examples/classes/Console/mail/list/tools.yml
+ examples/classes/Console/mail/mutt.yml
+ examples/classes/Console/mail/tools.yml
+ examples/classes/Console/media/audio/alsa.yml
+ examples/classes/Console/media/init.yml
+ examples/classes/Console/mobile/init.yml
+ examples/classes/Console/mobile/sync.yml
+ examples/classes/Console/mouse.yml
+ examples/classes/Console/multiplexer/init.yml
+ examples/classes/Console/tools.yml
+ examples/classes/Desktop/base.yml
+ examples/classes/Desktop/chat/init.yml
+ examples/classes/Desktop/chat/pidgin/crypto.yml
+ examples/classes/Desktop/chat/pidgin/init.yml
+ examples/classes/Desktop/email/base.yml
+ examples/classes/Desktop/email/bidi.yml
+ examples/classes/Desktop/email/harden.yml
+ examples/classes/Desktop/email/icedove/base.yml
+ examples/classes/Desktop/email/icedove/harden.yml
+ examples/classes/Desktop/email/init.yml
+ examples/classes/Desktop/email/locale/ALL.yml
+ examples/classes/Desktop/email/locale/AMERICAS.yml
+ examples/classes/Desktop/email/locale/ASIA.yml
+ examples/classes/Desktop/email/locale/EU.yml
+ examples/classes/Desktop/email/locale/EUROPE.yml
+ examples/classes/Desktop/email/locale/INDIA.yml
+ examples/classes/Desktop/harden.yml
+ examples/classes/Desktop/init.yml
+ examples/classes/Desktop/locale/EU.yml
+ examples/classes/Desktop/media/audio/alsa.yml
+ examples/classes/Desktop/media/audio/pulseaudio.yml
+ examples/classes/Desktop/media/init.yml
+ examples/classes/Desktop/mobile/init.yml
+ examples/classes/Desktop/mobile/sync.yml
+ examples/classes/Desktop/office/init.yml
+ examples/classes/Desktop/office/locale/AFRICA.yml
+ examples/classes/Desktop/office/locale/ALL.yml
+ examples/classes/Desktop/office/locale/AMERICAS.yml
+ examples/classes/Desktop/office/locale/ASIA.yml
+ examples/classes/Desktop/office/locale/EU.yml
+ examples/classes/Desktop/office/locale/EUROPE.yml
+ examples/classes/Desktop/office/locale/INDIA.yml
+ examples/classes/Desktop/office/locale/ZA.yml
+ examples/classes/Desktop/office/presentation.yml
+ examples/classes/Desktop/office/spreadsheet.yml
+ examples/classes/Desktop/office/word-processor.yml
+ examples/classes/Desktop/scheduling/init.yml
+ examples/classes/Desktop/screensaver/unicode.yml
+ examples/classes/Desktop/tools/harden.yml
+ examples/classes/Desktop/tools/pgp/gtk.yml
+ examples/classes/Desktop/tools/pgp/init.yml
+ examples/classes/Desktop/web/base.yml
+ examples/classes/Desktop/web/harden.yml
+ examples/classes/Desktop/web/iceweasel/base.yml
+ examples/classes/Desktop/web/iceweasel/harden.yml
+ examples/classes/Desktop/web/init.yml
+ examples/classes/Desktop/web/java.yml
+ examples/classes/Desktop/web/locale/AFRICA.yml
+ examples/classes/Desktop/web/locale/ALL.yml
+ examples/classes/Desktop/web/locale/AMERICAS.yml
+ examples/classes/Desktop/web/locale/ASIA.yml
+ examples/classes/Desktop/web/locale/EU.yml
+ examples/classes/Desktop/web/locale/EUROPE.yml
+ examples/classes/Desktop/web/locale/INDIA.yml
+ examples/classes/Framework/base.yml
+ examples/classes/Framework/crypto/base.yml
+ examples/classes/Framework/crypto/gnupg/pinentry/gtk/init.yml
+ examples/classes/Framework/media/base.yml
+ examples/classes/Framework/media/wildmidi/limit.yml
+ examples/classes/Framework/pkg/apt/cli/aptitude.yml
+ examples/classes/Framework/pkg/base.yml
+ examples/classes/Framework/web/webkit/webkit1/gtk/avoid.yml
+ examples/classes/Hardware/base.yml
+ examples/classes/Hardware/gl/hardware/init.yml
+ examples/classes/Hardware/gl/init.yml
+ examples/classes/Hardware/gl/software/avoid.yml
+ examples/classes/Hardware/harden.yml
+ examples/classes/Hardware/laptop/acer/aao725.yml
+ examples/classes/Hardware/laptop/apple/macbook2-1.yml
+ examples/classes/Hardware/laptop/apple/macbook5-1.yml
+ examples/classes/Hardware/laptop/init.yml
+ examples/classes/Hardware/laptop/lenovo/edge145.yml
+ examples/classes/Hardware/motherboard/amd/athlon/64.yml
+ examples/classes/Hardware/motherboard/amd/athlon/init.yml
+ examples/classes/Hardware/motherboard/amd/c60.yml
+ examples/classes/Hardware/motherboard/amd/e1-2500.yml
+ examples/classes/Hardware/motherboard/asus/a7n8x.yml
+ examples/classes/Hardware/motherboard/intel/atom/32bit.yml
+ examples/classes/Hardware/motherboard/intel/baytrail-m.yml
+ examples/classes/Hardware/motherboard/intel/core2duo.yml
+ examples/classes/Hardware/motherboard/intel/pentium3.yml
+ examples/classes/Hardware/motherboard/via/nehemiah.yml
+ examples/classes/Hardware/motherboard/via/samuel2.yml
+ examples/classes/Hardware/net/bluetooth.yml
+ examples/classes/Hardware/net/pac/avoid.yml
+ examples/classes/Hardware/nic/broadcom/sta.yml
+ examples/classes/Hardware/nic/realtek/init.yml
+ examples/classes/Hardware/power.yml
+ examples/classes/Hardware/tools/harden.yml
+ examples/classes/Language/java/base.yml
+ examples/classes/Language/java/init.yml
+ examples/classes/Language/java/openjdk6/avoid.yml
+ examples/classes/Language/java/openjdk6/init.yml
+ examples/classes/Language/java/openjdk7/avoid.yml
+ examples/classes/Language/java/openjdk7/init.yml
+ examples/classes/Service/antivirus.yml
+ examples/classes/Service/base.yml
+ examples/classes/Service/dhcp/client.yml
+ examples/classes/Service/dhcp/init.yml
+ examples/classes/Service/dns/authoritative.yml
+ examples/classes/Service/dns/init.yml
+ examples/classes/Service/git.yml
+ examples/classes/Service/ids.yml
+ examples/classes/Service/init.yml
+ examples/classes/Service/log/init.yml
+ examples/classes/Service/log/remote.yml
+ examples/classes/Service/mail/antispam.yml
+ examples/classes/Service/mail/base.yml
+ examples/classes/Service/mail/imap.yml
+ examples/classes/Service/mail/init.yml
+ examples/classes/Service/mail/list.yml
+ examples/classes/Service/mail/mda.yml
+ examples/classes/Service/mail/mta/init.yml
+ examples/classes/Service/mail/mta/postfix.yml
+ examples/classes/Service/mail/sasl.yml
+ examples/classes/Service/mail/sieve.yml
+ examples/classes/Service/ssh.yml
+ examples/classes/Service/web/apache/gnutls.yml
+ examples/classes/Service/web/apache/init.yml
+ examples/classes/Service/web/apache/uwsgi.yml
+ examples/classes/Service/web/init.yml
+ examples/classes/Service/web/mail/cider.yml
+ examples/classes/Service/web/uwsgi/init.yml
+ examples/classes/Service/web/uwsgi/psgi.yml
+ examples/classes/Service/web/uwsgi/python.yml
+ examples/classes/Service/web/wiki/moinmoin.yml
+ examples/classes/Task/harden/desktop.yml
+ examples/classes/cli/compression/init.yml
+ examples/classes/cli/compression/uncommon.yml
+ examples/classes/cli/gpm.yml
+ examples/classes/cli/less.yml
+ examples/classes/cli/mc.yml
+ examples/classes/cli/ssh-server.yml
+ examples/classes/cli/web.yml
+ examples/classes/hw/acpi/full.yml
+ examples/classes/hw/acpi/init.yml
+ examples/classes/hw/bluetooth.yml
+ examples/classes/hw/crypto.yml
+ examples/classes/hw/firmware.yml
+ examples/classes/hw/mac/init.yml
+ examples/classes/hw/mac/laptop.yml
+ examples/classes/hw/power.yml
+ examples/classes/hw/x86/amd64.yml
+ examples/classes/hw/x86/i486.yml
+ examples/classes/hw/x86/i686.yml
+ examples/classes/x11/init.yml
+ examples/classes/x11/lightdm/gtk.yml
+ examples/classes/x11/lightdm/init.yml
+ examples/nodes/lxp5.yml
+ examples/nodes/parl-greens.yml
+ share/skel/preseed.cfg.in
+ share/skel/script.sh.in
+Copyright: Unknown
+License: Unknown
+
+Files: README
+ lib/Boxer.pm
+ lib/Boxer/CLI.pm
+ lib/Boxer/CLI/Command.pm
+ lib/Boxer/CLI/Command/About.pm
+ lib/Boxer/CLI/Command/Aliases.pm
+ lib/Boxer/CLI/Command/Commands.pm
+ lib/Boxer/CLI/Command/Compose.pm
+ lib/Boxer/File/WithSkeleton.pm
+ lib/Boxer/Part.pm
+ lib/Boxer/Role/Interact.pm
+ lib/Boxer/Task.pm
+ lib/Boxer/Task/Classify.pm
+ lib/Boxer/Task/Serialize.pm
+ lib/Boxer/Types.pm
+ lib/Boxer/World.pm
+ lib/Boxer/World/Flat.pm
+ lib/Boxer/World/Reclass.pm
+Copyright: Copyright Â© 2013-2016 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Changes
+ META.json
+ META.yml
+ bin/boxer
+ doap.ttl
+ t/world.t
+Copyright: Copyright 2017 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/00_compile.t
+ t/00_compile_scripts.t
+ t/01_app_help.t
+ t/fixme.t
+ t/minimumversion.t
+ t/pod.t
+Copyright: Copyright 2016 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: Makefile.PL
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/Boxer/Part/Reclass.pm
+Copyright: Copyright Â© 2016 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2014 Jonas Smedegaard.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

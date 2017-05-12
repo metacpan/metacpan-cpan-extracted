@@ -1,0 +1,22 @@
+<!ELEMENT bio_gmod_defaults (live_server, development_server?,global_paths?,component) >
+<!ELEMENT live_server (name,url,description) >
+<!ELEMENT development_server (name,url,description) >
+<!ELEMENT name (#PCDATA) >
+<!ELEMENT url (#PCDATA) >
+<!ELEMENT description (#PCDATA) >
+
+<!ELEMENT global_paths (tmp,acedb,mysql,install_root)>
+<!ELEMENT tmp (#PCDATA) >
+<!
+    <acedb>/usr/local/acedb</acedb>
+    <mysql>/usr/local/mysql/data</mysql>
+    <tmp>/user/local/gmod/wormbase/releases</tmp>
+    <install>/usr/local/wormbase</install>
+    </installation_paths>
+
+<!ELEMENT component ( name,path,filename,disk_space_requirements) >
+<!ELEMENT path (#PCDATA)>
+<!ELEMENT filename (#PCDATA)>
+<!ELEMENT disk_space_requirements (download,install) >
+<!ELEMENT download (#PCDATA)>
+<!ELEMENT install (#PCDATA)>

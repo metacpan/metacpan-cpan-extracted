@@ -1,0 +1,104 @@
+Revision history for Basset
+
+1.04	06/08/2007
+		
+		+ Basset::Template
+			- lots of modifications
+
+1.03	04/27/2006
+
+		In addition to the usual bug fixes and optimizations and such, this stuff is important:
+
+		+ Basset::Object
+			- flipped the precedence on class attributes so that conf values take precedence over passed in values at add.
+			- No longer relies upon import to set default values
+			- added new and improved add_attr syntax
+			- added new and far more efficient accessor methods
+			- added attributes & is_attribute for introspection
+			- can no longer wrapper attributes, only methods
+			- the initializer can now take defaults from an initial hashref. Read the docs for new.
+			- added defaults to the conf file, rendering a default file unnecessary.
+			- made the inherits method obsolete
+			- removed escape_for_html (moved into Basset::Template)
+		+ Basset::Object::Persistent
+			- ripped out the group syntax (toldja it'd go)
+			- added primary & non primary attributes, which are experimental
+			- removed the on_load and on_commit wrappers and related miscellanea
+			- added the _isa_committing_accessor in their place
+			- improved internal definition of uniqueness, useful for objects tied to multiple tables
+			- added the force_arrayref loader flag
+			- iced load_by_user
+		+ Basset::Machine
+			- properly subclassed from the abstract object type
+			- added the extractor component, and related methods
+		+ Basset::Object::Conf
+			- read_conf_files now takes key/value pairs
+			- clarifications to the grammar
+		+ Basset::DB
+			- now disconnects (with a warning!) when a failed transaction ends its way down to an empty stack.
+			- only wipes & disconnects if it has a handle.
+		+ Basset::Template
+			- updated pod to reflect new default tags
+			- added pipe_flags (yeah, yeah, deviates from pure perl)
+			- templates starting with / now are assumed to sit off the document root.
+			- removed the esape_html flag (use a pipe_flag instead)
+			- you no longer need to populate the default tags in your conf file
+			- now includes escape_for_html ( | h) and escape_for_url ( | u)
+		+ Basset::DB::Table
+			- now does not create attributes by default.
+
+1.02	05/06/2005
+		+ Basset::DB
+			- added the recreate_handle method
+		+ Basset::Object::Persistent
+			- minor optimizations
+			- added a few omitted error codes
+			- newly overriden copy method
+			- fixed a bug where primary columns wouldn't always be aliased
+			- replaced explicit load_all calls with load_where calls
+			- added load_one_where
+			- driver now doesn't ping on the command line, always pings in mod_perl
+		+ Basset::Object
+			- minor optimizations
+			- inlined classes no longer muck up %INC
+			- pkg_for_type no longer caches
+		+ Basset::Template
+			- moved the default attribute definitions out of the conf file and into the module.
+			  (smaller default conf file, values can still be overridden in conf)
+		+ Basset::Machine
+			- added
+		+ Basset::Machine::State
+			- added
+1.01	04/20/2005
+		+ Basset::DB::Table
+			- added attributes_to_create, attributes_not_to_create, create_attributes flags
+			- added omit_columns_from_tables flag to multiselect_query
+			- qualify_name now accepts an array of colum names
+		+ Basset::Object::Persistent
+			- removed options and methods to cache objects (cache_object flag, etc.)
+			- removed perl_read_translation/perl_write_translation & import_from_db/export_to_db
+			  they are replaced with wrappers.
+			- added the on_load_* and on_commit_* methods
+			- Now expects attributes to be populated from Basset::DB::Table objects
+			- cleaned up the relationship and instantiation code
+			- load now uses load_where
+			- load_all can accept the in_query flag.
+			- added the local_driver attribute
+			- has_many will now subclass rlt tables on the fly
+		+ Basset::Object
+			- exceptions now croak instead of dying (requires Carp)
+			- Now uses Basset::Container::Hash for hashes in trickled class attributes.
+			- New instantiator
+			- Uses an import method to read in class defaults from the conf file
+			- attributes using an internal accessor now use the attribute value itself
+			  as the internal key inside the hash.
+			- error now takes a 4th argument to always die with an exception
+			- added wrappers
+			- added the load_pkg method to load up a class
+			- slightly faster initializer
+		* minor bug fixes, speed boosts, tweaks
+			
+1.00    04/20/2004
+        Initial public release. More good things to come later.
+
+

@@ -1,0 +1,35 @@
+Bio/Tools/Prepeat version 0.01
+==============================
+
+NAME
+       Bio::Tools::Prepeat - Finding repeats in protein sequences
+
+SYNOPSIS
+           use Bio::Tools::Prepeat;
+           my $p = Bio::Tools::Prepeat->new( wd => './working_directory' );
+           $p->feed(@seq);
+           $p->buildidx();
+           $result = $p->query();
+
+DESCRIPTION
+       This is a module for locating repeats in proteins'
+       sequences. Usage is as follows: feed the sequences, build
+       index files, perform queries, and then it will return a
+       reference to the repeat data.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 xern <xern@cpan.org>
+
+This module is free software; you can redistribute it or modify it under the same terms as Perl itself.

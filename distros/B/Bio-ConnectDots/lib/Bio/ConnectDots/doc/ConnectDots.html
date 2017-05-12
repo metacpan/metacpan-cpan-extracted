@@ -1,0 +1,669 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Bio::ConnectDots::ConnectDots -- Top level class for 'connect-the-dots'</title>
+<link rel="stylesheet" href="cpan.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#getting_started">GETTING STARTED</a></li>
+	<li><a href="#known_bugs_and_caveats">KNOWN BUGS AND CAVEATS</a></li>
+	<li><a href="#author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#appendix">APPENDIX</a></li>
+	<ul>
+
+		<li><a href="#constructors">Constructors</a></li>
+		<li><a href="#query_method">Query method</a></li>
+		<ul>
+
+			<li><a href="#examples">Examples</a></li>
+		</ul>
+
+		<li><a href="#full_scoop_on_queries">Full Scoop on Queries</a></li>
+		<ul>
+
+			<li><a href="#connectorqueries">ConnectorQueries</a></li>
+			<ul>
+
+				<li><a href="#constraints_and_joins">-constraints and -joins</a></li>
+				<li><a href="#constraint_operators">Constraint Operators</a></li>
+				<li><a href="#ct_aliases_and_cs_aliases">-ct_aliases and -cs_aliases</a></li>
+			</ul>
+
+			<li><a href="#dotqueries">DotQueries</a></li>
+		</ul>
+
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Bio::ConnectDots::ConnectDots -- Top level class for 'connect-the-dots'</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Bio::ConnectDots::DB;
+  use Bio::ConnectDots::ConnectDots;</pre>
+<pre>
+  my $db=new Bio::ConnectDots::DB(-database=&gt;'test',
+                                       -host=&gt;'computername',
+                                       -user=&gt;'usename',
+                                       -password=&gt;'secret');
+  my $cd=my $cd=new Bio::ConnectDots::ConnectDots(-db=&gt;$db);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This is the top level class for 'Connect the Dots'. At present, it
+mainly provides methods for running queries.</p>
+<p>Connect the Dots is a general data integration framework targeted 
+at translating biological identifiers across multiple transitive databases. 
+This software provides an alternative to writing custom parsers to join databases
+on common identifiers. See the example queries for details on the scope of database 
+joins that can be made.</p>
+<p>This software is built upon the PostgreSQL database system (developed with version 7.4.3)
+as support for full outer joins is strong.</p>
+<p>
+</p>
+<hr />
+<h1><a name="getting_started">GETTING STARTED</a></h1>
+<p>To get started, first you will need to have Postgres installed. <a href="http://www.postgresql.org/">http://www.postgresql.org/</a></p>
+<p>Next, you'll need to edit the file <code>Bio/ConnectDots/Config.pm</code> with your Postgres user connections and the name of the database 
+that you want to use for Connect the Dots. An example entry from this file looks like:</p>
+<pre>
+  if($db =~ /test/i) {
+    $info = {
+      host=&gt;'hostname',
+      user=&gt;'username',
+      password=&gt;'password',
+      dbname=&gt;'ctd_unittest'
+    };
+  }</pre>
+<p>You'll need to load in some ConnectorSets (databases) with the <code>scripts/load.pl</code> script. An 
+example of how to do this can be found in <code>scripts/newconnectdot.pl</code></p>
+<p>At this point you can query the ConnectorSets that you have loaded. There is an example 
+query script in <code>scripts/example_query.pl</code>. For details on query options, see below 'Query method'.</p>
+<p>For future maintainence of your ConnectorSets, see <code>scripts/unload.pl</code> and <code>scripts/update_connectorsets.pl</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="known_bugs_and_caveats">KNOWN BUGS AND CAVEATS</a></h1>
+<p>Please send us bugs that you find.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></h1>
+<p>Email <a href="mailto:dburdick@systemsbiology.org,">dburdick@systemsbiology.org,</a> <a href="mailto:natg@shore.net">natg@shore.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2005 Institute for Systems Biology (ISB). All Rights Reserved.</p>
+<p>This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix">APPENDIX</a></h1>
+<p>The rest of the documentation describes the methods.</p>
+<p>
+</p>
+<h2><a name="constructors">Constructors</a></h2>
+<pre>
+  Title   : new
+  Usage   : $cd=new Bio::ConnectDots::ConnectDots(-db=&gt;$db)
+  Function: Reads metadata that tell what ConnectorSets, DotSets, and 
+            other elements exist
+  Args    : -db =&gt; Bio::ConnectDots::DB object connected to database
+  Returns : Bio::ConnectDots::ConnectDots object</pre>
+<p>
+</p>
+<h2><a name="query_method">Query method</a></h2>
+<p>See section below, Full Scoop on Queries, for more explanation.</p>
+<pre>
+  Title   : query
+  Usage   : see examples below
+  Function: Run query, producing a database table
+  Args    : see below
+  Returns : Nothing</pre>
+<p>Args for all queries</p>
+<pre>
+  -name       =&gt; name of query result.  The result will be stored in a database
+                 table with this name
+  -create     =&gt; controls whether to create the table if it already exists
+                 default: create if it does not exist
+                 true:    create even if it does exist
+  -query_type =&gt; string combining the terms 'connector' or 'dot' 
+                 with 'inner' or 'outer'. 'full' is accepted as a deprecated 
+                 synonym for 'outer'
+                 defaults: 
+                   if neither 'connector' or 'dot' is specified, program tries to infer 
+                      type from other parameters
+                   if neither  'inner' or 'outer' is specified, default is 'inner'
+  -preview    =&gt; gives a fast preview of what the result of the query will look like.
+                 false (default): produce the full output of the query
+                 true: create short subset of rows from the output</pre>
+<p>Args for ConnectorQueries (see Full Scoop section below for details)</p>
+<pre>
+  -ct_aliases  =&gt; ConnectorTable aliases
+  -cs_aliases  =&gt; ConnectorSet aliases
+  -joins       =&gt; join expression
+  -constraints =&gt; constraint expression
+  -cs_version  =&gt; specifies version of each connectorset/alias to use. If not specified, 
+                  it select the newest version lexicographically</pre>
+<p>Args for dot queries (see Full Scoop section below for details)</p>
+<pre>
+  -input              =&gt; ConnectorTable or ConnectorSet name
+  -outputs            =&gt; outputs expression
+  -constraints        =&gt; constraint expression
+  -cs_version         =&gt; specifies version of the connectorset to use. If not specified,
+                         it select the newest version lexicographically 
+                         (only for dot queries from connectorsets)
+  -outfile            =&gt; Dumps the table, tab delimited, to this file.
+  -centric            =&gt; Column name. Removes rows where this column is NULL. (applicable in outer dot queries)
+  -remove_subsets     =&gt; Column name. Removes rows that are a subset of other rows. 
+  -collapse           =&gt; Column name. Collapses all rows with the given identifier into one row. Default seperator is ','
+  -collapse_seperator =&gt; String specifying an alternate field seperator.
+  -xml_root           =&gt; Column name. Outputs to -xml_file a collapsed hierarchical XML document of the dot of the dot
+                         table where the given root is used similar to a -collapse table. DTD included
+  -xml_file           =&gt; Specifies the file name for xml output. Without -xml_root specified, the table
+                         is exported by row into XML. DTD included</pre>
+<p>
+</p>
+<h3><a name="examples">Examples</a></h3>
+<p>Perl NOTE: These examples use the Perl 'q(..)' syntax for quoted
+strings.  This is completely equivalent to regular single-quotes, but
+indents better in emacs.</p>
+<p>A script for running these examples can be found in the file <code>scripts/example_query.pl</code>.</p>
+<p>Inner DotQuery operating on LocusLink ConnectorSet</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'inner_locuslink',
+   -query_type=&gt;'inner dot',
+   -create=&gt;1,
+   -input=&gt;'LocusLink',
+   -cs_version=&gt;'20040715',
+   -input_type=&gt;'connectorset',
+   -outputs=&gt;q(LocusLink, UniGene, refSeq, Organism AS Critter, 
+               Hugo AS Gene, 'Alias Symbol' AS Alias),
+  );</pre>
+<pre>
+ +-----------+---------+-----------+--------------+------+-------+
+ | LocusLink | UniGene | refSeq    | Critter      | Gene | Alias |
+ +-----------+---------+-----------+--------------+------+-------+
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | A1B   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | ABG   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | GAB   |
+ | 5         | Hs.5    | NM_000662 | Homo sapiens | NAT1 | AAC1  |
+ +-----------+---------+-----------+--------------+------+-------+</pre>
+<p>Inner DotQuery with constraint operating on LocusLink ConnectorSet</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'innerNM_locuslink',
+   -query_type=&gt;'inner dot',
+   -create=&gt;1,
+   -input=&gt;'LocusLink',
+   -input_type=&gt;'connectorset',
+   -outputs=&gt;q(LocusLink, UniGene, refSeq, Organism AS Critter, 
+               Hugo AS Gene, 'Alias Symbol' AS Alias),
+   -constraints=&gt;q(refSeq = NM_130786),
+ );</pre>
+<pre>
+ +-----------+---------+-----------+--------------+------+-------+
+ | LocusLink | UniGene | refSeq    | Critter      | Gene | Alias |
+ +-----------+---------+-----------+--------------+------+-------+
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | A1B   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | ABG   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | GAB   |
+ +-----------+---------+-----------+--------------+------+-------+</pre>
+<p>Outer DotQuery operating on LocusLink ConnectorSet</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'outer_locuslink',
+   -query_type=&gt;'outer dot',
+   -create=&gt;1,
+   -input=&gt;'LocusLink',
+   -input_type=&gt;'connectorset',
+   -outputs=&gt;q(LocusLink, UniGene, refSeq, Organism AS Critter, 
+               Hugo AS Gene, 'Alias Symbol' AS Alias),
+ );</pre>
+<pre>
+ +-----------+---------+-----------+--------------+------+-------+
+ | LocusLink | UniGene | refSeq    | Critter      | Gene | Alias |
+ +-----------+---------+-----------+--------------+------+-------+
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | A1B   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | ABG   |
+ | 1         | Hs.1    | NM_130786 | Homo sapiens | A1BG | GAB   |
+ | 2         | Hs.2    | NM_000014 | Homo sapiens | A2M  | NULL  |
+ | 3         | Hs.3    | NULL      | Homo sapiens | A2MP | NULL  |
+ | 4         | Hs.4    | NULL      | Homo sapiens | AA   | NULL  |
+ | 5         | Hs.5    | NM_000662 | Homo sapiens | NAT1 | AAC1  |
+ | 5         | Hs.0    | NULL      | Homo sapiens | ACP1 | NULL  |
+ +-----------+---------+-----------+--------------+------+-------+</pre>
+<p>Outer DotQuery on LocusLink with collapse on LocusLink id</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'outer_locuslink',
+   -query_type=&gt;'outer dot',
+   -create=&gt;1,
+   -collapse=&gt;'LocusLink'
+   -input=&gt;'LocusLink',
+   -input_type=&gt;'connectorset',
+   -outputs=&gt;q(LocusLink, UniGene, refSeq, Organism AS Critter, 
+               Hugo AS Gene, 'Alias Symbol' AS Alias),
+ );</pre>
+<pre>
+ +-----------+------------+-----------+--------------+-----------+-------------+
+ | LocusLink | UniGene    | refSeq    | Critter      | Gene      | Alias       |
+ +-----------+------------+-----------+--------------+-----------+-------------+
+ | 1         | Hs.1       | NM_130786 | Homo sapiens | A1BG      | A1B,ABG,GAB |
+ | 2         | Hs.2       | NM_000014 | Homo sapiens | A2M       | NULL        |
+ | 3         | Hs.3       | NULL      | Homo sapiens | A2MP      | NULL        |
+ | 4         | Hs.4       | NULL      | Homo sapiens | AA        | NULL        |
+ | 5         | Hs.5,Hs.10 | NM_000662 | Homo sapiens | NAT1,ACP1 | AAC1        |
+ +-----------+------------+-----------+--------------+-----------+-------------+</pre>
+<p>Outer DotQuery output on a ConnectorTable without and (after) with -centric and -remove_subsets options</p>
+<pre>
+ $cd-&gt;query(
+   -name       =&gt; 'image_centric',
+   -query_type =&gt; 'outer dot',
+   -create     =&gt; 1,
+   -input      =&gt; 'image_ct',
+   -input_type =&gt; 'connectortable',
+   -outputs    =&gt; q(EPconDBhumanchip1.IMAGE_ID, EPconDBhumanchip1.LocusLink, Unigene.UniGene),
+ );
+ 
+ +-----------+-----------+------------+
+ | IMAGE_ID  | LocusLink | Unigene    |
+ +-----------+-----------+------------+
+ | IMAGE1    | 1234      | Hs.1       |
+ | IMAGE2    | 2245      | Hs.2       |
+ | IMAGE3    | 33369     | Hs.3       |
+ | IMAGE3    | 77419     | Hs.3       |
+ | IMAGE3    | 77419     | NULL       |
+ | NULL      | 11155     | Hs.3       |
+ +-----------+-----------+------------+</pre>
+<p>with:   -centric =&gt; 'IMAGE_ID'</p>
+<pre>
+ +-----------+-----------+------------+
+ | IMAGE_ID  | LocusLink | Unigene    |
+ +-----------+-----------+------------+
+ | IMAGE1    | 1234      | Hs.1       |
+ | IMAGE2    | 2245      | Hs.2       |
+ | IMAGE3    | 33369     | Hs.3       |
+ | IMAGE3    | 77419     | Hs.3       |
+ | IMAGE3    | 77419     | NULL       |
+ | NULL      | 11155     | Hs.3       |
+ +-----------+-----------+------------+</pre>
+<p>with both:  -centric =&gt; 'IMAGE_ID', -remove_subsets =&gt; 'IMAGE_ID'</p>
+<pre>
+ +-----------+-----------+------------+
+ | IMAGE_ID  | LocusLink | Unigene    |
+ +-----------+-----------+------------+
+ | IMAGE1    | 1234      | Hs.1       |
+ | IMAGE2    | 2245      | Hs.2       |
+ | IMAGE3    | 33369     | Hs.3       |
+ | IMAGE3    | 77419     | Hs.3       |
+ +-----------+-----------+------------+</pre>
+<p>XML output options. Same query as above</p>
+<pre>
+ $cd-&gt;query(
+   -name       =&gt; 'image_centric',
+   -query_type =&gt; 'outer dot',
+   -create     =&gt; 1,
+   -input      =&gt; 'image_ct',
+   -input_type =&gt; 'connectortable',
+   -outputs    =&gt; q(EPconDBhumanchip1.IMAGE_ID, EPconDBhumanchip1.LocusLink, Unigene.UniGene),
+   -xml_file   =&gt; 'image_centric.xml',
+ );</pre>
+<p>XML Output:</p>
+<pre>
+  &lt;!DOCTYPE DotTable [&lt;!ELEMENT DotTable (row*)&gt;
+     &lt;!ATTLIST DotTable name CDATA #REQUIRED&gt;
+     &lt;!ELEMENT row (IMAGE_ID*,LocusLink*,Unigene*)&gt;
+     &lt;!ATTLIST row line CDATA&gt;
+     &lt;!ELEMENT IMAGE_ID (#PCDATA)&gt;
+     &lt;!ELEMENT LocusLink (#PCDATA)&gt;
+     &lt;!ELEMENT Unigene (#PCDATA)&gt;]&gt;
+  &lt;DotTable name='image_centric'&gt;
+  &lt;row line='1'&gt;
+    &lt;IMAGE_ID&gt;IMAGE1&lt;/IMAGE_ID&gt;
+    &lt;LocusLink&gt;1234&lt;/LocusLink&gt;
+    &lt;Unigene&gt;Hs.1&lt;/Unigene&gt;
+  &lt;/row&gt;
+  &lt;row line='1'&gt;
+    &lt;IMAGE_ID&gt;IMAGE2&lt;/IMAGE_ID&gt;
+    &lt;LocusLink&gt;2245&lt;/LocusLink&gt;
+    &lt;Unigene&gt;Hs.2&lt;/Unigene&gt;
+  &lt;/row&gt;
+  ...
+  &lt;/DotTable&gt;</pre>
+<p>XML Output with -xml_root='IMAGE_ID' (DTD omitted)</p>
+<pre>
+ $cd-&gt;query(
+   -name       =&gt; 'image_centric',
+   -query_type =&gt; 'outer dot',
+   -create     =&gt; 1,
+   -input      =&gt; 'image_ct',
+   -input_type =&gt; 'connectortable',
+   -outputs    =&gt; q(EPconDBhumanchip1.IMAGE_ID, EPconDBhumanchip1.LocusLink, Unigene.UniGene),
+   -xml_file   =&gt; 'image_centric.xml',
+   -xml_root   =&gt; 'IMAGE_ID',
+ );</pre>
+<pre>
+ &lt;DotTable name='image_centric'&gt;
+   &lt;IMAGE_ID id='IMAGE1'&gt;
+     &lt;LocusLink&gt;1234&lt;/LocusLink&gt;
+     &lt;Unigene&gt;Hs.1&lt;/Unigene&gt;
+   &lt;/IMAGE_ID&gt;
+   &lt;IMAGE_ID id='IMAGE2'&gt;
+     &lt;LocusLink&gt;2245&lt;/LocusLink&gt;
+     &lt;Unigene&gt;Hs.2&lt;/Unigene&gt;
+   &lt;/IMAGE_ID&gt;
+   ...
+ &lt;/DotTable&gt;</pre>
+<p>Inner ConnectorQuery operating on LocusLink, HsUnigene, and HGU133A ConnectorSets</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'inner_cs',
+   -query_type=&gt;'inner connector',
+   -create=&gt;1,
+   -cs_aliases=&gt;q(HsUnigene AS UG, HGU133A AS Affy),
+   -joins=&gt;q(LocusLink.LocusLink=UG.LocusLink AND
+             UG.UniGene=Affy.UniGene),
+   -cs_version=&gt;'LocusLink=20040715, UG=20040231, Affy=v2.0'
+ );</pre>
+<pre>
+ +-----------+------+----+
+ | LocusLink | Affy | UG |
+ +-----------+------+----+
+ |         9 |   13 |  2 |
+ |        12 |   13 |  6 |
+ |        10 |   14 |  3 |
+ |        11 |   15 |  4 |
+ +-----------+------+----+</pre>
+<p>Inner ConnectorQuery operating on ConnectorTable produced by previous
+query and HsUnigene ConnectorSet</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'inner_cs_ct',
+   -query_type=&gt;'inner connector',
+   -create=&gt;1,
+   -cs_aliases=&gt;q(HsUnigene AS UG),
+   -joins=&gt;q(inner_cs.Affy.UniGene=UG.UniGene)
+   -cs_version=&gt;'UG=20040231'
+ );</pre>
+<pre>
+ +--------------------+---------------+-------------+----+
+ | inner_cs_LocusLink | inner_cs_Affy | inner_cs_UG | UG |
+ +--------------------+---------------+-------------+----+
+ |                  9 |            13 |           2 |  2 |
+ |                  9 |            13 |           2 |  6 |
+ |                 12 |            13 |           6 |  2 |
+ |                 12 |            13 |           6 |  6 |
+ |                 10 |            14 |           3 |  3 |
+ |                 11 |            15 |           4 |  4 |
+ +--------------------+---------------+-------------+----+</pre>
+<p>Outer ConnectorQuery operating on LocusLink, HsUnigene, and HGU133A
+ConnectorSets.</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'outer_cs',
+   -query_type=&gt;'outer connector',
+   -create=&gt;1,
+   -cs_aliases=&gt;q(HsUnigene AS UG, HGU133A AS Affy),
+   -joins=&gt;q(LocusLink.LocusLink=UG.LocusLink AND
+             UG.UniGene=Affy.UniGene),
+ );</pre>
+<pre>
+ +-------+------+-----------+
+ | UG    | Affy | LocusLink |
+ +-------+------+-----------+
+ |  1    | NULL |         8 |
+ |  2    |   13 |         9 |
+ |  3    |   14 |        10 |
+ |  4    |   15 |        11 |
+ |  5    |   16 |      NULL |
+ |  6    |   13 |        12 |
+ |  NULL |   17 |      NULL |
+ |  NULL | NULL |         7 |
+ +-------+------+-----------+</pre>
+<p>Outer ConnectorQuery operating on ConnectorTable produced by previous
+query and HsUnigene ConnectorSet.</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;'outer_cs_ct',
+   -query_type=&gt;'outer connector',
+   -create=&gt;1,
+   -cs_aliases=&gt;q(HsUnigene AS UG),
+   -joins=&gt;q(outer_cs.Affy.UniGene=UG.UniGene)
+ );</pre>
+<pre>
+ +--------------------+---------------+-------------+------+
+ | outer_cs_LocusLink | outer_cs_Affy | outer_cs_UG | UG   |
+ +--------------------+---------------+-------------+------+
+ |                  8 |          NULL |           1 | NULL |
+ |                  9 |            13 |           2 |    2 |
+ |                  9 |            13 |           2 |    6 |
+ |                 10 |            14 |           3 |    3 |
+ |                 11 |            15 |           4 |    4 |
+ |               NULL |            16 |           5 |    5 |
+ |                 12 |            13 |           6 |    2 |
+ |                 12 |            13 |           6 |    6 |
+ |               NULL |            17 |        NULL | NULL |
+ |                  7 |          NULL |        NULL | NULL |
+ |               NULL |          NULL |        NULL |    1 |
+ +--------------------+---------------+-------------+------+</pre>
+<p>Outer ConnectorQuery that joins three copies of the inner_ct
+ConnectorTable produced in a previous query.</p>
+<pre>
+ $cd-&gt;query(
+   -name=&gt;&quot;ct_ct_ct_join&quot;,
+   -query_type=&gt;'outer connector',
+   -create=&gt;1,
+   -ct_aliases=&gt;q(outer_ct AS ct0, outer_ct AS ct1, outer_ct AS ct2),
+   -cs_aliases=&gt;q(HsUnigene AS UG),
+   -joins=&gt;q(ct0.LocusLink.LocusLink=ct1.LocusLink.LocusLink AND
+             ct1.UG.UniGene=ct2.UG.UniGene),
+ );</pre>
+<pre>
+ +---------------+----------+--------+---------------+----------+--------+---------------+----------+--------+
+ | ct0_LocusLink | ct0_Affy | ct0_UG | ct1_LocusLink | ct1_Affy | ct1_UG | ct2_LocusLink | ct2_Affy | ct2_UG |
+ +---------------+----------+--------+---------------+----------+--------+---------------+----------+--------+
+ |             8 |     NULL |      1 |             8 |     NULL |      1 |             8 |     NULL |      1 |
+ |             9 |       13 |      2 |             9 |       13 |      2 |             9 |       13 |      2 |
+ |             9 |       13 |      2 |             9 |       13 |      2 |            12 |       13 |      6 |
+ |            10 |       14 |      3 |            10 |       14 |      3 |            10 |       14 |      3 |
+ |            11 |       15 |      4 |            11 |       15 |      4 |            11 |       15 |      4 |
+ |          NULL |       16 |      5 |          NULL |     NULL |   NULL |          NULL |     NULL |   NULL |
+ |            12 |       13 |      6 |            12 |       13 |      6 |             9 |       13 |      2 |
+ |            12 |       13 |      6 |            12 |       13 |      6 |            12 |       13 |      6 |
+ |          NULL |       17 |      0 |          NULL |     NULL |   NULL |          NULL |     NULL |   NULL |
+ |             7 |     NULL |      0 |             7 |     NULL |      0 |          NULL |     NULL |   NULL |
+ |          NULL |     NULL |      0 |          NULL |       16 |      5 |          NULL |       16 |      5 |
+ |          NULL |     NULL |      0 |          NULL |       17 |      0 |          NULL |     NULL |   NULL |
+ |          NULL |     NULL |      0 |          NULL |     NULL |   NULL |          NULL |       17 |      0 |
+ |          NULL |     NULL |      0 |          NULL |     NULL |   NULL |             7 |     NULL |      0 |
+ +---------------+----------+--------+---------------+----------+--------+---------------+----------+--------+</pre>
+<p>
+</p>
+<h2><a name="full_scoop_on_queries">Full Scoop on Queries</a></h2>
+<p>Queries produce 'warehouse' tables that are stored in the
+database. Queries DO NOT return data to the program -- to get the
+results of a query, you have to run regular Postgres SQL queries against the
+warehouse tables.</p>
+<p>The system supports two broad classes of queries: (1)
+ConnectorQueries, and (2) DotQueries.</p>
+<p>ConnectorQueries create tables of related Connectors, eg, entries
+from LocusLink, UniGene, etc, that are linked.  The result of a
+ConnectorQuery is a ConnectorTable.</p>
+<p>NEW: ConnectorQueries can operate on ConnectorSets or other
+ConnectorTables.  This makes it possible to create ConnectorTables in
+'stages'. For example, one could create separate ConnectorTables for
+human, mouse, rat, ... genes, then combine pairs using a homology
+ConnectorSet or ConnectorTable.</p>
+<p>DotQueries produce tables that contain actual identifiers, eg,
+LocusLink id's, UniGene id's, etc. that are linked.  The result of a
+DotQuery is a DotTable.  DotQueries are usually run against
+ConnectorTables, although as a special case, they can also be run
+against individual ConnectorSets.</p>
+<p>In the end, users want DotTables.  ConnectorTables are a scaffold
+against which many different DotQueries can be run.</p>
+<p>Both ConnectorQueries and DotQueries come in two 'flavors' depending
+on the kind of relational joins that are done: inner, and outer (aka
+full). As the names suggest, 'inner' queries use regular inner joins,
+while 'outer' queries use full outer joins.  In most cases, 'inner'
+queries return less data than 'outer' and are much more efficient.</p>
+<p>Queries are expressed in a structured, textual query language which is
+vaguely reminiscent of SQL.</p>
+<p>For advanced use by software, it's also possible to express queries
+using objects.  In essense, it's possible to feed the query methods
+the object structures produced by the code that parses the text
+language.  This interface is not described in this document.</p>
+<p>
+</p>
+<h3><a name="connectorqueries">ConnectorQueries</a></h3>
+<p>A ConnectorQuery usually 'joins' 2 or more ConnectorSets or
+ConnectorTables, each of which can be 'constrained'.  It is also
+possible for a ConnectorQuery to operate on a single input (ie,
+ConnectorSet or ConnectorTable) in which case the query must have a
+constraint (else it would accomplish nothing).</p>
+<p>A ConnectorQuery has 4 parts: -constraints, -joins, -ct_aliases, -cs_aliases.  
+All are optional, except that at least one of -constraints or -joins must be 
+specified, or else the query would do nothing. Each part is specified in text 
+form (or, can be specified by objects as noted above).</p>
+<p>
+</p>
+<h4><a name="constraints_and_joins">-constraints and -joins</a></h4>
+<p>Here is a simple example of -contraints and -joins.</p>
+<pre>
+ -constraints =&gt; &quot;LocusLink.Hugo = AA AND LocusLink.Organism = 'Homo sapiens'&quot;
+ -joins       =&gt; &quot;LocusLink.LocusLink=HsUnigene.LocusLink AND HsUnigene.UniGene=HGU133A.UniGene&quot;</pre>
+<p>See, like I said, it's very SQL-esque.</p>
+<p>Queries on ConnectorTables are slightly more complex, because a
+ConnectorTable refers to multiple underlying ConnectorSets.  For
+example, suppose HumanGenes is a ConnectorTable that connects data
+from LocusLink, UniGene, and various Affy datasets for human genes.
+Now suppose you want to constrain HumanGenes to rows whose LocusLink
+data has Hugo = AA.  You'd say this as follows:</p>
+<pre>
+ -constraints =&gt; &quot;HumanGenes.LocusLink.Hugo = AA&quot;</pre>
+<p>In general, a term referring to a ConnectorSet will have the form</p>
+<pre>
+ &lt;ConnectorSet&gt;.&lt;label&gt;</pre>
+<p>while a term referring to a ConnectorTable will have the form</p>
+<pre>
+ &lt;ConnectorTable&gt;.&lt;column -- ie, underlying ConnectorSet&gt;.&lt;label&gt;</pre>
+<p>This is true for joins as well as constraints.  Thus, to join
+HumanGenes with HsUnigene on LocusLink (kind of silly to do in this
+example, but bear with me), you'd say</p>
+<pre>
+ -joins =&gt; &quot;HumanGenes.LocusLink.LocusLink=HsUnigene.LocusLink&quot;</pre>
+<p>The query language supports a limited form of 'OR'.  Instead of a
+single label, you can specify a list of labels, or the wildcard '*' in
+any term.  Also, in constraints, you can specify a list of constants
+instead of a single constant.  Here's an example of a list join</p>
+<pre>
+ -joins =&gt; &quot;HumanGenes.LocusLink.[Hugo,'Alias Symbol']=HsUnigene.'Gene Name'</pre>
+<p>The join expression means that we'll join a HumanGenes row with an
+HsUnigene connector if the Hugo symbol or any Alias Symbol in the LocusLink connector matches the Gene Name in the HsUnigene connector. Lists can appear on both sides of the join, eg,</p>
+<pre>
+ -joins =&gt; &quot;HumanGenes.LocusLink.[Hugo,'Alias Symbol']=HsUnigene.['Gene Name',Title]</pre>
+<p>This means we'll join a HumanGenes row with an
+HsUnigene connector if the Hugo symbol or any Alias Symbol in the LocusLink connector matches the Gene Name or Title in the HsUnigene connector.  Note that the order of labels in the lists doesn't matter: the system does NOT match the first label on the left with the first on the right or anything like that.</p>
+<p>Constraints are similar:</p>
+<pre>
+ -constraints =&gt; &quot;HumanGenes.LocusLink.* = [caspase-1, casp1]&quot;</pre>
+<p>The constraint expression means that we'll accept a HumanGenes row if any
+dot in it's LocusLink component equals 'caspase-1' or 'casp1'.</p>
+<p>
+</p>
+<h4><a name="constraint_operators">Constraint Operators</a></h4>
+<p>The full set of allowable constraint operators are</p>
+<pre>
+  =, ==
+  &lt;, &lt;=, !=, &gt;=, &gt;</pre>
+<pre>
+  IN, NOT IN
+  EXISTS</pre>
+<p>If no operator is provided, the default is '='.</p>
+<pre>
+ '=' and '==' are synonymous.</pre>
+<p>All operators except EXISTS require that a constant or list of
+constants be provided.  The EXISTS operator merely tests that the
+specified term exists, and is similar to the SQL operator IS NOT NULL.</p>
+<p>In most cases, IN and NOT IN operate on lists, eg, LocusLink.Hugo IN
+[AA A1BG].  However, it does work to provide these oparators with
+single constants, eg, LocusLink.Hugo IN AA.  If '=' or '!=' are given
+lists, they are translated into 'IN' and 'NOT IN' respectively.</p>
+<p>
+</p>
+<h4><a name="ct_aliases_and_cs_aliases">-ct_aliases and -cs_aliases</a></h4>
+<p>ct_aliases defines a list of ConnectorTable aliases and is only
+needed if the same ConnectorTable is used multiple times in the query.
+Likewise, -cs-aliases defines a list of ConnectoSet aliases and is
+only needed if the same ConnectorSet is used multiple times in the
+query.  Aliases can also be used to define shorthands for inputs with
+long names.</p>
+<p>The syntax is SQL-like:  &lt;real name&gt; AS &lt;alias&gt;,...
+For example,</p>
+<pre>
+ -cs_aliases =&gt; &quot;LocusLink AS HumanLL, LocusLink AS MouseLL&quot;
+ -ct_aliases =&gt; &quot;HumanGenes AS HG, MouseGenes AS MG&quot;</pre>
+<p>
+</p>
+<h3><a name="dotqueries">DotQueries</a></h3>
+<p>A DotQuery retrieves identifiers that are connected via a
+ConnectorTable or ConnectorSet.  You can also further constrain the
+ConnectorTable or ConnectorSet.</p>
+<p>A DotQuery has 3 parts: -input, -outputs, -constraints.  The first two are mandatory.</p>
+<pre>
+ -input gives the name of the input ConnectorTable or ConnectorSet.  
+ A further parameter -input_type tells which kind of object it is.</pre>
+<pre>
+ -outputs lists the fields (ie, dots) that are output.  When operating
+ on a ConnectorTable, each output is specified by giving the name of a
+ column (which refers to a ConnectorSet) and the label of the
+ identifier.</pre>
+<p>For example to retrieve the Hugo symbol from the LocusLink connector
+and Title from the UniGene connector, you would ask for</p>
+<pre>
+ -outputs =&gt; &quot;LocusLink.Hugo, UniGene.Title&quot;</pre>
+<p>You can also give a new name to the output using the SQL-like AS keyword, for example,</p>
+<pre>
+ -outputs =&gt; &quot;LocusLink.Hugo AS GeneSymbol, UniGene.Title AS GeneName&quot;</pre>
+<p>CAVEAT:  Do not use quoted phrases as the output names, eg LocusLink.Hugo AS 'Gene Symbol'.</p>
+<p>When operating on a ConnectorSet, outputs can be specified more simply
+since the ConnectorSet name is implicit.  For example, the retrieve the 
+LocusLink, UniGene, and refSeq identifiers from the LocusLink ConnectorSet:</p>
+<pre>
+ -outputs =&gt; &quot;LocusLink, UniGene, refSeq&quot;</pre>
+<p>Constraints are almost the same as for ConnectorQueries, except that
+that the input name is implicit.  When operating on a ConnectorSet, a term 
+need only state the label.  For example,</p>
+<pre>
+ -constraints =&gt; &quot;Hugo in IN [AA A2MP]&quot;</pre>
+<p>When operating on a ConnectorTable, a term must provide a column and label, eg,</p>
+<pre>
+ -constraints =&gt; &quot;LocusLink.Hugo in IN [AA A2MP]&quot;</pre>
+
+</body>
+
+</html>

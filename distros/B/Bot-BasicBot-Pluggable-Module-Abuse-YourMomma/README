@@ -1,0 +1,35 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::Abuse::YourMomma - maturity is
+    overrrated;
+
+DESCRIPTION
+    Randomly throw in "your momma" jokes when someone says something the bot
+    can respond to with an incredibly witty and original "your momma"-type
+    response.
+
+    (No guarantee is provided as to the wittyness or originality of the
+    jokes.)
+
+USAGE
+    Load the module like you would any other Bot::BasicBot::Pluggable
+    module.
+
+    That's about it.
+
+AUTHOR
+    David Precious `davidp@preshweb.co.uk'
+
+FAQs
+    Isn't this remarkably childish, silly and immature?
+        Erm,, yes.
+
+    Shouldn't this be under the `Acme::' namespace?
+        Probably, except Bot::BasicBot::Pluggable modules go under the
+        `Bot::BasicBot::Pluggable::Module' namespace, so, here it is.
+
+    Were you bored when you wrote this?
+        Whatever would make you think that?
+
+    Who is the fat controller?
+        Why, it's Ross, of course. *waves*
+

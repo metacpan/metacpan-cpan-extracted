@@ -1,0 +1,8 @@
+supersmart-bundle
+=================
+
+This is a bundle distribution to manage prerequisites for the supersmart-phylota API
+at http://github.com/karinils/supersmart-phylota.
+
+Usage: 
+	perl -MCPAN -e 'install Bundle::Bio::Phylo::PhyLoTA'

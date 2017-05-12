@@ -1,0 +1,24 @@
+0.06 - Thu Jun 21 15:29:20 PDT 2007
+ - move common functions into B::ME::TT2
+   - these functions are accessible from the templates, cool.
+ - create B::ME::Simple, which uses a config and template
+ - fix bug when hiding rester password
+
+0.05 - Mon Apr 23 22:21:20 PDT 2007
+ - hide rester password from templates
+ - add PerlSite magic engine (Hydra)
+
+0.04 - Wed Apr  4 15:37:33 PDT 2007
+ - Bug fixes
+
+0.03 - Sat Mar 10 15:09:00 PST 2007
+ - Added support for subblogs
+   - allows for multiple blog tags under a single blog_config
+   - subblogs can be arbitrary tags
+
+0.02 - Sun Feb 25 10:48:00 PST 2007
+ - Add Blikistan::MagicEngine::Jemplate
+ - Add ability to store templates in a wiki page
+
+0.01 - Wed Feb 21 23:27:17 PST 2007
+ - Initial release

@@ -1,0 +1,496 @@
+	    PARTIAL SPECIFICATION OF THE JAVA BOULDER API
+
+class Boulder.Stone
+
+public class Stone extends Object;
+
+In order to work around Java's strong typing and to emulate the
+behavior of Perl Boulder, the Stone object becomes a wrapper around
+simple types (strings and numerics) as well as a more complex object
+that contains tag/value pairs.  This allows the retrieval and storage
+methods to work on Stones rather than the more generic Objects, and
+should reduce the amount of upcasting necessary.
+
+Constructors:
+-------------
+
+* Stone()
+
+Create new Stone object containing no initial tags.
+
+* Stone(Dictionary d)
+
+Create new Stone object initialized from a Dictionary object.  Each
+key in the dictionary becomes a tag in the Stone.  Certain values are
+treated specially:
+	
+	-Dictionary values are recursively turned into sub-Stone
+	objects.
+	-Array and Vector values are turned into multivalued entries
+	that share the same tag.
+
+*Stone(String s) 
+
+Create a Stone wrapped around a string.
+
+*Stone(Number n)
+
+Create a Stone wrapped around any of the numeric objects (Integer,
+Long, Float, Double).
+
+
+Static (class) Methods:
+-----------------------
+
+* static public Stone fromString(String s)
+
+Create a Stone from its string representation.
+
+
+Object Methods:
+---------------
+
+*public String toString()
+
+Return the string representation of the Stone in Boulder format.
+Simple Stones are cast to the string representation of their scalar
+value.  Complex Stones are represented (recursively) in boulderio
+form.  This serializes a Stone in a form suitable for reconstitution
+with fromString().
+
+*public Integer toInt() throws NumberFormatException
+
+Converts a simple Stone to an Integer object.  Complex Stones and
+simple Stones that do not contain parseable contents throw a
+NumberFormatException.
+
+*public Float toFloat() throws NumberFormatException
+
+Converts a simple Stone to a Float object.  Complex Stones and simple
+Stones that do not contain parseable contents throw a
+NumberFormatException.
+
+*public Double toDouble() throws NumberFormatException
+
+Converts a simple Stone to a Double object.  Complex Stones and simple
+Stones that do not contain parseable contents throw a
+NumberFormatException.
+
+*public void insert(Stone s)
+
+Insert Stone s into the current Stone, merging their keys and values.
+
+*public void insert(Dictionary d)
+
+Insert the key/value pairs contained in dictionary into the Stone.
+Similarly-named keys are appended to, making them multi-valued.  On
+simple Stones this, and the other insertion methods, silently converts
+the simple Stone into a complex Stone, deleting its simple value.
+[This behavior is open for discussion; I think it's better than making
+the method a no-op]
+
+*public void insert(String tag,Object value)
+
+Insert an Object into the Stone at the indicated tag.  Similarly-named
+keys are appended to, making them multi-valued.
+
+*public void replace(Dictionary d)
+
+Insert the key/value pairs contained in dictionary into the Stone.
+Similarly-named keys are replaced, overwriting their previous
+contents.
+
+*public void replace(Stone s)
+
+Merge Stone s into the current Stone, overwriting any keys in common.
+
+*public void replace(String tag, Stone value)
+
+Insert a sub-Stone (complex or scalar) into the Stone at the indicated
+tag.  Similarly-named keys are replaced, overwriting their previous
+contents.
+
+*public void subtract(Stone s)
+
+Remove from this Stone all the tags and associated values present in
+Stone s.  Only the top level of tags are affected (no need to do
+recursive subtraction).
+
+*public void intersect(Stone s)
+
+Remove from this Stone any tags and associated values not in common
+with Stone s.
+
+*public Stone[] get(String tag)
+
+Return an array of the Stone at the indicated tag.  Returns null if
+the tag is not found.  Also returns null if called on a scalar Stone.
+
+*public Stone get(String tag, integer n)
+
+Return the nth Stone at the given tag.  Uses zero-based indexing.
+Returns null if the tag is not found or if the index is out of bounds
+(? should it raise an array exception).  Negative numbers count in
+from the right end of the array.  The last item is index -1.
+
+*public Stone getFirst(String tag)
+
+Return the first Stone at the indicated tag.  Returns null if the tag
+is not found.  This is the same as get(tag,0).
+
+*public Stone getLast(String tag)
+
+Return the first Stone at the indicated tag.  Returns null if the tag
+is not found.  This is the same as get(tag,-1).
+
+*public Stone getAny(String tag)
+
+Return a random value from the indicated tag.  This has never been
+used, to my knowledge, but it is a feature of the Perl implementation.
+
+*public String[] tags()
+
+Return all the tags available in this Stone.  If it is a scalar Stone, 
+an empty (not null) array is returned.
+
+*public Boolean exists(String tag)
+
+Returns true if the indicated tag exists.
+
+*public void delete(String tag)
+
+Delete the tag and its associated subtree from the Stone.
+
+*public Stone[] search(String tag)
+
+Recursively searches through the Stone and its subtrees for the first
+tag that matches the argument and returns its contents.  The search
+method is depth-first (top-level tags returned preferentially).
+
+*public Stone[] index(String index_string)
+
+Follows a path through the Stone, returning the value.  The path is of 
+the form:
+
+   tag1[index].tag2[index].tag3[index]
+
+Indexes can be omitted, in which case the path follows the first value 
+of the tag.  Indexes match any of the following expressions:
+
+	[0-9]+  index leftward from first value
+        -[0-9]+ index rightward from last value
+	#       last item
+	\?      random item (question mark)
+
+*public Stone[] path(String index_string)
+
+This is a better name for index(), but unfortunately not part of the
+Perl Boulder API.  Maybe index() should be phased out.
+
+*public Enumeration cursor()
+
+Return an Enumeration over the Stone object.  Each call to
+nextElement() takes a step in a breadth-first traversal of the Stone.
+The elements of the Enumeration are Stones with three tags:
+
+	tag name   interpretation
+        --------   --------------
+	"tag"      String representing the name of the current
+                       element's tag
+        "path"     String representing full path to current element
+        "value"    The value pointed to by the tag.
+
+===========================================================================
+public interface Boulder.Filter;
+
+Boulder.Filter can prefilter a BoulderIO stream so that only certain
+Stones are passed to higher layers.  Its filter() method is presented
+with each candidate Stone in turn.  It returns a boolean True to
+accept the Stone, or False to filter it.
+
+*public abstract Boolean filter(Stone s)
+
+Return True if this Stone should be passed up to higher layers.
+
+===========================================================================
+
+public interface Boulder.IO;
+
+This interface defines everything that a generic Boulder IO class
+should be able to do.  Both Boulder.Stream (serial input/output) and
+Boulder.Store (record-oriented input/output) implement this interface.
+
+Note that Boulder.IO has an intrinsic cursor behavior, in that it
+returns Stones in some defined order.
+
+* public abstract Stone read_record() throws IOException
+
+Reads a new Stone from input and returns it.  If no further stones can 
+be read returns NULL.  If an I/O error occurs returns IOException.
+Returns EOFException if the caller makes additional calls to
+read_record() after it has returned NULL.
+
+* public abstract Stone read_record(String[] f) throws IOException
+
+Reads a new Stone from input and returns it, filtering tag(s) based on
+an array of tag filter patterns. The argument is an array of strings
+of the form "tag1.tag2.tag3....", corresponding to a set of tag paths.
+For example, if the current Stone has the structure:
+
+  NAME=Fred
+  DEMOGRAPHICS={
+    AGE=62
+    GENDER=Male
+    PHYSICAL_ATTRIBUTES={
+      BALDING=Y
+      OVERWEIGHT=N
+    }
+  }
+  ADDRESS={
+    STREET=1313 Mockingbird Lane
+    TOWN=Port Washington
+    STATE=NY
+  }
+
+then the stone returned by
+read_record(["NAME","DEMOGRAPHICS.AGE","ADDRESS"]) will return the
+Stone:
+
+  NAME=Fred
+  DEMOGRAPHICS={
+    AGE=62
+  }
+  ADDRESS={
+    STREET=1313 Mockingbird Lane
+    TOWN=Port Washington
+    STATE=NY
+  }
+  
+If no tags match the filter specification, returns an empty (but not
+NULL) Stone.  If no further stones can be read returns NULL.  If an
+I/O error occurs, returns IOException.  Returns EOFException if the
+caller makes additional calls to read_record() after it has returned
+NULL.
+
+* public abstract Stone get() throws IOException
+* public abstract Stone get(String[] f) throws IOException
+
+The Perl version of Boulder uses get() as a synonum for read_record(),
+because some people requested it.  Now I use get() in preference to
+the longer form and am open to entirely replacing read_record() with
+get().
+
+* public abstract void write_record(Stone s) throws IOException
+* public abstract void write_record(Stone s, String[] f) throws IOException
+
+These two methods write a Stone to an output device or file.  In the
+first form, the Stone is written out with all its fields intact.  In
+the second form, the Stone's tags are first filtered on the specified
+array of filtering rules.  The format of filtering rules is identical
+to the read_record() method.  If the Stone cannot be successfully
+written, this method throws an IOException.
+
+* public abstract void put(Stone s) throws IOException
+* public abstract void put(Stone s, String[] f) throws IOException
+
+These methods are synonyms for write_record() in the Perl
+implementation.  They are shorter, and if you like them better maybe
+they should be the canonical names.
+
+* public void filter(Boulder.Filter s)
+
+This method adds a filter to the Boulder.IO object.  The filter is
+presented with each Stone in turn and selects whether to accept the
+Stone or reject it.  See the Boulder.Filter interface for details.
+
+===========================================================================
+public class Boulder.Stream implements Boulder.IO;
+
+This class defines a Boulder class that reads and writes to a type of
+I/O that behaves in a serial fashion.
+
+Constructors:
+-------------
+
+* public Stream()
+
+Create a new Boulder.Stream object attached to standard in and
+standard output.  The get_record() method will read Stones from
+standard input one at a time until standard input is exhausted.
+The write_record() method will emit Stones to standard output.
+
+* public Stream(InputStream in, OutputStream out)
+
+Create a Boulder.Stream, tieing it to the specified InputStream and
+OutputStream objects.
+
+* public void passthru(Boolean pass)
+
+A Boulder.Stream object can behave in either of two ways.  It can
+gobble up the Stone objects that are read via get_record() completely,
+in which case it emits nothing unless write_record() is called, or it
+can pass the unwanted components of the object through to its output
+stream.  In pass through mode, a program that repeatedly calls
+read_record(["NAME","DEMOGRAPHICS.AGE","ADDRESS"]) on an input stream
+containing the Stone given in the example above, would emit the
+following Stone automatically even if it doesn't make a call to
+write_record():
+
+  DEMOGRAPHICS={
+    GENDER=Male
+    PHYSICAL_ATTRIBUTES={
+      BALDING=Y
+      OVERWEIGHT=N
+    }
+  }
+
+In pass through mode, any calls to write_record() performed before the
+next read_record() will merge the contents of the Stone specified by
+write_record() with the passed through portion of the Stone.  If,
+after calling read_record(), the program were to call write_record()
+with a Stone with this structure:
+
+  NAME=Andrew
+  DEMOGRAPHICS={
+    FAVORITE_COLOR=blue
+  }
+
+Then the resulting stone would be:
+
+  NAME=Andrew
+  DEMOGRAPHICS={
+    GENDER=Male
+    FAVORITE_COLOR=blue
+    PHYSICAL_ATTRIBUTES={
+      BALDING=Y
+      OVERWEIGHT=N
+    }
+  }
+
+Note that this behavior is slightly different than the Perl
+implementation, in which only top-level tags are merged.  That
+behavior has always seemed a bit bogus, and this is more logical
+(but perhaps not more useful in practice).
+
+The passthru() method accepts a boolean indicating whether passthru
+behavior should be activated or not.  The default is "false", for no
+passthru.
+
+* public Boolean passthru()
+
+This method returns the state of the passthru flag.
+
+===========================================================================
+
+public interface Boulder.Store extends Boulder.IO;
+
+Boulder.Store adds unique record IDs to the basic Boulder.IO scheme,
+turning it into a database of sorts.  The record IDs can be used to
+fetch and store Stones in a non-linear fashion, and provides simple
+indexing and querying services.  The record ID is a declared tag in
+the Stone that must be present and unique.  The record ID can be
+generated automatically if desired.
+
+The serial access methods behave as they do in the parent interface.
+Stones are returned one at a time (in some implementation-specific
+order).  The set of Stones returned and their order can be affected by
+the query() method, however.  The behavior of the write_record()
+method is dependent on flags that control whether missing record IDs
+are automatically generated, and whether Stones can overwrite objects
+with identical record IDs that are already in the database.
+
+* public abstract void setRecordID (String tag)
+
+Declare that this tag will be used as the unique record ID in the
+Stone.  It is assumed that classes that implement the Boulder.Store
+interface will store this tag name somewhere in the associated
+database.  The default is "ID".
+
+* public abstract String getRecordID()
+
+Return the special tag.
+
+* public abstract Boolean setIndex (String tag)
+
+Declare that a tag (or tag path) is an index.  Returns a true value if 
+the database supports indexing on this tag.
+
+* public abstract String[] getIndex()
+
+Returns an array of all the tags that are indexes.
+
+* public abstract void setAutoID(Boolean doAuto)
+
+Sets a flag that allows write_record() to automatically add a
+record ID tag to Stones that do not already contain the designated
+tag.  The default is false.
+
+* public abstract Boolean getAutoID()
+
+Returns the state of the auto record generation flag.
+
+* public abstract void setClobber(Boolean clobber)
+
+Sets a flag that allows write_record() to clobber (overwrite) any Stone
+in the database that already has the ID of the Stone being written.
+The default is false.
+
+* public abstract Boolean getClobber()
+
+Returns the state of the clobber flag.
+
+* public abstract Stone read_record(String ID)
+
+Read the Stone with the indicated record ID from the database.
+Returns NULL if not present.
+
+* public abstract Stone read_record(String[] f,String ID)
+
+Reads the Stone with the indicated record ID from the database,
+filtering its tags on the provided array of tag patterns.
+
+* public abstract void write_record(Stone s) throws IOException;
+
+Writes the Stone to the database, using the value of its record ID tag 
+to put the Stone in the right place.  If no record ID tag is present,
+and autoID is true, then write_record() generates a new unique record
+ID tag and adds it to the Stone.  If the record ID is not unique, and
+clobber is false, then throws an InvalidObjectException.
+
+* public abstract void write_record(Stone s,String ID) throws IOException;
+
+First replaces the Stone's record ID tag with the indicated ID and
+then calls write_record(Stone s) to insert the Stone into the
+database.
+
+* public abstract Boolean query(String s)
+
+Add a query to the BoulderIO object.  The query is a string whose
+syntax and semantics are implementation-specific.  Once the query is
+in force, repeated calls to read_record() will return the set of
+Stone objects that match the query.  The order of Stones returned may
+be affected by the query as well.  The query remains in force until
+all selected Stones are exhausted (read_record() returns null).
+Calling query() before exhausting the Stones resets the state of the
+BoulderIO object.  The boolean result from query() indicates whether
+the query string is syntactically acceptable, not whether the query
+will return a non-empty set.
+
+Possibly it would be better to raise an exception for queries that
+fail the syntax check. What do you think?
+
+============================================================
+
+public class Boulder.Recno extends Boulder.Store;
+
+Boulder.Store implements a record-oriented/random-access type of
+retrieval.  Each Stone is associated with a unique record number that
+can be used to fetch and retrieve Stones in a non-linear fashion.  The
+record number is an integer greater than or equal to zero.  In the
+Perl implementation, the record numbers are continuous.  When a record
+is deleted, the remaining Stones are renumbered to fill in the gap.
+(This is a decision that we might want to reconsidered.)
+
+= unfinished =
+
+

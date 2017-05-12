@@ -1,0 +1,21 @@
+---
+name: Bot-BasicBot-Pluggable-Module-Assemble
+version: 0.03
+author:
+  - 'Philippe "BooK" Bruhat <book@cpan.org>'
+abstract: IRC frontend to Regexp::Assemble
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Bot::BasicBot::Pluggable: 0.5
+  Regexp::Assemble: 0
+  Test::More: 0
+provides:
+  Bot::BasicBot::Pluggable::Module::Assemble:
+    file: lib/Bot/BasicBot/Pluggable/Module/Assemble.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

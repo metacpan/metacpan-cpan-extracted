@@ -1,0 +1,8 @@
+begin:vcard
+version:3.0
+fn:net testcase
+n:testcase;net;;;
+email;type=internet:test@domain.com
+email;type=internet:name@domain.com
+email;type=internet:tc@anotherdomain.com
+end:vcard

@@ -1,0 +1,12 @@
+[%#
+    Template for generating divs containing field blocks.
+    Pass it the following parameters in view.data:
+
+        item       - result of walking postorder with app_block_hashes on
+                     the new field's AST node
+        block      - hash with one key: name (name of item's parent)
+        statements - hash returned by Bigtop::Parser::get_keyword_docs
+%]
+[% INCLUDE method_block.ttc
+           item       = view.data.item
+           block      = view.data.block %]

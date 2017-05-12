@@ -1,0 +1,425 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_correct_misassignments
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community::IO;
+use Bio::DB::Taxonomy;
+use Getopt::Euclid qw(:minimal_keys);
+
+$| = 1;
+
+
+=head1 NAME
+
+bc_correct_mis_assignments - Try fixing incorrect taxonomic assignments, using
+a reference community
+
+=head1 SYNOPSIS
+
+  bc_correct_mis_assignments -if my_communities.generic  \
+                             -op my_modified_communities \
+                             -cn theoretical
+
+=head1 DESCRIPTION
+
+This script reads a community file that contains reference communities. For
+every non-reference community in the file, find if the expected members are also
+found in the reference community. If not, use taxonomic information try to find
+which member of the reference community should be used instead.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+File containing the input communities: a reference community + communities for
+which to remove members not occuring in the reference community. When providing
+communities in a format that supports only one community per file (e.g. gaas),
+you can provide multiple input files.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_correct_misassignments'
+
+=item -rn <ref_name> | -ref_name <ref_name>
+
+Name of the reference community. Default: ref_name.default
+
+=for Euclid:
+   ref_name.type: string
+   ref_name.default: 'reference'
+
+=item -nt <name_type> | -name_type <name_type>
+
+Specify if <ref_name> represents a 'prefix', 'suffix', or the 'full' name of the
+reference community. Using prefix or suffix allows to have multiple communities
+with their respective reference community in the same input file. For example,
+using a suffic of '_theo', community 'sample1' is expected to have a reference
+community named 'sample1_theo'. Default: name_type.default
+
+=for Euclid:
+   name_type.type: /prefix|suffix|full/
+   name_type.default: 'full'
+
+=item -bs <base_sep> | -base_sep <base_sep>
+
+For the purpose of determining the name of the reference community, strip
+characters before or after the specified separator. For example, when using the
+prefix 'ref' and the separator '_', community 'sample1_rep1' and 'sample1_rep2'
+are expected to have a reference community named 'sample1_ref'.
+
+=for Euclid:
+   base_sep.type: string, length(base_sep) == 1
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+bc_correct_mis_assignments($ARGV{'input_files'}, $ARGV{'output_prefix'},
+   $ARGV{'ref_name'}, $ARGV{'name_type'}, $ARGV{'base_sep'});
+
+exit;
+
+
+func bc_correct_mis_assignments ($input_files, $output_prefix, $ref_name, $name_type, $base_sep) {
+   # Read input communities
+   my $meta = Bio::Community::Meta->new();
+   my $format;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+
+      # Add 'root'
+      my $input_file_rooted = $output_prefix.'.tmp';
+      add_root($input_file, $input_file_rooted);
+
+      my $in = Bio::Community::IO->new(
+         -file     => $input_file_rooted,
+         -taxonomy => Bio::DB::Taxonomy->new( -source => 'list' ),
+      );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+
+      unlink $input_file_rooted;
+   }
+   # Loop through all communities
+   while (my $comm = $meta->next_community) {
+      # Get reference community
+      my $ref_comm = get_ref_comm($comm, $meta, $ref_name, $name_type, $base_sep) || next;
+      print "Processing community ".$comm->name." (reference community ".$ref_comm->name.")\n";
+      # Process non-reference community
+      correct_comm($comm, $ref_comm);
+   }
+   # Write resulting communities
+   write_communities($meta, $output_prefix, $format, '');
+   return 1;
+}
+
+
+func add_root ($in_file, $out_file) {
+   # Add root node to Greengenes taxonomic strings         ### hack ###
+   open my $in , '<', $in_file  or die "Error: Could not read file $in_file\n";
+   open my $out, '>', $out_file or die "Error: Could not write file $out_file\n";
+   while (my $line = <$in>) {
+      $line =~ s/k__/cellular; k__/g;
+      print $out $line;
+   }
+   close $in;
+   close $out;
+   return 1;
+}
+
+
+func correct_comm ($comm, $ref_comm) {
+   # Correct community, in-place
+
+   # Find taxa missing from sample community
+   my %missings;
+   while (my $member = $ref_comm->next_member) {
+      my $count = $comm->get_count($member);
+      if ($count == 0) {
+         $missings{$member->id} = $member;
+      }
+   }
+
+   # Find taxa in reference community that are not present in sample community
+   my %candidates;
+   while (my $member = $comm->next_member) {
+      my $count = $ref_comm->get_count($member);
+      if ($count == 0) {
+         $candidates{$member->id} = $member;
+      }
+   }
+
+   if ( (scalar keys %missings > 0) && (scalar keys %candidates > 0) ) {
+
+      # Try to fix missing taxa
+      my $dists = calc_tax_distances( \%missings, \%candidates );
+      print "   # old_id / old_desc / new_id / new_desc / distance\n";
+      do {
+         (my $missing_id, my $candidate_id, my $dist, $dists) = remove_closest_pair($dists);
+         delete $missings{$missing_id};
+         delete $candidates{$candidate_id};
+         print "   ".
+            "$candidate_id / ".$comm->get_member_by_id($candidate_id)->desc." / ".
+            "$missing_id / ".$ref_comm->get_member_by_id($missing_id)->desc." / ".
+            "$dist\n";
+         $comm = fix_pair($comm, $ref_comm, $missing_id, $candidate_id);
+      } while ( (scalar keys %missings > 0) && (scalar keys %candidates > 0) );
+      print "\n";
+
+      if (scalar keys %missings > 0) {
+         warn "Warning: There are still ".scalar(keys %missings)." missing taxa\n";
+      }
+      if (scalar keys %candidates > 0) {
+         warn "Warning: There are still ".scalar(keys %candidates)." extra taxa\n";
+      }
+
+   }
+
+   if (scalar keys %missings > 0) {
+      print "Still missing from reference community:\n";
+      while (my ($member_id, $member) = each %missings) {
+         print "   ".$member->desc." (ID $member_id)\n";
+      }
+      print "\n";
+   }
+
+   return 1;
+}
+
+
+func fix_pair ($comm, $ref_comm, $missing_id, $candidate_id) {
+   # Change description of candidate member (in the sample community) to that of
+   # missing member (in the reference community).
+   my $old_member = $comm->get_member_by_id($candidate_id);
+   my $count = $comm->get_count($old_member);
+   $comm->remove_member($old_member);
+   my $new_member = $ref_comm->get_member_by_id($missing_id);
+   $comm->add_member($new_member, $count);
+   return $comm;
+}
+
+
+func calc_tax_distances( $missings, $candidates ) {
+   # Build a structure that contains the distance between members, in terms of
+   # taxonomic distance (number of nodes that separates them).
+
+   my $taxonomy = $missings->{(keys %$missings)[0]}->taxon->db_handle;
+
+   # Get the names of species that have an ancestor
+   my $names = { map { $taxonomy->get_taxon($_)->scientific_name => undef}
+                     ( keys %{$taxonomy->{ancestors}}                    ) };
+
+   my $tree = $taxonomy->get_tree(keys %$names);
+
+   print "--> There are ".scalar(keys(%$missings  ))." missings\n"  ; ###
+   print "--> There are ".scalar(keys(%$candidates))." candidates\n"; ###
+
+   my $dists;
+   while (my ($missing_mid, $missing) = each %$missings) {
+      my $missing_taxid  = $missing->taxon->id;
+      my $missing_node = $tree->find_node(-id => $missing_taxid);
+      if (not defined $missing_node) {
+         die "Error: Could not find node with ID '$missing_taxid' in tree\n";
+      }
+      while (my ($candidate_mid, $candidate) = each %$candidates) {
+         my $candidate_taxid = $candidate->taxon->id;
+         my $candidate_node = $tree->find_node(-id => $candidate_taxid);
+         if (not defined $candidate_node) {
+            die "Error: Could not find node with ID '$candidate_taxid' in tree\n";
+         }
+         print $missing->desc." (ID $missing_taxid)  VS  ".$candidate->desc." (ID $candidate_taxid)\n"; ###
+
+         my $dist = $tree->distance($missing_node, $candidate_node);
+         $dists->{$missing_mid}->{$candidate_mid} = $dist;
+      }
+   }
+
+   return $dists;
+}
+
+
+func remove_closest_pair ($dists) {
+   # Find pair of taxa with smallest distance, avoiding ex-aequos, and remove it.
+   # Calculate minimum distance for each missing
+   my $mins;
+   while (my ($missing_id, $candidates) = each %$dists) {
+      my $min;
+      my @min_candidates;
+      while (my ($candidate_id, $dist) = each %{$dists->{$missing_id}}) {
+         if ( (not defined $min) || ($dist <= $min) ) {
+            $min = $dist;
+            @min_candidates = ($candidate_id);
+         } elsif ($dist == $min) {
+            push @min_candidates, $candidate_id;
+         }
+      }
+      for my $min_candidate (@min_candidates) {
+         $mins->{$missing_id}->{$min_candidate} = $min;
+      }
+   }
+   # Calculate overall minimum distance
+   my ($min_min, $best_missing, $best_candidate);
+   while (my ($missing_id, $candidate) = each %$mins) {
+      my @candidate_ids = keys %{$mins->{$missing_id}};
+      next if scalar @candidate_ids > 1; # skip if ex-aequo
+      my $candidate_id = $candidate_ids[0];
+      my $min = $mins->{$missing_id}->{$candidate_id};
+      if ( (not defined $min_min) || ($min < $min_min) ) {
+         $min_min = $min;
+         $best_candidate = $candidate_id;
+         $best_missing   = $missing_id;
+      }
+   }
+   # Remove pair with smallest distance
+   delete $dists->{$best_missing};
+   for my $missing_id (keys %$dists) {
+      delete $dists->{$missing_id}->{$best_candidate};
+   }
+   return $best_missing, $best_candidate, $min_min, $dists;
+}
+
+
+func get_ref_comm ($comm, $meta, $ref_name, $name_type, $base_sep) {
+   # Get corresponding reference community, or undef if it itself is a reference.
+   # Determine name of reference community
+   my $name = $comm->name;
+   my $full_ref_name;
+   my $isa_ref = 0;
+   if ($name_type eq 'full') {
+      $isa_ref = 1 if $name eq $ref_name;
+      $full_ref_name = $ref_name;
+   } elsif ($name_type eq 'prefix') {
+      my $esc_ref_name = quotemeta($ref_name);
+      $isa_ref = 1 if $name =~ m/^$esc_ref_name/;
+      my $clean_name = $name;
+      if (defined $base_sep) {
+         my @arr = split($base_sep, $name);
+         @arr = @arr[1 .. scalar @arr - 1];
+         $clean_name = join $base_sep, @arr;
+      }
+      $full_ref_name = $ref_name.($base_sep||'').$clean_name;
+   } elsif ($name_type eq 'suffix') {
+      my $esc_ref_name = quotemeta($ref_name);
+      $isa_ref = 1 if $name =~ m/$esc_ref_name$/;
+      my $clean_name = $name;
+      if (defined $base_sep) {
+         my @arr = split($base_sep, $name);
+         @arr = @arr[0 .. scalar @arr - 2];
+         $clean_name = join $base_sep, @arr;
+      }
+      $full_ref_name = $clean_name.($base_sep||'').$ref_name;
+   } else {
+      die "Error: '$name_type' is not a valid value for <name_type>\n";
+   }
+   # Retrieve reference community
+   my $ref_comm;
+   if (not $isa_ref) {
+      $ref_comm = $meta->get_community_by_name($full_ref_name);
+      if (not defined $ref_comm) {
+         die "Error: Expected a community called '$full_ref_name' in input but ".
+            "could not find it.\n";
+      }
+   }
+   return $ref_comm;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type='') {
+   $type ||= '';
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format => $output_format,
+            -file   => '>'.$output_file,
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

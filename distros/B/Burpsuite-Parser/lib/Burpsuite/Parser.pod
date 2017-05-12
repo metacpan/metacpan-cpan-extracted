@@ -1,0 +1,117 @@
+=pod
+
+=head1 NAME
+
+Burpsuite::Parser - Parse Burpsuite scan data with Perl
+
+=head1 VERSION
+
+This document describes Burpsuite::Parser version .01
+
+=head1 SYNOPSIS
+
+ my $bpx = new Burpsuite::Parser;
+
+ my $parser = $bpx->parse_file('test1.xml');
+    #a Burpsuite::Parser Object
+
+ my @results = $parser->get_all_issues();
+    #an Array of Burpsuite::Parser::Issue Objects
+ 
+ foreach my $h ( @results ) {
+    print "Type: " . $h->type . "\n";
+    print "Serial: " . $h->serial_number . "\n";
+    print "Severity: " . $h->severity . "\n";
+    print "Host: " . $h->host . "\n";
+    print "Name: " . $h->name . "\n";
+    print "Location: " . $h->location . "\n";
+    print "Path: " . $h->path . "\n";
+    print "Issue Background: " . $h->issue_background . "\n";
+    print "Remediation Background: " . $h->remediation_background . "\n";
+    print "Issue Detail: " . $h->issue_detail . "\n";
+ }
+
+ 
+=head1 DESCRIPTION
+
+=head1 OVERVIEW
+
+
+The main idea behind the core modules is, you will first parse the scan data
+then extract the information. Therefore, you should run parse_file or
+parse_scan then the you can use any of the methods.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a Burpsuite XML file. The XML files are generated from using the: Burpsuite.pl --xml=file output.xml $IP
+
+=item B<get_session()>
+
+Obtain the Burpsuite::Parser::Session object which contains the session scan information.
+
+=item B<get_all_issues()>
+
+Obtain an Array of Burpsuite::Parser::Issue objects which contains information about the web applications being tested.
+
+=back
+
+=head2 Burpsuite::Parser::Issue
+
+This object contains the information for each of the issues found using Burpsuite.
+
+=over 4
+
+=item B<type()>
+
+Returns a number representing the type of issue found. Example SQL Injection or Cross-Site Scripting.
+
+=item B<serial_number()>
+
+Returns the serial number of each issue found. This is a unique identifer for each issue.
+
+=item B<path()>
+
+Returns the path of the issue found.
+
+=item B<host()>
+
+Returns the hostname that the issue was found on.
+
+=item B<severity()>
+
+Returns the severty of the issue found.
+
+=item B<issue_background()>
+
+Returns some background information of the issue found.
+
+=item B<remediation_background()>
+
+Returns some remediation information of the issue found.
+
+=item B<issue_detail()>
+
+Returns the technical details of the issue found.
+
+=back 
+
+=head1 SEE ALSO
+
+ Burpsuite, XML::LibXML and Object::InsideOut
+ 
+=head1 AUTHOR
+
+Joshua "Jabra" Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

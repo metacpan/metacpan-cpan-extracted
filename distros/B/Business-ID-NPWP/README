@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use Business::ID::NPWP qw(parse_npwp);
+    
+     my $res = parse_npwp(npwp => "02.183.241.5-000.000");
+
+DESCRIPTION
+
+    This module can be used to validate Indonesian taxpayer registration
+    number, Nomor Pokok Wajib Pajak (NPWP).
+
+    NPWP is composed of 15 digits as follow:
+
+     ST.sss.sss.C-OOO.BBB
+
+    S is a serial number from 0-9 (so far haven't seen 7 and up, but it's
+    probably possible).
+
+    T denotes taxpayer type code (0 = government treasury [bendahara
+    pemerintah], 1-3 = company/organization [badan], 4/6 = invidual
+    entrepreneur [pengusaha perorangan], 5 = civil servants [pegawai
+    negeri, PNS], 7-9 = individual employee [pegawai perorangan]).
+
+    sss.sss is a 6-digit serial code for the taxpayer, probably starts from
+    1. It is distributed in blocks by the central tax office (kantor pusat
+    dirjen pajak, DJP) to the local tax offices (kantor pelayanan pajak,
+    KPP) throughout the country for allocation to taypayers.
+
+    C is a check digit. It is apparently using Luhn (modulus 10) algorithm
+    on the first 9 digits on the NPWP.
+
+    OOO is a 3-digit local tax office code (kode KPP).
+
+    BBB is a 3-digit branch code. 000 means the taxpayer is the sole branch
+    (or, for individuals, the head of the family). 001, 002, and so on
+    denote each branch.
+

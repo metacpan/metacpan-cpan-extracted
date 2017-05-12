@@ -1,0 +1,20 @@
+2001-07-28  Bob Glickstein  <bobg@marzipan.emphatic.com>
+
+	* lib/Blatte/Parser.pm: Fix parsing bug in {\cond ...}.
+
+2001-06-20  Bob Glickstein  <bobg@marzipan.emphatic.com>
+
+	* lib/Blatte/Syntax.pm: Fix bug with {\and ...} and {\or ...}
+		  failing to properly treat their subexpressions as Blatte
+		  booleans.
+
+2001-05-01  Bob Glickstein  <bobg@marzipan.emphatic.com>
+
+	* lib/Blatte/Parser.pm: Fix lexing bug that failed to recognize
+		  {\foobar ...} when {\foo ...} is a special form.
+
+2001-04-02  Bob Glickstein  <bobg@marzipan.emphatic.com>
+
+	* lib/Blatte/Parser.pm: Don't fail to consume a parsed
+		  quoted-string.
+

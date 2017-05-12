@@ -1,0 +1,5 @@
+$VAR1 = bless( {
+                 'security-problem' => bless( {
+                                                'generalstring' => 'This is a security problem.'
+                                              }, 'Biblio::ILL::ISO::SecurityProblem' )
+               }, 'Biblio::ILL::ISO::UserErrorReport' );

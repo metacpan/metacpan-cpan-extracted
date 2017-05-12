@@ -1,0 +1,300 @@
+: ## Arguments: timeline_name, timeline_config_json,
+: ##            post_button_url, attached_image_max_height, attached_image_show_default_bool
+: cascade wrapper_navbar { title => $timeline_name }
+: around navbar_content -> {
+<form class="navbar-form navbar-right bb-nav-controls-container">
+  <div class="btn-group">
+    <a id="bb-new-statuses-button" class="btn btn-default disabled" href="#">
+      New <span class="bb-new-statuses-num badge">0</span>
+    </a>
+  </div>
+  <div class="btn-group">
+    <a id="bb-button-incriment-threshold-level" class="btn btn-default" href="#">
+      <span class="glyphicon glyphicon-zoom-out"></span>
+    </a>
+    <a id="bb-button-decriment-threshold-level" class="btn btn-default" href="#">
+      <span class="glyphicon glyphicon-zoom-in"></span>
+    </a>
+  </div>
+  <span class="label label-default">Lv. <span class="bb-threshold-level">0</span></span>
+  <a class="btn btn-default" href="<: $post_button_url :>" target="_blank"><span class="glyphicon glyphicon-pencil"></span></a>
+</form>
+<div class="hidden-xs" id="bb-spinner-placeholder"></div>
+<p id="bb-indicator" class="navbar-text navbar-right hidden-xs">
+  <span id="bb-msg"></span>
+</p>
+<!-- a menu collapsed in small screens -->
+<div class="navbar-collapse collapse">
+  <ul class="nav navbar-nav navbar-left">
+    <li class="active"><a><: $timeline_name :></a></li>
+    <li class="visible-xs"><a href="<: path('/') :>"><span class="glyphicon glyphicon-arrow-left"></span> Top</a></li>
+  </ul>
+</div>
+: }  ## around navbar_content
+
+: around head -> {
+<style type="text/css">
+.bb-status-extension-pane { display: <: $attached_image_show_default_bool ? "block" : "none" :>; }
+.bb-status-extension-<: $attached_image_show_default_bool ? "expander" : "collapser" :> { display: none; }
+.bb-status-extension-pane img { max-height: <: $attached_image_max_height :>px; }
+</style>
+: } ## around head
+
+: around content -> {
+<div class="container-fluid">
+  <div class="row">
+    <div class="hidden-xs col-sm-2 col-md-2">
+      <div class="sidebar-nav sidebar-nav-fixed" id="sidebar">
+        <div class="panel-group" id="bb-statuses-summary"></div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-10 col-md-8 bb-main-column">
+      <ul id="statuses" class="list-unstyled">
+      </ul>
+      <div id="main-footer">
+        <a class="btn btn-primary" id="bb-more-button" data-loading-text="Loading..." href="#">More...</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="<: path('/static/jquery.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/bootstrap/js/bootstrap.min.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/spin.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/q.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/busybird.js') :>"></script>
+<script type="text/javascript" src="<: path('/static/timeline.js') :>"></script>
+<script type="text/javascript">
+"use strict";
+
+(function() {
+    var showMaxReached = function(is_loading_max_reached, message_banner) {
+        if(!is_loading_max_reached) return;
+        var message = "Too many unread statuses. Some of them are not loaded here.";
+        message_banner.show(message, "warn");
+        console.warn(message);
+    };
+    
+    var NewStatusesButton = function(args) {
+        // @params: args.unackedCountsPoller, args.spinner, args.statusContainer,
+        //          args.messageBanner, args.statusesSummary, args.notification
+        var self = this;
+        var poller = args.unackedCountsPoller;
+        self.enabled = false;
+        self.now_loading = false;
+        self.spinner = args.spinner;
+        self.status_container = args.statusContainer;
+        self.message_banner = args.messageBanner;
+        self.statuses_summary = args.statusesSummary;
+        self.notification = args.notification;
+        self.cur_unacked_counts = {total: 0};
+
+        self._setEnabled(false);
+        $("#bb-new-statuses-button").on("click", function() { self.trigger(); return false; });
+        poller.listenOnChange(function(unacked_counts) {
+            self.cur_unacked_counts = unacked_counts;
+            self._updateUnackedCountView(true);
+        });
+        self.status_container.listenOnThresholdLevelChanged(function() {
+            self._updateUnackedCountView(false);
+        });
+    };
+    NewStatusesButton.prototype = {
+        _setEnabled: function(new_state) {
+            var self = this;
+            var $button = $("#bb-new-statuses-button");
+            self.enabled = new_state;
+            if(self.enabled) {
+                $button.removeClass("disabled");
+            }else {
+                $button.addClass("disabled");
+            }
+        },
+        _updateUnackedCountView: function(show_web_notification) {
+            var self = this;
+            var timeline_name = self.status_container.getTimelineName();
+            var visible_count = self._visibleUnackedCount();
+            if(show_web_notification && visible_count > 0) {
+                self.notification.showWebNotification({
+                    message: visible_count + ' new statuses!', tag: timeline_name + '/notifyNewStatuses',
+                    subtitle: timeline_name,
+                    onClick: function() { self.trigger(); }
+                });
+            }
+            self.notification.setFaviconAlert(visible_count > 0);
+            self.notification.setTitleNotification(visible_count > 0 ? '('+ visible_count +')' : null);
+            $(".bb-new-statuses-num").text(visible_count);
+            if(visible_count > 0 && !self.now_loading) {
+                self._setEnabled(true);
+            }else {
+                self._setEnabled(false);
+            }
+        },
+        _visibleUnackedCount: function() {
+            var self = this;
+            var visible_count = 0;
+            var cur_threshold_level = self.status_container.getThresholdLevel();
+            $.each(self.cur_unacked_counts, function(level, count) {
+                if(level === "total") return true;
+                level = parseInt(level, 10);
+                if(level >= cur_threshold_level) {
+                    visible_count += count;
+                }
+            });
+            return visible_count;
+        },
+        trigger: function() {
+            var self = this;
+            if(!self.enabled) return;
+            self._setEnabled(false);
+            self.now_loading = true;
+            self.spinner.begin();
+            self.status_container.loadUnackedStatuses().then(function(result) {
+                showMaxReached(result.maxReached, self.message_banner);
+                self.statuses_summary.showSummaryOf($(result.statuses));
+            }).fail(function(error) {
+                console.error(error);
+                self.message_banner.show(error, "error");
+            }).then(function() {
+                self.spinner.end();
+                self.now_loading = false;
+                self._updateUnackedCountView(false);
+            });
+        }
+    };
+    var MoreStatusesButton = function(args) {
+        // @params: args.spinner, args.messageBanner, args.statusContainer
+        var self = this;
+        self.enabled = true;
+        self.spinner = args.spinner;
+        self.message_banner = args.messageBanner;
+        self.status_container = args.statusContainer;
+        self._setEnabled(true);
+        $("#bb-more-button").on("click", function() { self.trigger(); return false; });
+    };
+    MoreStatusesButton.prototype = {
+        trigger: function() {
+            var self = this;
+            if(!self.enabled) return;
+            self._setEnabled(false);
+            self.spinner.begin();
+            self.status_container.loadMoreStatuses().fail(function(error) {
+                self.message_banner.show(error, "error");
+            }).then(function() {
+                self.spinner.end();
+                self._setEnabled(true);
+            });
+        },
+        _setEnabled: function(new_state) {
+            this.enabled = new_state;
+            $("#bb-more-button").button(this.enabled ? "reset" : "loading");
+        }
+    };
+    var ThresholdLevelButton = function(args) {
+        // @params: args.spinner, args.statusContainer;
+        var self = this;
+        self.enabled = true;
+        self.spinner = args.spinner;
+        self.status_container = args.statusContainer;
+        self._setEnabled(true);
+        $("#bb-button-incriment-threshold-level").on("click", function() { self.levelUp(); return false; });
+        $("#bb-button-decriment-threshold-level").on("click", function() { self.levelDown(); return false; });
+        $(".bb-threshold-level").text(self.status_container.getThresholdLevel());
+        self.status_container.listenOnThresholdLevelChanged(function(new_threshold) {
+            $(".bb-threshold-level").text(new_threshold);
+        });
+    };
+    ThresholdLevelButton.prototype = {
+        _setEnabled: function(new_state) {
+            var self = this;
+            var $target = $("#bb-button-incriment-threshold-level").add("#bb-button-decriment-threshold-level");
+            self.enabled = new_state;
+            if(self.enabled) {
+                $target.removeClass("disabled");
+            }else {
+                $target.addClass("disabled");
+            }
+        },
+        _levelChange: function(relative_level) {
+            var self = this;
+            var cur_level;
+            if(!self.enabled) return;
+            self._setEnabled(false);
+            cur_level = self.status_container.getThresholdLevel();
+            self.spinner.begin();
+            self.status_container.setThresholdLevel(cur_level + relative_level).fail(function(error) {
+                console.error("Unexpected error while changing level");
+                console.error(error);
+            }).then(function() {
+                self.spinner.end();
+                self._setEnabled(true);
+            });
+        },
+        levelUp: function() { this._levelChange(+1) },
+        levelDown: function() { this._levelChange(-1) }
+    };
+
+    $(function() {
+        var spinner = new bb.Spinner("#bb-spinner-placeholder");
+        var message_banner = new bb.MessageBanner("#bb-msg");
+        var timeline_config;
+        try {
+            timeline_config = JSON.parse("<: $timeline_config_json | js :>");
+        }catch(e) {
+            var error_message = "Error while parsing timeline config.";
+            console.error(error_message);
+            console.error(e);
+            message_banner.show(error_message, "error");
+            timeline_config = {};
+        }
+        if(defined(timeline_config.acked_statuses_load_count)) {
+            bb.StatusContainer.LOAD_MORE_STATUSES_COUNT = timeline_config.acked_statuses_load_count;
+        }
+        var notification = new bb.Notification({scriptName: "<: script_name() | js :>"});
+        if(timeline_config.timeline_web_notifications === "simple") {
+            notification.initWebNotification();
+        }
+        var status_container = new bb.StatusContainer({
+            selectorContainer: "#statuses", timeline: '<: $timeline_name | js :>',
+            apiBase: '<: script_name() | js :>'
+        });
+        if(defined(timeline_config.default_level_threshold)) {
+            status_container.setThresholdLevel(timeline_config.default_level_threshold);
+        }
+        var unacked_counts_poller = new bb.TimelineUnackedCountsPoller({
+            statusContainer: status_container
+        });
+        var statuses_summary = new bb.StatusesSummary({
+            selectorContainer: "#bb-statuses-summary"
+        });
+        var new_statuses_button = new NewStatusesButton({
+            unackedCountsPoller: unacked_counts_poller,
+            spinner: spinner, statusContainer: status_container,
+            messageBanner: message_banner, statusesSummary: statuses_summary,
+            notification: notification
+        });
+        var more_statuses_button = new MoreStatusesButton({
+            spinner: spinner, messageBanner: message_banner,
+            statusContainer: status_container
+        });
+        var threshold_level_button = new ThresholdLevelButton({
+            spinner: spinner, statusContainer: status_container
+        });
+
+        spinner.begin();
+        status_container.loadInit().then(function(result) {
+            message_banner.show("Initialized");
+            showMaxReached(result.maxReached, message_banner);
+            statuses_summary.showSummaryOf($(result.statuses));
+        }, function(reason) {
+            message_banner.show(reason, "error");
+            console.error(reason);
+        }).then(function() {
+            spinner.end();
+            unacked_counts_poller.start();
+        });
+    });
+})();
+</script>
+: } ## around content
+

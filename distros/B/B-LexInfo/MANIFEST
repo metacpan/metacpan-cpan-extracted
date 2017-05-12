@@ -1,0 +1,8 @@
+LexInfo.pm
+LexInfo.xs
+MANIFEST
+Makefile.PL
+lib/Apache/RegistryLexInfo.pm
+README
+Changes
+

@@ -1,0 +1,36 @@
+# example cnf file for EPconDBhumanchip1
+
+name=EPconDBhumanchip1
+module=EPconDBhumanchip1
+version=20040130
+source_version=
+source_date=
+download_date=
+comment=
+ftp=http://www.cbil.upenn.edu/EPConDB/Downloads/HumanPancChip
+ftp_files=HumanPancChip1.0/RAD_HumanPanc1_ChipDump_DoTS_rel8_20040727.txt
+
+label=Feature_Location, dotset=Feature_Location
+label=Kaestner_ID, dotset=Gene_ID
+label=Source_and_ID, dotset=Sequence_ID
+label=Name, dotset=Gene_Name
+label=LocusLink, dotset=Gene_ID
+label=GeneCards, dotset=Gene_Symbol
+label=HUGO_GENE_SYMBOL, dotset=Gene_Symbol
+label=HUGO_GENE_DESC, dotset=Gene_Desc
+label=HUGO_GENE_SYNONYM, dotset=Alias
+label=DoTS_GeneSymbol_and_Desc, dotset=Gene_Summary
+label=DoTS_Gene_Synonyms, dotset=Alias
+label=PCR_Failure_Flag, dotset=Status
+label=DoTS_ID, dotset=Sequence_Cluster_ID
+label=RNA_DESC, dotset=RNA_Desc
+label=Predicted_GO_func, dotset=GO_ID
+label=Seq_verified, dotset=Status
+label=IMAGE_ID, dotset=Sequence_ID
+label=GenBank_Acc, dotset=Sequence_ID
+label=WashU_Name, dotset=Clone_ID
+label=RefSeq, dotset=Sequence_ID
+label=Plate_Name, dotset=Location
+label=Well_Location, dotset=Locuation
+label=DNA_Concentration, dotset=Status
+

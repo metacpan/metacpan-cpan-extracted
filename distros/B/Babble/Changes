@@ -1,0 +1,207 @@
+Changes -- list of user visible changes			-*- outline -*-
+
+* Babble 0.07 -- 2004-04-25
+
+** Babble::Cache made into a proper object
+
+Babble::Cache was made into a proper object, it is not a global hash
+with accessor methods anymore.
+
+** Improved RSS parsing
+
+The RSS DataSource was modified to not let the whole application die
+when the underlying XML::Parser die()s. So-called item hooks were
+also implemented, to be able to store custom data from the feed in
+the Babble::Document object.
+
+** Improved caching
+
+Babble will only cache feeds that are known to be valid (ie,
+parsable).
+
+* Babble 0.06 -- 2004-04-12
+
+** More forgiving parsing and data handling
+
+Babble::DataSource::RSS was made a bit more robust (handles different
+date formats, and <content:encoded>...</content:encoded> stuff), and
+bin/babble was teached to correct some more common problems in RSS
+feeds.
+
+** Feed image support
+
+Babble is now able to parse, generate and handle feed images, as seen
+in RSS feeds. Useful when one would like to see a picture of article
+authors near their article.
+
+The planet, planet_gray and XML themes have support for displaying
+these, as does the RSS output method.
+
+** Babble::Theme::XML has a new format
+
+Babble::Theme::XML has a new format: rss10, which outputs RSS 1.0
+feeds. Intended to be used instead of Babble::Output:RSS, when one
+wants more control over the content of the feed.
+
+** Demise of Babble::Output::HTML
+
+It was found that HTML::Template is not too useful with Babble, so
+all the themes that were using it, were converted to Template
+Toolkit, and Babble::Output::HTML was removed.
+
+** Various layout fixes and improvements
+
+A few glitches and bugs were fixed in the templates.
+
+** Limiting support reimplemented
+
+Moved most of the limiting support out from the templates. This means
+that applications using Babble must do the limiting themselves, and
+the templates will use the collection they pass back to them.
+
+See bin/babble for an example on how to implement this.
+
+** Fixed a bug which prevented Babble to be used when installed
+
+Due to me testing Babble from the source tree, and not when it was
+installed, Babble::Output::TTk did not pass the ABSOLUTE option to
+template toolkit, resulting in run-time errors when trying to run
+babble after a ./Build install. This is now fixed.
+
+* Babble 0.05 -- 2004-04-03
+
+** Improved limiting support
+
+A different kind of limiting support was made accessible to the
+Template Toolkit based templates: limiting by age. Items older than
+a specified value will not be handled by the template.
+
+** Improved caching
+
+Babble is now able to cache parsed data (disabled by default,
+though), which results in significantly faster processing, but
+increases memory usage too.
+
+Also, the Babble::Cache module can store the cache contents in
+different formats now. The single new format is Storable, which is
+not human readable, but much faster than Data::Dumper.
+
+** Callback support while collecting feeds
+
+It is now possible to run callback routines whenever a source is
+about to collected and when collection ended. This gives one a way to
+print status messages or the like.
+
+** New, DBI based datasource
+
+A new datasource module, Babble::DataSource::DBI was added to the
+distribution. It can be used to collect feed data from any kind of
+database DBI might have support for.
+
+** New, Mail based datasource
+
+A new datasource module, Babble::DataSource::Mail was added to the
+distribution. It can be used to collect feed data from, say,
+mailboxes. One can use this for setting up a system where mail
+intended for blogging is saved in a separate mailbox, and this module
+is used for processing it.
+
+** Improved test suite
+
+Many new tests were added to the test suite, to achieve even higher
+codepath coverage (still not enough, but we're getting there).
+
+** Example bin/babble frontend enhancements
+
+The example `bin/babble' frontend was extended to understand
+parameters that should be eval-ed before usage (these are prefixed
+with a `&'), and to be able to read the configuration file from its
+standard input.
+
+* Babble 0.04 -- 2004-03-28
+
+** Caching support
+
+Modified Babble::Transport and added a Babble::cache method to
+Babble::Utils for optional feed and item caching. This is a much more
+efficient way than the datecache processor was. It can also save
+considerable bandwidth.
+
+** Limiting support
+
+Implemented support for limiting the number of elements returned by
+Babble::Document::Collection's search() and sort() methods.
+
+** Improved test suite
+
+The test suite received an additional file: t/pod.t, to test the
+documentation for syntax correctness.
+
+** Improved filtering support
+
+One can now specify a custom comparsion function to be used for
+filtering, searching. This makes one able to limit the items in an
+aggregation to, say, items only a week old or younger.
+
+* Babble 0.03 -- 2004-03-14
+
+** Some internal restructuring.
+
+Implemented a Babble::Transport module, for transparent location
+access (currently only used by Babble::DataSource::RSS and
+Babble::DataSource::OPML).
+
+** Theme updates and modifications.
+
+The FOAF and OPML formats from planet_ttk were moved to a separate
+XML theme, planet_ttk got renamed to planet_grey and received some
+layout updates.
+
+** New and improved example script
+
+There is a new and improved example script, that can be used to set
+up Babbles with only minimal configuration and no coding. It does not
+support all the bells and whistles of Babble, though.
+
+** New, OPML data source
+
+A new DataSource module, Babble::DataSource::OPML was added to the
+distribution. It can parse OPML documents, and collect the RSS feeds
+mentioned therein.
+
+* Babble 0.02 -- 2004-03-09
+
+** Lots of documentation updates.
+
+Documentation was cleared up in many places, and was generally made
+better.
+
+** Internal restructuring.
+
+The internal structure of objects was greatly simplified, resulting
+in less memory usage and faster operation. Not to mention easier
+maintainance.
+
+** Date parsing fixes
+
+The Babble::DataSource modules often failed to parse the dates they
+encountered, this was fixed.
+
+** New output method and theme
+
+There is a new output method, Babble::Output::TTk, which uses the
+Template Toolkit, and is the preferred output method as of now.
+
+There is a highly customisable theme based on it,
+Babble::Theme::planet_ttk. This one provides not only a HTML
+template, but FOAF and OPML templates too.
+
+** Test suite
+
+The beginnings of a test suite is included with this release.
+
+* Babble 0.01 -- 2004-03-07
+
+Initial release.
+
+# arch-tag: 6c29c03c-d34a-45ec-8078-1dd14c178b5d

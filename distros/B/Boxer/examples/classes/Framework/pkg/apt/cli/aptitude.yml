@@ -1,0 +1,11 @@
+classes:
+  - Framework.pkg.base
+parameters:
+  doc:
+    framework-pkg:
+      pkg:
+        - include command-line and Curses APT frontend aptitude
+  pkg:
+    - aptitude
+  pkg-auto:
+    - aptitude-common

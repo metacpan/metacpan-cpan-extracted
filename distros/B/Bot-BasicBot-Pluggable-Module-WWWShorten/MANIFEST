@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Bot/BasicBot/Pluggable/Module/WWWShorten.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t

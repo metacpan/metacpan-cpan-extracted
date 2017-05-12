@@ -1,0 +1,29 @@
+Bundle::CPANReporter2
+=====================
+
+This is a convenience bundle for CPAN::Reporter::Transport::Metabase
+esp. to install XS modules and its missing dependencies.
+
+INSTALLATION
+
+For all Perl versions (esp. compiles XS modules)
+
+	$ cpan Bundle::CPANReporter2
+
+CPAN::Reporter 2.0 switched from SMTP to Metabase via HTTP.
+To enable it, create a unique profile, or associate it with your CPAN id:
+
+	$ metabase-profile
+	Enter full name: John Doe
+        Enter email address: jdoe@example.com
+        Enter password/secret: zqxjkh
+        Writing profile to 'metabase_id.json'
+
+	$ mkdir ~/.cpanreporter
+	$ cp metabase_id.json ~/.cpanreporter/
+	$ chmod 400 ~/.cpanreporter/metabase_id.json
+	$ vi ~/.cpanreporter/config.ini
+
+	email_from = John Doe <jdoe@example.com>
+	transport = Metabase uri https://metabase.cpantesters.org/api/v1/ id_file ~/.cpanreporter/metabase_id.json
+

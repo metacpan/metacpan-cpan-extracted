@@ -1,0 +1,64 @@
+{
+   "abstract" : "Calculator plugin for Bot::Cobalt",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Bot-Cobalt-Plugin-Calc",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BSD::Resource" : "0",
+            "Bot::Cobalt" : "0",
+            "List::Objects::WithUtils" : "2",
+            "Math::Calc::Parser" : "0",
+            "POE" : "1",
+            "Storable" : "0",
+            "Time::HiRes" : "0",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/bot-cobalt-plugin-calc.git",
+         "web" : "https://github.com/avenj/bot-cobalt-plugin-calc"
+      }
+   },
+   "version" : "0.004005"
+}
+

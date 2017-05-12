@@ -1,0 +1,29 @@
+---
+abstract: 'Bot::Backbone service for chatting with IRC'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Backbone-Service-IRChat
+requires:
+  Bot::Backbone::Message: '0'
+  Bot::Backbone::Service: '0'
+  Bot::Backbone::Service::Role::BareMetalChat: '0'
+  Bot::Backbone::Service::Role::Dispatch: '0'
+  Bot::Backbone::Service::Role::GroupJoiner: '0'
+  Bot::Backbone::Service::Role::Service: '0'
+  POE: '0'
+  POE::Component::IRC::State: '0'
+  perl: v5.10.0
+resources:
+  IRC: irc://irc.perl.org/#backbone
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-Backbone-Service-IRChat
+  repository: git://github.com/zostay/Bot-Backbone-Service-IRChat.git
+version: '0.160630'

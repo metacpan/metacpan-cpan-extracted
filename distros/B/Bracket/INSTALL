@@ -1,0 +1,35 @@
+0. Get the Application:
+  git clone http://github.com/mateu/Bracket.git
+
+1. Create a database in MySQL or PostgreSQL (call it bracket_2016 if you like)
+sql> create database bracket_2016
+
+1b. If your database fu sucks or is lazy then use a SQLite database which will
+create the DB for you and does not require a user or password.
+
+2. Edit bracket.conf to match your database and user/pass (SQLite users do nothing)
+
+3. Deploy the database, initialize it and create an admin user all in one by running:
+     script/deploy_bracket.pl
+
+4. Start it up:
+     script/bracket_server.pl
+
+5. Login with your admin account at:
+  http://localhost:3000
+
+6. Once you've verified that Bracket is working for you with the Catalyst builtin web
+server, then you can deploy it more permanently.  To do so w/ apache and mod_perl
+do something like the following in an apache conf file:
+
+PerlSwitches -I/home/user/apps/Bracket/lib
+PerlModule Bracket
+<Location /bracket>
+  SetHandler          modperl
+  PerlResponseHandler Bracket
+</Location>
+
+This will make /bracket the URL for the base of the application.
+
+7. Let players know about your bracket.  They can register at /register
+

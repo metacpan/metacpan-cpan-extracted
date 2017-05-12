@@ -1,0 +1,172 @@
+        <WorkflowProcess AccessLevel="PUBLIC" Id="wcp10b" Name="WCP10: Arbitrary Cycles II">
+            <ProcessHeader DurationUnit="D">
+                <Created>2010-11-26 22:38:46</Created>
+                <Description>execute workflow graph w/out any structural restriction on loops</Description>
+            </ProcessHeader>
+            <RedefinableHeader PublicationStatus="UNDER_TEST">
+                <Author>Peter de Vos</Author>
+            </RedefinableHeader>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Description></Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="C-B"/>
+                                    <TransitionRef Id="C-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Description></Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="D-C"/>
+                                    <TransitionRef Id="D-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Description>Just press 'Complete' button</Description>
+                    <Implementation>
+                        <No/>
+                    </Implementation>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B" Name="Transition" From="A" To="B"/>
+                <Transition Id="B-C" Name="Transition" From="B" To="C"/>
+                <Transition Id="C-B" Name="Transition" From="C" To="B">
+                    <Condition Type="CONDITION">whereToGo=="B"</Condition>
+                </Transition>
+                <Transition Id="C-D" Name="Transition" From="C" To="D">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="D-C" Name="Transition" From="D" To="C">
+                    <Condition Type="CONDITION">whereToGo=="C"</Condition>
+                </Transition>
+                <Transition Id="D-E" Name="Transition" From="D" To="E">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>
+
+        <WorkflowProcess Id="wcp10b2" Name="WCP10: Arbitrary Cycles (nested-loops)">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="inner_loop" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="outer_loop" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="Start" Name="Start">
+                    <Event>
+                        <StartEvent Trigger="None" />
+                    </Event>
+                </Activity>
+                <Activity Id="A-XOR-Join" Name="A-XOR-Join">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B-OR-Join" Name="B-OR-Join">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C-OR-Split" Name="C-OR-Split">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="C-OR-Split-B-OR-Join"/>
+                                    <TransitionRef Id="C-OR-Split-D-XOR-Split"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D-XOR-Split" Name="D-XOR-Split">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="D-XOR-Split-A-XOR-Join"/>
+                                    <TransitionRef Id="D-XOR-Split-End"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="Start-A-XOR-Join" From="Start" To="A-XOR-Join"/>
+                <Transition Id="A-XOR-Join-B-OR-Join" From="A-XOR-Join" To="B-OR-Join"/>
+                <Transition Id="B-OR-Join-C-OR-Split" From="B-OR-Join" To="C-OR-Split"/>
+                <Transition Id="C-OR-Split-B-OR-Join" From="C-OR-Split" To="B-OR-Join">
+                    <Condition Type="CONDITION">attribute('inner_loop') > 0</Condition>                
+                </Transition>
+                <Transition Id="C-OR-Split-D-XOR-Split" From="C-OR-Split" To="D-XOR-Split">
+                    <Condition Type="CONDITION">1</Condition>
+                </Transition>
+                <Transition Id="D-XOR-Split-A-XOR-Join" From="D-XOR-Split" To="A-XOR-Join">
+                    <Condition Type="CONDITION">attribute('outer_loop') > 0</Condition>                
+                </Transition>
+                <Transition Id="D-XOR-Split-End" From="D-XOR-Split" To="End">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+            </Transitions>
+        </WorkflowProcess>

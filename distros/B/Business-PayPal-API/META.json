@@ -1,0 +1,97 @@
+{
+   "abstract" : "PayPal SOAP API client with sandbox support",
+   "author" : [
+      "Scott Wiersdorf <scott@perlcode.org>",
+      "Danny Hembree <danny@dynamical.org>",
+      "Bradley M. Kuhn <bkuhn@ebb.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Business-PayPal-API",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Printer" : "0",
+            "SOAP::Lite" : "0.67",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "List::AllUtils" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "autodie" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oalders/business-paypal-api/issues"
+      },
+      "homepage" : "https://github.com/oalders/business-paypal-api",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/business-paypal-api.git",
+         "web" : "https://github.com/oalders/business-paypal-api"
+      }
+   },
+   "version" : "0.76",
+   "x_contributors" : [
+      "Andrew Maltsev <am@ejelta.com>",
+      "Daniel Hembree <danny@chinook.local>",
+      "Danny Hembree <danny-hembree@dynamical.org>",
+      "Dave Lambley <davel@isosceles.(none)>",
+      "Dave Lambley <davel@state51.co.uk>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Gregory Oschwald <goschwald@maxmind.com>",
+      "Marco Pessotto <melmothx@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Ron Phipps <ron@endpoint.com>",
+      "Tomas Doran (t0m) <t0m@state51.co.uk>",
+      "William Lindley <wlindley@wlindley.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

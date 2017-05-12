@@ -1,0 +1,28 @@
+---
+abstract: 'work with International Standard Book Numbers'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::More: '0.95'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-ISBN
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::ISBN::Data: '20140910.002'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/briandfoy/business-isbn/issues
+  homepage: https://github.com/briandfoy/business-isbn
+  repository: https://github.com/briandfoy/business-isbn.git
+version: '3.004'

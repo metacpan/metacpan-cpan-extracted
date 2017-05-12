@@ -1,0 +1,3 @@
+classes:
+  - Language.java.openjdk6
+  - Language.java.openjdk7.avoid

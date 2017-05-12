@@ -1,0 +1,21 @@
+=head1 USE
+
+All field keywords beginning with C<html_form_> are passed directly
+into the form hash.  Thus, they are really defined in form.tt which
+ships with Gantry.
+
+Use C<html_form_raw_html> if you need to put HTML directly into the
+entry form's table.  Your html will be immediately before the <tr>
+for the current field.  For it to appear in the table, you need to
+wrap it in a <tr>.  Clever tricks are possible.  Remember to quote carefully.
+Some experimentation might be required.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in the form method
+in lib/Kids/GEN/Child.pm, but run app.server and point your browser to
+http://localhost:8080/child/add to see the result.

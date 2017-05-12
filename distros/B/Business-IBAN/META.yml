@@ -1,0 +1,15 @@
+---
+name: Business-IBAN
+version: 0.06
+author: ~
+abstract: Validate and generate IBANs
+license: perl
+requires:
+  Math::BigInt: 0
+recommends:
+  Locale::Country: 2.03
+provides:
+  Business::IBAN:
+    file: lib/Business/IBAN.pm
+    version: 0.06
+generated_by: Module::Build version 0.2611

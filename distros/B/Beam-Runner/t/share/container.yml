@@ -1,0 +1,34 @@
+
+$summary: A container for test purposes
+
+success:
+    $class: Local::Runnable
+    summary: A task that succeeds
+    exit: 0
+
+fail:
+    $class: Local::Runnable
+    summary: A task that fails
+    exit: 1
+
+nonrunnable:
+    $class: Moo
+
+unloadable:
+    $class: DOES::NOT::EXIST
+
+hidden_hash:
+    hidden_by:
+        $class: Local::Runnable
+        why: Hashes are not addressable from Beam::Wire->get()
+
+extends:
+    $extends: success
+
+alias:
+    $ref: success
+
+dep_missing:
+    $class: Local::Runnable
+    exit:
+        $ref: NOT_FOUND

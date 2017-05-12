@@ -1,0 +1,42 @@
+Revision history for Perl extension B::Utils1.
+
+1.05 (rurban)
+
+   - Remove unrelated t/z_leaktrace.t
+
+1.04 (rurban)
+
+   - Move build/IFiles.pm to lib/B/Utils1/Install/
+     make test_cover mistakes build as MB script.
+
+1.03 (rurban)
+
+   - Add $trace_removed and file/line for removed COPs (Rocky Bernstein)
+     Simplify t/40walk.t to use it.
+
+1.02 (rurban)
+
+   - Fix PAUSE permissions for build/IFiles.pm.t
+     Provide it even if now optionally user-generated.
+   - Allow building without ExtUtils::Depends.
+     Remove get_makefile_vars(), which only provided our typemap,
+     which is not needed to link with external modules.
+
+1.01 (rurban)
+
+   - Merge jbenjore/B-Utils/pull/9 by Andres Schwab
+     A pointer when viewed as signed integer may look negative.
+   - add README.md to repo
+
+1.0 (rurban)
+   - Fork of B::Utils 0.27, which does not work with newer perls and is unmaintained.
+   - Provide a backwards compatible B::OP::parent, patching the core B module.
+   - Fix build/IFiles.pm updates, need ExtUtils::Depends with DD SortKeys
+   - Merge OP.xs into Utils1.xs
+   - Merge BUtils_op.h into BUtils1.h
+   - Update ppport.h
+   - Add 5.22 support: METHOP, UNOP_AUX, fixed wrong classnames
+   - Add more author tests
+   - Fixed t/z_version.t
+
+See B::Utils for the older history

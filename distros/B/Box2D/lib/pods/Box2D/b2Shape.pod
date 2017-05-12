@@ -1,0 +1,161 @@
+
+=head1 NAME
+
+Box2D::b2Shape - Used for collision detection.
+
+=head1 SYNOPSIS
+
+  # Don't use this class directly, use a subclass.
+
+=head1 DESCRIPTION
+
+A shape is used for collision detection. You can create a shape however
+you like. Shapes used for simulation in C<Box2D::b2World> are created
+automatically when a C<Box2D::b2Fixture> is created.
+
+=head1 METHODS
+
+=head2 ComputeAABB( $aabb, $xf )
+
+Given a transform, compute the associated axis aligned bounding box for
+this shape.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2AABB> C<$aabb> - returns the axis aligned box.
+
+=item * C<Box2D::b2Transform> C<$xf> - the world transform of the
+shape.
+
+=back
+
+Implemented in C<Box2D::b2CircleShape>, and C<Box2D::b2PolygonShape>.
+
+=head2 ComputeMass( $massData, $density )
+
+Compute the mass properties of this shape using its dimensions and
+density. The inertia tensor is computed about the local origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2MassData> C<$massData> - returns the mass data for
+this shape.
+
+=item * C<float32> C<$density> - the density in kilograms per meter
+squared.
+
+=back
+
+Implemented in C<Box2D::b2CircleShape>, and C<Box2D::b2PolygonShape>.
+
+=head2 GetType()
+
+Get the type of this shape. You can use this to down cast to the
+concrete shape.
+
+Parameters:
+
+Returns a C<int>
+
+=head2 RayCast( $output, $input, $transform )
+
+Cast a ray against this shape.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2RayCastOutput> C<$output> - the ray-cast results.
+
+=item * C<Box2D::b2RayCastInput> C<$input> - the ray-cast input
+parameters.
+
+=item * C<Box2D::b2Transform> C<$transform> - the transform to be
+applied to the shape.
+
+=back
+
+Returns a C<bool>
+
+Implemented in C<Box2D::b2CircleShape>, and C<Box2D::b2PolygonShape>.
+
+=head2 TestPoint( $xf, $p )
+
+Test a point for containment in this shape. This only works for convex
+shapes.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Transform> C<$xf> - the shape world transform.
+
+=item * C<Box2D::b2Vec2> C<$p> - a point in world coordinates.
+
+=back
+
+Returns a C<bool>
+
+Implemented in C<Box2D::b2CircleShape>, and C<Box2D::b2PolygonShape>.
+
+=head2 m_radius()
+
+=head2 m_radius( $m_radius )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$m_radius> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 m_type()
+
+=head2 m_type( $m_type )
+
+Parameters:
+
+=over 4
+
+=item * C<int> C<$m_type> (optional)
+
+=back
+
+Returns a C<int>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2CircleShape>
+
+=item * L<Box2D::b2PolygonShape>
+
+=item * L<Box2D::b2World>
+
+=item * L<Box2D::b2Fixture>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

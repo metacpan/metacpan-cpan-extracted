@@ -1,0 +1,19 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Load Existing Critical Prefix List'; %]
+
+<p><h2>Select existing critical prefix list:</h2></p>
+
+<form action="cpm_workflow.cgi" method="get">
+<input type="hidden" name="action" value="view" />
+  <select name="list">
+    [% FOREACH list IN LISTNAMES %]
+      <option value="[% list %]">[% list %]</option>
+    [% END %]
+  </select>
+    <p> 
+      <input type="button" value="Back" onclick="history.go(-1)">
+      &nbsp 
+      <input type="submit" value="Submit" />
+    </p>   
+</form>
+
+[% INCLUDE footer.html %]

@@ -1,0 +1,9 @@
+--- 
+ircd_config: 
+  network: TestNet
+  nicklen: 15
+  servername: serverbotted.irc
+listeners: 
+  - 
+    port: 6667
+state_file: var/server/ServerBotted.db

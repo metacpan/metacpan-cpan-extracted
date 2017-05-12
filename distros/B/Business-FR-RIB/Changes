@@ -1,0 +1,17 @@
+Revision history for Perl module Business::FR::RIB
+0.05 Thu Jan 05 07:13:58 2012
+    - add test prerequisite modules to 'PREREQ_PM' (Thx Perl testers !)
+
+0.04 Wed Jan 04 14.17.31 2012
+    - use of perlcritic leads me to makes some changes in the tests
+
+0.03 Sun Dec 11 19:00:00 2011
+    - Update pod (delete french accents)
+
+0.02 Mon Aug 22 21:40:53 2011
+    - Update pod
+
+0.01 Mon Aug 22 09:10:44 2011
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

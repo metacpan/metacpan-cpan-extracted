@@ -1,0 +1,343 @@
+ToDo for LitUI, Biblio, ReferenceConverter et al.
+=================================================
+
+This is my personal list of what I want to add as soon as I have some time.
+
+
+
+- most of all: write lots of documentation ......
+
+
+- major re-design: use some XSL based formatting of references ...
+
+- rename file "CrossRef" to e.g. "XRef" to avoid confusion with bibtex's field, which does not always act the same way as PBib would do.
+
+
+- interal charset should always be utf8 --> check document handling (quote / unquote methods, esp. look at RTF) and biblio database handling (via bp).
+
+- release file after save as (04-03-17: fixed??)
+- ACM / default style: support "inline" fields!
+
+
+
+
+
+
+>>>
+OpenOffice::OODoc 1.207 is now available at CPAN.
+>
+> OpenOffice::OODoc (Open Office Document Connector) is an XPath-based,
+> object-oriented Perl module allowing direct read/write access to any
+> content, presentation or metadata element in OOo files. It's distributed
+>   in standard CPAN format and can run on any platform supporting Perl 5.8.
+> This tool is designed to allow simple scripting out of the OOo
+> environement.
+>
+> This last release brings some enhancements related to spreadsheets,
+> allowing the user to process cells in a Calc document in the same way as
+> in a Writer document containing tables.
+>
+> For documentation and download, see the project page
+>
+> http://search.cpan.org/dist/OpenOffice-OODoc
+
+David,
+
+FYI, the last release of the OpenOffice::OODoc Perl API (to be released
+in the next few hours) includes accessors allowing easy read/update
+queries against any biblio property.
+
+Example:
+
+@list = $doc->getBibliographyEntries("GEN99");
+
+returns the full list of entries where the identifier matches "GEN99"
+
+$doc->bibiographyEntryContent
+             (
+             "GEN99",
+             title     => "My Title",
+             author    => "A Name",
+             isbn      => "xxxzzz"
+             );
+
+updates (or creates) some properties of the [GEN99] entry
+
+%properties = $doc->bibliographyEntryContent("GEN99");
+
+returns a hash table (i.e. key/value pairs) containing all the
+properties of [GEN99]
+
+I hope that will help to develop quick scripts that directly process
+bibliography entries in the OOo files...
+<<<
+
+- integrate support for Bibilio::CiteParser to support maintainance of bibliography databases
+
+
+Config:
+- parse cmd line args with dot-syntax, e.g. -item.style=IEEE
+- maybe use AppConfig::Std
+
+LitUI:
+
+- resize main search windows: not only resize the text box at the bottom!!!
+
+- store paper: add paper to internal biblio DB (or update).
+
+
+- LitUIRef Dialog: use different conv. styles in menu items!
+
+
+- Paper menu: export found refs to bibtex etc.
+-- works?
+
+
+- pop-menu for query-history -- häufigsten und letzten einträge nach vorn
+
+- verwaltung von comments, todos (button, der ein fenster öffnet, wie bei search)
+
+- check for newly added references:
+  for "new" references try to analyze them (extract author, title fragment etc.)
+  and query for matching refs.
+  These should be presented in a separate window, and
+  it should be possible to automatically replace 'em in word ...
+- show rated + unused refs: get recommendation from biblio + sort unused according to it
+  = check used papers and their recommendation (if recommended papers are missing)
+  => maybe this should be integrated in the ToDo handling(?)
+- check-buttons: "display used only", "display known only", "new", "unknown & not new"
+- refactor: sub-modules for Ref-Lists
+- support multiple top-level windows (for different papers) ... needed???
+- fork thread to update widgets ... geht das?
+
+LitUIRefDialog:
+- LitUIRefDialog: insert ref: neuen text selektieren
+- LitUIRefDialog: insert hyperlink for Source, doi, BibSource, File, ...
+
+LitUISearchDialog:
+- im menü: alle references von dem suchergebnis ins clipboard als [[S1], [S2], ...]
+
+LitRefs:
+
+- bug: quote single (and double?) quotes in SQL select (')
+- LitRefs should use PBib::Document.pm
+- eigentlich sollte LitUI LitRefs gar nicht mehr benutzen ...
+
+PBib/Doc:
+- MSWord: paragraphs should return also other "stories" (text flows) beside 
+  the main one, esp. footnote/endnotes, or comments, or whichever other stories exist ...
+
+
+PBib:
+
+*****  option to load files that should be scanned for references, but that are not processed. This can be used to be able to have a document stored in multiple files and convert a single file (esp. the one with the bibliography!), without processing the others (well, only scanning).  *****
+
+*** option to use PDF or HTML field to generate a hyperlink to the PDF in the bibliography.
+
+***  option includeURL: "first" = include only one URL, if multiple are given (the first). (or maybe also "last")  ***
+
+
+- IEEETR style for proceedings (12) is broken. (need optional author?)
+
+- support field "CiteAlias[es]".
+
+- make pbib file read-only after processing
+  (to avoid that it is acidently edited ...)
+
+- option to produce more verbose warning messages, e.g. if a "?" is found in pages or URL, or if an author has no first name, or ... well ...
+
+- format Names: use tie connect between Firstnames and Lastname if Firstnames is a single "A." only, e.g. "P.~Tandler"
+- format Names: the "last, first" styles is broken if there is no first name ...
+
+- options for formatting fields that have multiple references.
+  e.g. sort by year or sort by key/year, group refs by 
+  key (author)
+  "(Streitz 1997, 2000, 2001; Tandler 1999, 2002)"
+
+- support for translating titles etc. "Title:EN=The translated title in English", maybe also for some other fields. The current language setting can be used to select the field. Some styles can offer to add a translated title (etc.) for publications in a foreign language.
+- option to force CrossRef overwrite fields (e.g. Proceedings entry has higher precedence than InProceedings)
+
+- options for normalizing SuperTitle fields etc. (always use same conference name, same abbrev. etc.)
+
+- I should use Text::BibTeX::Name to help name processing!!
+- RC's scanner: option to expand embedded references
+
+- "validate bibDB" function: check all entries in the $refs hash, if they are complete (no missing fields etc.), without processing a file.
+
+- LabelStyle::Name: option "forcekey" should take the key as name, but add the year anyway! This should
+  be the way this is handeled by bibtex?
+
+- LabelSytle: provide additional keys as options (to pbib)
+  (which are always forced to be used)
+- adapt the BibItem's sortkeyFor method to be used by the LabelStyle!
+- check: in unique labels are generated: the order should be same as in bibliography!
+- general handling of special entry types like "Name", "Title", "Enum", "Date",
+  "Text", "Number", ...
+  e.g. Pages : Enum (format range), Authors : Name (e.g. format to Lastname,
+  Firstnames, or use Lastname for sorting etc.),
+  Title, SuperTitle : Title (sortkey: strip leading "The"/"A"/...)
+
+- check for common errors in bibliographies
+ - e.g. "et. al" should be "et al."
+ - correct usage of fields etc.
+- fix handling of "et al." as an author name (produce right label, etc.)
+
+- new Ref'Style: Footnote, ~Endnote
+- new LabelStyles: ~FullName, ~Abbrev, ~Number
+- LabelStyle: option which parentheses and separator to use, e.g.
+  "(;)" or "[,]" or "{;}"
+
+- LabelStyle / RefStyle: specify sort order for multi-ref fields, e.g. sort by order in
+  bibliography, by year, by label (alphabetically), ...
+  [[b], [a], [c]] --> ["a", "b", "c"] ("x" stands for the label of [x])
+
+- option "noauthor" - should be different from "inline": really don't print author name
+- option "inline-one" and "inline-mult" to ensure that one / several names are generated.
+  This can be quite helpfull if the name is used as the subject withing the sentence.
+  In the case of one required author, only the first author should be output (with a warning).
+  In the case of several authors, an error should be given if the referenced paper has only one.
+  --> or should this be handled with "noauthor"??
+- option "inline": add correct handling of multiple references given in a single field,
+  e.g. [[BEACH-SyncCollaboration], [BEACH-AppModel+FW]]. This should be formated as
+  "Tandler (2001; 2002)", while
+  [[BEACH-SyncCollaboration], [BEACH-ConnecTables]] should yield
+  "Tandler (2001; Tandler et al. 2001)"
+- option "noparens", when the ref is within parentheses "(...[:noparens|...]...)" to suppress the output of 
+  parentheses. If the current style uses brackets "[...]", they may be generated.
+- option "all" for bibliographies: include all references, not only thoses cited in the document.
+  Especially helpfull for constrained bibliographys (with SQL select pattern).
+
+- Ref'Converter: support for unknown, (unused,), and new references
+- Ref'Converter: finalize-check (option "-final"):
+  look for remaining "??", "#", ">>" and
+  unrsolved references, highlighted text, comments etc. in the document ...
+  what about: [< some todo item?? >], [:global options ... ] |] :]
+  BUT: remove comments & todos when option "-final" is given!!!!!
+  => write ToDo items and new references to $outfile.todo
+- also support replacement of refs within todo+comment fields and
+  support todo + comment references (i.e. a [<...>] embedded within a
+  normal ref field.
+- pbib: options to select styles (dynamically check for available modules)
+- pbib: get default options from ENV or .cnf file
+
+- use bp to handle correct quoting of chars, esp. unbalanced "{"
+  or quotes in biblio fields ....
+
+- BibItem & Ref: support backward references from bibliography to all places
+  where an item was cited (see [[ContextToolkit-ArchSupport]])
+- BibItem option: prepend label to each item, e.g. "[Tan01] P. Tandler ...."
+- BibItem: support for line-break before each trailer field (URL, Note)
+- BibItem: more options to include other fields in trailer (Keywords, ...)
+  (using format_miscEntry())
+- BibItem: option to define bookmark around author (or arbitrary field?)
+  This would be better for the RefStyle::Field that the user can generate
+  e.g. the Author as the field's text.
+- BibItem: use keyword abbev. also within SupterTitle, Journal, etc.
+  to replace "Proceedings" => "Proc.", "Symposium" => "Sypm." etc.
+  optionally remove "on", "the", ...
+  (=> could be used in new style/option for short papers etc.)
+- BibItem + Label: If no explicit label is generated in the bibliography (and no
+  number), provide an option to include the "uniqueness-postfix" generated by
+  the label in the year-field, e.g. "Tandler, P. (2000b). BEACH ..."
+
+- Bibitem: new field CiteState: "to appear", "submitted" -- e.g. for inproceedings
+  or better: check year and month, if that's in future use "to appear in"
+  -- do I need an additional field ("PubDate" = date of conference or "submitted")
+
+- Bibliography: allow different sort styles, e.g. "by label" (default if label
+  is included in items), "as referenced", "by (last)name" ...
+  How can the sorting by coupled with the BibItem style?
+- Bibliography: sorting error "Jr. Dan Olsen" is sorted as "Dan", not "Olsen"
+
+- PBib: use bp Biblio::BP or (s.th. like PBib::Utils?) for debugging messages
+
+- check tib reference style [:...:] -- should pbib support arbitrary
+  reference source styles as well??
+
+Biblio:
+- Biblio::BP: extend goterror, gotwarn, debugs to support log file!
+- Biblio-shortcuts: warn about undefined shortcuts
+- multiple cite-keys would be nice, they could be automatically computed
+  (e.g. from a pattern: "Tool-Conference" or "Author-Year-AbbrevTitle" etc.)
+
+
+=======================================
+
+done:
+- update: always update both refs and paper! (?)
+- Move some formatting information from ReferenceFormators to Documents:
+  only document should know their true syntax,
+  ref'Formators should use abstract interface + rely on Doc's quote()
+  => Ref'Form'RTF -> Ref'Form'Field uses Doc's field() etc. methods
+- allow "inline" references like [Author1, Author2 "Title" ....] that will be
+  included in bibliographies!
+- search author dialog
+- search keyword dialog (look in keyword, title, comment, note, ....)
+- read paper ==> update refs list also! (used/unused might have changed)
+- BibItem bug: output "et al." instead of "et al.." if the Author field ends
+  with a dot.
+- BibItem bug: don't output "edition" if the Edition field is not an (ordinal) number
+- button: "copy selected ref to clipboard", "find + jump to selected ref in word"
+- search dialog: search case-independent
+- "open" doc button: open selected document (in word or notepad or associated app.)
+- pbib-import: import bib's into std-bib
+- doppel-klick in ref liste öffnet refs fenster
+- jump-to-key: auch für liste mit focus
+- option "inline" print "Tandler et al. (2000)" (et al. could be in italics!)
+- PBib: fix creation of bookmarks in IEEE style
+- LitUIRefDialog: use PBib to generate sensible output of reference!
+- use bp ...
+- support for xrefs.: define conferences and journals (see bibtex)
+- multiple CrossRef entries for a ref, separated by comma. now you can include conference and author address etc.
+- pop-menu for query-history -- doppelte raus!
+- LitUI: Open document should use previous file's dir as default dir
+
+15.3.03
+- two options for etal count: for label and for bibitem (might be larger or 0 (zero), if always all authors should be included).
+
+21.5.03
+- expand crossref now also adapts the CiteType (journal -> article, etc.)
+
+*** new CiteType for workshop position papers, that have no publisher, but published online.
+--> simple solution: use CiteType "talk". "talk" is now modified to be like inproceedings, but with optional publisher.
+
+23.5.03
+*** support for parsing names: use "/" as separator
+	/Jones/von/John/Jr./,/Krol/Ed/,/Beethoven/von/Ludwig/
+	i.e.
+		2 "/" -> "/Company/"
+		3 "/" -> "/Lastname/Firstnames/"
+		4 "/" -> hm ... "/Lastname/von/Firstnames/"
+		5 "/" -> "/Lastname/von/Firstnames/Jr/"
+	is it ok to separate Firstnames by spaces? or can a single name contain a 
+	space? in this case it might be quoted "\ " ...
+	by using a starting and trailing "/" we can distinguish this format from ord. names.
+
+
+11.01.04
+- ein "details of selected paper" view (->toni)
+- LitUIRefDialog: CrossRef in LitUIRefDialog: the CrossRef item is not included. (geht jetzt glaub ich)
+- LitUIRefDialog:menu öffnet nicht über alt+taste (works)
+
+12.02.04 (geht schon länger)
+*** edit window for LitUI: paste entry as bibtex or as "k=v\n" that can be modified and will be parsed afterwards ***
+--> 04-02-12: bibtex is not supported for import and export.
+
+
+- Config module ausprobieren & einbinden -- geht jetzt???
+---> reload config button? oder wird die config eh jedes mal neu eingelesen?
+--> 04-02-12: im "processPaperFile" wird jedes mal ein neues Config gemacht.
+
+- jump-to-key: handling wie bei windows (if at key, jump to next occurance)
+--> nö.
+- jump-to-key doesn't work anymore .....!!!
+--> geht wieder.
+
+- ctrl-a, ctrl-f: select whole text in input field, not only place cursor!!!
+--> 04-02-12: done
+
+- option to send all debug to .log file
+--> done
+
+- count time needed for processing
+--> 04-02-12: done

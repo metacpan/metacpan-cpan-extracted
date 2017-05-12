@@ -1,0 +1,14 @@
+Benchmark-Report-GitHub
+=======================
+
+Created:      2014-07-30
+Home page:    <https://metacpan.org/release/Benchmark-Report-GitHub>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Benchmark-Report-GitHub>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2014-09-23
+
+ [ Packaging ]
+ - Explicit dependency on Perl 5.6.
+
+0.001	2014-07-30	Initial release

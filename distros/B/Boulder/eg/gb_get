@@ -1,0 +1,67 @@
+#!/usr/local/bin/perl
+
+use strict 'vars';
+use Boulder::Stream;
+use Boulder::Genbank;
+use Getopt::Long;
+use Text::Abbrev;
+my ($ACCESSOR,$DELAY,$FIRST);
+
+GetOptions('accessor=s' => \$ACCESSOR,
+	   'delay=i'     => \$DELAY) || die <<USAGE;
+Usage: $0 [options] [accession] [accession] ...
+
+Retrieves Genbank entries from a list of accession
+numbers.  If no accession numbers are present on the
+command line, or if the magic "-" argument is given,
+will read accession numbers from standard in.
+
+Outputs a series of Boulder records for each accession
+number.
+
+Options:
+  -accessor <Entrez|Yank>  Use the Entrez|Yank methods
+                            for retrieving records.
+  -delay    <seconds>      Seconds to sleep between retrievals (10)
+
+Options may be abbreviated, i.e. -acc E
+USAGE
+;
+
+$ACCESSOR ||= 'Entrez';
+unless (defined $DELAY) {
+  warn "Warning: No -delay parameter. Introducing a 1 second delay between fetches\n";
+  $DELAY = 1;
+}
+my @accession_numbers;
+my $from_stdin = !@ARGV;
+my $abbrev = abbrev qw(Entrez Yank entrez yank);
+my $accessor = $abbrev->{$ACCESSOR} || die "Unknown access method $ACCESSOR";
+substr($accessor,0,1)=~tr/a-z/A-Z/; #canonicalize
+
+while (defined (my $a = shift)) {
+  $from_stdin++,last if $a eq '-';
+  push(@accession_numbers,$a);
+}
+
+if ($from_stdin) {
+  while (<>) {
+    chomp;
+    next if /^\#/;
+    my ($a) = /^(\w+)/;
+    next unless $a;
+    push(@accession_numbers,$a);
+  }
+}
+
+my $stream = new Boulder::Stream;
+my $gb = new Boulder::Genbank(-accessor=>$accessor,-fetch=>\@accession_numbers)
+  || die "Couldn't open new Boulder::Genbank object";
+my $count;
+while (1) {
+  last if $count++ > @accession_numbers;
+  next unless my $s = $gb->get;
+  sleep $DELAY if $FIRST++ && $DELAY > 0;
+  $stream->put($s);
+}
+

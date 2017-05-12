@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+FileIO.pm
+t/00use.t
+t/10create.t
+t/20insert.t
+t/30step.t
+t/40get.t
+t/99drop.t
+t/My_Test.pm

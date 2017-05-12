@@ -1,0 +1,140 @@
+
+=head1 NAME
+
+Box2D::b2JointDef - Used to construct joints.
+
+=head1 SYNOPSIS
+
+  # Don't use this class directly, use a subclass.
+
+=head1 DESCRIPTION
+
+Joint definitions are used to construct joints.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+=head2 bodyA()
+
+=head2 bodyA( $bodyA )
+
+The first attached body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body*> C<$bodyA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Body*>
+
+=head2 bodyB()
+
+=head2 bodyB( $bodyB )
+
+The second attached body.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body*> C<$bodyB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Body*>
+
+=head2 collideConnected()
+
+=head2 collideConnected( $collideConnected )
+
+Set this flag to true if the attached bodies should collide.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$collideConnected> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 type()
+
+=head2 type( $type )
+
+The joint type is set automatically for concrete joint types.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2JointType> C<$type> (optional)
+
+=back
+
+Returns a C<Box2D::b2JointType>
+
+=head2 userData()
+
+=head2 userData( $userData )
+
+Use this to attach application specific data to your joints.
+
+Parameters:
+
+=over 4
+
+=item * C<scalar> C<$userData> (optional)
+
+=back
+
+Returns a C<scalar>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2DistanceJointDef>
+
+=item * L<Box2D::b2FrictionJointDef>
+
+=item * L<Box2D::b2GearJointDef>
+
+=item * L<Box2D::b2LineJointDef>
+
+=item * L<Box2D::b2MouseJointDef>
+
+=item * L<Box2D::b2PrismaticJointDef>
+
+=item * L<Box2D::b2PulleyJointDef>
+
+=item * L<Box2D::b2RevoluteJointDef>
+
+=item * L<Box2D::b2WeldJointDef>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

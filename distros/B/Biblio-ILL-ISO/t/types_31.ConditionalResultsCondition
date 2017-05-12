@@ -1,0 +1,16 @@
+$VAR1 = bless( {
+                 'ENUMERATED' => 22,
+                 'ENUM_LIST' => {
+                                  'special-collections-supervision-required' => 25,
+                                  'cost-exceeds-limit' => 13,
+                                  'proposed-delivery-service' => 30,
+                                  'prepayment-required' => 15,
+                                  'responder-specific' => 28,
+                                  'library-use-only' => 22,
+                                  'lacks-copyright-compliance' => 16,
+                                  'client-signature-required' => 24,
+                                  'other' => 27,
+                                  'no-reproduction' => 23,
+                                  'charges' => 14
+                                }
+               }, 'Biblio::ILL::ISO::ConditionalResultsCondition' );

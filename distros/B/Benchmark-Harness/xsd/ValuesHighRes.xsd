@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xsd:element name="ValuesHighRes">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ID" type="TID" maxOccurs="unbounded"/>
+				<xsd:element name="T" type="TT" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="n" type="xsd:string" use="required"/>
+			<xsd:attribute name="v" type="xsd:string" use="required"/>
+			<xsd:attribute name="V" type="xsd:string" use="required"/>
+			<xsd:attribute name="tm" type="xsd:string" use="required"/>
+			<xsd:attribute name="pid" type="xsd:short" use="required"/>
+			<xsd:attribute name="userid" type="xsd:string" use="required"/>
+			<xsd:attribute name="os" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="TID">
+		<xsd:attribute name="id" type="xsd:short" use="required"/>
+		<xsd:attribute name="name" type="xsd:string" use="required"/>
+		<xsd:attribute name="type" type="xsd:string" use="required"/>
+		<xsd:attribute name="package" type="xsd:string" use="required"/>
+		<xsd:attribute name="modifiers" type="xsd:string" use="optional"/>
+	</xsd:complexType>
+	<xsd:complexType name="TT">
+		<xsd:sequence>
+			<xsd:element name="V" type="TV" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="_i" type="xsd:short" use="required"/>
+		<xsd:attribute name="_m" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:NMTOKEN">
+					<xsd:enumeration value="E"/>
+					<xsd:enumeration value="X"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+		<xsd:attribute name="t" type="xsd:decimal" use="required"/>
+	</xsd:complexType>
+	<xsd:complexType name="TV">
+		<xsd:attribute name="n" type="xsd:short" use="required"/>
+		<xsd:attribute name="v" type="xsd:string"/>
+		<xsd:attribute name="_t" type="xsd:NMTOKEN"/>
+	</xsd:complexType>
+</xsd:schema>

@@ -1,0 +1,22 @@
+Changes
+lib/Banal/Utils.pm
+lib/Banal/Utils/Array.pm
+lib/Banal/Utils/Class.pm
+lib/Banal/Utils/Data.pm
+lib/Banal/Utils/File.pm
+lib/Banal/Utils/General.pm
+lib/Banal/Utils/Hash.pm
+lib/Banal/Utils/String.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

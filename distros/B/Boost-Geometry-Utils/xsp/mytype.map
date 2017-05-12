@@ -1,0 +1,218 @@
+opolygon*	T_PTROBJ
+omultipolygon*	T_PTROBJ
+omultilinestring*	T_PTROBJ
+
+polygon		T_POLYGON
+polygon*        T_POLYGON_PTR
+
+multi_polygon		T_MULTI_POLYGON
+multi_polygon*        T_MULTI_POLYGON_PTR
+
+linestring	T_LINESTRING
+linestring*	T_LINESTRING_PTR
+
+multi_linestring	T_MULTI_LINESTRING
+multi_linestring*	T_MULTI_LINESTRING_PTR
+
+point_xy	T_POINT_XY
+point_xy*       T_POINT_XY_PTR
+
+INPUT
+T_POLYGON
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2polygon(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_POLYGON_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2polygon(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_MULTI_POLYGON
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2multi_polygon(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_MULTI_POLYGON_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2multi_polygon(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_LINESTRING
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2linestring(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_LINESTRING_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2linestring(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+
+T_MULTI_LINESTRING
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2multi_linestring(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_MULTI_LINESTRING_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2multi_linestring(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_POINT_XY
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $type* tmp = perl2point_xy(aTHX_ (AV*)SvRV($arg));
+	  if (tmp == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	  else {
+	    $var = *tmp;
+	    delete tmp;
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+T_POINT_XY_PTR
+	if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVAV) {
+	  $var = perl2point_xy(aTHX_ (AV*)SvRV($arg));
+	  if (($var) == NULL) {
+	    Perl_croak(aTHX_ \"%s: %s is not an array reference or contains invalid data\",
+	               ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	               \"$var\");
+	  }
+	}
+	else
+	  Perl_croak(aTHX_ \"%s: %s is not an array reference\",
+	             ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+	             \"$var\");
+
+
+OUTPUT
+
+T_POLYGON
+	$arg = polygon2perl(aTHX_ $var);
+
+T_POLYGON_PTR
+	$arg = polygon2perl(aTHX_ *$var);
+	delete $var;
+
+T_MULTI_POLYGON
+	$arg = multi_polygon2perl(aTHX_ $var);
+
+T_MULTI_POLYGON_PTR
+	$arg = multi_polygon2perl(aTHX_ *$var);
+	delete $var;
+
+T_LINESTRING
+	$arg = linestring2perl(aTHX_ $var);
+
+T_LINESTRING_PTR
+	$arg = linestring2perl(aTHX_ *$var);
+	delete $var;
+
+T_MULTI_LINESTRING
+	$arg = multi_linestring2perl(aTHX_ $var);
+
+T_MULTI_LINESTRING_PTR
+	$arg = multi_linestring2perl(aTHX_ *$var);
+	delete $var;
+
+T_POINT_XY
+	$arg = point_xy2perl(aTHX_ $var);
+
+T_POINT_XY_PTR
+	$arg = point_xy2perl(aTHX_ *$var);
+	delete $var;

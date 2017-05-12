@@ -1,0 +1,69 @@
+Bio::SeqReader is copyright 2012, John A. Crow and the National Center for
+Genome Resources. All rights reserved.
+
+--------------------------------------------------------------------------------
+
+ABOUT BIO::SEQREADER
+
+Bio::SeqReader provides developers simple-to-use classes for reading sequence
+data in standard formats. This currently includes FASTA and FASTQ. This module
+provides a very lightweight alternative to the fine Bioperl package.
+
+Bio::SeqReader::Fasta
+The FASTA (Pearson) sequence format is described in the documentation associated
+with the FASTA suite as introduced in W. R. Pearson and D. J. Lipman. (1988)
+"Improved tools for biological sequence comparison," Proceedings of the National
+Academy of Sciences USA 85. See for example
+
+  http://fasta.bioch.virginia.edu/fasta_www2/fasta_guide.pdf
+
+or
+
+  http://en.wikipedia.org/wiki/FASTA_format.
+
+The original format allows for the use of a semicolon (";") to introduce the
+sequence header. Bio::SeqReader::Fasta will handle this correctly.
+
+Bio::SeqReader::Fastq
+The FASTQ format is described formally in P. J. A. Cock, C. J. Fields, N. Goto,
+M. L. Heuer, P. M. Rice. (2010) "The Sanger FASTQ file format for sequences with
+quality scores, and the Solexa/Illumna FASTQ variants," Nucleic Acids Research
+38. Note that it specifically allows for multiline sequence and quality score
+information, and Bio::SeqReader::Fastq is designed to handle this correctly.
+
+INSTALLATION
+
+Bio::SeqReader is native Perl and, as noted below, only requires a standard Perl
+installation. To install this module first create the Makefile from Makefile.PL
+by running
+
+  perl Makefile.PL
+
+or for a nonstandard location (you'll probably need to adjust PERL5LIB later)
+
+  perl Makefile.PL INSTALL_BASE=/path/to/my/perlmods
+
+or
+
+  perl Makefile.PL PREFIX=/path/to/my/perllibs
+
+Then
+
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+Bio::SeqReader requires only core Perl.
+
+LICENSE
+
+This set of modules is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself, either Perl version 5.10.0 or, at your option,
+any later version of Perl 5 you may have available.
+
+The modules are distributed in the hope that they will be useful, but are provided
+"as is" and without any express or implied warranties.
+
+

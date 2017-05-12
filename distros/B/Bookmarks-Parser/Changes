@@ -1,0 +1,33 @@
+Revision history for Bookmarks::Parser
+
+0.08    Removed use of defined(@array) that doesn't work anymore in perl 5.21.x.
+        (fixes RT#103080).
+
+0.07    Fixed parsing of IN PANEL and PANEL_POS properties
+        in Opera bookmarks (RT#75463).
+
+0.06
+        Fixed parsing of DISPLAY URL property in Opera bookmarks.
+        Added unit tests.
+
+0.05
+        Fixed parsing of ICONFILE property in Opera bookmarks.
+        Added unit tests.
+
+0.04
+        Fixed RT#18238
+
+0.03
+        Fixed RT#18894
+
+0.02
+        [Bookmarks::Opera] Fixed two fairly bad bugs:
+          * items separated by lines containing leading spaces (instead of empty)
+            were not parsed correctly, skipping to the next bookmark
+          * last item wouldn't be parsed if there wasn't an empty last line
+
+        [Bookmarks::Opera] Updated to handle all Opera custom properties.
+
+0.01
+        First version, released on an unsuspecting world.
+

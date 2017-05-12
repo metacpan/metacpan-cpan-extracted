@@ -1,0 +1,18 @@
+CREATE TABLE family (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    street VARCHAR(100),
+    city VARCHAR(100),
+    created datetime,
+    modified datetime
+);
+
+CREATE TABLE child (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    birth_day date,
+    created datetime,
+    modified datetime,
+    family MEDIUMINT REFERENCES family(id)
+);
+

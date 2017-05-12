@@ -1,0 +1,101 @@
+Revision history
+
+1.10 2015-08-11 maintenance release, update not required
+
+- Added tests and documentation demonstrating how to address RT:16941
+
+  https://rt.cpan.org/Ticket/Display.html?id=16941
+
+
+1.09 2015-08-03 maintenance release, update not required
+
+- Added MetaProvides to Dist::Zilla build, this should assist in 
+  addressing the issue listed on CPANTS and on github
+
+  Ref: https://github.com/jonasbn/Business-Tax-VAT/issues/1
+
+- Adjusted and aligned version numbers
+
+- Removed the hack to present the proper tax rate for Luxembourg,
+  patch was handling a future, change this is not necessary anymore
+    
+- Corrected the Luxembourg rate in the POD
+
+
+1.08 2015-01-31 feature release, update recommended
+
+- Luxembourg VAT rates corrected by Sam Kington
+
+- Introducing dependency Test::MockTime
+
+
+1.07 2014-12-11 feature release, update recommended
+
+- Plenty of VAT rates corrected by Sam Kington
+
+
+1.06 2014-09-01 maintenance release, update not required
+
+- Minor updates to the POD
+
+- Updated Dist::Zilla configuration with more plugins to save more time
+
+
+1.05 2014-08-20 maintenance release, update not required
+
+- Added Test::CPAN::Changes test t/changes.t
+
+- Added Test::Kwalitee test t/kwalitee
+
+- Attempted to get the homepage pointing to MetaCPAN, instead of
+  search.cpan.org, but it might take some time before the change
+  goes through
+
+- Added provides in META.yml
+
+- Added repository information on Github
+
+
+1.04 2014-08-15 maintenance release, update not required
+
+- Addressing Kwalitee
+
+- Changed from classic Makefile.PL to Dist::Zilla based release
+  management and general SDLC tooling. This should address issues
+  with META spec, since it will not be automatically generated
+
+- Attemting specification of required perl version, due to POD
+  syntax we land on Perl 5.8 according to Perl::Critic
+
+
+1.03 2014-08-04 maintenance release, update not required
+
+- Addressing some cpantesters reports on Linux, holding
+  higher resolution on the floating-point numbers
+
+  Example report:
+
+  http://www.cpantesters.org/cpan/report/72783644-18dd-11e4-b23f-846b3a34fa6c
+
+1.02 2014-0731 maintenance release, update not required
+
+- Bumped up year in copyright section
+
+- Updated README from POD
+
+
+1.01 2014-07-31 feature release, update recommended
+
+- RT:88779, adjusting IT rate to 22%
+
+- RT:74846, adjusting UK rate to 20%
+
+- RT:61956, adjusting DE rate to 19%
+
+1.00 2005.09.03, feature release, update recommended
+
+- Added new EU countries and brought VAT rates up to date
+
+0.91 2001-11-11
+
+- Created this

@@ -1,0 +1,70 @@
+/* 
+To create the database, run this file through psql like so:
+prompt> psql -f 0_pph_createTables.postgresql bgpmon_db bgpmon_db_user
+*/
+
+/* pph = peer, prefix history */
+drop schema if exists pph cascade;
+create schema pph;
+
+
+CREATE TABLE pph.rib_import(
+	peer INET,
+	collector VARCHAR(30),
+	prefix CIDR,
+	ts TIMESTAMP WITHOUT TIME ZONE,
+	origin INTEGER,
+	lasthop INTEGER,
+	aspath INTEGER ARRAY
+);
+CREATE TABLE pph.update_import(
+	peer INET,
+	collector VARCHAR(30),
+	prefix CIDR,
+        update BOOLEAN,
+	ts TIMESTAMP WITHOUT TIME ZONE,
+	origin VARCHAR,
+	lasthop VARCHAR,
+	aspath VARCHAR ARRAY
+);
+	
+
+CREATE TABLE pph.prefixes (
+	pref CIDR UNIQUE NOT NULL, 
+	dbid SERIAL NOT NULL, 
+	PRIMARY KEY (dbid)
+);
+
+CREATE TABLE pph.peers (
+	dbid SERIAL NOT NULL, 
+	name VARCHAR(30), 
+	addr INET NOT NULL, 
+	collector VARCHAR(30) NOT NULL,
+        UNIQUE(addr,collector),
+	PRIMARY KEY (dbid)
+);
+create index peers_n1 on pph.peers (addr,collector);
+
+CREATE TABLE pph.ppms (
+	dbid SERIAL NOT NULL,
+	peer_dbid INTEGER NOT NULL, 
+	prefix_dbid INTEGER NOT NULL, 
+	last_timerange_dbid INTEGER NULL, 
+	prefix_safi INTEGER, 
+	PRIMARY KEY (dbid), 
+        UNIQUE(prefix_dbid,peer_dbid),
+	FOREIGN KEY(peer_dbid) REFERENCES pph.peers (dbid), 
+	FOREIGN KEY(prefix_dbid) REFERENCES pph.prefixes (dbid)
+);
+
+CREATE TABLE pph.timeranges (
+	dbid SERIAL NOT NULL, 
+	ppm_dbid INTEGER NOT NULL,
+	start_time TIMESTAMP WITHOUT TIME ZONE, 
+	end_time TIMESTAMP WITHOUT TIME ZONE, 
+	last_hop VARCHAR, 
+	origin_as VARCHAR, 
+	as_path VARCHAR ARRAY,
+	PRIMARY KEY (dbid), 
+	FOREIGN KEY (ppm_dbid) REFERENCES pph.ppms (dbid)
+);

@@ -1,0 +1,121 @@
+=head1 NAME
+
+Business::BancaSella::Gateway - Abstract class for Gateway compatibility parameter info
+
+=head1 SYNOPSIS
+
+  Abstract Class...you shouldn't use it directly. 
+  See Business::BancaSella::Encode::Gateway for encoding or
+  Business::BancaSella::Encode::Gateway for dencoding.
+
+=head1 DESCRIPTION
+
+This is an abstract class for Gateway compatibility payment system implementing all property passed
+and received during payment transaction with the international credit card 
+circuits between Banca Sella gateway.
+
+=head2 PROPERTY
+
+=over 2
+
+=item shopping
+
+Unique identification number assigned from Banca Sella to trader.
+Using during: Encode
+
+=item amount
+
+The amount of the transaction. The currency is related to the value
+of currency method. Default is expressed in Euro.
+Using during: Encode
+
+=item id
+
+An identification attributed to the transaction by trader. It will be returned
+in the reply response of payment system.
+Using during: Encode, Decode
+
+=item otp
+
+During Encode should be one of the "one time password" present in the ric file.
+During Decode must be one of the "one time password" present in the ris file.
+Using during: Encode, Decode
+
+=item result 
+
+Transaction result. It can be "KO" or the authcode of banking circuit systems
+Using during: Decode
+
+=item authcode 
+
+Authorization transaction Code
+Using during: Decode
+
+=item user_params
+
+It's a reference to hash of key => value user personalized parameters like 
+defined in the control panel of Banca Sella profile manager.
+
+=item currency
+
+It can assume values "eur" of "itl" for the EURO currency or for the old italian
+lire currency. Default value is "eur".
+
+=item anguage
+
+Set the language of the Banca Sella response pages. It can be set to one of this
+values: "italian", "french", "spanish" or "english". Default is "italian".
+
+=item 
+
+=back
+
+=head2 METHOD
+
+=over 2
+
+=item uri
+
+Using during Encode return the formatted uri to pass all prepared value to 
+Banca Sella online payment system
+
+=item form(frmName)
+
+Using during Encode return a form html code named "frmName" ready for passing
+all prepared value to Banca Sella online payment system
+
+=back
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 LICENSE
+
+Business::BancaSella::Gateway : Abstract class for Gateway compatibility parameter info with Perl 
+Copyright (C) 2001 Bruni Emiliano (info@ebruni.it)
+
+This module is free software; you can redistribute it and/or modify it under the terms of
+either:
+
+a) the GNU General Public License as published by the Free Software Foundation; either version
+1, or (at your option) any later version, or
+
+b) the "Artistic License" which comes with this module.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+either the GNU General Public License or the Artistic License for more details.
+
+You should have received a copy of the Artistic License with this module, 
+in the file ARTISTIC.  If not, I'll be glad to provide one.
+
+You should have received a copy of the GNU General Public License along with this program; if
+not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+02111-1307 USA
+
+=head1 SEE ALSO
+
+Business::BancaSella::Decode::Gestpay
+
+=cut

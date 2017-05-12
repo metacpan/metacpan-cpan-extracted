@@ -1,0 +1,134 @@
+
+=head1 NAME
+
+Box2D::b2DistanceJoint - Constrains two bodies at a fixed distance.
+
+=head1 SYNOPSIS
+
+  my $joint = $world->CreateJoint( $joint_def );
+  my $anchor_a = $joint->GetAnchorA();
+  my $anchor_b = $joint->GetAnchorB();
+
+=head1 DESCRIPTION
+
+A distance joint constrains two points on two bodies to remain at a
+fixed distance from each other. You can view this as a massless, rigid
+rod.
+
+=head1 METHODS
+
+=head2 GetAnchorA()
+
+Get the anchor point on bodyA in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Get the anchor point on bodyB in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetDampingRatio()
+
+Returns a C<float32>
+
+=head2 GetFrequency()
+
+Returns a C<float32>
+
+=head2 GetLength()
+
+Returns a C<float32>
+
+=head2 GetReactionForce( $inv_dt )
+
+Get the reaction force on body2 at the joint anchor in Newtons.
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Get the reaction torque on body2 in N*m. Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head2 SetDampingRatio( $ratio )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$ratio>
+
+=back
+
+=head2 SetFrequency( $hz )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$hz>
+
+=back
+
+=head2 SetLength( $length )
+
+Set/get the natural length. Manipulating the length can lead to
+non-physical behavior when the frequency is zero.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$length>
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2DistanceJointDef>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

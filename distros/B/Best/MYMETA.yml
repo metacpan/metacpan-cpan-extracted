@@ -1,0 +1,26 @@
+---
+abstract: 'Load modules with fallback'
+author:
+  - 'Gaal Yahas, C<< <gaal at forum2.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.113640'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Best
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.006
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.15

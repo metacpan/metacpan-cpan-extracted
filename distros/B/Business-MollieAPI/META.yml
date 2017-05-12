@@ -1,0 +1,39 @@
+---
+abstract: 'Implementation of new Mollie API'
+author:
+  - 'Peter Stuifzand <peter@stuifzand.eu>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.036
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-MollieAPI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON::XS: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Moo: 0
+  URI: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/stuifzand-software/Business-MollieAPI/issues
+  homepage: https://github.com/stuifzand-software/Business-MollieAPI
+  repository: https://github.com/stuifzand-software/Business-MollieAPI.git
+version: 0.10
+x_contributors:
+  - 'Christiaan Kras <c.kras@pcc-online.net>'
+  - 'Peter Stuifzand <peter.stuifzand@gmail.com>'

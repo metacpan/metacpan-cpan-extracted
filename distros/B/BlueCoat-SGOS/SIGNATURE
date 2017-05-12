@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3ebcedce7cd0a6285268e4e33aeb12cf6dc5aa65 Build.PL
+SHA1 bb8142ef62d6d364334a0daff8d3b52daf5c11a5 Changes
+SHA1 b42003d361f328a3c78e72e7a71e1736f8cc901b LICENSE
+SHA1 9ee44c699f81d2eda3e1d597f8c8cbe13354154a MANIFEST
+SHA1 bdec76e6177ad545806f77d1081d9e5a01679443 META.json
+SHA1 6fcdf274f395bc04b34e2dd730c1380b6964f17f META.yml
+SHA1 35ddb328279680b1b3962a434d0abe6f57b85a25 Makefile.PL
+SHA1 87a9d9e987f456eed5e6f7200df134b7dd0a8d98 README
+SHA1 b03b472ff0fb47b1c2ef3959971ed4724fc2b804 examples/cmd.pl
+SHA1 07697727ad90a80213f62566566fd6e7a26cc33b examples/cpl.pl
+SHA1 66c4b1b21790557bc33b0b34aed40f63053aab31 examples/inventory.pl
+SHA1 77cd52179eda663ef933ab1570640b0d07fb72a1 examples/networkinfo.pl
+SHA1 814be2e3311d77e1c9eaf0de5e3a6c3d8a67ae96 examples/sections.pl
+SHA1 a7ca44c77629c9df75c7dbf0d6dbac4893afe203 examples/sysinfo-capture.pl
+SHA1 5f0f41d5fa4f57eb2ee94d250dfbeaabd9501a07 lib/BlueCoat/SGOS.pm
+SHA1 3ab5c65f855964dc9f7990fdec6019bc9ebface9 t/000_load.t
+SHA1 e69dbefbef3ae10426af1ca8ab95acbb15bd3ac2 t/300_file_sysinfo.t
+SHA1 995fab11dcf7b9b99584438783c8378bce4fa234 t/sysinfos/ProxySG-4006060000--20090307-165730UTC.sysinfo
+SHA1 defc765414a0996fa87b0eb23ce8588d9a6e10ad t/sysinfos/public.parameters
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJRR+HtAAoJEL4hzQbZYh1qS/0P/RZHQKCDtvSusAu/xDDom2LU
+xWHvx17VbEFoWiCH79jpiPYq8e1lo5ojS75Jo+eN3wJdSUpjOOui0YMPmV9TYqzo
+Jp7+AfhNbrJk/opqQc71R6fPzmjzT2iEYkV/sXtT3x4jpOvgpVquIXJWOoUcx+71
+GOo/Xx44Pz2M45B8MYMml4wCeTqscN8l9SyDyVtQ2lrUL37ihjeKCQLIimd9c0LV
+/oOwJdjmJB+XwwDeDh9u5cV9J4+LQPKlbk83aIfWwJMmnssm49srTYpE5J1jvhOp
+iRe/OP7ffCP2knbZxXTxRQhPWXM7nTvQy5fg2TVHUDgNCU9mRFnlvhfxg+C1oqoi
+vAQQowQG86PhYkXfXSbrcGonEYSymGUwBznBGX7G2+IYMKfQlZoKtTvWjh5SURGy
+je0Ya837aZJTRNdWBz+E64IazsqoDThoTZC2bolALpHfDPAvLSzGosyobJpA43ee
+3mksPe3ZJrtcKn/KmcIPNnVQiMnpTDvvyUNMFKM7Ggi/9ggJbn+Satah2URXfkb4
+K+WtXi3i+FlZH8nRiFJ3Xr3B5b1vgxRyAegdpUz/q26jVaNVIrHqmOyQ9IqqY72e
+5bsXd7RBTGVywG0rkATr3Ro2Yrq9gKItfRWB0Cd1sQLtNEnoyPIjadvGBW7/ERPi
+95uYJvMKzKm0YOK1xARN
+=FX9j
+-----END PGP SIGNATURE-----

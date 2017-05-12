@@ -1,0 +1,24 @@
+Copyright (c) 2004 Ivan Kohler
+All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::StGeorge, an Business::OnlinePayment
+backend module for the St.George Bank Internet Payment Gateway.  It is only
+useful if you have a merchant account with St.George Bank:
+https://www.ipg.stgeorge.com.au/ and their "Perl API".
+
+It is (rather distantly, at this point) based on
+Business::OnlinePayment::AuthorizeNet written by Jason Kohles.
+
+There are additional tests in t2/ that may be useful to you once you have
+a merchant account and the digital certificate from St. George.
+
+Ivan Kohler <ivan-stgeorge@420.am>
+
+Please send patches as unified diffs (diff -u).
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+

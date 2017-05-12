@@ -1,0 +1,10 @@
+classes:
+  - hw.x86.amd64
+  - hw.firmware
+  - Hardware.igp.intel.valleyview
+  - Hardware.base
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include core support for board with Intel Bay Trail-M (Pentium/Celeron) SoC

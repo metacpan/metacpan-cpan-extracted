@@ -1,0 +1,45 @@
+0.27      2014-10-03 14:16:15 Europe/Amsterdam
+
+0.26      2014-03-05 14:00:05 Europe/Amsterdam
+
+0.25      2013-10-03 14:34:08 Europe/Paris
+
+0.24      2013-10-01 17:30:36 Europe/Paris
+  * fix issue #11, parameters are now validated (Tiago Peczenyj)
+
+0.23      2013-08-09 20:46:17 Europe/Paris
+
+  * fix issue #9: perl 5.12 not required, require 5.10
+
+0.22      2013-06-18 22:58:23 Europe/Paris
+
+0.21      2013-06-12 22:22:57 Europe/Paris
+
+0.20      2013-06-07 11:36:36 Europe/Paris
+
+0.19      2013-06-07 11:24:37 Europe/Paris
+  * fix compile tests
+
+0.18      2013-06-07 10:59:22 Europe/Paris
+
+0.17      2013-06-07 10:57:47 Europe/Paris
+  * fix minimum perl version requirement for cpan testers
+
+0.16      2013-06-07 00:05:59 Europe/Paris
+  * Fix Travis and dist.ini
+
+0.15      2013-06-06 23:58:05 Europe/Paris
+  * Minor fixes
+  * Configure Travis for this project
+
+0.14      2013-06-06 18:27:37 Europe/Paris
+
+0.13      2013-06-06 14:09:10 Europe/Paris
+
+0.12      2013-06-05 17:19:02 Europe/Paris
+
+0.11      2013-06-05 15:15:29 Europe/Paris
+
+0.10      2013-06-05 15:00:35 Europe/Paris
+  * First implementation
+  

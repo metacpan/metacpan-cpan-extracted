@@ -1,0 +1,22 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Home Page'; %]
+
+<p><h2>Critical Prefix List: "[% LIST  %]"</h2></p>
+
+<form name="viewform" action="cpm_workflow.cgi" method="get">
+
+<table width="100%" CELLPADDING="0" CELLSPACING="0" border="0">
+<tr>
+  <th width="5%" align="left"><input type="submit" name="action" value="Add"/></th>
+  <!--th width="5%" align="left"><input type="submit" name="action" value="Remove"/></th-->
+  <th width="5%" align="left">&nbsp</th>
+  <th width="5%" align="left"><input type="submit" name="action" value="Expand"/></th>
+  <th width="60%" align="center">&nbsp</th>
+  <th width="10%"align="right"><input type="submit" name="action" value="Export"/></th>
+</tr>
+</table>
+<br>
+[% INCLUDE table.tt %]
+<br>
+<input type="hidden" name="list" value="[% LIST %]"/>
+</form>
+[% INCLUDE footer.html %]

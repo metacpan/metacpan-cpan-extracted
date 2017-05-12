@@ -1,0 +1,27 @@
+Copyright (c) 2006 Fire2Wire Internet Services (http://www.fire2wire.com)
+
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This is Business::OnlinePayment::Skipjack, an Business::OnlinePayment backend
+module for the Skipjack transaction network.  It is only useful if you have an
+account with SkipJack:
+http://www.skipjack.com/transactionnetwork/index.html
+
+Inspiried by (but no longer contains) code from:
+
+  Original Skipjack.pm developed by New York Connect Net (http://nyct.net)
+  Michael Bacarella <mbac@nyct.net>
+
+  Modified for GetCareer.com by Slipstream.com
+  Troy Davis <troy@slipstream.com>
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+
+Environment variable recongnized by "make test":
+sj_html_serial_number - HTML serial number
+sj_devel_serial_number - Developer serial number (required for voids & credits)
+

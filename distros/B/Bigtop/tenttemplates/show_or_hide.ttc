@@ -1,0 +1,24 @@
+[%#
+    You should use this template in a WRAPPER directive.
+
+    Template component for clickable headings which reveal/hide their
+    content.  Designed to be used as a wrapper around the content to
+    be toggled into/out of view.
+
+    Requires a javascript function called show_or_hide to be in scope
+    to do the work.
+
+    Expects these parameters:
+
+        label                 - The link text shown to the user
+        element_under_control - div id of the content to reveal or hide
+%]
+<div id='[% element_under_control %]'
+  [% IF expanded %]
+    style='display: inline'
+  [% ELSE %]
+    style='display: none'
+  [% END %]
+>
+  [% content %]
+</div>

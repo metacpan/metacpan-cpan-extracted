@@ -1,0 +1,252 @@
+NAME
+    BBCode::Parser - Parses BBCode tags
+
+DESCRIPTION
+    BBCode is a simplified markup language used in several online forums and
+    bulletin boards. It originated with phpBB, and remains most popular
+    among applications written in PHP. Generally, users author their posts
+    in BBCode, and the forum converts it to a permitted subset of
+    well-formed HTML.
+
+    `BBCode::Parser' is a proper recursive parser for BBCode-formatted text.
+
+OVERVIEW
+    A `BBCode::Parser' object stores various settings that affect the
+    parsing process. Simple settings are typically set when the parser is
+    created using new(), but they can be queried using get() and altered
+    using set().
+
+    See "SETTINGS" for more information.
+
+    In addition to the simple settings, specific BBCode tags (or classes of
+    tags) can be permitted or forbidden, using permit() and forbid()
+    respectively. By default, the only forbidden tag is `[HTML]', which is
+    normally a security violation if permitted.
+
+    See "CLASSES" for a list of tag classes.
+
+    Once the parser has been configured appropriately, parse trees can be
+    created using the parse() method. The parse tree will consist of objects
+    derived from BBCode::Tag; the root of the tree will be a BBCode::Body
+    object.
+
+    Converting the parse tree to HTML is quite simple: call toHTML() on the
+    root of the tree. Likewise, the parse tree can be converted back to
+    BBCode by calling toBBCode(). See "METHODS" in BBCode::Tag to find out
+    what other output methods are available.
+
+SETTINGS
+    The following settings can be manipulated using get() and set().
+
+    css_prefix
+        (Type: String; Default: "bbcode-")
+
+        Many BBCode tags will add CSS classes as style hooks in the output
+        HTML, such as `<div class="bbcode-quote">...</div>'. This setting
+        allows you to override the naming scheme for those hooks. At the
+        moment, more direct control of the CSS class names is not available.
+
+    css_direct_styles
+        (Type: Boolean; Default: FALSE)
+
+        Certain style-related BBCode tags, such as [U] (underline) and [S]
+        (strike-through) don't have a direct equivalent in modern XHTML 1.0
+        Strict. If this value is TRUE, then the generated HTML will use a
+        `style' attribute on a `<span>' tag to simulate the effects. If this
+        value is FALSE, then the style attribute will be omitted. In either
+        case, a `class' attribute is provided for use as a hook by external
+        CSS stylesheets (not provided).
+
+    follow_links
+        (Type: Boolean; Default: FALSE)
+
+        To prevent blog spam and the like, many search engines now allow
+        HTML authors to indicate that specific URLs on a page should not be
+        indexed. If this value is TRUE, then there will be nothing special
+        about the URL (meaning that search engines are encouraged to follow
+        the link). If this value is FALSE, then a `rel="nofollow"' attribute
+        will be added wherever it makes sense (warning search engines that
+        the link might be spam).
+
+        Whether or not to set this value to TRUE will depend on what you're
+        using `BBCode::Parser' for. If you're implementing a forum or
+        bulletin board, TRUE might be reserved for senior, more trusted
+        members. If you're implementing a blog, the value might be TRUE for
+        the blog owner but FALSE for visitors.
+
+        For more information, see
+        http://www.google.com/webmasters/bot.html#www.
+
+        (If you turn this setting on, `follow_override' behaves as if it
+        were on as well. That way, users can explicitly mark links with
+        `FOLLOW=0' if necessary.)
+
+    follow_override
+        (Type: Boolean; Default: FALSE)
+
+        This BBCode implementation allows a user to override `follow_links'
+        using a BBCode extension, the `FOLLOW' parameter. If this value is
+        TRUE, the user can override `follow_links' with `FOLLOW=1';
+        otherwise, the user must abide by `follow_links'.
+
+        (However, a user can always specify `FOLLOW=0' regardless of this
+        setting. If the user posting the link doesn't think the link is
+        trustworthy, it's obviously not trustworthy.)
+
+        The same considerations that apply to `follow_links' also apply to
+        this setting.
+
+    newwindow_links
+        (Type: Boolean; Default: FALSE)
+
+        For reasons largely having to do with site aesthetics, some site
+        owners prefer for external links to each open in a new window using
+        `<a target="_blank">'. For reasons largely having to do with
+        browsing experience, some users prefer to summarily execute the
+        aforementioned site owners in the most painful manner available. If
+        you turn this option on, you will anger and frustrate people who
+        suddenly find that their back buttons and/or tabs don't work right
+        when they visit your site. Please take due consideration of that
+        before setting this option to a TRUE value and taking choices away
+        from the people reading your website.
+
+    newwindow_override
+        (Type: Boolean; Default: FALSE)
+
+        This BBCode implementation allows a user to override
+        `newwindow_links' using a BBCode extension, the `NEWWINDOW'
+        parameter. If this value is TRUE, the user can force the link to
+        open in the same window with `NEWWINDOW=0', or force the link to
+        open in a new window with `NEWWINDOW=1'. If this value is FALSE, the
+        user has no say whatsoever.
+
+        The same considerations that apply to `newwindow_links' also apply
+        to this setting, but in drastically reduced form. If you feel the
+        need to open links in new windows, please do it by turning this
+        setting on and leaving `newwindow_links' off.
+
+    allow_image_bullets
+        (Type: Boolean; Default: TRUE)
+
+        This setting allows you to restrict users from creating lists with
+        custom bullets.
+
+CLASSES
+    BLOCK
+        Tags with the `BLOCK' class are those that translate into
+        block-level elements in HTML, e.g. `[QUOTE]', which becomes
+        `<blockquote>'. They represent blocks of content that stand alone
+        from other blocks, often with vertical padding to separate them
+        visually.
+
+        In general, `BLOCK' tags are not allowed inside `INLINE' tags.
+
+    INLINE
+        Tags with the `INLINE' class are those that translate into inline
+        elements in HTML, e.g. `[URL]', which becomes `<a>'. They represent
+        content that's still part of the current flow of text, not the start
+        of a new block.
+
+    LINK
+        Tags with the `LINK' class are hyperlinks to external resources. At
+        the moment, the two tags with the `LINK' class are `[URL]' and
+        `[EMAIL]'.
+
+    TEXT
+        Tags with the `TEXT' class are plain text. At the moment, the three
+        tags with the `TEXT' class are `[TEXT]', `[ENT]', and `[BR]'.
+
+METHODS
+  DEFAULT
+
+            my $tree = BBCode::Parser->DEFAULT->parse($code);
+
+    `DEFAULT' returns the default parser. If you change the default parser,
+    all future parsers created with new() will incorporate your changes.
+    However, all existing parsers will be unaffected.
+
+  clone
+
+            my $parser = BBCode::Parser->new(follow_links => 1);
+            my $clone = $parser->clone;
+            $clone->forbid('IMG');
+            printf "[IMG] is%s OK\n", ($parser->isPermitted('IMG') ? "" : " not");
+            # Prints "[IMG] is OK", since forbid('IMG') applies only to the clone.
+
+    `clone' creates a new parser that copies the settings of an existing
+    parser. After cloning, the two parsers are completely independent;
+    changing settings in one does not affect the other.
+
+    If any arguments are given, they are handed off to the set() method.
+
+  new
+
+            my $parser = BBCode::Parser->new(%args);
+
+    `new' creates a new `BBCode::Parser'. Any arguments are handed off to
+    the set() method.
+
+  get
+
+            if($parser->get('follow_override')) {
+                    # [URL FOLLOW] permitted
+            } else {
+                    # [URL FOLLOW] forbidden
+            }
+
+    `get' fetches the current settings for the given parser. See "SETTINGS"
+    for a list of available settings.
+
+  set
+
+            $parser->set(follow_override => 1);
+
+    `set' alters the settings for the given parser. See "SETTINGS" for a
+    list of available settings.
+
+  addTag
+
+    TODO: Implement and document
+
+  permit
+
+            $parser->permit(qw(:INLINE !:LINK));
+
+    `permit' adds TAGs and :CLASSes to the list of permitted tags. Use '!'
+    in front of a tag or class to negate the meaning.
+
+  forbid
+
+            $parser->forbid(qw(:ALL !:TEXT));
+
+    `forbid' adds TAGs and :CLASSes to the list of forbidden tags. Use '!'
+    in front of a tag or class to negate the meaning.
+
+  isPermitted
+
+            if($parser->isPermitted('IMG')) {
+                    # Yay, [IMG] tags
+            } else {
+                    # Darn, no [IMG] tags
+            }
+
+    `isPermitted' checks if a tag is permitted by the current settings.
+
+  parse
+
+            my $tree = $parser->parse('[b]BBCode[/b] text.');
+
+    `parse' creates a parse tree for the given BBCode. The result is a tree
+    of BBCode::Tag objects. The most common use of the parse tree is to
+    convert it to HTML using BBCode::Tag->toHTML():
+
+            my $html = $tree->toHTML;
+
+SEE ALSO
+    BBCode::Tag
+
+    svn://chronos-tachyon.net/projects/BBCode-Parser
+
+AUTHOR
+    Donald King <dlking@cpan.org>
+

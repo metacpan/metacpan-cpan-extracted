@@ -1,0 +1,90 @@
+
+Step by step
+
+   - Copy upsxml_query.tag  to the interchange/code/UserTag/ directory (ex. /usr/lib/interchange/code/UserTag/)
+
+   - Add upsxml-query to catalog.cfg (i.e. Require UserTag upsxml_query)
+
+   - Add the following to variable.txt and delete variable.gdbm
+
+        UPSXML_USERID	username	Shipping
+        UPSXML_PASSWORD	password	Shipping
+        UPSXML_ACCESS_KEY	ADAE3A0BF2F71A98	Shipping
+        UPSXML_ORIGIN_COUNTRY	CA	Shipping
+	UPS_US_DEFAULT	83711	Shipping
+	UPSXML_ORIGIN	L4J8J2	Shipping
+	UPSXML_DBDIM	true	Shipping (if dimensions provided in db in length, width, height)
+	UPSXML_DIMUNIT	IN	Shipping
+
+   - Add the following to shipping.asc
+
+======================================================================
+XMLEXPR	UPS Express	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLEXPR", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLEXPR	UPS Express	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="01" weight="@@TOTAL@@"]		
+
+XML1DA	UPS Next Day Air	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XML1DA", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XML1DA	UPS Next Day Air	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="01" weight="@@TOTAL@@"]		
+
+XMLEXPD	UPS Expedited	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLEXPD", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLEXPD	UPS Expedited	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="02" weight="@@TOTAL@@"]		
+
+XML2DA	UPS 2nd Day Air	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XML2DA", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XML2DA	UPS 2nd Day Air	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="02" weight="@@TOTAL@@"]		
+
+XMLGND	UPS Ground	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLGND", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLGND	UPS Ground	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="03" weight="@@TOTAL@@"]		
+
+XMLWXPR	UPS Worldwide Express	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLWXPR", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLWXPR	UPS Worldwide Express	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="07" weight="@@TOTAL@@"]		
+
+XMLWXPD	UPS Worldwide Expedited	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLWXPD", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLWXPD	UPS Worldwide Expedited	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="08" weight="@@TOTAL@@"]		
+
+XMLSTD	UPS Standard	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLSTD", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLSTD	UPS Standard	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="11" weight="@@TOTAL@@"]		
+
+XML3DS	UPS 3 Day Select	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XML3DS", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XML3DS	UPS 3 Day Select	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="12" weight="@@TOTAL@@"]		
+
+XMLXPS	UPS Express Saver	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLXPS", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLXPS	UPS Express Saver	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="13" weight="@@TOTAL@@"]		
+
+XMLNDS	UPS Next Day Air Saver	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLNDS", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLNDS	UPS Next Day Air Saver	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="13" weight="@@TOTAL@@"]		
+
+XMLXPE	UPS Express Early AM	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLXPE", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLXPE	UPS Express Early AM	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="14" weight="@@TOTAL@@"]		
+
+XMLNDE	UPS Next Day Early AM	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLNDE", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLNDE	UPS Next Day Early AM	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="14" weight="@@TOTAL@@"]		
+
+XMLXDM	UPS Worldwide Express Plus	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLXDM", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLXDM	UPS Worldwide Express Plus	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="54" weight="@@TOTAL@@"]		
+
+XML2DM	UPS 2nd Day Air A.M.	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XML2DM", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XML2DM	UPS 2nd Day Air A.M.	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="59" weight="@@TOTAL@@"]		
+
+XMLNAI	UPS Express NAI	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLNAI", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLNAI	UPS Express NAI	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="64" weight="@@TOTAL@@"]		
+
+XMLXPSU	UPS Express Saver (US)	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLXPSU", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLXPSU	UPS Express Saver (US)	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="65" weight="@@TOTAL@@"]		
+
+XMLXPSE	UPS Express Saver (Eur)	weight	0	0	e Nothing to ship!		{ 'ui_ship_type' => "XMLXPSE", 'ups' => "0", 'at_least' => "5", adder => "3.00" }
+XMLXPSE	UPS Express Saver (Eur)	weight	0	150	f [upsxml-query zip="[either][value zip][or][var SHIP_DEFAULT_ZIP][/either]"  service_code="65" weight="@@TOTAL@@"]		
+
+======================================================================
+
+   - Set the ship default country in variable.txt
+
+        SHIP_DEFAULT_COUNTRY	CA	Shipping
+
+   - Set the shipmodes you'll use in country.txt
+
+   - Set the shipmodes you'll use in country.txt
+
+      update country set shipmodes = 'XMLEXPR XML1DA XMLEXPD XML2DA XMLGND XMLSTD XML3DS XMLXPS XMLNDS XMLXPE XMLNDE XML2DM XMLNAI XMLXPSU' where code = 'US';
+      update country set shipmodes = 'XMLEXPR XML1DA XMLEXPD XML2DA XMLGND XMLSTD XML3DS XMLXPS XMLNDS XMLXPE XMLNDE XML2DM XMLNAI XMLXPSU' where code = 'CA';
+      update country set shipmodes = 'XMLWXPR XMLWXPD XMLXDM XMLXPSE' where code <> 'CA' AND code <> 'US';
+
+

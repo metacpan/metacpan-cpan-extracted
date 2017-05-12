@@ -1,0 +1,59 @@
+---
+abstract: 'Functions for the design of synthetic genes'
+author:
+  - 'Sarah Richardson <SMRichardson@lbl.gov>'
+build_requires:
+  Test::Deep: '0.1'
+  Test::More: '0.8'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-GeneDesign
+provides:
+  Bio::GeneDesign:
+    file: lib/Bio/GeneDesign.pm
+    version: '5.54'
+  Bio::GeneDesign::Basic:
+    file: lib/Bio/GeneDesign/Basic.pm
+    version: '5.54'
+  Bio::GeneDesign::CodonJuggle:
+    file: lib/Bio/GeneDesign/CodonJuggle.pm
+    version: '5.54'
+  Bio::GeneDesign::Codons:
+    file: lib/Bio/GeneDesign/Codons.pm
+    version: '5.54'
+  Bio::GeneDesign::Graph:
+    file: lib/Bio/GeneDesign/Graph.pm
+    version: '5.54'
+  Bio::GeneDesign::Oligo:
+    file: lib/Bio/GeneDesign/Oligo.pm
+    version: '5.54'
+  Bio::GeneDesign::PrefixTree:
+    file: lib/Bio/GeneDesign/PrefixTree.pm
+    version: '5.54'
+  Bio::GeneDesign::Random:
+    file: lib/Bio/GeneDesign/Random.pm
+    version: '5.54'
+  Bio::GeneDesign::RestrictionEnzyme:
+    file: lib/Bio/GeneDesign/RestrictionEnzyme.pm
+    version: '5.54'
+  Bio::GeneDesign::RestrictionEnzymes:
+    file: lib/Bio/GeneDesign/RestrictionEnzymes.pm
+    version: '5.54'
+  Bio::GeneDesign::ReverseTranslate:
+    file: lib/Bio/GeneDesign/ReverseTranslate.pm
+    version: '5.54'
+requires:
+  Bio::Root::Root: '1.006924'
+  List::Util: '1.22'
+  Math::Combinatorics: '0.09'
+  Text::Wrap: '2009.0305'
+  perl: '5.006'
+resources:
+  license: http://opensource.org/licenses/bsd-license.php
+version: '5.54'

@@ -1,0 +1,221 @@
+NAME
+    Business::UPS::Tracking - Interface to the UPS tracking webservice
+
+SYNOPSIS
+      use Business::UPS::Tracking;
+  
+      my $tracking = Business::UPS::Tracking->new(
+        AccessLicenseNumber => '1CFFED5A5E91B17',
+        UserId              => 'myupsuser',
+        Password            => 'secret',
+      );
+  
+      eval {
+        my $response = $tracking->request(
+          TrackingNumber  => '1Z12345E1392654435',
+        )->run();
+    
+        foreach my $shipment ($response->shipment) {
+            say 'Service code is '.$shipment->ServiceCode;
+            foreach my $package ($shipment->Package) {
+                say 'Status is '.$package->CurrentStatus;
+            }
+        }
+      };
+  
+      if (my $e = Exception::Class->caught) {
+        given ($e) {
+          when ($_->isa('Business::UPS::Tracking::X::HTTP')) {
+            say 'HTTP ERROR:'.$e->full_message;
+          }
+          when ($_->isa('Business::UPS::Tracking::X::UPS')) {
+            say 'UPS ERROR:'.$e->full_message.' ('.$e->code.')';
+          }
+          default {
+            say 'SOME ERROR:'.$e;
+          }        
+        }
+      }
+
+DESCRIPTION
+  Class structure
+                       .-----------------------------------.
+                       |     Business::UPS::Tracking       |
+                       '-----------------------------------'
+                                       ^
+                                    HAS ONE 
+                                       |
+                       .-----------------------------------.
+                       |         B::U::T::Request          |
+                       '-----------------------------------'
+                                       ^
+                                    HAS ONE
+                                       |
+                       .-----------------------------------.
+                       |         B::U::T::Response         |
+                       '-----------------------------------'
+                                       |
+                                    HAS MANY
+                                       v
+                       .-----------------------------------.
+                       |         B::U::T::Shipment         |
+                       '-----------------------------------'
+                           ^                           ^
+                          ISA                         ISA
+                           |                           |
+     .---------------------------------. .-----------------------------------.
+     |    B::U::T::Shipment::Freight   | |  B::U::T::Shipment::Smallpackage  |
+     |---------------------------------| |-----------------------------------|
+     | Freight shipment type           | | Small package shipment type       |
+     | Not yet implemented             | '-----------------------------------'
+     '---------------------------------'               |
+                                                    HAS MANY
+                                                       v
+                                         .-----------------------------------.
+                                         |     B::U::T::Element::Package     |
+                                         '-----------------------------------'
+                                                       |
+                                                    HAS MANY
+                                                       v
+                                         .-----------------------------------.
+                                         |    B::U::T::Element::Activity     |
+                                         '-----------------------------------'
+
+  Exception Handling
+    If anythis goes wrong Business::UPS::Tracking throws an exception.
+    Exceptions are always Exception::Class objects which contain structured
+    information about the error. Please refer to the synopsis or to the
+    Exception::Class documentation for documentation how to catch and
+    rethrow exeptions.
+
+    The following exception classes are defined:
+
+   Business::UPS::Tracking::X
+    Basic exception class. All other exception classes inherit from this
+    class.
+
+   Business::UPS::Tracking::X::HTTP
+    HTTP error. The object provides additional parameters:
+
+    *   http_response : HTTP::Response object
+
+    *   request : Business::UPS::Tracking::Request object
+
+   Business::UPS::Tracking::X::UPS
+    UPS error message.The object provides additional parameters:
+
+    *   code : UPS error code
+
+    *   severity : Error severity 'hard' or 'soft'
+
+    *   context : XML::LibXML::Node object containing the whole error
+        response.
+
+    *   request : Business::UPS::Tracking::Request object
+
+   Business::UPS::Tracking::X::XML
+    XML parser or schema error.
+
+  Accessor / method naming
+    The naming of the methods and accessors tries to stick close to the
+    names used by the UPS webservice. All accessors containg uppercase
+    letters access xml data. Lowercase-only accessors and methods are used
+    for utility functions.
+
+  UPS license
+    In order to use this module you need to obtain a "Tracking WebService"
+    license key. See <http://www.ups.com/e_comm_access/gettools_index> for
+    more information.
+
+METHODS
+  new
+     my $tracking = Business::UPS::Tracking->new(%params);
+
+    Create a "Business::UPS::Tracking" object. See ACCESSORS for available
+    parameters.
+
+  access_request
+    UPS access request.
+
+  request
+     my $request = $tracking->request(%request_params);
+
+    Returns a Business::UPS::Tracking::Request object.
+
+  request_run
+     my $response = $tracking->request_run(%request_params);
+
+    Generates a Business::UPS::Tracking::Request object and imideately
+    executes it, returning a Business::UPS::Tracking::Response object.
+
+ACCESSORS
+  AccessLicenseNumber
+    UPS tracking service access license number
+
+  UserId
+    UPS account username
+
+  Password
+    UPS account password
+
+  config
+    Optionally you can retrieve all or some UPS webservice credentials from
+    a configuration file. This accessor holds the path to this file.
+    Defaults to "~/.ups_tracking"
+
+    Example configuration file:
+
+     <?xml version="1.0"?>
+     <UPS_tracking_webservice_config>
+        <AccessLicenseNumber>1CFFED5A5E91B17</AccessLicenseNumber>
+        <UserId>myupsuser</UserId>
+        <Password>secret</Password>
+     </UPS_tracking_webservice_config>
+
+  retry_http
+    Number of retries if http errors occur
+
+    Defaults to 0
+
+  url
+    UPS Tracking webservice url.
+
+    Defaults to https://wwwcie.ups.com/ups.app/xml/Track
+
+  _ua
+    LWP::UserAgent object.
+
+    Automatically generated
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "bug-buisness-ups-tracking@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Bug/Report.html?Queue=Business::UPS::Tracking
+    >. I will be notified, and then you'll automatically be notified of
+    progress on your report as I make changes.
+
+SEE ALSO
+    Download the UPS "OnLine® Tools Tracking Developer Guide" and get a
+    developer key at
+    <http://www.ups.com/e_comm_access/gettools_index?loc=en_US>. Please
+    check the "Developer Guide" for more detailed documentation on the
+    various fields.
+
+    The WebService::UPS::TrackRequest provides an alternative simpler
+    implementation.
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+    
+        http://www.k-1.com
+
+COPYRIGHT
+    Business::UPS::Tracking is Copyright (c) 2012 Maroš Kollár -
+    <http://www.k-1.com>
+
+LICENCE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

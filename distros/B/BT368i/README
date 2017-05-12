@@ -1,0 +1,34 @@
+BT368i version 1.00
+================
+
+This module reads a serial port and parse the GPS information and places
+it easily manipulated objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::SerialPort
+	RingBuffer
+
+Optionally you can use the Tk app and then you need
+
+  Tk
+  Tk::Graph
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Travis Kent Beste
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,156 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;                      # Find the location of seq-manipulations
+use rlib '../lib';
+require Bio::BPWrapper::PopManipulations;
+use v5.10;
+use Getopt::Long qw(:config gnu_getopt);
+use Pod::Usage;
+
+################# Option parsing #################
+my %opts;
+my %flags;
+GetOptions(
+    \%opts,
+    "help|h",
+    "man",
+#    "distance|d",
+#    "dist-method|D=s" => \$flags{"dist-method"},
+    "bihaps",
+    "bisites",
+    "bisites-for-r",
+    "heterozygosity|H",
+    "input|i=s" => \$flags{"input"},
+    "mismatch|m",
+    "mut-info",
+#    "numseq|n=i"    => \$flags{"numseq"},
+    "pi|p",
+    "stats|s=s@",    # Comma-separated, or multiply specified, list
+    "snp",
+    "snp-coding",
+    "snp-coding-long",
+    "snp-noncoding",
+    "version|V",
+    "segsites|S",
+    "bipart",
+#    "mutrec|b",
+#    "exclude|group3|seq3|r=s@",
+#    "ingroup|group1|seq1|p=s@",
+#    "simmk|k",
+#    "outgroup|group2|seq2|q=s@",
+#    "kaks=s",
+) or pod2usage(2);
+
+pod2usage(1) if $opts{"help"};
+pod2usage(-exitstatus => 0, -verbose => 2) if $opts{"man"};
+&print_version() if $opts{"version"};
+
+######################## Main #####################
+
+# This sets all internal variables, and loads AlignIO objects
+initialize(\%opts, \%flags);
+
+for my $option (keys %opts) {
+    # If there is a function to handle the current option, execute it
+    if (can_handle($option)) { handle_opt($option); exit }
+    else { warn "Missing handler for: $option\n" }
+}
+
+################# POD Documentation ##################
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+=over
+
+=item B<biopop> - Wrapper script for BioPerl's population genetics modules
+
+=back
+
+=head1 SYNOPSIS
+
+B<biopop> [options] <alignment_file>
+
+=head1 DESCRIPTION
+
+B<biopop> DESCRIPTION GOES HERE
+
+=head1 OPTIONS
+
+=head2 --help, -h
+
+Print a brief help message and exits.
+
+=head2 --distance, -d
+
+Calculates a distance matrix for all pairwise distances of all sequences in the input alignment and prints it out.
+
+Use B<--dist-method> to specify the method desired. The default in Bio::Align::DNAStatistics is "JukesCantor".
+
+=head2 --dist-method, -D
+
+Used with --distance to specify which distance method to use when getting the distance matrix.
+
+Program quits if the distance method is invalid
+
+=head2 --heterozygosity, -H
+
+Foreach segregating site(s), the observed heterozygosity is returned.
+
+=head2 --input, -i
+
+Input file format. By default, this is 'clustalw'.
+
+=head2 --mismatch, -m
+
+Pairwise calculation of mismatches for all sequences in the alignment.
+
+=head2 --numseq, -n
+
+Input file format. By default, this is 'clustalw'.
+
+=head2 --pi, -p
+
+Nucleotide Diversity is a measure of genetic variation or differences. It is similar to expected heterozygosity. This method takes in an alignment and outputs an integer.
+
+=head2 --stats, -s <comma separated list of values>
+
+Specify the statistics you would like to gather from input data. e.g., "theta,pi" will calculate the theta and pi values.
+
+Can also be specified by giving the option multiple times. e.g.,
+ biopop --stats=pi --stats=theta
+
+=head2 --snp_coding
+
+Identify & print, for each 2-state SNP, codon position, aligned nucleotide position, syn/nonsyn, frequencies of each allleic state, for a coding alignment.
+
+=head2 --varsites, -v
+
+This method outputs the number of segregating or SNP sites within your alignment.
+
+=head2 --version, -V
+
+Print current release version of bp-utils.
+
+Usage: bioseq -V
+
+=head1 REQUIRES
+
+Perl 5.010, BioPerl
+
+=head1 SEE ALSO
+
+  perl(1)
+
+=head1 AUTHORS
+
+ Weigang Qiu at genectr.hunter.cuny.edu
+ Yözen Hernández yzhernand at gmail dot com
+
+=cut
+
+##################### End ##########################

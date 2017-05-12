@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Specify directory manually to prevent accidentally running outside the 
+# intended directories.
+find ./Business-Shipping/  -iregex  '.+[.]\(pm\|t\|pod\|pl\)' \
+    -exec perltidy -pbp -b -nst -nse -pt=2 -sbt=2 {} \;
+
+#find ./Business-Shipping/  -name '*.bak' \
+#    -exec rm {} \;

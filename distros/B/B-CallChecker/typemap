@@ -1,0 +1,12 @@
+TYPEMAP
+OP *	T_BOP
+
+INPUT
+
+T_BOP
+	$var = decode_bop($arg);
+
+OUTPUT
+
+T_BOP
+	sv_setsv($arg, encode_bop($var));

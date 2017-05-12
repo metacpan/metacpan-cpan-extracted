@@ -1,0 +1,68 @@
+{
+   "abstract" : "input BusyBird statuses from RSS/Atom feed",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "BusyBird-Input-Feed",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BusyBird::DateTime::Format" : "0.04",
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0",
+            "WWW::Favicon" : "0",
+            "XML::FeedPP" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::Deep" : "0.084",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/BusyBird-Input-Feed/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/BusyBird-Input-Feed.git",
+         "web" : "https://github.com/debug-ito/BusyBird-Input-Feed"
+      }
+   },
+   "version" : "0.05"
+}

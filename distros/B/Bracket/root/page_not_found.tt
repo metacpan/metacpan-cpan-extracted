@@ -1,0 +1,4 @@
+<div style="background-color:white;margin:10px;padding:10px; font-size:1.618em;">
+Page not found.
+Want to <a href="[% c.uri_for('/') %]">go home?</a>
+</div>

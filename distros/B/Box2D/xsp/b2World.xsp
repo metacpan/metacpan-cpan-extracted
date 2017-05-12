@@ -1,0 +1,103 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2World} class b2World
+{
+
+void ClearForces();
+
+%{
+
+b2World*
+b2World::new( gravity, doSleep )
+	b2Vec2* gravity
+	bool doSleep
+	CODE:
+		RETVAL = new b2World( *gravity, doSleep );
+	OUTPUT:
+		RETVAL
+
+void
+b2World::SetGravity( gravity )
+	b2Vec2* gravity
+	CODE:
+		THIS->SetGravity((const b2Vec2)*gravity);
+
+
+
+b2Vec2*
+b2World::GetGravity()
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		b2Vec2* ret = new b2Vec2(THIS->GetGravity());
+		RETVAL = ret;
+	OUTPUT:
+		RETVAL
+
+
+void
+b2World::Step( timeStep, velocityIterations, positionIterations )
+	float32 timeStep
+	int32 velocityIterations
+	int32 positionIterations
+	CODE:
+		THIS->Step( timeStep, velocityIterations, positionIterations );
+
+b2Body*
+b2World::CreateBody( body_def )
+	b2BodyDef* body_def
+	PREINIT:
+		const char* CLASS = "Box2D::b2Body";
+	CODE:
+		RETVAL = THIS->CreateBody( body_def );
+	OUTPUT:
+		RETVAL
+
+b2Joint*
+b2World::CreateJoint( joint_def )
+	b2JointDef* joint_def
+	PREINIT:
+		const char* CLASS = "Box2D::b2Joint";
+	CODE:
+		RETVAL = THIS->CreateJoint( joint_def );
+	OUTPUT:
+		RETVAL
+
+void
+b2World::DestroyBody( body )
+	b2Body* body
+	CODE:
+		THIS->DestroyBody( body );
+
+void
+b2World::SetContactListenerXS( listener )
+	b2ContactListener* listener
+	CODE:
+		THIS->SetContactListener( listener );
+
+void
+b2World::RayCastXS( callback, point1, point2 )
+	b2RayCastCallback* callback
+	b2Vec2* point1
+	b2Vec2* point2
+	CODE:
+		THIS->RayCast( callback, *point1, *point2 );
+
+void
+b2World::DESTROY()
+	CODE:
+		if ( THIS != NULL )
+		{
+			delete THIS;
+		}
+
+%}
+
+};
+

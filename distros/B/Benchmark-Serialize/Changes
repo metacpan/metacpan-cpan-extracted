@@ -1,0 +1,44 @@
+Changes for Benchmark::Serialize
+
+0.08 - Tue Oct 26 17:20:46 2010
+	* Moved benchmark definitions into Benchmark::Serialize::Library
+	* Added native benchmarks for AnyMongo::BSON and JSYNC
+	* Added benchmark generators for Data::Serializer
+	* Added benchmark generators for two ProtocolBuffer implementations
+	* Improved testing for "correctness" of serialization
+
+0.07 - Thu Sep  9 09:24:53 2010
+	Added benchmark for Data::MessagePack
+	Improved handling of failing benchmarks
+	Added option to test script to pass structure as perl code
+
+0.06 - Wed Sep  8 16:01:03 2010
+	Add test for idempotence of transformation
+
+0.05 - Wed Sep  8 11:06:21 2010
+	Added benchmark for Data::Pond
+
+0.04 - Wed Jul 21 09:09:25 2010
+    Added benchmark for JSON::DWIW and a prettyfied version of JSON::XS
+
+0.03 - Tue Nov 24 13:56:42 2009
+	Added the following benchmarks: PHP::Serilization::XS, Data::asXML, XML::TreePP
+	Added :xml tag
+
+0.02 - Mon Nov  2 09:58:15 2009
+	Added comparison chart of sizes
+	Export cmpthese (RT #50997)
+	Fixed documentation errors (RT #50996)
+	Fixed dependencies (RT #50998)
+
+0.01 - Fri Oct 30 12:15:33 2009
+	Refactored into a Perl Module
+
+June 15, 2009
+    - Available at http://gist.github.com/130005
+    - Added Data::Dumper and a current set of YAML/JSON modules
+    - Added Data::Dumper and a current set of YAML/JSON modules
+
+Original
+    - Available at
+      http://idisk.mac.com/christian.hansen/Public/perl/serialize.pl

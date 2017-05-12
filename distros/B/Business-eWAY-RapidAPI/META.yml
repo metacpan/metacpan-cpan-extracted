@@ -1,0 +1,28 @@
+---
+abstract: 'eWAY RapidAPI V3'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-eWAY-RapidAPI
+requires:
+  IO::Socket::SSL: '0'
+  JSON::MaybeXS: '0'
+  Moo: '0'
+  MooX::Types::MooseLike: '0'
+  WWW::Mechanize: '0'
+  XML::Simple: '0'
+resources:
+  repository: git://github.com/fayland/p5-Business-eWAY-RapidAPI.git
+version: '0.11'

@@ -1,0 +1,45 @@
+Business::Payment::ClearingHouse - Payment Clearinghouse
+
+SYNOPSIS
+
+    use Business::Payment::ClearingHouse;
+
+    my $house = Business::Payment::ClearingHouse->new();
+
+    # Create a charge
+    my $charge = Business::Payment::ClearingHouse::Charge->new(
+        subtotal => 100,
+        tax      => 10
+    );
+    # Authorizate it and get the uuid
+    my $uuid = $house->auth($charge);
+
+    # Settle!
+    my $total = $house->settle;
+
+DESCRIPTION
+
+Business::Payment::ClearingHouse provides an API that emulates a payment
+processor like the ones used with credit cards.  The operations it provides
+are inspired by those present with a credit card processor: preauth (reserve),
+postauth (consume the reserved funds), auth (immediately charge), credit
+(refund) and void (remove a charge).
+
+This module is intended to provide a testbed for features of
+L<Business::Payment> and to provide a testing processor for use in development
+environments.  The C<settle> method allows a developer to examine the net
+results of a series of transactions.
+
+AUTHOR
+
+Cory G Watson, C<< <gphat at cpan.org> >>
+
+COPYRIGHT & LICENSE
+
+Copyright 2009 Cold Hard Code, LLC.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

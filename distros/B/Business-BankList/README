@@ -1,0 +1,28 @@
+NAME
+    Business::BankList - List banks/financial institutions
+
+VERSION
+    version 0.011
+
+SYNOPSIS
+DESCRIPTION
+    NOTE: This module is still empty without implementation.
+
+    This module provides a way to get a list of banks/financial
+    institutions. The primary use is to get SWIFT code/BIC/IBAN or the like.
+    This module is meant to be a "master" module. There will be submodules
+    for each country, e.g. Business::BankList::Indonesia, and so on. Each
+    country can provide additional information like country-specific codes.
+
+SEE ALSO
+    Business::BankList::Indonesia
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

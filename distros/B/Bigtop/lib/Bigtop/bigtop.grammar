@@ -1,0 +1,430 @@
+# To build this, go to the lib/Bigtop directory and type:
+#   perl -MParse::RecDescent - bigtop.grammar Bigtop::Grammar
+# Then append the pod to keep the tests happy:
+#   cat Grammar.pm grammar.pod > tmp; mv tmp Grammar.pm
+{
+    my $backtick_line = 0;
+    my $backtick_warning = '';
+}
+<autotree>    # Used sparingly.  Most actions build a smaller element.
+
+config_only : configuration anything { $item[1] }
+
+anything : /.*/s
+
+bigtop_file : configuration application
+
+configuration    : 'config' '{' config_body '}' { $item{config_body} } # '
+
+config_body      : config_statement(s?) {
+    my %config;
+    my %backend_lookup;
+    my @statements;
+    foreach my $statement ( @{ $item{'config_statement(s?)'} } ) {
+        $config{ $statement->[0] } = $statement->[1];
+        push @statements, [ $statement->[0], $statement->[1] ];
+
+        if ( ref( $statement->[1] ) eq 'HASH' ) {
+            push @{ $backend_lookup{ $statement->[0] } }, $statement->[1];
+        }
+    }
+    $config{__STATEMENTS__} = \@statements;
+    $config{__BACKENDS__}   = \%backend_lookup;
+    $return = \%config;
+}
+
+config_statement : module_ident IDENT '{' backend_body '}' {
+    my $backend_data = $item{backend_body};
+    my $backend_type = $item{module_ident};
+    my $backend_name = $item{IDENT};
+
+    $backend_data->{__NAME__} = $backend_name;
+
+    $return = [ $backend_type => $backend_data ];
+}
+                 | keyword[ 'config' ] arg_element SEMI_COLON {
+    $return = [ $item{keyword} => $item{arg_element} ];
+}
+
+backend_body : backend_statement(s?) {
+    my %config;
+    foreach my $statement ( @{ $item{'backend_statement(s?)'} } ) {
+        $config{ $statement->[0] } = $statement->[1];
+    }
+    $return = \%config;
+}
+
+backend_statement : IDENT arg_element SEMI_COLON {
+    $return = [ $item{IDENT} => $item{arg_element} ];
+}
+
+application : 'app'        module_ident '{' app_body        '}' {
+                  my $retval = bless {
+                      __NAME__ => $item{module_ident},
+                      __BODY__ => $item{app_body},
+                  }, 'application';
+
+                  $retval->walk_postorder( 'set_parent' );
+
+                  my $lookup_hash = $retval->walk_postorder(
+                        'build_lookup_hash'
+                  );
+
+                  $retval->{lookup} = { @{ $lookup_hash } };
+
+                  $retval;
+              }
+            | <error>
+
+app_body : block(s?)
+
+block : literal_block
+      | controller_block
+      | sql_block
+      | app_config_block
+      | app_statement
+
+app_statement : keyword[ 'app' ] arg_list(?) SEMI_COLON {
+                           bless {
+                               __KEYWORD__ => $item{keyword},
+                               __ARGS__    => $item{'arg_list(?)'}->[0],
+                           }, 'app_statement'
+                }
+
+literal_block : 'literal' keyword[ 'app_literal' ]
+                string SEMI_COLON {
+                    bless {
+                        __IDENT__   => Bigtop::Parser->get_ident(),
+                        __BACKEND__ => $item{ keyword },
+                        __BODY__    => $item{ string },
+                    }, 'literal_block'
+                }
+
+controller_block : 'controller' 'is' 'base_controller' '{'
+                        controller_body[ 'base_controller' ]
+                    '}' {
+                        bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __BODY__  => $item{controller_body}
+                                              {'controller_statement(s?)'},
+                            __NAME__  => 'base_controller',
+                            __TYPE__  => 'base_controller',
+                        }, 'controller_block'
+                    }
+                 | 'controller' module_ident is_type(?) '{'
+                        controller_body[ $item{module_ident} ]
+                    '}' {
+                        if ( defined $item{'is_type(?)'}[0]
+                                and
+                             $item{'is_type(?)'}[0] eq 'base_controller'
+                        ) {
+                            my $message = "base_controller cannot have an "
+                                        . "explicit name";
+                            my $diag_text = "controller $item{module_ident} "
+                                          . "is base_controller";
+                            Bigtop::Parser->fatal_error_two_lines(
+                                $message, $diag_text, $thisline
+                            );
+                        }
+                        bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __NAME__  => $item{module_ident},
+                            __BODY__  => $item{controller_body}
+                                              {'controller_statement(s?)'},
+                            __TYPE__        => $item{'is_type(?)'}[0],
+                        }, 'controller_block'
+                   }
+
+is_type : 'is' module_ident { $item{module_ident} }
+
+controller_body : controller_statement(s?)
+
+controller_statement : 'method' IDENT
+                            method_type '{' method_body '}' {
+                            bless {
+                                __IDENT__ => Bigtop::Parser->get_ident(),
+                                __NAME__  => $item{IDENT},
+                                __BODY__  => $item{method_body},
+                                __TYPE__  => $item{method_type},
+                            }, 'controller_method'
+                        }
+                     | 'method' IDENT '{' {
+                            my $diag_text = $item[1] . ' '
+                                          . $item[2] . ' {'
+                                          . $text;
+                            Bigtop::Parser->fatal_error_two_lines(
+                                'missing method type', $diag_text, $thisline
+                            );
+                     }
+         | CONFIG IDENT(?) '{' controller_config_statement(s?) '}' {
+                   bless {
+                       __IDENT__ => Bigtop::Parser->get_ident(),
+                       __BODY__  => $item{'controller_config_statement(s?)'},
+                       __TYPE__  => $item{'IDENT(?)'}[0],
+                   }, 'controller_config_block'
+                }
+         | 'literal' keyword[ 'controller_literal' ]
+                     string SEMI_COLON {
+                    bless {
+                        __IDENT__   => Bigtop::Parser->get_ident(),
+                        __BACKEND__ => $item{ keyword },
+                        __BODY__    => $item{ string },
+                    }, 'controller_literal_block'
+           }
+         | keyword['controller'] arg_list(?) SEMI_COLON {
+                           bless {
+                               __KEYWORD__ => $item{keyword},
+                               __ARGS__    => $item{'arg_list(?)'}->[0],
+                           }, 'controller_statement'
+           }
+
+controller_config_statement : IDENT arg_list SEMI_COLON {
+                        bless {
+                            __KEYWORD__ => $item{IDENT},
+                            __ARGS__    => $item{arg_list}
+                        }, 'controller_config_statement'
+                    }
+                    | /[^\}]/ {
+                            my $message = "bad config statement, "
+                                        . "possible extra semicolon";
+                            if ( $backtick_warning ) {
+                                $message .= " ($backtick_warning)";
+                                $backtick_warning = '';
+                            }
+                            my $diag_text = $item[1] . $text;
+                            Bigtop::Parser->fatal_error_two_lines(
+                                $message, $diag_text, $thisline
+                            );
+                      }
+
+method_type : 'is' IDENT { $item{IDENT} }
+
+method_body : method_statement(s?)
+
+method_statement : keyword['method'] arg_list SEMI_COLON {
+                        bless {
+                            __KEYWORD__ => $item{keyword},
+                            __ARGS__    => $item{arg_list}
+                        }, 'method_statement'
+                   }
+
+sql_block : 'sequence' <commit> table_ident  '{' sequence_body   '}' {
+                bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __NAME__  => $item{table_ident},
+                            __TYPE__  => 'sequences',
+                            __BODY__  => $item{sequence_body}
+                                              {'sequence_statement(s?)'},
+                }, 'seq_block'
+            }
+          | 'table'    <commit> table_ident  '{' table_body      '}' {
+                bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __NAME__  => $item{table_ident},
+                            __TYPE__  => 'tables',
+                            __BODY__  => $item{table_body}
+                                              {'table_element_block(s?)'},
+                }, 'table_block'
+            }
+          | 'join_table' <commit> table_ident '{' join_table_body '}' {
+                bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __NAME__  => $item{table_ident},
+                            __BODY__  => $item{join_table_body}
+                                              {'join_table_statement(s?)'},
+                }, 'join_table'
+            }
+          | 'schema' <commit> IDENT '{' '}' {
+                bless {
+                            __IDENT__ => Bigtop::Parser->get_ident(),
+                            __NAME__  => $item{ IDENT },
+                }, 'schema_block'
+            }
+
+sequence_body : sequence_statement(s?)
+
+# XXX make sequence_keywords that work like field_keywords
+sequence_statement : IDENT arg_list SEMI_COLON {
+        bless {
+            __NAME__ => $item[1], __ARGS__ => $item{arg_list}
+        }, 'sequence_statement'
+    }
+
+table_body : table_element_block(s?)
+
+table_element_block : 'field' <commit> IDENT '{' field_body '}' {
+                           bless {
+                               __IDENT__ => Bigtop::Parser->get_ident(),
+                               __TYPE__  => 'field',
+                               __NAME__  => $item{IDENT},
+                               __BODY__  =>
+                                    $item{field_body}{'field_statement(s?)'},
+                           }, 'table_element_block'
+                       }
+                     | 'extra_sql' <commit> IDENT '{' extra_sql_body '}' {
+                           bless {
+                               __IDENT__ => Bigtop::Parser->get_ident(),
+                               __TYPE__  => 'extra_sql',
+                               __NAME__  => $item{IDENT},
+                               __BODY__  =>
+                                    $item{extra_sql_body}
+                                         {'extra_sql_statement(s?)'},
+                           }, 'extra_sql_block'
+                       }
+                     | keyword['table'] arg_list SEMI_COLON {
+                           bless {
+                               __TYPE__  => $item[1],
+                               __ARGS__  => $item[2],
+                               __BODY__  => $item[1],
+                           }, 'table_element_block'
+                       }
+                    | <error>
+
+field_body : field_statement(s?)
+
+field_statement : keyword['field'] field_statement_def SEMI_COLON {
+                      bless {
+                          __KEYWORD__ => $item[1], __DEF__ => $item[2]
+                      }, 'field_statement'
+                  }
+
+field_statement_def : arg_list(?) {
+                        bless {
+                            __ARGS__ => $item[1]->[0]
+                        }, 'field_statement_def'
+                      }
+
+extra_sql_body : extra_sql_statement(s?)
+
+extra_sql_statement : keyword['extra_sql'] extra_sql_statement_def SEMI_COLON {
+                        bless {
+                            __KEYWORD__ => $item[1], __DEF__ => $item[2]
+                        }, 'extra_sql_statement'
+                      }
+
+extra_sql_statement_def : arg_list(?) {
+                    bless {
+                        __ARGS__ => $item[1]->[0]
+                    }, 'extra_sql_statement_def'
+                }
+
+join_table_body : join_table_statement(s?)
+
+join_table_statement : 'field' <commit> IDENT '{' field_body '}' {
+                           bless {
+                               __IDENT__ => Bigtop::Parser->get_ident(),
+                               __TYPE__  => 'field',
+                               __NAME__  => $item{IDENT},
+                               __BODY__  =>
+                                    $item{field_body}{'field_statement(s?)'},
+                           }, 'table_element_block'
+                       }
+
+                     | keyword['join_table'] arg_list SEMI_COLON {
+                      bless {
+                          __KEYWORD__ => $item[1], __DEF__ => $item[2]
+                      }, 'join_table_statement'
+                  }
+
+app_config_block : CONFIG IDENT(?) '{' app_config_statement(s?) '}' {
+                   bless {
+                       __IDENT__ => Bigtop::Parser->get_ident(),
+                       __BODY__ => $item{'app_config_statement(s?)'},
+                       __TYPE__ => $item{'IDENT(?)'}[0],
+                   }, 'app_config_block'
+                }
+
+app_config_statement : IDENT arg_list SEMI_COLON {
+                         bless {
+                            __KEYWORD__ => $item{IDENT},
+                            __ARGS__    => $item{arg_list}
+                         }, 'app_config_statement'
+                       }
+                     | /[^\}]/ {
+                            my $message = "bad config statement, "
+                                        . "possible extra semicolon";
+                            if ( $backtick_warning ) {
+                                $message .= " ($backtick_warning)";
+                                $backtick_warning = '';
+                            }
+                            my $diag_text = $item[1] . $text;
+                            Bigtop::Parser->fatal_error_two_lines(
+                                $message, $diag_text, $thisline
+                            );
+                       }
+
+keyword : IDENT {
+    if ( Bigtop::Parser->is_valid_keyword( $arg[0], $item[1] ) ) {
+        $return = $item[1];
+    }
+    else {
+        my @expected = Bigtop::Parser->get_valid_keywords( $arg[0] );
+        Bigtop::Parser->fatal_keyword_error(
+            {
+                bad_keyword   => $item[1],
+                diag_text     => $text,
+                input_linenum => $thisline,
+                expected      => \@expected,
+                type          => $arg[0],
+            }
+        );
+    }
+}
+
+arg_list : arg ',' arg_list {
+               unshift @{ $item[3] }, $item[1];
+               $return = $item[3];
+           }
+         | arg { bless [ $item[1] ], 'arg_list' }
+
+arg : arg_element '=>' arg_element { $return = { $item[1] => $item[3] } }
+    | arg_element                  { $item[1] }
+
+arg_element : module_ident { $item[1] }
+            | string       { $item[1] }
+            | {
+    my $message = "I was expecting an argument or argument list";
+    if ( $backtick_warning ) {
+        $message .= " ($backtick_warning)";
+        $backtick_warning = '';
+    }
+    Bigtop::Parser->fatal_error_two_lines(
+        $message, $text, $thisline
+    );
+}
+
+table_ident : IDENT '.' IDENT { $item[1] . '.' . $item[3] }
+            | IDENT           { $item[1] }
+
+module_ident : IDENT '::' module_ident { $item[1] . '::' . $item[3] }
+             | IDENT                   { $item[1] }
+
+string : BACKTICK <skip:''> text BACKTICK { $item{text} }
+
+text : /[^`]*/ {
+    my @lines = split /\n/, $item[1];
+    if ( @lines > 1 ) {
+        $backtick_warning
+            = "possible run-away string beginning on line "
+            . "$backtick_line.";
+    }
+    $item[1];
+}
+
+CONFIG : 'config' | 'set_vars'
+
+BACKTICK : "`" { $backtick_line = $thisline; }
+
+IDENT : /^\w[\w\d_]*/  { $item[1] }
+
+SEMI_COLON : ';'
+           | {
+    my $message = "missing semi-colon";
+    if ( $backtick_warning ) {
+        $message .= " ($backtick_warning)";
+        $backtick_warning = '';
+    }
+    Bigtop::Parser->fatal_error_two_lines(
+        $message, $text, $thisline
+    );
+}

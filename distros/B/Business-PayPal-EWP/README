@@ -1,0 +1,33 @@
+Business::PayPal::EWP - Perl extension for PayPal's Encrypted Website Payments
+==============================================================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004, 2005 Issac Goldstand E<lt>margol@beamartyr.netE<gt>
+Copyright (c) 2009 Thomas Busch (current maintainer)
+
+All rights reserved.
+
+This library includes code copied from PayPal's sample code.  More
+information about those projects' authors can be found at the respective
+project websites.
+
+This library is free software. It can be redistributed and/or modified
+under the same terms as Perl itself.
+
+

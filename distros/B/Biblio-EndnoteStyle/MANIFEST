@@ -1,0 +1,12 @@
+# $Id: MANIFEST,v 1.4 2007/02/15 23:49:52 mike Exp $
+
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+bin/endnote-format
+lib/Biblio/EndnoteStyle.pm
+t/Biblio-EndnoteStyle.t
+META.json                                Module JSON meta-data (added by MakeMaker)

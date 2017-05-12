@@ -1,0 +1,26 @@
+classes:
+  - Admin
+parameters:
+  doc:
+    admin:
+      tweak:
+        - define routines to make backup of and help edit config files
+  tweak:
+    - >
+      _backup(){ set -e;\
+        if [ -e "$1.orig" ]; then \
+          :;\
+        elif [ -e "$1" ]; then \
+          cp -a "$1" "$1.orig";\
+        else \
+          touch "$1.orig";\
+        fi; }
+    - >
+      _clone(){ set -e;\
+        _backup "$2";\
+        cp -a "$1" "$2"; }
+    - >
+      _setvar(){ set -e;\
+        _backup "$1";\
+        sed -i -r \
+          -e "s,^#?($2)=.*,\\1=$3," "$1"; }

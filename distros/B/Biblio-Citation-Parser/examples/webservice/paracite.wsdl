@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 	name="Paracite" targetNamespace="urn:Paracite"
+		xmlns = "http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap = "http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:typens  = "urn:Paracite"
+		xmlns:xsd  = "http://www.w3.org/2001/XMLSchema"
+		xmlns:wsdl = "http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soapenc = "http://schemas.xmlsoap.org/soap/encoding/">
+
+<types>
+  <xsd:schema	xmlns="http://schemas.xmlsoap.org/wsdl/"
+    		xmlns:SOAP-ENC="http://schemas.xmlsoap.org/wsdl/soap/encoding/"
+    		xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+
+    <xsd:complexType name="ParaciteSearchResult">
+      <xsd:all>
+        <xsd:element name="estimatedTotalResultsCount"  type="xsd:int"/>
+        <xsd:element name="estimateIsExact"             type="xsd:boolean"/>
+        <xsd:element name="resultElements"              type="typens:ResultElementArray"/>
+        <xsd:element name="searchQuery"                 type="xsd:string"/>
+        <xsd:element name="openURL"                     type="xsd:string"/>
+        <xsd:element name="metadata"                    type="typens:Metadata"/> 
+      </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="ResultElement">
+      <xsd:all>
+        <xsd:element name="URL"         type="xsd:string"/>
+        <xsd:element name="template"    type="xsd:string"/>
+        <xsd:element name="name"        type="xsd:string"/>
+        <xsd:element name="description" type="xsd:string"/>
+        <xsd:element name="tollfree"    type="xsd:boolean"/>
+        <xsd:element name="fulltext"    type="xsd:boolean"/>
+        <xsd:element name="fallback"    type="xsd:boolean"/>
+        <xsd:element name="score"       type="xsd:double"/>  
+      </xsd:all>
+    </xsd:complexType>
+
+    <xsd:complexType name="ResultElementArray">
+      <xsd:complexContent>
+        <xsd:restriction base="soapenc:Array">
+          <xsd:attribute ref="soapenc:arrayType" wsdl:arrayType="typens:ResultElement[]" />
+        </xsd:restriction>
+      </xsd:complexContent>
+    </xsd:complexType>
+
+    <xsd:complexType name="Metadata">
+      <xsd:all>
+        <xsd:element name="sid" type="xsd:string"/>
+        <xsd:element name="id" type="xsd:string"/>
+        <xsd:element name="genre" type="xsd:string"/>
+        <xsd:element name="aulast" type="xsd:string"/>
+        <xsd:element name="aufirst" type="xsd:string"/>
+        <xsd:element name="auinit" type="xsd:string"/>
+        <xsd:element name="auinitm" type="xsd:string"/>
+        <xsd:element name="coden" type="xsd:string"/>
+        <xsd:element name="issn" type="xsd:string"/>
+        <xsd:element name="eissn" type="xsd:string"/>
+        <xsd:element name="isbn" type="xsd:string"/>
+        <xsd:element name="title" type="xsd:string"/>
+        <xsd:element name="stitle" type="xsd:string"/>
+        <xsd:element name="atitle" type="xsd:string"/>
+        <xsd:element name="volume" type="xsd:int"/>
+        <xsd:element name="part" type="xsd:int"/>
+        <xsd:element name="issue" type="xsd:int"/>
+        <xsd:element name="spage" type="xsd:int"/>
+        <xsd:element name="epage" type="xsd:int"/>
+        <xsd:element name="pages" type="xsd:string"/>
+        <xsd:element name="artnum" type="xsd:int"/>
+        <xsd:element name="sici" type="xsd:string"/>
+        <xsd:element name="bici" type="xsd:string"/>
+        <xsd:element name="ssn" type="xsd:string"/>
+        <xsd:element name="quarter" type="xsd:int"/>
+        <xsd:element name="date" type="xsd:string"/>
+        <xsd:element name="pid" type="xsd:string"/>
+      </xsd:all>
+    </xsd:complexType>
+</types>
+
+
+
+<message name="doParaciteSearch">
+  <part name="q" type="xsd:string" />
+  <part name="baseurl" type="xsd:string" />
+</message>
+<message name="doParaciteSearchResponse">
+  <part name="return" type="typens:ParaciteSearchResult"/>
+</message>
+
+<message name="doOpenURLConstruct">
+  <part name="q" type="xsd:string" />
+  <part name="baseurl" type="xsd:string" />
+</message>
+<message name="doOpenURLConstructResponse">
+  <part name="return" type="xsd:string" />
+</message>
+
+<message name="doReferenceParse">
+  <part name="q" type="xsd:string" />
+  <part name="baseurl" type="xsd:string" />
+</message>
+<message name="doReferenceParseResponse">
+  <part name="return" type="typens:ParaciteSearchResult"/>
+</message>
+<!-- Ports -->
+
+<portType name="ParaciteSearchPort">
+  <operation name="doParaciteSearch">
+    <input message="typens:doParaciteSearch"/>
+    <output message="typens:doParaciteSearchResponse"/>
+  </operation>
+
+  <operation name="doOpenURLConstruct">
+    <input message="typens:doOpenURLConstruct"/>
+    <output message="typens:doOpenURLConstructResponse"/>
+  </operation>
+
+  <operation name="doReferenceParse">
+    <input message="typens:doReferenceParse"/>
+    <output message="typens:doReferenceParseResponse"/>
+  </operation>
+</portType>
+
+<binding name="ParaciteSearchBinding" type="typens:ParaciteSearchPort">
+  <soap:binding style="rpc"
+                transport="http://schemas.xmlsoap.org/soap/http"/>
+
+  <operation name="doParaciteSearch">
+    <soap:operation soapAction="WebService#doParaciteSearch"/>
+    <input>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </input>
+    <output>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </output>
+  </operation>
+
+  <operation name="doOpenURLConstruct">
+    <soap:operation soapAction="WebService#doOpenURLConstruct"/>
+    <input>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </input>
+    <output>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </output>
+  </operation>
+
+  <operation name="doReferenceParse">
+    <soap:operation soapAction="WebService#doReferenceParse"/>
+    <input>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </input>
+    <output>
+      <soap:body use="encoded"
+                 namespace="WebService"
+                 encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+    </output>
+  </operation>
+</binding>
+
+<service name="ParaciteSearchService">
+  <port binding="typens:ParaciteSearchBinding" name="ParaciteSearchPort">
+    <soap:address location="http://paracite.ecs.soton.ac.uk/cgi-bin/service/soapserver.cgi"/>
+  </port>
+</service>
+</definitions>

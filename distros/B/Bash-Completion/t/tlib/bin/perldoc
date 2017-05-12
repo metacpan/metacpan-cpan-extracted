@@ -1,0 +1,4 @@
+#!/bin/sh
+#
+# Fake perldoc binary to make Perldoc plugin activate
+#

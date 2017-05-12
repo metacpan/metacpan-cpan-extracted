@@ -1,0 +1,95 @@
+Bio::Protease
+==============
+
+Digest your protein substrates with customizable specificity
+------------------------------------------------------------
+
+This module models the hydrolitic behaviour of a proteolytic enzyme.
+Its main purpose is to predict the outcome of hydrolitic cleavage of a
+peptidic substrate.
+
+The enzyme specificity is currently modeled for 33 enzymes/reagents.
+This models are somewhat simplistic as they are largely regex-based, and
+do not take into account subtleties such as kinetic/temperature effects,
+accessible solvent area, secondary or tertiary structure elements.
+However, the module is flexible enough to allow the inclusion of any of
+these effects via user-defined regexes or by consuming the ProteaseI
+role.
+
+### Currently implemented specificities:
+
+* Alcalase
+* Arg-c Proteinase
+* asp-n Endopeptidase
+* asp-n Endopeptidase Glu
+* BNPS Skatole
+* Caspase 1
+* Caspase 2
+* Caspase 3
+* Caspase 4
+* Caspase 5
+* Caspase 6
+* Caspase 7
+* Caspase 8
+* Caspase 9
+* Caspase 10
+* Chymotrypsin high specificity
+* Chymotrypsin low specificity
+* Clostripain
+* CNBr
+* Enterokinase
+* Factor Xa
+* Formic Acid
+* Glutamyl Endopeptidase
+* GranzymeB
+* Hydroxylamine
+* Iodosobenzoic acid
+* Lys C
+* Lys N
+* NTCB
+* Pepsin pH 1.3
+* Pepsin
+* Proline Endopeptidase
+* Proteinase K
+* Staphylococcal Peptidase I
+* Thermolysin
+* Thrombin
+* Trypsin
+* HCl
+
+### Support for custom specificities
+
+You can customize your protease's specificity either consuming the
+Bio::ProteaseI role, or using a custom regex in the **specificity**
+attribute. The underlying model allows for up to 8 residues surrounding
+the siscile bond (P4-P1, P1'-P4'):
+
+    .----..----.----..----. .-----.-----.-----.-----.
+    | A  || M  | Q  || R  |*|  N  |  L  |  A  |  W  |
+    |----||----|----||----|^|-----|-----|-----|-----|
+    | P4 || P3 | P2 || P1 ||| P1' | P2' | P3' | P4' |
+    '----''----'----''----'|'-----'-----'-----'-----'
+                      cleavage site
+
+### Installation
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+### Support and Documentation
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bio::Protease
+
+### Copyright and Licence
+
+Copyright (C) 2010 **Bruno Vecchi**
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

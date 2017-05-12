@@ -1,0 +1,93 @@
+package Bio::ConnectDots::ConnectorQuery::Operator::CtCtJoin;
+use vars qw(@ISA @AUTO_ATTRIBUTES @OTHER_ATTRIBUTES %SYNONYMS %DEFAULTS);
+use strict;
+use Bio::Root::AutoClass;
+use Bio::ConnectDots::Util;
+use Bio::ConnectDots::ConnectorQuery::Operator::Join;
+@ISA = qw(Bio::ConnectDots::ConnectorQuery::Operator::Join);
+
+@AUTO_ATTRIBUTES=qw();
+%SYNONYMS=();
+@OTHER_ATTRIBUTES=qw();
+%DEFAULTS=();
+Bio::Root::AutoClass::declare(__PACKAGE__);
+
+sub generate {
+  my($self)=@_;
+  my $join=$self->join;
+  my @terms=@{$join->terms};
+  my @inputs=@{$self->inputs};
+  my @input_names=map {$_->name} @inputs;
+  my @ct_aliases=$join->aliases;
+  my @alias_names=map {$_->alias_name} @ct_aliases;
+
+  my @ct_sql_aliases=map {$_.'_ct'} @alias_names;
+  my $cs_sql_alias0= $terms[0]->cs->name.'_cs_0';
+  my $cs_sql_alias1= $terms[1]->cs->name.'_cs_1';
+  my $cs_id0=$terms[0]->cs->db_id;
+  my $cs_id1=$terms[1]->cs->db_id;
+  my $label_ids0=$join->term0->label_ids;
+  my $label_ids1=$join->term1->label_ids;
+
+  my $cs_where0="$cs_sql_alias0.connectorset_id=$cs_id0";
+  my $cs_where1="$cs_sql_alias1.connectorset_id=$cs_id1";
+  my $cs_label_where0=$self->label_where($cs_sql_alias0,$label_ids0);
+  my $cs_label_where1=$self->label_where($cs_sql_alias1,$label_ids1);
+
+  my $column0=$join->term0->column;
+  my $column_name0=$inputs[0]->is_ct? $column0: $self->column_name($ct_aliases[0],$column0);
+  my $ct_cs_where0="$ct_sql_aliases[0].$column_name0=$cs_sql_alias0.connector_id";
+  my $column1=$join->term1->column;
+  my $column_name1=$inputs[1]->is_ct? $column1: $self->column_name($ct_aliases[1],$column1);
+  my $ct_cs_where1="$ct_sql_aliases[1].$column_name1=$cs_sql_alias1.connector_id";
+
+  my $dot_where=qq($cs_sql_alias0.dot_id=$cs_sql_alias1.dot_id);
+
+  my $ct_from0=qq($input_names[0] AS $ct_sql_aliases[0]);
+  my $ct_from1=qq($input_names[1] AS $ct_sql_aliases[1]);
+  my $cs_from0=qq(connectdot AS $cs_sql_alias0);
+  my $cs_from1=qq(connectdot AS $cs_sql_alias1);
+
+  my @targets;
+  push(@targets,$self->ct_targets($inputs[0],,$ct_sql_aliases[0],$ct_aliases[0]));
+  push(@targets,$self->ct_targets($inputs[1],,$ct_sql_aliases[1],$ct_aliases[1]));
+  my $targets=join(', ',@targets);
+
+  my $left_join=qq(SELECT $targets FROM $ct_from0
+		   LEFT JOIN $cs_from0 ON $cs_where0 AND $cs_label_where0 AND $ct_cs_where0
+		   LEFT JOIN $cs_from1 ON $cs_where1 AND $cs_label_where1 AND $dot_where
+		   LEFT JOIN $ct_from1 ON $ct_cs_where1);
+
+  my $right_join=qq(SELECT $targets FROM $ct_from1
+		   LEFT JOIN $cs_from1 ON $cs_where1 AND $cs_label_where1 AND $ct_cs_where1
+		   LEFT JOIN $cs_from0 ON $cs_where0 AND $cs_label_where0 AND $dot_where
+		   LEFT JOIN $ct_from0 ON $ct_cs_where0);
+
+  my $sql="($left_join) UNION ($right_join)";
+  $self->sql($sql);
+}
+
+sub ct_targets {
+  my($self,$input,$ct_sql_alias,$ct_alias)=@_;
+  my $targets=[];
+  if ($input->is_ct) {
+    @$targets=map {qq($ct_sql_alias.$_ AS ).
+		     $self->column_name($ct_alias,$_)} @{$input->columns};
+  } else {
+    @$targets=map {qq($ct_sql_alias.$_ AS $_)} @{$input->columns};
+  }
+  wantarray? @$targets: $targets;
+}
+sub label_where {
+  my($self,$cs_sql_alias,$label_ids)=@_;
+  my $where;
+  # Note: if $label_ids is empty, the label was '*' -- matches all ids
+  if (@$label_ids==1) {
+    $where="$cs_sql_alias.label_id=".$label_ids->[0];
+  } elsif (@$label_ids>1) {
+    $where="$cs_sql_alias.label_id IN (".join(',',@$label_ids).")";
+  }
+  $where;
+}
+
+1;

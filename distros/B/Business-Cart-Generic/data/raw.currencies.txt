@@ -1,0 +1,4 @@
+INSERT INTO osc_currencies VALUES (1,'US Dollar','USD','$','','2','1.0000', now());
+INSERT INTO osc_currencies VALUES (2,'Euro','EUR','€','','2','1.2076', now());
+INSERT INTO osc_currencies VALUES (3,'British Pounds','GBP','£','','2','1.7587', now());
+INSERT INTO osc_currencies VALUES (4,'Australian Dollar','AUD','$','','2','1.000', now());

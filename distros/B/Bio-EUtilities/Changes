@@ -1,0 +1,30 @@
+Revision history for Bio-EUtilities
+
+1.75      2016-09-25 23:06:59-05:00 America/Chicago
+
+1.74      2016-09-25 20:09:15-05:00 America/Chicago
+  * NCBI related change from HTTP to HTTPS
+  * Add preliminary 'idtype' attribute for some eutils, which will be
+    needed for upcoming NCBI changes with migration of GI to Accession.Version
+  * Remove usage of 'given' and 'when' which have been downgraded to
+    experimental on perl 5.18.
+  * Fixed released tarball so it installs its programs `bp_einfo` and
+    `bp_genbank_ref_extractor`
+
+1.73      2013-09-08 22:17:18 America/Chicago
+  * LWP::UserAgent is required for Bio::DB::EUtilities, now added
+  * New script for download of all sequences from Entrez Gene queries
+
+1.72      2012-01-17 22:12:06 America/Chicago
+  * Add explicit prereqs
+  * Migrate all tests from Bio::Root::Test, add Test::More as
+    a build requirement, add helper module for test loading
+  * Remove Data::Dumper from modules
+
+1.71      2012-01-12 16:20:26 America/Chicago
+  * Full release (no changes from previous release)
+
+1.70      2012-01-12 14:38:27 America/Chicago
+  * Trial release
+  * Initial split from bioperl-live; history carried over [cjfields]
+  * No changes from last BioPerl release beyond splitting off.

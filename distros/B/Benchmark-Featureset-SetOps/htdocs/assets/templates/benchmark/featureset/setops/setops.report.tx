@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Perl Modules for Array/Set Handling</title>
+<link rel="stylesheet" type="text/css" href="<: $default_css :>">
+<link rel="stylesheet" type="text/css" href="<: $fancy_table_css :>">
+</head>
+<body>
+
+<h3 class="global_toc_text">Purpose</h3>
+
+<p align="center">To cross-check a personal selection of modules which offer:</p>
+
+: include "fancy.table.tx" { data => $purpose };
+
+<table align="center">
+<tr><td>Module names are read from data/module.list.ini, which is shipped with the distro.</td></tr>
+<tr><td>Each module's data has an indicator - 'include = Yes/No' - which makes it easy to edit & re-run.</td></tr>
+<tr><td>Further, each module has an indicator - 'overload_type = 1/2/3' - to specify the syntax to look for when processing overloads.</td></tr>
+<tr><td>Per-module notes are handled using the same mechanism.</td></tr>
+<tr><td>Excluded modules are listed at the end of this report.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Report generator</h3>
+
+: include "fancy.table.tx" { data => $report_generator };
+
+<hr />
+
+<h3 class="global_toc_text">Modules included</h3>
+
+: include "basic.table.tx" { row => $modules_included };
+
+<table align="center">
+<tr><td>Method names are found by scanning the source for /^sub.../.</td></tr>
+<tr><td>Method names starting with '_' are ignored.</td></tr>
+<tr><td>Also ignored are indented subs as in Set::Toolkit::TieArray, which is within the source of Set::Toolkit.</td></tr>
+<tr><td>Sub-class files for Object::Array and Set::Scalar have been scanned and included.
+<tr><td>Scanning the source means modules must be installed, but no attempt is made to load them at run-time.</td></tr>
+<tr><td>Source files are found by running 'mwhere' which is shipped with the marvellous App::moduleswhere.</td><tr>
+<tr><td>Version numbers are found by running 'mversion' which is shipped with the marvellous Module::Version.</td><tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Methods</h3>
+
+: include "basic.table.tx" { row => $method_data };
+
+<table align="center">
+<tr><td>A cell containing 'Yes' means that module has a method of that name.</td></tr>
+<tr><td>A token after 'Yes' is the overloaded operator defined in that module for that method.</td></tr>
+</table>
+
+<br />
+
+<table align="center">
+<tr><td>Just because 2 modules have a method with the same name does not mean the subs' behaviour is identical.</td></tr>
+<tr><td>For instance, symmetric_difference() in Set::Tiny and Set::Scalar return different lists.</td></tr>
+<tr><td>Not only that, but Set::Tiny's method returns a set, whereas Set::Scalar's returns a string.</td></tr>
+<tr><td>Further, some methods in Set::Array change the invocant object, which is an apalling design feature.</td></tr>
+<tr><td>Sample code ships as scripts/symmetric.demo.pl.</td></tr>
+<tr><td>As always, RTFM!</td></tr>
+</table>
+
+<p align="center">In order to make life difficult:</p>
+
+<table align="center">
+<tr><td>Object::Array fiddles a list of method names copied from List::MoreUtils.</td></tr>
+<tr><td>Set::Light has 2 aliases for exists: has and contains.</td></tr>
+<tr><td>Set::Object and Set::Toolkit define some overloads via subs. These are ignored.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Modules excluded</h3>
+
+: include "basic.table.tx" { row => $modules_excluded };
+
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+: include "fancy.table.tx" { data => $environment };
+
+<hr />
+
+</body>
+</html>

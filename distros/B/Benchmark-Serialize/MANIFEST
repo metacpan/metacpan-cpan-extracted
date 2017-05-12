@@ -1,0 +1,15 @@
+Changes
+examples/serialize.pl
+ignore.txt
+lib/Benchmark/Serialize.pm
+lib/Benchmark/Serialize/Library.pm
+lib/Benchmark/Serialize/Library/Data/Serializer.pm
+lib/Benchmark/Serialize/Library/ProtocolBuffers.pm
+lib/Benchmark/Serialize/Library/ProtocolBuffers/XS.pm
+lib/Data/Serializer/Benchmark/Serialize.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

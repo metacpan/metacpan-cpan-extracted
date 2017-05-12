@@ -1,0 +1,29 @@
+[% IF pager AND pager.first_page != pager.last_page; %]
+<p style="text-align: center;">Pages: 
+[%
+    SET begin_page = pager.current_page - 10;
+    IF begin_page < 1;
+        SET begin_page = pager.first_page;
+    ELSE; "..."; 
+    END;
+    SET end_page = pager.current_page + 10;
+    IF pager.last_page < end_page;
+        SET end_page = pager.last_page;
+    END;
+     FOREACH num = [begin_page .. end_page];
+          IF num == pager.current_page;
+            "["; num; "] ";
+          ELSE;
+%]
+<a href="[% base | remove('/$') %]/[% request.path | remove('^/') %]?page=[% num %]
+[%- IF request.query.terms; "&terms="; request.query.terms | uri; END; -%]">[[% num %]]</a>
+[%
+          END;
+     END;
+%]
+[% IF end_page < pager.last_page %]
+...
+[% END %]
+</p>
+[% END %]
+

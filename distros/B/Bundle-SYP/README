@@ -1,0 +1,204 @@
+NAME
+
+    Bundle::SYP - SYP's cozy environment
+
+VERSION
+
+    version 1.5
+
+SYNOPSIS
+
+     # Debian >= 5.0; Perl >= 5.14
+     sudo apt-get install curl gcc git-core libssl-dev libcurl4-gnutls-dev libdb-dev libexpat-dev libncurses-dev libreadline-dev libxml2-dev
+    
+     perl -MCPAN -e 'install Bundle::SYP'
+
+CONTENTS
+
+    Module::Install
+
+    XML::LibXML
+
+    YAML
+
+    Term::ANSIColor
+
+    Object::ID
+
+    AnyEvent::Net::Curl::Queued
+
+    App::cpanoutdated
+
+    App::p
+
+    App::pmodinfo
+
+    Bash::Completion::Plugins::cpanm
+
+    Bash::Completion::Plugins::perlbrew
+
+    Config::General
+
+    DBIx::Class::Schema::Loader
+
+    DB_File
+
+    Daemon::Generic
+
+    Data::DPath
+
+    Data::Float
+
+    Data::Printer::Filter::JSON
+
+    Data::Printer::Filter::URI
+
+    DateTime::Format::ISO8601
+
+    DateTime::Format::Strptime
+
+    Devel::NYTProf
+
+    Devel::REPL
+
+    Devel::REPL::Plugin::DataPrinter
+
+    Devel::Trace
+
+    Digest::SHA1
+
+    Dist::Zilla::App::Command::cover
+
+    Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes
+
+    Dist::Zilla::Plugin::CopyFilesFromBuild
+
+    Dist::Zilla::Plugin::Git::NextVersion
+
+    Dist::Zilla::Plugin::MetaResourcesFromGit
+
+    Dist::Zilla::Plugin::MinimumPerl
+
+    Dist::Zilla::Plugin::OurPkgVersion
+
+    Dist::Zilla::Plugin::PodWeaver
+
+    Dist::Zilla::Plugin::ReadmeAnyFromPod
+
+    Dist::Zilla::PluginBundle::Git
+
+    Dist::Zilla::PluginBundle::TestingMania
+
+    EV
+
+    File::Rename
+
+    FindBin::libs
+
+    Geo::DNA
+
+    Geo::Distance
+
+    Geo::GoogleEarth::Pluggable
+
+    HTML::AsText::Fix
+
+    HTML::Linear
+
+    HTML::TreeBuilder::LibXML
+
+    Imager
+
+    Lingua::PT::Nums2Ords
+
+    Log::Log4perl
+
+    LWP::Protocol::Net::Curl
+
+    LWP::Protocol::https
+
+    Mojolicious
+
+    MongoDB
+
+    Mouse
+
+    Net::Whois::Raw
+
+    Number::Format
+
+    Parallel::ForkManager
+
+    Perl::Critic
+
+    Perl::Critic::Policy::Modules::ProhibitModuleShebang
+
+    Pod::Elemental::Transformer::List
+
+    Regexp::Common
+
+    Roman
+
+    Sort::Key::Top
+
+    Statistics::Descriptive
+
+    String::Similarity
+
+    String::Trigram
+
+    Term::ReadLine::Gnu
+
+    Text::CSV
+
+    Text::Fingerprint
+
+    Text::TabularDisplay
+
+    Throwable
+
+    Tie::Handle::CSV
+
+    URI::Escape
+
+    URI::QueryParam
+
+    URI::sftp
+
+    Unicode::CaseFold
+
+    Unicode::CheckUTF8
+
+    Web::Scraper
+
+    WWW::Mechanize
+
+    XML::Rabbit
+
+    XML::SAX::ExpatXS
+
+    forks
+
+    lexicals
+
+CAVEATS
+
+    I know there's a Task:: way of doing it, and I could also play around
+    with [Prereqs] section of my dist.ini, and that using Dist::Zilla to
+    make a Bundle:: is an overkill.
+
+    But I simply like to stick with the idea that the first three modules
+    (YAML, Term::ANSIColor, Object::ID) will be installed before the rest,
+    disregarding the alphabetical order.
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

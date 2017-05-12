@@ -1,0 +1,316 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::Telegram::Keyboard - Telegram Keyboard handler
+
+=head1 SYNOPSIS
+
+   use Bot::ChatBots::Telegram::Keyboard qw< keyboard >;
+   # `keyboard` is a wrapper around constructor
+   # Bot::ChatBots::Telegram::Keyboard->new()
+
+   my $keyboard = keyboard(
+      [ # first row of the keyboard
+         {
+            text => "Happyness",      # shown in the button
+            _value => '/happyness', # substituted upon call
+         },
+         {
+            text => "+1",                # shown in the button
+            _value => '/happyness +1', # substituted upon call
+         },
+         {
+            text => "+2",                # shown in the button
+            _value => '/happyness +2', # substituted upon call
+         },
+         {
+            text => "+3",                # shown in the button
+            _value => '/happyness +3', # substituted upon call
+         },
+      ],
+      [ # second row of the keyboard. Note that the second, third
+        # and fourth button hold the same labels as in the first
+        # row... which can be problematic because the label is
+        # what Telegram clients send back when the button is hit
+         {
+            text => "Relax",      # shown in the button
+            _value => '/relax', # substituted upon call
+         },
+         {
+            text => "+1",            # shown in the button
+            _value => '/relax +1',  # substituted upon call
+         },
+         {
+            text => "+2",            # shown in the button
+            _value => '/relax +2', # substituted upon call
+         },
+         {
+            text => "+3",            # shown in the button
+            _value => '/relax +3', # substituted upon call
+         },
+      ],
+      [
+         {
+            text => 'Location',     # shown in the button
+            request_location => \1, # flag for Telegram
+         },
+         {
+            text => 'Help',      # shown in the button
+            _value => '/help', # substituted upon call
+         }
+      ],
+      # ...
+   );
+
+   # Suppose you have a Bot::ChatBots::Telegram::Sender now...
+   $sender->send_message(
+      text => "Here's your keyboard",
+      chat_id => $chat_id, # whatever it is...
+      reply_markup => {
+         resize_keyboard => \1,
+         keyboard => $keyboard->displayable,
+      },
+   );
+
+   # You're setting the Bot::ChatBots::Telegram::WebHook and need a
+   # processor...
+   sub processor {
+      my $record = shift;
+
+      my $command = $keyboard->get_value($record);
+      # ...
+
+      return $record;
+   }
+
+=head1 DESCRIPTION
+
+Telegram L<custom keyboards|https://core.telegram.org/bots#keyboards> are
+a handy feature to provide a cleaner interface to your users. They're
+pretty basic: you set up the keyboard with some text on a few buttons
+(including emojis) and whenever the user pushes the button, that text is
+sent back to your bot.
+
+While effective and amazing, this can prove stiff when compared to e.g.
+how HTML handles buttons. In HTML, you can I<independently> set what the
+user sees and what's sent to the server (in the form of a C<value>). This
+allows you to:
+
+=over
+
+=item *
+
+easily manage translations without changing the behavior of the button,
+and
+
+=item *
+
+have buttons with the same labels trigger different actions, e.g. based on
+where they are placed.
+
+=back
+
+As an example of the latter case, consider a keyboard in which you want to
+track two different variables, I<Happyness> and I<Relax>. You want to
+provide a button for showing their current value, and some buttons to
+increse those values. It might be something like this:
+
+   +-----------+-----------+-----------+-----------+
+   | Happyness |    +1     |    +2     |    +3     |
+   +-----------+-----------+-----------+-----------+
+   |   Relax   |    +1     |    +2     |    +3     |
+   +-----------+-----------+-----------+-----------+
+
+It's clear from the context what the different C<+1>, C<+2> and C<+3>
+mean, but they can't be shown like this because they will just send their
+label without providing any hint about the context.
+
+This module defines a class to help you with this. It allows you to define
+a Telegram keyboard that allows tracking each button individually and
+associate a translation C<_value> to it, so that when it is received you
+can get that C<_value> back, and e.g. use it as if it had been written
+by the client in the first place.
+
+The button tracking is accomplished by appending to the label of each
+keyboard button a unique sequence of zero-width Unicode characters. This
+allows having I<different> labels for each of them, while at the same time
+ensuring that they look exactly the same when printed. Luckily, Telegram
+clients as of February 2017 send the whole sequence instead of just the
+visible, non-zero-width characters.
+
+=head1 FUNCTIONS
+
+To ease with the creation of keyboards, a helper function is available:
+
+=head2 B<< keyboard >>
+
+   my $keyboard = keyboard(@keyboard_rows); # OR
+      $keyboard = keyboard(\@keyboard_rows); # OR
+      $keyboard = keyboard(id => $id, keyboard => \@rows);
+
+This is just a wrapper around the constructor. A such, it can throw
+exeptions, see L</DIAGNOSTICS> for the details.
+
+=head1 ACCESSORS
+
+=head2 B<< displayable >>
+
+   my $kbd_for_client = $obj->displayable;
+
+Read-only accessor for a rendition of the keyboard that is suitable for
+sending to the client. Any button that originally contained a C<_value>
+has this field removed (as it's not in Telegram's specification) and its
+label is changed with a suitable zero-width tracking code. As such, it can
+be used like this:
+
+   $sender->send_message(
+      text => "Here's your keyboard",
+      chat_id => $chat_id, # whatever it is...
+      reply_markup => {
+         resize_keyboard => \1,
+         keyboard => $obj->displayable,
+      },
+   );
+
+=head1 METHODS 
+
+=begin implementation
+
+=head2 B<< BUILDARGS >>
+
+This method takes care to transform the input C<keyboard> into something
+to set L</displayable> and something used by L</get_value>. This is not
+necessarily something that has to be shown in the docs.
+
+=end implementation
+
+
+=head2 B<< get_value >>
+
+   my $text = $obj->get_value($record); # OR
+      $text = $obj->get_value($record->{payload}); # OR
+      $text = $obj->get_value($record->{payload}{text});
+
+Get the command string from an input record (e.g. coming in a webhook).
+Returns the C<_value> fields content in the keyboard definition if such
+a command tracker is found in the input, C<undef> otherwise.
+
+The input can be:
+
+=over
+
+=item *
+
+a I<record>, i.e. something with a C<payload> field inside. In this case,
+whatever is in the C<text> subfield is taken;
+
+=item *
+
+a I<payload>, in which case a C<text> field inside is taken;
+
+=item *
+
+a plain string.
+
+=back
+
+If the input is a hash reference but neither C<payload> nor C<text> are
+found, it is assumed to be a I<payload> hash without a text and the text
+will be assumed to be C<undef>. If you want to have 100% of control,
+always pass a plain string.
+
+=head2 B<< get_keyboard_id >>
+
+   my $id = $obj_or_class->get_keyboard_id($record); # OR
+      $id = $obj_or_class->get_keyboard_id($record->{payload}); # OR
+      $id = $obj_or_class->get_keyboard_id($record->{payload}{text});
+
+Get the keyboard identifier from an input record (e.g. coming from
+a webhook). Returns an unsigned integer value. You can set this value for
+a keyboard via option C<keyboard_id> during construction, see L</new>.
+
+The input can be the same as in L</get_value>. Note that this method can
+be used as either an instance or a class method, with the same result.
+
+=head2 B<< new >>
+
+   my $kbd = Bot::ChatBots::Telegram::Keyboard->new(%args); # OR
+      $kbd = Bot::ChatBots::Telegram::Keyboard->new(\%args);
+
+Constructor. It accepts the following parameters:
+
+=over
+
+=item C<< keyboard >>
+
+an array of arrays of hashes, just like a normal Telegram keyboard. As an
+extension, each keyboard button can additionally support a C<_value>
+parameter, holding the I<real> value to associate to the button (which can
+be retrieved via L</get_value>).
+
+=item C<< id >>
+
+an unsigned integer to enable distinguishing different keyboards, its
+value can be retrieved via L</get_keyboard_id> from a received record.
+Defaults to C<0>.
+
+=back
+
+This method can throw exceptions if the input is not good, see
+L</DIAGNOSTICS> for the details.
+
+=head1 DIAGNOSTICS
+
+The following exceptions can be thrown by this class via L<Ouch>, all with
+code C<500>:
+
+=over
+
+=item C<< no input keyboard >>
+
+the constructor was not provided the requird C<keyboard> input parameter.
+See L</new>.
+
+=item C<< get_value(): pass either hash references or plain scalars >>
+
+method L</get_value> can accept either a plain scalar (used as text) or
+a hash reference where the text will be searched. Everything else leads to
+this exception.
+
+=item C<< invalid input keyboard, not an ARRAY >>
+
+=item C<< invalid input keyboard, not an AoA >>
+
+=item C<< invalid input keyboard, not an AoAoH >>
+
+constructor L</new> accepts a single input parameter C<keyboard> that MUST
+be a reference to an array of arrays of hashes. The first exception is
+thrown if the input is not an array, the second if any item inside the
+outer array is not an array itself, the third if the items in each row are
+not hashes.
+
+=back
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots::Telegram>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

@@ -1,0 +1,3 @@
+"country","zone","tax_class","rate","name"
+Australia,VIC,Exempt,0,name
+Australia,VIC,GST,0.10,name

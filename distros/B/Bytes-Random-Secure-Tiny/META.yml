@@ -1,0 +1,24 @@
+---
+abstract: 'A tiny Perl extension to generate cryptographically-secure random bytes.'
+author:
+  - 'David Oswald <davido@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.56'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bytes-Random-Secure-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008000'
+resources:
+  repository: git://github.com/daoswald/Bytes-Random-Secure-Tiny.git
+version: '1.008'

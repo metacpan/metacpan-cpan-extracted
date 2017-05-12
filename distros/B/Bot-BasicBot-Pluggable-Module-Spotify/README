@@ -1,0 +1,53 @@
+Bot-BasicBot-Pluggable-Module-Spotify
+
+This is a plugin for a Bot::BasicBot::Pluggable bot.
+Whenever someone writes a Spotify URI in an IRC channel, the plugin
+does a lookup for that URI, using the Spotify Metadata API through
+Net::Spotify, and sends back in the channel a message with the
+relevant information.
+
+Have fun! :)
+
+
+VERSION
+
+This is version 0.01.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bot::BasicBot::Pluggable::Module::Spotify
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Module-Spotify
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Spotify
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Spotify
+
+    Search CPAN
+        http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Spotify/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Edoardo Sabadelli
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

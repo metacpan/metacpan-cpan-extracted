@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Business-OnlinePayment-Exact
+version:      0.01
+version_from: lib/Business/OnlinePayment/Exact.pm
+installdirs:  site
+requires:
+    Business::OnlinePayment:       2.01
+    SOAP::Lite:                    0.65_3
+    Term::ReadLine:                0
+    Term::ReadLine::Gnu:           0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

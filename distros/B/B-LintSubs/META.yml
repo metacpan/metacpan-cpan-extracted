@@ -1,0 +1,21 @@
+---
+name: B-LintSubs
+version: 0.06
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+  - 'Based on the C<B::Lint> module by Malcolm Beattie, <mbeattie@sable.ox.ac.uk>.'
+abstract: Perl compiler backend to check sub linkage
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  IPC::Run: 0
+  Test::More: 0
+provides:
+  B::LintSubs:
+    file: lib/B/LintSubs.pm
+    version: 0.06
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

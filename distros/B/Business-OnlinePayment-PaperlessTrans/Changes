@@ -1,0 +1,23 @@
+Revision history for Business-OnlinePayment-PaperlessTrans
+0.001006  2013-06-07
+	- accidentally removed all prereqs when removing DateTime Prereq
+
+0.001005  2013-06-07
+	- DateTime is no longer used
+
+0.001004  2013-06-06
+	- remove Moose, and Split from Business::PaperlessTrans
+
+0.001003  2013-05-28
+	- File::ShareDir::ProjectDistDir was still in dist.ini
+
+0.001002  2013-05-28
+	- remove Test::Method, Test::Requires::Env,
+	  File::ShareDir::ProjectDistDir, MooseX::Types::*, and Data::Printer
+	  dependendencies per IVAN
+
+0.001001  2013-05-24
+	- fix dependency on MooseX::Types::CreditCard 0.002
+
+0.001000  2013-05-21
+	- initial release

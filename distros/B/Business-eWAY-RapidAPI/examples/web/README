@@ -1,0 +1,5 @@
+curl -L http://cpanmin.us | perl - App::cpanminus
+cpanm Plack CGI::Emulate::PSGI CGI::Compile DateTime CGI::Session
+plackup
+
+then visits http://localhost:5000/cgi-bin/default.pl with your favorite browser.

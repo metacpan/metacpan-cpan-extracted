@@ -1,0 +1,162 @@
+Revision history for Perl extension Business-BR-Ids.
+
+0.0022  Tue Jul  1 2008
+        - promoted to a "stable" release
+
+0.00_21 Mon Sep 17 2007
+        - fixed t/002_cpf_test.t and t/015_pis_rand.t
+          which did "BEGIN { use_ok }" before setting
+          the plan
+
+0.00_20 Tue Aug  7 2007
+        - 11 in 27 states supported in Business::BR::IE
+        - added support for IE/BA
+
+0.00_19 Sat Jul 28 2007
+        - 10 in 27 states (37.0%) supported in Business::BR::IE
+        - added support for IE-AM
+
+0.00_18 Sat Jul 28 2007
+        - 9 in 27 states (33.3%) supported in Business::BR::IE
+        - added support for IE-MG
+
+0.00_17 Tue May 16 2005 (unreleased)
+        - 8 in 27 states (29.6%) supported in Business::BR::IE
+        - added support for IE-AP
+
+0.00_16 Wed Oct 26 2005
+        - in canon_*(), instead of stripping all non-digits,
+          alphanumeric characters are preserved
+        - canon_ie_*() for each of the 27 states (untested)
+
+0.00_15 Wed Oct 26 2005
+        - 7 in 27 states (25.9%) supported in Business::BR::IE
+        - added support for IE-RO
+
+0.00_14 Tue Oct 25 2005
+        - the check equation for IE-AL was wrong: this
+          releases fixes the bug - the problem was
+          test sample too small
+
+0.00_13 Wed Oct 19 2005
+        - one more id: the PIS number
+        - new files: "lib/Business/BR/PIS.pm" and two tests "t/*_pis_*.t"
+
+0.00_12 Tue Aug 11 2005
+        - added support for IE-RR
+        - Scalar::Util 1.11 is needed (this is the
+          release which introduces "looks_like_number")
+
+0.00_11 Tue Aug 09 2005
+        - added support for IE-MA
+
+0.00_10 Sun Jul 17 2005
+        - 4 in 27 states (14.8%) supported in Business::BR::IE
+        - added support for IE-AL
+        - "t/001_dot.t" now works for other Perls < 5.008
+        - _dot now deals with untrue's avoiding
+          to do a computation which would throw
+          a warning
+        - _flatten in Business::BR::Ids::Common 
+          renamed to _canon_i
+        - references to 'flatten' renamed to 'canon'
+        - test, flatten, parse, format, random in
+          Business::BR::Ids renamed to test_id,
+          flatten_id, parse_id, format_id, random_id:
+          no more issues with clash with core 'format'
+          and functions names are better: not so 
+          general and yet short
+
+0.00_09 Sat Jul 16 2005
+        - new test script "t/014_ie_parse.t"
+        - parse_ie() in Business::BR:IE
+        - tests added for IE-AC (test, flatten, format,
+          random)
+        - support for IE-AC (Acre)
+        - fixed a typo in Business::BR::Biz
+        - "t/007_ids_test.t" now includes testing IE
+        - pale additions to Business::BR::Ids docs
+
+0.00_08 Sat Jul 16 2005
+        - 0.00_07 was not indexed by CPAN: maybe it was 
+          because of files that changed but didn't have
+          their versions incremented
+        - the bug below was fixed by explicit "scalar" conversions
+        - a bug slipped when semantics of _dv_*() changed,
+          allowing to reduce the code of random_*(). But then, instead
+          of knowing only about scalar context,  random_*()
+          returned the check digits on list context (like in
+          "print random_cnpj()"
+
+0.00_07 Fri Jul 15 2005
+        - the IE functions were made case-insensitive ('MG' works
+          the same as 'mg')
+        - added IE handling for PR state (test, flatten, format,
+          random, and parse)
+        - introduced _flatten in Business::BR::Ids::Common,
+          avoiding the redundant code of the various flatten_*()
+          methods
+        - changed semantics of calling _dv_*() in scalar context -
+          instead of returning a concatenation of the check digits,
+          it returns a complete entity with check digits in
+          (in IE-SP the check digits are the ninth and 12nd -
+          so that the concatenation of check digits is good for nothing)
+
+0.00_06 Thu Jul 14 2005
+        - added tests for Business::BR::IE
+        - added IE handling for SP state (test, flatten,
+          format, and random)
+
+0.00_05 Fri Jun 10 2005
+        - Deprecates Business::BR::Biz (waiting for the move
+          of its content somewhere else)
+        - README file revised
+        - first revision to POD in Business::BR::CNPJ
+        - new test "t/009_cnpj_rand.t"
+        - random_cnpj() in Business::BR::CNPJ
+        - test scripts renamed (eg. "t/dot.t" to "t/001_dot.t")
+        - random() in Business::BR::Ids
+        - new test "t/008_cpf_rand.t"
+        - random_cpf() in Business::BR::CPF
+        - introduced flatten() and parse() to Business::BR::Ids
+          with a small refactoring avoiding redundant code
+        - fixed synopsis of Business::BR::Ids
+        - test for _dot() with @a < @b now works for $] < 5.8
+        - fixed broken links at Business::BR, I hope
+
+0.00_04 Thu Jun 9 2005
+        - I thought about letting MakeMaker generate META.yml automatically 
+          again - but it does not generate the 'author' and 'licence' keys
+          which CPAN uses - so I insist on that
+        - distribution renamed to Business-BR-Ids reflecting
+          the orientation of this set of files to deal with
+          identification codes (CPF, CNPJ for now)
+        - added test "t/ids_test.t"
+        - added Business::BR::Ids as a generic entry point
+          for dealing with Brazilian identification entities
+
+0.00_03 Wed Jun 8 2005
+        - tests "t/*_cpf.t" renamed to "t/cpf_*.t"
+        - added new module Business::BR::CNPJ but POD is not finished
+          and tests aren't provided (except for a partial "t/cnpj_test.t")
+        - the heart of the distribution goes to Business::BR::Biz
+        - "_dot" goes to Business::BR::Biz::Common
+        - the ABSTRACT fix of the previous version was not enough
+          for correct CPAN display - now using a META.yml with 'abstract' key
+        - Adam Kennedy pointed that the general CPAN convention 
+          for naming distributions would suggest Business-BR instead of biz-br:
+          I would like to stick to this distribution name to mean
+          a partial bundle of Business::BR::* modules I will be authoring
+
+0.00_02 Tue Jun 7 2005
+        - fixed the missing ABSTRACT
+        - added flatten_cpf(), format_cpf(), parse_cpf() to Business::BR::CPF
+        - added corresponding tests
+
+0.00_01 Tue Jun 7 2005
+        - Business::BR::CPF provides test_cpf()
+        - submitted to CPAN 
+
+0.01  Tue Jun  7 08:06:16 2005
+        - original version; created by h2xs 1.23 with options
+                -AX -n biz-br

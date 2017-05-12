@@ -1,0 +1,185 @@
+The tooltips for backend keywords were lost, we should probably create a
+third subcolumn in the Config Statements column to show them.
+
+Features not in first version:
+    main_listing row_options and header_options don't allow alternate urls
+    table data statements are not supported (ignored during loading,
+    discarded during output).
+    controller level literal blocks
+
+Order adjustments are not even conceived yet, but we need them for:
+    app level blocks
+    fields in tables
+    html_form_options
+
+Tests.
+    More are always merrier, but there are quite a few.
+
+Have a way for backends to register legal controller and method types and
+to say which statements apply to that type.  Then either show only those
+statements or at least enable or highlight only those supported by the
+current type.  Also, include a required flag for statements which must
+appear (like controls_table for main_listing methods).
+
+Disable app statement boxes when none of the understanding backends is
+selected?
+
+Disable field statement entry boxes when the proper type is not selected?
+
+Disable input fields for backends which are not selected?  (But, note
+that this does not remove the need to take values from these fields
+when the backend is reselected.)
+
+Make selecting a backend (checking its box) scan the input fields
+in the far right column looking for existing values.
+
+When App Config Block 'Value' entries are blanked, bad things happen.
+(The value gets set to 'true' or 'undefined' etc.)
+    Fixed for fields that are made at page load time, but not
+    for fields created later.
+    Further, when a field is created, the statement should be
+    made with `` as the value (in case that is what is needed).
+
+Work on styling.
+
+Widen all input text boxes.  They are currently microscopic in comparison
+to the data they need to hold.
+
+Consider long range improvements that would preserve comments and
+whitespace in deparse output.  These would require major grammar work.
+
+Make a Gantry::Conf check box which does and undoes the following:
+    if the engine is mod_perl
+        adds skip_config statement to backend block for HttpdConf Gantry
+        adds literal `PerlSetVar GantryConfInstance appname`
+        adds Conf General backend
+    if the engine is CGI
+        adds instance statement with appname to backend block
+
+Make the subsequent pages:
+    Tables
+    Controllers
+
+Add full support for literals.
+
+Add support for table level data statements (which are more like literals
+than like other statements, since they can be repeated and their order
+could conceivably matter).
+
+Done:
+
+rel_location and location are not highlighting properly at the controller
+level.
+    This was a problem with the httpd conf backend not using B::Keywords
+    to register its keywords.
+
+Implement literal blocks
+    These are avaiable at the app level only.
+
+It would be nice if there were tabs instead of collapsing sections at the
+top level.  Further, each section should have a little summary of what it's
+for.
+    I haven't decided how to make the summaries yet.
+
+Required for and applies to are needed.
+    This is not so easy.  In response, I have color coded fields based
+    on the urgency with which you must attend to them.  Red for required,
+    yellow for mostly required (usually pick one or the other), and green
+    and blue for things you frequently need.
+
+Examples are needed (especially for things like constraints).
+
+Generated styling default is still unexceptable.
+    we could rename the generated wrapper to genwrapper.tt and look for that
+    then we would never see the one in gantry root which always make us
+    look so bad.
+
+Delete buttons on block level and subblock level elements don't work (or
+don't appear at all, in the case of subblocks).
+
+Try to build a name/phone app AND build it.
+
+Creating a table should give you an id field by default (or not).
+
+The default bigtop file in the __DATA__ section of TentMaker.pm is weak.
+
+For multiples, create two empty fields instead of one.  This prevents
+bounce problems with tabbing and shows clearly that multiple items are
+allowed when none are currently supplied.
+
+Method creation button doesn't work.
+
+Method creation has no type selector.
+
+Controller type selection for existing controllers doesn't work.
+
+Change the grammar so table_block_elements and field_statements are optional.
+
+Renaming needs seious help starting with a unique block id assigned during
+parsing and block creation.
+Example: When a field is renamed, none of its statements can be updated.
+When the name of a table changes, change the name on the
+Delete Table ... button.  Same for sequence, controller, etc.
+
+Start from scratch pretty much doesn't work.
+
+Make saving put something into the chat area, but this means we need
+to clear it on a regular basis (like in redraw).
+
+Once an item has been created, the name field should be reset.
+
+When pairs have a key, but no value, the ordering of the result is off.
+We need to make sure that the proper number of ][s get put into the values
+portion of the query string.
+
+Adding new html_form_options does not work.
+
+Boolean field statements are not operative.
+
+Blanking a field statement's value does not remove it, but also gives no
+error output.
+
+There is no support for adding pairs as statement values.  That should
+be seemless.
+
+Centralize the documentation of keywords.  If multiple backends want
+to register it, there should be a simple place they can delegate to
+with just the keyword name and level.  The central place will have
+definitive docs, etc.
+    See Bigtop::Keywords
+
+Factor out the dojo.html.createNodesFromText code so we don't need
+that whole library.
+
+Start from scratch app config block doesn't update values.
+    It only looked like it was making the statements.  It couldn't.
+    Now it can.
+
+Backend keyword values are not being properly quoted.
+
+Can't set app level statement values if none of them have values.
+
+When I enter a foreign display with an embedded comma, it gets turned
+into two items.
+
+Move the initial file parsing back to first browser hit?
+    Not done.  Mooted by move to precompiled grammar.
+
+Make the mouse pointer change from I-beam to click selection when
+over clickable divs.
+
+Get all the Backends on the system for the backend list.  Make check
+boxes for these which enable a set of text input boxes where values can
+be added for the commands the backend understands.  (This requires
+some better methods for determining what statements are legal.)
+
+Move the initial file parsing penalty to server start time.
+
+Put watchers on the config backend block statement checkboxes and text fields.
+
+Make a way to control the input type of keyword statement tables.
+
+Create a backend method for dumping the AST back to text.
+
+Make it possible to change the app name and save the result.
+

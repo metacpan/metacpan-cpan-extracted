@@ -1,0 +1,92 @@
+{
+   "abstract" : "Business::OnlinePayment::Litle - Vantiv (was Litle & Co.) Backend for Business::OnlinePayment",
+   "author" : [
+      "Jason Hall <jayce@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Business-OnlinePayment-Litle",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Weaver::Section::Contributors" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::CreditCard" : "0",
+            "Business::OnlinePayment" : "0",
+            "Business::OnlinePayment::HTTPS" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "HTTP::Tiny" : "0.022",
+            "IO::Socket::SSL" : "1.56",
+            "IO::String" : "0",
+            "Log::Scrubber" : "0.14",
+            "MIME::Base64" : "0",
+            "Net::SFTP::Foreign" : "1.57",
+            "Net::SSLeay" : "0",
+            "Test::More" : "0",
+            "Tie::IxHash" : "0",
+            "XML::Simple" : "0",
+            "XML::Writer" : "0",
+            "bytes" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::MockObject" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Jayceh/Business--OnlinePayment--Litle/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Business-OnlinePayment-Litle/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Jayceh/Business--OnlinePayment--Litle.git",
+         "web" : "https://github.com/Jayceh/Business--OnlinePayment--Litle"
+      }
+   },
+   "version" : "0.955",
+   "x_contributors" : [
+      "Daina Pettit <dpettit@bluehost.com>",
+      "David Bartle <captindave@gmail.com>",
+      "Jason Hall <jayce@jaycehall.com>",
+      "Jason (Jayce^) Hall <jayce@lug-nut.com>",
+      "Jason Terry <oaxlin@gmail.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

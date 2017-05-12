@@ -1,0 +1,59 @@
+Revision history for Perl extension Business::AU::Ledger.
+
+0.88  Fri Sep 24 11:28:00 2010
+	- Switch Config::IniFiles to Config::Tiny in Build.PL and Makefile.PL.
+
+0.87  Wed Sep 22 13:08:00 2010
+	- Remove form_action from config file. Use $self -> query -> url(-absolute => 1) instead.
+
+0.86  Wed Feb 24 16:44:00 2010
+	- Add namespace::autoclean to Build.PL and Makefile.PL.
+
+0.85  Sun Feb 21 12:54:19 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+
+0.84  Wed Feb 10 13:52:30 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+	- Update versions of modules in Build.PL and Makefile.PL, based on
+		feedback from CPAN testers.
+	- Change tmpl_path in .htledger.conf to /var/www/...
+	- Start using Moose's namespace::autoclean and make_immutable style.
+	- Move Business::AU::Ledger::Config to Business::AU::Ledger::Util::Config.
+	- Move Business::AU::Ledger::Create to Business::AU::Ledger::Util::Create.
+	- Move Business::AU::Ledger::Validate to Business::AU::Ledger::Util::Validate.
+	- In Validate, rename r to query since we don't use Apache::Request.
+	- Remove references to DBIx::Connector.
+	- Update TODO file.
+	- Switch from Config::IniFiles to Config::Tiny while re-writing Config.
+	- Reformat source by removing () from method names when called.
+
+0.83  Sun Nov 08 15:33:00 2009
+	- Add CGI::Application to the list of required modules.
+	- Replace (the module called) accessors with Hash::FieldHash.
+	- Change B::AU::L::Config to allow options at the end of session_driver.
+		E.g.: Before: session_driver=driver:postgresql
+		After:  session_driver=driver:postgresql;port=5433
+	- Add MANIFEST.SKIP to the distro.
+	- Add option to .htledger.conf to allow database port to be specified.
+	- Remove execution of SQL grant command
+	- Change css_path to css_url and yui_path to yui_url.
+	- Change default database username/password to book/keeper.
+	- Use database vendor's name to customize timestamp's time zone syntax.
+	- Adopt DBIx::Connector via DBIx::Admin::Connector.
+
+0.82  Sun Apr 12 10:08:00 2009
+	  - Rename Changes.txt to CHANGES because search.cpan.org won't display Changes.txt
+	  - Various code changes
+	  - Ship database schema in docs/
+	  - Document in POD the TODO list
+	  - Document in POD the Installation Instructions
+
+0.81  Tue Jul 22 10:46:00 2008
+	  - Rename CHANGES to Changes.txt to match all other modules
+	  - Add Changelog.ini
+
+0.80  Thu Mar 06 11:30:45 2008
+	- Original version

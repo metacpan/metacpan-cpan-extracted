@@ -1,0 +1,23 @@
+DESCRIPTION
+
+    EARLY RELEASE, WORK IN PROGRESS, MANY THINGS ARE NOT YET IMPLEMENTED.
+
+    Borang is a function-oriented form framework. Borang can generate forms
+    using information from Rinci function metadata. After you fill out and
+    submit a form, the form submission will be converted into function
+    arguments and sent to the function via function call.
+
+    Borang is environment-agnostic: it can target HTML forms as well as
+    CLI/CUI/GUI.
+
+FAQ
+
+ What does "borang" mean?
+
+    Borang means form in Indonesian and is currently seldom used in daily
+    conversations.
+
+SEE ALSO
+
+    Rinci
+

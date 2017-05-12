@@ -1,0 +1,117 @@
+Changes file for Business::DK::CVR
+
+The project Changelog is available at:
+
+http://logiclab.jira.com/browse/BDKCVR#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.09 2014-08-23, maintenance release, update not required
+
+- Added specification of required Perl version, settling for
+  5.8 for now as reported by Perl::Critic
+
+
+0.08 2014-08-15, maintenance release, update not required
+
+- Addressing Kwalitee, aligning version for version consistency
+  in modules in distribution
+
+- Added changes.t automatic assertion of the integrity of the
+  Changes file, see also BDKCVR-8 [BDKCVR-9]
+
+  https://logiclab.jira.com/browse/BDKCVR-9
+
+
+0.07 2013-08-01, maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to
+  the standard described in: CPAN::Changes::Spec [BDKCVR-8]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/BDKCVR-8
+
+- Added contemporay boiler plate of Perl::Critic test [BDKCVR-5]
+
+  https://logiclab.jira.com/browse/BDKCVR-5
+
+
+0.06 2011-02, maintenance release, update not required
+
+- Added use of Params::Validate in key places and phased out use
+  of Business::DK::PO
+
+- Made control cifers Readonly
+
+- The _length method has been removed, since it's use was
+  obsoleted
+
+
+0.05 2008-06-11, feature release, update not required
+
+- Add object oriented variant implementation [BDKCVR-1],
+  introducing Class::Business::DK::CVR
+
+- Added prerequisites test (Test::Prereq) [BDKCVR-2]
+
+- Added requirement of Scalar::Util, we are stealing as much as
+  we can from Michael Peters's distribution:
+
+    Data::FormValidator::Constraints::DateTime
+
+- Added a LICENSE file
+
+- Added LICENSE file and split COPYRIGHT and LICENSE section in
+  POD into two separate sections
+
+- Restructured tests files to follow namespace in directory
+  structure
+
+- Added recursive_test_files to Build.PL
+
+- Added create_readme to Build.PL
+
+- Introduced generate method so valid CVRs now can be generated
+  randomly
+
+- Introduced
+  Data::FormValidator::Constraints::Business::DK::CVR, this is
+  sort of an example application, it is however just a simple
+  wrapper fitting into the Data::FormValidator::Constraints
+  framework - it is should be usable, not just a demo, but still
+  experimental
+
+
+0.04 2007-03-13, maintenance release, update not required
+
+- Fixed problem in t/critic.t, I had implemented a mix of my own
+  and the recommended Perl::Critic test, so it gave unforseen
+  test failures
+
+
+0.03 2007-03-12, maintenance release, update not required
+
+- Added Perl::Critic test, t/critic.t and related t/perlcriticrc
+
+- Updated to more contemporary versions of:
+    t/pod-coverage.t
+    t/pod.t
+
+  These should be there for the quality, but will not be run as
+  a part of the normal test run, unless the TEST_POD environment
+  variable is set.
+
+  This seem to be the defacto way of doing things.
+
+
+0.02 2006-03-01, maintenance release, update not required
+
+- Added some more links to SEE ALSO section, apparently there is
+  already a module on CPAN capable of validating CVR numbers
+  this module does not use the name CVR so I did no locate it
+  prior to releasing this module to CPAN
+
+
+0.01 2006-02-21
+
+- Initial version

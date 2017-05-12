@@ -1,0 +1,312 @@
+     TAGS USED IN BOULDER REPRESENTATION OF GENBANK NUCLEOTIDE RECORDS
+			    August 3, 1998
+			   Lincoln D. Stein
+
+Last modified: November 12, 1998
+
+INTRODUCTION
+------------
+
+The boulder format is used by the Boulder::Genbank module, as well as
+by the gb_search and gb_fetch programs, to retrieve and parse Genbank
+entries from NCBI as well as from local files.  This document
+describes the tags that are returned in the boulder stream from
+Boulder::Genbank.
+
+DEFINED TAGS
+------------
+
+    The tags returned by the parsing operation are taken from the NCBI ASN.1
+    schema. For consistency, they are normalized so that the initial letter
+    is capitalized, and all subsequent letters are lowercase. This section
+    contains an abbreviated list of the most useful/common tags. See "The
+    NCBI Data Model", by James Ostell and Jonathan Kans in "Bioinformatics:
+    A Practical Guide to the Analysis of Genes and Proteins" (Eds. A.
+    Baxevanis and F. Ouellette), pp 121-144 for the full listing.
+
+  Top-Level Tags
+  --------------
+
+    These are tags that appear at the top level of the parsed Genbank entry.
+
+    Accession
+        The accession number of this entry. Because of the vagaries of the
+        Genbank data model, an entry may have multiple accession numbers
+        (e.g. after a merging operation). Accession may therefore be a
+        multi-valued tag.
+
+        Example: my $accessionNo = $s->Accession;
+
+    Authors
+        The list of authors, as they appear on the AUTHORS line of the
+        Genbank record. No attempt is made to parse them into individual
+        authors.
+
+    Basecount
+        The nucleotide basecount for the entry. It is presented as a Boulder
+        Stone with keys "a", "c", "t" and "g". Example:
+
+             my $A = $s->Basecount->a;
+             my $C = $s->Basecount->c;
+             my $G = $s->Basecount->g;
+             my $T = $s->Basecount->t;
+             print "GC content is ",($G+$C)/($A+$C+$G+$T),"\n";
+
+    Comment
+        The COMMENT line from the Genbank record.
+
+    Definition
+        The DEFINITION line from the Genbank record, unmodified.
+
+    Features
+        The FEATURES table. This is a complex stone object with multiple
+        subtags. See the the section on "The Features Tag" for details.
+
+    Journal
+        The JOURNAL line from the Genbank record, unmodified.
+
+    Keywords
+        The KEYWORDS line from the Genbank record, unmodified. No attempt is
+        made to parse the keywords into separate values.
+
+        Example:
+
+            my $keywords = $s->Keywords
+
+    Locus
+        The LOCUS line from the Genbank record. It is not further parsed.
+
+    Medline, Nid
+        References to other database accession numbers.
+
+    Organism
+        The taxonomic name of the organism from which this entry was
+        derived. This line is taken from the Genbank entry unmodified. See
+        the NCBI data model documentation for an explanation of their
+        taxonomic syntax.
+
+    Reference
+        The REFERENCE line from the Genbank entry. There are often multiple
+        Reference lines. Example:
+
+          my @references = $s->Reference;
+
+    Sequence
+        The DNA or RNA sequence of the entry. This is presented as a single
+        lower-case string, with all base numbers and formatting characters
+        removed.
+
+    Source
+        The entry's SOURCE field; often giving clues on how the sequencing
+        was performed.
+
+    Title
+        The TITLE field from the paper describing this entry, if any.
+
+  The Features Tag
+  ----------------
+
+    The Features tag points to a Stone record that contains multiple
+    subtags. Each subtag is the name of a feature which points, in turn, to
+    a Stone that describes the feature's location and other attributes. The
+    full list of feature is beyond this document, but the following are the
+    features that are most often seen:
+
+            Cds             a CDS
+            Intron          an intron
+            Exon            an exon
+            Gene            a gene
+            Mrna            an mRNA
+            Polya_site      a putative polyadenylation signal
+            Repeat_unit     a repetitive region
+            Source          More information about the organism and cell
+                            type the sequence was derived from
+            Satellite       a microsatellite (dinucleotide repeat)
+
+    Each feature will contain one or more of the following subtags:
+
+    DB_xref
+        A cross-reference to another database in the form
+        DB_NAME:accession_number. See the NCBI Web site for a description of
+        these cross references.
+
+    Evidence
+        The evidence for this feature, either "experimental" or "predicted".
+
+    Gene
+        If the feature involves a gene, this will be the gene's name (or one
+        of its names). This subtag is often seen in "Gene" and Cds features.
+
+        Example:
+
+                foreach ($s->Features->Cds) {
+                   my $gene = $_->Gene;
+                   my $position = $_->Position;
+                   Print "Gene $gene ($position)\n";
+                }
+
+    Map If the feature is mapped, this provides a map position, usually as a
+        cytogenetic band.
+
+    Note
+        A grab-back for various text notes.
+
+    Number
+        When multiple features of this type occur, this field is used to
+        number them. Ordinarily this field is not needed because
+        Boulder::Genbank preserves the order of features.
+
+    Organism
+        If the feature is Source, this provides the source organism.
+
+    Position
+        The position of this feature, usually expresed as a range
+        (1970..1975).
+
+    Product
+        The protein product of the feature, if applicable, as a text string.
+
+    Translation
+        The protein translation of the feature, if applicable.
+
+EXAMPLE GENBANK OBJECT
+----------------------
+
+The following is an excerpt from a moderately complex Genbank Stone. The
+Sequence line and several other long lines have been truncated for
+readability.
+
+     Authors=Spritz,R.A., Strunk,K., Surowy,C.S.O., Hoch,S., Barton,D.E. and Francke,U.
+     Authors=Spritz,R.A., Strunk,K., Surowy,C.S. and Mohrenweiser,H.W.
+     Locus=HUMRNP7011   2155 bp    DNA             PRI       03-JUL-1991
+     Accession=M57939
+     Accession=J04772
+     Accession=M57733
+     Keywords=ribonucleoprotein antigen.
+     Sequence=aagcttttccaggcagtgcgagatagaggagcgcttgagaaggcaggttttgcagcagacggcagtgacagcccag...
+     Definition=Human small nuclear ribonucleoprotein (U1-70K) gene, exon 10 and 11.
+     Journal=Nucleic Acids Res. 15, 10373-10391 (1987)
+     Journal=Genomics 8, 371-379 (1990)
+     Nid=g337441
+     Medline=88096573
+     Medline=91065657
+     Features={
+       Polya_site={
+         Evidence=experimental
+         Position=1989 
+         Gene=U1-70K
+       }
+       Polya_site={
+         Position=1990 
+         Gene=U1-70K
+       }
+       Polya_site={
+         Evidence=experimental
+         Position=1992 
+         Gene=U1-70K
+       }
+       Polya_site={
+         Evidence=experimental
+         Position=1998 
+         Gene=U1-70K
+       }
+       Source={
+         Organism=Homo sapiens
+         Db_xref=taxon:9606
+         Position=1..2155 
+         Map=19q13.3
+       }
+       Cds={
+         Codon_start=1 
+         Product=ribonucleoprotein antigen
+         Db_xref=PID:g337445
+         Position=join(M57929:329..475,M57930:183..245,M57930:358..412, ...
+         Gene=U1-70K
+         Translation=MTQFLPPNLLALFAPRDPIPYLPPLEKLPHEKHHNQPYCGIAPYIREFEDPRDAPPPTR...
+       }
+       Cds={
+         Codon_start=1 
+         Product=ribonucleoprotein antigen
+         Db_xref=PID:g337444
+         Evidence=experimental 
+         Position=join(M57929:329..475,M57930:183..245,M57930:358..412, ...
+         Gene=U1-70K
+         Translation=MTQFLPPNLLALFAPRDPIPYLPPLEKLPHEKHHNQPYCGIAPYIREFEDPR...
+       }
+       Polya_signal={
+         Position=1970..1975 
+         Note=putative
+         Gene=U1-70K
+       }
+       Intron={
+         Evidence=experimental
+         Position=1100..1208 
+         Gene=U1-70K
+       }
+       Intron={
+         Number=10 
+         Evidence=experimental
+         Position=1100..1181 
+         Gene=U1-70K
+       }
+       Intron={
+         Number=9 
+         Evidence=experimental
+         Position=order(M57937:702..921,1..1011) 
+         Note=2.1 kb gap
+         Gene=U1-70K
+       }
+       Intron={
+         Position=order(M57935:272..406,M57936:1..284,M57937:1..599, <1..>1208) 
+         Gene=U1-70K
+       }
+       Intron={
+         Evidence=experimental
+         Position=order(M57935:284..406,M57936:1..284,M57937:1..599, <1..>1208) 
+         Note=first gap-0.14 kb, second gap-0.62 kb
+         Gene=U1-70K
+       }
+       Intron={
+         Number=8 
+         Evidence=experimental
+         Position=order(M57935:272..406,M57936:1..284,M57937:1..599, <1..>1181) 
+         Note=first gap-0.14 kb, second gap-0.62 kb
+         Gene=U1-70K
+       }
+       Exon={
+         Number=10 
+         Evidence=experimental
+         Position=1012..1099 
+         Gene=U1-70K
+       }
+       Exon={
+         Number=11 
+         Evidence=experimental
+         Position=1182..(1989.1998) 
+         Gene=U1-70K
+       }
+       Exon={
+         Evidence=experimental
+         Position=1209..(1989.1998) 
+         Gene=U1-70K
+       }
+       Mrna={
+         Product=ribonucleoprotein antigen
+         Position=join(M57928:358..668,M57929:319..475,M57930:183..245, ...
+         Gene=U1-70K
+       }
+       Mrna={
+         Product=ribonucleoprotein antigen
+         Citation=[2] 
+         Evidence=experimental 
+         Position=join(M57928:358..668,M57929:319..475,M57930:183..245, ...
+         Gene=U1-70K
+       }
+       Gene={
+         Position=join(M57928:207..719,M57929:1..562,M57930:1..577, ...
+         Gene=U1-70K
+       }
+     }
+     Reference=1  (sites)
+     Reference=2  (bases 1 to 2155)
+     =

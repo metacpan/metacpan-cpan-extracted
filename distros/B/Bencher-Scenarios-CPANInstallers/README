@@ -1,0 +1,7 @@
+TODO
+
+    I very much like to compare cpm vs cpanm when installing against a
+    local filesystem mirror, but cpm currently needs to resolve using
+    cpanmetadb and doesn't have the equivalent for cpanm's --mirror-only
+    option.
+

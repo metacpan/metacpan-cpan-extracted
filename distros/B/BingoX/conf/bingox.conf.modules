@@ -1,0 +1,14 @@
+#############################################################
+################### Load Perl Modules Now ###################
+#############################################################
+PerlModule BingoX::Argon
+PerlModule BingoX::Carbon
+PerlModule BingoX::Chromium
+PerlModule BingoX::Cobalt
+PerlModule BingoX::Time
+
+PerlModule Time::Object
+PerlModule Date::Format
+PerlModule Date::Parse
+PerlModule Date::Language
+PerlModule Date::Language::English

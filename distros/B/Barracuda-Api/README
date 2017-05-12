@@ -1,0 +1,30 @@
+Barracuda-Api version 0.01
+==========================
+
+This module gives few method to play with Barracuda API version 4.x and above.
+
+A better documentation of Barracuda API can be found at https://techlib.barracuda.com/BSF/APIGuide
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	* XML::RPC at least 0.8
+	* Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Mael Regnery	<mql@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.

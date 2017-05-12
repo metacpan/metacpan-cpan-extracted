@@ -1,0 +1,115 @@
+Revision history for Business-OnlinePayment-CyberSource
+
+3.000016  2014-03-05
+	- finish converting to Module::Runtime
+	- require Crypt::SSLeay for tests
+
+3.000015  2014-03-04
+	- add Business::OnlinePayment 3 as a Prereq
+
+3.000014  2014-03-04
+	- add conditional check to see if auth object exists
+
+3.000013  2014-03-04
+	- remove use of deprecated run_transaction API
+
+3.000012  2014-03-03
+	- convert to Module::Runtime
+	- use Business::CyberSource 9 API
+	- remove Data::Dump
+	- update compile-tests should fix stall on windows
+	- update metainformation
+
+3.000011  2012-11-15
+	- Change minimum version of B::C to 0.007006
+	- Update MetaResources
+
+3.000010  2012-10-29
+	- Removed checking of accept role
+	- removed debugging output
+
+3.000009  2012-10-15
+	- Remove unneeded git remote
+
+3.000008  2012-10-15
+	- Updated logic in Client class to rethrow exceptions thrown by the CyberSource response object
+
+3.000007  2012-10-04
+	- improve conditional checks for avs, authorization and cvcode
+
+3.000006  2012-10-04
+	- Add conditionals to only set avs_code and authorization if the appropriate roles are applied to the response object
+	- Fix some logic errors in client object
+	- Clean up some logic to remove unnecessary variables
+
+3.000005  2012-09-04
+	- Specify minimum version of Business::CyberSource as 0.006000
+	- Set response values for success and failure
+	- Add auth failure tests
+
+3.000004  2012-08-30
+	- fix dependencies
+
+3.000003  2012-08-28
+	- fix licensing
+	- release to cpan
+
+3.000002  2012-08-24
+	- Fixed logic error preventing follow-on credits from working properly
+	- Fixed Logic errors with expiration dates
+	- Added support for expiration dates with MMYY format
+	- various other bug fixes
+
+3.000000  2012-08-16
+	- Refactored code to use Business::CyberSource as the underlying engine
+
+2.01      2011-07-25
+	- use dist-zilla
+	- mostly bring up to perl-critic compliance
+	- allow passing a config hash on object initialization
+	- fix to work with CyberSource Simple API 5.0
+	- new maintainership Caleb Cushing
+
+2.00	2007-04-21
+	- release of 2.00, no changes noted, and I'm way to lazy to look at diff's
+
+0.09	2007-03-01
+	- Updated by Jason Hall (Jayce^) <jayce+cpan@lug-nut.com>
+	- Updated to New Cybersource API
+	- Specifically using the new 'requestToken' field that is necessary
+	- Internal BOP option of 'security_key' to normalize its usage
+
+0.08   2005-12-31
+	- date unrecorded, so I made one up : Caleb Cushing
+	- This update by Ivan Kohler <ivan-cybersource@420.am>
+	- Add my previous patch against 0.6 to fix an explicitly specified
+	  conf_file
+	- Add "failure statuses" with a B:OP pre-3.00_04 workaround
+
+0.07	2005-12-12
+	- Improved the Documentation
+
+0.06	2005-10-12
+	- Allow both line items and grand total.  If you use both, the grand total will prevail.
+
+0.05	2005-10-02
+	- Set the defaults for the business logic settings using the cybs.ini
+
+0.04	2005-08-09
+	- Found a bug that allowed the system to point to production even if the cybs.conf said to use dev
+
+0.03	2005-06-16
+	- Ivan tested this and it was pretty broken.
+	- Fixed the regexp for expiration date so that it works (Ivan patch)
+		- Modified it slightly to allow for dates w/o slashes
+	- Allowed for custom cybs.ini locations (Ivan Patch)
+		- Made the default /etc/ as opposed to ./
+	- Added a ton of error handling after Ivan had cats over the poor error
+	  handling before
+	  (Peter is being generous.  I was downright bitchy. -Ivan)
+
+0.02	2005-01-31
+	- First Release
+
+0.01	2005-01-26
+	- original version; created by hand.

@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Setup bash-complete in the current shell
+#
+# Part of CPAN Bash::Complete distribution
+#
+# PODNAME:  setup-bash-complete
+# ABSTRACT: Use in .bashrc to setup bash-complete
+
+filename=`mktemp -t bash-template-XXXXXXX`
+
+bash-complete setup > $filename
+. $filename
+
+rm -f $filename
+
+
+POD=<<=cut
+__END__
+=pod
+
+=head1 NAME
+
+setup-bash-complete - Use in .bashrc to setup bash-complete
+
+=head1 VERSION
+
+version 0.008
+
+=head1 AUTHOR
+
+Pedro Melo <melo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2011 by Pedro Melo.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut
+

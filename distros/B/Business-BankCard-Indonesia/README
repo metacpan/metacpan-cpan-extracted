@@ -1,0 +1,13 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    NOTE: This module is still in early development and incomplete.
+
+    This module provides routines to deal with bank card number issued in
+    Indonesia.
+
+SEE ALSO
+
+    Business::BankCard
+

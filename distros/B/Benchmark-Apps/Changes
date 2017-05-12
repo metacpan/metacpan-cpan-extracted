@@ -1,0 +1,18 @@
+Revision history for Benchmark-Apps
+
+0.05    2014-09-14
+        - Release dzil'ified.
+
+0.04    2012-01-15
+        - Release 0.04 that's in the source repository
+
+0.03    2008-08-30
+        - API change for flexibility.
+        - Added support for different command arguments per iteration.
+
+0.02    2008-08-18
+        - Upload of version 0.01 failed.
+
+0.01    2008-08-16
+        - Added the basic code needed to run simple benchmarks.
+

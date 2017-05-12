@@ -1,0 +1,66 @@
+NAME
+    B::Hooks::OP::Check - Wrap OP check callbacks
+
+SYNOPSIS
+        # include "hook_op_check.h"
+
+        STATIC OP *my_const_check_op (pTHX_ OP *op, void *user_data) {
+            /* ... */
+            return op;
+        }
+
+        STATIC hook_op_check_id my_hook_id = 0;
+
+        void
+        setup ()
+            CODE:
+                my_hook_id = hook_op_check (OP_CONST, my_const_check_op, NULL);
+
+        void
+        teardown ()
+            CODE:
+                hook_op_check_remove (OP_CONST, my_hook_id);
+
+DESCRIPTION
+    This module provides a c api for XS modules to hook into the callbacks
+    of "PL_check".
+
+    ExtUtils::Depends is used to export all functions for other XS modules
+    to use. Include the following in your Makefile.PL:
+
+        my $pkg = ExtUtils::Depends->new('Your::XSModule', 'B::Hooks::OP::Check');
+        WriteMakefile(
+            ... # your normal makefile flags
+            $pkg->get_makefile_vars,
+        );
+
+    Your XS module can now include "hook_op_check.h".
+
+TYPES
+  typedef OP *(*hook_op_check_cb) (pTHX_ OP *, void *);
+    Type that callbacks need to implement.
+
+  typedef UV hook_op_check_id
+    Type to identify a callback.
+
+FUNCTIONS
+  hook_op_check_id hook_op_check (opcode type, hook_op_check_cb cb, void *user_data)
+    Register the callback "cb" to be called after the "PL_check" function
+    for opcodes of the given "type". "user_data" will be passed to the
+    callback as the last argument. Returns an id that can be used to remove
+    the callback later on.
+
+  void *hook_op_check_remove (opcode type, hook_op_check_id id)
+    Remove the callback identified by "id". Returns the userdata the
+    callback had.
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 Florian Ragwitz
+
+    This module is free software.
+
+    You may distribute this code under the same terms as Perl itself.
+

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Run Qcons to analyze protein-protein contacts",
+   "author" : [
+      "Bruno Vecchi <vecchi.b gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Tools-Run-Qcons",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : 0,
+            "File::Temp" : 0,
+            "IPC::Cmd" : 0,
+            "Mouse" : 0,
+            "Mouse::Util::TypeConstraints" : 0,
+            "autodie" : 0,
+            "namespace::autoclean" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy" : 0,
+            "File::Spec" : 0,
+            "FindBin" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/brunoV/qcons.git",
+         "web" : "http://github.com/brunoV/qcons"
+      }
+   },
+   "version" : "0.112881"
+}
+

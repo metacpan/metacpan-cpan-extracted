@@ -1,0 +1,12 @@
+classes:
+  - Desktop
+  - Desktop.email
+parameters:
+  doc:
+    desktop-scheduling:
+      headline:
+        - Desktop scheduling
+      pkg:
+        - include Icedove extension Iceowl
+  pkg:
+    - iceowl-extension

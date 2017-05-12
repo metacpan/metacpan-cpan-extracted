@@ -1,0 +1,19 @@
+<h3 align="center">Search</h3>
+<form name="search_form" id="search_form" action="" method="post" onSubmit="return false">
+<table align="center">
+<tr>
+<td>Order #:</td>
+<td align="left"><input name="search_number" id="search_number" type="text" size="10" maxlength="10" class="required" title="Order # is required" /></td>
+</tr>
+<tr>
+<td align="center"><button id="reset_search">Reset</button></td>
+<td align="center"><button id="submit_search">Search</button></td>
+</tr>
+</table>
+<input type="hidden" name="sid" id="sid" value="<: $sid :>" />
+</form>
+<table align="center">
+<tr>
+<td align="center"><div id="search_result_div"></div></td>
+</tr>
+</table>

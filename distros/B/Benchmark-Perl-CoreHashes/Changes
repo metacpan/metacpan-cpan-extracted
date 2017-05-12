@@ -1,0 +1,9 @@
+Revision history for Perl extension Benchmark::Perl::CoreHashes.
+
+0.02
+    - attempted fix for U64TYPE problems on *nix compilers
+
+0.01  Thu Jul 18 23:37:06 2013
+    - original version; created by h2xs 1.23 with options
+        -A -f -n Benchmark::CoreHashes
+

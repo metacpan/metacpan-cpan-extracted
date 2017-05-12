@@ -1,0 +1,160 @@
+#!/usr/bin/perl -s
+
+our ($dir,$nostyle);
+$dir ||= ".";
+
+my $thesaurus= shift or die("Usage: $0 [-dir=...] thesaurus [lang*]\n");
+mkdir($dir) unless -d $dir;
+
+my $obj;
+
+use Biblio::Thesaurus;
+use CGI qw(:all :nodebug);
+
+
+for my $lang ("",@ARGV)
+{
+  if($lang){ system("thesaurusTranslate $thesaurus - $lang > _$thesaurus$lang"); 
+             $thename="_$thesaurus$lang";}
+  else     { $thename=$thesaurus; }
+
+  my $la="!";
+  
+  $obj = thesaurusLoad($thename);
+  open (G,">$dir/${lang}0_lista_de_termos.html") or die("cant create index");
+  binmode(G,":utf8");
+  binmode(STDERR,":utf8");
+  $obj->baselang('_') if ($obj->{baselang} eq "?");
+
+  print G $obj->downtr(
+     {-default  => sub { 
+          my $cla=(exists $obj->{languages}{$rel})?"lingua":"rel";
+          if (@terms > 1) {
+	    li({-class => $cla},
+	       strong($obj->getDescription($rel)),"\t".
+	       ul(li([map{ a({href=>t2f($_,$cla,$rel)},$_)."\n"} sort @terms])))."\n";
+	  }
+          else {
+	    li({-class => $cla, '-lang' => $rel},
+	       strong($obj->getDescription($rel)),"\t".
+	       join(", ", map{ a({href=>t2f($_,$cla,$rel)},$_)."\n"} sort @terms))."\n";
+	  }
+	},
+      -order    => ["IOF",
+                   "PT","EN","FR",'SP','ES',"DE","IT","DA","NL","SV","FI" ,"EL","HU","HE"
+                  ,"BT","NT","RT","MT","UF","USE","SN"],
+      -end      => sub { ambsheader($obj->{title},$obj->{baselang}).
+                        ($obj->{title}? h2($obj->{title}):"").
+                        ($obj->{author}? h3($obj->{author}):"").
+                        "<small>\n<ol>\n $_ \n</ol>\n</small>".
+                         ambsfooter();
+                       },
+      -eachTerm => sub {
+          mkdir("$dir/" . uc($obj->{baselang})) unless -d ("$dir/" . uc($obj->{baselang}));
+          my $tt=t2f($term,"lingua",$obj->{baselang},1);
+          open(F,">$dir/$tt") or die ("cant create file $dir/$tt\n");
+          binmode(F,":utf8");
+          print F ambsheader($term,$obj->{baselang});
+          print F h3($term).ul($_)."\n";
+          print F ambsfooter();
+          close F;
+          print STDERR "$term\n";
+          
+          if(lett($term) ne $la){ $la = lett($term);
+                                   return "\n".li(a({href=>$tt},red($term)));}
+          else{ return  "\n".li(a({href=>$tt},$term));}
+        },
+      SN => sub{ li({-class=>"text"},strong("sn"),join("",@terms)) },
+     });
+  close G;
+}
+
+sub t2f{
+ my ($a,$c,$r,$f)=@_;
+ my $dir= uc( ($c eq "lingua")? $r : $obj->{baselang});
+ for ($a){ 
+           s/[ºª\[\] \(\)\/\?\":]/_/g ;
+           tr [A-ZÁÉÍÓÚÂÊÔÇÃÕÑÄËÏÖÜ] 
+              [a-záéíóúâêôçãõñäëïöü] ;
+           s/([\x{80}-\x{ffff}])/sprintf('=%x',ord($1))/ge ;
+#           tr [A-ZÁÉÍÓÚÂÊÔÇÃÕÑÄËÏÖÜ] 
+#              [a-zaeiouaeocaonaeiou] ;
+#           tr/áéíóúàèìòùâêîôûäëïöüãõñç/AEIOUAEIOUAEIOUAEIOUAONC/;
+         }
+ ($f)?"$dir/$a.html":"../$dir/$a.html"
+}
+
+sub lett{
+ my $p=shift;
+ $p =~ s/\W//g ;
+ $p =~ tr [A-ZÁÉÍÓÚÂÊÔÇÃÕÑÄËÏÖÜ] 
+          [a-zaeiouaeocaonaeiou] ;
+ $p =~ tr [áéíóúâêôçãõñäëïöü] 
+          [aeiouaeocaonaeiou] ;
+ substr $p,0,1;
+}
+
+sub ambsheader{
+ my ($t,$l)=@_;
+ return qq{<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="$l" lang="$l">
+ <head>
+  <title>$t</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+} .
+ ($nostyle
+  ?""
+  : qq{<link href="http://natura.di.uminho.pt/style.css" rel="stylesheet" type="text/css"/>\n}).
+ qq{
+ </head>
+ <body>
+};
+}
+
+sub ambsfooter{
+ return qq{
+  </body>
+</html>
+}
+}
+
+sub red{ font({color=>"red"},@_)}
+
+
+__END__
+<?xml version="1.0"?>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <title>NumExp</title>
+  <link href="http://eremita.di.uminho.pt/~ambs/style.css" rel="stylesheet"
+type="text/css"/>
+ </head>
+ <body>
+
+<!-- CONTENTS -->
+
+__END__
+
+=head1 NAME
+
+thesaurus2htmls - generates a HTML site (one file for each term)
+
+=head1 SYNOPSIS
+
+ thesaurus2htmls [-dir=D] thesaurus [lang*]
+
+=head1 DESCRIPTION
+
+For each term in each language passed as argument, creates a linked
+HTML page.
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      
+

@@ -1,0 +1,117 @@
+config {
+    engine MP20;
+    template_engine TT;
+    Init Std {  }
+    Conf Gantry { conffile `docs/app.gantry.conf`; instance simple; }
+    HttpdConf Gantry { gantry_conf 1; }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Simple {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+        doc_rootp `/static` => no_accessor;
+        show_dev_navigation 1 => no_accessor;
+    }
+    config CGI {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        app_rootp `/cgi-bin/simple.cgi` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    table fam.address {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field ident {
+            is varchar;
+            label Ident;
+            html_form_type text;
+        }
+        field description {
+            is varchar;
+            label Description;
+            html_form_type text;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%ident`;
+        refered_to_by `fam.bday`;
+    }
+    controller FamAddress is AutoCRUD {
+        controls_table `fam.address`;
+        rel_location fam_address;
+        text_description address;
+        page_link_label Address;
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title Address;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+    table fam.bday {
+        field id {
+            is int4, primary_key, auto;
+        }
+        field ident {
+            is varchar;
+            label Ident;
+            html_form_type text;
+        }
+        field description {
+            is varchar;
+            label Description;
+            html_form_type text;
+        }
+        field created {
+            is datetime;
+        }
+        field modified {
+            is datetime;
+        }
+        foreign_display `%ident`;
+        field fam_address {
+            is int4;
+            label Address;
+            refers_to `fam.address` => id;
+            html_form_type select;
+        }
+    }
+    controller FamBday is AutoCRUD {
+        controls_table `fam.bday`;
+        rel_location fam_bday;
+        text_description bday;
+        page_link_label Bday;
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title Bday;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+    }
+}

@@ -1,0 +1,9 @@
+classes:
+  - Desktop.web.base
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel web browser
+  pkg:
+    - iceweasel

@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link rel="stylesheet" href="http://awesnob.com/textpattern/css.php?s=default" type="text/css" media="screen" />
+  <title>Awesnob!</title>
+  <script type="text/javascript" src="Jemplate.js"></script>
+  <script type="text/javascript" src="jemplates.js"></script>
+  <script type="text/javascript">//<![CDATA[
+/* Javascript wiki blog */
+window.onload = function() {
+  load_page = function() {
+    /* Load the page config and setup the basic page */
+    var jsontext = '[% json_data %]';
+    var data = eval('(' + jsontext + ')');
+    Jemplate.process('container.tmpl', data, '#container');
+
+    var setup_req = function(req) {
+      req.setRequestHeader('Accept', 'application/json');
+    };
+
+    /* Load the list of pages and display the first few */
+    var uri_base = '/data/workspaces/lukec';
+    var jsonpages = Ajax.get(uri_base + '/tags/blog%20post/pages', null, setup_req);
+//    alert(jsonpages);
+    var pages = eval(jsonpages);
+    var posts = new Array;
+    var content = document.getElementById('content');
+    for (var p in pages) {
+      if (p < 5) {
+        var post = new Object;
+        post.title = pages[p].name;
+        post.permalink = pages[p].page_uri;
+        var page_id = pages[p].page_id;
+        post.content = Ajax.get(uri_base + '/pages/' + page_id);
+        post.date = new Date(pages[p].modified_time).toLocaleString();
+        posts.push(post);
+
+        /* stick post into template one at a time */
+        var postdata = new Object;
+        postdata.posts = posts;
+        content.innerHTML = content.innerHTML 
+                            + Jemplate.process('posts.tmpl', postdata);
+      }
+    }
+  }
+  load_page();
+}
+//]]></script>
+</head>
+<body>
+<div id="container">
+Please wait while I load the blog configuration.
+</div>
+</body>
+</html>

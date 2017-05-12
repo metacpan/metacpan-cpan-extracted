@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Bot/BasicBot/Pluggable/Module/Puppet.pm
+t/00-compile.t
+t/1pod.t
+t/2puppet.t
+t/release-eol.t
+t/release-pod-syntax.t

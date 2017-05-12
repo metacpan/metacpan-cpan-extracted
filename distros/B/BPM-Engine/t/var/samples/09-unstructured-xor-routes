@@ -1,0 +1,86 @@
+        <WorkflowProcess Id="unstructured-exclusive-routes" Name="unstructured-exclusive-routes">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <Participants>
+                <Participant Id="newpkg1_wp1_par1">
+                    <ParticipantType Type="ROLE"/>
+                </Participant>
+            </Participants>
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-A2"/>
+                                    <TransitionRef Id="A-A1"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A2" Name="A2">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A2-A1"/>
+                                    <TransitionRef Id="A2-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A1" Name="A1">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B-C"/>
+                                    <TransitionRef Id="B-D"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Route/>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-A1" From="A" To="A1"/>
+                <Transition Id="A-A2" From="A" To="A2"/>
+                <Transition Id="A2-A1" From="A2" To="A1"/>
+                <Transition Id="A1-B" From="A1" To="B"/>
+                <Transition Id="B-C" From="B" To="C"/>
+                <Transition Id="B-D" From="B" To="D"/>
+                <Transition Id="A2-C" From="A2" To="C"/>
+                <Transition Id="C-D" From="C" To="D"/>
+            </Transitions>
+        </WorkflowProcess>
+

@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Test::More;
+
+plan tests => 10;
+
+BEGIN {
+    use FindBin;
+    $ENV{MOJO_HOME} = $ENV{BOOTYLICIOUS_HOME} = "$FindBin::Bin/../";
+}
+
+use Mojolicious::Lite;
+use Mojo::ByteStream 'b';
+
+app->log->level('fatal');
+
+unshift @{app->plugins->namespaces}, 'Bootylicious::Plugin';
+
+plugin 'http_cache';
+
+any '/' => 'index';
+
+use Test::Mojo;
+
+my $t = Test::Mojo->new;
+
+my $etag = b("Hello\n")->md5_sum;
+
+$t->get_ok('/')->status_is(200)->header_is('ETag' => $etag)
+  ->content_like(qr/Hello/);
+
+$t->get_ok('/', {'If-None-Match' => $etag})->status_is(304)->content_is('');
+$t->post_ok('/', {'If-None-Match' => $etag})->status_is(200)->content_is("Hello\n");
+
+__DATA__
+@@ index.html.ep
+Hello

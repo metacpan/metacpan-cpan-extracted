@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use App::Bot::BasicBot::Pluggable;
+
+my $app = App::Bot::BasicBot::Pluggable->new_with_options();
+
+$app->run();
+
+__END__
+
+=head1 NAME
+
+bot-basicbot-pluggable - A standard Bot::BasicBot::Pluggable script
+
+=head1 VERSION
+
+version 1.20
+
+=head1 DESCRIPTION
+
+This script acts as standard interface for Bot::BasicBot::Pluggable,
+a generic framework for writing pluggable IRC bots in perl.  It
+enables the user to administrate a full-fledged bot without writing
+any perl code.
+
+=head1 SYNOPSIS
+
+  bot-basicbot-pluggable --nick MyBot --server irc.perl.org
+
+=head1 OPTIONS
+
+=over 4
+
+=item --server
+
+The server to connect to. Defaults to I<localhost>.
+
+=item --configfile FILE
+
+Read config options from specified FILE. For a discussion of possible
+value and format refer to the section CONFIGFILE. The default to read
+the configfile found by L<Config::Find>.
+
+=item --logconfig FILE
+
+The logging configuration will be read from the specified file.
+Please refer to L<Log::Log4perl::Config> for its format. The parameter
+loglevel will be ignored if this options is supplied.
+
+=item --loglevel LEVEL
+
+Sets the bots loglevel to one of the following levels in decreasing
+order of output: trace, debug, info, warn, error or fatal. Defaults
+to warn.
+
+=item --nick NICKNAME
+
+Nickname to use. Defaults to I<basicbot>.
+
+=item --channel CHANNELNAME
+
+Channel to connect to. This parameter may be provided several times.
+You do not have to prefix the channel name with a hash symbol, which
+would have to be escaped in shell. It's automatically added for
+you.
+
+=item --password
+
+Sets the admin password of the I<Auth> module. This also loads the
+I<Auth> module implicitly. Please be warned that this password will
+probably been seen on any process listing as on I<ps> or I<top>.
+
+=item --module
+
+Modules to load. This parameter may be provided several times. You
+can call --list-modules to get a list of all available modules. If
+you do not define any module via this option, I<Auth> and I<Loader>
+are loaded by default.
+
+=item --list-modules
+
+Lists all installed modules and exits afterwards. No bot is started.
+
+=item --list-stores
+
+Lists all installed storage modules and exits afterwards. No bot is
+started.
+
+=item --store
+
+Defines which storage module is used to save module settings. The
+default is I<Memory>, which does not save any settings between
+sessions but does neither leave any files nor need any special
+settings. 
+
+This options take a string in the form I<key>=I<value> and can be
+specified multiple times. The value of the key I<type> define which
+storage backend to load, all other parameters are passed to the
+object constructor as hash reference. 
+
+For example:
+
+  ./bot --store type=Deep --store file=foo.deep
+
+That command will create an L<Bot::BasicBot::Pluggable::Store::Deep>
+object and pass C<file =E<gt> 'foo.deep'> to its constructor.
+
+=item --charset
+
+Charset to use for the bot. Defaults to I<utf8>, but you can use
+any encoding listed in L<Encode>. The IRC protocol doesn't define
+a specific character-set to use.  This presents a big problem,
+because if you do not use the same as everybody else in the channel
+you just receive garbage.
+
+=item --port
+
+Port to connect to on target host. This defaults to the irc standard
+port 6667. You won't need to define this in most cases.
+
+=item --command-line
+
+The bot does not connect to any irc server, but will wait on stdin on
+commands from the user. This mode won't actually work with a lot of irc
+related modules like ChanOp.
+
+=back
+
+=head1 CONFIGFILE
+
+The bot read a configfile either found by L<Config::Find> (usually
+named ~/.bot-basicbot-pluggable.yaml) or specified on the command
+line via I<--configfile> on startup. The file should be a syntactical
+correct yaml file with a hash as its first level element. It
+understands every option listed above and the special settings
+parameter, which is a hash, where the keys are module names and the
+value is a hash of configurable module settings. Easier to show
+than to explain:
+
+ ---
+ server: host
+ nick: bot
+ settings:
+   Karma:
+     self_ignore: 0
+ store:
+   type: Deep
+   file: foo.deep
+
+All modules listed under settings are also loaded on startup.
+
+Please remember that you have to escape hash (or pound) signs in YAML:
+
+ ---
+ channel:
+   - '#botzone'
+
+=head1 AUTHOR
+
+Mario Domgoergen <mdom@cpan.org>
+
+=head1 SEE ALSO
+
+L<Bot::BasicBot::Pluggable>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2005-2009 Mario Domgoergen.
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of either:
+
+=over 4
+
+=item * the GNU General Public License as published by the Free
+Software Foundation; either version 1, or (at your option) any
+later version, or
+
+=item * the Artistic License version 2.0.
+
+=back
+
+=cut

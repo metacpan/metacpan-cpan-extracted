@@ -1,0 +1,274 @@
+=encoding utf8
+
+=head1 NAME
+
+BalanceOfPower::Manual - Instructions to play
+
+=head1 SCENARIO
+
+Balance Of Power throws you in an alternative universe. The year is the 1970 and the nations are the same from L<Balance of Power videogame|http://www.old-games.com/download/4171/balance-of-power-1990-edition/>, but superpowers don't exist so global politics is very different.
+
+As in our universe, every nation just wants to prevail on the others, be rich, help his friends and kill his enemies. Every turn, all of them do many action to reach these objectives, making the world a dynamic and dangerous place.
+
+The role of the player IS NOT to be involved by nations to aid them with politics, because in XXI century we all now that the real power lays in the shadows and uses money to manipulate the world. BoP player is a plutocrat, he buys and sells stocks coming from the nations and gain from the fluctations of their wealth. To obtain better results he can influence poltical decisions.
+
+=head1 OBJECTIVE OF THE GAME
+
+Your objective is to gain from the stock market as much money as you can.
+
+=head1 THE STOCK MARKET
+
+Every nation has a number of stocks, based on its dimensions. The value of a stock is the w/d (wealth for dimension) value that the nation had the previous turn.
+
+    Italy
+    ===
+    Area: Europe
+    Export quote: 50
+    Government strength: 60
+    Internal situation: Peace
+
+    Italy is free
+
+    Size    Prod.   Wealth  W/D     Growth  Disor.  Army    Prog.   Pstg.
+    2       150     155     38.75   1.03    9.44    8       0       2       
+
+    In this example Italy stock's value is 38.75
+
+The player can buy and sell stocks of any nation. Considering that w/d change from turn to turn because of the actions of the nation, a good timing with these two actions can give a great gain.
+
+=head2 STOCK COMMANDS
+
+Here are the commands you can use to manage your stock
+
+=head3 buy X NATION
+
+Allow you to buy X stocks from nation.
+
+=head3 sell X NATION
+
+Allow you to sell X stocks of nation.
+
+Buy and sell commands, when typed, are just registered. They will be executed when the turn will be elaborated. In that moment they can fail for many reasons.
+
+=head3 show stock orders
+
+List all the orders registered for the next turn
+
+=head3 empty stock orders
+
+Erase all the stock orders registered
+
+=head3 remove stock orders NATION
+
+Erase all the orders issued about NATION
+
+=head3 market
+
+Give back statistics about the market for every nation
+
+=head3 show stocks
+
+Give back informations about the stocks owned by the player
+
+=head3 stockevents TURN
+
+Display all the events about the player for the given TURN. If no TURN is given events are about the previous.
+
+=head2 WAR AND WAR BONDS
+
+When a nation is at war it creates war bonds every turn. If you own stocks of the nation you have to buy on of them if you have the money to afford it. At the end of the war, if the nation won it, you'll have back your money doubled. If the nation lose, you'll lost them all.
+
+=head2 CIVIL WAR
+
+You can't execute operations about stocks of a nation during its civil war. YOu can't buy them and you can't sell them. When the civil war is finished, if rebels win, all the stocks owned vanish.
+
+=head1 INFLUENCE AND CONTROL
+
+Every time you buy stocks from a nation you obtain influence on it. You can spend influence to order a nation to do something. When you control a nation you can access all the commands a nation can use during the turn.
+
+=head2 CONTROL COMMANDS
+
+=head3 control NATION
+
+If you have influence on NATION this command make you control it. The prompt changes a little.
+
+    [Player One, Money: 767.5, Influence: 3. Turn is 1976/2]
+    Controlling Italy (Int:87.5    Exp:87.5    Prtg:1    Army:8)
+    (Italy [3]) ? 
+
+All the resources available for the nation are displayed. In I<control mode> 
+you can select nations to display their statistics and give orders.
+
+Here are all the orders available:
+
+    DIPLOMATIC PRESSURE ON
+    REBEL MILITARY SUPPORT
+    ADD ROUTE
+    DELETE TRADEROUTE
+    MILITARY SUPPORT
+    RECALL MILITARY SUPPORT
+    AID INSURGENTS IN
+    DECLARE WAR TO
+    MILITARY AID FOR
+    ECONOMIC AID FOR
+    TREATY NAG WITH
+    BUILD TROOPS
+    PROGRESS
+    BOOST PRODUCTION
+    RECALL REBEL MILITARY SUPPORT
+    LOWER DISORDER
+    TREATY COM WITH
+
+=head3 clearorders
+
+In I<Contro mode> this command erase a command issued for controlled nation
+
+=head3 uncontrol
+
+Stop control
+
+=head3 show control orders
+
+List all the control orders issued for controlled nations
+
+=head1 TRAVEL
+
+The player has a position in the world. To change the position you have to travel to another country.
+
+=head3 go NATION
+
+The go command move you to NATION. Moving to a nation cost movement points. See the cost of travels in the section about travels command.
+
+=head3 travels
+
+This report gives you available travels and their cost. Rules are:
+
+=over
+
+=item *
+
+All the countries that have border with the one you are in can be reached by ground with a cost of 2 TU.
+
+=item *
+
+All the countries that have a trade route with the one you are in can be reached by air.
+
+=item *
+
+Cost of air travel is a number of TU as the distance from the country (country on border: 1TU)
+
+=item *
+
+You can't travel by air if one of the countries on the path is involved in a war
+
+=back
+
+=head1 THE SHOP
+
+Every country has a shop with five types of objects. The price of every type is based on a characteristic of the country. Higher is the characteristics, lower the price.
+
+=over
+
+=item *
+
+goods depends on production
+
+=item *
+
+luxury depends on wealth
+
+=item *
+
+arms depends on army
+
+=item *
+
+tech depends on progress
+
+=item *
+
+culture depends on prestige
+
+=back
+
+You can buy them in the country as long as you have money and hold to do that. You can try to earn money buying where the price is low and selling where it's high
+
+=head3 sbuy X TYPE
+
+Buy at the shop of the country X units of TYPE
+
+=head3 ssel X TYPE
+
+Sell at the shop of the country X units of TYPE
+
+=head3 prices NATION
+
+Show the prices of the NATION
+
+=head3 cargo
+
+Show your cargo
+
+
+=head1 REPORTS
+
+You can display many reports to decide how to manage your stocks.
+
+=head2 GENERAL REPORTS
+
+Here is a list of the reports you can see about general situation.
+
+    crises
+    wars
+    alliances
+    influences
+    hotspots
+    war history
+    treaties
+    situation [ORDERBY]
+    supports
+    rebel supports
+    distance [NATION1]-[NATION2]
+
+Writing a turn or an year you can obtain events happened then.
+
+=head2 NATION REPORTS
+
+You can select a nation naming it. Then you can retrieve many reports about it. If you want a nation report without selecting the nation just write the name of the nation before the report.
+
+    borders
+    near
+    relations
+    events [TURN or YEAR]
+    status
+    history
+    plot [VARIABLE]
+
+If you want to cancel nation selection type B<clear>.
+
+=head1 TURN
+
+When you have finished with stock orders and control orders just type B<turn>. This way a new turn will be elaborated, your orders executed (if possible) and all the values of the stocks will change, with profit or loss for your wallet.
+
+=head1 SAVE
+
+Typing B<save FILENAME> you can dump the present situation to a file. Launching the game with
+
+    bop-perl load FILENAME
+
+you can load it and start playing from the point you leaved.
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+

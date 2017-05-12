@@ -1,0 +1,104 @@
+Changes file for Business::DK::Phonenumber
+
+Project site changelog:
+
+http://logicLAB.jira.com/browse/BDKPHN#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+--
+
+0.10 2015-08-01, maintenance release, update not required
+
+- Added MetaProvides to Dist::Zilla build, this should assist in addressing the
+  issue listed on CPANTS, see also below
+
+- Prerequisites split into runtime and test, addressing issue listed on CPAN
+
+  Ref: http://cpants.cpanauthors.org/dist/Business-DK-Phonenumber-0.09
+
+
+0.09 2014-09-02, maintenance release, update not required
+
+- Fixed issued with Perl version format
+
+- Upgraded license from Artistic 1.0 to Artistic 2.0
+
+- Migrated build system from Module::Build to Dist::Zilla
+
+
+0.08 2014-08-23, maintenance release, update not required
+
+- Perl version requirement specified to be 5.8, based on
+  Perl::Critic output
+
+
+0.07 2014-08-15, maintenance release, update not required
+
+- Addressing Kwalitee, aligning version for version consistency in
+  modules in distribution
+
+- Added changes.t automatic assertion of the integrity of the
+  Changes file see also BDKPHN-12 [BDKPNH-13]
+
+  https://logiclab.jira.com/browse/BDKPNH-13
+
+
+0.06 2013-08-02, maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to
+  the standard described in: CPAN::Changes::Spec [BDKPHN-12]
+
+  Quest:
+  http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/BDKPHN-12
+
+- Addressed failing Kwalitee test [BDKPHN-6]
+
+  https://logiclab.jira.com/browse/BDKPHN-6
+
+- Added contemporay boiler plate of Perl::Critic test [BDKPHN-8]
+
+  https://logiclab.jira.com/browse/BDKPHN-8
+
+- Prerequisites test now under TEST_AUTHOR flag [BDKPHN-5]
+
+  https://logiclab.jira.com/browse/BDKPHN-5
+
+- Changed creation of traditional Makefile.PL to Build.PL
+  [BDKPHN-11]
+
+  https://logiclab.jira.com/browse/BDKPHN-11
+
+
+0.05 2012-04-11
+
+- Bug fix release, update not required
+
+- Addressed failing Kwalitee test [BDKPHN-6]
+
+
+0.04 2012-01-12, bug fix release, update recommended
+
+- fixed bug in render subroutine, template parameter was not
+  respected [BDKPHN-10]
+
+
+0.03 2009-07-17, bug fix release, update recommended
+
+- fixed bug in primary regular expression in validation
+  subroutine [BDKPHN-4]
+
+
+0.02 2009-07-01, maintenance release, update not required
+
+- Failing tests for release 0.01, missing requirement:
+  Data::FormValidator [BDKPHN-2]
+
+- Failing tests for release 0.01, missing requirement:
+  Test::Exception [BDKPHN-3]
+
+
+0.01 2009-06-19
+
+- Initial release

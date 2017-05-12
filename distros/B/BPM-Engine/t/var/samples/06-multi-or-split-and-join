@@ -1,0 +1,97 @@
+        <WorkflowProcess Id="multi-inclusive-split-and-join" Name="multi-inclusive-split-and-join">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="splitA" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="splitB" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="path_taken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Participants>
+                <Participant Id="newpkg1_wp1_par1">
+                    <ParticipantType Type="ROLE"/>
+                </Participant>
+            </Participants>
+            <DataFields>
+                <DataField Id="PaintingName">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'Mona Lisa'</InitialValue>
+                </DataField>
+            </DataFields>            
+            <Activities>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="A-B1"/>
+                                    <TransitionRef Id="A-B"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="B-B1"/>
+                                    <TransitionRef Id="B-C"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="B1" Name="B1">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="A-B1" From="A" To="B1">
+                    <Condition Type="CONDITION">1</Condition><!-- splitA == 'B1' -->
+                </Transition>
+                <Transition Id="A-B" From="A" To="B">
+                    <Condition Type="CONDITION">1</Condition>
+                </Transition>            
+                <Transition Id="B-B1" From="B" To="B1">
+                    <Condition Type="CONDITION"><Expression>1</Expression></Condition><!-- splitB == 'B1' -->
+                </Transition>
+                <Transition Id="B-C" From="B" To="C"/>
+                <Transition Id="B1-D" From="B1" To="D"/>
+                <Transition Id="C-D" From="C" To="D"/>
+            </Transitions>
+        </WorkflowProcess>
+

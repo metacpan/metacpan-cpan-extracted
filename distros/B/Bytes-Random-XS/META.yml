@@ -1,0 +1,28 @@
+---
+abstract: 'Perl extension to generate random bytes.'
+author:
+  - 'Tomasz Konojacki <me@xenu.pl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bytes-Random-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter::Lite: '0'
+  XSLoader: '0'
+  perl: '5.008008'
+resources:
+  repository: https://github.com/xenu/bytes-random-xs.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

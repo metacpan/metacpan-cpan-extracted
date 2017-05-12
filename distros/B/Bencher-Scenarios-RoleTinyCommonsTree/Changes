@@ -1,0 +1,22 @@
+0.04    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.03    2016-07-03 (PERLANCAR)
+
+	- Adjust to Tree-Object 0.03+ (Tree::Object::Hash).
+
+
+0.02    2016-03-24 (PERLANCAR)
+
+	- Add scenario: RoleTinyCommonsTree::descendants.
+
+
+0.01    2016-03-22 (PERLANCAR)
+
+        - First release.

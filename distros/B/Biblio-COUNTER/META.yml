@@ -1,0 +1,41 @@
+---
+name: Biblio-COUNTER
+version: 0.11
+author:
+  - Paul Hoffman <nkuitse@cpan.org>
+abstract: COUNTER Codes of Practice report processing
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Text::CSV: 0
+provides:
+  Biblio::COUNTER:
+    file: lib/Biblio/COUNTER.pm
+    version: 0.11
+  Biblio::COUNTER::Processor:
+    file: lib/Biblio/COUNTER/Processor.pm
+  Biblio::COUNTER::Processor::Atomize:
+    file: lib/Biblio/COUNTER/Processor/Atomize.pm
+  Biblio::COUNTER::Processor::Simple:
+    file: lib/Biblio/COUNTER/Processor/Simple.pm
+  Biblio::COUNTER::Processor::Validate:
+    file: lib/Biblio/COUNTER/Processor/Validate.pm
+  Biblio::COUNTER::Report:
+    file: lib/Biblio/COUNTER/Report.pm
+  Biblio::COUNTER::Report::Release2::DatabaseReport1:
+    file: lib/Biblio/COUNTER/Report/Release2/DatabaseReport1.pm
+  Biblio::COUNTER::Report::Release2::DatabaseReport2:
+    file: lib/Biblio/COUNTER/Report/Release2/DatabaseReport2.pm
+  Biblio::COUNTER::Report::Release2::DatabaseReport3:
+    file: lib/Biblio/COUNTER/Report/Release2/DatabaseReport3.pm
+  Biblio::COUNTER::Report::Release2::JournalReport1:
+    file: lib/Biblio/COUNTER/Report/Release2/JournalReport1.pm
+  Biblio::COUNTER::Report::Release2::JournalReport1a:
+    file: lib/Biblio/COUNTER/Report/Release2/JournalReport1a.pm
+  Biblio::COUNTER::Report::Release2::JournalReport2:
+    file: lib/Biblio/COUNTER/Report/Release2/JournalReport2.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

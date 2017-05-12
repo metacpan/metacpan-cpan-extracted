@@ -1,0 +1,2135 @@
+<html>
+<head>
+<title>Perl Modules for Array/Set Handling</title>
+<link rel="stylesheet" type="text/css" href="/assets/css/benchmark/featureset/setops/default.css">
+<link rel="stylesheet" type="text/css" href="/assets/css/benchmark/featureset/setops/fancy.table.css">
+</head>
+<body>
+
+<h3 class="global_toc_text">Purpose</h3>
+
+<p align="center">To cross-check a personal selection of modules which offer:</p>
+
+<table align="center" cellspacing="0" cellpadding="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Array and Set modules
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Method lists
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+&quot;
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+Overloaded methods
+</div>
+</td>
+</tr>
+</table>
+
+<table align="center">
+<tr><td>Module names are read from data/module.list.ini, which is shipped with the distro.</td></tr>
+<tr><td>Each module's data has an indicator - 'include = Yes/No' - which makes it easy to edit & re-run.</td></tr>
+<tr><td>Further, each module has an indicator - 'overload_type = 1/2/3' - to specify the syntax to look for when processing overloads.</td></tr>
+<tr><td>Per-module notes are handled using the same mechanism.</td></tr>
+<tr><td>Excluded modules are listed at the end of this report.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Report generator</h3>
+
+<table align="center" cellspacing="0" cellpadding="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Module
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Version
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+<a href="https://metacpan.org/release/Benchmark-Featureset-SetOps">Benchmark::Featureset::SetOps</a>
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+1.04
+</div>
+</td>
+</tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Modules included</h3>
+
+<table align="center" border = "1" summary = "Names">
+<tr>
+<td>Name</td>
+<td>Version</td>
+<td>Method count</td>
+<td>Notes</td>
+</tr>
+<tr>
+<td>1: <a href="https://metacpan.org/release/Array-AsObject">Array::AsObject</a></td>
+<td>1.02
+</td>
+<td>41</td>
+<td>Depends indirectly on Date::Manip</td>
+</tr>
+<tr>
+<td>2: <a href="https://metacpan.org/release/Object-Array">Object::Array</a></td>
+<td>0.060
+</td>
+<td>18</td>
+<td>Doesn't really offer set operations</td>
+</tr>
+<tr>
+<td>3: <a href="https://metacpan.org/release/Set-Array">Set::Array</a></td>
+<td>0.30
+</td>
+<td>47</td>
+<td>Some methods, e.g. difference(), update the invocant unexpectedly</td>
+</tr>
+<tr>
+<td>4: <a href="https://metacpan.org/release/Set-Bag">Set::Bag</a></td>
+<td>1.012
+</td>
+<td>17</td>
+<td>Supports multisets, so new() takes a hash, and elements are (name, value) pairs</td>
+</tr>
+<tr>
+<td>5: <a href="https://metacpan.org/release/Set-Light">Set::Light</a></td>
+<td>0.04
+</td>
+<td>6</td>
+<td>Claims to be very small and fast compared to Set::Object and Set::Scalar</td>
+</tr>
+<tr>
+<td>6: <a href="https://metacpan.org/release/Set-Object">Set::Object</a></td>
+<td>1.35
+</td>
+<td>39</td>
+<td>Requires a C compiler. Second choice after Set::Tiny</td>
+</tr>
+<tr>
+<td>7: <a href="https://metacpan.org/release/Set-Scalar">Set::Scalar</a></td>
+<td>1.29
+</td>
+<td>44</td>
+<td>Long term unfixed bug in Set::Scalar::ValuedUniverse</td>
+</tr>
+<tr>
+<td>8: <a href="https://metacpan.org/release/Set-SortedArray">Set::SortedArray</a></td>
+<td>0.02
+</td>
+<td>21</td>
+<td>Modification of the set (i.e. after creation) is not supported</td>
+</tr>
+<tr>
+<td>9: <a href="https://metacpan.org/release/Set-Tiny">Set::Tiny</a></td>
+<td>0.03
+</td>
+<td>24</td>
+<td>Recommended, taking in to account features (+), unfixed bugs (-),<br />minimal dependencies (+) and, lastly, speed (+). Stats below</td>
+</tr>
+<tr>
+<td>10: <a href="https://metacpan.org/release/Set-Toolkit">Set::Toolkit</a></td>
+<td>0.11
+</td>
+<td>16</td>
+<td>Bug report of random test failures</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>Version</td>
+<td>Method count</td>
+<td>Notes</td>
+</tr>
+</table>
+
+
+<table align="center">
+<tr><td>Method names are found by scanning the source for /^sub.../.</td></tr>
+<tr><td>Method names starting with '_' are ignored.</td></tr>
+<tr><td>Also ignored are indented subs as in Set::Toolkit::TieArray, which is within the source of Set::Toolkit.</td></tr>
+<tr><td>Sub-class files for Object::Array and Set::Scalar have been scanned and included.
+<tr><td>Scanning the source means modules must be installed, but no attempt is made to load them at run-time.</td></tr>
+<tr><td>Source files are found by running 'mwhere' which is shipped with the marvellous App::moduleswhere.</td><tr>
+<tr><td>Version numbers are found by running 'mversion' which is shipped with the marvellous Module::Version.</td><tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Methods</h3>
+
+<table align="center" border = "1" summary = "Names">
+<tr>
+<td>Method</td>
+<td>Array::AsObject</td>
+<td>Object::Array</td>
+<td>Set::Array</td>
+<td>Set::Bag</td>
+<td>Set::Light</td>
+<td>Set::Object</td>
+<td>Set::Scalar</td>
+<td>Set::SortedArray</td>
+<td>Set::Tiny</td>
+<td>Set::Toolkit</td>
+</tr>
+<tr>
+<td>1: AUTOLOAD</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2: DESTROY</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3: ELEMENT_SEPARATOR</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4: SET_FORMAT</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>5: STORABLE_freeze</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>6: STORABLE_thaw</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>7: append</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8: are_equal</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. eq</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>9: as_array</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. @{}</td>
+</tr>
+<tr>
+<td>10: as_hash</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>11: as_string</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &quot;&quot;</td>
+<td>Yes. &quot;&quot;</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. &quot;&quot;</td>
+</tr>
+<tr>
+<td>12: as_string_callback</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>13: asymmetric_difference</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>14: at</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>15: bag</td>
+<td></td>
+<td></td>
+<td>Yes. &amp;</td>
+<td>Yes. &quot;&quot;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>16: binary_intersection</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. *</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>17: cartesian_product</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>18: cartesian_product_iterator</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>19: clear</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>20: clone</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes. copy</td>
+<td></td>
+</tr>
+<tr>
+<td>21: cmp</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>22: compact</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>23: compare</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes. &lt;=&gt;</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>24: complement</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes. neg</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>25: contains</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td>Yes. has</td>
+<td></td>
+</tr>
+<tr>
+<td>26: copy</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. =</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>27: count</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>28: cpop</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>29: cshift</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>30: delete</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. -=</td>
+<td>Yes. remove</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>31: delete_at</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>32: difference</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. -</td>
+<td>Yes. -</td>
+<td></td>
+<td>Yes. -</td>
+<td>Yes</td>
+<td>Yes. -</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>33: duplicates</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>34: each</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>35: elem</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>36: element</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. member</td>
+<td></td>
+</tr>
+<tr>
+<td>37: elements</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. members</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>38: elems</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>39: empty_clone</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>40: eq</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. eq</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>41: equal</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. ==</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>42: err</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>43: errmsg</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>44: exists</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. contains</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>45: extend</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>46: fill</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>47: find</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>48: first</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>49: flatten</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>50: foreach</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>51: grab</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>52: grep</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>53: has</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>54: have_same_universe</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>55: impose</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>56: index</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>57: indices</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>58: insert</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. +=</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>59: intersection</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. *</td>
+<td>Yes. &amp;</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>60: invert</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>61: is_disjoint</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes. !=</td>
+<td>Yes. !=</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>62: is_empty</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes. is_null</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>63: is_equal</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. ==</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. ==</td>
+<td>Yes. ==</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>64: is_key</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>65: is_null</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes. is_empty</td>
+<td></td>
+</tr>
+<tr>
+<td>66: is_ordered</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>67: is_proper_subset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &lt;</td>
+<td>Yes. &lt;</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>68: is_proper_superset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &gt;</td>
+<td>Yes. &gt;</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>69: is_properly_intersecting</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>70: is_subset</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &lt;=</td>
+<td>Yes. &lt;=</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>71: is_superset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &gt;=</td>
+<td>Yes. &gt;=</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>72: is_unique</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>73: is_universal</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>74: isa</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>75: ish_int</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>76: join</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>77: last</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>78: length</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>79: list</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>80: map</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>81: max</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>82: maximize</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. |=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>83: member</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>84: members</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>85: merge</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. +</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>86: min</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>87: minimize</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &amp;=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>88: ne</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. ne</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>89: new</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>90: new_presorted</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>91: not_equal</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. !=</td>
+<td></td>
+<td></td>
+<td>Yes. !=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>92: not_subset</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>93: null</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>94: op_intersection</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. *</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>95: op_invert</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. /</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>96: op_symm_diff</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. %</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>97: op_union</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. +</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>98: ordered_elements</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>99: over_delete</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>100: pack</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>101: pop</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. &gt;&gt;=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>102: power_set</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>103: power_set_iterator</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>104: print</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>105: proper_subset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &lt;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>106: proper_superset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &gt;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>107: push</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. &lt;&lt;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>108: randomize</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>109: remove</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. delete</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>110: reverse</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>111: rindex</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>112: rotate</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>113: search</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>114: set</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>115: shift</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. &gt;&gt;</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>116: size</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td>Yes. bool</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>117: slice</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>118: sort</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>119: splice</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>120: strengthen</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>121: strong_pkg</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>122: subset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &lt;=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>123: sum</td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. +</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>124: superset</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes. &gt;=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>125: symmetric_difference</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. %</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. %</td>
+<td>Yes. unique</td>
+<td></td>
+</tr>
+<tr>
+<td>126: tie_array_pkg</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>127: tie_hash_pkg</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>128: union</td>
+<td>Yes</td>
+<td></td>
+<td>Yes. +</td>
+<td>Yes. |</td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td></td>
+</tr>
+<tr>
+<td>129: unique</td>
+<td>Yes</td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. /</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>130: universe</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>131: unordered_elements</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>132: unshift</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes. &lt;&lt;=</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>133: version</td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>134: weak_pkg</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>135: weak_set</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>136: weaken</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Yes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Method</td>
+<td>Array::AsObject</td>
+<td>Object::Array</td>
+<td>Set::Array</td>
+<td>Set::Bag</td>
+<td>Set::Light</td>
+<td>Set::Object</td>
+<td>Set::Scalar</td>
+<td>Set::SortedArray</td>
+<td>Set::Tiny</td>
+<td>Set::Toolkit</td>
+</tr>
+</table>
+
+
+<table align="center">
+<tr><td>A cell containing 'Yes' means that module has a method of that name.</td></tr>
+<tr><td>A token after 'Yes' is the overloaded operator defined in that module for that method.</td></tr>
+</table>
+
+<br />
+
+<table align="center">
+<tr><td>Just because 2 modules have a method with the same name does not mean the subs' behaviour is identical.</td></tr>
+<tr><td>For instance, symmetric_difference() in Set::Tiny and Set::Scalar return different lists.</td></tr>
+<tr><td>Not only that, but Set::Tiny's method returns a set, whereas Set::Scalar's returns a string.</td></tr>
+<tr><td>Further, some methods in Set::Array change the invocant object, which is an apalling design feature.</td></tr>
+<tr><td>Sample code ships as scripts/symmetric.demo.pl.</td></tr>
+<tr><td>As always, RTFM!</td></tr>
+</table>
+
+<p align="center">In order to make life difficult:</p>
+
+<table align="center">
+<tr><td>Object::Array fiddles a list of method names copied from List::MoreUtils.</td></tr>
+<tr><td>Set::Light has 2 aliases for exists: has and contains.</td></tr>
+<tr><td>Set::Object and Set::Toolkit define some overloads via subs. These are ignored.</td></tr>
+</table>
+
+<hr />
+
+<h3 class="global_toc_text">Modules excluded</h3>
+
+<table align="center" border = "1" summary = "Names">
+<tr>
+<td>Name</td>
+<td>Notes</td>
+</tr>
+<tr>
+<td>1: <a href="https://metacpan.org/release/Array-Compare">Array::Compare</a></td>
+<td>Array::Compare has very limited (focused) functionality</td>
+</tr>
+<tr>
+<td>2: <a href="https://metacpan.org/release/Array-Uniq">Array::Uniq</a></td>
+<td>Array::Uniq likewise</td>
+</tr>
+<tr>
+<td>3: <a href="https://metacpan.org/release/Array-Utils">Array::Utils</a></td>
+<td>Array::Utils likewise</td>
+</tr>
+<tr>
+<td>4: <a href="https://metacpan.org/release/Bit-Vector">Bit::Vector</a></td>
+<td>Bit::Vector is sophisticated, but is more like an underlying support mechanism for sets<br/>and hence leaves a lot up to the end-user</td>
+</tr>
+<tr>
+<td>5: <a href="https://metacpan.org/release/Set-DynamicGroups">Set::DynamicGroups</a></td>
+<td>Set::DynamicGroups handles multisets, as does Set::Bag.<br />It's designed to allow groups to be defined dynamically by rules based on other groups.<br />It has partial support for nested groups</td>
+</tr>
+<tr>
+<td>6: <a href="https://metacpan.org/release/Set-Equivalence">Set::Equivalence</a></td>
+<td>A set of objects or scalars with no duplicates and a user-configurable equivalence relation</td>
+</tr>
+<tr>
+<td>7: <a href="https://metacpan.org/release/Set-Groups">Set::Groups</a></td>
+<td>Set::Groups supports nested groups, and hence a completely different set of methods</td>
+</tr>
+<tr>
+<td>8: <a href="https://metacpan.org/release/Set-Hash">Set::Hash</a></td>
+<td>Set::Hash allows you to create strings as objects and use OO-style methods on them.<br />It's a sub-class of Set::Array</td>
+</tr>
+<tr>
+<td>9: <a href="https://metacpan.org/release/Set-NestedGroups">Set::NestedGroups</a></td>
+<td>Set::NestedGroups is like Set::Groups</td>
+</tr>
+<tr>
+<td>10: <a href="https://metacpan.org/release/Set-Relation">Set::Relation</a></td>
+<td>Set::Relation is an emulator for RDBMS-style relational data</td>
+</tr>
+<tr>
+<td>Name</td>
+<td>Notes</td>
+</tr>
+</table>
+
+
+<hr />
+
+<h3 class="global_toc_text">Environment</h3>
+
+<table align="center" cellspacing="0" cellpadding="0">
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+Author
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+<a href="http://savage.net.au/">Ron Savage</a>
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="odd_left">
+Date
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="odd_right">
+2015-11-16
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="even_left">
+OS
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="even_right">
+Debian V 6.0.4
+</div>
+</td>
+</tr>
+<tr>
+<!-- Left -->
+<td>
+<div class="last_odd_left">
+Perl
+</div>
+</td>
+<!-- Right -->
+<td>
+<div class="last_odd_right">
+5.20.2
+</div>
+</td>
+</tr>
+</table>
+
+<hr />
+
+</body>
+</html>

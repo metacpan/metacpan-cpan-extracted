@@ -1,0 +1,8 @@
+[% USE ANSIColor 'color' %]
+[% title | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FOREACH s IN supports %][% FILTER collapse %]
+[% s.node1 %] --> [% s.node2 %] [[% s.army %]]
+[% END %]
+[% END %]

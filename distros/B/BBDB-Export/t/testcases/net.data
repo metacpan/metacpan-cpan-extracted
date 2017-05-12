@@ -1,0 +1,13 @@
+$got_data = {
+          'timestamp' => '2005-03-05T10:29:01-0600',
+          'net' => [
+                     'test@domain.com',
+                     'name@domain.com',
+                     'tc@anotherdomain.com'
+                   ],
+          'full' => 'net testcase',
+          'last' => 'testcase',
+          'company' => '',
+          'first' => 'net',
+          'creation-date' => '2005-03-05T10:29:01-0600'
+        };

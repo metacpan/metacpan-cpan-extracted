@@ -1,0 +1,40 @@
+# example cnf file for IPI
+
+name=IPI
+module=IPI
+version=20040913_20040914_20040910
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp.ebi.ac.uk
+ftp_files=/pub/databases/IPI/current/ipi.HUMAN.dat.gz,/pub/databases/IPI/current/ipi.MOUSE.dat.gz,/pub/databases/IPI/current/ipi.RAT.dat.gz
+
+label=IPI_id, dotset=Sequence_ID
+label=IPI_id_old, dotset=Sequence_ID
+label=Retired_id, dotset=Sequence_ID
+label=Protein_Name, dotset=Protein_Name
+label=Organism, dotset=Organism_Name
+label=NCBI_taxID, dotset=Organism_ID
+label=REFSEQ_XP, dotset=Sequence_ID
+label=GI, dotset=Sequence_ID
+label=PRINTS, dotset=Protein_Domain_ID
+label=InterPro, dotset=Protein_Domain_ID
+label=pfam, dotset=Protein_Domain_ID
+label=ProDom, dotset=Protein_Domain_ID
+label=SMART, dotset=Protein_Domain_ID
+label=PROSITE, dotset=Protein_Domain_ID
+label=HUGO, dotset=Gene_Symbol
+label=GO_id, dotset=Sequence_ID
+label=SwissProt, dotset=Sequence_ID
+label=LocusLink, dotset=Gene_ID
+label=REFSEQ_NP, dotset=Sequence_ID
+label=TREMBL, dotset=Sequence_ID
+label=ENSEMBL_peptide, dotset=Sequence_ID
+label=ENSEMBL_gene, dotset=Sequence_ID
+label=TIGRFAMs, dotset=Protein_Domain_ID
+label=RZPD, dotset=Protein_Domain_ID
+label=AA_length, dotset=Metric
+label=Molecular_Weight, dotset=Metric
+label=Protein_Sequence, dotset=Sequence
+label=Genew, dotset=Protein_Domain_ID

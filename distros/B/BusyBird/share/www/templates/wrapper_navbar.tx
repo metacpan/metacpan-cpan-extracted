@@ -1,0 +1,14 @@
+: ## Arguments: title
+: ## Cascade Blocks: head, navbar_content, content
+: cascade wrapper_document { title => $title }
+: around navbar -> {
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container-fluid">
+    <a class="navbar-brand hidden-xs" href="<: path('/') :>"><span>BusyBird</span></a>
+    <button type="button" class="navbar-brand btn btn-link visible-xs" data-toggle="collapse" data-target=".navbar-collapse">
+      <span class="glyphicon glyphicon-home"></span>
+    </button>
+: block navbar_content -> {}
+  </div>
+</nav>
+: }

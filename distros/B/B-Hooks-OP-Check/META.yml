@@ -1,0 +1,30 @@
+---
+abstract: 'Wrap OP check callbacks'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::Depends: 0.302
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: B-Hooks-OP-Check
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  parent: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=B-Hooks-OP-Check
+  license: http://dev.perl.org/licenses/
+  repository: git://lake.fysh.org/zefram/B-Hooks-OP-Check.git
+version: 0.19

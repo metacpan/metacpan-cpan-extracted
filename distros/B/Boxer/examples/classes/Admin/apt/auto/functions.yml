@@ -1,0 +1,49 @@
+parameters:
+  doc:
+    admin:
+      tweak:
+        - define routines to resolve package dependencies
+  tweak:
+    - >
+      _pkgdeps(){ set -e;\
+        chroot /target dpkg-query \
+          -Wf=',$''{Pre-Depends},$''{Depends},$''{Recommends}\n' $* 2>/dev/null \
+          | sed -r \
+          -e 's/[,|] *([a-z0-9.+-]+)?(:\s+)?( *[^|,]*)?/\1\n/g' \
+          | sed '/^$/d'|sort -u; }
+    - >
+      _pkg2re(){ set -e;\
+        echo $* \
+          | sed -r \
+          -e 's/\s+/\|/g;' \
+          -e 's/^\|//;' \
+          -e 's/([.+-])/\\\1/g;' \
+          -e 's/\|$//'; }
+    - >
+      _pkgreal(){ set -e;\
+        chroot /target dpkg-query \
+          -Wf='$''{Package},$''{Provides},\n' \
+          | sed -r \
+          -e '/,,/d;' \
+          -e 's/^([a-z0-9.+-]+).*[,|] *('"$(_pkg2re $*)"')[ :,]/\1/;' \
+          -e '/,/d'; }
+    - >
+      _pkganddeepdeps(){ set -e;\
+        rest=$*;\
+        all=$rest;\
+        for i in 1 2 3 4 5; do \
+          deps=$(_pkgdeps $rest);\
+          rest="$deps $(_pkgreal $deps)";\
+          all="$all $rest";\
+        done;\
+        echo $all \
+          | sed -r \
+          -e 's/\s+/\n/g' \
+          | sort -u; }
+    - >
+      _pkgessentials(){ set -e;\
+        chroot /target dpkg-query \
+          -Wf='$''{Package}%$''{Essential}\n' \
+          | sed -r \
+          -e 's/(.*)%yes/\1/;' \
+          -e '/%/d'; }

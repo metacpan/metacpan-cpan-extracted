@@ -1,0 +1,259 @@
+1999-12-05  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* README: wrote a full README file as it should be for a first
+	public release.  :)
+
+	* ChangeLog: spell-checked change log.
+
+	* Java/org/perl/internals/Scalar.java: added seq and sne functions
+
+	* Jasmin.pm (B::LOGOP::JVMJasminPre): got cond_expr working
+	(B::BINOP::JVMJasminPost): fixed seq and sne work
+
+1999-12-04  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/Emit.pm (nop): added method
+
+	* Jasmin.pm (B::BINOP::JVMJasminPre): had to change things so that
+	the "concat" pre-processing did argument IN order.  It looks like
+	the "trick" of processing things in reverse order may be
+	problematic.  In this case, it occurred because if there are
+	cascaded BINOPs of "concat" type, and some of them are actually
+	".=" operations, we can get the wrong r-values in cases like:
+	$x = $y . ($y .= "f");
+
+	* lib/B/JVM/Jasmin/Emit.pm (dup): spruced up the POD and error
+	messages for this function
+	(swap): added function
+
+	* Jasmin.pm (B::UNOP::JVMJasminPre): added processing for creation
+	of the result StackElement here [instead of doing it in the child OP].
+	(B::UNOP::JVMJasminPost): set up things so that we can handle the
+	OPf_MOD flag properly.
+
+	* Java/org/perl/internals/Scalar.java: implemented concat member
+	function.
+
+	* Jasmin.pm (B::BINOP::JVMJasminPre): changed processing on
+	"sassign" to be in order
+	(TurnStackElementsToScalars): wrote function
+	(B::BINOP::JVMJasminPost): got "sassign" working properly using
+	TurnStackElementsToScalars
+
+	* Java/org/perl/internals/Scalar.java: added isConstant member
+	variable for sanity checking for assigning to constants
+
+1999-11-28  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/Emit.pm: moved labels to be handled inside
+	methods [just as locals are].  Since labels are, in fact, local to
+	methods, they should not be handled globally on the file level.
+	(ifne): spruced up the POD and error messages for this function
+	(labelCreate): spruced up the POD and error messages for this function
+	(labelSend): spruced up the POD and error messages for this function
+	(gotoLabel): spruced up the POD and error messages for this function
+
+	* ChangeLog: spell-checked change log.
+
+	* Jasmin.pm (walkoptree): removed recursive walks from this
+	function; they should now be done in the B::*::JasminPre
+	functions, when necessary
+	(B::LISTOP::JasminPre): changed the print function so that it
+	would process the pushmark first, and then process its arguments
+	in reverse order.  This was required so that the prints occur in
+	the proper order.  Apparently, perl is able to use the stack as a
+	queue at times.  Perl seems to first find the mark, and then
+	process from the mark to the end of the list as if it is a queue.
+	Very odd.
+	(B::LISTOP::JasminPre): added processing for "list" op so that it
+	works similarly to print.  The difference is that when a listop is
+	processed, it appears to pushmark, and then simply put the options
+	on in order, and then removes the mark at the end of the "list"
+	operation.  I took the same approach that I took for
+	"print"---except I threw away to "pushmark" operation and reversed
+	the order the other sub-ops are processed.  This may not work in
+	all cases for the "list" operation, but it at least works when
+	processing a 'print LIST' construct.  :)
+
+	* lib/B/JVM/Jasmin/Emit.pm (methodCreateLocal): changed so that
+	locals could be reused, as I found that far too many locals were
+	being generated for even the simplest of operations
+	(methodFreeLocal): created this function so that locals can be freed.
+
+1999-11-27  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Makefile.PL: fixed so that it could handle program names for
+	Java binaries better.
+
+	* lib/B/JVM/Jasmin/Emit.pm (returnVoid): added method
+
+	* Java/org/perl/internals/Functions.java: created a print(Scalar)
+	function.
+
+	* MANIFEST: for some reason Java/org/perl/internals/Hash.java was
+	not in here, also added Java/org/perl/internals/Functions.java
+	
+
+	* Jasmin.pm (B::LISTOP::JasminPost): added handling and loop for
+	print function
+	(B::SVOP::JasminPre): added code for handling a string const.
+	This might work as it stands for any scalar, assuming that the
+	$op->sv->PV() will promote.  I fear that it might not.  We'll find
+	out eventually I suppose.  :)
+
+	* lib/B/JVM/Jasmin/Emit.pm (iconst): added method
+	(istore): added method
+	(iload): added method
+	(iand): added method
+	(pop): added method
+	(getstatic): added method
+	(ldc): added method
+	(newObject): added method; should be called new, but cannot be as
+	it would conflict with constructor!
+	(invokespecial): added method
+	(dup): added method
+	(gotoLabel): added method
+	(astore): fixed to generate both astore_N and astore instructions
+	correctly
+	(aload): fixed to generate both aload_N and aload instructions
+	correctly
+
+	* Java/org/perl/internals/Scalar.java: added Scalar(String)
+	constructor so that we can easily create Scalars from native
+	strings easily.
+
+1999-11-26  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/Emit.pm (labelCreate): realized that I needed
+	both a labelCreate and labelSend method to avoid ever having to
+	back-patch.  This way, I can generate labels when I need them, and
+	use the labelSend method to emit them at the right location on the
+	output.
+	(astore): added method
+	(invokevirtual): added method
+	(astore): added method
+	(invokestatic): added method
+
+1999-11-23  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/CompileState.pm (DESTROY): added method to
+	cleanup any files on the $self->{cleanUpFiles} list.
+
+	* Java/org/perl/internals: got all the Java files to compile properly
+
+	* Java/org/perl/internals/Scalar.java: added isTrue() method
+
+	* Java/org/perl/internals/GV.java: created the GV object.
+	Currently, it can only hold hashes and scalars
+
+	* Java/org/perl/internals/Stash.java: finished implementation of
+	of findNamespace and findGV
+
+1999-11-18  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Java/org/perl/internals/Hash.java: created this class.  Just a
+	placeholder for now.
+
+	* Java/org/perl/internals/HV.java: created HV class.  I removed SV
+	interface a few days ago because I realized it was unneeded.  I
+	think I need HV because I want to wrap the fact that I am using
+	Java hashtable's internally---that might change and I'd like
+	another layer of abstraction.  This might be helpful for magic too.
+
+	* Java/org/perl/internals: modified lots of the .java files to get
+	them to compile properly.  :)
+
+	* Java/org/perl/internals/ScalarException.java: created this class
+	for throwing from class, Scalar
+
+	* Java/org/perl/internals/Scalar.java: got file to compile properly
+
+1999-11-16  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Java: moved files to Java/org/perl/internals
+
+1999-11-10  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Java/SvDouble.java: created an initial version of this class
+	that "mirrors" SvNV in the perlguts, which I got to understand by
+	reading http://home.sol.no/~aas/perl/guts/, so stuff may be
+	missing.  :)
+
+	* Java/SvInteger.java: created an initial version of this class
+	that "mirrors" SvIV in the perlguts, which I got to understand by
+	reading http://home.sol.no/~aas/perl/guts/, so stuff may be
+	missing.  :)
+
+	* Java/InvalidSVFieldException.java: wrote this exception class
+	that is needed by the Sv* hierarchy.
+
+	* Java/SvString.java: created an initial version of this class
+	that "mirrors" an SvPV in the perlguts, which I got to understand by
+	reading http://home.sol.no/~aas/perl/guts/, so stuff may be
+	missing.  :)
+
+	* Java/SvBase.java: created an initial version of this base class
+	for scalar variables.
+
+	* Java/SV.java: created initial version of the interface.
+
+1999-11-09  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Utils.pm: this module is some utility functions that
+	didn't fit anywhere else.  
+
+1999-11-08  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/CompileState.pm (emit): Added this method and
+	other code so that we can store an emitter object with this package.
+
+1999-11-06  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/Emit.pm: This is the emitter for
+	Jasmin-specific stuff.  It's a first hack, that doesn't support
+	everything yet [actually, it supports nearly nothing.  :]
+
+1999-11-03  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Emit.pm: Wrote the initial Emit object.  The idea is
+	that we should be able to port to non-Jasmin assemblers, or even a
+	direct bytecode syntax.  That's the hope at least.
+
+1999-10-26  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Jasmin.pm (compile): Began playing with this function and had it
+	be called automatically from O.  Currently, the function does
+	nothing but print some test output.
+
+	* lib/B/JVM/Jasmin/CompileState.pm (new): changed some of the
+	configuration parameters, and documented all configuration parameters.
+	(createNewFile): Completed this function and made sure it had
+	everything it would need for initial testing.
+
+1999-10-25  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* lib/B/JVM/Jasmin/CompileState.pm: moved
+	B::JVM::Jasmin::CompileState into its own file
+
+	* Makefile.PL: rewrote this to search for jasmin and java
+	programs, and fixed it so it handled CompileState.pm
+
+1999-10-20  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Jasmin.pm: created CompileState package for holding the state
+	of the compilation.
+	(new): new method for CompileState
+
+1999-10-07  Bradley M. Kuhn  <bkuhn@ebb.org>
+
+	* Jasimin.pm: original version created by h2xs 1.19
+
+#	LocalWords:  pushmark ops lib methodCreateLocal const sv PV iconst ldc
+#	LocalWords:  istore iload iand getstatic newObject invokespecial dup op
+#	LocalWords:  astore aload labelCreate labelSend invokevirtual JasminPre
+#	LocalWords:  invokestatic gotoLabel walkoptree listop methodFreeLocal
+#	LocalWords:  cleanUpFiles perlguts SvPV Jasmin bytecode pm returnVoid
+#	LocalWords:  createNewFile PL jasmin java CompileState Jasimin xs GV HV
+#	LocalWords:  isTrue findNamespace findGV hashtable's SvNV SvIV seq sne
+#	LocalWords:  cond expr nop concat pre BINOPs StackElement OPf sassign
+#	LocalWords:  TurnStackElementsToScalars isConstant ifne ChangeLog

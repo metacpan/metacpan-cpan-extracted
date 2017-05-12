@@ -1,0 +1,90 @@
+NAME
+    Business::TW::TSIB::VirtualAccount - Module for Taishin Bank Virtual
+    Account Management
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Business::TW::TSIB::VirtualAccount;
+        my $va  = Business::TW::TSIB::VirtualAccount->new({ corp_code => '9528' });
+        my $acc = $va->generate( { due    => DateTime->new( year => 2007, month => 4, day => 2 )
+                                   amount => 3900,
+                                   ar_id  => '20892' } );
+        # $acc should be '95286092208929'  
+        # total 14 columns
+    
+        my $entries = Business::TW::TSIB::VirtualAccount->parse_summary($fh);
+
+        # entries is arrayref of Business::TW::TSIB::VirtualAccount::Entry objects,
+        # which has the following accessors:
+        # seqno
+        # date
+        # amount
+        # virtualaccount
+        # ar_id
+        # code
+        # postive
+        # orig_bank
+
+DESCRIPTION
+    This module provides utility functions for the virtual account service
+    by TSIB (Taishin International Bank, Taiwan).
+
+METHODS
+  new( { corp_code => $corp_code} )
+    Initialize the virtual account context with "corp_code" provided by
+    TSIB.
+
+  $va->generate( $args )
+    Generate a virtual account with the given arguments. $args is a hash ref
+    and must contain:
+
+    due A DateTime object for due day of the payment
+
+    amount
+        The expected amount of the transaction.
+
+    ar_id
+        The arbitary account receivable identifier.
+
+  $self->parse_summary($fh)
+AUTHOR
+    Chia-liang Kao, "<clkao AT aiink.com>" , You-An Lin, "<c9s AT
+    aiink.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-business-tw-taishinbank-virtualaccount at rt.cpan.org", or through
+    the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Business-TW-TSIB-Virtual
+    Account>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Business::TW::TSIB::VirtualAccount
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Business-TW-TSIB-VirtualAccount>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Business-TW-TSIB-VirtualAccount>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-TW-TSIB-VirtualAc
+        count>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Business-TW-TSIB-VirtualAccount>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 AIINK co., ltd, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,48 @@
+{
+   "abstract" : "Validate russian business-related numbers",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-RU",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Business::RU" : {
+         "file" : "lib/Business/RU.pm",
+         "version" : "0.2"
+      },
+      "Business::RU::BankAccount" : {
+         "file" : "lib/Business/RU/BankAccount.pm",
+         "version" : 0
+      },
+      "Business::RU::INN" : {
+         "file" : "lib/Business/RU/INN.pm",
+         "version" : 0
+      },
+      "Business::RU::OKPO" : {
+         "file" : "lib/Business/RU/OKPO.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.2"
+}

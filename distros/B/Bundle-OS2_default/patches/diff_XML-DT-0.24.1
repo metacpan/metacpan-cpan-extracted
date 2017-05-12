@@ -1,0 +1,17 @@
+--- ./Makefile.PL-pre	Mon Jun 16 23:30:02 2003
++++ ./Makefile.PL	Mon Oct  6 01:34:40 2003
+@@ -31,12 +31,13 @@ do {
+ } until defined $XML;
+ 
+ my $pattern = uc($XML);
++my $q = $^O eq 'os2' ? '"' : '\\"';	# Quoting hell...
+ 
+ WriteMakefile(
+ 	      'NAME'         => 'XML::DT',
+ 	      'VERSION_FROM' => 'DT.pm',
+ 	      'EXE_FILES'    => [ "mkdtskel", "mkdtdskel" ],
+-	      'PM_FILTER'    => qq(perl -npe \\"s/\\#$pattern\\#//;\\"),
++	      'PM_FILTER'    => qq(perl -npe ${q}s/\\#$pattern\\#//;$q),
+ 	      'PREREQ_PM'    => \%req_modules,
+ 	      ($] >= 5.005 ?
+ 	       (ABSTRACT_FROM => 'DT.pm',

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Backtick-AutoChomp
+version:             0.02
+abstract:            auto-chomp() result of backtick(``) and qx//
+license:             ~
+author:              
+    - David Westbrook <dwestbrook@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Filter::Simple:                0
+    PPI:                           0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

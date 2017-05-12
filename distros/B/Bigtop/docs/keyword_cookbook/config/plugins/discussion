@@ -1,0 +1,28 @@
+=head1 USE
+
+Put a C<plugins> keyword in your Bigtop config section to insert one or
+more plugins into the base controller.  If you use a controller level
+plugins keyword, the top level plugins will be repeated in the that
+controller so the plugin can re-register itself in that controller's
+namespace.
+
+Note that multiple plugins are allowed, space separate them and remember
+to wrap them in backticks.
+
+when you use C<plugins>, you get a -PluginNamespace in you base module
+use statement.  Plugins register themselves against that namespace
+so multiple apps in the same Apache instance don't have to share
+plugins.
+
+=head1 EXAMPLE
+
+Build the example with:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<PluginA> in:
+
+    app.cgi
+    app.server
+    docs/httpd.conf
+    t/10_run.t

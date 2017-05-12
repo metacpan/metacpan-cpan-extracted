@@ -1,0 +1,8 @@
+bin/cobalt2-dbterm
+Build.PL
+lib/Bot/Cobalt/DB/Term.pm
+MANIFEST			This list of files
+Makefile.PL
+META.yml
+META.json
+t/01_loadable.t

@@ -1,0 +1,25 @@
+name    = Business-OnlinePayment-SagePay
+abstract = SagePay (formerly Protx) backend for Business::OnlinePayment
+<<<<<<< HEAD
+version = 0.15
+=======
+version = 0.14
+>>>>>>> 1703a51eaa43f3ead3fa9ad6f7a62e246cc975b5
+author  = Simon Elliott <cpan@papercreatures.com>
+license = Perl_5
+copyright_holder = Simon Elliott
+
+[@Classic]
+
+[MetaResources]
+repository = http://github.com/purge/Business-OnlinePayment-SagePay
+bugtracker = https://github.com/purge/Business-OnlinePayment-SagePay/issues
+license = http://dev.perl.org/licenses/
+
+[Prereqs]
+Test::More = 0
+Data::Dumper = 0
+Business::OnlinePayment = 2.01
+Net::SSLeay = 1.35
+Devel::Dwarn = 0
+WWW::Mechanize = 0

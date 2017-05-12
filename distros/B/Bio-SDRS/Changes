@@ -1,0 +1,27 @@
+Revision history for Perl extension Bio::SDRS.
+
+0.11  Sat Jan 03 11:03:42 2014
+	Add Inline::C as a prerequsite.
+	
+0.10  Sun Mar 11 20:32:00 2012
+	- Correct an error with setting step sizes for low magnitude responses.
+
+0.09  Tue Feb 28 12:09:00 2012
+	- Based on an error report from Eric Gunther, corrected a
+        divide by zero error. Test cases updated to reflect possibility.
+
+0.05  Sun Jul  3 23:40:01 2011
+ 	- Changed dose output formatting to make it use less precision
+	for comparison purposes. Also, force use of LC_ALL environment
+ 	variable set to C to make sorting consistent.
+
+0.04  Sat Jul  2 21:15:01 2011
+	- Added a precision control to the output for ec50data method so
+	the test output would have controlled rounding and lead to fewer
+	discrepancies. Added documentation to sdrs.pl script and modified
+	the makefile so it would be included as an executable.
+	
+0.01  Sun Feb  6 14:31:01 2011
+	- original version; created by h2xs 1.23 with options
+		--omit-autoload --omit-XS --name=Bio::SDRS --compat-version=5.8.0
+

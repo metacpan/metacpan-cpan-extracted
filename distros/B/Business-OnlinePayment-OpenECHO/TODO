@@ -1,0 +1,15 @@
+- set required fields https://wwws.echo-inc.com/ISPGuide-Fields2.asp
+- counter field shouldn't be just a random integer (but it does need to
+  fallback to that as B:OP doesn't require it)
+
+- echecks / ACH
+    #echeck use customer_org and account_type to generate ec_account_type
+
+- check HTTPS response code and die if not 200?
+- order_type & ccexp_month,ccexp_year setting fiddling ->{_content} directly
+- 'echo_reference', 'security_result', 'mac', and 'decline_code' fields...?
+
+- handle returning correct is_success and error_message values in the
+  special case for AVS-only transactions we don't handle yet (B:OP needs a
+  name for that transaction!)
+- Hosted order type?

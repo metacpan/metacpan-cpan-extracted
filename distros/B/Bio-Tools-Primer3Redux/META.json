@@ -1,0 +1,205 @@
+{
+   "abstract" : "BioPerl-based tools for Primer3 (redone)",
+   "author" : [
+      "cjfields <cjfields@bioperl.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Tools-Primer3Redux",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Bio-Tools-Primer3Redux@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Bio-Tools-Primer3Redux"
+      },
+      "homepage" : "http://search.cpan.org/dist/Bio-Tools-Primer3Redux",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cjfields/bio-tools-primer3redux.git",
+         "web" : "http://github.com/cjfields/bio-tools-primer3redux"
+      }
+   },
+   "version" : "0.09",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@CJFIELDS/@Filter/GatherDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@CJFIELDS/@Filter/PruneCruft",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@CJFIELDS/@Filter/ManifestSkip",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@CJFIELDS/@Filter/MetaYAML",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@CJFIELDS/@Filter/License",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@CJFIELDS/@Filter/ExtraTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@CJFIELDS/@Filter/ExecDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@CJFIELDS/@Filter/ShareDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@CJFIELDS/@Filter/Manifest",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@CJFIELDS/@Filter/TestRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@CJFIELDS/@Filter/ConfirmRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@CJFIELDS/@Filter/UploadToCPAN",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild::Custom",
+            "name" : "@CJFIELDS/ModuleBuild::Custom",
+            "version" : "3.05"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@CJFIELDS/NextRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "@CJFIELDS/CompileTests",
+            "version" : "1.110930"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@CJFIELDS/MetaJSON",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@CJFIELDS/PkgVersion",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@CJFIELDS/MetaConfig",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@CJFIELDS/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@CJFIELDS/PodSyntaxTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@CJFIELDS/MetaResources",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@CJFIELDS/Authority",
+            "version" : "1.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@CJFIELDS/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@CJFIELDS/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.200006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.200006"
+      }
+   },
+   "x_authority" : "cpan:CJFIELDS"
+}
+

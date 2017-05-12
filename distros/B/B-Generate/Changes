@@ -1,0 +1,356 @@
+Revision history for the Perl extension B::Generate.
+
+1.55 - 2017-02-23 (Reini Urban)
+   - Fixed typo for METHOOP [CPAN #120343] by Igor Yu. Vlasenko
+
+1.54 - 2016-05-26 (Reini Urban)
+   - Fixes for perl5.22 and 5.24: OP_PARENT, METHOP, UNOP_AUX
+
+1.53 - 2015-05-04 (Reini Urban)
+   - Fixes for perl>5.18 without exported pad_alloc (HAVE_PAD_ALLOC)
+     i.e. MSWin32 or AIX. [CPAN #104208]
+
+1.52 - 2015-05-02 (Reini Urban)
+   - Fix 1.51 regression for older perls <5.18
+
+1.51 - 2015-05-02 (Reini Urban)
+   - Fixes for 5.21.22: op->sibling, added op->sibparent for -DPERL_OP_PARENT.
+   - Weaker op_list test, to match the number of ops. Also add op_signature variant.
+   - Adjust README
+
+1.50 - 2014-12-24 (Reini Urban)
+   - Fixed for 5.21.7 multideref by Father Chrysostomos [cpan#101070]
+
+1.49 - Fri Aug 8 2014 (Reini Urban)
+   - Fix t/new_cv.t with Devel::Cover
+   - Add test_cover target
+   - tested up to 5.21.2 -DPERL_OP_PARENT
+   - add dates to the latest Changelog entries
+
+1.48 - Mon Sep 30 2013 (Reini Urban)
+   - Support the 5.20 changes so far (BIND vs INVLIST)
+   - Simplify tautological (sv)->sv_flags != SVTYPEMASK to !SvIS_FREED(sv)
+
+1.47 - Thu Oct 11 2012 (Reini Urban)
+   - Support the 5.17.4 boolkeys removal. (andk)
+
+1.46 - Sat Aug 25 2012 (Reini Urban)
+   - Support the 5.17.4 AV -> PADLIST change. (sprout)
+
+1.45 - Thu Jul 19 2012 (Reini Urban)
+   - Remove fold_constants in $op->convert.
+     Inproper usage can lead to leaks, which p5p hates. 
+     constants have to be folded beforehand, just manually.
+   - skip t/cpan70398.t as B::Concise prints foul on 5.6.
+
+1.44 - Wed Mar 7 2012 (Reini Urban)
+   - Generate.xs: global-buffer-overflow detected by AddressSanitizer:
+     specialsv_list[7] for 0-6
+
+1.43 - Wed Feb 22 2012 (Reini Urban)
+   - t/cpan70398.t: Windows quote fix
+
+1.42 - Sat Feb 11 2012 (Reini Urban)
+   - Generate.xs: disable B::COP->warnings [CPAN #70396] detected by Zefram
+   - t/cpan70396.t: new
+   - Makefile.PL: make release: add git push
+
+1.41 - (Reini Urban)
+   - Generate.xs: fixed B::SVOP->sv [CPAN #70398] detected by Zefram
+   - t/cpan70398.t: new
+   - Generate.pm: do not import B
+   - Makefile.PL: add target release, make it easier to copy depends
+   - t/basic.t: fixed debug_const()
+
+1.40 - (Reini Urban)
+   - Makefile.PL: darwin fixed by Chia-liang Kao. Tested ok on all
+     darwin perls but 5.6.2.
+
+1.39 - (Reini Urban)
+   - removed B 1.09 dependency. Tested down to B 1.02 perl-5.8.4 but it was 
+     claimed to work down to perl-5.5.62
+
+1.38 - (Reini Urban)
+   - Generate.xs, t/find_cv.t: minor optimizations
+   - t/new_cv.t: skip with B < 1.09 [cpan#70397]
+
+1.37 - (Reini Urban)
+   - SVOP->sv: added 2nd optional arg cvref for threaded perls, the 
+     surrounding cv of the op
+   - make PADOP->sv writable
+   - t/const.t: test SVOP->new "const" (from Devel::BeginLift)
+   - t/basic.t: fixed ithreads tests 3,5,6.
+     const is an SVOP but it should be a PADOP really.
+   - improved SVOP->sv() read-only case: no GEN_PAD needed.
+   - XS internal: harmonize croak usage
+   -   renamed OP_CUSTOM_OPS to CHECK_CUSTOM_OPS
+   - updated cc_opclass from 5.15
+
+1.36 - (Reini Urban)
+   - t/op_list.t: added two more ops for 5.15
+
+1.35 - (Reini Urban)
+   - fixed t/new_cv.t
+   - improved Makefile.PL
+
+1.34 - (Reini Urban)
+   - enabled old basic find_cv test (seq workaround)
+   - added scope.t test
+
+1.33 - (Reini Urban)
+   - added t/find_cv.t
+   - improved overall test coverage from 30% to 40%
+   - precise limitation warning
+
+1.3202 - (Reini Urban)
+   - Fix a few assertion errors PL_curcop == &PL_compiling
+   - Reformat some XS funcs 
+   - Remove yet unneeded BTest.pm tests
+
+1.3201 - (Reini Urban)
+   - Actually use the new unsupported function checks from git.
+   - use Perl_cv_clone as this symbol is tested. Do not rely on
+     a public cv_clone macro.
+
+1.32 - (Reini Urban)
+   - Check each unsupported function better and extra
+   - B::CV->NEW_with_start disabled with strict linkers 
+     fixes Can't locate object method "NEW_with_start"
+   - Do not hardcode exported B OPf_ flags, so we don't really need 
+     to test for sameness.
+     We keep the tests for reference.
+
+1.31 - (Reini Urban)
+   - add prof and cov targets for gcc
+   - comment test coverage in the code
+   - check for each exported symbol on non-broken platforms
+
+1.3001 - (Reini Urban)
+   - fix MANIFEST
+
+1.30 - (Reini Urban)
+  - switch from Module::Build to ExtUtils::MakeMaker. Module::Build 
+    cannot properly track dependencies and drives me insane.
+    mv lib/B/Generate.xs .
+    mv BTest.pm t/
+  - add prominent warning about PERL_DL_NONLAZY. This is a 
+    run-time problem. p5p effectively dropped B::Generate support 
+    since 5.10.
+
+1.29 - (Reini Urban)
+  - remove CALL_FPTR, removed from core with 5.13.4 commit 16c91539
+
+1.28 - (Reini Urban)
+  - fix CPAN #59502 "Provokes error for B::Concise, B::Debug and B::Deparse"
+    (svclassnames patch by Ben Morrow)
+  - added t/svclasses.t for CPAN #59502
+  - silence COP_warnings and OP_desc warnings
+  - fix OP_targ compilation for MSWin32. Missing sv decl
+  - added README
+  - added github repo url
+
+1.27 - (Reini Urban)
+  - fixed op->targ: implemented pad_alloc for DISABLE_PERL_CORE_EXPORTED 
+    platforms (Win32, AIX, newer cygwin) with strict linkers.
+    CPAN #28912 hereby partially solved.
+    posix with export PERL_DL_NONLAZY=1 still broken.
+
+1.26 - (Reini Urban)
+  - fix t/op_list.t for 5.12
+
+1.25 - (Reini Urban)
+  - removed Devel::Peek from BTest.pm
+
+1.24 - (Reini Urban)
+  - 5.11.2 does not understand 5.5.62
+    Prereq '5.5.62' for 'perl' is not supported by Module::Build::Compat
+    ERROR: perl (5.006002) is installed, but we need version >= 5.5062
+
+1.23 - (Reini Urban)
+  - fix Bug #52490 for 5.6.2. const char* not in typemap.
+
+1.22 - (Reini Urban)
+  - update t/op_list.t for 5.11.1 and 5.11.2
+  - disable fold_constants for cygwin gcc-4 also
+
+1.21 - (Reini Urban)
+  - fix t/basic.t for >=5.10.1 and blead. skip panic restartop
+
+1.20 - (Reini Urban)
+  - Remove certain features for MSWin32: disable CV->NEW_with_start,
+    setting op->targ, and folding constants with op->convert.
+    Reason: Perl_pad_alloc, Perl_fold_constants, Perl_cv_clone
+    not exported with MSVC and mingw perls. CPAN #28912
+  - fixed __svop_new for MSVC. cl is stricter
+  - fixed t/inspect-this.t for MSWin32: file regex => eq test
+  - t/inspect-this.t requires B::Concise 0.64
+  - fix t/op_list.t for perl-5.6.2
+
+1.19 - (Reini Urban)
+  - Re-enable fold_constants in $op->convert, disabled with 1.16
+
+1.18 - (Reini Urban)
+  - Remove the t/new_cv.t todos. 
+  - Explain the correct B::CV::NEW_with_start behaviour
+
+1.17 - (Reini Urban)
+  - fixed B::CV::NEW_with_start padlist for 5.10 and newer (different cv_clone behaviour),
+    only need to fixup padlist targ for cv_clone
+
+1.16 - (Reini Urban)
+  - remove fold_constants from OP_convert() as it is not exported from blead anymore. 
+    No functional difference.
+  - skip t/inspect_this.t plan on unknown patchlevels 
+
+1.15 - (Reini Urban)
+  - disable some new_cv TARG test failures in t/new_cv.t for 5.10 and higher,
+    new_cv dumps core at destroy with 5.8.6 and lower
+  - disable a segv test for 5.11 in t/basic.t
+  - added to http://github.com/rurban/b-generate,
+    another older svn repo is at http://svn.jifty.org/svn/jifty.org/B-Generate/
+
+1.14 - (Reini Urban)
+  - fix t/inspect-this.t for 5.8.9
+
+1.13 - (released by Reini Urban)
+  - same as 1.12_10
+
+1.12
+  _01 - (against 5.10)
+      - fixed a GV assertion error by adding isGV_with_GP
+      - silenced a const warning (another remains in COP_warnings)
+  _02 - ifdef'd PMOP_precomp, removed in 5.11
+  _03 - add a call to isGV_with_GP, 5.11 version of COP_warnings (released)
+  _04 - isGV_with_GP is 5.10 only
+  _0501
+      - reduced dependency on B => 1.09
+      - added broken/failing t/synopsis.t - very raw, moving ahead
+      - started build.nt - attempt to loop over opnames and construct ops
+  _0502
+      - added BTest.pm and several files using it
+  _06 - "duh, thanks CPANTS" release
+      - undo creeping 'feature'isms in tests (5.8 friendly)
+      - static renderings dont port, drop test_all_ops in inspect-btest 
+      - drop filegv from nextstate tests (caused uninit-strings in prints)
+  _07 Anton Berezin
+      - fixed a leak in find_cv_by_root()
+  _08 Reini Urban
+      - cop_label now in hints_hash (5.11 Change #33656)
+      - silence use64bitint warnings
+      - fix t/inspect-btest.t test count
+      - fix t/inspect-this.t not ok 568 - ->LEN 0.
+	skip all PV->LEN tests >= 5.10
+      - removed //= from BTest to support 5.8 and older
+  _09 Reini Urban
+      - fix 5.8.8 test PVIV->NV
+      - < 5.8 and blead DEBUGGING builds fail, the rest passes
+  _10 Dmitry Karasik 
+      - B::COP->new won't coredump on 5.10.0
+      - proper allocation of COP label
+      - add B::cv_pad for switching padlist during op generation
+      - add B::GVOP->new because B::PADOP is needed on threaded perls
+        where B::SVOP is normally used
+      - added missing t/op_list.t OP_LIST indices for 5.8 (Reini Urban)
+
+1.11 - (releaed by Josh Ben Jore)
+  - rt#29257 - patches from Reini Urban & Jim Cromie
+
+1.10 - (Josh Ben Jore)
+  - License clarification. B::Generate is available under the same
+    terms as perl. Dist now includes copy of Artistic and GPL licenses.
+
+1.09 - (Josh Ben Jore)
+  - Merged distributions:
+    - S/SW/SWALTERS/B-Generate-1.06_1.tar.gz
+      - Removed ppaddr setting for OP_LIST
+      - Call Perl_fold_constants instead of fold_constants
+    - M/MS/MSCHWERN/B-Generate-1.06_2.tar.gz
+      - Awesome!
+      - fold_constants is called w/ thread context
+    - J/JJ/JJORE/B-Generate-1.07.tar.gz
+      - Populates specialsv_list
+    - J/JJ/JJORE/B-Generate-1.08.tar.gz
+      - Nothing interesting, apparently.
+    - RT #4747:
+      - changes to compile for 5.8.1+ by Jim Cromie <jcromie@cpan.org>
+        - altered Build.PL to add extra_compiler_flags when building for 5.8.x,
+          ie: -DPERL_CUSTOM_OPS -DPERL_CUSTOM_OPCODES
+          these didnt work for me under 5.6.x
+        - silenced redefined warnings with $SIG{__WARN__}
+        - various XS tweaks: casts, aTHX_, and Perl_ prefix on symbols
+        - various pm tweaks to silence warnings
+
+
+1.08 Thu Nov 25 23:00:00 CST 2004 jbenjore
+    - Remembered to change Simon's address to mine
+
+1.07 Thu Nov 25 22:49:00 CST 2004 jbenjore
+    - Added some missing contants to Generate.xs
+
+1.06 Sun Jul 28 18:43:06 CEST 2002 abergman
+    - Added support for changing PV in SvPV
+
+1.06 Tue Jul  2 14:37:43 CEST 2002 abergman
+    - If PL_compcv is set, we will return that cv instead
+      of trying to find the root. PL_compcv is only set
+      during compilation when we only can safely work with ops
+      during that compilation, and the next approach won't work
+      since optree isn't complete.
+
+1.05 Thu Jun 27 23:57:02 CEST 2002 abergman
+    - Apperently we the previous release was a bit too quick.
+      Sometimes the CV for the PL_eval_root doesn't have a real
+      CvROOT set so we create a new fake temporary CV.
+
+1.04 Thu Jun 27 22:41:07 CEST 2002 abergman
+    - Made find_cv support working in an existing eval ""
+
+1.03  June 26, 2002 abergman
+
+1.01  May 02, 2002 Simon Cozens
+    - Added op_mutate. Fixed op_convert targ
+
+1.00  Wed Aug 29 00:24:30 BST 2001 Simon Cozens
+    - It's time for a 1.0 release, this has been tested thoroughly
+      enough.
+    - Support for custom ops. Oh yes.
+
+0.07  Mon Jun  4 11:10:02 BST 2001
+    - Oh, all sorts. Mainly undocumented. Added documentation about the
+      undocumentation.
+    - append_elem has been fixed up, and prepend_elem has been added.
+    - convert and scope
+    - assignment
+    - constructor for conditional (if/then/else) ops. (B::LOGOP->newcond)
+    - constructor for subroutines. (B::CV->newsub_simple)
+    - lots of field testing with the bytecode compiler. (Shiny-Byte)
+
+0.06  Mon May 28 18:08:12 BST 2001
+    - Backed out disastrous context compilation fix
+    - Fixed B::LOGOP->new and B::LISTOP->new - it was creating binops and 
+      blessing them as B::BINOP. Oops!
+    - Added the undocumented "append_elem" method; this is enough for
+      you to create subroutine calls if you know how. I should probably
+      make a "gimme a sub call" utility function.
+
+0.05  Wed Apr 18 08:50:33 2001
+    - The bastards took op_children away!
+    - Fixed interpret context compilation bug
+
+0.04  Wed Mar 21 00:18:27 2001
+    - Urgh. Fixed *nasty* segfault bug. (PL_op==0x0 after ->new)
+    - Added "linklist" and undocumented "clean" method
+    - Added "newstate" method
+    - Documentation nits
+
+0.03  Wed Jan 10 00:21:08 2001
+    - Test script needed a fix to stop ->targ pointing into never-never
+      land. Not *exactly* sure why.
+
+0.02  Fri Jan  5 13:14:29 2001
+    - Added a couple more methods and tests, mainly SVOP and SV methods.
+
+0.01  Sat Dec 23 18:00:08 2000
+	- original version; created by h2xs 1.20 with options
+		-A -n B::Generate
+

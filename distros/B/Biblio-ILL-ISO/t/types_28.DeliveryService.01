@@ -1,0 +1,5 @@
+$VAR1 = bless( {
+                 'physical-delivery' => bless( {
+                                                 'generalstring' => 'Canada Post'
+                                               }, 'Biblio::ILL::ISO::TransportationMode' )
+               }, 'Biblio::ILL::ISO::DeliveryService' );

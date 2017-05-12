@@ -1,0 +1,16 @@
+.travis.yml
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+lib/Bloomd/Client.pm
+t/00-compile.t
+t/basic.t
+t/fork.t
+t/release-distmeta.t
+t/release-pod-coverage.t
+t/timeout.t

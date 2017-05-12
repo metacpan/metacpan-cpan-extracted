@@ -1,0 +1,95 @@
+NAME
+    Business::Tax::Canada - perform Canadian GST/HST/PST calculations
+
+SYNOPSIS
+      use Business::Tax::Canada;
+
+      my $tax = Business::Tax::Canada->new;
+
+      my $price               = $tax->item(
+                                    from  => 'ab',
+                                    to    => 'ab'
+                                    price => 120);
+      my $price_to_customer   = $price->full;     # 126.00
+      my $gst_charged         = $price->gst;      # 6.00
+      my $pst_charged         = $price->pst;      # 0
+      my $net_charged         = $price->net;      # 120
+
+DESCRIPTION
+    This module will allow you to calculate the Canadian GST and PST charges
+    on items.
+
+    There are several key processes:
+
+CONSTRUCTING A TAX OBJECT
+      my $tax = Business::Tax::Canada->new;
+
+    First, construct a tax object. There is no need to specify a list of
+    provinces as all are supported.
+
+PRICING AN ITEM
+      my $price = $tax->item(
+        from => $province_code,
+        to => $province_code,
+        $unit_price => $province_code);
+
+    You create a Price object by calling the 'item' constructor, with the
+    seller's location (from), the buyer's location (to), and the unit price.
+    From and to locations are used to determine if PST tax should be
+    charged.
+
+    You must supply all values or you will receive an error.
+
+CALCULATING THE COMPONENT PRICES
+      my $price_to_customer = $price->full;
+      my $gst_charged       = $price->gst;
+      my $pst_charged       = $price->pst;
+      my $tvq_charged       = $price->tvq;
+      my $net_price_to_me   = $price->net;
+
+    Once you have the price, you can query it for either the 'full' price
+    that will be charged (GST + PST if applicable), the 'gst' amount, the
+    'pst' amount, or the 'net' amount, which will be the same number you
+    entered in the item method. tvq (Quebec's PST) is simply an alias to the
+    pst method.
+
+PROVINCES AND RATES
+    This module uses the following rates and codes:
+
+      Code  Province                GST/HST PST
+      ab    Alberta                 5%      N/A
+      bc    British Columbia        12%     N/A
+      mb    Manitoba                5%      7%
+      nb    New Brunswick           13%     N/A
+      nf    Newfoundland & Labrador 13%     N/A
+      nt    Northwest Territories   5%      N/A
+      ns    Nova Scotia             15%     N/A
+      nu    Nunavut                 5%      N/A
+      on    Ontario                 13%     N/A
+      pe    Prince Edward Island    5%      10%     *
+      qc    Quebec                  5%      9.975%
+      sk    Saskatchewan            5%      5%
+      yt    Yukon Territory         5%      N/A
+  
+      * In Prince Edward Island only, the GST is included in the
+        provincial sales tax base. You are also charged PST on GST.
+
+FEEDBACK
+    If you find this module useful, or have any comments, suggestions or
+    improvements, please let me know. Patches are welcome!
+
+AUTHOR
+    Created by Andy Grundman. Updated and maintained by Steve Simms.
+
+THANKS
+    This module was heavily inspired by Tony Bowden's Business::Tax::VAT.
+
+COPYRIGHT
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+WARRANTY
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

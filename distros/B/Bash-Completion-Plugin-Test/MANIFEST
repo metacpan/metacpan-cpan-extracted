@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/Bash/Completion/Plugin/Test.pm
+t/00-compile.t
+t/01-basic.t
+t/lib/Bash/Completion/Plugins/TestPlugin.pm
+t/lib/Bash/Completion/Plugins/TestPluginNoDups.pm
+xt/author/critic.t
+xt/release/dist-manifest.t
+xt/release/kwalitee.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

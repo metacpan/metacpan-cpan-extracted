@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         BrLock
+version:      0.1
+version_from: lib/BrLock.pm
+installdirs:  site
+requires:
+    IO::Socket:                    1.23
+    Switch:                        2.1001
+    threads:                       1.07
+    threads::shared:               0.94
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

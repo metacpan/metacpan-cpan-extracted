@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Bloom-Scalable
+version:            0.01
+abstract:           Implementation of the probalistic datastructure - ScalableBloomFilter
+author:
+    - Subhojit Banerjee <subhojit20@gmail.com>
+license:            Artistic_2_0
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Digest::MurmurHash:  0
+    MCE::Grep:           0
+    Test::More:          0
+requires:
+    perl:  5.006
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,123 @@
+# NAME
+
+Bot::BasicBot::Pluggable::Module::Gitbot - A Bot::BasicBot::Pluggable Module to give out Gitweb links for commits.
+
+# INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+# VERSION
+
+1.00.01
+
+# SYNOPSIS
+
+    use Bot::BasicBot::Pluggable;
+
+    my $bot = Bot::BasicBot::Pluggable->new();
+
+    $bot->load('Gitbot');
+    ...
+
+or
+
+    !load Gitbot
+
+
+
+Once the module is loaded, you'll need to configure the module.  Using admin commands.
+
+    !git gitweb_url http://example.com/
+    !git repo_root /path/to/where/your/bare/git/repositories/are/
+
+
+
+Any time someone says a SHA1 (full, or abbreviated with a minimum of 7
+characters) where the bot can hear it, it will try to find a repository under
+`repo_root`, and provide a GitWeb url to the commitdiff of that SHA1.
+
+    <me> gitbot: 1a2b3c4
+    <gitbot> me: [repo.git 1a2b3c4] http://example.com/?p=my_repo.git;a=commitdiff;hb=1a2b3c4
+
+
+
+You can also specify things in the form `<sha>:<file>`, and the module will
+reply with a link to the blob of that file, in the commit specified by the SHA.
+
+    <me> Hey, you should check out 1a2b3c4:README
+    <gitbot> [repo.git 1a2b3c4:README] http://example.com/?p=my_repo.git;a=blob;hb=1a2b3c4;f=README [blob]
+
+
+
+If you wish you reference a ref from a specific repository, you can do that,
+too.  Just say something in the form of `<repo>/<ref>`, where `<repo>`
+is the name of the repository on disk (optionally without the `.git` at the
+end), and `<ref>` is something parsable by `git rev-parse`.
+
+    <me> Anyone seen the latest commits on gitbot/master ?
+    <gitbot> [gitbot.git master] http://example.com/?p=gitbot.git;a=log;hb=master
+
+    <me> Could someone code review project/refs/personal/my-topic-branch ?
+    <gitbot> [project.git refs/personal/my-topic-branch] http://example.com/?p=gitbot.git;a=log;hb=refs/personal/my-topic-branch
+
+
+
+You can also directly link to a file this way using `<repo>/<ref>:<file>`.
+
+    <me> You should check out project/master:README
+    <gitbot> [project.git master:README] http://example.com/?p=project.git;a=blob;hb=master;f=README [blob]
+
+
+
+# AUTHOR
+
+Jacob Helwig, `<jhelwig at cpan.org>`
+
+# BUGS
+
+Please report any bugs or feature requests to
+`bug-bot-basicbot-pluggable-module-gitbot at rt.cpan.org`, or through the web
+interface at
+<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-Module-Gitbot>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Bot::BasicBot::Pluggable::Module::Gitbot
+
+
+
+You can also look for information at:
+
+- * RT: CPAN's request tracker
+
+<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Module-Gitbot>
+
+- * AnnoCPAN: Annotated CPAN documentation
+
+<http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Gitbot>
+
+- * CPAN Ratings
+
+<http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Gitbot>
+
+- * Search CPAN
+
+<http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Gitbot>
+
+
+
+# COPYRIGHT & LICENSE
+
+Copyright 2010 Jacob Helwig, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

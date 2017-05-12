@@ -1,0 +1,31 @@
+#NEXUS
+[Features to test: Transpose, Interleave, StatesFormat]
+
+BEGIN TAXA;
+	dimensions ntax=4;
+	taxlabels A B C D;  
+END;
+
+BEGIN CHARACTERS;
+	dimensions nchar=59;
+	format
+		datatype=protein
+		missing=?
+		gap=-
+		[Transpose - remove the brackets when this feature is supported]
+		Interleave
+		StatesFormat=StatesPresent
+		;
+	
+	matrix
+		A	-MQVADISLQG--DAKKGANLFKTRCAQCHTL
+		B	-------MAGG--DIKKGANLFKTRCAQCHTV
+		C	-MG----FSAG--DLKKGEKLFTTRCAQCHTL
+		D	-MG--DVEKGKKIFVQKCAQCHTVEKGGKHKT
+		
+		A	KAGEGNKI-----------GPELHG-?
+		B	EKDGGNKI-----------GPALHG--
+		C	KEGEGNKV-----------GPALHG--
+		D	------?----GPNLHG--LFGRKTGQ
+		;
+END;

@@ -1,0 +1,157 @@
+NAME
+    Blatte::HTML - tools for generating HTML with Blatte
+
+SYNOPSIS
+      use Blatte;
+      use Blatte::Builtins;
+      use Blatte::HTML;
+
+      $perl = &Blatte::Parse(...string of Blatte code...);
+      $val = eval $perl;
+      &Blatte::HTML::render($val, \&emit);
+
+      sub emit {
+        print shift;
+      }
+
+DESCRIPTION
+    This module defines Blatte functions corresponding to HTML tags,
+    making it possible to write Blatte that looks like this:
+
+      Here is a {\a \href=http://www.blatte.org/ link}
+
+    and can be translated to this:
+
+      Here is a <a href="http://www.blatte.org/">link</a>
+
+    The beauty is that you can use Blatte functions to encapsulate
+    repeated constructs. For instance, this definition:
+
+      {\define {\mypagestyle \=name \&content}
+       {\html {\head {\title \name}}
+              {\body {\h1 \name} \content}}}
+
+    allows you to write
+
+      {\mypagestyle \name={A page I wrote} This is my page.}
+
+    which saves you from having to write:
+
+      <html><head><title>A page I wrote</title></head>
+      <body><h1>A page I wrote</h1>This is my page.</body></html>
+
+    End-tags are supplied automatically. The module HTML::Tagset, by
+    Gisle Aas and Sean M. Burke, is used to identify HTML elements
+    that require no end-tag.
+
+    Paragraph tags (<p>) are also supplied automatically wherever a
+    blank line appears in the text. For instance, this:
+
+      Here is some text.
+
+      Here is some more.
+
+    becomes this:
+
+      Here is some text.
+
+      <p>Here is some more.
+
+    This module tries hard to keep HTML element nesting correct. For
+    instance, this:
+
+      Paragraph 1.
+
+      Paragraph 2 {\b with some bold text
+
+      continuing to paragraph 3}.
+
+    becomes this:
+
+      Paragraph 1.
+
+      <p>Paragraph 2 <b>with some bold text</b></p>
+
+      <p><b>continuing to paragraph 3</b>.
+
+    Entity-encoding is automatic too. So this:
+
+      Five & dime
+
+    becomes this:
+
+      Five &amp; dime
+
+FUNCTIONS
+    make_start_tag(ELEMENT)
+        Given a Blatte::HTML::Element object, renders a string
+        representing that element's HTML start tag.
+
+        (Blatte::HTML::Element is the type of object returned by the
+        Blatte functions representing HTML tags.)
+
+    render(OBJECT, CALLBACK)
+        Renders OBJECT as HTML, converting it to a series of strings
+        that are passed one at a time to repeated calls to CALLBACK.
+        OBJECT can be a string, a Blatte::HTML::Element object, or a
+        Blatte list (Perl ARRAY ref) containing any combination of
+        strings, Blatte::HTML::Elements, and Blatte lists.
+
+BLATTE FUNCTIONS
+    This module defines a Blatte function for every HTML element
+    defined in the HTML 4.01 specification
+    (http://www.w3.org/TR/html401):
+
+        a abbr acronym address applet area b base basefont bdo big
+        blockquote body br button caption center cite code col colgroup dd
+        del dfn dir div dl dt em fieldset font form frame frameset h1 h2
+        h3 h4 h5 h6 head hr html i iframe img input ins isindex kbd label
+        legend li link map menu meta noframes noscript object ol optgroup
+        option p param pre q s samp script select small span strike strong
+        style sub sup table tbody td textarea tfoot th thead title tr tt u
+        ul var
+
+    Tag names are case-sensitive.
+
+    HTML attributes are specified using Blatte named parameters,
+    like so:
+
+      {\td \colspan=2 ...}
+
+    Boolean attributes, such as the `ismap' in
+
+      <img src="..." ismap>
+
+    are specified using the special Blatte values \html_bool_yes and
+    \html_bool_no. For instance, this:
+
+      {\img \src=... \ismap=\html_bool_yes}
+
+    yields this:
+
+      <img src="..." ismap>
+
+    while this:
+
+      {\img \src=... \ismap=\html_bool_no}
+
+    yields this:
+
+      <img src="...">
+
+AUTHOR
+    Bob Glickstein <bobg@zanshin.com>.
+
+    Visit the Blatte website, <http://www.blatte.org/>. (It's
+    written using Blatte::HTML!)
+
+LICENSE
+    Copyright 2001 Bob Glickstein. All rights reserved.
+
+    Blatte::HTML is distributed under the terms of the GNU General
+    Public License, version 2. See the file LICENSE that accompanies
+    the Blatte::HTML distribution.
+
+SEE ALSO
+    the blatte-html(1) manpage, the Blatte(3) manpage, the
+    Blatte::Builtins(3) manpage.

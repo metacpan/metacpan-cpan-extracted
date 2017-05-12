@@ -1,0 +1,122 @@
+
+=head1 NAME
+
+Box2D::b2PulleyJoint - Connects two bodies and two ground points.
+
+=head1 SYNOPSIS
+
+  my $joint = $world->CreateJoint( $joint_def );
+  my $ratio = $joint->GetRatio();
+
+=head1 DESCRIPTION
+
+The pulley joint is connected to two bodies and two fixed ground
+points. The pulley supports a ratio such that:
+S<length1 + ratio * length2 <= constant>
+
+Yes, the force transmitted is scaled by the ratio.
+The pulley also enforces a maximum length limit on both sides. This is
+useful to prevent one side of the pulley hitting the top.
+
+=head1 METHODS
+
+=head2 GetAnchorA()
+
+Get the anchor point on bodyA in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetAnchorB()
+
+Get the anchor point on bodyB in world coordinates. Implements
+C<Box2D::b2Joint>.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetGroundAnchorA()
+
+Get the first ground anchor.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetGroundAnchorB()
+
+Get the second ground anchor.
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetLength1()
+
+Get the current length of the segment attached to body1.
+
+Returns a C<float32>
+
+=head2 GetLength2()
+
+Get the current length of the segment attached to body2.
+
+Returns a C<float32>
+
+=head2 GetRatio()
+
+Get the pulley ratio.
+
+Returns a C<float32>
+
+=head2 GetReactionForce( $inv_dt )
+
+Get the reaction force on body2 at the joint anchor in Newtons.
+Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 GetReactionTorque( $inv_dt )
+
+Get the reaction torque on body2 in N*m. Implements C<Box2D::b2Joint>.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$inv_dt>
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2PulleyJointDef>
+
+=item * L<Box2D::b2Joint>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

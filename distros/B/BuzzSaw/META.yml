@@ -1,0 +1,113 @@
+---
+name: BuzzSaw
+version: v0.12.0
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Tools for parsing and filtering log files
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  File::Find::Rule: 0
+  Test::More: 0.87
+requires:
+  DBD::Pg: 0
+  DBIx::Class: 0.08196
+  Date::Parse: 0
+  DateTime: 0
+  DateTime::Format::Pg: 0
+  Digest::SHA: 0
+  File::Find::Rule: 0
+  File::LibMagic: 0
+  IO::Uncompress::Bunzip2: 2.020
+  IO::Uncompress::Gunzip: 2.020
+  Log::Log4perl: 0
+  MIME::Lite: 0
+  Moose: 0.57
+  MooseX::App::Cmd: 0
+  MooseX::Getopt: 0
+  MooseX::Log::Log4perl: 0
+  MooseX::SimpleConfig: 0
+  MooseX::Types: 0.21
+  MooseX::Types::EmailAddress: 0
+  Readonly: 0
+  Template: 0
+  Text::Diff: 0
+  UNIVERSAL::require: 0
+  YAML::Syck: 0
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  App::BuzzSaw:
+    file: lib/App/BuzzSaw.pm
+    version: v0.12.0
+  BuzzSaw::Cmd:
+    file: lib/BuzzSaw/Cmd.pm
+    version: v0.12.0
+  BuzzSaw::Cmd::Import:
+    file: lib/BuzzSaw/Cmd/Import.pm
+    version: v0.12.0
+  BuzzSaw::DB:
+    file: lib/BuzzSaw/DB.pm
+    version: v0.12.0
+  BuzzSaw::DB::Schema:
+    file: lib/BuzzSaw/DB/Schema.pm
+    version: v0.12.0
+  BuzzSaw::DB::Schema::Result::CurrentProcessing:
+    file: lib/BuzzSaw/DB/Schema/Result/CurrentProcessing.pm
+    version: v0.12.0
+  BuzzSaw::DB::Schema::Result::Event:
+    file: lib/BuzzSaw/DB/Schema/Result/Event.pm
+    version: v0.12.0
+  BuzzSaw::DB::Schema::Result::Log:
+    file: lib/BuzzSaw/DB/Schema/Result/Log.pm
+    version: v0.12.0
+  BuzzSaw::DB::Schema::Result::Tag:
+    file: lib/BuzzSaw/DB/Schema/Result/Tag.pm
+  BuzzSaw::DataSource:
+    file: lib/BuzzSaw/DataSource.pm
+    version: v0.12.0
+  BuzzSaw::DataSource::Files:
+    file: lib/BuzzSaw/DataSource/Files.pm
+    version: v0.12.0
+  BuzzSaw::DateTime:
+    file: lib/BuzzSaw/DateTime.pm
+    version: v0.12.0
+  BuzzSaw::Filter:
+    file: lib/BuzzSaw/Filter.pm
+    version: v0.12.0
+  BuzzSaw::Filter::Kernel:
+    file: lib/BuzzSaw/Filter/Kernel.pm
+    version: v0.12.0
+  BuzzSaw::Filter::Sleep:
+    file: lib/BuzzSaw/Filter/Sleep.pm
+    version: v0.12.0
+  BuzzSaw::Importer:
+    file: lib/BuzzSaw/Importer.pm
+    version: v0.12.0
+  BuzzSaw::Parser:
+    file: lib/BuzzSaw/Parser.pm
+    version: v0.12.0
+  BuzzSaw::Parser::RFC3339:
+    file: lib/BuzzSaw/Parser/RFC3339.pm
+    version: v0.12.0
+  BuzzSaw::Report:
+    file: lib/BuzzSaw/Report.pm
+    version: v0.12.0
+  BuzzSaw::Report::Kernel:
+    file: lib/BuzzSaw/Report/Kernel.pm
+    version: v0.12.0
+  BuzzSaw::Report::Sleep:
+    file: lib/BuzzSaw/Report/Sleep.pm
+    version: v0.12.0
+  BuzzSaw::Reporter:
+    file: lib/BuzzSaw/Reporter.pm
+    version: v0.12.0
+  BuzzSaw::Types:
+    file: lib/BuzzSaw/Types.pm
+    version: v0.12.0
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

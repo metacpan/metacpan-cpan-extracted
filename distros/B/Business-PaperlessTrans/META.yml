@@ -1,0 +1,137 @@
+---
+abstract: 'PaperlessTrans Client object'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  Test::Method: 0
+  Test::Moose: 0
+  Test::More: 0.88
+  Test::Requires::Env: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-PaperlessTrans
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  Business::PaperlessTrans::Client:
+    file: lib/Business/PaperlessTrans/Client.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request:
+    file: lib/Business/PaperlessTrans/Request.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::AuthorizeCard:
+    file: lib/Business/PaperlessTrans/Request/AuthorizeCard.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::ProcessACH:
+    file: lib/Business/PaperlessTrans/Request/ProcessACH.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::ProcessCard:
+    file: lib/Business/PaperlessTrans/Request/ProcessCard.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::Role::Authorization:
+    file: lib/Business/PaperlessTrans/Request/Role/Authorization.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::Role::Money:
+    file: lib/Business/PaperlessTrans/Request/Role/Money.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::Role::Profile:
+    file: lib/Business/PaperlessTrans/Request/Role/Profile.pm
+    version: 0.002000
+  Business::PaperlessTrans::Request::TestConnection:
+    file: lib/Business/PaperlessTrans/Request/TestConnection.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::Address:
+    file: lib/Business/PaperlessTrans/RequestPart/Address.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::Card:
+    file: lib/Business/PaperlessTrans/RequestPart/Card.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::Check:
+    file: lib/Business/PaperlessTrans/RequestPart/Check.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::CustomFields:
+    file: lib/Business/PaperlessTrans/RequestPart/CustomFields.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::Identification:
+    file: lib/Business/PaperlessTrans/RequestPart/Identification.pm
+    version: 0.002000
+  Business::PaperlessTrans::RequestPart::Phone:
+    file: lib/Business/PaperlessTrans/RequestPart/Phone.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response:
+    file: lib/Business/PaperlessTrans/Response.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::AuthorizeCard:
+    file: lib/Business/PaperlessTrans/Response/AuthorizeCard.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::ProcessACH:
+    file: lib/Business/PaperlessTrans/Response/ProcessACH.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::ProcessCard:
+    file: lib/Business/PaperlessTrans/Response/ProcessCard.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::Role::Authorization:
+    file: lib/Business/PaperlessTrans/Response/Role/Authorization.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::Role::IsApproved:
+    file: lib/Business/PaperlessTrans/Response/Role/IsApproved.pm
+    version: 0.002000
+  Business::PaperlessTrans::Response::TestConnection:
+    file: lib/Business/PaperlessTrans/Response/TestConnection.pm
+    version: 0.002000
+  Business::PaperlessTrans::Role::Address:
+    file: lib/Business/PaperlessTrans/Role/Address.pm
+    version: 0.002000
+  Business::PaperlessTrans::Role::EmailAddress:
+    file: lib/Business/PaperlessTrans/Role/EmailAddress.pm
+    version: 0.002000
+  Business::PaperlessTrans::Role::Identification:
+    file: lib/Business/PaperlessTrans/Role/Identification.pm
+    version: 0.002000
+  Business::PaperlessTrans::Role::NameOnAccount:
+    file: lib/Business/PaperlessTrans/Role/NameOnAccount.pm
+    version: 0.002000
+  Business::PaperlessTrans::Role::State:
+    file: lib/Business/PaperlessTrans/Role/State.pm
+    version: 0.002000
+requires:
+  Carp: 0
+  Class::Load: 0.20
+  Data::Printer: 0
+  File::ShareDir::ProjectDistDir: v0.4.0
+  LWP::Protocol::https: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::RemoteHelper: 0
+  MooseX::RemoteHelper::CompositeSerialization: 0
+  MooseX::RemoteHelper::Types: 0
+  MooseX::Types::Common::Numeric: 0.001003
+  MooseX::Types::Common::String: 0
+  MooseX::Types::CreditCard: 0.002
+  MooseX::Types::DateTime: 0
+  MooseX::Types::Email: 0
+  MooseX::Types::Locale::Currency: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::UUID: 0
+  MooseY::RemoteHelper::MessagePart: 0
+  MooseY::RemoteHelper::Role::Client: 0
+  XML::Compile::SOAP11: 0
+  XML::Compile::Transport::SOAPHTTP: 0
+  XML::Compile::WSDL11: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/xenoterracide/business-paperlesstrans/issues
+  homepage: https://metacpan.org/release/Business-PaperlessTrans
+  repository: git://github.com/xenoterracide/business-paperlesstrans.git
+version: 0.002000

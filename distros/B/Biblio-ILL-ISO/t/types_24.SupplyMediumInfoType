@@ -1,0 +1,17 @@
+$VAR1 = bless( {
+                 'medium-characteristics' => bless( {
+                                                      'generalstring' => 'legal-size paper'
+                                                    }, 'Biblio::ILL::ISO::ILLString' ),
+                 'supply-medium-type' => bless( {
+                                                  'ENUMERATED' => 2,
+                                                  'ENUM_LIST' => {
+                                                                   'machine-readable' => 6,
+                                                                   'photocopy' => 2,
+                                                                   'printed' => 1,
+                                                                   'audio-recording' => 5,
+                                                                   'microform' => 3,
+                                                                   'film-or-video-recording' => 4,
+                                                                   'other' => 7
+                                                                 }
+                                                }, 'Biblio::ILL::ISO::SupplyMediumType' )
+               }, 'Biblio::ILL::ISO::SupplyMediumInfoType' );

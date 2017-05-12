@@ -1,0 +1,10 @@
+Revision history for Bot-Cobalt-Plugin-SeenURL
+ 
+0.003     2014-05-29 12:58:34-05:00 America/Chicago
+    - Fixed bug in allow_relink
+
+0.002     2014-05-25 21:25:36-05:00 America/Chicago
+    - Added support for multiple channels.
+
+0.001     2014-05-24 21:25:36-05:00 America/Chicago
+    - Initial revision.

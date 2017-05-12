@@ -1,0 +1,171 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Bot::ChatBots::MojoPlugin - Mojolicious Plugin base for Bot::ChatBots
+
+=head1 VERSION
+
+This document describes Bot::ChatBots::MojoPlugin version {{[ version ]}}.
+
+=head1 SYNOPSIS
+
+   package Bot::ChatBots::Whatever;
+   use Mojo::Base 'Bot::ChatBots::MojoPlugin';
+   1;
+
+   # in your Mojoliocious app
+   use Mojolicious::Lite;
+   plugin 'Bot::ChatBots::Whatever' => instances => [ ... ];
+   app->start;
+
+=head1 DESCRIPTION
+
+This module allows you to create L<Bot::ChatBots> adapter plugins for
+L<Mojolicious>. In particular, it provides a L</register> method that is
+called by L<Mojolicious> when you load this module as a plugin, taking
+care to initialize what has to be initialized and set a helper in the
+L<Mojolicious> app.
+
+The basic model is that with a single plugin you can manage a multitude of
+different chatbot L</instances>. This might not be really needed in the
+general case, as your program will probably serve one single chatbot at
+a time, but it's handy to have around.
+
+This module is supposed to be used as a base class for your Mojolicious
+plugin, like this:
+
+   package Bot::ChatBots::Whatever;
+   use Mojo::Base 'Bot::ChatBots::MojoPlugin';
+   1;
+
+This will provide you with:
+
+=over
+
+=item *
+
+automatic registration of the plugin via L</register>. This takes care to
+parse the input parameters and create instances accordingly;
+
+=item *
+
+automatically set the name of the helper in L<Mojolicious>' app based on
+the package name (see L</helper_name>);
+
+=item *
+
+provide means to add new instances (L</add_instance>) and retrieve them
+(L</instances>).
+
+=back
+
+
+=head1 METHODS
+
+=head2 B<< add_instance >>
+
+   $obj->add_instance($module, %args); # OR 
+   $obj->add_instance($module, \%args);
+
+Add a new instance (creating it).
+
+The first argument C<$module> is used (via
+L<Bot::ChatBots::Utils/load_module>) to load a class and call its C<new>
+method with the provided C<%args>. The I<prefix> that is used for this
+loading is the same as C<ref $obj>, so if your package name is
+C<Bot::ChatBots::Whatever>, this is what will be used.
+
+While creating the instance, the C<%args> hash is extended with an
+additional pair with key C<app> and value to whatever L</app> provides
+back. This allows the instance to be able and refer back to the
+application object should this be needed (beware that this can create
+loops of references). This overrides any previously present value for
+C<app>, sorry.
+
+=head2 B<< app >>
+
+   my $app = $obj->app;
+   $self->app($new_app_object);
+
+Accessor for the application object. It is initialized by L</register>.
+
+=head2 B<< helper_name >>
+
+   my $name = $obj->helper_name;
+
+Get the default name for the helper set by L</register>. This name is
+built by taking the last part of the package name (e.g. C<Whatever> in
+package name C<Bot::ChatBots::Whatever>), lowercasing it and pre-pending
+C<chatbots.> (in the example, the result would be C<chatbots.whatever>).
+You can override this in your derived class.
+
+This method can also be called as a class method, e.g.:
+
+   my $name = Bot::ChatBots::Whatever->helper_name;
+
+=head2 B<< register >>
+
+   $obj->register($app, $conf);
+
+L<Mojolicious::Plugin> method for registering the plugin.
+
+The registration process adds a helper function based on C<<
+$conf->{helper_name} >> (if present) or L</helper_name>. For example, if
+the helper name is C<chatbots.whatever>, the helper can be accessed by the
+application like this:
+
+   my $obj = app->chatbots->whatever;
+
+This will allow you to call the other methods explained in this documentation.
+
+Argument C<$conf> is a hash reference supporting the following keys:
+
+=over
+
+=item C<helper_name>
+
+to set the helper name, should you not like what L</helper_name> gives
+back by default;
+
+=item C<instances>
+
+an array reference containing definitions of instances, each represented
+as another array reference that is expanded to the arguments list for
+L</add_instance>.
+
+=back
+
+=head2 B<< instances >>
+
+   my $aref = $obj->instances;
+   $obj->instances($array_ref);
+
+Accessor for defined instances, stored in an array reference.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Bot::ChatBots>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

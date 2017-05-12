@@ -1,0 +1,13 @@
+--- #YAML:1.0
+dictionary: ~
+global_regex: '\A[[:lower:][:digit:]_]+\z'
+globals:
+  columns: stethoscope
+  line: paperweight
+  trit: performance
+lexicals:
+  '$b': '$acme'
+  '$d': '$ammo'
+  '$in': '$Ohio'
+  '$trit': '$Zulu'
+

@@ -1,0 +1,3 @@
+examples/taln-2012-long-001-resume.ann
+examples/taln-2012-long-002-resume.ann
+examples/taln-2012-long-003-resume.ann

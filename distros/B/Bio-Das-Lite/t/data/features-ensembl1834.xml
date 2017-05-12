@@ -1,0 +1,17 @@
+<?xml version='1.0' standalone='no' ?>
+<!DOCTYPE DASGFF SYSTEM 'dasgff.dtd' >
+<DASGFF>
+  <GFF version="1.0" href="http://servlet.sanger.ac.uk:8080/das/ensembl1834/features?segment=10:1,1000">
+    <SEGMENT id="10" version="18" start="1" stop="1000">
+      <FEATURE id="10/p15.3" label="gneg">
+        <TYPE id="karyotype">karyotype</TYPE>
+        <METHOD id="ensembl">ensembl</METHOD>
+        <START>0</START>
+        <END>3000000</END>
+        <SCORE>-</SCORE>
+        <ORIENTATION>0</ORIENTATION>
+        <PHASE>-</PHASE>
+      </FEATURE>
+    </SEGMENT>
+  </GFF>
+</DASGFF>

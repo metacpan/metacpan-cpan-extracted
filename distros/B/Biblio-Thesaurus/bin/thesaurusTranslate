@@ -1,0 +1,132 @@
+#!/usr/bin/perl -w -s
+
+use strict;
+use Biblio::Thesaurus;
+
+our ($comment,$dic);
+
+my %AuxDic=();
+
+if ($dic){
+ open(F,"$dic") or die("cant open auxiliar dictionary\n");
+ while(<F>){ 
+   chomp;
+   if (/^%\s*enc(oding)?\s+(\S+)/) { binmode(F,"$2:"); next }
+   if(/(.*?)\s*:\s*([^:\n]*)/){$AuxDic{lc($1)}=$2 }
+ }
+ close F;
+
+}
+
+my $thesaurus = shift or die_usage();
+my $langorig  = shift or die_usage();
+my $langdest  = shift or die_usage();
+
+my $the = thesaurusLoad($thesaurus);
+binmode(STDOUT,"$the->{encoding}:") if defined $the->{encoding};
+$langorig = $the->{baselang}        if $langorig eq "-";
+
+my $m=$the->meta2str();
+$m =~ s/(\%baselang(?:uage)?\s+)([-\w:]+)/$1$langdest/;
+print $m;
+
+our $termBody = "";
+
+$the->downtr( {
+	       -order    => [qw/PT FR SP ES EN DE BT NT RT MT UF USE SN/],
+	       -default  => sub {
+		 if ($the->{languages}{$rel}) {   ### Is a language
+		   if ($rel eq "$langdest") {
+		     # $termBody .= "$langorig $term\n"
+		     ""
+		   } else {
+		     $termBody .= "$rel ".join(", ",@terms)."\n"
+		   }
+		 } else {
+		   if ($the->{externals}{$rel}) { ### Is external
+		     $termBody .= join("", map { "$rel $_\n" } @terms);
+		     # $termBody .= "$rel $term\n"
+		   } else {
+		     if ($comment) {
+		       $termBody .= join("", map {
+			 my $trans = $the->_translateTerm($_,$langdest,\%AuxDic);
+			 my $t;
+			 if ($t = missing_translation($trans)) {
+			   "# $rel $t\n";
+			 } else {
+			   "$rel $trans\n";
+			 }
+		       } @terms);
+		       } else {
+			 $termBody .= join("", map {"$rel ".$the->_translateTerm($_,$langdest,\%AuxDic)."\n"} @terms);
+		       }
+
+		   }
+		 }
+	       },
+	       -eachTerm => sub {
+		 my $tterm = $the->_translateTerm($term,$langdest,\%AuxDic);
+		 if ($comment) {
+		   my $t;
+		   if ($t = missing_translation($tterm)) {
+		     print "\n# $t\n$langorig $term\n$termBody";
+		   } else {
+		     print "\n$tterm\n$langorig $term\n$termBody";
+		   }
+		 } else {
+		   print "\n$tterm\n$langorig $term\n$termBody";
+		 }
+		 $termBody = "";
+	       },
+	      });
+
+
+
+sub die_usage {
+  die "Usage: $0 [options] <thesaurus> <lang-source> <lang-target>
+  Options: -comments          # missing translations become comments
+           -dic=auxiliardic   # use an auxiliar dicionary\n";
+}
+
+sub missing_translation {
+  my $t = shift;
+  if ($t =~ m!^\[[A-Z]+-[A-Z]+:(.*)\]$!) {
+    return $1
+  } else {
+    return undef;
+  }
+}
+
+__END__
+
+=head1 NAME
+
+thesaurusTranslate - Change baselanguage of a thesaurus ISO...
+
+=head1 SYNOPSIS
+
+ thesaurusTranslate [ops] thesaurus sourceLang targetLang > f.the
+ ops:
+   -comments          # missing translations become comments
+   -dic=auxiliardic   # use an auxiliar dicionary
+
+=head1 DESCRIPTION
+
+
+
+
+=head2 EXPORT
+
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+Biblio::Thesaurus
+
+=cut      
+

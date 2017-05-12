@@ -1,0 +1,80 @@
+﻿h1 {color:#ffb205; font-size:1.6em; font-weight: normal;}
+h1 span {color:#000; font-size:0.7em; margin-left:30px;}
+h2 {font-size:1.1em; font-weight:bold;display:inline; float:left; margin:0; padding:0; }
+h2.first {margin-top:0; }
+
+.clear {clear:both;}
+
+#outer {width:926px; font-family:Arial, Helvetica, sans-serif; font-size:62.5%; color:#999; text-align:left; }
+#main {background:#ebebeb; color:#000; line-height:1.4em;  width:926px; padding:7px 7px 7px 27px; clear:both; font-size:1.2em; overflow:hidden;}
+img {border:none;}
+
+#toplinks {width:926px; }
+#toplinks .help {float:right;}
+#titlearea {padding:20px 0px 10px 20px; overflow:hidden;float:left; width:879px; color:#000; clear:both; font-size:1.1em; }
+#titlearea p.left {float:left; width:477px;}
+#titlearea p.right {float:right; width:363px; background:url(../Images/titlerightbg.gif) no-repeat; padding-left:20px; min-height:45px;  line-height:1.6em;}
+#titlearea p.right span.tel {font-weight:bold; font-size:1.6em;}
+#titlearea p.right span.sub {font-size:0.8em; color:#000;}
+
+#maincontent {background:url(../Images/secure-body.gif) repeat-y; float:left; width:845px; padding:10px 27px; margin:0 auto; overflow:hidden;  }
+#maincontentbottom {background:url(../Images/reg-body-bottom.gif) no-repeat; clear:both; height:4px;}
+
+.fields {clear:both; float:left; margin-bottom:20px; width:400px; margin-top:10px; }
+label {width:174px; float:left; }
+input {margin-top:2px;  border:1px solid #9fa0a5; color:#7b7b7b; }
+input.text {width:187px;}
+input.zip {width:72px; }
+select {margin-top:2px; border:1px solid #9fa0a5; color:#7b7b7b; height:18px;}
+
+a.question {background:url(../Images/question.gif) no-repeat left middle; float:right; margin-left:10px; margin:3px 0 0 40px;  color:#fa0000; font-weight:normal; text-decoration:none;}
+a.question:hover {text-decoration:none;}
+
+#footer {border:1px solid #ccc; width:953px; margin:0px 3px; background:#fff; clear:both;}
+#footer .foothead {background:url(../Images/footheadbg.gif) repeat-x; font-weight:bold; color:#646464; line-height:25px; padding-left:19px;}
+
+a {text-decoration:none;}
+a:hover {text-decoration:underline;}
+a.logo {display:block; height:60px; margin-left:40px; float:left;}
+* html a.logo {margin-left:20px;}
+
+p {margin:5px 0;}
+
+div.button {clear:both; text-align:right;  margin-right:10px; color:#000; margin-right:37px;}
+.button input { background-color: #FFAF00; border-radius: 5px; color:#000; padding:10px; }
+.button input:hover { background-color: #FFC855; }
+
+div.paymentbutton { clear: both; text-align:right; margin-right:10px; color:#FFF; margin-right:37px;}
+.paymentbutton input { background-color: #009900; border-radius: 5px; color:#FFF; padding:10px; }
+.paymentbutton input:hover { background-color: #00D700; }
+
+.transactioncard {float:left; width:393px; background:#f3f3f3; padding:5px 5px 20px 5px; overflow:hidden;}
+.transactioncard .header { width:380px; margin-top:5px; clear:both; font-weight: bold;}
+*:first-child+html .transactioncard .header {margin-top:10px;} * html .transactioncard .header {margin-top:10px;}
+.transactioncard .fields {background:#fafafa; margin:1px 0px; width:380px; padding:4px 5px; line-height:20px; }
+.transactioncard .fields label {padding-top:3px; width:150px;}
+.transactioncard .fields input {width:220px; height:20px; color:#000000; }
+.transactioncard .fields select {width:60px; margin-right:2px; height:20px; color:#000000;}
+.transactioncard .fields .price {font-size:1.4em;}
+
+.transactioncustomer {float:left; width:393px; background:#f3f3f3; padding:5px 5px 20px 5px; overflow:hidden;}
+.transactioncustomer .header { width:380px; margin-top:5px; clear:both; font-weight: bold; }
+*:first-child+html .transactioncustomer .header {margin-top:10px;} * html .transactioncustomer .header {margin-top:10px;}
+.transactioncustomer .fields {background:#fafafa; margin:1px 0px; width:380px; padding:4px 5px; line-height:20px; }
+.transactioncustomer .fields label {padding-top:3px; width:150px;}
+.transactioncustomer .fields input {width:220px; height:20px; color:#000000; }
+.transactioncustomer .fields select {width:85px; margin-right:2px; height:20px; color:#000000;}
+.transactioncustomer .fields .price {font-size:1.4em;}
+
+.response {float:left; width:835px; background:#f3f3f3; padding:5px 5px 20px 5px; overflow:hidden;}
+.response .fields {background:#fafafa; margin:1px 0px; width:824px; padding:4px 5px; line-height:20px; }
+.response .fields label {padding-top:3px; width:150px;}
+.response .fields input {width:220px; height:20px; color:#000000; }
+.response .fields select {width:85px; margin-right:2px; height:20px; color:#000000;}
+.response .fields .price {font-size:1.4em;}
+
+
+div#errors { border: 1px solid red; display: none; background: url(../Images/cross.gif) no-repeat 2px 12px; }
+div#errors h4 { color:Red; padding-left: 32px;  }
+div#errors Li { margin-left: 16px; }
+input[type="image"] { border: 0px;}

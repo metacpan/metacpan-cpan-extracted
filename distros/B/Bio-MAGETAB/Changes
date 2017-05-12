@@ -1,0 +1,119 @@
+Changelog for Bio::MAGETAB
+--------------------------
+
+1.31    Bio::MAGETAB-1.31.tar.gz        Replacing the old DateTime::Format::DateManip module
+                                          with DateTime::Format::Flexible, which appears to be
+                                          maintained more responsively.
+
+1.30    Bio::MAGETAB-1.30.tar.gz        Fix for FactorValue and Characteristics Measurement bug
+                                          (https://rt.cpan.org/Public/Bug/Display.html?id=94398).
+
+1.28    Bio::MAGETAB-1.28.tar.gz        Minor bug fixes for assorted test case failures;
+                                          no substantive changes in code behaviour.
+
+1.27    Bio::MAGETAB-1.27.tar.gz        Change to the default v1.1 SDRF export such that all
+                                          assays are represented by "Assay Name" columns, and
+                                          all Assay and Hybridization Name columns will include
+                                          Technology Type. The v1.0 export remains unchanged.
+                                        Added the EFO term "array assay" to the Technology Type
+                                          terms recognised as being attached to hybridisations.
+
+1.26    Bio::MAGETAB-1.26.tar.gz        Re-release incorporating Module::Install 1.06 to fix a
+                                          known bug when installing using perl 5.16. No other
+                                          code changes.
+
+1.25    Bio::MAGETAB-1.25.tar.gz        Fixing SDRF parser to correctly recognise Array Design
+                                          columns associated with Assay Name.
+
+1.24    Bio::MAGETAB-1.24.tar.gz        Making the parsed MAGE-TAB document version attribute
+                                          accessible from in the Reader classes.
+
+1.23    Bio::MAGETAB-1.23.tar.gz        Several important bug fixes provided by Anna Farne.
+
+1.22    Bio::MAGETAB-1.22.tar.gz        Another attempt to solve the error reporting problem,
+                                          newly reintroduced by the loss of previously-documented
+                                          functions from Parse::RecDescent (see below). Improved
+                                          error message formatting.
+
+1.21    Bio::MAGETAB-1.21.tar.gz        Fixed redirection of Parse::RecDescent error reporting to
+                                          use the now-documented mechanisms for doing so.
+
+1.20    Bio::MAGETAB-1.20.tar.gz        Added the option to link from ParameterValue to
+                                          ControlledTerm as per June 2009 v1.1 MAGE-TAB
+                                          specification.
+                                        Default search path for SDRF/ADF/DataMatrix switched
+                                          from current working directory to IDF directory.
+                                        Tests added for Bio::MAGETAB::Util::Reader class.
+                                        Possible fix for URI test errors when running on MSWin32.
+
+1.13    Bio::MAGETAB-1.13.tar.gz        Fixed minor FileHandle type coercion bug which led to an
+                                          unsightly verbose warning in Moose::Meta::Attribute.
+
+1.12    Bio::MAGETAB-1.12.tar.gz        Migrated from the deprecated Moose::Policy module to using
+                                          MooseX::FollowPBP.
+
+1.11    Bio::MAGETAB-1.11.tar.gz        Minor fixes to IDF and SDRF export to comply with a stricter
+                                          interpretation of the MAGE-TAB specification.
+
+1.10    Bio::MAGETAB-1.10.tar.gz        Added export_version attribute to the Writer classes to
+                                          support export of either MAGE-TAB v1.0 or MAGE-TAB v1.1.
+                                        Corrected the behaviour of the ADF Writer class when
+                                          exporting [mapping] sections.
+
+1.00    Bio::MAGETAB-1.00.tar.gz        Bug fix for export of IDF containing no multi-value
+                                          fields. Minor POD fixes.
+
+0.99    Bio::MAGETAB-0.99.tar.gz        Added support for IDF "MAGE-TAB Version" tag. Now
+                                          compliant with the second draft of the MAGE-TAB
+                                          v1.1 specification document.
+
+0.98	Bio::MAGETAB-0.98.tar.gz        Minor fixes to enable Bio::MAGETAB::Types to work
+                                          with the most recent Moose and MooseX::Types modules.
+
+0.97    Bio::MAGETAB-0.97.tar.gz        Merged magetab and magetab-util packages together for
+                                          convenience (see below for old Bio::MAGETAB::Util
+                                          changelog).
+                                        Minor bug fixes.
+                                        New class to automate fixes to ArrayExpress MAGE-TAB
+                                          documents.
+
+0.96    Bio::MAGETAB-0.96.tar.gz        Made LabeledExtract->label attribute optional. This
+                                          better agrees with the MAGE-TAB specification, even
+                                          if it doesn't make much sense in reality. This
+                                          change makes SDRF parsing slightly simpler.
+
+0.95    Bio::MAGETAB-0.95.tar.gz        Added BaseClass to the MagicDraw UML model document.
+                                        Renamed Feature blockColumn and column attributes
+                                          to blockCol and col respectively; this avoids
+                                          naming conflicts in some ORM implementations.
+                                        Renamed all "type" attributes, similarly to
+                                          avoid conflicts.
+                                        Converted Source providers and ProtocolApplication
+                                          performers to fully-fledged Contact objects.
+                                        Relaxed requirement for measurement on ParameterValue.
+                                        Added POD coverage tests.
+
+0.91    Bio::MAGETAB-0.91.tar.gz        Added class documentation (POD).
+
+0.9	Bio::MAGETAB-0.9.tar.gz	        Initial public release; API almost finalised.
+
+
+
+
+
+
+Changelog for Bio::MAGETAB::Util, prior to merging with Bio::MAGETAB
+--------------------------------------------------------------------
+
+0.4     Bio-MAGETAB-Util-0.4.tar.gz           Added ADF, IDF and SDRF export
+                                                  functions.
+                                                Improved GraphViz visualisation API.
+                                                Minor parser bug fixes.
+
+0.31    Bio-MAGETAB-Util-0.31.tar.gz          Various bug fixes based on tests
+                                                  with real-world IDFs and SDRFs.
+                                                Improved object identity heuristics.
+                                                Full MySQL database schema and
+                                                  unloader script.
+
+0.3	Bio-MAGETAB-Util-0.3.tar.gz	        Initial public release

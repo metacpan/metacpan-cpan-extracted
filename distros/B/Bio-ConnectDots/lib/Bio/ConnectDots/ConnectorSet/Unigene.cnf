@@ -1,0 +1,23 @@
+# example cnf file for Unigene
+
+name=Unigene
+module=Unigene
+version=20041102
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.ncbi.nih.gov/repository/UniGene/
+ftp_files=Hs.data.gz Mm.data.gz Rn.data.gz
+
+label=LocusLink, dotset=LocusLink_ID
+label=UniGene, dotset=UniGene_ID
+label=Organism, dotset=Organism
+label=Gene_Name, dotset=Gene_Name
+label=Gene_Symbol, dotset=Gene_Name
+label=STS, dotset=Marker
+label=Chromosome, dotset=Gene_Location
+label=Sequence_Accession, dotset=Sequence_Accession
+label=Clone, dotset=Clone_ID
+label=LID, dotset=CDNA_ID
+label=MGC, dotset=Clone_ID

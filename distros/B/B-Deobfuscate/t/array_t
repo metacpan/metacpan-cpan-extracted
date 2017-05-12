@@ -1,0 +1,7 @@
+my @padav;
+\@padav;
+$padav[0];
+$padav[rand()];
+@padav[0,1];
+@gvav;
+

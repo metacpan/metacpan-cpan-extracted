@@ -1,0 +1,8 @@
+</div>
+[% IF pager %]
+<div class="footer">
+[% INCLUDE pager %]
+</div>
+[% END %]
+</body>
+</html>

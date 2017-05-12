@@ -1,0 +1,10 @@
+Revision history for Business-PinPayment
+
+0.04    03/03/2014
+        Use Net::SSL to get around an SSL issue.
+0.03    02/11/2013
+        Updated Test and POD.
+0.02    01/11/2013
+        Better handle missing secret API key.
+0.01    30/10/2013
+        First version, released on an unsuspecting world.

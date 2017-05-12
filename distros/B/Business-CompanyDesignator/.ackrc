@@ -1,0 +1,5 @@
+--ignore-dir=data
+--ignore-dir=inc
+--ignore-dir=log
+--ignore-dir=services
+--ignore-dir=var

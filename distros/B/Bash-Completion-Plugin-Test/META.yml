@@ -1,0 +1,25 @@
+---
+abstract: 'Module for testing Bash::Completion plugins'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::Tester: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bash-Completion-Plugin-Test
+requires:
+  Bash::Completion: 0
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/bash-completion-plugin-test/issues
+  homepage: https://github.com/hoelzro/bash-completion-plugin-test
+  repository: https://github.com/hoelzro/bash-completion-plugin-test.git
+version: 0.01

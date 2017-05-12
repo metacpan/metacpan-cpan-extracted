@@ -1,0 +1,31 @@
+--- IPN.pm-1.7	Mon Mar  3 18:50:39 2003
++++ IPN.pm-1.7-brian	Tue Mar  4 02:27:13 2003
+@@ -63,8 +63,8 @@
+   $self->_init()          or return undef;
+   $self->_validate_txn()  or return undef;
+ 
+-  unless ( $self->{notify_version} eq $SUPPORTEDV ) {
+-    croak "This library supports $SUPPORTEDV of PayPal IPN. Required support is $self->{notify_version}";
++  unless ( $self->{_PAYPAL_VARS}{notify_version} eq $SUPPORTEDV ) {
++    croak "This library supports $SUPPORTEDV of PayPal IPN. Required support is $self->{_PAYPAL_VARS}{notify_version}";
+   }
+   return $self;
+ }
+@@ -202,7 +202,7 @@
+ # The same as payment_status(), but shorter :-).
+ sub status {
+   my $self = shift;
+-  return $self->{payment_status};
++  return $self->{_PAYPAL_VARS}{payment_status};
+ }
+ 
+ 
+@@ -226,7 +226,7 @@
+   my $self = shift;
+ 
+   if ( $self->status() eq 'Pending' ) {
+-    return $self->{pending_reason};
++    return $self->{_PAYPAL_VARS}{pending_reason};
+   }
+   return undef;
+ }

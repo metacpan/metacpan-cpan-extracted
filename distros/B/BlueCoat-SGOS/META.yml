@@ -1,0 +1,28 @@
+---
+abstract: 'A module to interact with Blue Coat SGOS-based devices.'
+author:
+  - 'Matthew Lange <mmlange@cpan.org>'
+build_requires:
+  TAP::Harness: 3.18
+  Test::NoWarnings: 1.04
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: BlueCoat-SGOS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Date::Parse: 0
+  HTTP::Request: 6.00
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 6.00
+  Test::More: 0
+  perl: 5.006000
+version: 1.05

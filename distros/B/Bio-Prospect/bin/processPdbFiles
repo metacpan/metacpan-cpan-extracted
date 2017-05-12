@@ -1,0 +1,107 @@
+#! /usr/bin/env perl
+
+#-------------------------------------------------------------------------------
+# NAME: processPdbFiles
+# PURPOSE: script to processing pdb files so that they can be used with
+#          prospect output for building threading-aligned models.  need to
+#          add header and footers to the output from convertProspect since
+#          it only contains the ATOM records.
+# USAGE: processPdbFiles [list of template ids]
+#
+# $Id: processPdbFiles,v 1.10 2003/11/18 19:45:46 rkh Exp $
+#-------------------------------------------------------------------------------
+
+use Bio::Prospect::Options;
+use Bio::Prospect::LocalClient;
+use Bio::Prospect::Thread;
+use Bio::Prospect::Init;
+use File::Temp;
+use XML::Simple;
+use warnings;
+use strict;
+use vars qw( $VERSION );
+
+$VERSION = sprintf( "%d.%02d", q$Revision: 1.10 $ =~ /(\d+)\.(\d+)/ );
+$XML::Simple::PREFERRED_PARSER = 'XML::Parser';
+
+(undef, my $fn) = File::Temp::tempfile(OPEN => 0);
+
+# get the date for outputting with processed pdb files
+my @tm = localtime;
+my $date = sprintf("%02d-%3s-%02d",$tm[3],("JAN","FEB","MAR","APR","MAY"
+,"JUN","JUL","AUG","SEP","OCT","NOV","DEC")[$tm[4]],$tm[5]-100);
+my $atom_unpack =   "x6 a5 x1 a4 a1 a3 x1 a1 a4 a1 x3 a8 a8 a8 a6 a6";
+
+my $parser = new XML::Simple;
+
+# foreach template
+foreach my $t ( @ARGV ) {
+  print "$t...\n";
+
+  # get the sequence from the xml file
+  chomp(my $xmlFile = `find $Bio::Prospect::Init::PROSPECT_PATH/data/ -name $t.xml 2>/dev/null`);
+  if ( ! defined $xmlFile || ! -r $xmlFile ) {
+    throw Bio::Prospect::RuntimeError
+      ( "Unable to find template xml file for the $t template",
+    "The $t template xml file was not found within the PROSPECT_PATH " .
+    "($Bio::Prospect::Init::PROSPECT_PATH) directory",
+    "Verify that $t is a valid template, PROSPECT_PATH correctly points to " .
+    "your prospect installation and that you have read permission on the PROSPECT_PATH dir" );
+  }
+  my $dom = $parser->XMLin( $xmlFile );
+
+  # self-thread
+  my $po = new Bio::Prospect::Options( seq=>1, svm=>1, global_local=>1, templates=>[$t]);
+  my $pf = new Bio::Prospect::LocalClient( {options=>$po} );
+  my $xml = $pf->xml( $dom->{'seq'} );
+  open(FP,">$fn") or die ( "can't open $fn for writing\n" );
+  print FP $xml;
+  close(FP);
+
+  # build the model
+  throw Bio::Prospect::RuntimeError
+    ( "PROCESSED_PDB_PATH is not writeable",
+    "The PROCESSED_PDB_PATH ($Bio::Prospect::Init::PROCESSED_PDB_PATH) is not writeable",
+    'change the file permissions on this directory' ) if ( ! -w $Bio::Prospect::Init::PROCESSED_PDB_PATH);
+  my $ppdb = "$Bio::Prospect::Init::PROCESSED_PDB_PATH/$t.pdb";
+
+  # write header
+  open(PDB,">$ppdb") or throw Bio::Prospect::RuntimeError( "can't open $ppdb for appending\n" );
+  #printf PDB ("HEADER    CREATED BY CONVERTPROSPECT              %9s             %4s   1\n",$date,uc($t));
+  printf PDB ("%-6s    %-40s%-9s   %-4s\n",'HEADER','From processPdbFiles $Revision: 1.10 $',$date,uc($t));
+  close(PDB);
+  my $cmd = sprintf( 'export PROSPECT_PATH=%s; export PDB_PATH=%s;' .
+    '(%s %s -pdb %s) 1>>%s 2>/dev/null',$Bio::Prospect::Init::PROSPECT_PATH,$Bio::Prospect::Init::PDB_PATH,
+    "$Bio::Prospect::Init::PROSPECT_PATH/bin/convertProspect",$fn,$t,"$Bio::Prospect::Init::PROCESSED_PDB_PATH/$t.pdb");
+  print(STDERR "execut'n: [$cmd]\n") if $ENV{DEBUG};
+  if ( eval { system($cmd) } ) {
+  my $s = $?;
+  if ($s & 127) {
+    $s &= 127;
+    my $sn = Bio::Prospect::utilities::signame($s);
+    throw Bio::Prospect::RuntimeError
+    ( 'failed to execute Prospect',
+      "received signal $s ($sn)" );
+    }
+  $s >>= 8;
+  throw Bio::Prospect::RuntimeError
+    ( 'failed to execute Prospect',
+    "system($cmd) exited with status $s",
+    'check your prospect installation manually' );
+  }
+  # get last ATOM record so that we can write a TER record
+  my $last_atom = `tail -1 $ppdb`;
+  throw Bio::Prospect::RuntimeError ( "unable to tail $ppdb file" ) if 
+    ( ! defined $last_atom || $last_atom eq '' );
+  my @fld = unpack $atom_unpack, $last_atom;
+
+  # write footer
+  open(PDB,">>$ppdb") or throw Bio::Prospect::RuntimeError( "can't open $ppdb for appending\n" );
+  printf PDB ( "%-6s%5d      %3s %1s%4d\n",'TER',$fld[0]+1,$fld[3],$fld[4],$fld[5]);
+  printf PDB ( "%-6s    %5d%5d\n",'MASTER', 0, 0 );
+  printf PDB ( "%-6s\n",'END' );
+  close(PDB);
+}
+
+unlink $fn;
+

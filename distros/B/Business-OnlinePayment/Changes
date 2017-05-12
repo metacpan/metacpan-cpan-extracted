@@ -1,0 +1,143 @@
+Revision history for Perl extension Business::OnlinePayment.
+
+3.04    Thu Dec  3 12:49:59 PST 2015
+        - Partial authorizations
+        - Doc: Moo is a-okay for module authors
+        - Doc: update URLs for new domain
+
+3.03    Tue Apr 29 11:14:25 PDT 2014
+        - Document Reverse Authorization action
+        - Document expiration is MM/YY and fix the example
+        - Document repository moved from CVS to git
+        - Add avs_code and cvv2_response to build_subs, they're standard fields
+        - Document best-practice eval of the submit() method in example
+        - Rework build_subs(), thanks to Michael Schwern, closes: CPAN#22073
+
+3.02    Fri Aug 19 16:20:04 PDT 2011
+        - Fix fatal error calling ->info('supported_actions') on a gateway that
+          does not yet support introspection (e.g. AuthorizeNet)
+        - Fix introspection with a complicated supported_actions
+        - Documentation fix for recurring_billing flag
+        - Add optional transaction field to documentation: currency
+        - Fix spelling mistake in preCharge.pm POD, thanks to gregor herrmann,
+          Closes: CPAN#69647
+
+3.01    Wed Jul 14 13:54:57 PDT 2010
+        - Add optional transaction fields to documentation: tax, freight,
+          duty, tax_exempt, po_number.
+        - Add return fields to documentation: order_number, avs_code,
+          cvv2_response, response_code, response_headers, response_page.
+        - Add beginning of introspection interface for processor modules.
+        - Add electronic check fields to documentation: bank_city, bank_state
+        - Add clarification to notes_for_module_writers_v3 on authorization vs.
+          order_number
+        - (3.01_03) Add ECHECK_void_requires_account to introspection
+        - (3.01_04) Refactor most of the B:OP:HTTPS code out to Net:HTTPS::Any
+        - (3.01_04) Add card_token documentation.  Add token_support to
+          introspection.
+
+3.00     Mon Aug 17 15:55:11 PDT 2009
+        - It finally happened.
+        - doc: add repo info
+
+3.00_09  Mon Jul 21 20:44:08 PDT 2008
+        - doc: Allowable values of account_type
+        - doc: Recurring billing actions and fields
+        - doc: new standard fields track1, track2, patch from Chris Travers,
+          thanks!
+        - B:OP:HTTPS: Normalize https_get and https_post response_code to
+          "NNN message" without HTTP version even when using Net::SSLeay.
+
+3.00_08  Wed Jun 13 17:51:14 PDT 2007
+        - B:OP:HTTPS: set response_page, response_code, response_headers
+        - B:OP:HTTPS: Normalize https_post (and debugging) response_code to
+          "NNN message" even when using LWP/Crypt::SSLeay.
+        - B:OP: defined &$class is not how you detect if a class has been loaded
+          (just using use should be fine).  Closes: CPAN#22071
+        - Enable retrieval of fraud transaction score and transaction ID,
+          B:OP and B:FD:preCharge patch from Jason Hall, thanks!
+
+3.00_07  Fri Mar 23 14:54:57 PDT 2007
+	- B:OP:HTTPS request headers now work with Crypt::SSLeay too.
+
+3.00_06  Tue Mar 13 12:26:04 PDT 2007
+	- B:OP:HTTPS: add optional \%options (options hashref) to
+	  https_get and https_post to allow modules using this to set
+	  headers, etc. required for PayflowPro HTTP protocol support
+	- B:OP:HTTPS: support setting Net::SSLeay "$mime_type6" argument
+	- B:OP:HTTPS: pass $DEBUG value to $Net::SSLeay::trace (debug control)
+        - new() now passes %data (processor data) to set_defaults
+	- update B:OP:HTTPS to allow setting request headers
+        - doc: list a bunch of previously undocumented fields
+
+3.00_05  29 Nov 2006
+	- Update Makefile.PL so Business::FraudDetect::preCharge is installed,
+	  included by make dist, etc.
+	- Phil Lobbes is responsible for the rest of the work in this release.
+	  Thanks!
+	  - Reworked _pre_submit functionality:
+	    - Add Class data %WrappedSubmitClassMethod to remember "wrapped"
+	      submit 
+            - Fix new() to check %WrappedSubmitClassMethod to avoid creating
+	      deep recursion 
+            - Used feedback from MSCHWERN / Bug #22074 to cleanup
+	      new/_pre_submit more
+            - Now always wrap submit() method with _pre_submit() (but only
+	      once)
+	    - no longer populate _child_submit, code in anon sub was cleaned
+	      up
+	    - use return values from _pre_submit to determine if real submit
+	      is called.  the return values from _pre_submit should be
+	      reviewed/verified still
+	    - _risk_detect(): explicity set return value
+            - _pre_submit(): explicity set return value
+	  - Updated tests:
+	    - 8 new tests and 1 new "MOCK3" driver for testing _pre_submit()
+	      functionality
+            - test for new() replacing subclass submit and causing deep
+	      recursion
+	    - minor cleanup of test drivers
+	    - fix "submit unchanged" test case: now wrapped with _pre_submit()
+	      always
+	  - Updated POD documentation:
+            - Minor documentation change in print statements use ',' instead
+	      of '.'         
+
+3.00_04  Tue Oct 10 12:49:43 PDT 2006
+	- failure statues (see notes_for_module_writers_v3)
+	- oops, forgot _03 changelog in _03
+	- B:OP:HTTPS: require Net::SSLeay 1.30 and remove _my_https_post kludge
+	- eliminate warnings about redefined subroutines
+	- Business::FraudDetect and Business::FraudDetect::preCharge included
+	- From Phil Lobbes:
+	  - content() now returns empty hash if no content is defined
+	  - build_subs now uses can() so it doesn't redefine subs (and generate
+	    warnings)
+	  - DOC: SYNOPSIS now uses correct "card_number" and not "cardnumber"
+	  - created test cases for (all?) methods except _risk_detect
+	    _pre_submit 
+	  - Removed some old commented out 2.x statements
+	  - set $VERSION using eval per modperlstyle
+	  - new() now will strip off multiple leading dashes before calling
+	    build_subs
+	    NOTE: we should probably have it remove any \W to make perl happy
+	  - required_fields() now croaks with a list of missing fields
+	  - Lots of general cleanup, no functional changes. "fill
+	    paragraphs" in POD, remove extra whitespace, sorted %fields,
+	    dump_contents now sorts %contents, added myself to AUTHORS.
+	- From Frederic Briere (closes: CPAN#21082):
+	  - DOC: s/exp_date/expiration/ 
+
+3.00_03  Wed Mar 16 02:41:59 PST 2005
+	- https_post now accepts a scalar of raw content instead of key value
+	  pairs
+
+3.00_02  Mon Jan 10 21:36:53 PST 2005
+	- HTTPS base class now has https_post in addition to https_get
+
+3.00_01  Thu Aug 26 04:49:26 2004
+	- first of the v3 dev releases
+
+0.01  Sun Jul 25 13:59:10 1999
+	- original version; created by h2xs 1.19
+

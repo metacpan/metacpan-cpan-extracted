@@ -1,0 +1,43 @@
+<div class="content">
+<div class="body">
+
+<div class="cover">
+: if $entry.work_link {
+    <a href="<: $entry.work_link :>">
+: }
+
+: if $entry.work_cover {
+    <img title="<: $entry.title :>" src="<: $prefix :>static/<: split_id($entry.id) :>/<: $entry.work_cover :>" />
+: } else {
+    <img title="<: $entry.title :>" src="<: $prefix :>system/images/review_cover.png" />
+: }
+
+: if $entry.work_link {
+    </a>
+: }
+
+</div>
+
+: include 'entry_body.tx';
+
+</div>
+
+: if $attachments_map[$entry.id] &&
+: !( size($attachments_map[$entry.id]) == 1 && $entry.work_cover == $attachments_map[$entry.id].keys().0 ) {
+<div class="attachments">
+<hr class="attachments" />
+: for $attachments_map[$entry.id].keys().sort() -> $name {
+: if $entry.work_cover != $name && match($attachments_map[$entry.id][$name].mime_type, '^image/' ) {
+<a class="image" href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>"><img title="<:$name:>" src="<: $prefix :>static/<: $entry.id :>/<: $name :>" /></a>
+: }
+: else {
+<a href="<: $prefix :>static/<: split_id($entry.id) :>/<: $name :>"><: $name :></a>
+: }
+
+: }
+</div>
+: }
+
+: include 'entry_comments.tx';
+
+</div>

@@ -1,0 +1,9 @@
+classes:
+  - Desktop.chat.pidgin
+parameters:
+  doc:
+    desktop-chat:
+      pkg:
+        - include Pidgin crypto plugin for Off-The-Record protocol
+  pkg:
+    - pidgin-otr

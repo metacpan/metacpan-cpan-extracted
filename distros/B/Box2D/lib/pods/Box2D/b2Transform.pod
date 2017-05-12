@@ -1,0 +1,107 @@
+
+=head1 NAME
+
+Box2D::b2Transform - Contains translation and rotation.
+
+=head1 SYNOPSIS
+
+  my $transform = Box2D::b2Transform->new( $postiion, $rotation );
+
+=head1 DESCRIPTION
+
+A transform contains translation and rotation. It is used to represent
+the position and orientation of rigid frames.
+
+=head1 METHODS
+
+=head2 new( $position, $R )
+
+Initialize using a position vector and a rotation matrix.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$position>
+
+=item * C<Box2D::b2Mat22> C<$R>
+
+=back
+
+Returns a C<Box2D::b2Transform>
+
+=head2 GetAngle()
+
+Calculate the angle that the rotation matrix represents.
+
+Returns a C<float32>
+
+=head2 Set( $p, $angle )
+
+Set this based on the position and angle.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$p>
+
+=item * C<float32> C<$angle>
+
+=back
+
+=head2 SetIdentity()
+
+Set this to the identity transform.
+
+=head2 position()
+
+=head2 position( $position )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$position> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 R()
+
+=head2 R( $rotation )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Mat22> C<$rotation> (optional) - rotation matrix
+
+=back
+
+Returns a C<Box2D::b2Mat22>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Mat22>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

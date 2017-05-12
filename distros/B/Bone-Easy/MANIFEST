@@ -1,0 +1,9 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/Bone/Easy.pm
+lib/Bone/Easy/Rules.pm
+script/pickup
+t/Easy.t

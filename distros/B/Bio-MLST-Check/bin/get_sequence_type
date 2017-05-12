@@ -1,0 +1,189 @@
+#!/usr/bin/env perl
+package Bio::MLST::Bin::GetSequenceType;
+$Bio::MLST::Bin::GetSequenceType::VERSION = '2.1.1706216';
+# ABSTRACT: Given an assembly find the MLST sequence type.
+# PODNAME: get_sequence_type
+
+
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+use lib "/software/pathogen/internal/prod/lib";
+use Moose;
+use Getopt::Long;
+use Cwd;
+use Bio::MLST::Check;
+use Bio::MLST::Databases;
+use Bio::MLST::Validate::Executable;
+use Bio::MLST::SearchForFiles;
+use Bio::MLST::CheckMultipleSpecies;
+
+my ($species, $output_fasta_files, $output_directory, $show_alternatives, $output_phylip_files, $available_databases, $base_directory, $makeblastdb_exec, $blastn_exec, $spreadsheet_basename,$parallel_processes, $report_lowest_st, $help, $version);
+
+GetOptions ('s|species=s'              => \$species,
+            'o|output_directory=s'     => \$output_directory,
+            'c|output_fasta_files'     => \$output_fasta_files,
+            'y|output_phylip_files'    => \$output_phylip_files,
+            'a|available_databases'    => \$available_databases,
+            'b|mlst_base_directory=s'  => \$base_directory,
+            'm|makeblastdb_exec=s'     => \$makeblastdb_exec,
+            'n|blastn_exec=s'          => \$blastn_exec,
+            'p|spreadsheet_basename=s' => \$spreadsheet_basename,
+            'd|parallel_processes=i'   => \$parallel_processes,
+            'show_alternatives'        => \$show_alternatives,
+            'report_lowest_st'         => \$report_lowest_st,
+            'h|help'                   => \$help,
+            'v|version'                => \$version,
+);
+
+(! $version ) or die "$0 version " . Bio::MLST::Bin::GetSequenceType->VERSION . "\n";
+
+( ((@ARGV > 0) || (defined($available_databases))) && ! $help ) or die <<USAGE;
+Usage: get_sequence_type [options] *.fasta
+
+   -s STR Species of MLST scheme (0 or more comma separated)
+   -d INT Number of threads [1]
+   -c     Output a FASTA file of concatenated alleles and unknown sequences 
+   -y     Output a phylip file of concatenated alleles and unknown sequences
+   -o STR Output directory [.]
+   -a     Print out all available MLST schemes and exit
+   -h     Print this message and exit
+   -v     Print version number and exit
+
+If you use this software please cite:
+  "Multilocus sequence typing by blast from de novo assemblies against PubMLST", 
+  Andrew J. Page, Ben Taylor, Jacqueline A. Keane, The Journal of Open Source Software, (2016). 
+  doi: http://dx.doi.org/10.21105/joss.00118
+
+USAGE
+;
+
+$base_directory ||= $ENV{MLST_DATABASES};
+$base_directory ||= '/lustre/scratch108/pathogen/pathpipe/mlst';
+
+# Multiple versions of blast lying around, so use a particular one if possible
+# Warns if the user's preferred executable cannot be found; errors if defaults are also missing
+my $validator = Bio::MLST::Validate::Executable->new();
+$makeblastdb_exec = $validator->preferred_executable($makeblastdb_exec,
+                                                     ['/software/pubseq/bin/ncbi-blast-2.2.28+/bin/makeblastdb',
+                                                      'makeblastdb']);
+$blastn_exec = $validator->preferred_executable($blastn_exec,
+                                                ['/software/pubseq/bin/ncbi-blast-2.2.28+/bin/blastn',
+                                                 'blastn']);
+
+$spreadsheet_basename ||= 'mlst_results';
+$output_directory    ||= getcwd;
+$output_fasta_files  ||= 0;
+$output_phylip_files ||= 0;
+$parallel_processes  ||= 2;
+my $contamination_flag = (defined($show_alternatives)) ? 0 : 1;
+
+
+# get list of species to check
+my @species_list = ();
+if(defined $species)
+{
+    my %species_found;
+    for my $species_in (split(/,/,$species))
+    {
+        my $species_check = Bio::MLST::SearchForFiles->new(
+            species_name => $species_in,
+            base_directory => $base_directory,
+            );
+        for my $spec (@{$species_check->list_species})
+        {
+            $species_found{$spec} = 1;
+        }
+    }
+    @species_list = sort keys %species_found;
+    die( "Nothing found for species: $species\n" ) unless (@species_list);
+}
+
+if(defined($available_databases))
+{
+  my $mlst_dbs = Bio::MLST::Databases->new(
+    base_directory => $base_directory,
+  );
+  $mlst_dbs->print_db_list;
+}
+elsif(@species_list > 1 || !defined($species))
+{
+    my $multiple_species = Bio::MLST::CheckMultipleSpecies->new(
+        species               => \@species_list,
+        base_directory        => $base_directory,
+        raw_input_fasta_files => \@ARGV,
+        makeblastdb_exec      => $makeblastdb_exec,
+        blastn_exec           => $blastn_exec,
+        output_directory      => $output_directory,
+        spreadsheet_basename  => $spreadsheet_basename,
+        parallel_processes    => $parallel_processes,
+        output_fasta_files    => $output_fasta_files,  # not supported
+        output_phylip_files   => $output_phylip_files, # not supported
+        verbose               => 0, # databases searched and matches found
+        report_all_mlst_db    => 0, # list databases searched in csv file
+        show_contamination_instead_of_alt_matches => $contamination_flag,
+        report_lowest_st      => $report_lowest_st
+        );
+    $multiple_species->create_result_files;
+}
+else
+{
+  my $multiple_fastas = Bio::MLST::Check->new(
+    species               => $species,
+    base_directory        => $base_directory,
+    raw_input_fasta_files => \@ARGV,
+    makeblastdb_exec      => $makeblastdb_exec,
+    blastn_exec           => $blastn_exec,
+    output_directory      => $output_directory,
+    output_fasta_files    => $output_fasta_files,
+    spreadsheet_basename  => $spreadsheet_basename,
+    parallel_processes    => $parallel_processes,
+    output_phylip_files   => $output_phylip_files,
+    show_contamination_instead_of_alt_matches => $contamination_flag,
+    report_lowest_st      => $report_lowest_st
+  );
+  $multiple_fastas->create_result_files;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+get_sequence_type - Given an assembly find the MLST sequence type.
+
+=head1 VERSION
+
+version 2.1.1706216
+
+=head1 SYNOPSIS
+
+Given Fasta files and a Species regex, lookup the relevant MLST database and output the sequence type to a file.
+It requires NBCI Blast+ to be available in your PATH.
+
+Usage: get_sequence_type [options] *.fasta
+
+   -s STR Species of MLST scheme (0 or more comma separated)
+   -d INT Number of threads [1]
+   -c     Output a FASTA file of concatenated alleles and unknown sequences 
+   -y     Output a phylip file of concatenated alleles and unknown sequences
+   -o STR Output directory [.]
+   -a     Print out all available MLST schemes and exit
+   -h     Print this message and exit
+   -v     Print version number and exit
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

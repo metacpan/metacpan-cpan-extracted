@@ -1,0 +1,5 @@
+BENCHMARK NOTES
+
+    Since they are both implemented in C, the speeds of both are roughly
+    the same.
+

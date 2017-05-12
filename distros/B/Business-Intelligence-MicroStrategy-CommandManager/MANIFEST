@@ -1,0 +1,22 @@
+.cvsignore
+Changes
+lib/Business/Intelligence/MicroStrategy/CommandManager.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/adds.t
+t/alters.t
+t/applies.t
+t/connections.t
+t/creates.t
+t/deletes.t
+t/disconnects.t
+t/gets.t
+t/grants.t
+t/lists.t
+t/misc.t
+t/pod-coverage.t
+t/pod.t
+t/removes.t
+META.yml                                 Module meta-data (added by MakeMaker)

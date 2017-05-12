@@ -1,0 +1,19 @@
+Bundle-POPFile
+
+A bundle that lets you install all the modules needed by POPFile in one go.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Manni Heumann
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

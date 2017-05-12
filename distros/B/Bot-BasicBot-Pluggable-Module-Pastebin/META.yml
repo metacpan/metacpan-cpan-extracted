@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Bot-BasicBot-Pluggable-Module-PasteBin
+version: 0.01
+author:
+  - Frederico Recsky <frederico@gmail.com>
+abstract: IRC frontend to PasteBin site
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

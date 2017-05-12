@@ -1,0 +1,175 @@
+NAME
+    Business::iDEAL::Adyen - Backend for iDEAL payments through adyen.com
+
+SYNOPSIS
+      use Business::iDEAL::Adyen;
+    
+      # first setup the object
+      my $ideal = Business::iDEAL::Adyen->new({
+                      shared_secret   => 'your very secure secret',
+                      skinCode        => 's0m3C0d3',
+                      merchantAccount => 'your merchant account',
+                      test            => 1,
+                  });
+    
+      # then fetch a list of bank ids and bank codes
+      my $banks = $ideal->banklist();
+  
+      # after the user has chosen the bank he/she wants to use
+      # it's time to fetch the redirect URL
+      my $redir = $ideal->fetch({
+                      # mandatory fields
+                      bank_id         => 1000,
+                      paymentAmount   => 1250,
+  
+                      # optional fields
+                      merchantReference => 'your order ID',
+                      currencyCode      => 'EUR',
+                      shopperLocale     => 'nl',
+                      shipBeforeDate    => '2010-01-01',
+                      sessionValidity   => '2009-01-01T01:01:01Z',
+                  });
+  
+      # redirect your user to his/her bank, like
+      print redirect( $redir );
+
+    After the user has finalized the payment, he/she'll be returned to your
+    website (as defined in the Adyen skin)
+
+      use Business::iDEAL::Adyen;
+      use CGI qw/:standard/;
+  
+      # first setup the objects
+      my $cgi   = new CGI;
+      my $ideal = Business::iDEAL::Adyen->new({
+                      shared_secret => 'your very secure secret',
+                      skinCode      => 
+                      test          => 1,
+                  });
+  
+      # check user input
+      if( $ideal->check( \%{$cgi->Vars} ) ) {
+  
+         # payment succeeded, so you probably want to update your
+         # database with $cgi->param('merchantReference')
+  
+      } else {
+
+         # payment was not successful
+         # $ideal->error() contains what went wrong (most likely the
+         # request has been tampered with and the signature is incorrect)
+  
+      }
+
+DESCRIPTION
+    Business::iDEAL::Adyen provides a backend to process iDEAL payments
+    through adyen.com (the non-HPP (Hosted Payment Pages) way).
+
+    A word of warning to start with (copied verbatim out of Adyen's iDEAL
+    PDF):
+
+      iDeal API Payments are not enabled by default. If you would like to 
+      process iDeal using this method, you can request this through the support 
+      channel at L<https://support.adyen.com>.
+
+  METHODS
+   new
+    "new" creates a new "Business::iDEAL::Adyen" object.
+
+   options
+    shared_secret *[mandatory]*
+         This option should be the same as the secret entered in the Adyen
+         skin.
+
+    skinCode *[mandatory]*
+         The code of the skin we're using.
+
+    merchantAccount *[mandatory]*
+         The merchant account name
+
+    test A boolean value that switches on the use of the test environment.
+
+   banklist
+    In order to offer all iDEAL banks, you will have to fetch a list with
+    their names and codes. This list is subject to change, so check this
+    often (Adyen recommends "regularly (e.g. once a day)"). I'd suggest to
+    always check this before a payment.
+
+    This method will return an arrayref with the bank_ids and bank_names, or
+    undef in case an error occured (see "error")
+
+   fetch
+    After you've retrieved the "banklist", your users may choose the
+    preferred bank. Now you can feed that 'bank_id', together with the other
+    mandatory options to this method.
+
+    "fetch" will return an URL to the bank's iDEAL page that the user should
+    be directed to.
+
+    Some fields are mandatory, while others have somewhat sane defaults and
+    may be skipped.
+
+   options
+    bank_id *[mandatory]*
+         This is the bank ID chose by the user and provided by the
+         "banklist" method.
+
+    paymentAmount *[mandatory]*
+         How much would you like to charge your user? Note that this is in
+         cents, so 12,50 EUR should be inserted as 1250. If a dot or comma
+         is found in this value, it will be stripped. Don't count on this
+         being perfect, so sanitize your own input.
+
+    merchantReference
+         This will normally be set to your order number, or anything that's
+         useful to identify the order with. If not set, a semi-random number
+         is generated.
+
+    currencyCode
+         Defaults to 'EUR', since iDEAL is a Dutch system and we Dutchmen
+         "embraced" the euro.
+
+    shopperLocale
+         Defaults to 'nl'. Again, iDEAL is a Dutch system.
+
+    shipBeforeDate
+         To make matters easy, we set a *shipBeforeDate* of today + 1 month.
+
+    sessionValidity
+         By default, we set this value to now + 1 hour, UTC. A user should
+         be able to finish his/her transaction within an hour.
+
+   check
+    When a user has proceeded the payment throught the bank's website,
+    he/she'll be returned to your website (as specified on the Adyen's skin
+    pages).
+
+    This method can be called to check whether the payment succeeded or not.
+    *check* returns true when the payment was authorized and undef in all
+    other cases (see "error" in that case).
+
+   error
+    If errors occur (most likely signature related), this method will return
+    the latest error that occured.
+
+SEE ALSO
+    * <http://www.ideal.nl>
+    * <https://support.adyen.com/index.php>
+    * <http://menno.b10m.net/perl/>
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Ticket/Create.html?Queue=Business-iDEAL-Adyen>.
+
+AUTHOR
+    Menno Blom, <blom@cpan.org>, <http://menno.b10m.net/perl/>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Menno Blom
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,15 @@
+Changes
+lib/BSON/Decode.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-functionality.t
+t/02-delete_hash_deep.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test1.bson
+t/test2.bson
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

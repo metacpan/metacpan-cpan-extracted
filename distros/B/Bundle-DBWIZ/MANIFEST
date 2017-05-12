@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/Bundle-DBWIZ.t
+lib/Bundle/DBWIZ.pm
+META.yml                                 Module meta-data (added by MakeMaker)

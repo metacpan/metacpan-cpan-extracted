@@ -1,0 +1,40 @@
+Boost/Graph version 1.1
+========================
+
+The Boost::Graph 
+
+INSTALLATION
+
+To Install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Installation works as with any other CPAN distribution. This package comes bundled with the Boost Graph 
+C++ Library, version 1.33. This allows the package to install without any extra installation steps. 
+However, if you would like to use a different version of Boost, you can edit the following line in 
+Directed/Makefile.PL and Undirected/Makefile.PL to point to your installation:
+   
+  'INC' => '-I. -I../include -I/usr/local/include/boost-1_33/', 
+
+note, the Boost Library location on the example system is located in /usr/local/include/boost-1_33/
+
+See http://www.boost.org/libs/graph/doc/
+
+
+DEPENDENCIES
+
+This module requires the C++ Boost Graph Library to be installed. You can download it for free, here:
+http://www.boost.org/libs/graph/doc/
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 David Burdick
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

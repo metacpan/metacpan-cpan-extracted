@@ -1,0 +1,22 @@
+Revision history for Bot-MetaSyntactic
+
+0.04    2006.10.15 - SAPER
+        [TESTS] Added t/podspell.t
+
+0.03    2006.04.18 - SAPER
+        [BUGFIX] Added workaround to actually ignore nicks in ignore_list.
+        [FEATURE] Don't output more than a given number of words, in order
+        to avoid flooding a channel.
+        [CODE] Better (but stil not perfect) parsing.
+        [TESTS] Corrected t/api.t
+
+0.02    2005.03.06 - SAPER
+        [NEW] Now only create one Acme::MetaSyntactic object
+        [NEW] Added words limitation
+        [NEW] Words are nicely wrapped using Text::Wrap
+        (NEW] Added wrapper script script/metabot
+        [TESTS] Added t/01.api.t
+
+0.01    2005.03.05 - SAPER
+        First version, released on an unsuspecting world.
+

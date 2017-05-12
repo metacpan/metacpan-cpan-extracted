@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Bundle-STBEY
+version:             1.1
+abstract:            a Bundle of my most popular modules
+license:             perl
+author:              
+    - Steffen Beyer <STBEY@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Bit::Vector:                   7.1
+    Carp::Clan:                    6.04
+    Data::Locations:               5.5
+    Date::Calc:                    6.2
+    Date::Calc::Util:              1
+    Date::Calc::XS:                6.2
+    Math::MatrixBool:              5.8
+    Set::IntRange:                 5.2
+    Storable:                      2.21
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

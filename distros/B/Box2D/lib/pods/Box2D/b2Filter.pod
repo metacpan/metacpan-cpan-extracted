@@ -1,0 +1,100 @@
+
+=head1 NAME
+
+Box2D::b2Filter - This holds contact filtering data.
+
+=head1 SYNOPSIS
+
+  my $filter = Box2D::b2Filter->new();
+  $filter->categoryBits( $category_bits );
+  $filter->maskBits( $mask_bits );
+  $filter->groupIndex($ group_index );
+
+=head1 DESCRIPTION
+
+This holds contact filtering data.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2Filter>
+
+=head2 categoryBits()
+
+=head2 categoryBits( $categoryBits )
+
+The collision category bits. Normally you would just set one bit.
+
+Parameters:
+
+=over 4
+
+=item * C<uint16> C<$categoryBits> (optional)
+
+=back
+
+Returns a C<uint16>
+
+=head2 groupIndex()
+
+=head2 groupIndex( $groupIndex )
+
+Collision groups allow a certain group of objects to never collide
+(negative) or always collide (positive). Zero means no collision group.
+Non-zero group filtering always wins against the mask bits.
+
+Parameters:
+
+=over 4
+
+=item * C<int16> C<$groupIndex> (optional)
+
+=back
+
+Returns a C<int16>
+
+=head2 maskBits()
+
+=head2 maskBits( $maskBits )
+
+The collision mask bits. This states the categories that this shape
+would accept for collision.
+
+Parameters:
+
+=over 4
+
+=item * C<uint16> C<$maskBits> (optional)
+
+=back
+
+Returns a C<uint16>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2Fixture>
+
+=item * L<Box2D::b2FixtureDef>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

@@ -1,0 +1,33 @@
+ProxySG-4006060000--20090307-165730UTC.sysinfo;appliance-name;proxy
+ProxySG-4006060000--20090307-165730UTC.sysinfo;modelnumber;200-B
+ProxySG-4006060000--20090307-165730UTC.sysinfo;serialnumber;4006060000
+ProxySG-4006060000--20090307-165730UTC.sysinfo;sgosversion;5.3.1.4
+ProxySG-4006060000--20090307-165730UTC.sysinfo;sgosreleaseid;35795
+ProxySG-4006060000--20090307-165730UTC.sysinfo;ssl-accelerator;none
+ProxySG-4006060000--20090307-165730UTC.sysinfo;sysinfotime;Sat Mar 7, 2009 16:57:30 GMT
+ProxySG-4006060000--20090307-165730UTC.sysinfo;ip-default-gateway;172.16.1.1
+ProxySG-4006060000--20090307-165730UTC.sysinfo;sysinfo_type;sysinfo
+ProxySG-4006060000--20090307-165730UTC.sysinfo;hardware_reboot;21 hours, 45 minutes, and 21 seconds ago.
+ProxySG-4006060000--20090307-165730UTC.sysinfo;hardware_reboot_day;0
+ProxySG-4006060000--20090307-165730UTC.sysinfo;hardware_reboot_hour;21
+ProxySG-4006060000--20090307-165730UTC.sysinfo;hardware_reboot_minute;45
+ProxySG-4006060000--20090307-165730UTC.sysinfo;hardware_reboot_second;21
+ProxySG-4006060000--20090307-165730UTC.sysinfo;software_reboot;21 hours, 45 minutes, and 15 seconds ago.
+ProxySG-4006060000--20090307-165730UTC.sysinfo;software_reboot_day;0
+ProxySG-4006060000--20090307-165730UTC.sysinfo;software_reboot_hour;21
+ProxySG-4006060000--20090307-165730UTC.sysinfo;software_reboot_minute;45
+ProxySG-4006060000--20090307-165730UTC.sysinfo;software_reboot_second;15
+ProxySG-4006060000--20090307-165730UTC.sysinfo;length-vpm-xml;9558
+ProxySG-4006060000--20090307-165730UTC.sysinfo;length-vpm-cpl;3526
+ProxySG-4006060000--20090307-165730UTC.sysinfo;length-static-bypass;
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:0-mac;00:d0:83:04:ae:fc
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:0-capabilities;10/100
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:0-linkstatus;no link
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:0-ip;
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:0-netmask;
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:1-mac;00:d0:83:04:ae:fd
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:1-capabilities;10/100
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:1-linkstatus;100 Mbps full duplex
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:1-ip;172.16.1.15
+ProxySG-4006060000--20090307-165730UTC.sysinfo;int-0:1-netmask;255.255.255.0
+

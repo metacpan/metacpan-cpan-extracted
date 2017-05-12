@@ -1,0 +1,70 @@
+NAME
+    Build::Daily - module to update daily versions for Module::Build and
+    ExtUtils::MakeMaker
+
+SYNOPSIS
+        perl -MBuild::Daily Build.PL
+        perl -MBuild::Daily Makefile.PL
+    
+        # force version append, useful when not building daily but based on ex. SVN revisions
+        perl -MBuild::Daily=version,12345 Build.PL
+        perl -MBuild::Daily=version,12345 Build
+        perl -MBuild::Daily=version,12345 Build distmeta
+        perl -MBuild::Daily=version,12345 Build dist
+
+DESCRIPTION
+    Updates `$VERSION' string based on current date or forced string. This
+    allows to create daily/commit builds.
+
+  FUNCTIONS
+
+  import()
+
+        use Build::Daily 'version' => '12345';
+
+    Forces string that will be appended.
+
+  version($original_version)
+
+    For original version returns new version.
+
+        $original_version.($original_version =~ m/_/ ? '' : '_').$append
+
+    `$append' is either YearMonthDay or the forced string.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-build-daily at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Build-Daily. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Build::Daily
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Build-Daily
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Build-Daily
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Build-Daily
+
+    * Search CPAN
+        http://search.cpan.org/dist/Build-Daily
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

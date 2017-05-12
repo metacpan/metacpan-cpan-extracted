@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Package xmlns="http://www.wfmc.org/2008/XPDL2.1" Id="activity" Name="Complete Activity Example">
+
+    <PackageHeader>
+        <XPDLVersion>2.1</XPDLVersion>
+        <Vendor>BPM::Engine</Vendor>
+        <Created>2010-09-07 04:04:45</Created>
+    </PackageHeader>
+
+    <Participants>
+        <Participant Id="test1" Name="Peter">
+            <ParticipantType Type="HUMAN"/>
+            <Description>Me</Description>
+            <ExternalReference xref="1" location="mailto:peter@sitecorporation.com" namespace=""/>
+        </Participant>
+    </Participants>
+
+    <DataFields>
+        <DataField Id="pcommon" IsArray="0">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+            <InitialValue>'P1'</InitialValue>
+        </DataField>
+        <DataField Id="svc_res_status" IsArray="true">
+            <DataType>
+                <BasicType Type="STRING"/>
+            </DataType>
+        </DataField>
+    </DataFields>
+
+    <Artifacts>
+      <Artifact ArtifactType="Annotation" Id="29" TextAnnotation="Contact Customer by Phone"/>
+      <Artifact Id="art1" ArtifactType="DataObject">
+        <DataObject Id="art1" Name="TAP test 1" State="">
+          <DataField Id="pcommon"/>
+        </DataObject>
+      </Artifact>
+      <Artifact Id="8bd1c307-a3a7-4343-ba79-fefe79b8cc1c" ArtifactType="DataObject">
+        <DataObject Id="8bd1c307-a3a7-4343-ba79-fefe79b8cc1c" Name="TAP test 1" State="">
+          <DataField Id="pcommon"/>
+          <DataField Id="common"/>
+          <DataField Id="result1"/>
+        </DataObject>
+      </Artifact>
+      <Artifact Id="service_result" ArtifactType="DataObject">
+        <DataObject Id="service_result" Name="TAP Test 2" State="" RequiredForStart="false" ProducedAtCompletion="false">
+          <DataField Id="svc_res_status"/>
+          <DataField Id="svc_res_message"/>
+        </DataObject>
+      </Artifact>
+    </Artifacts>
+
+    <WorkflowProcesses>
+
+        <WorkflowProcess Id="fulltask" Name="Verbose Activity">
+
+            <ProcessHeader/>
+
+            <FormalParameters>
+                <FormalParameter Id="test1_ok" Mode="IN" Required="1">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="test2_ok" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="run_test2" Mode="INOUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                    <InitialValue>'C'</InitialValue>
+                </FormalParameter>
+                <FormalParameter Id="pathtaken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+
+            <InputSets>
+                <InputSet>
+                  <Input ArtifactId="art1"/>
+                  <Input ArtifactId="8bd1c307-a3a7-4343-ba79-fefe79b8cc1c"/>
+                  <ArtifactInput ArtifactId="art1" RequiredForStart="false"/>
+                  <ArtifactInput ArtifactId="art1" RequiredForStart="true"/>
+                  <ArtifactInput ArtifactId="art1"/>
+                  <PropertyInput PropertyId="common"/>
+                  <PropertyInput PropertyId="pcommon"/>
+                </InputSet>
+            </InputSets>
+            <OutputSets>
+                <OutputSet>
+                  <Output ArtifactId="service_result"/>
+                </OutputSet>
+            </OutputSets>
+
+            <Participants>
+                <Participant Id="test2" Name="John">
+                    <ParticipantType Type="ROLE"/>
+                    <ExternalReference xref="POST" location="user/john/tasks" namespace="http://yourtaskserver.com/api"/>
+                </Participant>
+                <Participant Id="par1">
+                    <ParticipantType Type="ROLE"/>
+                </Participant>
+            </Participants>
+
+            <DataFields>
+              <DataField Id="common" IsArray="1">
+                  <DataType>
+                      <BasicType Type="STRING"/>
+                  </DataType>
+                  <InitialValue>['P2']</InitialValue>
+              </DataField>
+              <DataField Id="result1" IsArray="true">
+                  <DataType>
+                      <BasicType Type="STRING"/>
+                  </DataType>
+                  <InitialValue>['R1']</InitialValue>
+              </DataField>
+              <DataField Id="result2" IsArray="0">
+                  <DataType>
+                      <BasicType Type="STRING"/>
+                  </DataType>
+                  <InitialValue>'R2'</InitialValue>
+              </DataField>
+              <DataField Id="svc_res_message" IsArray="1">
+                  <DataType>
+                      <BasicType Type="STRING"/>
+                  </DataType>
+              </DataField>
+          </DataFields>
+
+          <Activities>
+                <Activity Id="service-task" Name="Service Task"
+                    StartMode="Automatic" FinishMode="Automatic"
+                    StartQuantity="1" CompletionQuantity="1"
+                    IsForCompensation="false" IsATransaction="false">
+                    <Description>Send and receive stuff, eg a payment to a payment provider</Description>
+                    <Limit/>
+                    <Implementation>
+                        <Task>
+                            <TaskUser Implementation="WebService">
+                    <Performers>
+                        <Performer>test1</Performer>
+                    </Performers>
+                                <MessageIn Id="7" Name="msg" From="test1" To="test2" FaultName="error">
+                                    <ActualParameters>
+                                        <ActualParameter ScriptType="tt" ScriptVersion="1.0" ScriptGrammar="http://www.daisy.org/pipeline/gui">common</ActualParameter>
+                                        <ActualParameter>pcommon</ActualParameter>
+                                    </ActualParameters>
+                                </MessageIn>
+                                <MessageOut Id="8">
+                                        <ActualParameters>
+                                            <ActualParameter>pcommon</ActualParameter>
+                                        </ActualParameters>
+                                </MessageOut>
+                                <WebServiceOperation OperationName="POST">
+                                    <Service ServiceName="Flow::Handler::REST" PortName="80">
+                                        <EndPoint EndPointType="Service">
+                                            <ExternalReference
+                                              xref="post"
+                                              location="http://www.postbin.org/p413pv"
+                                              namespace="http://www.postbin.org/p413pv"
+                                              />
+                                        </EndPoint>
+                                    </Service>
+                                </WebServiceOperation>
+<!--
+                                <WebServiceFaultCatch FaultName="throws">
+                                    <Message Id="5">
+                                        <DataMappings>
+                                            <DataMapping Formal="subprocParam1" Direction="OUT">
+                                                <Actual>ParProcFieldName</Actual>
+                                                <TestValue>'This subprocess has not been invoked'</TestValue>
+                                            </DataMapping>
+                                        </DataMappings>
+                                    </Message>
+                                    <TransitionRef Id="6"/>
+                                </WebServiceFaultCatch>
+-->
+
+
+                            </TaskUser>
+                        </Task>
+                    </Implementation>
+                    <!-- if SubProcess is a transaction: Transaction TransactionMethod="explode"/-->
+                    <Performers>
+                        <Performer>test2</Performer>
+                    </Performers>
+                    <Performer>par1</Performer>
+                    <Priority/>
+                    <!-- SimulationInformation/ -->
+                    <Icon/>
+                    <Documentation/>
+                    <TransitionRestrictions/>
+                    <ExtendedAttributes/>
+                    <DataFields/>
+                    <!-- 2.2: FormalParameters/>
+                    <ActualParameters/ -->
+                    <InputSets>
+                        <InputSet>
+                          <Input ArtifactId="art1"/>
+                          <Input ArtifactId="8bd1c307-a3a7-4343-ba79-fefe79b8cc1c"/>
+                          <ArtifactInput ArtifactId="art1" RequiredForStart="false"/>
+                          <ArtifactInput ArtifactId="art1" RequiredForStart="true"/>
+                          <ArtifactInput ArtifactId="art1"/>
+                          <PropertyInput PropertyId="common"/>
+                          <PropertyInput PropertyId="pcommon"/>
+                        </InputSet>
+                    </InputSets>
+                    <OutputSets>
+                        <OutputSet>
+                          <Output ArtifactId="service_result"/>
+                        </OutputSet>
+                    </OutputSets>
+                    <!-- IORules/><Loop/ -->
+                    <Assignments>
+                        <Assignment AssignTime="End">
+                            <Target>common</Target>
+                            <Expression>['A2']</Expression>
+                        </Assignment>
+                        <Assignment AssignTime="Start">
+                            <Target>common</Target>
+                            <Expression>['A1']</Expression>
+                        </Assignment>
+                    </Assignments>
+                    <Object Id="1"/>
+                    <NodeGraphicsInfos/>
+                </Activity>
+            </Activities>
+            <Transitions/>
+        </WorkflowProcess>
+    </WorkflowProcesses>
+</Package>

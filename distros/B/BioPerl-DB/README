@@ -1,0 +1,134 @@
+# $Id$
+
+The bioperl-db package contains interfaces and adaptors that work 
+with a BioSQL database and serialize and de-serialize Bioperl
+objects.
+
+===================================================================
+Information about BioSQL and bioperl-db
+===================================================================
+
+This project was started by Ewan Birney with major work by Elia Stupka
+and continued support by Hilmar Lapp and the Bioperl community. It's 
+purpose is to create a standalone sequence database with little 
+external dependencies and tight integration with Bioperl. Support for 
+more databases and bindings in Java and python by Biojava and
+Biopython projects is welcomed, and a working prototype was one of 
+the accomplishments of the February 2002 hackathon in South Africa. 
+All questions and comments should be directed to the bioperl list
+<bioperl-l@bioperl.org> and more information can be found about the
+related projects at http://www.bioperl.org and http://www.open-bio.org.
+
+I. Scripts located in the scripts/ directory:
+
+biosql/load_seqdatabase.pl      - a very flexible script to load
+			          sequences into a BioSQL database
+biosql/bioentry2flat.pl         - dump sequence data into rich sequence
+		                  format flatfile from a BioSQL database
+biosql/load_ontology.pl         - load GO or SOFA ontology data into
+                                  a BioSQL database
+biosql/merge-unique-ann.pl      - script used by load_seqdatabase.pl,
+                                  it merges features and annotations
+biosql/update-on-new-date.pl    - script used by load_seqdatabase.pl,
+                                  it will update based on date
+biosql/update-on-new-version.pl - script used by load_seqdatabase.pl,
+			          it will update based on version
+biosql/cgi-bin/getentry.pl      - example CGI script that fetches from
+                                  a BioSQL database
+biosql/clean_ontology.pl        - "cleans" an ontology in a BioSQL
+                                  database without foreign keys
+biosql/del-assocs-sql.pl        - script used by load-seqdatabase.pl,
+                                  removes annotations and features 
+biosql/freshen-annot.pl         - script used by load-seqdatabase.pl,
+                                  removes annotations and features
+biosql/load_interpro.pl         - deprecated
+biosql/terms/add-term-annot.pl  - load ontology terms read from a file
+biosql/terms/importrelation.pl  - load relations between ontology
+			          terms and bioentries
+biosql/terms/interpro2go.pl     - load from interpro2go file
+corba/caching_corba_server.pl   - setup a corba sequence caching server
+corba/test_bioenv.pl            - test the bioenv of a running server
+corba/bioenv_server.pl          - setup a CORBA sequence server
+
+There is also a script called scripts/load_ncbi_taxonomy.pl in the 
+BioSQL package that loads taxonomic data from NCBI. Most users use
+this script to load the NCBI taxonomy into their Biosql databases
+before loading sequences with load_seqdatabase.pl.
+
+II. Some background information and how it all works:
+
+The adaptor code in Bio::DB and Bio::DB::BioSQL was completely
+refactored and architected from scratch since the previous branch
+bioperl-release-1-1-0. Meanwhile almost everything works. The
+following things are unsupported or do not work yet:
+
+     - sub-seqfeatures
+     - round-tripping fuzzy locations (they will be stored according
+	  to their Bio::Location::CoordinatePolicyI interpretation)
+     - Bio::Annotation::DBLink::optional_id
+
+To understand the layout of the API and how you can interact with the
+adaptors to formulate your own queries, here is what you should know
+and read (i.e., read the PODs of all interfaces and modules named
+below).
+
+1) Bio::DB::BioDB acts as a factory of database adaptors, where a
+database adaptor encapsulates an entire database, not a specific
+object-relational mapping or table. It is similar Bio::SeqIO in
+bioperl, where you specify a format and get back a parser for that 
+format. Here you specify the database and get back a persistence 
+factory for that database. Note that the only database really 
+supported right now in this framework is BioSQL.
+
+2) The persistence factory returned by Bio::DB::BioDB->new() will
+implement Bio::DB::DBAdaptorI. It allows you to obtain a persistence
+adaptor for an object at hand, and to turn an object into a persistent
+object.
+
+3) A persistent object will implement Bio::DB::PersistentObjectI. A
+persistent object can be updated in and removed from the database. It
+also knows about its primary key in the database once it has been
+created or found in the database. A persistent object will still
+implement all interfaces and all methods that the non-persistent base
+object implements. E.g., a persistent sequence object will implement
+Bio::DB::PersistentObjectI and Bio::PrimarySeqI (or Bio::SeqI).
+
+4) A persistence adaptor will implement Bio::DB::PersistenceAdaptorI. 
+Apart from actually implementing all the persistence methods for 
+persistent objects, a persistence adaptor allows you to locate 
+objects in the database by key and by query. You can
+find_by_primary_key(), find_by_unique_key(), find_by_association(), 
+and find_by_query(). The latter allows you to formulate object queries 
+as Bio::DB::Query::BioQuery objects and retrieve the matching objects.
+
+5) The guiding principle for the redesign of the adaptors was to
+separate business logic from schema logic. While business logic is
+largely driven by the object model (hence, by the bioperl object
+model) and therefore is mostly independent from the schema, but
+specific to the object model, the schema logic is driven by and
+specific to the relational model. The schema logic will therefore need
+to differ from one schema to another and even from one schema flavor
+to another for very similar relational models, whereas the business
+logic is unaffected by this.
+
+This had two consequences. First, the user interacts with the adaptors
+without knowing anything about the specific schema behind it. All
+interaction takes place in object space. You construct queries by
+specifying object slots and the values they should have or
+match. Joins and associations are also specified on the object level
+(cf. Bio::DB::Query::BioQuery). Internally, the respective drivers for
+the particular schema translate those queries into schema-specific SQL
+queries.
+
+The second consequence was that every persistence adaptor is divided
+into two layers, the persistence adaptor itself which does not contain
+a single SQL phrase or query, and its schema-specific driver which
+implements those functions which cannot be accomplished without
+actually doing the concrete object-relational mapping.
+
+===================================================================
+Information about Bio::DB::Map modules and database interface
+===================================================================
+
+These modules have been deprecated and are no longer in the distribution.
+

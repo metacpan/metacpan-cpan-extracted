@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+package Bio::Roary::Main::CreatePanGenome;
+$Bio::Roary::Main::CreatePanGenome::VERSION = '3.8.0';
+# ABSTRACT: Create a pan genome from a set of GFF files with WTSI defaults
+# PODNAME: create_pan_genome
+
+
+use Cwd qw(abs_path); 
+BEGIN { unshift( @INC, abs_path('./lib') ) }
+BEGIN { unshift( @INC, abs_path('./t/lib') ) }
+use Bio::Roary::CommandLine::CreatePanGenome;
+
+Bio::Roary::CommandLine::CreatePanGenome->new(args => \@ARGV, script_name => $0)->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+create_pan_genome - Create a pan genome from a set of GFF files with WTSI defaults
+
+=head1 VERSION
+
+version 3.8.0
+
+=head1 SYNOPSIS
+
+Create a pan genome from a set of GFF files with WTSI defaults
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

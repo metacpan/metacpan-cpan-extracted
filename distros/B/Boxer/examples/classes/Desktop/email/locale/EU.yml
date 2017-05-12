@@ -1,0 +1,30 @@
+# bg cs da nl en-gb et fi fr de el hu ga-ie it lt pl pt-pt ro sk sl es-es sv-se
+classes:
+  - Desktop.email
+parameters:
+  doc:
+    desktop-email:
+      pkg:
+        - include Icedove locales for European Union (except Maltese or Croatian)
+  pkg:
+    - icedove-l10n-bg
+    - icedove-l10n-cs
+    - icedove-l10n-da
+    - icedove-l10n-de
+    - icedove-l10n-el
+    - icedove-l10n-en-gb
+    - icedove-l10n-es-es
+    - icedove-l10n-et
+    - icedove-l10n-fi
+    - icedove-l10n-fr
+    - icedove-l10n-ga-ie
+    - icedove-l10n-hu
+    - icedove-l10n-it
+    - icedove-l10n-lt
+    - icedove-l10n-nl
+    - icedove-l10n-pl
+    - icedove-l10n-pt-pt
+    - icedove-l10n-ro
+    - icedove-l10n-sk
+    - icedove-l10n-sl
+    - icedove-l10n-sv-se

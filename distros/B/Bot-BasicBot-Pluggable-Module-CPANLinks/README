@@ -1,0 +1,85 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::CPANLinks - provide links to CPAN
+    module docs
+
+DESCRIPTION
+    A module for Bot::BasicBot::Pluggable-powered IRC bots, to automatically
+    provide links to documentation when people mention certain CPAN modules
+    or keywords. Can be configured to only respond to modules in certain
+    namespaces on a per-channel basis.
+
+HOW IT WORKS
+    If someone's message looks like it contains a CPAN module name (e.g.
+    `Foo::Bar'), this plugin will look for the bot setting `filter_$channel'
+    where `$channel' is the channel that the user spoke in - so, e.g.
+    `filter_#dancer'. If this setting exists, its value should be a regular
+    expression; if the module name matches this expression, the plugin will
+    look up that module, and, if it exists, provide a link to it (unless it
+    has done so more recently than the configurable threshold).
+
+    Similarly, if someone says something like "the session keyword" or
+    similar, the plugin will check if `keywords_$channel' exists and is set
+    to a package name; if it does, it will make sure that package is loaded,
+    check if that package `can($keyword)', and if so, will provide a link to
+    the documentation for that keyword.
+
+    So, for example, in the `#dancer' channel, `keywords_#dancer' would be
+    set to `Dancer' - so if I say "the session keyword", the plugin will
+    check if `Dancer-'can('session')> to check it's a valid keyword, and if
+    so, will provide a link to the docs.
+
+    WARNING: this setting causes the named package to be loaded; that means
+    that anyone who can configure your bot from IRC can cause a package of
+    their choosing to be loaded into your bot. It must be a package which is
+    already installed on your system, of course, but it deserves that
+    warning.
+
+CONFIGURATION
+    See Bot::BasicBot::Pluggable::Module::Vars for details on how to set the
+    appropriate config options in your bot's store (or do it directly in the
+    DB, if you prefer).
+
+    The settings to set up are:
+
+    `filter_channelname'
+        Set the pattern which module names must match for a given channel.
+        If this setting doesn't exist for the channel, nothing will be
+        linked.
+
+        For example, for `#dancer', `filter_#dancer' is set to `^Dancer'.
+
+    `keywords_channelname'
+        Set the package from which keywords are linked for a given channel.
+        If this setting doesn't exist for the channel, no keywords will be
+        linked.
+
+        If you want to use this, set this setting to the name of the package
+        keywords should be looked for in - for instance, for `#dancer',
+        `keywords_#dancer' is set to `Dancer'. So, if I mention e.g. "see
+        the session keyword", the bot will check if
+        `Dancer-'can('session')>, see that that's a valid keyword, and will
+        provide a link to the docs.
+
+        Be aware that using this setting means the named package will be
+        loaded; this means anyone who can configure your bot can cause a
+        package of their choosing to be loaded. However, it's loaded by
+        Module::Load at runtime, so no importing will be done, and it can
+        only be a package installed on your system. It's still something to
+        be aware of, though, if you think there's a possibility of code in
+        your `@INC' that you wouldn't want your bot to load.
+
+    `dupe_gap'
+        How many seconds between successive mentions of the same module name
+        / keyword to wait before providing a link again. Nobody wants the
+        bot to respond with a link every time a given module name is
+        mentioned. If not set, defaults to a sensible value.
+
+HOSTED OPTION
+    If you like the idea of this but don't want to go to the effort of
+    setting it up, I have a bot on `irc.perl.org' already running it, which
+    I'd be happy to add to your channel and configure appropriately for you
+    - just drop me a mail.
+
+AUTHOR
+    David Precious (bigpresh) `<davidp@preshweb.co.uk>'
+

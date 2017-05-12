@@ -1,0 +1,56 @@
+namespace : %
+    classes : %
+        DataFile : @
+            getFileName
+            load
+            setFileName
+            save
+            __init__
+        ECDDataFile : @
+            load
+            getSizeOfLine
+            setSizeOfColumn
+            getNote
+            getSize
+            setDataName
+            setNote
+            getLabel
+            __init__
+            setLabel
+            getData
+            setData
+            getHeaderString
+            getSizeOfColumn
+            setSizeOfLine
+            getHeaderList
+            save
+            setFileName
+            getDataName
+            setSize
+    functions : @
+        internalLoadEcell3
+        internalECDDataFile
+filtered : <<EOV
+import sys
+import string
+import getopt
+import os
+
+import ecell
+import ecell.ecs
+import ecell.emc
+
+import ecell.Session
+
+from ecell.ECDDataFile import *
+
+def internalLoadEcell3():
+    aSimulator = ecell.emc.Simulator()
+    aSession = ecell.Session(aSimulator)
+    return aSession
+
+def internalECDDataFile(logger):
+    return ECDDataFile(logger.getData())
+
+
+EOV

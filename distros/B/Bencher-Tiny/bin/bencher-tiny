@@ -1,0 +1,311 @@
+#!perl
+
+our $DATE = '2016-10-20'; # DATE
+our $VERSION = '0.003'; # VERSION
+
+use 5.010001;
+use strict 'subs', 'vars';
+use warnings;
+
+my $DEBUG = $ENV{DEBUG};
+
+my %Opts = (
+    count => undef,
+    mode  => 'cmpthese',
+);
+
+sub parse_options {
+    require Getopt::Long;
+    Getopt::Long::Configure(
+        "no_ignore_case", "permute", "bundling", "no_getopt_compat");
+    my $res = Getopt::Long::GetOptions(
+        'help|h|?' => sub {
+            print <<'_';
+Usage:
+  bencher-tiny [options] <scenario-name>
+  bencher-tiny --help|-h|-?
+Options:
+  --count, -c   Set count
+  --timethese   Use timethese() instead of cmpthese()
+_
+            exit 0;
+        },
+        'version|v' => sub {
+            no warnings 'once';
+            print "bencher-tiny version ",
+                ($main::VERSION ? $main::VERSION : 'dev'), "\n";
+            exit 0;
+        },
+        'count|c=i' => \$Opts{count},
+        'cmpthese' => sub { $Opts{mode} = 'cmpthese' },
+        'timethese' => sub { $Opts{mode} = 'timethese' },
+    );
+    unless ($res) {
+        warn "Error in parsing command-line options, exiting\n";
+        exit 99;
+    }
+    if (@ARGV != 1) {
+        warn "Please specify a single scenario module\n";
+        exit 99;
+    }
+    unless ($Opts{count}) {
+        warn "Please specify --count (-c), e.g. -c 1000 or -c -0.25\n";
+        exit 99;
+    }
+}
+
+sub load_scenario {
+    my $mod = "Bencher::Scenario::$ARGV[0]";
+    (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+    require $mod_pm;
+    my $scenario = ${"$mod\::scenario"};
+    die "No scenario found in module $mod\n" unless ref($scenario) eq 'HASH';
+    $scenario;
+}
+
+sub dmp {
+    no warnings 'once';
+    require Data::Dumper;
+    local $Data::Dumper::Terse = 1;
+    local $Data::Dumper::Indent = 0;
+    local $Data::Dumper::SortKeys = 1;
+    Data::Dumper::Dumper(shift);
+}
+
+sub fill_template {
+    my ($t, $vars) = @_;
+    $t =~ s{<(\w+)(:raw)?>}
+           { $2 ? "$vars->{$1}" : dmp($vars->{$1}) }eg;
+    $t;
+}
+
+my %mem;
+sub gen_item {
+    my ($participant, $dataset, $seq) = @_;
+
+    # determine module & function
+    my ($module, $function);
+    {
+        $module = $participant->{module};
+        $function = $participant->{function};
+        last if $module;
+        if ($participant->{fcall_template}) {
+            $participant->{fcall_template} =~ /\A(\w+(?:::\w+)*)(?:::|->)(\w+)/
+                or die "Invalid syntax in fcall_template '$participant->{fcall_template}': can't extract module & function\n";
+            $module = $1;
+            $function = $2;
+        }
+    }
+
+    # generate code by filling in code template
+    my $code;
+    {
+        $code = $participant->{code};
+        last if $code;
+        if (my $t = $participant->{fcall_template} || $participant->{code_template}) {
+            my $code_str = "sub { ". fill_template($t, $dataset->{args}) . "}";
+            # XXX support argv
+            $code = eval $code_str;
+            die "Can't compile '$code_str': $@" if $@;
+        } else {
+            die "Unsupported participant type in participant #$participant->{seq}\n";
+        }
+        # XXX cmdline, cmdline_template
+        # XXX perl_cmdline, perl_cmdline_template
+    }
+
+    # determine appropriate name
+    my $name;
+    {
+        $name = $participant->{name};
+        last if $name;
+        if ($module && $function) {
+            $name = "$module\::$function";
+            last;
+        } elsif ($module) {
+            $name = $module;
+            last;
+        } else {
+            $name = "#$seq";
+        }
+    }
+
+    # make name unique
+    {
+        last unless $mem{$name};
+        my $i = 2;
+        while (1) {
+            my $name2 = "$name #$i";
+            $i++;
+            next if $mem{$name2};
+            $name = $name2;
+            last;
+        }
+        $mem{$name}++;
+    }
+
+    +{
+        name => $name,
+        (module   => $module  ) x !!defined($module),
+        (function => $function) x !!defined($function),
+        code => $code,
+    };
+}
+
+sub gen_items {
+    my $scenario = shift;
+
+    my $participants = $scenario->{participants};
+    die "Scenario doesn't have any participants\n"
+        unless $participants && @$participants;
+    my $datasets = $scenario->{datasets};
+
+    my @items;
+    my $seq_p = 0;
+    my $seq_i = 0;
+    for my $participant (@$participants) {
+        $participant->{seq} = $seq_p++;
+        if ($datasets && @$datasets) {
+            for my $dataset (@$datasets) {
+                push @items, gen_item($participant, $dataset, $seq_i++);
+            }
+        } else {
+            push @items, gen_item($participant, undef, $seq_i++);
+        }
+    }
+
+    \@items;
+}
+
+sub bench_items {
+    require Benchmark;
+
+    my $items = shift;
+
+    # load modules first
+    for my $item (@$items) {
+        my $mod = $item->{module} or next;
+        (my $mod_pm = "$mod.pm") =~ s!::!/!g;
+        print "DEBUG: Loading module '$mod' ...\n" if $DEBUG;
+        require $mod_pm;
+    }
+
+    my $func = $Opts{mode} eq 'timethese' ? 'timethese' : 'cmpthese';
+
+    &{"Benchmark::$func"}(
+        $Opts{count}, {
+            map { ($_->{name} => $_->{code}) } @$items,
+        },
+    );
+}
+
+sub run {
+    my $scenario = load_scenario();
+    my $items = gen_items($scenario);
+    bench_items($items);
+}
+
+parse_options();
+run();
+
+# ABSTRACT: Simple script to run benchmark scenario with Benchmark.pm
+# PODNAME: bencher-tiny
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bencher-tiny - Simple script to run benchmark scenario with Benchmark.pm
+
+=head1 VERSION
+
+This document describes version 0.003 of bencher-tiny (from Perl distribution Bencher-Tiny), released on 2016-10-20.
+
+=head1 SYNOPSIS
+
+After you install L<Bencher::Scenario::RefUtil>:
+
+ % bencher-tiny -c 10000 RefUtil
+                      Rate reftype(ARRAY) is_plain_arrayref is_arrayref ref(ARRAY)
+ reftype(ARRAY)    11905/s             --              -36%        -42%       -43%
+ is_plain_arrayref 18519/s            56%                --         -9%       -11%
+ is_arrayref       20408/s            71%               10%          --        -2%
+ ref(ARRAY)        20833/s            75%               12%          2%         --
+
+ % bencher-tiny -c 10000 RefUtil --timethese
+ Benchmark: timing 10000 iterations of is_arrayref, is_plain_arrayref, ref(ARRAY), reftype(ARRAY)...
+ is_arrayref:  1 wallclock secs ( 0.48 usr +  0.00 sys =  0.48 CPU) @ 20833.33/s (n=10000)
+ is_plain_arrayref:  0 wallclock secs ( 0.51 usr +  0.00 sys =  0.51 CPU) @ 19607.84/s (n=10000)
+ ref(ARRAY):  1 wallclock secs ( 0.49 usr +  0.00 sys =  0.49 CPU) @ 20408.16/s (n=10000)
+ reftype(ARRAY):  1 wallclock secs ( 0.84 usr +  0.00 sys =  0.84 CPU) @ 11904.76/s (n=10000)
+
+=head1 DESCRIPTION
+
+L<bencher> is a simple script to run benchmark scenario with L<Benchmark>
+(Benchmark.pm). It lacks L<bencher> features like filtering
+participants/datasets/modules, listing participants/datasets or other actions.
+But it is small and does not have any non-core dependency.
+
+=head1 EXIT CODES
+
+0 on success.
+
+99 on command-line options error.
+
+=head1 OPTIONS
+
+=head2 --count=i, -c
+
+Specify count to pass to C<cmpthese()>.
+
+=head2 --timethese
+
+Use C<timethese()> instead of C<cmpthese()>.
+
+=head2 --cmpthese
+
+Use C<cmpthese()> (the default, so normally it is not necessary to use this
+option).
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG => bool
+
+Will print debug messages when set to true.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Bencher-Tiny>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Bencher-Tiny>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Tiny>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<bencher>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

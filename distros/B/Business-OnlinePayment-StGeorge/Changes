@@ -1,0 +1,8 @@
+Revision history for Perl extension Business::OnlinePayment::StGeorge.
+
+0.02  Fri May  7 00:17:46 PDT 2004
+	- Only call init_client and free_client once, fixes multiple
+	  transactions
+
+0.01  Sat Jan 31 02:43:20 PST 2004
+	- original version; created by ivan 1.0

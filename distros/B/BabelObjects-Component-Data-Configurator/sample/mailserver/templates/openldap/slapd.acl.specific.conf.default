@@ -1,0 +1,99 @@
+################
+#access		to dn="$(CONFIGURATOR.BASE)"
+#		by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+
+################
+access          to dn="(.*),cn=(.*),ou=People,$(CONFIGURATOR.BASE)"
+                by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+                by dn="cn=\$2,ou=People,$(CONFIGURATOR.BASE)" write
+                by * none
+
+################
+access		to dn="cn=.*,ou=people,$(CONFIGURATOR.BASE)"
+		by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by self write
+                by dn="uid=.*,ou=Mail Account,$(CONFIGURATOR.BASE)" search
+                by dn="^\$\$" search
+		by * none
+
+################
+access          to dn="cn=(.*),ou=People,$(CONFIGURATOR.BASE)" attr=children
+                by dn="cn=\$1,ou=People,$(CONFIGURATOR.BASE)" write
+                by * none
+
+################
+access          to dn="ou=People,$(CONFIGURATOR.BASE)" attr=children
+                by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+                by group="cn=(.*) Administrateur,ou=Domain Administration Group,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by group="cn=Technical Administration,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+                by dn="uid=.*,ou=Mail Account,$(CONFIGURATOR.BASE)" write 
+                by dn="^\$\$" write
+                by * none
+
+################
+access		to dn="ou=Mail Account,$(CONFIGURATOR.BASE)" attr=children
+		by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by group="cn=(.*) Administrateur,ou=Domain Administration Group,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by dn="cn=(.*),ou=People,$(CONFIGURATOR.BASE)" write
+		by * none
+
+################
+access          to dn="uid=postadm,ou=Mail Account,$(CONFIGURATOR.BASE)"
+                by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+                by dnattr=owner write
+                by self write
+                by dn="cn=Ldap to Cyrus,$(CONFIGURATOR.BASE)" write
+                by dn="cn=Mail Account Server,$(CONFIGURATOR.BASE)" read
+                by * none
+
+################
+access		to dn="uid=(([^\-]+)(\-.+)*)\-(.+)-(.+),ou=Mail Account,$(CONFIGURATOR.BASE)"
+		by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by group="cn=\$1-\$4 Administrateur,ou=Domain Administration Group,ou=Administration group,$(CONFIGURATOR.BASE)" write
+		by dnattr=owner write
+		by self write
+		by dn="cn=Ldap to Cyrus,$(CONFIGURATOR.BASE)" write
+		by dn="cn=Mail Account Server,$(CONFIGURATOR.BASE)" read
+		by * none
+
+################
+access          to dn="uid=(.*),ou=Mail Account,$(CONFIGURATOR.BASE)"
+                by dnattr=owner write
+                by dn="cn=Mail Account Server,$(CONFIGURATOR.BASE)" read
+                by * none
+
+################
+access		to dn="ou=Mail Alias,$(CONFIGURATOR.BASE)" attr=children
+		by group="cn=Administrateur,ou=Administration group,$(CONFIGURATOR.BASE)" write
+		by group="cn=(.*) Administrateur,ou=Domain Administration Group,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by dn="cn=(.*),ou=People,$(CONFIGURATOR.BASE)" write
+		by * none
+
+################
+access          to dn="alias=(.+)@(.*)[\.]([^\.]+),ou=Mail Alias,$(CONFIGURATOR.BASE)"
+                by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+                by group="cn=\$2-\$3 Administrateur,ou=Domain Administration Group,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by dnattr=owner write
+                by dn="cn=Ldap to Cyrus,$(CONFIGURATOR.BASE)" write
+		by dn="cn=Mail Alias Server,$(CONFIGURATOR.BASE)" read
+                by * none
+
+################
+access          to dn="(.*),ou=Mail Alias,$(CONFIGURATOR.BASE)"
+                by dnattr=owner write
+                by dn="cn=Mail Alias Server,$(CONFIGURATOR.BASE)" read
+                by * none
+
+################
+access		to dn="cn=(.*),ou=Domain Administration Group,ou=Administration Group,$(CONFIGURATOR.BASE)" attr=member,entry
+		by group="cn=Administrateur,ou=Administration Group,$(CONFIGURATOR.BASE)" write
+		by dnattr=member read
+		by * none
+#		by dnattr=owner write
+#               by dn="cn=(.*),ou=People,$(CONFIGURATOR.BASE)" write
+#		by dn="cn=Mail Alias Server,$(CONFIGURATOR.BASE)" read
+#		by * none
+
+################
+defaultaccess	none		
+			

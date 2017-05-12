@@ -1,0 +1,9 @@
+classes:
+  - Service.mail.base
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - install mail transport agent Postfix
+  pkg:
+    - postfix

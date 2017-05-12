@@ -1,0 +1,23 @@
+---
+abstract: 'Bots that lookup JIRA tickets'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bot-Backbone-Service-Ticket-Tracker-JIRA
+requires:
+  Bot::Backbone::Service::Ticket::Tracker: '0'
+  JIRA::REST: '0'
+  Moose: '0'
+resources:
+  IRC: irc://irc.perl.org/#backbone
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-Backbone-Service-Ticket-Tracker-JIRA
+  repository: git://github.com/zostay/Bot-Backbone-Service-Ticket-Tracker-JIRA.git
+version: '0.160490'

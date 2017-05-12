@@ -1,0 +1,149 @@
+#!/usr/local/bin/perl -w
+use lib qw(lib);
+
+=head1 NAME
+
+bot-basicbot-pluggable.pl - A standard Bot::BasicBot::Pluggable script
+
+=head1 VERSION
+
+version 1.20
+
+=head1 DESCRIPTION
+
+A standard Bot::BasicBot::Pluggable interface. You can /query the bot to
+load in more modules. Change the admin password ASAP - 
+See perldoc L<Bot::BasicBot::Pluggable::Auth> for details of this.
+
+=head1 USAGE
+
+  bot-basicbot-pluggable.pl --nick MyBot --server irc.perl.org
+
+=head2 SEE ALSO
+
+Bot::BasicBot::Pluggable
+
+=cut
+
+use warnings;
+use strict;
+use CGI;
+use Template;
+
+my $q        = CGI->new; print $q->header;
+my $tt       = Template->new || die $Template::ERROR."\n";
+my $template = join "", <DATA>;
+
+
+my $nick = "dipsy";
+
+my $bot = Bot::BasicBot::Pluggable::CLI->new(
+  channels => [ ],
+  server => "",
+  nick => $nick,
+  charset => "utf8",
+  store   => { type => 'Storable' },
+);
+
+
+# Loader lets you tell the bot to load other modules.
+$bot->load("Loader");
+
+my @dunno = split /\|/, $bot->store->get('Infobot',"user_unknown_responses");
+
+my $in = $q->param("q");
+my $ret;
+goto VARS unless defined $in;
+
+# strip off whitespace before and after the message
+$in =~ s!(^\s*|\s*$)!!g;
+
+my $mess = { 
+				address => 1, 
+                channel => "#$nick",
+				body => $in, 
+				who => $ENV{USER},
+		  };
+
+if ($mess->{body} =~ /^help/i) {
+	$ret = $bot->help($mess);
+} else {
+	$bot->said($mess);
+	$ret = $bot->{_tmp_reply}->{body} if ($bot->{_tmp_reply});
+	$bot->{_tmp_reply} = undef;
+}
+
+VARS:
+$ret = $dunno[rand $#dunno] unless defined $ret and $ret ne "";
+
+my $vars = {
+				nick     => $nick,
+			    question => $in,
+                response => $ret,
+		   };
+
+
+$tt->process(\$template, $vars) || die $tt->error(), "\n";
+
+
+
+
+package Bot::BasicBot::Pluggable::CLI;
+$Bot::BasicBot::Pluggable::CLI::VERSION = '1.20';
+use base qw(Bot::BasicBot::Pluggable);
+
+sub reply {
+    my $self = shift;
+    my ($mess, $body) = @_;
+	$mess->{body} = $body;
+	$self->{_tmp_reply} = $mess;
+
+}
+
+package main;
+$main::VERSION = '1.20';
+__DATA__
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Web Dipsy [% IF question %] - [% question | html %] [% END %]</title>
+<style type="text/css">
+body {
+  background: #fff;
+  color: #000
+}
+p, td {
+  font-family: Geneva, MS Sans Serif, Helvetica, Arial, sans-serif; 
+}
+.botname {
+	
+}
+.botanswer {
+
+}
+.username {
+
+}
+.userquestion {
+}
+</style>
+</head>
+<body>
+
+<p>
+[% IF question %]
+<span class="username">you:</span>&nbsp;<span class="userquestion">[% question | html %]</span><br />
+<span class="botname">[% nick | html %]:</span>&nbsp;<span class="botanswer">[% response | html %]</span><br />
+[% ELSE %]
+<span class="botname">[% nick %]:</span><span class="botanswer">Hello!</span><br />
+[% END %]
+</p>
+<p>
+<form action="" method="GET">
+You: <input type="text" name="q" />&nbsp;<input type="submit" name="submit" value="?" />
+</form>
+
+
+</body>
+</html>

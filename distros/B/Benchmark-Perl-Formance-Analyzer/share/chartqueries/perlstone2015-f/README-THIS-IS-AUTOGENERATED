@@ -1,0 +1,5 @@
+The *.json files in here are auto.generated via
+
+  ./create-query-files
+
+so do not edit them by hand.

@@ -1,0 +1,33 @@
+---
+abstract: 'perl tools to use different RFID readers for library use '
+author:
+  - 'Dobrica Pavlinusic, C<< <dpavlin at rot13.org> >>'
+  - 'Dobrica Pavlinusic <dpavlin@rot13.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Module::Install::Repository: 0
+  Pod::Readme: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Biblio-RFID
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Carp: 0
+  Data::Dump: 0
+  Device::SerialPort: 0
+  Time::HiRes: 0
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: git://github.com/dpavlin/Biblio-RFID.git
+version: 0.03

@@ -1,0 +1,10 @@
+use strict;
+use warnings;
+
+use Bread::Board;
+
+sub {
+    container shift() => as {
+        service created_by => __FILE__;
+    };
+}

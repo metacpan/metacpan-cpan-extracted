@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Build/Daily.pm
+MANIFEST			This list of files
+t/00_compile.t
+t/01_Build-Daily.t
+t/distribution.t
+t/fixme.t
+t/mb/lib/Build/Daily/t/mb.pm
+t/mb/lib/Build/Daily/t/mb2.pm
+t/mb/lib/Build/Daily/t/mb3.pm
+t/pod-coverage.t
+t/pod-spell.t
+t/pod.t
+README
+META.yml
+SIGNATURE    Added here by Module::Build

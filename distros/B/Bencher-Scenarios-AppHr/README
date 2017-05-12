@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    hr from App::hr is an example of a simple
+    Perinci::CmdLine::Inline-based application which I benchmark to give a
+    rough idea of the minimal/baseline startup overhead a Perinci::CmdLine
+    application can have.
+
+SEE ALSO
+
+    App::hr
+

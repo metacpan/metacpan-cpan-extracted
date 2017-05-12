@@ -1,0 +1,6 @@
+use strict;
+use warnings;
+
+# this file is empty, returns something different from coderef
+
+1;

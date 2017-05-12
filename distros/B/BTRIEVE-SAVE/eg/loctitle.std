@@ -1,0 +1,46 @@
+
+File Manager Version 6.15
+Copyright 1982 - 1995, Btrieve Technologies, Inc.
+All Rights Reserved.
+
+File Statistics for LOCTITLE.DAT
+
+File Version = 6.10
+Page Size = 2048
+Page Preallocation = No
+Key Only = No
+
+Total Number of Records = 8
+Record Length = 34
+Data Compression = No
+Variable Records = Yes
+   Variable-Tail Allocation Tables = No
+   Blank Truncation = No
+Free Space Threshold = 5%
+
+Available Linked Duplicate Keys = 0
+Balanced Key = Yes
+Total Number of Keys = 3
+Total Number of Segments = 3
+
+Key         Position        Type            Null Values*               ACS
+    Segment          Length           Flags              Unique Values     Langname
+  0    1         1       4  Zstring             --                 8    --  Location
+  1    1         5       4  Integer      MD     --                 8    --  dbcn
+  2    1         9       7  Zstring      MD     --                 8    --  loc_title_sort
+  2    1         16      8  Zstring      MD     --                 8    --  date
+
+
+Legend:									    
+ < = Descending Order							    
+ D = Duplicates Allowed
+ I = Case Insensitive
+ M = Modifiable
+ R = Repeat Duplicate
+ A = Any Segment (Manual)
+ L = All Segments (Null)
+ * = The values in this column are hexadecimal.
+?? = Unknown
+-- = Not Specified
+
+The command completed successfully.

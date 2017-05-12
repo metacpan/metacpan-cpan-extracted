@@ -1,0 +1,24 @@
+Revision history for bioperl-network.
+
+Full details of changes between all versions are available online at:
+http://www.bioperl.org/wiki/Change_log
+
+1.6.901
+-----
+Attempt to fix CPAN indexing
+
+1.6.900
+-----
+Release to coincide with BioPerl 1.6.900
+
+1.6.0
+-----
+Minor updates and documentation fixes
+
+1.5.2
+-----
+First named release: released with bioperl-1.5.2 developer branch release
+
+Introduced Build.PL as the recommended alternative to installation,
+instead of Makefile.PL
+

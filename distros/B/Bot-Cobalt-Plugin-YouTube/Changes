@@ -1,0 +1,17 @@
+Revision history for Perl module Bot::Cobalt::Plugin::YouTube
+
+0.003001 2013-03-15
+
+  - Fix youtube.com link retrieval
+
+0.003000 2013-03-02
+
+  - Operate on channel CTCP actions
+
+0.002 2012-07-26
+
+  - Also fetch metadata from 'youtu.be' short links
+
+0.001 2012-07-22
+
+  - Initial release.

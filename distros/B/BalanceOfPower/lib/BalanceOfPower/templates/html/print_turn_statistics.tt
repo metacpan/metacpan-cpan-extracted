@@ -1,0 +1,19 @@
+<h3>YEAR [% year %]</h3>
+<div class="row">
+<table id="alldata" class="table table-striped table-bordered" cellspacing="0" width="100%">
+<thead>
+<tr>
+    <th>Nation</th>
+    [% INCLUDE 'fragments/nation_attributes_header.tt' -%]
+</tr>
+</thead>
+<tbody>
+[% FOREACH n IN names %]
+<tr>
+<td>[% INCLUDE fragments/linked_nation.tt %]</span></td>
+[%- nationstats = statistics.$n -%] 
+[% INCLUDE 'fragments/nation_attributes.tt' -%]
+[% END %]
+</tbody>
+</table>
+</div>

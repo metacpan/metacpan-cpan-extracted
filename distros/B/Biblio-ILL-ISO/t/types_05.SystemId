@@ -1,0 +1,12 @@
+$VAR1 = bless( {
+                 'name-of-person-or-institution' => bless( {
+                                                             'name-of-person' => bless( {
+                                                                                          'generalstring' => 'David A. Christensen'
+                                                                                        }, 'Biblio::ILL::ISO::ILLString' )
+                                                           }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' ),
+                 'person-or-institution-symbol' => bless( {
+                                                            'institution-symbol' => bless( {
+                                                                                             'generalstring' => 'MWPL'
+                                                                                           }, 'Biblio::ILL::ISO::ILLString' )
+                                                          }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+               }, 'Biblio::ILL::ISO::SystemId' );

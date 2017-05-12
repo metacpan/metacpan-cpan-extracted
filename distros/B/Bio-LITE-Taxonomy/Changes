@@ -1,0 +1,25 @@
+Revision history for Bio-LITE-Taxonomy
+
+0.07	Tue May 24 11:52:14 2011
+	Taxonomies now start in the first non-"root" level instead of the second.
+
+0.06    Fri Dec 3 15:06:31 2010
+        Small documentation changes
+
+0.05    Fri Dec 3 13:04:51 2010
+        Tests refactored
+
+0.04	Wed Dec 1 01:07:37 2010
+	More tests have been added
+	Improved documentation
+
+0.03    Fri Oct 12 10:42:34 2010
+        Minor bug fixes
+
+0.02    Tue Oct 9 10:30:22 2010
+        Make happy Pod::Coverage
+
+0.01    Mon Oct 8 12:43:04 2010
+        First version, released to CPAN
+
+

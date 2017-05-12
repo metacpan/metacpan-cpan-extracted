@@ -1,0 +1,19 @@
+classes:
+  - Hardware.power
+  - Hardware.net.bluetooth
+parameters:
+  doc:
+    hardware:
+      pkg:
+        - include low-level laptop tools
+parameters:
+  pkg:
+    - task-laptop
+  pkg-auto:
+    - bluetooth
+  pkg-avoid:
+    - bluez-cups
+    - cups
+    - printer-driver-all
+    - hplip
+    - hpijs

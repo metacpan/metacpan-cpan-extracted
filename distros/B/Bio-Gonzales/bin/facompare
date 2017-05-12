@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+#Copyright (c) 2010 Joachim Bargsten <code at bargsten dot org>. All rights reserved.
+
+use warnings;
+use strict;
+
+use 5.010;
+use Carp;
+use Bio::SeqIO;
+use File::stat;
+use Getopt::Long;
+
+my $only_header;
+
+GetOptions( 'only-header|oh|o' => \$only_header ) or die "Fehler im System";
+
+my ( $file1, $file2 ) = @ARGV;
+die "$file1 is no file" unless ( -f $file1 );
+die "$file2 is no file" unless ( -f $file2 );
+
+my $first_file_in_mem;
+my ( $load_in_memory, $from_disk );
+if ( stat($file1)->size > stat($file2)->size ) {
+    $load_in_memory = $file2;
+    $from_disk      = $file1;
+} else {
+    $load_in_memory    = $file1;
+    $first_file_in_mem = 1;
+    $from_disk         = $file2;
+}
+
+my %memory_seq;
+{
+    my $sin = Bio::SeqIO->new(
+        -format => 'fasta',
+        -file   => $load_in_memory,
+    );
+
+    while ( my $so = $sin->next_seq ) {
+        ( my $seq = $so->seq ) =~ s/[^\w]//g;
+        $memory_seq{$seq} = $so;
+    }
+}
+
+my $sin = Bio::SeqIO->new(
+    -format => 'fasta',
+    -file   => $from_disk,
+);
+
+my $sout = Bio::SeqIO->new(
+    -format => 'fasta',
+    -fh     => \*STDOUT,
+);
+
+say STDERR "--- $file1";
+say STDERR "+++ $file2";
+
+while ( my $so = $sin->next_seq ) {
+    ( my $seq = $so->seq ) =~ s/[^\w]//g;
+
+    if ( exists( $memory_seq{$seq} ) && $memory_seq{$seq} ) {
+        my ( $new_id, $new_desc );
+        if ($first_file_in_mem) {
+            $new_id   = $memory_seq{$seq}->display_id . '<=>' . $so->display_id;
+            $new_desc = $memory_seq{$seq}->desc . '<=>' . $so->desc;
+
+        } else {
+            $new_id   = $so->display_id . ' <=> ' . $memory_seq{$seq}->display_id;
+            $new_desc = $so->desc . ' <=> ' . $memory_seq{$seq}->desc;
+
+        }
+
+        $so->display_id( '=' . $new_id );
+        $so->desc($new_desc);
+        undef $memory_seq{$seq};
+        die unless ( exists( $memory_seq{$seq} ) );
+    } elsif( exists($memory_seq{$seq}) ) {
+        say STDERR "Found sequence " . $so->display_id ." two times, skipping it";
+    } else {
+        if ($first_file_in_mem) {
+            $so->display_id( '+' . $so->display_id );
+
+        } else {
+            $so->display_id( '-' . $so->display_id );
+
+        }
+    }
+
+    $only_header ? say $so->display_id . " " . $so->desc : $sout->write_seq($so);
+}
+
+for my $so ( grep {$_} values %memory_seq ) {
+    if ($first_file_in_mem) {
+        $so->display_id( '-' . $so->display_id );
+
+    } else {
+        $so->display_id( '+' . $so->display_id );
+
+    }
+    $sout->write_seq($so);
+}

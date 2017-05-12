@@ -1,0 +1,8 @@
+---
+- name:            "bracket.server"
+  server_class:    "FCGI::Engine::Manager::Server"
+  scriptname:      "script/bracket_fastcgi.pl"
+  nproc:            1
+  pidfile:         "/tmp/bracket.pid"
+  socket:          "/tmp/bracket.socket" 
+  additional_args: [ "-I", "lib/" ]

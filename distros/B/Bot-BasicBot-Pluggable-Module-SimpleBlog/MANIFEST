@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Bot/BasicBot/Pluggable/Module/SimpleBlog/Store/SQLite.pm
+lib/Bot/BasicBot/Pluggable/Module/SimpleBlog.pm
+t/simpleblog.t

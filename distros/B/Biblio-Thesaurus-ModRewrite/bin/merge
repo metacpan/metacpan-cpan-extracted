@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+if (@ARGV < 2) {
+    print "Usage: apply_rules <ontology1> <ontology2>\n";
+    exit 1;
+}
+
+use Data::Dumper;
+
+use Biblio::Thesaurus;
+use Biblio::Thesaurus::ModRewrite;
+
+my $obj = thesaurusLoad($ARGV[1]);
+
+foreach $i ($obj->allTerms) {
+	foreach $j ($obj->relations($i)) {
+		($k,$v) = each(%{$obj->depth_first($i, 1, $j)});
+		print 'Checking "', $i, ' ' , $j, ' ', $k, '" ...';
+		$res = `./validate "$i" "$j" "$k" $ARGV[0]`;
+		if ($res eq '') {
+			print " OK!\n";
+			$obj->addRelation($i,$k,$k);
+		}
+		else {
+			print " NOK!\n";
+			print $res;
+		}
+	}
+}
+
+$obj->save('merged.iso');
+print "Written 'merged.iso'.\n";

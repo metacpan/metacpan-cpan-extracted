@@ -1,0 +1,12 @@
+0.02 Wed, 29 Jun 2005 18:33:32 +0800
+	- added medpost_file()
+	- Now it allows options in the function call.
+
+0.03 Mon, 04 Jul 2005 01:11:24 +0800
+	- jump back to the original directory after medpost() is done.
+	- removed an assignment error in Medpost.pm
+
+0.04 Mon, 04 Jul 2005 01:38:44 +0800
+	- Added delimiter for PENN format.
+	- added t/medpost-penn.t for testing PENN format.
+	- Altered tests.

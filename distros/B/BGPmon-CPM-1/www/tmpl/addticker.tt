@@ -1,0 +1,18 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Add Stock Ticker'; %]
+
+<p><h2>Enter desired stock ticker symbol:</h2></p>
+
+<form action="cpm_workflow.cgi" method="GET">
+  <input type="hidden" name="action" value="showticker" /> 
+  <input type="hidden" name="list" value="[% LIST %]"/>
+  <input type="text" name="value" namesize=20>
+<p>For example: ANZ</p>
+  
+  <p>
+    <input type="button" value="Back" onClick="history.go(-1);">
+    &nbsp
+    <input type="submit" value = "Continue"/>
+  </p>
+</form>    
+
+[% INCLUDE footer.html %]

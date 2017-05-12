@@ -1,0 +1,60 @@
+NAME
+    BIND-Conf_Parser - a module for parsing BIND version 8 named.conf files
+
+DESCRIPTION
+    This module allows a script to understand the contents of a BIND
+    version 8 named.conf file.  Why would you want to parse your
+    /etc/named.conf file?  Well, let's say you're a sysadmin and you've
+    gotten tired of mismatches between your DNS forward and reverse
+    zones, and you want a tool that'll check your zone files for
+    inconsistencies and typos.  How's that tool going to get the
+    complete list of zone files?  Tah da, enter this module, stage
+    right!  The verify_zones script included with this module does
+    exactly the above, and may even work at your site.
+
+    Truth be told, finding zone files is all I currently use it for.
+    However, it handles the complete syntax, so perhaps you can think
+    of other users.
+
+    The name of this module is perhaps not the best.  Suggestions
+    are welcome.
+
+    This revision matches BIND version 8.2.2.
+
+THANKS
+    The design of this module was inspired by Gisle Aas's HTML::Parser
+    module.
+
+REQUIREMENTS
+    This module is known to work with perl-5.6.0, perl-5.005_02 and
+    perl-5.005_03, and is believed to work with Perl5.004.  However, it
+    is sensitive to changes in the semantics of the pos() function and
+    /\G.../g matching.  Indeed, the 5.004 -> 5.005 upgrade broke an
+    earlier version of this module.  You Have Been Warned.
+
+    The parse() method requires that the IO::Scalar module from the
+    IO-stringy kit be installed.
+
+DOCUMENTATION
+    The BIND::Conf_Parser module has been PODified, but good
+    descriptions of the data structures are, well, missing.  The
+    examples in the POD may be enough to get one started.
+
+MISSING
+    An automated test suite, for starters.  I 'test' this using the
+    named.conf at where I work, but the coverage of that test is pretty
+    poor.
+
+    Support for the new statements supported by BIND 9.0.0 would be
+    nice.
+
+AVAILABILITY
+    Currently, BIND-Conf_Parser can be found under:
+		ftp://ftp.gac.edu/pub/guenther/
+
+    I.e.,
+		ftp://ftp.gac.edu/pub/guenther/BIND-Conf_Parser-0.95.tar.gz
+
+AUTHOR
+    BIND-Conf_Parser was created by Philip Guenther <guenther@gac.edu>
+

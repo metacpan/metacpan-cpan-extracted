@@ -1,0 +1,6 @@
+name:         Bot-BasicBot-Pluggable-Module-Retort 
+version_from: lib/Bot/BasicBot/Pluggable/Module/Retort.pm
+installdirs:  site
+requires:
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

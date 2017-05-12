@@ -1,0 +1,74 @@
+=head1 Name
+
+Bigtop::Docs::QuickStart - The fastest ways to Gantry apps with Bigtop
+
+=head1 From the Command Line Alone
+
+Suppose you want to keep track of your relatives phone numbers and
+their children's birthdays.  After installing sqlite, Gantry, and Bigtop,
+type:
+
+    bigtop -n Phone 'family(name,phone,+email)<-child(name,birth_day:date)'
+    cd Phone
+    ./app.server
+
+We call the definition in the single quotes the 'kickstart,' it's a
+description of the data model.  See L<Bigtop::ScriptHelp::Style::Kickstart>
+for additional details on the syntax for kickstarts.  Here there are two
+tables.  family has name, phone, and optional email columns.  child has
+name and birth_day which is a date.
+
+If you don't have sqlite, you'll need to build your database.  If your
+database engine of choice is PostgreSQL or MySQL, you can follow these
+instructions...
+
+=head2 PostgreSQL
+
+    cd Phone
+    createdb app.db -U some_power_user
+    psql app.db -U regular_user < docs/schema.postgres
+    ./app.server -d Pg -u regular_user -p password
+
+=head2 mysql
+
+    cd Phone
+    msyqladmin create app.db -u root -p
+    mysql -u regular_user -p app.db < docs/schema.mysql
+    ./app.server -d mysql -u regular_user -p password
+
+In all cases, once you start C<app.server>, it will print URLs where you
+may point your browser to start using the app.
+
+You may choose to put the database connection information in the base config
+block in your bigtop file.  Then you won't need the flags.  If you want
+to use mulitple databases on a regular basis, consider adding a config block
+named for each database:
+
+    config mydbd {
+        dbconn `dbi:mydbd:dbname=somename`;
+        dbuser `your_pg_user`;
+        dbpass `secret`;
+    }
+
+Then you can regenerate once, and switch to the database of your choice with
+one command line flag:
+
+    bigtop docs/your.bigtop  # do this once
+    ./app.server -t mydbd    # repeat on each server start
+
+The rest of your app's config info will still come from the base config block,
+which you don't need to change.
+
+=head1 From a PostgreSQL Database
+
+If you already have a PostgreSQL 8 database called yourdb, and would like a
+CRUD app for it:
+
+    bigtop -n YourApp -s Pg8Live 'dbi:Pg:dbname=yourdb' user pass
+    cd YourApp
+    ./app.server -d Pg -n yourdb -u user -p pass
+
+Again, you might want to create a config block for this database as
+discussed above.
+
+=cut

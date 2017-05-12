@@ -1,0 +1,6 @@
+Revision history for Perl extension Bit::Fast.
+
+0.01  Sun Mar 15 13:45:19 2015
+	- original version; created by h2xs 1.23 with options
+		-A -n Bit::Fast
+

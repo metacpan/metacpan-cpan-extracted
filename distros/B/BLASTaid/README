@@ -1,0 +1,40 @@
+BLASTaid version 0.0.3
+
+BLASTaid was written to aid accessing specific reports from longer,
+multi part WU-BLAST (http://blast.wustl.edu/) alignments reports.
+
+NOTE: This module includes a command line script called BLASTaid. It
+should install on Mac OS X & *nix systems readily. For Windows
+machines, place the script somewhere in your perl path; also do this
+on other systems if there are problems with the installation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, Todd Wylie
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

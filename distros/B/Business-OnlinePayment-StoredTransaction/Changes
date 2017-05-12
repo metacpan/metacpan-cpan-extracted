@@ -1,0 +1,6 @@
+Revision history for Perl extension Business::OnlinePayment::StoredTransaction.
+
+0.01  Mon Jul 12 14:47:41 2004
+	- original version; created by h2xs 1.23 with options
+		--use-new-tests -AX -n Business::OnlinePayment::StoredTransaction
+

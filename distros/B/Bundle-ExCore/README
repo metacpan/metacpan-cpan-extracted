@@ -1,0 +1,20 @@
+Bundle-ExCore version 0.003
+===========================
+
+Bundle for Modules that have been removed or deprecated from the core
+of perl5.
+
+INSTALLATION
+
+To install this bundle type the following:
+
+   perl -MCPAN -e "install Bundle::ExCore"
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Martin Becker.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+

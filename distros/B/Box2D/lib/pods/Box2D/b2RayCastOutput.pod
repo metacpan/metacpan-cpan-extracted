@@ -1,0 +1,80 @@
+
+=head1 NAME
+
+Box2D::b2RayCastOutput - Ray-cast output data.
+
+=head1 SYNOPSIS
+
+  my $output = Box2D::b2RayCastOutput->new();
+  $shape->RayCast( $output, $input, $transform );
+  my $fraction = $output->fraction();
+  my $normal   = $output->normal();
+
+=head1 DESCRIPTION
+
+Ray-cast output data. The ray hits at S<p1 + fraction * (p2 - p1)>,
+where p1 and p2 come from C<Box2D::b2RayCastInput>.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2RayCastOutput>
+
+=head2 fraction()
+
+=head2 fraction( $fraction )
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$fraction> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 normal()
+
+=head2 normal( $normal )
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$normal> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2RayCastInput>
+
+=item * L<Box2D::b2AABB>
+
+=item * L<Box2D::b2Shape>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

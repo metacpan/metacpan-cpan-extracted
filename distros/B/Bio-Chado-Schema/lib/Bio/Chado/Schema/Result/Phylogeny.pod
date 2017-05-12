@@ -1,0 +1,39 @@
+package Bio::Chado::Schema::Result::Phylogeny;
+
+=head1 NAME
+
+Bio::Chado::Schema::Result::Phylogeny - For representing phylogenetic trees; the trees represent the
+phylogeny of some some kind of sequence feature (mainly
+proteins) or actual organism taxonomy trees
+
+=head1 CHADO MODULE
+
+Classes in this namespace correspond to tables and views in the
+Chado Phylogeny module.
+
+=head1 CLASSES
+
+These classes are part of the L<Bio::Chado::Schema> distribution.
+
+Below is a list of classes in this module of Chado.  Each of the
+classes below corresponds to a single Chado table or view.
+
+L<Bio::Chado::Schema::Result::Phylogeny::Phylonode>
+
+L<Bio::Chado::Schema::Result::Phylogeny::PhylonodeDbxref>
+
+L<Bio::Chado::Schema::Result::Phylogeny::PhylonodeOrganism>
+
+L<Bio::Chado::Schema::Result::Phylogeny::PhylonodePub>
+
+L<Bio::Chado::Schema::Result::Phylogeny::PhylonodeRelationship>
+
+L<Bio::Chado::Schema::Result::Phylogeny::Phylonodeprop>
+
+L<Bio::Chado::Schema::Result::Phylogeny::Phylotree>
+
+L<Bio::Chado::Schema::Result::Phylogeny::PhylotreePub>
+
+=cut
+
+1;

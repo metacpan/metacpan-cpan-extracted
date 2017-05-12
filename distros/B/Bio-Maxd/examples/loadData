@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+use DBI;
+use DBD::mysql;
+use Bio::Maxd;
+
+  my $maxd_db = new Bio::Maxd();
+
+  $result = $maxd_db->load_file(
+     -verbose=>"1",
+     -matrix_file=>'./examples/SA10Hu95metrics.txt',
+     -submitter=>'User Name',
+     -experiment=>'Cancer',
+     -array_type=>'HG-U95A2',
+     -extract=>'SA8',
+     -scanning_protocol=>'0',
+     -hybridisation=>'2345',
+     -hybridisation_protocol=>'0',
+     -image=>'1234',
+     -image_analysis_protocol=>'0',
+     -image_attribute_description=>'',
+     -public=>'false');
+
+  print "Done\n" if ($result);
+
+
+

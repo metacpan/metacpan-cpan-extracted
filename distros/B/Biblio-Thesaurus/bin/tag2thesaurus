@@ -1,0 +1,131 @@
+#!/usr/bin/perl -w -s
+
+eval 'exec /usr/bin/perl -w -s -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+our($rs,$fs,$fss);
+
+my $bl = shift or die("usage: $0 [options] Baselang File
+  option -fs=..  -rs=.. -fss=..\n");
+my $n=1;
+
+$rs ||= '';
+$rs =~ s/\\n/\n/g;
+$rs =~ s/\\n/\n/g;
+$/= $rs;
+
+$fs ||= qr{\s*\n};
+
+$fss ||= qr{\s+};
+
+print "%baselang $bl\n\n";
+
+while(<>){
+ next unless /\w/;
+ if(/^\%/){
+    print ;
+    next
+ }
+ chomp;
+ my %r=();
+ my $term=undef;
+# for $a (split(/\s*\n/,$_)){ 
+ for $a (split(/$fs\s*/,$_)){ 
+    if   ($a =~ /^($bl)$fss\s*(.*)/){ 
+        if ($term and $term ne $2){warn("2 baselang terms ($term,$2)\n");
+                   push(@{$r{"SYN-$bl"}}, $2) }
+        else {$term=$2;} }
+    elsif($a =~ /^(\S+)$fss\s*(.+)/){ push(@{$r{$1}}, $2) } 
+    else { warn("???: $a\n") } 
+ }
+
+ $term ||="undefined term ".$n++;
+ print "\n$term\n";
+ for $a (keys %r){
+    for ( @{$r{$a}} ){ print("$a $_\n") }
+ }
+}
+
+
+__END__
+
+=head1 NAME
+
+tag2thesaurus - transform a tagdictionary into a thesaurus
+
+=head1 SYNOPSIS
+
+ tag2thesaurus baselang tagdictionary
+
+=head1 DESCRIPTION
+
+tag2thesaurus converts tag-format in thesaurus-format
+
+Input file should follow the following tag-format
+
+ lang1  t11
+ lang2  t12
+ rel ...
+
+ lang1  t21
+ lang2  t22
+ rel ...
+
+C<tag2thesaurus lang2 file> output looks like:
+
+ %baselang lang2
+
+ t12
+ lang1  t11
+ rel ...
+
+ t22
+ lang1  t21
+ rel ...
+
+
+=head2 Options
+
+ -fs='::'   field separator (def \n)
+ -rs='\n'   record separatos (def "\n\n")
+ -fss='='   fiels separator2 (def \s+)
+
+Example: if the file has the following format
+
+ L1=v11 :: L2= v21 :: Ln= vn1 
+ L1=v12 :: L2= v22 :: Ln= vn2 
+
+the command
+
+ tag2thesaurus -rs='\n' -fs='::' -fss='=' L2 file
+
+would produce thesaurus :
+
+ %baselang L2
+
+ v21
+ L1   v11
+ Ln   vn1
+
+ v22
+ L1   v12
+ Ln   vn2
+
+=head2 Errors and Warnings
+
+Each entry must have a term in the baselanguage (otherwise, it is created
+one named "undef term 1").
+
+Each entry should have just one term in the baselanguage (the first one
+will be taken as the term, the other became C<SYN-baselang> ).
+
+=head1 AUTHOR
+
+J.Joao Almeida, jj@di.uminho.pt
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut      
+

@@ -1,0 +1,67 @@
+    Copyright (c) 1997 Ron Squiers. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself. 
+
+NAME
+    Btrees - executable comments
+
+SYNOPSIS
+    # yes, do USE the package ...
+    use Btrees;
+
+    # no constructors
+
+    # traverse a tree and invoke a function
+    traverse( $tree, $func );
+
+    # find a node in a balanced tree
+    $node = bal_tree_find( $tree, $val $cmp );
+
+    # add a node in a balanced tree, rebalancing if required
+    ($tree, $node) = bal_tree_add( $tree, $val, $cmp )
+
+    # delete a node in a balanced tree, rebalancing if required
+    ($tree, $node) = bal_tree_del( $tree, $val , $cmp )
+
+DESCRIPTION
+
+    Btrees uses the AVL balancing method, by G. M. Adelson-Velskii
+    and E.M. Landis. Bit scavenging, as done in low level languages like
+    C, is not used for height balancing since this is too expensive for
+    an interpreter. Instead the actual height of each subtree is stored
+    at each node. A null pointer has a height of zero. A leaf a height of
+    1. A nonleaf a height of 1 greater than the height of its two children.
+
+BUGS, CAVETS and other MUSINGS
+    Characterized a speed up of 25/5 = 500%, 25 seconds using a doubly
+    linked list class for search and add, versus a 5 second search, add
+    and balancing using the Btrees class.
+
+AUTHOR
+    Ron Squiers <ron@broadcom.com>. Adapted from "Mastering Algorithms with
+    Perl" by Jon Orwant, Jarkko Hietaniemi & John Macdonald. Copyright
+    1999 O'Reilly and Associates, Inc. All rights reserved. ISBN: 1-56592-398-7
+
+WHAT IS THIS?
+
+This is Btrees, a perl module.  Please see the README that comes with
+this distribution.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+To install this module into a specific directory, do:
+   perl Makefile.PL PREFIX=/name/of/the/directory
+   ...the rest is the same...
+
+Please also read the perlmodinstall man page, if available.
+
+WHAT MODULES DO I NEED?
+
+   CARP 

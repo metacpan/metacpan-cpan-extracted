@@ -1,0 +1,11 @@
+classes:
+  - Desktop.email.base
+parameters:
+  doc:
+    desktop-email:
+      headline:
+        - Desktop email
+      pkg:
+        - include Icedove email client
+  pkg:
+    - icedove

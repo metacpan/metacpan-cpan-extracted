@@ -1,0 +1,29 @@
+Revision history for Bot::Training
+
+0.06 2015-01-08 15:15:12
+
+    - Fixed "Can't modify split in chomp" error (See http://www.cpantesters.org/cpan/report/6e341b28-9675-11e4-a3f3-4fad3a6893cb).
+    - Added Dist::Zilla::Plugin::MinimumPerl to fix errors in Perl versions < 5.10
+    - Renamed MooseX::Getopt _getopt_full_usage to print_usage_text, see https://rt.cpan.org/Ticket/Display.html?id=82278
+
+0.05 2015-01-07 13:55:58
+
+    - Removed deprecated dependencies: Any::Moose and Class::MOP::load_class
+
+0.04 2010-05-12 03:41:15
+
+    - Remove X::Types use and depend on Moose/Mouse
+
+0.03 2010-05-01 21:10:00
+
+    - Re-release due to Makefile.PL breakage caused by Dist::Zilla
+      FAIL: http://github.com/rjbs/dist-zilla/commit/2e47b6c205
+
+0.02 2010-03-29 00:26:26
+
+    - RT#56037: Dist::Zilla::Plugin::AutoPrereq didn't catch our
+      Any::Moose dependencies.
+
+0.01 2010-03-27 18:12:29
+
+    - Initial and buggy version

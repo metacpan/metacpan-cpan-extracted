@@ -1,0 +1,11 @@
+$VAR1 = bless( {
+                 'client-identifier' => bless( {
+                                                 'generalstring' => '007'
+                                               }, 'Biblio::ILL::ISO::ILLString' ),
+                 'client-status' => bless( {
+                                             'generalstring' => 'Most excellent'
+                                           }, 'Biblio::ILL::ISO::ILLString' ),
+                 'client-name' => bless( {
+                                           'generalstring' => 'David Christensen'
+                                         }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::ClientId' );

@@ -1,0 +1,46 @@
+################################################################################
+# Spork Configuration File.
+# 
+# Please read this file over and set the values to your own.
+#
+# If you want global settings for all your slideshows, copy this file to
+# ~/.sporkrc/config.yaml. Any settings in this local file will override
+# the global value of that setting.
+# 
+# See C<perldoc Spork::Config> for details on settings.
+################################################################################
+author_name: Robert Buels
+author_email: rmb32@cornell.edu
+author_webpage: http://gmod.org/wiki/User:RobertBuels
+copyright_string: Copyright &copy; 2011 Robert Buels
+
+banner_bgcolor: red
+show_controls: 1
+mouse_controls: 0
+image_width: 350
+auto_scrolldown: 1
+logo_image: logo.png
+file_base: /Users/ingy/dev/cpan/Spork/
+
+slides_file: Spork.slides
+template_directory: template/tt2
+template_path:
+- ./template/tt2
+slides_directory: slides
+download_method: wget
+character_encoding: utf-8
+link_previous: &lt; &lt; Previous
+link_next: Next &gt;&gt;
+link_index: Index
+
+start_command: open slides/start.html
+
+# Change core classes here:
+# formatter_class: Spork::Formatter::Kwid
+
+# Set plugin classes here:
+plugin_classes:
+- Spork::S5
+- Spork::S5ThemeRedSimple
+#- Kwiki::PerlBlocks 
+

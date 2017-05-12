@@ -1,0 +1,12 @@
+# example cnf file for DoTS
+
+name=DoTS
+module=DoTS
+version=hum20040215_mus20031212
+source_version=N/A
+source_date=20040215
+download_date=20050413
+comment=Database Of Transcribed Sequences (DoTS)
+
+label=DoTS_ID, dotset=DoTS_ID, source_label=DoTS_ID
+label=LocusLink, dotset=LocusLink_ID, description=kind of a difficult one

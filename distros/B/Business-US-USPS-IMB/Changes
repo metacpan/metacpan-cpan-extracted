@@ -1,0 +1,6 @@
+Revision history for Perl extension IMB.
+
+0.01  Wed Jun  6 09:56:17 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n IMB
+

@@ -1,0 +1,280 @@
+#!/usr/local/bin/perl
+
+# Do some sanity checks on the DNS forward and reverse files.
+
+# This checks for duplicate host and ip entries in DNS forward,
+# duplicate ip in DNS reverse, DNS forward entries with no reverse, DNS
+# forward entries that don't match their reverses, and DNS reverse
+# entries with no forward entry.
+
+#
+# This file is copyright (C)  Philip Guenther <guenther@gac.edu>, 1999
+# 
+# This program is free software; redistribution and modification
+# in any form is explicitly permitted provided that all source
+# code versions retain this copyright notice and the following
+# disclaimer.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# Questions, ideas and suggestions are enthusiasticly welcomed
+# by the author.
+#
+
+use strict;
+
+# Where is the named.conf file?
+my($named_conf) = "/etc/named.conf";
+
+if (@ARGV) {
+    $named_conf = shift;
+}
+
+sub regularize;
+
+my(%ip, %files, $file, $named_dir, %name, $domain, $name, $ip, %nomatch);
+
+$| = 1;
+$\ = "\n";
+
+print "Checking DNS forward files...";
+
+# Parse the named.conf file to find the primary domains
+Parser->parse_file($named_conf);
+
+chdir($named_dir);
+
+while(($domain, $file) = each(%files)) {
+    next if $domain =~ /in-addr\.arpa/i;
+    $domain =~ tr[A-Z][a-z];
+    print " - Scanning $file...";
+    open(FORW, $file) || die "unable to open $file: $!";
+    while(<FORW>) {
+	my($nowarn, $nomatch);
+	$nowarn = 1 if /;NOWARN/;
+	$nomatch = 1 if /;NOMATCH/;
+	next if /;SKIP/;
+	s:;.*::;
+	next if /^\s*$/;
+	if (/\sA\s/) {
+	    if (/^[\w@]/) {
+		if (/^([@\w-.]+)\s+(?:\d+\s+)?(?:IN\s+)?A\s+([\d.]+)/) {
+		    $ip = $2;
+		    $name = regularize($1, $domain);
+		    if ($name{$name}) {
+			print "$name occurs multiple times" unless $nowarn;
+		    } else {
+			$name{$name} = $ip;
+			$nomatch{$name} = 1 if $nomatch;
+		    }
+		} else {
+		    chop;
+		    print "Invalid line?\n$_";
+		}
+	    } elsif (/^\s+(?:\d+\s+)?(?:IN\s+)?A\s+([\d.]+)/) {
+		$ip = $1;
+		$name{$name} .= " $ip";
+	    } else {
+		print "Syntax error on line $.: $_";
+		next;
+	    }
+	    if ($ip{$ip}) {
+		print "Duplicate ip $ip with hosts $ip{$ip} and $name"
+						unless $nowarn;
+		next;
+	    }
+	    if ($name !~ /\S/ || ! $ip) {
+		print "Empty name, say wha?  \$. = $., file = $file";
+		next;
+	    }
+	    $ip{$ip} = $name;
+	} elsif (/^([@\w-]+)\s+(?:\d+\s+)?(?:IN\s+)?PTR\s+(\d+\.){4}in-addr\.arpa/i) {
+	    # A network tag
+	    chop($ip = $2);		# rip off the trailing dot
+	    $name = regularize($1, $domain);
+	    $ip = join(".", reverse split(/\./, $ip));	# reverse the addr
+	    if ($name{$name}) {
+		print "$name occurs multiple times" unless $nowarn;
+	    } else {
+		$name{$name} = $ip;
+		$nomatch{$name} = 1 if $nomatch;
+	    }
+	    if ($ip{$ip}) {
+		print "Duplicate ip $ip with hosts $ip{$ip} and $name"
+						unless $nowarn;
+		next;
+	    }
+	    if ($name !~ /\S/ || $ip) {
+		print "Empty name, say wha?  \$. = $., file = $file";
+		next;
+	    }
+	    $ip{$ip} = $name;
+	} elsif (/^([@\w-.]+)\s+(?:\d+\s+)?(?:IN\s+)?CNAME\s+([\w-.]+)/) {
+	    $name = regularize($1, $domain);
+	    if ($name{$name}) {
+		print "$name occurs multiple times" unless $nowarn;
+	    } else {
+		$name{$name} = regularize($2, $domain);
+		$nomatch{$name} = 1 if $nomatch;
+	    }
+	} elsif (/^\$ORIGIN\s+([\w-.]+)/i) {
+	    $domain = regularize($1, $domain);
+	} else {
+	    next if /\sNS\s/;
+	    next if /\sTXT\s/;
+	    next if /\sHINFO\s/;
+	    next if /\sMX\s/;
+	    if (/\sSOA\s/) {
+		if (/\(/) {
+		    while (<FORW>) {
+			s/;.*//;
+			last if /\)/;
+		    }
+		}
+		next;
+	    }
+	    print "Syntax error on line $.: unknown format: $_";
+	    next;
+	}
+
+    }
+    close(FORW);
+}
+
+my(%revname, %revip);
+print "Checking DNS reverse files...";
+
+while(($domain, $file) = each(%files)) {
+    next unless $domain =~ s/\.in-addr\.arpa\.?//i;
+    # flip the domain around
+    $domain = join(".", reverse split(/\./, $domain));
+    print " - Scanning $file...";
+    open(REV, $file) || die "unable to open $file: $!";
+    while(<REV>) {
+	my($nowarn, $nomatch);
+	$nowarn = 1 if /;NOWARN/;
+	$nomatch = 1 if /;NOMATCH/;
+	next if /;SKIP/;
+	s:;.*::;
+	next if /^\s*$/;
+	if (/\sPTR\s/) {
+	    if (/^(\d+)(\.\d+)?\s+(?:IN\s+)?PTR\s+([\w-.]+)\.\s*$/) {
+		my($host, $subnet, $name) = ($1, $2, $3);
+		$ip = "$domain$subnet.$host";
+		if ($revname{$name}) {
+		    $revname{$name} .= " $ip";
+		} else {
+		    $revname{$name} = $ip;
+		}
+		if ($revip{$ip}) {
+		    print "$ip occurs multiple times";
+		} else {
+		    $revip{$ip} = $name;
+		    $nomatch{$ip} = 1 if $nomatch;
+		}
+	    } else {
+		print "Unknown PTR format on line $.: $_" unless $nowarn;
+		next;
+	    }
+	} elsif (/^\$ORIGIN\s+([\w-.]+)/i) {
+	    if (substr($1, -1, 1) eq '.') {
+		$domain = $1;
+		chop($domain);
+		if ($domain =~ s/\.in-addr\.arpa//i) {
+		    $domain = join(".", reverse split(/\./, $domain));
+		} else {
+		    print "\$ORIGIN set to out of zone: $file";
+		}
+	    } else {
+		$domain .= join(".", '', reverse split(/\./, $1));
+	    }
+	    next;
+	} else {
+	    next if /\sNS\s/;
+	    next if /\sA\s/;		# netmask declaration
+	    next if /\sTXT\s/;
+	    next if /\sHINFO\s/;
+	    if (/\sSOA\s/) {
+		if (/\(/) {
+		    while (<REV>) {
+			s/;.*//;
+			last if /\)/;
+		    }
+		}
+		next;
+	    }
+	    print "Syntax error on line $.: unknown format: $_";
+	    next;
+	}
+    }
+    close(REV);
+}
+
+print "Checking DNS reverse against DNS forward...";
+
+while(($ip, $name) = each %revip) {
+    next if $nomatch{$ip};
+    if (defined $ip{$ip}) {
+	if (!defined($name{$name})) {
+	    print <<EOM
+ * Name for ip $ip in reverse ($name) not in forward.
+   Forward file thinks it should be $ip{$ip}
+EOM
+	} else {
+	    if ($name{$name} !~ /\b$ip\b/) {
+		print " * $ip isn't an address for $name in the DNS forward";
+	    }
+	    if ($name ne $ip{$ip}) {
+		print <<EOM
+ * Name for ip $ip in reverse ($name) is in the forward,
+   but the forward think its address(es) is/are $name{$name}.
+EOM
+	    }
+	}
+	delete $ip{$ip};
+    } else {
+	print " * No forward entry for $ip (name = $name)";
+    }
+}
+
+print "Checking for DNS forward entries with no reverse...";
+foreach (sort keys %ip) {
+    if (/^(?:127\..*|\d+)$/) {
+	# These should be fine
+    } else {
+	print " * No reverse entry for $ip{$_}, ip = $_"
+		    unless $nomatch{$ip{$_}};
+    }
+}
+
+sub regularize {
+    my($name, $domain) = @_;
+    if ($name eq "@") {
+	$name = $domain;
+    } elsif (substr($name, -1, 1) ne '.') {
+	$name .= ".$domain";
+    } else {
+	chop($name);
+    }
+    $name
+}
+
+package Parser;
+
+use BIND::Conf_Parser;
+use vars qw(@ISA);
+BEGIN{ @ISA = qw(BIND::Conf_Parser); }
+
+sub handle_option {
+    my($self, $option, $argument) = @_;
+    return unless $option eq "directory";
+    $named_dir = $argument;
+}
+
+sub handle_zone {
+    my($self, $name, $class, $type, $options) = @_;
+    return unless $type eq "master" && $class eq "in";
+    $files{$name} = $options->{file};
+}

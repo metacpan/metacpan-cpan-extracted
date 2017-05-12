@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Bundle/MyLibrary.pm
+README
+t/1.t

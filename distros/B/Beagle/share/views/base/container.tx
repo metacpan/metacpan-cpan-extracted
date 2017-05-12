@@ -1,0 +1,4 @@
+<div id="container">
+: include '_wedge.tx' { template => 'container_start.tx', general => 1 };
+: include 'content.tx';
+: include '_wedge.tx' { template => 'container_end.tx', general => 1 };

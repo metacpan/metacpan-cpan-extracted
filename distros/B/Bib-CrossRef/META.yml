@@ -1,0 +1,26 @@
+---
+abstract: 'Uses crossref to robustly parse bibliometric references.'
+author:
+  - 'Doug Leith <dougleith@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bib-CrossRef
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTML::Entities: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+  URI::Escape: 0
+version: 0.09

@@ -1,0 +1,141 @@
+#!/usr/bin/perl -w
+# Retrieve OCV Totals from the OCV server.
+#  - note the OCV totals are generated internally to the OCV - they are 
+#    not provided by the bank.
+# **
+# NOTE: this procedure (using the OCV server) is unreliable, the OPS
+# maintains it's own totals logging and this should be used instead.
+# **
+#
+# Note on Settlement Dates:
+#  The desired day is specified as an offset from the "current" settlement
+# day. The OCV's notion of the current settlement day is generally that for
+# the last transaction - which may not have been for some time. i.e. the
+# current day may not be "today"! The OCV transparently skips idle days,
+# so requesting an offset of say 0 and then 1 on the 1/3/00 could conceivably 
+# return settlement dates of 25/2/00 and 7/2/00 if there were no transactions
+# on any days between.
+#  Furthermore, it is unspecified whether settlement days are independant of 
+# Accounts - that is, whether the loop below could return different settlement
+# days for the same day offset but different account numbers. To avoid any 
+# ambiguity the settlement date is printed with each listing.
+
+use strict;
+
+use OCV;
+
+my $server = shift;
+my $accountnum = shift || 1;
+my $day = shift || 0;
+
+$SIG{__DIE__} = sub { die "$0: @_" };
+
+die "usage: $0 <server<:port>> [<account number>] [<day>]\n" unless $server;
+
+
+# required parameters are: server address, client ID, account number
+$0 =~ /\/?([^\/]+)$/;	# basename
+my $ocv = new OCV
+	(
+		Server => $server, 
+		ClientId => substr($1, 0, 8), 
+		Timeout => 60, 
+		TxnLog => './var/totals.log',
+		Debug => 0, DebugLog => './var/totals.debug',
+	)
+	or die "Could not create OCV object: $@\n";
+
+my @statistics = $ocv->statistics(type => STATS_CURRENT) 
+	or die "ocv->statistics failed: $@\n";
+
+print "\n";
+#print "Server up since $statistics[14]\n";
+
+# get Accounts list
+# - turn into number => name hash
+#   - account number is actually a string, replete with leading 0's
+my $l = $ocv->accountlist()->Accounts	# ref to list of OCV::Message objects
+	or die "ocv->accountlist failed: $@\n";
+my %accounts = map {$_->Num+0 => $_->Name} @{$l};
+
+# if a specific account number was given, confirm it exists and skip
+# all other accounts - i.e. only get totals for given account
+# - also, skip Default account (0), as it's not a real account
+delete $accounts{0};
+if (defined($accountnum))
+{
+	die "no such account number [$accountnum]\n" 
+		unless exists $accounts{$accountnum};
+	%accounts = ($accountnum => $accounts{$accountnum});
+}
+
+
+for my $n (sort keys %accounts)
+{
+	my $t = $ocv->totals(accountnum=>$n, day=>$day) 
+		or die "ocv->totals failed: $@\n";
+
+	unless ($t->ResponseCode eq '00')
+	{
+		# whilst the spec isn't explicit, the totals request "fails" when
+		# when there are no transactions in the journal files
+		if ($t->ResponseCode =~ /^xx$/i)
+		{
+			print "There are no totals for account [$n], day [$day].\n";
+		}
+		else
+		{
+			print "Totals request for account [$n], day [$day] failed " . 
+				"with code [" . $t->ResponseCode . "]\n";
+		}
+		next;
+	}
+
+	{
+		# sum amounts and counts (fields 1 -> 4)
+		my @t;
+		for my $f (@{$t->Totals})
+		{
+			for (my $i = 1; $i <= 4; $i++)
+			{
+				$t[$i] += $f->[$i];
+			}
+		}
+		$t[1] /= 100;	# cents => $
+		$t[3] /= 100;
+
+		print "\nTotals for Account $n ($accounts{$n}) for " . 
+			join('/', unpack('A4A2A2', $t->Date)) . ":\n";
+		printf "  Purchases: Total amount \$%6.2f  Count %3d (Avg. \$%5.2f)\n", 
+			$t[1], $t[2], $t[2] ? ($t[1]/$t[2]) : 0;
+		printf "    Refunds: Total amount \$%6.2f  Count %3d (Avg. \$%5.2f)\n", 
+			$t[3], $t[4], $t[4] ? ($t[3]/$t[4]) : 0;
+		print  "  " . '-' x 60, "\n";
+		printf "       Nett:              \$%6.2f\n", $t[1] - $t[3];
+		print "\n";
+	}
+
+	{
+		# get the field names and widths from the first (0th) total message
+		my @w = $t->Totals->[0]->fieldwidths;
+
+		my $fmt = '';	# row format
+		my $l = '';		# separator line
+		for my $w (@w) { $l .= '-' x $w . " "; }
+
+		$fmt = "%-${w[0]}s %${w[1]}s %${w[2]}s %${w[3]}s %${w[4]}s";
+		printf $fmt, $t->Totals->[0]->fieldnames;
+		print "\n$l\n";
+
+		$fmt = "%-${w[0]}s %${w[1]}.2f %${w[2]}d %${w[3]}.2f %${w[4]}d";
+		for my $t (@{$t->Totals})
+		{
+			my @t =  @{$t};
+			$t[1] /= 100;	# cents => $
+			$t[3] /= 100;
+			printf $fmt, @t;
+			print "\n";
+		}
+	}
+	print "\n\n";
+}

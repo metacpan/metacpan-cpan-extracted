@@ -1,0 +1,146 @@
+# PODNAME: Bread::Board::Manual::Example::LogDispatch
+# ABSTRACT: An example of composing a dynamic Log::Dispatch object.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Bread::Board::Manual::Example::LogDispatch - An example of composing a dynamic Log::Dispatch object.
+
+=head1 VERSION
+
+version 0.34
+
+=head1 SYNOPSIS
+
+  my $c = container 'Logging' => as {
+      service 'Logger' => (
+          block => sub {
+              my $s       = shift;
+              my $c       = $s->parent;
+              my $outputs = $c->get_sub_container('Outputs');
+              my $log     = Log::Dispatch->new;
+              foreach my $name ( $outputs->get_service_list ) {
+                  $log->add(
+                      $outputs->get_service( $name )->get
+                  );
+              }
+              $log;
+          }
+      );
+
+      container 'Outputs' => as {
+          service 'File' => (
+              block => sub {
+                  Log::Dispatch::File->new(
+                      name      => 'file',
+                      min_level => 'debug',
+                      filename  => 'logfile'
+                  )
+              }
+          );
+          service 'Screen' => (
+              block => sub {
+                  Log::Dispatch::Screen->new(
+                      name      => 'screen',
+                      min_level => 'warning',
+                  )
+              }
+          );
+      };
+  };
+
+  my $logger = $c->resolve( service => 'Logging/Logger' );
+
+=head1 DESCRIPTION
+
+This example was inspired by a discussion I had with Jay Shirley.
+He wanted to know an easy way to have a dynamic list of output
+types for his Log::Dispatch object.
+
+Often with Bread::Board you will be wiring up components that
+are of a fixed type and set, but this is not always the case.
+It is in these cases when you can simply use the Bread::Board
+objects themselves to fetch your dependencies.
+
+The value passed into the block of a BlockInjection service
+is the service itself. Calling the C<parent> method on that
+service will give you the container that service is in. From
+there you can introspect the other containers and services
+any which way you want to.
+
+This example can be made even more dynamic if you build the
+'Logging' component as a parameterized container whose parameter
+is the 'Outputs' container. Here is what that would look like.
+
+  my $logging = container 'Logging' => [ 'Outputs' ] as {
+      service 'Logger' => (
+          block => sub {
+              my $s       = shift;
+              my $c       = $s->parent;
+              my $outputs = $c->get_sub_container('Outputs');
+              my $log     = Log::Dispatch->new;
+              foreach my $name ( $outputs->get_service_list ) {
+                  $log->add(
+                      $outputs->get_service( $name )->get
+                  );
+              }
+              $log;
+          }
+      );
+  };
+
+
+  my $outputs = container 'Outputs' => as {
+      service 'File' => (
+          block => sub {
+              Log::Dispatch::File->new(
+                  name      => 'file',
+                  min_level => 'debug',
+                  filename  => 'logfile'
+              )
+          }
+      );
+      service 'Screen' => (
+          block => sub {
+              Log::Dispatch::Screen->new(
+                  name      => 'screen',
+                  min_level => 'warning',
+              )
+          }
+      );
+  };
+
+  my $c  = $logging->create( Outputs => $outputs );
+  my $ld = $c->resolve( service => 'Logging/Logger' );
+
+This example illustrates how when a parameterized container is
+instantiated, the parameters become sub-containers of the
+resulting container. This makes it just as easy to fetch
+the 'Outputs' container and use it inside the 'Logger' service.
+
+=head1 AUTHOR
+
+Stevan Little <stevan@iinteractive.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+https://github.com/stevan/BreadBoard/issues
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

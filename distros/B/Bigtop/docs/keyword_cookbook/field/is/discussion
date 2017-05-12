@@ -1,0 +1,52 @@
+=head1 USE
+
+The most fundamental field keyword is C<is>.  Use it to specify the SQL
+type of the column.  The value can be a single SQL type name or a comma
+separated list of things to include in the SQL column definition.
+
+You may use any type your database engine understands.  But, some values are
+special because they are convereted to appropriate synonymns for all
+database engines:
+
+    type        what it becomes
+  ---------------------------------------------
+    varchar     a string type
+    int4        a moderately large integer
+    datetime    a full time and date
+
+In addition to the types which are converted for each database, two other
+values have special effects:
+
+    primary_key - marks this field as the primary key (or part of it)
+    auto        - indicates that the field should be auto-incremented
+
+Most tables have meaningless, sequentially assigned, integer keys.  To
+get one of those say:
+
+    field id { is int4, primary_key, auto; }
+
+Many fields hold strings, to get one say:
+
+    field name { is varchar; }
+
+Note that you may want to add other field statements in the block other
+than C<is>.
+
+You may augment the type with anything your database understands in
+a column declaration.  Some of those things have their own keywords,
+for instance, C<on_delete> and C<on_update> allow you to easily specify
+cascading behavior when employing foreign keys.
+
+You could say something like:
+
+    field state {
+        is varchar, `DEFAULT 'KS'`;
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in
+Kids/docs/schema.sqlite for the result of C<is> statements.

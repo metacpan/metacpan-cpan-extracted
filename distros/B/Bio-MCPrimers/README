@@ -1,0 +1,99 @@
+README for MCPrimers.pm V2.5 and
+mcprimers.pl, mcprimers_gui.pl, CloningVector.pm
+
+1. Authorship and copyright
+
+Authors:   MCPrimers:     Stephen G. Lenk, 2005, 2006.
+           CloningVector: Tim Wiggin and Steve Lenk 2006
+           
+Copyright: Stephen G. Lenk (C) 2005, 2006 on MCPrimers.pm
+           Tim Wiggin and Steve Lenk (C) 2006 on CloningVector.pm
+
+This program is free software; you can redistribute it and/or  
+modify it under the same terms as Perl itself.
+Licenced under the Perl Artistic Licence.
+
+############################################################################
+# This software comes with no guarantee of usefulness.
+# There is no guarantee this code will find the best solution, or even 
+# any solution, or that the solutions it finds will be correct or useful 
+# to you.
+#
+# Use at your risk. Check any solutions you obtain.
+#
+# Stephen G. Lenk assumes no responsibility for the use of this software.
+# Tim Wiggin assumes no responsibility for the use of this software.
+#
+############################################################################
+
+Primer3 is called by this code to verify that the PCR primers are OK.
+Primer3 is Copyright (c) 1996,1997,1998,1999,2000,2001,2004
+Whitehead Institute for Biomedical Research. All rights reserved.
+
+2. Installation
+
+MCPrimers.pm         - Place into Bio/MCPrimers.pm
+                       Use the perl site directory for Activestate
+CloningVector.pm     - Place into Bio/Data/Plasmid/CloningVector.pm
+                       Use the perl site directory for Activestate
+
+mcprimers.pl         - Front end CLI script. Make available to users.
+mcprimers_gui.pl     - GUI. Make available to users.
+
+MCPrimers_manual.doc - a Word format user manual.
+
+You WILL want to wrap the .pl files with a shell script or batch file
+so that the environment variables can be set. Remember that pl2bat
+on XP (Activestate) will make a batch file. You can edit the resulting
+file and add environment variables. Example files are provided.
+
+pET-32a.txt  - Put in data dir.
+It is OK to make your own vector data files using this format.
+
+MCPRIMER_DIR - Set this environment variable to point to the directory 
+               containing mcprimers.pl                   
+PRIMER3_DIR  - Set this environment variable to point to the directory 
+               containing the Primer3 executable.
+
+MCPrimers defaults environment variables to its starting directory.
+
+mcprimers.acd - provided for EMBOSS users 
+                not tested in actual EMBOSS environment
+
+MSWindows - use primer3.exe
+Other OS  - use primer3_core
+
+It is easiest to test and install mcprimers.pl & modules first
+then test and install the GUI.
+
+Note: Use perl -Ilib if modules are still in local lib directory.
+
+3. Purpose
+
+Creates molecular cloning PCR primer pairs for a given gene so that the
+gene can be directionally inserted into a vector, which is defined in
+an external data file.
+
+Solver is generic, restriction enzymes and their order in the vector 
+are specified in the data file specified.
+
+4. Test Results (V2.5)
+
+t/test.pl will test the release when run from a command line
+
+Passes test.pl clean on Windows XP with Activestate Perl 5.8.7
+Passes test.pl clean on MacOSX with Activestate Perl 5.8.8
+Passes test.pl clean on Linux with the standard installed Perl 5.8.7 
+
+The GUI was tested (OK) on XP and OSX.
+
+mcprimers.acd was checked on XP with acdc.exe and acdverify.exe
+mcprimers.acd was NOT checked in an actual EMBOSS environemnt
+
+---------------
+
+Enjoy,
+
+Steve Lenk
+slenk@emich.edu
+

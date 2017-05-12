@@ -1,0 +1,27 @@
+This is the application directory for a BenchmarkAnything storage,
+see http://benchmarkanything.org for more info.
+
+By default it contains an SQLite database containing benchmark results
+and config files for different situations:
+
+* For a distributed client/server configuration, point your tools to
+  use the 'client.cfg' by setting the environment variable in your
+  ~/.bash_profile:
+
+    export BENCHMARKANYTHING_CONFIGFILE=[% CLIENTCFG %]
+
+  and your server environment to use the 'server,cfg' by setting the
+  environment variable ONLY in the web server environment:
+
+    export BENCHMARKANYTHING_CONFIGFILE=[% SERVERCFG %]
+
+* For a single-host environment where everything contacts the database
+  locally (tools and the HTTP frontend), set this environment variable
+  in your ~/.bash_profile:
+
+    export BENCHMARKANYTHING_CONFIGFILE=[% LOCALCFG %]
+
+  which is also the built-in default. This config file also works for
+  frontend http server, so if you want to use remote clients later,
+  you only need to give them a client config pointing the http
+  base_url to this host here.

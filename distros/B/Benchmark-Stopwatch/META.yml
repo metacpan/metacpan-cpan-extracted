@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Benchmark-Stopwatch
+version:             0.05
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Clone:                         0
+    Data::Dumper:                  0
+    Test::LongString:              0
+    Test::More:                    0
+    Time::HiRes:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

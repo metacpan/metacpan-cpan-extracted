@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Bio::ConnectDots::Dot -- one dot entry for 'connect-the-dots'</title>
+<link rel="stylesheet" href="cpan.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#known_bugs_and_caveats">KNOWN BUGS AND CAVEATS</a></li>
+	<ul>
+
+		<li><a href="#bugs,_caveats,_and_todos">Bugs, Caveats, and ToDos</a></li>
+	</ul>
+
+	<li><a href="#author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#appendix">APPENDIX</a></li>
+	<ul>
+
+		<li><a href="#constructors">Constructors</a></li>
+		<li><a href="#simple_attributes">Simple attributes</a></li>
+		<li><a href="#retrieving_dots_(ie,_objects_connected_by_the_connector)">Retrieving Dots (ie, objects connected by the connector)</a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Bio::ConnectDots::Dot -- one dot entry for 'connect-the-dots'</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Bio::ConnectDots::Dot;
+  my $locuslink = ...;          #??? set to LocusLink dot somehow
+  my $Dot = new Bio::ConnectDots::Dot;
+  ???$dot-&gt;connectors({LocusID,UniGene,...});   
+  ???$locuslink-&gt;put($connector);       # add to LocusLink connector object</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<hr />
+<h1><a name="known_bugs_and_caveats">KNOWN BUGS AND CAVEATS</a></h1>
+<p>This is still a work in progress.  This documentation is out of date.
+In any case, this class is no longer used in normal processing</p>
+<p>
+</p>
+<h2><a name="bugs,_caveats,_and_todos">Bugs, Caveats, and ToDos</a></h2>
+<pre>
+  TBD</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author__david_burdick,_nat_goodman">AUTHOR - David Burdick, Nat Goodman</a></h1>
+<p>Email <a href="mailto:dburdick@systemsbiology.org,">dburdick@systemsbiology.org,</a> <a href="mailto:natg@shore.net">natg@shore.net</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2005 Institute for Systems Biology (ISB). All Rights Reserved.</p>
+<p>This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix">APPENDIX</a></h1>
+<p>The rest of the documentation describes the methods.</p>
+<p>
+</p>
+<h2><a name="constructors">Constructors</a></h2>
+<pre>
+ Title   : new
+ Usage   : my $dot = new Bio::ConnectDots::Dot;
+ Function: Create empty dot object
+ Returns : Bio::ConnectDots::Dot object</pre>
+<p>
+</p>
+<h2><a name="simple_attributes">Simple attributes</a></h2>
+<p>These are methods for getting and setting the values of simple
+attributes. Each of these can be set in the argument list to new, if
+desired.  Some of these should be read-only (more precisely, should
+only be written by code internal to the obkect), but this is not
+enforced. We assume, Perl-style, that programmers will behave nicely
+and not complain too loudly if the software lets them do something
+stupid.</p>
+<p>Methods have the same name as the attribute.  To get the value of
+attribute xxx, just say $xxx=$object-&gt;xxx; To set it, say
+$object-&gt;xxx($new_value); To clear it, say $object-&gt;xxx(undef);</p>
+<pre>
+ Attr    : connectors
+ Function: Hash ref of connected objects. The keys are the Connector names
+ Access  : read-write</pre>
+<p>
+</p>
+<h2><a name="retrieving_dots_(ie,_objects_connected_by_the_connector)">Retrieving Dots (ie, objects connected by the connector)</a></h2>
+<pre>
+ Title   : get_connector
+ Usage   : ??? my $dot=$locuslink-&gt;get_next;
+           my $locusid=$dot-&gt;get_connector('LocusID');
+           my @locusid=$dot-&gt;get_connector('LocusID');
+ Args    : Name of Connector (ie, connected object) to retrieve
+ Returns : In a scalar context: 
+             Returns the connected connector, if there's only one of the given type
+             If there are multiple connected dots, returns an arbitray one
+           In a list context, returns a list of the connected connectors of the 
+           given type.</pre>
+<pre>
+ Title   : get_dots
+ Usage   : ????my $dot=$locuslink-&gt;get_next;
+           my $aliases=$dot-&gt;get_connectors('Alias');
+           my @aliases=$dot-&gt;get_connectors('Alias');
+ Args    : Type of Connector (ie, connected object) to retrieve
+           These can be names or objects
+ Returns : In a scalar context, returns a list ref of the connected connectors
+           of the given type.
+           In a list context, returns a list of the connected dots of the 
+           given type.
+=cut</pre>
+
+</body>
+
+</html>

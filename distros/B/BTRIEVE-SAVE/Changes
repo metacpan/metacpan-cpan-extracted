@@ -1,0 +1,50 @@
+Revision history for Perl extension BTRIEVE::SAVE.
+
+0.3   Thu Feb 10 12:11:02 EST 2000 and previous <Lane>
+        - created BTRIEVE::SAVE and BTRIEVE::SAVE::REC to 
+	  handle Pervasive's dump file format.
+	- subs are:
+	  new
+	  _initbtrieve
+	  config
+	  parse_file
+	  next_rec
+	  next_recbits
+	  openbtr
+	  closebtr
+	  nextbtr
+	  output
+	  as_string
+	  rdb_to_save
+	  save_to_rdb
+	 ::REC
+	  new
+	  newconfig
+	  all_indexed
+	  copy_struct
+	  parse_string
+	  counted_rec
+	  counted_rec_hash
+	  fixed
+	  var
+	  data
+	  fix_hash_to_string	
+
+	- Made home page.
+
+0.35   Thu Feb 10 16:01:37 EST 2000 <Lane>
+        - original CPAN-style version; created by h2xs 1.19
+	- linux command: h2xs -A -X -n BTRIEVE::SAVE
+	- added Makefile.PL, MANIFEST, README, etc.
+	- created t and eg directories
+	- added t/test1.t -simple test of reading and writing 
+	  dump files.
+	- added eg/make_save.pl and location.* as an example 
+	   of reading a para-separated file and writing with 
+	   fancy sorting to the a save file.
+	- Set up automation for shipping.
+	- Updates on README.
+	
+       Tue Feb 15 15:18:27 EST 2000
+	- Re-formats and minor edits on docs.
+	- Added 'cleargz' as a target for shipping automation.

@@ -1,0 +1,57 @@
+# my default style
+<<include peter/Diss.pbib>>
+
+<pbib>
+	showresult	true
+</pbib>
+
+
+# use my mapping & mysql config
+# include OOo-table.pbib
+
+include mysql.pbib
+
+
+# use local mysql DB
+<biblio>
+	dbms mysql
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+#	debug_sql true
+	biblio_table biblio
+	shortcuts_table shortcuts
+</biblio>
+
+
+
+/*
+# default: use ODBC source named 'biblio'
+<biblio>
+	class Database
+	dbms ODBC
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+</biblio>
+*/
+
+/*
+# use a csv file as DBI data source
+<biblio>
+	class Database
+	dsn dbi:CSV:f_dir=C:/Documents and Settings/tandler.PC-BLAUBAER/My Documents/Diss/DissLit
+	debug_sql true
+	dbtable biblio
+	shortcuts_table shortcuts
+</biblio>
+*/
+
+/*
+# use a bibtex file
+<biblio>
+	class File
+#    file V:/Literature/peters-refs.bib
+	file C:/Documents and Settings/tandler.PC-BLAUBAER/My Documents/Diss/DissLit/LitBackup/refs-03-02-20.bib
+</biblio>
+*/

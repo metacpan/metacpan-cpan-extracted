@@ -1,0 +1,29 @@
+---
+abstract: 'Invoke code from an XSUB in opcode context'
+author:
+  - 'Yuval Kogman, Florian Ragwitz'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+  Test::use::ok: 0
+configure_requires:
+  ExtUtils::Depends: 0.302
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: B-Hooks-XSUB-CallAsOp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nothingmuch/b-hooks-xsub-callasop.git
+version: 0.02

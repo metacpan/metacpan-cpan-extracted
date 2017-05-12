@@ -1,0 +1,53 @@
+Revision history for Business-ID-NOPPBB
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-07-10 (PERLANCAR)
+
+	- Split pericmd CLI scripts to App-IndonesianNumberUtils to reduce
+	  dependencies on our dist.
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.05     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.04     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.03    2013-05-11 (SHARYANTO)
+
+        - Add script: bin/parse-nop-pbb.
+
+        - Add result fields: {eng,ind}_province_name.
+
+
+0.02    2012-03-23 (SHARYANTO)
+
+        - No functional changes. Remove dependency to old module Sub::Spec.
+
+
+0.01    2011-12-14 (SHARYANTO)
+
+        - First release.

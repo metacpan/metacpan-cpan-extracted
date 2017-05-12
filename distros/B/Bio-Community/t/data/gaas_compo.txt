@@ -1,0 +1,5 @@
+# tax_name	tax_id	rel_abund
+Streptococcus pyogenes phage 315.1	198538	0.791035649011735
+Goatpox virus Pellor	376852	0.196094208626593
+Lumpy skin disease virus NI-2490	376849	0.0128701423616715
+

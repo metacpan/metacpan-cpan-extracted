@@ -1,0 +1,165 @@
+package Beam::Minion::Util;
+our $VERSION = '0.003';
+# ABSTRACT: Utility functions for Beam::Minion
+
+#pod =head1 SYNOPSIS
+#pod
+#pod     use Beam::Minion::Util qw( minion );
+#pod
+#pod     my $minion = minion();
+#pod     my %attrs = minion_attrs();
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module contains helper routines for L<Beam::Minion>.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod L<Beam::Minion>
+#pod
+#pod =cut
+
+use strict;
+use warnings;
+use Exporter qw( import );
+use Minion;
+
+our @EXPORT_OK = qw( minion_init_args minion );
+
+our %BACKEND = (
+    sqlite => 'SQLite',
+    postgres => 'Pg',
+    mongodb => 'MongoDB',
+    mysql => 'mysql',
+);
+
+#pod =sub minion_init_args
+#pod
+#pod     my %args = minion_init_args();
+#pod
+#pod Get the arguments needed to initialize a new Minion instance by parsing
+#pod the C<BEAM_MINION> environment variable.
+#pod
+#pod This environment variable can take a few forms:
+#pod
+#pod =over
+#pod
+#pod =item <url>
+#pod
+#pod A simple backend URL like C<postgres://postgres@/test>,
+#pod C<sqlite:/tmp/minion.db>, C<mongodb://127.0.0.1:27017>, or
+#pod C<mysql://user@127.0.0.1/minion>. The following backends are supported:
+#pod L<Minion::Backend::SQLite>, L<Minion::Backend::Pg>,
+#pod L<Minion::Backend::MongoDB>, L<Minion::Backend::mysql>.
+#pod
+#pod =item <backend>+<url>
+#pod
+#pod A backend name and backend spec, separated by C<+>, like
+#pod C<Storable+/tmp/minion.db>.  Any backend may be used this way
+#pod
+#pod =back
+#pod
+#pod =cut
+
+sub minion_init_args {
+    die "You must set the BEAM_MINION environment variable to the Minion database URL.\n"
+        . "See `perldoc Beam::Minion` for getting started instructions.\n"
+        unless $ENV{BEAM_MINION};
+    my ( $backend, $url );
+    if ( $ENV{BEAM_MINION} =~ /^[^+:]+\+/ ) {
+        return split /\+/, $ENV{BEAM_MINION};
+    }
+    my ( $schema ) = $ENV{BEAM_MINION} =~ /^([^:]+)/;
+    return $BACKEND{ $schema }, $ENV{BEAM_MINION};
+}
+
+#pod =sub minion
+#pod
+#pod     my $minion = minion();
+#pod
+#pod Get a L<Minion> instance as configured by the C<BEAM_MINION> environment
+#pod variable (parsed by L</minion_init_args>).
+#pod
+#pod =cut
+
+sub minion {
+    return Minion->new( minion_init_args );
+}
+
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Beam::Minion::Util - Utility functions for Beam::Minion
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    use Beam::Minion::Util qw( minion );
+
+    my $minion = minion();
+    my %attrs = minion_attrs();
+
+=head1 DESCRIPTION
+
+This module contains helper routines for L<Beam::Minion>.
+
+=head1 SUBROUTINES
+
+=head2 minion_init_args
+
+    my %args = minion_init_args();
+
+Get the arguments needed to initialize a new Minion instance by parsing
+the C<BEAM_MINION> environment variable.
+
+This environment variable can take a few forms:
+
+=over
+
+=item <url>
+
+A simple backend URL like C<postgres://postgres@/test>,
+C<sqlite:/tmp/minion.db>, C<mongodb://127.0.0.1:27017>, or
+C<mysql://user@127.0.0.1/minion>. The following backends are supported:
+L<Minion::Backend::SQLite>, L<Minion::Backend::Pg>,
+L<Minion::Backend::MongoDB>, L<Minion::Backend::mysql>.
+
+=item <backend>+<url>
+
+A backend name and backend spec, separated by C<+>, like
+C<Storable+/tmp/minion.db>.  Any backend may be used this way
+
+=back
+
+=head2 minion
+
+    my $minion = minion();
+
+Get a L<Minion> instance as configured by the C<BEAM_MINION> environment
+variable (parsed by L</minion_init_args>).
+
+=head1 SEE ALSO
+
+L<Beam::Minion>
+
+=head1 AUTHOR
+
+Doug Bell <preaction@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

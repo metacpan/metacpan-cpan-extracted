@@ -1,0 +1,202 @@
+---
+## etc/langs/english.yml
+## This is a cobalt2 core langset.
+##
+## It provides IRC message strings for core plugins incl. Bot::Cobalt::IRC
+##
+## See the Bot::Cobalt::Lang docs for information on loading langsets.
+## See the Bot::Cobalt::Utils docs for help with formatting RPL strings.
+##
+## The actual replies exist in 'RPL:' below.
+## Typically they are strings formattable by Bot::Cobalt::Utils::rplprintf
+## The list of available variables is documented with each RPL.
+##
+## Variables with trailing characters can be terminated with %
+## e.g. "Running %version%."  -> "Running cobalt 2.00."
+
+### Names must be lowercase:
+NAME: english
+### Bump +1 on significant revisions:
+REV: 14
+### english.yml set is authoritative and must match t/02_core/02_lang.t:
+SPEC: 7
+
+RPL:
+
+ ## Core Cobalt set:
+
+  ## RPL_NO_ACCESS: %nick
+  RPL_NO_ACCESS: "%nick%, you are not authorized!"
+  
+  ## RPL_DB_ERR
+  RPL_DB_ERR: "Unknown database operation failure!"
+
+  ## RPL_PLUGIN_LOAD: %plugin, %module, %version
+  RPL_PLUGIN_LOAD: "Plugin loaded: %plugin (%module %version%)"
+
+  ## RPL_PLUGIN_UNLOAD: %plugin
+  RPL_PLUGIN_UNLOAD: "Plugin removed: %plugin"
+
+  ## RPL_PLUGIN_ERR: %plugin, %err
+  RPL_PLUGIN_ERR: "Failed plugin load: %plugin%: %err"
+
+  ## RPL_PLUGIN_UNLOAD_ERR: %plugin, %err
+  RPL_PLUGIN_UNLOAD_ERR: "Failed plugin unload: %plugin%: %err"
+
+  ## RPL_TIMER_ERR
+  RPL_TIMER_ERR: "Failed to add timer; unknown timer_set failure"
+
+
+ ## Bot::Cobalt::IRC:
+
+  ## RPL_CHAN_SYNC: %chan
+  RPL_CHAN_SYNC: "Sync complete on %chan"
+
+
+ ## Plugin::Version:
+
+  ## RPL_VERSION: %version, %perl_v, %poe_v, %pocoirc_v
+  RPL_VERSION: "Running %version (perl-%perl_v poe-%poe_v pocoirc-%pocoirc_v%) -- http://www.cobaltirc.org"
+
+  ## RPL_INFO: %version, %plugins, %uptime, %sent, %topics, %randstuffs
+  RPL_INFO: "Running %version%. I have %plugins plugins loaded. I've been up for %uptime and sent %sent messages. I have %topics info3 topics and %randstuffs randstuffs."
+
+  ## RPL_OS: %os
+  RPL_OS: "I am running %os"
+
+
+ ## Plugin::Alarmclock:
+
+  ## ALARMCLOCK_SET: %nick, %secs, %timestr, %timerid
+  ALARMCLOCK_SET: "Alarm set to trigger in %secs%s (%nick%) [timerID: %timerid%]"
+  
+  ## ALARMCLOCK_NOSUCH: %nick, %timerid
+  ALARMCLOCK_NOSUCH: "No such alarmID: %timerid"
+  
+  ## ALARMCLOCK_NOTYOURS: %nick, %timerid
+  ALARMCLOCK_NOTYOURS: "%nick%: alarmID %timerid doesn't appear to belong to you!"
+  
+  ## ALARMCLOCK_DELETED: %nick, %timerid
+  ALARMCLOCK_DELETED: "%nick%: alarmID %timerid has been cleared."
+
+
+ ## Plugin::Auth:
+
+  ## Broken syntax RPLs, no args:
+  AUTH_BADSYN_LOGIN: "Bad syntax. Usage: LOGIN <username> <passwd>"
+  AUTH_BADSYN_CHPASS: "Bad syntax. Usage: CHPASS <oldpass> <newpass>"
+
+  ## AUTH_SUCCESS: %context, %src, %nick, %user, %lev
+  AUTH_SUCCESS: "Successful auth [%nick%] (%user - %lev%)"
+
+  ## AUTH_FAIL_*: %context, %src, %nick, %user
+  AUTH_FAIL_BADHOST: "Login failed; host mismatch for %user [%src%]"
+  AUTH_FAIL_BADPASS: "Login failed; passwd mismatch (%user%)"
+  AUTH_FAIL_NO_SUCH: "Login failed; no such user (%user%)"
+  AUTH_FAIL_NO_CHANS: "Login failed; I don't share any channels with you!"
+  
+  ## AUTH_CHPASS_*: %context, %src, %nick, %user 
+  AUTH_CHPASS_BADPASS: "Specified password doesn't match (%user%)"
+  AUTH_CHPASS_SUCCESS: "Password changed (%user%)"
+
+  ## AUTH_STATUS, %nick, %user, %lev
+  AUTH_STATUS: "%nick% (%user%) is level %lev%"
+
+  ## AUTH_USER_ADDED, %nick, %user, %mask, %lev
+  AUTH_USER_ADDED: "Added username %user% (%mask%) at level %lev%"
+
+  ## AUTH_MASK_ADDED, %nick, %mask, %user
+  AUTH_MASK_ADDED: "Added new mask (%mask%) to %user%"
+
+  ## AUTH_MASK_EXISTS, %nick, %mask, %user
+  AUTH_MASK_EXISTS: "User %user% appears to have mask %mask% already"
+
+  ## AUTH_MASK_DELETED, %nick, %mask, %user
+  AUTH_MASK_DELETED: "Deleted mask %mask% from user %user%"
+
+  ## AUTH_USER_DELETED, %nick, %user
+  AUTH_USER_DELETED: "Deleted user %user%"
+
+  ## AUTH_USER_NOSUCH, %nick, %user
+  AUTH_USER_NOSUCH: "Could not find user %user%"
+
+  ## AUTH_USER_EXISTS, %nick, %user
+  AUTH_USER_EXISTS: "User %user% already exists"
+
+  ## AUTH_NOT_ENOUGH_ACCESS, %nick, %lev
+  AUTH_NOT_ENOUGH_ACCESS: "You don't have enough access for that operation (current: %lev%)"
+
+ ## Plugin::Info3:
+
+  ## INFO_DONTKNOW, %nick, %topic
+  INFO_DONTKNOW: "%nick%, I don't know anything about %topic"
+
+  ## INFO_WHAT, %nick
+  INFO_WHAT: "%nick%, what?"
+  
+  ## INFO_TELL_WHO, %nick
+  INFO_TELL_WHO: "Tell who what, %nick%?"
+  
+  ## INFO_TELL_WHAT, %nick, %target
+  INFO_TELL_WHAT: "Tell %target% about what, %nick%?"
+
+  ## INFO_ADD, %nick, %topic
+  INFO_ADD: "%nick%, %topic has been added."
+
+  ## INFO_DEL, %nick, %topic
+  INFO_DEL: "%nick%, %topic has been removed."
+
+  ## INFO_ABOUT, %nick, %topic, %author, %date, %length
+  INFO_ABOUT: "(%topic%) added by %author% at %date%. Response is %length% characters"
+
+  ## INFO_REPLACE, %nick, %topic
+  INFO_REPLACE: "Alright, %nick%, I just replaced %topic"
+
+  # INFO_ERR_NOSUCH, %nick, %topic
+  INFO_ERR_NOSUCH: "Could not find topic %topic%, %nick%."
+
+  # INFO_ERR_EXISTS, %nick, %topic
+  INFO_ERR_EXISTS: "%nick%, %topic already exists; perhaps you meant replace?"
+  
+  INFO_BADSYNTAX_ADD: "Usage: <bot> ADD <topic> <response>"
+  INFO_BADSYNTAX_DEL: "Usage: <bot> DEL <topic>"
+  INFO_BADSYNTAX_REPL: "Usage: <bot> REPLACE <topic> <new response>"
+
+
+ ## Plugin::RDB:
+
+  ## RDB_ERR_NO_SUCH_RDB, %nick, %rdb
+  RDB_ERR_NO_SUCH_RDB: "%nick%, RDB %rdb% doesn't appear to exist."
+
+  ## RDB_ERR_INVALID_NAME, %nick
+  RDB_ERR_INVALID_NAME: "%nick%, that RDB name appears to be invalid."
+  
+  ## RDB_ERR_NO_SUCH_ITEM, %nick, %rdb, %index
+  RDB_ERR_NO_SUCH_ITEM: "%nick%, RDB %rdb doesn't appear to have item %index"
+  
+  ## RDB_ERR_NO_STRING, %nick, %rdb
+  RDB_ERR_NO_STRING: "What would you like to add to RDB %rdb%, %nick%?"
+  
+  ## RDB_ERR_RDB_EXISTS, %nick, %rdb
+  RDB_ERR_RDB_EXISTS: "RDB %rdb already exists, %nick%!"
+  
+  ## RDB_ERR_NOTPERMITTED, %nick, %rdb, %op
+  RDB_ERR_NOTPERMITTED: "Operation %op appears to be disallowed."
+
+  ## RDB_CREATED, %nick, %rdb
+  RDB_CREATED: "Created RDB %rdb per request of %nick"
+
+  ## RDB_DELETED, %nick, %rdb
+  RDB_DELETED: "Deleted RDB %rdb%, %nick"
+
+  ## RDB_ITEM_ADDED, %nick, %rdb, %index
+  RDB_ITEM_ADDED: "Added item %index to %rdb for %nick"
+
+  ## RDB_ITEM_DELETED, %nick, %rdb, %index
+  RDB_ITEM_DELETED: "Deleted item %index from %rdb per request of %nick"
+
+  ## RDB_ITEM_INFO, %nick, %rdb, %index, %date, %time, %addedby
+  RDB_ITEM_INFO: "[rdb: %rdb%] %index%: added by %addedby at %time %date"
+
+  ## RDB_UNLINK_FAILED, %nick, %rdb
+  RDB_UNLINK_FAILED: "Failed to unlink RDB for %rdb"

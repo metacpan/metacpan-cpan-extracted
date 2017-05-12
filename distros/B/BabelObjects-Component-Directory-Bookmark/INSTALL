@@ -1,0 +1,96 @@
+The perl implementation can be installed as a CGI or FastCGI module.
+
+-------
+Warning
+-------
+
+You need a running BabelObjects installation. Go and install BabelObjects
+from CPAN if you haven't already done it.
+
+--------------
+Tested Version
+--------------
+
+  * RedHat 6.2 : Linux 2.2.14-6.1.1
+  * Apache : 1.3.12
+  * FastCGI : mod_fastcgi
+  * Perl : 5.6.0
+
+-------------
+Prerequisites
+-------------
+
+  * URI::Bookmarks
+
+------------
+Installation
+------------
+
+CPAN
+----
+
+BabelObjects may be installed through the CPAN shell in the usual CPAN shell
+manner.  It typically is:
+
+  perl -MCPAN -e 'install BabelObjects::Component::Directory::Bookmark'
+
+It involves a little more work if you have an older CPAN shell:
+
+  perl -MCPAN -e shell
+  install BabelObjects::Component::Directory::Bookmark
+
+MANUAL
+------
+
+Read next.
+
+--------------------------
+Getting The Latest Version
+--------------------------
+
+BabelObjects can also be installed manually. Tarballs are available from
+several sources:
+
+The most recent stable release can be found at your favorite CPAN
+mirror.  If you don't have a favorite CPAN mirror, there's always:
+
+  ftp://ftp.cpan.org/pub/CPAN/authors/id/K/KE/KERMAGO/
+
+The most recent development snapshot is available from :
+
+  http://www.BabelObjects.org/
+
+The BabelObjects project includes a CVS repository browser, so you can
+look around to see what's new.  It also has facilities for people to
+submit bug reports, patches, and support requests.
+
+On BabelObjects, you will find this same project in Java and Php (so
+you understand now the name Babel Objects :-). If you are brave, come
+and develop the framework in a new language.
+
+---------------------------
+Building The Latest Version
+---------------------------
+
+Downloading and unpacking the distribution are left as an exercise for
+the reader.  See the previous section for tarball locations.
+
+  perl Makefile.PL
+  make
+  make test    # very important : tells you what libraries are missing
+  make install
+
+------------
+Test Results
+------------
+
+To do...
+
+--------------
+Test  Coverage
+--------------
+
+To do...
+
+
+Go to CONFIGURATION file now.

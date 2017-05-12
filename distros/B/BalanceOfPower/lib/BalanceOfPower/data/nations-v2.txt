@@ -1,0 +1,69 @@
+# North America
+Canada,CAN,2,d
+Cuba,CUB,0,D
+Honduras,HON,0,D
+Mexico,MEX,1,d
+Nicaragua,NIC,0,D
+Panama,PAN,0,d
+USA,USA,2,d
+# South America
+Argentina,ARG,2,D
+Brazil,BRA,2,d
+Chile,CHI,1,D
+Colombia,COL,0,D
+Peru,PER,1,d
+Venezuela,VEN,0,d
+# Europe
+United Kingdom,GBR,2,d
+France,FRA,2,d
+Italy,ITA,2,d
+Spain,SPA,2,d
+Sweden,SWE,1,d
+West Germany,BRD,1,d
+Czechoslovakia,CZE,0,D
+East Germany,DDR,1,D
+Greece,GRE,0,D
+Poland,POL,0,D
+Romania,ROM,0,D
+USSR,URS,2,D
+Yugoslavia,YUG,1,D
+# Africa
+Algeria,ALG,1,D
+Egypt,EGY,2,d
+Ethiopia,ETH,1,d
+Libya,LIB,1,D
+Mali,MAL,0,D
+Morocco,MOR,0,d
+Nigeria,NIG,2,d
+Sudan,SUD,1,d
+Tunisia,TUN,0,d
+Angola,ANG,2,d
+Kenya,KEN,2,d
+Mozambique,MOZ,0,d
+South Africa,RSA,2,d
+Tanzania,TAN,1,d
+Zaire,ZAI,1,D
+Zimbabwe,ZIM,0,D
+# Middle East
+Afghanistan,AFG,2,D
+Israel,ISR,1,d
+Iran,IRI,1,D
+Iraq,IRQ,1,D
+Pakistan,PAK,1,D
+Saudi Arabia,KSA,2,D
+Syria,SYR,0,D
+Turkey,TUR,2,d
+# Far East
+Burma,BIR,0,D
+China,CHN,2,D
+India,IND,2,d
+North Korea,PRK,1,D
+South Korea,KOR,1,d
+Thailand,THA,0,d
+Vietnam,VIE,1,D
+# Pacific
+Australia,AUS,2,d
+Indonesia,INA,0,d
+Japan,JAP,1,d
+Philippines,PHI,0,d
+Taiwan,TWN,0,D

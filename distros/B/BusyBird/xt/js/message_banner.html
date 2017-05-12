@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>MessageBanner tests</title>
+    <link rel="stylesheet" href="qunit.css">
+  </head>
+  <body>
+    <div id="mb"></div>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit.js"></script>
+    <script src="sinon.js"></script>
+    <script src="../../share/www/static/jquery.js"></script>
+    <script src="../../share/www/static/busybird.js"></script>
+    <script type="text/javascript">
+"use strict";
+
+function testMessage(type, message) {
+    var class_name = ".bb-msg-" + type;
+    notStrictEqual($("#mb").css("display"), "none", "message banner displayed");
+    var $msg_span = $("#mb " + class_name);
+    strictEqual($msg_span.size(), 1, "message exists");
+    notStrictEqual($msg_span.css('display'), "none", "message displayed");
+    strictEqual($msg_span.text(), message, "message content OK");
+}
+
+function testNoMessage() {
+    var $msg_children = 
+    strictEqual($("#mb").css("display"), "none", "message banner hidden");
+}
+
+test("MessageBanner", function() {
+    var faketimer = sinon.useFakeTimers();
+    var mb = new bb.MessageBanner("#mb");
+    
+    ok(defined(mb), "MessageBanner created");
+    mb.show("normal message");
+    testMessage("normal", "normal message");
+    mb.show("error message", "error");
+    testMessage("error", "error message");
+    faketimer.tick(3000);
+    testMessage("error", "error message");
+    
+    faketimer.tick(4000);
+    testNoMessage();
+
+    mb.show("message", null, 500);
+    testMessage("normal", "message");
+
+    faketimer.tick(2000);
+    testNoMessage();
+
+    faketimer.restore();
+});
+
+    </script>
+  </body>
+</html>

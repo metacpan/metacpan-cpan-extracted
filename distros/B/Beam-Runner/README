@@ -1,0 +1,74 @@
+Beam::Runner
+
+This distribution is an execution and organization system for runnable
+objects (tasks). This allows you to prepare a list of runnable tasks in
+configuration files and then execute them. This also allows easy
+discovery of configuration files and objects, and allows you to document
+your objects for your users.
+
+  Configuration Files
+
+The configuration file is a Beam::Wire container file that describes
+objects. Some of these objects are marked as executable tasks by
+consuming the Beam::Runnable role.
+
+The container file can have a special entry called $summary which has a
+short summary that will be displayed when using the "beam list" command.
+
+Here's an example container file that has a summary, configures a
+DBIx::Class schema (using the schema class for CPAN Testers:
+CPAN::Testers::Schema), and configures a runnable task called
+"to_metabase" located in the class
+"CPAN::Testers::Backend::Migrate::ToMetabase":
+
+    # migrate.yml
+    $summary: Migrate data between databases
+
+    _schema:
+        $class: CPAN::Testers::Schema
+        $method: connect_from_config
+
+    to_metabase:
+        $class: CPAN::Testers::Backend::Migrate::ToMetabase
+        schema:
+            $ref: _schema
+
+For more information about container files, see the Beam::Wire
+documentation.
+
+  Tasks
+
+A task is an object configured in the container file that consumes the
+Beam::Runnable role. This role requires only a "run()" method be
+implemented in the class.
+
+Task modules are expected to have documentation that will be displayed
+by the "beam list" and "beam help" commands. The "beam list" command
+will display the "NAME" section of the documentation, and the "beam
+help" command will display the "NAME", "SYNOPSIS", "DESCRIPTION",
+"ARGUMENTS", "OPTIONS", "ENVIRONMENT", and "SEE ALSO" sections of the
+documentation.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Doug Bell.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

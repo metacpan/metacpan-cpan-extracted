@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use BioX::Map::CLIS;
+
+our $VERSION = '0.0.12'; # VERSION:
+# ABSTRACT: a tool used to mapping and compare mapping result
+
+# PODNAME: biox_map
+
+
+BioX::Map::CLIS->new_with_cmd;
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+biox_map - a tool used to mapping and compare mapping result
+
+=head1 VERSION
+
+version 0.0.12
+
+=head1 SYNOPSIS
+
+biox_map command syntax:
+
+  biox_map <command> [options] [arguments]
+
+Commands
+
+  map                 mapping one or more samples using bwa or soap
+  compare             compare the result of bwa or soap
+  mapcompare          a pipeline to mapping and compare result
+
+See `biox_map --help` for the full documentation of biox_map, or
+
+See `biox_map <command> --help` for detail description of the command
+
+=head1 COMMAND: map
+
+usage 1: using 2 cpu cores to map one file
+
+  biox_map map -i in.fastq -g hg19.fa -o out.txt -p 2
+
+usage 2: batch mapping parallel, run 3 samples parallel with each one using 2 cpu
+
+  biox_map map -I indir -g hg19.fa -O outdir -p 2 -P 3
+
+=head1 COMMAND: compare
+
+useage: all mapping result stored in indir. suffix of soap result is '.soap'[default:.soap] and suffix of bwa result is '.sam'[default: .bwa].
+
+  biox_map compare -i indir -o summary.txt -s soap -b sam
+
+=head1 COMMAND: mapcompare
+
+useage: run 3 samples parallel with each one using 2 cpu, all result will be stored in outdir
+
+  biox_map mapcompare -i indir -o outdir -g hg.fa -s outdir/summary1.txt -p 2 -P 3
+
+=head1 SEE ALSE
+
+L<BioX::Map>
+
+=head1 AUTHOR
+
+Yan Xueqing <yanxueqing621@163.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Yan Xueqing.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

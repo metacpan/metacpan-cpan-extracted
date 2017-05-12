@@ -1,0 +1,259 @@
+Changelog for Bubblegum
+
+0.45 2014-10-05T12:08:30
+ - Updated POD, README, and Makefile.
+ - Added missing Clone dependency.
+
+0.44 2014-09-30T00:21:30
+ - v0.44
+ - Updated POD, README, and Makefile.
+ - Miscellaneous POD updates.
+ - Removed hard IPC::System::Simple dependency.
+
+0.43 2014-09-29T18:47:29
+ - v0.43
+ - Removed Syntax::Keyword::Junction and Hash::Merge::Simple dependencies.
+
+0.42 2014-09-29T04:31:41
+ - v0.42
+ - Updated POD, README, and Makefile.
+ - Miscellaneous documentation updates.
+
+0.41 2014-09-28T23:59:38
+ - v0.41
+ - Updated POD, README, and Makefile.
+ - Added test and documentation for the partition method.
+ - Added partition method to Array.pm.
+ - Added undocumented codification of strings within methods that expect
+   coderefs.
+ - Miscellaneous updates.
+ - Added codify method to String.pm
+ - Miscellaneous cleanup.
+ - Added tests for the coercive role.
+
+0.40 2014-09-23T04:09:36
+ - v0.40
+ - Updated POD, README, and Makefile.
+ - Miscellaneous update.
+
+0.39 2014-09-23T03:44:50
+ - v0.39
+ - Updated POD, README, and Makefile.
+ - Relocated prototype functionality. Added a prototype package (meta)
+   class. Miscellaneous cleanup and better structure.
+
+0.38 2014-09-22T00:15:16
+ - v0.38
+ - Updated POD, README, and Makefile.
+ - Added DEMOLISH method which reaps anonymous packages.
+ - Added disclaimer to all top-level components.
+ - Prevent memory leak caused by anonymous package creation.
+
+0.37 2014-09-21T15:40:16
+ - v0.37
+ - Updated POD, README, and Makefile.
+ - Modified Prototype.pm to better support extending non-prototype classes.
+ - Fixed a bug in Universal created in the previous release.
+
+0.36 2014-09-20T16:00:25
+ - v0.36
+ - Updated POD, README, and Makefile.
+ - Added new dependencies to dist.ini.
+ - Added/started functionality to support prototype-based programming.
+ - Miscellaneous cleanup in Array.pm.
+ - Added deep hash merging to Hash.pm via Hash::Merg::Simple.
+ - Added undocumented reftype and refaddr methods to Universal.
+
+0.35 2014-09-20T03:51:08
+ - v0.35
+ - Updated POD, README, and Makefile.
+ - Added undocumented and untested yet complete, standardized explicit
+   coercion methods.
+ - Standardize object imports from the constraints class.
+ - Corrected contributors list.
+ - Corrected a typo.
+ - Add ability for all methods which accept a regexp parameter to accept a
+   string. Added a search-and-replace method.
+
+0.34 2014-09-16T00:59:55
+ - v0.34
+ - Updated POD, README, and Makefile.
+ - Added the gum shoehorn module.
+
+0.33 2014-09-14T15:25:25
+ - v0.33
+ - Updated POD, README, and Makefile.
+ - Added the output role to all data types.
+ - Added tests and changes to ensure methods that modify their subject work
+   as intended.
+ - Relocated isa and asa constraints and made them available to UNIVERSAL.
+ - Changed PWP::Encoding to PWP::SingleEncoding.
+
+0.32 2014-08-30T19:40:01
+ - v0.32
+ - Updated POD, README, and Makefile.
+ - Faster mechanism for importing and configuring, Replaced custom
+   Bubblegum::Exception with Throwable::Error version, Removed
+   Devel::StackTrace, Module::Find, and Try::Tiny, Added Throwable
+ - Fixed documentation errors in Bubblegum::Object::Universal.
+
+0.31 2014-08-19T09:24:15
+ - v0.31
+ - Updated POD, README, and Makefile.
+ - Completely refactored Bubblegum::Contraints, Update related
+   documentation, Added namespace::autoclean to classes importing
+   functions.
+
+0.30 2014-08-18T17:40:29
+ - v0.30
+ - Updated Contributors List, POD, README, and Makefile
+ - Updated POD, README, and Makefile.
+ - Updated miscellaneous sections of documentation.
+ - Added new methods, append, concat, and contains, to
+   Bubblegum::Object::String.
+ - Added print and say methods to Bubblegum::Object::Scalar
+ - improved efficiency for some constraint stuff
+
+0.29 2014-08-18T09:42:58
+ - v0.29
+ - Fixed documentation in Bubblegum::Object::Universal.
+
+0.28 2014-08-18T08:43:34
+ - v0.28
+ - Added documentation destined for type checking and assertions, as well
+   as wrappers, to Bubblegum::Object::Universal.
+ - Removed AUTOLOADing, Added standard assertions to
+   Bubblegum::Object::Role::Item, Started depreciating
+   Bubblegum::Constraints.
+ - Added tests and documentation to support the rebasing concept.
+
+0.27 2014-04-16T07:39:18
+ - v0.27
+ - Updated POD, README, and Makefile.
+ - Fix to prevent autoboxing from creating Moo objects.
+ - Removed all-fatal warnings configuration.
+ - Miscellaneous POD Update (main module).
+
+0.26 2014-04-08T05:37:18
+ - v0.26
+ - Updated dist.ini.
+ - Updated POD, README, and Makefile.
+ - Added experimental indirect method/role.
+ - Made all exception throwing verbose; All modules use 5.10.0 explicitly;
+   Added clear and hashify methods to B::O::Array; Added clear method to
+   B::O::Hash; Update B::O namespace POD with SEE ALSO sections.
+
+0.25 2014-04-04T03:43:43
+ - v0.25
+ - Updated POD, README, and Makefile.
+ - Made exceptions more verbose and refactored constraints slightly.
+
+0.24 2014-03-31T12:39:16
+ - v0.24
+ - Fix Bubblegum::Constraints implied attribute builder feature.
+
+0.23 2014-03-27T22:28:31
+ - v0.23
+ - Updated Makefile and README.
+ - Removed Exception::Tiny dependency, updated POD for Bubblegum
+   Constraints and Exception.
+
+0.22 2014-03-27T21:52:07
+ - v0.22
+ - Updated Makefile and README.
+ - Various refactoring of POD and functions.
+ - Allow Bubblegum::Constraints -attr to deduce a builder.
+
+0.21 2014-03-26T11:12:51
+ - v0.21
+ - Updated Makefile and README.
+ - Miscellaneous cleanup and fixed missing dependency.
+
+0.20 2014-03-21T17:49:18
+ - v0.20
+ - Trimmed dependencies and broke Bubblegum::Syntax out into a separate
+   dist.
+
+0.19 2014-03-11T23:09:56
+ - v0.19
+ - Miscellaneous cosmetic changes.
+
+0.18 2014-03-08T21:27:55
+ - v0.18
+ - Miscellaneous cosmetic changes.
+
+0.17 2014-03-08T00:49:53
+ - v0.17
+ - Updated Makefile and README.
+ - Requiring the RFC-compliant JSON::Tiny 0.45.
+ - Fixed typos and updated POD in Bubblegum, Class, Exception, Role, and
+   Singleton.
+ - Fixed typos and updated POD in Bubblegum::Syntax; the raise function
+   defaults to $@.
+ - Fixed string formatting method agrument error.
+
+0.16 2014-03-02T16:44:07
+ - v0.16
+ - Updated Makefile and README.
+ - Insignificant cosmetic changes.
+
+0.15 2014-03-02T08:52:37
+ - v0.15
+ - Updated the README.
+ - Fixed hypocracy bug in Bubblegum::Object::Universal.
+ - Added POD for Bubblegum Class, Exception, Role and Singleton.
+ - Added -typing export group to Bubblegum::Syntax.
+ - Miscellaneous cleanup and fixed a bug in the universal autoload routine.
+
+0.14 2014-03-01T04:53:00
+ - v0.14
+ - Many miscellaneous cosmetic changes.
+
+0.13 2014-02-28T06:23:09
+ - v0.13
+ - Updated Makefile and README.
+ - Added constraints and minimal tags to Bubblegum::Syntax.
+ - Miscellaneous cleanup of Bubblegum::Wrapper POD.
+ - Miscellaneous cleanup of Bubblegum::Syntax and Bubblegum POD.
+ - Added data accessor to Bubblegum::Exception.
+
+0.12 2014-02-22T06:53:06
+ - Added POD for core wrappers.
+ - Miscellaneous cleanup.
+ - Fixed cpantesters reported errors.
+ - Added object role tests.
+ - Added syntax section to POD in bubblegum.
+ - Updated synopsis in syntax.
+ - Replaced function is with will in syntax.
+ - Misc. updates to object roles.
+ - Added function is to syntax.
+ - Updated POD and added here function to syntax.
+
+0.11 2014-02-17T07:41:57
+ - Fixed test failures for numbers.t on x64 arc, updated documentation.
+ - Removed Bubblegum::Constraint and added the contributors section of the
+   POD.
+ - Fixed POD errors.
+
+0.10 2014-02-15T15:10:48
+ - Added syntax class providing type functions.
+ - Relocated numeric coercion routines.
+
+0.09 2014-02-13T07:20:07
+ - Miscellaneous cleanup, updates and documentation changes.
+ - Added tests for string and scalar operations.
+ - Added tests for number operations.
+ - Added tests for integer operations.
+ - Added tests for code operations.
+ - Updated .gitignore.
+
+0.08 2014-02-03T00:56:01
+ - Fixed homedir test in t/bubblegum/environment.t.
+ - Added additional test coverage and fixes.
+ - Updated dist.ini.
+ - Updated gitignore.
+ - Add INSTALL file to the repo.
+
+0.07 2014-01-28T10:45:06
+ - Initial commit.
+

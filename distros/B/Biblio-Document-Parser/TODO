@@ -1,0 +1,8 @@
+TODO
+====
+
+This is a fairly informal list of things I'd like to add:
+
+- Add Expat-style functions to the DocParsers. I've started this
+  by allowing an %options hash in the parse method, but I'd also
+  like to add parsefile, etc. 

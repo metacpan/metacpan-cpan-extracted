@@ -1,0 +1,113 @@
+/* $Id: sample-local.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * The default config how to find the bibliographic database
+ *
+ * Instead of ODBC, any data source can be used that has a driver
+ * for perl's DBI module.
+ *
+ */
+
+
+<biblio>
+	class File
+    file ../docs/intro.bib
+</biblio>
+
+
+
+/*
+
+#
+# some other examples
+#
+
+# use ODBC source named 'biblio'
+<biblio>
+	class Database
+	dbms ODBC
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+#	debug_sql true
+#	shortcuts_table shortcuts
+</biblio>
+
+# mysql
+<biblio>
+	class Database
+	dbms mysql
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+	shortcuts_table shortcuts
+</biblio>
+
+# use mysql with a remote host (without DSN)
+<biblio>
+	class Database
+	dbms mysql
+	dbhost pc-nerz
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+	shortcuts_table shortcuts
+</biblio>
+
+# use mysql with a remote host (using Perl DBI's DSN directly)
+# use this, if the version above fails for any reason
+<biblio>
+	class Database
+	dsn dbi:mysql:database=biblio;host=pc-nerz
+	dbname biblio
+	dbuser biblio
+	dbpass biblio
+	shortcuts_table shortcuts
+</biblio>
+
+
+
+# use a csv file as DBI data source
+<biblio>
+	class Database
+	dsn dbi:CSV:f_dir=sample-refs.csv
+	debug_sql true
+	dbtable biblio
+	shortcuts_table shortcuts
+</biblio>
+
+# use a bibtex file
+<biblio>
+	class File
+    file sample-refs.bib
+</biblio>
+
+*/
+
+
+/*
+ * specify default style
+ */
+
+<<include ../styles/Elsevier/JSS.pbib>>
+
+/*
+ * defaults for general pbib options
+ */
+
+<pbib>
+	showresult	true
+</pbib>
+
+
+/*
+ * $Log: local.pbib,v $
+ * Revision 1.3  2003/06/13 18:15:54  tandler
+ * default is ODBC, mysql example with remote host
+ *
+ * Revision 1.2  2003/06/13 16:11:09  tandler
+ * moved default local.pbib to "conf" folder
+ *
+ * Revision 1.1  2003/04/16 15:41:28  tandler
+ * defualt pbib config
+ *
+ */

@@ -1,0 +1,62 @@
+Bytes::Random::Secure
+
+Generate strings of cryptographic-quality pseudo-random bytes as a string of
+raw bytes, hex digits, MIME Base64, MIME QuotedPrintable, or just long ints.
+
+
+CONFIGURATION
+
+If you require better performance, install Math::Random::ISAAC::XS.  It will
+be automatically detected, and will provide better performance as you generate
+random bytes.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or preferably, let your favorite CPAN installer do the work for you.  Users
+are encouraged to use a fairly modern version of their CPAN installer, 
+particularly if building this distribution on Perl versions that
+preceed Perl 5.8.9.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Bytes::Random::Secure
+
+You can also look for information at:
+
+    Github Repository
+        https://github.com/daoswald/Bytes-Random-Secure.git
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bytes-Random-Secure
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Bytes-Random-Secure
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Bytes-Random-Secure
+
+    Search CPAN
+        http://search.cpan.org/dist/Bytes-Random-Secure/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 David Oswald
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,16 @@
+# Simple config file for testing only.
+config {
+    base_dir `t`;
+}
+app Apps::Checkbook {
+    authors `Phil Crow`;
+
+    # test default
+    license_text `All rights reserved.`;
+    table payeepayor {
+        field id    { is int4, primary_key, assign_by_sequence; }
+    }
+#    table something {
+#        field id    { is int4, primary_key, assign_by_sequence; }
+#    }
+}

@@ -1,0 +1,38 @@
+Revision history for Business-Giropay
+
+0.103 Tue 16 Aug 17:31:59 CEST 2016
+
+    * correct name for JSON::MaybeXS in deps (GH#1, Alexandr Ciornii)
+
+0.102 Tue 21 Jun 16:34:29 CEST 2016
+
+    * switch from deprecated JSON::Any to JSON::MaybeXS
+
+0.101 Wed  6 Apr 14:45:29 CEST 2016
+
+    * add message attribute to Notification class
+    * pass merchantId and projectId in main class notification method
+    * add Core role to Notification class
+    * add returned json to error in Response hmac mismatch
+
+0.100 Tue  5 Apr 11:26:10 CEST 2016
+
+    * add Role::Urls
+    * urlRedirect and urlNotify can now be set in Business::Giropay->new
+      and will be used by call to transaction
+    * add tests missing from MANIFEST
+
+0.003 Mon 21 Mar 13:10:24 CET 2016
+
+    * bump dep on Moo to 1st release that allowed non-ref default values
+    * add response tests
+    * bump dep on Test::More to 0.94 since we use subtest
+
+0.002 Fri 18 Mar 10:35:51 CET 2016
+
+    * add missing build dependency on 'aliased'
+    * POD improvements
+
+0.001 Thu 17 Mar 16:41:46 CET 2016
+
+    * Initial release

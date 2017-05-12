@@ -1,0 +1,140 @@
+NAME
+    BatchSystem::SBS - a Simple Batch System
+
+DESCRIPTION
+    A light, file based batch system.
+
+SYNOPSIS
+   a short example
+    #edit examples/sbsconfig-examples-1.xml to put your own local machines
+    (it can be a good idea, if you have not a cluster, to enter your local
+    machine with different addresses (localhost, 123.156.78.90, hostname) to
+    see sommething a bit more realistic...
+
+    #System status #in a side term, to see every second the watch -n 1
+    ../scripts/sbs-scheduler-print.pl --config=sbsconfig-examples-1.xml
+
+    #to submit or dozen or so scripts on queue 'single'
+
+    ../scripts/sbs-batch-submit.pl --config=sbsconfig-examples-1.xml
+    --queue=single --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh
+
+    #and on a higher priority queue
+
+    ../scripts/sbs-batch-submit.pl --config=sbsconfig-examples-1.xml
+    --queue=single_high --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh --command=a.sh
+    --command=a.sh --command=a.sh --command=a.sh
+
+    #to update
+
+    ../scripts/sbs-scheduler-update.pl --config=sbsconfig-examples-1.xml
+
+    #to check data consistency (and solve main problems
+
+    ../scripts/sbs-scheduler-check.pl
+
+    #to remove a job --config=sbsconfig-examples-1.xml
+
+    ../scripts/sbs-batch-remove --config=sbsconfig-examples-1.xml yourjobid
+
+   submiting command
+    You can submit either comman or scripts.
+
+    Script submited on a resource of type 'machine' will be sshed on the
+    host
+
+    Once a resource is attributed to a job, the script is transformed,
+    changing the following varaibles (see examples/*.sh)
+
+    $(machinefile} (for cluster type resource)
+    ${nbmachines} (for cluster type resource)
+    ${host} (for machine type resource)
+    ${jobid}
+
+    At submition time, a directory with the job number (incremented integer)
+    is created, where stdout/err will be written.
+
+    There will also have a batch.properties file (pids, start time etc.
+    etc.)
+
+EXPORT
+FUNCTIONS
+METHODS
+   my $sbs=BatchSystem::SBS->new();
+  Accessors
+   $sbs->scheduler
+    Returns the scheduler (BatchSystem::SBS::DefaultScheduler)
+
+   $sbs->workingDir([$val])
+    Get set the working directory
+
+   $sbs->
+   $sbs->
+  Actions
+   $sbs->job_submit(command=>cmd, queue=>queuename);
+    Returns a jobid
+
+   $sbs->job_remove(id=>job_id);
+    Remove the job from the list, the scheduler, kill processes
+
+   $sbs->job_action(id=>job_id, action=>ACTION);
+    Send an action to a job. ACTION can be of
+
+    'KILL': to kill (kill the process if running) one job
+
+   $sbs->job_infoStr(id=>job_id);
+    Returns a string (or undef if no job exist) with the job info
+
+   $sbs->job_info(id=>job_id);
+    Returns a hash (or undef if no job exist) with the job info
+
+   $sbs->jobs_dir([clean=>1]);
+    Get the job directory;
+
+    clean=>1 argument will clean the whole job directory
+
+   $sbs->jobs_list()
+    Returns an n x 4 array (each row contains jobid, queuename, scripts)
+
+  I/O
+   $sbs->readConfig(file=>file.xml)
+    Read its config from an xml file (see examples/ dir)
+
+   $sbs->dataRequest(request=>'req1,req2...')
+    request data (rpc oriented)
+
+AUTHOR
+    Alexandre Masselot, "<alexandre.masselot@genebio.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-batchsystem-sbs@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=BatchSystem-SBS>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright (C) 2004-2007 Geneva Bioinformatics (www.genebio.com) &
+    Jacques Colinge (Upper Austria University of Applied Science at
+    Hagenberg)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the Free Software Foundation,
+    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+

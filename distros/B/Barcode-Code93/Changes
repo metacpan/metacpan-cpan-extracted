@@ -1,0 +1,17 @@
+Revision history for Barcode-Code93
+
+0.04    Tue Feb 10 11:08:31 CST 2015
+        - Fixed makefile to require Moo
+
+0.03    Mon Feb, 2 01:00:06 CET 2015
+        - Moved from deprecated Any::Moose to Moo
+        - Refactor for readability
+
+0.02    Fri Apr  1 09:49:05 CDT 2011
+        - Renamed _calculateSums to calculateSums because GD::Barcode::Code93
+          needs it (made non-private, indicating we won't break it in the
+          future), though choosing to keep it undocumented.
+
+0.01    Fri Apr  1 09:04:47 CDT 2011
+        - Initial release, based on GD::Barcode::Code93
+

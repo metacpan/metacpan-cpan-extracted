@@ -1,0 +1,9 @@
+classes:
+  - Framework.crypto.base
+parameters:
+  doc:
+    framework-crypto:
+      pkg:
+        - include GTK+ PIN entry interface for GnuPG
+  pkg:
+    - pinentry-gtk2

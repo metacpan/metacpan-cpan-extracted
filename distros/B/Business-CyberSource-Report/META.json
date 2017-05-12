@@ -1,0 +1,71 @@
+{
+   "abstract" : "Factory class for modules that retrieve CyberSource's XML reports.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-CyberSource-Report",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "LWP::UserAgent" : "0",
+            "Storable" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Business::CyberSource::Report" : {
+         "file" : "lib/Business/CyberSource/Report.pm",
+         "version" : "v1.2.0"
+      },
+      "Business::CyberSource::Report::PaymentEvents" : {
+         "file" : "lib/Business/CyberSource/Report/PaymentEvents.pm",
+         "version" : "v1.2.0"
+      },
+      "Business::CyberSource::Report::SingleTransaction" : {
+         "file" : "lib/Business/CyberSource/Report/SingleTransaction.pm",
+         "version" : "v1.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/Business-CyberSource-Report/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Business-CyberSource-Report",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/Business-CyberSource-Report"
+      }
+   },
+   "version" : "v1.2.0"
+}

@@ -1,0 +1,28 @@
+Bundle-HTMLWikiConverter version 0.04
+=====================================
+
+This is a bundle of modules that can convert HTML into a number of
+wiki markups (or dialects). It includes HTML::WikiConverter 0.55 and
+all of its dialect modules (eg, DokuWiki, MediaWiki, Markdown).
+
+INSTALLATION
+
+This bundle should be installed using the CPAN shell or CPANPLUS.
+
+DEPENDENCIES
+
+This modules requires these modules:
+
+  * Test::More for testing
+  * HTML::TreeBuilder for building and manipulating HTML trees
+  * HTML::Entities for encoding HTML entities
+  * URI and URI::Escape for handling URIs in links
+
+COPYRIGHT
+
+Copyright (c) 2006 David J. Iberri <diberri@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html

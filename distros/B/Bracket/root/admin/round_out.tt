@@ -1,0 +1,20 @@
+[% page_title = 'Mark Round out for Teams' %]
+
+<div style="font-size: 0.88em;">
+<form id="round_out" name="round_out" action="" method="post">
+<input type="submit" value="Save" />
+<table summary="Round Out">
+<tr><th></th><th>Team</th><th>Round Out</th></tr>
+[% SET counter = 1 %]
+[% FOREACH team IN teams %]
+<tr>
+<td>[% counter %]</td>
+<td><label>[% team.name %]</label></td>
+<td><input type="text" name="[% team.id %]" value="[% team.round_out %]" size="1" maxlength="1" style="font-size: 0.88em;" /></td>
+</tr>
+[% counter = counter + 1 %]
+[% END %]
+<tr><td colspan="2"><input type="submit" value="Save" /></tr>
+</table>
+</form>
+</div>

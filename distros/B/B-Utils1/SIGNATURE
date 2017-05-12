@@ -1,0 +1,67 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4b121243d2b588e9a5bdc7cdf9e1c835133411be .gitignore
+SHA1 94f9a2d1ddcff15590778a9d23164e14b6666048 BUtils1.h
+SHA1 f11bc67dcd9d21a33aa154783ac094e03c9a6b1f Changes
+SHA1 187c2cfc1fc31d42c18d5b1653afa1a905bf266c LICENSE
+SHA1 fb42a09f848a7c4516fdc9c5275a0b4c31be55a7 MANIFEST
+SHA1 9991ab5d4f7473ccbff574144640a0645eeab406 META.json
+SHA1 c62add9f4e0f44fb85de0c0c6f19d67bd0abaeb2 META.yml
+SHA1 40374338772f8509409ba6ef79f6e400494206ba Makefile.PL
+SHA1 92f79205eb3fbf9a4cfbf031c9410479c56dfca2 README.md
+SHA1 5841c74ca367837714105fe21f1d4c7638ee5765 Utils1.xs
+SHA1 2732190eb473580e3a778c53e0e4fe78611e7b19 lib/B/Utils1.pm
+SHA1 850939d6409e5c657d49073756b208fb39302bdd lib/B/Utils1/Install/IFiles.pm
+SHA1 9a14424b4ca1b519d5f9722be282f97797b76613 lib/B/Utils1/OP.pm
+SHA1 2205d7c9d16c098d44de045371e2c2f03b266d21 ppport.h
+SHA1 5562b13d65b1f45a76a9e33519141cc333977907 t/10use.t
+SHA1 e0bd50be3253c0f8c3f14540a166c332b0c7d74c t/11export.t
+SHA1 dd72401bfa028ea4577d00351f78719ec7df523b t/20all_starts.t
+SHA1 3de0517edecc6363a1e972a770f8e474bb30be84 t/21all_roots.t
+SHA1 2a5a2db1d9ec72d9bf27ab5ce3823f4da390b963 t/22anon_subs.t
+SHA1 31fd249d8cd01cb56f02950260bd5576201a3459 t/30parent.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/31oldname.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/32kids.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/33ancestors.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/34descendants.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/35siblings.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/36previous.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/37stringify.t
+SHA1 4226de33b888b090bf6ea884147ab168610e3b7f t/40walk.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/41walkfilt.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/42all.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/43allfilt.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/44optrep.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/50carp.t
+SHA1 eded214935bfe2f87c3539ca997436653034b9d8 t/51croak.t
+SHA1 ab4db3630c67d1389ecd06bb47a8572bf7f989ba t/regression_walkallops_filtered.t
+SHA1 b5e9429b5aa5ee98015911e4229dede8d09b0ece t/z_kwalitee.t
+SHA1 9eba44de180daef6319b2c4a75ab55c972844c0e t/z_manifest.t
+SHA1 993b3cef8c06a70d99829facf76140864eb57240 t/z_meta.t
+SHA1 ace5e81d6d512c2dd862f56de8d1b0d6ffb6503e t/z_perl_minimum_version.t
+SHA1 43d52fd4190a5ddfc9132bd5eb85f2f83440a1c6 t/z_pod-coverage.t
+SHA1 c8aa3903d3aba84c19bbd94d677620c758fa07d5 t/z_pod.t
+SHA1 0d0b65ca900bef466f76a4626a1b61550af20924 t/z_ppport.t
+SHA1 eb2340fa08a606f4d26699ff24696727094d4f1c t/z_version.t
+SHA1 28a43cbd077cd63012725fb8eec1d7e2f3acf6be typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlW4dyQACgkQmm2SYo/9yULHHwCgit0DnOdO5/kFia74qMsA1Q79
+yQ0AnRCwwQqbIBfNCOHXtDkvMucVWawR
+=1kPo
+-----END PGP SIGNATURE-----

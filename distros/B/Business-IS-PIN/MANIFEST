@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Business/IS/PIN.pm
+t/00-load.t
+t/checksum.t
+t/day.t
+t/month.t
+t/new.t
+t/person-company.t
+t/valid.t
+t/year.t

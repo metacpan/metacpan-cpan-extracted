@@ -1,0 +1,3 @@
+BigIP::ParseConfig is a F5/BigIP configuration file parser.  It is
+freely distributable under the terms of the GNU General Public License.
+

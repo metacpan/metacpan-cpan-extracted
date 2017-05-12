@@ -1,0 +1,58 @@
+Business-OnlinePayment-Cardcom
+
+This is Business::OnlinePayment::Cardcom, a Business::OnlinePayment backend
+module for the Cardcom gateway. It's useful only if you have a merchant account
+with Cardcom (http://www.cardcom.co.il).
+
+Business::OnlinePayment is a generic interface for processing payments through
+online credit card processors, online check acceptance houses, etc.  (If you
+like buzzwords, call it an "multiplatform ecommerce-enabling middleware
+solution").
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Business::OnlinePayment::Cardcom
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-OnlinePayment-Cardcom
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Business-OnlinePayment-Cardcom
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Business-OnlinePayment-Cardcom
+
+    Search CPAN
+        http://search.cpan.org/dist/Business-OnlinePayment-Cardcom
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Freeside Internet Services, Inc.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+ADVERTISEMENT
+
+Need a complete, open-source back-office and customer self-service solution?
+The Freeside software includes support for credit card and electronic check
+processing, integrated trouble ticketing, and customer signup and self-service
+web interfaces.
+
+http://freeside.biz/freeside/
+

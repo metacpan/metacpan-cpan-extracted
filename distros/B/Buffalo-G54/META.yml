@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Buffalo-G54
+version:             0.03
+abstract:            Limited scraping API for Buffalo WBR2-G54 routers
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Log::Log4perl:                 1
+    Test::More:                    0
+    WWW::Mechanize:                1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Mike Schilli <cpan@perlmeister.com>

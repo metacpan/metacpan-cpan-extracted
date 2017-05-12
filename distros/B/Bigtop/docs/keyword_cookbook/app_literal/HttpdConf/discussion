@@ -1,0 +1,23 @@
+=head1 USE
+
+C<HttpdConf> literals dump output into C<docs/httpd.conf> files, which
+are used for mod_perl deployment.  Their output is intermixed with the
+location directives made for eacy controller in their order of
+appearance in the bigtop file.  This is useful if you need Apache
+configuration Bigtop does not understand.
+
+If all you want to do is insert PerlSetVars, use app level config
+block statements.  But, consider using Gantry::Conf which and decouples
+you from Apache.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+then look for the C<LocationMatch> directive in C<docs/httpd.conf>.  Notice
+that it falls between the base controller and the C<child> controller,
+in just the order the blocks appear in the bigtop file.  Also notice the
+way the whitespace is managed.  One new line is added to the end of the
+literal text, because it does not have trailing whitespace.

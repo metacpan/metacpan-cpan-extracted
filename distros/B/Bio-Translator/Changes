@@ -1,0 +1,55 @@
+Revision history for Bio::Translator
+
+0.6.1   Nov 10 2011
+  - Fixed translate_fasta.pl
+
+0.6.0   Jun 23 2011
+  - Changed interface (again) 
+
+0.5.7   May 10 2011
+  - Changed namespace
+  - Migrated to git
+
+0.5.6   May 7 2009
+  - Fixed bug in Translator where sequence was being cleaned after default
+    upper bound was being set and bounds were tested to be within the sequence.
+    Cleaning can cause the sequence to be truncated, which then invalidates
+    these tests/settings.
+
+0.5.5   Apr 23 2009
+  - Fixed bug in Base where Xs weren't being put in when base isn't found
+
+0.5.4   Apr 15 2009
+  - Put use version on same line as $VERSION declared
+  - Added META.yml so make dist would work
+
+0.5.3   Apr 13 2009
+  - Fixed inconsistencies in the way the start codon is being stored in the
+    reverse translation table
+  - Added test for above condition
+
+0.5.2   Apr 13 2009
+  - Even more documentation in Utils
+  - codons/regex/find method in Utils can take "stop" for stop codons
+
+0.5.1   Apr 13 2009
+  - Better documentation in Utils
+  - Fixed bugs in Bio::Translator::Utils::regex and find
+  - Fixed load test and added new tests
+
+0.5.0   Apr 2 2009
+  - Split out the table into its own package
+  - Split out helper translator functions into their own package
+
+0.4.3   Apr 1 2009
+  - Enforced that functions are called using func(@mandatory, %optional)
+
+0.4.2   Apr 1 2009
+  - Added find method into utils
+
+0.4.1   Mar 31 2009
+  - Minor fixes in documentation
+  - Use "my $self = shift->SUPER::new(@_)" in constructors
+
+0.4.0   Mar 18 2009
+  - Major refactor

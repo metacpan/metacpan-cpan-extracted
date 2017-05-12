@@ -1,0 +1,7 @@
+EXCL, Excluded from GST
+EXPORT, Export sales
+FREE, GST-free
+INPUT, Input taxed
+NREG, Not registered for GST
+RCTI, Recipient created tax invoice
+TAXED, GST Taxable

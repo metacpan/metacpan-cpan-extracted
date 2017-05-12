@@ -1,0 +1,49 @@
+#!/usr/local/bin/perl -w -I../blib/lib
+
+#
+# Copyright (C) 1998, David Muir Sharnoff
+#
+
+use strict;
+use BSD::Ipfwgen;
+use IO::Handle;
+
+us qw(
+	140.174.82.0/24 
+	207.33.232.0/22 
+	207.33.184.0/22 
+	207.33.240.0/21 
+	209.157.64.0/19 
+	140.174.154.0/24 
+	207.33.66.0/24 
+	209.66.121.0/24
+    );
+symmetric qw(
+	140.174.82.0/27
+	140.174.82.32/27
+    );
+consolidate qw(
+	209.157.65.0/24
+	207.33.90.0/24
+	140.174.82.128/25
+    );
+
+no_looping();
+
+to_me_rules <<'';
+	=skipto nfs-ok udp from 140.174.82.0/26 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok udp from 209.66.121.0/28 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok udp from 209.157.69.248/29 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 140.174.82.0/26 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 209.66.121.0/28 to any 111,2049 # portmap, NFS
+	=skipto nfs-ok tcp from 209.157.69.248/29 to any 111,2049 # portmap, NFS
+	=deny tcp from any to any 111,2049
+	=label nfs-ok
+	=skipto radius-ok udp from 207.33.185.2 to any 1645,1646 # RADIUS
+	=skipto radius-ok udp from 207.33.242.1 to any 1645,1646
+	=deny udp from any to any 1645,1646
+	=label radius-ok
+	=deny udp from any to any 515 # printer protocol
+
+generate qw(INSECURE DEFAULT-ACCEPT);
+

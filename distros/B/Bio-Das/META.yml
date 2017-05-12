@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Bio-Das
+version:      1.02
+version_from: Das.pm
+installdirs:  site
+requires:
+    Bio::Root::Root:               0
+    Compress::Zlib:                1
+    HTML::Parser:                  3
+    LWP:                           5
+    MIME::Base64:                  2.12
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

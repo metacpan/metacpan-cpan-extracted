@@ -1,0 +1,11 @@
+- Get all B::Deparse tests working
+- Get more of Perl distribution tests round-tripping:
+  deparse test, run deparsed test which should succeed
+- Refactor more common parts of 5.20 and 5.22 out
+- Better tree structure. Bodies could have subparts tagged
+- texts could have more structure: nested lists with different
+  separators per list.
+- Cleaner output based on more sophisticated tree analysis
+- Distinguish a node skipped from above or from below.
+- make indentation less hacky using tagging outside of text.
+  (Perl::Tidy is what folks should use for fancier indentation)

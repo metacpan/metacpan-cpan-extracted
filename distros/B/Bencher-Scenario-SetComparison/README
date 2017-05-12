@@ -1,0 +1,16 @@
+prepend:DESCRIPTION
+
+    TODO: include more set modules.
+
+    TODO: compare complex elements.
+
+BENCHMARK NOTES
+
+    Test::Deep is slow :)
+
+SEE ALSO
+
+    Bencher::Scenario::BagComparison
+
+    Bencher::Scenario::SetOperationModules
+

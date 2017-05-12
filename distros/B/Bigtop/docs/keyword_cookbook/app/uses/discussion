@@ -1,0 +1,44 @@
+=head1 USE
+
+The C<uses> keyword is deprecated.  It was used to specify the modules
+to use in the base module of the application.  You should put a C<uses>
+statement in the base_controller block to achieve this behavior.
+
+Better yet, you should really use C<gen_uses> and C<stub_uses> so the
+modules are used only where they are needed.
+
+This statement puts listed modules into both the stub and the gen module,
+but always remember that the stub is only built once and is never regenerated.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the Kids directory and look for C<Scalar> in these files:
+
+    docs/example.bigtop 15
+    lib/GENKids.pm 15
+    lib/Kids.pm
+
+Notice that this form of uses does not allow you to control imports
+from the used modules.  The other forms do, which is all the more
+reason to choose them.
+
+For a better approach, build:
+
+    bigtop -c example.better.bigtop all
+
+(Note that you will need to delete or rename the Kids directory.  Otherwise,
+bigtop will fail while complaining loudly that the build directory already
+exists.)
+
+Again, look for C<Scalar> in the same files.  It shows how to specify
+import lists.
+
+Finally, for the best approach build:
+
+    bigtop -c example.best.bigtop all
+
+Look for C<Scalar> in C<lib/Kids.pm> and for C<Some> in C<lib/GENKids.pm>.

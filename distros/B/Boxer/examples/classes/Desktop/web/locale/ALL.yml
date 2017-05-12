@@ -1,0 +1,9 @@
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include all Iceweasel locales
+  pkg:
+    - iceweasel-l10n-all

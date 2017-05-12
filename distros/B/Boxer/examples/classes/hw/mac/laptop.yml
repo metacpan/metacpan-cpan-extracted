@@ -1,0 +1,7 @@
+classes:
+  - hw.mac
+parameters:
+  pkg:
+    - pommed
+  pkg-nonfree:
+    - isight-firmware-tools

@@ -1,0 +1,3 @@
+: include "header.tx";
+: include "_archives.tx";
+: include "footer.tx";

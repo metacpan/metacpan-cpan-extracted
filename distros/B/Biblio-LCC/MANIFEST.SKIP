@@ -1,0 +1,11 @@
+\.DS_Store$
+\.cvsignore$
+^Makefile(\.bak)?$
+(^|/)CVS/
+^MANIFEST.bak$
+^blibdirs$
+^pm_to_blib$
+^blib\b
+^\.nkpr
+(^|/)_darcs/
+^Biblio-LCC-

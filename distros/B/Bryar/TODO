@@ -1,0 +1,23 @@
+Is the fastcgi_request method the best interface for Bryar::Frontend::FastCGI?
+Passing the variable to $bryar->go() looks more elegant, but it would
+require restructuring it and Bryar::Config to support merging new
+configuration values after the object has been created.
+Could this be useful in other situations as well?
+
+The Sitemap renderer needs to be much more configurable.
+Maybe we need a way to declare class-specific configuration directives
+in the new and go methods of Bryar (see above for another possible use).
+
+The TT renderer badly needs to be configurable. See above.
+
+Instantiate more classes to simplify the interfaces. (?)
+
+Update Bryar::_doit to support caching the collector output instead of
+the renderer output, to allow using dynamic templates.
+
+Remove all calls to chdir(2).
+
+Add support for trackbacks.
+
+Add many more tests.
+

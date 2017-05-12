@@ -1,0 +1,73 @@
+{
+   "abstract" : "Business::OnlinePayment::DLocal - DLocal (astropay) backend for Business::OnlinePayment",
+   "author" : [
+      "Jason (Jayce^) Hall <jayce@lug-nut.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Business-OnlinePayment-DLocal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::OnlinePayment" : "0",
+            "Business::OnlinePayment::HTTPS" : "0",
+            "Digest::SHA" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "Log::Scrubber" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Archive::Any::Lite" : "0",
+            "Module::CPANTS::Analyse" : "0",
+            "Module::Runtime" : "0",
+            "Test::More" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Jayceh/Business-OnlinePayment-DLocal/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Business-OnlinePayment-DLocal/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Jayceh/Business-OnlinePayment-DLocal.git",
+         "web" : "https://github.com/Jayceh/Business-OnlinePayment-DLocal"
+      }
+   },
+   "version" : "0.003",
+   "x_contributors" : [
+      "Jason Terry <jterry@bluehost.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

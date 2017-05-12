@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet href="../../../../../css/rss/feedRss1.xsl" media="screen" type="text/xsl"?>
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:syn="http://purl.org/rss/1.0/modules/syndication/" xmlns:admin="http://webns.net/mvcb/">  
+  <channel rdf:about="http://slashdot.jp/"> 
+    <title>スラッシュドット・ジャパン</title>  
+    <link>http://slashdot.jp/</link>  
+    <description>アレゲなニュースと雑談サイト</description>  
+    <dc:language>ja-jp</dc:language>  
+    <dc:rights>Copyright (C) Slashdot Japan, OSDN Corporation</dc:rights>  
+    <dc:date>2014-07-09T12:54:17+00:00</dc:date>  
+    <dc:publisher>Slashdot Japan</dc:publisher>  
+    <dc:creator>slashmaster@slashdot.jp</dc:creator>  
+    <dc:subject>Technology</dc:subject>  
+    <syn:updateBase>1970-01-01T00:00+00:00</syn:updateBase>  
+    <syn:updateFrequency>2</syn:updateFrequency>  
+    <syn:updatePeriod>hourly</syn:updatePeriod>  
+    <items> 
+      <rdf:Seq> 
+        <rdf:li rdf:resource="http://linux.slashdot.jp/story/14/07/09/097242/"/>  
+        <rdf:li rdf:resource="http://yro.slashdot.jp/story/14/07/09/0533213/"/>  
+        <rdf:li rdf:resource="http://it.slashdot.jp/story/14/07/09/0533204/"/>  
+        <rdf:li rdf:resource="http://yro.slashdot.jp/story/14/07/09/0532256/"/>  
+        <rdf:li rdf:resource="http://it.slashdot.jp/story/14/07/09/0532253/"/>  
+        <rdf:li rdf:resource="http://hardware.slashdot.jp/story/14/07/09/0412240/"/>  
+        <rdf:li rdf:resource="http://slashdot.jp/story/14/07/09/0410203/"/>  
+        <rdf:li rdf:resource="http://slashdot.jp/story/14/07/09/043250/"/>  
+        <rdf:li rdf:resource="http://slashdot.jp/story/14/07/09/040230/"/>  
+        <rdf:li rdf:resource="http://it.slashdot.jp/story/14/07/08/0859255/"/> 
+      </rdf:Seq> 
+    </items>  
+    <image rdf:resource="http://images.slashdot.jp/topics/topicslashjp.png"/>  
+    <textinput rdf:resource="http://slashdot.jp/search.pl"/>  
+    <atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="self" href="http://rss.rssad.jp/rss/slashdot/slashdot.rss" type="application/rss+xml"/>
+  </channel>  
+  <image rdf:about="http://images.slashdot.jp/topics/topicslashjp.png"> 
+    <title>スラッシュドット・ジャパン</title>  
+    <url>http://images.slashdot.jp/topics/topicslashjp.png</url>  
+    <link>http://slashdot.jp/</link> 
+  </image>  
+  <item rdf:about="http://linux.slashdot.jp/story/14/07/09/097242/"> 
+    <title>ミラクル・リナックス、ソフトバンク・テクノロジーに買収される</title>  
+    <link>http://linux.slashdot.jp/story/14/07/09/097242/</link>  
+    <description><![CDATA[<p>insiderman 曰く、OracleがOracle Linux事業を始めてからはますます微妙なポジションとなってしまったミラクル・リナックスが、ソフトバンク・テクノロジーに買収される模様。ミラクル・リナックス株式の58.0％をソフトバンク・テクノロジーが約6億4000万円で取得する形のようだ（ITmedia、プレスリリース）。
+
+ミラクル・リナックスはかつてはZabbix関連の国内サポート窓口になっていたような気もするが、最近ではZabbixが直接日本向けのサポートをやるようになっているし（2012年よりミラクルはZabbixの公式パートナーではなくなっている）、近年ではデジタルサイネージ分野の売り上げで何とか生き残っているような雰囲気。まあ、そろそろMIRACLE LINUXがお亡くなりになっても困る人はいなさそうだし、潮時という感じだろうか。<p> <a href="http://linux.slashdot.jp/story/14/07/09/097242/">すべて読む</a> | <a href="http://linux.slashdot.jp/">Linuxセクション</a> | <a href="http://slashdot.jp/stories/linux">Linux</a> </p> <p> 関連ストーリー： <br><a href="http://linux.slashdot.jp/article.pl?sid=12/12/26/0638229">ターボリナックスが建設業許可を取得、家屋解体工事を進行中</a> <small>2012年12月26日</small> <br><a href="http://it.slashdot.jp/article.pl?sid=08/07/02/0342236">ミラクルの吉岡弘隆氏が取締役退任、生涯一プログラマ宣言。</a> <small>2008年07月02日</small> <br><a href="http://slashdot.jp/article.pl?sid=06/04/19/0321211">米オラクルが独自Linuxディストリビューション開発へ</a> <small>2006年04月19日</small> <br><a href="http://slashdot.jp/article.pl?sid=04/01/10/1219252">ミラクル＋紅旗＝Asianux</a> <small>2004年01月10日</small> <br><a href="http://slashdot.jp/article.pl?sid=01/10/26/0418228">ターボ、ミラクル、迷走中?</a> <small>2001年10月26日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T09:44:00+00:00</dc:date>  
+    <dc:subject>linux</dc:subject>  
+    <slash:department>そろそろ社名からリナックスを外しても良いのでは</slash:department>  
+    <slash:section>linux</slash:section>  
+    <slash:comments>12</slash:comments>  
+    <slash:hit_parade>12,10,4,3,1,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[insiderman 曰く、<blockquote><div><p>OracleがOracle Linux事業を始めてからはますます微妙なポジションとなってしまったミラクル・リナックスが、ソフトバンク・テクノロジーに買収される模様。ミラクル・リナックス株式の58.0％をソフトバンク・テクノロジーが約6億4000万円で取得する形のようだ（<a href="http://www.itmedia.co.jp/news/articles/1407/08/news108.html">ITmedia</a>、<a href="http://www.softbanktech.co.jp/corp/news/press/2014/057/">プレスリリース</a>）。
+</p><p>
+ミラクル・リナックスはかつてはZabbix関連の国内サポート窓口になっていたような気もするが、最近ではZabbixが直接日本向けのサポートをやるようになっているし（<a href="http://www.zabbix.com/jp/pr23.php">2012年よりミラクルはZabbixの公式パートナーではなくなっている</a>）、近年ではデジタルサイネージ分野の売り上げで何とか生き残っているような雰囲気。まあ、そろそろMIRACLE LINUXがお亡くなりになっても困る人はいなさそうだし、潮時という感じだろうか。</p></div></blockquote><p>
+	<a href="http://linux.slashdot.jp/story/14/07/09/097242/">すべて読む</a>
+	
+		| <a href="http://linux.slashdot.jp/">Linuxセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/linux">Linux</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://linux.slashdot.jp/article.pl?sid=12/12/26/0638229">ターボリナックスが建設業許可を取得、家屋解体工事を進行中</a>
+			<small>2012年12月26日</small>
+		
+			<br><a href="http://it.slashdot.jp/article.pl?sid=08/07/02/0342236">ミラクルの吉岡弘隆氏が取締役退任、生涯一プログラマ宣言。</a>
+			<small>2008年07月02日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=06/04/19/0321211">米オラクルが独自Linuxディストリビューション開発へ</a>
+			<small>2006年04月19日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=04/01/10/1219252">ミラクル＋紅旗＝Asianux</a>
+			<small>2004年01月10日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=01/10/26/0418228">ターボ、ミラクル、迷走中?</a>
+			<small>2001年10月26日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://yro.slashdot.jp/story/14/07/09/0533213/"> 
+    <title>バイオハザードを手がけた三上真司氏の新作ホラーゲームはDLCでCERO Z相当になる</title>  
+    <link>http://yro.slashdot.jp/story/14/07/09/0533213/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、日本ではゲームの自主規制団体CEROによるレーティングが行われ、「18才以上のみ対象」となる「CERO Z」のレーティングに指定されると一部の店頭では取り扱われなくなるのだが、Bethesda Softworksの新作ゲーム「サイコブレイク」では、ゲーム本編については「CERO D」（17歳以上対象）のレーティングで発売し、予約特典として表現をCERO Z相当にするというDLCを提供するそうだ。
+
+「サイコブレイク」は「バイオハザード」シリーズを手がけた三上真司氏がディレクターを務めるバイオレンスホラーゲームで、非常に暴力的な表現も多いという。Bethesda Softworksは海外のメーカーということもあって、日本の表現規制にとらわれずに開発が行われているようだが、それをできるだけ再現させつつ、流通による制限をなるべく受けないようにするためにこのような形を取ることとしたという（4Gamerのインタビュー記事）。
+
+また、予約限定としたのは、小売店でぜひ予約して購入して欲しいという意図のようだ。<p> <a href="http://yro.slashdot.jp/story/14/07/09/0533213/">すべて読む</a> | <a href="http://yro.slashdot.jp/">YROセクション</a> | <a href="http://slashdot.jp/stories/censorship">検閲</a> | <a href="http://slashdot.jp/stories/games">ゲーム</a> </p> <p> 関連ストーリー： <br><a href="http://slashdot.jp/article.pl?sid=14/01/08/044250">「18歳以上のみ対象」のゲームソフトを小学3年生に無理矢理プレイさせた男性が逮捕される</a> <small>2014年01月08日</small> <br><a href="http://yro.slashdot.jp/article.pl?sid=13/10/30/049206">バイオレンス満載のゲーム「GTA V」、日本版での自主規制が海外で話題に</a> <small>2013年10月30日</small> <br><a href="http://yro.slashdot.jp/article.pl?sid=13/09/26/041247">ゲームの「レーティング」は機能していない、「GTA V」が証明</a> <small>2013年09月26日</small> <br><a href="http://slashdot.jp/article.pl?sid=08/10/01/0344221">ゲームソフトのレーティング「知らない」が６割</a> <small>2008年10月01日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T08:55:00+00:00</dc:date>  
+    <dc:subject>games</dc:subject>  
+    <slash:department>この手があったか</slash:department>  
+    <slash:section>yro</slash:section>  
+    <slash:comments>16</slash:comments>  
+    <slash:hit_parade>16,16,2,1,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>日本ではゲームの自主規制団体<a href="http://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%82%BF%E3%82%A8%E3%83%B3%E3%82%BF%E3%83%BC%E3%83%86%E3%82%A4%E3%83%B3%E3%83%A1%E3%83%B3%E3%83%88%E3%83%AC%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E6%A9%9F%E6%A7%8B">CERO</a>によるレーティングが行われ、「18才以上のみ対象」となる「CERO Z」のレーティングに指定されると一部の店頭では取り扱われなくなるのだが、Bethesda Softworksの新作ゲーム「<a href="http://psychobreak.com/">サイコブレイク</a>」では、ゲーム本編については「CERO D」（17歳以上対象）のレーティングで発売し、予約特典として表現をCERO Z相当にするというDLCを提供するそうだ。
+</p><p>
+「サイコブレイク」は「バイオハザード」シリーズを手がけた三上真司氏がディレクターを務めるバイオレンスホラーゲームで、非常に暴力的な表現も多いという。Bethesda Softworksは海外のメーカーということもあって、日本の表現規制にとらわれずに開発が行われているようだが、それをできるだけ再現させつつ、流通による制限をなるべく受けないようにするためにこのような形を取ることとしたという（<a href="http://www.4gamer.net/games/212/G021286/20140708012/">4Gamerのインタビュー記事</a>）。
+</p><p>
+また、予約限定としたのは、小売店でぜひ予約して購入して欲しいという意図のようだ。</p></div></blockquote><p>
+	<a href="http://yro.slashdot.jp/story/14/07/09/0533213/">すべて読む</a>
+	
+		| <a href="http://yro.slashdot.jp/">YROセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/censorship">検閲</a>
+	
+		| <a href="http://slashdot.jp/stories/games">ゲーム</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/01/08/044250">「18歳以上のみ対象」のゲームソフトを小学3年生に無理矢理プレイさせた男性が逮捕される</a>
+			<small>2014年01月08日</small>
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=13/10/30/049206">バイオレンス満載のゲーム「GTA V」、日本版での自主規制が海外で話題に</a>
+			<small>2013年10月30日</small>
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=13/09/26/041247">ゲームの「レーティング」は機能していない、「GTA V」が証明</a>
+			<small>2013年09月26日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=08/10/01/0344221">ゲームソフトのレーティング「知らない」が６割</a>
+			<small>2008年10月01日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/GeZdQoQNk6pC?type=2&amp;ent=f3066ee02ea21316588ceced6f011096">
+    <title><![CDATA[PR: 既存システム捨てますか？移行しますか？]]></title>
+    <link>http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/GeZdQoQNk6pC?type=2&amp;ent=f3066ee02ea21316588ceced6f011096</link>
+    <description><![CDATA[<table cellspacing="0" cellpadding="0"><tbody><tr><td align="left" valign="center"><a href="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/GeZdQoQNk6pC?type=2" target="_blank"><img alt="" style="border: 0;" border="0" src="http://rss.rssad.jp/rss/img/j4nGeu1Q93_5/GeZdQoQNk6pC?type=2&ent=f3066ee02ea21316588ceced6f011096"/></a></td></tr><tr><td align="left" valign="top" > 仮想化統合を成功させる仮想化移行セミナー【無料】 </td></tr></tbody></table><div style="font-size:10px;"><span style="padding-top:5px;"><br style="display:none"/><a href="http://www.rssad.jp/trendmatch/trendmatch.html">Ads by Trend Match</a></span><br/></div>]]></description>
+    <dc:date>2014-07-09T08:55:00+00:00</dc:date>
+  </item>
+  <item rdf:about="http://it.slashdot.jp/story/14/07/09/0533204/"> 
+    <title>LaTeXをオンラインでコンパイルできるサービスが登場</title>  
+    <link>http://it.slashdot.jp/story/14/07/09/0533204/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、大学院生・研究者の就職支援や研究・教育支援事業を行うアカリクが、日本語に対応したLaTeXのオンラインコンパイルサービス「Cloud LaTeX」を2014年7月4日に譲受し、β版をリリースしたそうだ（プレスリリース）。
+
+LaTeXは、研究者・学生が論文やレポートを作成する際のテキストベースの組版処理言語として使われているが、開発環境の構築やファイルの管理が面倒であるという問題があった。この「Cloud LaTeX」はWebブラウザでアクセスでき、クラウド上で文章の作成や管理ができるサービスとして開発された。また、同様のサービスは海外でも展開されているが、日本語や中国語などのマルチバイト言語へのローカライズがされていなかった。<p> <a href="http://it.slashdot.jp/story/14/07/09/0533204/">すべて読む</a> | <a href="http://it.slashdot.jp/">ITセクション</a> | <a href="http://slashdot.jp/stories/tech">テクノロジー</a> | <a href="http://slashdot.jp/stories/science">サイエンス</a> | <a href="http://slashdot.jp/stories/internet">インターネット</a> </p> <p> 関連ストーリー： <br><a href="http://it.slashdot.jp/article.pl?sid=14/04/28/0911215">「TeX」の読み方は「テック」だった</a> <small>2014年04月28日</small> <br><a href="http://it.slashdot.jp/article.pl?sid=13/10/23/037221">「ネ申Excel」はなぜ問題なのか</a> <small>2013年10月23日</small> <br><a href="http://slashdot.jp/article.pl?sid=11/08/09/0457241">Vine Linux 6リリース</a> <small>2011年08月09日</small> <br><a href="http://askslashdot.slashdot.jp/article.pl?sid=09/04/27/1151257">最低限度文化的なドキュメントジェネレータとは？</a> <small>2009年04月27日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T08:12:00+00:00</dc:date>  
+    <dc:subject>internet</dc:subject>  
+    <slash:department>LaTeXもクラウド時代に</slash:department>  
+    <slash:section>it</slash:section>  
+    <slash:comments>21</slash:comments>  
+    <slash:hit_parade>21,21,3,1,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>大学院生・研究者の就職支援や研究・教育支援事業を行うアカリクが、日本語に対応したLaTeXのオンラインコンパイルサービス「<a href="https://cloudlatex.io/ja">Cloud LaTeX</a>」を2014年7月4日に譲受し、β版をリリースしたそうだ（<a href="https://acaric.co.jp/news/2014/07/cloudlatex/">プレスリリース</a>）。
+</p><p>
+LaTeXは、研究者・学生が論文やレポートを作成する際のテキストベースの組版処理言語として使われているが、開発環境の構築やファイルの管理が面倒であるという問題があった。この「Cloud LaTeX」はWebブラウザでアクセスでき、クラウド上で文章の作成や管理ができるサービスとして開発された。また、同様のサービスは海外でも展開されているが、日本語や中国語などのマルチバイト言語へのローカライズがされていなかった。</p></div></blockquote><p>
+	<a href="http://it.slashdot.jp/story/14/07/09/0533204/">すべて読む</a>
+	
+		| <a href="http://it.slashdot.jp/">ITセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/tech">テクノロジー</a>
+	
+		| <a href="http://slashdot.jp/stories/science">サイエンス</a>
+	
+		| <a href="http://slashdot.jp/stories/internet">インターネット</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://it.slashdot.jp/article.pl?sid=14/04/28/0911215">「TeX」の読み方は「テック」だった</a>
+			<small>2014年04月28日</small>
+		
+			<br><a href="http://it.slashdot.jp/article.pl?sid=13/10/23/037221">「ネ申Excel」はなぜ問題なのか</a>
+			<small>2013年10月23日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=11/08/09/0457241">Vine Linux 6リリース</a>
+			<small>2011年08月09日</small>
+		
+			<br><a href="http://askslashdot.slashdot.jp/article.pl?sid=09/04/27/1151257">最低限度文化的なドキュメントジェネレータとは？</a>
+			<small>2009年04月27日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://yro.slashdot.jp/story/14/07/09/0532256/"> 
+    <title>LINE、PC版クライアント初回使用時にスマートフォンを使った認証を必須に</title>  
+    <link>http://yro.slashdot.jp/story/14/07/09/0532256/</link>  
+    <description><![CDATA[<p>headless 曰く、LINEは7日、PC版LINEでメールアドレスとパスワードを使用して初めてログインする際に、スマートフォン版のLINE上で確認画面を表示させる認証機能を追加したことを発表した（LINE公式ブログの記事）。
+
+PC版LINEのログインでは、メールアドレスとパスワードを使用する方法と、画面に表示されるQRコードをスマートフォン版のLINEで読み取る方法が用意されている。メールアドレスとパスワードを使用したログインはLINEを使用しているスマートフォンが手元になくても利用できるものの、他社サービスから流出したとみられるアカウント情報を使用した不正ログインが多数発生していた。
+
+新しいログイン手順ではメールアドレスとパスワードを入力して「ログイン」をクリックすると、初回のみ4桁の認証番号が表示される。スマートフォン版のLINEを起動すると入力画面が表示されるので、3分以内に認証番号を入力して「本人確認」をクリックすれば認証が完了する。以降はメールアドレスとパスワードのみでログインできるようになるとのことだ。<p> <a href="http://yro.slashdot.jp/story/14/07/09/0532256/">すべて読む</a> | <a href="http://yro.slashdot.jp/">YROセクション</a> | <a href="http://slashdot.jp/stories/mobile">モバイル</a> | <a href="http://slashdot.jp/stories/security">セキュリティ</a> | <a href="http://slashdot.jp/stories/privacy">プライバシ</a> </p> <p> 関連ストーリー： <br><a href="http://yro.slashdot.jp/article.pl?sid=14/07/05/0420251">パスワード変更を促進するため、LINEが特製スタンププレゼントキャンペーンを開始</a> <small>2014年07月05日</small> <br><a href="http://security.slashdot.jp/article.pl?sid=14/06/20/0834245">「LINEの通信が傍受されている」と報じたFACTA、「最高レベルの暗号技術」が破られていると主張</a> <small>2014年06月20日</small> <br><a href="http://yro.slashdot.jp/article.pl?sid=14/06/14/0625206">LINEでも他社サービスから流出したパスワードを使用したとみられる不正ログインが増加</a> <small>2014年06月14日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T07:22:00+00:00</dc:date>  
+    <dc:subject>privacy</dc:subject>  
+    <slash:department>パスワード流用対策</slash:department>  
+    <slash:section>yro</slash:section>  
+    <slash:comments>16</slash:comments>  
+    <slash:hit_parade>16,16,1,1,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[headless 曰く、<blockquote><div><p>LINEは7日、PC版LINEでメールアドレスとパスワードを使用して初めてログインする際に、スマートフォン版のLINE上で確認画面を表示させる認証機能を追加したことを発表した（<a href="http://official-blog.line.me/ja/archives/1005593400.html">LINE公式ブログの記事</a>）。
+</p><p>
+PC版LINEのログインでは、メールアドレスとパスワードを使用する方法と、画面に表示されるQRコードをスマートフォン版のLINEで読み取る方法が用意されている。メールアドレスとパスワードを使用したログインはLINEを使用しているスマートフォンが手元になくても利用できるものの、他社サービスから流出したとみられるアカウント情報を使用した不正ログインが多数発生していた。
+</p><p>
+新しいログイン手順ではメールアドレスとパスワードを入力して「ログイン」をクリックすると、初回のみ4桁の認証番号が表示される。スマートフォン版のLINEを起動すると入力画面が表示されるので、3分以内に認証番号を入力して「本人確認」をクリックすれば認証が完了する。以降はメールアドレスとパスワードのみでログインできるようになるとのことだ。</p></div></blockquote><p>
+	<a href="http://yro.slashdot.jp/story/14/07/09/0532256/">すべて読む</a>
+	
+		| <a href="http://yro.slashdot.jp/">YROセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/mobile">モバイル</a>
+	
+		| <a href="http://slashdot.jp/stories/security">セキュリティ</a>
+	
+		| <a href="http://slashdot.jp/stories/privacy">プライバシ</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=14/07/05/0420251">パスワード変更を促進するため、LINEが特製スタンププレゼントキャンペーンを開始</a>
+			<small>2014年07月05日</small>
+		
+			<br><a href="http://security.slashdot.jp/article.pl?sid=14/06/20/0834245">「LINEの通信が傍受されている」と報じたFACTA、「最高レベルの暗号技術」が破られていると主張</a>
+			<small>2014年06月20日</small>
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=14/06/14/0625206">LINEでも他社サービスから流出したパスワードを使用したとみられる不正ログインが増加</a>
+			<small>2014年06月14日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://it.slashdot.jp/story/14/07/09/0532253/"> 
+    <title>内閣官房、「ITダッシュボード」を公開</title>  
+    <link>http://it.slashdot.jp/story/14/07/09/0532253/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、内閣官房・情報通信技術（IT）総合戦略室が7月4日より「ITダッシュボード」を公開している（ASCII.jp）。
+
+ITダッシュボードは、「世界最先端IT国家創造宣言」（2013年6月閣議決定）に掲げられた施策の進捗状況や、政府各府庁の保有する情報システム数や情報システム関連予算などの統計情報を公開するサイト。利用者がサイト上で統計データをグラフ化/分析できる機能や、データを二次利用できるよう機械判読可能な形式で取得できる機能なども提供されている。
+
+政府の「電子行政オープンデータ戦略」に基づき、すべてのデータはCSVやWeb APIなど機械判読可能な形式で公開されているとのこと。<p> <a href="http://it.slashdot.jp/story/14/07/09/0532253/">すべて読む</a> | <a href="http://it.slashdot.jp/">ITセクション</a> | <a href="http://slashdot.jp/stories/it">IT</a> | <a href="http://slashdot.jp/stories/government">政府</a> </p> <p> 関連ストーリー： <br><a href="http://security.slashdot.jp/article.pl?sid=14/04/24/0411250">情報セキュリティの強化は10万人規模の新規雇用創出効果がある？</a> <small>2014年04月24日</small> <br><a href="http://slashdot.jp/article.pl?sid=13/02/05/1414201">経済産業省の主催するアレゲなアイディア・雑談サイト 第三段</a> <small>2013年02月06日</small> <br><a href="http://it.slashdot.jp/article.pl?sid=13/01/31/0135233">経済産業省、オープンデータ推進のための実証用サイトを公開</a> <small>2013年01月31日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T06:32:00+00:00</dc:date>  
+    <dc:subject>government</dc:subject>  
+    <slash:department>機械判読できるデータを提供するのは良いが</slash:department>  
+    <slash:section>it</slash:section>  
+    <slash:comments>15</slash:comments>  
+    <slash:hit_parade>15,15,5,0,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>内閣官房・情報通信技術（IT）総合戦略室が7月4日より「ITダッシュボード」を公開している（<a href="http://ascii.jp/elem/000/000/911/911086/?mail">ASCII.jp</a>）。
+</p><p>
+ITダッシュボードは、「世界最先端IT国家創造宣言」（2013年6月閣議決定）に掲げられた施策の進捗状況や、政府各府庁の保有する情報システム数や情報システム関連予算などの統計情報を公開するサイト。利用者がサイト上で統計データをグラフ化/分析できる機能や、データを二次利用できるよう機械判読可能な形式で取得できる機能なども提供されている。
+</p><p>
+政府の「電子行政オープンデータ戦略」に基づき、すべてのデータはCSVやWeb APIなど機械判読可能な形式で公開されているとのこと。</p></div></blockquote><p>
+	<a href="http://it.slashdot.jp/story/14/07/09/0532253/">すべて読む</a>
+	
+		| <a href="http://it.slashdot.jp/">ITセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/it">IT</a>
+	
+		| <a href="http://slashdot.jp/stories/government">政府</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://security.slashdot.jp/article.pl?sid=14/04/24/0411250">情報セキュリティの強化は10万人規模の新規雇用創出効果がある？</a>
+			<small>2014年04月24日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=13/02/05/1414201">経済産業省の主催するアレゲなアイディア・雑談サイト 第三段</a>
+			<small>2013年02月06日</small>
+		
+			<br><a href="http://it.slashdot.jp/article.pl?sid=13/01/31/0135233">経済産業省、オープンデータ推進のための実証用サイトを公開</a>
+			<small>2013年01月31日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://hardware.slashdot.jp/story/14/07/09/0412240/"> 
+    <title>ドイツ、シェールガス採掘を7年間停止へ</title>  
+    <link>http://hardware.slashdot.jp/story/14/07/09/0412240/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、飲料水の汚染を懸念する環境保護団体やビール醸造会社に配慮して、ドイツでは今後7年間にわたってシェールガスの採掘を停止することを決めたそうだ（ウォール・ストリート・ジャーナル）。
+
+ドイツが禁止するのは、岩に亀裂を生じさせるフラッキング（水圧破砕）という技術を使った採掘。ドイツ政府は地下3000メートル未満の地層でのフラッキングによる採掘を禁止する予定。来年初めまでに法案をまとめたい意向だとしている。
+
+通常のガス鉱床の採掘には今後もフラッキング技術の利用が認められるが、政府は破砕の過程で放出される液体による水質汚染を防止するため規制を強化する方針だとしている。なお、アメリカでもシェール採掘が地震発生の要因となっているとして問題とされており、シェールガスが今後も安定供給されるかはかなり微妙な感じがする（日経）。<p> <a href="http://hardware.slashdot.jp/story/14/07/09/0412240/">すべて読む</a> | <a href="http://hardware.slashdot.jp/">ハードウェアセクション</a> | <a href="http://slashdot.jp/stories/power">電力</a> </p> <p> 関連ストーリー： <br><a href="http://science.slashdot.jp/article.pl?sid=12/10/05/0044259">テキサスで発生した地震、シェールガス採掘場が地震の震源地である可能性が高い</a> <small>2012年10月05日</small> <br><a href="http://slashdot.jp/article.pl?sid=11/11/06/1617209">イギリスで起きた地震、原因はシェールガス採掘</a> <small>2011年11月07日</small> <br><a href="http://science.slashdot.jp/article.pl?sid=10/10/20/0054251">シェールガスが変える資源のパワーバランス</a> <small>2010年10月20日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T05:34:00+00:00</dc:date>  
+    <dc:subject>power</dc:subject>  
+    <slash:department>新エネルギー源は銀の弾丸ではなかった</slash:department>  
+    <slash:section>hardware</slash:section>  
+    <slash:comments>11</slash:comments>  
+    <slash:hit_parade>11,11,4,2,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>飲料水の汚染を懸念する環境保護団体やビール醸造会社に配慮して、ドイツでは今後7年間にわたってシェールガスの採掘を停止することを決めたそうだ（<a href="http://jp.wsj.com/news/articles/SB10001424052702304174304580010482275582018">ウォール・ストリート・ジャーナル</a>）。
+</p><p>
+ドイツが禁止するのは、岩に亀裂を生じさせるフラッキング（水圧破砕）という技術を使った採掘。ドイツ政府は地下3000メートル未満の地層でのフラッキングによる採掘を禁止する予定。来年初めまでに法案をまとめたい意向だとしている。
+</p><p>
+通常のガス鉱床の採掘には今後もフラッキング技術の利用が認められるが、政府は破砕の過程で放出される液体による水質汚染を防止するため規制を強化する方針だとしている。なお、アメリカでもシェール採掘が地震発生の要因となっているとして問題とされており、シェールガスが今後も安定供給されるかはかなり微妙な感じがする（<a href="http://www.nikkei.com/article/DGXNASDG03030_T00C14A7CR8000/">日経</a>）。</p></div></blockquote><p>
+	<a href="http://hardware.slashdot.jp/story/14/07/09/0412240/">すべて読む</a>
+	
+		| <a href="http://hardware.slashdot.jp/">ハードウェアセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/power">電力</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://science.slashdot.jp/article.pl?sid=12/10/05/0044259">テキサスで発生した地震、シェールガス採掘場が地震の震源地である可能性が高い</a>
+			<small>2012年10月05日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=11/11/06/1617209">イギリスで起きた地震、原因はシェールガス採掘</a>
+			<small>2011年11月07日</small>
+		
+			<br><a href="http://science.slashdot.jp/article.pl?sid=10/10/20/0054251">シェールガスが変える資源のパワーバランス</a>
+			<small>2010年10月20日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/PtsQ6ozweyR.?type=2&amp;ent=01820a5352265708b2c5610709e279b8">
+    <title><![CDATA[PR: 本番環境を仮想化に移行するソリューション、最適解は？]]></title>
+    <link>http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/PtsQ6ozweyR.?type=2&amp;ent=01820a5352265708b2c5610709e279b8</link>
+    <description><![CDATA[<table cellspacing="0" cellpadding="0"><tbody><tr><td align="left" valign="center"><a href="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/PtsQ6ozweyR.?type=2" target="_blank"><img alt="" style="border: 0;" border="0" src="http://rss.rssad.jp/rss/img/j4nGeu1Q93_5/PtsQ6ozweyR.?type=2&ent=01820a5352265708b2c5610709e279b8"/></a></td></tr><tr><td align="left" valign="top" > 仮想化技術をフル活用すればもっとコストは安価にできる！仮想化移行セミナー </td></tr></tbody></table><div style="font-size:10px;"><span style="padding-top:5px;"><br style="display:none"/><a href="http://www.rssad.jp/trendmatch/trendmatch.html">Ads by Trend Match</a></span><br/></div>]]></description>
+    <dc:date>2014-07-09T05:34:00+00:00</dc:date>
+  </item>
+  <item rdf:about="http://slashdot.jp/story/14/07/09/0410203/"> 
+    <title>CEOの報酬が多いほど企業の業績は悪化する傾向</title>  
+    <link>http://slashdot.jp/story/14/07/09/0410203/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、CEOの報酬が多い企業ほど、その業績は悪いという話があるそうだ（GIGAZINE、Forbes）。
+
+GIGAZINEの記事の例はオラクルなど海外の例だが、日本でも日産やトヨタ、ソニー、武田薬品工業などの例が思い浮かぶ。
+ユタ大学のMichael J. Cooper 氏らの研究によって明らかになったとのことで（研究論文）、CEOに高い給料を支払うと、その後3年間は業績が悪化するという傾向があるそうだ。<p> <a href="http://slashdot.jp/story/14/07/09/0410203/">すべて読む</a> | <a href="http://slashdot.jp/stories/business">ビジネス</a> | <a href="http://slashdot.jp/stories/money">お金</a> </p> <p> 関連ストーリー： <br><a href="http://slashdot.jp/article.pl?sid=14/04/23/1823210">金持ちはより長時間労働する</a> <small>2014年04月24日</small> <br><a href="http://slashdot.jp/article.pl?sid=14/02/25/0444224">なぜシリコンバレーでは高い給料が批判されないのか</a> <small>2014年02月26日</small> <br><a href="http://slashdot.jp/article.pl?sid=13/09/04/0913239">Lenovo CEO、今年も自身のボーナスの一部を社員に分配</a> <small>2013年09月04日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T04:59:00+00:00</dc:date>  
+    <dc:subject>business</dc:subject>  
+    <slash:department>成功報酬でもダメなのだろうか</slash:department>  
+    <slash:section>mainpage</slash:section>  
+    <slash:comments>31</slash:comments>  
+    <slash:hit_parade>31,31,5,0,0,0,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>CEOの報酬が多い企業ほど、その業績は悪いという話があるそうだ（<a href="http://gigazine.net/news/20140708-highest-paid-ceo-worst-performer/">GIGAZINE</a>、<a href="http://www.forbes.com/sites/susanadams/2014/06/16/the-highest-paid-ceos-are-the-worst-performers-new-study-says/">Forbes</a>）。
+</p><p>
+GIGAZINEの記事の例はオラクルなど海外の例だが、日本でも日産やトヨタ、ソニー、武田薬品工業などの例が思い浮かぶ。</p></div></blockquote><p>
+ユタ大学のMichael J. Cooper 氏らの研究によって明らかになったとのことで（<a href="http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1572085">研究論文</a>）、CEOに高い給料を支払うと、その後3年間は業績が悪化するという傾向があるそうだ。</p><p>
+	<a href="http://slashdot.jp/story/14/07/09/0410203/">すべて読む</a>
+	
+		| <a href="http://slashdot.jp/stories/business">ビジネス</a>
+	
+		| <a href="http://slashdot.jp/stories/money">お金</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/04/23/1823210">金持ちはより長時間労働する</a>
+			<small>2014年04月24日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/02/25/0444224">なぜシリコンバレーでは高い給料が批判されないのか</a>
+			<small>2014年02月26日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=13/09/04/0913239">Lenovo CEO、今年も自身のボーナスの一部を社員に分配</a>
+			<small>2013年09月04日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://slashdot.jp/story/14/07/09/043250/"> 
+    <title>米情報誌の消費者調査で「一番不味い」とされたハンバーガーチェーン</title>  
+    <link>http://slashdot.jp/story/14/07/09/043250/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、米「コンシューマー・レポート」誌の消費者調査で、「米国の大手ハンバーガーチェーンのなかで一番不味いのはマクドナルド」という結果が出たそうだ（ウォール・ストリート・ジャーナル）。
+
+日本ではマクドナルドの不振が伝えられているが、米国でも売り上げ高が減少傾向にあるらしい。日本で同様の調査を行ったらどうなるかも気になるところだ。<p> <a href="http://slashdot.jp/story/14/07/09/043250/">すべて読む</a> | <a href="http://slashdot.jp/stories/business">ビジネス</a> | <a href="http://slashdot.jp/stories/news">ニュース</a> | <a href="http://slashdot.jp/stories/usa">アメリカ合衆国</a> </p> <p> 関連ストーリー： <br><a href="http://slashdot.jp/article.pl?sid=14/05/22/0327215">国連、ジャンクフードはたばこよりも大きな脅威と警告</a> <small>2014年05月22日</small> <br><a href="http://slashdot.jp/article.pl?sid=14/02/20/0357210">日本マクドナルドホールディングスの原田会長兼社長兼CEO、社長とCEOを退任へ</a> <small>2014年02月20日</small> <br><a href="http://idle.slashdot.jp/article.pl?sid=13/12/13/2240209">マクドナルドのレジカウンターにメニュー表復活</a> <small>2013年12月14日</small> <br><a href="http://slashdot.jp/article.pl?sid=13/10/29/046228">米マクドナルドのトマトケチャップ、40年以上使っていたハインツから他メーカーに切り替え</a> <small>2013年10月29日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T04:32:00+00:00</dc:date>  
+    <dc:subject>usa</dc:subject>  
+    <slash:department>マクドナルドはこれを認識しているのだろうか</slash:department>  
+    <slash:section>mainpage</slash:section>  
+    <slash:comments>74</slash:comments>  
+    <slash:hit_parade>74,73,26,9,6,3,3</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>米「コンシューマー・レポート」誌の消費者調査で、「米国の大手ハンバーガーチェーンのなかで一番不味いのはマクドナルド」という結果が出たそうだ（<a href="http://jp.wsj.com/news/articles/SB10001424052702304174304580008140580963532">ウォール・ストリート・ジャーナル</a>）。
+</p><p>
+日本ではマクドナルドの不振が伝えられているが、米国でも売り上げ高が減少傾向にあるらしい。日本で同様の調査を行ったらどうなるかも気になるところだ。</p></div></blockquote><p>
+	<a href="http://slashdot.jp/story/14/07/09/043250/">すべて読む</a>
+	
+		| <a href="http://slashdot.jp/stories/business">ビジネス</a>
+	
+		| <a href="http://slashdot.jp/stories/news">ニュース</a>
+	
+		| <a href="http://slashdot.jp/stories/usa">アメリカ合衆国</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/05/22/0327215">国連、ジャンクフードはたばこよりも大きな脅威と警告</a>
+			<small>2014年05月22日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/02/20/0357210">日本マクドナルドホールディングスの原田会長兼社長兼CEO、社長とCEOを退任へ</a>
+			<small>2014年02月20日</small>
+		
+			<br><a href="http://idle.slashdot.jp/article.pl?sid=13/12/13/2240209">マクドナルドのレジカウンターにメニュー表復活</a>
+			<small>2013年12月14日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=13/10/29/046228">米マクドナルドのトマトケチャップ、40年以上使っていたハインツから他メーカーに切り替え</a>
+			<small>2013年10月29日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://slashdot.jp/story/14/07/09/040230/"> 
+    <title>正社員・契約社員全員が人事部との兼任となる企業</title>  
+    <link>http://slashdot.jp/story/14/07/09/040230/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、Webサービスの制作などを行う「カヤック」が、正社員・契約社員199人全員を人事部との兼任にすると発表した（ITmedia、カヤックの発表）。
+
+人事や採用といった業務やその情報を、社員全員で共有することで効率化を目指すという試みのようだ。<p> <a href="http://slashdot.jp/story/14/07/09/040230/">すべて読む</a> | <a href="http://slashdot.jp/stories/business">ビジネス</a> </p> <p> 関連ストーリー： <br><a href="http://slashdot.jp/article.pl?sid=14/01/20/0414222">日本メーカーは「ソフトウェア工場」の発想から抜け出せるか？</a> <small>2014年01月20日</small> <br><a href="http://slashdot.jp/article.pl?sid=13/03/25/0522218">「スキルアップのための作業」が仕事のソニー・東京キャリアデザイン室</a> <small>2013年03月25日</small> <br><a href="http://security.slashdot.jp/article.pl?sid=12/11/01/0641211">ITセキュリティの専門家が欲しければ社会不適合者を受け入れてギーク文化を学べ</a> <small>2012年11月01日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-09T03:59:00+00:00</dc:date>  
+    <dc:subject>business</dc:subject>  
+    <slash:department>他人の評価と給与丸見えということ？</slash:department>  
+    <slash:section>mainpage</slash:section>  
+    <slash:comments>22</slash:comments>  
+    <slash:hit_parade>22,22,12,5,2,1,1</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>Webサービスの制作などを行う「カヤック」が、正社員・契約社員199人全員を人事部との兼任にすると発表した（<a href="http://nlab.itmedia.co.jp/nl/articles/1407/07/news103.html">ITmedia</a>、<a href="http://www.kayac.com/news/2014/07/alljinji">カヤックの発表</a>）。
+</p><p>
+人事や採用といった業務やその情報を、社員全員で共有することで効率化を目指すという試みのようだ。</p></div></blockquote><p>
+	<a href="http://slashdot.jp/story/14/07/09/040230/">すべて読む</a>
+	
+		| <a href="http://slashdot.jp/stories/business">ビジネス</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=14/01/20/0414222">日本メーカーは「ソフトウェア工場」の発想から抜け出せるか？</a>
+			<small>2014年01月20日</small>
+		
+			<br><a href="http://slashdot.jp/article.pl?sid=13/03/25/0522218">「スキルアップのための作業」が仕事のソニー・東京キャリアデザイン室</a>
+			<small>2013年03月25日</small>
+		
+			<br><a href="http://security.slashdot.jp/article.pl?sid=12/11/01/0641211">ITセキュリティの専門家が欲しければ社会不適合者を受け入れてギーク文化を学べ</a>
+			<small>2012年11月01日</small>
+		
+		</p>]]></content:encoded> 
+  </item>  
+  <item rdf:about="http://it.slashdot.jp/story/14/07/08/0859255/"> 
+    <title>ソフトウェアの価格設定はどうするべきか</title>  
+    <link>http://it.slashdot.jp/story/14/07/08/0859255/</link>  
+    <description><![CDATA[<p>あるAnonymous Coward 曰く、GIGAZINEにて、「ソフトウェアを15年間販売してきてわかった効果的な価格設定方法」なる記事が掲載されている。
+
+とあるソフトメーカーが販売するソフトウェアの価格設定方法について紹介するもので、簡単にまとめると次のとおり。
+
+
+通貨レートの変動が売り上げに大きな影響を及ぼすターゲット層を設定して価格調査を行え複数の料金プランがあると高いプランの売り上げも上がる市場（国）ごとに価格特性が異なる決済システムを独自で持つメリットはあるが不正対策が大変いまでは単体販売されるソフトウェアも少なくなってしまっているが、シェアウェアなどの値付けは大変そうだ。<p> <a href="http://it.slashdot.jp/story/14/07/08/0859255/">すべて読む</a> | <a href="http://it.slashdot.jp/">ITセクション</a> | <a href="http://slashdot.jp/stories/software">ソフトウェア</a> | <a href="http://slashdot.jp/stories/money">お金</a> </p> <p> 関連ストーリー： <br><a href="http://yro.slashdot.jp/article.pl?sid=14/05/30/0314255">日本電子出版協会、不正コピーへの風当たりが強まればDRMなしでの電子出版物配信も可能になると述べる</a> <small>2014年05月30日</small> <br><a href="http://it.slashdot.jp/article.pl?sid=14/02/27/0847216">Autodesk、ソフトウェアの「アップグレード購入」を廃止へ</a> <small>2014年02月27日</small> <br><a href="http://yro.slashdot.jp/article.pl?sid=14/02/20/0553223">「電子書籍をコピーできる」というソフトを販売していた会社社長やプログラマーらが逮捕される</a> <small>2014年02月20日</small> </p></p>]]></description>  
+    <dc:creator>hylom</dc:creator>  
+    <dc:date>2014-07-08T23:00:00+00:00</dc:date>  
+    <dc:subject>money</dc:subject>  
+    <slash:department>高めの価格を設定してセールしまくるとか</slash:department>  
+    <slash:section>it</slash:section>  
+    <slash:comments>49</slash:comments>  
+    <slash:hit_parade>49,49,18,6,3,1,0</slash:hit_parade>  
+    <content:encoded><![CDATA[あるAnonymous Coward 曰く、<blockquote><div><p>GIGAZINEにて、「<a href="http://gigazine.net/news/20140707-software-pricing/">ソフトウェアを15年間販売してきてわかった効果的な価格設定方法</a>」なる記事が掲載されている。
+</p><p>
+とあるソフトメーカーが販売するソフトウェアの価格設定方法について紹介するもので、簡単にまとめると次のとおり。
+
+</p><ul>
+<li>通貨レートの変動が売り上げに大きな影響を及ぼす</li><li>ターゲット層を設定して価格調査を行え</li><li>複数の料金プランがあると高いプランの売り上げも上がる</li><li>市場（国）ごとに価格特性が異なる</li><li>決済システムを独自で持つメリットはあるが不正対策が大変</li></ul></div></blockquote><p>いまでは単体販売されるソフトウェアも少なくなってしまっているが、シェアウェアなどの値付けは大変そうだ。</p><p>
+	<a href="http://it.slashdot.jp/story/14/07/08/0859255/">すべて読む</a>
+	
+		| <a href="http://it.slashdot.jp/">ITセクション</a>
+	
+		| <a href="http://slashdot.jp/stories/software">ソフトウェア</a>
+	
+		| <a href="http://slashdot.jp/stories/money">お金</a>
+		</p>
+		<p>
+		関連ストーリー：
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=14/05/30/0314255">日本電子出版協会、不正コピーへの風当たりが強まればDRMなしでの電子出版物配信も可能になると述べる</a>
+			<small>2014年05月30日</small>
+		
+			<br><a href="http://it.slashdot.jp/article.pl?sid=14/02/27/0847216">Autodesk、ソフトウェアの「アップグレード購入」を廃止へ</a>
+			<small>2014年02月27日</small>
+		
+			<br><a href="http://yro.slashdot.jp/article.pl?sid=14/02/20/0553223">「電子書籍をコピーできる」というソフトを販売していた会社社長やプログラマーらが逮捕される</a>
+			<small>2014年02月20日</small>
+		
+		</p>]]></content:encoded> 
+  </item>
+  <item rdf:about="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/gZtlgMGsChom?type=2&amp;ent=383445df5682cc52a6052abdcb61d072">
+    <title><![CDATA[PR: えっ、誰？？有名なあの人の顔は全然違った！？]]></title>
+    <link>http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/gZtlgMGsChom?type=2&amp;ent=383445df5682cc52a6052abdcb61d072</link>
+    <description><![CDATA[<table cellspacing="0" cellpadding="0"><tbody><tr><td align="left" valign="center"><a href="http://rss.rssad.jp/rss/ad/j4nGeu1Q93_5/gZtlgMGsChom?type=2" target="_blank"><img alt="" style="border: 0;" border="0" src="http://rss.rssad.jp/rss/img/j4nGeu1Q93_5/gZtlgMGsChom?type=2&ent=383445df5682cc52a6052abdcb61d072"/></a></td></tr><tr><td align="left" valign="top" > 水戸黄門が色白のイケメン！偉人達の顔は、あなたのイメージによって作られていた！ </td></tr></tbody></table><div style="font-size:10px;"><span style="padding-top:5px;"><br style="display:none"/><a href="http://www.rssad.jp/trendmatch/trendmatch.html">Ads by Trend Match</a></span><br/></div>]]></description>
+    <dc:date>2014-07-08T23:00:00+00:00</dc:date>
+  </item>  
+  <textinput rdf:about="http://slashdot.jp/search.pl"> 
+    <title>スラッシュドット・ジャパン検索</title>  
+    <description/>  
+    <name>query</name>  
+    <link>http://slashdot.jp/search.pl</link> 
+  </textinput> 
+</rdf:RDF>

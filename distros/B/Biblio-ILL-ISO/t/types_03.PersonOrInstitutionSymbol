@@ -1,0 +1,5 @@
+$VAR1 = bless( {
+                 'institution-symbol' => bless( {
+                                                  'generalstring' => 'MWPL'
+                                                }, 'Biblio::ILL::ISO::ILLString' )
+               }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' );

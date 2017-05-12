@@ -1,0 +1,9 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+
+# DBIx::Class::Schema::Loader
+dbicdump -o dump_directory="$CURDIR"/../lib \
+         -o debug=1 \
+         Biblio::Zotero::DB::Schema \
+         'dbi:SQLite:dbname='"$CURDIR"'/zotero.sqlite'

@@ -1,0 +1,330 @@
+{
+   "abstract" : "BioPerl-DB - package for biological databases",
+   "author" : [
+      "BioPerl Team <bioperl-l@bioperl.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BioPerl-DB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Graph::Directed" : 0
+         },
+         "requires" : {
+            "Bio::Root::Version" : "1.006900",
+            "DBI" : 0,
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::BioEntry" : {
+         "file" : "lib/Bio/BioEntry.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioDB" : {
+         "file" : "lib/Bio/DB/BioDB.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::AnnotationCollectionAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/AnnotationCollectionAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::BaseDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/BaseDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::BasePersistenceAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/BasePersistenceAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::BioNamespaceAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/BioNamespaceAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::BiosequenceAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/BiosequenceAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::ClusterAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/ClusterAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::CommentAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/CommentAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::DBAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/DBAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::DBLinkAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/DBLinkAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::LocationAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/LocationAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::MultiDB" : {
+         "file" : "lib/Bio/DB/BioSQL/MultiDB.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::OBDA" : {
+         "file" : "lib/Bio/DB/BioSQL/OBDA.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::OntologyAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/OntologyAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::AnnotationCollectionAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/AnnotationCollectionAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::BasePersistenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/BasePersistenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::BiosequenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/BiosequenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::PathAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/PathAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::SpeciesAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/SpeciesAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Oracle::TermAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Oracle/TermAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::PathAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/PathAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::AnnotationCollectionAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/AnnotationCollectionAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::BasePersistenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/BasePersistenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::BiosequenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/BiosequenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::PathAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/PathAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::SpeciesAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/SpeciesAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::Pg::TermAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/Pg/TermAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::PrimarySeqAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/PrimarySeqAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::ReferenceAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/ReferenceAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::RelationshipAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/RelationshipAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::SeqAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/SeqAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::SeqFeatureAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/SeqFeatureAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::SimpleValueAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/SimpleValueAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::SpeciesAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/SpeciesAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::TermAdaptor" : {
+         "file" : "lib/Bio/DB/BioSQL/TermAdaptor.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::AnnotationCollectionAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/AnnotationCollectionAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::BasePersistenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/BasePersistenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::BiosequenceAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/BiosequenceAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::PathAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/PathAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::SpeciesAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/SpeciesAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::BioSQL::mysql::TermAdaptorDriver" : {
+         "file" : "lib/Bio/DB/BioSQL/mysql/TermAdaptorDriver.pm",
+         "version" : 0
+      },
+      "Bio::DB::CacheServer::SeqDB" : {
+         "file" : "lib/Bio/DB/CacheServer/SeqDB.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBAdaptorI" : {
+         "file" : "lib/Bio/DB/DBAdaptorI.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBContextI" : {
+         "file" : "lib/Bio/DB/DBContextI.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBD" : {
+         "file" : "lib/Bio/DB/DBD.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI" : {
+         "file" : "lib/Bio/DB/DBI.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::Oracle" : {
+         "file" : "lib/Bio/DB/DBI/Oracle.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::Pg" : {
+         "file" : "lib/Bio/DB/DBI/Pg.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::Transaction" : {
+         "file" : "lib/Bio/DB/DBI/Transaction.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::TransactionListener" : {
+         "file" : "lib/Bio/DB/DBI/TransactionListener.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::base" : {
+         "file" : "lib/Bio/DB/DBI/base.pm",
+         "version" : 0
+      },
+      "Bio::DB::DBI::mysql" : {
+         "file" : "lib/Bio/DB/DBI/mysql.pm",
+         "version" : 0
+      },
+      "Bio::DB::EasyArgv" : {
+         "file" : "lib/Bio/DB/EasyArgv.pm",
+         "version" : 0
+      },
+      "Bio::DB::PersistenceAdaptorI" : {
+         "file" : "lib/Bio/DB/PersistenceAdaptorI.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::BioNamespace" : {
+         "file" : "lib/Bio/DB/Persistent/BioNamespace.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::ObjectRellMapperI" : {
+         "file" : "lib/Bio/DB/Persistent/ObjectRelMapperI.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::PersistentObject" : {
+         "file" : "lib/Bio/DB/Persistent/PersistentObject.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::PersistentObjectFactory" : {
+         "file" : "lib/Bio/DB/Persistent/PersistentObjectFactory.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::PrimarySeq" : {
+         "file" : "lib/Bio/DB/Persistent/PrimarySeq.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::Seq" : {
+         "file" : "lib/Bio/DB/Persistent/Seq.pm",
+         "version" : 0
+      },
+      "Bio::DB::Persistent::SeqFeature" : {
+         "file" : "lib/Bio/DB/Persistent/SeqFeature.pm",
+         "version" : 0
+      },
+      "Bio::DB::PersistentObjectI" : {
+         "file" : "lib/Bio/DB/PersistentObjectI.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::AbstractQuery" : {
+         "file" : "lib/Bio/DB/Query/AbstractQuery.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::BioQuery" : {
+         "file" : "lib/Bio/DB/Query/BioQuery.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::DBQueryResult" : {
+         "file" : "lib/Bio/DB/Query/DBQueryResult.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::PrebuiltResult" : {
+         "file" : "lib/Bio/DB/Query/PrebuiltResult.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::QueryConstraint" : {
+         "file" : "lib/Bio/DB/Query/QueryConstraint.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::QueryResultI" : {
+         "file" : "lib/Bio/DB/Query/QueryResultI.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::SqlGenerator" : {
+         "file" : "lib/Bio/DB/Query/SqlGenerator.pm",
+         "version" : 0
+      },
+      "Bio::DB::Query::SqlQuery" : {
+         "file" : "lib/Bio/DB/Query/SqlQuery.pm",
+         "version" : 0
+      },
+      "Bio::DB::SimpleDBContext" : {
+         "file" : "lib/Bio/DB/SimpleDBContext.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.006900"
+}

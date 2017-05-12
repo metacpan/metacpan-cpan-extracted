@@ -1,0 +1,26 @@
+# suggestion from MTM:
+
+    Each lap is a member in an array. In ETL I run the same code for
+    each listing. So for 1.000 listings I can have 5.000 laps. Those
+    laps have only 5 distinct names.
+    
+    What I do is
+    my $laps = $stopwatch_data->{'laps'};
+    my %stopwatch_times = ();
+    foreach my $lap (@$laps) {
+        my $name = $lap->{'name'};
+        $stopwatch_times{$name} ||= 0;
+        $stopwatch_times{$name} += $lap->{'time'};
+        $stopwatch_times{'_total_'} += $lap->{'time'};
+    }
+    
+    foreach my $key ( keys %stopwatch_times ){
+      print $key . ': ' . $stopwatch_times{$key} . "\n";
+    }
+    
+    My suggestion is to add a method 'collapse' that will collapse
+    same names. The user of the module would have to explicitly
+    call it.
+    
+    marc tobias
+

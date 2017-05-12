@@ -1,0 +1,10 @@
+classes:
+  - Service.web.apache
+  - Service.mail.mta
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - include mailinglist service Mailman
+  pkg:
+    - mailman

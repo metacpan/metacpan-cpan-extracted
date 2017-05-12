@@ -1,0 +1,5 @@
+classes:
+  - x11.lightdm
+parameters:
+  pkg-auto:
+    - lightdm-gtk-greeter

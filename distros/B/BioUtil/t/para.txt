@@ -1,0 +1,4 @@
+# cell phone 
+apple = 1 # note
+
+nokia = 2 # 

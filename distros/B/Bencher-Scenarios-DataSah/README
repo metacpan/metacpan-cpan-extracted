@@ -1,0 +1,8 @@
+SEE ALSO
+
+    Data::Sah
+
+    Bencher::Scenarios::DataSahVSTypeTiny - split to keep the number of
+    benchmarks for a single distribution small (and minimize building
+    time).
+

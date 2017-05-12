@@ -1,0 +1,7 @@
+classes:
+  - Console
+parameters:
+  doc:
+    console-mail:
+      headline:
+        - Console mail

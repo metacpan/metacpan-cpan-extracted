@@ -1,0 +1,15 @@
+0.01 (11.15.2004) - John Siracusa <siracusa@mindspring.com>
+
+    * Initial release.
+
+0.011 (11.15.2004) - John Siracusa <siracusa@mindspring.com>
+
+    * Fixed typo and broken POD.  Deleted version 0.01.
+
+0.012 (11.18.2004) - John Siracusa <siracusa@mindspring.com>
+
+    * Added Rose::Conf.
+
+0.02 (03.05.2005) - John Siracusa <siracusa@mindspring.com>
+
+    * Added Rose::DB and Rose::DB::Object.

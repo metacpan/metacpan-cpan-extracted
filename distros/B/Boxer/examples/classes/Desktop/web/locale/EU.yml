@@ -1,0 +1,31 @@
+# bg hr cs da nl en-gb et fi fr de el hu ga-ie it lt pl pt-pt ro sk sl es-es sv-se
+classes:
+  - Desktop.web
+parameters:
+  doc:
+    desktop-web:
+      pkg:
+        - include Iceweasel locales for European Union (except Maltese)
+  pkg:
+    - iceweasel-l10n-bg
+    - iceweasel-l10n-hr
+    - iceweasel-l10n-cs
+    - iceweasel-l10n-da
+    - iceweasel-l10n-nl
+    - iceweasel-l10n-en-gb
+    - iceweasel-l10n-et
+    - iceweasel-l10n-fi
+    - iceweasel-l10n-fr
+    - iceweasel-l10n-de
+    - iceweasel-l10n-el
+    - iceweasel-l10n-hu
+    - iceweasel-l10n-ga-ie
+    - iceweasel-l10n-it
+    - iceweasel-l10n-lt
+    - iceweasel-l10n-pl
+    - iceweasel-l10n-pt-pt
+    - iceweasel-l10n-ro
+    - iceweasel-l10n-sk
+    - iceweasel-l10n-sl
+    - iceweasel-l10n-es-es
+    - iceweasel-l10n-sv-se

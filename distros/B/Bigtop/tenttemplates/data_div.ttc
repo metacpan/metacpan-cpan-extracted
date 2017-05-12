@@ -1,0 +1,42 @@
+[%#
+    Template for table (and join_table) data statement div
+
+    Expects this top level key:
+    block - an array element from app_blocks array given to tenter.tt
+%]
+<table class='bordered' id='data_table::[% block.ident %]'>
+[% columns = [] %]
+[% FOREACH field IN block.body.fields %]
+[% columns.push( { name = field.name, ident = field.ident } ) %]
+[% END %]
+  [% FOREACH column IN columns %]
+  [% column_name = column.name %]
+  <tr>
+    <th id='data_for_field::[% column.ident %]'> [% column.name %] </th>
+    [% row_number_str = 'x';
+       row_number     = row_number_str.length %]
+    [% FOREACH data_statement IN block.body.statements.data %]
+      [% column_in_use = data_statement.one_hash %]
+      [% IF column_in_use.$column_name %]
+      [% value = column_in_use.$column_name %]
+      [% ELSE %]
+      [% value = '' %]
+      [% END %]
+        <td>
+            <input type='text'
+                   value='[% value %]'
+                   id='data_value::[% block.ident %]::[% column.ident %]::[% row_number %]'
+                   onchange='javascript:change_data_statement( this )' />
+        </td>
+        [% row_number_str = "x$row_number_str";
+           row_number     = row_number_str.length  %]
+    [% END %]
+        <td>
+            <input type='text'
+                   value=''
+                   id='data_value::[% block.ident %]::[% column.ident %]::[% row_number %]'
+                   onchange='javascript:change_data_statement( this )' />
+        </td>
+  </tr>
+    [% END %]
+</table>

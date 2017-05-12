@@ -1,0 +1,29 @@
+---
+abstract: 'Validate and process Icelandic PIN numbers (Icelandic: kennitE<ouml>lur)'
+author:
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100660'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-IS-PIN
+no_index:
+  directory:
+    - t
+requires:
+  Exporter: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Test::More: 0
+  overload: 0
+resources:
+  Ratings: http://cpanratings.perl.org/d/Business-IS-PIN
+  bugtracker: http://github.com/avar/business-is-pin/issues
+  homepage: http://search.cpan.org/dist/Business-IS-PIN/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/avar/business-is-pin
+version: 0.06

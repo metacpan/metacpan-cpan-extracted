@@ -1,0 +1,34 @@
+README
+------
+
+    B::XPath - search Perl optrees with XPath syntax
+
+    Perl represents programs internally as a tree of opcodes. To execute a
+    program, it walks this tree, performing each operation as it encounters
+    it. The B family of modules allows you to examine (and in some cases,
+    manipulate) this optree on programs *even as they run*.
+
+    B::XPath allows you to use XPath syntax to select ops in the optree.
+
+INSTALLATION
+------------
+
+	$ perl Build.PL
+	$ perl ./Build
+	$ perl ./Build test
+	# perl ./Build install
+
+DEPENDENCIES
+------------
+
+	Perl 5.6 or greater (maybe 5.8; I don't know)
+	Class::XPath
+	Scalar::Util
+	Test::Simple (for testing only)
+	A working knowledge of XPath and courage to read B.pm
+
+COPYRIGHT
+---------
+
+	Copyright 2006 chromatic.  You may use, distribute, and modify this code
+	under the same terms as Perl 5.8.x itself.

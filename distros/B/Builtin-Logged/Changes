@@ -1,0 +1,109 @@
+Revision history for Builtin-Logged
+
+0.15    2016-09-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Avoid failure reports in perl < 5.20.
+
+
+0.14    2016-09-06 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload because accidentally deleted the release.
+
+
+0.13    2016-04-18 (PERLANCAR)
+
+	- No functional changes.
+
+        - Add some diag() and explain() to aid debugging CT failure reports.
+
+
+0.12    2016-04-17 (PERLANCAR)
+
+	- Change my_qx() to readpipe(), to be able to override backtick operator
+          (perl indeed provides a way to override backtick this way). But
+          'my_qx' will be supported for a while for backward compatibility.
+
+
+0.11    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.10    2015-01-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Mark deprecated.
+
+
+0.09    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::Trim::More.
+
+
+0.08    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - [dist] Fix version of dependency (Proc::ChildError).
+
+
+0.07    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.06    2014-03-20 (SHARYANTO)
+
+        - No functional changes.
+
+        - Add missing prereq to Log::Any [CT].
+
+
+0.05    2012-07-24 (SHARYANTO)
+
+        - No functional changes.
+
+        [BUG FIXES]
+
+        - Forgot to import explain_child_error().
+
+
+0.04    2012-07-24 (SHARYANTO)
+
+        - No functional changes.
+
+        [BUG FIXES]
+
+        - Forgot to import ellipsis().
+
+
+0.03    2012-07-15 (SHARYANTO)
+
+        - No functional changes. Module name changed to Log::Any::For::Builtins,
+          but old module and dist name retained.
+
+
+0.02    2012-06-21 (SHARYANTO)
+
+        - Fix my_qx() which didn't return result :p
+
+        - Only log error if there is error.
+
+        - Add tests.
+
+
+0.01    2012-03-28 (SHARYANTO)
+
+        - First release.

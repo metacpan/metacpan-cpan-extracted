@@ -1,0 +1,37 @@
+=head1 USE
+
+The C<accessor> keyword tells your ORM to use an alternate name for
+the dual use get/set accessor for a field.  This is useful if you want
+to use the field's name for some other method.  I do this for date
+beautification, among other things.  So, as in the example below,
+I might have a field like this:
+
+    field birth_day {
+        is date;
+        label `Birth Day`;
+        html_form_type text;
+        accessor birth_date_acc;
+    }
+
+Then in the model stub for this table I can add a method called
+birth_date.  Anyone calling it gets the formatting of my choosing:
+
+    sub birth_date {
+        my $row = shift;
+
+        my $value = $row->birth_date_acc( @_ );
+
+        return beautify_date( $value );
+    }
+
+Note that I carefully dispatch to the real accessor first, then pretty up
+the date.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+From the newly created Kids subdirectory, look in lib/Kids/Model/GEN/child.pm
+for a special C<add_columns> statement for C<birth_day>.

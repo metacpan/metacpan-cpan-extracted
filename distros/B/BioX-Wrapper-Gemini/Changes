@@ -1,0 +1,17 @@
+Revision history for BioX-Wrapper-Gemini
+
+0.05  2015-06-28 10:27:24 AST
+    Fixed bug in SNPEFFconfig
+
+0.04  2015-06-24 11:10:31 AST
+    - Updated documentaton
+
+0.03  2015-06-18 08:32:26 AST
+    - Changed copyright
+
+0.02  2015-06-16 08:54:04 AST
+    - Updated documentation
+    - Cleaned up cpanfile
+
+0.01  2015-06-11 11:57:41 AST
+        - Initial release

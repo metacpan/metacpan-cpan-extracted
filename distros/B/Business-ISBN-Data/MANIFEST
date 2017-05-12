@@ -1,0 +1,19 @@
+Changes
+examples/README
+INSTALL.SKIP
+lib/Business/ISBN/Data.pm
+lib/Business/ISBN/RangeMessage.xml
+LICENSE
+make_data.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/check_data_structure.t
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

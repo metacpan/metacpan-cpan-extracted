@@ -1,0 +1,33 @@
+Revision history for Bio-Tools-CodonOptTable
+
+0.01    28th Dec 08
+        First version, released on an unsuspecting world.
+0.02    30th Dec 08
+        Second version, Added graphical view for RSCU and RAC.
+0.03	30th Dec 08
+		Third version, Typo correction
+0.04	1st Jan 09
+		Test correction, pod-coverage
+0.05	19th Jan 09
+		Added new sub to get prefered codons, and optimized the code
+0.06	19th Jan 09
+		just mistake while make archive file
+0.08	17th Mar 10
+		improved all failed test
+0.09	18th Mar 10
+		cpan test improved
+1.00	8th Sep 10
+		Code cleanup and warnings removed
+1.01	8th Sep 10
+		Added new method to calculate CAI value
+		$seqobj->calculate_cai($myCodons);
+1.02	9th Sep 10
+		Added new method to generate HTML report of result
+		$seqobj->generate_report($outfile_name);
+1.03	11th Sep 10
+		CPAN test fail fixes and added html report sample output
+1.04 	11th Sep 10
+		Fixed broken url in pod
+1.05 	16th Sep 10
+		'LWP::UserAgent'	=> '0' added in make file to avoid test fail
+		

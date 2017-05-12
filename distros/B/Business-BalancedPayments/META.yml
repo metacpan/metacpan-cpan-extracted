@@ -1,0 +1,40 @@
+---
+abstract: 'Balanced Payments API bindings'
+author:
+  - 'Ali Anari <ali@tilt.com>'
+  - 'Khaled Hussein <khaled@tilt.com>'
+  - 'Naveed Massjouni <naveed@tilt.com>'
+  - 'Al Newkirk <al@tilt.com>'
+  - 'Will Wolf <will@tilt.com>'
+build_requires:
+  Exporter: 0
+  File::Spec: 0
+  HTTP::Response: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Mock::LWP::Dispatch: 0
+  Test::Modern: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Business-BalancedPayments
+requires:
+  Carp: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  Method::Signatures: 0
+  Moo: 0
+  WebService::Client: 0.0001
+resources:
+  bugtracker: https://github.com/Crowdtilt/Business-BalancedPayments/issues
+  repository: git://github.com/Crowdtilt/Business-BalancedPayments.git
+version: 1.0600

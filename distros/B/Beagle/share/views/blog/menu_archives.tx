@@ -1,0 +1,22 @@
+<div class="menu archives">
+<h3 class="menu"><a href="<: $prefix :>archives"><: _('Archives') :></a></h3>
+<ul>
+: for $archives.keys().sort(-> $x, $y { $y <=> $x }) -> $year {
+    <li class="hover archive">
+    <a href="<: $prefix :>archive/<: $year :>"><: $year :>(<: size($archives[$year]) :>)</a>
+: if $~year.is_first {
+    <ul>
+: } else {
+    <ul class="hidden">
+: }
+
+: for $archives[$year].keys().sort(-> $x, $y { $y <=> $x }) -> $month {
+: for $archives[$year][$month] -> $e {
+                <li><a href="<: $prefix :>entry/<: $e.id :>"><: $map[$e.id].summary  || '' :></a></li>
+: }
+: }
+        </ul>
+    </li>
+: }
+</ul>
+</div>

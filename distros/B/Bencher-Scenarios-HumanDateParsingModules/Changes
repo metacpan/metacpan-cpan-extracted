@@ -1,0 +1,39 @@
+0.006   2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.005   2016-07-16 (PERLANCAR)
+
+        - Rename dist from Bencher-Scenarios-DateTimeFormatAlami to
+          Bencher-Scenarios-HumanDateParsingModules.
+
+        - Show charts.
+
+
+0.004   2016-06-29 (PERLANCAR)
+
+        - Add more datasets.
+
+        - [build] Rebuild to show results split per-dataset.
+
+
+0.003   2016-06-29 (PERLANCAR)
+
+	- Add participant: DateTime::Format::Flexible.
+
+
+0.002   2016-04-07 (PERLANCAR)
+
+	- Add scenario: DateTimeFormatAlami::Parsing.
+
+	- Add ::EN & ::ID to startup bench.
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+        - First release.

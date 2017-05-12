@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:ietf:params:xml:ns:xfb" xmlns:xfb="urn:ietf:params:xml:ns:xfb"
+	xmlns:ne="urn:ietf:params:xml:ns:network_elements" elementFormDefault="qualified">
+	<xsd:import id="ne" namespace="urn:ietf:params:xml:ns:network_elements"
+		schemaLocation="network_elements_2_00.xsd" />
+
+	<xsd:element name="OPEN" type="xfb:open_type" />
+	<xsd:element name="UPDATE" type="xfb:update_type" />
+	<xsd:element name="NOTIFICATION" type="xfb:notification_type" />
+	<xsd:element name="KEEP_ALIVE" type="xfb:keepalive_type" />
+
+
+	<xsd:complexType name="open_type">
+
+		<xsd:sequence>
+			<xsd:element name="VERSION" type="xsd:unsignedByte"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="ASN" type="xsd:unsignedInt" minOccurs="1"
+				maxOccurs="1" />
+			<xsd:element name="HOLD_TIME" type="xsd:unsignedInt"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:element name="BGP_ID" type="xsd:unsignedLong"
+				minOccurs="1" maxOccurs="1" />
+			<xsd:choice maxOccurs="unbounded" minOccurs="0">
+				<xsd:element ref="xfb:MP_CAP" />
+				<xsd:element ref="xfb:ROUTE_REFRESH_CAP" />
+				<xsd:element ref="xfb:OUTBOUND_ROUTE_FILTERING_CAP" />
+				<xsd:element ref="xfb:MPLS_CAP" />
+				<xsd:element ref="xfb:UNKNOWN_CAPABILITY" />
+			</xsd:choice>
+		</xsd:sequence>
+
+		<xsd:attribute name="bgp_message_type" type="xsd:integer"
+			fixed="1" use="required" />
+	</xsd:complexType>
+
+
+	<xsd:complexType name="update_type">
+		<xsd:sequence>
+			<xsd:element name="WITHDRAW" type="ne:ipv4_prefix_type"
+				maxOccurs="unbounded" minOccurs="0" />
+
+			<xsd:choice maxOccurs="unbounded" minOccurs="0">
+
+				<!-- type 1 -->
+				<xsd:element ref="xfb:ORIGIN" maxOccurs="1" minOccurs="0" />
+				<!-- type 2 -->
+				<xsd:element ref="xfb:AS_PATH" maxOccurs="1" minOccurs="0" />
+				<!-- type 3 -->
+				<xsd:element ref="xfb:NEXT_HOP" maxOccurs="1" minOccurs="0" />
+				<!-- type 4 -->
+				<xsd:element ref="xfb:MULTI_EXIT_DISC" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 5 -->
+				<xsd:element ref="xfb:LOCAL_PREF" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 6 -->
+				<xsd:element ref="xfb:ATOMIC_AGGREGATE" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 7 -->
+				<xsd:element ref="xfb:AGGREGATOR" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 8 -->
+				<xsd:element ref="xfb:COMMUNITY" maxOccurs="unbounded"
+					minOccurs="0" />
+				<!-- type 9 -->
+				<xsd:element ref="xfb:ORIGINATOR_ID" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 10 -->
+				<xsd:element ref="xfb:CLUSTER_LIST" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 14 -->
+				<xsd:element ref="xfb:MP_REACH_NLRI" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 15 -->
+				<xsd:element ref="xfb:MP_UNREACH_NLRI" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 16 -->
+				<xsd:element ref="xfb:EXTENDED_COMMUNITIES" maxOccurs="1"
+					minOccurs="0" />
+				<!-- type 17 -->
+				<xsd:element ref="xfb:AS4_PATH" maxOccurs="1" minOccurs="0" />
+				<!-- type 18 -->
+				<xsd:element ref="xfb:AS4_AGGREGATOR" maxOccurs="1"
+					minOccurs="0" />
+				<xsd:element ref="xfb:UNKNOWN_ATTRIBUTE" maxOccurs="unbounded"
+					minOccurs="0" />
+				<xsd:element ref="xfb:PARSE_ERROR" maxOccurs="1" minOccurs="1" />
+
+			</xsd:choice>
+			<xsd:element name="NLRI" type="ne:ipv4_prefix_type"
+				maxOccurs="unbounded" minOccurs="0" />
+		</xsd:sequence>
+		<xsd:attribute name="bgp_message_type" type="xsd:integer"
+			fixed="2" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="notification_type">
+		<xsd:choice>
+			<xsd:element name="MESSAGE_HEADER_ERROR" type="xfb:message_header_error_type" />
+			<xsd:element name="OPEN_MESSAGE_ERROR" type="xfb:open_message_error_type" />
+			<xsd:element name="UPDATE_MESSAGE_ERROR" type="xfb:update_message_error_type" />
+			<xsd:element name="HOLD_TIMER_EXPIRED" type="xfb:hold_timer_expired_type" />
+			<xsd:element name="FINITE_STATE_MACHINE_ERROR" type="xfb:finite_state_machine_error_type" />
+			<xsd:element name="CEASE" type="xfb:cease_type" />
+			<xsd:element name="UNKNOWN_ERROR" type="xfb:unknown_error_type" />
+		</xsd:choice>
+		<xsd:attribute name="bgp_message_type" type="xsd:integer"
+			fixed="3" use="required" />
+	</xsd:complexType>
+
+
+
+
+	<xsd:element name="MP_CAP">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AFI" type="xsd:unsignedInt" />
+				<xsd:element name="SAFI" type="xsd:unsignedByte" />
+			</xsd:sequence>
+
+			<xsd:attribute name="param_code" type="xsd:integer"
+				fixed="2" />
+			<xsd:attribute name="code" type="xsd:integer" fixed="1" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="ROUTE_REFRESH_CAP">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AFI" type="xsd:unsignedInt" />
+				<xsd:element name="SAFI" type="xsd:unsignedByte" />
+			</xsd:sequence>
+
+			<xsd:attribute name="param_code" type="xsd:integer"
+				fixed="2" />
+			<xsd:attribute name="code" type="xsd:integer" fixed="2" />
+		</xsd:complexType>
+	</xsd:element>
+
+
+	<xsd:element name="OUTBOUND_ROUTE_FILTERING_CAP">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AFI" type="xsd:unsignedInt" />
+				<xsd:element name="SAFI" type="xsd:unsignedByte" />
+				<xsd:element name="ORF_TYPE" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="type" type="xsd:unsignedByte" />
+						</xsd:sequence>
+						<xsd:attribute name="send" type="xsd:boolean" />
+						<xsd:attribute name="receive" type="xsd:boolean" />
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+
+			<xsd:attribute name="param_code" type="xsd:integer"
+				fixed="2" />
+			<xsd:attribute name="code" type="xsd:integer" fixed="3" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="MPLS_CAP">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="AFI" type="xsd:unsignedInt" />
+				<xsd:element name="SAFI" type="xsd:unsignedByte" />
+			</xsd:sequence>
+
+			<xsd:attribute name="param_code" type="xsd:integer"
+				fixed="2" />
+			<xsd:attribute name="code" type="xsd:integer" fixed="4" />
+		</xsd:complexType>
+	</xsd:element>
+
+
+
+
+
+
+
+
+
+
+
+
+	<xsd:complexType name="message_header_error_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="1" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:complexType name="open_message_error_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="2" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:complexType name="update_message_error_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="3" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:complexType name="hold_timer_expired_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="4" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:complexType name="finite_state_machine_error_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="5" type="xsd:integer" />
+	</xsd:complexType>
+
+
+	<xsd:complexType name="cease_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" fixed="6" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:complexType name="unknown_error_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:SUBCODE" />
+		</xsd:sequence>
+		<xsd:attribute name="code" type="xsd:integer" />
+	</xsd:complexType>
+
+	<xsd:element name="SUBCODE" type="xfb:notification_error_subcode" />
+
+	<xsd:complexType name="notification_error_subcode">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:string">
+				<xsd:attribute name="code" type="xsd:integer" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="keepalive_type">
+		<xsd:attribute name="bgp_message_type" type="xsd:integer"
+			fixed="4" use="required" />
+	</xsd:complexType>
+
+	<!-- This section defines the optional parameters in an open message https://tools.ietf.org/html/rfc5492 -->
+	<xsd:element name="UNKNOWN_CAPABILITY" type="xfb:unknown_capability_type" />
+
+	<xsd:complexType name="unknown_capability_type">
+		<xsd:complexContent>
+			<xsd:extension base="xfb:capabilities_type">
+				<xsd:sequence>
+					<xsd:element name="VALUE" type="xsd:hexBinary" />
+				</xsd:sequence>
+				<xsd:attribute name="code" type="xsd:unsignedInt" />
+			</xsd:extension>
+
+		</xsd:complexContent>
+
+	</xsd:complexType>
+
+
+	<xsd:complexType name="capabilities_type">
+		<xsd:complexContent>
+			<xsd:restriction base="xfb:optional_parameter_type">
+				<xsd:attribute name="parameter_type" type="xsd:integer"
+					fixed="2" use="required" />
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="optional_parameter_type"
+		abstract="true">
+		<xsd:attribute name="parameter_type" type="xsd:integer"
+			use="required" />
+	</xsd:complexType>
+
+	<xsd:element name="ORIGIN" type="xfb:origin_type" />
+	<xsd:element name="AS_PATH" type="xfb:as_path_type" />
+	<xsd:element name="NEXT_HOP" type="xfb:next_hop_type" />
+	<xsd:element name="MULTI_EXIT_DISC" type="xfb:multi_exit_disc_type" />
+	<xsd:element name="LOCAL_PREF" type="xfb:local_pref_type" />
+	<xsd:element name="ATOMIC_AGGREGATE" type="xfb:atomic_aggregate_type" />
+	<xsd:element name="AGGREGATOR" type="xfb:aggregator_type" />
+	<xsd:element name="COMMUNITY" type="xfb:community_type" />
+	<xsd:element name="ORIGINATOR_ID" type="xfb:originator_id_type" />
+	<xsd:element name="CLUSTER_LIST" type="xfb:cluster_list_type" />
+	<xsd:element name="MP_REACH_NLRI" type="xfb:mp_reach_nlri_type" />
+	<xsd:element name="MP_UNREACH_NLRI" type="xfb:mp_unreach_nlri_type" />
+	<xsd:element name="EXTENDED_COMMUNITIES" type="xfb:extended_communities_type" />
+	<xsd:element name="AS4_PATH" type="xfb:as4_path" />
+	<xsd:element name="AS4_AGGREGATOR" type="xfb:as4_aggregator_type" />
+	<xsd:element name="UNKNOWN_ATTRIBUTE" type="xfb:unknown_attribute_type" />
+	<xsd:element name="PARSE_ERROR" type="xfb:parse_error_type" />
+
+	<xsd:complexType name="origin_type">
+		<xsd:simpleContent>
+			<xsd:extension base="xfb:origin_sub_type">
+				<xsd:attribute name="optional" type="xsd:boolean"
+					fixed="false" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					fixed="true" use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					fixed="1" use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:simpleType name="origin_sub_type">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="IGP" />
+			<xsd:enumeration value="EGP" />
+			<xsd:enumeration value="INCOMPLETE" />
+			<xsd:enumeration value="UNKNOWN" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+	<xsd:complexType name="as_path_type">
+		<xsd:choice maxOccurs="255" minOccurs="1">
+			<xsd:element ref="xfb:AS_SEQUENCE" maxOccurs="1" />
+			<xsd:element ref="xfb:AS_SET" maxOccurs="1" />
+			<xsd:element ref="xfb:AS_CONFED_SEQUENCE" maxOccurs="1" />
+			<xsd:element ref="xfb:AS_CONFED_SET" maxOccurs="1" />
+		</xsd:choice>
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="false"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="2" use="required" />
+	</xsd:complexType>
+
+	<xsd:element name="AS_SEQUENCE" type="xfb:as_list" />
+	<xsd:element name="AS_SET" type="xfb:as_list" />
+	<xsd:element name="AS_CONFED_SEQUENCE" type="xfb:as_list" />
+	<xsd:element name="AS_CONFED_SET" type="xfb:as_list" />
+
+	<xsd:complexType name="next_hop_type">
+		<xsd:simpleContent>
+			<xsd:extension base="ne:ipv4_address_type">
+				<xsd:attribute name="optional" type="xsd:boolean"
+					fixed="false" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					fixed="true" use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					fixed="3" use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="multi_exit_disc_type">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:unsignedLong">
+				<xsd:attribute name="optional" type="xsd:boolean"
+					fixed="true" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					fixed="false" use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					fixed="4" use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="local_pref_type">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:unsignedLong">
+				<xsd:attribute name="optional" type="xsd:boolean"
+					fixed="false" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					fixed="true" use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					fixed="5" use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="atomic_aggregate_type">
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="false"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="6" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="aggregator_type">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element ref="xfb:ASN2" />
+				<xsd:element ref="xfb:ASN4" />
+			</xsd:choice>
+			<xsd:element name="IPv4_ADDRESS" type="ne:ipv4_address_type" />
+		</xsd:sequence>
+
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="7" use="required" />
+
+	</xsd:complexType>
+
+
+	<xsd:complexType name="as4_aggregator_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:ASN4" />
+			<xsd:element name="IPv4_ADDRESS" type="ne:ipv4_address_type" />
+		</xsd:sequence>
+
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="18" use="required" />
+
+	</xsd:complexType>
+
+	<xsd:complexType name="community_type">
+		<xsd:sequence>
+			<xsd:element ref="xfb:ASN2" />
+			<xsd:element name="VALUE" type="xsd:unsignedInt" />
+		</xsd:sequence>
+
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="8" use="required" />
+
+	</xsd:complexType>
+
+	<xsd:complexType name="originator_id_type">
+		<xsd:annotation>
+			<xsd:documentation>http://tools.ietf.org/html/rfc4456
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="ne:ipv4_address_type">
+				<xsd:attribute name="optional" type="xsd:boolean"
+					fixed="true" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					fixed="false" use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					fixed="9" use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="cluster_list_type">
+		<xsd:annotation>
+			<xsd:documentation>http://tools.ietf.org/html/rfc4456
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CLUSTER_ID" type="ne:ipv4_address_type"
+				minOccurs="1" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="false" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="10" use="required" />
+	</xsd:complexType>
+
+	<xsd:annotation>
+		<xsd:documentation>http://tools.ietf.org/html/draft-ietf-idr-deprecate-dpa-etal-00
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:complexType name="mp_reach_nlri_type">
+		<xsd:annotation>
+			<xsd:documentation>http://tools.ietf.org/html/rfc2858
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:choice minOccurs="1" maxOccurs="unbounded">
+			<xsd:element name="MP_NEXT_HOP" type="ne:network_address_type"
+				minOccurs="0" maxOccurs="unbounded" />
+			<xsd:element name="MP_NLRI" type="ne:network_prefix_type"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xsd:choice>
+		<xsd:attribute name="safi" type="xsd:unsignedByte" use="required" />
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="false" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="14" use="required" />
+	</xsd:complexType>
+
+	<xsd:complexType name="mp_unreach_nlri_type">
+		<xsd:annotation>
+			<xsd:documentation>http://tools.ietf.org/html/rfc2858
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="MP_NLRI" type="ne:network_prefix_type"
+				minOccurs="1" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="safi" type="xsd:unsignedByte" use="required" />
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="false" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="15" use="required" />
+	</xsd:complexType>
+
+
+	<xsd:complexType name="extended_communities_type">
+		<xsd:annotation>
+			<xsd:documentation>http://tools.ietf.org/html/rfc4360
+			</xsd:documentation>
+		</xsd:annotation>
+
+		<xsd:sequence>
+			<xsd:choice>
+
+				<!-- Two-Octet specific -->
+				<xsd:sequence>
+					<xsd:element ref="xfb:ASN2" />
+					<xsd:element name="VALUE" type="xsd:string" minOccurs="1"
+						maxOccurs="1" />
+				</xsd:sequence>
+
+				<!-- IPv4 Address Specific -->
+				<xsd:sequence>
+					<xsd:element name="IPv4_ADDRESS" type="ne:ipv4_address_type"
+						minOccurs="1" maxOccurs="1" />
+					<xsd:element name="VALUE" type="xsd:string" minOccurs="1"
+						maxOccurs="1" />
+				</xsd:sequence>
+
+				<!-- Four-Octet specific -->
+				<xsd:sequence>
+					<xsd:element ref="xfb:ASN4" />
+					<xsd:element name="VALUE" type="xsd:string" minOccurs="1"
+						maxOccurs="1" />
+				</xsd:sequence>
+
+				<!-- Opaque -->
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:sequence> <!-- Type 0,1,and 2 -->
+							<xsd:element name="VALUE" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+						</xsd:sequence>
+						<xsd:sequence> <!-- Type 6 -->
+							<xsd:element name="AREA_NUMBER" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+							<xsd:element name="ROUTE_TYPE" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+							<xsd:element name="OPTIONS" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+						</xsd:sequence>
+						<xsd:sequence> <!-- Type 11 -->
+							<xsd:element name="COLOR_VALUE" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+						</xsd:sequence>
+						<xsd:sequence> <!-- Type 12 -->
+							<xsd:element name="TUNNEL_TYPE" type="xsd:string"
+								minOccurs="1" maxOccurs="1" />
+						</xsd:sequence>
+					</xsd:choice>
+				</xsd:sequence>
+				
+				<!-- UNKNOWN OR UNNSUPPORTED -->
+				<xsd:sequence>
+					<xsd:element name="HEX_STRING" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:choice>
+
+
+		</xsd:sequence>
+
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"	fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"	fixed="16" use="required" />
+		<xsd:attribute name="extended_communities_type" type="xsd:string" use="required" />
+		<xsd:attribute name="extended_communities_subtype" type="xsd:string" use="optional" />
+
+
+
+
+	</xsd:complexType>
+
+
+	<xsd:complexType name="unknown_attribute_type">
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:hexBinary">
+				<xsd:attribute name="length" type="xsd:integer" use="required" />
+				<xsd:attribute name="optional" type="xsd:boolean" use="required" />
+				<xsd:attribute name="transitive" type="xsd:boolean"
+					use="required" />
+				<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+				<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+				<xsd:attribute name="attribute_type" type="xsd:integer"
+					use="required" />
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="parse_error_type">
+		<xsd:attribute name="position" type="xsd:integer" use="required" />
+	</xsd:complexType>
+
+
+
+
+	<xsd:complexType name="as4_path">
+		<xsd:choice maxOccurs="255" minOccurs="1">
+			<xsd:element ref="xfb:AS4_SEQUENCE" maxOccurs="1" />
+			<xsd:element ref="xfb:AS4_SET" maxOccurs="1" />
+			<xsd:element ref="xfb:AS_SET" maxOccurs="1" />
+			<xsd:element ref="xfb:AS_SEQUENCE" maxOccurs="1" />
+		</xsd:choice>
+		<xsd:attribute name="optional" type="xsd:boolean" fixed="true"
+			use="required" />
+		<xsd:attribute name="transitive" type="xsd:boolean"
+			fixed="true" use="required" />
+		<xsd:attribute name="partial" type="xsd:boolean" use="required" />
+		<xsd:attribute name="extended" type="xsd:boolean" use="required" />
+		<xsd:attribute name="attribute_type" type="xsd:integer"
+			fixed="17" use="required" />
+	</xsd:complexType>
+
+	<xsd:element name="AS4_SEQUENCE" type="xfb:as4_list" />
+	<xsd:element name="AS4_SET" type="xfb:as4_list" />
+
+	<xsd:element name="ASN4" type="xfb:asn4_type" />
+
+
+	<xsd:complexType name="asn4_type">
+		<xsd:simpleContent>
+			<xsd:restriction base="ne:asn_type">
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+
+	<xsd:element name="ASN2" type="xfb:asn2_type" />
+	<xsd:complexType name="asn2_type">
+		<xsd:simpleContent>
+			<xsd:restriction base="ne:asn_type">
+				<xsd:maxInclusive value="65535" />
+			</xsd:restriction>
+		</xsd:simpleContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="as_list">
+		<xsd:sequence maxOccurs="1" minOccurs="1">
+			<xsd:choice maxOccurs="255" minOccurs="1">
+				<xsd:element ref="xfb:ASN2" />
+				<xsd:element ref="xfb:ASN4" />
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="as4_list">
+		<xsd:sequence maxOccurs="255" minOccurs="1">
+			<xsd:element ref="xfb:ASN4" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="as2_list">
+		<xsd:sequence maxOccurs="255" minOccurs="1">
+			<xsd:element ref="xfb:ASN2" />
+		</xsd:sequence>
+	</xsd:complexType>
+
+
+</xsd:schema>

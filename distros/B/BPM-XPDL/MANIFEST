@@ -1,0 +1,36 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+examples/xpdl-1.0-sample/creditService.wsdl
+examples/xpdl-1.0-sample/orderschema.xsd
+examples/xpdl-1.0-sample/sample.xpdl
+examples/xpdl-1.0-sample/xyzSchema.xsd
+examples/xpdl-2.0-sample/README
+examples/xpdl-2.0-sample/output.dd
+examples/xpdl-2.0-sample/sample.xpdl
+examples/xpdl-2.0alpha/ActivityCostStructure.xsd
+examples/xpdl-2.0alpha/ActivityRuntimeMetrics.xsd
+examples/xpdl-2.0alpha/xyzSchema.xsd
+lib/BPM/XPDL.pm
+lib/BPM/XPDL.pod
+lib/BPM/XPDL/Util.pm
+lib/BPM/XPDL/Util.pod
+lib/BPM/XPDL/xsd/xpdl-0.01/020301-xpdl.xsd
+lib/BPM/XPDL/xsd/xpdl-0.09/TC-1025_020305_xpdl.xsd
+lib/BPM/XPDL/xsd/xpdl-1.0/TC-1025_schema_10_xpdl.xsd
+lib/BPM/XPDL/xsd/xpdl-2.0/TC-1025_schema_20_2005-09-07_xpdl.xsd
+lib/BPM/XPDL/xsd/xpdl-2.0alpha-21/TC-1025_bpmnxpdl_21.xsd
+lib/BPM/XPDL/xsd/xpdl-2.0alpha-24/TC-1025_bpmnxpdl_24.xsd
+lib/BPM/XPDL/xsd/xpdl-2.1/bpmnxpdl_31.xsd
+lib/BPM/XPDL/xsd/xpdl-2.2/bpmnxpdl_40a.xsd
+t/01use.t
+t/10minimal.t
+t/11create.t
+t/20sample.t
+t/30read.t
+t/40conv10to20.t
+t/41conv20to21.t
+t/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

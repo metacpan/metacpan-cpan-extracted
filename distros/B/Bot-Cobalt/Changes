@@ -1,0 +1,479 @@
+Revision history for Perl module Bot::Cobalt
+
+0.021003 2016-07-31
+
+  - Cwd-in-@INC security improvements
+    
+    Drop "." from @INC when running 'cobalt2'
+    Ignore "." in @INC when Bot::Cobalt::Core::Loader->load is called
+
+  - Removed deprecated Plugin::Extras::Money (broken for some time)
+
+  - Randomize Plugin::Games::Roulette output
+
+  - POD improvements
+
+0.021002 2016-06-23
+
+  - Fix '!cpan changes' (Plugin::Extras::CPAN)
+
+0.021001 2016-06-16
+
+  - Fix ContextMeta->list_as_array
+
+  - Add '!alarmclear' command to Plugin::Alarmclock
+
+  - Add '!cpan changes' command to Plugin::Extras::CPAN
+
+  - Logger-related fixes
+
+  - Minor Plugin::RDB::AsyncSearch worker optimizations
+
+  - Various Plugin cleanups and minor optimizations;
+    Plugin::Seen, Plugin::Debug, Plugin::Extras::CPAN, Plugin::Games::
+
+  - POD improvements
+
+0.020001 2016-01-14
+
+  - Alarmclocks are now persistent between runs
+
+  - Revert ContextMeta changes (poorly considered; too much breakage)
+
+0.019003 2016-01-08
+
+  - Fix an interactive prompter bug that would fail to capture after
+    re-asking due to bad input (busted in v0.17.7)
+
+0.019002 2016-01-07
+
+  - Message-related optimizations
+
+  - Move old darkbot6/cobalt1 import tools from bin/ to tools/
+
+  - Improved ContextMeta argument & validity checks
+
+  - Kill stale dependency on Term::ReadKey
+
+0.019001 2015-12-29
+
+  - Add '!topkarma' command to Plugin::Extras::Karma
+
+  - Fix caching behavior in Plugin::Extras::Karma to play nicely with external
+    modifications (or shared Karma DBs)
+
+  - Fix Plugin::Seen to force a database sync when unregistering
+
+  - Fix day(s)/year(s) pluralization in secs_to_str/secs_to_str_y
+
+  - Support Bot::Cobalt::DB->dbdump('HASH') for exporting a data structure
+
+0.018001 2015-12-16
+
+  - Remove stale documentation regarding deprecated '%COLORS' hash
+    (no longer exported)
+
+  - Adjust Seen plugin to report years + days
+
+  - Add 'secs_to_timestr_y' to Utils
+
+0.017008 2015-12-16
+
+  - Add '!server reconnect' (alias to connect)
+
+  - Add import/merge tool for eggdrop bseen DBs -> Plugin::Seen DBs
+
+  - Fix a possible bug regarding all-zero RDB IDs
+
+  - Improved RDB configuration validation
+
+  - Handle broken SeenDBs more gracefully
+
+  - Various minor optimizations
+
+  - Stale documentation cleanup
+
+0.017007 2015-08-15
+
+  - Make Plugin::Extras::Debug safe to load persistently
+
+  - Devel::MAT dump command for Plugin::Extras::Debug
+
+  - Fix a bug in '!server connect' error reporting
+
+  - Improved error reporting in configuration handling
+
+  - Various optimizations
+
+0.017006 2015-04-13
+
+  - Fix Plugin::RDB blocking search; a blocking search that returned no
+    matches would previously fail to DTRT and potentially leave an open shared
+    read lock on the searched RDB
+
+  - Ensure STDERR/STDOUT are reopened before Logger is initialized when
+    daemonizing
+
+  - Minor Info3 optimization
+
+0.017005 2015-04-09
+
+  - Fix Plugin::RDB::AsyncSearch MaxWorkers limiter
+
+  - Fix busted stderr redirection when daemonizing
+
+  - Various minor cleanups & POD fixes
+
+0.017004 2015-03-22
+
+  - Fix ::Plugin::Rehash (broken in 0.017)
+
+0.017003 2015-03-15
+
+  - Fix ::Plugin::Seen
+
+0.017002 2015-03-06
+
+  - Missing dependency 'Devel::StackTrace'
+
+0.017001 2015-03-05
+
+  - Deprecate most uppercase and camel-case methods/attributes
+
+  - Export types from Types::Standard and List::Objects::Types from
+    Bot::Cobalt::Common, drop MooX::Types::MooseLike
+
+  - Import 'strictures' without arguments to importers of Bot::Cobalt::Common;
+    'use strictures 2' internally for saner fatal warnings behavior
+
+  - Remove deprecated 'Extras::Shorten' plugin (sadly metamark is no more)
+
+  - Refactor Bot::Cobalt::Common to use a custom import method
+
+  - Use JSON::MaybeXS with 'utf8 => 1' for JSON serialization
+  
+  - Use ShareDir for base 'etc/' files
+
+  - Refactor cobalt2-installer to be cleaner/saner and use new ShareDir
+
+  - Refactor Bot::Cobalt::Lang to use ShareDir, drop inlined language set
+
+  - Begin deploying List::Objects::Types / List::Objects::WithUtils across
+    codebase
+
+  - Begin deploying Path::Tiny across codebase
+
+  - Switch to Exporter::Tiny in exporting modules
+
+  - Switch to dist.ini + cpanfile packaging
+
+  - Deprecate old 'tools/'
+
+  - Various other more minor cleanups, fixes, and optimizations
+
+0.016003 2014-05-25
+
+  - Fix hi-res time support in ::IRC::FloodChk
+
+  - Fix possible memory leak in Conf objects
+
+  - Fix perl-5.12.5 test failures (missing explicit IO::File require)
+
+  - Drop base.pm in favor of parent.pm
+
+  - POD fixes
+
+  - Various cleanups (including leftover Moose-y namespace::clean imports)
+
+0.016002 2013-04-25
+
+  - Kill smart-matching and when() in preparation for perl-5.18
+
+0.016001 2013-03-02
+
+  - Utils; Fix escaped [] in globs
+
+0.016000 2013-02-25
+
+  - POD fixes, switch to long-form vers
+
+0.015 2013-02-24
+
+  - Plugin::Auth; fix mixed-case superuser usernames (miniCruzer)
+
+  - Serializer utf8 handling fixes
+  
+  - Drop XML serialization support
+
+  - IRC; Support 'Umodes:' directive in IRC context confs (avenj)
+
+  - POD fixes and example config cleanups (miniCruzer)
+
+  - Plugin::WWW; MaxPerHost configuration directive (avenj)
+
+  - Plugin::Extras::Money; fix output formatting    (avenj)
+
+  - Plugin::Games::Roulette; expire old entries     (avenj)
+
+  - Purge almost all use of smart-match / when()    (avenj)
+
+
+0.014 2012-07-21
+
+  - Add logging-related opts LogFormat and LogTimeFormat (cobalt.conf)
+
+  - Plugin::RDB; allow for deletion of multiple items via 'rdb del'
+
+  - POD updates; documentation for Logger::Output:: classes was old/wrong.
+
+
+0.013 2012-07-20
+
+  - Fully reworked configuration file handling; see docs for Bot::Cobalt::Conf
+    for details. Incompatible changes:
+    - get_core_cfg() now returns a Bot::Cobalt::Conf::File::Core
+      Previously returned a HASH.
+    - 'PluginOpts' no longer exists. Opts directives specified in 
+      plugins.conf will override directives from loaded configuration 
+      files.
+
+  - Dropped Log::Handler dependency. Logging is now handled by 
+    Bot::Cobalt::Logger (and twice as fast per message!)
+
+  - Importing Bot::Cobalt::Common will now import 'strictures 1' rather 
+    than strict + warnings.
+  
+  - Fix Bot::Cobalt::IRC to be more discerning about Bot_rehash events and 
+    triggered autojoin reloads.
+
+  - Drop DateTime dependency; strftime() will do.
+  
+  - Explicitly use JSON::XS. Saves some overhead vs. 'use JSON' and 
+    performance sucks without it anyway. (We are already pulling in XS 
+    bits, so 'eh')
+
+  - Plugin::RDB; Revert to strictly random item IDs; hashing is unnecessary 
+    overhead. Drops Digest::SHA dependency.
+  
+  - Plugin::RDB; Clean up randstuff timer in _unregister.
+
+  - Plugin::Extras::DNS; add simplistic iptohex and hextoip command 
+    handlers.
+
+  - Core::Role::Singleton; kill is_instanced in favor of Moosey 
+    'has_instance'
+
+  - Optimized Bot::Cobalt::Utils::rplprintf()
+
+
+0.012  2012-07-05
+
+  - Add Bot::Cobalt::Error exception objects; adds Devel::StackTrace as a
+    dependency.
+
+  - Convert Plugin::Auth and Plugin::RDB / Plugin::RDB::Database to 
+    make use of Bot::Cobalt::Error.
+
+  - Language sets updated to include RDB_ERR_INVALID_NAME
+    (Core lang SPEC numbers bumped to 7.)
+
+  - Rewrite Bot::Cobalt::Lang, related tests & documentation.
+
+  - Largely refactored Plugin::RDB; various bugfixes, no functionality 
+    changes.
+
+  - Provide core()->rpl method as a frontend to rplprintf.
+    Return proper error strings when a specified RPL is missing.
+
+  - Provide POE::Component::Client::DNS instance via core()->resolver; 
+    share amongst IRC sessions & Plugin::Extras::DNS to save some 
+    overhead.
+
+  - IRC::Server; provide uppercase()/lowercase() methods making use of 
+    available casemap() value.
+
+
+0.011  2012-06-30
+
+  - Fix conflated incoming/outgoing notice events:
+   - Outgoing notices still go to 'send_notice' or 'notice'
+   - Incoming notices to 'got_notice'
+
+  - Bot::Cobalt::Core::Sugar subs are now prototyped.
+
+  - Shorter lock retry delays in Bot::Cobalt::DB, Bot::Cobalt::Serializer.
+    Also remove 4-arg select() statements in favor of Time::HiRes 
+    (Windows doesn't like select-on-undef, I'm told).
+
+  - Plugin::RDB bug fix; reset rdb_broadcast timer regardless of whether 
+   _select_random() failed.
+   
+  - Plugin::Extras::CPAN; Add 'belongs' command.
+  
+  - Various smaller bugfixes, test expansions, POD cleanups.
+
+
+0.010  2012-06-21
+
+  - Add Bot::Cobalt::Core::Loader, a lightweight module load/unload class,
+    and update Bot::Cobalt::Core + Bot::Cobalt::Plugins::PluginMgr to make 
+    use of it. Sanitizes previous module load/unload code.
+
+  - Bot::Cobalt::Plugin::Auth:
+    - Handle configured superusers in context '-ALL'
+    - Reloadable
+    - Significant cleanups
+  
+  - Bot::Cobalt::IRC::FloodChk; support fractional seconds.
+
+  - POD updates, particularly Bot::Cobalt::Manual::Plugins.
+
+  - Wide-ranging cleanups, minor optimizations and expanded tests.
+
+
+0.009  2012-06-15
+
+  - Fix RDB.pm bug that would cause log noise on certain command 
+    dispatches.
+  
+  - Vaguely improved configuration validation.
+
+  - The beginnings of some core / PluginMgr plug load/unload cleanup.
+
+
+0.008  2012-06-13
+
+  - Core configuration accessors no longer return cloned copies of config 
+    hashes. This behavior was intended to make it harder for plugins to 
+    break core config unintentionally, but it was also unintuitive 
+    enough to trip myself up from time to time ;-)
+    Return actual references instead.
+  
+  - Bot::Cobalt::Serializer:
+    - Drop Logger/LogMethod, always carp/croak/confess
+    - Throw proper exceptions on most errors
+    - Support writefile() lock retries and timeout
+
+  - Bot::Cobalt::IRC refactor and fixes:
+    - ircplug_connect & ircplug_disconnect handlers
+    - '!server' command handler in IRC::Role::AdminCmds    
+    - Move outgoing-to-IRC handlers to IRC::Role::UserEvents
+    - Improved disconnect cleanup
+    - Improved warnings/logging
+
+  - Bot::Cobalt::Utils:
+    - support list-style arguments in rplprintf()
+    - build %C_vars for rplprintf at load-time rather than when called 
+  
+  - Plugin::Master; required access levels should've come from PluginOpts
+    (rather than Opts, as this plugin doesn't normally have an external cfg)
+
+  - Die with stack traces on most errors (confess rather than croak)
+
+  - Various syntax / POD / test cleanups.
+
+
+0.007  2012-06-06
+  
+  - Fix usage help message in Plugin::Extras::CPAN.
+
+  - Push missing bin/cobalt2{-installer, -plugin-installcf} portable path 
+    fixes. (Uh, oops?)
+  
+  - Add missing test for Frontend::RC.
+
+
+0.006  2012-06-05
+
+  - Fix instance rc files:
+    - Kill old-style rcfiles, use YAML like other confs
+    - Allow absolute 'BASE' path to be passed in
+    - Default to cwd() if not absolute and home directory not available
+    - Create portable paths (File::Spec)
+  - This is an incompatible change; issue an informative error and 
+    suggest running `cobalt2-installer` on failure.
+
+  - Add Plugin::Extras::CPAN, a simplistic MetaCPAN and Module::CoreList 
+    querying plugin.
+
+  - Add debug opt to Bot::Cobalt::Conf constructor. Pass our --debug value 
+    to Conf as well (in bin/cobalt2 and Plugin::Rehash).
+
+  - Bot::Cobalt::Serializer should complain when freeze() or thaw() are 
+    given no data.
+
+  - Improved ::Core log object handling. Create initial log object at 
+    construction-time (not Syndicator start time) and ensure that 
+    replacement log objects can handle log methods in use in the core set.
+  
+  - Use Try::Tiny in place of previous block evals and $@ checks.
+
+  - Depend on newer POE::Component::Client::HTTP and 
+    POE::Component::Resolver. Systems with older Components that happened 
+    to grab newer Socket::GetAddrInfo would produce failures due to 
+    Socket::GetAddrInfo API changes -- newer POE bits make use of newer 
+    Socket.pm and drop the GetAddrInfo dependency entirely.
+    ...Not technically "our problem" but this makes my life less annoying 
+    on a couple machines :-)
+
+  - Some POD improvements and widely expanded tests.
+
+  - Drop 'tick' tracker for low-priority timer pool; pretty useless.
+
+  - Various small bug/oversight fixes:
+   - Conf.pm; catch Serializer failures and report more details
+     Related Plugin::Rehash fix to leave current configs untouched on
+     read_cfg failures.
+   - IRC.pm; more consistent error messages
+   - IRC::Event::Nick; fix common() when channels() has changed
+   - Explicitly 'use strictures' in IRC::subclasses
+   - Plugin::Auth; log to error() not emerg()
+
+
+0.005  2012-05-29
+
+  - Fix an IRC.pm bug that would cause failures if an error event was 
+    received for a context that never completed a connection.
+
+  - Fix Utils.pm bug in glob_functions that would cause failures when
+    operating on an untrue value. Should've been defined() checks.
+
+  - POD and test improvements and clean-ups.
+
+
+0.004  2012-05-27
+
+  - Fix IRC.pm bug that kept sessions hanging about when the bot was 
+    terminated via an online command. (This fixes the busted '!die' 
+    command from Plugin::Master).
+  - Also improve shutdown cleanups in Core.
+
+  Code cleanups (no functionality change):
+   - Bot::Cobalt::IRC
+   - Bot::Cobalt::Utils
+   - Significant POD cleanups
+
+
+0.003  2012-05-22
+
+  - Require perl-5.12.1; given/when changed sometime in there, it seems,
+    and I'm tired of playing with EOL Perls anyway.
+
+  - Some Plugin::RDB cleanups.
+
+
+0.002 2012-05-22
+
+  - Fix a couple oversights resulting in test failures:
+   - Fix Utils.pm test failures on <perl-5.14
+   - Fix Plugin::Auth syntax error on <perl-5.14
+
+  - Plugin::RDB:
+   - Warn if Info3 seems to be missing
+
+  - POD tweaks.
+
+
+0.001 2012-05-22
+
+  - Initial release of Bot::Cobalt

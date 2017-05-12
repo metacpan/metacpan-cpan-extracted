@@ -1,0 +1,34 @@
+=pod
+
+=head1 Bytes-Random-Secure-Tiny
+
+The minimal stuff needed from Bytes::Random::Secure, with no dependencies.
+
+=head1 Description
+
+This module provides a simple to use Cryptographically Secure Pseudo-Random
+Number Generator (CSPRNG) built around the ISAAC algorithm. Its methods
+include C<irand> for unsigned 32-bit integers, C<bytes> for simple random
+bytes, and C<string_from> for characters chosen at random from a bag of
+candidates. It also reliably seeds the CSPRNG from a secure source on a wide
+variety of platforms.
+
+The CPAN Module L<Bytes::Random::Secure> also produces high quality
+pseudo-randomness using the ISAAC cryptographically secure pseudo-random number
+generation algorithm, seeded using cryptographically secure entropy sources on
+a wide variety of operating systems. It has many configuration options. And
+provides both a functions and an object interface. But it has several
+dependencies, and its configurability and its user-interface, while flexible
+and useful, may expose more complexity than most use-cases require.
+
+Bytes::Random::Secure::Tiny's goal is to have no dependencies outside of the
+Perl core, and a simple interface that presents a minimal amount of
+configuration.  We asked ourselves, what are the essentials, and how can we
+achieve them in the most light-weight way?  This module is the answer we came
+up with.  We believe that this module will satisfy 90% of those users who were
+using Bytes::Random::Secure, but will do so with reduced complexity, a smaller
+user interface, and none of the frustration that dependencies can bring.
+
+See the documentation for L<Bytes::Random::Secure::Tiny> for more information.
+
+=cut

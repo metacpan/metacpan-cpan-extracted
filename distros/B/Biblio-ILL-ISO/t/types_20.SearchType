@@ -1,0 +1,16 @@
+$VAR1 = bless( {
+                 'expiry-flag' => bless( {
+                                           'ENUMERATED' => 3,
+                                           'ENUM_LIST' => {
+                                                            'other-Date' => 2,
+                                                            'need-Before-Date' => 1,
+                                                            'no-Expiry' => 3
+                                                          }
+                                         }, 'Biblio::ILL::ISO::ExpiryFlag' ),
+                 'level-of-service' => bless( {
+                                                'generalstring' => '1'
+                                              }, 'Biblio::ILL::ISO::ILLString' ),
+                 'expiry-date' => bless( {
+                                           'generalstring' => '20030720'
+                                         }, 'Biblio::ILL::ISO::ISODate' )
+               }, 'Biblio::ILL::ISO::SearchType' );

@@ -1,0 +1,43 @@
+Revision history for Perl extension Bundle::OpenInteract.
+
+1.11  Mon Apr  7 21:21:07 EDT 2003
+
+Sync with OI 1.57 Makefile.PL.
+
+1.10  Mon Aug 12 08:21:02 EDT 2002
+
+   Added 'Pod::POM', 'Lingua::Stem', 'LWP::UserAgent', 'HTTP::Request'
+   and replaced 'Email::Valid' with 'Mail::RFC822::Address'
+
+1.09  Fri Jan 18 18:07:00 EST 2002
+
+   Added 'Class::Accessor', 'Class::Fields' and 'Carp::Assert'
+
+1.08  Mon Nov 26 02:01:07 EST 2001
+
+   Added 'File::MMagic'
+
+1.07  Mon Oct  8 12:54:23 EDT 2001
+
+   Added 'MIME::Lite' and note about PPMs on SF site.
+
+1.06  Mon Aug 20 11:14:18 EDT 2001
+
+   Added 'Class::Date'
+
+1.05  Thu Jul 12 09:03:48 EDT 2001
+
+   Added 'Digest::MD5' and changed 'SPOPS::Configure' to 'SPOPS'
+
+1.04  Sun Feb 11 11:11:46 EST 2001
+
+   Added 'Apache::DBI'
+
+1.02  Dec 01 2000
+
+   Added some more prerequsites.
+
+1.00  Oct 15 2000
+
+   First version of the Bundlefile (not related to Brundlefly)
+

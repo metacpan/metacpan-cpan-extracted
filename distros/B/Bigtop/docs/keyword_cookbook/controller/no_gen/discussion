@@ -1,0 +1,18 @@
+=head1 USE
+
+The C<no_gen> keyword at the controller level turns off all generation
+of the controller and its methods.  Use this when you've been very
+naughty and modified the GEN module to avoid having Bigtop overwrite
+your changes, or when you are overwhelmed with paranoia.
+
+Note that the value of this statement must be true.  I usually use
+1 as the value.
+
+=head1 THE EXAMPLE
+
+When you try to build the example with:
+
+    bigtop -c example.bigtop all
+
+bigtop will create everything as normal except make the stub/GEN
+pair for the Child controller.

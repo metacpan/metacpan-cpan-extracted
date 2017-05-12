@@ -1,0 +1,23 @@
+Revision history for Bot::Twatterhose
+
+0.04 2010-05-21 15:42:05
+
+    - Fix Makefile.PL breakage caused by Dist::Zilla FAIL:
+      http://github.com/rjbs/dist-zilla/commit/2e47b6c205
+
+    - Ignore URLs, or stuff matching :// rather. Keeps the brain
+      smaller.
+
+0.03 2010-04-27 12:19:19
+
+    - Don't learn from non-ASCII input on Twitter. It's too complex to
+      handle south-east asian languages and others that don't split
+      their words on whitespace.
+
+0.02 2010-04-26 12:13:03
+
+    - Correct module name in Changes file
+
+0.01 2010-04-26 12:10:40
+
+    - Initial CPAN release

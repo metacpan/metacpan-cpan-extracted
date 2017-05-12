@@ -1,0 +1,135 @@
+NAME
+    Bot::BasicBot::Pluggable::Module::Log - Provide logging for
+    Bot::BasicBot::Pluggable
+
+VERSION
+    Version 0.11
+
+SYNOPSIS
+    This module logs all traffic in irc channels to files. Every channel is
+    logged to its own logfile and all files are rotated every 24 hours. For
+    the sake of simplicity this module implements a very straightforward
+    logging mechanism. Please take a look at the BUGS section for its
+    limitations.
+
+IRC USAGE
+    None. If the module is loaded every message, join and part event is
+    recorded in the channel's log file.
+
+FUNCTIONS
+  seen
+    The bot calls this functions for every message sent to the channel. The
+    message is then formatted and sent further to the loggings subsystem. If
+    the message is from the bot or addressed to it and "ignore_bot" is set
+    to a true value, those messages are not logged. The same applies if the
+    body of the message matches the pattern defined in "ignore_pattern". The
+    default logging output would look something like
+
+    [#botzone 12:34:12] <me> Hello World
+
+  emoted
+    This function simply calls seen.
+
+  chanjoin
+    This function is called every time someone enters the channel. The event
+    is logged as follows:
+
+    [#botzone 12:34:12] JOIN: me
+
+  chanpart
+    This function is called every time someone leaves the channel. The event
+    is logged as follows:
+
+    [#botzone 12:34:12] PART: me
+
+  replied
+    When ignore_bot is set to false, we log replies of the bot in this
+    function. The message is formatted as in seen.
+
+  help
+    Print a friendly help message to the channel.
+
+  init
+    Sets all user variables to their default values. Please see the next
+    section for further information about their exact values.
+
+VARIABLES
+  ignore_pattern
+    All lines mattching this regular expression will b<not> be logged at
+    all. Normally all lines are logged.
+
+  log_path
+    Path to the directory where all logfiles are stored. Defaults to the
+    current directory.
+
+  timestamp_fmt
+    Format of the timestamp that is prepended to every logged statement.
+    Defaults to '%H:%M:%S'. Consult your system's strftime() manpage for
+    details about these and the other arguments.
+
+  ignore_bot
+    Whether to ignore all communications with this bot. Defaults to 1.
+
+  ignore_joinpart
+    Whether to log join and part events. Defaults to 0.
+
+  ignore_query
+    Whether to ignore all communications in a query with this bot. Defaults
+    to 1.
+
+  link_current
+    If this variable is true (default), we will generate a symbolic link to
+    the current logfile called $channel_current.log.
+
+AUTHOR
+    Mario Domgoergen, "<dom at math.uni-bonn.de>"
+
+BUGS
+    *   For the sake of simplicity this module opens and closes the logfile
+        every time a message is written. This is far from optimal, but save
+        me the hassle to save open filehandles between invocations, locking
+        over nfs and rotating the log files. In the future there will be a
+        submodule to use Log::Log4perl or Log::Dispatch.
+
+    *   No file is locked, so there could be a possible problem with
+        multiple bots writing to the same file. This will also be solved by
+        using one of the serious logging modules mentioned above.
+
+    Please report any bugs or feature requests to
+    "bug-bot-basicbot-pluggable-module-log at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Bot-BasicBot-Pluggable-M
+    odule-Log>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Bot::BasicBot::Pluggable::Module::Log
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bot-BasicBot-Pluggable-Mod
+        ule-Log>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Bot-BasicBot-Pluggable-Module-Log>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Bot-BasicBot-Pluggable-Module-Log>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Bot-BasicBot-Pluggable-Module-Log>
+
+SEE ALSO
+    *   Bot::BasicBot::Pluggable
+
+    *   Bot::BasicBot
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mario Domgoergen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

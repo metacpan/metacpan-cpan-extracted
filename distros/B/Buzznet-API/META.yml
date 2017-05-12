@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Buzznet-API
+version:      0.01
+version_from: lib/Buzznet/API.pm
+installdirs:  site
+requires:
+    RPC::XML:                      0.56
+    RPC::XML::Client:              0.56
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,12 @@
+{
+    "select" : [
+        "NAME",
+        "VALUE"
+    ],
+    "where" : [
+        ["=" , "NAME"    , "benchmarkanything.test.metric" ]
+    ],
+    "order_by" : [
+        "VALUE_ID"
+    ]
+}

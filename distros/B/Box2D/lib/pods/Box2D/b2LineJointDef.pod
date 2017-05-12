@@ -1,0 +1,224 @@
+
+=head1 NAME
+
+Box2D::b2LineJointDef - Line joint definition.
+
+=head1 SYNOPSIS
+
+  my $joint_def = Box2D::b2LineJointDef->new();
+  $joint_def->Initialize( $body_a, $body_b, $anchor, $axis );
+  $joint_def->enableLimit( 1 );
+  $joint_def->lowerTranslation( $lower_translation );
+  $joint_def->upperTranslation( $upper_translation );
+  $joint_def->enableMotor( 1 );
+  $joint_def->motorSpeed( $speed );
+  $joint_def->maxMotorForce( $max_force );
+  my $joint = $world->CreateJoint( $joint_def );
+
+=head1 DESCRIPTION
+
+Line joint definition. This requires defining a line of motion using an
+axis and an anchor point. The definition uses local anchor points and a
+local axis so that the initial configuration can violate the constraint
+slightly. The joint translation is zero when the local anchor points
+coincide in world space. Using local anchors and a local axis helps
+when saving and loading a game.
+
+=head1 METHODS
+
+=head2 new()
+
+Default constructor.
+
+Returns a C<Box2D::b2LineJointDef>
+
+=head2 Initialize( $bodyA, $bodyB, $anchor, $axis )
+
+Initialize the bodies, anchors, axis, and reference angle using the
+world anchor and world axis.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Body> C<$bodyA>
+
+=item * C<Box2D::b2Body> C<$bodyB>
+
+=item * C<Box2D::b2Vec2> C<$anchor>
+
+=item * C<Box2D::b2Vec2> C<$axis>
+
+=back
+
+=head2 enableLimit()
+
+=head2 enableLimit( $enableLimit )
+
+Enable/disable the joint limit.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$enableLimit> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 enableMotor()
+
+=head2 enableMotor( $enableMotor )
+
+Enable/disable the joint motor.
+
+Parameters:
+
+=over 4
+
+=item * C<bool> C<$enableMotor> (optional)
+
+=back
+
+Returns a C<bool>
+
+=head2 localAnchorA()
+
+=head2 localAnchorA( $localAnchorA )
+
+The local anchor point relative to body1's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localAnchorB()
+
+=head2 localAnchorB( $localAnchorB )
+
+The local anchor point relative to body2's origin.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAnchorB> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 localAxisA()
+
+=head2 localAxisA( $localAxisA )
+
+The local translation axis in body1.
+
+Parameters:
+
+=over 4
+
+=item * C<Box2D::b2Vec2> C<$localAxisA> (optional)
+
+=back
+
+Returns a C<Box2D::b2Vec2>
+
+=head2 lowerTranslation()
+
+=head2 lowerTranslation( $lowerTranslation )
+
+The lower translation limit, usually in meters.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$lowerTranslation> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 maxMotorForce()
+
+=head2 maxMotorForce( $maxMotorForce )
+
+The maximum motor torque, usually in N-m.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$maxMotorForce> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 motorSpeed()
+
+=head2 motorSpeed( $motorSpeed )
+
+The desired motor speed in radians per second.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$motorSpeed> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head2 upperTranslation()
+
+=head2 upperTranslation( $upperTranslation )
+
+The upper translation limit, usually in meters.
+
+Parameters:
+
+=over 4
+
+=item * C<float32> C<$upperTranslation> (optional)
+
+=back
+
+Returns a C<float32>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Box2D>
+
+=item * L<Box2D::b2LineJoint>
+
+=item * L<Box2D::b2JointDef>
+
+=item * L<Box2D::b2World>
+
+=back
+
+=head1 BUGS
+
+See L<Box2D/BUGS>
+
+=head1 AUTHORS
+
+See L<Box2D/AUTHORS>
+
+=head1 COPYRIGHT & LICENSE
+
+See L<Box2D/"COPYRIGHT & LICENSE">
+
+=cut

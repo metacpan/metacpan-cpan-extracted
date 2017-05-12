@@ -1,0 +1,18 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Stock Ticker Prefixes'; %]
+
+<p><h2>Stock ticker symbol "[% TICKER %]" corresponds to:</h2></p>
+<p>Company name: [% COMPANY %]</p>
+<p>Company website: [% DOMAIN %]</p>
+
+<form action="cpm_workflow.cgi" method="get">
+<input type="hidden" name="action" value="processticker">
+<input type="hidden" name="list" value="[% LIST %]"/>
+<input type="hidden" name="company" value="[% COMPANY %]" />
+<input type="hidden" name="domain" value="[% DOMAIN %]" />
+
+<input type="button" value="Back" onclick="history.go(-1)">
+
+<input type="submit" value="Continue"/>
+    
+</form>
+[% INCLUDE footer.html %]

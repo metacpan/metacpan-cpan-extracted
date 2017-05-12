@@ -1,0 +1,250 @@
+#! /usr/bin/env perl
+
+# BioPerl script bc_remove_unexpected_members
+#
+# Please direct questions and support issues to <bioperl-l@bioperl.org>
+#
+# Copyright 2011-2014 Florent Angly <florent.angly@gmail.com>
+#
+# You may distribute this module under the same terms as perl itself
+
+
+use strict;
+use warnings;
+use Method::Signatures;
+use Bio::Community::IO;
+use Getopt::Euclid qw(:minimal_keys);
+
+
+=head1 NAME
+
+bc_remove_unexpected_members - Remove community members not expected to occur, based on a reference community
+
+=head1 SYNOPSIS
+
+  remove_unexpected_members -if my_communities.generic  \
+                            -op my_modified_communities \
+                            -cn theoretical
+
+=head1 DESCRIPTION
+
+This script reads a community file that contains a reference community. For
+every other community in the file, every member that is not also present in the
+reference community is removed. This is useful if you have sequenced mock
+communities and some of them have spurious members.
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item -if <input_files>... | -input_files <input_files>...
+
+This script reads a community file that contains reference communities. For
+every non-reference community in the file, every member that is not also present
+in the corresponding reference community is removed. This is useful if you have
+sequenced mock communities and some of them have spurious members.
+
+=for Euclid:
+   input_files.type: readable
+
+=back
+
+=head1 OPTIONAL ARGUMENTS
+
+=over
+
+=item -op <output_prefix> | -output_prefix <output_prefix>
+
+Path and prefix for the output files. Default: output_prefix.default
+
+=for Euclid:
+   output_prefix.type: string
+   output_prefix.default: 'bc_remove_unexpected_members'
+
+=item -rn <ref_name> | -ref_name <ref_name>
+
+Name of the reference community. Default: ref_name.default
+
+=for Euclid:
+   ref_name.type: string
+   ref_name.default: 'reference'
+
+=item -nt <name_type> | -name_type <name_type>
+
+Specify if <ref_name> represents a 'prefix', 'suffix', or the 'full' name of the
+reference community. Using prefix or suffix allows to have multiple communities
+with their respective reference community in the same input file. For example,
+using a suffic of '_theo', community 'sample1' is expected to have a reference
+community named 'sample1_theo'. Default: name_type.default
+
+=for Euclid:
+   name_type.type: /prefix|suffix|full/
+   name_type.default: 'full'
+
+=item -bs <base_sep> | -base_sep <base_sep>
+
+For the purpose of determining the name of the reference community, strip
+characters before or after the specified separator. For example, when using the
+prefix 'ref' and the separator '_', community 'sample1_rep1' and 'sample1_rep2'
+are expected to have a reference community named 'sample1_ref'.
+
+=for Euclid:
+   base_sep.type: string, length(base_sep) == 1
+
+=back
+
+=head1 FEEDBACK
+
+=head2 Mailing Lists
+
+User feedback is an integral part of the evolution of this
+and other Bioperl modules. Send your comments and suggestions preferably
+to one of the Bioperl mailing lists.
+
+Your participation is much appreciated.
+
+  bioperl-l@bioperl.org                  - General discussion
+  http://bioperl.org/wiki/Mailing_lists  - About the mailing lists
+
+=head2 Support 
+
+Please direct usage questions or support issues to the mailing list:
+
+I<bioperl-l@bioperl.org>
+
+rather than to the module maintainer directly. Many experienced and 
+reponsive experts will be able look at the problem and quickly 
+address it. Please include a thorough description of the problem 
+with code and data examples if at all possible.
+
+=head2 Reporting Bugs
+
+Report bugs to the Bioperl bug tracking system to help us keep track
+the bugs and their resolution.  Bug reports can be submitted via the
+web:
+
+  http://bugzilla.open-bio.org/
+
+=head1 AUTHOR - Florent Angly
+
+Email florent.angly@gmail.com
+
+=cut
+
+remove_unexpected_members($ARGV{'input_files'}, $ARGV{'output_prefix'},
+   $ARGV{'ref_name'}, $ARGV{'name_type'}, $ARGV{'base_sep'});
+
+exit;
+
+
+func remove_unexpected_members ($input_files, $output_prefix, $ref_name, $name_type, $base_sep) {
+   # Read input communities
+   my $meta = Bio::Community::Meta->new();
+   my $format;
+   for my $input_file (@$input_files) {
+      print "Reading file '$input_file'\n";
+      my $in = Bio::Community::IO->new( -file => $input_file );
+      $format = $in->format;
+      while (my $community = $in->next_community) {
+         $meta->add_communities([$community]);
+      }
+      $in->close;
+   }
+   # Loop through all communities
+   while (my $comm = $meta->next_community) {
+      # Get reference community
+      my $ref_comm = get_ref_comm($comm, $meta, $ref_name, $name_type, $base_sep) || next;
+      print "Processing community ".$comm->name." (reference community ".$ref_comm->name.")\n";
+      # Process non-reference community
+      while (my $member = $comm->next_member) {
+         if (not defined $ref_comm->get_member_by_id($member->id)) {
+            $comm->remove_member($member);
+         }
+      }
+   }
+   # Write resulting communities
+   write_communities($meta, $output_prefix, $format, '');
+   return 1;
+}
+
+
+func get_ref_comm ($comm, $meta, $ref_name, $name_type, $base_sep) {
+   # Get corresponding reference community, or undef if it itself is a reference.
+   # Determine name of reference community
+   my $name = $comm->name;
+   my $full_ref_name;
+   my $isa_ref = 0;
+   if ($name_type eq 'full') {
+      $isa_ref = 1 if $name eq $ref_name;
+      $full_ref_name = $ref_name;
+   } elsif ($name_type eq 'prefix') {
+      my $esc_ref_name = quotemeta($ref_name);
+      $isa_ref = 1 if $name =~ m/^$esc_ref_name/;
+      my $clean_name = $name;
+      if (defined $base_sep) {
+         my @arr = split($base_sep, $name);
+         @arr = @arr[1 .. scalar @arr - 1];
+         $clean_name = join $base_sep, @arr;
+      }
+      $full_ref_name = $ref_name.($base_sep||'').$clean_name;
+   } elsif ($name_type eq 'suffix') {
+      my $esc_ref_name = quotemeta($ref_name);
+      $isa_ref = 1 if $name =~ m/$esc_ref_name$/;
+      my $clean_name = $name;
+      if (defined $base_sep) {
+         my @arr = split($base_sep, $name);
+         @arr = @arr[0 .. scalar @arr - 2];
+         $clean_name = join $base_sep, @arr;
+      }
+      $full_ref_name = $clean_name.($base_sep||'').$ref_name;
+   } else {
+      die "Error: '$name_type' is not a valid value for <name_type>\n";
+   }
+   # Retrieve reference community
+   my $ref_comm;
+   if (not $isa_ref) {
+      $ref_comm = $meta->get_community_by_name($full_ref_name);
+      if (not defined $ref_comm) {
+         die "Error: Expected a community called '$full_ref_name' in input but ".
+            "could not find it.";
+      }
+   }
+   return $ref_comm;
+}
+
+
+func write_communities ($meta, $output_prefix, $output_format, $type='') {
+   $type ||= '';
+   my $multiple_communities = Bio::Community::IO->new(-format=>$output_format)->multiple_communities;
+   my $num = 0;
+   my $out;
+   my $output_file = '';
+   while (my $community = $meta->next_community) {
+      if (not defined $out) {
+         if ($multiple_communities) {
+            $output_file = $output_prefix;
+         } else {
+            $num++;
+            $output_file = $output_prefix.'_'.$num;
+         }
+         if ($type) {
+            $output_file .= '_'.$type;
+         }
+         $output_file .= '.'.$output_format;
+         $out = Bio::Community::IO->new(
+            -format => $output_format,
+            -file   => '>'.$output_file,
+         );
+      }
+      print "Writing community '".$community->name."' to file '$output_file'\n";
+      $out->write_community($community);
+      if (not $multiple_communities) {
+         $out->close;
+         $out = undef;
+      }
+   }
+   if (defined $out) {
+      $out->close;
+   }
+   return 1;
+}

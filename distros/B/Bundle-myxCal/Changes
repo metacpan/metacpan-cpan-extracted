@@ -1,0 +1,6 @@
+Revision history for Perl extension Bundle::myxCal.
+
+0.01  Mon May 19 14:17:18 2003
+	- original version; created by h2xs 1.21 with options
+		-AXcfn Bundle::myxCal
+

@@ -1,0 +1,77 @@
+BS2/LMS version 0.08
+====================
+
+This module is a Perl extension to access BS2000 libraries using the
+LMS API (Library Management System, Subroutine Interface).  It is only
+useful for the BS2000 port of Perl.  Probably it won't compile on
+other platforms!
+
+This versions supports:
+
+- connecting to a BS2000 library
+- getting the table of contents
+- adding and extracting elements
+
+See the perl documation of the module for further details.
+
+INSTALLATION
+
+To install this module read the DEPENDENCIES section and type the
+following (throughout this README we assume you build a new static
+Perl version for this):
+
+   export BLSLIBnn=$TSOS.SYSLNK.LMS.mmm
+   perl Makefile.PL
+   make perl
+   make test
+   make install
+
+If you want to test the module under native BS2000, first you have to
+copy the new perl interpreter and the test script:
+
+   bs2cp -f ./perl 'bs2:perl(perl,l)'
+   bs2cp -f t/LMS.t bs2:LMS.T
+
+The you can test it with the following:
+
+   /START-PROG FROM-FILE=*MODULE(PERL,PERL),RUN-MODE=*ADV
+   -I<Posix-path-to-the-module> LMS.T
+
+After installation, you can omit the include path in this example.
+You may also enter the path to the test script on the Posix
+filesystem here.
+
+DEPENDENCIES
+
+This module requires the BS2000 LMS API header lms.h.  If it isn't
+already installed in your Posix environment, copy it with:
+
+bs2cp 'bs2:$TSOS.SYSLIB.LMS.<your-version-number>(LMS.H,S)' /usr/include/lms.h
+
+In order to link the new static perl interpreter, the linker has to
+find the dynamic native BS2000 LMS library.  This is done by setting a
+environment variable BLSLIBnn where nn is the first unused number
+between 00 and 99, e.g. if you don't use any dynamic BS2000 libraries
+yet you would type (in your shell):
+
+BLSLIB00=$TSOS.SYSLNK.LMS.<your-version-number>
+export BLSLIB00
+
+or simply
+
+export BLSLIB00=$TSOS.SYSLNK.LMS.<your-version-number>
+
+BUGS
+
+Only a few functions of the LMS library are implemented yet.  As my
+company phases out BS2000 in 2008 this will probably the last version.
+If someone still uses BS2000 and likes to take over support just
+contact me via PAUSE.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003,2007 Thomas Dorner (dorner (AT) pause.org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

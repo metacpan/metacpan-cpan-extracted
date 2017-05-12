@@ -1,0 +1,18 @@
+CREATE TABLE family (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    street varchar,
+    city varchar,
+    created datetime,
+    modified datetime
+);
+
+CREATE TABLE child (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name varchar,
+    birth_day date,
+    created datetime,
+    modified datetime,
+    family INTEGER REFERENCES family(id)
+);
+

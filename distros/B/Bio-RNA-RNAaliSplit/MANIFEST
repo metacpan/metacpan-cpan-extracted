@@ -1,0 +1,21 @@
+Changes
+inc/File/ShareDir/Install.pm
+lib/Bio/RNA/RNAaliSplit.pm
+lib/Bio/RNA/RNAaliSplit/FileDir.pm
+lib/Bio/RNA/RNAaliSplit/WrapAnalyseDists.pm
+lib/Bio/RNA/RNAaliSplit/WrapRNAalifold.pm
+lib/Bio/RNA/RNAaliSplit/WrapRNAz.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+scripts/RNAalisplit.pl
+share/aln/all.SL.JEVG.aln
+share/aln/all.SL.SPOVG.aln
+share/aln/all.SL.YFVG.aln
+t/00-load.t
+t/01-prereq.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

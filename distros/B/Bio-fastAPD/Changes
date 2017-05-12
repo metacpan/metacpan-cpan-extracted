@@ -1,0 +1,53 @@
+Revision history for Bio::fastAPD
+
+1.10.0  04/08/2015
+        This is a major release with substantial changes. This release is not 
+        backwards compatible with scripts designed for previous versions. Our 
+        method for rapid calculation of APD remains unaltered, thus APD results
+        from previous versions should be identical to those calculated with the
+        current release. A fix has been applied to correct standard error 
+        estimates which were determined to be incorrect under certain 
+        conditions. 
+
+        Major Changes:
+        1. The apd_by_pos() function has been removed. Although this alternative
+	method for rapid calculation of APD was previously provided for the sake
+	of comparison with our method, it was removed from the current release
+        due to the absence of a robust mathematical justification.
+        2. The 'gap_gap' option for missing data handling in the apd and 
+        standard error calculations has been removed. Thus the current options 
+        for missing data are pairwise deletion (base_base or gap_base) and 
+	complete deletion (complete_del).
+        3. The main function calls have been updated to reflect the changes 
+        described above. The rapid APD and standard error calculations are now 
+        performed as follows:
+        $fastAPD_obj->apd('gap_base');                                      
+        $fastAPD_obj->std_err('gap_base');
+        4. It was determined that the standard error estimate was incorrect 
+        when performing a 'complete_del' analysis on datasets in which positions
+        may consist of an insertion in a single sequence (thus gaps present in 
+        all other sequences). This is also relevant for calculations involving 
+        thresholds for missing data (N's, gaps, or ragged ends). This has been 
+	corrected in the current version. 
+        5. The testing and example scripts have been appropriately updated.
+1.08    12/14/2014
+        Added META.yml
+1.07    12/10/2014
+        Added LICENSE file, as well as MYMETA.json and MYMETA.yml.
+1.06    12/09/2014
+        Removed developer tests.
+1.05    12/08/2014
+        Included inc/Module/Install.
+1.04    12/08/2014
+        Adjusted test.t for new output from freqs().
+1.03    12/08/2014
+        Fixed namespace in 00-load.t and altered output format of freqs() in 
+        fastAPD.pm.
+1.02    12/04/2014
+        Propagated new namespace throughout module (Changed fastAPD to 
+        Bio::fastAPD).
+1.01    12/03/2014
+        Minor bug fix for example_script.t.
+1.00    12/02/2014
+        First version released.
+

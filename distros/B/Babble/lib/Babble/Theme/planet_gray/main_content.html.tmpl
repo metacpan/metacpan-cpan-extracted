@@ -1,0 +1,61 @@
+[%- UNLESS template_knob_no_date_head -%][%- myhead = "1970-01-01" -%][%- END -%]
+
+<div id="body">
+[%- FOREACH item = my_collection -%]
+  [%- UNLESS template_knob_no_date_head -%]
+    [%- IF myhead != item.date_date -%][%- myhead = item.date_date -%]
+    <h1 class="date-head">
+      [%- UNLESS template_knob_no_content_links -%]<a name="[% item.date_date %]">[%- END -%]
+      [%- UnixDate (item.date_iso, "%B %d, %Y") %]
+    [%- UNLESS template_knob_no_content_links %]</a>[% END %]</h1>
+    [%- END -%]
+  [%- END -%]
+
+  <div id="item">
+    [% IF item.author || (item.date_text && !template_knob_no_date) -%]
+    <div id="item-meta">
+      [% IF template_knob_with_image && item.image.url %]
+         [% UNLESS template_knob_no_content_links %]
+	   <a href="[% item.image.link %]">
+	 [% END %]
+      	 <img src="[% item.image.url %]" alt="[% item.image.title %]"
+	 [%- IF item.image.width %]width="[% item.image.width %]"[% END %]
+	 [%- IF item.image.height %]height="[% item.image.height %]"[% END %]>
+	 [% UNLESS template_knob_no_content_links %]
+	   </a>
+	 [% END %]
+      [% END %]
+      [% IF item.author -%]
+      [% UNLESS template_knob_no_content_links -%]
+        <a href="[% item.master %]">
+      [%- END -%]
+      [% UNLESS template_knob_prefer_parent_name %]
+      [%- item.author -%]
+      [% ELSE %]
+      [%- item.parent.name -%]
+      [% END %]
+      [%- UNLESS template_knob_no_content_links -%]</a>[%- END -%]
+      <span class="separator">|</span>
+      [%- END -%]
+      [% UNLESS template_knob_no_date %]&nbsp;&nbsp;[% item.date_text %][% END %]
+    </div>
+    [%- END %]
+
+    <div id="item-title">
+      [% UNLESS template_knob_no_content_links -%]
+        <a href="[% item.id %]">
+      [%- END -%]
+      [%- item.title || item.date_date -%]
+      [%- UNLESS template_knob_no_content_links -%]</a>[%- END %]
+    </div>
+
+    <div id="item-content">
+      [%- item.content -%]
+    </div>
+  </div>
+[% END %]
+</div>
+
+[%#
+arch-tag: be16f748-3420-4f35-82e3-1c6c66c37dbe
+%]

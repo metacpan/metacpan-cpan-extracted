@@ -1,0 +1,38 @@
+---
+abstract: 'An Inversion of Control framework for Perl'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  List::Util: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: v5.10.0
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bolts
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Hash::Util::FieldHash: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Moose::Util::MetaRole: '0'
+  Moose::Util::TypeConstraints: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Bolts
+  repository: git://github.com/zostay/Bolts.git
+version: '0.143171'

@@ -1,0 +1,57 @@
+---
+abstract: 'Business::OnlinePayment::Litle - Vantiv (was Litle & Co.) Backend for Business::OnlinePayment'
+author:
+  - 'Jason Hall <jayce@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Business-OnlinePayment-Litle
+requires:
+  Business::CreditCard: '0'
+  Business::OnlinePayment: '0'
+  Business::OnlinePayment::HTTPS: '0'
+  Carp: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  HTTP::Tiny: '0.022'
+  IO::Socket::SSL: '1.56'
+  IO::String: '0'
+  Log::Scrubber: '0.14'
+  MIME::Base64: '0'
+  Net::SFTP::Foreign: '1.57'
+  Net::SSLeay: '0'
+  Test::More: '0'
+  Tie::IxHash: '0'
+  XML::Simple: '0'
+  XML::Writer: '0'
+  bytes: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Jayceh/Business--OnlinePayment--Litle/issues
+  homepage: http://search.cpan.org/dist/Business-OnlinePayment-Litle/
+  repository: git://github.com/Jayceh/Business--OnlinePayment--Litle.git
+version: '0.955'
+x_contributors:
+  - 'Daina Pettit <dpettit@bluehost.com>'
+  - 'David Bartle <captindave@gmail.com>'
+  - 'Jason Hall <jayce@jaycehall.com>'
+  - 'Jason (Jayce^) Hall <jayce@lug-nut.com>'
+  - 'Jason Terry <oaxlin@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

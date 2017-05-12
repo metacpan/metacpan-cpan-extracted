@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This distribution includes the script bencher-tiny to run benchmark
+    scenario with Benchmark (Benchmark.pm). It lacks bencher features like
+    filtering participants/datasets/modules, listing participants/datasets
+    or other actions. But it is small and does not have any non-core
+    dependency.
+
+SEE ALSO
+
+    bencher from Bencher
+

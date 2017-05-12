@@ -1,0 +1,27 @@
+---
+abstract: 'Bio::Das::Lite is an implementation of the BioDas protocol, http://biodas.org/'
+author:
+  - 'Roger Pettett <rmp@psyphi.net>'
+build_requires:
+  Test::More: 0.8
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-Das-Lite
+provides:
+  Bio::Das::Lite:
+    file: lib/Bio/Das/Lite.pm
+    version: 2.11
+requires:
+  Carp: 1.02
+  English: 1.01
+  HTTP::Response: 1.49
+  Readonly: 1.03
+  WWW::Curl: 4.07
+resources:
+  license: http://dev.perl.org/licenses/
+version: 2.11

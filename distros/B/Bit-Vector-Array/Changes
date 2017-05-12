@@ -1,0 +1,6 @@
+Revision history for Perl extension Bit::Vector::Array.
+
+0.01  Wed Jan 14 00:20:30 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n Bit::Vector::Array
+

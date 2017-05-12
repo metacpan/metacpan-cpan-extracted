@@ -1,0 +1,10 @@
+Revision history for Perl extension Business::OnlinePayment::PaymentsGateway.
+
+0.02  Wed Apr 11 11:28:24 PDT 2007
+	-quieter tests on older perl
+	-don't need to redeclare test_transaction
+	-echeck or check, gah
+
+0.01  Tue Dec 17 11:18:38 PST 2002
+	-original version; created by ivan 1.0 on an aeroplane to OAK
+

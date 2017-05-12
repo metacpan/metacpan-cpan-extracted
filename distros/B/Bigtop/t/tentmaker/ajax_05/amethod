@@ -1,0 +1,825 @@
+<!-- END DATA TABLE --><!-- END QUICK TABLE --><div class='app_block_element'
+         id='div_ident_9'>
+        
+         <fieldset>
+         <legend>Method 
+            ( <a href='javascript:show_or_hide( "hideable_ident_9" );'>edit or hide</a> |  
+<a href="#" name='app_body_delete::ident_9' onclick='javascript:delete_block( this )'>delete</a>
+       
+
+            )
+         </legend> 
+         <table>
+            <tr>
+                <td>Name: </td>
+                <td>
+                  <input type='text'
+                         id='method_name::ident_9'
+                         value='do_alt_main'
+                         onblur='javascript:update_tree(
+                             "name",
+                             "method::ident_9",
+                             this.value
+                         )'
+                  />
+                </td>
+            </tr>
+            <tr>
+                <td> Type: </td>
+                <td>
+                    <select
+                        id='method_type_ident_6::ident_9'
+                        onchange='javascript:type_change(
+                            "ident_9",
+                            this.value
+                        )'
+                    >
+                      <option value='stub'
+     >
+                        stub
+                      </option>
+                      <option value='main_listing'
+    selected='selected' >
+                        main_listing
+                      </option>
+                      <option value='AutoCRUD_form'
+     >
+                        AutoCRUD_form
+                      </option>
+                      <option value='CRUD_form'
+     >
+                        CRUD_form
+                      </option>
+                      <option value='hashref'
+     >
+                        hashref
+                      </option>
+                      <option value='base_links'
+     >
+                        base_links
+                      </option>
+                      <option value='links'
+     >
+                        links
+                      </option>
+                      <option value='SOAP'
+     >
+                        SOAP
+                      </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan='2'>
+                  
+<div id='hideable_ident_9'
+  
+    style='display: none'
+  
+>
+  
+                    
+
+  <table class='bordered'>
+    <tr>
+        <th> Keyword     </th>
+        <th> Value(s)    </th>
+        <th> Description </th>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> no_gen </td>
+        <td>
+
+            
+            
+
+<input type='checkbox'
+       value='ident_9::no_gen'
+       id='ident_9::no_gen'
+       class='urgency_0'       onchange='javascript:update_tree(
+           "method_statement_bool",
+           "ident_9::no_gen",
+           this.checked
+       )'
+/>
+
+
+        </td>
+        <td>
+            Skip this method completely
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> extra_args </td>
+        <td>
+
+            
+            
+
+    
+        
+        
+        <input type='text'
+            name='ident_9::extra_args'
+            value=''
+            class='urgency_0'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::extra_args",
+                this
+            )'
+        />
+        <br />
+        
+        <input type='text'
+            name='ident_9::extra_args'
+            value=''
+            class='urgency_0'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::extra_args",
+                this
+            )'
+        />
+        
+        
+    
+
+
+        </td>
+        <td>
+            Extra args for any method
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> order_by </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::order_by'
+            value=""
+            class='urgency_0'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::order_by",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            Exact text of SQL order by
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> rows </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::rows'
+            value=""
+            class='urgency_3'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::rows",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            How many rows should appear per listing page?
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> paged_conf </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::paged_conf'
+            value=""
+            class='urgency_0'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::paged_conf",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            Take rows per page from this (conf var) accessor
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> cols </td>
+        <td>
+
+            
+            
+
+    
+        
+        
+        <input type='text'
+            name='ident_9::cols'
+            value=''
+            class='urgency_5'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::cols",
+                this
+            )'
+        />
+        <br />
+        
+        <input type='text'
+            name='ident_9::cols'
+            value=''
+            class='urgency_5'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::cols",
+                this
+            )'
+        />
+        
+        
+    
+
+
+        </td>
+        <td>
+            Fields to include in main_listing
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> col_labels </td>
+        <td>
+
+            
+            
+
+    
+        
+        
+        <input type='text'
+            name='ident_9::col_labels'
+            value=''
+            class='urgency_0'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::col_labels",
+                this
+            )'
+        />
+        <br />
+        
+        <input type='text'
+            name='ident_9::col_labels'
+            value=''
+            class='urgency_0'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::col_labels",
+                this
+            )'
+        />
+        
+        
+    
+
+
+        </td>
+        <td>
+            Labels for fields on main_listing<br />[optional default uses field labels]
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> pseudo_cols </td>
+        <td>
+
+            
+            
+
+    
+        
+        
+        <input type='text'
+            name='ident_9::pseudo_cols'
+            value=''
+            class='urgency_5'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::pseudo_cols",
+                this
+            )'
+        />
+        <br />
+        
+        <input type='text'
+            name='ident_9::pseudo_cols'
+            value=''
+            class='urgency_5'
+            onblur='javascript:update_multivalue(
+                "method_statement_text",
+                "ident_9::pseudo_cols",
+                this
+            )'
+        />
+        
+        
+    
+
+
+        </td>
+        <td>
+            Pseudo Fields to include in main_listing
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> livesearch </td>
+        <td>
+
+            
+            
+
+<input type='checkbox'
+       value='ident_9::livesearch'
+       id='ident_9::livesearch'
+       class='urgency_0'       onchange='javascript:update_tree(
+           "method_statement_bool",
+           "ident_9::livesearch",
+           this.checked
+       )'
+/>
+
+
+        </td>
+        <td>
+            Places a search box on results page
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> header_options </td>
+        <td>
+
+            
+            
+
+      <table id='ident_9::header_options_input_table'>
+        <tr><th> Label </th>
+            <th> Location
+                 
+                    [optional]
+                 
+            </th></tr>
+    
+            <tr><td>
+                <input
+                    type='text'
+                    name='ident_9::header_options_key'
+                    class='urgency_5'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::header_options",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='ident_9::header_options_value'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::header_options",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      
+      </table>
+
+
+        </td>
+        <td>
+            User actions affecting the table [like Add]
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> header_option_perms </td>
+        <td>
+
+            
+            
+
+      <table id='ident_9::header_option_perms_input_table'>
+        <tr><th> Header Option Label </th>
+            <th> Controlling Permission
+                 
+            </th></tr>
+    
+            <tr><td>
+                <input
+                    type='text'
+                    name='ident_9::header_option_perms_key'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::header_option_perms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='ident_9::header_option_perms_value'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::header_option_perms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      
+      </table>
+
+
+        </td>
+        <td>
+            The table permission which controls options<br />Pick from create, retrieve, update, or delete
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> row_options </td>
+        <td>
+
+            
+            
+
+      <table id='ident_9::row_options_input_table'>
+        <tr><th> Label </th>
+            <th> Location
+                 
+                    [optional]
+                 
+            </th></tr>
+    
+            <tr><td>
+                <input
+                    type='text'
+                    name='ident_9::row_options_key'
+                    class='urgency_5'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::row_options",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='ident_9::row_options_value'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::row_options",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      
+      </table>
+
+
+        </td>
+        <td>
+            User actions affecting rows [like Edit]<br />Locations should not end with / or <br />include $id
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> row_option_perms </td>
+        <td>
+
+            
+            
+
+      <table id='ident_9::row_option_perms_input_table'>
+        <tr><th> Row Option Label </th>
+            <th> Controlling Permission
+                 
+            </th></tr>
+    
+            <tr><td>
+                <input
+                    type='text'
+                    name='ident_9::row_option_perms_key'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::row_option_perms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='ident_9::row_option_perms_value'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::row_option_perms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      
+      </table>
+
+
+        </td>
+        <td>
+            The table permission which controls options<br />Pick from create, retrieve, update, or delete
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> limit_by </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::limit_by'
+            value=""
+            class='urgency_0'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::limit_by",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            If an arg is supplied, show only matching rows
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> where_terms </td>
+        <td>
+
+            
+            
+
+      <table id='ident_9::where_terms_input_table'>
+        <tr><th> Table </th>
+            <th> Table
+                 
+            </th></tr>
+    
+            <tr><td>
+                <input
+                    type='text'
+                    name='ident_9::where_terms_key'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::where_terms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+            <td>
+                <input
+                    type='text'
+                    name='ident_9::where_terms_value'
+                    class='urgency_0'
+                    onblur='javascript:update_pairs(
+                        "method_statement_pair",
+                        "ident_9::where_terms",
+                        1,
+                        this
+                    )'
+                />
+            </td>
+        </tr>
+      
+      </table>
+
+
+        </td>
+        <td>
+            Where clause will include these equality tests
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> title </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::title'
+            value=""
+            class='urgency_3'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::title",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            Browser title bar title for main_listing
+        </td>
+    </tr>
+  
+    
+    
+    <tr>
+        <td> html_template </td>
+        <td>
+
+            
+            
+
+    
+        <input type='text'
+            id='ident_9::html_template'
+            value=""
+            class='urgency_0'
+            onblur='javascript:update_tree(
+                "method_statement_text",
+                "ident_9::html_template",
+                this.value
+            )'
+        />
+    
+
+
+        </td>
+        <td>
+            Template to use for main_listing<br />[defaults to results.tt or main.tt]
+        </td>
+    </tr>
+  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </table>
+
+                  
+</div>
+ </td>
+            </tr>
+         </table>
+
+        <br style='clear: both' />
+
+    </div>config {
+    engine MP20;
+    template_engine TT;
+    Init Std {  }
+    Conf Gantry { conffile `docs/app.gantry.conf`; instance sample; }
+    HttpdConf Gantry { gantry_conf 1; }
+    SQL SQLite {  }
+    SQL Postgres {  }
+    SQL MySQL {  }
+    CGI Gantry { with_server 1; flex_db 1; gantry_conf 1; }
+    Control Gantry { dbix 1; }
+    Model GantryDBIxClass {  }
+    SiteLook GantryDefault {  }
+}
+app Sample {
+    config {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        template_wrapper `genwrapper.tt` => no_accessor;
+        doc_rootp `/static` => no_accessor;
+        show_dev_navigation 1 => no_accessor;
+    }
+    config CGI {
+        dbconn `dbi:SQLite:dbname=app.db` => no_accessor;
+        app_rootp `/cgi-bin/sample.cgi` => no_accessor;
+    }
+    controller is base_controller {
+        method do_main is base_links {
+        }
+        method site_links is links {
+        }
+    }
+    controller Address is AutoCRUD {
+        method do_main is main_listing {
+            cols ident, description;
+            header_options Add;
+            row_options Edit, Delete;
+            title Address;
+        }
+        method form is AutoCRUD_form {
+            all_fields_but id, created, modified;
+            extra_keys
+                legend => `$self->path_info =~ /edit/i ? q!Edit! : q!Add!`;
+        }
+        method do_alt_main is main_listing {
+        }
+    }
+}

@@ -1,0 +1,34 @@
+#!/usr/local/bin/perl -wT
+#########
+# This script needs to have Bio:Das and Bio::Das::Lite installed, or be started with:
+# perl -I/path/to/bio-das -I/path/to/bio-daslite
+#
+use strict;
+use Bio::Das;
+use Bio::Das::Lite;
+use Benchmark;
+use Data::Dumper;
+#$Bio::Das::Lite::DEBUG = 1;
+
+use vars qw($SOURCES);
+$SOURCES  = [qw(http://servlet.sanger.ac.uk/das/ensembl1834
+	        http://das.sanger.ac.uk/das/spectral35)];
+
+#########
+# Build some random segments
+#
+my @segments = ();
+for (my $chr=1;$chr<=20;$chr++) {
+  my $rnd = int(rand(100000000));
+  push @segments, "$chr:$rnd,@{[$rnd+1000000]}";
+}
+
+my $biodas     = Bio::Das->new();
+my $biodaslite = Bio::Das::Lite->new({'dsn' => $SOURCES, 'caching' => 0});
+
+timethese(
+	  5, {
+	      "Bio::Das"     => sub { $biodas->features(-dsn => $SOURCES, -segment => \@segments); },
+	      "Bio::Das::Lite" => sub { $biodaslite->features(\@segments); },
+	     },
+	 );

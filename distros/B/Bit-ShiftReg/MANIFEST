@@ -1,0 +1,15 @@
+MANIFEST
+Makefile.PL
+README
+ShiftReg.pm
+ShiftReg.xs
+lib_defs.h
+t/f000.t
+t/f001.t
+t/f002.t
+t/f003.t
+t/f004.t
+t/f005.t
+t/f006.t
+t/f007.t
+typemap

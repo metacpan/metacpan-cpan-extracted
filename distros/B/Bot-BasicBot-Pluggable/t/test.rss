@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- generator="wordpress/1.5" -->
+<rss version="0.92">
+<channel>
+        <title>jerakeen.org</title>
+        <link>http://jerakeen.org</link>
+        <description>achieved discursive power</description>
+        <lastBuildDate>Thu, 17 Mar 2005 17:51:38 +0000</lastBuildDate>
+        <docs>http://backend.userland.com/rss092</docs>
+        <language>en</language>
+
+        <item>
+                <title>title</title>
+                <description>desc</description>
+                <link>http://jerakeen.org/2005/03/17/oops</link>
+        </item>
+</channel>
+</rss>

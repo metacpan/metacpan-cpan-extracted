@@ -1,0 +1,68 @@
+html, body {
+    background-color: #fff3f0;
+}
+
+a {
+    color: #456789;
+}
+
+#menu ul li a {
+    color: #2b3856;
+}
+
+#menu div {
+    color: #222;
+}
+
+span.datetime, span.number {
+    color: #eee;
+}
+
+div.meta div.tags a {
+    color: #4e387e;
+}
+
+div.message {
+    color: green;
+    border: #080 1px solid;
+}
+
+h3.title { 
+    background-color: #efd595;
+    color: navy;
+}
+
+h5.color {
+    color: #234;
+}
+
+h3.menu {
+    background-color: #e0d0a0;
+}
+
+.annotation {
+    color: blue;
+}
+
+hr.attachments {
+    color: #eee;
+    background-color: #eee;
+}
+
+pre.shell {
+    background-color: #333;
+    color: #eee;
+    -moz-opacity: 0.7;
+}
+
+pre.pod, pre.shell {
+    border-color: #000;
+}
+
+.hover > div.glance {
+    background-color: #feb;
+}
+
+div.hover > ul {
+    background-color: #eee3e0;
+}

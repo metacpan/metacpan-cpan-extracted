@@ -1,0 +1,18 @@
+=head1 USE
+
+Fields are usually presented to users in main listing tables and on add/edit
+forms, or used for various control structures in each controller.  The
+C<pseudo_value> statement provides a way to use 'pseudo' columns for these
+various purposes.  The definition of a pseudo column is a complex query/field
+that is not actually part of the table itself, but has been given an alias so
+that it can be treated as if it were.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created PhoneProv directory and look in
+PhoneProv/lib/PhoneProv/GEN/E911.pm and
+PhoneProv/lib/PhoneProv/GEN/DirectoryInfo.pm for 'days_until_install'.

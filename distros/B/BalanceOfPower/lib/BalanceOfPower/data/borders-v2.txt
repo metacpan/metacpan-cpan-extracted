@@ -1,0 +1,115 @@
+USA,Mexico
+Canada,USA
+Cuba,USA
+Cuba,Mexico
+Cuba,Honduras
+Cuba,Nicaragua
+Honduras,Mexico
+Honduras,Nicaragua
+Panama,Nicaragua
+Panama,Colombia
+Argentina,Chile
+Argentina,Brazil
+Brazil,Chile
+Brazil,Colombia
+Brazil,Peru
+Brazil,Venezuela
+Chile,Peru
+Colombia,Venezuela
+Colombia,Peru
+United Kingdom,France
+United Kingdom,West Germany
+France,Spain
+France,Italy
+France,West Germany
+Czechoslovakia,West Germany
+Czechoslovakia,East Germany
+Czechoslovakia,Poland
+Czechoslovakia,Yugoslavia
+Czechoslovakia,Romania
+East Germany,West Germany
+East Germany,Poland
+East Germany,Sweden
+Greece,Yugoslavia
+Greece,Romania
+Greece,Turkey
+Greece,Italy
+Poland,USSR
+Poland,Sweden
+Italy,West Germany
+Italy,Yugoslavia
+Italy,Tunisia
+Spain,Algeria
+Spain,Morocco
+Sweden,USSR
+Yugoslavia,Romania
+Romania,USSR
+USSR,Turkey
+USSR,Iran
+USSR,Pakistan
+USSR,China
+USSR,North Korea
+USSR,Japan
+Algeria,Morocco
+Algeria,Mali
+Algeria,Tunisia
+Algeria,Libya
+Algeria,Nigeria
+Egypt,Libya
+Egypt,Sudan
+Egypt,Saudi Arabia
+Egypt,Israel
+Ethiopia,Kenya
+Ethiopia,Sudan
+Ethiopia,Saudi Arabia
+Libya,Tunisia
+Libya,Sudan
+Libya,Nigeria
+Mali,Morocco
+Mali,Nigeria
+Nigeria,Sudan
+Nigeria,Zimbabwe
+Sudan,Kenya
+Sudan,Zimbabwe
+Angola,Zimbabwe
+Angola,Zaire
+Angola,South Africa
+Kenya,Tanzania
+Kenya,Zimbabwe
+Mozambique,Tanzania
+Mozambique,Zaire
+Mozambique,South Africa
+South Africa,Zaire
+Tanzania,Zimbabwe
+Tanzania,Zaire
+Zaire,Zimbabwe
+Afghanistan,Iran
+Afghanistan,Pakistan
+Afghanistan,China
+Israel,Saudi Arabia
+Israel,Syria
+Israel,Turkey
+Iran,Turkey
+Iran,Iraq
+Iran,Pakistan
+Iran,Saudi Arabia
+Iraq,Saudi Arabia
+Iraq,Syria
+Iraq,Turkey
+Pakistan,India
+Pakistan,China
+Syria,Turkey
+Burma,India
+Burma,China
+Burma,Vietnam
+Burma,Thailand
+China,North Korea
+China,Vietnam
+China,Taiwan
+North Korea,South Korea
+South Korea,Japan
+Thailand,Vietnam
+Thailand,Indonesia
+Australia,Indonesia
+Indonesia,Philippines
+Philippines,Taiwan

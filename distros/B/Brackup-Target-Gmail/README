@@ -1,0 +1,7 @@
+Standard module blurb
+
+	% perl Build.PL
+	% ./Build test
+	% sudo Build install
+
+

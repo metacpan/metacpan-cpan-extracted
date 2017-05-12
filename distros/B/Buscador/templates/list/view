@@ -1,0 +1,27 @@
+[% INCLUDE header title = list.name %]
+[% PROCESS macros %]
+<h1>[% list.name %]</h1>
+
+[% MACRO clean_name(name) BLOCK;
+    name | replace('\W+', '.');
+   END;
+ SET search_name = clean_name(list.name);
+    SET hint = 'You can search for mails in this list by adding <i>+list:"' _ search_name _ '"</i> to your search terms';
+    INCLUDE searchbox;
+%]
+
+[% FOR mail = recent;
+    mailday = mail.date.ymd;
+    IF mail == recent.first or mailday != previous %]
+        <h3>[% mailday %]</h3>
+    [% END %]
+    [% previous = mailday %]
+
+    [% summary_link(mail) %]
+    <blockquote>
+    <p>[% mail.original | html %]</p>
+    </blockquote>
+
+[% END %]
+[% make_atom("list/atom/$list.id") %]
+[% INCLUDE footer %]

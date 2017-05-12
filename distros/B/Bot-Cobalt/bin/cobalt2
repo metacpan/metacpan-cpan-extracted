@@ -1,0 +1,278 @@
+#!perl
+## simplistic cobalt2 Bot::Cobalt::Core frontend
+
+use 5.10.1;
+use strict;
+use warnings;
+
+BEGIN {
+  pop @INC if $INC[-1] eq '.';
+}
+
+use File::Spec;
+
+## Default rcfile location.
+my $rcfile = $ENV{HOME} ?
+  File::Spec->catfile( $ENV{HOME}, ".cobalt2rc" )
+  : ".cobalt2rc" ;
+
+my $opt_debug  = 0;
+my $opt_detach = 1;
+my $loglevel   = 'info';
+my ($etcdir, $vardir, $basedir);
+
+# FIXME switch to Daemon::Control? drops Proc::PID::File
+# and all the custom double-forkness
+use Proc::PID::File;
+
+use Bot::Cobalt::Frontend::RC qw/rc_read/;
+
+use Getopt::Long;
+GetOptions(
+  ## Path to .cobalt2rc
+  'rcfile=s' => \$rcfile,
+  'config=s' => \$rcfile,
+
+  ## Override .cobalt2rc
+  'rundir=s' => \$basedir,
+  'base=s'   => \$basedir,
+
+  ## Invocation opts
+  'debug:+' => \$opt_debug,   ## Overrides loglevel=
+  'detach!' => \$opt_detach,
+  'daemon!' => \$opt_detach,
+  'loglevel=s' => \$loglevel,
+
+  ## Informational
+  version => sub {
+    require Bot::Cobalt;
+    my $vers = $Bot::Cobalt::VERSION // 'vcs';
+    print "cobalt $vers\n";
+    exit 0
+  },
+
+  help => \&show_help,
+);
+
+sub show_help {
+  print(
+    "cobalt2 invocation help \n",
+    "   --version \n",
+    "     Display current Bot::Cobalt::Core version \n",
+
+    "\n",
+    "  Execution:\n",
+    "   --nodetach / --nodaemon \n",
+    "     Run in the foreground (do not daemonize) \n",
+    "   --loglevel=LOGLEVEL \n",
+    "     Specify log verbosity. Defaults to 'info' \n",
+    "     Valid levels, most verbose to least: \n",
+    "       debug info notice warn err crit alert emerg \n",
+    "   --debug / --nodebug / --debug=LEVEL\n",
+    "     Enable debug output. Overrides loglevel. \n",
+    "     Higher levels offer more verbosity. \n",
+
+    ## FIXME; note on POCOIRC_DEBUG and POE debug opts ?
+
+    "\n",
+    "  Paths:\n",
+    "   --rcfile=/path/to/rcfile \n",
+    "     Specify a rcfile. Defaults to \$HOME/.cobalt2rc \n",
+    "   --base=/path/to/basedir \n",
+    "     Specify base path for 'etc/' and 'var/' for this instance\n",
+    "     Overrides rcfile. \n",
+  );
+
+  exit 0
+}
+
+sub _rc_check {
+  unless (-e $rcfile) {
+    say ">! rcfile $rcfile not found.";
+    say ">! You can specify one via --rcfile=";
+    say ">! If this is your first time running cobalt2, try `cobalt2-installer`";
+    die "rcfile not found"
+  } else {
+    return 1
+  }
+}
+
+sub _check_dirs {
+  my %paths = (
+    etcdir => $etcdir,
+    vardir => $vardir,
+  );
+  for my $thisname (keys %paths) {
+    my $thispath = $paths{$thisname};
+    unless (-e $thispath) {
+      say ">! $thisname ($thispath) doesn't appear to exist.";
+      say ">! Your rcfile ($rcfile) may be broken.";
+      say ">! Perhaps try `cobalt2-installer`";
+      die "$thisname not a directory"
+    }
+  }
+}
+
+sub _check_cfs {
+  ## Check if required confs exist in etcdir
+  ## Otherwise suggest cobalt2-installer
+
+  my @required = qw/ cobalt.conf channels.conf plugins.conf /;
+
+  for my $file (@required) {
+    unless (-e File::Spec->catfile($etcdir, $file) ) {
+      say ">! Missing core conf: $file";
+      say ">! (etcdir: $etcdir)";
+      say ">! You may want to try `cobalt2-installer`";
+      die "missing core conf: $file"
+    }
+  }
+}
+
+
+sub _start_cobalt {
+  my $pid = Proc::PID::File->new(
+    dir => $vardir,
+    name => 'cobalt',
+  );
+  die "cobalt appears to be already running\n"
+    if $pid->alive;
+
+  ## POSIX fork dance
+  use POSIX ();
+  if ($opt_detach)
+  {
+    say "Starting cobalt in background";
+    my $fork = fork;
+    exit 1 if not defined $fork;
+    exit 0 if $fork;
+    POSIX::setsid();
+    $fork = fork;
+    exit 1 if not defined $fork;
+    exit 0 if $fork;
+    chdir('/');
+    open(STDIN, '<', '/dev/null');
+    open(STDOUT, '>>', '/dev/null');
+    open(STDERR, '>>', '/dev/null');
+    umask(022);
+  }
+  $pid->touch();
+
+  require Bot::Cobalt::Conf;
+  require Bot::Cobalt::Core;
+
+  ## FIXME could take paths to specific confs now
+  my $cfg = Bot::Cobalt::Conf->new(
+    etc   => $etcdir,
+    debug => $opt_debug,
+  );
+
+  Bot::Cobalt::Core->instance(
+    cfg => $cfg,
+    var => $vardir,
+    loglevel => $loglevel,
+    debug    => $opt_debug,
+    detached => $opt_detach,
+  )->init;
+
+  POE::Kernel->run;
+}
+
+
+say "-> debug ON, overrides loglevel" if $opt_debug;
+## Bot::Cobalt::Core does this anyway, but just for the validator:
+$loglevel = $opt_debug ? 'debug' : lc $loglevel ;
+## Check specified loglevel
+my @loglevels = qw/debug info notice warn warning
+                   err error crit critical alert
+                   emerg emergency/;
+
+unless ($loglevel && grep { $_ eq $loglevel } @loglevels) {
+  say("Invalid loglevel ($loglevel)");
+  say("Possible loglevels, most verbose to least: ".join(' ',@loglevels));
+  say("Setting loglevel to INFO");
+
+  $loglevel = 'info';
+}
+
+
+if ($basedir) {
+  say ">! Using --basedir=${basedir}";
+  ## A basedir was specified, disregard cobalt2rc
+  unless (-e $basedir) {
+    die "basedir $basedir specified but nonexistant";
+  }
+
+  $etcdir = File::Spec->catdir($basedir, "etc");
+  $vardir = File::Spec->catdir($basedir, "var");
+
+} else {
+  ## no basedir specified, try rcfile
+  _rc_check();
+  ($basedir, $etcdir, $vardir) = rc_read($rcfile);
+}
+
+
+_check_dirs();
+_check_cfs();
+_start_cobalt();
+
+__END__
+=pod
+
+=head1 NAME
+
+cobalt2 - Bot::Cobalt IRC bot frontend
+
+=head1 SYNOPSIS
+
+  # Start cobalt2 in the background
+  # Grab etc/var paths from ~/.cobalt2rc
+  cobalt2
+
+  # Start but do not detach
+  # '--nodaemon' is also valid
+  cobalt2 --nodetach
+
+  # Start in the foreground in debug mode
+  cobalt2 --debug --nodetach
+
+  # Higher debug verbosity modes:
+  cobalt2 --debug=2
+
+  # Start cobalt2 using a specified rcfile
+  cobalt2 --rcfile=/path/to/cobalt2rc
+
+  # Start cobalt2, only log warnings and above
+  cobalt2 --loglevel=warn
+
+=head1 DESCRIPTION
+
+L<Bot::Cobalt> is a pluggable IRC bot framework coupled with a core set
+of plugins vaguely replicating classic B<darkbot> and B<cobalt1>
+behavior (and a great deal more).
+
+This is the core frontend; it uses C<.cobalt2rc> files to find the 
+relevant configuration & data directories to start a particular 
+Cobalt instance.
+
+See C<cobalt2-installer> for more on getting started. The installer can 
+set up directories and example configuration files for a fresh instance.
+
+=head1 SEE ALSO
+
+L<Bot::Cobalt>
+
+L<Bot::Cobalt::Manual::Plugins>
+
+L<Bot::Cobalt::Core>
+
+L<Bot::Cobalt::IRC>
+
+=head1 AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+L<http://www.cobaltirc.org>
+
+=cut

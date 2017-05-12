@@ -1,0 +1,95 @@
+0.14    2017-01-25 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild with updated Dist::Zilla::Plugin::Bencher::Scenario
+          (0.16) to add benchmarked modules as prereq with phase=x_benchmarks,
+          type=x_benchmarks.
+
+
+0.13    2016-06-30 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild to split result tables per-dataset, to make the
+          results more readable.
+
+
+0.12    2016-03-26 (PERLANCAR)
+
+	- Add participant: JSON::Tiny.
+
+
+0.11    2016-02-18 (PERLANCAR)
+
+	- Add participant (not included by default):
+	  PERLANCAR::JSON::Match.
+
+
+0.10    2016-01-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- [build] Rebuild to fix displayed module versions in Benchmarked
+          Modules POD.
+
+
+0.09    2016-01-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix summary of Unicode strings (bytes != chars).
+
+
+0.08    2016-01-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to fix bencher commands shown in Benchmark Sample
+          Results section (missing "-m Module" option).
+
+
+0.07    2016-01-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to split sample results into serialize & deserialize
+          to make it more readable [RT#111269].
+
+
+0.06    2016-01-05 (PERLANCAR)
+
+        - [Bugfix] Fix json:array_str1k_10 dataset.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Bencher::Scenario
+          (0.03) which shows sample benchmark participants & results in POD.
+
+
+0.05    2015-10-22 (PERLANCAR)
+
+	- Add datasets: ustr1k, array_str1k_10, array_ustr1k_10,
+          json:array_str1k_10.
+
+
+0.04    2015-10-21 (PERLANCAR)
+
+	- Add participant: Cpanel::JSON::XS.
+
+
+0.03    2015-10-21 (PERLANCAR)
+
+	- Add datasets: {,json:}array_int{100,1000} (longer arrays),
+          {,json:}hash_int{10,100,1000} (hashes).
+
+	- Add participants: JSON::Parse & JSON::Create.
+
+
+0.02    2015-10-14 (PERLANCAR)
+
+	- Add the rest of the serializers (yaml, storable, sereal,
+	  messagepack).
+
+
+0.01    2015-10-14 (PERLANCAR)
+
+        - First release.

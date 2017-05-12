@@ -1,0 +1,59 @@
+<SBSConfig>
+  <name>SBS demo #1</name>
+  <workingDir>/tmp/to/be/defined</workingDir>
+  <Scheduler type="SBS::DefaultScheduler">
+    <schedulingMethod>fifo</schedulingMethod>
+    <joblistIndex>/tmp/to/be/defined/joblist.dump</joblistIndex>
+    <resourcesIndex>/tmp/to/be/defined/resourceslist.dump</resourcesIndex>
+    <queuesIndex>/tmp/to/be/defined/queuesstatuslist.dump</queuesIndex>
+    <resourcesList>
+      <oneResource type="cluster">
+        <name>subcluster_A</name>
+        <machineFile>a.mach</machineFile>
+      </oneResource>
+      <oneResource type="cluster">
+        <name>subcluster_B</name>
+        <machineFile>b.mach</machineFile>
+      </oneResource>
+      <oneResource type="cluster">
+        <name>subcluster_C</name>
+        <machineFile>c.mach</machineFile>
+      </oneResource>
+      <oneResource type="machine">
+        <name>mynode_1</name>
+        <host>localhost</host>
+      </oneResource>
+      <oneResource type="machine">
+        <name>mynode_2</name>
+        <host>localhost</host>
+      </oneResource>
+    </resourcesList>
+    <queueList>
+      <oneQueue>
+         <name>user_default_.+</name>
+         <resource>
+            <type>cluster</type>
+         </resource>
+         <priority>5</priority>
+         <maxConcurentJob>2</maxConcurentJob>
+      </oneQueue>
+      <oneQueue>
+         <name>single</name>
+         <resource>
+            <type>machine</type>
+         </resource>
+         <priority>5</priority>
+         <maxConcurentJob>1</maxConcurentJob>
+      </oneQueue>
+      <oneQueue>
+         <name>single_high</name>
+         <resource>
+            <type>machine</type>
+         </resource>
+         <priority>10</priority>
+         <maxConcurentJob>1</maxConcurentJob>
+      </oneQueue>
+    </queueList>
+
+  </Scheduler>
+</SBSConfig>

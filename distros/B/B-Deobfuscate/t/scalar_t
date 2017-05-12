@@ -1,0 +1,4 @@
+$gvsv;
+my $padsv;
+$$gvsv;
+# BEGIN { close STDERR }

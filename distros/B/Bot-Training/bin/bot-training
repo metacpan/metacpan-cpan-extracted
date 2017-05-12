@@ -1,0 +1,59 @@
+#!/usr/bin/env perl
+use 5.010;
+use open qw< :encoding(utf8) :std >;
+use Dir::Self;
+use Any::Moose;
+use Encode qw< decode >;
+use Bot::Training;
+use namespace::clean -except => 'meta';
+
+# Nothing to see here
+__PACKAGE__->meta->make_immutable;
+
+# use utf8 everywhere
+$_ = decode('utf8', $_) for @ARGV;
+
+# I want my mommy!
+{ no warnings 'once';
+$Bot::Training::HERE_MOMMY = __DIR__; }
+
+# Show help if run without arguments
+@ARGV = qw(--help) unless @ARGV;
+
+# Hailing frequencies open
+exit(Bot::Training->new_with_options->run // 0);
+
+=encoding utf8
+
+=head1 NAME
+
+bot-training - Command-line interface L<Bot::Training>
+
+=head1 SYNOPSIS
+
+    # Install all known training files from CPAN
+    sudo cpan Task::Bot::Training
+
+    # Spew the megahal training file(provided by
+    # Bot::Training::MegaHAL) file to STDOUT)
+    bot-training -f megahal
+
+    # List the currently available training files
+    bot-training -l
+
+=head1 DESCRIPTION
+
+See the documentation for L<Bot::Training> for more information.
+
+=head1 AUTHOR
+
+E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason <avar@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 E<AElig>var ArnfjE<ouml>rE<eth> Bjarmason <avar@cpan.org>
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

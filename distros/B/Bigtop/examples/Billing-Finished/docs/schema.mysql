@@ -1,0 +1,70 @@
+CREATE TABLE my_company (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    address VARCHAR(100),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    zip VARCHAR(100),
+    description VARCHAR(100),
+    contact_name VARCHAR(100),
+    contact_email VARCHAR(100),
+    contact_phone VARCHAR(100)
+);
+
+INSERT INTO my_company ( name, address, city, state, zip, description, contact_name, contact_email, contact_phone )
+    VALUES ( 'Crow Motors', '12 E. Main', 'Paxton', 'NE', 69155, 'Car and Implement Sales and Service', 'EJ', 'ej@example.com', '1-800-CROW-MOT' );
+
+CREATE TABLE customer (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    address VARCHAR(100),
+    city VARCHAR(100),
+    state VARCHAR(100),
+    zip VARCHAR(100),
+    description VARCHAR(100),
+    contact_name VARCHAR(100),
+    contact_email VARCHAR(100),
+    contact_phone VARCHAR(100)
+);
+
+INSERT INTO customer ( name, address, city, state, zip, description, contact_name, contact_email, contact_phone )
+    VALUES ( 'Groover Nordqvist', '502 E. Third', 'Paxton', 'NE', 69155, 'Prime Customer', 'Groover', 'gnordqvist@example.com', 'Unlisted' );
+
+CREATE TABLE line_item (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    due_date date,
+    name VARCHAR(100),
+    invoice MEDIUMINT,
+    hours MEDIUMINT,
+    charge_per_hour MEDIUMINT,
+    notes text,
+    description text
+);
+
+CREATE TABLE invoice (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    number VARCHAR(100),
+    status MEDIUMINT,
+    sent date,
+    paid date,
+    my_company MEDIUMINT,
+    customer MEDIUMINT,
+    notes text,
+    description text
+);
+
+CREATE TABLE status (
+    id MEDIUMINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100),
+    description VARCHAR(100)
+);
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Working', 'Work in Progress, NOT Billed' );
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Sent', 'Mailed to Customer' );
+
+INSERT INTO status ( name, description )
+    VALUES ( 'Paid', 'Payment Received' );
+

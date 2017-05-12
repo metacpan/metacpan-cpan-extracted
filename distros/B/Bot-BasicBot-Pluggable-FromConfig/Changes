@@ -1,0 +1,15 @@
+Revision history for Perl extension Bot-BasicBot-Pluggable-FromConfig
+
+0.6 2014-04-11T13:49:18Z
+    - Amended typos in documentation
+    - Added documentation of running run_bot
+    - Added documentation for B::BB::P install error
+    - Switched to MBT rather than MB for building
+
+0.5 2014-03-21T15:10:47Z
+
+    - allow string refs as config name arg as perl Config::JFDI docs
+    - added tests for config file format loading
+    - added module for running bots from config
+    - original version
+

@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>Babel Objects</TITLE>
+<LINK REL="stylesheet" TYPE="text/css" HREF="/css/bo.css">
+<meta name="description" content="Construisez vos pages web dynamiques, sans aucune programmation, à l'aide de composants écrits dans différents langages (Java, Php, Perl, Python, ...)">
+<meta name="keywords" content="opensource,modèle,modele,composant,corba,beans,javabean,javabeans,architecture,web,java,xml,php,perl,python,html">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#000000" VLINK="#000000" ALINK="#000000" TOPMARGIN=5 LEFTMARGIN=5 MARGINWIDTH=5 MARGINHEIGHT=5>
+<div align="left">
+<h1 align="center">Bookmark </h1>
+</div>
+<blockquote>
+<div align="left"> 
+    <p>What you see is the exact content of my bookmark. Whan I start Netscape, 
+      I load this bookmark. All modifications I make to it through Netscape are 
+      exported when I close my browser. It's a very simple way to manage a directory</p>
+    <p>
+      <script language="javascript">
+<!--
+function submitForFolder (user, folder) {
+    document.directory.folder.value = folder;
+    document.directory.user.value = user;
+    document.directory.submit();
+}
+//-->
+</script>
+    </p>
+  </div>
+  <form name=directory action="test_bookmark.bo" method="get">
+    <p align="left"> 
+      <input name="folder" type="hidden" value="">
+      <input name="user" type="hidden" value="">
+    </p>
+    <p align="left">$(Bookmark.Folders) </p>
+    <p align="left">__</p>
+    <p align="left">$(Bookmark.Urls) </p>
+  </form>
+</blockquote>
+<blockquote><a href="/law/license">Legal stuff</a></blockquote>
+  <CENTER>
+  <p>© 2000 The Babel Objects Network</p>
+</CENTER>
+</BODY>
+</HTML>

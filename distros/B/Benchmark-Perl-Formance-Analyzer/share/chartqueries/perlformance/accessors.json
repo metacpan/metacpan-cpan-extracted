@@ -1,0 +1,437 @@
+{
+   "charttitle" : "accessors - $obj->foo / $obj->foo(42)",
+   "chartlines" : [
+       {
+           "title" : "selfmade.hash.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsHash.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "selfmade.hash.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsHash.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "selfmade.hash.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsHash.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "selfmade.hash.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsHash.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessor.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessor.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessor.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessor.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor::Fast.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessorFast.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor::Fast.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessorFast.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor::Fast.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessorFast.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::Accessor::Fast.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassAccessorFast.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Object::Tiny::RW.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsObjectTinyRW.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Object::Tiny::RW.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsObjectTinyRW.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Object::Tiny::RW.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsObjectTinyRW.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Object::Tiny::RW.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsObjectTinyRW.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::MethodMaker.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassMethodMaker.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::MethodMaker.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassMethodMaker.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::MethodMaker.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassMethodMaker.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::MethodMaker.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassMethodMaker.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessor.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessor.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessor.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessor.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor::Array.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessorArray.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor::Array.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessorArray.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor::Array.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessorArray.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Class::XSAccessor::Array.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsClassXSAccessorArray.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Mouse.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMouse.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Mouse.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMouse.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Mouse.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMouse.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Mouse.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMouse.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Moose.get/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMoose.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Moose.get/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMoose.get" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Moose.set/threads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMoose.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-thread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       },
+       {
+           "title" : "Moose.set/nothreads",
+           "query" : {
+               "select" : [ "NAME", "VALUE", "perlconfig_version" ],
+               "where" : [
+                   [  "=", "NAME", "perlformance.perl5.AccessorsMoose.set" ],
+                   [  "=", "sysinfo_cpu_name", "AMD Opteron(tm) Processor 4180" ],
+                   [ "like", "bootstrap_perl_symbolic_name", "%-nothread%" ]
+               ],
+               "order_by" : [ "VALUE_ID" ]
+           }
+       }
+   ]
+}

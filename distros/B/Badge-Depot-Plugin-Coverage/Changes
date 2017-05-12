@@ -1,0 +1,40 @@
+Revision history for Badge-Depot-Plugin-Coverage
+
+0.0101 2016-02-17 19:13:34 UTC
+ [Bug Fixes]
+ - Make it work on 5.10, for real.
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 9 insertions(+), 3 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   (any)
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped (any)
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Version (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs (any)
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Badges
+ - (dev sug) + Dist::Iller 0.1406
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0307
+
+0.0100 2016-01-19T00:24:23Z UTC
+ - Initial release

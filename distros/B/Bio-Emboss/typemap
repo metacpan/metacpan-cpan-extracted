@@ -1,0 +1,337 @@
+TYPEMAP
+
+AjBool			T_BOOL
+AjStatus		T_IV
+
+PLFLT			T_DOUBLE
+
+ajint			T_IV
+ajlong			T_IV
+ajshort			T_IV
+ajuint			T_IV
+ajulong			T_IV
+const ajlong		T_IV
+const char		T_IV
+const time_t		T_IV
+unsigned long long	T_IV
+
+const float		T_FLOAT
+float			T_FLOAT
+
+const char *		T_PV
+
+PLFLT *			T_PTR
+ajint *			T_PTR
+ajint **		T_PTR
+ajint ***		T_PTR
+ajlong *		T_PTR
+ajlong **		T_PTR
+ajlong ***		T_PTR
+ajuint *		T_PTR
+ajuint **		T_PTR
+ajuint ***		T_PTR
+char **			T_PTR
+const PLFLT *		T_PTR
+const ajint *		T_PTR
+const ajlong *		T_PTR
+const ajuint *		T_PTR
+const double *		T_PTR
+const float *		T_PTR
+const void *		T_PTR
+double *		T_PTR
+double **		T_PTR
+double ***		T_PTR
+float *			T_PTR
+float **		T_PTR
+float ***		T_PTR
+short *			T_PTR
+short **		T_PTR
+short ***		T_PTR
+void **			T_PTR
+
+AjFloatArray *		T_PTROBJ_AJP
+AjIList			T_PTROBJ_AJP
+AjIStr			T_PTROBJ_AJP
+AjIntArray *		T_PTROBJ_AJP
+AjP3dVector		T_PTROBJ_AJP
+AjPAlign		T_PTROBJ_AJP
+AjPAtom			T_PTROBJ_AJP
+AjPBtHybrid		T_PTROBJ_AJP
+AjPBtId			T_PTROBJ_AJP
+AjPBtKeyWild		T_PTROBJ_AJP
+AjPBtPri		T_PTROBJ_AJP
+AjPBtWild		T_PTROBJ_AJP
+AjPBtcache		T_PTROBJ_AJP
+AjPBtpage		T_PTROBJ_AJP
+AjPCath			T_PTROBJ_AJP
+AjPCath const		T_PTROBJ_AJP
+AjPCath const *		T_PTROBJ_AJP
+AjPChain		T_PTROBJ_AJP
+AjPChar			T_PTROBJ_AJP
+AjPCmap			T_PTROBJ_AJP
+AjPCod			T_PTROBJ_AJP
+AjPDir			T_PTROBJ_AJP
+AjPDomAttr		T_PTROBJ_AJP
+AjPDomCDATASection	T_PTROBJ_AJP
+AjPDomCharacterData	T_PTROBJ_AJP
+AjPDomComment		T_PTROBJ_AJP
+AjPDomDocument		T_PTROBJ_AJP
+AjPDomDocumentFragment	T_PTROBJ_AJP
+AjPDomDocumentType	T_PTROBJ_AJP
+AjPDomElement		T_PTROBJ_AJP
+AjPDomEntityReference	T_PTROBJ_AJP
+AjPDomNode		T_PTROBJ_AJP
+AjPDomNodeEntry		T_PTROBJ_AJP
+AjPDomNodeList		T_PTROBJ_AJP
+AjPDomNodeMap		T_PTROBJ_AJP
+AjPDomPi		T_PTROBJ_AJP
+AjPDomText		T_PTROBJ_AJP
+AjPDomain		T_PTROBJ_AJP
+AjPDouble		T_PTROBJ_AJP
+AjPDouble2d		T_PTROBJ_AJP
+AjPDouble3d		T_PTROBJ_AJP
+AjPFeattabIn		T_PTROBJ_AJP
+AjPFeattabOut		T_PTROBJ_AJP
+AjPFeattable		T_PTROBJ_AJP
+AjPFeature		T_PTROBJ_AJP
+AjPFile			T_PTROBJ_AJP
+AjPFileBuff		T_PTROBJ_AJP
+AjPFloat		T_PTROBJ_AJP
+AjPFloat2d		T_PTROBJ_AJP
+AjPFloat3d		T_PTROBJ_AJP
+AjPFloatArray		T_PTROBJ_AJP
+AjPGraph		T_PTROBJ_AJP
+AjPGraphData		T_PTROBJ_AJP
+AjPGraphPlpData		T_PTROBJ_AJP
+AjPGraphXml		T_PTROBJ_AJP
+AjPHet			T_PTROBJ_AJP
+AjPHetent		T_PTROBJ_AJP
+AjPHist			T_PTROBJ_AJP
+AjPHit			T_PTROBJ_AJP
+AjPHitidx		T_PTROBJ_AJP
+AjPHitlist		T_PTROBJ_AJP
+AjPIList		T_PTROBJ_AJP
+AjPInt			T_PTROBJ_AJP
+AjPInt2d		T_PTROBJ_AJP
+AjPInt3d		T_PTROBJ_AJP
+AjPIntArray		T_PTROBJ_AJP
+AjPList			T_PTROBJ_AJP
+AjPListNode		T_PTROBJ_AJP
+AjPLong			T_PTROBJ_AJP
+AjPLong2d		T_PTROBJ_AJP
+AjPLong3d		T_PTROBJ_AJP
+AjPMatrix		T_PTROBJ_AJP
+AjPMatrixf		T_PTROBJ_AJP
+AjPNexus		T_PTROBJ_AJP
+AjPNodeEntry		T_PTROBJ_AJP
+AjPOutfile		T_PTROBJ_AJP
+AjPPStr			T_PTROBJ_AJP
+AjPPatComp		T_PTROBJ_AJP
+AjPPatlist		T_PTROBJ_AJP
+AjPPatlistRegex		T_PTROBJ_AJP
+AjPPatlistRegexp	T_PTROBJ_AJP
+AjPPatlistSeq		T_PTROBJ_AJP
+AjPPattern		T_PTROBJ_AJP
+AjPPatternRegex		T_PTROBJ_AJP
+AjPPatternRegex *	T_PTROBJ_AJP
+AjPPatternSeq		T_PTROBJ_AJP
+AjPPdb			T_PTROBJ_AJP
+AjPPdbtosp		T_PTROBJ_AJP
+AjPPdbtosp const *	T_PTROBJ_AJP
+AjPPhyloDist		T_PTROBJ_AJP
+AjPPhyloDist*		T_PTROBJ_AJP
+AjPPhyloFreq		T_PTROBJ_AJP
+AjPPhyloProp		T_PTROBJ_AJP
+AjPPhyloState		T_PTROBJ_AJP
+AjPPhyloState *		T_PTROBJ_AJP
+AjPPhyloTree		T_PTROBJ_AJP
+AjPPhyloTree *		T_PTROBJ_AJP
+AjPRange		T_PTROBJ_AJP
+AjPRegexp		T_PTROBJ_AJP
+AjPReport		T_PTROBJ_AJP
+AjPResidue		T_PTROBJ_AJP
+AjPScop			T_PTROBJ_AJP
+AjPScop const		T_PTROBJ_AJP
+AjPScop const *		T_PTROBJ_AJP
+AjPScopalg		T_PTROBJ_AJP
+AjPScopcla		T_PTROBJ_AJP
+AjPScopdes		T_PTROBJ_AJP
+AjPScophit		T_PTROBJ_AJP
+AjPScorealg		T_PTROBJ_AJP
+AjPSelex		T_PTROBJ_AJP
+AjPSelexSQ		T_PTROBJ_AJP
+AjPSelexdata		T_PTROBJ_AJP
+AjPSeq			T_PTROBJ_AJP
+AjPSeq *		T_PTROBJ_AJP
+AjPSeqCvt		T_PTROBJ_AJP
+AjPSeqQuery		T_PTROBJ_AJP
+AjPSeqall		T_PTROBJ_AJP
+AjPSeqin		T_PTROBJ_AJP
+AjPSeqout		T_PTROBJ_AJP
+AjPSeqset		T_PTROBJ_AJP
+AjPSeqset *		T_PTROBJ_AJP
+AjPShort		T_PTROBJ_AJP
+AjPShort2d		T_PTROBJ_AJP
+AjPShort3d		T_PTROBJ_AJP
+AjPSigdat		T_PTROBJ_AJP
+AjPSignature		T_PTROBJ_AJP
+AjPSigpos		T_PTROBJ_AJP
+AjPStockholm		T_PTROBJ_AJP
+AjPStockholmdata	T_PTROBJ_AJP
+AjPStr			T_PTROBJ_AJP
+AjPStr const		T_PTROBJ_AJP
+AjPStr const *		T_PTROBJ_AJP
+AjPStr*			T_PTROBJ_AJP
+AjPStrTok		T_PTROBJ_AJP
+AjPTable		T_PTROBJ_AJP
+AjPTime			T_PTROBJ_AJP
+AjPTree			T_PTROBJ_AJP
+AjPTrn			T_PTROBJ_AJP
+AjPUint			T_PTROBJ_AJP
+AjPUint2d		T_PTROBJ_AJP
+AjPUint3d		T_PTROBJ_AJP
+AjPVdwall		T_PTROBJ_AJP
+AjPVdwres		T_PTROBJ_AJP
+AjPXmlNode		T_PTROBJ_AJP
+AjPatlistRegex		T_PTROBJ_AJP
+EmbPBtreeEntry		T_PTROBJ_AJP
+EmbPEntry		T_PTROBJ_AJP
+EmbPEstAlign		T_PTROBJ_AJP
+EmbPField		T_PTROBJ_AJP
+EmbPGroupProg		T_PTROBJ_AJP
+EmbPGroupTop		T_PTROBJ_AJP
+EmbPHit			T_PTROBJ_AJP
+EmbPHitidx		T_PTROBJ_AJP
+EmbPHitidx const *	T_PTROBJ_AJP
+EmbPHitlist		T_PTROBJ_AJP
+EmbPMatMatch		T_PTROBJ_AJP
+EmbPMatPrints		T_PTROBJ_AJP
+EmbPPatBYPNode		T_PTROBJ_AJP
+EmbPPatMatch		T_PTROBJ_AJP
+EmbPPatRestrict		T_PTROBJ_AJP
+EmbPShow		T_PTROBJ_AJP
+GPnode			T_PTROBJ_AJP
+SeqPAccess		T_PTROBJ_AJP
+const AjIList		T_PTROBJ_AJP
+const AjIStr		T_PTROBJ_AJP
+const AjP3dVector	T_PTROBJ_AJP
+const AjPAlign		T_PTROBJ_AJP
+const AjPAtom		T_PTROBJ_AJP
+const AjPBtHybrid	T_PTROBJ_AJP
+const AjPBtId		T_PTROBJ_AJP
+const AjPBtNumId	T_PTROBJ_AJP
+const AjPBtPri		T_PTROBJ_AJP
+const AjPBtcache	T_PTROBJ_AJP
+const AjPCath		T_PTROBJ_AJP
+const AjPChar		T_PTROBJ_AJP
+const AjPCmap		T_PTROBJ_AJP
+const AjPCod		T_PTROBJ_AJP
+const AjPDir		T_PTROBJ_AJP
+const AjPDomElement	T_PTROBJ_AJP
+const AjPDomNode	T_PTROBJ_AJP
+const AjPDomNodeList	T_PTROBJ_AJP
+const AjPDomain		T_PTROBJ_AJP
+const AjPDouble		T_PTROBJ_AJP
+const AjPDouble2d	T_PTROBJ_AJP
+const AjPDouble3d	T_PTROBJ_AJP
+const AjPFeattabOut	T_PTROBJ_AJP
+const AjPFeattable	T_PTROBJ_AJP
+const AjPFeature	T_PTROBJ_AJP
+const AjPFile		T_PTROBJ_AJP
+const AjPFileBuff	T_PTROBJ_AJP
+const AjPFloat		T_PTROBJ_AJP
+const AjPFloat2d	T_PTROBJ_AJP
+const AjPFloat3d	T_PTROBJ_AJP
+const AjPGraph		T_PTROBJ_AJP
+const AjPGraphPlpData	T_PTROBJ_AJP
+const AjPGraphXml	T_PTROBJ_AJP
+const AjPHet		T_PTROBJ_AJP
+const AjPHist		T_PTROBJ_AJP
+const AjPHit		T_PTROBJ_AJP
+const AjPHitlist	T_PTROBJ_AJP
+const AjPHitlist *	T_PTROBJ_AJP
+const AjPIList		T_PTROBJ_AJP
+const AjPInt		T_PTROBJ_AJP
+const AjPInt2d		T_PTROBJ_AJP
+const AjPInt3d		T_PTROBJ_AJP
+const AjPList		T_PTROBJ_AJP
+const AjPLong		T_PTROBJ_AJP
+const AjPLong2d		T_PTROBJ_AJP
+const AjPLong3d		T_PTROBJ_AJP
+const AjPMatrix		T_PTROBJ_AJP
+const AjPMatrixf	T_PTROBJ_AJP
+const AjPNexus		T_PTROBJ_AJP
+const AjPOutfile	T_PTROBJ_AJP
+const AjPPatlistRegex	T_PTROBJ_AJP
+const AjPPatlistSeq	T_PTROBJ_AJP
+const AjPPatternRegex	T_PTROBJ_AJP
+const AjPPatternSeq	T_PTROBJ_AJP
+const AjPPdb		T_PTROBJ_AJP
+const AjPPdbtosp	T_PTROBJ_AJP
+const AjPPdbtosp *	T_PTROBJ_AJP
+const AjPPhyloDist	T_PTROBJ_AJP
+const AjPPhyloFreq	T_PTROBJ_AJP
+const AjPPhyloProp	T_PTROBJ_AJP
+const AjPPhyloState	T_PTROBJ_AJP
+const AjPPhyloTree	T_PTROBJ_AJP
+const AjPRange		T_PTROBJ_AJP
+const AjPRegexp		T_PTROBJ_AJP
+const AjPReport		T_PTROBJ_AJP
+const AjPResidue	T_PTROBJ_AJP
+const AjPScop		T_PTROBJ_AJP
+const AjPScopalg	T_PTROBJ_AJP
+const AjPScophit	T_PTROBJ_AJP
+const AjPSeq		T_PTROBJ_AJP
+const AjPSeqCvt		T_PTROBJ_AJP
+const AjPSeqQuery	T_PTROBJ_AJP
+const AjPSeqall		T_PTROBJ_AJP
+const AjPSeqin		T_PTROBJ_AJP
+const AjPSeqout		T_PTROBJ_AJP
+const AjPSeqset		T_PTROBJ_AJP
+const AjPShort		T_PTROBJ_AJP
+const AjPShort2d	T_PTROBJ_AJP
+const AjPShort3d	T_PTROBJ_AJP
+const AjPSignature	T_PTROBJ_AJP
+const AjPStr		T_PTROBJ_AJP
+const AjPStrIter	T_PTROBJ_AJP
+const AjPStrTok		T_PTROBJ_AJP
+const AjPTable		T_PTROBJ_AJP
+const AjPTime		T_PTROBJ_AJP
+const AjPTree		T_PTROBJ_AJP
+const AjPTrn		T_PTROBJ_AJP
+const AjPUint		T_PTROBJ_AJP
+const AjPUint2d		T_PTROBJ_AJP
+const AjPUint3d		T_PTROBJ_AJP
+const AjPVdwall		T_PTROBJ_AJP
+const EmbPBtreeEntry	T_PTROBJ_AJP
+const EmbPEstAlign	T_PTROBJ_AJP
+const EmbPMatPrints	T_PTROBJ_AJP
+const EmbPPatMatch	T_PTROBJ_AJP
+const EmbPPatRestrict	T_PTROBJ_AJP
+const EmbPShow		T_PTROBJ_AJP
+
+AjPSeqDate		T_PTROBJ_AJP
+AjPSeqRef		T_PTROBJ_AJP
+const AjPSeqDate	T_PTROBJ_AJP
+const AjPSeqRef		T_PTROBJ_AJP
+
+
+INPUT
+T_PTROBJ_AJP
+  if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/^(?:const +)?(?:AjP|(AjI))/Bio::Emboss::$1/;\$ntt}\")) {
+      IV tmp = SvIV((SV*)SvRV($arg));
+      $var = INT2PTR($type, tmp);
+  } else if (SvIV($arg) == 0) {
+      $var = ($type) 0;
+  } else
+      croak(\"$var is not of type ${(my $ntt=$ntype)=~s/^(?:const +)?(?:AjP|(AjI))/Bio::Emboss::$1/;\$ntt}\")
+
+OUTPUT
+T_PTROBJ_AJP
+  sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/^(?:const +)?(?:AjP|(AjI))/Bio::Emboss::$1/;\$ntt}\", (void*)$var);
+
+
+#OUTPUT
+#T_PTROBJ_AJP
+#  if ${my $a = ($var ne "RETVAL") ? "(${var}__sv) SvIV_set(${var}__sv, PTR2IV($var))" : "(0)" ; \$a} ;
+#  else sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/^(?:const +)?(?:AjP|(AjI))/Bio::Emboss::$1/;\$ntt}\", (void*)$var);

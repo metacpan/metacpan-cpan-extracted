@@ -1,0 +1,42 @@
+html, body, h4, h5, h6 { 
+    background-color: #111;
+    color: white !important;
+}
+
+a, h3 {
+    color: #ace !important;
+}
+
+h3.title {
+    background-color: #222 !important;
+}
+
+h3.menu {
+    background-color: #111 !important;
+}
+
+div.even, a.even, li.even {
+    background-color: #222;
+}
+
+select, input, textarea {
+    background-color: #222;
+    color: #fff;
+}
+
+.hover > div.glance {
+    background-color: #222;
+}
+
+span.datetime, span.number {
+    color: #222;
+}
+
+hr {
+    background-color: #111;
+    color: #111;
+}
+
+div.hover > ul {
+    background-color: #111;
+}

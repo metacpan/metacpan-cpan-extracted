@@ -1,0 +1,24 @@
+0.06  Sun, 19 Apr 2009 10:16:33 +0200
+  * Explicitly declare testing dependency on Test::More (Closes RT#45134).
+  * Additional tests for behavior used by Catalyst (Tomas Doran).
+  * Specify bugtracker and repository urls in META.yml.
+  * Upgrade ppport.h from 3.14_02 to 3.17.
+
+0.05  Mon, 10 Nov 2008 08:10:15 +0100
+  * Explicitly put undef to the stack of old_stash is NULL. This way we also
+    work on older perls where newSVpv(NULL, 0) doesn't create undef.
+
+0.04  Mon, 10 Nov 2008 00:39:00 +0100
+  * Tell MakeMaker which c symbols we need to have exported.
+  * Depend on a B::Hooks::OP::Check 0.14 so we can be sure all the symbols we
+    need will be found.
+
+0.03  Sat, 25 Oct 2008 10:28:46 +0200
+  * Use ppport.h for better portability.
+
+0.02  Wed, 22 Oct 2008 02:43:53 +0200
+  * configure_require B::Hooks::OP::Check.
+  * Specify prototyping behaviour.
+
+0.01  Sun, 19 Oct 2008 17:26:19 +0200
+  * Initial release.

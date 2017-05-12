@@ -1,0 +1,15 @@
+Revision history for Perl module Bot-Cobalt-Plugin-Ohm
+
+1.001001 2015-10-01
+
+  - Fix parsing of fractional values without a leading 0
+
+  - Cleanups & optimizations
+
+0.001002 2015-09-27
+
+  - Improved error/usage messages
+
+0.001001 2015-09-08
+
+  - Initial release

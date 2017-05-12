@@ -1,0 +1,215 @@
+body {
+    padding: 50px 0 0 0;
+}
+
+@media (max-width: 767px) {
+    .bb-main-column {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+}
+
+ul#statuses {
+    margin: 0;
+    padding: 5px 0px;
+    width: auto;
+}
+
+ul#statuses li{
+    border-width: 1px 0 0 0;
+    border-color: black;
+    border-style: solid;
+    margin: 2px 0;
+    padding: 0;
+    list-style-type: none;
+}
+
+ul#statuses li.bb-hidden-statuses-header {
+    padding: 0 3px;
+}
+
+.bb-status-id {
+    display: none;
+}
+
+div.bb-status-columns-container {
+    overflow: hidden;
+    padding: 3px 0 5px 0;
+}
+
+div.bb-status-profile-image {
+    float: left;
+    text-align: center;
+    width: 48px;
+    padding: 0 0 0 0;
+}
+
+div.bb-status-main {
+    margin-left: 54px;
+    padding: 0 0 0 0;
+}
+
+div.bb-status-header {
+    border-width: 0 0 1px 0;
+    border-color: #999;
+    border-style: solid;
+    padding: 0 3px 3px 3px;
+    overflow: hidden;
+}
+
+div.bb-status-text {
+    padding: 8px 8px 0 8px;
+}
+
+div.bb-status-attributes {
+    float: right;
+    color: #333;
+}
+
+.bb-status-retweeted-by {
+    color: #666;
+    padding: 0 8px 0 12px;
+}
+
+.bb-status-username {
+    font-weight: bold;
+    padding: 2px 0 3px 0;
+}
+
+.bb-status-created-at {
+    font-size: 80%;
+}
+
+.bb-status-cursor {
+    background-color: #e7e8ec;
+}
+
+.bb-status-extension-container {
+    padding: 0 0 5px 0;
+}
+
+.bb-status-extension-toggler {
+    cursor: pointer;
+}
+
+.bb-status-extension-toggler:hover {
+    background-color: #f4f5f9;
+}
+
+.bb-status-extension-pane {
+    padding: 5px 0 0 0;
+    border-width: 1px 0 0 0;
+    border-color: #444;
+    border-style: dashed;
+}
+
+.bb-status-extension-pane img {
+    max-width: 100%;
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+.bb-status-extension-handle {
+    padding: 5px 0 0 3px;
+    line-height: 1;
+    font-size: 90%;
+}
+
+.bb-status-extension-handle button {
+    font-weight: normal;
+    background-color: transparent;
+    line-height: 1;
+    border-width: 0;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.bb-summary-heading {
+    padding: 0;
+}
+
+.bb-summary-heading > a {
+    display: block;
+    padding: 10px 15px 10px 15px;
+}
+
+.bb-summary-count-pair {
+    white-space: nowrap;
+}
+
+.bb-unacked-counts-pair {
+    white-space: nowrap;
+}
+
+.bb-timeline-unacked-counts-levels-cell li {
+    margin: 0 0 4px 0;
+}
+
+.label {
+    font-size: 90%;
+    padding: 2px 4px 2px 4px;
+}
+
+/****
+  fixed sidebar
+  http://stackoverflow.com/questions/9350818/fixed-sidebar-navigation-in-fluid-twitter-bootstrap-2-0
+****/
+
+.sidebar-nav {
+    padding: 9px 0;
+}
+
+.sidebar-nav-fixed {
+    position:fixed;
+    top: 50px;
+    width: 14.7%;
+}
+
+.sidebar-detail {
+    max-height: 300px;
+    overflow: auto;
+}
+
+/****************************/
+
+#bb-spinner-placeholder {
+    height: 40px;
+    width: 40px;
+    float: right;
+    margin-left: 20px;
+    margin-top: 4px;
+}
+
+.bb-msg-error {
+    text-weight: bold;
+    color: #ff4758;
+}
+
+.bb-msg-warn {
+    text-weight: bold;
+    color: #faf681;
+}
+
+.bb-nav-controls-container {
+    text-align: right;
+}
+
+@media (max-width: 767px) {
+    .bb-nav-controls-container {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+}
+
+.bb-nav-controls-container > * {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+button.navbar-brand {
+    padding-left: 0;
+    padding-right: 0;
+}
+

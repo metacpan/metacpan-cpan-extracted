@@ -1,0 +1,11 @@
+Revision history for Perl extension Bgpmon-core.
+
+0.01  Tue May  8 08:54:18 2012
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -AX bgpmon-util
+
+1.00  Mon May  21 2012
+	- first official version
+
+1.10  Wed July  11 2012
+	-  clean-up of module structure

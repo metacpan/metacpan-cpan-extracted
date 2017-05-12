@@ -1,0 +1,53 @@
+=head1 NAME
+
+Business::BancaSella::Ric - Parent class for extracting One-Time-Password from different
+storage place
+
+=head1 SYNOPSIS
+
+Currently supported file, fileFast and mysql storage.
+
+For file storage use:
+
+  use Business::BancaSella::Ric;
+
+  my $ric = new Business::BancaSella::Ric(
+  				type 		=> 'file',
+  				file 		=> 'filePath/filename.ric');
+  my $otp = $ric->extract;
+  
+For file fast storage use:
+
+  use Business::BancaSella::Ric;
+
+  my $ric = new Business::BancaSella::Ric(
+  				type 		=> 'filefast',
+  				file 		=> 'filePath/filename.ric');
+  my $otp = $ric->extract;
+
+For Mysql database use:
+
+  use Business::BancaSella::Ric;
+
+  my $ric = new Business::BancaSella::Ric(
+  				type 		=> 'mysql',
+  				dbh		=> $DBI_handle,
+				tableName	=> $table_with_otp,
+				fieldName	=> $field_with_otp);
+  my $otp = $ric->extract;
+
+=head1 DESCRIPTION
+
+This module extract an One-Time-Password from a system storage place. Currently 
+are supported only file, fileFast and mysql location for OTP.
+
+=head1 AUTHOR
+
+Bruni Emiliano, info@ebruni.it
+
+=head1 SEE ALSO
+
+  Business::BancaSella::Ric::File
+  Business::BancaSella::Ric::Mysql
+
+=cut

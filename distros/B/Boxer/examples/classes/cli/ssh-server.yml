@@ -1,0 +1,7 @@
+parameters:
+  pkg:
+    - task-ssh-server
+    - molly-guard
+  pkg-auto:
+    - openssh-server
+    - openssh-client

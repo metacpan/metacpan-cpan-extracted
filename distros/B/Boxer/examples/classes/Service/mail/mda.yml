@@ -1,0 +1,9 @@
+classes:
+  - Service.mail
+parameters:
+  doc:
+    service-mail:
+      pkg:
+        - install mail delivery agent Dovecot
+  pkg:
+    - dovecot-core

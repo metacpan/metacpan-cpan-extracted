@@ -1,0 +1,9 @@
+- After Module::Install support CPAN::Meta 2.0, specify gpl_2 as the license.
+  Suggested by Paul Howarth <paul@city-fan.org>
+- After Module::Install support CPAN::Meta 2.0, add info for repository URL
+  and bug tracker. Suggested by Paul Howarth <paul@city-fan.org>
+- Figure out mod_perl integration (maybe allow an output callback so you could
+  pass it a sub { Apache->request->log->info(@_) } or similar)
+- Work (in a handicapped way) even if Time::HiRes is unavailable (just go to
+  the nearest second, and hope that you're timing something that's really
+  lengthy!)

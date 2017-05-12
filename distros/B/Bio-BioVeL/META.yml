@@ -1,0 +1,26 @@
+---
+abstract: 'BioVeL web services for phyloinformatics'
+author:
+  - 'Rutger Vos <rutger.vos@naturalis.nl>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.8, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio-BioVeL
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Bio::Phylo: 0
+  BioPerl: 0
+  Proc::ProcessTable: 0
+  YAML: 0
+  mod_perl: 0
+version: 0.1

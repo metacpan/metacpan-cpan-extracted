@@ -1,0 +1,9 @@
+Revision history for Perl extension Bit::Util.
+
+0.02  Jun 14, 2012
+        - solve bug on bu_count
+
+0.01  Thu Sep  9 14:20:53 2010
+	- original version; created by h2xs 1.23 with options
+		-An Bit::Util
+

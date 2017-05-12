@@ -1,0 +1,33 @@
+---
+_worker_config_file: /tmp/lXGH5pgD5r/cluster_job.tmp/cluster_job.config.dat
+cmd:
+- t/Bio-Grid-Run-SGE-Master.script.pl
+extra:
+  result_on_stdout: 1
+  use_stdin: 1
+input:
+- elements:
+  - t/data/test.fa
+  format: General
+  sep: ^>
+job_cmd: /tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl -t 1-45 -S PERL -N cluster_job -e /tmp/lXGH5pgD5r/cluster_job.tmp/err
+  -o /tmp/lXGH5pgD5r/cluster_job.tmp/out /tmp/lXGH5pgD5r/cluster_job.tmp/env.cluster_job.pl t/Bio-Grid-Run-SGE-Master.script.pl --worker /tmp/lXGH5pgD5r/master_config
+job_name: cluster_job
+mode: Dummy
+num_comb: 45
+parts: 45
+range:
+  - 1
+  - 45
+prefix_output_dirs: 1
+perl_bin: PERL
+result_dir: /tmp/lXGH5pgD5r/result
+log_dir: /tmp/lXGH5pgD5r/result
+stderr_dir: /tmp/lXGH5pgD5r/tmp/err
+idx_dir: /tmp/lXGH5pgD5r/idx
+stdout_dir: /tmp/lXGH5pgD5r/tmp/out
+submit_bin: /tmp/lXGH5pgD5r/Bio-Grid-Run-SGE-Master.qsub.pl
+submit_params: []
+tmp_dir: /tmp/lXGH5pgD5r/tmp
+working_dir: /tmp/lXGH5pgD5r
+args: []

@@ -1,0 +1,6 @@
+Revision history for Perl extension BT368i.
+
+1.00  Sat Aug  7 23:40:45 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n BT368i -b 5.8.0
+

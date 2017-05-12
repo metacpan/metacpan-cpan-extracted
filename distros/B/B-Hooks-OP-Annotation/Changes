@@ -1,0 +1,52 @@
+Revision history for Perl extension B::Hooks::OP::Annotation.
+
+0.44  Wed Apr 20 03:22:43 2011
+    - rm references to deprecated CALL_FPTR
+    - Makefile.PL fix
+    - add GitHub repo
+    - update ppport.h
+
+0.43  Fri Feb 27 00:40:07 2009
+    - RT #43682: fix typo in function name (thanks Taro Nishino)
+
+0.42  Thu Feb 26 01:44:26 2009
+    - fix deletion
+
+0.41  Wed Feb 25 23:18:35 2009
+    - fix hash function
+
+0.40  Wed Feb 25 20:57:42 2009
+    - replace khash.h with optable.h
+    - addded op_annotate - void version of op_annotation_new
+    - gcc fix (thanks BinGOs)
+
+0.32  Sun Feb 22 01:19:50 2009
+    - fix metadata
+    - fix metadata info in POD
+
+0.31  Sun Feb 15 02:43:49 2009
+    - Makefile.PL fixlet
+
+0.30  Fri Feb 13 16:02:55 2009
+    - API change
+      - don't expose annotation destructor
+      - rename op_annotation_set => op_annotation_new and return the new annotation
+      - destroy clobbered annotation if the OP has already been annotated
+      - s/ppaddr/op_ppaddr/ to appease ppport.h
+    - don't issue a warning if data is supplied without a destructor
+
+0.21  Sat Feb 7 03:50:37 2009
+    - portability fix
+    - fix destructor prototypes
+    - POD fixes
+
+0.20  Thu Feb 5 01:19:47 2009
+    - API overhaul - use a pull interface
+    - replace linked list with khash: http://tinyurl.com/3kkclt
+
+0.10  Wed Feb 4 04:26:02 2009
+    - API cleanup
+    - simplify/optimize groups
+
+0.01  Wed Feb 4 01:40:17 2009
+    - original version; created by h2xs 1.23 with options -A -b5.8.0 --name=B::Hooks::OP::Annotation

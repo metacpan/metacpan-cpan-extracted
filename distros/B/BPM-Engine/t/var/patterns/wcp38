@@ -1,0 +1,125 @@
+        <WorkflowProcess Id="wcp38" Name="WCP38: General Synchronizing Merge">
+            <ProcessHeader>
+                <Created>2010-09-07 04:04:58</Created>
+                <Description>The convergence of two or more branches which diverged earlier in the process into a single subsequent branch such that the thread of control is passed to the subsequent branch when either (1) each active incoming branch has been enabled or (2) it is not possible that any branch that has not yet been enabled will be enabled at any future time.</Description>
+            </ProcessHeader>
+            <FormalParameters>
+                <FormalParameter Id="multi_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="deferred_choice" Mode="IN">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+                <FormalParameter Id="path_taken" Mode="OUT">
+                    <DataType>
+                        <BasicType Type="STRING"/>
+                    </DataType>
+                </FormalParameter>
+            </FormalParameters>
+            <Activities>
+                <Activity Id="MC" Name="MC">
+                    <Description>Multiple Choice (OR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="OR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="MC-A"/>
+                                    <TransitionRef Id="MC-B"/>
+                                    <TransitionRef Id="MC-XOR"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="XOR" Name="XOR">
+                    <Description>Exclusive (XOR) Join</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="XOR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="A" Name="A">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="B" Name="B">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="C" Name="C">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="DC" Name="DC">
+                    <Description>Deferred Choice (XOR-split)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Split Type="XOR">
+                                <TransitionRefs>
+                                    <TransitionRef Id="DC-XOR"/>
+                                    <TransitionRef Id="DC-D"/>
+                                    <TransitionRef Id="DC-E"/>
+                                </TransitionRefs>
+                            </Split>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="D" Name="D">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="E" Name="E">
+                    <Implementation><Task><TaskManual/></Task></Implementation>
+                </Activity>
+                <Activity Id="SM" Name="SM">
+                    <Description>Synchronizing Merge (OR-join)</Description>
+                    <Route />
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+                <Activity Id="End" Name="End">
+                    <Event>
+                        <EndEvent />
+                    </Event>
+                    <TransitionRestrictions>
+                        <TransitionRestriction>
+                            <Join Type="OR"/>
+                        </TransitionRestriction>
+                    </TransitionRestrictions>
+                </Activity>
+            </Activities>
+            <Transitions>
+                <Transition Id="MC-A" From="MC" To="A">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="MC-B" From="MC" To="B">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('B')</Condition>                
+                </Transition>
+                <Transition Id="MC-XOR" From="MC" To="XOR">
+                    <Condition Type="CONDITION">attribute('multi_choice').search('XOR')</Condition>                
+                </Transition>
+                <Transition Id="XOR-C" From="XOR" To="C"/>
+                <Transition Id="A-SM" From="A" To="SM"/>
+                <Transition Id="B-SM" From="B" To="SM"/>
+                <Transition Id="C-DC" From="C" To="DC"/>
+                <Transition Id="DC-D" From="DC" To="D">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('D')</Condition>                
+                </Transition>
+                <Transition Id="DC-E" From="DC" To="E">
+                    <Condition Type="CONDITION">attribute('deferred_choice').search('E')</Condition>                
+                </Transition>
+                <Transition Id="DC-XOR" From="DC" To="XOR">
+                    <Condition Type="OTHERWISE"/>
+                </Transition>
+                <Transition Id="D-SM" From="D" To="SM"/>
+                <Transition Id="E-End" From="E" To="End"/>
+                <Transition Id="SM-End" From="SM" To="End"/>
+            </Transitions>
+        </WorkflowProcess>

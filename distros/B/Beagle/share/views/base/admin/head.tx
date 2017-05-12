@@ -1,0 +1,17 @@
+: if $admin {
+<div class="admin-links">
+
+  <div class="hover create-entry">
+  <a class="menu" href="#"><: _( 'create' ) :></a>
+  <ul class="hidden">
+  : for $entry_types.sort() -> $x {
+  : next if $x == 'comment';
+    <li><a href="<: $prefix :>admin/entry/<: $x :>/new"><: _( $x ) :></a><li>
+  : }
+  </ul>
+  </div>
+  <a class="menu" href="<: $prefix :>admin/term"><: _('terminal') :></a>
+  <a class="menu" href="<: $prefix :>admin/info"><: _('info') :></a>
+  <a class="menu" href="<: $prefix :>admin/entries"><: _('all entries') :></a>
+</div>
+: }

@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+package Bio::RetrieveAssemblies::Script;
+$Bio::RetrieveAssemblies::Script::VERSION = '1.1.5';
+BEGIN { unshift( @INC, '../lib' ) }
+BEGIN { unshift( @INC, './lib' ) }
+
+use Moose;
+use Bio::RetrieveAssemblies;
+
+# ABSTRACT: Download WGS assemblies or annotation from GenBank
+# PODNAME: retrieve_assemblies
+
+
+Bio::RetrieveAssemblies->new(args => \@ARGV, script_name => $0)->download();
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+retrieve_assemblies - Download WGS assemblies or annotation from GenBank
+
+=head1 VERSION
+
+version 1.1.5
+
+=head1 SYNOPSIS
+
+Download WGS assemblies or annotation from GenBank
+
+=head1 AUTHOR
+
+Andrew J. Page <ap13@sanger.ac.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Wellcome Trust Sanger Institute.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

@@ -1,0 +1,25 @@
+---
+abstract: 'Determine Federal Reserve holidays, 2017 - 2021'
+author:
+  - 'Tyler Hardison <tyler@seraph-net.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bank-Holidays
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: '0.22'
+  HTML::TableExtract: '2'
+  LWP::Simple: '1.3'
+version: '0.86'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

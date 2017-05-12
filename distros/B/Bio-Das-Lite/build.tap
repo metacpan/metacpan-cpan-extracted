@@ -1,0 +1,191 @@
+t/00-critic.t ............... skipped: Author test.  Set $ENV{TEST_AUTHOR} to a true value to run.
+t/00-distribution.t ......... 
+1..9
+ok 1 - Checking MANIFEST integrity
+ok 2 - use Bio::Das::Lite;
+ok 3 - Bio::Das::Lite defines a version
+ok 4 - POD test for blib/lib/Bio/Das/Lite.pm
+ok 5 - MANIFEST exists
+ok 6 - README exists
+ok 7 - Changes(.pod)? or ChangeLog(.pod)? exists
+ok 8 - Build.PL or Makefile.PL exists
+ok 9 - Pod Coverage ok
+ok
+t/00-pod.t .................. 
+1..1
+ok 1 - POD test for blib/lib/Bio/Das/Lite.pm
+ok
+t/00-podcoverage.t .......... 
+1..1
+ok 1 - Pod coverage on Bio::Das::Lite
+ok
+t/01-general.t .............. 
+1..7
+ok 1 - The object isa Bio::Das::Lite
+ok 2 - get/set timeout
+ok 3 - get/set http_proxy
+ok 4 - plain http fetch
+ok 5 - feature-by-id returned a list
+ok 6 - feature-by=id returned one or no elements
+ok 7 - feature-by-id element was a hash
+ok
+t/02-statuscodes.t .......... 
+1..6
+ok 1 - HTTP OK, X-DAS OK (code)
+ok 2 - HTTP OK, X-DAS OK (message)
+ok 3 - HTTP OK, X-DAS-Status error (code)
+ok 4 - HTTP OK, X-DAS-Status error (message)
+ok 5 - HTTP error, no X-DAS-Status (code)
+ok 6 - HTTP error, no X-DAS-Status (message)
+ok
+t/05-singledsn.t ............ 
+1..33
+ok 1 - new with a single dsn returned something
+ok 2 - single service get gave an array ref
+ok 3 - single service get had length of one
+ok 4 - single service get returned the same dsn
+ok 5 - dsns call returned something (service http://das.sanger.ac.uk/das)
+ok 6 - dsns call gave a hash (service http://das.sanger.ac.uk/das)
+ok 7 - dsns call gave one key service http://das.sanger.ac.uk/das)
+ok 8 - dsns call returned OK status (service http://das.sanger.ac.uk/das status 200 OK)
+ok 9 - dsns call gave a arrayref value (service http://das.sanger.ac.uk/das)
+ok 10 - dsns call returned at least one source (service http://das.sanger.ac.uk/das)
+ok 11 - all sources parsed correctly into hashes (service http://das.sanger.ac.uk/das)
+ok 12 - new with a single dsn returned something
+ok 13 - single service get gave an array ref
+ok 14 - single service get had length of one
+ok 15 - single service get returned the same dsn
+ok 16 - dsns call returned something (service http://das.ensembl.org/das/dsn)
+ok 17 - dsns call gave a hash (service http://das.ensembl.org/das/dsn)
+ok 18 - dsns call gave one key service http://das.ensembl.org/das/dsn)
+ok 19 - dsns call returned OK status (service http://das.ensembl.org/das/dsn status 200 OK)
+ok 20 - dsns call gave a arrayref value (service http://das.ensembl.org/das/dsn)
+ok 21 - dsns call returned at least one source (service http://das.ensembl.org/das/dsn)
+ok 22 - all sources parsed correctly into hashes (service http://das.ensembl.org/das/dsn)
+ok 23 - new with a single dsn returned something
+ok 24 - single service get gave an array ref
+ok 25 - single service get had length of one
+ok 26 - single service get returned the same dsn
+ok 27 - dsns call returned something (service http://das.ensembl.org/das/dsn\#foo)
+ok 28 - dsns call gave a hash (service http://das.ensembl.org/das/dsn\#foo)
+ok 29 - dsns call gave one key service http://das.ensembl.org/das/dsn\#foo)
+ok 30 - dsns call returned OK status (service http://das.ensembl.org/das/dsn\#foo status 200 OK)
+ok 31 - dsns call gave a arrayref value (service http://das.ensembl.org/das/dsn\#foo)
+ok 32 - dsns call returned at least one source (service http://das.ensembl.org/das/dsn\#foo)
+ok 33 - all sources parsed correctly into hashes (service http://das.ensembl.org/das/dsn\#foo)
+ok
+t/06-singledsn-singleseg.t .. 
+1..13
+ok 1 - entry_points returns a hash
+ok 2 - entry_points returns the same number of sources
+ok 3 - entry_points hash contains an array
+ok 4 - types returns a hash
+ok 5 - types returns the same number of sources
+ok 6 - types hash contains an array
+ok 7 - features returns a hash
+ok 8 - features returns the same number of sources
+ok 9 - features hash contains an array
+ok 10 - sequence returns a hash
+ok 11 - sequence returns the same number of sources
+ok 12 - sequence hash contains an array
+ok 13 - requesting 1Kb of sequence returns 1Kb
+ok
+t/07-singledsn-multiseg.t ... 
+1..10
+ok 1 - features returns a hash
+ok 2 - features returns data to the tune of (number of sources * number of segments)
+ok 3 - features hash contains an array
+ok 4 - features returns some data
+ok 5 - features returns some data
+ok 6 - sequence returns a hash
+ok 7 - sequence returns data to the tune of (number of sources * number of segments)
+ok 8 - sequence hash contains an array
+ok 9 - sequence returns some data
+ok 10 - sequence returns some data
+ok
+t/10-multidsn.t ............. 
+1..11
+ok 1 - new with a multi dsn returned something
+ok 2 - multi service get gave an array ref
+ok 3 - multi service get had length of one
+ok 4 - multi service get returned the same dsns in the same order
+ok 5 - dsns call returned something
+ok 6 - dsns call gave a hash
+ok 7 - dsns call gave one key
+ok 8 - dsns call returned OK status (status is 200 OK)
+ok 9 - dsns call gave a arrayref value for the one key
+ok 10 - dsns call returned at least one source
+ok 11 - all sources parsed correctly into hashes
+ok
+t/20-authentication.t ....... 
+1..3
+ok 1 - http_proxy processed ok
+ok 2 - proxy_user processed ok
+ok 3 - proxy_pass processed ok
+ok
+t/21-proxy.t ................ skipped: Proxy testing requires POE and WWW::Curl::Simple
+t/40-dna.t .................. 
+1..1
+ok 1 - is_deeply
+ok
+t/45-sequence.t ............. 
+1..1
+ok 1 - is_deeply
+ok
+t/50-entry_points.t ......... 
+1..1
+ok 1 - Correct number of segments returned
+ok
+t/60-features.t ............. 
+1..3
+ok 1 - Whole-response-mode gave correct number of features returned
+ok 2 - bug from Nick Landridge 2011-05-05
+ok 3 - bug from Nick Landridge 2011-05-05
+ok
+t/60-features_chunked.t ..... 
+1..1
+ok 1 - Chunked-response-mode gave number of features returned
+ok
+t/60-features_empty.t ....... 
+1..5
+ok 1 - Empty segment gives a hash with seginfo rather than an empty array of features
+ok 2 - segment_id
+ok 3 - segment_version
+ok 4 - segment_start
+ok 5 - segment_stop
+ok
+t/61-features_group.t ....... 
+1..5
+ok 1 - Corrent number of links returned
+ok 2 - Corrent number of notes returned
+ok 3 - Correct link href
+ok 4 - Correct link text
+ok 5 - Correct note text
+ok
+t/70-alignment.t ............ 
+1..4
+ok 1 - Whole-response-mode gave correct number of features returned
+ok 2 - Got expected number of alignment objects
+ok 3 - Got expected number of alignment blocks
+ok 4 - Got cigar string
+ok
+t/80-structure.t ............ 
+1..9
+ok 1 - Whole-response-mode gave correct structure
+ok 2 - Got the correct number of chains
+ok 3 - Got the correct number of groups for the chain
+ok 4 - Got the correct number of atoms for the first group
+ok 5 - Got the correct number of het
+ok 6 - Got the correct number of groups for the het
+ok 7 - Got the correct number of atoms for the first group
+ok 8 - Got connection data
+ok 9 - Got correct number of atoms in connection
+ok
+t/90-sources.t .............. 
+1..2
+ok 1 - Whole-response-mode gave correct number of sources returned
+ok 2 - Got maintainers email
+ok
+All tests successful.
+Files=22, Tests=126,  5 wallclock secs ( 0.11 usr  0.06 sys +  3.51 cusr  0.56 csys =  4.24 CPU)
+Result: PASS

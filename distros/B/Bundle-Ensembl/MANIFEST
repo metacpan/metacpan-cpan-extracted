@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+WHAT_MODULES
+ens_modtest.pl
+t/Bundle-Ensembl.t
+lib/Bundle/Ensembl.pm
+META.yml                                 Module meta-data (added by MakeMaker)

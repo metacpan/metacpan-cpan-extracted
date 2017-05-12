@@ -1,0 +1,192 @@
+# 
+#
+# Babel Objects Project's directory schema items
+#
+# depends upon:
+#	core.schema
+#	inetorgperson.schema
+#	misc.schema
+#
+
+attributetype ( 9.9.9.9.9.9.9.1.1
+        NAME 'mailAccessDomain'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.2
+        NAME 'mailAlternateAddress'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        )
+
+attributetype ( 9.9.9.9.9.9.9.1.3
+        NAME 'mailAutoReplyMode'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.4
+        NAME 'mailAutoReplyText'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.5
+        NAME 'mailDeliveryOption'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.6
+        NAME 'mailForwardingAddress'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.7
+        NAME 'mailMessageStore'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.8
+        NAME 'mailProgramDeliveryInfo'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.9
+        NAME 'mailQuota'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.10
+        NAME 'multiLineDescription'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+objectClass ( 9.9.9.9.9.9.9.0.1
+	NAME 'mailRecipient'
+	DESC 'e-Mail Address'
+	SUP inetOrgPerson
+	MUST ( cn )
+	MAY ( mail $ mailAccessDomain $ mailAlternateAddress
+		$ mailAutoReplyMode $ mailAutoReplyText $ mailDeliveryOption
+		$ mailForwardingAddress $ mailHost $ mailMessageStore
+		$ mailProgramDeliveryInfo $ mailQuota $ multiLineDescription
+		$ uid $ userPassword ) )
+
+attributetype ( 9.9.9.9.9.9.9.1.21
+        NAME 'mgrpAllowedBroadcaster'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        )
+
+attributetype ( 9.9.9.9.9.9.9.1.22
+        NAME 'mgrpAllowedDomain'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        )
+
+attributetype ( 9.9.9.9.9.9.9.1.23
+        NAME 'mgrpDeliverTo'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.24
+        NAME 'mgrpErrorsTo'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.25
+        NAME 'mgrpModerator'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        )
+
+attributetype ( 9.9.9.9.9.9.9.1.26
+        NAME 'mgrpMsgMaxSize'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.27
+        NAME 'mgrpMsgRejectAction'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.28
+        NAME 'mgrpMsgRejectText'
+        DESC 'RFC 822 email address of this recipient'
+        EQUALITY caseIgnoreIA5Match
+        SUBSTR caseIgnoreIA5SubstringsMatch
+        SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256}
+        SINGLE-VALUE
+	)
+
+attributetype ( 9.9.9.9.9.9.9.1.30
+        NAME 'mgrpRFC822MailMember'
+        DESC 'RFC 822 email address of this recipient'
+	SUP name
+	)
+
+objectClass ( 9.9.9.9.9.9.9.0.2
+	NAME 'mailGroup'
+	DESC 'Mailing List'
+	SUP groupOfUniqueNames
+	MUST ( mail )
+	MAY ( cn $ mailAlternateAddress $ mailHost $ mgrpAllowedBroadcaster
+		$ mgrpAllowedDomain $ mgrpDeliverTo $ mgrpErrorsTo
+		$ mgrpModerator $ mgrpMsgMaxSize $ mgrpMsgRejectAction
+		$ mgrpMsgRejectText $ mgrpRFC822MailMember $ owner ) )
+

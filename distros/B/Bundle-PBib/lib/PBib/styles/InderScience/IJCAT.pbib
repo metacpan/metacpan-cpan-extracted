@@ -1,0 +1,24 @@
+/* $Id: JSS.pbib 11 2004-11-22 23:56:20Z tandler $
+ */
+<bib>
+</bib>
+<item>
+	class InderScience
+	include-label   0
+	label-separator   {space}
+	includeAnnote   1
+	includeURL   1
+	language English
+	keywordStyle   Abbrev
+</item>
+<label>
+	class Name
+	etal   3
+	forcekey   1
+	etal-italics	1
+	unique   1
+</label>
+<ref>
+	class BookmarkLink
+	final   0
+</ref>

@@ -1,0 +1,26 @@
+=head1 USE
+
+All field keywords beginning with C<html_form_> are passed directly
+into the form hash.  Thus, they are really defined in form.tt which
+ships with Gantry.
+
+Use C<html_form_options> to specify the choices for fields of
+html_form_type C<select>.  The options are a comma separated list
+of pair.  The first member of the pair is the label the user will see,
+the second is the value that will be in the params hash.  With AutoCRUD,
+the value goes directly into the database.
+
+If you use DBIx::Class, your model will have a method whose name starts
+the same as the field, but ends with _display.  Call this method with
+the value from the table row; it will return the label ready for display
+back to the user.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+Change to the newly created Kids directory and look in the form method
+in lib/Kids/GEN/Child.pm to see the options being passed to the template;
+and in lib/Kids/Model/GEN/child.pm for the C<gender_display> method.

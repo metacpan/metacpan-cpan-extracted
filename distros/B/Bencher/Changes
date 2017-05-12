@@ -1,0 +1,459 @@
+1.028   2017-01-25 (PERLANCAR)
+
+	- Fix relationship name from x_benchmarked to x_benchmarks to be
+	  consistent with requires [not required], suggests [not
+	  suggested], etc.
+
+
+1.027   2017-01-25 (PERLANCAR)
+
+	- [doc] Document participant property 'helper_modules'
+	  (Bencher::Backend 1.034).
+
+	- [doc] Mention bencher-tiny.
+
+
+1.026   2016-10-13 (PERLANCAR)
+
+        - Adjust to Bencher::Backend 1.026 (new hooks
+          before_parse_{datasets,participants}, {before,after}_test_item).
+
+
+1.025   2016-10-09 (PERLANCAR)
+
+        - Adjust to Bencher::Backend 1.025 (new property: test).
+
+
+1.024   2016-10-09 (PERLANCAR)
+
+        - Bump version number to re-sync with Bencher::Backend.
+
+        - Update documentation to Bencher::Backend 1.024 (new property
+          'runner').
+
+
+1.011   2016-09-09 (PERLANCAR)
+
+	- [doc] Document per-scenario 'result' property (Bencher::Backend
+	  1.023) and per-dataset 'result' property.
+
+	- [doc] Add Cookbook.pod.
+
+
+1.010   2016-08-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Adjust to Bencher::Backend 1.021 (introduced with_args_size).
+
+
+1.009   2016-08-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix POD's package.
+
+
+1.008   2016-08-24 (PERLANCAR)
+
+	- Adjust to Bencher::Backend 1.020 (include_process_size &
+	  include_result_size renamed to with_process_size &
+	  with_result_size).
+
+
+1.007   2016-06-16 (PERLANCAR)
+
+        - Update to Bencher::Backend 1.018.
+
+        - Add Bencher::Manual::FAQ.
+
+
+1.006   2016-06-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version of Bencher::Backend to 1.008.
+
+	- Fix documentation about include_participant_tags &
+	  exclude_participant_tags.
+
+	- Show Bencher version as well as Bencher::Backend version in
+	  --version.
+
+
+1.005   2016-04-08 (PERLANCAR)
+
+        - No functional changes.
+
+        - Synchronize version number with Bencher::Backend 1.005. Update
+          documentation: document about capture_stdout, capture_stderr,
+          include_process_size (1.005), document that code template is eval-ed
+          in the 'main' package and note about <VARNAME:raw> syntax in template
+          (1.004), document BENCHER_RESULT_DIR and scenario property
+          'extra_modules' (1.001).
+
+
+1.000   2016-03-31 (PERLANCAR)
+
+        - No functional changes.
+
+        - Synchronize version number with Bencher::Backend (1.000).
+
+
+0.46.1  2016-03-31 (PERLANCAR)
+
+        - [dist] Forgot to bump prereq version Bencher::Backend 0.46. UPDATE:
+          this version number is broken because 0.46 > 0.46.1 because 0.46
+          normalizes to 0.460.000 while 0.46.1 is 0.046.100. This has happened a
+          few times to me in other distributions too, so perhaps it's time to
+          consider switching to a 3-digit minor version.
+
+        - CLI script: Include description from Bencher::Backend.
+
+
+0.46    2016-03-31 (PERLANCAR)
+
+        - Synchronize version number with Bencher::Backend (0.46).
+
+
+0.42    2016-03-22 (PERLANCAR)
+
+        - Synchronize version number with Bencher::Backend (0.42).
+
+        - [doc] Expand the 'participants' section, update to Bencher::Backend
+          0.42 (introduced 'modules' property in participant).
+
+        - [doc] Tweak/fix examples in Synopsis.
+
+
+0.39    2016-03-15 (PERLANCAR)
+
+	- Update to Bencher::Backend 0.39.
+
+
+0.38    2016-03-15 (PERLANCAR)
+
+	- [Incompatible change] Split backend to Bencher-Backend to reduce
+	  dependencies when installing Bencher to a perl installation (this is
+	  part of developing support for benchmarking against multiple
+	  perls/module versions).
+
+	- Add option --noreturn-meta to disable returning extra metadata.
+
+	- Add action: show-items-codes.
+
+
+0.37    2016-03-13 (PERLANCAR)
+
+        - In addition to 'cmdline', you can also use 'cmdline_template' in
+          participant (which can also be a string or array of strings). This is
+          like 'code' and 'code_template'.
+
+
+0.36    2016-03-11 (PERLANCAR)
+
+	- [Bugfix] Reorder formatters to avoid division by zero ('rates'
+	  field removed by ModuleStartup formatter).
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.35    2016-02-18 (PERLANCAR)
+
+	- Add option: --sort.
+
+	- Add result field: vs_slowest to compare items more easily.
+
+	- Scenarios often use 'precision' property instead of
+	  'default_precision', so let's accept that too.
+
+	- Allow precision >= 1 (this means number of samples).
+
+
+0.34    2016-01-22 (PERLANCAR)
+
+	- [formatter] Don't delete constant columns if there are less than
+	  two rows in result.
+
+	- Replace POSIX::round() with sprintf(%d) because older version of
+	  POSIX doesn't have round().
+
+	- Move executing before_bench hook before testing code (which is
+	  the first time we run the codes).
+
+
+0.33    2016-01-22 (PERLANCAR)
+
+	- Add option: --note.
+
+
+0.32    2016-01-21 (PERLANCAR)
+
+	- Handle case when Dumbbench returns negative time (for small
+	  times).
+
+
+0.31    2016-01-19 (PERLANCAR)
+
+	- [Bugfix] bencher-fmt was broken by recent changes.
+
+
+0.30    2016-01-19 (PERLANCAR)
+
+        - [internal][refactor] Modularize formatting process into formatter
+          modules & roles.
+
+        - Tweak formatted result ('seq' field is by default removed, unit is now
+          moved to header to keep the time fields as pure numbers).
+
+
+0.29    2016-01-11 (PERLANCAR)
+
+	- [ux] Remove notes column in results table when there are no
+	  notes.
+
+
+0.28    2016-01-11 (PERLANCAR)
+
+        - [Bugfix] Fix for on_result_failure='warn', forgot to remove 'next'
+          statement, derp.
+
+        - Add example scenarios: Example::MultipleArgValues::Array &
+          Example::MultipleArgValues::Hash.
+
+        - Instead of just adding item's "name" (which was convoluted
+          JSON-encoded string) to the result, we now add permutation keys from
+          the item, e.g. "participant", "dataset", and other permutations.
+          Including each multiple argument value permutation (run included
+          scenario Example::MultipleArgValues::Array for a demonstration). This
+          makes for a more readable result table. As well as a more useful
+          results data as we can later more easily filter/re-sort the results.
+
+        - As an added human readability aid, when formatting result as text
+          table, we now remove item permutation columns that are constant, to
+          reduce clutter. For example, if you are benchmarking only a single
+          dataset, the "dataset" column will be omitted from display because we
+          know it only contains the same value. The JSON result will still
+          contain the complete columns though.
+
+        - In dataset's "args" property, multiple-valued argument can now be hash
+          as an alternative to array. This makes for a more readable result
+          because we use the hash keys as the permutation key instead of value
+          (which might be long or less unreadable to human).
+
+
+0.27    2016-01-11 (PERLANCAR)
+
+	- Add on_result_failure.
+
+	- Check item's result and assume failure if item's result is not as
+	  expected.
+
+
+0.26    2016-01-08 (PERLANCAR)
+
+	- Add option: --precision-limit.
+
+	- Add func.precision (used precision setting) to result metadata.
+
+
+0.25    2016-01-08 (PERLANCAR)
+
+	- Introduce hooks: before_parse_scenario, after_parse_scenario,
+	  before_list_datasets, before_list_participants.
+
+
+0.24    2016-01-07 (PERLANCAR)
+
+	- [Bugfix] Also add binmode(utf8) to bencher-fmt because it might print
+	  the Greek Mu letter.
+
+	- bencher-fmt: Avoid JSON decoding error warning cmdline is
+	  'bencher-fmt FILENAME' when perisga-argv tries to decode FILENAME
+	  as JSON first.
+
+	- bench: Also load modules specified in scenario's modules property
+	  (mainly to list their versions in the result).
+
+
+0.23    2016-01-06 (PERLANCAR)
+
+	- Add option: --precision & observe scenario's default_precision
+	  property.
+
+	- [Bugfix] stringify $^V so it survives JSON-ification.
+
+
+0.22    2016-01-05 (PERLANCAR)
+
+	- Formatting fixes.
+
+	- [ux] Reorder fields: samples moved after errors.
+
+	- Add result metadata: time_start & time_end.
+
+
+0.21    2016-01-05 (PERLANCAR)
+
+	- Format time/rate with %g using appropriate number of significant
+	  digits based on errors.
+
+	- Reduce startup overheads by delay-loading Benchmark::Dumb &
+	  Time::HiRes.
+
+
+0.20    2016-01-05 (PERLANCAR)
+
+	- [Bugfix] prevent autovivify $ds.
+
+	- Split formatting functionality to its own sub, add
+	  bin/bencher-fmt.
+
+	- Add information about scenario file/module and its version to
+	  result metadata.
+
+
+0.19    2015-12-23 (PERLANCAR)
+
+        - Support multivalued arguments.
+
+
+0.18    2015-12-17 (PERLANCAR)
+
+	- Add option --raw, currently only to show items' results directly
+	  as string instead of as data dump.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.17    2015-12-09 (PERLANCAR)
+
+	- Add hooks (currently available hooks: before_gen_items,
+	  before_bench, after_bench, before_return).
+
+
+0.16    2015-12-09 (PERLANCAR)
+
+	- Add action: show-items-results.
+
+	- bench: Return more information in result metadata: CPU information in
+          'func.cpu_info' (using Sys::Info), modules' versions in
+          'func.module_versions' (includes benchmarked modules, 'perl', as well
+          as some other modules used e.g. Benchmark::Dumb,
+          Devel::Platform::Info).
+
+
+0.15    2015-11-29 (PERLANCAR)
+
+	- Tweak code for parsing scenario (copy all keys, reorganize code).
+
+
+0.14    2015-11-29 (PERLANCAR)
+
+        - Some minor fixes.
+
+
+0.13    2015-11-19 (PERLANCAR)
+
+	- Add elapsed_time to result metadata.
+
+
+0.12    2015-11-19 (PERLANCAR)
+
+	- Add platform information (from Devel::Platform::Info and
+	  Sys::Load) in result metadata.
+
+	- [ux] Add --dataset (in addition to -d) and --participant (in
+	  addition to -p) to add dataset/participant.
+
+
+0.11    2015-11-17 (PERLANCAR)
+
+        - [refactor] Move backend code from bin/bencher to lib/Bencher.pm so
+          it's reusable by other code.
+
+
+0.10    2015-11-14 (PERLANCAR)
+
+        - Add options: --include-function, --exclude-function,
+          --include-function-pattern, --exclude-function-pattern.
+
+
+0.09    2015-11-13 (PERLANCAR)
+
+	- Only load modules from participants that are included.
+
+
+0.08    2015-11-13 (PERLANCAR)
+
+	- Introduce include_by_default property to dataset & participant.
+
+
+0.07    2015-10-21 (PERLANCAR)
+
+	- Add module: Sah::Schema::Bencher::Scenario.
+
+	- Observe scenario property: module_startup.
+
+	- [ux] Formatting for module_startup mode: remove 'rate' column,
+	  add 'mod_overhead_time' column.
+
+
+0.06    2015-10-14 (PERLANCAR)
+
+        - [ux] Automatically select appropriate time unit, remove option
+          --time-format / --ms.
+
+        - Formatting of bench result (row sorting, formatting time) is only done
+          when displaying result as text. When outputting JSON (--json), the
+          original/raw numbers are returned instead.
+
+
+0.05    2015-10-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Fix completion of --include-* and --exclude-* option value.
+
+	- [Bugfix] Finding item should not use array subscript (this caused some
+	  items' names to be empty in bench result).
+
+
+0.04    2015-10-14 (PERLANCAR)
+
+	- Observe dataset spec's properties: {include,exclude}_participant_tags.
+
+	- Add options: --{include,exclude}-{participant,dataset}-tag.
+
+        - Some other fixes & tweaks.
+
+
+0.03    2015-10-11 (PERLANCAR)
+
+	- [Incompatible change] No longer subtract perl baseline time from
+	  module startup time.
+
+	- Add more filtering options
+          --{in,ex}clude-{item,dataset,participant}-pattern.
+
+        - Some other fixes & tweaks.
+
+
+0.02    2015-10-09 (PERLANCAR)
+
+	- Add several --include-* and --exlude-* options to filter
+	  modules/participants/datasets/items.
+
+	- Add --on-failure option (as well as scenario's on_failure property) to
+          be able to skip failed items.
+
+	- Add example scenario module: Example::CommandNotFound.
+
+	- [doc] Add section about scenario module.
+
+        - Add a few tweaks and fixes.
+
+
+0.01    2015-10-08 (PERLANCAR)
+
+        - First release.

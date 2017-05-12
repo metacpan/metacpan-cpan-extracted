@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html>
+
+<head>
+
+<title>Business::AU::Ledger</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<style type="text/css">
+body
+{
+margin: 0;
+padding: 0;
+}
+
+.blue_center
+{
+	background-color: #60c0ff;
+	font-weight: bold;
+	text-align: center;
+}
+
+.dfv_errors
+{
+	color: red;
+	font-weight: bold;
+}
+
+.note_text
+{
+	background-color: #afeeee; // PaleTurquoise.
+	border-style: solid;
+	border-width: 1px;
+}
+
+</style>
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=css_url>/table.even.odd.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/container/assets/skins/sam/container.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/datatable/assets/skins/sam/datatable.css">
+<link rel="stylesheet" type="text/css" href="<tmpl_var name=yui_url>/build/tabview/assets/skins/sam/tabview.css">
+
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/dom/dom-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/event/event-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/connection/connection-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/element/element-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/json/json-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/datatable/datatable-min.js"></script>
+<script type="text/javascript" src="<tmpl_var name=yui_url>/build/tabview/tabview-min.js"></script>
+<script type="text/javascript">
+<tmpl_var name=head_js>
+</script>
+<script type="text/javascript">
+function init()
+{
+<tmpl_var name=head_init>
+}
+YAHOO.util.Event.onDOMReady(init);
+</script>
+</head>
+
+<body class="yui-skin-sam">
+
+<h3 class="blue_center">Business::AU::Ledger</h3>
+
+<table align="center">
+<tr><td><div id="container"></div></td></tr>
+</table>
+
+</body>
+</html>

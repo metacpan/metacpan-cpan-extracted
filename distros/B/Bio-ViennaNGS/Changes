@@ -1,0 +1,152 @@
+Revision history for Perl extension Bio::ViennaNGS.
+
+0.01  Fri Sep 13 12:02:47 2013
+	- original version; created by h2xs 1.23 with options
+		-XA -n ViennaNGS
+	- added get_stranded_subsequence()
+
+0.02  Mon Nov 4 2013
+	- added split_bam()
+        - added scripts/bam_split.pl
+
+0.03  Tue Nov 5 2013
+    	- added bam2bw()
+	- updated README
+
+0.04  Tue Nov 26 2013
+	- added scripts/DEXSeq_gff2bed.pl
+	- updated README
+
+0.05  Thu Apr 03 2014
+	- added bed2bw()
+	- updated and extended bam_split()
+	- updated scripts/bam_split.pl
+	- adjusted perl shebang in /scripts
+
+0.06  Fri Sep 19 2014
+	- adjusted perl shebang in /scripts
+	- added normalize_multicov.pl in /scripts. For that purpose:
+	- added computeTPM()
+	- added parse_multicov()
+	- added write_multicov()
+	- added featCount_data() accessor for @featCount AoHoH 
+	- added normalization support for bigWigs generated from scripts/bam_split.pl
+	- refactored split_bam()
+	- intermediate bedGraph files are now removed in bed2bw()
+
+0.07  Mon Sep 29 2014
+	- minimum version of Bio::Perl is 1.006924
+	- minimum version of Bio::DB::Sam is 1.39
+	- added scripts/splice_site_summary.pl
+	- added scripts/assembly_hub_constructer.pl prototype
+	- added bed2bigBed()
+	- use IPC::Cmd for running external tools in bed2bigBed()
+	- use Carp for error handling
+	- refactored bam2bw()
+	- refactored bed2bw()
+	- removed scripts/ensembl_fa2bed.pl
+
+0.08  Tue Sep 30 2014
+	- added tests for third-party utilities
+	- use Carp for error handling throughout the module
+	- updated documentation
+
+0.09  Thu Oct 2 2014
+	- changed namespace to Bio::ViennaNGS
+	- adjusted utilities to use new namespace
+	- everything is exported via @EXPORT_OK now
+	- updated README
+
+0.10  Thu Nov 27 2014
+	- requires Perl >= 5.12.0
+	- added sortbed()
+	- added uniquify_bam()
+	- added scripts/bam_uniq.pl
+	- added scripts/sj_visualizer.pl
+	- refactored scripts/motiffinda.pl
+	- removed development version of scripts/assembly_hub_constructer.pl
+	- made scripts/gff2bed.pl work with OO Bio::ViennaNGS::AnnoC 
+	- removed get_stranded_subsequence (now lives in Bio::ViennaNGS::Fasta)
+	- updated POD
+
+0.11 Wed Dec 10 2014
+	- integrated Bio::ViennaNGS::AnnoC
+	- integrated Bio::ViennaNGS::Fasta 
+	- removed obsolete bam2bw()
+	- added scripts/bam_to_bigwig.pl
+	- added scripts/bed2bedGraph.pl
+	- added scripts/extend_bed.pl
+	- added scripts/kmer_analysis.pl
+	- added scripts/MEME_XML_motif_extractor.pl
+	- added scripts/trim_fastq.pl
+	- refactored scripts/bam_to_bigwig.pl
+	- refactored scripts/splice_site_summary.pl
+	- refactored scripts/bam_split.pl
+	- refactored scripts/gff2bed.pl
+	- added Moose-based classes for feature handling	
+	- renamed bed2bw() to bam_or_bed2bw() and refactored it accordingly to
+	  properly handle BAM files
+	- added '-split' option to 'genomeCoverageBed' call in
+	  bam_or_bed2bw()
+	- updated MakeMaker scripts (MANIFEST and Makefile.PL)
+	- minimum version of Bio::Root::Version is now 1.00690001
+	- added some tests
+	- ship demo files in share/ folder
+	- updated POD and README
+	
+0.12 Wed Feb 11 2015
+	- requires Perl >= 5.10.0
+	- minimum version of Bio::DB::Sam is 1.37
+	- integrated Bio::ViennaNGS::Bam
+	- integrated Bio::ViennaNGS::BamStat
+	- integrated Bio::ViennaNGS::BamStatSummary
+	- integrated Bio::ViennaNGS::Bed
+	- integrated Bio::ViennaNGS::ExtFeature
+	- integrated Bio::ViennaNGS::SpliceJunc
+	- integrated Bio::ViennaNGS::Tutorial
+	- integrated Bio::ViennaNGS::UCSC
+ 	- integrated Bio::ViennaNGS::FeatureLine
+	- added scripts/assembly_hub_generator.pl
+	- added scripts/bam_quality_stat.pl
+	- added scripts/Tutorial_pipeline00.pl
+	- added scripts/Tutorial_pipeline01.pl
+	- added scripts/Tutorial_pipeline02.pl
+	- added scripts/Tutorial_pipeline03.pl
+	- added scripts/track_hub_constructor.pl
+	- renamed Bio::ViennaNGS.pm to Bio::ViennaNGS::Util.pm
+	- migrated BAM specific code from Bio::ViennaNGS::Util 
+	  to Bio::ViennaNGS::Bam
+	- migrated expression/normalization code from Bio::ViennaNGS::Util
+	  to Bio::ViennaNGS::Expression
+	- refactored scripts/normalize_multicov.pl
+	- removed scripts/motiffinda.pl from distribution
+	- added static templates for the Assembly and Track Hub generator
+	- updated POD and README 
+
+0.13 Thu Feb 14 2015
+	- fixed an issue in Bio::ViennaNGS::FeatureChain
+	- updated POD
+
+0.14 Tue Feb 24 2015
+	- updated mkdircheck() 
+	- updated rmdircheck()
+	- fixed directory creation in bam_split.pl
+	- updated POD in Tutorials
+
+0.15 Mon Jul 6 2015
+	- fixed path creation in bed_or_bam2bw()
+	- fixed scalar initialization bug
+        - fixed bug in Bio::ViennaNGS::BamStat
+	- scripts/bam_to_bigwig.pl can now produce normalized bigWigs
+	- added functionality to compute RPKM in Bio::ViennaNGS::Expression
+	- added tests for UCSC.pm
+	- added tests for SpliceJunc.pm
+
+0.16 Tue Oct 27 2015
+	- added Bio::ViennaNGS::FeatureInterval
+	- added Bio::ViennaNGS::BedGraphLine
+	- added Bio::ViennaNGS::Peak
+	- make Bio::ViennaNGS::MinimalFeature subclass of Bio::ViennaNGS::FeatureInterval
+	- added scripts/rnaseq_peakfinder.pl
+	- added scripts/bed2nt2aa.pl
+	- updated POD and README

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Business/UPC.pm
+t/00-load.t
+t/01-correct.t
+t/02-incorrect.t
+t/03-incomplete.t
+t/04-type_e.t
+t/05-check.t
+t/06-coupon.t
+t/99-warnings.t

@@ -1,0 +1,12 @@
+TODO
+====
+
+This is a fairly informal list of things I'd like to add:
+
+- Check over documentation
+
+- Model a reference as an object (ParaTools::Reference). This would
+  be returned by the parsers, and perhaps have methods like 'toOpenURL',
+  etc. This would allow for changes in metadata in future, too.
+
+- Check over foreign character support.

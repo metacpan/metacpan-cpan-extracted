@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+Everything.pm
+README
+update_bundle.pl
+META.yml                                Module meta-data (added by MakeMaker)

@@ -1,0 +1,20 @@
+Revision history for Bencher-Scenario-Interpreters
+
+0.03    2016-06-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild to show abstract.
+
+
+0.02    2016-01-05 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Bencher::Scenario
+          (0.03) which shows sample benchmark participants & results in POD.
+
+
+0.01    2015-10-09 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,7 @@
+classes:
+  - Desktop
+parameters:
+  doc:
+    desktop-chat:
+      headline:
+        - Desktop chat

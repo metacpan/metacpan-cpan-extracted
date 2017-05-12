@@ -1,0 +1,80 @@
+/* $Id: OOo-table.pbib 25 2005-09-17 21:45:54Z tandler $
+ *
+ * Define column for PBib for the StarOffice
+ * bibliography database
+ *
+ */
+
+
+<biblio>
+	<column-mapping>
+		CiteKey	Custom4
+		CiteType	Type
+		Category	Custom1
+		Recommendation	Custom5
+		CrossRef	Custom2
+		File	Custom3
+		Keywords	Note
+		PBibNote	Annote
+		Organization	Organizat
+		Institution	Institutn
+		Authors	Author
+		Editors	Editor
+		ReportType	RepType
+		SuperTitle	Booktitle
+		Source	URL
+		Location	Address
+		HowPublished	Howpublish
+	</column-mapping>
+	column-max-string-length 254
+	<column-types>
+		CiteKey	varchar(128)
+		CiteType INTEGER
+		Category varchar(128)
+		Identifier varchar(50)
+		
+		CrossRef varchar(128)
+		
+		AccessMonth varchar(64)
+		AccessYear varchar(64)
+		Authors	varchar(128)
+		Chapter	varchar(128)
+		Edition	varchar(128)
+		Editors	varchar(128)
+		HowPublished varchar(50)
+		Institution varchar(100)
+		ISBN varchar(64)
+		ISSN varchar(64)
+		Journal	varchar(64)
+		Location varchar(128)
+		Month varchar(64)
+		Number varchar(64)
+		Organization varchar(100)
+		Pages varchar(64)
+		Publisher varchar(64)
+		ReportType varchar(254)
+		School varchar(100)
+		Series varchar(254)
+		SuperTitle varchar(254)
+		Title varchar(254)
+		Volume varchar(64)
+		Year varchar(64)
+		
+		Keywords varchar(254)
+		PBibNote varchar(254)
+		Recommendation varchar(254)
+		
+		Source varchar(128)
+	</column-types>
+</biblio>
+
+/*
+ * $Log: OOo-table.pbib,v $
+ * Revision 1.2  2003/12/01 11:11:55  tandler
+ * HowPublished has a capital "P" ...
+ *
+ * Revision 1.1  2003/06/16 09:10:54  tandler
+ * some new config files
+ * - default.pbib contains config that was previously directly in the perl source
+ *
+ */

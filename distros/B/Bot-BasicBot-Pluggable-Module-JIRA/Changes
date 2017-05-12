@@ -1,0 +1,14 @@
+Revision history for Bot-BasicBot-Pluggable-Module-JIRA
+
+0.03 - Thu May  5 19:57:46 CDT 2011
+ - major bugfix for those not using the optional database linkage
+   support (which is just about everyone, i'd imagine).  thanks go
+   to daniel austin for the heads up.
+ - switch to dzil
+
+0.02 - Tue Nov  2 14:35:41 CDT 2010
+ - remove t/pod-coverage.t and t/boilerplate.t so that tests will pass
+
+0.01 - Fri Oct 22 11:59:29 CDT 2010
+ - first release
+

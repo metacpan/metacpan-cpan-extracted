@@ -1,0 +1,106 @@
+---
+abstract: 'Modules to represent and manipulate communities of biological organisms'
+author:
+  - 'BioPerl Team <bioperl-l@bioperl.org>'
+build_requires:
+  Test::Number::Delta: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Bio-Community
+provides:
+  Bio::Community:
+    file: lib/Bio/Community.pm
+    version: '0.001008'
+  Bio::Community::Alpha:
+    file: lib/Bio/Community/Alpha.pm
+  Bio::Community::IO:
+    file: lib/Bio/Community/IO.pm
+  Bio::Community::IO::Driver::biom:
+    file: lib/Bio/Community/IO/Driver/biom.pm
+  Bio::Community::IO::Driver::dummy:
+    file: lib/Bio/Community/IO/Driver/dummy.pm
+  Bio::Community::IO::Driver::gaas:
+    file: lib/Bio/Community/IO/Driver/gaas.pm
+  Bio::Community::IO::Driver::generic:
+    file: lib/Bio/Community/IO/Driver/generic.pm
+  Bio::Community::IO::Driver::qiime:
+    file: lib/Bio/Community/IO/Driver/qiime.pm
+  Bio::Community::IO::Driver::unifrac:
+    file: lib/Bio/Community/IO/Driver/unifrac.pm
+  Bio::Community::IO::FormatGuesser:
+    file: lib/Bio/Community/IO/FormatGuesser.pm
+  Bio::Community::Member:
+    file: lib/Bio/Community/Member.pm
+  Bio::Community::Meta:
+    file: lib/Bio/Community/Meta.pm
+  Bio::Community::Meta::Beta:
+    file: lib/Bio/Community/Meta/Beta.pm
+  Bio::Community::Meta::Gamma:
+    file: lib/Bio/Community/Meta/Gamma.pm
+  Bio::Community::Role::Classified:
+    file: lib/Bio/Community/Role/Classified.pm
+  Bio::Community::Role::Described:
+    file: lib/Bio/Community/Role/Described.pm
+  Bio::Community::Role::IO:
+    file: lib/Bio/Community/Role/IO.pm
+  Bio::Community::Role::Locked:
+    file: lib/Bio/Community/Role/Locked.pm
+  Bio::Community::Role::PRNG:
+    file: lib/Bio/Community/Role/PRNG.pm
+  Bio::Community::Role::Sequenced:
+    file: lib/Bio/Community/Role/Sequenced.pm
+  Bio::Community::Role::Table:
+    file: lib/Bio/Community/Role/Table.pm
+  Bio::Community::Role::Weighted:
+    file: lib/Bio/Community/Role/Weighted.pm
+  Bio::Community::TaxonomyUtils:
+    file: lib/Bio/Community/TaxonomyUtils.pm
+  Bio::Community::Tools::Accumulator:
+    file: lib/Bio/Community/Tools/Accumulator.pm
+  Bio::Community::Tools::IdConverter:
+    file: lib/Bio/Community/Tools/IdConverter.pm
+  Bio::Community::Tools::Rarefier:
+    file: lib/Bio/Community/Tools/Rarefier.pm
+  Bio::Community::Tools::Sampler:
+    file: lib/Bio/Community/Tools/Sampler.pm
+  Bio::Community::Tools::ShrapnelCleaner:
+    file: lib/Bio/Community/Tools/ShrapnelCleaner.pm
+  Bio::Community::Tools::Summarizer:
+    file: lib/Bio/Community/Tools/Summarizer.pm
+  Bio::Community::Tools::Transformer:
+    file: lib/Bio/Community/Tools/Transformer.pm
+  Bio::Community::Types:
+    file: lib/Bio/Community/Types.pm
+recommends:
+  Math::GSL::RNG: '0'
+  Math::GSL::Randist: '0'
+  Math::GSL::SF: '0'
+requires:
+  Bio::Root::Version: '1.006923'
+  DateTime: '0'
+  Getopt::Euclid: v0.4.3
+  Hash::Util: '0'
+  JSON::XS: '0'
+  Math::Random::MT: '0'
+  Method::Signatures: '20140224'
+  Module::Runtime: '0'
+  Moose: '0'
+  MooseX::NonMoose: '0'
+  MooseX::StrictConstructor: '0'
+  PerlIO::eol: '0'
+  Scalar::Util: '0'
+  Tie::IxHash: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://redmine.open-bio.org/projects/bioperl/
+  homepage: http://www.bioperl.org
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bioperl/Bio-Community.git
+version: '0.001008'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,49 @@
+---
+abstract: 'Code coverage plugin for Badge::Depot'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1406, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Badge-Depot-Plugin-Coverage
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Badge::Depot::Plugin::Coverage:
+    file: lib/Badge/Depot/Plugin/Coverage.pm
+    version: '0.0101'
+requires:
+  Badge::Depot: '0'
+  DateTime: '0'
+  DateTime::Format::RFC3339: '0'
+  JSON::MaybeXS: '0'
+  Moose: '0'
+  MooseX::AttributeShortcuts: '0'
+  Path::Tiny: '0'
+  Types::Standard: '0'
+  Types::URI: '0'
+  namespace::autoclean: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Badge-Depot-Plugin-Coverage/issues
+  homepage: https://metacpan.org/release/Badge-Depot-Plugin-Coverage
+  repository: https://github.com/Csson/p5-Badge-Depot-Plugin-Coverage.git
+version: '0.0101'
+x_authority: cpan:CSSON

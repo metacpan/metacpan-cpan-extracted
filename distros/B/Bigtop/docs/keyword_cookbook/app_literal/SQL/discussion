@@ -1,0 +1,20 @@
+=head1 USE
+
+C<SQL> literals dump output into all generated C<schema.yourdbhere> files.
+Their output is intermixed with tables and join_tables in the order of
+appearance in the bigtop file.  This is useful if you need SQL Bigtop
+does not understand.  But, it will break database independence, if not
+all dataabases understand the SQL you include.
+
+If all you want to do is insert fixed or test data, use table level C<data>
+statements.  They save typing and editable with tentmaker.
+
+=head1 EXAMPLE
+
+To see an example, build:
+
+    bigtop -c example.bigtop all
+
+then look for the literal SQL in C<docs/schema.sqlite>.  If you use
+other SQL backends, they will receive the same literal text at the same
+point.

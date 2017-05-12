@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Carp;
+
+use File::Spec;
+use File::Spec::Functions;
+use Cwd qw/fastcwd abs_path/;
+use Data::Dumper;
+use Bio::Grid::Run::SGE;
+use Bio::Grid::Run::SGE::Util::Blast qw/formatdb/;
+use Bio::Grid::Run::SGE::Util qw/my_glob expand_path concat_files/;
+use Bio::Grid::Run::SGE::Master;
+use Params::Validate qw(:all);
+use Bio::Gonzales::Util::Cerial;
+
+
+run_job(
+    {
+        pre_task      => \&do_master_stuff,
+        task          => \&do_worker_stuff,
+        mrproper_task => \&mrproper,
+        post_task     => \&concat_files,
+    }
+);
+1;
+
+sub do_master_stuff {
+    my ($cc) = @_;
+    $cc->{extra}{db_dir} = expand_path( $cc->{extra}{db_dir} );
+
+    my $e = $cc->{extra};
+    $e->{input} = $cc->{input};
+    $e->{no_prompt} = 1 if($cc->{no_prompt});
+
+    my %c = validate_with(
+        params => [$e],
+        spec   => {
+            db_name       => 1,
+            db_type       => 1,
+            db_dir        => 1,
+            no_prompt     => { default => 0 },
+            input         => 1,
+            blast_program => 1,
+            evalue        => 1,
+        },
+        allow_extra => 1
+    );
+
+    my @seq_files = exists($c{db_seq_files}) ? @{ $c{db_seq_files} } : ( map { @{ $_->{files} } } @{ $c{input} } );
+
+    formatdb(
+        {
+            db_seq_files => \@seq_files,
+            db_name   => $c{db_name},
+            db_type   => $c{db_type},
+            no_prompt => $c{no_prompt},
+            db_dir    => $c{db_dir},
+        }
+    );
+    return Bio::Grid::Run::SGE::Master->new( $cc );
+}
+
+sub do_worker_stuff {
+    my ( $c, $result_prefix, $seq_file ) = @_;
+
+    my $out_f     = $result_prefix . ".blast";
+    my @blast_cmd = (
+        "blastall",
+        '-a', '1',    # one thread
+        "-i", $seq_file,    #input
+        "-o",  $out_f,       #output
+        "-p", $c->{extra}{blast_program},                              # blast program
+        "-d", catfile( $c->{extra}{db_dir}, $c->{extra}{db_name} ),    #db location
+        '-e', $c->{extra}{evalue},                                     # evalue
+        @{ $c->{args} },
+    );
+
+    return my_sys_non_fatal(@blast_cmd);
+}
+
+sub mrproper {
+    my $c = shift;
+    delete_by_regex( $c->{extra}{db_dir}, "$c->{extra}{db_name}\\..*" );
+    return;
+}

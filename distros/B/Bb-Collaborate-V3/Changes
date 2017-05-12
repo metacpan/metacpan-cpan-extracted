@@ -1,0 +1,55 @@
+Revision history for Bb-Collaborate-V3
+
+0.10 9th December 2015
+     - Fixed readback check for Bb::Collaborate::V3::Session::Telephony->update(...)
+
+0.09 3rd December 2015
+     [distribution]
+     - Bump minimum Elive version to 1.37
+
+0.08 3rd December 2015
+     Bb::Collaborate::V3::_Content work arounds (Presentation and Multimedia)
+     - The upload calls are only suceeding when arguments are given in
+       a particular order, with size following encoded content.
+
+0.07 1st December 2015
+     - Fixed Recording Deletion
+     - Allow general class level updates, e.g.:
+          my $obj = Bb::Collaborate::V3::Session->update(SessionId => 123456, startTime => '1448922188000', ... )
+       Note: primary key and all mandatory fields must be supplied.
+
+     - Also, class level deletes:
+         Bb::Collaborate::V3::Session->delete(SessionId => 123456);
+
+0.06 November 2015
+     - Bb::Collaborate::V3->connect defaults to ping => 0. Do not
+       issue a `GetSchedulingManager` call to check the connection. 
+
+0.05 19th July 2015
+     - soap-connect.t - fixed text plan
+
+0.04 17th July 2015
+     - added $connection->telephony_license method
+     [testing]
+     - RT#105567 added AUTHOR_TESTS guard to t/pod.t, t/pod-coverage.t
+     [distribution]
+       - moved source repository to https://github.com/dwarring/p5-Bb-Collaborate.git
+     [pod]
+     - No longer a 'DEVELOPMENT RELEASE" + other fossils
+
+0.03 1st July 2015
+     [testing]
+     - culled another 'wide-character' failure in t/pod.t
+
+0.02 31th June 2015
+     [testing]
+     - fixed smoke-test (wide-character) failures in t/pod.t
+     [scripts]
+     - remove script/bbc-create-session from distribution. accidentally released (coming soon)
+     [documentation]
+     - removed stale references to Elive-StandardV3 - old distro name
+
+0.01 30th June 2015
+     Initial construction and release for smoke testing.
+     Based on earlier, unreleased Elive::StandardV3 package.
+

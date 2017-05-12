@@ -1,0 +1,37 @@
+Bundle::CMap version 1.0.1
+=========================
+
+This is a bundle of modules required by CMap version 1.0
+
+INSTALLATION
+
+To install this module,please use the CPAN shell.
+
+    $ perl -MCPAN -e "install Bundle::Cmap";
+
+Or you can run 
+
+    $ perl Makefile.pl
+    $ ./make
+    $ sudo make install
+
+Then run:
+
+    $ perl -MCPAN -e "install Bundle::Cmap";
+
+SEE ALSO
+
+The actual CMap code is not located on CPAN.  To find out about the latest version of CMap, please go to http://www.gmod.org/cmap
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006-8 Cold Spring Harbor Laboratory
+
+Licenced under the terms of Perl.
+
+REFERENCES
+
+Bundle::Math was used as a template for the support files (Changes,
+Makefile.PL, MANIFEST, README). Copyright (c) 2004-2005 Steffen Mueller, which "is free software; you can redistribute it and/or modify it under the same terms as Perl itself."
+
+

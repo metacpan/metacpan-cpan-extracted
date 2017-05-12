@@ -1,0 +1,13 @@
+dn: cn=phone testcase, ou=addressbook, dc=geekfarm, dc=org
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+cn: phone testcase
+givenName: phone
+sn: testcase
+ou: addressbook
+telephoneNumber: (333) 333-3333
+homePhone: (222) 222-2222
+mobile: (444) 444-4444
+facsimileTelephoneNumber: (555) 555-5555

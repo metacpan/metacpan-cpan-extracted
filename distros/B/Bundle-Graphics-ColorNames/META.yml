@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Bundle-Graphics-ColorNames
+version:             1.04
+abstract:            bundle of schemas for Graphics::ColorNames
+license:             ~
+author:              
+    - Robert Rothenberg <rrwo at cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

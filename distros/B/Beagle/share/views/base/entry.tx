@@ -1,0 +1,9 @@
+: if template_exists( $entry.type ~ '_entry.tx' ) {
+:   include $entry.type ~ '_entry.tx';
+: }
+: else {
+:   include 'entry_title.tx';
+:   include "entry_meta.tx";
+:   include "entry_content.tx";
+</div>
+: }

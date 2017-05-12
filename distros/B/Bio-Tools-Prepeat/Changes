@@ -1,0 +1,24 @@
+Revision history for Perl extension Bio::Tools::Prepeat.
+
+0.01  Sun Apr 20 23:15:31 2003
+	- original version; created by h2xs 1.21 with options
+		-A Bio::Tools::Prepeat
+
+0.02  Thu, 24 Apr 2003 20:58:05 +0800
+	- redundancy of query result is eliminated.
+	- random_sequence() becomes a method too.
+
+0.03  Fri, 25 Apr 2003 12:03:41 +0800
+	- can handle JUZBOX 
+	- relpos() fixed
+	- query() fixed
+
+0.04  Fri, 25 Apr 2003 17:29:57 +0800
+	- can query repeats within a range
+
+0.05  Thu,  1 May 2003 16:05:24 +0800
+	- query() fixed
+	- @extamino added for distinguishing from canonical amino acids
+
+0.06  Thu,  8 May 2003 04:03:00 +0800
+	- minor bug in query() is recovered, which was correct in 0.04

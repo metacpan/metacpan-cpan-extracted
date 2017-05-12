@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+
+lib/Baseball/Simulation.pm
+
+t/1.t

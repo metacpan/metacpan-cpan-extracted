@@ -1,0 +1,224 @@
+{
+   "abstract" : "An object oriented mechanism for tab separated columnar files.",
+   "author" : [
+      "John Macdonald  <John.Macdonald@oicr.on.ca>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "BoutrosLab-TSVStream",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0.33",
+            "Module::Build" : "0.421",
+            "Moose" : "2.1208",
+            "Moose::Role" : "2.1208",
+            "Moose::Util" : "2.1403",
+            "Moose::Util::TypeConstraints" : "2.1208",
+            "MooseX::ClassAttribute" : "0.27",
+            "MooseX::Types" : "0.45",
+            "MooseX::Types::Moose" : "0.45",
+            "Try::Tiny" : "0.22"
+         }
+      }
+   },
+   "provides" : {
+      "BoutrosLab::TSVStream" : {
+         "file" : "lib/BoutrosLab/TSVStream.pm",
+         "version" : "v0.5.3"
+      },
+      "BoutrosLab::TSVStream::Format" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Human::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Human/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Human::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Human/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanNoChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanNoChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanNoChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanNoChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanTag::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanTag/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanTag::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanTag/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanTagNoChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanTagNoChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::HumanTagNoChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/HumanTagNoChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Role" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Role::Human" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Role::HumanNoChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Role::HumanTag" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Role::HumanTagNoChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::AnnovarInput::Types" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/AnnovarInput/Types.pm"
+      },
+      "BoutrosLab::TSVStream::Format::None::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/None/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::AsAnnovarInputChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/AsAnnovarInputChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::AsAnnovarInputChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/AsAnnovarInputChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::AsAnnovarInputNoChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/AsAnnovarInputNoChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::AsAnnovarInputNoChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/AsAnnovarInputNoChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::FullChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/FullChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::FullChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/FullChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::FullNoChr::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/FullNoChr/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::FullNoChr::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/FullNoChr/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::AsAnnovarInput" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::AsAnnovarInputChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::AsAnnovarInputNoChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::Base" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::Full" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::FullChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::FullNoChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::RecSNV" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::WithChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Role::WithNoChr" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Role.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Types" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Types.pm"
+      },
+      "BoutrosLab::TSVStream::Format::VCF::Types::KeyValueString" : {
+         "file" : "lib/BoutrosLab/TSVStream/Format/VCF/Types.pm"
+      },
+      "BoutrosLab::TSVStream::IO" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Reader" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Reader.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Reader::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Reader/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Reader::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Reader/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Base::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Base/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Base::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Base/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Reader::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Reader/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Reader::Filter" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Reader/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Reader::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Reader/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Writer::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Writer/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Writer::Filter" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Writer/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Role::Writer::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Role/Writer/Fixed.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Writer" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Writer.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Writer::Dyn" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Writer/Dyn.pm"
+      },
+      "BoutrosLab::TSVStream::IO::Writer::Fixed" : {
+         "file" : "lib/BoutrosLab/TSVStream/IO/Writer/Fixed.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.5.3",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

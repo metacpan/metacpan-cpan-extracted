@@ -1,0 +1,7 @@
+Revision history for Business-RealEx
+
+0.02  2013-12-30 17:00:56 CST
+        - fix requires for XML::Simple
+
+0.01  2013-12-27 09:57:42 CST
+        - Initial release

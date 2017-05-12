@@ -1,0 +1,57 @@
+{
+   "abstract" : "take a Benchmark and confirm returned values",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Benchmark-Confirm",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.04"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.04"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Benchmark" : "1.051",
+            "IO::Capture::Stdout" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "Benchmark::Confirm" : {
+         "file" : "lib/Benchmark/Confirm.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/bayashi/Benchmark-Confirm/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Benchmark-Confirm"
+      }
+   },
+   "version" : "1.00"
+}

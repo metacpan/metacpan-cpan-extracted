@@ -1,0 +1,21 @@
+Revision history for Business-Mondo
+
+0.06     2015-08-21
+        - live API test is absorbed into emulated test so can run the same
+          test against both live and emulated endpoints
+
+0.05     2015-07-22
+        - Use Any type for Booleans as some test failures with Bool related
+          to incorrect coercion (?) of JSON::PP boolean types (GH #4)
+
+0.04     2015-05-28
+        - Add missing attributes to Transaction and Merchant objects (GH #3)
+
+0.03     2015-05-22
+        - Kwalitee improvements
+
+0.02     2015-04-28
+        - Tweak merchant coercion to handle null values
+
+0.01     2015-04-27
+        - First release

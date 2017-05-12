@@ -1,0 +1,17 @@
+---
+name: Bundle-Net-SNMP-Mixin
+version: 0.11
+author:
+  - 'Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>'
+abstract: A bundle for Net::SNMP::Mixins
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Bundle::Net::SNMP::Mixin:
+    file: lib/Bundle/Net/SNMP/Mixin.pm
+    version: 0.11
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

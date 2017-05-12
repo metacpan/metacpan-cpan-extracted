@@ -1,0 +1,15 @@
+classes:
+  - Admin.etc.functions
+  - Admin
+parameters:
+  doc:
+    admin:
+      pkg:
+        - include automated maintenance routines
+      tweak:
+        - auto-repair inconsistent filesystems during boot
+  pkg:
+  - unattended-upgrades
+  - ntp
+  tweak:
+    - _setvar /target/etc/default/rcS FSCKFIX yes

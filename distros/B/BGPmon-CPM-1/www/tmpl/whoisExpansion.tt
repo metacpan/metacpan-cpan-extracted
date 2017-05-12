@@ -1,0 +1,46 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Whois Expansion'; %]
+
+<h2>Attempting to expand [% NUM %] Critical Prefixes.</h2>
+<p>Clicking "Add" will expand the critical prefixes to include all of the checked prefixes below.<br>
+Clicking "Back" will return you to the critical prefix list without making any changes.</p>
+
+<form name="expandform" action="cpm_workflow.cgi" method="get">
+<input type="hidden" name="action" value="insertfromexpand"/>
+<input type="hidden" name="list" value="[% LIST %]"/>
+
+<hr>
+<input type="submit" name="submit" value="Add"/>
+<input type="submit" name="submit" value="Back"/>
+<hr>
+[% FOREACH prefix IN DATA %]
+  [% IF prefix.msg %]
+    <p>[% prefix.msg %]</p>
+  [% ELSE %]
+    [% FOREACH range IN prefix.range %]
+    <input type="checkbox" name="prefix" value="[% range %]" checked/>[% range %]   
+    <input type="hidden" name="[% range %]IP" value="[% prefix.ip %]" />
+    [% END %]
+    covers [% prefix.ip %] 
+ 
+    <br>
+    &nbsp;&nbsp;netname: [% prefix.netname %]<br>
+    &nbsp;&nbsp;inetnum: [% prefix.inetnum %]<br>
+    &nbsp;&nbsp;Owned by: [% prefix.orgid %]<br>
+    &nbsp;&nbsp;Source: [% prefix.source %]<br>
+    [% IF prefix.nets %]
+      &nbsp;&nbsp;Also owned by [% prefix.orgid %]:<br>
+    [% END %]
+    [% FOREACH net IN prefix.nets %]
+    &nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="prefix" value="[% net %]" checked/>[% net %]<br> 
+    <input type="hidden" name="[% net %]IP" value="[% prefix.ip %]" />
+    [% END %]  
+
+    </p>
+  [% END %]
+<hr>
+[% END %]
+<input type="submit" name="submit" value="Add"/>
+<input type="submit" name="submit" value="Back"/>
+<hr>
+</form>
+[% INCLUDE footer.html %]

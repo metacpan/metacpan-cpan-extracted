@@ -1,0 +1,9 @@
+Revision history for Perl extension Bio::SeqReader.
+
+0.1.0	Version bump 2012-09-17:
+	o  Added reader for fasta format.
+        o  Added explicit inclusion of IO::Handle in Fasta.pm and Fastq.pm to
+           work around weirdness with using \*STDIN directly as an IO::Handle
+           filehandle.
+
+

@@ -1,0 +1,6 @@
+* B:BB:P::Message module
+* replied handler is still not working ... maybe lift tell from B::BB
+* better error message and not just echoing into the channel
+* converting store script
+* is the special case of return 1 in said() really needed?
+* remove modules with a lot of dependiencies

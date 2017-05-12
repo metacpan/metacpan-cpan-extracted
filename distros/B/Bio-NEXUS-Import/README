@@ -1,0 +1,33 @@
+Bio-NEXUS-Import version 0.2.0
+------------------------------
+
+A module that extends Bio::NEXUS with parsers for file formats of popular 
+phylogeny programs
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+Bio::NEXUS
+
+
+LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

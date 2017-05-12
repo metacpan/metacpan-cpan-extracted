@@ -1,0 +1,29 @@
+---
+abstract: 'Client to communicate with beanstalkd server'
+author:
+  - 'Graham Barr <gbarr@pobox.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Beanstalk-Client
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  IO::Socket::INET: 0
+  Socket: 0
+  YAML::Syck: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/gbarr/perl-beanstalk-client
+version: 1.07

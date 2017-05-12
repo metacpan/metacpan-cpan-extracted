@@ -1,0 +1,114 @@
+==================================================
+Changes from 1741-03-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.102 at 2014-12-18 03:39:05 +0000
+------------------------------------------
+
+  Change: bd2942ab0ab32f5deed7d0dbd4faa4deb272c1d5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:37:52 +0000
+
+    Aehm, should document it PROPER.... 
+
+  Change: 38f593829195563b82f6a6c2a49159007129fcf4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:36:58 +0000
+
+    Implemented nil_exists proper and documented it 
+
+  Change: 1e2b6ed7b3015fe4ddf8b7870eb1e9ccea62d409
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:20:26 +0000
+
+    More documentation more organization in the code 
+
+  Change: 36b809960a58cdf772256d37df0bd1569a2229ec
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:13:22 +0000
+
+    More documentation about what it is 
+
+  Change: 5d72c698a81997e9a6eb75c7d880b93cc14ac8ea
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:08:24 +0000
+
+    Hups 
+
+  Change: 29d21b0aa299631dad0138420efceb558689e60f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 04:07:36 +0000
+
+    No prefer_integer!!!! 
+
+  Change: a78980c82eff86c9818856081abf99e485794701
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 03:41:34 +0000
+
+    Fix for travis 
+
+  Change: 62e572dd2e6e0c7c61168e8aa3abe50706f5da1a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 03:35:17 +0000
+
+    Made bee tool for accessing beepacks, requirements tuning, release
+    ready 
+
+  Change: 1c1abc84e4abeee57b86a8455268db5203c294ff
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-18 02:54:32 +0000
+
+    BeePack is now something completly different..... (CDB+MsgPack) 
+
+  Change: 5ccb512967f09b2fa6a0c801a2769e829e421ffe
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 04:25:31 +0000
+
+    Hups, fix in doc 
+
+  Change: 8edac616e0536c88d5436b6c01b7941198d5af85
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 03:01:26 +0000
+
+    Fixed rights 
+
+  Change: 27f6d202c5390d8826bd9e3732ac322b41e54aab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 03:01:09 +0000
+
+    A bit documentation for bee 
+
+  Change: 8e55c0eaf66457b07974248e7d881fd996ee3d76
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 02:58:50 +0000
+
+    Made bee giving out raw value for piping 
+
+  Change: a648b6de0b14427deb774d118cebf77e5f8c1fbf
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 02:50:03 +0000
+
+    Fixed rights 
+
+  Change: c06ec385b188ff9f9cb1640f87470f8ecf993714
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 02:49:42 +0000
+
+    bee tool, tuning 
+
+  Change: eb979168b11e734ed2f34cc6636b6536ced71f85
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-14 01:52:53 +0000
+
+    Probably first release 
+
+  Change: ce33e12d0711dbbfed7313e3f58afd581011da3b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-13 18:07:05 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,5 @@
+First blog entry
+
+This is a simple blog entry. The first one.
+
+# arch-tag: 4e689399-7878-4a59-ae2c-d8207d20ea67

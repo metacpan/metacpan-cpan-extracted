@@ -1,0 +1,86 @@
+package Business::EDI::CodeList::MarkingInstructionsCode;
+
+use base 'Business::EDI::CodeList';
+my $VERSION     = 0.02;
+sub list_number {4233;}
+my $usage       = 'B';
+
+# 4233  Marking instructions code                               [B]
+# Desc: Code specifying instructions for marking.
+# Repr: an..3
+
+my %code_hash = (
+'1' => [ 'Do not mark suppliers company name',
+    "Packaging should not be marked with supplier's company name." ],
+'2' => [ 'Mark customers company name',
+    "Packaging should be marked with customer's company name." ],
+'3' => [ 'Mark customers references',
+    "Packaging should be marked with customer's references." ],
+'4' => [ 'Mark additionally customers article description',
+    "Packaging should also be marked with customer's article description." ],
+'5' => [ 'Mark exclusively customers article description',
+    "Packaging should be marked with customer's article description only." ],
+'6' => [ 'Mark packages dimensions',
+    "Packaging should be marked with package's dimensions." ],
+'7' => [ 'Mark net weight',
+    'Packaging should be marked with net weight.' ],
+'8' => [ 'Mark gross weight',
+    'Packaging should be marked with gross weight.' ],
+'9' => [ 'Mark tare weight',
+    'Packaging should be marked with tare weight.' ],
+'10' => [ 'Mark batch number',
+    'Packaging should be marked with batch number.' ],
+'11' => [ 'Mark article number customer',
+    "Packaging should be marked with customer's article number." ],
+'12' => [ 'Mark running number of packages',
+    'Packaging should be marked with the running number of packages.' ],
+'13' => [ 'Mark date of production',
+    'Packaging should be marked with the date of production.' ],
+'14' => [ 'Mark expiry date',
+    'Packaging should be marked with the expiry date.' ],
+'15' => [ 'Mark supplier number',
+    'Packaging should be marked with the supplier number.' ],
+'16' => [ "Buyer's instructions",
+    'Markings as specified by the buyer.' ],
+'17' => [ "Seller's instructions",
+    'Markings as specified by the seller.' ],
+'18' => [ "Carrier's instructions",
+    'Markings as specified by carrier.' ],
+'19' => [ 'Legal requirements',
+    'Markings as specified by law.' ],
+'20' => [ 'Industry instructions',
+    'Markings as specified by industry.' ],
+'21' => [ 'Line item only',
+    'Exclusive reference markings for this line.' ],
+'22' => [ 'Pre-marked by buyer',
+    'Packaging should be pre-marked by buyer.' ],
+'23' => [ 'Entire shipment',
+    'Markings refer to the entire shipment.' ],
+'24' => [ 'Shipper assigned',
+    'Markings to identify a shipment, package or carton as assigned by shipper.' ],
+'25' => [ 'Shipper assigned roll number',
+    'Markings to identify a roll as assigned by the shipper.' ],
+'26' => [ 'Shipper assigned skid number',
+    'Markings used to identify a skid as assigned by shipper.' ],
+'27' => [ 'Uniform Code Council (UCC) format',
+    'Markings according to UCC format are required. System of coding products where by each item/multipack case type is uniquely identified. A unique manufacturer Id is assigned by the UCC.' ],
+'28' => [ 'Mark free text',
+    'Packaging should be marked with free text.' ],
+'29' => [ 'Mark case number',
+    'Case numbers to be used for marking.' ],
+'30' => [ 'Mark serial shipping container code',
+    'Requests the marking of the serial shipping container code to the transport container or packaging.' ],
+'31' => [ 'Marked with ISO 10374 (permanent container tag)',
+    'The container has been marked with a permanent container tag according to ISO 10374.' ],
+'32' => [ 'Mark date of packaging',
+    'Packaging must be marked with the packaging date.' ],
+'33' => [ 'Mark reference to source entity',
+    'Packaging must be marked with the reference to source entity. The reference to source identifies that the trade item was derived from.' ],
+'34' => [ 'Marked GS1 Global Individual Asset Identifier',
+    'Indication that the GS1 Global Individual Asset Identifier has been marked on the package.' ],
+'ZZZ' => [ 'Mutually defined',
+    'A code assigned within a code list to be used on an interim basis and as defined among trading partners until a precise code can be assigned to the code list.' ],
+);
+sub get_codes { return \%code_hash; }
+
+1;

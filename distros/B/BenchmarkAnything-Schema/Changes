@@ -1,0 +1,12 @@
+Revision history for BenchmarkAnything-Schema
+
+0.004     2016-02-23
+        - accept non-number VALUEs since the backend allows it
+
+0.002     2015-09-28
+        - RT#107315 - replace File::Slurp with File::Slurper
+
+0.001     2015-08-16
+        - Initial release - CPAN DAY - 2015-08-16
+        - schema definition with tools to handle and validate
+          BenchmarkAnything data - see http://benchmarkanything.org/

@@ -1,0 +1,66 @@
+%{
+
+#include <Box2D/Box2D.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2MouseJointDef} class b2MouseJointDef :public %name{Box2D::b2JointDef} b2JointDef
+{
+
+b2MouseJointDef();
+
+%{
+
+b2Vec2*
+b2MouseJointDef::target( ... )
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		if ( items > 1 )
+		{
+			b2Vec2* v = (b2Vec2*)stack_to_object( ST(1) );
+			THIS->target = *v;
+		}
+		RETVAL = &(THIS->target);
+	OUTPUT:
+		RETVAL
+
+float32
+b2MouseJointDef::maxForce( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->maxForce = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->maxForce;
+	OUTPUT:
+		RETVAL
+
+float32
+b2MouseJointDef::frequencyHz( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->frequencyHz = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->frequencyHz;
+	OUTPUT:
+		RETVAL
+
+float32
+b2MouseJointDef::dampingRatio( ... )
+	CODE:
+		if ( items > 1 )
+		{
+			THIS->dampingRatio = (float32)SvNV( ST(1) );
+		}
+		RETVAL = THIS->dampingRatio;
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
+

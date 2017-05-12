@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"></head><body>
+<div style="position:relative; height:600px; padding:10px; border:1px solid">    
+<h3>Import References</h3>
+<form action="handle_query.pl" method="POST" id="in" enctype="multipart/form-data">
+<table>
+<tr><td>
+Use ORCID id:<br>
+<small style="color:#C0C0C0">e.g. 0000-0003-4056-4014</small></td>
+<td><INPUT type="text" name="orcid" size="128"></p></td>
+</tr>
+
+<tr><td colspan=2>(to import from Scopus, follow these <a href="http://orcid.scopusfeedback.com/">instructions</a>, and for Web of Science/ResearcherId follow <a href="http://wokinfo.com/researcherid/integration/">these</a>)</td></tr>
+
+<tr><td width="150px">Use DBLP XML page:<br>
+<small style="color:#C0C0C0">e.g. http://www.informatik.uni-trier.de/~ley/pers/xx/l/Leith:Douglas_J=</small></td>
+<td> <INPUT type="text" name="dblp" size="128"></td></tr>
+
+<tr><td>Use PubMed query:<br>
+<small style="color:#C0C0C0">e.g. mills kh[author]</small></td>
+<td> <INPUT type="text" name="query" size="128"></td></tr>
+
+<tr><td>BibTeX file:</td>
+<td> <INPUT type="file" name="bibtex"></td></tr>
+
+<tr><td>
+Use Google Scholar personal page:<br>
+<small style="color:#C0C0C0">e.g. http://scholar.google.com/citations?user=n8dX1fUAAAAJ</small></td>
+<td><INPUT type="text" name="google" size="128"></p></td>
+</tr>
+
+<tr><td>
+Use Google Scholar search page:<br>
+<small style="color:#C0C0C0">e.g. http://scholar.google.com/scholar?q=andr%C3%A9s+garcia+saavedra</small></td>
+<td><INPUT type="text" name="google2" size="128"></p></td>
+</tr>
+
+</table>
+<p>Enter references, one per line (free form text):</p>
+<textarea name="refs" rows="10" cols="128" form="in"></textarea><br>
+<INPUT type="submit" value="Submit">
+(can be slow, be patient)
+</form>
+</div>
+<div style="position: absolute; bottom: 5px;"><small>Source: <a href="http://search.cpan.org/~dougleith/Bib-Tools/">Bib::Tools</a></div>
+</body></html>

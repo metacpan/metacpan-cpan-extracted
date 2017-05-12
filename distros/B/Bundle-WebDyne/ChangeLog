@@ -1,0 +1,38 @@
+commit 4ddb3866138fb3ac298d2b38021b350d99954b14
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 23:03:13 2010 +0930
+
+    Tag: Bundle-WebDyne_1.004
+    
+    Updated README file
+
+commit f4c2cb1b14a7efdc867b536076ff318cb4e40b50
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 23:02:00 2010 +0930
+
+    Tag: Bundle-WebDyne_1.003
+    
+    Fixed module name type in 00-load.t test file
+
+commit 217b87c1d255edac78cff4d9be4057205524fc41
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 22:53:09 2010 +0930
+
+    Tag: Bundle-WebDyne_1.002
+    
+    Correct module name typo
+
+commit c6dc165e6d856110ac460a4d9f7e52a2739bc02b
+Author: Andrew Speer <andrew@webdyne.org>
+Date:   Sun Apr 11 22:51:10 2010 +0930
+
+    Tag: Bundle-WebDyne_1.001
+    
+    Prep for CPAN release
+
+commit 1f42cc9b12d45e4dab1d534781c37541b2088da6
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun Apr 11 22:49:52 2010 +0930
+
+    MANIFEST Import
+

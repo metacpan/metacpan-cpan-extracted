@@ -1,0 +1,41 @@
+NAME
+
+  BTRIEVE::Native - Interface to Btrieve ISAM file manager
+
+DESCRIPTION
+
+  This is a simple wrapper for the Btrieve single function API.
+
+INSTALLATION
+
+  To install this module type the following:
+
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+PREREQUISITES
+
+  This module is tested on Windows NT 4.0 with the Microkernel
+  Interface  DLL (WBTRV32.DLL) version 6.15 from Btrieve
+  Technologies, Inc.
+  On that platform, it requires WBTRV32.DLL in your PATH,
+  e.g.:
+
+    set PATH=\opt\btrieve\bin;%PATH%
+
+  To satisfy the linker, an import library may be required, e.g. WBTRV32.lib.
+  For Borland C++ 5.5, the generated .def file is used.
+  For MinGW, copy WBTRV32.DLL to WBTRV32.a.
+
+AUTHOR
+
+  Steffen Goeldner <sgoeldner@cpan.org>
+
+COPYRIGHT
+
+  Copyright (c) 2003, 2014 Steffen Goeldner. All rights reserved.
+
+  This program is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself.

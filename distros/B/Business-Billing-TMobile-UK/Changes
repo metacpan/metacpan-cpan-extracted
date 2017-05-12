@@ -1,0 +1,23 @@
+Revision history for Business-Billing::TMobile::UK
+
+0.16    - Improve 03_scripts.t. Thanks to David Cantrell for the suggestion.
+
+0.15    - Do not hard code perl binary name in tests
+        - Do not run compilation test on windows/vms
+        - Added rant about T-Mobile
+
+0.14    - POD Update
+
+0.13    - Resolved weird encoding isuses from the current version
+          of the T-Mobile site
+
+0.12    - Require Term-ReadPassword v0.06 so can use its new
+          USE_STARS feature in the check_tmobile_allowances
+					script . Thanks to Tom Phoenix for adding that feature.
+					
+0.11	- Added the check_tmobile_allowances script
+        - Fixed minor bug
+
+0.10    - Implemented public interface, inital CPAN release
+
+0.01    - First version, released on an unsuspecting world.

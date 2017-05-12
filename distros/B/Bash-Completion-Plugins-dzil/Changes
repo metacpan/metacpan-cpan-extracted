@@ -1,0 +1,7 @@
+Revision history for Bash-Completion-Plugins-dzil
+
+0.02 September 03 2012
+     - Fix should_activate.
+
+0.01 September 03 2012
+     - Initial release.

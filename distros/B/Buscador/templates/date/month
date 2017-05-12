@@ -1,0 +1,55 @@
+[% SET title = date.strftime("%B, %Y") %]
+[% INCLUDE header title="Mails for the month of $title" %]
+[% PROCESS macros %]
+<h1>Mails for the month of [% title %]</h1>
+
+[% INCLUDE searchbox %]
+
+[% SET ym  = date.strftime("%Y/%m") %] 
+[% SET url = "${base}/date/list/$ym" %]
+
+
+[% MACRO print_day(day) BLOCK %]
+<td class="header" style="width: 83px; height: 83px; text-align: center;">[% day %]</td>
+[% END %]
+
+[% MACRO cell(date, event) BLOCK %]
+<td class="[% IF event; 'event'; ELSE; 'noevent'; END %]" style="width: 83px; height: 83px; text-align: center;">
+[% IF date; "<a href='$url/$date'>"; ordinate(date); "</a>"; IF event; "<br />($event)"; END; ELSE; '&nbsp;'; END %]
+</td> 
+[% END %]
+
+
+<div style="text-align: center;">
+
+<p><a href="[% base %]/date/view/[% date.strftime("%Y") %]"><b>See the whole of [% date.strftime("%Y") %]</b></a></p>
+
+<table border="0" class="calendar" cellpadding="1" cellspacing="2">
+<tr style="height: 83px;">
+[% FOR day = [ 'Sunday', 'Monday' , 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ] ; print_day(day); END -%]
+</tr>
+<trstyle="height: 83px;">
+[%- SET pad = 0 -%]
+[%- SET counter = 0 -%]
+[%- WHILE date.day_of_week > pad; pad = pad + 1; cell(0,0);  END -%]
+[%- WHILE days.size>0 %]
+    [% counter = counter + 1 %]
+    [%- IF pad==7 %]
+    </tr>
+    <tr style="height: 83;">
+    [% pad = 0 -%]
+    [%- END -%]
+    [% cell(counter, days.shift) %]
+    [%- pad = pad + 1 -%]
+[%- END -%]
+[%- WHILE pad<7;  pad = pad + 1; cell(0,0); END -%]
+</tr>
+<tr>
+    <td class="cal_nav" colspan="3"><div style="text-align: left;"><a href="[% base %]/date/view/[% last_month.strftime("%Y/%m") %]">&lt; [% last_month.fullmonth %]</a></div></td>
+    <td class="cal_nav">&nbsp;</td>
+    <td class="cal_nav" colspan="3"><div style="text-align: right;"><a href="[% base %]/date/view/[% next_month.strftime("%Y/%m") %]">[% next_month.fullmonth %] &gt;</a></div></td>
+</tr>
+</table>
+</div>
+
+[% INCLUDE footer %]

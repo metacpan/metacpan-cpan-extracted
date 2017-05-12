@@ -1,0 +1,859 @@
+<!-- BEGIN s5 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>bio-chado-schema</title>
+<meta name="generator" content="Spork-S5" />
+<meta name="version" content="Spork-S5 0.04" />
+<meta name="author" content="Robert Buels" />
+<link rel="stylesheet" href="ui/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/opera.css" type="text/css" media="projection" id="operaFix" />
+<link rel="stylesheet" href="ui/print.css" type="text/css" media="print" id="slidePrint" />
+  <link rel="stylesheet" type="text/css" href="" />
+<script src="ui/slides.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="layout">
+  <div id="currentSlide"></div>
+  <div id="header"></div>
+  <div id="footer">
+    <h2>Robert Buels</h2>
+    <h2>rmb32@cornell.edu</h2>
+    <div id="controls"></div>
+  </div>
+</div>
+
+<div class="slide">
+    <h1>Bio::Chado::Schema</h1>
+    <h2>NESCent, Durham, NC</h2>
+    <h3>March 5-7, 2011</h3>
+</div>
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>What is DBIx::Class?</h1>
+<ul>
+<li>Object-relational mapping framework for Perl 5</li>
+<li>is now the de-facto standard</li>
+<li>very powerful query builder</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>What is DBIx::Class?</h1>
+<ul>
+<li>query building &#40;the magic of chainable ResultSets&#41;</li>
+<li>cross-database deployment &#40;using <tt>SQL::Translator</tt> in the backend&#41;</li>
+<li>lots and lots of plugins availabe &#40;dates, testing, ...&#41;</li>
+</ul>
+
+<p>
+see <a href="http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod">http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod</a>
+
+</p>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Data Model</h1>
+<ul>
+<li>a set of classes</li>
+<li>encapsulate the underlying storage</li>
+<li>providing a nicer, maintainable API for working with the data</li>
+</ul>
+
+<p>
+This isn&#39;t really middleware, it&#39;s a code library.
+
+</p>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>And therefore, Bio::Chado::Schema</h1>
+<h2>As of 0.08: 205 Perl 5 classes</h2>
+<ul>
+<li>every table and view, every module</li>
+<li>Chado docs mirrored in the POD</li>
+</ul>
+
+<p>
+<a href="http://search.cpan.org/dist/Bio-Chado-Schema">http://search.cpan.org/dist/Bio-Chado-Schema</a>
+
+</p>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>And therefore, Bio::Chado::Schema</h1>
+<h2>As of 0.08: 205 Perl 5 classes</h2>
+<ul>
+<li>every table and view, every module</li>
+<li>Chado docs mirrored in the POD</li>
+</ul>
+
+<p>
+<a href="http://search.cpan.org/dist/Bio-Chado-Schema">http://search.cpan.org/dist/Bio-Chado-Schema</a>
+
+</p>
+<pre class="formatter_pre">&#40; So why do we need this? &#41;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Chado needs encapsulation</h1>
+<h2>Chado's design makes for:</h2>
+<ul>
+<li>complex queries</li>
+<li>steep learning curve</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Chado needs encapsulation</h1>
+<h2>complex queries</h2>
+<ul>
+<li>generating</li>
+<li>storing</li>
+<li>automating</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Chado needs encapsulation</h1>
+<h2>steep learning curve</h2>
+<ul>
+<li>codifying best practices</li>
+<li>unified, high-level documentation</li>
+<li>can help with database administration</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;;
+      -&gt;search&#40;{ name =&gt; &#39;something&#39; }&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;;
+      -&gt;search&#40;{ name =&gt; &#39;something&#39; }&#41;;
+      -&gt;search_related&#40;&#39;organism&#39;&#41;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;;
+      -&gt;search&#40;{ name =&gt; &#39;something&#39; }&#41;;
+      -&gt;search_related&#40;&#39;organism&#39;&#41;
+</pre>
+<ul>
+<li>get an actual data object</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $chado = Bio::Chado::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;;
+      -&gt;search&#40;{ name =&gt; &#39;something&#39; }&#41;;
+      -&gt;search_related&#40;&#39;organism&#39;&#41;
+</pre>
+<ul>
+<li>get an actual data object</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;
+      -&gt;find&#40; 232432 &#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>iterate over the actual data in a set</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>iterate over the actual data in a set</li>
+</ul>
+<pre class="formatter_pre">my $stuff = $chado-&gt;blahblahblah;
+while&#40; my $row = $stuff-&gt;next &#41; {
+  # do something
+}
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>iterate over the actual data in a set</li>
+</ul>
+<pre class="formatter_pre">my $stuff = $chado-&gt;blahblahblah;
+while&#40; my $row = $stuff-&gt;next &#41; {
+  # do something
+}
+</pre>
+<ul>
+<li>traverse relationships</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage</h1>
+<ul>
+<li>iterate over the actual data in a set</li>
+</ul>
+<pre class="formatter_pre">my $stuff = $chado-&gt;blahblahblah;
+while&#40; my $row = $stuff-&gt;next &#41; {
+  # do something
+}
+</pre>
+<ul>
+<li>traverse relationships</li>
+</ul>
+<pre class="formatter_pre">say $some_feature-&gt;type-&gt;name;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Joined Select</h1>
+<pre class="formatter_pre"># get features via the potato organism, also joining in the cvterms table
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Joined Select</h1>
+<pre class="formatter_pre"># get features via the potato organism, also joining in the cvterms table
+my $potato_bacs =
+     $chado-&gt;resultset&#40;&#39;Organism::Organism&#39;&#41;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Joined Select</h1>
+<pre class="formatter_pre"># get features via the potato organism, also joining in the cvterms table
+my $potato_bacs =
+     $chado-&gt;resultset&#40;&#39;Organism::Organism&#39;&#41;
+           -&gt;search&#40;{ species =&gt; &#39;Solanum tuberosum&#39; }&#41;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Joined Select</h1>
+<pre class="formatter_pre"># get features via the potato organism, also joining in the cvterms table
+my $potato_bacs =
+     $chado-&gt;resultset&#40;&#39;Organism::Organism&#39;&#41;
+           -&gt;search&#40;{ species =&gt; &#39;Solanum tuberosum&#39; }&#41;
+           -&gt;search_related&#40; &#39;features&#39;,
+                             { &#39;type.name&#39; =&gt; &#39;BAC_clone&#39;},
+                             { &#39;join&#39; =&gt; &#39;type&#39; },
+                           &#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Joined Select</h1>
+<pre class="formatter_pre"># the equivalent bare SQL
+my $potato_bacs = $dbh-&gt;selectall_arrayref&#40; &lt;&lt;EOS, undef, &#39;Solanum tuberosum&#39;, &#39;BAC_clone&#39;&#41;;
+SELECT features.feature_id
+     , features.dbxref_id
+     , features.organism_id
+     , features.name
+     , features.uniquename
+     , features.residues
+     , features.seqlen
+     , features.md5checksum
+     , features.type_id
+     , features.is_analysis
+     , features.is_obsolete
+     , features.timeaccessioned
+     , features.timelastmodified
+FROM organism me
+LEFT JOIN feature features
+       ON features.organism_id = me.organism_id
+JOIN cvterm type
+       ON type.cvterm_id = features.type_id
+WHERE type.name = &#39;BAC_clone&#39; AND species = &#39;Solanum tuberosum&#39;
+EOS
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Loading</h1>
+<pre class="formatter_pre">$chado-&gt;resultset&#40; &#39;Cv::Cv&#39; &#41;
+      -&gt;find_or_create&#40;{ name =&gt; &#39;My Fake Ontology&#39; }&#41;
+      -&gt;create_related&#40;  &#39;cvterm&#39;,
+                         { name =&gt; &#39;MyFakeTerm&#39; }&#41;;
+</pre>
+<p>
+makes the SQL:
+
+</p>
+<pre class="formatter_pre">SELECT me.cv_id
+     , me.name
+     , me.definition
+FROM cv me
+WHERE &#40; me.name = &#39;my fake ontology&#39; &#41;
+
+INSERT INTO cv &#40; name &#41;
+        VALUES &#40; ?    &#41;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>BCS Usage: Transactions</h1>
+<pre class="formatter_pre">$chado-&gt;txn_do&#40;sub {
+
+    $chado-&gt;resultset&#40;&#39;Cv::Cv&#39;&#41;
+          -&gt;find_or_create&#40;{ name =&gt; &#39;My Fake Ontology&#39; }&#41;
+          -&gt;create_related&#40; &#39;cvterm&#39;, { name =&gt; &#39;MyFakeTerm&#39; } &#41;;
+
+    $chado-&gt;do_all_kinds_of_other_stuff;
+}&#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>easier to manipulate and assemble queries</li>
+<li>Don&#39;t Repeat Yourself</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>it&#39;s all objects.  you can delegate to them, pass them around, etc.</li>
+<li>HOWEVER:</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>it&#39;s all objects.  you can delegate to them, pass them around, etc.</li>
+<li>HOWEVER:</li>
+
+<ul>
+<li>usually you don&#39;t want to subclass them</li>
+<li>but, see <tt>DBIx::Class::Manual::Cookbook</tt></li>
+</ul></ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>complex joined queries &#40;Chado queries&#41; are very easy and compact</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>SQL syntax errors are much more difficult to make</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Using DBIC with your own tables</h1>
+<ul>
+<li>use <tt>DBIx::Class::Schema::Loader</tt> to dump a whole set</li>
+<li>make your own definitions</li>
+</ul>
+
+<ul>
+<li>your table: other_thing, foreign key feature_id to Chado feature table</li>
+</ul>
+<pre class="formatter_pre">
+package My::DBIC:::Layer::OtherThing;
+use base &#39;DBIx::Class::Core&#39;;
+
+__PACKAGE__-&gt;table&#40;&#39;other_thing&#39;&#41;;
+__PACKAGE__-&gt;add_columns&#40;
+  &#39;other_thing_id&#39; =&gt; { ... },
+  &#39;name&#39;           =&gt; { ... },
+  &#39;definition&#39;     =&gt; { ... },
+  &#39;feature_id&#39;     =&gt; { ... },
+&#41;;
+__PACKAGE__-&gt;set_primary_key&#40;&#39;other_thing_id&#39;&#41;;
+__PACKAGE__-&gt;add_unique_constraint&#40;&#39;ot_c1&#39;, [&#39;name&#39;]&#41;;
+
+__PACKAGE__-&gt;belongs_to&#40;
+  &#39;feature&#39;,
+  &#39;Bio::Chado::Schema::Sequence::Feature&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+<pre class="formatter_pre">
+Bio::Chado::Schema::Sequence::Feature-&gt;has_many&#40;
+  &#39;other_things&#39;,
+  &#39;My::DBIC::Layer::OtherThing&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+<pre class="formatter_pre">
+Bio::Chado::Schema::Sequence::Feature-&gt;has_many&#40;
+  &#39;other_things&#39;,
+  &#39;My::DBIC::Layer::OtherThing&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+<ul>
+<li>add it to the BCS schema dynamically</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+<pre class="formatter_pre">
+Bio::Chado::Schema::Sequence::Feature-&gt;has_many&#40;
+  &#39;other_things&#39;,
+  &#39;My::DBIC::Layer::OtherThing&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+<ul>
+<li>add it to the BCS schema dynamically</li>
+</ul>
+<pre class="formatter_pre">Bio::Chado::Schema-&gt;register_source&#40;&#39;OtherThing&#39;, &#39;My::DBIC::Layer::OtherThing&#39;&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+<pre class="formatter_pre">
+Bio::Chado::Schema::Sequence::Feature-&gt;has_many&#40;
+  &#39;other_things&#39;,
+  &#39;My::DBIC::Layer::OtherThing&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+<ul>
+<li>add it to the BCS schema dynamically</li>
+</ul>
+<pre class="formatter_pre">Bio::Chado::Schema-&gt;register_source&#40;&#39;OtherThing&#39;, &#39;My::DBIC::Layer::OtherThing&#39;&#41;;
+</pre>
+<ul>
+<li>use it with the rest</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>"Duct tape" your own schema onto BCS</h1>
+<ul>
+<li>make an accessor &#39;other_things&#39; that ties your own DBIC class to BCS</li>
+</ul>
+<pre class="formatter_pre">
+Bio::Chado::Schema::Sequence::Feature-&gt;has_many&#40;
+  &#39;other_things&#39;,
+  &#39;My::DBIC::Layer::OtherThing&#39;,
+  { &#39;foreign.feature_id&#39; =&gt; &#39;self.feature_id&#39; },
+&#41;;
+</pre>
+<ul>
+<li>add it to the BCS schema dynamically</li>
+</ul>
+<pre class="formatter_pre">Bio::Chado::Schema-&gt;register_source&#40;&#39;OtherThing&#39;, &#39;My::DBIC::Layer::OtherThing&#39;&#41;;
+</pre>
+<ul>
+<li>use it with the rest</li>
+</ul>
+<pre class="formatter_pre">$chado-&gt;resultset&#40;&#39;Sequence::Feature&#39;&#41;-&gt;other_things;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Making a composite schema</h1>
+<pre class="formatter_pre">package My::Schema;
+# load our own classes
+__PACKAGE__-&gt;load_namespaces;
+__PACKAGE__-&gt;load_namespaces&#40;
+    result_namespace    =&gt; &#39;+Bio::Chado::Schema::Result&#39;,
+    resultset_namespace =&gt; &#39;+Bio::Chado::Schema::ResultSet&#39;,
+  &#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Development Roadmap</h1>
+<ul>
+<li>continue to fill in many_to_many rels as needed</li>
+<li>continue to add more &#40;generic!&#41; convenience methods</li>
+
+<ul>
+<li>automate more common querying and loading patterns</li>
+</ul></ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Acknowledgments</h1>
+<ul>
+<li>Jonathan Leto &#40;SGN&#41;</li>
+<li>Aure Bombarely &#40;SGN&#41;</li>
+<li>Naama Menda &#40;SGN&#41;</li>
+<li>Siddhartha Basu &#40;dictybase&#41;</li>
+<li>Lukas Mueller &#40;SGN&#41;</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+</body>
+</html>
+<!-- END s5 -->

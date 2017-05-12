@@ -1,0 +1,148 @@
+Bio-Das-ProServer
+=================
+
+Bio::Das::ProServer is an implementation of the BioDAS protocol,
+http://biodas.org/ for the serving of biological data using XML over
+HTTP.
+
+Bio::Das::ProServer is designed as a lightweight alternative to some
+other DAS servers. Version 2.0 is a drop-in replacement for previous
+versions but has a core based on the POE system which is much better
+tested and debugged than the ProServer v1 core. ProServer can be seen
+as the server-side complement to the Bio-DasLite client.
+
+More information can be found at the ProServer homepage:
+
+    http://www.sanger.ac.uk/proserver/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+
+You may receive warnings about missing dependencies, note that only
+some of these are required (see DEPENDENCIES section).
+
+
+RUNNING
+
+  There is a command-line executable in the eg directory:
+  eg/proserver --help
+
+  To start the server, type:
+  eg/proserver -x
+
+
+RUNNING AS A DAEMON
+
+  To start the server in daemon mode, type:
+  eg/proserver
+
+  To stop:
+  kill -TERM `cat eg/proserver.myhostname.pid`
+
+  To restart:
+  kill -USR1 `cat eg/proserver.myhostname.pid`
+
+
+REQUIRED DEPENDENCIES
+
+Any missing dependencies will be reported during the build process. All are
+available from CPAN (http://www.cpan.org).
+
+CGI
+Compress::Zlib
+Config::IniFiles
+File::Spec
+Getopt::Long
+HTML::Entities
+HTTP::Request
+HTTP::Response
+HTTP::Date
+POE
+POE::Filter::HTTPD
+POE::Wheel::ReadWrite
+POE::Wheel::SocketFactory
+POSIX
+Socket
+Sys::Hostname
+
+
+OPTIONAL DEPENDENCIES
+
+Missing optional dependencies will also be reported in the build process. They
+are only required for specific functionality or plugins.
+
+DBI               For all database-backed SourceAdaptor plugins
+LWP::UserAgent    For SourceAdaptor::proxy
+                      Authenticator::http
+                      Transport::wgetz
+Cache::Cache      For Authenticator::http
+Net::IP           For Authenticator::ip
+Bio::Das::Lite    For SourceAdaptor::proxy
+BioPerl           For Transport::bioseqio
+EnsEMBL core API  For SourceAdaptor::ensembl
+
+
+SECURITY
+
+Whilst every attempt is made to keep ProServer free from security
+holes we cannot guarantee its safety. As with all daemon services like
+this, it is strongly advised to take certain measures to mitigate any
+faults which may be present and minimised their consequences.
+
+       1. Run ProServer as a non-privileged user. Usually there is a
+          'nobody' user or equivalent. Running daemon services as this
+          user means that if compromised the service has minimal
+          access to the rest of the host.
+
+       2. Where possible run in a chroot'ed environment. This is more
+          complicated than simply using a non-privileged user but is
+          safer all-round. Using chroot puts the ProServer processes
+          in a jail from which they cannot easily access the rest of
+          the filesystem. This may be complex to set up, depending on
+          the variety of your source adaptors and the access they
+          require to resources outside of your ProServer
+          installation. This method also requires a dedicated copy of
+          all dependencies such as a perl interpreter and system
+          libraries.
+
+       3. Another useful mechanism is to run ProServer behind a
+          reverse-proxy. This means ProServer is never in direct
+          communication with the client and the reverse-proxy will
+          sanitise requests, removing some of the opportunities for
+          attack. It also allows services to be moved behind the
+          scenes using for example a combination of Apache and
+          mod_rewrite on the proxy. One other possibility is to use a
+          reverse-proxy to unify services provided by other
+          technologies such as LDAS or Dazzle into one consolidated
+          namespace.
+
+SCALABILITY
+
+At the Sanger Institute we run ProServer, behind an Apache
+reverse-proxy, on 14 2.4GHz blades serving just under 300,000 DAS
+requests a week for 220 sources mostly with MySQL databases. ProServer
+should scale comfortably being only IO-bound as it's not
+computationally intensive. Efficiency of data retrieval is most
+important. Ensure database connections and statement handles are
+cached and reused wherever possible.
+
+KNOWN PROBLEMS
+
+ProServer depends on source adaptors to provide details of known
+segments in order to correctly serve error or unknown segments.
+In the absence of this information responses serve empty result sets.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Roger M Pettett, Genome Research Ltd.
+http://www.sanger.ac.uk/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.

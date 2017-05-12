@@ -1,0 +1,326 @@
+#!/usr/bin/perl -w
+# (should also use taint mode (-T) for production)
+#
+# ocvtest.pl
+#
+#  Show a couple of test transactions to the (development) OCV server, 
+# using both blocking (non-polled) and polled modes.
+# Note the test OCV server (at least v1.15) does not respond well to polled 
+# requests, see usage() below.
+
+use strict;
+
+use POSIX;
+
+# load the module and import all constants
+use OCV;
+
+use constant CLIENTID => 'ocvtest';	# up to 8 chars
+
+# to avoid confusion with the live server, the test server should always be 
+# run on a different port than a live server
+use constant PORT		=> 53995;	# my 'standard' test port
+
+use constant TIMEOUT	=> 15;		# OCV send/recv timeout (seconds)
+use constant BUSYWAIT	=> 2;		# OCV SERVER BUSY - (avg) wait time
+use constant BUSYATTEMPTS	=> 2;	# OCV SERVER BUSY - number of attempts
+
+use constant LOGDIR		=> './var';	# link to OCV txn log dir
+use constant TXNLOG		=> 'test.txnlog';
+use constant DEBUGLOG	=> 'test.debuglog';
+use constant TRUNCATE	=> 0;	# truncate logs?
+
+my $server = shift;
+my $accountnum = shift;
+my $polled = shift;
+
+STDOUT->autoflush(1);
+STDERR->autoflush(1);
+
+die "usage: $0 <development server<:port>> <account number> <polled mode>\n" 
+	unless ($server and $accountnum);
+
+# create an OCV object
+
+$server = $server . ':' . PORT unless $server =~ /:\d+/;
+
+print <<EOM;
+
+OCV Arguments
+
+          Server: $server          (standard test port = ${\PORT})
+  Account Number: $accountnum
+
+         Timeout: ${\TIMEOUT} s
+       BUSY Wait: ${\BUSYWAIT} s
+   BUSY Attempts: ${\BUSYATTEMPTS}
+
+       Client ID: ${\CLIENTID}
+
+   Log Directory: ${\LOGDIR}
+ Transaction Log: ${\TXNLOG}
+       Debug Log: ${\DEBUGLOG}
+    Logs will be: ${TRUNCATE ? \'truncated' : \'appended'}
+
+ Polled/Blocking: ${$polled ? \'POLLED' : \'BLOCKING'}
+
+NOTES:
+  - you should adjust the OCV simulated service time to say < 500ms for
+    this test (unless you have all day :-)
+
+EOM
+
+print <<EOM if $polled;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+NOTE: the test OCV server (at least v1.15) does not respond well to polled 
+requests. It 'locks' the account after serving some polled requests (i.e. 
+subsequent transactions on the account return SERVER BUSY or RECORD NOT FOUND).
+In addition, on subsequent connections it erroneously sends a response to the 
+polled request which missynchronises the rest of the communications.
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+EOM
+
+# the OCV always appends to its logs, so manually truncate them if required
+# - create/truncate the log files now, so as to allow them to be tailed 
+#   before starting the test
+map { my $f = LOGDIR . $_; open (FH, TRUNCATE ? ">$f" : ">>$f") }
+	TXNLOG, DEBUGLOG;
+close FH;
+
+$server =~ /:(\d+)/;
+if ($1 != PORT)
+{
+	print "Are you sure you want to use a non-'standard' test port? [yN] ";
+	exit 1 unless (<STDIN> =~ /y/i);
+}
+else
+{
+	print "Press enter to continue, Ctrl-C to quit...";
+	<STDIN>;
+}
+
+my $ocv = new OCV (Server => $server, ClientID => CLIENTID, 
+		AccountNum => $accountnum, timeout => TIMEOUT, 
+		BusyWait => BUSYWAIT, BusyAttempts => BUSYATTEMPTS,
+		LogDir => LOGDIR, TxnLog => TXNLOG, DebugLog => DEBUGLOG, 
+		debug => 1)
+	or die "Could not create OCV object: $@\n";
+
+# set the Transaction Reference number generator
+# - the OCV allows a 16 character field for the transaction reference
+# - basically a client identifier string, a hex-encoded time (32 bits == 8 hex
+#   digits), and a sequence number.
+my $sn = 0;
+sub txnref
+	{ $sn %= 255; sprintf("%.6s%08X%02x", uc(CLIENTID), time(), $sn++) }
+$ocv->txnref(\&txnref);
+
+my %carddata = 
+(
+	CardData => "5424000000000015", 
+	CardExpiry => POSIX::strftime('%m%y', localtime(time()+3*4*7*24*3600)),
+);
+
+sub block
+{
+	my ($amount, $type, $e) = @_;
+
+	my $m;
+	if ($type eq 'purchase')
+	{
+		$m = $ocv->purchase
+		(
+			%carddata,
+			Amount => $amount, 
+			PolledMode => POLL_BLOCK,
+		);
+	}
+	elsif ($type eq 'refund')
+	{
+		$m = $ocv->refund
+		(
+			%carddata,
+			Amount => $amount, 
+			PolledMode => POLL_BLOCK,
+		);
+	}
+	else
+	{
+		$@ = "unknown transaction type: [$type]\n";
+		return undef;
+	}
+
+	unless ($m)	# erk... didn't get a response
+	{
+		print "Error: $@\n";
+		my $ref = $ocv->gettxnref;
+		unless ($ref)
+		{
+			$@ = 'no TxnRef returned by gettxnref()';
+			print "Error: $@\n";
+			return undef;
+		}
+		print "Trying status for [$ref]...\n";
+		my $n = 60;	# don't keep trying forever
+		do
+		{
+			sleep 1;
+			$m = $ocv->status();
+			print "Error: $@\n" if $@;
+		} while ($m and $m->Result == TRANS_INPROGRESS and $n--);
+	}
+
+	if ($m and defined($m->Result))
+	{
+		$m->Result == TRANS_APPROVED and print "Result: APPROVED\n";
+		$m->Result == TRANS_DECLINED and print "Result: DECLINED: " . 
+			$m->ResponseText . ($m->Retry ? " RETRY":"") . "\n";
+		$m->Result == TRANS_INPROGRESS and print "Result: (still) INPROGRESS\n";
+
+		if (defined $e and $m->Result != $e)
+		{
+			$@ = "Unexpected result: wanted [$e], got [" . $m->Result . "]";
+			print "Error: $@\n";
+		}
+	}
+
+	return $m;
+}
+
+sub poll
+{
+	my ($amount, $type, $e) = @_;
+
+	my $w;	# propagate warnings from OCV ($@) through the eval
+
+	my $m = eval    # try
+	{
+		my $m;
+
+		if ($type eq 'purchase')
+		{
+			$m = $ocv->purchase
+			(
+				%carddata,
+				Amount => $amount, 
+				PolledMode => POLL_NONBLOCK,
+			) or die "$@\n";
+		}
+		elsif ($type eq 'refund')
+		{
+			$m = $ocv->refund
+			(
+				%carddata,
+				Amount => $amount, 
+				PolledMode => POLL_NONBLOCK,
+			) or die "$@\n";
+		}
+		else
+		{
+			die "unknown transaction type: [$type]\n";
+		}
+
+		# need to know the txnref to query
+		my $ref = $ocv->gettxnref;
+		die "no TxnRef returned by gettxnref()\n" unless $ref;
+
+		my $n = 60;	# don't keep trying forever
+		do
+		{
+			sleep 1;
+			# get the status of the last transaction
+			# - status "blocks" and always returns a response
+			$m = $ocv->status() or die "$@\n";
+
+		} while ($m and $m->Result == TRANS_INPROGRESS and $n--);
+
+		if ($m and defined($m->Result))
+		{
+			$m->Result == TRANS_APPROVED and print "Result: APPROVED\n";
+			$m->Result == TRANS_DECLINED and print "Result: DECLINED: " . 
+				$m->ResponseText . ($m->Retry ? " RETRY":"") . "\n";
+			$m->Result == TRANS_INPROGRESS and 
+				print "Result: (still) INPROGRESS\n";
+		}
+
+		$w = $@;
+
+		$m;
+	}
+	or do     # catch
+	{
+		chomp($@);
+		print "Error: $@\n";
+		undef;
+	};
+
+	$@ ||= $w;
+
+	return $m;
+}
+
+# the test OCV server responds with a result depending on the 
+# cent value of the amount: response code = amount % 100
+# - the server also provides 'special' responses for codes 80-85, simulating
+#   various networking failures
+# - all requests should be responded to, except code 80 which purposely
+#   does not reply. A subsequent query should elicit a response.
+# - the 00 and 80 amounts should be APPROVED, the others are undefined
+#   (most are DECLINED, at least one is APPROVED (08))
+#
+
+my $failures = 0;
+my $warnings = 0;
+
+my %e =	# transactions with known expected result
+(
+	 0	=> TRANS_APPROVED,
+	80	=> TRANS_APPROVED,
+);
+
+unless ($polled)
+{
+	print "\nNonPolled (Blocking) Mode\n", '-'x80, "\n";
+	#foreach my $a (0,10,80,99)
+	foreach my $a ((0..99))
+	{
+		printf "\nTrying purchase [\$1.%02d]\n", $a;
+		$failures++ unless block(100 + $a, 'purchase', $e{$a});
+		# the .80 amount *should* cause a warning as it fails to respond
+		$warnings++ if ($@ and !($a == 80 and $@ =~ /timeout/i));
+	}
+	foreach my $a (0, 1, 80, 99)
+	{
+		printf "\nTrying refund [\$1.%02d]\n", $a;
+		$failures++ unless block(100 + $a, 'refund');
+		$warnings++ if ($@ and !($a == 80 and $@ =~ /timeout/i));
+	}
+}
+else
+{
+	print "\nPolled Mode\n", '-'x80, "\n";
+	foreach my $a ((0..99))
+	{
+		printf "\nTrying purchase [\$1.%02d]\n", $a;
+		$failures++ unless poll(100 + $a, 'purchase');
+		$warnings++ if $@;
+	}
+	foreach my $a (0, 1, 80, 99)
+	{
+		printf "\nTrying refund [\$1.%02d]\n", $a;
+		$failures++ unless poll(100 + $a, 'refund');
+		$warnings++ if $@;
+	}
+}
+
+print '-'x80, "\n";
+if ($failures or $warnings)
+{
+	print "$failures tests failed\n";
+	print "$warnings tests produced unexpected warnings\n";
+}
+else
+{
+	print "All tests passed ok\n";
+}

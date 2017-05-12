@@ -1,0 +1,22 @@
+
+use Blosxom::Include qw(testplugin3);
+
+package testplugin3;
+
+# ----- Configuration variables ----- 
+
+$package = 'abc';
+
+my $lexical = 'def';
+
+# ----------------------------------- 
+# __END_CONFIG__
+
+sub get_lexical {
+  return $lexical;
+}
+
+1;
+
+# vim:ft=perl
+

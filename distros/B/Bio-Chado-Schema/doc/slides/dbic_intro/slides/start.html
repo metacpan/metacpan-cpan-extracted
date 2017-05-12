@@ -1,0 +1,1112 @@
+<!-- BEGIN s5 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>dbic_chado</title>
+<meta name="generator" content="Spork-S5" />
+<meta name="version" content="Spork-S5 0.04" />
+<meta name="author" content="Robert Buels" />
+<link rel="stylesheet" href="ui/slides.css" type="text/css" media="projection" id="slideProj" />
+<link rel="stylesheet" href="ui/opera.css" type="text/css" media="projection" id="operaFix" />
+<link rel="stylesheet" href="ui/print.css" type="text/css" media="print" id="slidePrint" />
+  <link rel="stylesheet" type="text/css" href="" />
+<script src="ui/slides.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div class="layout">
+  <div id="currentSlide"></div>
+  <div id="header"></div>
+  <div id="footer">
+    <h2>Robert Buels</h2>
+    <h2>rmb32@cornell.edu</h2>
+    <div id="controls"></div>
+  </div>
+</div>
+
+<div class="slide">
+    <h1>Introduction to DBIx::Class</h1>
+    <h2>Portland, OR</h2>
+    <h3>April 14, 2010</h3>
+</div>
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>What is DBIx::Class?</h1>
+<ul>
+<li>Object-relational mapping framework for Perl</li>
+<li>is now the de-facto standard</li>
+<li>nice features</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>What is DBIx::Class?</h1>
+<ul>
+<li>query building &#40;the magic of chainable ResultSets&#41;</li>
+<li>cross-database deployment &#40;using <tt>SQL::Translator</tt> in the backend&#41;</li>
+<li>lots and lots of plugins availabe &#40;dates, testing, ...&#41;</li>
+</ul>
+
+<p>
+see the manual: <a href="http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod">http://search.cpan.org/dist/DBIx-Class/lib/DBIx/Class/Manual.pod</a>
+
+</p>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>What it looks like</h1>
+<pre class="formatter_pre">package My::Schema;
+
+__PACKAGE__-&gt;load_namespaces;
+
+package My::Schema::Result::Foo;
+
+__PACKAGE__-&gt;table&#40;&#39;foo&#39;&#41;;
+__PACKAGE__-&gt;add_columns&#40;qw&#40; foo_id bar baz &#41;&#41;;
+__PACKAGE__-&gt;has_many&#40;&#39;bars&#39; =&gt; &#39;My::Schema::Result::Bar&#39;&#41;;
+# also belongs_to  many_to_many
+
+package My::Schema::Result::Bar;
+
+__PACKAGE__-&gt;table&#40;&#39;bar&#39;&#41;;
+# and so on
+</pre>
+<ul>
+<li>use <tt>DBIx::Class::Schema::Loader</tt> to generate this from a DB</li>
+<li>use <tt>$schema-&gt;deploy</tt> to make a DB from this</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">my $orgs_rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">my $orgs_rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;;
+</pre>
+<ul>
+<li>take a subset of those &#40;another ResultSet&#41;</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">my $orgs_rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;;
+</pre>
+<ul>
+<li>take a subset of those &#40;another ResultSet&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $orgs_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">my $orgs_rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;;
+</pre>
+<ul>
+<li>take a subset of those &#40;another ResultSet&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $orgs_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+</pre>
+<ul>
+<li>first one in the result set</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>open the schema.  &#40; actual DB connection is deferred &#41;</li>
+</ul>
+<pre class="formatter_pre">my $schema = My::Schema-&gt;connect&#40; &#39;dbi:Pg:...&#39;, $user, $pass &#41;;
+</pre>
+<ul>
+<li>get a ResultSet object representing a set of Rows</li>
+</ul>
+<pre class="formatter_pre">my $orgs_rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;;
+</pre>
+<ul>
+<li>take a subset of those &#40;another ResultSet&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $orgs_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+</pre>
+<ul>
+<li>first one in the result set</li>
+</ul>
+<pre class="formatter_pre">my $chicken = $chickeny_things-&gt;first;     #&lt; actual query is run
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>getting actual data</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>getting actual data</li>
+</ul>
+<pre class="formatter_pre">my $wombat = $orgs_rs-&gt;find&#40; 232432 &#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>getting actual data</li>
+</ul>
+<pre class="formatter_pre">my $wombat = $orgs_rs-&gt;find&#40; 232432 &#41;;
+say $wombat-&gt;genus.&#39; &#39;.$wombat-&gt;species; #&lt; print &#39;Vombatus ursinus&#39; or something
+
+# or search in list context returns all resulting rows
+my @all_nightshades = $orgs_rs-&gt;search&#40;{ genus =&gt; &#39;Solanum&#39; }&#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<ul>
+<li>loading</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<ul>
+<li>loading</li>
+</ul>
+<pre class="formatter_pre">$orgs_rs&gt;create&#40;{ genus =&gt; &#39;Mus&#39;, species =&gt; &#39;musculus&#39; }&#41;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<ul>
+<li>loading</li>
+</ul>
+<pre class="formatter_pre">$orgs_rs&gt;create&#40;{ genus =&gt; &#39;Mus&#39;, species =&gt; &#39;musculus&#39; }&#41;
+# or piecewise
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<ul>
+<li>loading</li>
+</ul>
+<pre class="formatter_pre">$orgs_rs&gt;create&#40;{ genus =&gt; &#39;Mus&#39;, species =&gt; &#39;musculus&#39; }&#41;
+# or piecewise
+my $new = $orgs_rs-&gt;new;
+$new-&gt;genus&#40;&#39;Mus&#39;&#41;;  $new-&gt;species&#40;&#39;musculus&#39;&#41;;
+$new-&gt;insert;
+</pre>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Basic Usage</h1>
+<ul>
+<li>traverse relationships &#40;joined queries&#41;</li>
+</ul>
+<pre class="formatter_pre">my $chickeny_things = $ck_rs-&gt;search&#40;{ genus =&gt; &#39;Gallus&#39; }&#41;;
+my @chr = $chickeny_things-&gt;chromosomes;  #&lt; query is run here
+my @genes = $chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;;
+</pre>
+<ul>
+<li>loading</li>
+</ul>
+<pre class="formatter_pre">$orgs_rs&gt;create&#40;{ genus =&gt; &#39;Mus&#39;, species =&gt; &#39;musculus&#39; }&#41;
+# or piecewise
+my $new = $orgs_rs-&gt;new;
+$new-&gt;genus&#40;&#39;Mus&#39;&#41;;  $new-&gt;species&#40;&#39;musculus&#39;&#41;;
+$new-&gt;insert;
+</pre>
+<ul>
+<li>deleting</li>
+</ul>
+<pre class="formatter_pre">$chicken-&gt;chromosomes-&gt;features-&gt;search&#40;{ type =&gt; &#39;gene&#39; }&#41;-&gt;delete;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>When not to use DBIC</h1>
+<ul>
+<li>tiny app, tiny schema &#40;setup overhead&#41;</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>When not to use DBIC</h1>
+<ul>
+<li>tiny app, tiny schema &#40;setup overhead&#41;</li>
+<li>or tiny number of different queries</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>When not to use DBIC</h1>
+<ul>
+<li>tiny app, tiny schema &#40;setup overhead&#41;</li>
+<li>or tiny number of different queries</li>
+<li>or hate objects</li>
+</ul>
+
+<p>
+strengths/weaknesses ...
+
+</p>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+<li>good support for custom SQL</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+<li>good support for custom SQL</li>
+<li>prefetching</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+<li>good support for custom SQL</li>
+<li>prefetching</li>
+<li>lots of nice extensions</li>
+</ul></ul>
+
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+<li>good support for custom SQL</li>
+<li>prefetching</li>
+<li>lots of nice extensions</li>
+</ul></ul>
+
+<ul>
+<li>weaknesses</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Strengths and Weaknesses</h1>
+<ul>
+<li>strengths</li>
+
+<ul>
+<li>chainable ResultSets</li>
+<li>lazy querying</li>
+<li>good support for custom SQL</li>
+<li>prefetching</li>
+<li>lots of nice extensions</li>
+</ul></ul>
+
+<ul>
+<li>weaknesses</li>
+
+<ul>
+<li>non-ORM-y things are possible, but can be cumbersome</li>
+</ul></ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Chainable ResultSets</h1>
+<pre class="formatter_pre">my $styx_tracks =
+     $music_schema-&gt;resultset&#40;&#39;Artist&#39;&#41;
+                  -&gt;search&#40;{ name =&gt; &#39;Styx&#39; }&#41;
+                  -&gt;albums
+                  -&gt;tracks;
+
+SELECT ...
+  FROM artist
+  JOIN albums ON ...
+  JOIN tracks ON ...
+  WHERE artist.name = &#39;Styx&#39;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Lazy Querying</h1>
+<ul>
+<li>does not run the query until data is actually needed</li>
+</ul>
+<pre class="formatter_pre">
+# fetch all
+my @tracks = $styx_tracks-&gt;all;
+
+# or iterate
+while&#40; my $track = $styx_tracks-&gt;next &#41; { ... }
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Custom SQL</h1>
+<ul>
+<li>can make a view <tt>ResultSource</tt> for big tuned queries</li>
+</ul>
+<pre class="formatter_pre">
+package My::Schema::SummarizedFrobs;
+__PACKAGE__-&gt;table_class&#40;&#39;DBIx::Class::ResultSource::View&#39;&#41;;
+__PACKAGE__-&gt;result_source_instance-&gt;view_definition&#40;&lt;&lt;&#39;&#39;&#41;;
+   SELECT omg_so_much_stuff
+   UNION
+   SELECT &#40; SELECT blah blah blah FROM blah &#41;,
+          &#40; blah blah blah &#41;,
+   WHERE blah blah blah
+   UNION
+      blah blah blah
+
+__PACKAGE__-&gt;add_column&#40; &lt;cols in your view&gt; &#41;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Custom SQL</h1>
+<ul>
+<li>for custom conditions, searches accept <tt>SQL::Abstract</tt> syntax</li>
+</ul>
+<pre class="formatter_pre">
+$schema-&gt;resultSet&#40;&#39;Sequence::Feature&#39;&#41;
+       -&gt;search&#40;{
+            &#39;me.feature_id&#39; =&gt;
+              \[ &#34;IN&#40; select feature_id from clone_feature where clone_id = ?&#41;&#34;,
+                 [ dummy =&gt; $self-&gt;clone_id ],
+               ],
+            },
+            { rows =&gt; 10,
+              order_by =&gt; [qw[ me.name me.type_id ]],
+              having
+            }&#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Prefetching</h1>
+<pre class="formatter_pre"># query will get the wombat organism, and also prefetch *all its
+# chromosomes and features on those chromosomes*
+my $rs = $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;-&gt;search&#40;
+ { genus =&gt; &#39;Vombatus&#39;, species =&gt; &#39;ursinus&#39; },
+ { prefetch =&gt; { chromosomes =&gt; features =&gt; } },
+&#41;;
+</pre>
+<p>
+&#40;in a real biological DB this would probably blow your memory&#41;
+
+</p>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Extensions</h1>
+<ul>
+<li><tt>DBIx::Class::Helpers</tt></li>
+
+<ul>
+<li><tt>fREW</tt>&#39;s miscellaneous things</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Extensions</h1>
+<ul>
+<li><tt>DBIx::Class::Helpers</tt></li>
+
+<ul>
+<li><tt>fREW</tt>&#39;s miscellaneous things</li>
+</ul>
+<li><tt>DBIx::Class::Cursor::Cached</tt></li>
+
+<ul>
+<li>tunable, flexible resultset caching</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Extensions</h1>
+<ul>
+<li><tt>DBIx::Class::Helpers</tt></li>
+
+<ul>
+<li><tt>fREW</tt>&#39;s miscellaneous things</li>
+</ul>
+<li><tt>DBIx::Class::Cursor::Cached</tt></li>
+
+<ul>
+<li>tunable, flexible resultset caching</li>
+</ul>
+<li><tt>DBIx::Class::Ordered</tt></li>
+
+<ul>
+<li>nice for doing ordering or ranking columns in a table</li>
+</ul></ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Extensions</h1>
+<ul>
+<li><tt>DBIx::Class::Helpers</tt></li>
+
+<ul>
+<li><tt>fREW</tt>&#39;s miscellaneous things</li>
+</ul>
+<li><tt>DBIx::Class::Cursor::Cached</tt></li>
+
+<ul>
+<li>tunable, flexible resultset caching</li>
+</ul>
+<li><tt>DBIx::Class::Ordered</tt></li>
+
+<ul>
+<li>nice for doing ordering or ranking columns in a table</li>
+</ul>
+<li><tt>DBIx::Class::InflateColumn::DateTime</tt>, <tt>DBIx::Class::Timestamp</tt></li>
+
+<ul>
+<li>work with dates, times, and timestamps as <tt>DateTime</tt> objects</li>
+</ul></ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Thread-Safe / Fork-Safe</h1>
+<ul>
+<li><tt>theory</tt>&#39;s <tt>DBix::Connector</tt></li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Non-linear Join</h1>
+<pre class="formatter_pre"># get features via the potato organism, also joining in the cvterms table
+my $potato_bacs =
+     $schema-&gt;resultset&#40;&#39;Organism&#39;&#41;
+            -&gt;search&#40;{ species =&gt; &#39;Solanum tuberosum&#39; }&#41;
+            -&gt;search_related&#40; &#39;features&#39;,
+                             { &#39;type.name&#39; =&gt; &#39;BAC_clone&#39;},
+                             { &#39;join&#39; =&gt; &#39;type&#39; },
+                           &#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Non-linear Join</h1>
+<pre class="formatter_pre"># the equivalent bare SQL
+my $potato_bacs = $dbh-&gt;selectall_arrayref&#40; &lt;&lt;EOS, undef, &#39;Solanum tuberosum&#39;, &#39;BAC_clone&#39;&#41;;
+SELECT features.feature_id
+     , features.dbxref_id
+     , features.organism_id
+     , features.name
+     , features.uniquename
+     , features.residues
+     , features.seqlen
+     , features.md5checksum
+     , features.type_id
+     , features.is_analysis
+     , features.is_obsolete
+     , features.timeaccessioned
+     , features.timelastmodified
+FROM organism me
+LEFT JOIN feature features
+       ON features.organism_id = me.organism_id
+JOIN cvterm type
+       ON type.cvterm_id = features.type_id
+WHERE species = ? AND type.name = ?
+EOS
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Convenient Loading of Relationships</h1>
+<pre class="formatter_pre">$chado-&gt;resultset&#40; &#39;Cv::Cv&#39; &#41;
+      -&gt;find_or_create&#40;{ name =&gt; &#39;My Fake Ontology&#39; }&#41;
+      -&gt;create_related&#40;  &#39;cvterm&#39;,
+                         { name =&gt; &#39;MyFakeTerm&#39; }&#41;;
+</pre>
+<p>
+makes the SQL:
+
+</p>
+<pre class="formatter_pre">SELECT me.cv_id
+     , me.name
+     , me.definition
+FROM cv me
+WHERE &#40; me.name = &#39;my fake ontology&#39; &#41;
+
+INSERT INTO cv &#40; name &#41;
+        VALUES &#40; &#39;my fake ontology&#39; &#41;
+     RETURNING cv_id
+
+INSERT INTO cvterm &#40; cv_id,  name        &#41;
+            VALUES &#40; ?,     &#39;MyFakeTerm&#39; &#41;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>Transactions</h1>
+<pre class="formatter_pre">$schema-&gt;txn_do&#40;sub {
+
+    $schema-&gt;resultset&#40;&#39;Cv::Cv&#39;&#41;
+           -&gt;find_or_create&#40;{ name =&gt; &#39;My Fake Ontology&#39; }&#41;
+           -&gt;create_related&#40; &#39;cvterm&#39;, { name =&gt; &#39;MyFakeTerm&#39; } &#41;;
+
+}&#41;;
+</pre>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>easier to manipulate and assemble queries</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>complex joined queries &#40;Chado queries&#41; are very easy and compact</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>SQL syntax errors are more difficult to make</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>it&#39;s all objects.  you can delegate to them, pass them around, etc.</li>
+<li>HOWEVER:</li>
+</ul>
+<small>continued...</small>
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h1>The Real Advantages of DBIC</h1>
+<ul>
+<li>it&#39;s all objects.  you can delegate to them, pass them around, etc.</li>
+<li>HOWEVER:</li>
+
+<ul>
+<li>usually you don&#39;t want to subclass them</li>
+<li>but, see <tt>DBIx::Class::Manual::Cookbook</tt></li>
+</ul></ul>
+
+
+</div>
+<!-- END slide -->
+
+
+<!-- BEGIN slide -->
+<div class="slide">
+
+<h2>That's All</h2>
+<ul>
+<li>The END</li>
+</ul>
+
+
+</div>
+<!-- END slide -->
+
+
+</body>
+</html>
+<!-- END s5 -->

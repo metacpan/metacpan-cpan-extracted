@@ -1,0 +1,20 @@
+MANIFEST			This list of files
+Makefile.PL
+README
+TODO
+lib/Bio/Metabolic.pm
+lib/Bio/Metabolic/Dynamics.pm
+lib/Bio/Metabolic/Dynamics/Network.pm
+lib/Bio/Metabolic/Dynamics/Reaction.pm
+lib/Bio/Metabolic/Dynamics/Substrate.pm
+lib/Bio/Metabolic/MatrixOps.pm
+lib/Bio/Metabolic/Network.pm
+lib/Bio/Metabolic/Reaction.pm
+lib/Bio/Metabolic/Substrate.pm
+lib/Bio/Metabolic/Substrate/Cluster.pm
+t/01substrate.t
+t/02cluster.t
+t/03reaction.t
+t/04network.t
+t/05dynamics.t
+t/06matrixops.t

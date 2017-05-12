@@ -1,0 +1,8 @@
+success:
+    $class: Local::Service
+    exit_code: 0
+
+failure:
+    $class: Local::Service
+    exit_code: 1
+

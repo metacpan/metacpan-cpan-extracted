@@ -1,0 +1,81 @@
+{
+   "abstract" : "Create a bot from a config file.",
+   "author" : [
+      "Mike Francis <ungrim97@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bot-BasicBot-Pluggable-FromConfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Bot::BasicBot::Pluggable" : "0.98",
+            "Carp" : "1.32",
+            "Config::JFDI" : "0.065",
+            "Data::Dumper" : "2.151",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Modern" : "0.002"
+         }
+      }
+   },
+   "provides" : {
+      "Bot::BasicBot::Pluggable::FromConfig" : {
+         "file" : "lib/Bot/BasicBot/Pluggable/FromConfig.pm",
+         "version" : "0.6"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ungrim97/Bot-BasicBot-Pluggable-FromConfig/issues"
+      },
+      "homepage" : "https://github.com/ungrim97/Bot-BasicBot-Pluggable-FromConfig",
+      "repository" : {
+         "url" : "git://github.com/ungrim97/Bot-BasicBot-Pluggable-FromConfig.git",
+         "web" : "https://github.com/ungrim97/Bot-BasicBot-Pluggable-FromConfig"
+      }
+   },
+   "version" : "0.6",
+   "x_contributors" : [
+      "Dominic Humphries <dominich@broadbean.com>",
+      "ungrim97 <ungrim97@hotmail.com>"
+   ]
+}

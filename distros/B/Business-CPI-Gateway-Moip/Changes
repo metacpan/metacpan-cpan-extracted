@@ -1,0 +1,11 @@
+Revision history for Perl module Business::CPI::Gateway::Moip
+
+0.01 Fri Jan 18 09:23:51 2013
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.03 Tue Feb 12
+    - launch first release
+    - fixed some pod
+
+0.05 26/apr/13
+    - Enforce latest Locale::Codes release. It fixed the bug on older perl versions.

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Size.pm
+Size.xs
+b_sizeof.c
+lib/B/TerseSize.pm
+patches/b_clearsym_60.pat
+test.pl
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

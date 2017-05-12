@@ -1,0 +1,49 @@
+# $Id: DBHarness.conf.example,v 1.11 2005-01-31 08:15:54 lapp Exp $
+
+# FILE: t/DBHarness.biosql.conf
+# 
+# These are the default values for the test db configuration.
+
+{
+    # DBD driver to use - mandatory
+    'driver'        => 'mysql',
+    
+    # machine to connect to - mandatory
+    'host'          => '127.0.0.1',
+    
+    # user to connect to server as - mandatory
+    'user'          => 'root',
+    
+    # port the server is running on - optional
+    'port'          => '3306',
+    
+    # Password if needed
+    'password'      => '',
+
+    # Correct to use the version appropriate for your RDBMS.  
+    # Note: this will not be used if you also set dbname below, so
+    # don't bother changing this if you pre-built your schema.
+    'schema_sql'    => [ '../biosql-schema/sql/biosqldb-mysql.sql'],
+    
+    # Set to the name of your existing Biosql database, as it is known
+    # to your RDBMS. It will be used to identify the database name in
+    # the connect string, e.g., using database=, dbname=, or sid=,
+    # depending on the driver.
+    # If this is not set the test scripts will build a temporary
+    # database from scratch at the beginning and destroy it at the
+    # end. Conversely, if you do set it then the database must exist,
+    # or else the tests will fail.
+    # Generally, it is preferred to pre-build the database, simply for
+    # efficiency reasons, and it will also enable debugging your
+    # schema content if some test acts up.
+    'dbname'        => 'biosql',
+
+    # The name of the database within bioperl-db (biosql). Note that
+    # this does not refer to the schema or RDBMS; it only identifies
+    # which of the databases supported in bioperl-db you want to be
+    # using.
+    # Since at present bioperl-db only supports biosql, this must be
+    # biosql.
+    'database'      => 'biosql',
+
+}

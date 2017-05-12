@@ -1,0 +1,61 @@
+{
+   "abstract" : "A bundle to install external CPAN modules used by",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bundle-Latemp",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Class::Accessor" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Find::Rule" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Latemp::GenMakeHelpers" : "0",
+            "HTML::Latemp::NavLinks::GenHtml" : "0",
+            "HTML::Latemp::News" : "0",
+            "HTML::Widgets::NavMenu" : "0",
+            "Pod::Usage" : "0",
+            "Template" : "0",
+            "YAML" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Bundle::Latemp" : {
+         "file" : "lib/Bundle/Latemp.pm",
+         "version" : "v0.2.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/latemp"
+      }
+   },
+   "version" : "v0.2.4"
+}

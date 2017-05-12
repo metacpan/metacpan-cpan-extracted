@@ -1,0 +1,16 @@
+
+This all started out as a script whose code is in original_script.pl
+
+It was turned into a module mostly by cutting and pasting, but I'd
+like to keep it around for reference, at least until I'm convinced
+that the module is working as expected.
+
+
+If you want to run a scan and find out what backpan releases
+you have installed to your system perl, run example_scan.pl.
+
+It will scan perl's @INC, excluding relative paths and paths
+under your $HOME directory, and (hopefully) tell you what
+you installed.
+
+

@@ -1,0 +1,20 @@
+Currently (Mon Sept 11, 2006) the following tenter.js actions cause refresh:
+
+
+    date changes?
+
+Converted to DOM work:
+    . all quick_all calls (changes to a field quick edit box item)
+
+    . update_tree when the call was triggered by a quick edit field or its
+      full edit counterpart
+
+    . update_multiple when the call was triggered by a quick edit field
+
+    . all delete_block calls
+
+    . all create_subblock calls
+
+    . update_tree calls where the update type is name
+
+    . date updates

@@ -1,0 +1,3 @@
+Version 1.03
+	- Changed Makefile.PL to link to libstaden-read, which was renamed
+	starting from version 1.12.

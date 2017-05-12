@@ -1,0 +1,6 @@
+0.02 20160813
+    . Updated API entry point to new domain https://api.backblazeb2.com/
+    + Add support for C<b2_get_download_authorization>
+
+0.01 20160407
+    . Released on an unsuspecting world

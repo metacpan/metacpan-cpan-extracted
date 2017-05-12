@@ -1,0 +1,30 @@
+Description
+~~~~~~~~~~~
+A module for clearing Internet payment transactions with the Danish PBS
+through an SSL connection, provided by the excellent OpenSSL library.
+CashCow will clear the following kinds of transactions between a customer
+and PBS:
+
+	Dankort
+	Visa/Dankort
+	Eurocard
+	MasterCard
+	Visa
+
+This module is a perl wrapper for the c lib cashcow, se
+http://www.cashcow.dk/ for more info.
+
+Prerequisites
+~~~~~~~~~~~~~
+cashcow lib http://www.cashcow.dk/
+
+Usage
+~~~~~
+Get the sourcecode for cashcow lib at http://www.cashcow.dk/. Build and
+install. Then run 'perl Makefile.PL', 'make', 'make test' and 'make install'.
+
+Copyright
+~~~~~~~~~
+Copyright (c) 1999 Gustav Kristoffer Ek <stoffer@netcetera.dk>. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself. 

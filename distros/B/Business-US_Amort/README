@@ -1,0 +1,114 @@
+README for Business::US_Amort
+                                        Time-stamp: "2000-05-14 01:14:45 MDT"
+
+NAME
+     Business::US_Amort - class encapsulating US-style amortization
+
+SYNOPSIS
+       use Business::US_Amort;
+       my $loan = Business::US_Amort->new;
+       $loan->principal(123654);
+       $loan->interest_rate(9.25);
+       $loan->term(20);
+
+       my $add_before_50_amt = 700;
+       sub add_before_50 {
+         my $this = $_[0];
+         if($this->{'_month_count'} == 50) {
+           $this->{'_monthly_payment'} += $add_before_50_amt;
+         }
+       }
+       $loan->callback_before_monthly_calc(\&add_before_50);
+       $loan->start_date_be_now;
+
+       $loan->run;
+       $loan->dump_table;
+
+       print "Total paid toward interest: ", $loan->total_paid_interest, "\n";
+
+DESCRIPTION
+     This class encapsulates amortization calculations figured
+     according to what I've been led to believe is the usual
+     algorithm for loans in the USA.
+
+     I used to think amortization was simple, just the output of
+     an algorithm that'd take just principle, term, and interest
+     rate, and return the monthly payment and maybe something
+     like total paid toward interest.  However, I discovered that
+     there's a need for loan calculations where, say, between the
+     49th and 50th month, your interest rate drops, or where you
+     decide to add $100 to your monthly payment in the 32nd
+     month.
+
+     So I wrote this class, so that I could amortize simply in
+     simple cases while still allowing any kind of strangeness in
+     complex cases.
+
+DISCLAIMER
+     This program is distributed in the hope that it will be
+     useful, but without any warranty; without even the implied
+     warranty of merchantability or fitness for a particular
+     purpose.
+
+     But let me know if it gives you any problems, OK?
+
+COPYRIGHT
+     Copyright 1999, 2000, Sean M. Burke sburke@cpan.org, all
+     rights reserved.  This program is free software; you can
+     redistribute it and/or modify it under the same terms as
+     Perl itself.
+
+AUTHOR
+     Sean M. Burke sburke@cpan.org
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Business::US_Amort doesn't use any nonstandard modules.
+
+
+INSTALLATION
+
+You install Business::US_Amort, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Business::US_Amort in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in Business::US_Amort.  POD is
+readable with the 'perldoc' utility.  See ChangeLog for recent
+changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Business folder under
+your MacPerl site_lib or lib directory and move US_Amort.pm into
+there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Business::US_Amort should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Business::US_Amort is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

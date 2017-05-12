@@ -1,0 +1,9 @@
+[% USE ANSIColor 'color' %]
+[% "FRIENDSHIP FOR $player" | color 'yellow' 'bold' %]
+[% "===" | color 'yellow' 'bold' %]
+
+[% FOREACH n IN friendship.keys -%]
+[% n %]: [% friendship.$n %]
+[% END %]
+
+[% IF others == 1 %]All the other nations are perfectly neutral[% END %]

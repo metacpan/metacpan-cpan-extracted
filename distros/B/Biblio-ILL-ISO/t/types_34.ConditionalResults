@@ -1,0 +1,72 @@
+$VAR1 = bless( {
+                 'date-for-reply' => bless( {
+                                              'generalstring' => '20030727'
+                                            }, 'Biblio::ILL::ISO::ISODate' ),
+                 'proposed-delivery-service' => bless( {
+                                                         'physical-delivery' => bless( {
+                                                                                         'generalstring' => 'Canada Post'
+                                                                                       }, 'Biblio::ILL::ISO::TransportationMode' )
+                                                       }, 'Biblio::ILL::ISO::DeliveryService' ),
+                 'locations' => bless( {
+                                         'SEQUENCE' => [
+                                                         bless( {
+                                                                  'location-id' => bless( {
+                                                                                            'name-of-person-or-institution' => bless( {
+                                                                                                                                        'name-of-person' => bless( {
+                                                                                                                                                                     'generalstring' => 'David A. Christensen'
+                                                                                                                                                                   }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                                                      }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' ),
+                                                                                            'person-or-institution-symbol' => bless( {
+                                                                                                                                       'institution-symbol' => bless( {
+                                                                                                                                                                        'generalstring' => 'MWPL'
+                                                                                                                                                                      }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                                                     }, 'Biblio::ILL::ISO::PersonOrInstitutionSymbol' )
+                                                                                          }, 'Biblio::ILL::ISO::SystemId' ),
+                                                                  'location-note' => bless( {
+                                                                                              'generalstring' => 'This is a location note.'
+                                                                                            }, 'Biblio::ILL::ISO::ILLString' ),
+                                                                  'location-address' => bless( {
+                                                                                                 'telecom-service-identifier' => bless( {
+                                                                                                                                          'generalstring' => 'SMTP'
+                                                                                                                                        }, 'Biblio::ILL::ISO::ILLString' ),
+                                                                                                 'telecom-service-address' => bless( {
+                                                                                                                                       'generalstring' => 'DChristensen@westman.wave.ca'
+                                                                                                                                     }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                               }, 'Biblio::ILL::ISO::SystemAddress' )
+                                                                }, 'Biblio::ILL::ISO::LocationInfo' ),
+                                                         bless( {
+                                                                  'location-id' => bless( {
+                                                                                            'name-of-person-or-institution' => bless( {
+                                                                                                                                        'name-of-institution' => bless( {
+                                                                                                                                                                          'generalstring' => 'Brandon Public Library'
+                                                                                                                                                                        }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                                                                      }, 'Biblio::ILL::ISO::NameOfPersonOrInstitution' )
+                                                                                          }, 'Biblio::ILL::ISO::SystemId' ),
+                                                                  'location-address' => bless( {
+                                                                                                 'telecom-service-identifier' => bless( {
+                                                                                                                                          'generalstring' => 'SMTP'
+                                                                                                                                        }, 'Biblio::ILL::ISO::ILLString' ),
+                                                                                                 'telecom-service-address' => bless( {
+                                                                                                                                       'generalstring' => 'library@brandon.mb.ca'
+                                                                                                                                     }, 'Biblio::ILL::ISO::ILLString' )
+                                                                                               }, 'Biblio::ILL::ISO::SystemAddress' )
+                                                                }, 'Biblio::ILL::ISO::LocationInfo' )
+                                                       ]
+                                       }, 'Biblio::ILL::ISO::LocationInfoSequence' ),
+                 'conditions' => bless( {
+                                          'ENUMERATED' => 14,
+                                          'ENUM_LIST' => {
+                                                           'special-collections-supervision-required' => 25,
+                                                           'cost-exceeds-limit' => 13,
+                                                           'proposed-delivery-service' => 30,
+                                                           'prepayment-required' => 15,
+                                                           'responder-specific' => 28,
+                                                           'library-use-only' => 22,
+                                                           'lacks-copyright-compliance' => 16,
+                                                           'client-signature-required' => 24,
+                                                           'other' => 27,
+                                                           'no-reproduction' => 23,
+                                                           'charges' => 14
+                                                         }
+                                        }, 'Biblio::ILL::ISO::ConditionalResultsCondition' )
+               }, 'Biblio::ILL::ISO::ConditionalResults' );

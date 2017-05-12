@@ -1,0 +1,33 @@
+Bio-FdrFet version 0.01
+=======================
+
+Perl extension for False Discovery Rate and Fisher Exact Test applied
+to pathway analysis.
+
+See the documentation in lib/bio/FdrFet.pm for all the details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Requires Inline::C
+
+TEST CASE CONSTRUCTION
+
+The script, generate_tests.sh, can be used to generate the eight
+results files in the t directory.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Bristol-Myers Squibb Company and Congenomics LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

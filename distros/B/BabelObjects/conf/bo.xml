@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no" ?>
+ 
+<!DOCTYPE bo [
+  <!ENTITY webRoot "http://www.babelobjects.org" >
+  <!ENTITY confDir "/usr/local/babelobjects/conf" >
+  <!ENTITY webDir "/opt/www/www.babelobjects.org" >
+  <!ENTITY classes SYSTEM "./classes.xml" >
+
+<!-- 
+  <!ENTITY webcalendar SYSTEM "./webcalendar.xml" >
+  <!ENTITY webforum SYSTEM "./webforum.xml" >
+  <!ENTITY webmail SYSTEM "./webmail.xml" >
+  <!ENTITY test    SYSTEM "./test.xml" >
+  <!ENTITY module  "&classes; &webcalendar; &webforum; &webmail; &test;" >
+-->
+
+  <!ENTITY module  "&classes;" >
+
+  <!ENTITY nbsp "&amp;nbsp;" >
+  <!ENTITY lt "<" >
+  <!ENTITY gt ">" >
+]> 
+
+<bo>
+   <global>
+      <parameter>
+         <webRoot>&webRoot;</webRoot>
+         <!--Url for your web site from which relative links will be appended-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <confDir>&confDir;</confDir>
+         <!--Directory where the main configuration file resides-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <webDir>&webDir;</webDir>
+         <!--Directory for your web site from which relative links will be appended-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <defaultLanguage>en</defaultLanguage>
+         <!--Default Language-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <contentType>text/html</contentType>
+         <!--Default content-type-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <extension>html</extension>
+         <!-- -->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <debug>true</debug>
+         <!--Logging mode must take one of the following value. Values are cumulative.&lt;ul&gt;
+               &lt;li&gt;DEBUG
+               &lt;li&gt;CRITICAL
+               &lt;li&gt;WARNING
+               &lt;li&gt;INFO
+               &lt;li&gt;ERROR
+-->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <varRegExp>\$\(([a-zA-Z_0-9\.]*)\)</varRegExp>
+         <!-- -->
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <nbCarBeforeVar>2</nbCarBeforeVar>
+         <!-- -->
+         <example>a</example>
+      </parameter>
+<!--
+      <parameter>
+         <varRegExp>\$([a-zA-Z_0-9\.]*)\$</varRegExp>
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <nbCarBeforeVar>1</nbCarBeforeVar>
+         <example>a</example>
+      </parameter>                                                                                 
+-->
+      <parameter>
+         <dictionary>dictionary.txt</dictionary>
+      </parameter>
+      <parameter>
+         <varRegExpForTranslation>\*\(([^\)]*)\)</varRegExpForTranslation>
+         <example>a</example>
+      </parameter>
+      <parameter>
+         <nbCarBeforeVarForTranslation>2</nbCarBeforeVarForTranslation>
+         <example>a</example>
+      </parameter>
+   </global>
+   &module;
+</bo>

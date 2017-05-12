@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b5f36aa71a805e6421504222e8b1919004c5ba88 Changes
+SHA1 4bcb44922263ad97b3d3edc98670e86e1f02fd07 MANIFEST
+SHA1 97e90f64a4deddd38e7726164bbb63012916d254 MANIFEST.SKIP
+SHA1 a0cbb076fca5516da6b7d35d0f74c2e7cf625c88 META.yml
+SHA1 451a932af94bb4d8fcae277ccfd30d85d23ef70c Makefile.PL
+SHA1 ecd22ad05e4ef0b1fd8f8b3d013a100c21e16e00 TODO
+SHA1 eb976f2a0cc0513c6decbc404cd8b9cb58b1944d check_bdb_version.PL
+SHA1 837691bd9a52a69eaffc5c25311b6d3f3688ef9d lib/BerkeleyDB/Manager.pm
+SHA1 08c37e6ce2c017449929f980d59f45c5a67c798c t/01_basic.t
+SHA1 06604edf5f8fb9e7f9dcba403e1294d1a7bf458c t/02_txn.t
+SHA1 b97ee111bbdc9f032153699fbcb59a45ae9118ac t/03_associate.t
+SHA1 19f865e24d053114c98c7409ad6d7c869b87bb5b t/04_streams.t
+SHA1 a20a5b240ec688edc7d14e49ae137884441c09af t/lib/BerkeleyDB/Manager/Test.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFJcNlOVCwRwOvSdBgRAllNAKDCfp1eP5oHeZqavD0Cf2rHtDqwNwCfQLrL
+IGT8VFHYIIoPJhTv3RJIXaQ=
+=hfmX
+-----END PGP SIGNATURE-----

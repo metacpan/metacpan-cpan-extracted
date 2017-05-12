@@ -1,0 +1,11 @@
+[% INCLUDE header.html title = 'Critical Prefix Management: Home Page'; %]
+
+<p><h2>Export of "[% LIST  %]" Critical Prefix List:</h2></p>
+
+[% FOREACH var IN DATA %]
+[% var %]<br>
+[% END %]
+<br>
+
+
+[% INCLUDE footer.html %]

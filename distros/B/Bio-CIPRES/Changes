@@ -1,0 +1,23 @@
+Revision history for Bio-CIPRES
+
+0.003003 2017-04-24
+         Fixed bug returning incorrect value for Bio::CIPRES::Job::is_failed()
+         Fixed return type of Bio::CIPRES::Job::submit_time()
+         Expanded test coverage
+
+0.003002 2016-09-27
+         Fixed bug caused by typo in UMBRELLA property
+
+0.003001 2016-09-27
+         Fixed fatal bug in Bio::CIPRES::Job::wait() default handling
+
+0.003    2016-09-27
+         Added UMBRELLA auth support
+         Minor bugfixes to test suite
+
+0.002    2016-09-23
+         Numerous POD fixes
+
+0.001    2016-09-23
+         Initial release
+

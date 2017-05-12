@@ -1,0 +1,186 @@
+#!perl
+use Config;
+use ExtUtils::Embed;
+
+my ($coredir, $libdir);
+if ($ENV{PERL_CORE}) {
+  $libdir = $coredir = $^O eq 'MSWin32'? '../../lib/CORE' : '../..';
+} else {
+  $libdir  = $Config{prefix} . "/lib";
+  $coredir = $ENV{PERL_SRC} || $Config{archlib}."/CORE";
+}
+my $useshrplib = $Config{useshrplib} =~ /^(true|yes)$/;
+my $libs = $Config{libs};
+my $so = $Config{so};
+my $libperl = $Config{libperl};
+my ($linkargs, $quiet, $debug);
+my $pkg = ($Config{usecperl} and $libperl =~ /libcperl/) ? "cperl" : "perl";
+if (grep {$_ eq '-q' or $_ eq '--quiet'} @ARGV) {
+  $quiet++;
+  @ARGV = grep {$_ ne '-q' and $_ ne '--quiet'} @ARGV;
+}
+if (grep {$_ eq '-d' or $_ eq '--debug'} @ARGV) {
+  $debug++;
+  @ARGV = grep {$_ ne '-d' and $_ ne '--debug'} @ARGV;
+}
+if (grep {$_ eq '-A'} @ARGV) {
+  @ARGV = grep {$_ ne '-A'} @ARGV;
+  push @ARGV, '-DALLOW_PERL_OPTIONS';
+}
+eval { require B::C::Config; };
+
+if (grep(/^-[cES]$/, @ARGV)) { # compile-only with -c -E or -S
+    ;
+} elsif (grep(/^-Bdynamic$/, @ARGV)) { # force dynamic linking with -Bdynamic
+    @ARGV = grep{ !/^-Bdynamic$/o } @ARGV;
+    $linkargs = ldopts;
+} elsif (grep(/^-Bstatic$/, @ARGV)) { # force static linking with -Bstatic
+    @ARGV = grep{ !/^-Bstatic$/o } @ARGV;
+    $linkargs = ldopts("-std");
+    for my $lib ("$libdir/lib$pkg.a", "$coredir/lib$pkg.a") {
+      if (-e $lib) {
+	$linkargs =~ s|-l$pkg |$lib |;
+	push @ARGV, ("$coredir/DynaLoader.o") if -e "$coredir/DynaLoader.o";
+	#$linkargs .= " $coredir/Win32CORE.o" if $^O eq 'cygwin' and -e "$coredir/Win32CORE.o";
+	last;
+      }
+    }
+} elsif (-e "$coredir/$libperl" and $libperl !~ /\.$so$/) {
+    $linkargs = ldopts("-std"); # importlib or static
+} elsif ( $useshrplib and -e "$libdir/$libperl") {
+    # debian: /usr/lib/libperl.so.5.10.1 and broken ExtUtils::Embed::ldopts
+    $linkargs = ldopts('-std');
+    $linkargs =~ s|-lc?perl |$libdir/$libperl |;
+} elsif ( $useshrplib and -e "$coredir/$libperl") {
+    # just help cygwin debugging
+    $linkargs = ldopts('-std');
+    $linkargs =~ s|-lc?perl |$coredir/$libperl |;
+} else { # try dynamic lib if no static lib exists
+    @ARGV = grep{ !/^-Bdynamic$/o } @ARGV;
+    $linkargs = ldopts('-std');
+}
+# Note (probably harmless): No library found for -lnsl
+# another ldopts bug: ensure Win32CORE gets added.
+if ($^O =~ /^(cygwin|MSWin32|msys)/) {
+    if (index($linkargs, "Win32CORE") < 0) {
+        my $archdir = $ENV{PERL_CORE} ? "../.." : $Config{archlib};
+        my $win32core = "-L$archdir/lib/auto/Win32CORE -lWin32CORE";
+        if (-e "$archdir/lib/auto/Win32CORE/Win32CORE.a") {
+            $win32core = "$archdir/lib/auto/Win32CORE/Win32CORE.a";
+        }
+        if ($linkargs =~ m{ (-lc?perl|\S*/$libperl)}) {
+            $linkargs =~ s{ (-lc?perl|\S*/$libperl)}{ $win32core $1};
+        } else {
+            $linkargs .= " $win32core";
+        }
+    }
+}
+$linkargs .= " -L".$coredir if $ENV{PERL_CORE};
+$linkargs .= " -l$pkg" unless $linkargs =~ /( -lc?perl|CORE\/libc?perl)/;
+$linkargs = $B::C::Config::extra_libs . " " . $linkargs;
+$linkargs .= " $libs" if index($linkargs,$libs) == -1;
+
+sub cc_harness_msvc {
+    my @ARGV = @_;
+    my $cfile = 'a.c';
+    my $Output;
+    for my $i (0 .. @ARGV) {
+      if ($ARGV[$i] eq '-o') {
+        $Output = $ARGV[$i+1];
+      }
+    }
+    my @cfile = grep {!/^-/} @ARGV;
+    if (@cfile == 1) {
+        $cfile = $cfile[0];
+    } elsif (@cfile > 1) {
+        die "too many arguments @cfile";
+    }
+    my $obj = $cfile;
+    $obj =~ s/\.c$/.obj/;
+    unless ($Output) {
+      $Output = $cfile;
+      $Output =~ s/\.c$/.exe/;
+    }
+    my $compile = ccopts." -c @ARGV ";
+    if ($debug) {
+      $compile .= "/Wall " if !$quiet;
+      # remove conflicting flags
+      $compile .= "-g ";
+      $compile =~ s/ -O.? / -Od /;
+      $compile =~ s/ -DNDEBUG / -DDEBUG /;
+    } else {
+      # avoid expensive optimisations with low memory (1-2 hours!)
+      $compile .= " -Od" if $ENV{APPVEYOR};
+    }
+    $compile .= "-DHAVE_INDEPENDENT_COMALLOC " if $B::C::Config::have_independent_comalloc;
+    $compile .= $B::C::Config::extra_cflags;
+    $compile = ' -I"..\..\lib\CORE"'.$compile if $ENV{PERL_CORE};
+    print "running $Config{cc} $compile" unless $quiet;
+    system("$Config{cc} $compile");
+    
+    my $link = "-out:$Output $obj ";
+    $link .= " -libpath:".$coredir if $ENV{PERL_CORE};
+    # TODO: -shared,-static,-sharedxs,-staticxs
+    $link .= (" ".$B::C::Config::extra_libs);
+    if ($stash) {
+        my @mods = split /-?u /, $stash;
+        $link .= " ".ldopts("-std", \@mods);
+    } else {
+        $link .= " ".ldopts("-std");
+    }
+    if ($debug) {
+        $link .= " /DEBUG";
+    } else {
+      # avoid expensive folding with low memory
+      $link .= " /OPT:NOREF" if $ENV{APPVEYOR};
+    }
+    if (index($link, "Win32CORE") < 0) {
+        my $archdir = $ENV{PERL_CORE} ? "../.." : $Config{archlib};
+        my $win32core = "-L$archdir/lib/auto/Win32CORE -lWin32CORE";
+        if (-e "$archdir/lib/auto/Win32CORE/Win32CORE.lib") {
+            $win32core = "$archdir/lib/auto/Win32CORE/Win32CORE.lib";
+        }
+        $link .= " $win32core";
+    }
+    $link .= " ".($Config{usecperl}?"c":"")."perl5$Config{PERL_VERSION}.lib";
+    $link .= " kernel32.lib msvcrt.lib";
+    print "running $Config{ld} $link" unless $quiet;
+    system("$Config{ld} $link");
+}
+
+if ($^O eq 'MSWin32' && $Config{cc} =~ 'cl') {
+    cc_harness_msvc(@ARGV);
+    exit;
+}
+
+# ActivePerl 5.10.0.1004 claims to use MSVC6 but used MSVC8
+#if ($Config::Config{ccversion} eq '12.0.8804' and $Config::Config{cc} eq 'cl') {
+#  $linkargs =~ s/ -opt:ref,icf//;
+#}
+
+my $ccflags = $Config{ccflags};
+# crashes on cygwin
+if ($^O eq 'cygwin' and $ccflags =~ /-fstack-protector\b/
+                    and $linkargs =~ /-fstack-protector\b/)
+{
+  $linkargs =~ s/-fstack-protector\b//;
+}
+#-pedantic -Wextra -Wconversion
+if ($debug and $Config{cc} =~ /gcc/) {
+  $ccflags .= " -ansi -Wall -Wshadow -Wcast-qual -Wwrite-strings"
+    if !$quiet;
+  # remove conflicting flags, esp. -s for strip
+  $ccflags =~ s/ -O.? / /;
+  $ccflags =~ s/ -s / /;
+  $linkargs =~ s/-s / /;
+}
+
+# -Wl,--warn-once is not gold compatible
+$ccflags .= " --no-warn"
+  if $Config{cc} =~ /gcc/ and $quiet and $^O ne 'darwin';
+$ccflags .= " -DHAVE_INDEPENDENT_COMALLOC" if $B::C::Config::have_independent_comalloc;
+$ccflags .= $B::C::Config::extra_cflags;
+
+my $cccmd = "$Config{cc} $ccflags -I$coredir @ARGV $linkargs";
+print "$cccmd\n" unless $quiet;
+exec $cccmd;

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perlish OO bindings to the L<Global Names Resolver|http://resolver.globalnames.org/> API",
+   "author" : [
+      "Dimitrios - Georgios Kontopoulos <d.kontopoulos13@imperial.ac.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-Taxonomy-GlobalNames",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "LWP::UserAgent" : "6.05",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.9",
+            "JSON::Parse" : "0.23",
+            "LWP::UserAgent" : "6.05",
+            "Moo" : "1.004005",
+            "Moo::Lax" : "0.12",
+            "REST::Client" : "249",
+            "Scalar::Readonly" : "0.03",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dgkontopoulos/Bio-Taxonomy-GlobalNames.git",
+         "web" : "https://github.com/dgkontopoulos/Bio-Taxonomy-GlobalNames"
+      }
+   },
+   "version" : "0.07"
+}

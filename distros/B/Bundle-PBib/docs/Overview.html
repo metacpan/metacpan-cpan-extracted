@@ -1,0 +1,448 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Overview - Something like BibTeX, but written in perl and designed to be extensible in three dimensions: bibliographic databases</title>
+<link rel="stylesheet" href="Active.css" type="text/css" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Overview - Something like BibTeX, but written in perl and designed to be extensible in three dimensions: bibliographic databases</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#quick_start">QUICK START</a></li>
+	<ul>
+
+		<li><a href="#setup_bibliography_database">SETUP BIBLIOGRAPHY DATABASE</a></li>
+		<li><a href="#create_input_documents">CREATE INPUT DOCUMENTS</a></li>
+		<li><a href="#supported_document_formats">Supported document formats</a></li>
+		<li><a href="#run_pbib">RUN PBIB</a></li>
+	</ul>
+
+	<li><a href="#success_stories_;)">SUCCESS STORIES ;-)</a></li>
+	<li><a href="#configuration">CONFIGURATION</a></li>
+	<ul>
+
+		<li><a href="#environment_variables">Environment Variables</a></li>
+		<li><a href="#config_files">Config Files</a></li>
+	</ul>
+
+	<li><a href="#dependencies">DEPENDENCIES</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_licence">COPYRIGHT AND LICENCE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>PBib::PBib - Something like BibTeX, but written in perl and designed to be extensible in three dimensions: bibliographic databases (e.g. BibTeX, OpenOffice), document file formats (e.g. Word, RTF, OpenOffice), styles (e.g. ACM, IEEE)</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        use PBib::PBib;
+        use Biblio::Biblio;
+        my $bib = new Biblio::Biblio();
+        my $pbib = new PBib::PBib('refs' =&gt; $bib-&gt;queryPapers());
+        $pbib-&gt;convertFile($file);</pre>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>I wrote PBib to have something like BibTex for MS Word that can use a various sources for bibliographic references, not just BibTex files, but also database systems. Especially, I wanted to use the StarOffice bibliographic database.</p>
+<p>Now, PBib can be extended in a couple of dimensions:</p>
+<dl>
+<dt><strong><a name="item_%2d_bibliographic_styles">- bibliographic styles</a></strong><br />
+</dt>
+<dd>
+such as ACM style or IEEE style.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2d_document_format">- document format</a></strong><br />
+</dt>
+<dd>
+such as Plain text, (La)TeX, Word, RTF, OpenOffice
+</dd>
+<p></p>
+<dt><strong><a name="item_%2d_bibliographic_database_format">- bibliographic database format</a></strong><br />
+</dt>
+<dd>
+such as bibtex, refer, tib, but also database systems with different mappings to database fields.
+</dd>
+<p></p></dl>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="quick_start">QUICK START</a></h1>
+<p>
+</p>
+<h2><a name="setup_bibliography_database">SETUP BIBLIOGRAPHY DATABASE</a></h2>
+<p>Once you've installed the distribution you have to set up a bibliography database in order to start using PBib and PBibTk.</p>
+<p>Several formats are supported:</p>
+<dl>
+<dt><strong><a name="item_%2d_perl%3adbi_databases">- Perl:DBI databases</a></strong><br />
+</dt>
+<dd>
+You can configure the database schema to use, see <em>conf/default.pbib</em>, <em>conf/OOo-table.pbib</em> and some for DBMSs, see
+<em>conf/mysql.pbib</em>, <em>conf/adabas.pbib</em>.
+You can <code>include</code> the files in your <em>site.pbib</em> file if you are
+using one of these systems.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2d_bibtex_files">- bibtex files</a></strong><br />
+</dt>
+<dt><strong><a name="item_%2d_several_other_file_types_that_are_supported_by">- several other file types that are supported by the bp package.</a></strong><br />
+</dt>
+</dl>
+<p>I'd recommend to use a mysql database, this works fine for me.
+See the config/sample user.pbib file for some examples.</p>
+<p>You should specify your default settings in a user.pbib file, which is searched for at a couple of places, e.g. you home directory. (Check that the HOME environment variable on windows is set.) In case you want to provide defaults for your organization, use the local.pbib file.</p>
+<p>You can adapt the mapping of PBib fields to DB fields, see file config/OOo-table.pbib for an example if you want to use a OpenOffice.org bibliography database.</p>
+<p>No support is given to edit the bibliography database, as there are lots of tools around. Check docs/Edit_Bibliography.sxw for a OpenOffice.org document to edit a bibliography database. (That's the form that I use.) Ensure that it's attached to the correct database (Tools&gt;&gt;Data Sources, Edit&gt;&gt;Exchange Database).</p>
+<p>
+</p>
+<h2><a name="create_input_documents">CREATE INPUT DOCUMENTS</a></h2>
+<dl>
+<dt><strong><a name="item_cite_references">Cite references</a></strong><br />
+</dt>
+<dd>
+In your documents, use [[Cite-Key]] (Double brackets) to place references in the document. These will be replaced by PBib to a reference according to the selected style, e.g. (Tandler, 2004).
+</dd>
+<dd>
+<p>The CiteKey is the key defined in the bibliography database.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_generate_the_list_of_references_used">Generate the list of references used</a></strong><br />
+</dt>
+<dd>
+Use [{}] as the place holder for the list of references.
+</dd>
+<p></p></dl>
+<p>See <a href="././blib/html/site/lib/PBib/Intro.html">the PBib::Intro manpage</a> for a more detailed description.
+You can find sample files in the test folder <em>t</em>.</p>
+<p>
+</p>
+<h2><a name="supported_document_formats">Supported document formats</a></h2>
+<dl>
+<dt><strong><a name="item_%2d_ms_word_%2edoc%2c_%2ertf">- MS Word .doc, .rtf</a></strong><br />
+</dt>
+<dd>
+.doc will be converted to .rtf before processing (requires MS Word to be installed)
+</dd>
+<p></p>
+<dt><strong><a name="item_%2d_plain_text">- Plain Text</a></strong><br />
+</dt>
+<dd>
+TeX input is currently handled as plain text, there is no specific style for TeX yet.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2d_openoffice_%2esxw">- OpenOffice .sxw</a></strong><br />
+</dt>
+<dd>
+OpenOffice Text (.sxw) uses actually a zipped XML document. (You need the <a href="./Archive/Zip.html">the Archive::Zip manpage</a> and <a href="./XML/Parser.html">the XML::Parser manpage</a> modules to use this.)
+</dd>
+<p></p></dl>
+<p>Not yet supported:</p>
+<dl>
+<dt><strong><a name="item_latex_and_tex">LaTeX and TeX</a></strong><br />
+</dt>
+<dd>
+Should generate s.th. similar to BibTeX. But wait, if you write with TeX, you can <em>use</em> BibTeX!
+</dd>
+<dd>
+<p>For now, this is treated as plain text.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_html">HTML</a></strong><br />
+</dt>
+<dd>
+For now, this is treated as plain text.
+</dd>
+<dd>
+<p>At minimum, the correct character encoding should be ensured and 
+some formatting for the References section.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_xml">XML</a></strong><br />
+</dt>
+<dd>
+There is support for XML, but of course the generic XML support is very limited. Maybe, support DocBook, or provide an easy way to specify the tags to be used.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="run_pbib">RUN PBIB</a></h2>
+<p>Provided scripts as front ends for the modules:</p>
+<p>bin/pbib.pl &lt;&lt;filename&gt;&gt;</p>
+<p>Process an input document and write the converted output to a new file
+called <em>filename</em><code>-pbib.</code><em>ext</em>.</p>
+<p>bin/PBibTk.pl [&lt;&lt;optional filename&gt;&gt;]</p>
+<p>Open a Tk GUI that allows you to browse you bibliography database and browse the items referenced in your document.</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="success_stories_;)">SUCCESS STORIES ;-)</a></h1>
+<p>I've used PBib/PBibTk to format citations and generate the bibliography for my thesis and several other papers; 
+in fact, I wrote it as I couldn't find another tool that matched my requirements. 
+To get an idea of the scope that PBib can handle: My thesis references about 360 papers, there are &gt;900 entries in the database, the thesis converted to a RTF file is about 50MB. Maybe, you want to have a look at 
+<a href="http://elib.tu-darmstadt.de/diss/000506">http://elib.tu-darmstadt.de/diss/000506</a> or 
+<a href="http://ipsi.fraunhofer.de/ambiente/publications/">http://ipsi.fraunhofer.de/ambiente/publications/</a>.</p>
+<p>The bibliographic database I used is available in BibTeX format at <a href="http://tandlers.de/peter/beach/">http://tandlers.de/peter/beach/</a> (with lots of HCI, CSCW, UbiComp references).</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="configuration">CONFIGURATION</a></h1>
+<p>You can configure PBib in a number of ways, e.g. using config files and 
+environment variables. For detailed information, please refer to 
+module <a href="././blib/html/site/lib/PBib/Config.html">the PBib::Config manpage</a>.</p>
+<p>You can use a filename.pbib config file to specify specific configuration for a file.</p>
+<p>
+</p>
+<h2><a name="environment_variables">Environment Variables</a></h2>
+<dl>
+<dt><strong><a name="item_pbibdir">PBIBDIR</a></strong><br />
+</dt>
+<dd>
+The directory where the PBib scripts are located, e.g. /usr/local/bin.
+</dd>
+<p></p>
+<dt><strong><a name="item_pbibpath">PBIBPATH</a></strong><br />
+</dt>
+<dd>
+Path to look for config files (and also styles), separated by ';'.
+</dd>
+<p></p>
+<dt><strong><a name="item_pbibstyles">PBIBSTYLES</a></strong><br />
+</dt>
+<dd>
+Path to look for PBib styles, separated by ';'.
+</dd>
+<p></p>
+<dt><strong><a name="item_pbibconfig">PBIBCONFIG</a></strong><br />
+</dt>
+<dd>
+Path to look for PBib config, separated by ';'.
+</dd>
+<p></p>
+<dt><strong><a name="item_home">HOME</a></strong><br />
+</dt>
+<dd>
+If set, PBib looks for the user's personal config at
+</dd>
+<dl>
+<dt><strong><a name="item_%24home%2f%2epbib%2fstyles">$HOME/.pbib/styles</a></strong><br />
+</dt>
+<dt><strong><a name="item_%24home%2f%2epbib%2fconf">$HOME/.pbib/conf</a></strong><br />
+</dt>
+<dt><strong><a name="item_%24home">$HOME</a></strong><br />
+</dt>
+</dl>
+<dt><strong><a name="item_appdata">APPDATA</a></strong><br />
+</dt>
+<dd>
+If set, PBib looks for the user's personal config at
+</dd>
+<dl>
+<dt><strong><a name="item_%24appdata%2fpbib%2fstyles">$APPDATA/PBib/styles</a></strong><br />
+</dt>
+<dt><strong><a name="item_%24appdata%2fpbib%2fconf">$APPDATA/PBib/conf</a></strong><br />
+</dt>
+</dl>
+<p>$APPDATA points on Windows XP to something like ``C:\Documents and Settings\&lt;&lt;user&gt;&gt;\Application Data''.</p>
+</dl>
+<p>
+</p>
+<h2><a name="config_files">Config Files</a></h2>
+<p><em>ToDo: Explain format of config files ...</em>, look at <a href="././blib/html/site/lib/PBib/Config.html">the PBib::Config manpage</a> and 
+the exsamples provided with this distribution.</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="dependencies">DEPENDENCIES</a></h1>
+<p>PBib itself consists of three packages that can be used independently:</p>
+<dl>
+<dt><strong><a name="item_biblio">Biblio</a></strong><br />
+</dt>
+<dd>
+Provides an interface to bibliographic databases. The main class is <a href="././blib/html/site/lib/Biblio/Biblio.html">the Biblio::Biblio manpage</a>.
+</dd>
+<dd>
+<p><a href="././blib/lib/Biblio/File.html">the Biblio::File manpage</a> uses <a href="././blib/html/site/lib/Biblio/BP.html">the Biblio::BP manpage</a> and <a href="././blib/html/site/lib/Biblio/Util.html">the Biblio::Util manpage</a> that encapsulate the ``bp'' package mentioned above.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pbib">PBib</a></strong><br />
+</dt>
+<dd>
+Main functionality to process documents that contain references.
+</dd>
+<dd>
+<p>PBib uses the format for references returned by Biblio, so it's well designed to be used together. But, PBib can be used with any hash of references that contains the same keys.</p>
+</dd>
+<dd>
+<p>The main class is <a href="././blib/html/site/lib/PBib/PBib.html">the PBib::PBib manpage</a>. The main script is <em>pbib.pl</em>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_pbibtk">PBibTk</a></strong><br />
+</dt>
+<dd>
+PBibTk provides a GUI for PBib. It uses PBib and Biblio.
+</dd>
+<dd>
+<p>The main class is <a href="././blib/html/site/lib/PBibTk/Main.html">the PBibTk::Main manpage</a>. It is started with the script <em>PBibTk.pl</em>.</p>
+</dd>
+<p></p></dl>
+<p>I've thought about deploying these as separate packages, but currently I believe that this way it's easier to install and use.</p>
+<p>This module requires these other modules and libraries:</p>
+<dl>
+<dt><strong><a name="item_bp">bp</a></strong><br />
+</dt>
+<dd>
+The Perl Bibliography Package ``bp'', by Dana Jacobsen (<a href="mailto:dana@acm.org">dana@acm.org</a>) is used. An adapted version of it (with some bug fixes and 
+enhancements) is included in this distribution.
+</dd>
+<dd>
+<p>In fact, bp is really helpful to generate the hashes with literature references from various sources.
+Please check <a href="http://www.ecst.csuchico.edu/~jacobsd/bib/bp/">http://www.ecst.csuchico.edu/~jacobsd/bib/bp/</a> and the bp README located in <em>lib/Biblio/bp/README</em>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_config%3a%3ageneral">Config::General</a></strong><br />
+</dt>
+<dd>
+by Thomas Linden &lt;<a href="mailto:tom@daemon.de">tom@daemon.de</a>&gt;
+</dd>
+<p></p>
+<dt><strong><a name="item_archive%3a%3azip_and_xml%3a%3aparser">Archive::Zip and XML::Parser</a></strong><br />
+</dt>
+<dd>
+for OpenOffice support.
+</dd>
+<p></p></dl>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>These methods are exported.</p>
+<dl>
+<dt><strong>$conf = new PBib::PBib(<em>options</em>)</strong><br />
+</dt>
+<dd>
+Supported Options:
+</dd>
+<dl>
+<dt><strong><a name="item_refs">refs</a></strong><br />
+</dt>
+<dt><strong><a name="item_config">config</a></strong><br />
+</dt>
+<dt><strong><a name="item_indoc">inDoc</a></strong><br />
+</dt>
+<dt><strong><a name="item_outdoc">outDoc</a></strong><br />
+</dt>
+</dl>
+<dt><strong><a name="item_processfile">$conv = $pbib-&gt;processFile($infile, $outfile, $config, $refs)</a></strong><br />
+</dt>
+<dd>
+Calls <a href="#item_convertfile"><code>convertFile()</code></a> &amp; optionally opens result in editor.
+</dd>
+<p></p>
+<dt><strong><a name="item_convertfile">$conv = $pbib-&gt;convertFile($infile, $outfile, $config, $refs)</a></strong><br />
+</dt>
+<dd>
+If $infile (filename) is undef, inDoc (document) is used.
+</dd>
+<dd>
+<p>If $outfile (filename) is undef, outDoc (document) is used.</p>
+</dd>
+<dd>
+<p>If $config or $refs is undef, the default values are used (the ones passed to the constructor).</p>
+</dd>
+<dd>
+<p>The converter $conv is passed to the caller.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_logstatistics">logStatistics($logfile, $conv, $options, $duration)</a></strong><br />
+</dt>
+<dd>
+Write log file.
+</dd>
+<p></p>
+<dt><strong><a name="item_scanfile">$pbib-&gt;scanFile($infile, $config)</a></strong><br />
+</dt>
+<dd>
+Returns the foundInfo for the $infile.
+</dd>
+<p></p>
+<dt><strong><a name="item_filterreferencesforfiles">\%foundIDs = $pbib-&gt;<code>filterReferencesForFiles(@files)</code></a></strong><br />
+</dt>
+<dd>
+Filter the known references to the ones used in @files, a hash reference is returned.
+CrossRefs are also included (filterReferences() is used).
+</dd>
+<p></p>
+<dt><strong><a name="item_filterreferences">$pbib-&gt;<code>filterReferences($filter_refs)</code></a></strong><br />
+</dt>
+<dd>
+Scan the passed refs for the known ones, return a new hash reference with all known references (including CrossRefs).
+</dd>
+<p></p></dl>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Peter Tandler &lt;<a href="mailto:pbib@tandlers.de">pbib@tandlers.de</a>&gt;
+
+</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="copyright_and_licence">COPYRIGHT AND LICENCE</a></h1>
+<p>Copyright (C) 2002-2004 P. Tandler
+
+</p>
+<p>For copyright information please refer to the LICENSE file included in this distribution.
+
+</p>
+<p>
+<a href="#__index__"><small>__top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>bin\pbib.pl</em>, <em>bin\PBibTk.pl</em>
+
+</p>
+<p><a href="http://tandlers.de/peter/pbib/">http://tandlers.de/peter/pbib/</a>
+</p>
+<p><a href="#__index__"><small>__top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;Overview - Something like BibTeX, but written in perl and designed to be extensible in three dimensions: bibliographic databases</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

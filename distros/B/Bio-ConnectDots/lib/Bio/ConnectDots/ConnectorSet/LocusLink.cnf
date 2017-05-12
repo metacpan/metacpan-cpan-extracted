@@ -1,0 +1,29 @@
+# example cnf file for LocusLink
+
+name=LocusLink
+module=LocusLink
+version=20041102
+source_version=
+source_date=
+download_date=
+comment=
+ftp=ftp://ftp.ncbi.nih.gov/refseq/LocusLink
+ftp_files=LL_templ
+
+label=LocusLink, dotset=LocusLink_ID
+label=UniGene, dotset=UniGene_ID
+label=Organism, dotset=Organism_Name
+label=Prefered_Symbol, dotset=Gene_Symbol
+label=Alias_Symbol, dotset=Gene_Symbol
+label=Hugo, dotset=Gene_Symbol
+label=Official_GeneName, dotset=Gene_Name
+label=Prefered_GeneName, dotset=Gene_Name
+label=refSeq, dotset=Sequence_ID
+label=refSeq_Protein, dotset=Sequence_ID
+label=refSeq_XM, dotset=Sequence_ID
+label=refSeq_Protein_XP, dotset=Sequence_ID
+label=STS, dotset=Marker
+label=OMIM, dotset=Omim_ID
+label=PubMed, dotset=Publication_ID
+label=Sequence_Accession, dotset=Sequence_ID
+

@@ -1,0 +1,53 @@
+NAME
+
+    Business::UPC - Perl extension for manipulating Universal Product Codes
+
+SYNOPSIS
+
+       use Business::UPC;
+    
+       # Constructors:
+       # create a UPC object using standard (type-A) UPC
+       $upc = new Business::UPC('012345678905');
+       # create a UPC object using zero-supressed (type-E) UPC
+       $upc = type_e Business::UPC('01201303');
+    
+       # is the UPC valid (correct check digit)?
+       $upc->is_valid;
+    
+       # correct the check digit
+       $upc->fix_check_digit;
+    
+       # get the numeric string:
+       $upc->as_upc;        # same as $upc->as_upc_a;
+       $upc->as_upc_a;
+       $upc->as_upc_e;
+    
+       # get the components;
+       $upc->number_system;         # UPC number system character
+       $upc->mfr_id;                # Manufacturer ID
+       $upc->prod_id;               # Product ID
+       $upc->check_digit;           # Check Digit
+    
+       # more information about the components:
+       $upc->number_system_description      # explain number_system
+    
+       # methods specific to coupon UPC codes:
+       $upc->is_coupon;
+       $upc->coupon_family_code;            # 3-digit family code
+       $upc->coupon_family_description;     # explain above
+       $upc->coupon_value_code;             # 2-digit value code
+       $upc->coupon_value;                  # explain above
+
+DESCRIPTION
+
+    More detail to come later...
+
+AUTHOR
+
+    Rob Fugina, robf@fugina.com
+
+SEE ALSO
+
+    perl(1).
+

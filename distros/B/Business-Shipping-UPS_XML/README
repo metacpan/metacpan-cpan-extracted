@@ -1,0 +1,10 @@
+
+After spending hours trying to fullfill all the prerequisites for XML modules,
+to build this UPS module, I relized there's a deffinate need for a simple XML
+solution without a load of prerequisites.  I designed this module to be 100%
+self sufficient.  No additional modules are needed.
+
+Using this module requires an UPS account.  You can get an account at 
+www.ups.com/
+
+See INSTALL.interchange to install the Interchange user tag.

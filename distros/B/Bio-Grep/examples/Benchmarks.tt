@@ -1,0 +1,117 @@
+=head1 NAME
+
+Bio::Grep::Benchmarks - Bio::Grep Benchmarks
+
+=head1 DESCRIPTION
+
+A collection of quick and dirty benchmarks. 
+
+=head1 BENCHMARKS
+
+[% cpuinfo %], 4GB RAM. [% osname %]. Perl [% perl %].
+
+[% filenameCDNA %] (Arabidopsis CDNA Fasta file, 63MB). 
+
+Bio::Grep [% biogrepv %]. 
+
+=head2 Database Generation
+
+Average over [% iterationsdb %] iterations.
+
+  GUUGle         : [% guugle_dbgen %] sec
+  Agrep/RE       : [% agrep_dbgen  %] sec
+  Vmatch (-pl 3) : [% vmatch_dbgen %] sec
+
+  
+=head2 Mismatches
+
+Query: C<ugacagaagagagugagcac> (revcom)
+
+Average over [% iterations %] iterations.
+
+=over
+
+=item B<No mismatches (exact matching):>
+
+  Agrep (Wu-Manber):  [%  agrep_mm_0_0 %] sec
+  Vmatch           :  [% vmatch_mm_0_0 %] sec
+  RE               :  [%     re_mm_0_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_0_1 %] sec
+  GUUGle           : [% guugle_mm_0_0 %] sec
+  Agrep (TRE)      : [% agrep_tre_mm_0_0 %] sec
+
+Note that C<Vmatch> needs one slow run to load the suffix arrays in memory
+(Values are the average over [% iterations %] iterations). Also note that GUUGle
+allows GU mismatches.
+
+=item B<One mismatch:>
+
+  Vmatch           :  [% vmatch_mm_1_0 %] sec
+  Agrep (Wu-Manber):  [%  agrep_mm_1_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_1_1 %] sec
+  Agrep (TRE)      :  [% agrep_tre_mm_1_0 %] sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Two mismatches:>
+
+  Vmatch           :  [% vmatch_mm_2_0 %] sec
+  Agrep (Wu-Manber):  [%  agrep_mm_2_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_2_1 %] sec
+  Agrep (TRE)      :  [% agrep_tre_mm_2_0 %] sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Three mismatches:>
+
+  Vmatch           :  [% vmatch_mm_3_0 %] sec
+  Agrep (Wu-Manber):  [%  agrep_mm_3_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_3_1 %] sec
+  Agrep (TRE)      :  [% agrep_tre_mm_3_0 %] sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Four mismatches:>
+
+  Vmatch           :  [% vmatch_mm_4_0 %] sec
+  Agrep (Wu-Manber):  [%  agrep_mm_4_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_4_1 %] sec
+  Agrep (TRE)      :  [% agrep_tre_mm_4_0 %] sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=item B<Five mismatches:>
+
+  Agrep (Wu-Manber):  [%  agrep_mm_5_0 %] sec
+  Vmatch           :  [% vmatch_mm_5_0 %] sec
+  Vmatch (-online) :  [% vmatch_mm_5_1 %] sec
+  Agrep (TRE)      :  [% agrep_tre_mm_5_0 %] sec
+  GUUGle           :       n/a
+  RE               :       n/a
+
+=back
+
+=head1 FEEDBACK
+
+The script that generated these benchmarks is available in the I<examples>
+directory of this distribution. 
+
+Please report any bugs, feature requests and benchmarks to
+C<bug-bio-grep@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>. 
+
+=head1 AUTHOR
+
+Markus Riester, E<lt>mriester@gmx.deE<gt>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2007-2009 M. Riester.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+# vim: ft=perl sw=4 ts=4 expandtab

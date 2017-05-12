@@ -1,0 +1,66 @@
+Revision history for Bag-Similarity
+
+0.021  2016-11-24 11:11:33 CET
+       - requires 'parent'
+
+0.020  2015-05-28 22:13:47 CEST
+       - added author tests
+
+0.019  2015-04-27 15:56:32 CEST
+       - improved travis, badges
+
+0.018  2014-10-19 22:45:38 CEST
+       - retry release
+
+0.017  2014-10-19 22:37:27 CEST
+       - naming internal methods
+
+0.016  2014-10-19 10:27:00 CEST
+       - add Overlap
+       - improve docs
+
+0.015  2014-10-16 23:18:34 CEST
+       - now Dice and Jaccard are correct
+
+0.014  2014-10-10 10:17:16 CEST
+       - improved test coverage
+       - ngram returns string if shorter than width
+
+0.013  2014-08-20 20:02:45 CEST
+       - remove n-gram padding, return the unchanged word if shorter
+
+0.012  2014-08-20 09:05:29 CEST
+       - pad if length word < n-gram width
+
+0.011  2014-08-19 23:46:56 CEST
+       - remove useless code
+
+0.010  2014-08-16 23:36:48 CEST
+       - badges in pod
+
+0.009  2014-08-16 13:42:55 CEST
+       - improve test coverage
+
+0.008  2014-08-16 07:43:22 CEST
+       - add travis
+
+0.007  2014-08-09 22:12:11 CEST
+       - code streaming
+
+0.006  2014-08-08 22:46:51 CEST
+       - remove default method and croak
+
+0.005  2014-08-07 22:15:54 CEST
+       - documentation ipmprovement
+
+0.004  2014-08-07 00:08:23 CEST
+       - added Dice, Jaccard, tests
+
+0.003  2014-08-06 22:40:25 CEST
+       - cleanup
+
+0.002  2014-08-06 00:12:50 CEST
+        - added cosine
+
+0.001  2014-08-05 23:45:03 CEST
+        - Initial release

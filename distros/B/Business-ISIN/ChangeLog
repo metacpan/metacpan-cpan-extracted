@@ -1,0 +1,36 @@
+Revision history for Perl module Business::ISIN.
+
+0.20 Wed Feb 13 00:00:22 UTC 2001
+
+	- Added pseudo country codes XA, XB, XC, XD and XS.
+
+	- Made error messages more informative.  Thanks to Tim Ayers for the
+	  suggestion.
+	  
+
+0.12 Tue Oct  9 19:17:35 BST 2001
+
+	- Made set() method return the ISIN object, rather than the ISIN
+	  as a string, to allow $isin->set("GB0004005475")->is_valid.  (Note
+	  that stringification means that print $isin->set("GB0004005475")
+	  still works).
+
+0.11 Thu Oct  4 21:22:51 BST 2001
+
+	- Fixed algorithm bug and checked against thousands of ISINs.
+	  Thanks to Peter Dintelmann for providing useful feedback and test
+	  data.
+	
+	- Added PS country code (Palestine).
+
+0.10 Sat Sep 29 06:42:39 UTC 2001
+
+	- Changed algorithm to cope with ISINs containing letters, such
+	  as "US459056DG99".
+	
+	- Checked algorithm against draft copy of update of ISO 6166.
+
+0.01 Sat Mar 10 15:17:41 UTC 2001
+
+	- Original version.
+

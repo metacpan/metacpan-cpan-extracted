@@ -1,0 +1,5 @@
+Bio::Graphics requires BioPerl version 1.6 ($VERSION 1.006 or higher),
+which is expected to be released by the end of 2008. Until then, you
+should use the version of Bio::Graphics that is in the current (1.5 or
+lower) version of BioPerl.
+

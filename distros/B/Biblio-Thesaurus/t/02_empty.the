@@ -1,0 +1,17 @@
+%baselang PT
+
+a
+NT Aa, Ab, Ac
+RT  
+BT c
+SN text
+  and more text
+
+ff
+
+c
+NT a
+POF
+SN text, text and more text
+
+d

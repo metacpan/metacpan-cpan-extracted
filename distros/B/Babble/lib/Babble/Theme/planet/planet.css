@@ -1,0 +1,139 @@
+/* arch-tag: fea2196a-a08b-4dc5-ba38-66916a77d346
+ */
+
+#sidebar {
+	position: absolute;
+	top: 125px;
+	right: 10px;
+	width: 160px;
+
+	z-index: 1;
+	border: 1px dashed rgb(215, 7, 81);
+
+	padding: 0;
+	margin: 0;
+	padding-left: 5px;
+	padding-right: 5px;
+
+	font-size: 75%;
+}
+
+#sidebar div {
+               border-top: 1px dashed rgb(215, 7, 81);
+}
+
+#sidebar #about {
+                 border-top: none;
+}
+
+#sidebar #freshness {
+                      font-size: 80%;
+}
+
+#sidebar ul {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+              margin-top: 0.5em;
+              margin-bottom: 0.5em;
+}
+
+#sidebar ul li {
+                 display: block;
+                 padding: 0;
+                 margin: 0;
+}
+
+#sidebar h1 {
+              font-weight: bold;
+              font-size: 100%;
+
+              margin-top: 0.5em;
+              margin-bottom: 0.5em;
+
+              color: rgb(215, 7, 81);
+}
+
+#banner {
+          position: absolute;
+          top: 0px;
+          left: 0px;
+          right: 0px;
+          height: 64px;
+
+          background-color: silver;
+          border-bottom: 1px solid black;
+}
+
+#banner #babble_logo {
+                       position: absolute;
+                       top: 0px;
+                       right: 0px;
+}
+
+#banner h1 {
+             margin-left: 1em;
+             color: rgb(215, 71, 8);
+}
+
+#body {
+       margin-right: 200px;
+       margin-top: 125px;
+}
+
+body {
+       color: black;
+       background-color: white;
+       font-family: "trebuchet ms", "verdana", sans-serif;
+}
+
+.date {
+        margin-top: 50px;
+        margin-bottom: 10px;
+        text-align: center;
+
+        font-weight: bold;
+        font-size: 125%;
+
+        color: rgb(215, 7, 81);
+}
+
+.entry {
+         margin-top: 5px;
+         margin-bottom: 25px;
+         padding-left: 25px;
+         text-align: justify;
+         
+         clear: both;
+}
+
+.entry-title {
+               font-family: "trebuchet ms", "verdana", sans-serif;
+               font-weight: bold;
+               font-size: 100%;
+
+               border-bottom: 1px solid rgb(125, 125, 125);
+}
+
+.entry-date {
+              font-size: 90%;
+              color: rgb(125, 125, 125);
+              text-decoration: none;
+}
+
+.entry-title a {
+    text-decoration: none;
+    color: rgb(75, 75, 75);
+}
+
+.entry-title a:hover, .entry-date a:hover {
+          text-decoration: underline;
+          color: blue;
+}
+
+.entry-pic {
+             float: right;
+             border: 1px dotted black;
+             padding: 2px;
+             margin: 1em;
+}

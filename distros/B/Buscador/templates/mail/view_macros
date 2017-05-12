@@ -1,0 +1,47 @@
+[% PROCESS macros %]
+
+[% MACRO addressing_row(mail, role) BLOCK; %]
+    [% SET addressings = mail.addressings("Role", role) %]
+    [% IF addressings %]
+    <tr>
+        <td class="field"> [% role %] </td>
+        <td>
+            [% FOR addressing = addressings("Role", role) %]
+            <a href="[%base | remove('/$')%]/entity/view/[% addressing.entity %]">
+                [% addressing.name.name %] ([% addressing.address.address %])
+            </a>
+                [% ", " UNLESS addressings.last == addressing %]
+            [% END %]
+        </td>
+    </tr>
+    [% END %]
+[% END %]
+
+[% MACRO lists_row(mail) BLOCK; %]
+    [% IF mail.lists %]
+    <tr>
+        <td class="field"> Lists </td>
+        <td>
+            [% FOR list = mail.lists %]
+                <a href="[%base | remove('/$')%]/list/view/[%list.id%]">[%list%]</a>
+                [% ", " UNLESS mail.lists.last == list %]
+            [% END %]
+        </td>
+    </tr>
+    [% END %]
+[% END %]
+
+[% MACRO attachments(mail) BLOCK; %]
+        <div class="attachments">
+        Attachments:
+        <ul>
+        [% FOR att = mail.attachments %]
+            <li> <a href="[%base |
+            remove('/$')%]/attachment/view/[%att.id%]/[% att.filename %]">
+            [% att.filename %]</a> <small>([% att.content_type %])</small>
+            </li>
+        [% END %]
+        </ul>
+        </div>
+[% END %]
+

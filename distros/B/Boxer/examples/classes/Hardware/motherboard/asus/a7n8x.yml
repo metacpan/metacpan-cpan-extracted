@@ -1,0 +1,4 @@
+classes:
+  - hw.x86.amd64
+  - hw.firmware
+  - Hardware.igp.nvidia.nv1f

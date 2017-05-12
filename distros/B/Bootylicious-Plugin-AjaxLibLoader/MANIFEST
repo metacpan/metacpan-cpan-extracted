@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Bootylicious/Plugin/AjaxLibLoader.pm
+t/ajax_loader.t
+t/lib/TestController.pm
+t/load.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

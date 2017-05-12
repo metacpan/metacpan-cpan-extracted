@@ -1,0 +1,34 @@
+Revision history for Perl extension Business::OnlinePayment::PaymenTech::Orbital.
+
+1.7
+   - Renamed to Business::OnlinePayment::PaymenTech::Orbital
+   - Added support for soft descriptors
+
+1.6
+   - Add response method (which takes in ResponseCode)
+
+1.5
+   - Add cvn handling and fix "cvv2val" in the docs that didn't work
+
+1.4
+   - Allow switching between MOTO and CC APIs via ecommerce flag
+
+1.3
+   - Don't blindly set AVSphoneNum and Comments... only send them if they are
+     set (helps older API install)
+   - Print raw XML request when test_transaction is true
+   - Don't set account number when requesting a capture
+
+1.2
+   - Integrate patch from Garth Sainio fixing all the typos I introduced when
+     I hand applied his last patch. :(
+
+1.1.0  Mon Feb 23, 2009
+   - Swap out hardcoded values for BIN and TZCode with configurable ones that
+     merely default to their previously hardcoded values. (Garth Sainio)
+   - Add CountryCode and Phone Number to AVS. (Garth Sainio)
+   - Die with an error if an unrecognized action is supplied. (Garth Sainio)
+   - Include treaceNumber if set (Garth Sainio)
+
+1.0  Fri Feb 29 08:33:01 2008
+   - release

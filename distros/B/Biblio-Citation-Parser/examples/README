@@ -1,0 +1,21 @@
+Example Descriptions 
+====================
+
+NB: These examples will only work once the Perl module is installed
+(see INSTALL for more information).
+
+parsing/			- Examples using the ParaTools API
+parsing/complexparser.pl	  - Shows some detailed metadata from a parsed reference
+parsing/openurl.pl		  - Creates an OpenURL address from a parsed reference
+parsing/openurl2.pl		  - Decomposes and trims OpenURL metadata then displays the result.		  
+parsing/simpleparser.pl		  - Displays the basic metadata of a parsed reference
+
+
+webservice			- Examples using the WSDL web service. These require the SOAP::Lite Perl module.
+webservice/make_html.pl		  - Creates a list of ParaCite links using the provided reference list.
+webservice/make_openurl.pl	  - Generates an OpenURL via the web service. 
+webservice/parse_reference.pl	  - Extracts the metadata from a reference over the web service.
+webservice/ref_search.pl	  - Searches the ParaCite engine on a reference and displays the results.
+
+webservice/paracite.wsdl	  - The ParaCite WSDL document.
+webservice/referencelist.txt 	  - The reference list used by make_html.pl

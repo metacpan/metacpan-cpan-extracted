@@ -1,0 +1,74 @@
+Revision history for Perl extension B-Tap
+
+0.15 2015-05-02T02:38:11Z
+
+    - Skip tests on bled perl
+
+0.14 2014-08-20T02:18:53Z
+
+    commit 595a364add38356078177753b00574f4078ae7f8
+    Author: Brian Fraser <fraserbn@gmail.com>
+    Date:   Sat Aug 16 04:35:54 2014 +0200
+
+        Avoid assertion failures in debugging perls
+
+0.13 2014-03-19T11:05:53Z
+
+    - Suppress warnings from Devel::CodeObserver
+
+0.12 2014-03-14T01:42:23Z
+
+    - [Devel::CodeObserver] Load B::Deparse lazily.
+      (tokuhirom)
+
+0.11 2014-03-10T01:31:58Z
+
+    [INCOMPATIBLE CHANGES]
+    - Devel::CodeObserver returns Devel::CodeObserver::Result instead of plain ArrayRef
+      (tokuhirom)
+
+0.10 2014-03-10T01:13:04Z
+
+    - Added Devel::CodeObserver(formely known as Test::Power::Core)
+      (tokuhirom)
+
+0.08 2013-11-05T07:54:43Z
+
+    [BUG FIX]
+    - Fixed infinite loop bug.
+      (tokuhirom)
+
+0.07 2013-11-05T04:11:43Z
+
+    [BUG FIX]
+    - 0.06 does not works with ithreads.
+      (tokuhirom)
+
+0.06 2013-11-02T02:50:45Z
+
+    - Care extended ops.
+      (tokuhirom)
+
+0.05 2013-09-18T04:54:19Z
+
+    - Apply OPf_KIDS for b_tap_tap.
+      (tokuhirom)
+
+0.04 2013-09-15T01:24:08Z
+
+    - oops.
+
+0.03 2013-09-15T01:15:30Z
+
+    - restore MARK on b_tap_tap
+
+0.02 2013-09-14T06:59:09Z
+
+    - Oops. I forgot to restore MARK.
+      It fixed segmentation fault on 32bit machines.
+      (Reported by syohex++)
+
+0.01 2013-09-14T03:37:15Z
+
+    - original version
+

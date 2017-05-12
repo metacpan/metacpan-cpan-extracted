@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Bundle/Bricolage.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/basic.t
+t/zpod.t

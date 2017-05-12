@@ -1,0 +1,44 @@
+---
+abstract: 'A Bot::BasicBot::Pluggable Module to give out Gitweb links for commits.'
+author:
+  - 'Jacob Helwig <jhelwig@cpan.org>'
+build_requires:
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Find::Rule: 0
+  File::Find::Rule::Perl: 0
+  Git::Wrapper: 0
+  Test::More: 0
+  Test::TempDir: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bot-BasicBot-Pluggable-Module-Gitbot
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Bot::BasicBot::Pluggable::Module::Gitbot:
+    file: lib/Bot/BasicBot/Pluggable/Module/Gitbot.pm
+    version: 1.00.01
+requires:
+  Bot::BasicBot::Pluggable: 0
+  File::Basename: 0
+  File::Fu: 0
+  File::HomeDir: 0
+  Git: 0
+  MooseX::Declare: 0
+  PPI: 0
+  Text::Pluralize: 0
+  perl: 5.8.0
+resources:
+  homepage: http://github.com/jhelwig/Bot-BasicBot-Pluggable-Module-Gitbot
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jhelwig/Bot-BasicBot-Pluggable-Module-Gitbot.git
+version: 1.00.01

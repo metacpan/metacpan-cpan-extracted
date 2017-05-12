@@ -1,0 +1,16 @@
+In order to install this perl extension you have to install io-lib
+version 1.12 or higher from the Staden library
+(staden.sourceforge.net). To confirm that the package installed
+correctly look for a library named "libstaden-read".
+
+You will also need the zlib library which can be found at
+http://www.zlib.net/.
+
+To install this extension:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Dmitri Priimak

@@ -1,0 +1,20 @@
+---
+name: Business-DE-KontoCheck
+version: 0.12
+author:
+  - Tina Mueller
+abstract: Validating Bank-Account Numbers for Germany
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+provides:
+  Business::DE::Konto:
+    file: lib/Business/DE/Konto.pm
+    version: 0.02
+  Business::DE::KontoCheck:
+    file: lib/Business/DE/KontoCheck.pm
+    version: 0.12
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

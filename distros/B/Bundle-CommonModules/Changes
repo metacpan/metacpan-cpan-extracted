@@ -1,0 +1,6 @@
+Revision history for Perl extension Bundle::CommonModules.
+
+0.01  Mon Feb 28 11:16:19 2011
+	- original version; created by h2xs 1.23 with options
+		-AX Bundle::CommonModules
+

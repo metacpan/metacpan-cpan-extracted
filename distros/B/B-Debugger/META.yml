@@ -1,0 +1,29 @@
+---
+abstract: 'optree debugger'
+author:
+  - 'Reini Urban <rurban@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: B-Debugger
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B: 1.09
+  B::Concise: 0.66
+  B::Flags: 0.02
+  B::Utils: 0.05
+  Devel::Hook: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/rurban/B-Debugger
+version: 0.14

@@ -1,0 +1,90 @@
+#! /usr/bin/perl -w
+
+use strict;
+use BSD::Process;
+
+use vars '$VERSION';
+$VERSION = '0.2';
+
+if (@ARGV and $ARGV[0] eq '-V') {
+    print $VERSION, $/;
+    exit;
+}
+
+my $attr = shift || 'rssize';
+my $want = shift || 10;
+
+my $all = BSD::Process::all;
+for my $pid (
+    sort {
+        $all->{$b}{$attr} <=> $all->{$a}{$attr}
+            ||
+        $all->{$a}{start} <=> $all->{$b}{start}
+    }
+    keys %$all
+) {
+    my $proc = $all->{$pid};
+    print "$proc->{comm}($pid) owned by $proc->{login}: $proc->{$attr}\n";
+    last unless --$want;
+}
+
+=head1 NAME
+
+topten - Show the ten biggest processes according to some attribute
+
+=head1 SYNOPSIS
+
+B<topten> <attr> <count>
+
+=head1 DESCRIPTION
+
+Display one or more attributes for a number of processes currently running
+on the system. By default, the C<rssize> attribute is assumed, and 10
+processes are displayed.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-V>
+
+Print the version of this program and exit.
+
+=back
+
+=head1 EXAMPLES
+
+C<topten time 5>
+
+Display the 5 processes that have spent the most CPU time (system and
+user).
+
+C<topten nsignals 10>
+
+Display the 10 processes that have received the most signals. On my
+machine, this produces
+
+  svnserve(89699) owned by eric: 4346541
+  syslogd(45796) owned by david: 1447563
+  sshd(478) owned by root: 729944
+  pflogd(253) owned by root: 727742
+  cron(498) owned by root: 648861
+  postgres(18164) owned by eric: 589751
+  master(95268) owned by david: 294754
+  master(56500) owned by david: 39297
+  httpd-static(15330) owned by eric: 14309
+  httpd-static(15332) owned by eric: 14280
+
+
+=head1 SEE ALSO
+
+L<BSD::Process>
+
+=head1 AUTHOR
+
+David Landgren, copyright (C) 2006. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,42 @@
+=pod
+
+-----------------------------------------------------------------------------
+                                                        Biblio::Thesaurus
+-----------------------------------------------------------------------------
+
+To read this document in a more readable form, do
+
+  perldoc INSTALL
+
+or convert it to HTML:
+
+  pod2html INSTALL > file.html
+
+=head1 INSTALLATION
+
+Installation instructions:
+
+=head1 Needed Modules
+
+To use this module you need:
+
+=over 4
+
+=item *
+Storable 1.0006 or newer (look at your nearest CPAN)
+
+=back
+
+=head1 Process
+
+After the modules installation, do:
+
+  perl Makefile.PL
+  make
+  make test
+
+Now, as root,
+
+  make install
+
+=cut

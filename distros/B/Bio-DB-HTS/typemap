@@ -1,0 +1,20 @@
+TYPEMAP
+Bio::DB::HTSfile        T_PTROBJ
+Bio::DB::HTS::Header    T_PTROBJ
+Bio::DB::HTS::Alignment T_PTROBJ
+Bio::DB::HTS::Index     T_PTROBJ
+Bio::DB::HTS::Fai       T_PTROBJ
+Bio::DB::HTS::Pileup    T_PTROBJ
+Bio::DB::HTS::Tabix     T_PTROBJ
+Bio::DB::HTS::Tabix::Iterator T_PTROBJ
+Bio::DB::HTS::VCFfile         T_PTROBJ
+Bio::DB::HTS::VCF::Header     T_PTROBJ
+Bio::DB::HTS::VCF::Row        T_PTROBJ
+Bio::DB::HTS::VCF::Sweep      T_PTROBJ
+Bio::DB::HTS::Kseq::Iterator  T_PTROBJ
+Bio::DB::HTS::Kseq            T_PTROBJ
+Bio::DB::HTS::Kseq::Kstream   T_PTROBJ
+Bio::DB::HTS::Kseq::Kstring   T_PTROBJ
+z_off_t			    T_UV
+const uint8_t *		T_PV
+const int8_t *		T_PV

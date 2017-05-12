@@ -1,0 +1,4 @@
+;;; file-version: 6
+;;; user-fields: (birthday)
+["first name" "last name" ("aka name 1, aka name 2") "company name" (["phone1" 123 456 7890 0] ["phone2" "123-456"]) (["address name" ("street 1" "street 2" "street 3") "city" "state" "12345" "country"]) ("email@address1" "email@adress2") ((notes . "notes field")) nil]
+["Henry" "Laxen" ("Henry, Enrique") "Elegant Solutions" (["home" 415 789 1159 0] ["fax" 415 789 1156 0] ["mazatlan" "011-5269-164195"]) (["mailing" ("PMB 141" "524 San Anselmo Ave.") "San Anselmo" "CA" "94960" "USA"] ["mazatlan" ("Reino de Navarra #757" "Frac. El Cid") "Mazatlan" "Sinaloa" "CP-82110" "Mexico"]) ("nadine.and.henry@pobox.com" "maztravel@maztravel.com") ((creation-date . "1999-09-02") (timestamp . "1999-10-17") (notes . "Always split aces and eights") (birthday . "6/15")) nil]

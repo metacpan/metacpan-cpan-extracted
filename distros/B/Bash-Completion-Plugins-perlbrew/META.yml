@@ -1,0 +1,23 @@
+---
+abstract: 'Bash completion for perlbrew'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bash-Completion-Plugins-perlbrew
+requires:
+  Bash::Completion: 0.001
+  perl: v5.8.0
+resources:
+  bugtracker: https://github.com/hoelzro/bash-completion-plugins-perlbrew/issues
+  homepage: https://github.com/hoelzro/bash-completion-plugins-perlbrew
+  repository: https://github.com/hoelzro/bash-completion-plugins-perlbrew.git
+version: 0.10

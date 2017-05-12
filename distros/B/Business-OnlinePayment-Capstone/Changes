@@ -1,0 +1,10 @@
+Revision history for Perl extension Business::OnlinePayment::Capstone.
+
+0.02  Mon Oct 10 17:46:23 PDT 2005
+	- fix required fields for postauth/void/return,
+	  should fix "unparsable expiration" error on refunds
+
+0.01  Thu Aug 18 01:43:39 2005
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.5.0 -n Business::OnlinePayment::Capstone -v 0.01
+

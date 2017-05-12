@@ -1,0 +1,1 @@
+<span class="nation-link" ref="[% nation_codes.$n %]">[%- n %]</span>

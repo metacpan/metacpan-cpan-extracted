@@ -1,0 +1,29 @@
+$Id: README,v 1.1.1.1 2007/01/23 09:26:00 mike Exp $
+
+Biblio::EndnoteStyle
+====================
+
+This module provides a class that can format references according to
+style templates resembling those used by Endnote.  For details, see
+the POD documentation in lib/Biblio/EndnoteStyle.pm -- for example,
+use:
+	$ perldoc lib/Biblio/EndnoteStyle.pm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Mike Taylor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

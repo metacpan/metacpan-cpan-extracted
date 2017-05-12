@@ -1,0 +1,11 @@
+BUGS
+CONFIGURATION
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/BabelObjects/Component/Directory/Bookmark.pm
+licence.txt
+sample/test_bookmark.bo

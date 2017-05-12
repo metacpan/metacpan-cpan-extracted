@@ -1,0 +1,38 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Business-IS-PIN/",
+      "repository" : "http://github.com/avar/business-is-pin",
+      "bugtracker" : "http://github.com/avar/business-is-pin/issues",
+      "license" : "http://dev.perl.org/licenses/",
+      "Ratings" : "http://cpanratings.perl.org/d/Business-IS-PIN"
+   },
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "generated_by" : "Dist::Zilla version 1.100660",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "0.06",
+   "name" : "Business-IS-PIN",
+   "author" : [
+      "\u00c3\u0086var Arnfj\u00c3\u00b6r\u00c3\u00b0 Bjarmason <avar@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "List::Util" : "0",
+      "Test::More" : "0",
+      "overload" : "0",
+      "File::Spec::Functions" : "0",
+      "Exporter" : "0"
+   },
+   "abstract" : "Validate and process Icelandic PIN numbers (Icelandic: kennitE<ouml>lur)",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

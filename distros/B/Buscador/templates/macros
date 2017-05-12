@@ -1,0 +1,74 @@
+[% MACRO from_name(mail) BLOCK; mail.addressings("role", "From").list.first.name.name | html; END; %]
+[% MACRO from_email(mail) BLOCK; mail.addressings("role", "From").list.first.address.address | html; END; %]
+[% MACRO from_entity(mail) BLOCK; mail.addressings("role", "From").list.first.entity; END; %]
+
+[% MACRO link_addr(addr) BLOCK; %]
+<a href="[% base | remove( '/$' ) %]/address/view/[% addr.id %]">[% addr.address %]</a>
+[% END; %]
+
+[% MACRO make_atom(url) BLOCK; %]
+    <div class="atom"><a href="[% base | remove('/$') %]/[% url | remove ('^/') %]"><img src="[% config.img_base | replace('/$')%]/atompixel.png" style="border: 0;" width="80" height="15" alt="atom feed" /></a></div>
+[% END %]
+
+[% MACRO show_lists(mail) BLOCK; %]
+    [% IF mail.lists %]
+    <span class="lists">
+            [% FOR list = mail.lists %]
+                <a href="[% base | remove('/$') %]/list/view/[% list.id %]">[% list %]</a>
+                [% ", " UNLESS mail.lists.last == list %]
+            [% END %]
+    </span>
+    [% END %]
+[% END; %] 
+
+[% MACRO show_original(mail) BLOCK; %]
+    <blockquote>
+    <p>[% mail.original | html %]</p>
+    </blockquote>
+[% END; %]
+
+[% MACRO summary_link(mail) BLOCK; %]
+    <a href="[% base | remove('/$') %]/mail/view/[% mail.id | uri | html %]">[% mail.subject | html %]</a> 
+    - <a href="[% base | remove('/$') %]/entity/view/[% from_entity(mail) %]" class="secondarylink">[% from_name(mail) %]</a>
+[% END %]
+
+[% MACRO search_result(mail,terms) BLOCK; %]
+   [% summary_link(mail); %]
+   <br />
+   [% show_lists(mail); %]
+       <blockquote>
+           <p>[% mail.contextualize_result(terms)  %]</p>
+       </blockquote>
+[% END %]
+
+[% MACRO summary(mail, date) BLOCK; %]
+<p>[% summary_link(mail) %] 
+[% IF date %]
+    (<a href="[% base | remove('/$') %]/date/list/[% mail.date.strftime("%Y/%m/%d/") %]">[% mail.date.ymd %]</a>)
+[% END %]
+    <br />
+    [% show_lists(mail) %]
+</p>
+    [% show_original(mail) %]
+[% END %]
+
+[% MACRO mails_by_addressing(thing) BLOCK; %]
+
+<table class="view">
+[% FOR addressing =  sorted_addressings %]
+<tr>
+<td class="field">
+[% addressing.role %]
+</td>
+<td>
+[% addressing.name.name %] ([% addressing.address.address %])
+</td>
+</tr>
+<tr>
+<td> &nbsp; </td><td>
+[% summary(addressing.mail,1) %] 
+</td>
+</tr>
+[% END %]
+</table>
+[% END %]

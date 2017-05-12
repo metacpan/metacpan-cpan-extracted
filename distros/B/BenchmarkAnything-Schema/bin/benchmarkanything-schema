@@ -1,0 +1,200 @@
+#! /usr/bin/perl
+# PODNAME: benchmarkanything-schema
+# ABSTRACT: BenchmarkAnything schema cmdline tool
+
+use 5.008;
+use strict;
+use warnings;
+
+use App::Rad;
+
+######################################################################
+#
+# App::Rad interface
+#
+######################################################################
+
+App::Rad->run();
+
+sub setup
+{
+        my $c = shift;
+        $c->unregister_command("help");
+        $c->register_commands("help", "validate");
+}
+
+sub help
+{
+        my ($c) = @_;
+
+        return qq{benchmarkanything-schema [-i|--intype] <FILENAME>
+
+        -i
+        --intype         - input format
+                           [json(default), yaml, dumper, xml, tap, ini]
+};
+}
+
+sub validate :Help(validate if data conforms to BenchmarkAnything json schema)
+{
+        my ($c) = @_;
+
+        _getopt($c);
+
+        my $file = $c->argv->[0] || '-';
+        exit (_validate($c, _read_in( $c, $file )) ? 0 : 1);
+}
+
+sub default { validate(@_) }
+
+######################################################################
+#
+# Implementation
+#
+######################################################################
+
+sub _read_in
+{
+        my ($c, $file) = @_;
+
+        my $opt = $c->options;
+
+        my $intype  = $opt->{intype}  || 'json';
+        my $data;
+        my $filecontent;
+        {
+                local $/;
+                if ($file eq '-') {
+                        $filecontent = <STDIN>;
+                }
+                else
+                {
+                        open (my $FH, "<", $file) or die "benchmarkanything-schema: cannot open input file $file.\n";
+                        $filecontent = <$FH>;
+                        close $FH;
+                }
+        }
+
+        if (not defined $filecontent or $filecontent !~ /[^\s\t\r\n]/ms) {
+                die "benchmarkanything-schema: no meaningful input to read.\n";
+        }
+
+        if ($intype eq "yaml") {
+                require YAML::Any;
+                $data = [YAML::Any::Load($filecontent)];
+        }
+        elsif ($intype eq "json") {
+                require JSON;
+                $data = JSON::decode_json($filecontent);
+        }
+        elsif ($intype eq "xml")
+        {
+                require XML::Simple;
+                my $xs = new XML::Simple;
+                $data  = $xs->XMLin($filecontent, KeepRoot => 1);
+        }
+        elsif ($intype eq "ini") {
+                require Config::INI::Serializer;
+                my $ini = Config::INI::Serializer->new;
+                $data = $ini->deserialize($filecontent);
+        }
+        elsif ($intype eq "cfggeneral") {
+                require Config::General;
+                my %data = Config::General->new(-String => $filecontent,
+                                                -InterPolateVars => 1,
+                                               )->getall;
+                $data = \%data;
+        }
+        elsif ($intype eq "dumper") {
+                eval '$data = my '.$filecontent;
+        }
+        elsif ($intype eq "tap") {
+                require TAP::DOM;
+                require TAP::Parser;
+                $data = new TAP::DOM( tap => $filecontent, $TAP::Parser::VERSION > 3.22 ? (version => 13) : () );
+        }
+        else
+        {
+                die "benchmarkanything-schema: unrecognized input format: $intype.\n";
+        }
+        return $data;
+}
+
+sub _validate
+{
+        my ($c, $data) = @_;
+
+        if (not $data) {
+                die "benchmarkanything-schema: no input data to validate.\n";
+        }
+
+        require BenchmarkAnything::Schema;
+        return BenchmarkAnything::Schema::valid_json_schema($data);
+}
+
+sub _getopt
+{
+        my ($c) = @_;
+
+        $c->getopt( "intype|i=s",
+                  )
+         or help() and return undef;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+benchmarkanything-schema - BenchmarkAnything schema cmdline tool
+
+=head1 SYNOPSIS
+
+Validate data against BenchmarkAnything schema, see http://benchmarkanything.org/
+
+Default data format (in and out) is JSON, other formats can be
+specified.
+
+  $ benchmarkanything-schema validate data.json
+
+Use it as filter:
+
+  $ benchmarkanything-schema validate < data.json
+  $ cat data.json | benchmarkanything-schema validate
+
+Input is YAML:
+
+  $ benchmarkanything-schema validate -i yaml data.yaml
+
+=head2 Input formats
+
+The following B<input formats> are allowed, with their according
+modules used to convert the input into a data structure:
+
+ yaml   - YAML::Any (default)
+ json   - JSON
+ xml    - XML::Simple
+ ini    - Config::INI::Serializer
+ dumper - Data::Dumper (including the leading $VAR1 variable assignment)
+ tap    - TAP::DOM
+
+=head1 SEE ALSO
+
+For more information about the BenchmarkAnything schema, see
+L<http://www.benchmarkanything.org/|http://www.benchmarkanything.org/>.
+
+=head1 AUTHOR
+
+Steffen Schwigon <ss5@renormalist.net>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Steffen Schwigon.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

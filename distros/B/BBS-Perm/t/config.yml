@@ -1,0 +1,35 @@
+---
+global:  
+    term:
+        # Default values for all sites
+        protocol: ssh
+        port: 22
+        font:
+            family: 'courier new'
+            size: 20
+            anti_alias: 'force-disable'
+        encoding: gbk
+        timeout: 60
+                # send some character every 60 seconds to anti-idle
+    uri:
+        default: 'http://www.google.com'
+        browser: 'firefox -new-tab'
+    ip:
+        qqwry: /opt/QQWry.Dat
+    feed:
+        label: Feed
+newsmth:
+    shortcut: 'M-s'
+        # use Alt+s to connect
+    title: sunnavy@newsmth
+    site: 60.2.251.8
+    username: sunnavy
+    password: cGFzc3dvcmQ=
+            # use MIME::Base64; encode_base64('password')
+
+zixia:
+    shortcut: 'M-c'
+    title: sunnavy@zixia
+    site: 211.99.222.55
+    username: sunnavy
+    password: cGFzc3dvcmQ=
